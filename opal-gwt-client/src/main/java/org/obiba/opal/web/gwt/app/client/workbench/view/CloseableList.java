@@ -90,7 +90,17 @@ public class CloseableList extends UList {
     }
   }
 
-
+  @Override
+  public void clear() {
+    // inform listeners about items removal
+    for(int i = 0; i < getWidgetCount(); i++) {
+      ListItem item = (ListItem) getWidget(i);
+      for(ItemRemovedHandler handler : itemRemovedHandlers) {
+        handler.onItemRemoved(item);
+      }
+    }
+    super.clear();
+  }
 
   private String getItemText(IndexedPanel item) {
     Widget label = item.getWidget(0);
