@@ -192,7 +192,7 @@ class RestValueTable extends AbstractValueTable {
       for(int i = 0; i < valueSet.getVariablesCount(); i++) {
         if(variable.getName().equals(valueSet.getVariables(i))) {
           if(variable.getValueType().equals(BinaryType.get())) {
-            return getBinary(variable, values, i);
+            return getBinary(variable, values.getValues(i));
           } else {
             return Dtos.fromDto(values.getValues(i), variable.getValueType(), variable.isRepeatable());
           }
@@ -201,13 +201,12 @@ class RestValueTable extends AbstractValueTable {
       throw new NoSuchVariableException(variable.getName());
     }
 
-    private Value getBinary(Variable variable, ValueSetsDto.ValueSetDto values, int i) {
-      if(variable.isRepeatable()) return getRepeatableBinary(variable, values, i);
-      return getBinaryResource(values.getValues(i));
+    private Value getBinary(Variable variable, ValueSetsDto.ValueDto valueDto) {
+      if(variable.isRepeatable()) return getRepeatableBinary(valueDto);
+      return getBinaryResource(valueDto);
     }
 
-    private Value getRepeatableBinary(Variable variable, ValueSetsDto.ValueSetDto values, int i) {
-      ValueSetsDto.ValueDto valueDto = values.getValues(i);
+    private Value getRepeatableBinary(ValueSetsDto.ValueDto valueDto) {
       if(valueDto.getValuesCount() == 0) return BinaryType.get().nullSequence();
       return BinaryType.get().sequenceOf(ImmutableList
           .copyOf(Iterables.transform(valueDto.getValuesList(), new Function<ValueSetsDto.ValueDto, Value>() {
