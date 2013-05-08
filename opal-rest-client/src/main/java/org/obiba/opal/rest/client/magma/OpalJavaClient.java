@@ -313,7 +313,7 @@ public class OpalJavaClient {
     }
   }
 
-  private void closeQuietly(Closeable closable) {
+  void closeQuietly(Closeable closable) {
     if(closable == null) return;
     try {
       closable.close();

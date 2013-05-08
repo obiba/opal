@@ -9,12 +9,18 @@
  */
 package org.obiba.opal.rest.client.magma;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.util.EntityUtils;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.Initialisable;
 import org.obiba.magma.NoSuchValueSetException;
@@ -32,6 +38,7 @@ import org.obiba.magma.support.AbstractValueTable;
 import org.obiba.magma.support.ValueSetBean;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.support.VariableEntityProvider;
+import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Magma;
@@ -41,8 +48,10 @@ import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.io.ByteStreams;
 
 @SuppressWarnings("OverlyCoupledClass")
 class RestValueTable extends AbstractValueTable {
@@ -182,10 +191,60 @@ class RestValueTable extends AbstractValueTable {
 
       for(int i = 0; i < valueSet.getVariablesCount(); i++) {
         if(variable.getName().equals(valueSet.getVariables(i))) {
-          return Dtos.fromDto(values.getValues(i), variable.getValueType(), variable.isRepeatable());
+          if(variable.getValueType().equals(BinaryType.get())) {
+            return getBinary(variable, values, i);
+          } else {
+            return Dtos.fromDto(values.getValues(i), variable.getValueType(), variable.isRepeatable());
+          }
         }
       }
       throw new NoSuchVariableException(variable.getName());
+    }
+
+    private Value getBinary(Variable variable, ValueSetsDto.ValueSetDto values, int i) {
+      if(variable.isRepeatable()) return getRepeatableBinary(variable, values, i);
+      return getBinaryResource(values.getValues(i));
+    }
+
+    private Value getRepeatableBinary(Variable variable, ValueSetsDto.ValueSetDto values, int i) {
+      ValueSetsDto.ValueDto valueDto = values.getValues(i);
+      if(valueDto.getValuesCount() == 0) return BinaryType.get().nullSequence();
+      return BinaryType.get().sequenceOf(ImmutableList
+          .copyOf(Iterables.transform(valueDto.getValuesList(), new Function<ValueSetsDto.ValueDto, Value>() {
+
+            @Override
+            public Value apply(ValueSetsDto.ValueDto input) {
+              return getBinaryResource(input);
+            }
+          })));
+    }
+
+    /**
+     * Get the binary value directly from the link provided in the value dto.
+     * @param valueDto
+     * @return
+     */
+    private Value getBinaryResource(ValueSetsDto.ValueDto valueDto) {
+      if(!valueDto.hasLength() || valueDto.getLength() == 0 || !valueDto.hasLink()) return BinaryType.get().nullValue();
+
+      URI uri = getOpalClient().newUri().link(valueDto.getLink()).build();
+
+      InputStream is = null;
+      try {
+        HttpResponse response = getOpalClient().get(uri);
+        if(response.getStatusLine().getStatusCode() >= HttpStatus.SC_BAD_REQUEST) {
+          EntityUtils.consume(response.getEntity());
+          throw new RuntimeException(response.getStatusLine().getReasonPhrase());
+        }
+        is = response.getEntity().getContent();
+        return BinaryType.get().valueOf(ByteStreams.toByteArray(is));
+      } catch(IOException e) {
+        //noinspection CallToPrintStackTrace
+        e.printStackTrace();
+        throw new RuntimeException(e);
+      } finally {
+        getOpalClient().closeQuietly(is);
+      }
     }
 
     @Override
@@ -210,7 +269,7 @@ class RestValueTable extends AbstractValueTable {
     synchronized ValueSetsDto loadValueSet() {
       if(valueSet == null) {
         valueSet = getOpalClient().getResource(ValueSetsDto.class,
-            newUri("valueSet", getVariableEntity().getIdentifier()).query("filterBinary", "false").build(),
+            newUri("valueSet", getVariableEntity().getIdentifier()).query("filterBinary", "true").build(),
             ValueSetsDto.newBuilder());
         timestamps = new ValueSetTimestamps(valueSet.getValueSets(0).getTimestamps());
       }
