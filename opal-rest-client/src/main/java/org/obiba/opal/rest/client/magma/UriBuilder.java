@@ -39,6 +39,19 @@ public class UriBuilder {
     return this;
   }
 
+  public UriBuilder link(String link) {
+    int idx = link.indexOf('?');
+    if(idx > 0) {
+      segment(link.substring(1, idx).split("/"));
+      for(String q : link.substring(idx + 1).split("&")) {
+        query(q.split("="));
+      }
+    } else {
+      segment(link.substring(1).split("/"));
+    }
+    return this;
+  }
+
   public UriBuilder query(String parameter, String value) {
     query.put(parameter, value);
     return this;
