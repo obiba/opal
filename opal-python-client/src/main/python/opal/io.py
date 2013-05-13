@@ -15,7 +15,7 @@ class OpalImporter:
   def __init__(self, args):
   	self.args = args
 
-  def submit_import(self, extension_factory):
+  def submit(self, extension_factory):
     """
     Build a specific transient datasource, using extension_factory, and submit import job.
     """
@@ -101,3 +101,55 @@ class OpalImporter:
     Add specific datasource factory extension
     """
     extension_factory(self.args, factory)
+
+
+class OpalExporter:
+  """
+  OpalExporter takes care of submitting a import job.
+  """
+  def __init__(self, args):
+    self.output = args.output
+    self.incremental = args.incremental
+    self.datasource = args.datasource
+    self.tables = args.tables
+    self.unit = args.unit
+    self.verbose = args.verbose
+    self.json = args.json
+    self.args = args
+
+  def submit(self, format):
+    # export options
+    options = opal.protobuf.Commands_pb2.CopyCommandOptionsDto()
+    options.format = format
+    options.out = self.output
+    options.nonIncremental = not self.incremental
+    options.noVariables = False
+    if self.tables:
+      tables2export = self.tables
+      def table_fullname(t): return self.datasource + '.' + t
+      options.tables.extend(map(table_fullname,tables2export))
+    if self.unit:
+      options.unit = self.unit
+
+    if self.verbose:
+      print "** Export options:"
+      print options
+      print "**"
+
+    # submit data import job
+    request = opal.core.OpalClient(self.args).new_request()
+    request.fail_on_error().accept_json().content_type_protobuf()
+
+    if self.verbose:
+      request.verbose()
+
+    uri = opal.core.UriBuilder(['datasource', self.datasource, 'commands', '_copy']).build()
+    response = request.post().resource(uri).content(options.SerializeToString()).send()
+
+    # format response    
+    res = response.content
+    if self.json:
+      res = response.pretty_json()
+
+    # return result
+    return res

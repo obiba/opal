@@ -5,7 +5,7 @@ Opal data import.
 import sys
 import re
 import opal.core
-import opal.importer
+import opal.io
 
 def add_arguments(parser):
   """
@@ -38,9 +38,9 @@ def do_command(args):
   """
   # Build and send request
   try:
-    importer = opal.importer.OpalImporter(args)
+    importer = opal.io.OpalImporter(args)
     # print result
-    print importer.submit_import(add_rest_datasource_factory_extension)
+    print importer.submit(add_rest_datasource_factory_extension)
   except Exception,e :
     print e
     sys.exit(2)
