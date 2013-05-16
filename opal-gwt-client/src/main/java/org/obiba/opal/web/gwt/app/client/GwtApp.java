@@ -148,7 +148,8 @@ public class GwtApp implements EntryPoint {
               .delete().send();
           credentials.invalidate();
         }
-        opalGinjector.getPlaceManager().revealDefaultPlace();
+        // Reload application and reset history
+        Window.Location.replace("/");
       }
     });
 
