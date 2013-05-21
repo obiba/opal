@@ -53,16 +53,19 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   private final String path;
 
+  private final boolean withMissings;
+
   private final Set<MagmaRConverter> magmaRConverters = Sets
       .newHashSet(new DatasourceRConverter(), new ValueTableRConverter(), new VariableRConverter());
 
-  public MagmaAssignROperation(VariableEntitiesHolder holder, String symbol, String path) {
+  public MagmaAssignROperation(VariableEntitiesHolder holder, String symbol, String path, boolean withMissings) {
     if(holder == null) throw new IllegalArgumentException("holder cannot be null");
     if(symbol == null) throw new IllegalArgumentException("symbol cannot be null");
     if(path == null) throw new IllegalArgumentException("path cannot be null");
     this.holder = holder;
     this.symbol = symbol;
     this.path = path;
+    this.withMissings = withMissings;
   }
 
   @Override
@@ -70,7 +73,7 @@ public class MagmaAssignROperation extends AbstractROperation {
     try {
       for(MagmaRConverter converter : magmaRConverters) {
         if(converter.canResolve(path)) {
-          assign(symbol, converter.asVector(path));
+          assign(symbol, converter.asVector(path, withMissings));
           return;
         }
       }
@@ -99,9 +102,10 @@ public class MagmaAssignROperation extends AbstractROperation {
      * Build a R vector from the Magma fully-qualified path.
      *
      * @param path
+     * @param withMissings
      * @return
      */
-    REXP asVector(String path);
+    REXP asVector(String path, boolean withMissings);
 
     /**
      * Check if path can be resolved as a datasource, table or variable.
@@ -118,9 +122,9 @@ public class MagmaAssignROperation extends AbstractROperation {
    */
   private abstract class AbstractMagmaRConverter implements MagmaRConverter {
 
-    protected REXP getVector(VariableValueSource vvs, SortedSet<VariableEntity> entities) {
+    protected REXP getVector(VariableValueSource vvs, SortedSet<VariableEntity> entities, boolean withMissings) {
       VectorType vt = VectorType.forValueType(vvs.getValueType());
-      return vt.asVector(vvs, entities);
+      return vt.asVector(vvs, entities, withMissings);
     }
   }
 
@@ -135,7 +139,7 @@ public class MagmaAssignROperation extends AbstractROperation {
     }
 
     @Override
-    public REXP asVector(String path) {
+    public REXP asVector(String path, boolean withMissings) {
       Datasource datasource = MagmaEngine.get().getDatasource(path);
 
       if(!holder.hasEntities()) {
@@ -151,7 +155,7 @@ public class MagmaAssignROperation extends AbstractROperation {
       List<String> names = Lists.newArrayList();
       for(ValueTable vt : datasource.getValueTables()) {
         ValueTableRConverter vtv = new ValueTableRConverter(vt);
-        contents.add(vtv.asVector());
+        contents.add(vtv.asVector(withMissings));
         names.add(vt.getName());
       }
       return new REXPList(new RList(contents, names));
@@ -180,17 +184,18 @@ public class MagmaAssignROperation extends AbstractROperation {
     }
 
     @Override
-    public REXP asVector(String path) {
+    public REXP asVector(String path, boolean withMissings) {
       resolvePath(path);
-      return asVector();
+      return asVector(withMissings);
     }
 
     /**
      * Build a R vector from an already set ValueTable.
      *
+     * @param withMissings
      * @return
      */
-    REXP asVector() {
+    REXP asVector(boolean withMissings) {
       if(table == null) throw new IllegalStateException("Table must not be null");
       prepareEntities(table);
       // build a list of vectors
@@ -198,13 +203,13 @@ public class MagmaAssignROperation extends AbstractROperation {
       List<String> names = Lists.newArrayList();
 
       // entity identifiers
-      contents.add(getVector(new VariableEntityValueSource(), holder.getEntities()));
+      contents.add(getVector(new VariableEntityValueSource(), holder.getEntities(), withMissings));
       names.add(ENTITY_ID_SYMBOL);
 
       // vector for each variable
       for(Variable v : table.getVariables()) {
         VariableValueSource vvs = table.getVariableValueSource(v.getName());
-        contents.add(getVector(vvs, holder.getEntities()));
+        contents.add(getVector(vvs, holder.getEntities(), withMissings));
         names.add(vvs.getVariable().getName());
       }
       return new REXPList(new RList(contents, names));
@@ -296,10 +301,10 @@ public class MagmaAssignROperation extends AbstractROperation {
     }
 
     @Override
-    public REXP asVector(String path) {
+    public REXP asVector(String path, boolean withMissings) {
       resolvePath(path);
       prepareEntities(table);
-      return getVector(variableValueSource, holder.getEntities());
+      return getVector(variableValueSource, holder.getEntities(), withMissings);
     }
   }
 

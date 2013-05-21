@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.web.r;
 
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -41,7 +43,7 @@ public class SecuredRSymbolResource extends RSymbolResource {
    * @return
    */
   @Override
-  public Response putMagma(@Context UriInfo uri, String path) {
+  public Response putMagma(@Context UriInfo uri, String path, @QueryParam("missings") @DefaultValue("false") Boolean missings) {
     if(path == null) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
@@ -52,7 +54,7 @@ public class SecuredRSymbolResource extends RSymbolResource {
       }
     }
 
-    return super.putMagma(uri, path);
+    return super.putMagma(uri, path, missings);
   }
 
   private Iterable<ValueTable> getValueTables(String path) {
