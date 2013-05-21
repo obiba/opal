@@ -33,7 +33,12 @@ import org.obiba.magma.support.MagmaEngineVariableResolver;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.r.service.VariableEntitiesHolder;
 import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPGenericVector;
+import org.rosuda.REngine.REXPInteger;
 import org.rosuda.REngine.REXPList;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REXPString;
+import org.rosuda.REngine.REXPVector;
 import org.rosuda.REngine.RList;
 
 import com.google.common.base.Function;
@@ -203,8 +208,7 @@ public class MagmaAssignROperation extends AbstractROperation {
       List<String> names = Lists.newArrayList();
 
       // entity identifiers
-      contents.add(getVector(new VariableEntityValueSource(), holder.getEntities(), withMissings));
-      names.add(ENTITY_ID_SYMBOL);
+      REXP ids = getVector(new VariableEntityValueSource(), holder.getEntities(), withMissings);
 
       // vector for each variable
       for(Variable v : table.getVariables()) {
@@ -212,7 +216,28 @@ public class MagmaAssignROperation extends AbstractROperation {
         contents.add(getVector(vvs, holder.getEntities(), withMissings));
         names.add(vvs.getVariable().getName());
       }
-      return new REXPList(new RList(contents, names));
+
+      RList list = new RList(contents, names);
+      return createDataFrame(ids, list);
+    }
+
+    /**
+     *
+     * @param ids
+     * @param values
+     * @return
+     * @see REXP.createDataFrame()
+     */
+    private REXP createDataFrame(REXP ids, RList values) {
+      return new REXPGenericVector(values, new REXPList(new RList( //
+          new REXP[] { //
+              new REXPString("data.frame"), //
+              new REXPString(values.keys()), //
+              ids }, //
+          new String[] { //
+              "class", //
+              "names", //
+              "row.names" })));
     }
 
     private void resolvePath(String path) {
