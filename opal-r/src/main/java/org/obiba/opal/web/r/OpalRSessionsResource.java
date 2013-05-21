@@ -12,6 +12,7 @@ package org.obiba.opal.web.r;
 import java.net.URI;
 import java.util.List;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.core.Context;
@@ -45,6 +46,12 @@ public class OpalRSessionsResource {
       rSessions.add(Dtos.asDto(rSession));
     }
     return rSessions;
+  }
+
+  @DELETE
+  public Response removeRSessions() {
+    opalRSessionManager.removeSubjectRSessions();
+    return Response.ok().build();
   }
 
   @POST

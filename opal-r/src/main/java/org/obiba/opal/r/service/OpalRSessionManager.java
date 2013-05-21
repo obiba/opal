@@ -137,6 +137,10 @@ public class OpalRSessionManager implements SessionListener {
     return getRSession(getSubjectSessionId(), rSessionId);
   }
 
+  public void removeSubjectRSessions() {
+    getRSessions(getSubjectSessionId()).removeRSessions();
+  }
+
   //
   // SessionListener methods
   //
@@ -254,6 +258,17 @@ public class OpalRSessionManager implements SessionListener {
       } catch(Exception e) {
         log.warn("Failed closing R session: {}", rSessionId, e);
       }
+    }
+
+    public void removeRSessions() {
+      for (OpalRSession rSession : rSessions) {
+        try {
+          rSession.close();
+        } catch(Exception e) {
+          log.warn("Failed closing R session: {}", rSession.getId(), e);
+        }
+      }
+      rSessions.clear();
     }
 
     private OpalRSession getRSession(String rSessionId) {
