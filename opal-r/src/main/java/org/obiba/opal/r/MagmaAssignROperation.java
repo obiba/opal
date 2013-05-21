@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.r;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -27,6 +28,7 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.VectorSource;
+import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
@@ -34,14 +36,12 @@ import org.obiba.magma.type.TextType;
 import org.obiba.opal.r.service.VariableEntitiesHolder;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPGenericVector;
-import org.rosuda.REngine.REXPInteger;
 import org.rosuda.REngine.REXPList;
-import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REXPString;
-import org.rosuda.REngine.REXPVector;
 import org.rosuda.REngine.RList;
 
 import com.google.common.base.Function;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -58,18 +58,21 @@ public class MagmaAssignROperation extends AbstractROperation {
 
   private final String path;
 
+  private final String variableFilter;
+
   private final boolean withMissings;
 
   private final Set<MagmaRConverter> magmaRConverters = Sets
       .newHashSet(new DatasourceRConverter(), new ValueTableRConverter(), new VariableRConverter());
 
-  public MagmaAssignROperation(VariableEntitiesHolder holder, String symbol, String path, boolean withMissings) {
+  public MagmaAssignROperation(VariableEntitiesHolder holder, String symbol, String path, String variableFilter, boolean withMissings) {
     if(holder == null) throw new IllegalArgumentException("holder cannot be null");
     if(symbol == null) throw new IllegalArgumentException("symbol cannot be null");
     if(path == null) throw new IllegalArgumentException("path cannot be null");
     this.holder = holder;
     this.symbol = symbol;
     this.path = path;
+    this.variableFilter = variableFilter;
     this.withMissings = withMissings;
   }
 
@@ -211,7 +214,7 @@ public class MagmaAssignROperation extends AbstractROperation {
       REXP ids = getVector(new VariableEntityValueSource(), holder.getEntities(), withMissings);
 
       // vector for each variable
-      for(Variable v : table.getVariables()) {
+      for(Variable v : filterVariables()) {
         VariableValueSource vvs = table.getVariableValueSource(v.getName());
         contents.add(getVector(vvs, holder.getEntities(), withMissings));
         names.add(vvs.getVariable().getName());
@@ -219,6 +222,25 @@ public class MagmaAssignROperation extends AbstractROperation {
 
       RList list = new RList(contents, names);
       return createDataFrame(ids, list);
+    }
+
+    protected Iterable<Variable> filterVariables() {
+      List<Variable> filteredVariables = null;
+
+      if(Strings.isNullOrEmpty(variableFilter)) {
+        filteredVariables = Lists.newArrayList(table.getVariables());
+      } else {
+        JavascriptClause jsClause = new JavascriptClause(variableFilter);
+        jsClause.initialise();
+
+        filteredVariables = new ArrayList<Variable>();
+        for(Variable variable : table.getVariables()) {
+          if(jsClause.select(variable)) {
+            filteredVariables.add(variable);
+          }
+        }
+      }
+      return filteredVariables;
     }
 
     /**
