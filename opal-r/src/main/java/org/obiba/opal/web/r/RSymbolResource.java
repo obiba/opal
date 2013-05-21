@@ -13,9 +13,11 @@ import java.net.URI;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -67,8 +69,8 @@ public abstract class RSymbolResource extends AbstractOpalRSessionResource {
 
   @PUT
   @Consumes("application/x-opal")
-  public Response putMagma(@Context UriInfo uri, String path) {
-    rSession.execute(new MagmaAssignROperation(rSession, name, path));
+  public Response putMagma(@Context UriInfo uri, String path, @QueryParam("missings") @DefaultValue("false") Boolean missings) {
+    rSession.execute(new MagmaAssignROperation(rSession, name, path, missings));
     return Response.created(getSymbolURI(uri)).build();
   }
 

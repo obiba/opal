@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.r;
 
+import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 
@@ -38,6 +39,7 @@ import org.rosuda.REngine.REXPRaw;
 import org.rosuda.REngine.REXPString;
 import org.rosuda.REngine.RList;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
@@ -47,32 +49,32 @@ public enum VectorType {
 
   booleans(BooleanType.get()) {
     @Override
-    protected REXP asContinuousVector(Variable variable, int size, Iterable<Value> values) {
-      byte booleans[] = new byte[size];
+    protected REXP asContinuousVector(Variable variable, int size, Iterable<Value> values, boolean withMissings) {
+      byte bools[] = new byte[size];
       int i = 0;
       for(Value value : values) {
         // OPAL-1536 do not push missings
-        if(variable.isMissingValue(value)) {
-          booleans[i++] = REXPLogical.NA;
+        if(!withMissings && variable.isMissingValue(value) || value.isNull()) {
+          bools[i++] = REXPLogical.NA;
         } else if((Boolean) value.getValue()) {
-          booleans[i++] = REXPLogical.TRUE;
+          bools[i++] = REXPLogical.TRUE;
         } else {
-          booleans[i++] = REXPLogical.FALSE;
+          bools[i++] = REXPLogical.FALSE;
         }
       }
-      return new REXPLogical(booleans);
+      return new REXPLogical(bools);
     }
 
   },
 
   ints(IntegerType.get()) {
     @Override
-    protected REXP asContinuousVector(Variable variable, int size, Iterable<Value> values) {
+    protected REXP asContinuousVector(Variable variable, int size, Iterable<Value> values, boolean withMissings) {
       int ints[] = new int[size];
       int i = 0;
       for(Value value : values) {
         // OPAL-1536 do not push missings
-        if(variable.isMissingValue(value)) {
+        if(!withMissings && variable.isMissingValue(value) || value.isNull()) {
           ints[i++] = REXPInteger.NA;
         } else {
           ints[i++] = ((Number) value.getValue()).intValue();
@@ -85,12 +87,16 @@ public enum VectorType {
 
   doubles(DecimalType.get()) {
     @Override
-    protected REXP asContinuousVector(Variable variable, int size, Iterable<Value> values) {
+    protected REXP asContinuousVector(Variable variable, int size, Iterable<Value> values, boolean withMissings) {
       double doubles[] = new double[size];
       int i = 0;
       for(Value value : values) {
         // OPAL-1536 do not push missings
-        doubles[i++] = variable.isMissingValue(value) ? REXPDouble.NA : ((Number) value.getValue()).doubleValue();
+        if(!withMissings && variable.isMissingValue(value) || value.isNull()) {
+          doubles[i++] = REXPDouble.NA;
+        } else {
+          doubles[i++] = ((Number) value.getValue()).doubleValue();
+        }
       }
       return new REXPDouble(doubles);
     }
@@ -106,7 +112,7 @@ public enum VectorType {
 
   binaries(BinaryType.get()) {
     @Override
-    protected REXP asContinuousVector(Variable variable, int size, Iterable<Value> values) {
+    protected REXP asContinuousVector(Variable variable, int size, Iterable<Value> values, boolean withMissings) {
       REXPRaw raws[] = new REXPRaw[size];
       int i = 0;
       for(Value value : values) {
@@ -136,61 +142,68 @@ public enum VectorType {
    *
    * @param vvs
    * @param entities
+   * @param withMissings if true, values corresponding to missing categories will be pushed to the vector
    * @return
    */
-  public REXP asVector(VariableValueSource vvs, SortedSet<VariableEntity> entities) {
+  public REXP asVector(VariableValueSource vvs, SortedSet<VariableEntity> entities, boolean withMissings) {
     Variable variable = vvs.getVariable();
     int size = entities.size();
     Iterable<Value> values = vvs.asVectorSource().getValues(entities);
     return variable.isRepeatable()
-        ? asValueSequencesVector(variable, size, values)
-        : asValuesVector(variable, size, values);
+        ? asValueSequencesVector(variable, size, values, withMissings)
+        : asValuesVector(variable, size, values, withMissings);
   }
 
   /**
    * Build a type specific R vector. Default behaviour is to check the variable if it defines categories
    *
+   * @param variable
    * @param size
    * @param values
+   * @param withMissings
    * @return
    */
-  protected REXP asValuesVector(Variable variable, int size, Iterable<Value> values) {
+  protected REXP asValuesVector(Variable variable, int size, Iterable<Value> values, boolean withMissings) {
     switch(VariableNature.getNature(variable)) {
       case CATEGORICAL:
-        return asFactors(variable, size, values);
+        return asFactors(variable, size, values, withMissings);
     }
-    return asContinuousVector(variable, size, values);
+    return asContinuousVector(variable, size, values, withMissings);
   }
 
-  protected REXP asContinuousVector(Variable variable, int size, Iterable<Value> values) {
-    return asStringValuesVector(variable, size, values);
+  protected REXP asContinuousVector(Variable variable, int size, Iterable<Value> values, boolean withMissings) {
+    return asStringValuesVector(size, values);
   }
 
   /**
    * Build a list of R vectors.
    *
+   * @param variable
    * @param size
    * @param values
+   * @param withMissings
    * @return
    */
-  private REXP asValueSequencesVector(Variable variable, int size, Iterable<Value> values) {
+  private REXP asValueSequencesVector(Variable variable, int size, Iterable<Value> values, boolean withMissings) {
     REXP sequences[] = new REXP[size];
     int i = 0;
     for(Value value : values) {
       ValueSequence seq = value.asSequence();
-      sequences[i++] = seq.isNull() ? null : asValuesVector(variable, seq.getSize(), seq.getValue());
+      sequences[i++] = seq.isNull() ? null : asValuesVector(variable, seq.getSize(), seq.getValue(), withMissings);
     }
     return new REXPList(new RList(sequences));
   }
 
-  protected REXP asFactors(Variable variable, int size, Iterable<Value> values) {
-    String[] levels = new String[variable.getCategories().size()];
+  protected REXP asFactors(Variable variable, int size, Iterable<Value> values, boolean withMissings) {
+    List<String> levels = Lists.newArrayList();
     Map<String, Integer> codes = Maps.newHashMap();
     // REXPFactor is one-based. That is, the ID the first level, is 1.
     int i = 1;
     for(Category c : variable.getCategories()) {
-      levels[i - 1] = c.getName();
-      codes.put(c.getName(), i++);
+      if(withMissings || !c.isMissing()) {
+        levels.add(c.getName());
+        codes.put(c.getName(), i++);
+      }
     }
 
     int ints[] = new int[size];
@@ -201,23 +214,27 @@ public enum VectorType {
         throw new IllegalStateException("unexpected value");
       }
 
-      String str = value.toString();
-      Integer code = codes.get(str);
+      Integer code = null;
+      if(withMissings || !variable.isMissingValue(value)) {
+        String str = value.toString();
+        code = codes.get(str);
+      }
       ints[i] = code != null ? code : REXPInteger.NA;
       i++;
     }
-    return new REXPFactor(ints, levels);
+    return new REXPFactor(ints, levels.toArray(new String[levels.size()]));
   }
 
   /**
    * Build a R vector of strings.
    *
+   * @param variable
    * @param size
    * @param values
    * @return
    */
-  protected REXP asStringValuesVector(Variable variable, int size, Iterable<Value> values) {
-    String strings[] = new String[size];
+  protected REXP asStringValuesVector(int size, Iterable<Value> values) {
+    String strs[] = new String[size];
     int i = 0;
     for(Value value : values) {
       if(i >= size) {
@@ -225,10 +242,10 @@ public enum VectorType {
       }
 
       String str = value.toString();
-      strings[i] = str != null && str.length() > 0 ? str : null;
+      strs[i] = str != null && str.length() > 0 ? str : null;
       i++;
     }
 
-    return new REXPString(strings);
+    return new REXPString(strs);
   }
 }

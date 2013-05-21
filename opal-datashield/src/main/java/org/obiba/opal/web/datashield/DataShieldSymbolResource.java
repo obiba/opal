@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.datashield;
 
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -34,9 +36,9 @@ public class DataShieldSymbolResource extends RSymbolResource {
   }
 
   @Override
-  public Response putMagma(UriInfo uri, String path) {
+  public Response putMagma(UriInfo uri, String path, @QueryParam("missings") @DefaultValue("false") Boolean missings) {
     DataShieldLog.userLog("creating symbol '{}' from opal data '{}'", getName(), path);
-    return super.putMagma(uri, path);
+    return super.putMagma(uri, path, missings);
   }
 
   @Override
