@@ -69,8 +69,8 @@ public abstract class RSymbolResource extends AbstractOpalRSessionResource {
 
   @PUT
   @Consumes("application/x-opal")
-  public Response putMagma(@Context UriInfo uri, String path, @QueryParam("missings") @DefaultValue("false") Boolean missings) {
-    rSession.execute(new MagmaAssignROperation(rSession, name, path, missings));
+  public Response putMagma(@Context UriInfo uri, String path, @QueryParam("variables") String variableFilter, @QueryParam("missings") @DefaultValue("false") Boolean missings) {
+    rSession.execute(new MagmaAssignROperation(rSession, name, path, variableFilter, missings));
     return Response.created(getSymbolURI(uri)).build();
   }
 

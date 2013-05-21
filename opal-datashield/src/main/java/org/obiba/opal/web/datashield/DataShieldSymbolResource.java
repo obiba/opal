@@ -36,9 +36,9 @@ public class DataShieldSymbolResource extends RSymbolResource {
   }
 
   @Override
-  public Response putMagma(UriInfo uri, String path, @QueryParam("missings") @DefaultValue("false") Boolean missings) {
+  public Response putMagma(UriInfo uri, String path, @QueryParam("variables") String variableFilter, @QueryParam("missings") @DefaultValue("false") Boolean missings) {
     DataShieldLog.userLog("creating symbol '{}' from opal data '{}'", getName(), path);
-    return super.putMagma(uri, path, missings);
+    return super.putMagma(uri, path, variableFilter, missings);
   }
 
   @Override

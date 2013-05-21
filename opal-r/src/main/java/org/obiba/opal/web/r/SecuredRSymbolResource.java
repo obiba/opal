@@ -43,7 +43,7 @@ public class SecuredRSymbolResource extends RSymbolResource {
    * @return
    */
   @Override
-  public Response putMagma(@Context UriInfo uri, String path, @QueryParam("missings") @DefaultValue("false") Boolean missings) {
+  public Response putMagma(@Context UriInfo uri, String path, @QueryParam("variables") String variableFilter, @QueryParam("missings") @DefaultValue("false") Boolean missings) {
     if(path == null) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
@@ -54,7 +54,7 @@ public class SecuredRSymbolResource extends RSymbolResource {
       }
     }
 
-    return super.putMagma(uri, path, missings);
+    return super.putMagma(uri, path, variableFilter, missings);
   }
 
   private Iterable<ValueTable> getValueTables(String path) {
