@@ -78,7 +78,6 @@ public class OpalRSession implements ROperationTemplate, VariableEntitiesHolder 
 
   @Override
   public void setEntities(SortedSet<VariableEntity> entities) {
-    if(this.entities != null) throw new IllegalStateException("cannot invoke setEntities() more than once.");
     this.entities = ImmutableSortedSet.copyOf(entities);
   }
 

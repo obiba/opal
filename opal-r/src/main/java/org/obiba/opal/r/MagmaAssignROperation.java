@@ -65,7 +65,8 @@ public class MagmaAssignROperation extends AbstractROperation {
   private final Set<MagmaRConverter> magmaRConverters = Sets
       .newHashSet(new DatasourceRConverter(), new ValueTableRConverter(), new VariableRConverter());
 
-  public MagmaAssignROperation(VariableEntitiesHolder holder, String symbol, String path, String variableFilter, boolean withMissings) {
+  public MagmaAssignROperation(VariableEntitiesHolder holder, String symbol, String path, String variableFilter,
+      boolean withMissings) {
     if(holder == null) throw new IllegalArgumentException("holder cannot be null");
     if(symbol == null) throw new IllegalArgumentException("symbol cannot be null");
     if(path == null) throw new IllegalArgumentException("path cannot be null");
@@ -92,9 +93,8 @@ public class MagmaAssignROperation extends AbstractROperation {
   }
 
   void prepareEntities(ValueTable table) {
-    if(!holder.hasEntities()) {
-      holder.setEntities(ImmutableSortedSet.copyOf(table.getVariableEntities()));
-    }
+    // store the entities of a table sorted by ID
+    holder.setEntities(ImmutableSortedSet.copyOf(table.getVariableEntities()));
   }
 
   //
@@ -244,7 +244,6 @@ public class MagmaAssignROperation extends AbstractROperation {
     }
 
     /**
-     *
      * @param ids
      * @param values
      * @return
