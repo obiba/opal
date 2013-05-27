@@ -12,14 +12,15 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-public class OpalAnnotationConfigurationHelper implements FactoryBean {
+public class OpalAnnotationConfigurationHelper implements FactoryBean<Set<Class<?>>> {
+
   private final Set<Class<?>> annotatedClasses = new ImmutableSet.Builder<Class<?>>()
       .add(UnitKeyStoreState.class, SubjectAcl.class).build();
 
   private final List<Class<?>> additionalClasses = Lists.newArrayList();
 
   @Override
-  public Object getObject() throws Exception {
+  public Set<Class<?>> getObject() throws Exception {
     return ImmutableSet.copyOf(Iterables.concat(annotatedClasses, additionalClasses));
   }
 
@@ -33,7 +34,7 @@ public class OpalAnnotationConfigurationHelper implements FactoryBean {
     return true;
   }
 
-  public void setAdditionalClasses(Collection<?> additionalClasses) {
+  public void setAdditionalClasses(Iterable<?> additionalClasses) {
     for(Collection<?> c : Iterables.filter(additionalClasses, Collection.class)) {
       setAdditionalClasses(c);
     }
