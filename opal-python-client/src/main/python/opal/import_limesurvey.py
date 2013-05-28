@@ -1,5 +1,5 @@
 """
-Opal data import.
+Opal LimeSurvey import.
 """
 
 import sys
