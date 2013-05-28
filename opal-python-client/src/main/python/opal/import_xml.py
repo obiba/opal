@@ -53,4 +53,4 @@ class OpalExtensionFactory(opal.io.OpalImporter.ExtensionFactoryInterface):
         Add specific datasource factory extension
         """
         xml_factory = factory.Extensions[opal.protobuf.Magma_pb2.FsDatasourceFactoryDto.params]
-        xml_factory.url = self.path
+        xml_factory.file = self.path
