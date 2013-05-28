@@ -6,6 +6,7 @@ import opal.data
 import opal.file
 import opal.entity
 import opal.import_opal
+import opal.import_csv
 import opal.export_xml
 import argparse
 
@@ -42,6 +43,10 @@ add_subcommand('entity', 'Query for entities (Participant, etc.).', opal.entity.
 add_subcommand('file', 'Manage Opal file system.', opal.file.add_arguments, opal.file.do_command)
 add_subcommand('import-opal', 'Import data from a remote Opal server.', opal.import_opal.add_arguments,
                opal.import_opal.do_command)
+add_subcommand('import-csv', 'Import data from a CSV file..', opal.import_csv.add_arguments,
+               opal.import_csv.do_command)
+add_subcommand('export-xml', 'Export data to a zip of Opal XML files.', opal.export_xml.add_arguments,
+               opal.export_xml.do_command)
 add_subcommand('export-xml', 'Export data to a zip of Opal XML files.', opal.export_xml.add_arguments,
                opal.export_xml.do_command)
 add_subcommand('rest', 'Request directly the Opal REST API, for advanced users.', opal.rest.add_arguments,
