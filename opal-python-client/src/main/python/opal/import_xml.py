@@ -30,11 +30,20 @@ def do_command(args):
     try:
         client = opal.core.OpalClient.build(args.opal, args.user, args.password)
         importer = opal.io.OpalImporter.build(client=client, destination=args.destination, tables=args.tables,
-                                              incremental=args.incremental, unit=args.unit, json=args.json,
+                                              incremental=args.incremental, unit=args.unit,
                                               verbose=args.verbose)
         # print result
         extension_factory = OpalExtensionFactory(path=args.path)
-        print importer.submit(extension_factory)
+
+        response = importer.submit(extension_factory)
+
+        # format response
+        res = response.content
+        if args.json:
+            res = response.pretty_json()
+
+        # output to stdout
+        print res
     except Exception, e:
         print e
         sys.exit(2)
