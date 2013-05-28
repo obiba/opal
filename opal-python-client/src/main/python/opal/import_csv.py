@@ -28,50 +28,22 @@ def add_arguments(parser):
     parser.add_argument('--json', '-j', action='store_true', help='Pretty JSON formatting of the response')
 
 
-def add_csv_datasource_factory_extension(args, factory):
-    """
-    Add specific datasource factory extension
-    """
-    csv_factory = factory.Extensions[opal.protobuf.Magma_pb2.CsvDatasourceFactoryDto.params]
-
-    if args.characterSet:
-        csv_factory.characterSet = args.characterSet
-
-    if args.separator:
-        csv_factory.separator = args.separator
-
-    if args.quote:
-        csv_factory.quote = args.quote
-
-    if args.firstRow:
-        csv_factory.firstRow = args.firstRow
-
-    table = csv_factory.tables.add()
-    table.data = args.path
-    table.entityType = args.type
-
-    if args.tables:
-        table.name = args.tables[0]
-    else:
-        # Take filename as the table name
-        name = args.path.split("/")
-
-        index = name[-1].find('.csv')
-        if index > 0:
-            table.name = name[-1][:-index]
-        else:
-            table.name = name[-1]
-
-
 def do_command(args):
     """
     Execute import data command
     """
     # Build and send request
     try:
-        importer = opal.io.OpalImporter(args)
+        client = opal.core.OpalClient.build(args.opal, args.user, args.password)
+        importer = opal.io.OpalImporter.build(client=client, destination=args.destination, tables=args.tables,
+                                              incremental=args.incremental, unit=args.unit, json=args.json,
+                                              verbose=args.verbose)
         # print result
-        print importer.submit(add_csv_datasource_factory_extension)
+        extension_factory = OpalExtensionFactory(characterSet=args.characterSet, separator=args.separator,
+                                                 quote=args.quote,
+                                                 firstRow=args.firstRow, path=args.path, type=args.type,
+                                                 tables=args.tables)
+        print importer.submit(extension_factory)
     except Exception, e:
         print e
         sys.exit(2)
@@ -79,3 +51,49 @@ def do_command(args):
         errno, errstr = error
         print >> sys.stderr, 'An error occurred: ', errstr
         sys.exit(2)
+
+
+class OpalExtensionFactory(opal.io.OpalImporter.ExtensionFactoryInterface):
+    def __init__(self, characterSet, separator, quote, firstRow, path, type, tables):
+        self.characterSet = characterSet
+        self.separator = separator
+        self.quote = quote
+        self.firstRow = firstRow
+        self.path = path
+        self.type = type
+        self.tables = tables
+
+
+    def add(self, factory):
+        """
+        Add specific datasource factory extension
+        """
+        csv_factory = factory.Extensions[opal.protobuf.Magma_pb2.CsvDatasourceFactoryDto.params]
+
+        if self.characterSet:
+            csv_factory.characterSet = self.characterSet
+
+        if self.separator:
+            csv_factory.separator = self.separator
+
+        if self.quote:
+            csv_factory.quote = self.quote
+
+        if self.firstRow:
+            csv_factory.firstRow = self.firstRow
+
+        table = csv_factory.tables.add()
+        table.data = self.path
+        table.entityType = type
+
+        if self.tables:
+            table.name = self.tables[0]
+        else:
+            # Take filename as the table name
+            name = self.path.split("/")
+
+            index = name[-1].find('.csv')
+            if index > 0:
+                table.name = name[-1][:-index]
+            else:
+                table.name = name[-1]
