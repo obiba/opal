@@ -28,9 +28,18 @@ def do_command(args):
         client = opal.core.OpalClient.build(args.opal, args.user, args.password)
         exporter = opal.io.OpalExporter.build(client=client, datasource=args.datasource, tables=args.tables,
                                               unit=args.unit, output=args.output, incremental=args.incremental,
-                                              verbose=args.verbose, json=args.json)
+                                              verbose=args.verbose)
         # print result
-        print exporter.submit('xml')
+        response = exporter.submit('xml');
+
+        # format response
+        res = response.content
+        if args.json:
+            res = response.pretty_json()
+
+        # output to stdout
+        print res
+
     except Exception, e:
         print e
         sys.exit(2)
