@@ -11,7 +11,7 @@ def add_arguments(parser):
     """
     Add data command specific options
     """
-    parser.add_argument('--path', '-pa', required=True, help='CSV file to import on the Opal filesystem '
+    parser.add_argument('--path', '-pa', required=True, help='Zip of XML files to import on the Opal filesystem '
                                                              '(from the Opal filesystem).')
     # non specific import arguments
     parser.add_argument('--destination', '-d', required=True, help='Destination datasource name')
