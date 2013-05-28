@@ -7,6 +7,7 @@ import opal.file
 import opal.entity
 import opal.import_opal
 import opal.import_csv
+import opal.import_xml
 import opal.export_xml
 import argparse
 
