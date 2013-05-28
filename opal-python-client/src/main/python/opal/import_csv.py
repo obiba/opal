@@ -84,7 +84,7 @@ class OpalExtensionFactory(opal.io.OpalImporter.ExtensionFactoryInterface):
 
         table = csv_factory.tables.add()
         table.data = self.path
-        table.entityType = type
+        table.entityType = self.type
 
         if self.tables:
             table.name = self.tables[0]
