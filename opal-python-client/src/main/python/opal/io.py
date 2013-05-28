@@ -9,147 +9,170 @@ import opal.protobuf.Commands_pb2
 
 
 class OpalImporter:
-  """
-  OpalImporter takes care of submitting a import job.
-  """
-  def __init__(self, args):
-  	self.args = args
-
-  def submit(self, extension_factory):
     """
-    Build a specific transient datasource, using extension_factory, and submit import job.
+    OpalImporter takes care of submitting a import job.
     """
-    transient = self.__create_transient_datasource(extension_factory)
 
-    # submit data import job
-    request = opal.core.OpalClient(self.args).new_request()
-    request.fail_on_error().accept_json().content_type_protobuf()
+    class ExtensionFactoryInterface:
+        def add(self, factory):
+            raise Exception("ExtensionFactoryInterface.add() method must be implemented by a concrete class.")
 
-    if self.args.verbose:
-      request.verbose()
+    @classmethod
+    def build(cls, client, destination, tables=None, incremental=None, unit=None,
+              json=None, verbose=None):
+        setattr(cls, 'client', client)
+        setattr(cls, 'destination', destination)
+        setattr(cls, 'tables', tables)
+        setattr(cls, 'incremental', incremental)
+        setattr(cls, 'unit', unit)
+        setattr(cls, 'json', json)
+        setattr(cls, 'verbose', verbose)
+        return cls()
 
-    # import options
-    options = opal.protobuf.Commands_pb2.ImportCommandOptionsDto()
-    options.destination = self.args.destination
-    # tables must be the ones of the transient
-    tables2import = transient.table
-    if self.args.tables:
-      def f(t): return any(t in s for s in transient.table)
-      tables2import = filter(f,self.args.tables)
-    def table_fullname(t): return transient.name + '.' + t
-    options.tables.extend(map(table_fullname,tables2import))
-    if self.args.verbose:
-      print "** Import options:"
-      print options
-      print "**"
+    def submit(self, extension_factory):
+        """
+        Build a specific transient datasource, using extension_factory, and submit import job.
+        """
+        transient = self.__create_transient_datasource(extension_factory)
 
-    uri = opal.core.UriBuilder(['datasource', self.args.destination, 'commands', '_import']).build()
-    response = request.post().resource(uri).content(options.SerializeToString()).send()
+        # submit data import job
+        request = self.client.new_request()
+        request.fail_on_error().accept_json().content_type_protobuf()
 
-    # get job status
-    job_resource = re.sub(r'http.*\/ws',r'', response.headers['Location'])
-    request = opal.core.OpalClient(self.args).new_request()
-    request.fail_on_error().accept_json()
-    response = request.get().resource(job_resource).send()
+        if self.verbose:
+            request.verbose()
 
-    # format response    
-    res = response.content
-    if self.args.json:
-      res = response.pretty_json()
+        # import options
+        options = opal.protobuf.Commands_pb2.ImportCommandOptionsDto()
+        options.destination = self.destination
+        # tables must be the ones of the transient
+        tables2import = transient.table
+        if self.tables:
+            def f(t): return any(t in s for s in transient.table)
 
-    # return result
-    return res
+            tables2import = filter(f, self.tables)
 
-  def __create_transient_datasource(self, extension_factory):
-  	"""
-  	Create a transient datasource
-  	"""
-  	request = opal.core.OpalClient(self.args).new_request()
-  	request.fail_on_error().accept_protobuf().content_type_protobuf()
+        def table_fullname(t):
+            return transient.name + '.' + t
 
-	if self.args.verbose:
-	  request.verbose()
+        options.tables.extend(map(table_fullname, tables2import))
+        if self.verbose:
+            print "** Import options:"
+            print options
+            print "**"
 
-	# build transient datasource factory
-	factory = opal.protobuf.Magma_pb2.DatasourceFactoryDto()
-	if self.args.incremental:
-	  factory.incrementalConfig.incremental = True
-	  factory.incrementalConfig.incrementalDestinationName = self.args.destination
-	if self.args.unit:
-	  factory.unitConfig.unit = self.args.unit
-	  factory.unitConfig.allowIdentifierGeneration = False
-	  factory.unitConfig.ignoreUnknownIdentifier = False
-	self.__add_datasource_factory_extension(extension_factory, factory)
-	if self.args.verbose:
-	  print "** Datasource factory:"
-	  print factory
-	  print "**"
-	  
-	# send request and parse response as a datasource
-	response = request.post().resource('/transient-datasources').content(factory.SerializeToString()).send()
-	transient = opal.protobuf.Magma_pb2.DatasourceDto()
-	transient.ParseFromString(response.content)
+        uri = opal.core.UriBuilder(['datasource', self.destination, 'commands', '_import']).build()
+        response = request.post().resource(uri).content(options.SerializeToString()).send()
 
-	if self.args.verbose:
-	  print "** Transient datasource:"
-	  print transient
-	  print "**"
-	return transient
+        # get job status
+        job_resource = re.sub(r'http.*\/ws', r'', response.headers['Location'])
+        request = self.client.new_request()
+        request.fail_on_error().accept_json()
+        response = request.get().resource(job_resource).send()
 
-  def __add_datasource_factory_extension(self, extension_factory, factory):
-    """
-    Add specific datasource factory extension
-    """
-    extension_factory(self.args, factory)
+        # format response
+        res = response.content
+        if self.json:
+            res = response.pretty_json()
+
+        # return result
+        return res
+
+    def __create_transient_datasource(self, extension_factory):
+        """
+        Create a transient datasource
+        """
+        request = self.client.new_request()
+        request.fail_on_error().accept_protobuf().content_type_protobuf()
+
+        if self.verbose:
+            request.verbose()
+
+        # build transient datasource factory
+        factory = opal.protobuf.Magma_pb2.DatasourceFactoryDto()
+        if self.incremental:
+            factory.incrementalConfig.incremental = True
+            factory.incrementalConfig.incrementalDestinationName = self.destination
+        if self.unit:
+            factory.unitConfig.unit = self.unit
+            factory.unitConfig.allowIdentifierGeneration = False
+            factory.unitConfig.ignoreUnknownIdentifier = False
+
+        extension_factory.add(factory)
+
+        if self.verbose:
+            print "** Datasource factory:"
+            print factory
+            print "**"
+
+        # send request and parse response as a datasource
+        response = request.post().resource('/transient-datasources').content(factory.SerializeToString()).send()
+        transient = opal.protobuf.Magma_pb2.DatasourceDto()
+        transient.ParseFromString(response.content)
+
+        if self.verbose:
+            print "** Transient datasource:"
+            print transient
+            print "**"
+        return transient
 
 
 class OpalExporter:
-  """
-  OpalExporter takes care of submitting a import job.
-  """
-  def __init__(self, args):
-    self.output = args.output
-    self.incremental = args.incremental
-    self.datasource = args.datasource
-    self.tables = args.tables
-    self.unit = args.unit
-    self.verbose = args.verbose
-    self.json = args.json
-    self.args = args
+    """
+    OpalExporter takes care of submitting a import job.
+    """
 
-  def submit(self, format):
-    # export options
-    options = opal.protobuf.Commands_pb2.CopyCommandOptionsDto()
-    options.format = format
-    options.out = self.output
-    options.nonIncremental = not self.incremental
-    options.noVariables = False
-    if self.tables:
-      tables2export = self.tables
-      def table_fullname(t): return self.datasource + '.' + t
-      options.tables.extend(map(table_fullname,tables2export))
-    if self.unit:
-      options.unit = self.unit
+    @classmethod
+    def build(cls, client, datasource, tables, output, incremental=None, unit=None, json=None, verbose=None):
+        setattr(cls, 'client', client)
+        setattr(cls, 'datasource', datasource)
+        setattr(cls, 'tables', tables)
+        setattr(cls, 'output', output)
+        setattr(cls, 'incremental', incremental)
+        setattr(cls, 'unit', unit)
+        setattr(cls, 'json', json)
+        setattr(cls, 'verbose', verbose)
+        return cls()
 
-    if self.verbose:
-      print "** Export options:"
-      print options
-      print "**"
+    def setClient(self, client):
+        self.client = client
+        return self
 
-    # submit data import job
-    request = opal.core.OpalClient(self.args).new_request()
-    request.fail_on_error().accept_json().content_type_protobuf()
+    def submit(self, format):
+        # export options
+        options = opal.protobuf.Commands_pb2.CopyCommandOptionsDto()
+        options.format = format
+        options.out = self.output
+        options.nonIncremental = not self.incremental
+        options.noVariables = False
+        if self.tables:
+            tables2export = self.tables
 
-    if self.verbose:
-      request.verbose()
+            def table_fullname(t): return self.datasource + '.' + t
 
-    uri = opal.core.UriBuilder(['datasource', self.datasource, 'commands', '_copy']).build()
-    response = request.post().resource(uri).content(options.SerializeToString()).send()
+            options.tables.extend(map(table_fullname, tables2export))
+        if self.unit:
+            options.unit = self.unit
 
-    # format response    
-    res = response.content
-    if self.json:
-      res = response.pretty_json()
+        if self.verbose:
+            print "** Export options:"
+            print options
+            print "**"
 
-    # return result
-    return res
+        # submit data import job
+        request = self.client.new_request()
+        request.fail_on_error().accept_json().content_type_protobuf()
+
+        if self.verbose:
+            request.verbose()
+
+        uri = opal.core.UriBuilder(['datasource', self.datasource, 'commands', '_copy']).build()
+        response = request.post().resource(uri).content(options.SerializeToString()).send()
+
+        # format response
+        res = response.content
+        if self.json:
+            res = response.pretty_json()
+
+        # return result
+        return res
