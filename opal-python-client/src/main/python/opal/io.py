@@ -18,14 +18,12 @@ class OpalImporter:
             raise Exception("ExtensionFactoryInterface.add() method must be implemented by a concrete class.")
 
     @classmethod
-    def build(cls, client, destination, tables=None, incremental=None, unit=None,
-              json=None, verbose=None):
+    def build(cls, client, destination, tables=None, incremental=None, unit=None, verbose=None):
         setattr(cls, 'client', client)
         setattr(cls, 'destination', destination)
         setattr(cls, 'tables', tables)
         setattr(cls, 'incremental', incremental)
         setattr(cls, 'unit', unit)
-        setattr(cls, 'json', json)
         setattr(cls, 'verbose', verbose)
         return cls()
 
@@ -68,15 +66,7 @@ class OpalImporter:
         job_resource = re.sub(r'http.*\/ws', r'', response.headers['Location'])
         request = self.client.new_request()
         request.fail_on_error().accept_json()
-        response = request.get().resource(job_resource).send()
-
-        # format response
-        res = response.content
-        if self.json:
-            res = response.pretty_json()
-
-        # return result
-        return res
+        return request.get().resource(job_resource).send()
 
     def __create_transient_datasource(self, extension_factory):
         """
@@ -123,14 +113,13 @@ class OpalExporter:
     """
 
     @classmethod
-    def build(cls, client, datasource, tables, output, incremental=None, unit=None, json=None, verbose=None):
+    def build(cls, client, datasource, tables, output, incremental=None, unit=None, verbose=None):
         setattr(cls, 'client', client)
         setattr(cls, 'datasource', datasource)
         setattr(cls, 'tables', tables)
         setattr(cls, 'output', output)
         setattr(cls, 'incremental', incremental)
         setattr(cls, 'unit', unit)
-        setattr(cls, 'json', json)
         setattr(cls, 'verbose', verbose)
         return cls()
 
@@ -167,12 +156,4 @@ class OpalExporter:
             request.verbose()
 
         uri = opal.core.UriBuilder(['datasource', self.datasource, 'commands', '_copy']).build()
-        response = request.post().resource(uri).content(options.SerializeToString()).send()
-
-        # format response
-        res = response.content
-        if self.json:
-            res = response.pretty_json()
-
-        # return result
-        return res
+        return request.post().resource(uri).content(options.SerializeToString()).send()
