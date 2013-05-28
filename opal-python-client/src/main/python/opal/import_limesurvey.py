@@ -67,7 +67,9 @@ class OpalExtensionFactory(opal.io.OpalImporter.ExtensionFactoryInterface):
         """
         limesurvey_factory = factory.Extensions[opal.protobuf.Magma_pb2.LimesurveyDatasourceFactoryDto.params]
         limesurvey_factory.database = self.database
-        limesurvey_factory.tablePrefix = self.prefix
+
+        if self.prefix:
+            limesurvey_factory.tablePrefix = self.prefix
 
         if self.key:
             limesurvey_factory.key = self.key
