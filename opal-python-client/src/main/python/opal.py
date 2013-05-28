@@ -8,6 +8,7 @@ import opal.entity
 import opal.import_opal
 import opal.import_csv
 import opal.import_xml
+import opal.import_limesurvey
 import opal.export_xml
 import argparse
 
@@ -35,7 +36,8 @@ def add_subcommand(name, help, add_args_func, default_func):
 # Parse arguments
 parser = argparse.ArgumentParser(description='Opal command line.')
 subparsers = parser.add_subparsers(title='sub-commands',
-                                   help='Available sub-commands. Use --help option on the sub-command for more details.')
+                                   help='Available sub-commands. Use --help option on the sub-command '
+                                        'for more details.')
 
 # Add subcommands
 add_subcommand('dict', 'Query for data dictionary.', opal.dictionary.add_arguments, opal.dictionary.do_command)
@@ -48,6 +50,8 @@ add_subcommand('import-csv', 'Import data from a CSV file.', opal.import_csv.add
                opal.import_csv.do_command)
 add_subcommand('import-xml', 'Import data from a ZIP file.', opal.import_xml.add_arguments,
                opal.import_xml.do_command)
+add_subcommand('import-limesurvey', 'Import data from a LimeSurvey database.', opal.import_limesurvey.add_arguments,
+               opal.import_limesurvey.do_command)
 add_subcommand('export-xml', 'Export data to a zip of Opal XML files.', opal.export_xml.add_arguments,
                opal.export_xml.do_command)
 add_subcommand('rest', 'Request directly the Opal REST API, for advanced users.', opal.rest.add_arguments,

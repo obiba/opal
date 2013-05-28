@@ -30,7 +30,7 @@ def do_command(args):
                                               unit=args.unit, output=args.output, incremental=args.incremental,
                                               verbose=args.verbose)
         # print result
-        response = exporter.submit('xml');
+        response = exporter.submit('xml')
 
         # format response
         res = response.content
