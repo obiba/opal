@@ -53,11 +53,19 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
 
   @GET
   @POST
-  public Response get(@QueryParam("distinct") boolean distinct) {
+  public Response get(@QueryParam("distinct") boolean distinct, @QueryParam("offset") Integer offset,
+      @QueryParam("limit") Integer limit) {
     SummaryStatisticsDto.Builder builder = SummaryStatisticsDto.newBuilder().setResource(getVariable().getName());
-    CategoricalSummaryDto summary = canQueryEsIndex() ? queryEs(distinct) : queryMagma(distinct);
-    if(summary != null) builder.setExtension(CategoricalSummaryDto.categorical, summary);
-    return TimestampedResponses.ok(getValueTable(), builder.build()).build();
+
+    if(offset == null && limit == null) {
+      CategoricalSummaryDto summary = canQueryEsIndex() ? queryEs(distinct) : queryMagma(distinct);
+      if(summary != null) builder.setExtension(CategoricalSummaryDto.categorical, summary);
+      return TimestampedResponses.ok(getValueTable(), builder.build()).build();
+    } else {
+      CategoricalSummaryDto summary = queryMagma(distinct, offset, limit);
+      if(summary != null) builder.setExtension(CategoricalSummaryDto.categorical, summary);
+      return Response.ok(builder.build()).build();
+    }
   }
 
   @Nullable
@@ -105,17 +113,24 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
 
   @Nullable
   private CategoricalSummaryDto queryMagma(boolean distinct) {
+    return queryMagma(distinct, null, null);
+  }
+
+  @Nullable
+  private CategoricalSummaryDto queryMagma(boolean distinct, Integer offset, Integer limit) {
 
     log.debug("Query Magma for {} summary", getVariable().getName());
 
     CategoricalVariableSummary summary = new CategoricalVariableSummary.Builder(getVariable()) //
         .distinct(distinct) //
+        .filter(offset, limit) //
         .addTable(getValueTable(), getVariableValueSource()) //
         .build();
 
     if(summary.isEmpty()) return null;
 
-    if(!"_transient".equals(getVariable().getName()) && isEsAvailable()) {
+    // onl cache full summary
+    if(!"_transient".equals(getVariable().getName()) && isEsAvailable() && !summary.isFiltered()) {
       statsIndexManager.getIndex(getValueTable()).indexSummary(summary);
     }
 

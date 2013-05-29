@@ -54,16 +54,23 @@ public class ContinuousSummaryResource extends AbstractSummaryResource {
   @GET
   @POST
   public Response compute(@QueryParam("d") @DefaultValue("normal") Distribution distribution,
-      @QueryParam("p") List<Double> percentiles, @QueryParam("intervals") @DefaultValue("10") int intervals) {
+      @QueryParam("p") List<Double> percentiles, @QueryParam("intervals") @DefaultValue("10") int intervals,
+      @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
 
-    ContinuousSummaryDto summary = canQueryEsIndex()
-        ? queryEs(distribution, percentiles, intervals)
-        : queryMagma(distribution, percentiles, intervals);
+    SummaryStatisticsDto.Builder statisticsDto = SummaryStatisticsDto.newBuilder().setResource(getVariable().getName());
 
-    SummaryStatisticsDto statisticsDto = SummaryStatisticsDto.newBuilder().setResource(getVariable().getName())
-        .setExtension(ContinuousSummaryDto.continuous, summary).build();
-    return TimestampedResponses.ok(getValueTable(), statisticsDto).build();
+    if(offset == null && limit == null) {
+      ContinuousSummaryDto summary = canQueryEsIndex()
+          ? queryEs(distribution, percentiles, intervals)
+          : queryMagma(distribution, percentiles, intervals);
 
+      statisticsDto.setExtension(ContinuousSummaryDto.continuous, summary);
+      return TimestampedResponses.ok(getValueTable(), statisticsDto.build()).build();
+    } else {
+      ContinuousSummaryDto summary = queryMagma(distribution, percentiles, intervals, offset, limit);
+      statisticsDto.setExtension(ContinuousSummaryDto.continuous, summary);
+      return Response.ok(statisticsDto.build()).build();
+    }
   }
 
   private ContinuousSummaryDto queryEs(Distribution distribution, List<Double> percentiles, int intervals) {
@@ -108,16 +115,22 @@ public class ContinuousSummaryResource extends AbstractSummaryResource {
   }
 
   private ContinuousSummaryDto queryMagma(Distribution distribution, List<Double> percentiles, int intervals) {
+    return queryMagma(distribution, percentiles, intervals, null, null);
+  }
+
+  private ContinuousSummaryDto queryMagma(Distribution distribution, List<Double> percentiles, int intervals,
+      Integer offset, Integer limit) {
 
     log.debug("Query Magma for {} summary", getVariable().getName());
 
     ContinuousVariableSummary summary = new ContinuousVariableSummary.Builder(getVariable(), distribution) //
         .defaultPercentiles(percentiles) //
         .intervals(intervals) //
+        .filter(offset, limit) //
         .addTable(getValueTable(), getVariableValueSource()) //
         .build();
 
-    if(!"_transient".equals(getVariable().getName()) && isEsAvailable()) {
+    if(!"_transient".equals(getVariable().getName()) && isEsAvailable() && !summary.isFiltered()) {
       statsIndexManager.getIndex(getValueTable()).indexSummary(summary);
     }
 

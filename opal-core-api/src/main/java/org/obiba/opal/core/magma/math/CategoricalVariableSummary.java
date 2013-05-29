@@ -12,6 +12,7 @@ package org.obiba.opal.core.magma.math;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.SortedSet;
 
 import javax.annotation.Nonnull;
 
@@ -20,6 +21,7 @@ import org.obiba.magma.Value;
 import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
+import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VectorSource;
 import org.obiba.magma.type.BooleanType;
 import org.springframework.util.Assert;
@@ -33,7 +35,7 @@ import com.google.common.collect.Sets;
 /**
  *
  */
-public class CategoricalVariableSummary {
+public class CategoricalVariableSummary extends AbstractVariableSummary {
 
   public static final String NULL_NAME = "N/A";
 
@@ -66,7 +68,7 @@ public class CategoricalVariableSummary {
 
     VectorSource vectorSource = variableValueSource.asVectorSource();
     if(vectorSource == null) return;
-    for(Value value : vectorSource.getValues(Sets.newTreeSet(table.getVariableEntities()))) {
+    for(Value value : vectorSource.getValues(getVariableEntities(table))) {
       add(value);
     }
   }
@@ -235,6 +237,12 @@ public class CategoricalVariableSummary {
 
     public Builder distinct(boolean distinct) {
       summary.setDistinct(distinct);
+      return this;
+    }
+
+    public Builder filter(Integer offset, Integer limit) {
+      summary.setOffset(offset);
+      summary.setLimit(limit);
       return this;
     }
 

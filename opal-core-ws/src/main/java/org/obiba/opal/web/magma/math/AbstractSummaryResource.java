@@ -9,15 +9,29 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.math;
 
-import javax.annotation.Nonnull;
+import java.util.Iterator;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
+import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
+import org.obiba.magma.js.JavascriptValueSource;
+import org.obiba.magma.type.BooleanType;
 import org.obiba.opal.search.StatsIndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.search.service.OpalSearchService;
 import org.springframework.util.Assert;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 
 public class AbstractSummaryResource {
 
@@ -73,4 +87,18 @@ public class AbstractSummaryResource {
   protected boolean canQueryEsIndex() {
     return isEsAvailable() && statsIndexManager.isIndexUpToDate(valueTable);
   }
+
+  protected Iterable<VariableEntity> filterEntities(@Nullable Integer offset, @Nullable Integer limit) {
+    Iterable<VariableEntity> entities;
+    entities = valueTable.getVariableEntities();
+    // Apply offset then limit (in that order)
+    if(offset != null) {
+      entities = Iterables.skip(entities, offset);
+    }
+    if(limit != null && limit >= 0) {
+      entities = Iterables.limit(entities, limit);
+    }
+    return entities;
+  }
+
 }

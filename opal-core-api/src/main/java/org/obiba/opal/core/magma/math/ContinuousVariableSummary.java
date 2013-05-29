@@ -38,7 +38,7 @@ import com.google.common.collect.Sets;
 /**
  *
  */
-public class ContinuousVariableSummary {
+public class ContinuousVariableSummary extends AbstractVariableSummary {
 
   public static final int DEFAULT_INTERVALS = 10;
 
@@ -98,7 +98,7 @@ public class ContinuousVariableSummary {
 
     VectorSource vectorSource = variableValueSource.asVectorSource();
     if(vectorSource == null) return;
-    for(Value value : vectorSource.getValues(Sets.newTreeSet(table.getVariableEntities()))) {
+    for(Value value : vectorSource.getValues(getVariableEntities(table))) {
       add(value);
     }
   }
@@ -226,6 +226,12 @@ public class ContinuousVariableSummary {
       summary.defaultPercentiles = defaultPercentiles == null || defaultPercentiles.isEmpty()
           ? DEFAULT_PERCENTILES
           : defaultPercentiles;
+      return this;
+    }
+
+    public Builder filter(Integer offset, Integer limit) {
+      summary.setOffset(offset);
+      summary.setLimit(limit);
       return this;
     }
 
