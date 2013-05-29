@@ -354,14 +354,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
   final class ParentCommand implements Command {
     @Override
     public void execute() {
-      ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(table.getLink()).get()
-          .withCallback(new ResourceCallback<TableDto>() {
-            @Override
-            public void onResource(Response response, TableDto resource) {
-              getEventBus().fireEvent(new TableSelectionChangeEvent(VariablePresenter.this, resource));
-            }
-
-          }).send();
+      getEventBus().fireEvent(new TableSelectionChangeEvent(VariablePresenter.this, table.getDatasourceName(), table.getName()));
     }
   }
 

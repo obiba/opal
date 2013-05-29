@@ -87,7 +87,7 @@ public class TableResource extends AbstractValueTableResource {
   }
 
   @GET
-  public TableDto get(@Context UriInfo uriInfo, @QueryParam("counts") @DefaultValue("true") Boolean counts) {
+  public TableDto get(@Context UriInfo uriInfo, @QueryParam("counts") @DefaultValue("false") Boolean counts) {
     String path = uriInfo.getPath(false);
     TableDto.Builder builder = Dtos.asDto(getValueTable(), counts).setLink(path);
     if(getValueTable().isView()) {

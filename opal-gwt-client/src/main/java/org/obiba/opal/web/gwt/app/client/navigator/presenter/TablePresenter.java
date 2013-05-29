@@ -94,8 +94,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   private TableDto table;
 
-  private TableDto originalTable;
-
   private TableIndexStatusDto statusDto;
 
   private String previous;
@@ -143,9 +141,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   public void onTableSelectionChanged(TableSelectionChangeEvent e) {
     if(!isVisible()) {
       forceReveal();
-      updateDisplay(e.getSelection(), e.getPrevious(), e.getNext());
-
-      if(originalTable == null) originalTable = e.getSelection();
+      updateDisplay(e.getDatasourceName(), e.getTableName(), e.getPrevious(), e.getNext());
     }
   }
 
@@ -317,6 +313,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   private void authorize() {
+    if (table == null) return;
+
     UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName());
     // export variables in excel
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/variables/excel").get()
@@ -351,6 +349,21 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     // set permissions
     AclRequest.newResourceAuthorizationRequestBuilder()
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+  }
+
+  private void updateDisplay(String datasourceName, String tableName, final String previous, final String next) {
+    if(table != null && table.getDatasourceName().equals(datasourceName) && table.getName().equals(tableName)) {
+      updateDisplay(table, previous, next);
+    } else {
+      UriBuilder ub = UriBuilder.create().segment("datasource", "{}", "table", "{}").query("counts","true");
+      ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(datasourceName, tableName)).get()
+          .withCallback(new ResourceCallback<TableDto>() {
+            @Override
+            public void onResource(Response response, TableDto resource) {
+              updateDisplay(resource, previous, next);
+            }
+          }).send();
+    }
   }
 
   private void updateDisplay(TableDto tableDto, String previous, String next) {
@@ -429,7 +442,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }//
         .withQuery(getView().getFilter().getText())//
         .withVariable(true)//
-        .withLimit(table.getVariableCount())//
+            //.withLimit(table.getVariableCount())//
         .withSortDir(
             sortAscending == null || sortAscending ? VariablesFilter.SORT_ASCENDING : VariablesFilter.SORT_DESCENDING)//
         .withSortField(getView().getClickableColumnName(sortColumn) == null
@@ -619,7 +632,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }//
         .withVariable(true)//
         .withQuery(query)//
-        .withLimit(table.getVariableCount())//
+            //.withLimit(table.getVariableCount())//
         .withSortDir(
             sortAscending == null || sortAscending ? VariablesFilter.SORT_ASCENDING : VariablesFilter.SORT_DESCENDING)//
         .withSortField(sortColumnName == null ? "index" : sortColumnName)//
@@ -804,35 +817,14 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         updateFromTableLink(tableLink);
       }
     }
-  }
 
-  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
-  private void updateFromTableLink(Anchor tableLink) {
-    String[] s = tableLink.getText().split("\\.");
-    UriBuilder ub = UriBuilder.create().segment("datasource", "{}", "table", "{}");
-    ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(s[0], s[1])).get()
-        .withCallback(new TableResourceCallback(tableLink)).withCallback(SC_NOT_FOUND, new ResponseCodeCallback() {
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        // Nothing table does not exists
-      }
-    }).send();
-  }
+    private void updateFromTableLink(Anchor tableLink) {
+      final String[] s = tableLink.getText().split("\\.");
 
-  class TableResourceCallback implements ResourceCallback<TableDto> {
-
-    private final Anchor link;
-
-    TableResourceCallback(Anchor link) {
-      this.link = link;
-    }
-
-    @Override
-    public void onResource(Response response, final TableDto resource) {
-      link.addClickHandler(new ClickHandler() {
+      tableLink.addClickHandler(new ClickHandler() {
         @Override
         public void onClick(ClickEvent event) {
-          getEventBus().fireEvent(new TableSelectionChangeEvent(TablePresenter.this, resource));
+          getEventBus().fireEvent(new TableSelectionChangeEvent(TablePresenter.this, s[0], s[1]));
         }
       });
     }
@@ -841,7 +833,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   private class TableSelectionChangeHandler implements TableSelectionChangeEvent.Handler {
     @Override
     public void onTableSelectionChanged(TableSelectionChangeEvent event) {
-      updateDisplay(event.getSelection(), event.getPrevious(), event.getNext());
+      updateDisplay(event.getDatasourceName(), event.getTableName(), event.getPrevious(), event.getNext());
       authorize();
     }
   }

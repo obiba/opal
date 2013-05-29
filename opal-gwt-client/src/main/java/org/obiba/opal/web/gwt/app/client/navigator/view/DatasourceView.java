@@ -166,6 +166,7 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
 
   @Override
   public void afterRenderRows() {
+    dataProvider.refresh();
     boolean enableItem = table.getRowCount() > 0;
     pager.setVisible(table.getRowCount() > NavigatorView.PAGE_SIZE);
     toolbar.setExportVariableDictionaryItemEnabled(enableItem);
@@ -176,9 +177,9 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
 
   @Override
   public void renderRows(JsArray<TableDto> rows) {
+    int length = rows.length();
     dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
     pager.firstPage();
-    dataProvider.refresh();
   }
 
   @Override

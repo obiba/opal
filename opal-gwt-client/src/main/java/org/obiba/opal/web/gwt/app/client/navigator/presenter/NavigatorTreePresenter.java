@@ -65,7 +65,7 @@ public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Dis
 
           @Override
           public void onTableSelectionChanged(TableSelectionChangeEvent event) {
-            getView().selectTable(event.getSelection().getDatasourceName(), event.getSelection().getName(), false);
+            getView().selectTable(event.getDatasourceName(), event.getTableName(), false);
           }
 
         }));
@@ -201,27 +201,20 @@ public class NavigatorTreePresenter extends Presenter<NavigatorTreePresenter.Dis
           }).send();
     }
 
-    private void fireTableSelectionChangeEvent(final TreeItem item) {
-      UriBuilder ub = UriBuilder.create().segment("datasource", "{}", "table", "{}");
-      ResourceRequestBuilderFactory.<TableDto>newBuilder()
-          .forResource(ub.build(item.getParentItem().getText(), item.getText())).get()
-          .withCallback(new ResourceCallback<TableDto>() {
-            @Override
-            public void onResource(Response response, TableDto resource) {
-              TreeItem parentItem = item.getParentItem();
-              int index = parentItem.getChildIndex(item);
-              String previous = null;
-              if(index > 0) {
-                previous = item.getParentItem().getChild(index - 1).getText();
-              }
-              String next = null;
-              if(index < parentItem.getChildCount() - 1) {
-                next = item.getParentItem().getChild(index + 1).getText();
-              }
-              getEventBus()
-                  .fireEvent(new TableSelectionChangeEvent(NavigatorTreePresenter.this, resource, previous, next));
-            }
-          }).send();
+    private void fireTableSelectionChangeEvent(TreeItem item) {
+      TreeItem parentItem = item.getParentItem();
+      int index = parentItem.getChildIndex(item);
+      String previous = null;
+      if(index > 0) {
+        previous = item.getParentItem().getChild(index - 1).getText();
+      }
+      String next = null;
+      if(index < parentItem.getChildCount() - 1) {
+        next = item.getParentItem().getChild(index + 1).getText();
+      }
+      getEventBus().fireEvent(
+          new TableSelectionChangeEvent(NavigatorTreePresenter.this, item.getParentItem().getText(), item.getText(),
+              previous, next));
     }
   }
 

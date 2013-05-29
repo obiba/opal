@@ -68,7 +68,7 @@ public class DatasourceTablesResource implements AbstractTablesResource {
    * @return
    */
   @GET
-  public List<Magma.TableDto> getTables(@QueryParam("counts") @DefaultValue("true") Boolean counts,
+  public List<Magma.TableDto> getTables(@QueryParam("counts") @DefaultValue("false") Boolean counts,
       @Nullable @QueryParam("entityType") String entityType) {
     List<Magma.TableDto> tables = Lists.newArrayList();
     UriBuilder tableLink = UriBuilder.fromPath("/").path(DatasourceResource.class)

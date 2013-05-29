@@ -29,7 +29,9 @@ public class TableSelectionChangeEvent extends GwtEvent<TableSelectionChangeEven
 
   private static final Type<Handler> TYPE = new Type<Handler>();
 
-  private final TableDto tableDto;
+  private final String datasourceName;
+
+  private final String tableName;
 
   private final String previous;
 
@@ -37,17 +39,14 @@ public class TableSelectionChangeEvent extends GwtEvent<TableSelectionChangeEven
 
   private final Object source;
 
-  /**
-   * @param source
-   * @param tableDto
-   */
-  public TableSelectionChangeEvent(Object source, TableDto tableDto) {
-    this(source, tableDto, null, null);
+  public TableSelectionChangeEvent(Object source, String datasourceName, String tableName) {
+    this(source, datasourceName, tableName, null, null);
   }
 
-  public TableSelectionChangeEvent(Object source, TableDto tableDto, @Nullable String previous, @Nullable String next) {
+  public TableSelectionChangeEvent(Object source, String datasourceName, String tableName, @Nullable String previous, @Nullable String next) {
     this.source = source;
-    this.tableDto = tableDto;
+    this.datasourceName = datasourceName;
+    this.tableName = tableName;
     this.previous = previous;
     this.next = next;
   }
@@ -57,8 +56,12 @@ public class TableSelectionChangeEvent extends GwtEvent<TableSelectionChangeEven
     return source;
   }
 
-  public TableDto getSelection() {
-    return tableDto;
+  public String getDatasourceName() {
+    return datasourceName;
+  }
+
+  public String getTableName() {
+    return tableName;
   }
 
   public String getPrevious() {

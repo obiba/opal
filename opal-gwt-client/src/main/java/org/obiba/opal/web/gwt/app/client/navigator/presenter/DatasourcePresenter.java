@@ -64,6 +64,8 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
 
   private String datasourceName;
 
+  private boolean toUpdate;
+
   private JsArray<TableDto> tables;
 
   private JsArray<DatasourceDto> datasources;
@@ -185,11 +187,11 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     displayDatasource(datasourceDto, null);
   }
 
-  private void displayDatasource(final DatasourceDto datasourceDto, @Nullable TableDto tableDto) {
-    if(datasourceName == null || !isCurrentDatasource(datasourceDto)) {
+  private void displayDatasource(final DatasourceDto datasourceDto, @Nullable String table) {
+    if(datasourceName == null || isCurrentDatasourceToUpdate(datasourceDto)) {
       datasourceName = datasourceDto.getName();
       getView().setDatasource(datasourceDto);
-      updateTable(tableDto == null ? null : tableDto.getName());
+      updateTable(table);
 
       // make sure the list of datasources is initialized before looking for siblings
       if(datasources == null || datasources.length() == 0 || getDatasourceIndex(datasourceDto) < 0) {
@@ -207,10 +209,12 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
       }
 
       authorize();
-    } else if(tableDto != null) {
-      selectTable(tableDto.getName());
-    } else {
+    } else if(table != null) {
+      selectTable(table);
+    } else if (isCurrentDatasourceToUpdate(datasourceDto)) {
       updateTable(null);
+    } else {
+      getView().afterRenderRows();
     }
   }
 
@@ -242,8 +246,9 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     return index;
   }
 
-  private boolean isCurrentDatasource(DatasourceDto datasourceDto) {
-    return datasourceDto.getName().equals(datasourceName);
+  private boolean isCurrentDatasourceToUpdate(DatasourceDto datasourceDto) {
+    String name = datasourceDto.getName();
+    return toUpdate || !name.equals(datasourceName);
   }
 
   private void selectTable(String tableName) {
@@ -254,7 +259,8 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
   }
 
   private void updateTable(@Nullable String tableName) {
-    UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName, "tables");
+    toUpdate = false;
+    UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName, "tables").query("counts","true");
     ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(ub.build()).get()
         .withCallback(new TablesResourceCallback(datasourceName, tableName)).send();
   }
@@ -472,7 +478,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     @Override
     public void update(int index, TableDto tableDto, String value) {
       getEventBus().fireEvent(
-          new TableSelectionChangeEvent(DatasourcePresenter.this, tableDto, getPreviousTableName(index),
+          new TableSelectionChangeEvent(DatasourcePresenter.this, tableDto.getDatasourceName(), tableDto.getName(), getPreviousTableName(index),
               getNextTableName(index)));
     }
   }
@@ -489,15 +495,15 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
 
     @Override
     public void onTableSelectionChanged(final TableSelectionChangeEvent event) {
-      if(event.getSelection().getDatasourceName().equals(datasourceName)) {
-        selectTable(event.getSelection().getName());
+      if(event.getDatasourceName().equals(datasourceName)) {
+        selectTable(event.getTableName());
       } else {
-        UriBuilder ub = UriBuilder.create().segment("datasource", event.getSelection().getDatasourceName());
+        UriBuilder ub = UriBuilder.create().segment("datasource", event.getDatasourceName());
         ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(ub.build()).get()
             .withCallback(new ResourceCallback<DatasourceDto>() {
               @Override
               public void onResource(Response response, DatasourceDto resource) {
-                displayDatasource(resource, event.getSelection());
+                displayDatasource(resource, event.getTableName());
               }
             }).send();
       }
@@ -526,7 +532,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
       getView().setTableSelection(siblingSelection, siblingIndex);
 
       getEventBus().fireEvent(
-          new TableSelectionChangeEvent(DatasourcePresenter.this, siblingSelection, getPreviousTableName(siblingIndex),
+          new TableSelectionChangeEvent(DatasourcePresenter.this, siblingSelection.getDatasourceName(), siblingSelection.getName(), getPreviousTableName(siblingIndex),
               getNextTableName(siblingIndex)));
     }
   }
@@ -581,15 +587,7 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
 
     @Override
     public void onViewSaved(ViewSavedEvent event) {
-      UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName);
-      ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(ub.build()).get()
-          .withCallback(new ResourceCallback<DatasourceDto>() {
-
-            @Override
-            public void onResource(Response response, DatasourceDto resource) {
-              displayDatasource(resource, null);
-            }
-          }).send();
+      toUpdate = true;
     }
   }
 

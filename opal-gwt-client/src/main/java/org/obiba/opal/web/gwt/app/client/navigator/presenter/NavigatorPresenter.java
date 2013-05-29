@@ -154,8 +154,8 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
           public void onTableSelectionChanged(TableSelectionChangeEvent event) {
             getView().clearSearch();
             getView()
-                .addSearchItem(event.getSelection().getDatasourceName(), VariableSearchListItem.ItemType.DATASOURCE);
-            getView().addSearchItem(event.getSelection().getName(), VariableSearchListItem.ItemType.TABLE);
+                .addSearchItem(event.getDatasourceName(), VariableSearchListItem.ItemType.DATASOURCE);
+            getView().addSearchItem(event.getTableName(), VariableSearchListItem.ItemType.TABLE);
           }
         }));
 
