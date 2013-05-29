@@ -61,7 +61,7 @@ def do_command(args):
     """
     # Build and send request
     try:
-        request = opal.core.OpalClient(args).new_request()
+        request = opal.core.OpalClient.build(args.opal, args.user, args.password).new_request()
         request.fail_on_error()
 
         if args.accept:

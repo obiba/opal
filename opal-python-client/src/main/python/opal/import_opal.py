@@ -24,17 +24,6 @@ def add_arguments(parser):
     parser.add_argument('--json', '-j', action='store_true', help='Pretty JSON formatting of the response')
 
 
-def add_rest_datasource_factory_extension(data, factory):
-    """
-    Add specific datasource factory extension
-    """
-    rest_factory = factory.Extensions[opal.protobuf.Magma_pb2.RestDatasourceFactoryDto.params]
-    rest_factory.url = data.ropal
-    rest_factory.username = data.ruser
-    rest_factory.password = data.rpassword
-    rest_factory.remoteDatasource = data.rdatasource
-
-
 def do_command(args):
     """
     Execute import data command
@@ -43,16 +32,21 @@ def do_command(args):
     try:
         client = opal.core.OpalClient.build(args.opal, args.user, args.password)
         importer = opal.io.OpalImporter.build(client=client, destination=args.destination, tables=args.tables,
-                                              incremental=args.incremental, unit=args.unit, json=args.json,
-                                              verbose=args.verbose)
-
-
-
-
+                                              incremental=args.incremental, unit=args.unit, verbose=args.verbose)
         # print result
         extension_factory = OpalExtensionFactory(ropal=args.ropal, rdatasource=args.rdatasource, ruser=args.ruser,
                                                  rpassword=args.rpassword)
-        print importer.submit(extension_factory)
+        response = importer.submit(extension_factory)
+
+        # format response
+        res = response.content
+        if args.json:
+            res = response.pretty_json()
+
+        # output to stdout
+        print res
+
+
     except Exception, e:
         print e
         sys.exit(2)
