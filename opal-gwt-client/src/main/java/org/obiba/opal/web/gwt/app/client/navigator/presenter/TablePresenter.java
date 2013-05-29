@@ -399,7 +399,13 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   private void showFromTables(TableDto tableDto) {// Show from tables
-    ResourceRequestBuilderFactory.<JsArray<ViewDto>>newBuilder().forResource(tableDto.getViewLink()).get()
+    ResourceRequestBuilderFactory.<JsArray<ViewDto>>newBuilder().forResource(tableDto.getViewLink()).get() //
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().setFromTables(null);
+          }
+        }, SC_FORBIDDEN, SC_INTERNAL_SERVER_ERROR, SC_NOT_FOUND)//
         .withCallback(new ViewResourceCallback()).send();
   }
 
