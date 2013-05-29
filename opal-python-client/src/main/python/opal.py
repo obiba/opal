@@ -9,6 +9,7 @@ import opal.import_opal
 import opal.import_csv
 import opal.import_xml
 import opal.import_limesurvey
+import opal.import_spss
 import opal.export_xml
 import argparse
 
@@ -52,6 +53,8 @@ add_subcommand('import-xml', 'Import data from a ZIP file.', opal.import_xml.add
                opal.import_xml.do_command)
 add_subcommand('import-limesurvey', 'Import data from a LimeSurvey database.', opal.import_limesurvey.add_arguments,
                opal.import_limesurvey.do_command)
+add_subcommand('import-spss', 'Import data from a SPSS file.', opal.import_spss.add_arguments,
+               opal.import_spss.do_command)
 add_subcommand('export-xml', 'Export data to a zip of Opal XML files.', opal.export_xml.add_arguments,
                opal.export_xml.do_command)
 add_subcommand('rest', 'Request directly the Opal REST API, for advanced users.', opal.rest.add_arguments,
