@@ -36,8 +36,8 @@ public enum ValueRenderer {
     protected String getValue(ValueSetsDto.ValueDto value) {
       if(!value.hasLink() || value.getLink().isEmpty()) return "";
       String label = translations.downloadLabel();
-      if (value.hasLength()) {
-        label += " [" + ValueRenderingHelper.getSizeWithUnit(value.getLength()) +"]";
+      if(value.hasLength()) {
+        label += " [" + ValueRenderingHelper.getSizeWithUnit(value.getLength()) + "]";
       }
 
       return label;
@@ -49,7 +49,7 @@ public enum ValueRenderer {
       return translations.downloadLabel();
     }
   },
-  INTEGER, DECIMAL, BOOLEAN, LOCALE, TEXT;
+  INTEGER, DECIMAL, BOOLEAN, LOCALE, TEXT, POINT, LINE, POLYGON;
 
   private static final Translations translations = GWT.create(Translations.class);
 

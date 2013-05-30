@@ -236,7 +236,7 @@ public class VariableDtos {
 
   public enum ValueType {
 
-    TEXT, DECIMAL, INTEGER, BINARY, BOOLEAN, DATETIME, DATE, LOCALE;
+    TEXT, DECIMAL, INTEGER, BINARY, BOOLEAN, DATETIME, DATE, LOCALE, POINT, LINE, POLYGON;
 
     private final String label;
 
