@@ -106,6 +106,26 @@ class OpalImporter:
             print "**"
         return transient
 
+    def compare_datasource(self, transient):
+        # Compare datasources : /datasource/<transient_name>/compare/<ds_name>
+        uri = opal.core.UriBuilder(['datasource',
+                                    transient.name.encode('ascii', 'ignore'),
+                                    'compare', self.destination]).build()
+        request = self.client.new_request()
+        request.fail_on_error().accept_protobuf().content_type_protobuf()
+        if self.verbose:
+            request.verbose()
+        response = request.get().resource(uri).send()
+        compare = opal.protobuf.Magma_pb2.DatasourceCompareDto()
+        compare.ParseFromString(response.content)
+        for i in compare.tableComparisons:
+            if i.conflicts:
+                all_conflicts = []
+                for c in i.conflicts:
+                    all_conflicts.append(c.code + "(" + ', '.join(c.arguments) + ")")
+
+                raise Exception("Import conflicts: " + '; '.join(all_conflicts))
+
 
 class OpalExporter:
     """
