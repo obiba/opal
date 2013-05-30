@@ -24,6 +24,9 @@ import org.obiba.magma.type.DateType;
 import org.obiba.magma.type.DecimalType;
 import org.obiba.magma.type.IntegerType;
 import org.obiba.magma.type.LocaleType;
+import org.obiba.magma.type.PointType;
+import org.obiba.magma.type.LineType;
+import org.obiba.magma.type.PolygonType;
 import org.obiba.magma.type.TextType;
 
 import com.google.common.collect.ImmutableMap;
@@ -41,7 +44,11 @@ public class ValueTypeMappings {
         .put(DateType.get(), forTypeWithFormat("date", "date")) //
         .put(DateTimeType.get(), forTypeWithFormat("date", "date_time")) //
         .put(LocaleType.get(), forType("string")) //
-        .put(BinaryType.get(), forType("binary")).build();
+        .put(BinaryType.get(), forType("binary")) //
+        .put(PointType.get(), forType("string")) // point, multipoint
+        .put(LineType.get(), forType("string")) // linestring
+        .put(PolygonType.get(), forType("string")) // polygon, multipolygon
+        .build();
   }
 
   @Nonnull
