@@ -1,5 +1,5 @@
 """
-Data export in XML.
+Data export in CSV.
 """
 
 import sys
@@ -13,7 +13,7 @@ def add_arguments(parser):
     """
     parser.add_argument('--datasource', '-d', required=True, help='Datasource name')
     parser.add_argument('--tables', '-t', nargs='+', required=True, help='The list of tables to be exported')
-    parser.add_argument('--output', '-out', required=True, help='Output zip file name that will be exported')
+    parser.add_argument('--output', '-out', required=True, help='Output directory name')
     parser.add_argument('--incremental', '-i', action='store_true', help='Incremental export')
     parser.add_argument('--unit', '-un', required=False, help='Unit name for Participant ID mapping')
 
@@ -29,7 +29,7 @@ def do_command(args):
                                               unit=args.unit, output=args.output, incremental=args.incremental,
                                               verbose=args.verbose)
         # print result
-        response = exporter.submit('xml')
+        response = exporter.submit('csv')
 
         # output to stdout
         print response.code
