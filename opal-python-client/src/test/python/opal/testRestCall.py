@@ -10,9 +10,12 @@ class OpalClientTestSSLConnection(unittest.TestCase):
         setattr(cls, 'SERVER', 'http://localhost')
         setattr(cls, 'SSL_PORT', '8443')
         setattr(cls, 'SSL_SERVER', 'https://localhost')
+        # Make sure to place your own certificate files
+        setattr(cls, 'SSL_CERTIFICATE', '../../resources/certificates/publickey.pem')
+        setattr(cls, 'SSL_KEY', '../../resources/certificates/privatekey.pem')
 
     def test_sendRestBadServer(self):
-        client = OpalClient.build(server='http://badserver:8080', user='administrator',
+        client = OpalClient.build(server='http://deadbeef:8080', user='administrator',
                                   password='password')
 
         self.assertRaises(Exception, self.__sendSimpleRequest, client.new_request())
@@ -35,8 +38,8 @@ class OpalClientTestSSLConnection(unittest.TestCase):
     def test_sendSecuredRest(self):
         try:
             client = OpalClient.buildSecured(server="%s:%s" % (self.SSL_SERVER, self.SSL_PORT),
-                                             cert='/home/rhaeri/mica/mica-publickey.pem',
-                                             key='/home/rhaeri/mica/mica-privatekey.pem')
+                                             cert=self.SSL_CERTIFICATE,
+                                             key=self.SSL_KEY)
             self.__sendSimpleRequest(client.new_request())
         except Exception, e:
             self.fail(e)
