@@ -23,13 +23,17 @@ class OpalClient:
         self.curl_options = {}
         self.headers = {}
         self.base_url = self.__ensure_entry('Opal address', server)
-        if self.base_url.startswith('https:'):
-            self.verify_peer(0)
 
     @classmethod
     def buildSecured(cls, server, cert, key):
-        # TODO implement in future sprint
-        return cls(server)
+        client = cls(server)
+        if client.base_url.startswith('https:'):
+            client.verify_peer(0)
+            client.verify_host(0)
+            client.ssl_version(3)
+            client.curl_option(pycurl.HEADER, 1)
+        client.keys(cert, key)
+        return client
 
     @classmethod
     def build(cls, server, user, password):
