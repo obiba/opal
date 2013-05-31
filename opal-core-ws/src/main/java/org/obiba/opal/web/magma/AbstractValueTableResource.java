@@ -31,6 +31,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 abstract class AbstractValueTableResource {
 
@@ -91,7 +92,7 @@ abstract class AbstractValueTableResource {
   protected Iterable<VariableEntity> filterEntities(@Nullable String script, @Nullable Integer offset,
       @Nullable Integer limit) {
     Iterable<VariableEntity> entities;
-    entities = script == null ? valueTable.getVariableEntities() : getFilteredEntities(script);
+    entities = script == null ? Sets.newTreeSet(valueTable.getVariableEntities()) : getFilteredEntities(script);
     // Apply offset then limit (in that order)
     if(offset != null) {
       entities = Iterables.skip(entities, offset);
@@ -108,7 +109,7 @@ abstract class AbstractValueTableResource {
 
     JavascriptValueSource jvs = newJavaScriptValueSource(BooleanType.get(), script);
 
-    SortedSet<VariableEntity> entities = new TreeSet<VariableEntity>(valueTable.getVariableEntities());
+    SortedSet<VariableEntity> entities = Sets.newTreeSet(valueTable.getVariableEntities());
     final Iterator<Value> values = jvs.asVectorSource().getValues(entities).iterator();
 
     // filter the entities once and for all
