@@ -88,17 +88,4 @@ public class AbstractSummaryResource {
     return isEsAvailable() && statsIndexManager.isIndexUpToDate(valueTable);
   }
 
-  protected Iterable<VariableEntity> filterEntities(@Nullable Integer offset, @Nullable Integer limit) {
-    Iterable<VariableEntity> entities;
-    entities = valueTable.getVariableEntities();
-    // Apply offset then limit (in that order)
-    if(offset != null) {
-      entities = Iterables.skip(entities, offset);
-    }
-    if(limit != null && limit >= 0) {
-      entities = Iterables.limit(entities, limit);
-    }
-    return entities;
-  }
-
 }
