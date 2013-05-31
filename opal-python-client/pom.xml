@@ -22,6 +22,11 @@
     </dependency>
   </dependencies>
 
+  <properties>
+    <pythonDistPath>${basedir}/target/python_package</pythonDistPath>
+    <pythonDistName>${name}-${version}.tar.gz</pythonDistName>
+  </properties>
+
   <build>
     <plugins>
       <plugin>
@@ -40,6 +45,43 @@
             <phase>package</phase>
             <goals>
               <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unzip-package</id>
+            <phase>package</phase>
+            <configuration>
+              <tasks>
+                <!-- Unzip package -->
+                <unzip src="${basedir}/target/opal-python_${project.version}.zip" dest="${pythonDistPath}"/>
+                <copy todir="${pythonDistPath}/opal-python">
+                    <fileset dir="${basedir}/dist">
+                        <include name="*"/>
+                    </fileset>
+                </copy>
+                <exec dir="${pythonDistPath}/opal-python" executable="python" failonerror="true">
+                  <arg line="${pythonDistPath}/opal-python/setup.py" />
+                  <arg line="--pkg-name=${name}" />
+                  <arg line="--pkg-version=${version}" />
+                  <arg line="--pkg-description='${description}'" />
+                  <arg line="--pkg-download-url=http://download.obiba.org/opal/stable/${opal.deploy.dir}" />
+                  <arg line="sdist" />
+                </exec>
+                <move todir="${basedir}/target">
+                  <fileset dir="${pythonDistPath}/opal-python/dist">
+                      <include name="${pythonDistName}"/>
+                  </fileset>
+                </move>
+                <delete dir="${pythonDistPath}"/>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
             </goals>
           </execution>
         </executions>
