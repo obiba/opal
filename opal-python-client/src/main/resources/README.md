@@ -41,3 +41,7 @@ sub-commands will be developed in the future.
 ### Development
 
 Opal Python client can be easily extended by using the classes defined in `core.py` and in `protobuf/*.py` files.
+
+### User Guide
+
+A user guide with a detailed list of commands and options can be found [http://wiki.obiba.org/display/OPALDOCDEV/Opal+Python+User+Guide](here).
