@@ -1,0 +1,26 @@
+Source: opal-python-client
+Section: python
+Priority: extra
+Maintainer: OBiBa <info@obiba.org>
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.8.4
+Homepage: http://www.obiba.org
+
+Package: opal-python-client
+Architecture: all
+Depends: python (>= 2.6)
+Description: OBiBa study management framework
+ Mica is a dynamic web site platform which allows an individual or
+ community of users to publish, manage and organize a study
+ content, Mica integrates many popular features of content
+ management systems, weblogs, collaborative tools and discussion-based
+ community software into one easy-to-use package.
+ .
+ This package contains version 7 of Drupal.
+ .
+ OBiBa is an international software development project committed to building a
+ full suite of open source software for biobanks. It is comprised of several
+ independent and self-funded teams around the world, each of which is producing
+ stand-alone applications that support particular biobank activities. The
+ applications can be customized and integrated to create a complete biobank
+ information management system.

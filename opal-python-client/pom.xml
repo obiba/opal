@@ -24,7 +24,7 @@
 
   <properties>
     <pythonDistPath>${basedir}/target/python_package</pythonDistPath>
-    <pythonDistName>${name}-${version}.tar.gz</pythonDistName>
+    <pythonDistName>${project.name}-${project.version}.tar.gz</pythonDistName>
   </properties>
 
   <build>
@@ -61,20 +61,22 @@
                 <unzip src="${basedir}/target/opal-python_${project.version}.zip" dest="${pythonDistPath}"/>
                 <copy todir="${pythonDistPath}/opal-python">
                     <fileset dir="${basedir}/dist">
-                        <include name="*"/>
+                        <include name="**"/>
                     </fileset>
                 </copy>
-                <exec dir="${pythonDistPath}/opal-python" executable="python" failonerror="true">
+                <exec dir="${pythonDistPath}/opal-python" executable="make" failonerror="true">
+                  <arg line="-s" />
                   <arg line="${pythonDistPath}/opal-python/setup.py" />
-                  <arg line="--pkg-name=${name}" />
-                  <arg line="--pkg-version=${version}" />
-                  <arg line="--pkg-description='${description}'" />
-                  <arg line="--pkg-download-url=http://download.obiba.org/opal/stable/${opal.deploy.dir}" />
-                  <arg line="sdist" />
+                  <arg line="PACKAGE=${project.name}" />
+                  <arg line="VERSION=${project.version}" />
+                  <arg line="DESCRIPTION='${description}'" />
+                  <arg line="TARGETDIR=${basedir}/target/" />
+				  <arg line="DOWNLOAD_URL=http://download.obiba.org/opal/${opal.deploy.dir}/${pythonDistName}" />
+                  <arg line="builddeb" />
                 </exec>
                 <move todir="${basedir}/target">
-                  <fileset dir="${pythonDistPath}/opal-python/dist">
-                      <include name="${pythonDistName}"/>
+                  <fileset dir="${pythonDistPath}/">
+                      <include name="*.deb"/>
                   </fileset>
                 </move>
                 <delete dir="${pythonDistPath}"/>

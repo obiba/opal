@@ -1,1 +1,3 @@
-recursive-include . *.md
+include *.md
+exclude Makfile
+prune debian

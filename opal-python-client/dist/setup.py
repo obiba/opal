@@ -56,7 +56,8 @@ setup_args = get_kw(
     license=LICENSE,
     description=DESCRIPTION,
     long_description=DESCRIPTION_LOG,
-    platforms=PLATFORMS
+    platforms=PLATFORMS,
+    scripts=['bin/opalcmd.py']
 )
 
 if __name__ == '__main__':
