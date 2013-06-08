@@ -66,10 +66,10 @@
                   <arg line="--pkg-name=${project.name}" />
                   <arg line="--pkg-version=${project.version}" />
                   <arg line="--pkg-description='${project.description}'" />
-				  <arg line="--pkg-download-url=http://download.obiba.org/opal/${opal.deploy.dir}/${python.package.name}" />
+                  <arg line="--pkg-download-url=http://download.obiba.org/opal/${opal.deploy.dir}/${python.package.name}" />
                   <arg line="sdist" />
-				  <arg line="--dist-dir=${basedir}/target" />
-				  <arg line="--prune" />
+                  <arg line="--dist-dir=${basedir}/target" />
+                  <arg line="--prune" />
                 </exec>
               </target>
             </configuration>
@@ -92,54 +92,54 @@
             <artifactId>maven-antrun-plugin</artifactId>
             <executions>
               <execution>
-            <id>make-deb</id>
-            <phase>package</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <configuration>
-              <target>
-                <property name="target.dir" value="${basedir}/target" />
-                <property name="deb.dir" value="${target.dir}/deb" />
-                <property name="deb.version" value="${project.version}-b${buildNumber}" />
-                <unzip src="${target.dir}/opal-python_${project.version}.zip" dest="${target.dir}"/>
-                <!-- delete junk python bytecode -->
-                <delete>
-                    <fileset dir="${target.dir}/opal-python" includes="**/*.pyc" />
-                </delete>
-                <tstamp>
-                  <!-- http://www.debian.org/doc/debian-policy/ch-source.html -->
-                  <format property="deb.date" pattern="EEE, d MMM yyyy HH:mm:ss Z" locale="en" />
-                </tstamp>
-                <copy todir="${deb.dir}/debian">
-                  <fileset dir="${basedir}/dist/debian" />
-                  <filterset>
-                    <filter token="project.version" value="${deb.version}" />
-                    <filter token="date" value="${deb.date}" />
-                  </filterset>
-                </copy>
-                <mkdir dir="${deb.dir}/usr/share/pyshared" />
-                <mkdir dir="${deb.dir}/usr/bin" />
-                <move todir="${deb.dir}/usr/bin">
-                    <fileset dir="${target.dir}/opal-python/bin" includes="opal-client" />
-                </move>
-                <move todir="${deb.dir}/usr/share/pyshared">
-                    <fileset dir="${target.dir}/opal-python/bin" includes="**/*" />
-                </move>
-                <exec executable="debuild" dir="${deb.dir}" failonerror="true" osfamily="unix">
-                  <arg value="-us" />
-                  <arg value="-uc" />
-                  <arg value="-b" />
-                </exec>
-                <move todir="${basedir}/target">
-                  <fileset dir="${deb.dir}">
-                      <include name="*.deb"/>
-                  </fileset>
-                </move>
-                <delete dir="${deb.dir}"/>
-              </target>
-            </configuration>
-            </execution>
+                <id>make-deb</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target>
+                    <property name="target.dir" value="${basedir}/target" />
+                    <property name="deb.dir" value="${target.dir}/deb" />
+                    <property name="deb.version" value="${project.version}-b${buildNumber}" />
+                    <unzip src="${target.dir}/opal-python_${project.version}.zip" dest="${target.dir}"/>
+                    <!-- delete junk python bytecode -->
+                    <delete>
+                        <fileset dir="${target.dir}/opal-python" includes="**/*.pyc" />
+                    </delete>
+                    <tstamp>
+                      <!-- http://www.debian.org/doc/debian-policy/ch-source.html -->
+                      <format property="deb.date" pattern="EEE, d MMM yyyy HH:mm:ss Z" locale="en" />
+                    </tstamp>
+                    <copy todir="${deb.dir}/debian">
+                      <fileset dir="${basedir}/dist/debian" />
+                      <filterset>
+                        <filter token="project.version" value="${deb.version}" />
+                        <filter token="date" value="${deb.date}" />
+                      </filterset>
+                    </copy>
+                    <mkdir dir="${deb.dir}/usr/share/pyshared" />
+                    <mkdir dir="${deb.dir}/usr/bin" />
+                    <move todir="${deb.dir}/usr/bin">
+                        <fileset dir="${target.dir}/opal-python/bin" includes="opal-client" />
+                    </move>
+                    <move todir="${deb.dir}/usr/share/pyshared">
+                        <fileset dir="${target.dir}/opal-python/bin" includes="**/*" />
+                    </move>
+                    <exec executable="debuild" dir="${deb.dir}" failonerror="true" osfamily="unix">
+                      <arg value="-us" />
+                      <arg value="-uc" />
+                      <arg value="-b" />
+                    </exec>
+                    <move todir="${basedir}/target">
+                      <fileset dir="${deb.dir}">
+                          <include name="*.deb"/>
+                      </fileset>
+                    </move>
+                    <delete dir="${deb.dir}"/>
+                  </target>
+                </configuration>
+              </execution>
               <execution>
                 <id>deploy-package</id>
                 <phase>deploy</phase>
