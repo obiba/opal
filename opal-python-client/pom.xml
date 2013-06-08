@@ -22,11 +22,6 @@
     </dependency>
   </dependencies>
 
-  <properties>
-    <pythonDistPath>${basedir}/target/python_package</pythonDistPath>
-    <pythonDistName>${project.name}-${project.version}.tar.gz</pythonDistName>
-  </properties>
-
   <build>
     <plugins>
       <plugin>
@@ -56,31 +51,27 @@
             <id>unzip-package</id>
             <phase>package</phase>
             <configuration>
-              <tasks>
+              <target>
                 <!-- Unzip package -->
-                <unzip src="${basedir}/target/opal-python_${project.version}.zip" dest="${pythonDistPath}"/>
-                <copy todir="${pythonDistPath}/opal-python">
-                    <fileset dir="${basedir}/dist">
-                        <include name="**"/>
+                <property name="python.dist.path" value="${basedir}/target" />
+                <property name="python.package.name" value="${project.name}-${project.version}.tar.gz" />
+                <unzip src="${basedir}/target/opal-python_${project.version}.zip" dest="${python.dist.path}"/>
+                <copy todir="${python.dist.path}/opal-python">
+                    <fileset dir="${basedir}/dist/python">
+                        <include name="*.*"/>
                     </fileset>
                 </copy>
-                <exec dir="${pythonDistPath}/opal-python" executable="make" failonerror="true">
-                  <arg line="-s" />
-                  <arg line="${pythonDistPath}/opal-python/setup.py" />
-                  <arg line="PACKAGE=${project.name}" />
-                  <arg line="VERSION=${project.version}" />
-                  <arg line="DESCRIPTION='${description}'" />
-                  <arg line="TARGETDIR=${basedir}/target/" />
-				  <arg line="DOWNLOAD_URL=http://download.obiba.org/opal/${opal.deploy.dir}/${pythonDistName}" />
-                  <arg line="builddeb" />
+                <exec dir="${python.dist.path}/opal-python" executable="python" failonerror="true">
+                  <arg line="${python.dist.path}/opal-python/setup.py" />
+                  <arg line="--pkg-name=${project.name}" />
+                  <arg line="--pkg-version=${project.version}" />
+                  <arg line="--pkg-description='${project.description}'" />
+				  <arg line="--pkg-download-url=http://download.obiba.org/opal/${opal.deploy.dir}/${python.package.name}" />
+                  <arg line="sdist" />
+				  <arg line="--dist-dir=${basedir}/target" />
+				  <arg line="--prune" />
                 </exec>
-                <move todir="${basedir}/target">
-                  <fileset dir="${pythonDistPath}/">
-                      <include name="*.deb"/>
-                  </fileset>
-                </move>
-                <delete dir="${pythonDistPath}"/>
-              </tasks>
+              </target>
             </configuration>
             <goals>
               <goal>run</goal>
@@ -100,6 +91,55 @@
           <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
             <executions>
+              <execution>
+            <id>make-deb</id>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <property name="target.dir" value="${basedir}/target" />
+                <property name="deb.dir" value="${target.dir}/deb" />
+                <property name="deb.version" value="${project.version}-b${buildNumber}" />
+                <unzip src="${target.dir}/opal-python_${project.version}.zip" dest="${target.dir}"/>
+                <!-- delete junk python bytecode -->
+                <delete>
+                    <fileset dir="${target.dir}/opal-python" includes="**/*.pyc" />
+                </delete>
+                <tstamp>
+                  <!-- http://www.debian.org/doc/debian-policy/ch-source.html -->
+                  <format property="deb.date" pattern="EEE, d MMM yyyy HH:mm:ss Z" locale="en" />
+                </tstamp>
+                <copy todir="${deb.dir}/debian">
+                  <fileset dir="${basedir}/dist/debian" />
+                  <filterset>
+                    <filter token="project.version" value="${deb.version}" />
+                    <filter token="date" value="${deb.date}" />
+                  </filterset>
+                </copy>
+                <mkdir dir="${deb.dir}/usr/share/pyshared" />
+                <mkdir dir="${deb.dir}/usr/bin" />
+                <move todir="${deb.dir}/usr/bin">
+                    <fileset dir="${target.dir}/opal-python/bin" includes="opal-client" />
+                </move>
+                <move todir="${deb.dir}/usr/share/pyshared">
+                    <fileset dir="${target.dir}/opal-python/bin" includes="**/*" />
+                </move>
+                <exec executable="debuild" dir="${deb.dir}" failonerror="true" osfamily="unix">
+                  <arg value="-us" />
+                  <arg value="-uc" />
+                  <arg value="-b" />
+                </exec>
+                <move todir="${basedir}/target">
+                  <fileset dir="${deb.dir}">
+                      <include name="*.deb"/>
+                  </fileset>
+                </move>
+                <delete dir="${deb.dir}"/>
+              </target>
+            </configuration>
+            </execution>
               <execution>
                 <id>deploy-package</id>
                 <phase>deploy</phase>
