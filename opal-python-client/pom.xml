@@ -60,13 +60,15 @@
                     <fileset dir="${basedir}/dist/python">
                         <include name="*.*"/>
                     </fileset>
+                    <filterset>
+                      <filter token="project.name" value="${project.name}" />
+                      <filter token="project.version" value="${project.version}" />
+                      <filter token="project.description" value="${project.description}" />
+                      <filter token="project.download.url" value="http://download.obiba.org/opal/${opal.deploy.dir}/${python.package.name}" />
+                    </filterset>
                 </copy>
                 <exec dir="${python.dist.path}/opal-python" executable="python" failonerror="true">
                   <arg line="${python.dist.path}/opal-python/setup.py" />
-                  <arg line="--pkg-name=${project.name}" />
-                  <arg line="--pkg-version=${project.version}" />
-                  <arg line="--pkg-description='${project.description}'" />
-                  <arg line="--pkg-download-url=http://download.obiba.org/opal/${opal.deploy.dir}/${python.package.name}" />
                   <arg line="sdist" />
                   <arg line="--dist-dir=${basedir}/target" />
                   <arg line="--prune" />
@@ -105,7 +107,7 @@
                     <unzip src="${target.dir}/opal-python_${project.version}.zip" dest="${target.dir}"/>
                     <!-- delete junk python bytecode -->
                     <delete>
-                        <fileset dir="${target.dir}/opal-python" includes="**/*.pyc" />
+                      <fileset dir="${target.dir}/opal-python" includes="**/*.pyc" />
                     </delete>
                     <tstamp>
                       <!-- http://www.debian.org/doc/debian-policy/ch-source.html -->
@@ -121,19 +123,17 @@
                     <mkdir dir="${deb.dir}/usr/share/pyshared" />
                     <mkdir dir="${deb.dir}/usr/bin" />
                     <move todir="${deb.dir}/usr/bin">
-                        <fileset dir="${target.dir}/opal-python/bin" includes="opal-client" />
+                      <fileset dir="${target.dir}/opal-python/bin/scripts" includes="opal" />
                     </move>
-                    <move todir="${deb.dir}/usr/share/pyshared">
-                        <fileset dir="${target.dir}/opal-python/bin" includes="**/*" />
+                    <move todir="${deb.dir}/usr/share/pyshared/opal">
+                      <fileset dir="${target.dir}/opal-python/bin/opal" includes="**/*" />
                     </move>
                     <exec executable="debuild" dir="${deb.dir}" failonerror="true" osfamily="unix">
-                      <arg value="-us" />
-                      <arg value="-uc" />
                       <arg value="-b" />
                     </exec>
                     <move todir="${basedir}/target">
                       <fileset dir="${deb.dir}">
-                          <include name="*.deb"/>
+                        <include name="*.deb"/>
                       </fileset>
                     </move>
                     <delete dir="${deb.dir}"/>

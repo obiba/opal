@@ -1,6 +1,6 @@
 This work was packaged for Debian by:
 
-    OBiBa <info@obiba.org> on Fri, 04 Mar 2011 14:40:07 -0500
+    OBiBa <info@obiba.org> on Fri, 04 Mar 2013 14:40:07 -0500
 
 It was downloaded from:
 
@@ -12,7 +12,7 @@ Upstream Author(s):
 
 Copyright:
 
-    <Copyright (C) 2011 OBiBa>
+    <Copyright (C) 2013 OBiBa>
 
 License:
 
@@ -34,4 +34,4 @@ Public License version 3 can be found in "/usr/share/common-licenses/GPL-3".
 
 The Debian packaging is:
 
-    Copyright (C) 2011 OBiBa <info@obiba.org> and is licensed under the GPL version 3, see above.
+    Copyright (C) 2013 OBiBa <info@obiba.org> and is licensed under the GPL version 3, see above.

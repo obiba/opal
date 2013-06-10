@@ -1,13 +1,10 @@
 #!/usr/bin/env python
 
 from distutils.core import setup
-import string
-import sys
 
-VERSION = '1.15'
-NAME = 'OpalPythonClient'
+VERSION = '@project.version@'
+NAME = '@project.name@'
 PACKAGE_NAME = 'opal-python-client'
-PACKAGE_ROOT_DIR = '../src/main/python/'
 AUTHOR = 'OBiBa'
 AUTHOR_EMAIL = 'OBiBa <info@obiba.org>'
 MAINTAINER = 'OBiBa'
@@ -15,8 +12,8 @@ MAINTAINER_EMAIL = 'OBiBa <info@obiba.org>'
 LICENSE = 'GPL-3'
 PLATFORMS = "Any"
 URL = 'http://www.obiba.org'
-DOWNLOAD_URL = "http://download.obiba.org/opal/stable/%s-%s.tar.gz" % (NAME, VERSION)
-DESCRIPTION = 'Opal Python Client'
+DOWNLOAD_URL = '@project.download.url@'
+DESCRIPTION = '@project.description@'
 DESCRIPTION_LOG = """Data integration Web application for biobanks by OBiBa. Opal is
     OBiBa's core database application for biobanks. Participant data, once
     collected from any data source, must be integrated and stored in a central
@@ -26,26 +23,11 @@ DESCRIPTION_LOG = """Data integration Web application for biobanks by OBiBa. Opa
     assessment centres. Its ultimate purpose is to achieve seamless
     data-sharing among biobanks.
 """
+PACKAGES = ['opal', 'opal.protobuf']
+PACKAGES_DIR = {'opal': 'bin/opal'}
+SCRIPTS = ['bin/scripts/opal']
 
-
-def scan_argv(s):
-    p = None
-    i = 1
-    while i < len(sys.argv):
-        arg = sys.argv[i]
-        if string.find(arg, s) == 0:
-            p = arg[len(s):]
-            assert p, arg
-            del sys.argv[i]
-        else:
-            i += 1
-    return p
-
-
-def get_kw(**kw):
-    return kw
-
-setup_args = get_kw(
+setup(
     name=PACKAGE_NAME,
     version=VERSION,
     author=AUTHOR,
@@ -57,21 +39,7 @@ setup_args = get_kw(
     description=DESCRIPTION,
     long_description=DESCRIPTION_LOG,
     platforms=PLATFORMS,
-    scripts=['bin/opal-client']
+    packages=PACKAGES,
+    package_dir=PACKAGES_DIR,
+    scripts=SCRIPTS
 )
-
-if __name__ == '__main__':
-    # extract  commandline option
-    package_name = scan_argv('--pkg-name=')
-    package_version = scan_argv('--pkg-version=')
-    package_description = scan_argv('--pkg-description=')
-    package_download_url = scan_argv('--pkg-download-url=')
-    # Set the setup() arguments supplied by commandline
-    setup_args['name'] = package_name
-    setup_args['version'] = package_version
-    setup_args['description'] = package_description
-    setup_args['download_url'] = package_download_url
-    setup_args['packages'] = ['opal', 'opal.protobuf']
-    setup_args['package_dir'] = {'opal': 'bin/opal'}
-
-    apply(setup, (), setup_args)

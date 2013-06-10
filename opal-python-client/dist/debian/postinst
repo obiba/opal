@@ -6,11 +6,13 @@ python_lib=$(python -c "from distutils.sysconfig import get_python_lib; print(ge
 
 case "$1" in
     configure)
+    if [ -d $python_lib ]; then
+        rm -f $python_lib/opal
+    fi
     ln -s /usr/share/pyshared/opal $python_lib/opal
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
-    unlink -f $python_lib/opal
     ;;
 
     *)
