@@ -141,6 +141,20 @@
                 </configuration>
               </execution>
               <execution>
+                <id>deploy-deb</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target>
+                    <property name="deb.package.name" value="${project.name}_${project.version}-b${buildNumber}_all.deb" />
+                    <!-- Deploy deb file in deb repo -->
+                    <copy todir="${obiba.deb.dir}/${opal.deploy.dir}" file="target/${deb.package.name}" />
+                  </target>
+                </configuration>
+              </execution>
+              <execution>
                 <id>deploy-package</id>
                 <phase>deploy</phase>
                 <goals>
@@ -148,8 +162,10 @@
                 </goals>
                 <configuration>
                   <target>
+                    <property name="python.dist.path" value="${basedir}/target" />
+                    <property name="python.package.name" value="${project.name}-${project.version}.tar.gz" />
                     <!-- Deploy Python package file in download repo -->
-                    <copy todir="${obiba.download.dir}/opal/${opal.deploy.dir}" file="target/opal-python_${project.version}.zip" />
+                    <copy todir="${obiba.download.dir}/opal/${opal.deploy.dir}" file="target/${python.package.name}" />
                   </target>
                 </configuration>
               </execution>
