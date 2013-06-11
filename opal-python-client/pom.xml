@@ -71,7 +71,6 @@
                   <arg line="${python.dist.path}/opal-python/setup.py" />
                   <arg line="sdist" />
                   <arg line="--dist-dir=${basedir}/target" />
-                  <arg line="--prune" />
                 </exec>
               </target>
             </configuration>

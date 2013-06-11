@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from ez_setup import use_setuptools
+use_setuptools()
 from distutils.core import setup
 
 VERSION = '@project.version@'
@@ -26,6 +28,7 @@ DESCRIPTION_LOG = """Data integration Web application for biobanks by OBiBa. Opa
 PACKAGES = ['opal', 'opal.protobuf']
 PACKAGES_DIR = {'opal': 'bin/opal'}
 SCRIPTS = ['bin/scripts/opal']
+INSTALL_REQUIRES = ['protobuf >= 2.4', 'pycurl']
 
 setup(
     name=PACKAGE_NAME,
@@ -41,5 +44,6 @@ setup(
     platforms=PLATFORMS,
     packages=PACKAGES,
     package_dir=PACKAGES_DIR,
-    scripts=SCRIPTS
+    scripts=SCRIPTS,
+    install_requires=INSTALL_REQUIRES
 )
