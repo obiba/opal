@@ -29,6 +29,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.bytes.BytesReference;
+import org.elasticsearch.common.collect.ImmutableMap;
 import org.elasticsearch.common.collect.Maps;
 import org.elasticsearch.rest.RestChannel;
 import org.elasticsearch.rest.RestResponse;
@@ -243,10 +244,13 @@ public class ValueTableIndexResource extends IndexResource {
 
     private final String esUri;
 
+    private final Map<String, String> headers;
+
     JaxRsRestRequest(ValueTableIndex tableIndex, HttpServletRequest servletRequest, String body, String path) {
       this.body = body;
       this.servletRequest = servletRequest;
       params = Maps.newHashMap();
+      headers = Maps.newHashMap();
       rawPath = tableIndex.getRequestPath() + "/" + path;
 
       // Reconstruct the uri
@@ -254,6 +258,13 @@ public class ValueTableIndexResource extends IndexResource {
       esUri = rawPath + (queryString != null ? '?' + queryString : "");
 
       RestUtils.decodeQueryString(queryString != null ? queryString : "", 0, params);
+
+      // headers
+      String cType = servletRequest.getHeader("Content-Type");
+      if (cType == null) {
+        cType = "application/json";
+      }
+      headers.put("Content-Type", cType);
     }
 
     @Override
@@ -284,7 +295,7 @@ public class ValueTableIndexResource extends IndexResource {
 
     @Override
     public String header(String name) {
-      return servletRequest.getHeader(name);
+      return headers.get(name);
     }
 
     @Override
