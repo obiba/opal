@@ -744,6 +744,11 @@
           </exclusion>
         </exclusions>
       </dependency>
+      <dependency>
+        <groupId>org.scannotation</groupId>
+        <artifactId>scannotation</artifactId>
+        <version>${scannotation.version}</version>
+      </dependency>
 
       <!-- Jetty dependencies -->
       <dependency>
@@ -1091,6 +1096,12 @@
         <groupId>rhino</groupId>
         <artifactId>js</artifactId>
         <version>${rhino-js.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.wordnik</groupId>
+        <artifactId>swagger-jaxrs_2.9.1</artifactId>
+        <version>${swagger.version}</version>
       </dependency>
 
     </dependencies>
@@ -1475,12 +1486,14 @@
     <REngine.version>0.6-8</REngine.version>
     <resteasy.version>2.3.6.Final</resteasy.version>
     <rhino-js.version>1.7R2</rhino-js.version>
+    <scannotation.version>1.0.3</scannotation.version>
     <shiro.version>1.1.0</shiro.version>
     <shiro-extras.version>1.0.1-obiba</shiro-extras.version>
     <slf4j.version>1.7.5</slf4j.version>
     <spring.version>3.1.4.RELEASE</spring.version>
     <spring-batch.version>2.0.3.RELEASE</spring-batch.version>
     <sshd.version>0.8.0</sshd.version>
+    <swagger.version>1.2.4</swagger.version>
     <truezip.version>6.6</truezip.version>
     <velocity.version>1.6.4</velocity.version>
     <xfire.version>1.2.6</xfire.version>
