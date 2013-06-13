@@ -195,9 +195,11 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     expect(datasourceMock.createWriter("name", "entityType")).andReturn(valueTableWriterMock);
     expect(valueTableWriterMock.writeVariables()).andReturn(variableWriterMock);
 
+
     variableWriterMock.writeVariable(EasyMock.isA(Variable.class));
     EasyMock.expectLastCall().times(5);
     variableWriterMock.close();
+    valueTableWriterMock.close();
 
     replay(valueTableMock, datasourceMock, valueTableWriterMock, variableWriterMock);
 

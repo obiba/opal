@@ -34,9 +34,11 @@ import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
+import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.opal.web.TimestampedResponses;
@@ -127,7 +129,6 @@ public class VariablesResource extends AbstractValueTableResource {
 
   @POST
   public Response addOrUpdateVariables(List<VariableDto> variables) {
-    VariableWriter vw = null;
     try {
 
       // @TODO Check if table can be modified and respond with "IllegalTableModification" (it seems like this cannot be
@@ -137,24 +138,29 @@ public class VariablesResource extends AbstractValueTableResource {
         return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "CannotWriteToView"))
             .build();
       }
-      vw = addOrUpdateTableVariables(variables);
+      addOrUpdateTableVariables(variables);
 
       return Response.ok().build();
     } catch(Exception e) {
       return Response.status(Status.INTERNAL_SERVER_ERROR)
           .entity(getErrorMessage(Status.INTERNAL_SERVER_ERROR, e.toString())).build();
-    } finally {
-      StreamUtil.silentSafeClose(vw);
     }
   }
 
-  protected VariableWriter addOrUpdateTableVariables(Iterable<VariableDto> variables) {
-    VariableWriter vw = getValueTable().getDatasource()
-        .createWriter(getValueTable().getName(), getValueTable().getEntityType()).writeVariables();
-    for(VariableDto variable : variables) {
-      vw.writeVariable(Dtos.fromDto(variable));
+  protected void addOrUpdateTableVariables(Iterable<VariableDto> variables) {
+    ValueTableWriter vtw = null;
+    VariableWriter vw = null;
+    try {
+      vtw = getValueTable().getDatasource()
+          .createWriter(getValueTable().getName(), getValueTable().getEntityType());
+      vw = vtw.writeVariables();
+      for(VariableDto variable : variables) {
+        vw.writeVariable(Dtos.fromDto(variable));
+      }
+    } finally {
+      Closeables.closeQuietly(vw);
+      Closeables.closeQuietly(vtw);
     }
-    return vw;
   }
 
   @Override

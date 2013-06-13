@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response.Status;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
+import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.web.magma.view.ViewDtos;
@@ -40,16 +41,15 @@ public class VariablesViewResource extends VariablesResource {
   @Override
   @POST
   public Response addOrUpdateVariables(List<VariableDto> variables) {
-    VariableWriter vw = null;
     try {
 
       // @TODO Check if table can be modified and respond with "IllegalTableModification" (it seems like this cannot be
       // done with the current Magma implementation).
 
       if(!getValueTable().isView()) {
-        vw = addOrUpdateTableVariables(variables);
+        addOrUpdateTableVariables(variables);
       } else if(viewManager != null || viewDtos == null) {
-        vw = addOrUpdateViewVariables(variables);
+        addOrUpdateViewVariables(variables);
       } else {
         return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "CannotWriteToView"))
             .build();
@@ -59,19 +59,21 @@ public class VariablesViewResource extends VariablesResource {
     } catch(Exception e) {
       return Response.status(Status.INTERNAL_SERVER_ERROR)
           .entity(getErrorMessage(Status.INTERNAL_SERVER_ERROR, e.toString())).build();
-    } finally {
-      StreamUtil.silentSafeClose(vw);
     }
   }
 
-  private VariableWriter addOrUpdateViewVariables(Iterable<VariableDto> variables) {
-    View view = getValueTableAsView();
-    VariableWriter vw = view.getListClause().createWriter();
-    for(VariableDto variable : variables) {
-      vw.writeVariable(Dtos.fromDto(variable));
+  private void addOrUpdateViewVariables(Iterable<VariableDto> variables) {
+    VariableWriter vw = null;
+    try {
+      View view = getValueTableAsView();
+      vw = view.getListClause().createWriter();
+      for(VariableDto variable : variables) {
+        vw.writeVariable(Dtos.fromDto(variable));
+      }
+      viewManager.addView(getDatasource().getName(), view);
+    } finally {
+      Closeables.closeQuietly(vw);
     }
-    viewManager.addView(getDatasource().getName(), view);
-    return vw;
   }
 
   //
