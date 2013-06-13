@@ -231,7 +231,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
 
         @Override
         public boolean apply(Variable input) {
-          return !input.getValueType().equals(BinaryType.get());
+          return !input.getValueType().isGeo() && !input.getValueType().equals(BinaryType.get());
         }
 
       });

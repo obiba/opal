@@ -72,6 +72,15 @@
           <g:item value="date">
             <ui:msg description="Date label">date</ui:msg>
           </g:item>
+          <g:item value="point">
+            <ui:msg description="Point label">point</ui:msg>
+          </g:item>
+          <g:item value="line">
+            <ui:msg description="Line label">line</ui:msg>
+          </g:item>
+          <g:item value="polygon">
+            <ui:msg description="Polygon label">polygon</ui:msg>
+          </g:item>
           <g:item value="locale">
             <ui:msg description="Locale label">locale</ui:msg>
           </g:item>
