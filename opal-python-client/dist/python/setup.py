@@ -2,7 +2,7 @@
 
 from ez_setup import use_setuptools
 use_setuptools()
-from distutils.core import setup
+from setuptools import setup
 
 VERSION = '@project.version@'
 NAME = '@project.name@'

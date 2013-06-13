@@ -70,6 +70,7 @@
                 <exec dir="${python.dist.path}/opal-python" executable="python" failonerror="true">
                   <arg line="${python.dist.path}/opal-python/setup.py" />
                   <arg line="sdist" />
+                  <arg line="--formats=gztar,zip" />
                   <arg line="--dist-dir=${basedir}/target" />
                 </exec>
               </target>
@@ -86,7 +87,7 @@
   <profiles>
     <profile>
       <!-- A profile for the builds performed by the continuous integration server -->
-      <id>ci-build</id>
+      <id>ci-buildWithAuthentication</id>
       <build>
         <plugins>
           <plugin>
