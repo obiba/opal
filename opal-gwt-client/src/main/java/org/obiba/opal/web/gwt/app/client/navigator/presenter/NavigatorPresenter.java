@@ -144,7 +144,7 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
           @Override
           public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
             getView().clearSearch();
-            getView().addSearchItem(event.getSelection().getName(), VariableSearchListItem.ItemType.DATASOURCE);
+            getView().addSearchItem(event.getSelection(), VariableSearchListItem.ItemType.DATASOURCE);
           }
         }));
 

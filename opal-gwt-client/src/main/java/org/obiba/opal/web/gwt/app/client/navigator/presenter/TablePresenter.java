@@ -489,6 +489,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == SC_OK) {
           getEventBus().fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
+          getEventBus().fireEvent(new DatasourceSelectionChangeEvent(table.getDatasourceName()));
         } else {
           String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
           getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
@@ -510,6 +511,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == SC_OK) {
           getEventBus().fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
+          getEventBus().fireEvent(new DatasourceSelectionChangeEvent(table.getDatasourceName()));
         } else {
           String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
           getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
@@ -669,15 +671,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   private final class ParentCommand implements Command {
     @Override
     public void execute() {
-      UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName());
-      ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(ub.build()).get()
-          .withCallback(new ResourceCallback<DatasourceDto>() {
-            @Override
-            public void onResource(Response response, DatasourceDto resource) {
-              getEventBus().fireEvent(new DatasourceSelectionChangeEvent(resource));
-            }
-
-          }).send();
+      getEventBus().fireEvent(new DatasourceSelectionChangeEvent(table.getDatasourceName()));
     }
   }
 

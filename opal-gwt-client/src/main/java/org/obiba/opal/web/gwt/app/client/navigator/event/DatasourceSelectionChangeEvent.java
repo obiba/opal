@@ -27,17 +27,21 @@ public class DatasourceSelectionChangeEvent extends GwtEvent<DatasourceSelection
 
   private static final Type<Handler> TYPE = new Type<Handler>();
 
-  private final DatasourceDto datasourceDto;
+  private final String datasource;
 
   /**
    * @param datasourceDto
    */
   public DatasourceSelectionChangeEvent(DatasourceDto datasourceDto) {
-    this.datasourceDto = datasourceDto;
+    datasource = datasourceDto.getName();
   }
 
-  public DatasourceDto getSelection() {
-    return datasourceDto;
+  public DatasourceSelectionChangeEvent(String datasource) {
+    this.datasource = datasource;
+  }
+
+  public String getSelection() {
+    return datasource;
   }
 
   public static Type<Handler> getType() {
