@@ -56,15 +56,10 @@
       <groupId>com.googlecode.protobuf-java-format</groupId>
       <artifactId>protobuf-java-format</artifactId>
     </dependency>
-    <dependency>
+    <!--dependency>
       <groupId>org.scannotation</groupId>
       <artifactId>scannotation</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.wordnik</groupId>
-      <artifactId>swagger-jaxrs_2.9.1</artifactId>
-      <scope>compile</scope>
-    </dependency>
+    </dependency-->
   </dependencies>
 
 </project>
