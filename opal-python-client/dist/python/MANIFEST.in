@@ -1,3 +1,2 @@
 include *.md
-exclude Makefile
-prune debian
+include ez_setup.py

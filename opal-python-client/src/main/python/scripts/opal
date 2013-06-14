@@ -22,6 +22,8 @@ def add_opal_arguments(parser):
     parser.add_argument('--opal', '-o', required=False, help='Opal server base url')
     parser.add_argument('--user', '-u', required=False, help='User name')
     parser.add_argument('--password', '-p', required=False, help='User password')
+    parser.add_argument('--ssl-cert', '-sc', required=False, help='Certificate (public key) file')
+    parser.add_argument('--ssl-key', '-sk', required=False, help='Private key file')
     parser.add_argument('--verbose', '-v', action='store_true', help='Verbose output')
 
 

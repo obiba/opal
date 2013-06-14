@@ -25,18 +25,27 @@ class OpalClient:
         self.base_url = self.__ensure_entry('Opal address', server)
 
     @classmethod
-    def buildSecured(cls, server, cert, key):
+    def build(cls, loginInfo):
+        if loginInfo.isSsl():
+            return OpalClient.buildWithCertificate(loginInfo.data['server'], loginInfo.data['cert'],
+                                                   loginInfo.data['key'])
+        else:
+            return OpalClient.buildWithAuthentication(loginInfo.data['server'], loginInfo.data['user'],
+                                                      loginInfo.data['password'])
+        raise Exception('Failed to build Opal Client')
+
+    @classmethod
+    def buildWithCertificate(cls, server, cert, key):
         client = cls(server)
         if client.base_url.startswith('https:'):
             client.verify_peer(0)
             client.verify_host(0)
             client.ssl_version(3)
-            client.curl_option(pycurl.HEADER, 1)
         client.keys(cert, key)
         return client
 
     @classmethod
-    def build(cls, server, user, password):
+    def buildWithAuthentication(cls, server, user, password):
         client = cls(server)
         client.credentials(user, password)
         return client
@@ -85,6 +94,36 @@ class OpalClient:
 
     def new_request(self):
         return OpalRequest(self)
+
+    class LoginInfo:
+        data = None
+
+        @classmethod
+        def parse(cls, args):
+            data = {}
+            argv = vars(args)
+
+            if argv.get('opal'):
+                data['server'] = argv['opal']
+            else:
+                raise Exception('Opal server information is missing.')
+
+            if argv.get('user') and argv.get('password'):
+                data['user'] = argv['user']
+                data['password'] = argv['password']
+            elif argv.get('ssl_cert') and argv.get('ssl_key'):
+                data['cert'] = argv['ssl_cert']
+                data['key'] = argv['ssl_key']
+            else:
+                raise Exception('Invalid login information. Requires user-password or certificate-key information')
+
+            setattr(cls, 'data', data)
+            return cls()
+
+        def isSsl(self):
+            if self.data.viewkeys() & {'cert', 'key'}:
+                return True
+            return False
 
 
 class OpalRequest:
