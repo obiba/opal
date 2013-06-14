@@ -78,7 +78,7 @@ class OpalImporter:
         if self.verbose:
             request.verbose()
 
-        # buildWithAuthentication transient datasource factory
+        # build transient datasource factory
         factory = opal.protobuf.Magma_pb2.DatasourceFactoryDto()
         if self.incremental:
             factory.incrementalConfig.incremental = True

@@ -87,7 +87,7 @@
   <profiles>
     <profile>
       <!-- A profile for the builds performed by the continuous integration server -->
-      <id>ci-buildWithAuthentication</id>
+      <id>ci-build</id>
       <build>
         <plugins>
           <plugin>
