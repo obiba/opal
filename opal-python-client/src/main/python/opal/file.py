@@ -40,13 +40,13 @@ def do_command(args):
     """
     # Build and send request
     try:
-        request = opal.core.OpalClient.build(args.opal, args.user, args.password).new_request()
+        request = opal.core.OpalClient.build(opal.core.OpalClient.LoginInfo.parse(args)).new_request()
         request.fail_on_error().accept_json()
 
         if args.verbose:
             request.verbose()
 
-        # build opal file
+        # buildWithAuthentication opal file
         file = OpalFile(args.path)
 
         # send request

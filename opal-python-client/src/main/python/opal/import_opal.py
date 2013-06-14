@@ -30,7 +30,7 @@ def do_command(args):
     """
     # Build and send request
     try:
-        client = opal.core.OpalClient.build(args.opal, args.user, args.password)
+        client = opal.core.OpalClient.build(opal.core.OpalClient.LoginInfo.parse(args))
         importer = opal.io.OpalImporter.build(client=client, destination=args.destination, tables=args.tables,
                                               incremental=args.incremental, unit=args.unit, verbose=args.verbose)
         # print result

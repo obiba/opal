@@ -70,8 +70,8 @@
                 <exec dir="${python.dist.path}/opal-python" executable="python" failonerror="true">
                   <arg line="${python.dist.path}/opal-python/setup.py" />
                   <arg line="sdist" />
+                  <arg line="--formats=gztar,zip" />
                   <arg line="--dist-dir=${basedir}/target" />
-                  <arg line="--prune" />
                 </exec>
               </target>
             </configuration>
