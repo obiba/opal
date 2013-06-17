@@ -28,7 +28,7 @@ def do_command(args):
         exporter = opal.io.OpalExporter.build(client=client, datasource=args.datasource, tables=args.tables,
                                               unit=args.unit, output=args.output, incremental=args.incremental,
                                               verbose=args.verbose)
-        # Take filename as the table name
+        # Check output filename extension
         if not (args.output.endswith('.zip')):
             raise Exception('Output must be a zip file.')
 
