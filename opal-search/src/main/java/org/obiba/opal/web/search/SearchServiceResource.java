@@ -92,7 +92,11 @@ public class SearchServiceResource extends IndexResource {
         .setSchedule(getScheduleDto(datasource.getName(), valueTable.getName())) //
         .setStatus(getTableIndexationStatus(datasource.getName(), valueTable.getName())) //
         .setProgress(progress) //
-        .setLink(link.getPath()).setTableLastUpdate(timestamps.getLastUpdate().toString()).build();
+        .setLink(link.getPath()).build();
+
+    if(!timestamps.getLastUpdate().isNull()) {
+      tableStatusDto = tableStatusDto.toBuilder().setTableLastUpdate(timestamps.getLastUpdate().toString()).build();
+    }
 
     if(!indexManager.getIndex(valueTable).getTimestamps().getCreated().isNull()) {
       tableStatusDto = tableStatusDto.toBuilder()

@@ -81,8 +81,11 @@ public class ValueTableIndexResource extends IndexResource {
       Opal.TableIndexStatusDto tableStatusDto = Opal.TableIndexStatusDto.newBuilder().setDatasource(datasource)
           .setTable(table).setSchedule(getScheduleDto(datasource, table))
           .setStatus(getTableIndexationStatus(datasource, table))
-          .setProgress(getValueTableIndexationProgress(datasource, table)).setLink(link.getPath())
-          .setTableLastUpdate(valueTable.getTimestamps().getLastUpdate().toString()).build();
+          .setProgress(getValueTableIndexationProgress(datasource, table)).setLink(link.getPath()).build();
+
+      if(!valueTable.getTimestamps().getCreated().isNull()) {
+        tableStatusDto = tableStatusDto.toBuilder().setTableLastUpdate(valueTable.getTimestamps().getLastUpdate().toString()).build();
+      }
 
       if(!indexManager.getIndex(valueTable).getTimestamps().getCreated().isNull()) {
         tableStatusDto = tableStatusDto.toBuilder()
@@ -261,7 +264,7 @@ public class ValueTableIndexResource extends IndexResource {
 
       // headers
       String cType = servletRequest.getHeader("Content-Type");
-      if (cType == null) {
+      if(cType == null) {
         cType = "application/json";
       }
       headers.put("Content-Type", cType);
