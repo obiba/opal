@@ -60,6 +60,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationPresenter
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueMapPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.view.ScriptEditorView;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
@@ -168,6 +169,8 @@ public interface OpalGinjector extends Ginjector {
   ConfirmationPresenter getConfirmationPresenter();
 
   Provider<ScriptEvaluationPopupPresenter> getScriptEvaluationPopupPresenter();
+
+  ValueMapPopupPresenter getValueMapPopupPresenter();
 
   ValueSequencePopupPresenter getValueSequencePopupPresenter();
 

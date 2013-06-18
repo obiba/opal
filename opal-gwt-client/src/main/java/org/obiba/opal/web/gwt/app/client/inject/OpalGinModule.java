@@ -26,6 +26,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.ItemSelectorPresenter
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEditorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEvaluationPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueMapPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.view.ConfirmationView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.DatasourceSelectorView;
@@ -33,6 +34,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.view.ItemSelectorView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.ScriptEditorView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.ScriptEvaluationPopupView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.SummaryTabView;
+import org.obiba.opal.web.gwt.app.client.widgets.view.ValueMapPopupView;
 import org.obiba.opal.web.gwt.app.client.widgets.view.ValueSequencePopupView;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.ScriptEvaluationPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ScriptEvaluationView;
@@ -78,6 +80,8 @@ public class OpalGinModule extends AbstractPresenterModule {
     bind(SummaryTabPresenter.Display.class).to(SummaryTabView.class);
     bindPresenterWidget(ScriptEvaluationPresenter.class, ScriptEvaluationPresenter.Display.class,
         ScriptEvaluationView.class);
+    bindPresenterWidget(ValueMapPopupPresenter.class, ValueMapPopupPresenter.Display.class,
+        ValueMapPopupView.class);
     bindPresenterWidget(ValueSequencePopupPresenter.class, ValueSequencePopupPresenter.Display.class,
         ValueSequencePopupView.class);
   }

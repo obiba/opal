@@ -55,15 +55,14 @@ public class ValueMapPopupPresenter extends PresenterWidget<ValueMapPopupPresent
   @Override
   protected void onBind() {
     super.onBind();
-    getView().setValueSetFetcher(new ValueSetFetcherImpl());
     addHandler();
   }
 
-  public void initialize(TableDto table, VariableDto variable, String entityIdentifier, boolean modal) {
+  public void initialize(TableDto table, VariableDto variable, String entityIdentifier, ValueSetsDto.ValueDto value, boolean modal) {
     this.table = table;
     this.variable = variable;
     this.entityIdentifier = entityIdentifier;
-    getView().initialize(table, variable, entityIdentifier, modal);
+    getView().initialize(table, variable, entityIdentifier, value, modal);
   }
 
   //
@@ -84,74 +83,12 @@ public class ValueMapPopupPresenter extends PresenterWidget<ValueMapPopupPresent
   // Inner classes and Interfaces
   //
 
-  private final class ValueSetFetcherImpl implements ValueSetFetcher {
-    @Override
-    public void request(String filter) {
-      if(filter == null || filter.isEmpty()) {
-        requestValueSet(Arrays.asList(variable), filter);
-      } else {
-        requestVariablesAndValueSet(filter);
-      }
-    }
-
-    private void requestVariablesAndValueSet(final String filter) {
-      StringBuilder link = new StringBuilder(table.getLink());
-      link.append("/variables").append("?script=").append(URL.encodePathSegment(filter));
-      ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link.toString()).get()
-          .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
-
-            @Override
-            public void onResource(Response response, JsArray<VariableDto> resource) {
-              requestValueSet(JsArrays.toList(JsArrays.toSafeArray(resource)), filter);
-            }
-
-          }).send();
-    }
-
-    private void requestValueSet(final List<VariableDto> variables, String filter) {
-      StringBuilder link = new StringBuilder(table.getLink());
-      link.append("/valueSet/").append(entityIdentifier).append("?select=");
-      if(filter == null || filter.isEmpty()) {
-        link.append(URL.encodePathSegment("name().eq('" + variable.getName() + "')"));
-      } else {
-        link.append(URL.encodePathSegment(filter));
-      }
-      ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder().forResource(link.toString()).get()
-          .withCallback(new ResourceCallback<ValueSetsDto>() {
-
-            @Override
-            public void onResource(Response response, ValueSetsDto resource) {
-              getView().populate(variables, resource);
-            }
-          }).send();
-    }
-
-    @Override
-    public void requestBinaryValue(VariableDto variable, String entityIdentifier, int index) {
-      StringBuilder link = new StringBuilder(table.getLink());
-      link.append("/valueSet/").append(entityIdentifier).append("/variable/").append(variable.getName())
-          .append("/value").append("?pos=").append(index);
-      getEventBus().fireEvent(new FileDownloadEvent(link.toString()));
-    }
-  }
-
   public interface Display extends PopupView {
 
-    void initialize(TableDto table, VariableDto variable, String entityIdentifier, boolean modal);
+    void initialize(TableDto table, VariableDto variable, String entityIdentifier, ValueSetsDto.ValueDto value, boolean modal);
 
     HasClickHandlers getButton();
 
-    void populate(List<VariableDto> variables, ValueSetsDto valueSet);
-
-    void setValueSetFetcher(ValueSetFetcher fetcher);
-
-  }
-
-  public interface ValueSetFetcher {
-
-    void request(String filter);
-
-    void requestBinaryValue(VariableDto variable, String entityIdentifier, int index);
   }
 
 }

@@ -677,6 +677,11 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     }
 
     @Override
+    public void onGeoValueSelection(VariableDto variable, int row, int column, ValueSetDto valueSet, ValueSetsDto.ValueDto value) {
+      fetcher.requestGeoValue(variable, valueSet.getIdentifier(), value);
+    }
+
+    @Override
     public void onValueSequenceSelection(VariableDto variable, int row, int column, ValueSetDto valueSet) {
       fetcher.requestValueSequence(variable, valueSet.getIdentifier());
     }

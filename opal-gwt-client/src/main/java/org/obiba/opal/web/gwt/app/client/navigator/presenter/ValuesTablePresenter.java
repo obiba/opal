@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.util.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueMapPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.TextBoxClearable;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -53,14 +54,17 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private DataFetcher fetcher;
 
+  private final ValueMapPopupPresenter valueMapPopupPresenter;
+
   private final ValueSequencePopupPresenter valueSequencePopupPresenter;
 
   private final EntityDialogPresenter entityDialogPresenter;
 
   @Inject
-  public ValuesTablePresenter(Display display, EventBus eventBus,
+  public ValuesTablePresenter(Display display, EventBus eventBus, ValueMapPopupPresenter valueMapPopupPresenter,
       ValueSequencePopupPresenter valueSequencePopupPresenter, EntityDialogPresenter entityDialogPresenter) {
     super(eventBus, display);
+    this.valueMapPopupPresenter = valueMapPopupPresenter;
     this.valueSequencePopupPresenter = valueSequencePopupPresenter;
     this.entityDialogPresenter = entityDialogPresenter;
   }
@@ -132,6 +136,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   private void hidePopups(TableDto newTable) {
     if(table != null && !table.getName().equals(newTable.getName())) {
       valueSequencePopupPresenter.getView().hide();
+      valueMapPopupPresenter.getView().hide();
       entityDialogPresenter.getView().hide();
     }
   }
@@ -326,6 +331,12 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
 
     @Override
+    public void requestGeoValue(VariableDto variable, String entityIdentifier, ValueSetsDto.ValueDto value) {
+      valueMapPopupPresenter.initialize(table, variable, entityIdentifier, value, false);
+      addToPopupSlot(valueMapPopupPresenter);
+    }
+
+    @Override
     public void requestValueSequence(VariableDto variable, String entityIdentifier) {
       valueSequencePopupPresenter.initialize(table, variable, entityIdentifier, false);
       addToPopupSlot(valueSequencePopupPresenter);
@@ -431,6 +442,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     void request(String filter, int offset, int limit, boolean exactMatch);
 
     void requestBinaryValue(VariableDto variable, String entityIdentifier);
+
+    void requestGeoValue(VariableDto variable, String entityIdentifier, ValueSetsDto.ValueDto value);
 
     void requestValueSequence(VariableDto variable, String entityIdentifier);
 

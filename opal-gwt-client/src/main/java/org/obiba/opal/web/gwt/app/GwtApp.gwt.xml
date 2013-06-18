@@ -59,6 +59,9 @@
   <inherits name='com.google.gwt.query.Query'/>
   <inherits name='com.watopi.chosen.Chosen'/>
 
+  <!-- Oen Layers Mapping -->
+  <inherits name='org.gwtopenmaps.openlayers.OpenLayers'/>
+
   <!-- Specify the app entry point class. -->
   <entry-point class='org.obiba.opal.web.gwt.app.client.GwtApp'/>
 

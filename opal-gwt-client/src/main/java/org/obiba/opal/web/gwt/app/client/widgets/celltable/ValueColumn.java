@@ -19,6 +19,7 @@ import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.TextCell;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.cellview.client.Column;
 
 public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
@@ -57,6 +58,9 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
     if("binary".equalsIgnoreCase(variable.getValueType())) {
       return new ClickableTextCell(new ClickableIconRenderer("i-down"));
     }
+    if("point".equalsIgnoreCase(variable.getValueType())) {
+      return new ClickableTextCell(new ClickableIconRenderer("i-image"));
+    }
     if(VariableDtos.ValueType.TEXT.is(variable.getValueType())) {
       return new TextCell(new MultilineTextRenderer());
     }
@@ -70,17 +74,34 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
     this.variable = variable;
     valueRenderer = ValueRenderer.valueOf(variable.getValueType().toUpperCase());
 
-    if(variable.getIsRepeatable() || "binary".equalsIgnoreCase(variable.getValueType())) {
+    if(variable.getIsRepeatable()) {
       setFieldUpdater(new FieldUpdater<ValueSetsDto.ValueSetDto, String>() {
 
         @Override
         public void update(int index, ValueSetDto valueSet, String value) {
           if(valueSelectionHandler != null) {
-            if(ValueColumn.this.variable.getIsRepeatable()) {
               valueSelectionHandler.onValueSequenceSelection(ValueColumn.this.variable, index, getPosition(), valueSet);
-            } else {
-              valueSelectionHandler.onBinaryValueSelection(ValueColumn.this.variable, index, getPosition(), valueSet);
-            }
+          }
+        }
+      });
+    } else if("binary".equalsIgnoreCase(variable.getValueType())) {
+      setFieldUpdater(new FieldUpdater<ValueSetsDto.ValueSetDto, String>() {
+
+        @Override
+        public void update(int index, ValueSetDto valueSet, String value) {
+          if(valueSelectionHandler != null) {
+            valueSelectionHandler.onBinaryValueSelection(ValueColumn.this.variable, index, getPosition(), valueSet);
+          }
+        }
+      });
+    } else if("point".equalsIgnoreCase(variable.getValueType())) {
+      setFieldUpdater(new FieldUpdater<ValueSetsDto.ValueSetDto, String>() {
+
+        @Override
+        public void update(int index, ValueSetDto valueSet, String value) {
+          if(valueSelectionHandler != null) {
+            valueSelectionHandler.onGeoValueSelection(ValueColumn.this.variable, index, getPosition(), valueSet,
+                valueSet.getValuesArray().get(getPosition()));
           }
         }
       });
@@ -110,6 +131,9 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
   public interface ValueSelectionHandler {
 
     void onBinaryValueSelection(VariableDto variableDto, int row, int column, ValueSetsDto.ValueSetDto valueSet);
+
+    void onGeoValueSelection(VariableDto variableDto, int row, int column, ValueSetsDto.ValueSetDto valueSet,
+        ValueSetsDto.ValueDto value);
 
     void onValueSequenceSelection(VariableDto variableDto, int row, int column, ValueSetsDto.ValueSetDto valueSet);
 

@@ -89,6 +89,11 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
       }
 
       @Override
+      public void onGeoValueSelection(VariableDto variableDto, int row, int column, ValueSetDto valueSet, ValueSetsDto.ValueDto value) {
+
+      }
+
+      @Override
       public void onValueSequenceSelection(VariableDto variable, int row, int column, ValueSetDto valueSet) {
       }
 
