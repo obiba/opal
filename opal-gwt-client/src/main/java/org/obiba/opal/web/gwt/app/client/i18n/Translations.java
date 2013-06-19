@@ -828,6 +828,26 @@ public interface Translations extends Constants {
   @DefaultStringValue("No summary data available")
   String noSummaryDataAvailableLabel();
 
+  @Description("Summary preview pending on label")
+  @DefaultStringValue("Summary preview pending on")
+  String summaryPreviewPendingLabel();
+
+  @Description("/{0} entities label")
+  @DefaultStringValue("/{0} entities")
+  String summaryTotalEntitiesLabel();
+
+  @Description("Full summary pending... label")
+  @DefaultStringValue("Full summary pending...")
+  String summaryFullPendingLabel();
+
+  @Description("This is a summary preview on label")
+  @DefaultStringValue("This is a summary preview on")
+  String summaryPreviewOnLabel();
+
+  @Description("Fetch summary preview on label")
+  @DefaultStringValue("Fetch summary preview on")
+  String summaryFetchSummaryLabel();
+
   @Description("Remove label")
   @DefaultStringValue("Remove")
   String removeLabel();
@@ -1089,7 +1109,7 @@ public interface Translations extends Constants {
       "fs", "XML", //
       "csv", "CSV", //
       "excel", "Excel", //
-      "null", "None"})
+      "null", "None" })
   Map<String, String> datasourceTypeMap();
 
   @Description("Data Import Format Step")

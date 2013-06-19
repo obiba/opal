@@ -122,14 +122,14 @@ public class SummaryTabView implements SummaryTabPresenter.Display {
       previewSummaryTextSuffix.setVisible(true);
       fullSummaryLink.setVisible(false);
       refreshSummaryLink.setVisible(false);
-      previewSummaryText.setText("Summary preview pending on");
-      previewSummaryTextSuffix.setText("/" + max + " entities");
+      previewSummaryText.setText(translations.summaryPreviewPendingLabel());
+      previewSummaryTextSuffix.setText(translations.summaryTotalEntitiesLabel().replaceAll("{0}", String.valueOf(max)));
     } else {
       limitTextBox.setVisible(false);
       previewSummaryTextSuffix.setVisible(false);
       fullSummaryLink.setVisible(false);
       refreshSummaryLink.setVisible(false);
-      previewSummaryText.setText("Full summary pending...");
+      previewSummaryText.setText(translations.summaryFullPendingLabel());
     }
     previewSummary.setVisible(true);
     cancelSummaryLink.setVisible(true);
@@ -144,8 +144,8 @@ public class SummaryTabView implements SummaryTabPresenter.Display {
       cancelSummaryLink.setVisible(false);
       refreshSummaryLink.setVisible(true);
       fullSummaryLink.setVisible(true);
-      previewSummaryText.setText("This is a summary preview on");
-      previewSummaryTextSuffix.setText("/" + max + " entities");
+      previewSummaryText.setText(translations.summaryPreviewOnLabel());
+      previewSummaryTextSuffix.setText(translations.summaryTotalEntitiesLabel().replaceAll("{0}", String.valueOf(max)));
     } else {
       previewSummary.setVisible(false);
     }
@@ -162,8 +162,8 @@ public class SummaryTabView implements SummaryTabPresenter.Display {
     previewSummaryTextSuffix.setVisible(true);
     fullSummaryLink.setVisible(true);
     refreshSummaryLink.setVisible(true);
-    previewSummaryText.setText("Fetch summary preview on");
-    previewSummaryTextSuffix.setText("/" + max + " entities");
+    previewSummaryText.setText(translations.summaryFetchSummaryLabel());
+    previewSummaryTextSuffix.setText(translations.summaryTotalEntitiesLabel());
   }
 
   @Override
