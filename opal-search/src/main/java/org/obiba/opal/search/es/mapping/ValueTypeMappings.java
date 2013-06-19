@@ -25,7 +25,7 @@ import org.obiba.magma.type.DecimalType;
 import org.obiba.magma.type.IntegerType;
 import org.obiba.magma.type.LocaleType;
 import org.obiba.magma.type.PointType;
-import org.obiba.magma.type.LineType;
+import org.obiba.magma.type.LineStringType;
 import org.obiba.magma.type.PolygonType;
 import org.obiba.magma.type.TextType;
 
@@ -46,7 +46,7 @@ public class ValueTypeMappings {
         .put(LocaleType.get(), forType("string")) //
         .put(BinaryType.get(), forType("binary")) //
         .put(PointType.get(), forType("string")) // point, multipoint
-        .put(LineType.get(), forType("string")) // linestring
+        .put(LineStringType.get(), forType("string")) // linestring
         .put(PolygonType.get(), forType("string")) // polygon, multipolygon
         .build();
   }

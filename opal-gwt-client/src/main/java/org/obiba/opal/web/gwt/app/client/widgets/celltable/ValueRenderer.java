@@ -49,7 +49,7 @@ public enum ValueRenderer {
       return translations.downloadLabel();
     }
   },
-  INTEGER, DECIMAL, BOOLEAN, LOCALE, TEXT, POINT, LINE, POLYGON;
+  INTEGER, DECIMAL, BOOLEAN, LOCALE, TEXT, POINT, LINESTRING, POLYGON;
 
   private static final Translations translations = GWT.create(Translations.class);
 

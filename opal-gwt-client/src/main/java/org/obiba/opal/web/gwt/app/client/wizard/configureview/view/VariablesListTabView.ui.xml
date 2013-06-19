@@ -75,8 +75,8 @@
           <g:item value="point">
             <ui:msg description="Point label">point</ui:msg>
           </g:item>
-          <g:item value="line">
-            <ui:msg description="Line label">line</ui:msg>
+          <g:item value="linestring">
+            <ui:msg description="LineString label">line</ui:msg>
           </g:item>
           <g:item value="polygon">
             <ui:msg description="Polygon label">polygon</ui:msg>
