@@ -131,15 +131,8 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
 
     max = entitiesCount;
     limit = max;
-//
-//    if (max > DEFAULT_LIMIT){
-//      resourceRequestBuilder = ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()
-//          .forResource(UriBuilder.create().fromPath(resourceUri).query("limit", String.valueOf(limit)).build()).get();
-//    }
-//    else{
     resourceRequestBuilder = ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()
         .forResource(UriBuilder.create().fromPath(resourceUri).build()).get();
-//    }
   }
 
   public void setRequestBuilder(ResourceRequestBuilder<SummaryStatisticsDto> resourceRequestBuilder) {
