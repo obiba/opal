@@ -32,6 +32,8 @@ public class BaseMap extends Composite {
 
   protected Panel contentPanel = new SimplePanel();
 
+  private MapWidget mapWidget;
+
   protected Map map;
 
   protected BaseMap() {
@@ -48,7 +50,7 @@ public class BaseMap extends Composite {
     defaultMapOptions.setNumZoomLevels(16);
 
     //Create a MapWidget and add an OSM layers
-    MapWidget mapWidget = new MapWidget(width, height, defaultMapOptions);
+    mapWidget = new MapWidget(width, height, defaultMapOptions);
     map = mapWidget.getMap();
 
     // open street map
@@ -67,6 +69,14 @@ public class BaseMap extends Composite {
     //map.addControl(new ScaleLine()); //Display the scaleline
 
     contentPanel.add(mapWidget);
+  }
+
+  public void setHeight(String height) {
+    mapWidget.setHeight(height);
+  }
+
+  public void setWidth(String width) {
+    mapWidget.setWidth(width);
   }
 
   protected void center(double lon, double lat, int zoom) {

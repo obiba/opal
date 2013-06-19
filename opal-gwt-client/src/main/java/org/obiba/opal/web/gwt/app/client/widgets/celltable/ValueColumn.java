@@ -58,7 +58,7 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
     if("binary".equalsIgnoreCase(variable.getValueType())) {
       return new ClickableTextCell(new ClickableIconRenderer("i-down"));
     }
-    if("point".equalsIgnoreCase(variable.getValueType())) {
+    if(variable.getValueType().matches("point|linestring|polygon")) {
       return new ClickableTextCell(new ClickableIconRenderer("i-image"));
     }
     if(VariableDtos.ValueType.TEXT.is(variable.getValueType())) {
@@ -94,7 +94,7 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
           }
         }
       });
-    } else if("point".equalsIgnoreCase(variable.getValueType())) {
+    } else if(variable.getValueType().matches("point|linestring|polygon")) {
       setFieldUpdater(new FieldUpdater<ValueSetsDto.ValueSetDto, String>() {
 
         @Override

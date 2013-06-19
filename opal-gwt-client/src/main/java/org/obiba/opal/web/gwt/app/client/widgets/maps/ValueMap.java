@@ -17,7 +17,11 @@ import org.gwtopenmaps.openlayers.client.control.SelectFeature;
 import org.gwtopenmaps.openlayers.client.event.VectorFeatureSelectedListener;
 import org.gwtopenmaps.openlayers.client.event.VectorFeatureUnselectedListener;
 import org.gwtopenmaps.openlayers.client.feature.VectorFeature;
+import org.gwtopenmaps.openlayers.client.geometry.Geometry;
+import org.gwtopenmaps.openlayers.client.geometry.LineString;
+import org.gwtopenmaps.openlayers.client.geometry.LinearRing;
 import org.gwtopenmaps.openlayers.client.geometry.Point;
+import org.gwtopenmaps.openlayers.client.geometry.Polygon;
 import org.gwtopenmaps.openlayers.client.layer.Vector;
 import org.gwtopenmaps.openlayers.client.popup.FramedCloud;
 import org.gwtopenmaps.openlayers.client.popup.Popup;
@@ -90,14 +94,25 @@ public abstract class ValueMap extends BaseMap {
    * @param style
    */
   protected void addPointFeature(Vector vectorLayer, ValueSetsDto.ValueDto value, String id) {
-    double[] coordinates = parseValue(value);
-    Point p = new Point(coordinates[0], coordinates[1]);
-    p.transform(DEFAULT_PROJECTION, new Projection(map.getProjection()));
+    Point p = parsePoint(value);
+    addGeometryFeature(vectorLayer, p, id);
+  }
 
+  protected void addLineStringFeature(Vector vectorLayer, ValueSetsDto.ValueDto value, String id) {
+    LineString p = parseLineString(value);
+    addGeometryFeature(vectorLayer, p, id);
+  }
+
+  protected void addPolygonFeature(Vector vectorLayer, ValueSetsDto.ValueDto value, String id) {
+    Polygon p = parsePolygon(value);
+    addGeometryFeature(vectorLayer, p, id);
+  }
+
+  private void addGeometryFeature(Vector vectorLayer, Geometry g, String id) {
     Style style = getDefaultPointStyle();
     style.setLabel(id);
 
-    VectorFeature pointFeature = new VectorFeature(p, style);
+    VectorFeature pointFeature = new VectorFeature(g, style);
     pointFeature.setFeatureId(id);
     vectorLayer.addFeature(pointFeature);
 
@@ -163,7 +178,45 @@ public abstract class ValueMap extends BaseMap {
     return st;
   }
 
-  protected double[] parseValue(ValueSetsDto.ValueDto value) {
+  protected Point parsePoint(ValueSetsDto.ValueDto value) {
+    JSONArray array = (JSONArray) JSONParser.parseStrict(value.getValue());
+    double[] coordinates = new double[2];
+    coordinates[0] = ((JSONNumber) array.get(0)).doubleValue();
+    coordinates[1] = ((JSONNumber) array.get(1)).doubleValue();
+
+    Point p = new Point(coordinates[0], coordinates[1]);
+    p.transform(DEFAULT_PROJECTION, new Projection(map.getProjection()));
+
+    return p;
+  }
+  protected LineString parseLineString(ValueSetsDto.ValueDto value) {
+    JSONArray array = (JSONArray) JSONParser.parseStrict(value.getValue());
+    return new LineString(parsePoints(array));
+  }
+
+
+  protected Polygon parsePolygon(ValueSetsDto.ValueDto value) {
+    JSONArray array = (JSONArray) JSONParser.parseStrict(value.getValue());
+    LinearRing[] rings = new LinearRing[array.size()];
+    for(int i = 0; i < array.size(); i++) {
+      JSONArray shape = (JSONArray) array.get(i);
+      rings[i] = new LinearRing(parsePoints(shape));
+    }
+    return new Polygon(rings);
+  }
+
+  protected Point[] parsePoints(JSONArray array) {
+    Point[] rval = new Point[array.size()];
+    for(int i = 0; i < array.size(); i++) {
+      JSONArray point = (JSONArray) array.get(i);
+      double x = ((JSONNumber) point.get(0)).doubleValue();
+      double y = ((JSONNumber) point.get(1)).doubleValue();
+      rval[i] = new Point(x, y);
+    }
+    return rval;
+  }
+
+  protected double[] parseCoordinates(ValueSetsDto.ValueDto value) {
     JSONArray array = (JSONArray) JSONParser.parseStrict(value.getValue());
     double[] coordinates = new double[2];
     coordinates[0] = ((JSONNumber) array.get(0)).doubleValue();

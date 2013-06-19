@@ -52,7 +52,7 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
           }
         }
       });
-    } else if("point".equalsIgnoreCase(variable.getValueType())) {
+    } else if(variable.getValueType().matches("point|linestring|polygon")) {
       setFieldUpdater(new FieldUpdater<ValueOccurrence, String>() {
 
         @Override
@@ -70,7 +70,7 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
     if("binary".equalsIgnoreCase(variable.getValueType())) {
       return new ClickableTextCell(new ClickableIconRenderer("i-down"));
     }
-    if("point".equalsIgnoreCase(variable.getValueType())) {
+    if(variable.getValueType().matches("point|linestring|polygon")) {
       return new ClickableTextCell(new ClickableIconRenderer("i-image"));
     }
     return new TextCell();

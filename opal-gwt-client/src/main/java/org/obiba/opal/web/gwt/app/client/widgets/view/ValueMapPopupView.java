@@ -11,7 +11,9 @@ package org.obiba.opal.web.gwt.app.client.widgets.view;
 
 import org.obiba.opal.web.gwt.app.client.navigator.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueOccurrenceColumn.ValueOccurrence;
+import org.obiba.opal.web.gwt.app.client.widgets.maps.LineStringValueMap;
 import org.obiba.opal.web.gwt.app.client.widgets.maps.PointValueMap;
+import org.obiba.opal.web.gwt.app.client.widgets.maps.PolygonValueMap;
 import org.obiba.opal.web.gwt.app.client.widgets.maps.ValueMap;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueMapPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
@@ -79,8 +81,17 @@ public class ValueMapPopupView extends PopupViewImpl implements ValueMapPopupPre
     dialogBox.setModal(true);
     dialogBox.setText(event.getVariable().getName() + " - " + event.getEntityIdentifier());
     panel.clear();
-    ValueMap map = new PointValueMap(event.getVariable(), event.getValue(), event.getIndex());
-    panel.add(map);
+    ValueMap map = null;
+    
+    if (event.getVariable().getValueType().equals("point"))
+      map = new PointValueMap(event.getVariable(), event.getValue(), event.getIndex());
+    else if (event.getVariable().getValueType().equals("linestring"))
+      map = new LineStringValueMap(event.getVariable(), event.getValue(), event.getIndex());
+    else if (event.getVariable().getValueType().equals("polygon"))
+      map = new PolygonValueMap(event.getVariable(), event.getValue(), event.getIndex());
+
+    if (map != null)
+      panel.add(map);
   }
 
   //
