@@ -20,16 +20,18 @@
             <g:Label ui:field="previewSummaryTextSuffix" addStyleNames="inline"></g:Label>
           </g:customCell>
           <g:customCell styleName="middle-aligned">
-            <g:Anchor ui:field="refreshSummaryLink" addStyleNames="inline xsmall-indent action" visible="true">Refresh
+            <g:Anchor ui:field="refreshSummaryLink" addStyleNames="inline xsmall-indent action" visible="true">
+              <ui:msg description="Refresh summary label">Refresh</ui:msg>
             </g:Anchor>
           </g:customCell>
           <g:customCell styleName="middle-aligned">
-            <g:Anchor ui:field="fullSummaryLink" addStyleNames="inline xsmall-indent action" visible="true">Full
-              Summary
+            <g:Anchor ui:field="fullSummaryLink" addStyleNames="inline xsmall-indent action" visible="true">
+              <ui:msg description="Full Summary label">Full Summary</ui:msg>
             </g:Anchor>
           </g:customCell>
           <g:customCell styleName="middle-aligned">
-            <g:Anchor ui:field="cancelSummaryLink" addStyleNames="inline xsmall-indent action" visible="true">Cancel
+            <g:Anchor ui:field="cancelSummaryLink" addStyleNames="inline xsmall-indent action" visible="true">
+              <ui:msg description="Cancel Pending Summary label">Cancel</ui:msg>
             </g:Anchor>
           </g:customCell>
         </g:row>
