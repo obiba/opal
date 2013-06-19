@@ -89,6 +89,17 @@ public class UriBuilder {
     return sb.toString();
   }
 
+  /**
+   * Parses a path to return a UriBuilder
+   *
+   * @param path
+   * @return uriBuilder
+   */
+  public UriBuilder fromPath(String p) {
+    append(path, p.split("/"));
+    return this;
+  }
+
   private void append(Collection<String> list, String... strings) {
     for(String pathItem : strings) {
       list.add(URL.encodePathSegment(pathItem));

@@ -67,7 +67,7 @@ public class DeriveNumericalVariableStepPresenter
       VariableDto derivedVariable) {
     super.initialize(originalTable, destinationTable, originalVariable, derivedVariable);
     getView().setNumberType(originalVariable.getValueType());
-    summaryTabPresenter.setResourceUri(originalVariable.getLink() + "/summary");
+    summaryTabPresenter.setResourceUri(originalVariable.getLink() + "/summary", originalTable.getValueSetCount());
     summaryTabPresenter.forgetSummary();
     summaryTabPresenter.refreshDisplay();
   }
