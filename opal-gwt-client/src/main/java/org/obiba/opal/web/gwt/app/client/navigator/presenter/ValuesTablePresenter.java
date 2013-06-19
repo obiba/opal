@@ -15,6 +15,7 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.navigator.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.util.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
@@ -54,17 +55,14 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private DataFetcher fetcher;
 
-  private final ValueMapPopupPresenter valueMapPopupPresenter;
-
   private final ValueSequencePopupPresenter valueSequencePopupPresenter;
 
   private final EntityDialogPresenter entityDialogPresenter;
 
   @Inject
-  public ValuesTablePresenter(Display display, EventBus eventBus, ValueMapPopupPresenter valueMapPopupPresenter,
+  public ValuesTablePresenter(Display display, EventBus eventBus,
       ValueSequencePopupPresenter valueSequencePopupPresenter, EntityDialogPresenter entityDialogPresenter) {
     super(eventBus, display);
-    this.valueMapPopupPresenter = valueMapPopupPresenter;
     this.valueSequencePopupPresenter = valueSequencePopupPresenter;
     this.entityDialogPresenter = entityDialogPresenter;
   }
@@ -136,7 +134,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   private void hidePopups(TableDto newTable) {
     if(table != null && !table.getName().equals(newTable.getName())) {
       valueSequencePopupPresenter.getView().hide();
-      valueMapPopupPresenter.getView().hide();
       entityDialogPresenter.getView().hide();
     }
   }
@@ -332,8 +329,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     @Override
     public void requestGeoValue(VariableDto variable, String entityIdentifier, ValueSetsDto.ValueDto value) {
-      valueMapPopupPresenter.initialize(table, variable, entityIdentifier, value, false);
-      addToPopupSlot(valueMapPopupPresenter);
+      getEventBus().fireEvent(new GeoValueDisplayEvent(variable, entityIdentifier, value));
     }
 
     @Override

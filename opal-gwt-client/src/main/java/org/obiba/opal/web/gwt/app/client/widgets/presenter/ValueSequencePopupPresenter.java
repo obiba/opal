@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.navigator.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -133,6 +134,11 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
           .append("/value").append("?pos=").append(index);
       getEventBus().fireEvent(new FileDownloadEvent(link.toString()));
     }
+
+    @Override
+    public void requestGeoValue(VariableDto variable, String entityIdentifier, ValueSetsDto.ValueDto value, int index) {
+      getEventBus().fireEvent(new GeoValueDisplayEvent(variable, entityIdentifier, value, index));
+    }
   }
 
   public interface Display extends PopupView {
@@ -152,6 +158,8 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
     void request(String filter);
 
     void requestBinaryValue(VariableDto variable, String entityIdentifier, int index);
+
+    void requestGeoValue(VariableDto variable, String entityIdentifier, ValueSetsDto.ValueDto value, int index);
   }
 
 }

@@ -213,7 +213,7 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
     return null;
   }
 
-  private ValueOccurrenceColumn createValueOccurrenceColumn(VariableDto variable, int pos) {
+  private ValueOccurrenceColumn createValueOccurrenceColumn(VariableDto variable, final int pos) {
     ValueOccurrenceColumn col = new ValueOccurrenceColumn(variable, pos);
     if(valueSelectionHandler == null) {
       valueSelectionHandler = new ValueSelectionHandler() {
@@ -221,6 +221,11 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
         @Override
         public void onBinaryValueSelection(VariableDto variable, int index, ValueSetDto valueSet) {
           fetcher.requestBinaryValue(variable, valueSet.getIdentifier(), index);
+        }
+
+        @Override
+        public void onGeoValueSelection(VariableDto variable, int index, ValueSetDto valueSet, ValueSetsDto.ValueDto value) {
+          fetcher.requestGeoValue(variable, valueSet.getIdentifier(), value, index);
         }
       };
     }

@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueOccurrenceColumn.ValueOccurrence;
+import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -34,7 +35,7 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
 
   private final ValueRenderer valueRenderer;
 
-  public ValueOccurrenceColumn(VariableDto variable, int pos) {
+  public ValueOccurrenceColumn(VariableDto variable, final int pos) {
     super(createCell(variable));
     this.pos = pos;
     this.variable = variable;
@@ -51,13 +52,28 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
           }
         }
       });
+    } else if("point".equalsIgnoreCase(variable.getValueType())) {
+      setFieldUpdater(new FieldUpdater<ValueOccurrence, String>() {
+
+        @Override
+        public void update(int index, ValueOccurrence object, String value) {
+          if(valueSelectionHandler != null) {
+            valueSelectionHandler
+                .onGeoValueSelection(ValueOccurrenceColumn.this.variable, index, object.getValueSet(), object.getValueSet().getValuesArray().get(pos));
+          }
+        }
+      });
     }
   }
 
   private static Cell<String> createCell(VariableDto variable) {
-    return "binary".equalsIgnoreCase(variable.getValueType()) //
-        ? new ClickableTextCell(new ClickableIconRenderer("i-down")) //
-        : new TextCell();
+    if("binary".equalsIgnoreCase(variable.getValueType())) {
+      return new ClickableTextCell(new ClickableIconRenderer("i-down"));
+    }
+    if("point".equalsIgnoreCase(variable.getValueType())) {
+      return new ClickableTextCell(new ClickableIconRenderer("i-image"));
+    }
+    return new TextCell();
   }
 
   public void setValueSelectionHandler(ValueSelectionHandler valueSelectionHandler) {
@@ -103,6 +119,8 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
   public interface ValueSelectionHandler {
 
     void onBinaryValueSelection(VariableDto variable, int index, ValueSetDto valueSet);
+
+    void onGeoValueSelection(VariableDto variable, int index, ValueSetDto valueSet, ValueSetsDto.ValueDto value);
 
   }
 }

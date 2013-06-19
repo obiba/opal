@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.navigator.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -36,12 +37,6 @@ import com.gwtplatform.mvp.client.PresenterWidget;
  */
 public class ValueMapPopupPresenter extends PresenterWidget<ValueMapPopupPresenter.Display> {
 
-  private TableDto table;
-
-  private VariableDto variable;
-
-  private String entityIdentifier;
-
   /**
    * @param eventBus
    * @param view
@@ -58,11 +53,8 @@ public class ValueMapPopupPresenter extends PresenterWidget<ValueMapPopupPresent
     addHandler();
   }
 
-  public void initialize(TableDto table, VariableDto variable, String entityIdentifier, ValueSetsDto.ValueDto value, boolean modal) {
-    this.table = table;
-    this.variable = variable;
-    this.entityIdentifier = entityIdentifier;
-    getView().initialize(table, variable, entityIdentifier, value, modal);
+  public void handle(GeoValueDisplayEvent event) {
+    getView().initialize(event);
   }
 
   //
@@ -85,7 +77,7 @@ public class ValueMapPopupPresenter extends PresenterWidget<ValueMapPopupPresent
 
   public interface Display extends PopupView {
 
-    void initialize(TableDto table, VariableDto variable, String entityIdentifier, ValueSetsDto.ValueDto value, boolean modal);
+    void initialize(GeoValueDisplayEvent event);
 
     HasClickHandlers getButton();
 

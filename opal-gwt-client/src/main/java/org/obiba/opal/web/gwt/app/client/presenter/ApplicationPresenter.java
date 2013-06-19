@@ -13,10 +13,12 @@ import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdminis
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.ui.HasUrl;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueMapPopupPresenter;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -92,17 +94,20 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   private final Provider<FileSelectorPresenter> fileSelectorPresenter;
 
+  private final Provider<ValueMapPopupPresenter> valueMapPopupPresenter;
+
   private final RequestUrlBuilder urlBuilder;
 
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public ApplicationPresenter(Display display, Proxy proxy, EventBus eventBus, RequestCredentials credentials,
       NotificationPresenter messageDialog, Provider<FileSelectorPresenter> fileSelectorPresenter,
-      RequestUrlBuilder urlBuilder) {
+      Provider<ValueMapPopupPresenter> valueMapPopupPresenter, RequestUrlBuilder urlBuilder) {
     super(eventBus, display, proxy);
     this.credentials = credentials;
     this.messageDialog = messageDialog;
     this.fileSelectorPresenter = fileSelectorPresenter;
+    this.valueMapPopupPresenter = valueMapPopupPresenter;
     this.urlBuilder = urlBuilder;
   }
 
@@ -124,6 +129,15 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
             addToPopupSlot(fsp);
           }
         }));
+    registerHandler(getEventBus().addHandler(GeoValueDisplayEvent.getType(), new GeoValueDisplayEvent.Handler() {
+
+      @Override
+      public void onGeoValueDisplay(GeoValueDisplayEvent event) {
+        ValueMapPopupPresenter vmp = valueMapPopupPresenter.get();
+        vmp.handle(event);
+        addToPopupSlot(vmp);
+      }
+    }));
     registerHandler(getEventBus().addHandler(FileDownloadEvent.getType(), new FileDownloadEvent.Handler() {
 
       @Override

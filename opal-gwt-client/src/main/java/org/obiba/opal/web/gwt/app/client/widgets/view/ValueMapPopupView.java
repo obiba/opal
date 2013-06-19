@@ -9,8 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.view;
 
+import org.obiba.opal.web.gwt.app.client.navigator.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueOccurrenceColumn.ValueOccurrence;
 import org.obiba.opal.web.gwt.app.client.widgets.maps.PointValueMap;
+import org.obiba.opal.web.gwt.app.client.widgets.maps.ValueMap;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueMapPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -73,11 +75,12 @@ public class ValueMapPopupView extends PopupViewImpl implements ValueMapPopupPre
   }
 
   @Override
-  public void initialize(TableDto table, VariableDto variable, String entityIdentifier, ValueSetsDto.ValueDto value, boolean modal) {
-    dialogBox.setModal(modal);
-    dialogBox.setText(variable.getName() + " - " + entityIdentifier);
+  public void initialize(GeoValueDisplayEvent event) {
+    dialogBox.setModal(true);
+    dialogBox.setText(event.getVariable().getName() + " - " + event.getEntityIdentifier());
     panel.clear();
-    panel.add(new PointValueMap(value));
+    ValueMap map = new PointValueMap(event.getVariable(), event.getValue(), event.getIndex());
+    panel.add(map);
   }
 
   //
