@@ -1,3 +1,40 @@
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
-  <g:SimplePanel ui:field="summary" width="100%"/>
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui">
+
+  <g:FlowPanel>
+    <b:Alert ui:field="previewSummary" close="false" visible="true">
+      <g:Grid>
+        <g:row>
+          <g:customCell styleName="middle-aligned">
+            <g:Label ui:field="previewSummaryText" addStyleNames="inline"></g:Label>
+          </g:customCell>
+          <g:customCell styleName="middle-aligned">
+            <b:InputAddOn>
+              <o:NumericTextBox ui:field="limitTextBox" addStyleNames="inline xsmall-indent limitSummary"
+                  visible="true"/>
+            </b:InputAddOn>
+          </g:customCell>
+          <g:customCell styleName="middle-aligned">
+            <g:Label ui:field="previewSummaryTextSuffix" addStyleNames="inline"></g:Label>
+          </g:customCell>
+          <g:customCell styleName="middle-aligned">
+            <g:Anchor ui:field="refreshSummaryLink" addStyleNames="inline xsmall-indent action" visible="true">Refresh
+            </g:Anchor>
+          </g:customCell>
+          <g:customCell styleName="middle-aligned">
+            <g:Anchor ui:field="fullSummaryLink" addStyleNames="inline xsmall-indent action" visible="true">Full
+              Summary
+            </g:Anchor>
+          </g:customCell>
+          <g:customCell styleName="middle-aligned">
+            <g:Anchor ui:field="cancelSummaryLink" addStyleNames="inline xsmall-indent action" visible="true">Cancel
+            </g:Anchor>
+          </g:customCell>
+        </g:row>
+      </g:Grid>
+    </b:Alert>
+    <g:SimplePanel ui:field="summary" width="100%"/>
+  </g:FlowPanel>
 </ui:UiBinder>

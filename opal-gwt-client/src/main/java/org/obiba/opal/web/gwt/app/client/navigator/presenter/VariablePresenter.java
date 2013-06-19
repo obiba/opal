@@ -213,7 +213,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
    */
   @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void requestSummary(VariableDto selection) {
-    getEventBus().fireEvent(new SummaryRequiredEvent(selection.getLink() + "/summary"));
+    getEventBus().fireEvent(new SummaryRequiredEvent(selection.getLink() + "/summary", table.getValueSetCount()));
   }
 
   @SuppressWarnings("MethodOnlyUsedFromInnerClass")
@@ -354,7 +354,8 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
   final class ParentCommand implements Command {
     @Override
     public void execute() {
-      getEventBus().fireEvent(new TableSelectionChangeEvent(VariablePresenter.this, table.getDatasourceName(), table.getName()));
+      getEventBus()
+          .fireEvent(new TableSelectionChangeEvent(VariablePresenter.this, table.getDatasourceName(), table.getName()));
     }
   }
 

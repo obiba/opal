@@ -27,12 +27,23 @@ public class SummaryRequiredEvent extends GwtEvent<SummaryRequiredEvent.Handler>
 
   private final String resourceUri;
 
+  private Integer max = null;
+
   public SummaryRequiredEvent(String resourceUri) {
     this.resourceUri = resourceUri;
   }
 
+  public SummaryRequiredEvent(String resourceUri, Integer max) {
+    this.resourceUri = resourceUri;
+    this.max = max;
+  }
+
   public String getResourceUri() {
     return resourceUri;
+  }
+
+  public Integer getMax() {
+    return max;
   }
 
   public static Type<Handler> getType() {
