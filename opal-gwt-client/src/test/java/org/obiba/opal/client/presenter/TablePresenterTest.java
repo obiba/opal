@@ -63,8 +63,6 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     eventBusMock = createMock(EventBus.class);
     usersAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
-    ValueMapPopupPresenter.Display valueMapDisplayMock = createMock(
-        ValueMapPopupPresenter.Display.class);
     ValueSequencePopupPresenter.Display valueSequenceDisplayMock = createMock(
         ValueSequencePopupPresenter.Display.class);
     EntityDialogPresenter.Display entityDialogDisplayMock = createMock(EntityDialogPresenter.Display.class);
@@ -72,7 +70,6 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     Provider<IndexPresenter> mockIndexProvider = createMock(Provider.class);
 
     ValuesTablePresenter values = new ValuesTablePresenter(null, null,
-        new ValueMapPopupPresenter(null, valueMapDisplayMock),
         new ValueSequencePopupPresenter(null, valueSequenceDisplayMock),
         new EntityDialogPresenter(null, entityDialogDisplayMock, createMock(ValueSequencePopupPresenter.class)));
     presenter = new TablePresenter(displayMock, new CountingEventBus(), null, values, mockProvider, mockIndexProvider);
