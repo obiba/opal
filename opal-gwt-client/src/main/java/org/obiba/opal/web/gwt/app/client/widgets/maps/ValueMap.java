@@ -29,6 +29,7 @@ import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.common.collect.Maps;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONParser;
@@ -93,30 +94,32 @@ public abstract class ValueMap extends BaseMap {
    * @param value
    * @param style
    */
-  protected void addPointFeature(Vector vectorLayer, ValueSetsDto.ValueDto value, String id) {
+  protected Point addPointFeature(Vector vectorLayer, ValueSetsDto.ValueDto value, String id) {
     Point p = parsePoint(value);
-    addGeometryFeature(vectorLayer, p, id);
+    addGeometryFeature(vectorLayer, p, id, getDefaultStyle());
+    return p;
   }
 
-  protected void addLineStringFeature(Vector vectorLayer, ValueSetsDto.ValueDto value, String id) {
+  protected LineString addLineStringFeature(Vector vectorLayer, ValueSetsDto.ValueDto value, String id) {
     LineString p = parseLineString(value);
-    addGeometryFeature(vectorLayer, p, id);
+    addGeometryFeature(vectorLayer, p, id, getDefaultStyle());
+    return p;
   }
 
-  protected void addPolygonFeature(Vector vectorLayer, ValueSetsDto.ValueDto value, String id) {
+  protected Polygon addPolygonFeature(Vector vectorLayer, ValueSetsDto.ValueDto value, String id) {
     Polygon p = parsePolygon(value);
-    addGeometryFeature(vectorLayer, p, id);
+    addGeometryFeature(vectorLayer, p, id, getDefaultStyle());
+    return p;
   }
 
-  private void addGeometryFeature(Vector vectorLayer, Geometry g, String id) {
-    Style style = getDefaultPointStyle();
+  private void addGeometryFeature(Vector vectorLayer, Geometry g, String id, Style style) {
     style.setLabel(id);
 
-    VectorFeature pointFeature = new VectorFeature(g, style);
-    pointFeature.setFeatureId(id);
-    vectorLayer.addFeature(pointFeature);
+    VectorFeature feature = new VectorFeature(g, style);
+    feature.setFeatureId(id);
+    vectorLayer.addFeature(feature);
 
-    addFeaturePopup(vectorLayer, pointFeature, value.getValue());
+    addFeaturePopup(vectorLayer, feature, value.getValue());
   }
 
   /**
@@ -139,13 +142,13 @@ public abstract class ValueMap extends BaseMap {
       // Secondly add a VectorFeatureSelectedListener to the feature
       vectorLayer.addVectorFeatureSelectedListener(new VectorFeatureSelectedListener() {
         public void onFeatureSelected(FeatureSelectedEvent eventObject) {
-          VectorFeature pointFeature = eventObject.getVectorFeature();
-          String content = featurePopupContent.get(pointFeature.getFeatureId());
+          VectorFeature feature = eventObject.getVectorFeature();
+          String content = featurePopupContent.get(feature.getFeatureId());
           //Attach a popup to the point, we use null as size cause we set autoSize to true
-          Popup popup = new FramedCloud("id1", pointFeature.getCenterLonLat(), null, content, null, false);
+          Popup popup = new FramedCloud("id1", feature.getCenterLonLat(), null, content, null, false);
           popup.setPanMapIfOutOfView(true); //this set the popup in a strategic way, and pans the map if needed.
           popup.setAutoSize(true);
-          pointFeature.setPopup(popup);
+          feature.setPopup(popup);
 
           //And attach the popup to the map
           map.addPopup(eventObject.getVectorFeature().getPopup());
@@ -155,9 +158,9 @@ public abstract class ValueMap extends BaseMap {
       // And add a VectorFeatureUnselectedListener which removes the popup.
       vectorLayer.addVectorFeatureUnselectedListener(new VectorFeatureUnselectedListener() {
         public void onFeatureUnselected(FeatureUnselectedEvent eventObject) {
-          VectorFeature pointFeature = eventObject.getVectorFeature();
-          map.removePopup(pointFeature.getPopup());
-          pointFeature.resetPopup();
+          VectorFeature feature = eventObject.getVectorFeature();
+          map.removePopup(feature.getPopup());
+          feature.resetPopup();
         }
       });
     }
@@ -165,16 +168,18 @@ public abstract class ValueMap extends BaseMap {
     featurePopupContent.put(pointFeature.getFeatureId(), content);
   }
 
-  protected Style getDefaultPointStyle() {
+  protected Style getDefaultStyle() {
     // Create a style that we will use for the point
     Style st = new Style();
     st.setGraphicSize(25, 41);
     st.setExternalGraphic("img/marker-icon.png");
-    st.setFillOpacity(1.0);
+    st.setFillOpacity(0.4);
+    //st.setFillColor("red");
+    //st.setStrokeColor("green");
+    st.setFontColor("#0000FF");
     st.setLabelXOffset(10);
     st.setLabelYOffset(10);
     st.setLabelAlign("lb");
-    st.setFontColor("#0000FF");
     return st;
   }
 
@@ -189,16 +194,17 @@ public abstract class ValueMap extends BaseMap {
 
     return p;
   }
+
   protected LineString parseLineString(ValueSetsDto.ValueDto value) {
     JSONArray array = (JSONArray) JSONParser.parseStrict(value.getValue());
     return new LineString(parsePoints(array));
   }
 
-
   protected Polygon parsePolygon(ValueSetsDto.ValueDto value) {
     JSONArray array = (JSONArray) JSONParser.parseStrict(value.getValue());
     LinearRing[] rings = new LinearRing[array.size()];
     for(int i = 0; i < array.size(); i++) {
+      //GWT.log("shape["+ i + "]");
       JSONArray shape = (JSONArray) array.get(i);
       rings[i] = new LinearRing(parsePoints(shape));
     }
@@ -208,10 +214,14 @@ public abstract class ValueMap extends BaseMap {
   protected Point[] parsePoints(JSONArray array) {
     Point[] rval = new Point[array.size()];
     for(int i = 0; i < array.size(); i++) {
+      //GWT.log("  point["+ i + "]");
       JSONArray point = (JSONArray) array.get(i);
       double x = ((JSONNumber) point.get(0)).doubleValue();
       double y = ((JSONNumber) point.get(1)).doubleValue();
-      rval[i] = new Point(x, y);
+      //GWT.log("    ["+ x + ", " + y + "]");
+      Point p = new Point(x, y);
+      p.transform(DEFAULT_PROJECTION, new Projection(map.getProjection()));
+      rval[i] = p;
     }
     return rval;
   }

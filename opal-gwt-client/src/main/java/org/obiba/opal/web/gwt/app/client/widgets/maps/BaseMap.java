@@ -15,6 +15,9 @@ import org.gwtopenmaps.openlayers.client.MapOptions;
 import org.gwtopenmaps.openlayers.client.MapWidget;
 import org.gwtopenmaps.openlayers.client.Projection;
 import org.gwtopenmaps.openlayers.client.control.LayerSwitcher;
+import org.gwtopenmaps.openlayers.client.geometry.LineString;
+import org.gwtopenmaps.openlayers.client.geometry.Point;
+import org.gwtopenmaps.openlayers.client.geometry.Polygon;
 import org.gwtopenmaps.openlayers.client.layer.GoogleV3;
 import org.gwtopenmaps.openlayers.client.layer.GoogleV3MapType;
 import org.gwtopenmaps.openlayers.client.layer.GoogleV3Options;
@@ -84,6 +87,28 @@ public class BaseMap extends Composite {
     LonLat lonLat = new LonLat(lon, lat);
     lonLat.transform(DEFAULT_PROJECTION.getProjectionCode(), map.getProjection());
     map.setCenter(lonLat, zoom);
+  }
+
+  protected void center(Point point) {
+    // Center and zoom
+    if(point != null) {
+      point.transform(DEFAULT_PROJECTION, new Projection(map.getProjection()));
+      center(point.getX(), point.getY(), DEFAULT_ZOOM);
+    }
+  }
+
+  protected void center(LineString line) {
+    // Center and zoom
+    if(line != null) {
+      center(line.getCentroid());
+    }
+  }
+
+  protected void center(Polygon polygon) {
+    // Center and zoom
+    if(polygon != null) {
+      center(polygon.getCentroid());
+    }
   }
 
   protected void addOSMMapnikLayer() {

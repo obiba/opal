@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.widgets.maps;
 
 import javax.annotation.Nullable;
 
+import org.gwtopenmaps.openlayers.client.geometry.Polygon;
 import org.gwtopenmaps.openlayers.client.layer.Vector;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -31,30 +32,27 @@ public class PolygonValueMap extends ValueMap {
 
   @Override
   protected void initializeValue() {
-    // Center and zoom
-    //double[] coordinates = parseCoordinates(value);
-    //center(coordinates[0], coordinates[1], DEFAULT_ZOOM);
-
     // Add a vector layer
     Vector vectorLayer = addVectorLayer(variable.getName());
 
     // Add a polygon feature to the vector layer
-    addPolygonFeature(vectorLayer, value, variable.getName());
+    center(addPolygonFeature(vectorLayer, value, variable.getName()));
   }
 
   @Override
   protected void initializeValueSequence() {
-    // Center and zoom
-    //double[] coordinates = parseCoordinates(value.getValuesArray().get(index == null ? 0 : index));
-    //center(coordinates[0], coordinates[1], DEFAULT_ZOOM);
-
     // Add a vector layer
     Vector vectorLayer = addVectorLayer(variable.getName());
 
+    Polygon mainPolygon = null;
     // Add a polygon feature to the vector layer
     for(int i = 0; i < value.getValuesArray().length(); i++) {
-      addPolygonFeature(vectorLayer, value.getValuesArray().get(i), variable.getName() + " [" + (i + 1) + "]");
+      Polygon polygon = addPolygonFeature(vectorLayer, value.getValuesArray().get(i), variable.getName() + " [" + (i + 1) + "]");
+      if(mainPolygon == null && (index == null && i == 0) || (index != null && i == index)) {
+        mainPolygon = polygon;
+      }
     }
+    center(mainPolygon);
   }
 
 }
