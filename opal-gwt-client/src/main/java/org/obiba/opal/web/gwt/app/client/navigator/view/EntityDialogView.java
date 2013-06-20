@@ -261,12 +261,12 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
 
       VariableDto variable = variableValueRow.getVariableDto();
 
-      if(variable.getIsRepeatable() || "binary".equalsIgnoreCase(variable.getValueType())) {
-        if(variable.getIsRepeatable()) {
-          valueViewHandler.requestValueSequenceView(variable);
-        } else {
-          valueViewHandler.requestBinaryValueView(variable);
-        }
+      if(variable.getIsRepeatable()) {
+        valueViewHandler.requestValueSequenceView(variable);
+      } else if("binary".equalsIgnoreCase(variable.getValueType())) {
+        valueViewHandler.requestBinaryValueView(variable);
+      } else if (variable.getValueType().matches("point|linestring|polygon")) {
+        valueViewHandler.requestGeoValueView(variable, variableValueRow.getValueDto());
       }
     }
   }
@@ -299,11 +299,14 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
         public SafeHtml render(EntityDialogPresenter.VariableValueRow object) {
           String valueStr = renderValue(object);
           if(valueStr == null || valueStr.trim().isEmpty()) return new SafeHtmlBuilder().toSafeHtml();
+          if(object.getVariableDto().getIsRepeatable()) {
+            return renderLink(valueStr, "i-list");
+          }
           if(object.getVariableDto().getValueType().compareToIgnoreCase("binary") == 0) {
             return renderLink(valueStr, "i-down");
           }
-          if(object.getVariableDto().getIsRepeatable()) {
-            return renderLink(valueStr, "i-list");
+          if(object.getVariableDto().getValueType().matches("point|linestring|polygon")) {
+            return renderLink(valueStr, "i-image");
           }
           return SimpleSafeHtmlRenderer.getInstance().render(valueStr);
         }

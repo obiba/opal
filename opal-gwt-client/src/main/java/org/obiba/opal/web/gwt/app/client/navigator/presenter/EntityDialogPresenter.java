@@ -18,6 +18,7 @@ import java.util.Map;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
+import org.obiba.opal.web.gwt.app.client.navigator.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.util.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.TextBoxClearable;
@@ -357,6 +358,8 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
     void requestValueSequenceView(VariableDto variableDto);
 
     void requestBinaryValueView(VariableDto variable);
+
+    void requestGeoValueView(VariableDto variable, ValueSetsDto.ValueDto value);
   }
 
   public class ValueSequenceHandlerImpl implements ValueViewHandler {
@@ -372,6 +375,11 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
       StringBuilder link = new StringBuilder(selectedTable.getLink());
       link.append("/valueSet/").append(entityId).append("/variable/").append(variableDto.getName()).append("/value");
       getEventBus().fireEvent(new FileDownloadEvent(link.toString()));
+    }
+
+    @Override
+    public void requestGeoValueView(VariableDto variable, ValueSetsDto.ValueDto value) {
+      getEventBus().fireEvent(new GeoValueDisplayEvent(variable, entityId, value));
     }
   }
 
