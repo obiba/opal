@@ -96,19 +96,19 @@ public abstract class ValueMap extends BaseMap {
    */
   protected Point addPointFeature(Vector vectorLayer, ValueSetsDto.ValueDto value, String id) {
     Point p = parsePoint(value);
-    addGeometryFeature(vectorLayer, p, id, getDefaultStyle());
+    addGeometryFeature(vectorLayer, p, id, getPointStyle());
     return p;
   }
 
   protected LineString addLineStringFeature(Vector vectorLayer, ValueSetsDto.ValueDto value, String id) {
     LineString p = parseLineString(value);
-    addGeometryFeature(vectorLayer, p, id, getDefaultStyle());
+    addGeometryFeature(vectorLayer, p, id, getLineStringStyle());
     return p;
   }
 
   protected Polygon addPolygonFeature(Vector vectorLayer, ValueSetsDto.ValueDto value, String id) {
     Polygon p = parsePolygon(value);
-    addGeometryFeature(vectorLayer, p, id, getDefaultStyle());
+    addGeometryFeature(vectorLayer, p, id, getPolygonStyle());
     return p;
   }
 
@@ -170,17 +170,33 @@ public abstract class ValueMap extends BaseMap {
 
   protected Style getDefaultStyle() {
     // Create a style that we will use for the point
-    Style st = new Style();
-    st.setGraphicSize(25, 41);
-    st.setExternalGraphic("img/marker-icon.png");
-    st.setFillOpacity(0.4);
-    //st.setFillColor("red");
-    //st.setStrokeColor("green");
-    st.setFontColor("#0000FF");
-    st.setLabelXOffset(10);
-    st.setLabelYOffset(10);
-    st.setLabelAlign("lb");
-    return st;
+    Style style = new Style();
+    style.setFontColor("#3c3c3c");
+    style.setFontWeight("bold");
+    style.setLabelXOffset(10);
+    style.setLabelYOffset(10);
+    style.setLabelAlign("lb");
+    return style;
+  }
+
+  protected Style getPointStyle() {
+    Style style = getDefaultStyle();
+    style.setGraphicSize(25, 41);
+    style.setExternalGraphic("img/marker-icon.png");
+    style.setFillOpacity(1.0);
+    return style;
+  }
+
+  protected Style getLineStringStyle() {
+    return getDefaultStyle();
+  }
+
+  protected Style getPolygonStyle() {
+    Style style = getDefaultStyle();
+    //style.setFillColor("red");
+    //style.setStrokeColor("green");
+    style.setFillOpacity(0.4);
+    return style;
   }
 
   protected Point parsePoint(ValueSetsDto.ValueDto value) {
