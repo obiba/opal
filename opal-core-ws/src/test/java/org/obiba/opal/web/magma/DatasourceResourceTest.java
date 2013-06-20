@@ -45,6 +45,8 @@ import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.service.ImportService;
+import org.obiba.opal.search.IndexManagerConfiguration;
+import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.StatsIndexManager;
 import org.obiba.opal.search.es.ElasticSearchConfigurationService;
 import org.obiba.opal.search.es.ElasticSearchProvider;
@@ -221,9 +223,11 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
         createMock(ApplicationContext.class));
     StatsIndexManager statsIndexManager = createMock(StatsIndexManager.class);
     ElasticSearchProvider esProvider = createMock(ElasticSearchProvider.class);
+    IndexManagerConfigurationService indexManagerConfigService = new IndexManagerConfigurationService(
+        opalConfigurationService);
 
     DatasourceResource resource = new DatasourceResource(opalConfigurationService, importService, viewManagerMock,
-        opalSearchService, statsIndexManager, esProvider, newViewDtos(),
+        opalSearchService, statsIndexManager, esProvider, indexManagerConfigService, newViewDtos(),
         Collections.<ValueTableUpdateListener>emptySet());
     resource.setName(name);
     return resource;
@@ -238,8 +242,20 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     StatsIndexManager statsIndexManager = createMock(StatsIndexManager.class);
     ElasticSearchProvider esProvider = createMock(ElasticSearchProvider.class);
 
+    IndexManagerConfigurationService indexManagerConfigService = new IndexManagerConfigurationService(mockOpalRuntime);
+
+    OpalConfiguration opalConfig = new OpalConfiguration();
+    opalConfig.addExtension(new IndexManagerConfiguration());
+
+    expect(mockOpalRuntime.getOpalConfiguration()).andReturn(opalConfig).anyTimes();
+    mockOpalRuntime.modifyConfiguration(EasyMock.<ConfigModificationTask>anyObject());
+    expectLastCall();
+    //mockOpalRuntime.getOpalConfiguration()
+    replay(mockOpalRuntime);
+
     DatasourceResource sut = new DatasourceResource(mockOpalRuntime, importService, mockViewManager, opalSearchService,
-        statsIndexManager, esProvider, newViewDtos(), Collections.<ValueTableUpdateListener>emptySet()) {
+        statsIndexManager, esProvider, indexManagerConfigService, newViewDtos(),
+        Collections.<ValueTableUpdateListener>emptySet()) {
 
       @Override
       Datasource getDatasource() {
@@ -261,9 +277,10 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
         createMock(ApplicationContext.class));
     StatsIndexManager statsIndexManager = createMock(StatsIndexManager.class);
     ElasticSearchProvider esProvider = createMock(ElasticSearchProvider.class);
+    IndexManagerConfigurationService indexManagerConfigService = new IndexManagerConfigurationService(opalRuntimeMock);
 
     DatasourceResource resource = new DatasourceResource(opalRuntimeMock, importService, viewManagerMock,
-        opalSearchService, statsIndexManager, esProvider, newViewDtos(),
+        opalSearchService, statsIndexManager, esProvider, indexManagerConfigService, newViewDtos(),
         Collections.<ValueTableUpdateListener>emptySet());
     resource.setName("datasourceNotExist");
     Response response = resource.removeDatasource();
@@ -479,12 +496,15 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     String fqViewName = mockDatasourceName + "." + "fromTable";
 
     ValueTable mockFromTable = createMock(ValueTable.class);
+    View mockView = new View(viewName, mockFromTable);
 
     Datasource mockDatasource = createMock(Datasource.class);
     mockDatasource.initialise();
     expect(mockDatasource.getName()).andReturn(mockDatasourceName).atLeastOnce();
     expect(mockDatasource.hasValueTable(viewName)).andReturn(false).atLeastOnce();
     expect(mockDatasource.getValueTable("fromTable")).andReturn(mockFromTable).atLeastOnce();
+    expect(mockDatasource.getValueTable("viewToAdd")).andReturn(mockView).once();
+    expect(mockFromTable.getDatasource()).andReturn(mockDatasource).atLeastOnce();
     mockDatasource.dispose();
 
     JavaScriptViewDto jsViewDto = JavaScriptViewDto.newBuilder().build();
@@ -492,7 +512,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
         .setExtension(JavaScriptViewDto.view, jsViewDto).build();
 
     ViewManager mockViewManager = createMock(ViewManager.class);
-    mockViewManager.addView(EasyMock.same(mockDatasourceName), eqView(new View(viewName, mockFromTable)));
+    mockViewManager.addView(EasyMock.same(mockDatasourceName), eqView(mockView));
     expectLastCall().once();
 
     UriInfo uriInfoMock = createMock(UriInfo.class);
