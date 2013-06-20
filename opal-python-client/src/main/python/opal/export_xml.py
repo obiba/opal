@@ -16,6 +16,7 @@ def add_arguments(parser):
     parser.add_argument('--output', '-out', required=True, help='Output zip file name that will be exported')
     parser.add_argument('--incremental', '-i', action='store_true', help='Incremental export')
     parser.add_argument('--unit', '-un', required=False, help='Unit name for Participant ID mapping')
+    parser.add_argument('--json', '-j', action='store_true', help='Pretty JSON formatting of the response')
 
 
 def do_command(args):
@@ -35,8 +36,13 @@ def do_command(args):
         # print result
         response = exporter.submit('xml')
 
+        # format response
+        res = response.content
+        if args.json:
+            res = response.pretty_json()
+
         # output to stdout
-        print response.code
+        print res
 
     except Exception, e:
         print e

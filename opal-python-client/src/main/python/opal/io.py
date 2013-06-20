@@ -176,4 +176,10 @@ class OpalExporter:
             request.verbose()
 
         uri = opal.core.UriBuilder(['datasource', self.datasource, 'commands', '_copy']).build()
-        return request.post().resource(uri).content(options.SerializeToString()).send()
+        response = request.post().resource(uri).content(options.SerializeToString()).send()
+
+        # get job status
+        job_resource = re.sub(r'http.*\/ws', r'', response.headers['Location'])
+        request = self.client.new_request()
+        request.fail_on_error().accept_json()
+        return request.get().resource(job_resource).send()
