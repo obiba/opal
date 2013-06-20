@@ -13,7 +13,6 @@ def add_arguments(parser):
     """
     parser.add_argument('--database', '-db', required=True, help='Name of the LimeSurvey SQL database.')
     parser.add_argument('--prefix', '-pr', required=False, help='Table prefix.')
-    parser.add_argument('--key', '-k', type=bool, required=False, help='Key.')
 
     # non specific import arguments
     parser.add_argument('--destination', '-d', required=True, help='Destination datasource name')
@@ -34,7 +33,7 @@ def do_command(args):
         importer = opal.io.OpalImporter.build(client=client, destination=args.destination, tables=args.tables,
                                               incremental=args.incremental, unit=args.unit, verbose=args.verbose)
         # print result
-        extension_factory = OpalExtensionFactory(database=args.database, prefix=args.prefix, key=args.key)
+        extension_factory = OpalExtensionFactory(database=args.database, prefix=args.prefix)
 
         response = importer.submit(extension_factory)
 
@@ -56,10 +55,9 @@ def do_command(args):
 
 
 class OpalExtensionFactory(opal.io.OpalImporter.ExtensionFactoryInterface):
-    def __init__(self, database, prefix, key):
+    def __init__(self, database, prefix):
         self.database = database
         self.prefix = prefix
-        self.key = key
 
     def add(self, factory):
         """
@@ -70,6 +68,3 @@ class OpalExtensionFactory(opal.io.OpalImporter.ExtensionFactoryInterface):
 
         if self.prefix:
             limesurvey_factory.tablePrefix = self.prefix
-
-        if self.key:
-            limesurvey_factory.key = self.key
