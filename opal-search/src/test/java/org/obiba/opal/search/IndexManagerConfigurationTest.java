@@ -62,6 +62,7 @@ public class IndexManagerConfigurationTest {
 
     // MINUTES_15
     Schedule schedule = new Schedule();
+    schedule.setType(Opal.ScheduleType.MINUTES_15);
     config.updateSchedule(vt, schedule);
     assertEquals(Opal.ScheduleType.MINUTES_15, config.getSchedule(vt).getType());
 

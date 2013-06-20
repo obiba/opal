@@ -41,12 +41,15 @@ import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.runtime.security.support.OpalPermissions;
 import org.obiba.opal.core.service.ImportService;
+import org.obiba.opal.search.IndexManagerConfigurationService;
+import org.obiba.opal.search.Schedule;
 import org.obiba.opal.search.StatsIndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.ViewDto;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.AclAction;
 import org.obiba.opal.web.model.Opal.LocaleDto;
 import org.obiba.opal.web.security.AuthorizationInterceptor;
@@ -81,6 +84,8 @@ public class DatasourceResource {
 
   private final ElasticSearchProvider esProvider;
 
+  private final IndexManagerConfigurationService indexManagerConfigService;
+
   private final ViewDtos viewDtos;
 
   private final Set<ValueTableUpdateListener> tableListeners;
@@ -94,7 +99,8 @@ public class DatasourceResource {
   @Autowired
   public DatasourceResource(OpalConfigurationService configService, ImportService importService,
       ViewManager viewManager, OpalSearchService opalSearchService, StatsIndexManager statsIndexManager,
-      ElasticSearchProvider esProvider, ViewDtos viewDtos, Set<ValueTableUpdateListener> tableListeners) {
+      ElasticSearchProvider esProvider, IndexManagerConfigurationService indexManagerConfigService, ViewDtos viewDtos,
+      Set<ValueTableUpdateListener> tableListeners) {
 
     if(configService == null) throw new IllegalArgumentException("configService cannot be null");
     if(viewManager == null) throw new IllegalArgumentException("viewManager cannot be null");
@@ -108,6 +114,7 @@ public class DatasourceResource {
     this.importService = importService;
     this.viewManager = viewManager;
     this.opalSearchService = opalSearchService;
+    this.indexManagerConfigService = indexManagerConfigService;
     this.statsIndexManager = statsIndexManager;
     this.esProvider = esProvider;
     this.viewDtos = viewDtos;
@@ -198,6 +205,11 @@ public class DatasourceResource {
 
     URI viewUri = UriBuilder.fromUri(uriInfo.getBaseUri().toString()).path(DatasourceResource.class)
         .path(DatasourceResource.class, "getView").build(name, viewDto.getName());
+
+    ValueTable vt = getDatasource().getValueTable(view.getName());
+    Schedule schedule = new Schedule();
+    schedule.setType(Opal.ScheduleType.NOT_SCHEDULED);
+    indexManagerConfigService.update(vt, schedule);
 
     return Response.created(viewUri)
         .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(viewUri, AclAction.VIEW_ALL)).build();
