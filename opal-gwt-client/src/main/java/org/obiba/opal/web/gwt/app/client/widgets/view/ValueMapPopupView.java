@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 OBiBa. All rights reserved.
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -10,16 +10,12 @@
 package org.obiba.opal.web.gwt.app.client.widgets.view;
 
 import org.obiba.opal.web.gwt.app.client.navigator.event.GeoValueDisplayEvent;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueOccurrenceColumn.ValueOccurrence;
 import org.obiba.opal.web.gwt.app.client.widgets.maps.LineStringValueMap;
 import org.obiba.opal.web.gwt.app.client.widgets.maps.PointValueMap;
 import org.obiba.opal.web.gwt.app.client.widgets.maps.PolygonValueMap;
 import org.obiba.opal.web.gwt.app.client.widgets.maps.ValueMap;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueMapPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
-import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.ValueSetsDto;
-import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -30,9 +26,9 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
 
@@ -52,7 +48,7 @@ public class ValueMapPopupView extends PopupViewImpl implements ValueMapPopupPre
   DialogBox dialogBox;
 
   @UiField
-  DockLayoutPanel content;
+  Panel content;
 
   @UiField
   Panel panel;
@@ -60,10 +56,14 @@ public class ValueMapPopupView extends PopupViewImpl implements ValueMapPopupPre
   @UiField
   Button closeButton;
 
+  @UiField
+  ResizeHandle resizeHandle;
+
   @Inject
   public ValueMapPopupView(EventBus eventBus) {
     super(eventBus);
     widget = uiBinder.createAndBindUi(this);
+    resizeHandle.makeResizable(content);
   }
 
   @Override
@@ -90,8 +90,12 @@ public class ValueMapPopupView extends PopupViewImpl implements ValueMapPopupPre
     else if (event.getVariable().getValueType().equals("polygon"))
       map = new PolygonValueMap(event.getVariable(), event.getValue(), event.getIndex());
 
-    if (map != null)
+    if (map != null) {
+      map.setHeight("500px");
+      map.setWidth("100%");
+      resizeHandle.makeResizable(map, 200);
       panel.add(map);
+    }
   }
 
   //

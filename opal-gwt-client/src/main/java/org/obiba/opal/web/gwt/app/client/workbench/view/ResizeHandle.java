@@ -9,12 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.HasMouseDownHandlers;
 import com.google.gwt.event.dom.client.HasMouseMoveHandlers;
 import com.google.gwt.event.dom.client.HasMouseUpHandlers;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.MouseEvent;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
@@ -65,6 +67,10 @@ public class ResizeHandle extends Widget
     makeResizable(objectToResize, 0, 0);
   }
 
+  public void makeResizable(UIObject objectToResize, int minHeight) {
+    makeResizable(objectToResize, -1, minHeight);
+  }
+
   public void makeResizable(UIObject objectToResize, int minWidth, int minHeight) {
     MouseResizeHandler handler = new MouseResizeHandler(objectToResize, minWidth, minHeight);
     addMouseDownHandler(handler);
@@ -92,32 +98,46 @@ public class ResizeHandle extends Widget
       this.minHeight = minHeight;
     }
 
+    private int getX(MouseEvent<?> evt) {
+      return evt.getClientX();
+    }
+
+    private int getY(MouseEvent<?> evt) {
+      return evt.getClientY();
+    }
+
     @Override
     public void onMouseDown(MouseDownEvent evt) {
-      // GWT.log("begin drag at x=" + evt.getX() + " y=" + evt.getY());
       dragging = true;
       DOM.setCapture(getElement());
-      dragStartX = evt.getX();
-      dragStartY = evt.getY();
+      dragStartX = getX(evt);
+      dragStartY = getY(evt);
+      //GWT.log("begin drag at x=" + dragStartX + " y=" + dragStartY);
     }
 
     @Override
     public void onMouseMove(MouseMoveEvent evt) {
       if(!dragging) return;
+      //GWT.log("continue drag at x=" + getY(evt) + " y=" + getY(evt));
 
-      int height = evt.getY() - dragStartY + objectToResize.getOffsetHeight();
-      if(height >= minHeight) objectToResize.setHeight(height + "px");
+      //GWT.log("  client.height=" + objectToResize.getElement().getClientHeight());
+      int height = getY(evt) - dragStartY + objectToResize.getElement().getClientHeight();
+      if(height >= minHeight) {
+        objectToResize.setHeight(height + "px");
+      }
 
-      if(direction == Direction.SOUTH_EAST) {
-        int width = evt.getX() - dragStartX + objectToResize.getOffsetWidth();
+      int width = getX(evt) - dragStartX + objectToResize.getElement().getClientWidth();
+      if(minWidth >= 0 && direction == Direction.SOUTH_EAST) {
         if(width >= minWidth) objectToResize.setWidth(width + "px");
       }
-      // GWT.log("continue drag: height=" + height + " width=" + width);
+      //GWT.log("  height=" + height + " width=" + width);
+      dragStartX = getX(evt);
+      dragStartY = getY(evt);
     }
 
     @Override
     public void onMouseUp(MouseUpEvent evt) {
-      // GWT.log("end drag at x=" + evt.getX() + " y=" + evt.getY());
+      //GWT.log("end drag at x=" + getY(evt) + " y=" + getY(evt));
       dragging = false;
       DOM.releaseCapture(getElement());
     }

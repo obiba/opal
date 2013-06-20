@@ -1,17 +1,19 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
   <g:DialogBox ui:field="dialogBox" modal="false">
-    <g:DockLayoutPanel styleName="main" ui:field="content" unit="EM" height="520px" width="480px">
+    <g:DockLayoutPanel ui:field="content" unit="EM" height="530px" width="480px">
       <g:center>
           <g:FlowPanel ui:field="panel">
           </g:FlowPanel>
       </g:center>
       <g:south size="4">
         <g:FlowPanel addStyleNames="footer">
+          <o:ResizeHandle ui:field="resizeHandle"></o:ResizeHandle>
           <g:Button styleName="btn right-aligned top-margin" ui:field="closeButton">
             <ui:msg description="Close label">Close</ui:msg>
           </g:Button>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 OBiBa. All rights reserved.
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -9,25 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.GeoValueDisplayEvent;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.ValueSetsDto;
-import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
