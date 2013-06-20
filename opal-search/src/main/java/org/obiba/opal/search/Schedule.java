@@ -22,7 +22,7 @@ public class Schedule {
   private Integer minutes;
 
   public Schedule() {
-    type = Opal.ScheduleType.NOT_SCHEDULED;
+    type = Opal.ScheduleType.MINUTES_15;
   }
 
   public Opal.ScheduleType getType() {

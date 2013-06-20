@@ -60,15 +60,8 @@ public class IndexManagerConfigurationTest {
 
     EasyMock.replay(datasource, vt, index);
 
-    // NOT_SCHEDULED
-    Schedule schedule = new Schedule();
-    config.updateSchedule(vt, schedule);
-    assertEquals(Opal.ScheduleType.NOT_SCHEDULED, config.getSchedule(vt).getType());
-
-    assertTrue(!config.isReadyForIndexing(vt, index));
-
     // MINUTES_15
-    schedule = new Schedule();
+    Schedule schedule = new Schedule();
     schedule.setType(Opal.ScheduleType.MINUTES_15);
     config.updateSchedule(vt, schedule);
     assertEquals(Opal.ScheduleType.MINUTES_15, config.getSchedule(vt).getType());
