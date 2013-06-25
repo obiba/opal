@@ -130,9 +130,9 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
     cancelPendingSummaryRequest();
 
     max = entitiesCount;
-    limit = max;
+    limit = Math.min(max, DEFAULT_LIMIT);
     resourceRequestBuilder = ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()
-        .forResource(UriBuilder.create().fromPath(resourceUri).build()).get();
+        .forResource(UriBuilder.create().fromPath(resourceUri).query("limit", String.valueOf(limit)).build()).get();
   }
 
   public void setRequestBuilder(ResourceRequestBuilder<SummaryStatisticsDto> resourceRequestBuilder) {
@@ -210,7 +210,11 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
     public void onClick(ClickEvent event) {
       cancelPendingSummaryRequest();
       getDisplay().renderCancelSummaryLimit(limit < max ? limit : Math.min(DEFAULT_LIMIT, max), max);
-      refreshSummary();
+
+      // If canceling from a full summary, automatically fetch for limit, else, do nothing
+      if(!resourceRequestBuilder.getResource().contains("limit")) {
+        refreshSummary();
+      }
     }
   }
 
