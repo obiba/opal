@@ -21,9 +21,12 @@
             <g:Label ui:field="previewSummaryTextSuffix" addStyleNames="inline"></g:Label>
           </g:customCell>
           <g:customCell styleName="middle-aligned">
-            <g:Anchor ui:field="refreshSummaryLink" addStyleNames="inline xsmall-indent action" visible="true">
-              <ui:msg description="Refresh summary label">Refresh</ui:msg>
-            </g:Anchor>
+            <g:FlowPanel addStyleNames="indent">
+              <b:Icon type="REFRESH" ui:field="refreshIcon"/>
+              <g:Anchor ui:field="refreshSummaryLink" addStyleNames="inline xsmall-indent action" visible="true">
+                <ui:msg description="Refresh summary label">Refresh</ui:msg>
+              </g:Anchor>
+            </g:FlowPanel>
           </g:customCell>
           <g:customCell styleName="middle-aligned">
             <g:Anchor ui:field="fullSummaryLink" addStyleNames="inline xsmall-indent action" visible="true">

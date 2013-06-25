@@ -19,6 +19,7 @@ import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
+import com.github.gwtbootstrap.client.ui.Icon;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -55,6 +56,9 @@ public class SummaryTabView implements SummaryTabPresenter.Display {
 
   @UiField
   NumericTextBox limitTextBox;
+
+  @UiField
+  Icon refreshIcon;
 
   @UiField
   Anchor refreshSummaryLink;
@@ -122,6 +126,7 @@ public class SummaryTabView implements SummaryTabPresenter.Display {
       previewSummaryTextSuffix.setVisible(true);
       fullSummaryLink.setVisible(false);
       refreshSummaryLink.setVisible(false);
+      refreshIcon.setVisible(false);
       previewSummaryText.setText(translations.summaryPreviewPendingLabel());
       previewSummaryTextSuffix.setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(max)));
     } else {
@@ -129,6 +134,7 @@ public class SummaryTabView implements SummaryTabPresenter.Display {
       previewSummaryTextSuffix.setVisible(false);
       fullSummaryLink.setVisible(false);
       refreshSummaryLink.setVisible(false);
+      refreshIcon.setVisible(false);
       previewSummaryText.setText(translations.summaryFullPendingLabel());
     }
     previewSummary.setVisible(true);
@@ -143,6 +149,7 @@ public class SummaryTabView implements SummaryTabPresenter.Display {
       previewSummary.setVisible(true);
       cancelSummaryLink.setVisible(false);
       refreshSummaryLink.setVisible(true);
+      refreshIcon.setVisible(true);
       fullSummaryLink.setVisible(true);
       previewSummaryText.setText(translations.summaryPreviewOnLabel());
       previewSummaryTextSuffix.setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(max)));
@@ -162,6 +169,7 @@ public class SummaryTabView implements SummaryTabPresenter.Display {
     previewSummaryTextSuffix.setVisible(true);
     fullSummaryLink.setVisible(true);
     refreshSummaryLink.setVisible(true);
+    refreshIcon.setVisible(true);
     previewSummaryText.setText(translations.summaryFetchSummaryLabel());
     previewSummaryTextSuffix.setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(max)));
   }
