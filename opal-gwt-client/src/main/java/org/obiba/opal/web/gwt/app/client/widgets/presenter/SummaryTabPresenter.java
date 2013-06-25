@@ -210,6 +210,7 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
     public void onClick(ClickEvent event) {
       cancelPendingSummaryRequest();
       getDisplay().renderCancelSummaryLimit(limit < max ? limit : Math.min(DEFAULT_LIMIT, max), max);
+      refreshSummary();
     }
   }
 
@@ -217,16 +218,19 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
     @Override
     public void onClick(ClickEvent event) {
       cancelPendingSummaryRequest();
-      limit = getDisplay().getLimit().intValue();
-      if(limit < Math.min(MIN_LIMIT, max)) {
-        limit = Math.min(MIN_LIMIT, max);
-      }
-      String uri = resourceRequestBuilder.getResource();
-      uri = uri.substring(0, uri.indexOf("?") > 0 ? uri.indexOf("?") : uri.length());
-      resourceRequestBuilder.forResource(limit >= max ? uri : uri + "?limit=" + limit)
-          .get();// = ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()
-
-      refreshDisplay();
+      refreshSummary();
     }
+  }
+
+  private void refreshSummary() {
+    limit = getDisplay().getLimit().intValue();
+    if(limit < Math.min(MIN_LIMIT, max)) {
+      limit = Math.min(MIN_LIMIT, max);
+    }
+    String uri = resourceRequestBuilder.getResource();
+    uri = uri.substring(0, uri.indexOf("?") > 0 ? uri.indexOf("?") : uri.length());
+    resourceRequestBuilder.forResource(limit >= max ? uri : uri + "?limit=" + limit).get();
+
+    refreshDisplay();
   }
 }
