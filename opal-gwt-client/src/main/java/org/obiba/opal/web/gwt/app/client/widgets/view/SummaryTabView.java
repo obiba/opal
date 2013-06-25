@@ -58,13 +58,19 @@ public class SummaryTabView implements SummaryTabPresenter.Display {
   NumericTextBox limitTextBox;
 
   @UiField
-  Icon refreshIcon;
+  Panel refreshPanel;
 
   @UiField
   Anchor refreshSummaryLink;
 
   @UiField
+  Panel fullPanel;
+
+  @UiField
   Anchor fullSummaryLink;
+
+  @UiField
+  Panel cancelPanel;
 
   @UiField
   Anchor cancelSummaryLink;
@@ -124,21 +130,19 @@ public class SummaryTabView implements SummaryTabPresenter.Display {
     if(limit < max) {
       limitTextBox.setVisible(true);
       previewSummaryTextSuffix.setVisible(true);
-      fullSummaryLink.setVisible(false);
-      refreshSummaryLink.setVisible(false);
-      refreshIcon.setVisible(false);
+      fullPanel.setVisible(false);
+      refreshPanel.setVisible(false);
       previewSummaryText.setText(translations.summaryPreviewPendingLabel());
       previewSummaryTextSuffix.setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(max)));
     } else {
       limitTextBox.setVisible(false);
       previewSummaryTextSuffix.setVisible(false);
-      fullSummaryLink.setVisible(false);
-      refreshSummaryLink.setVisible(false);
-      refreshIcon.setVisible(false);
+      fullPanel.setVisible(false);
+      refreshPanel.setVisible(false);
       previewSummaryText.setText(translations.summaryFullPendingLabel());
     }
     previewSummary.setVisible(true);
-    cancelSummaryLink.setVisible(true);
+    cancelPanel.setVisible(true);
   }
 
   @Override
@@ -147,10 +151,9 @@ public class SummaryTabView implements SummaryTabPresenter.Display {
       limitTextBox.setValue(String.valueOf(limit));
 
       previewSummary.setVisible(true);
-      cancelSummaryLink.setVisible(false);
-      refreshSummaryLink.setVisible(true);
-      refreshIcon.setVisible(true);
-      fullSummaryLink.setVisible(true);
+      cancelPanel.setVisible(false);
+      refreshPanel.setVisible(true);
+      fullPanel.setVisible(true);
       previewSummaryText.setText(translations.summaryPreviewOnLabel());
       previewSummaryTextSuffix.setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(max)));
     } else {
@@ -165,11 +168,10 @@ public class SummaryTabView implements SummaryTabPresenter.Display {
     limitTextBox.setVisible(true);
 
     previewSummary.setVisible(true);
-    cancelSummaryLink.setVisible(false);
+    cancelPanel.setVisible(false);
     previewSummaryTextSuffix.setVisible(true);
-    fullSummaryLink.setVisible(true);
-    refreshSummaryLink.setVisible(true);
-    refreshIcon.setVisible(true);
+    fullPanel.setVisible(true);
+    refreshPanel.setVisible(true);
     previewSummaryText.setText(translations.summaryFetchSummaryLabel());
     previewSummaryTextSuffix.setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(max)));
   }

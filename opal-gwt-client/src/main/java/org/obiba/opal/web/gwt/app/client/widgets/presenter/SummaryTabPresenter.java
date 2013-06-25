@@ -69,11 +69,11 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
 
   private ResourceRequestBuilder<SummaryStatisticsDto> resourceRequestBuilder;
 
-  private final static int DEFAULT_LIMIT = 1000;
+  private final static int DEFAULT_LIMIT = 500;
 
-  private final static int MIN_LIMIT = 100;
+  private final static int MIN_LIMIT = 10;
 
-  private int limit = 0;
+  private int limit = DEFAULT_LIMIT;
 
   private int max = 0;
 
@@ -130,7 +130,7 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
     cancelPendingSummaryRequest();
 
     max = entitiesCount;
-    limit = Math.min(max, DEFAULT_LIMIT);
+    limit = Math.min(max, limit);
     resourceRequestBuilder = ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()
         .forResource(UriBuilder.create().fromPath(resourceUri).query("limit", String.valueOf(limit)).build()).get();
   }

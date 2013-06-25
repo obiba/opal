@@ -21,22 +21,28 @@
             <g:Label ui:field="previewSummaryTextSuffix" addStyleNames="inline"></g:Label>
           </g:customCell>
           <g:customCell styleName="middle-aligned">
-            <g:FlowPanel addStyleNames="indent">
-              <b:Icon type="REFRESH" ui:field="refreshIcon"/>
+            <g:FlowPanel addStyleNames="indent" ui:field="refreshPanel">
+              <b:Icon type="REFRESH"/>
               <g:Anchor ui:field="refreshSummaryLink" addStyleNames="inline xsmall-indent action" visible="true">
                 <ui:msg description="Refresh summary label">Refresh</ui:msg>
               </g:Anchor>
             </g:FlowPanel>
           </g:customCell>
           <g:customCell styleName="middle-aligned">
-            <g:Anchor ui:field="fullSummaryLink" addStyleNames="inline xsmall-indent action" visible="true">
-              <ui:msg description="Full Summary label">Full Summary</ui:msg>
-            </g:Anchor>
+            <g:FlowPanel addStyleNames="indent" ui:field="fullPanel">
+              <b:Icon type="BAR_CHART"/>
+              <g:Anchor ui:field="fullSummaryLink" addStyleNames="inline xsmall-indent action" visible="true">
+                <ui:msg description="Full Summary label">Full Summary</ui:msg>
+              </g:Anchor>
+            </g:FlowPanel>
           </g:customCell>
           <g:customCell styleName="middle-aligned">
-            <g:Anchor ui:field="cancelSummaryLink" addStyleNames="inline xsmall-indent action" visible="true">
-              <ui:msg description="Cancel Pending Summary label">Cancel</ui:msg>
-            </g:Anchor>
+            <g:FlowPanel addStyleNames="indent" ui:field="cancelPanel">
+              <b:Icon type="STOP"/>
+              <g:Anchor ui:field="cancelSummaryLink" addStyleNames="inline xsmall-indent action" visible="true">
+                <ui:msg description="Cancel Pending Summary label">Cancel</ui:msg>
+              </g:Anchor>
+            </g:FlowPanel>
           </g:customCell>
         </g:row>
       </g:Grid>
