@@ -123,7 +123,7 @@ public class SummaryTabView implements SummaryTabPresenter.Display {
       fullSummaryLink.setVisible(false);
       refreshSummaryLink.setVisible(false);
       previewSummaryText.setText(translations.summaryPreviewPendingLabel());
-      previewSummaryTextSuffix.setText(translations.summaryTotalEntitiesLabel().replaceAll("{0}", String.valueOf(max)));
+      previewSummaryTextSuffix.setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(max)));
     } else {
       limitTextBox.setVisible(false);
       previewSummaryTextSuffix.setVisible(false);
@@ -145,7 +145,7 @@ public class SummaryTabView implements SummaryTabPresenter.Display {
       refreshSummaryLink.setVisible(true);
       fullSummaryLink.setVisible(true);
       previewSummaryText.setText(translations.summaryPreviewOnLabel());
-      previewSummaryTextSuffix.setText(translations.summaryTotalEntitiesLabel().replaceAll("{0}", String.valueOf(max)));
+      previewSummaryTextSuffix.setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(max)));
     } else {
       previewSummary.setVisible(false);
     }
@@ -163,7 +163,7 @@ public class SummaryTabView implements SummaryTabPresenter.Display {
     fullSummaryLink.setVisible(true);
     refreshSummaryLink.setVisible(true);
     previewSummaryText.setText(translations.summaryFetchSummaryLabel());
-    previewSummaryTextSuffix.setText(translations.summaryTotalEntitiesLabel());
+    previewSummaryTextSuffix.setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(max)));
   }
 
   @Override
