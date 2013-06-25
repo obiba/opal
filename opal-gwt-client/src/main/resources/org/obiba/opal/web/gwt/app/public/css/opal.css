@@ -166,6 +166,10 @@ td.top, td.top-aligned {
   vertical-align: top;
 }
 
+td.top, td.middle-aligned {
+  vertical-align: middle;
+}
+
 td.xsmall-indent,
 table.styled td.xsmall-indent {
   padding-left: 0.4em;
@@ -2564,4 +2568,17 @@ div.full-width select.chzn-done+div>div {
 
 div.full-width select.chzn-done+div>div>div input {
   width: 96% !important;
+}
+
+/* Summary preview/cancel */
+.preview-status .alert {
+  padding: 0 1.2em;
+  border-radius: 0px;
+  margin-bottom: 0px;
+}
+
+input.limitSummary {
+  width: 3em !important;
+  margin-bottom: 0px !important;
+  padding: 2px !important;
 }
