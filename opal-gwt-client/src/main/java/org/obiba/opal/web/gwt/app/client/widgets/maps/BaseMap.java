@@ -9,12 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.maps;
 
+import org.gwtopenmaps.openlayers.client.Bounds;
 import org.gwtopenmaps.openlayers.client.LonLat;
 import org.gwtopenmaps.openlayers.client.Map;
 import org.gwtopenmaps.openlayers.client.MapOptions;
 import org.gwtopenmaps.openlayers.client.MapWidget;
 import org.gwtopenmaps.openlayers.client.Projection;
-import org.gwtopenmaps.openlayers.client.control.LayerSwitcher;
 import org.gwtopenmaps.openlayers.client.geometry.LineString;
 import org.gwtopenmaps.openlayers.client.geometry.Point;
 import org.gwtopenmaps.openlayers.client.geometry.Polygon;
@@ -97,17 +97,27 @@ public class BaseMap extends Composite {
     }
   }
 
+  protected void center(Bounds bounds) {
+    // Center and zoom
+    if(bounds != null) {
+      map.zoomToExtent(
+          new Bounds(bounds.getLowerLeftX(), bounds.getLowerLeftY(), bounds.getUpperRightX(), bounds.getUpperRightY()),
+          true);
+      map.setCenter(bounds.getCenterLonLat());
+    }
+  }
+
   protected void center(LineString line) {
     // Center and zoom
     if(line != null) {
-      center(line.getCentroid());
+      center(line.getBounds());
     }
   }
 
   protected void center(Polygon polygon) {
     // Center and zoom
     if(polygon != null) {
-      center(polygon.getCentroid());
+      center(polygon.getBounds());
     }
   }
 
