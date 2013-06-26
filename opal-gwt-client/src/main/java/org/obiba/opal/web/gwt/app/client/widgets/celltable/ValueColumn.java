@@ -15,11 +15,11 @@ import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.TextCell;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.cellview.client.Column;
 
 public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
@@ -53,13 +53,13 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
 
   private static Cell<String> createCell(VariableDto variable) {
     if(variable.getIsRepeatable()) {
-      return new ClickableTextCell(new ClickableIconRenderer("i-list"));
+      return new ClickableTextCell(new ClickableIconRenderer(IconType.LIST));
     }
     if("binary".equalsIgnoreCase(variable.getValueType())) {
-      return new ClickableTextCell(new ClickableIconRenderer("i-down"));
+      return new ClickableTextCell(new ClickableIconRenderer(IconType.DOWNLOAD));
     }
     if(variable.getValueType().matches("point|linestring|polygon")) {
-      return new ClickableTextCell(new ClickableIconRenderer("i-image"));
+      return new ClickableTextCell(new ClickableIconRenderer(IconType.MAP_MARKER));
     }
     if(VariableDtos.ValueType.TEXT.is(variable.getValueType())) {
       return new TextCell(new MultilineTextRenderer());
@@ -80,7 +80,7 @@ public class ValueColumn extends Column<ValueSetsDto.ValueSetDto, String> {
         @Override
         public void update(int index, ValueSetDto valueSet, String value) {
           if(valueSelectionHandler != null) {
-              valueSelectionHandler.onValueSequenceSelection(ValueColumn.this.variable, index, getPosition(), valueSet);
+            valueSelectionHandler.onValueSequenceSelection(ValueColumn.this.variable, index, getPosition(), valueSet);
           }
         }
       });

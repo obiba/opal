@@ -9,22 +9,29 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.celltable;
 
+import com.github.gwtbootstrap.client.ui.Icon;
+import com.github.gwtbootstrap.client.ui.constants.IconSize;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
 
 public class ClickableIconRenderer extends AbstractSafeHtmlRenderer<String> {
 
-  private final String iconClass;
+  private final IconType iconType;
 
-  public ClickableIconRenderer(String iconClass) {
-    this.iconClass = iconClass;
+  public ClickableIconRenderer(IconType iconType) {
+    this.iconType = iconType;
   }
 
   @Override
   public SafeHtml render(String object) {
     if(object == null || object.trim().isEmpty()) return new SafeHtmlBuilder().toSafeHtml();
-    return new SafeHtmlBuilder().appendHtmlConstant("<a class=\"iconb " + iconClass + "\">").appendEscaped(object)
-        .appendHtmlConstant("</a>").toSafeHtml();
+
+    Icon i = new Icon(iconType);
+    i.setIconSize(IconSize.LARGE);
+    i.addStyleName("xsmall-right-indent");
+    return new SafeHtmlBuilder().appendHtmlConstant("<a class=\"iconb\">").appendHtmlConstant(i.toString())
+        .appendEscaped(object).appendHtmlConstant("</a>").toSafeHtml();
   }
 }
