@@ -55,10 +55,10 @@
                 <!-- Unzip package -->
                 <property name="python.dist.path" value="${basedir}/target" />
                 <property name="python.package.name" value="${project.name}-${project.version}.tar.gz" />
-                <unzip src="${basedir}/target/opal-python_${project.version}.zip" dest="${python.dist.path}"/>
+                <unzip src="${basedir}/target/opal-python_${project.version}.zip" dest="${python.dist.path}" />
                 <copy todir="${python.dist.path}/opal-python">
                     <fileset dir="${basedir}/dist/python">
-                        <include name="*.*"/>
+                        <include name="*.*" />
                     </fileset>
                     <filterset>
                       <filter token="project.name" value="${project.name}" />
@@ -104,7 +104,7 @@
                     <property name="target.dir" value="${basedir}/target" />
                     <property name="deb.dir" value="${target.dir}/deb" />
                     <property name="deb.version" value="${project.version}-b${buildNumber}" />
-                    <unzip src="${target.dir}/opal-python_${project.version}.zip" dest="${target.dir}"/>
+                    <unzip src="${target.dir}/opal-python_${project.version}.zip" dest="${target.dir}" />
                     <!-- delete junk python bytecode -->
                     <delete>
                       <fileset dir="${target.dir}/opal-python" includes="**/*.pyc" />
@@ -133,10 +133,10 @@
                     </exec>
                     <move todir="${basedir}/target">
                       <fileset dir="${deb.dir}">
-                        <include name="*.deb"/>
+                        <include name="*.deb" />
                       </fileset>
                     </move>
-                    <delete dir="${deb.dir}"/>
+                    <delete dir="${deb.dir}" />
                   </target>
                 </configuration>
               </execution>
