@@ -20,6 +20,9 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.TextBoxClearable;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.github.gwtbootstrap.client.ui.Icon;
+import com.github.gwtbootstrap.client.ui.constants.IconSize;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.cell.client.AbstractSafeHtmlCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.ValueUpdater;
@@ -265,7 +268,7 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
         valueViewHandler.requestValueSequenceView(variable);
       } else if("binary".equalsIgnoreCase(variable.getValueType())) {
         valueViewHandler.requestBinaryValueView(variable);
-      } else if (variable.getValueType().matches("point|linestring|polygon")) {
+      } else if(variable.getValueType().matches("point|linestring|polygon")) {
         valueViewHandler.requestGeoValueView(variable, variableValueRow.getValueDto());
       }
     }
@@ -300,19 +303,22 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
           String valueStr = renderValue(object);
           if(valueStr == null || valueStr.trim().isEmpty()) return new SafeHtmlBuilder().toSafeHtml();
           if(object.getVariableDto().getIsRepeatable()) {
-            return renderLink(valueStr, "i-list");
+            return renderLink(valueStr, IconType.LIST);
           }
           if(object.getVariableDto().getValueType().compareToIgnoreCase("binary") == 0) {
-            return renderLink(valueStr, "i-down");
+            return renderLink(valueStr, IconType.DOWNLOAD);
           }
           if(object.getVariableDto().getValueType().matches("point|linestring|polygon")) {
-            return renderLink(valueStr, "i-image");
+            return renderLink(valueStr, IconType.MAP_MARKER);
           }
           return SimpleSafeHtmlRenderer.getInstance().render(valueStr);
         }
 
-        private SafeHtml renderLink(String valueStr, String iconClass) {
-          return new SafeHtmlBuilder().appendHtmlConstant("<a class=\"iconb " + iconClass + "\">")
+        private SafeHtml renderLink(String valueStr, IconType iconType) {
+          Icon i = new Icon(iconType);
+          i.setIconSize(IconSize.LARGE);
+          i.addStyleName("xsmall-right-indent");
+          return new SafeHtmlBuilder().appendHtmlConstant("<a class=\"iconb\">").appendHtmlConstant(i.toString())
               .appendEscaped(valueStr).appendHtmlConstant("</a>").toSafeHtml();
         }
 

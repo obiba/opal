@@ -18,6 +18,7 @@ import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
@@ -58,8 +59,8 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
         @Override
         public void update(int index, ValueOccurrence object, String value) {
           if(valueSelectionHandler != null) {
-            valueSelectionHandler
-                .onGeoValueSelection(ValueOccurrenceColumn.this.variable, index, object.getValueSet(), object.getValueSet().getValuesArray().get(pos));
+            valueSelectionHandler.onGeoValueSelection(ValueOccurrenceColumn.this.variable, index, object.getValueSet(),
+                object.getValueSet().getValuesArray().get(pos));
           }
         }
       });
@@ -68,10 +69,10 @@ public class ValueOccurrenceColumn extends Column<ValueOccurrence, String> {
 
   private static Cell<String> createCell(VariableDto variable) {
     if("binary".equalsIgnoreCase(variable.getValueType())) {
-      return new ClickableTextCell(new ClickableIconRenderer("i-down"));
+      return new ClickableTextCell(new ClickableIconRenderer(IconType.DOWNLOAD));
     }
     if(variable.getValueType().matches("point|linestring|polygon")) {
-      return new ClickableTextCell(new ClickableIconRenderer("i-image"));
+      return new ClickableTextCell(new ClickableIconRenderer(IconType.MAP_MARKER));
     }
     return new TextCell();
   }
