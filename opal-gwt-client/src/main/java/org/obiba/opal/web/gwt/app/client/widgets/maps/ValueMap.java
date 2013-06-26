@@ -119,7 +119,7 @@ public abstract class ValueMap extends BaseMap {
     feature.setFeatureId(id);
     vectorLayer.addFeature(feature);
 
-    addFeaturePopup(vectorLayer, feature, value.getValue());
+    //addFeaturePopup(vectorLayer, feature, value.getValue());
   }
 
   /**
