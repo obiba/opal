@@ -341,7 +341,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
       valuesTable.addColumn(createColumn(getVariableAt(i)), getColumnHeader(i));
     }
 
-    if(listVariable.size() > getMaxVisibleColumns() + 1) {
+    if(listVariable.size() > getMaxVisibleColumns()) {
       valuesTable.insertColumn(1, createEmptyColumn(), createHeader(new PreviousActionCell()));
       valuesTable.insertColumn(valuesTable.getColumnCount(), createEmptyColumn(), createHeader(new NextActionCell()));
     }
@@ -677,7 +677,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     }
 
     @Override
-    public void onGeoValueSelection(VariableDto variable, int row, int column, ValueSetDto valueSet, ValueSetsDto.ValueDto value) {
+    public void onGeoValueSelection(VariableDto variable, int row, int column, ValueSetDto valueSet,
+        ValueSetsDto.ValueDto value) {
       fetcher.requestGeoValue(variable, valueSet.getIdentifier(), value);
     }
 
