@@ -49,10 +49,11 @@ public class UserResource {
 
     List<Opal.UserDto> userDtos = Lists.newArrayList();
 
-    for(User u : users) {
-      userDtos.add(toDto(u));
+    if(users != null) {
+      for(User u : users) {
+        userDtos.add(toDto(u));
+      }
     }
-
     return userDtos;
   }
 
