@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.administration.main.view.MainItemAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.AbstractTabLayout;
 
@@ -21,6 +22,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -58,7 +60,7 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
       tab.setText(tabData.getLabel());
       orderedTabs.add(this);
       Collections.sort(orderedTabs, AdminTabComparator.instance);
-      administrationDisplays.insert(tabContent, tab, getTabIndex());
+//      administrationDisplays.insert(tabContent, tab, getTabIndex());
     }
 
     public int getTabIndex() {
@@ -67,7 +69,7 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
 
     @Override
     public void activate() {
-      administrationDisplays.selectTab(tabContent);
+//      administrationDisplays.selectTab(tabContent);
     }
 
     @Override
@@ -110,7 +112,10 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   private final List<AdminTab> orderedTabs = Lists.newLinkedList();
 
   @UiField
-  AbstractTabLayout administrationDisplays;
+  Anchor slqDatabases;
+
+//  @UiField
+//  AbstractTabLayout administrationDisplays;
 
   private Widget currentTabContent;
 
@@ -125,13 +130,13 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
 
   @Override
   public void removeTab(Tab tab) {
-    administrationDisplays.remove(((AdminTab) tab).getTabIndex());
+//    administrationDisplays.remove(((AdminTab) tab).getTabIndex());
     orderedTabs.remove(tab);
   }
 
   @Override
   public void removeTabs() {
-    administrationDisplays.clear();
+//    administrationDisplays.clear();
   }
 
   @Override
@@ -141,7 +146,7 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
       adminTab.tabContent.setWidget(currentTabContent);
       currentTabContent = null;
     }
-    administrationDisplays.selectTab(adminTab.getTabIndex());
+//    administrationDisplays.selectTab(adminTab.getTabIndex());
   }
 
   @Override
