@@ -16,8 +16,6 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -28,8 +26,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.obiba.core.domain.AbstractEntity;
 import org.obiba.core.util.HexUtil;
 
-import static org.obiba.opal.core.user.Status.ACTIVE;
-
 @SuppressWarnings("UnusedDeclaration")
 @Entity
 @Table(name = "user")
@@ -38,15 +34,14 @@ public class User extends AbstractEntity {
 
   private static final long serialVersionUID = -2200053643926715563L;
 
-  @Column(length = 250, nullable = false)
+  @Column(length = 250, nullable = false, unique = true)
   private String name;
 
   @Column(length = 250)
   private String password;
 
   @Column(nullable = false)
-  @Enumerated(EnumType.STRING)
-  private Status status;
+  private Boolean enabled;
 
   @ManyToMany
   @JoinTable(name = "user_groups", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = @JoinColumn(
@@ -79,15 +74,21 @@ public class User extends AbstractEntity {
   }
 
   public void addGroup(Group group) {
-    getGroups().add(group);
+    if(!getGroups().contains(group)) {
+      getGroups().add(group);
+    }
   }
 
-  public Status getStatus() {
-    return status;
+  public void clearGroups() {
+    groups = new HashSet<Group>();
   }
 
-  public void setStatus(Status status) {
-    this.status = status;
+  public boolean getEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(Boolean b) {
+    enabled = b;
   }
 
   /**
@@ -106,7 +107,7 @@ public class User extends AbstractEntity {
     }
   }
 
-  public boolean isActive() {
-    return getStatus() == ACTIVE;
-  }
+//  public boolean isActive() {
+//    return getStatus() == ACTIVE;
+//  }
 }

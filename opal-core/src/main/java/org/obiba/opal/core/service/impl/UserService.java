@@ -11,10 +11,7 @@ package org.obiba.opal.core.service.impl;
 
 import java.util.List;
 
-import org.obiba.core.service.PagingClause;
-import org.obiba.core.service.SortingClause;
 import org.obiba.opal.core.user.Group;
-import org.obiba.opal.core.user.Status;
 import org.obiba.opal.core.user.User;
 
 @SuppressWarnings("UnusedDeclaration")
@@ -23,19 +20,16 @@ public interface UserService {
   /**
    * Returns the list of users
    *
-   * @param template a template instance for matching users
-   * @param paging paging clause, can be null
-   * @param clauses sorting clause(s), can be null
-   * @return a list of user instances that match the template
+   * @return a list of user instances
    */
-  List<User> getUsers(User template, PagingClause paging, SortingClause... clauses);
+  List<User> getUsers();
 
   /**
    * Returns the count of users that match the specified template
    *
    * @return the number of users that match the template
    */
-  int getUserCount(User template);
+  int getUserCount();
 
   /**
    * Returns the user with the specified login
@@ -49,9 +43,9 @@ public interface UserService {
    * Change the status of the specified user
    *
    * @param user
-   * @param status
+   * @param enabled
    */
-  void updateStatus(User user, Status status);
+  void updateEnabled(User user, boolean enabled);
 
   /**
    * Update the password of the specified user
@@ -69,6 +63,13 @@ public interface UserService {
   void createOrUpdateUser(User user);
 
   /**
+   * Deletes a user from user table and from subject_acl
+   *
+   * @param user
+   */
+  void deleteUser(User user);
+
+  /**
    * Create the given group.
    *
    * @param role
@@ -82,5 +83,20 @@ public interface UserService {
    * @param clauses
    * @return
    */
-  List<Group> getGroups(SortingClause... clauses);
+  List<Group> getGroups();
+
+  /**
+   * Returns the group with the specified name
+   *
+   * @param name
+   * @return the group with the specified name or null if none exist
+   */
+  Group getGroupWithName(String name);
+
+  /**
+   * Deletes a group from group table and from subject_acl
+   *
+   * @param group
+   */
+  void deleteGroup(Group group);
 }

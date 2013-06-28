@@ -13,8 +13,6 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.obiba.core.service.PagingClause;
-import org.obiba.core.service.SortingClause;
 import org.obiba.core.service.impl.hibernate.AssociationCriteria;
 import org.obiba.opal.core.user.User;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,20 +35,16 @@ public class UserServiceHibernateImpl extends DefaultUserServiceImpl {
     return factory.getCurrentSession();
   }
 
-  public List<User> getUsers(User template, PagingClause paging, SortingClause... clauses) {
-    return getUserCriteria(template, paging, clauses).list();
+  public List<User> getUsers() {
+    return getUserCriteria().list();
   }
 
-  public int getUserCount(User template) {
-    return getUserCriteria(template, null, (SortingClause) null).count();
+  public int getUserCount() {
+    return getUserCriteria().count();
   }
 
-  private AssociationCriteria getUserCriteria(User template, PagingClause paging, SortingClause... clauses) {
+  private AssociationCriteria getUserCriteria() {
     AssociationCriteria criteria = AssociationCriteria.create(User.class, getSession());
-
-//    if(template.isDeleted() == false) criteria.add("deleted", Operation.eq, template.isDeleted());
-    if(paging != null) criteria.addPagingClause(paging);
-    if(clauses != null) criteria.addSortingClauses(clauses);
 
     return criteria;
   }

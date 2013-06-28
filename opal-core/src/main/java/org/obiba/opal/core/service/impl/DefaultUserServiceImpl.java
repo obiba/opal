@@ -11,10 +11,8 @@ package org.obiba.opal.core.service.impl;
 
 import java.util.List;
 
-import org.obiba.core.service.SortingClause;
 import org.obiba.core.service.impl.PersistenceManagerAwareService;
 import org.obiba.opal.core.user.Group;
-import org.obiba.opal.core.user.Status;
 import org.obiba.opal.core.user.User;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,8 +30,8 @@ public abstract class DefaultUserServiceImpl extends PersistenceManagerAwareServ
   }
 
   @Override
-  public void updateStatus(User user, Status status) {
-    user.setStatus(status);
+  public void updateEnabled(User user, boolean enabled) {
+    user.setEnabled(enabled);
     getPersistenceManager().save(user);
   }
 
@@ -49,13 +47,29 @@ public abstract class DefaultUserServiceImpl extends PersistenceManagerAwareServ
   }
 
   @Override
+  public void deleteUser(User user) {
+    getPersistenceManager().delete(user);
+  }
+
+  @Override
   public Group createGroup(Group group) {
     return getPersistenceManager().save(group);
   }
 
   @Override
-  public List<Group> getGroups(SortingClause... clauses) {
-    return getPersistenceManager().list(Group.class, clauses);
+  public List<Group> getGroups() {
+    return getPersistenceManager().list(Group.class);
   }
 
+  @Override
+  public Group getGroupWithName(String name) {
+    Group template = new Group();
+    template.setName(name);
+    return getPersistenceManager().matchOne(template);
+  }
+
+  @Override
+  public void deleteGroup(Group group) {
+    getPersistenceManager().delete(group);
+  }
 }
