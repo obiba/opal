@@ -12,20 +12,19 @@ package org.obiba.opal.core.user;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.Table;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.obiba.core.domain.AbstractEntity;
 
 @SuppressWarnings("UnusedDeclaration")
-@Entity
-@Table(name = "group")
+@Entity(name = "groups") // 'group' is a mysql reserved word
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Group extends AbstractEntity implements Comparable<Group> {
 
@@ -34,9 +33,10 @@ public class Group extends AbstractEntity implements Comparable<Group> {
   @Column(nullable = false, unique = true)
   private String name = null;
 
-  @ManyToMany
-  @JoinTable(name = "group_users", joinColumns = { @JoinColumn(name = "group_id") }, inverseJoinColumns = @JoinColumn(
-      name = "user_id"))
+  @ManyToMany(cascade = CascadeType.ALL)
+  @JoinTable(name = "user_groups",
+      joinColumns = { @JoinColumn(name = "group_id") },
+      inverseJoinColumns = { @JoinColumn(name = "user_id") })
   @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
   private Set<User> users;
 
