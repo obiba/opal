@@ -128,7 +128,6 @@ message IncrementalDatasourceFactoryDto {
   }
 }
 
-
 message SpssDatasourceFactoryDto {
   required string file = 1;
   optional string characterSet = 2;
@@ -136,6 +135,18 @@ message SpssDatasourceFactoryDto {
   optional string locale = 4;
   extend DatasourceFactoryDto {
     optional SpssDatasourceFactoryDto params = 1009;
+  }
+}
+
+message HCDatasourceFactoryDto {
+  extend DatasourceFactoryDto {
+    optional HCDatasourceFactoryDto params = 1010;
+  }
+}
+
+message GNPostalCodesDatasourceFactoryDto {
+  extend DatasourceFactoryDto {
+    optional GNPostalCodesDatasourceFactoryDto params = 1011;
   }
 }
 

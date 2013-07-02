@@ -70,6 +70,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   private final RestStepPresenter restStepPresenter;
 
+  private final NoFormatStepPresenter noFormatStepPresenter;
+
   private final DestinationSelectionStepPresenter destinationSelectionStepPresenter;
 
   private final UnitSelectionStepPresenter unitSelectionStepPresenter;
@@ -90,6 +92,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       CsvFormatStepPresenter csvFormatStepPresenter, XmlFormatStepPresenter xmlFormatStepPresenter, //
       LimesurveyStepPresenter limesurveyStepPresenter, SpssFormatStepPresenter spssFormatStepPresenter,//
       RestStepPresenter restStepPresenter,//
+      NoFormatStepPresenter noFormatStepPresenter,//
       DestinationSelectionStepPresenter destinationSelectionStepPresenter,
       UnitSelectionStepPresenter unitSelectionStepPresenter, //
       ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter,
@@ -101,6 +104,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     this.spssFormatStepPresenter = spssFormatStepPresenter;
     this.limesurveyStepPresenter = limesurveyStepPresenter;
     this.restStepPresenter = restStepPresenter;
+    this.noFormatStepPresenter = noFormatStepPresenter;
     this.destinationSelectionStepPresenter = destinationSelectionStepPresenter;
     this.unitSelectionStepPresenter = unitSelectionStepPresenter;
     this.comparedDatasourcesReportPresenter = comparedDatasourcesReportPresenter;
@@ -228,8 +232,9 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         getView().setFormatStepDisplay(spssFormatStepPresenter.getDisplay());
         break;
       default:
-        formatStepPresenter = null;
-        throw new IllegalStateException("Unknown format: " + getView().getImportFormat());
+        noFormatStepPresenter.setImportFormat(getView().getImportFormat());
+        formatStepPresenter = noFormatStepPresenter;
+        getView().setFormatStepDisplay(noFormatStepPresenter.getView());
     }
   }
 
@@ -250,6 +255,12 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         break;
       case SPSS:
         submitJob(createImportCommandOptionsDto(importConfig.getSpssFile()));
+        break;
+      case HEALTH_CANADA:
+        submitJob(createImportCommandOptionsDto(null));
+        break;
+      case GEONAMES_POSTAL_CODES:
+        submitJob(createImportCommandOptionsDto(null));
         break;
     }
   }

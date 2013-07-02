@@ -107,6 +107,12 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   FlowPanel helpOpalRest;
 
   @UiField
+  FlowPanel helpHealthCanada;
+
+  @UiField
+  FlowPanel helpGeonamesPostalCodes;
+
+  @UiField
   HTMLPanel formatSelectionHelp;
 
   @UiField
@@ -151,7 +157,14 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
         .append(formatSelectionStep, formatSelectionHelp)//
         .title(translations.dataImportFormatStep())//
 
-        .append(formatStep)//
+        .append(formatStep, null, new Skippable() {
+          @Override
+          public boolean skip() {
+            String selection = formatChooser.getSelectedValue();
+            return ImportFormat.GEONAMES_POSTAL_CODES.name().equals(selection) ||
+                ImportFormat.HEALTH_CANADA.name().equals(selection);
+          }
+        })//
         .help(new WidgetProvider() {
 
           @Override
@@ -216,13 +229,15 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
           public void onStepIn() {
             datasourceValuesStepInHandler.onStepIn();
           }
-        })
-        .title(translations.dataImportValuesStep())//
+        }).title(translations.dataImportValuesStep())//
 
         .append(archiveStep, archiveHelp, new Skippable() {
           @Override
           public boolean skip() {
-            return ImportFormat.LIMESURVEY.name().equals(formatChooser.getSelectedValue());
+            String selection = formatChooser.getSelectedValue();
+            return ImportFormat.LIMESURVEY.name().equals(selection) || ImportFormat.REST.name().equals(selection) ||
+                ImportFormat.GEONAMES_POSTAL_CODES.name().equals(selection) ||
+                ImportFormat.HEALTH_CANADA.name().equals(selection);
           }
         })//
         .title(translations.dataImportArchiveStep())//
@@ -237,6 +252,9 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
     formatChooser.addGroup(translations.remoteServerBasedDatasources());
     formatChooser.addItemToGroup(translations.limesurveyLabel(), ImportFormat.LIMESURVEY.name());
     formatChooser.addItemToGroup(translations.opalRestLabel(), ImportFormat.REST.name());
+    formatChooser.addGroup(translations.publicDatasources());
+    formatChooser.addItemToGroup(translations.geonamesPostalCodesLabel(), ImportFormat.GEONAMES_POSTAL_CODES.name());
+    formatChooser.addItemToGroup(translations.healthCanadaLabel(), ImportFormat.HEALTH_CANADA.name());
   }
 
   @Override
@@ -403,6 +421,13 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
       case SPSS:
         helpSpss.setVisible(true);
         break;
+      case HEALTH_CANADA:
+        helpHealthCanada.setVisible(true);
+        break;
+      case GEONAMES_POSTAL_CODES:
+        helpGeonamesPostalCodes.setVisible(true);
+        break;
+
     }
   }
 
@@ -412,5 +437,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
     helpLimeSurvey.setVisible(false);
     helpOpalRest.setVisible(false);
     helpSpss.setVisible(false);
+    helpHealthCanada.setVisible(false);
+    helpGeonamesPostalCodes.setVisible(false);
   }
 }
