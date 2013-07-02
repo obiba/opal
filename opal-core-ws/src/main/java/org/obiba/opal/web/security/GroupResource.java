@@ -31,6 +31,7 @@ import com.google.common.collect.Lists;
 @SuppressWarnings("UnusedDeclaration")
 @Component
 @Scope("request")
+@Path("/")
 public class GroupResource {
 
   private final UserService userService;
@@ -49,7 +50,7 @@ public class GroupResource {
     List<Opal.GroupDto> groupDtos = Lists.newArrayList();
 
     for(Group g : groups) {
-      groupDtos.add(Opal.GroupDto.newBuilder().setName(g.getName()).build());
+      groupDtos.add(toDto(g));
     }
 
     return groupDtos;

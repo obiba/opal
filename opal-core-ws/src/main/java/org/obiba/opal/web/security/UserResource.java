@@ -32,6 +32,7 @@ import com.google.common.collect.Lists;
 @SuppressWarnings("UnusedDeclaration")
 @Component
 @Scope("request")
+@Path("/")
 public class UserResource {
 
   private final UserService userService;
@@ -64,10 +65,14 @@ public class UserResource {
     if(userService.getUserWithName(userDto.getName()) != null) {
       return Response.status(Response.Status.CONFLICT).build();
     }
+    if(!userDto.hasPassword()) {
+      return Response.status(Response.Status.PRECONDITION_FAILED).build();
+    }
 
     User u = new User();
     u.setName(userDto.getName());
     u.setEnabled(userDto.getEnabled());
+    u.setPassword(User.digest(userDto.getPassword()));
     for(String g : userDto.getGroupsList()) {
       Group group = userService.getGroupWithName(g);
 
@@ -107,7 +112,7 @@ public class UserResource {
     u.setEnabled(userDto.getEnabled());
 
     if(userDto.hasPassword()) {
-      u.setPassword(userDto.getPassword());
+      u.setPassword(User.digest(userDto.getPassword()));
     }
 
     for(String g : userDto.getGroupsList()) {
