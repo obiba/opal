@@ -6,6 +6,8 @@ import java.util.Set;
 
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
+import org.obiba.opal.core.user.Group;
+import org.obiba.opal.core.user.User;
 import org.springframework.beans.factory.FactoryBean;
 
 import com.google.common.collect.ImmutableSet;
@@ -15,7 +17,7 @@ import com.google.common.collect.Lists;
 public class OpalAnnotationConfigurationHelper implements FactoryBean<Set<Class<?>>> {
 
   private final Set<Class<?>> annotatedClasses = new ImmutableSet.Builder<Class<?>>()
-      .add(UnitKeyStoreState.class, SubjectAcl.class).build();
+      .add(UnitKeyStoreState.class, SubjectAcl.class, User.class, Group.class).build();
 
   private final List<Class<?>> additionalClasses = Lists.newArrayList();
 
