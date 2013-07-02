@@ -106,7 +106,7 @@ public abstract class VariablesFilter extends AbstractVariablesFilter {
             .query("variable", String.valueOf(variable));
 
         if(!query.isEmpty()) ub.query("query", query);
-        if(limit != null) ub.query("limit", String.valueOf(limit));
+        if(limit != null && limit > 0) ub.query("limit", String.valueOf(limit));
         if(!sortField.isEmpty()) ub.query("sortField", sortField);
         if(!sortDir.isEmpty()) ub.query("sortDir", sortDir);
 
@@ -152,7 +152,7 @@ public abstract class VariablesFilter extends AbstractVariablesFilter {
       if(!query.isEmpty()) ub.query("script", exactMatch
           ? "name().lowerCase().matches(/^" + cleanFilter(query) + "$/)"
           : "name().lowerCase().matches(/" + cleanFilter(query) + "/)");
-      if(limit != null) ub.query("limit", String.valueOf(limit));
+      if(limit != null && limit > 0) ub.query("limit", String.valueOf(limit));
       if(!sortField.isEmpty()) ub.query("sortField", sortField);
       if(!sortDir.isEmpty()) ub.query("sortDir", sortDir);
 
