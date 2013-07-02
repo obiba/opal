@@ -239,3 +239,15 @@ message ScheduleDto {
   optional int32 hours = 3;
   optional int32 minutes = 4;
 }
+
+message UserDto {
+  required string name = 1;
+  optional string password = 2; // only set when the password is to be updated on POST or PUT
+  repeated string groups = 3; // only set when user is from the user table
+  optional bool enabled = 4 [default = true];
+}
+
+message GroupDto {
+  required string name = 1;
+  repeated string users = 2;
+}
