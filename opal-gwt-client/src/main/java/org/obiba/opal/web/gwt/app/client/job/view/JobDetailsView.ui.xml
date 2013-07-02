@@ -7,7 +7,7 @@
     >
 
   <g:DialogBox ui:field="dialogBox" modal="true">
-    <g:DockLayoutPanel styleName="main" ui:field="content" unit="EM" height="35em" width="45em">
+    <g:DockLayoutPanel ui:field="content" unit="EM" height="35em" width="45em">
       <g:center>
         <g:ScrollPanel width="100%">
           <o:Table width="100%" ui:field="table" addStyleNames="main"/>
