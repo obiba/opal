@@ -23,9 +23,9 @@
               <ui:msg description="Storage Type label">Storage Type</ui:msg>
             </g:Label>
             <o:Chooser ui:field="datasourceType">
-              <g:item value="null"></g:item>
               <g:item value="hibernate"></g:item>
               <g:item value="jdbc"></g:item>
+              <g:item value="null"></g:item>
             </o:Chooser>
           </g:FlowPanel>
         </g:FlowPanel>
