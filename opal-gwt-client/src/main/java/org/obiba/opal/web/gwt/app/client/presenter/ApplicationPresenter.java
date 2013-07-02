@@ -230,9 +230,6 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   }
 
   private void authorize() {
-// RAMIN
-//    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/administration").get()
-//        .authorize(new UIObjectAuthorizer(getView().getAdministrationItem())).send();
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").get()
         .authorize(new UIObjectAuthorizer(getView().getDatasourcesItem())).send();
 //    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").get()

@@ -2,7 +2,6 @@
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
-    xmlns:my="urn:import:org.obiba.opal.web.gwt.app.client.administration.main.view"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -11,9 +10,6 @@
     <b:PageHeader>
       <ui:msg description="Dashboard label">Administration</ui:msg>
     </b:PageHeader>
-    <g:FlowPanel>
-      <my:MainItemAdministrationView title="TOTO" />
-    </g:FlowPanel>
     <g:FlowPanel addStyleNames="main">
       <b:FluidRow>
         <b:Column size="6">
@@ -25,7 +21,7 @@
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="large-bottom-margin">
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action">
+                <g:Anchor addStyleNames="admin-item action" ui:field="usersGroupsPlace">
                   <ui:msg description="Main Administration Users and Groups title">Users and Groups</ui:msg>
                 </g:Anchor>
               </g:FlowPanel>
@@ -37,7 +33,7 @@
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="large-bottom-margin">
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action">
+                <g:Anchor addStyleNames="admin-item action" ui:field="unitsPlace">
                   <ui:msg description="Main Administration Units Identifiers title">Units and Identifiers</ui:msg>
                 </g:Anchor>
               </g:FlowPanel>
@@ -57,7 +53,7 @@
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="large-bottom-margin">
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action" ui:field="slqDatabases">
+                <g:Anchor addStyleNames="admin-item action" ui:field="databasesPlace">
                   <ui:msg description="Main Administration SQL Databases title">SQL Databases</ui:msg>
                 </g:Anchor>
               </g:FlowPanel>
@@ -69,7 +65,7 @@
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="large-bottom-margin">
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action">
+                <g:Anchor addStyleNames="admin-item action" ui:field="mongoDbPlace">
                   <ui:msg description="Main Administration MongoDB title">MongoDB Databases</ui:msg>
                 </g:Anchor>
               </g:FlowPanel>
@@ -89,7 +85,7 @@
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="large-bottom-margin">
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action">
+                <g:Anchor addStyleNames="admin-item action" ui:field="esPlace">
                   <ui:msg description="Main Administration Elastic Search title">Elastic Search</ui:msg>
                 </g:Anchor>
               </g:FlowPanel>
@@ -101,7 +97,7 @@
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="large-bottom-margin">
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action">
+                <g:Anchor addStyleNames="admin-item action" ui:field="indexPlace">
                   <ui:msg description="Main Administration Index title">Index</ui:msg>
                 </g:Anchor>
               </g:FlowPanel>
@@ -125,7 +121,7 @@
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="large-bottom-margin">
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action">
+                <g:Anchor addStyleNames="admin-item action" ui:field="rPlace">
                   <ui:msg description="Main Administration R title">R</ui:msg>
                 </g:Anchor>
               </g:FlowPanel>
@@ -137,7 +133,7 @@
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="large-bottom-margin">
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action">
+                <g:Anchor addStyleNames="admin-item action" ui:field="dataShieldPlace">
                   <ui:msg description="Main Administration DatsSHIELD title">DatsSHIELD</ui:msg>
                 </g:Anchor>
               </g:FlowPanel>
@@ -149,7 +145,7 @@
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="large-bottom-margin">
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action">
+                <g:Anchor addStyleNames="admin-item action" ui:field="pluginsPlace">
                   <ui:msg description="Main Administration Plugins title">Plugins</ui:msg>
                 </g:Anchor>
               </g:FlowPanel>
@@ -161,7 +157,7 @@
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="large-bottom-margin">
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action">
+                <g:Anchor addStyleNames="admin-item action" ui:field="reportsPlace">
                   <ui:msg description="Main Administration Reports title">Reports</ui:msg>
                 </g:Anchor>
               </g:FlowPanel>
@@ -180,7 +176,7 @@
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="large-bottom-margin">
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action">
+                <g:Anchor addStyleNames="admin-item action" ui:field="filesPlace">
                   <ui:msg description="Main Administration Files title">Files</ui:msg>
                 </g:Anchor>
               </g:FlowPanel>
@@ -192,7 +188,7 @@
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="large-bottom-margin">
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action">
+                <g:Anchor addStyleNames="admin-item action" ui:field="tasksPlace">
                   <ui:msg description="Main Administration Tasks title">Tasks</ui:msg>
                 </g:Anchor>
               </g:FlowPanel>
@@ -204,7 +200,7 @@
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="large-bottom-margin">
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action">
+                <g:Anchor addStyleNames="admin-item action" ui:field="javaPlace">
                   <ui:msg description="Main Administration Java title">Java</ui:msg>
                 </g:Anchor>
               </g:FlowPanel>
@@ -216,7 +212,7 @@
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="large-bottom-margin">
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action">
+                <g:Anchor addStyleNames="admin-item action" ui:field="serverPlace">
                   <ui:msg description="Main Administration Server title">Server</ui:msg>
                 </g:Anchor>
               </g:FlowPanel>
