@@ -12,6 +12,8 @@ import opal.import_limesurvey
 import opal.import_spss
 import opal.export_xml
 import opal.export_csv
+import opal.user
+import opal.group
 import argparse
 
 
@@ -62,6 +64,8 @@ add_subcommand('export-xml', 'Export data to a zip of Opal XML files.', opal.exp
                opal.export_xml.do_command)
 add_subcommand('export-csv', 'Export data to a folder of CSV files.', opal.export_csv.add_arguments,
                opal.export_csv.do_command)
+add_subcommand('user', 'Manage users.', opal.user.add_arguments, opal.user.do_command)
+add_subcommand('group', 'Manage groups.', opal.group.add_arguments, opal.group.do_command)
 add_subcommand('rest', 'Request directly the Opal REST API, for advanced users.', opal.rest.add_arguments,
                opal.rest.do_command)
 

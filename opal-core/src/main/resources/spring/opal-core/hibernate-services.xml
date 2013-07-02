@@ -24,4 +24,10 @@
 
   <bean id="userProvider" class="org.obiba.opal.audit.OpalUserProvider"/>
 
+  <bean id="userService"
+      class="org.obiba.opal.core.service.impl.UserServiceHibernateImpl" scope="singleton">
+    <property name="sessionFactory" ref="opalSessionFactory"/>
+    <property name="persistenceManager" ref="persistenceManager"/>
+  </bean>
+
 </beans>
