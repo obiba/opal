@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportP
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DatasourceValuesStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DestinationSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.LimesurveyStepPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.NoFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.RestStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.SpssFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.UnitSelectionStepPresenter;
@@ -25,6 +26,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.DataImportView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.DatasourceValuesStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.DestinationSelectionStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.LimesurveyStepView;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.NoFormatStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.RestStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.SpssFormatStepView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.UnitSelectionStepView;
@@ -53,5 +55,6 @@ public class ImportModule extends AbstractOpalModule {
     bind(SpssFormatStepPresenter.Display.class).to(SpssFormatStepView.class);
     bind(LimesurveyStepPresenter.Display.class).to(LimesurveyStepView.class);
     bind(RestStepPresenter.Display.class).to(RestStepView.class);
+    bind(NoFormatStepPresenter.Display.class).to(NoFormatStepView.class);
   }
 }

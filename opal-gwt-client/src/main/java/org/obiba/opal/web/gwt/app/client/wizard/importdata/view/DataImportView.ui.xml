@@ -14,7 +14,7 @@
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="30em" width="45em">
+  <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="35em" width="45em">
     <g:caption>
       <ui:msg description="Data import title">Import Data</ui:msg>
     </g:caption>
@@ -62,6 +62,16 @@
                 remote
                 Opal.
               </ui:msg>
+            </g:Label>
+          </g:FlowPanel>
+          <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpHealthCanada" visible="false">
+            <g:Label styleName="help-block">
+              <ui:msg description="Health Canada Information">Medications from Health Canada.</ui:msg>
+            </g:Label>
+          </g:FlowPanel>
+          <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpGeonamesPostalCodes" visible="false">
+            <g:Label styleName="help-block">
+              <ui:msg description="Geonames Postal Codes Information">Postal Codes by country from geonames.org.</ui:msg>
             </g:Label>
           </g:FlowPanel>
         </g:FlowPanel>

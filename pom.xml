@@ -254,6 +254,18 @@
       </dependency>
 
       <dependency>
+        <groupId>org.obiba.public-datasources</groupId>
+        <artifactId>magma-datasource-health-canada</artifactId>
+        <version>${public-datasources.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.obiba.public-datasources</groupId>
+        <artifactId>magma-datasource-geonames</artifactId>
+        <version>${public-datasources.version}</version>
+      </dependency>
+
+      <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>${guava.version}</version>
@@ -1495,6 +1507,7 @@
     <junit.version>4.7</junit.version>
     <liquibase.version>1.9.4</liquibase.version>
     <magma.version>1.7.1</magma.version>
+    <public-datasources.version>1.0</public-datasources.version>
     <mail.version>1.4</mail.version>
     <mockftpserver.version>2.1</mockftpserver.version>
     <mysql-connector-java.version>5.1.24</mysql-connector-java.version>

@@ -725,6 +725,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("LimeSurvey")
   String limesurveyLabel();
 
+  @Description("Health Canada label")
+  @DefaultStringValue("Health Canada")
+  String healthCanadaLabel();
+
+  @Description("Geonames Postal Codes label")
+  @DefaultStringValue("Postal Codes")
+  String geonamesPostalCodesLabel();
+
   @Description("Select file and data format label")
   @DefaultStringValue("Select a file and data format")
   String selectFileAndDataFormatLabel();
@@ -1594,6 +1602,10 @@ public interface Translations extends Constants {
   @Description("Remote server based datasources label")
   @DefaultStringValue("Servers")
   String remoteServerBasedDatasources();
+
+  @Description("Public datasources label")
+  @DefaultStringValue("Public Datasources")
+  String publicDatasources();
 
   @Description("Elastic Search Configuration")
   @DefaultStringValue("Elastic search configuration")
