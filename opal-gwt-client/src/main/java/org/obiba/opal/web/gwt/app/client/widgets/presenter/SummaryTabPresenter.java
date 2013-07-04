@@ -185,7 +185,11 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
     @Override
     public void onSummaryRequest(SummaryRequiredEvent event) {
       cancelPendingSummaryRequest();
-      setResourceUri(event.getResourceUri(), event.getMax());
+      int max = DEFAULT_LIMIT;
+      if (event.getMax() != null) {
+        max = event.getMax();
+      }
+      setResourceUri(event.getResourceUri(), max);
     }
 
   }
