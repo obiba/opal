@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -42,6 +40,7 @@ import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
@@ -253,7 +252,7 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
   }
 
   @Override
-  public void setSummaryTabWidget(WidgetDisplay widget) {
+  public void setSummaryTabWidget(View widget) {
     summary.add(widget.asWidget());
   }
 
