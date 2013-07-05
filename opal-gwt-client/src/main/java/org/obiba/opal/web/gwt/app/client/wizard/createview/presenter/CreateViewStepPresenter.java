@@ -96,16 +96,12 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
     this.fileSelectionPresenter = fileSelectionPresenter;
   }
 
-  //
-  // WidgetPresenter Methods
-  //
-
   @Override
   protected void onBind() {
     super.onBind();
     fileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
     fileSelectionPresenter.bind();
-    getView().setFileSelectionDisplay(fileSelectionPresenter.getDisplay());
+    getView().setFileSelectionDisplay(fileSelectionPresenter.getView());
 
     addEventHandlers();
   }

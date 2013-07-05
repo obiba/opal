@@ -93,7 +93,7 @@ public class CategoriesPresenter extends PresenterWidget<CategoriesPresenter.Dis
     categoryDialogPresenter.setViewDto(viewDto);
     categoryDialogPresenter.setCategoryDto(categoryDto);
     categoryDialogPresenter.setCategories(currentVariable.getCategoriesArray());
-    categoryDialogPresenter.revealDisplay();
+    categoryDialogPresenter.onReveal();
   }
 
   private class AddCategoryHandler implements ClickHandler {

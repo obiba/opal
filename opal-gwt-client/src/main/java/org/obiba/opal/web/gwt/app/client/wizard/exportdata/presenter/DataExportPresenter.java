@@ -82,8 +82,8 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
   protected void initDisplayComponents() {
     initFileSelectionType();
     fileSelectionPresenter.bind();
-    fileSelectionPresenter.getDisplay().setFile("/home/" + credentials.getUsername() + "/export");
-    getView().setFileWidgetDisplay(fileSelectionPresenter.getDisplay());
+    fileSelectionPresenter.getView().setFile("/home/" + credentials.getUsername() + "/export");
+    getView().setFileWidgetDisplay(fileSelectionPresenter.getView());
     getView().setTablesValidator(new TablesValidator());
     getView().setDestinationValidator(new DestinationValidator());
   }

@@ -10,10 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
 import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
@@ -22,61 +18,42 @@ import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig;
 
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
 import static org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig.ImportFormat;
 
-public class XmlFormatStepPresenter extends WidgetPresenter<XmlFormatStepPresenter.Display>
+public class XmlFormatStepPresenter extends PresenterWidget<XmlFormatStepPresenter.Display>
     implements DataImportPresenter.DataConfigFormatStepPresenter {
 
-  @Inject
   private FileSelectionPresenter xmlFileSelectionPresenter;
 
   @Inject
-  public XmlFormatStepPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
+  public XmlFormatStepPresenter(EventBus eventBus, Display display, FileSelectionPresenter xmlFileSelectionPresenter) {
+    super((com.google.gwt.event.shared.EventBus) eventBus, display);
+    this.xmlFileSelectionPresenter = xmlFileSelectionPresenter;
   }
 
   @Override
   protected void onBind() {
     xmlFileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE_OR_FOLDER);
     xmlFileSelectionPresenter.bind();
-    getDisplay().setXmlFileSelectorWidgetDisplay(xmlFileSelectionPresenter.getDisplay());
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
+    getView().setXmlFileSelectorWidgetDisplay(xmlFileSelectionPresenter.getView());
   }
 
   @Override
   public ImportConfig getImportConfig() {
     ImportConfig importConfig = new ImportConfig();
     importConfig.setFormat(ImportFormat.XML);
-    importConfig.setXmlFile(getDisplay().getSelectedFile());
+    importConfig.setXmlFile(getView().getSelectedFile());
 
     return importConfig;
   }
 
   @Override
   public boolean validate() {
-    if(getDisplay().getSelectedFile().isEmpty() || !getDisplay().getSelectedFile().toLowerCase().endsWith(".zip")) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error("ZipFileRequired").build());
+    if(getView().getSelectedFile().isEmpty() || !getView().getSelectedFile().toLowerCase().endsWith(".zip")) {
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error("ZipFileRequired").build());
       return false;
     }
     return true;
@@ -86,7 +63,7 @@ public class XmlFormatStepPresenter extends WidgetPresenter<XmlFormatStepPresent
   // Interfaces
   //
 
-  public interface Display extends WidgetDisplay, WizardStepDisplay {
+  public interface Display extends View, WizardStepDisplay {
 
     void setXmlFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
 

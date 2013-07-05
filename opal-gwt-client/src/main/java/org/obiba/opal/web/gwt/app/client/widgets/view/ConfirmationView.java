@@ -13,23 +13,25 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationPresenter
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupViewImpl;
 
 /**
  *
  */
-public class ConfirmationView extends DialogBox implements Display {
+public class ConfirmationView extends PopupViewImpl implements Display {
 
   @UiTemplate("ConfirmationView.ui.xml")
-  interface ConfirmationViewUiBinder extends UiBinder<DockLayoutPanel, ConfirmationView> {}
+  interface ConfirmationViewUiBinder extends UiBinder<Widget, ConfirmationView> {}
 
   //
   // Constants
@@ -45,9 +47,14 @@ public class ConfirmationView extends DialogBox implements Display {
 
   private static final ConfirmationViewUiBinder uiBinder = GWT.create(ConfirmationViewUiBinder.class);
 
+  private final Widget widget;
+
   //
   // Instance Variables
   //
+
+  @UiField
+  DialogBox dialogBox;
 
   @UiField
   HTML message;
@@ -61,15 +68,13 @@ public class ConfirmationView extends DialogBox implements Display {
   //
   // Constructors
   //
+  @Inject
+  public ConfirmationView(EventBus eventBus) {
+    super(eventBus);
+    widget = uiBinder.createAndBindUi(this);
 
-  public ConfirmationView() {
-    setHeight(DIALOG_HEIGHT);
-    setWidth(DIALOG_WIDTH);
-
-    DockLayoutPanel content = uiBinder.createAndBindUi(this);
-    content.setHeight(DIALOG_HEIGHT);
-    content.setWidth(DIALOG_WIDTH);
-    add(content);
+    dialogBox.setHeight(DIALOG_HEIGHT);
+    dialogBox.setWidth(DIALOG_WIDTH);
   }
 
   //
@@ -89,7 +94,7 @@ public class ConfirmationView extends DialogBox implements Display {
 
   @Override
   public void setConfirmationTitle(String title) {
-    setText(title);
+    dialogBox.setText(title);
   }
 
   @Override
@@ -108,16 +113,8 @@ public class ConfirmationView extends DialogBox implements Display {
   }
 
   @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
-  }
-
-  @Override
   public Widget asWidget() {
-    return this;
+    return widget;
   }
 
 }

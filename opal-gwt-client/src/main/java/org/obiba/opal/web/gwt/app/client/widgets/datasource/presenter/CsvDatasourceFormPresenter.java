@@ -83,7 +83,7 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
     csvFileSelectionPresenter.bind();
     csvFileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
 
-    getView().setCsvFileSelectorWidgetDisplay(csvFileSelectionPresenter.getDisplay());
+    getView().setCsvFileSelectorWidgetDisplay(csvFileSelectionPresenter.getView());
   }
 
   @Override

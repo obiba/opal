@@ -13,17 +13,19 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.DatasourceSelectorPre
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
  *
  */
-public class DatasourceSelectorView extends Composite implements DatasourceSelectorPresenter.Display {
+public class DatasourceSelectorView extends ViewImpl implements DatasourceSelectorPresenter.Display {
   //
   // Instance Variables
   //
+
+  private final Widget uiWidget;
 
   private final ListBox datasourceListBox;
 
@@ -35,7 +37,7 @@ public class DatasourceSelectorView extends Composite implements DatasourceSelec
 
   public DatasourceSelectorView() {
     datasourceListBox = new ListBox();
-    initWidget(datasourceListBox);
+    uiWidget = datasourceListBox;
   }
 
   //
@@ -89,14 +91,7 @@ public class DatasourceSelectorView extends Composite implements DatasourceSelec
 
   @Override
   public Widget asWidget() {
-    return this;
+    return uiWidget;
   }
 
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
-  }
 }

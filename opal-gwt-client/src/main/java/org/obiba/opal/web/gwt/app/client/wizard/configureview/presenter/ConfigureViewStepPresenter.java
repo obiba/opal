@@ -77,7 +77,7 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
   @Override
   protected void onBind() {
     dataTabPresenter.bind();
-    getView().addDataTabWidget(dataTabPresenter.getDisplay().asWidget());
+    getView().addDataTabWidget(dataTabPresenter.getView().asWidget());
 
     getView().getHelpDeck().showWidget(0);
     viewSavePending = false;
@@ -102,7 +102,7 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
 
   @Override
   public void onReset() {
-    dataTabPresenter.refreshDisplay();
+    dataTabPresenter.onReset();
   }
 
   //

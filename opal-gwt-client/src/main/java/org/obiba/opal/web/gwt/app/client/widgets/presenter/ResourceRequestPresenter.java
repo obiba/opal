@@ -9,12 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -22,15 +16,19 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
 /**
  *
  */
 public class ResourceRequestPresenter<T extends JavaScriptObject>
-    extends WidgetPresenter<ResourceRequestPresenter.Display> {
+    extends PresenterWidget<ResourceRequestPresenter.Display> {
   //
   // Instance Variables
   //
@@ -43,45 +41,13 @@ public class ResourceRequestPresenter<T extends JavaScriptObject>
   // Constructors
   //
 
+  @Inject
   public ResourceRequestPresenter(Display display, EventBus eventBus, ResourceRequestBuilder<T> requestBuilder,
       ResponseCodeCallback callback) {
-    super(display, eventBus);
+    super(eventBus, display);
 
     this.requestBuilder = requestBuilder;
     this.callback = callback;
-  }
-
-  //
-  // WidgetPresenter Methods
-  //
-
-  @Override
-  protected void onBind() {
-    addEventHandlers();
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  protected void addEventHandlers() {
-  }
-
-  @Override
-  public void revealDisplay() {
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
   }
 
   //
@@ -93,7 +59,7 @@ public class ResourceRequestPresenter<T extends JavaScriptObject>
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        getDisplay().completed();
+        getView().completed();
 
         if(callback != null) {
           callback.onResponseCode(request, response);
@@ -113,18 +79,18 @@ public class ResourceRequestPresenter<T extends JavaScriptObject>
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        getDisplay().failed();
+        getView().failed();
 
         if(response.getText() != null && response.getText().length() != 0) {
           try {
             ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
-            getDisplay().showErrorMessage(errorDto.getStatus());
+            getView().showErrorMessage(errorDto.getStatus());
           } catch(Exception e) {
             // Should never get here!
-            getDisplay().showErrorMessage("Internal Error");
+            getView().showErrorMessage("Internal Error");
           }
         } else {
-          getDisplay().showErrorMessage("Unknown Error");
+          getView().showErrorMessage("Unknown Error");
         }
 
         if(callback != null) {
@@ -141,7 +107,7 @@ public class ResourceRequestPresenter<T extends JavaScriptObject>
   }
 
   public void sendRequest() {
-    getDisplay().inProgress();
+    getView().inProgress();
     requestBuilder.send();
   }
 
@@ -149,7 +115,7 @@ public class ResourceRequestPresenter<T extends JavaScriptObject>
   // Inner Classes / Interfaces
   //
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     void setResourceName(String resourceName);
 

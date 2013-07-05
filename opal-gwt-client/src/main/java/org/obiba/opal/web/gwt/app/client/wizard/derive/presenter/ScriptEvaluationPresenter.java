@@ -12,8 +12,6 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
@@ -89,7 +87,8 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
       }
 
       @Override
-      public void onGeoValueSelection(VariableDto variableDto, int row, int column, ValueSetDto valueSet, ValueSetsDto.ValueDto value) {
+      public void onGeoValueSelection(VariableDto variableDto, int row, int column, ValueSetDto valueSet,
+          ValueSetsDto.ValueDto value) {
 
       }
 
@@ -137,7 +136,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
 
     summaryTabPresenter.setRequestBuilder(requestBuilder);
     summaryTabPresenter.forgetSummary();
-    summaryTabPresenter.refreshDisplay();
+    summaryTabPresenter.onReset();
   }
 
   private ResourceRequestBuilder<SummaryStatisticsDto> requestSummaryBuilder(String link) {
@@ -203,15 +202,11 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
     }
   }
 
-  //
-  // WidgetPresenter Methods
-  //
-
   @Override
   protected void onBind() {
     super.onBind();
     summaryTabPresenter.bind();
-    getView().setSummaryTabWidget(summaryTabPresenter.getDisplay());
+    getView().setSummaryTabWidget(summaryTabPresenter.getView());
     // TODO
     // setInSlot(Display.Slots.Summary, summaryTabPresenter);
   }
@@ -321,7 +316,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
       Summary
     }
 
-    void setSummaryTabWidget(WidgetDisplay widget);
+    void setSummaryTabWidget(SummaryTabPresenter.Display widget);
 
     void setValuesVisible(boolean visible);
 

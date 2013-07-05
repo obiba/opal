@@ -9,12 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.support.LanguageLocale;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.CharacterSetDisplay;
@@ -27,79 +21,61 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
-public class SpssFormatStepPresenter extends WidgetPresenter<SpssFormatStepPresenter.Display>
+public class SpssFormatStepPresenter extends PresenterWidget<SpssFormatStepPresenter.Display>
     implements DataImportPresenter.DataConfigFormatStepPresenter {
 
   @Inject
   private FileSelectionPresenter spssFileSelectionPresenter;
 
   @Inject
-  public SpssFormatStepPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
+  public SpssFormatStepPresenter(EventBus eventBus, Display display) {
+    super(eventBus, display);
   }
 
   @Override
   protected void onBind() {
     spssFileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE_OR_FOLDER);
     spssFileSelectionPresenter.bind();
-    getDisplay().setSpssFileSelectorWidgetDisplay(spssFileSelectionPresenter.getDisplay());
+    getView().setSpssFileSelectorWidgetDisplay(spssFileSelectionPresenter.getView());
     setDefaultCharset();
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
   }
 
   @Override
   public ImportConfig getImportConfig() {
     ImportConfig importData = new ImportConfig();
     importData.setFormat(ImportFormat.SPSS);
-    importData.setSpssFile(getDisplay().getSelectedFile());
-    importData.setCharacterSet(getDisplay().getCharsetText().getText());
-    importData.setDestinationEntityType(getDisplay().getEntityType().getText());
-    importData.setLocale(getDisplay().getLocale());
+    importData.setSpssFile(getView().getSelectedFile());
+    importData.setCharacterSet(getView().getCharsetText().getText());
+    importData.setDestinationEntityType(getView().getEntityType().getText());
+    importData.setLocale(getView().getLocale());
 
     return importData;
   }
 
   @Override
   public boolean validate() {
-    if(getDisplay().getSelectedFile().isEmpty() || !getDisplay().getSelectedFile().toLowerCase().endsWith(".sav")) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error("SpssFileRequired").build());
+    if(getView().getSelectedFile().isEmpty() || !getView().getSelectedFile().toLowerCase().endsWith(".sav")) {
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error("SpssFileRequired").build());
       return false;
     }
 
-    String selectedLocale = getDisplay().getLocale();
-    if (!LanguageLocale.isValid(selectedLocale)) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error("InvalidLocaleName").args(selectedLocale).build());
+    String selectedLocale = getView().getLocale();
+    if(!LanguageLocale.isValid(selectedLocale)) {
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error("InvalidLocaleName").args(selectedLocale).build());
       return false;
     }
 
     return true;
   }
 
-  public interface Display extends WidgetDisplay, WizardStepDisplay, CharacterSetDisplay {
+  public interface Display extends View, WizardStepDisplay, CharacterSetDisplay {
 
     void setSpssFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
 
@@ -117,7 +93,7 @@ public class SpssFormatStepPresenter extends WidgetPresenter<SpssFormatStepPrese
           @Override
           public void onResource(Response response, JsArrayString resource) {
             String charset = resource.get(0);
-            getDisplay().setDefaultCharset(charset);
+            getView().setDefaultCharset(charset);
           }
         }).send();
   }

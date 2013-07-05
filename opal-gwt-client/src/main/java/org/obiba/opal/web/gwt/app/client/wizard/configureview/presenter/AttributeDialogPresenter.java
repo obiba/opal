@@ -14,12 +14,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -46,12 +40,15 @@ import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.TextBoxBase;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
-public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPresenter.Display> {
+public class AttributeDialogPresenter extends PresenterWidget<AttributeDialogPresenter.Display> {
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -61,42 +58,37 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
   private AttributeDto attributeDto;
 
-  @Inject
   private LabelListPresenter labelListPresenter;
 
   private ViewDto viewDto;
 
   @SuppressWarnings("unchecked")
   @Inject
-  public AttributeDialogPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
+  public AttributeDialogPresenter(EventBus eventBus, Display display, LabelListPresenter labelListPresenter) {
+    super(eventBus, display);
+    this.labelListPresenter = labelListPresenter;
     attributes = (JsArray<AttributeDto>) JsArray.createArray();
   }
 
   @Override
-  public void refreshDisplay() {
-    labelListPresenter.refreshDisplay();
-  }
-
-  @Override
-  public void revealDisplay() {
+  public void onReveal() {
     initDisplayComponents();
     addValidators();
-    getDisplay().showDialog();
+    getView().showDialog();
   }
 
   @Override
   protected void onBind() {
     labelListPresenter.bind();
-    labelListPresenter.getDisplay().setUseTextArea(true);
-    getDisplay().addInputField(labelListPresenter.getDisplay());
+    labelListPresenter.getView().setUseTextArea(true);
+    getView().addInputField(labelListPresenter.getView());
     addEventHandlers();
   }
 
   @Override
   protected void onUnbind() {
     labelListPresenter.unbind();
-    getDisplay().removeInputField();
+    getView().removeInputField();
 
     // Reset attributeNameToDisplay to null, otherwise an Edit followed by an Add will look like another Edit.
     setAttribute(null);
@@ -113,46 +105,37 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
       labelListPresenter.setAttributes(attributes);
       labelListPresenter.updateFields();
     } else {
-      getDisplay().clear();
+      getView().clear();
     }
   }
 
   private void addValidators() {
-    validators.add(new RequiredTextValidator(getDisplay().getName(), translations.attributeNameRequired()));
+    validators.add(new RequiredTextValidator(getView().getName(), translations.attributeNameRequired()));
     validators.add(new UniqueAttributeNameValidator(translations.attributeNameAlreadyExists()));
     validators.add(labelListPresenter.new BaseLanguageTextRequiredValidator(translations.attributeValueRequired()));
   }
 
   private void setTitle() {
-    getDisplay().getCaption().setText(isEdit() ? translations.editAttribute() : translations.addNewAttribute());
+    getView().getCaption().setText(isEdit() ? translations.editAttribute() : translations.addNewAttribute());
   }
 
   private void addEventHandlers() {
-    registerHandler(getDisplay().getSaveButton().addClickHandler(new SaveClickHandler()));
+    registerHandler(getView().getSaveButton().addClickHandler(new SaveClickHandler()));
 
-    registerHandler(getDisplay().getCancelButton().addClickHandler(new ClickHandler() {
+    registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        getDisplay().hideDialog();
+        getView().hideDialog();
       }
     }));
 
     // Hiding the Attribute dialog will generate a CloseEvent.
-    registerHandler(getDisplay().getDialog().addCloseHandler(new CloseHandler<DialogBox>() {
+    registerHandler(getView().getDialog().addCloseHandler(new CloseHandler<DialogBox>() {
       @Override
       public void onClose(CloseEvent<DialogBox> event) {
         unbind();
       }
     }));
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
   }
 
   String validate() {
@@ -171,7 +154,7 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
   public void setAttribute(AttributeDto attributeDto) {
     this.attributeDto = attributeDto;
-    getDisplay().setAttribute(attributeDto);
+    getView().setAttribute(attributeDto);
   }
 
   public void setAttributes(JsArray<AttributeDto> attributes) {
@@ -180,7 +163,7 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
   public void setViewDto(ViewDto viewDto) {
     this.viewDto = viewDto;
-    getDisplay().setUniqueNames(findUniqueAttributeNames());
+    getView().setUniqueNames(findUniqueAttributeNames());
     labelListPresenter.setDatasourceName(viewDto.getDatasourceName());
   }
 
@@ -208,8 +191,8 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
 
     @Override
     protected boolean hasError() {
-      String safeNamespace = Strings.nullToEmpty(getDisplay().getNamespace().getText());
-      String safeName = Strings.nullToEmpty(getDisplay().getName().getText());
+      String safeNamespace = Strings.nullToEmpty(getView().getNamespace().getText());
+      String safeName = Strings.nullToEmpty(getView().getName().getText());
 
       // Edits can have the same safeNamespace/safeName.
       if(isEdit() && safeNamespace.equals(attributeDto.getNamespace()) && safeName.equals(attributeDto.getName())) {
@@ -234,25 +217,25 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
     public void onClick(ClickEvent event) {
       String errorMessageKey = validate();
       if(errorMessageKey != null) {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error(errorMessageKey).build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorMessageKey).build());
         return;
       }
       if(isEdit()) {
-        eventBus.fireEvent(
+        getEventBus().fireEvent(
             new AttributeUpdateEvent(getNewAttributeDtos(), attributeDto.getNamespace(), attributeDto.getName(),
                 UpdateType.EDIT));
       } else {
-        eventBus.fireEvent(new AttributeUpdateEvent(getNewAttributeDtos(), UpdateType.ADD));
+        getEventBus().fireEvent(new AttributeUpdateEvent(getNewAttributeDtos(), UpdateType.ADD));
       }
-      getDisplay().hideDialog();
+      getView().hideDialog();
     }
 
     private JsArray<AttributeDto> getNewAttributeDtos() {
       @SuppressWarnings("unchecked")
       JsArray<AttributeDto> attributesArray = (JsArray<AttributeDto>) JsArray.createArray();
-      Map<String, TextBoxBase> labelMap = labelListPresenter.getDisplay().getLanguageLabelMap();
-      String namespace = getDisplay().getNamespace().getText();
-      String name = getDisplay().getName().getText();
+      Map<String, TextBoxBase> labelMap = labelListPresenter.getView().getLanguageLabelMap();
+      String namespace = getView().getNamespace().getText();
+      String name = getView().getName().getText();
       for(Map.Entry<String, TextBoxBase> entry : labelMap.entrySet()) {
         String value = entry.getValue().getValue();
         if(!Strings.isNullOrEmpty(value)) {
@@ -264,7 +247,7 @@ public class AttributeDialogPresenter extends WidgetPresenter<AttributeDialogPre
     }
   }
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     HasCloseHandlers<DialogBox> getDialog();
 

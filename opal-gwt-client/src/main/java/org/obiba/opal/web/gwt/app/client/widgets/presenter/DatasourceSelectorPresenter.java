@@ -9,24 +9,21 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
 /**
  * Widget for selecting an Opal datasource.
  */
-public class DatasourceSelectorPresenter extends WidgetPresenter<DatasourceSelectorPresenter.Display> {
+public class DatasourceSelectorPresenter extends PresenterWidget<DatasourceSelectorPresenter.Display> {
   //
   // Instance Variables
   //
@@ -38,28 +35,12 @@ public class DatasourceSelectorPresenter extends WidgetPresenter<DatasourceSelec
   //
 
   @Inject
-  public DatasourceSelectorPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
-  }
-
-  //
-  // WidgetPresenter Methods
-  //
-
-  @Override
-  protected void onBind() {
+  public DatasourceSelectorPresenter(EventBus eventBus, Display display) {
+    super(eventBus, display);
   }
 
   @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public void revealDisplay() {
-  }
-
-  @Override
-  public void refreshDisplay() {
+  public void onReset() {
     ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
         .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
 
@@ -68,7 +49,7 @@ public class DatasourceSelectorPresenter extends WidgetPresenter<DatasourceSelec
             JsArray<DatasourceDto> datasources = resource != null
                 ? resource
                 : (JsArray<DatasourceDto>) JsArray.createArray();
-            getDisplay().setDatasources(datasources);
+            getView().setDatasources(datasources);
 
             if(datasourcesRefreshedCallback != null) {
               datasourcesRefreshedCallback.onDatasourcesRefreshed();
@@ -77,29 +58,20 @@ public class DatasourceSelectorPresenter extends WidgetPresenter<DatasourceSelec
         }).send();
   }
 
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
   //
   // Methods
   //
 
   public String getSelection() {
-    return getDisplay().getSelection();
+    return getView().getSelection();
   }
 
   public DatasourceDto getSelectionDto() {
-    return getDisplay().getSelectionDto();
+    return getView().getSelectionDto();
   }
 
   public void setSelection(String datasourceName) {
-    getDisplay().setSelection(datasourceName);
+    getView().setSelection(datasourceName);
   }
 
   public void setDatasourcesRefreshedCallback(DatasourcesRefreshedCallback datasourcesRefreshedCallback) {
@@ -110,7 +82,7 @@ public class DatasourceSelectorPresenter extends WidgetPresenter<DatasourceSelec
   // Inner Classes / Interfaces
   //
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     void setEnabled(boolean enabled);
 

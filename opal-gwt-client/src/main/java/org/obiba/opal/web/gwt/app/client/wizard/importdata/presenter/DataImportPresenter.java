@@ -132,7 +132,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     setInSlot(Slots.Rest, restStepPresenter);
 
     getView().setUnitSelectionStepInHandler(new UnitSelectionStepInHandler());
-    getView().setComparedDatasourcesReportDisplay(comparedDatasourcesReportPresenter.getDisplay());
+    getView().setComparedDatasourcesReportDisplay(comparedDatasourcesReportPresenter.getView());
     getView().setComparedDatasourcesReportStepInHandler(transientDatasourceHandler = new TransientDatasourceHandler());
     getView().setDatasourceValuesStepInHandler(new DatasourceValuesHandler());
 
@@ -213,11 +213,11 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       case CSV:
         csvFormatStepPresenter.clear();
         formatStepPresenter = csvFormatStepPresenter;
-        getView().setFormatStepDisplay(csvFormatStepPresenter.getDisplay());
+        getView().setFormatStepDisplay(csvFormatStepPresenter.getView());
         break;
       case XML:
         formatStepPresenter = xmlFormatStepPresenter;
-        getView().setFormatStepDisplay(xmlFormatStepPresenter.getDisplay());
+        getView().setFormatStepDisplay(xmlFormatStepPresenter.getView());
         break;
       case LIMESURVEY:
         formatStepPresenter = limesurveyStepPresenter;
@@ -229,7 +229,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         break;
       case SPSS:
         formatStepPresenter = spssFormatStepPresenter;
-        getView().setFormatStepDisplay(spssFormatStepPresenter.getDisplay());
+        getView().setFormatStepDisplay(spssFormatStepPresenter.getView());
         break;
       default:
         noFormatStepPresenter.setImportFormat(getView().getImportFormat());
@@ -386,7 +386,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
     @Override
     public void onStepIn() {
-      comparedDatasourcesReportPresenter.getDisplay().clearDisplay();
+      comparedDatasourcesReportPresenter.getView().clearDisplay();
       removeTransientDatasource();
       importConfig = formatStepPresenter.getImportConfig();
       destinationSelectionStepPresenter.updateImportConfig(importConfig);

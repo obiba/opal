@@ -22,7 +22,6 @@ import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.InlineLabel;
@@ -31,8 +30,11 @@ import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.TextBoxBase;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class LabelListView extends Composite implements LabelListPresenter.Display {
+public class LabelListView extends ViewImpl implements LabelListPresenter.Display {
+
+  private final Widget uiWidget;
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -46,20 +48,12 @@ public class LabelListView extends Composite implements LabelListPresenter.Displ
 
   public LabelListView() {
     panel = new FlowPanel();
-    initWidget(panel);
+    uiWidget = panel;
   }
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return uiWidget;
   }
 
   @Override

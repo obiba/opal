@@ -49,7 +49,7 @@ public class ExcelDatasourceFormPresenter extends PresenterWidget<ExcelDatasourc
   protected void onBind() {
     fileSelectionPresenter.bind();
     fileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
-    getView().setFileSelectorWidgetDisplay(fileSelectionPresenter.getDisplay());
+    getView().setFileSelectorWidgetDisplay(fileSelectionPresenter.getView());
   }
 
   @Override
@@ -97,6 +97,6 @@ public class ExcelDatasourceFormPresenter extends PresenterWidget<ExcelDatasourc
 
   @Override
   public void clearForm() {
-    fileSelectionPresenter.getDisplay().setFile("");
+    fileSelectionPresenter.getView().setFile("");
   }
 }

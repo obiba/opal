@@ -19,20 +19,22 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class CategoryDialogView extends Composite implements CategoryDialogPresenter.Display {
+public class CategoryDialogView extends ViewImpl implements CategoryDialogPresenter.Display {
 
   @UiTemplate("CategoryDialogView.ui.xml")
   interface CategoryDialogUiBinder extends UiBinder<DialogBox, CategoryDialogView> {}
 
   private static final CategoryDialogUiBinder uiBinder = GWT.create(CategoryDialogUiBinder.class);
+
+  private final Widget uiWidget;
 
   @UiField
   DialogBox dialog;
@@ -55,21 +57,13 @@ public class CategoryDialogView extends Composite implements CategoryDialogPrese
   private LabelListPresenter.Display inputField;
 
   public CategoryDialogView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    uiWidget = uiBinder.createAndBindUi(this);
     uiBinder.createAndBindUi(this);
   }
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return uiWidget;
   }
 
   @Override

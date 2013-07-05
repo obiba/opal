@@ -172,7 +172,7 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
 
     fileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
     fileSelectionPresenter.bind();
-    getView().setDesignFileWidgetDisplay(fileSelectionPresenter.getDisplay());
+    getView().setDesignFileWidgetDisplay(fileSelectionPresenter.getView());
 
   }
 
