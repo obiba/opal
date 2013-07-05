@@ -11,12 +11,6 @@ package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 
 import java.util.Map;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -26,11 +20,14 @@ import org.obiba.opal.web.model.client.opal.LocaleDto;
 
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.TextBoxBase;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
-public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Display> {
+public class LabelListPresenter extends PresenterWidget<LabelListPresenter.Display> {
 
   private JsArray<AttributeDto> attributes;
 
@@ -41,20 +38,8 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
   private String name;
 
   @Inject
-  public LabelListPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
-  }
-
-  @Override
-  protected void onBind() {
+  public LabelListPresenter(EventBus eventBus, Display display) {
+    super(eventBus, display);
   }
 
   private void getLanguages() {
@@ -72,23 +57,10 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
             noLocaleDto.setName("");
             languages.push(noLocaleDto);
 
-            getDisplay().setLanguages(languages);
+            getView().setLanguages(languages);
             updateFields();
           }
         }).send();
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
   }
 
   public void setAttributes(JsArray<AttributeDto> attributes) {
@@ -101,10 +73,10 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
   }
 
   public void updateFields() {
-    getDisplay().clearAttributes();
+    getView().clearAttributes();
 
     if(name != null) {
-      getDisplay().displayAttributes(namespace, name, attributes);
+      getView().displayAttributes(namespace, name, attributes);
     }
   }
 
@@ -116,12 +88,11 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
 
     @Override
     protected boolean hasError() {
-      LocaleDto baseLanguageLocaleDto = getDisplay().getBaseLanguage();
-      String baseLanguageLabelValue = getDisplay().getLanguageLabelMap().get(baseLanguageLocaleDto.getName())
-          .getValue();
+      LocaleDto baseLanguageLocaleDto = getView().getBaseLanguage();
+      String baseLanguageLabelValue = getView().getLanguageLabelMap().get(baseLanguageLocaleDto.getName()).getValue();
 
       // Base language not required when no locale value is provided.
-      String noLocaleValue = getDisplay().getLanguageLabelMap().get("").getValue();
+      String noLocaleValue = getView().getLanguageLabelMap().get("").getValue();
       return Strings.isNullOrEmpty(noLocaleValue) && Strings.isNullOrEmpty(baseLanguageLabelValue);
     }
 
@@ -133,7 +104,7 @@ public class LabelListPresenter extends WidgetPresenter<LabelListPresenter.Displ
     getLanguages();
   }
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     void setLanguages(JsArray<LocaleDto> languages);
 

@@ -89,7 +89,8 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
       }
 
       @Override
-      public void onGeoValueSelection(VariableDto variableDto, int row, int column, ValueSetDto valueSet, ValueSetsDto.ValueDto value) {
+      public void onGeoValueSelection(VariableDto variableDto, int row, int column, ValueSetDto valueSet,
+          ValueSetsDto.ValueDto value) {
 
       }
 
@@ -202,10 +203,6 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
           .append(originalTable.getName());
     }
   }
-
-  //
-  // WidgetPresenter Methods
-  //
 
   @Override
   protected void onBind() {

@@ -14,12 +14,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
@@ -43,14 +37,17 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
 
 public class ComparedDatasourcesReportStepPresenter
-    extends WidgetPresenter<ComparedDatasourcesReportStepPresenter.Display> {
+    extends PresenterWidget<ComparedDatasourcesReportStepPresenter.Display> {
 
   private String targetDatasourceName;
 
@@ -61,17 +58,8 @@ public class ComparedDatasourcesReportStepPresenter
   private boolean modificationsExist;
 
   @Inject
-  public ComparedDatasourcesReportStepPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onBind() {
+  public ComparedDatasourcesReportStepPresenter(EventBus eventBus, Display display) {
+    super(eventBus, display);
   }
 
   public Request compare(String sourceDatasourceName,
@@ -79,7 +67,7 @@ public class ComparedDatasourcesReportStepPresenter
       DatasourceCreatedCallback datasourceCreatedCallback, DatasourceFactoryDto factory,
       DatasourceDto datasourceResource) {
     this.targetDatasourceName = targetDatasourceName;
-    getDisplay().clearDisplay();
+    getView().clearDisplay();
     authorizedComparedTables = JsArrays.create();
     String resourceUri = UriBuilder.create()
         .segment("datasource", sourceDatasourceName, "compare", targetDatasourceName).build();
@@ -92,35 +80,19 @@ public class ComparedDatasourcesReportStepPresenter
   }
 
   public void allowIgnoreAllModifications(boolean allow) {
-    getDisplay().setIgnoreAllModificationsVisible(allow);
+    getView().setIgnoreAllModificationsVisible(allow);
   }
 
   public boolean canBeSubmitted() {
-    return !conflictsExist || getDisplay().ignoreAllModifications() || !getDisplay().isIgnoreAllModificationsVisible();
+    return !conflictsExist || getView().ignoreAllModifications() || !getView().isIgnoreAllModificationsVisible();
   }
 
   public List<String> getSelectedTables() {
-    return getDisplay().getSelectedTables();
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
+    return getView().getSelectedTables();
   }
 
   public void addUpdateVariablesResourceRequests(ConclusionStepPresenter conclusionStepPresenter) {
-    final List<String> selectedTableNames = getDisplay().getSelectedTables();
+    final List<String> selectedTableNames = getView().getSelectedTables();
     Iterable<TableCompareDto> filteredTables = Iterables
         .filter(JsArrays.toIterable(authorizedComparedTables), new Predicate<TableCompareDto>() {
 
@@ -142,7 +114,7 @@ public class ComparedDatasourcesReportStepPresenter
 
     JsArray<VariableDto> variablesToStringify = (JsArray<VariableDto>) JsArray.createArray();
     JsArrays.pushAll(variablesToStringify, newVariables);
-    if(!getDisplay().ignoreAllModifications()) {
+    if(!getView().ignoreAllModifications()) {
       JsArrays.pushAll(variablesToStringify, modifiedVariables);
     }
 
@@ -192,7 +164,8 @@ public class ComparedDatasourcesReportStepPresenter
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error("DataImportFailed").args(response.getText()).build());
+      getEventBus()
+          .fireEvent(NotificationEvent.newBuilder().error("DataImportFailed").args(response.getText()).build());
     }
   }
 
@@ -225,7 +198,7 @@ public class ComparedDatasourcesReportStepPresenter
           modificationsExist = true;
         }
       }
-      getDisplay().setIgnoreAllModificationsEnabled(conflictsExist || modificationsExist);
+      getView().setIgnoreAllModificationsEnabled(conflictsExist || modificationsExist);
       if(datasourceCreatedCallback != null) {
         datasourceCreatedCallback.onSuccess(factory, datasourceResource);
       }
@@ -291,7 +264,7 @@ public class ComparedDatasourcesReportStepPresenter
 
     @Override
     public void unauthorized() {
-      getDisplay().addTableComparison(tableCompareDto, ComparisonResult.FORBIDDEN);
+      getView().addTableComparison(tableCompareDto, ComparisonResult.FORBIDDEN);
     }
 
     @Override
@@ -301,14 +274,14 @@ public class ComparedDatasourcesReportStepPresenter
     @Override
     public void authorized() {
       authorizedComparedTables.push(tableCompareDto);
-      getDisplay().addTableComparison(tableCompareDto, comparisonResult);
+      getView().addTableComparison(tableCompareDto, comparisonResult);
     }
   }
 
   //
   // Interfaces
   //
-  public interface Display extends WidgetDisplay, WizardStepDisplay {
+  public interface Display extends View, WizardStepDisplay {
 
     enum ComparisonResult {
       CREATION, MODIFICATION, CONFLICT, SAME, FORBIDDEN

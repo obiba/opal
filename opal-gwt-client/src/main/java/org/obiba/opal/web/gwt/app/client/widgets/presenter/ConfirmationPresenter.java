@@ -9,12 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
@@ -22,13 +16,16 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
 /**
  *
  */
-public class ConfirmationPresenter extends WidgetPresenter<ConfirmationPresenter.Display> {
+public class ConfirmationPresenter extends PresenterWidget<ConfirmationPresenter.Display> {
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -44,39 +41,12 @@ public class ConfirmationPresenter extends WidgetPresenter<ConfirmationPresenter
 
   @Inject
   public ConfirmationPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
+    super(eventBus, display);
   }
-
-  //
-  // WidgetPresenter Methods
-  //
 
   @Override
   protected void onBind() {
     addEventHandlers();
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public void refreshDisplay() {
-
-  }
-
-  @Override
-  public void revealDisplay() {
-    getDisplay().showDialog();
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
   }
 
   //
@@ -90,22 +60,22 @@ public class ConfirmationPresenter extends WidgetPresenter<ConfirmationPresenter
   }
 
   private void addConfirmationRequiredHandler() {
-    registerHandler(eventBus.addHandler(ConfirmationRequiredEvent.getType(), new ConfirmationRequiredHandler()));
+    registerHandler(getEventBus().addHandler(ConfirmationRequiredEvent.getType(), new ConfirmationRequiredHandler()));
   }
 
   private void addYesButtonHandler() {
-    registerHandler(getDisplay().addYesButtonHandler(new YesButtonHandler()));
+    registerHandler(getView().addYesButtonHandler(new YesButtonHandler()));
   }
 
   private void addNoButtonHandler() {
-    registerHandler(getDisplay().addNoButtonHandler(new NoButtonHandler()));
+    registerHandler(getView().addNoButtonHandler(new NoButtonHandler()));
   }
 
   //
   // Inner Classes / Interfaces
   //
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     void setConfirmationTitle(String title);
 
@@ -125,13 +95,13 @@ public class ConfirmationPresenter extends WidgetPresenter<ConfirmationPresenter
     @Override
     public void onConfirmationRequired(ConfirmationRequiredEvent event) {
       confirmationRequiredSource = event.getSource();
-      getDisplay().setConfirmationTitle(event.getTitleKey() == null
+      getView().setConfirmationTitle(event.getTitleKey() == null
           ? event.getTitle()
           : translations.confirmationTitleMap().get(event.getTitleKey()));
-      getDisplay().setConfirmationMessage(event.getMessageKey() == null
+      getView().setConfirmationMessage(event.getMessageKey() == null
           ? event.getMessage()
           : translations.confirmationMessageMap().get(event.getMessageKey()));
-      revealDisplay();
+      onReveal();
     }
   }
 
@@ -139,8 +109,8 @@ public class ConfirmationPresenter extends WidgetPresenter<ConfirmationPresenter
 
     @Override
     public void onClick(ClickEvent event) {
-      eventBus.fireEvent(new ConfirmationEvent(confirmationRequiredSource, true));
-      getDisplay().hideDialog();
+      getEventBus().fireEvent(new ConfirmationEvent(confirmationRequiredSource, true));
+      getView().hideDialog();
     }
   }
 
@@ -148,8 +118,8 @@ public class ConfirmationPresenter extends WidgetPresenter<ConfirmationPresenter
 
     @Override
     public void onClick(ClickEvent event) {
-      eventBus.fireEvent(new ConfirmationEvent(confirmationRequiredSource, false));
-      getDisplay().hideDialog();
+      getEventBus().fireEvent(new ConfirmationEvent(confirmationRequiredSource, false));
+      getView().hideDialog();
     }
   }
 }

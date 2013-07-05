@@ -117,10 +117,6 @@ public class DeriveNumericalVariableStepPresenter
     setDerivedVariable(derivationHelper.getDerivedVariable());
   }
 
-  //
-  // WidgetPresenter Methods
-  //
-
   @Override
   protected void onBind() {
     getView().setSummaryTabWidget(summaryTabPresenter.getDisplay());

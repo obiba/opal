@@ -42,10 +42,6 @@ public class DatasourceSelectorPresenter extends WidgetPresenter<DatasourceSelec
     super(display, eventBus);
   }
 
-  //
-  // WidgetPresenter Methods
-  //
-
   @Override
   protected void onBind() {
   }
