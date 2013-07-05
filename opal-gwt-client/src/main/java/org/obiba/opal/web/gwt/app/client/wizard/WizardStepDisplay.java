@@ -10,8 +10,9 @@
 package org.obiba.opal.web.gwt.app.client.wizard;
 
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.View;
 
-public interface WizardStepDisplay {
+public interface WizardStepDisplay extends View {
 
   Widget asWidget();
 

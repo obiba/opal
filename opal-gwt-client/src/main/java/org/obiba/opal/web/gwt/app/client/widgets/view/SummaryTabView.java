@@ -19,7 +19,6 @@ import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
-import com.github.gwtbootstrap.client.ui.Icon;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -30,11 +29,12 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
  *
  */
-public class SummaryTabView implements SummaryTabPresenter.Display {
+public class SummaryTabView extends ViewImpl implements SummaryTabPresenter.Display {
 
   @UiTemplate("SummaryTabView.ui.xml")
   interface SummaryTabViewUiBinder extends UiBinder<Widget, SummaryTabView> {}
@@ -85,15 +85,6 @@ public class SummaryTabView implements SummaryTabPresenter.Display {
   @Override
   public Widget asWidget() {
     return uiWidget;
-  }
-
-  @Override
-  public void startProcessing() {
-
-  }
-
-  @Override
-  public void stopProcessing() {
   }
 
   @Override

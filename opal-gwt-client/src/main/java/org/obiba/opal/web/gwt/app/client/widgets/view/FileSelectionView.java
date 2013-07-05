@@ -18,16 +18,16 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
  *
  */
-public class FileSelectionView extends Composite implements FileSelectionPresenter.Display {
+public class FileSelectionView extends ViewImpl implements FileSelectionPresenter.Display {
 
   @UiTemplate("FileSelectionView.ui.xml")
   interface FileSelectionViewUiBinder extends UiBinder<Panel, FileSelectionView> {}
@@ -37,6 +37,8 @@ public class FileSelectionView extends Composite implements FileSelectionPresent
   //
 
   private static final FileSelectionViewUiBinder uiBinder = GWT.create(FileSelectionViewUiBinder.class);
+
+  private final Widget uiWidget;
 
   //
   // Instance Variables
@@ -53,7 +55,7 @@ public class FileSelectionView extends Composite implements FileSelectionPresent
   //
 
   public FileSelectionView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    uiWidget = uiBinder.createAndBindUi(this);
 
     fileField.setReadOnly(true);
   }
@@ -79,15 +81,7 @@ public class FileSelectionView extends Composite implements FileSelectionPresent
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return uiWidget;
   }
 
   @Override

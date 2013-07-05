@@ -30,21 +30,23 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.MultiSelectionModel;
 import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.SelectionModel;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class ComparedDatasourcesReportStepView extends Composite
+public class ComparedDatasourcesReportStepView extends ViewImpl
     implements ComparedDatasourcesReportStepPresenter.Display {
   //
   // Static Variables
   //
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+
+  private final Widget uiWidget;
 
   //
   // Instance Variables
@@ -72,7 +74,7 @@ public class ComparedDatasourcesReportStepView extends Composite
 
   public ComparedDatasourcesReportStepView() {
     initTableList();
-    initWidget(uiBinder.createAndBindUi(this));
+    uiWidget = uiBinder.createAndBindUi(this);
 
     ignoreAllModifications.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 
@@ -165,15 +167,7 @@ public class ComparedDatasourcesReportStepView extends Composite
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return uiWidget;
   }
 
   //

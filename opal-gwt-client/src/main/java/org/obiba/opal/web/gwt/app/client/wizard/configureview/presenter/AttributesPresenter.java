@@ -95,7 +95,7 @@ public class AttributesPresenter extends PresenterWidget<AttributesPresenter.Dis
     attributeDialogPresenter.setViewDto(viewDto);
     attributeDialogPresenter.setAttribute(attributeDto);
     attributeDialogPresenter.setAttributes(currentVariable.getAttributesArray());
-    attributeDialogPresenter.revealDisplay();
+    attributeDialogPresenter.onReveal();
   }
 
   private class AddAttributeHandler implements ClickHandler {

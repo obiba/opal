@@ -17,17 +17,19 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class XmlFormatStepView extends Composite implements XmlFormatStepPresenter.Display {
+public class XmlFormatStepView extends ViewImpl implements XmlFormatStepPresenter.Display {
 
   @UiTemplate("XmlFormatStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, XmlFormatStepView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+
+  private final Widget uiWidget;
 
   private FileSelectionPresenter.Display fileSelection;
 
@@ -38,7 +40,7 @@ public class XmlFormatStepView extends Composite implements XmlFormatStepPresent
   HTMLPanel help;
 
   public XmlFormatStepView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    uiWidget = uiBinder.createAndBindUi(this);
   }
 
   @Override
@@ -55,15 +57,7 @@ public class XmlFormatStepView extends Composite implements XmlFormatStepPresent
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return uiWidget;
   }
 
   @Override

@@ -42,7 +42,6 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
-import com.gwtplatform.mvp.client.View;
 
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
 
@@ -281,7 +280,7 @@ public class ComparedDatasourcesReportStepPresenter
   //
   // Interfaces
   //
-  public interface Display extends View, WizardStepDisplay {
+  public interface Display extends WizardStepDisplay {
 
     enum ComparisonResult {
       CREATION, MODIFICATION, CONFLICT, SAME, FORBIDDEN

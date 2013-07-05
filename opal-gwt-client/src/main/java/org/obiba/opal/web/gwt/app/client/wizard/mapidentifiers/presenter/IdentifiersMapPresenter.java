@@ -112,7 +112,7 @@ public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMa
 
     csvOptionsFileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
     csvOptionsFileSelectionPresenter.bind();
-    getView().setCsvOptionsFileSelectorWidgetDisplay(csvOptionsFileSelectionPresenter.getDisplay());
+    getView().setCsvOptionsFileSelectorWidgetDisplay(csvOptionsFileSelectionPresenter.getView());
 
     getView().setFileSelectionValidator(new FileValidator());
 

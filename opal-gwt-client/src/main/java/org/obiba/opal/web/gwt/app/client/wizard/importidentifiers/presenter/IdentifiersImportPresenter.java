@@ -152,11 +152,11 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
 
     fileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
     fileSelectionPresenter.bind();
-    getView().setFileSelectorWidgetDisplay(fileSelectionPresenter.getDisplay());
+    getView().setFileSelectorWidgetDisplay(fileSelectionPresenter.getView());
 
     csvOptionsFileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
     csvOptionsFileSelectionPresenter.bind();
-    getView().setCsvOptionsFileSelectorWidgetDisplay(csvOptionsFileSelectionPresenter.getDisplay());
+    getView().setCsvOptionsFileSelectorWidgetDisplay(csvOptionsFileSelectionPresenter.getView());
 
     addEventHandlers();
   }

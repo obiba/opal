@@ -85,14 +85,6 @@ public class SpssFormatStepView extends ViewImpl implements SpssFormatStepPresen
   }
 
   @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
-  }
-
-  @Override
   public Widget getStepHelp() {
     help.removeFromParent();
     return help;

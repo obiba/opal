@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.client.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -24,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.testing.CountingEventBus;
@@ -59,12 +58,8 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
     Provider<AuthorizationPresenter> mockProvider = createMock(Provider.class);
 
     variablePresenter = new VariablePresenter(displayMock, new CountingEventBus(),
-        createMock(VariablePresenter.Proxy.class), null, new SummaryTabPresenter(summaryTabMock, eventBusMock) {
-      @Override
-      public void bind() {
-        // noop for testing
-      }
-    }, mockProvider);
+        createMock(VariablePresenter.Proxy.class), null, new SummaryTabPresenter(eventBusMock, summaryTabMock),
+        mockProvider);
   }
 
   @SuppressWarnings("unchecked")

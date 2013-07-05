@@ -19,8 +19,8 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
-import com.gwtplatform.mvp.client.View;
 
 /**
  *
@@ -75,7 +75,7 @@ public class ConfirmationPresenter extends PresenterWidget<ConfirmationPresenter
   // Inner Classes / Interfaces
   //
 
-  public interface Display extends View {
+  public interface Display extends PopupView {
 
     void setConfirmationTitle(String title);
 

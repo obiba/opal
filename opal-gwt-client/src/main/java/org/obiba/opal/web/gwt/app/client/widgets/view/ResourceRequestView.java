@@ -19,16 +19,16 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
  *
  */
-public class ResourceRequestView extends Composite implements ResourceRequestPresenter.Display {
+public class ResourceRequestView extends ViewImpl implements ResourceRequestPresenter.Display {
   //
   // Constants
   //
@@ -44,6 +44,8 @@ public class ResourceRequestView extends Composite implements ResourceRequestPre
   //
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+
+  private final Widget uiWidget;
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -65,7 +67,7 @@ public class ResourceRequestView extends Composite implements ResourceRequestPre
   //
 
   public ResourceRequestView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    uiWidget = uiBinder.createAndBindUi(this);
   }
 
   //
@@ -102,15 +104,7 @@ public class ResourceRequestView extends Composite implements ResourceRequestPre
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return uiWidget;
   }
 
   @Override
