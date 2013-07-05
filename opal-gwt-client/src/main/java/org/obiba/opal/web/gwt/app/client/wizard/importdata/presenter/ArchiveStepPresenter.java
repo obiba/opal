@@ -39,7 +39,7 @@ public class ArchiveStepPresenter extends PresenterWidget<ArchiveStepPresenter.D
 
     archiveFolderSelectionPresenter.setFileSelectionType(FileSelectionType.FOLDER);
     archiveFolderSelectionPresenter.bind();
-    getView().setArchiveWidgetDisplay(archiveFolderSelectionPresenter.getDisplay());
+    getView().setArchiveWidgetDisplay(archiveFolderSelectionPresenter.getView());
   }
 
   protected void addEventHandlers() {
@@ -47,14 +47,14 @@ public class ArchiveStepPresenter extends PresenterWidget<ArchiveStepPresenter.D
 
       @Override
       public void onClick(ClickEvent arg0) {
-        archiveFolderSelectionPresenter.getDisplay().setEnabled(false);
+        archiveFolderSelectionPresenter.getView().setEnabled(false);
       }
     }));
     registerHandler(getView().addArchiveMoveClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent arg0) {
-        archiveFolderSelectionPresenter.getDisplay().setEnabled(true);
+        archiveFolderSelectionPresenter.getView().setEnabled(true);
       }
     }));
   }

@@ -9,14 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 
-import javax.annotation.Nullable;
-
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.event.SummaryReceivedEvent;
@@ -33,16 +25,19 @@ import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
 /**
  *
  */
-public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Display> {
+public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Display> {
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     void requestingSummary(int limit, int max);
 
@@ -78,47 +73,29 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
   private int max = 0;
 
   @Inject
-  public SummaryTabPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
-  }
-
-  @Nullable
-  @Override
-  public Place getPlace() {
-    return null;
+  public SummaryTabPresenter(EventBus eventBus, Display display) {
+    super(eventBus, display);
   }
 
   @Override
   protected void onBind() {
-    registerHandler(eventBus.addHandler(SummaryRequiredEvent.getType(), new DeferredSummaryRequestHandler()));
+    registerHandler(getEventBus().addHandler(SummaryRequiredEvent.getType(), new DeferredSummaryRequestHandler()));
 
     // Summary: Get full summary
-    registerHandler(getDisplay().getFullSummary().addClickHandler(new FullSummaryHandler()));
+    registerHandler(getView().getFullSummary().addClickHandler(new FullSummaryHandler()));
 
     // Summary: Cancel summary
-    registerHandler(getDisplay().getCancelSummary().addClickHandler(new CancelSummaryHandler()));
+    registerHandler(getView().getCancelSummary().addClickHandler(new CancelSummaryHandler()));
 
     // Summary: Refresh summary
-    registerHandler(getDisplay().getRefreshSummary().addClickHandler(new RefreshSummaryHandler()));
+    registerHandler(getView().getRefreshSummary().addClickHandler(new RefreshSummaryHandler()));
   }
 
   @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public void refreshDisplay() {
+  public void onReset() {
     if(!hasSummaryOrPendingRequest()) {
       requestSummary();
     }
-  }
-
-  @Override
-  public void revealDisplay() {
   }
 
   public void forgetSummary() {
@@ -140,21 +117,21 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
   }
 
   private void requestSummary() {
-    getDisplay().requestingSummary(limit, max);
+    getView().requestingSummary(limit, max);
     summaryRequest = resourceRequestBuilder //
         .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
           @Override
           public void onResource(Response response, SummaryStatisticsDto resource) {
             summary = resource;
-            getDisplay().renderSummary(resource);
-            getDisplay().renderSummaryLimit(limit, max);
-            eventBus.fireEvent(new SummaryReceivedEvent(resourceRequestBuilder.getResource(), resource));
+            getView().renderSummary(resource);
+            getView().renderSummaryLimit(limit, max);
+            getEventBus().fireEvent(new SummaryReceivedEvent(resourceRequestBuilder.getResource(), resource));
           }
         }) //
         .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            getDisplay().renderNoSummary();
+            getView().renderNoSummary();
           }
         }) //
         .withCallback(Response.SC_BAD_REQUEST, new ResponseCodeCallback() {
@@ -162,7 +139,7 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
           public void onResponseCode(Request request, Response response) {
             NotificationEvent notificationEvent = new JSErrorNotificationEventBuilder()
                 .build((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
-            eventBus.fireEvent(notificationEvent);
+            getEventBus().fireEvent(notificationEvent);
           }
         }) //
         .send();
@@ -205,7 +182,7 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
       }
       resourceRequestBuilder.forResource(uri).get();
       limit = max;
-      refreshDisplay();
+      onReset();
     }
   }
 
@@ -213,7 +190,7 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
     @Override
     public void onClick(ClickEvent event) {
       cancelPendingSummaryRequest();
-      getDisplay().renderCancelSummaryLimit(limit < max ? limit : Math.min(DEFAULT_LIMIT, max), max);
+      getView().renderCancelSummaryLimit(limit < max ? limit : Math.min(DEFAULT_LIMIT, max), max);
 
       // If canceling from a full summary, automatically fetch for limit, else, do nothing
       if(!resourceRequestBuilder.getResource().contains("limit")) {
@@ -231,7 +208,7 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
   }
 
   private void refreshSummary() {
-    limit = getDisplay().getLimit().intValue();
+    limit = getView().getLimit().intValue();
     if(limit < Math.min(MIN_LIMIT, max)) {
       limit = Math.min(MIN_LIMIT, max);
     }
@@ -239,6 +216,6 @@ public class SummaryTabPresenter extends WidgetPresenter<SummaryTabPresenter.Dis
     uri = uri.substring(0, uri.indexOf("?") > 0 ? uri.indexOf("?") : uri.length());
     resourceRequestBuilder.forResource(limit >= max ? uri : uri + "?limit=" + limit).get();
 
-    refreshDisplay();
+    onReset();
   }
 }

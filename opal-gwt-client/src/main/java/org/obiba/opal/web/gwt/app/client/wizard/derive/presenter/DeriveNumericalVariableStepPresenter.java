@@ -15,8 +15,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.SummaryReceivedEvent;
@@ -69,7 +67,7 @@ public class DeriveNumericalVariableStepPresenter
     getView().setNumberType(originalVariable.getValueType());
     summaryTabPresenter.setResourceUri(originalVariable.getLink() + "/summary", originalTable.getValueSetCount());
     summaryTabPresenter.forgetSummary();
-    summaryTabPresenter.refreshDisplay();
+    summaryTabPresenter.onReset();
   }
 
   @Override
@@ -117,13 +115,9 @@ public class DeriveNumericalVariableStepPresenter
     setDerivedVariable(derivationHelper.getDerivedVariable());
   }
 
-  //
-  // WidgetPresenter Methods
-  //
-
   @Override
   protected void onBind() {
-    getView().setSummaryTabWidget(summaryTabPresenter.getDisplay());
+    getView().setSummaryTabWidget(summaryTabPresenter.getView());
     registerHandler(
         getEventBus().addHandler(SummaryReceivedEvent.getType(), new OriginalVariableSummaryReceivedHandler()));
     registerHandler(getView().addValueMapEntryHandler(new AddValueMapEntryHandler()));
@@ -502,7 +496,7 @@ public class DeriveNumericalVariableStepPresenter
 
     void setNumberType(String valueType);
 
-    void setSummaryTabWidget(WidgetDisplay widget);
+    void setSummaryTabWidget(View widget);
 
   }
 

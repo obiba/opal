@@ -13,14 +13,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.CsvOptionsDisplay;
@@ -33,30 +25,27 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
 import static org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig.ImportFormat;
 
-public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresenter.Display>
+public class CsvFormatStepPresenter extends PresenterWidget<CsvFormatStepPresenter.Display>
     implements DataImportPresenter.DataConfigFormatStepPresenter {
 
   private static final Translations translations = GWT.create(Translations.class);
 
   private final Collection<String> availableCharsets = new ArrayList<String>();
 
-  @Inject
   private FileSelectionPresenter csvFileSelectionPresenter;
 
   @Inject
-  public CsvFormatStepPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
-  }
-
-  @Nullable
-  @Override
-  public Place getPlace() {
-    return null;
+  public CsvFormatStepPresenter(EventBus eventBus, Display display, FileSelectionPresenter csvFileSelectionPresenter) {
+    super(eventBus, display);
+    this.csvFileSelectionPresenter = csvFileSelectionPresenter;
   }
 
   @Override
@@ -66,27 +55,11 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
 
     csvFileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
     csvFileSelectionPresenter.bind();
-    getDisplay().setCsvFileSelectorWidgetDisplay(csvFileSelectionPresenter.getDisplay());
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public void revealDisplay() {
+    getView().setCsvFileSelectorWidgetDisplay(csvFileSelectionPresenter.getView());
   }
 
   private String getSelectedCharacterSet() {
-    return getDisplay().getCharsetText().getText();
+    return getView().getCharsetText().getText();
   }
 
   private Collection<String> validateCharacterSet(String charset) {
@@ -114,7 +87,7 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
           @Override
           public void onResource(Response response, JsArrayString resource) {
             String charset = resource.get(0);
-            getDisplay().setDefaultCharset(charset);
+            getView().setDefaultCharset(charset);
           }
         }).send();
 
@@ -133,7 +106,7 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
   }
 
   public void clear() {
-    getDisplay().clear();
+    getView().clear();
   }
 
   public String getSelectedFile() {
@@ -149,9 +122,9 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
     ImportConfig importConfig = new ImportConfig();
     importConfig.setFormat(ImportFormat.CSV);
     importConfig.setCsvFile(getSelectedFile());
-    importConfig.setRow(Integer.parseInt(getDisplay().getRowText().getText()));
-    importConfig.setField(getDisplay().getFieldSeparator());
-    importConfig.setQuote(getDisplay().getQuote());
+    importConfig.setRow(Integer.parseInt(getView().getRowText().getText()));
+    importConfig.setField(getView().getFieldSeparator());
+    importConfig.setQuote(getView().getQuote());
     importConfig.setCharacterSet(getSelectedCharacterSet());
     return importConfig;
   }
@@ -168,7 +141,7 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
     errors.addAll(validateCharacterSet(getSelectedCharacterSet()));
 
     if(!errors.isEmpty()) {
-      eventBus.fireEvent(NotificationEvent.newBuilder().error(errors).build());
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error(errors).build());
     }
 
     return errors.isEmpty();
@@ -178,7 +151,7 @@ public class CsvFormatStepPresenter extends WidgetPresenter<CsvFormatStepPresent
   // Inner classes
   //
 
-  public interface Display extends CsvOptionsDisplay, WidgetDisplay, WizardStepDisplay {
+  public interface Display extends CsvOptionsDisplay, View, WizardStepDisplay {
 
   }
 

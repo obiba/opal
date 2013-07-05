@@ -16,17 +16,19 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class ConclusionStepView extends Composite implements ConclusionStepPresenter.Display {
+public class ConclusionStepView extends ViewImpl implements ConclusionStepPresenter.Display {
   //
   // Static Variables
   //
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+
+  private final Widget uiWidget;
 
   //
   // Instance Variables
@@ -43,7 +45,7 @@ public class ConclusionStepView extends Composite implements ConclusionStepPrese
   //
 
   public ConclusionStepView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    uiWidget = uiBinder.createAndBindUi(this);
   }
 
   //
@@ -64,15 +66,22 @@ public class ConclusionStepView extends Composite implements ConclusionStepPrese
 
   @Override
   public Widget asWidget() {
-    return this;
+    return uiWidget;
   }
 
   @Override
-  public void startProcessing() {
+  public void addToSlot(Object slot, Widget content) {
+    //To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
-  public void stopProcessing() {
+  public void removeFromSlot(Object slot, Widget content) {
+    //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  @Override
+  public void setInSlot(Object slot, Widget content) {
+    //To change body of implemented methods use File | Settings | File Templates.
   }
 
   //

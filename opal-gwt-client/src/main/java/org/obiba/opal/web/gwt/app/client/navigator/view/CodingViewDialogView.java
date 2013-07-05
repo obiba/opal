@@ -24,20 +24,22 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-public class CodingViewDialogView extends Composite implements Display {
+public class CodingViewDialogView extends ViewImpl implements Display {
 
   @UiTemplate("CodingViewDialogView.ui.xml")
   interface CodingViewDialogUiBinder extends UiBinder<DialogBox, CodingViewDialogView> {}
 
   private static final CodingViewDialogUiBinder uiBinder = GWT.create(CodingViewDialogUiBinder.class);
+
+  private final Widget uiWidget;
 
   @UiField
   DialogBox dialog;
@@ -58,7 +60,7 @@ public class CodingViewDialogView extends Composite implements Display {
   CheckBox duplicateCheck;
 
   public CodingViewDialogView() {
-    initWidget(uiBinder.createAndBindUi(this));
+    uiWidget = uiBinder.createAndBindUi(this);
     uiBinder.createAndBindUi(this);
     dialog.hide();
 
@@ -75,15 +77,7 @@ public class CodingViewDialogView extends Composite implements Display {
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return uiWidget;
   }
 
   @Override

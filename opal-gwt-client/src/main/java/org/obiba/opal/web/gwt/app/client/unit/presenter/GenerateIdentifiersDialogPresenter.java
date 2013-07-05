@@ -37,10 +37,6 @@ public class GenerateIdentifiersDialogPresenter extends PresenterWidget<Generate
     super(eventBus, display);
   }
 
-  //
-  // WidgetPresenter Methods
-  //
-
   @Override
   protected void onBind() {
     super.onBind();

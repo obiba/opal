@@ -142,7 +142,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     setInSlot(Display.Slots.Attributes, attributesPresenter);
 
     summaryPresenter.bind();
-    getView().addSummaryTabWidget(summaryPresenter.getDisplay().asWidget());
+    getView().addSummaryTabWidget(summaryPresenter.getView().asWidget());
 
     registerEventHandlers();
     addValidators();
@@ -424,7 +424,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
       setScript(event.getVariable());
       updateSummaryLink(false);
       if(isTabSelected(Tabs.SUMMARY)) {
-        summaryPresenter.refreshDisplay();
+        summaryPresenter.onReset();
       }
     }
 
@@ -505,7 +505,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
     public void onBeforeSelection(BeforeSelectionEvent<Integer> event) {
       switch(Tabs.values()[event.getItem()]) {
         case SUMMARY:
-          summaryPresenter.refreshDisplay();
+          summaryPresenter.onReset();
           break;
       }
     }
@@ -523,8 +523,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
       getView().setInProgress(true);
 
-      UriBuilder ub = UriBuilder.create()
-          .segment("datasource", viewDto.getDatasourceName(), "table", viewDto.getName()).query("counts","false");
+      UriBuilder ub = UriBuilder.create().segment("datasource", viewDto.getDatasourceName(), "table", viewDto.getName())
+          .query("counts", "false");
       ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build()).get()
           .withCallback(new ResourceCallback<TableDto>() {
             @Override
@@ -584,7 +584,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
     private void setEmptyDerivedVariable() {
       UriBuilder ub = UriBuilder.create()
-          .segment("datasource", firstTableInViewParts[0], "table", firstTableInViewParts[1]).query("counts","false");
+          .segment("datasource", firstTableInViewParts[0], "table", firstTableInViewParts[1]).query("counts", "false");
       ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build()).get()
           .withCallback(new ResourceCallback<TableDto>() {
             @Override
@@ -784,7 +784,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
       // TODO check if we really need to do that on all form changes, it seems expensive when editing the script
       updateSummaryLink(true);
       if(isTabSelected(Tabs.SUMMARY)) {
-        summaryPresenter.refreshDisplay();
+        summaryPresenter.onReset();
       }
     }
   }

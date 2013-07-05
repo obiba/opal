@@ -12,12 +12,6 @@ package org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter.ResourceClickHandler;
@@ -32,11 +26,14 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
-public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPresenter.Display> {
+public class ConclusionStepPresenter extends PresenterWidget<ConclusionStepPresenter.Display> {
   //
   // Instance Variables
   //
@@ -58,39 +55,10 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
   //
 
   @Inject
-  public ConclusionStepPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
+  public ConclusionStepPresenter(EventBus eventBus, Display display) {
+    super(eventBus, display);
 
     resourceRequests = new LinkedHashSet<ResourceRequestPresenter<? extends JavaScriptObject>>();
-  }
-
-  //
-  // WidgetPresenter Methods
-  //
-
-  @Override
-  protected void onBind() {
-  }
-
-  @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public void revealDisplay() {
-  }
-
-  @Override
-  public void refreshDisplay() {
-  }
-
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
   }
 
   //
@@ -101,20 +69,20 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
     resourceRequests.clear();
     resourceRequestsCompleted = 0;
 
-    getDisplay().clearResourceRequests();
+    getView().clearResourceRequests();
   }
 
   public <T extends JavaScriptObject> void addResourceRequest(String resourceName, String resourceLink,
       ResourceRequestBuilder<T> requestBuilder) {
     ResourceRequestPresenter<T> resourceRequestPresenter = new ResourceRequestPresenter<T>(new ResourceRequestView(),
-        eventBus, requestBuilder, new ImportVariablesResponseCodeCallback());
-    resourceRequestPresenter.getDisplay().setResourceName(resourceName);
-    resourceRequestPresenter.getDisplay().setResourceClickHandler(new TableResourceClickHandler(resourceLink));
+        getEventBus(), requestBuilder, new ImportVariablesResponseCodeCallback());
+    resourceRequestPresenter.getView().setResourceName(resourceName);
+    resourceRequestPresenter.getView().setResourceClickHandler(new TableResourceClickHandler(resourceLink));
     resourceRequestPresenter.setSuccessCodes(200, 201);
     resourceRequestPresenter.setErrorCodes(400, 404, 405, 500);
 
     resourceRequests.add(resourceRequestPresenter);
-    getDisplay().addResourceRequest(resourceRequestPresenter.getDisplay());
+    getView().addResourceRequest(resourceRequestPresenter.getView());
   }
 
   public int getResourceRequestCount() {
@@ -135,7 +103,7 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
   // Inner Classes / Interfaces
   //
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
 
     void clearResourceRequests();
 
@@ -149,7 +117,7 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
       resourceRequestsCompleted++;
 
       if(resourceRequestsCompleted == resourceRequests.size()) {
-        // TODO enable finish getDisplay().setReturnButtonEnabled(true);
+        // TODO enable finish getView().setReturnButtonEnabled(true);
         // OPAL-927: Refresh target datasource.
         refreshTargetDatasource();
       }
@@ -160,7 +128,7 @@ public class ConclusionStepPresenter extends WidgetPresenter<ConclusionStepPrese
 
         @Override
         public void onResource(Response response, DatasourceDto resource) {
-          eventBus.fireEvent(new DatasourceUpdatedEvent(resource));
+          getEventBus().fireEvent(new DatasourceUpdatedEvent(resource));
         }
       };
       UriBuilder ub = UriBuilder.create().segment("datasource", targetDatasourceName);

@@ -27,16 +27,18 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.ViewImpl;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 
-public class DataTabView extends Composite implements DataTabPresenter.Display {
+public class DataTabView extends ViewImpl implements DataTabPresenter.Display {
 
   @UiTemplate("DataTabView.ui.xml")
   interface myUiBinder extends UiBinder<Widget, DataTabView> {}
 
   private static final myUiBinder uiBinder = GWT.create(myUiBinder.class);
+
+  private final Widget uiWidget;
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -50,20 +52,12 @@ public class DataTabView extends Composite implements DataTabPresenter.Display {
 
   public DataTabView() {
     tableChooser = new TableChooser(true);
-    initWidget(uiBinder.createAndBindUi(this));
+    uiWidget = uiBinder.createAndBindUi(this);
   }
 
   @Override
   public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void startProcessing() {
-  }
-
-  @Override
-  public void stopProcessing() {
+    return uiWidget;
   }
 
   @Override

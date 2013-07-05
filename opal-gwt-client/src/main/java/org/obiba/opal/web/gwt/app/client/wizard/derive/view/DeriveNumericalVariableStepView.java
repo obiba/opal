@@ -11,8 +11,6 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 
 import java.util.List;
 
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveNumericalVariableStepPresenter;
@@ -34,6 +32,7 @@ import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
+import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
@@ -223,7 +222,7 @@ public class DeriveNumericalVariableStepView extends ViewImpl implements DeriveN
   }
 
   @Override
-  public void setSummaryTabWidget(WidgetDisplay widget) {
+  public void setSummaryTabWidget(View widget) {
     summary.clear();
     summary.add(widget.asWidget());
   }

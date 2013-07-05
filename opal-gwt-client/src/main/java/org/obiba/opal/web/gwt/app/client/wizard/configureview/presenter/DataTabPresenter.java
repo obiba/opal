@@ -14,12 +14,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.customware.gwt.presenter.client.EventBus;
-import net.customware.gwt.presenter.client.place.Place;
-import net.customware.gwt.presenter.client.place.PlaceRequest;
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-import net.customware.gwt.presenter.client.widget.WidgetPresenter;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
@@ -40,14 +34,17 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
-public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> {
+public class DataTabPresenter extends PresenterWidget<DataTabPresenter.Display> {
 
-  public interface Display extends WidgetDisplay {
+  public interface Display extends View {
     HandlerRegistration addSaveChangesClickHandler(ClickHandler clickHandler);
 
     void saveChangesEnabled(boolean enabled);
@@ -75,8 +72,8 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
   private Request refreshRequest;
 
   @Inject
-  public DataTabPresenter(Display display, EventBus eventBus) {
-    super(display, eventBus);
+  public DataTabPresenter(EventBus eventBus, Display display) {
+    super(eventBus, display);
   }
 
   @Override
@@ -85,18 +82,9 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
   }
 
   @Override
-  protected void onUnbind() {
-  }
-
-  @Override
-  public void revealDisplay() {
-
-  }
-
-  @Override
-  public void refreshDisplay() {
-    getDisplay().saveChangesEnabled(false);
-    getDisplay().clear();
+  public void onReset() {
+    getView().saveChangesEnabled(false);
+    getView().clear();
     refreshTables();
   }
 
@@ -108,9 +96,9 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
             public void onResource(Response response, JsArray<TableDto> resource) {
               JsArray<TableDto> tables = JsArrays.toSafeArray(resource);
               TableDto viewTableDto = findViewTabledto(tables);
-              getDisplay().addTableSelections(filterTables(tables, viewTableDto));
+              getView().addTableSelections(filterTables(tables, viewTableDto));
               if(viewDto != null) {
-                getDisplay().selectTables(viewDto.getFromArray());
+                getView().selectTables(viewDto.getFromArray());
               }
               refreshRequest = null;
             }
@@ -156,21 +144,12 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
     }
   }
 
-  @Override
-  public Place getPlace() {
-    return null;
-  }
-
-  @Override
-  protected void onPlaceRequest(PlaceRequest request) {
-  }
-
   private void addEventHandlers() {
-    registerHandler(
-        eventBus.addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
-    registerHandler(getDisplay().addSaveChangesClickHandler(new SaveChangesClickHandler()));
-    registerHandler(eventBus.addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
-    getDisplay().setTableListListener(new FormChangedHandler());
+    registerHandler(getEventBus()
+        .addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredEventHandler()));
+    registerHandler(getView().addSaveChangesClickHandler(new SaveChangesClickHandler()));
+    registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedHandler()));
+    getView().setTableListListener(new FormChangedHandler());
   }
 
   class ViewConfigurationRequiredEventHandler implements ViewConfigurationRequiredEvent.Handler {
@@ -189,7 +168,7 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
       HasCollection<TableDto> tablesField = new HasCollection<TableDto>() {
         @Override
         public Collection<TableDto> getCollection() {
-          return getDisplay().getSelectedTables();
+          return getView().getSelectedTables();
         }
       };
       validators.add(new MinimumSizeCollectionValidator<TableDto>(tablesField, 1, "TableSelectionRequired"));
@@ -200,12 +179,12 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
     public void onClick(ClickEvent event) {
       String errorMessageKey = validate();
       if(errorMessageKey != null) {
-        eventBus.fireEvent(NotificationEvent.newBuilder().error(errorMessageKey).build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorMessageKey).build());
         return;
       }
       viewDto.clearFromArray();
       viewDto.setFromArray(getSelectedTables());
-      eventBus.fireEvent(new ViewSaveRequiredEvent(viewDto));
+      getEventBus().fireEvent(new ViewSaveRequiredEvent(viewDto));
     }
 
     String validate() {
@@ -223,7 +202,7 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
 
     @Override
     public void onTableListUpdated() {
-      List<TableDto> tables = getDisplay().getSelectedTables();
+      List<TableDto> tables = getView().getSelectedTables();
 
       boolean changed = false;
       if(tables.size() == viewDto.getFromArray().length()) {
@@ -237,8 +216,8 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
       } else {
         changed = true;
       }
-      getDisplay().saveChangesEnabled(changed);
-      eventBus.fireEvent(new ViewSavePendingEvent(changed));
+      getView().saveChangesEnabled(changed);
+      getEventBus().fireEvent(new ViewSavePendingEvent(changed));
     }
   }
 
@@ -246,14 +225,14 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
 
     @Override
     public void onViewSaved(ViewSavedEvent event) {
-      getDisplay().saveChangesEnabled(false);
+      getView().saveChangesEnabled(false);
     }
 
   }
 
   private JsArrayString getSelectedTables() {
     JsArrayString tables = JavaScriptObject.createArray().cast();
-    for(TableDto tableDto : getDisplay().getSelectedTables()) {
+    for(TableDto tableDto : getView().getSelectedTables()) {
       tables.push(tableDto.getDatasourceName() + "." + tableDto.getName());
     }
     return tables;
@@ -262,6 +241,6 @@ public class DataTabPresenter extends WidgetPresenter<DataTabPresenter.Display> 
   public void setViewDto(ViewDto viewDto) {
     this.viewDto = viewDto;
     viewDto.setFromArray(JsArrays.toSafeArray(viewDto.getFromArray()));
-    getDisplay().selectTables(viewDto.getFromArray());
+    getView().selectTables(viewDto.getFromArray());
   }
 }

@@ -14,8 +14,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import net.customware.gwt.presenter.client.widget.WidgetDisplay;
-
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -105,7 +103,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     getView().setPreviousCommand(new PreviousCommand());
     getView().setValuesTabCommand(new ValuesCommand());
     getView().setSummaryTabCommand(new SummaryCommand());
-    getView().setSummaryTabWidget(summaryTabPresenter.getDisplay());
+    getView().setSummaryTabWidget(summaryTabPresenter.getView());
     getView().setAddVariableToViewCommand(new AddVariableToViewCommand());
     getView().setDeriveCategorizeCommand(new DeriveCategorizeCommand());
     getView().setDeriveFromCommand(new DeriveFromCommand());
@@ -323,7 +321,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
     public void authorized() {
       requestSummary(variable);
       if(getView().isSummaryTabSelected()) {
-        summaryTabPresenter.refreshDisplay();
+        summaryTabPresenter.onReset();
       }
     }
   }
@@ -371,7 +369,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
   final class SummaryCommand implements Command {
     @Override
     public void execute() {
-      summaryTabPresenter.refreshDisplay();
+      summaryTabPresenter.onReset();
     }
   }
 
@@ -446,7 +444,7 @@ public class VariablePresenter extends Presenter<VariablePresenter.Display, Vari
 
     boolean isSummaryTabSelected();
 
-    void setSummaryTabWidget(WidgetDisplay widget);
+    void setSummaryTabWidget(View widget);
 
     HasAuthorization getSummaryAuthorizer();
 
