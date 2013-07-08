@@ -872,6 +872,9 @@ td.row-actions span {
   border: none;
   margin: 0 auto;
   width: 1000px;
+}
+
+.padding50-top {
   padding-top: 50px;
 }
 
@@ -2599,7 +2602,7 @@ input.limitSummary {
 }
 
 a.admin-item {
-    color: #205A97;
-    font-size: 14px;
-    text-decoration: underline;
+  color: #205A97;
+  font-size: 14px;
+  text-decoration: underline;
 }

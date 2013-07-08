@@ -9,7 +9,7 @@
   </ui:style>
 
   <g:DialogBox ui:field="dialogBox" modal="true">
-    <g:DockLayoutPanel unit="EM">
+    <g:DockLayoutPanel unit="EM" height="15em" width="30em">
       <g:center>
         <g:HTML ui:field="message" addStyleNames="main p">Confirmation message.</g:HTML>
       </g:center>

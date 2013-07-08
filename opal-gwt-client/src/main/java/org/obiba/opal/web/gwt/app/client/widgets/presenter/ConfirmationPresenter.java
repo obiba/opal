@@ -40,13 +40,19 @@ public class ConfirmationPresenter extends PresenterWidget<ConfirmationPresenter
   //
 
   @Inject
-  public ConfirmationPresenter(Display display, EventBus eventBus) {
+  public ConfirmationPresenter(Display display, EventBus eventBus, Object confirmationRequiredSource) {
     super(eventBus, display);
+    this.confirmationRequiredSource = confirmationRequiredSource;
   }
 
   @Override
   protected void onBind() {
     addEventHandlers();
+  }
+
+  @Override
+  public void onReveal() {
+    getView().showDialog();
   }
 
   //

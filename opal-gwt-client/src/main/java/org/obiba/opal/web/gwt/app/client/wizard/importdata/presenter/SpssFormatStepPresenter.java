@@ -31,12 +31,13 @@ import com.gwtplatform.mvp.client.View;
 public class SpssFormatStepPresenter extends PresenterWidget<SpssFormatStepPresenter.Display>
     implements DataImportPresenter.DataConfigFormatStepPresenter {
 
-  @Inject
   private FileSelectionPresenter spssFileSelectionPresenter;
 
   @Inject
-  public SpssFormatStepPresenter(EventBus eventBus, Display display) {
+  public SpssFormatStepPresenter(EventBus eventBus, Display display,
+      FileSelectionPresenter spssFileSelectionPresenter) {
     super(eventBus, display);
+    this.spssFileSelectionPresenter = spssFileSelectionPresenter;
   }
 
   @Override
