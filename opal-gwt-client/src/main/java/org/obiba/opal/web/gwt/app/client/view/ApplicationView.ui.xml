@@ -33,7 +33,7 @@
       </b:Nav>
     </b:ResponsiveNavbar>
     <g:FlowPanel addStyleNames="main">
-      <g:FlowPanel ui:field="workbench" addStyleNames="content">
+      <g:FlowPanel ui:field="workbench" addStyleNames="content padding50-top">
         <g:Label>
           <ui:msg description="Workbench label">The Workbench</ui:msg>
         </g:Label>

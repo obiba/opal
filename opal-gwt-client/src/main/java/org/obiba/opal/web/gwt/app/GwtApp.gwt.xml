@@ -19,7 +19,7 @@
 
   <!-- Use an MVP pattern framework -->
   <inherits name='com.google.gwt.place.Place'/>
-  <inherits name='net.customware.gwt.presenter.Presenter'/>
+  <!--<inherits name='net.customware.gwt.presenter.Presenter'/>-->
   <inherits name='com.gwtplatform.mvp.Mvp'/>
 
   <!-- GWT Bootstrap -->
