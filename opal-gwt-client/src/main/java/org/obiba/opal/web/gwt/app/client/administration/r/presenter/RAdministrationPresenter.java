@@ -1,11 +1,12 @@
 package org.obiba.opal.web.gwt.app.client.administration.r.presenter;
 
-import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -24,9 +25,8 @@ import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
-import com.gwtplatform.mvp.client.annotations.TabInfo;
+import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
-import com.gwtplatform.mvp.client.proxy.TabContentProxyPlace;
 
 public class RAdministrationPresenter
     extends ItemAdministrationPresenter<RAdministrationPresenter.Display, RAdministrationPresenter.Proxy> {
@@ -55,7 +55,7 @@ public class RAdministrationPresenter
 
   @Override
   protected void revealInParent() {
-    RevealContentEvent.fire(this, AdministrationPresenter.TabSlot, this);
+    RevealContentEvent.fire(this, ApplicationPresenter.WORKBENCH, this);
   }
 
   @Override
@@ -133,9 +133,8 @@ public class RAdministrationPresenter
   }
 
   @ProxyStandard
-  @NameToken("!admin.r")
-  @TabInfo(container = AdministrationPresenter.class, label = "R", priority = 2)
-  public interface Proxy extends TabContentProxyPlace<RAdministrationPresenter> {}
+  @NameToken(Places.r)
+  public interface Proxy extends ProxyPlace<RAdministrationPresenter> {}
 
   public interface Display extends View {
 

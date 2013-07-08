@@ -69,6 +69,38 @@ public final class Places {
     return administration;
   }
 
+  public static final String databases = administration  + ".databases";
+
+  public static final Place databasesPlace = new Place(databases);
+
+  public static String databases() {
+    return databases;
+  }
+
+  public static final String index = administration  + ".index";
+
+  public static final Place indexPlace = new Place(index);
+
+  public static String index() {
+    return index;
+  }
+
+  public static final String datashield = administration  + ".datashield";
+
+  public static final Place datashieldPlace = new Place(datashield);
+
+  public static String datashield() {
+    return datashield;
+  }
+
+  public static final String r = administration  + ".r";
+
+  public static final Place rPlace = new Place(r);
+
+  public static String r() {
+    return r;
+  }
+
   public static final class Place extends com.google.gwt.place.shared.Place {
 
     final String place;

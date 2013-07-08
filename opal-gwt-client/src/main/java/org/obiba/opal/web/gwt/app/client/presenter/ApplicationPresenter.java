@@ -55,23 +55,25 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
     HasClickHandlers getHelp();
 
-    HasClickHandlers getAdministration();
+//    HasClickHandlers getAdministration();
 
     HasUrl getDownloder();
+
+    NavLink getAdministrationItem();
 
     NavLink getDatasourcesItem();
 
     HasAuthorization getAdministrationAuthorizer();
 
-    NavLink getListJobsItem();
+//    NavLink getListJobsItem();
 
-    NavLink getFileExplorerItem();
+//    NavLink getFileExplorerItem();
 
     NavLink getDashboardItem();
 
-    NavLink getReportsItem();
+//    NavLink getReportsItem();
 
-    NavLink getUnitsItem();
+//    NavLink getUnitsItem();
 
     void setCurrentSelection(MenuItem selection);
 
@@ -154,6 +156,13 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       }
     });
 
+    getView().getAdministrationItem().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        getEventBus().fireEvent(new PlaceChangeEvent(Places.administrationPlace));
+      }
+    });
+
     getView().getDatasourcesItem().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
@@ -161,33 +170,33 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       }
     });
 
-    getView().getReportsItem().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.reportTemplatesPlace));
-      }
-    });
+//    getView().getReportsItem().addClickHandler(new ClickHandler() {
+//      @Override
+//      public void onClick(ClickEvent event) {
+//        getEventBus().fireEvent(new PlaceChangeEvent(Places.reportTemplatesPlace));
+//      }
+//    });
 
-    getView().getUnitsItem().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.unitsPlace));
-      }
-    });
+//    getView().getUnitsItem().addClickHandler(new ClickHandler() {
+//      @Override
+//      public void onClick(ClickEvent event) {
+//        getEventBus().fireEvent(new PlaceChangeEvent(Places.unitsPlace));
+//      }
+//    });
 
-    getView().getListJobsItem().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.jobsPlace));
-      }
-    });
-
-    getView().getFileExplorerItem().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.filesPlace));
-      }
-    });
+//    getView().getListJobsItem().addClickHandler(new ClickHandler() {
+//      @Override
+//      public void onClick(ClickEvent event) {
+//        getEventBus().fireEvent(new PlaceChangeEvent(Places.jobsPlace));
+//      }
+//    });
+//
+//    getView().getFileExplorerItem().addClickHandler(new ClickHandler() {
+//      @Override
+//      public void onClick(ClickEvent event) {
+//        getEventBus().fireEvent(new PlaceChangeEvent(Places.filesPlace));
+//      }
+//    });
 
     getView().getQuit().addClickHandler(new ClickHandler() {
       @Override
@@ -203,12 +212,12 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       }
     });
 
-    getView().getAdministration().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.administrationPlace));
-      }
-    });
+//    getView().getAdministration().addClickHandler(new ClickHandler() {
+//      @Override
+//      public void onClick(ClickEvent event) {
+//        getEventBus().fireEvent(new PlaceChangeEvent(Places.administrationPlace));
+//      }
+//    });
 
     registerUserMessageEventHandler();
   }
@@ -223,12 +232,12 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   private void authorize() {
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").get()
         .authorize(new UIObjectAuthorizer(getView().getDatasourcesItem())).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").get()
-        .authorize(new UIObjectAuthorizer(getView().getUnitsItem())).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").get()
-        .authorize(new UIObjectAuthorizer(getView().getReportsItem())).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/commands").get()
-        .authorize(new UIObjectAuthorizer(getView().getListJobsItem())).send();
+//    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").get()
+//        .authorize(new UIObjectAuthorizer(getView().getUnitsItem())).send();
+//    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").get()
+//        .authorize(new UIObjectAuthorizer(getView().getReportsItem())).send();
+//    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/commands").get()
+//        .authorize(new UIObjectAuthorizer(getView().getListJobsItem())).send();
 
     getEventBus().fireEvent(new RequestAdministrationPermissionEvent(new HasAuthorization() {
 
