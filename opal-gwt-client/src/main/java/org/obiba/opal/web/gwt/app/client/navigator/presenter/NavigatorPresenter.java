@@ -16,7 +16,8 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChan
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourcesRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
+import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
@@ -54,7 +55,8 @@ import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 
-public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, NavigatorPresenter.Proxy> {
+public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, NavigatorPresenter.Proxy>
+    implements HasPageTitle {
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -96,8 +98,13 @@ public class NavigatorPresenter extends Presenter<NavigatorPresenter.Display, Na
   }
 
   @Override
+  public String getTitle() {
+    return translations.pageDatasourcesTitle();
+  }
+
+  @Override
   protected void revealInParent() {
-    RevealContentEvent.fire(this, ApplicationPresenter.WORKBENCH, this);
+    RevealContentEvent.fire(this, PageContainerPresenter.CONTENT, this);
   }
 
   @Override

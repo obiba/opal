@@ -9,12 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
+import org.obiba.opal.web.gwt.app.client.administration.presenter.BreadcrumbDisplay;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallbacks;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -45,7 +46,7 @@ public class DataShieldConfigPresenter
   @NameToken(Places.datashield)
   public interface Proxy extends ProxyPlace<DataShieldConfigPresenter> {}
 
-  public interface Display extends View {
+  public interface Display extends View, BreadcrumbDisplay {
 
     HasValue<DataShieldConfigDto.Level> levelSelector();
 
@@ -92,7 +93,7 @@ public class DataShieldConfigPresenter
 
   @Override
   protected void revealInParent() {
-    RevealContentEvent.fire(this, ApplicationPresenter.WORKBENCH, this);
+    RevealContentEvent.fire(this, PageContainerPresenter.CONTENT, this);
   }
 
   @Override
@@ -123,7 +124,13 @@ public class DataShieldConfigPresenter
   }
 
   @Override
+  public String getTitle() {
+    return translations.pageDataShieldTitle();
+  }
+
+  @Override
   protected void onBind() {
+    super.onBind();
     authorizationPresenter
         .setAclRequest("datashield", new AclRequest(AclAction.DATASHIELD_SESSION_ALL, "/datashield/session"),
             new AclRequest(AclAction.DATASHIELD_ALL, "/datashield"));

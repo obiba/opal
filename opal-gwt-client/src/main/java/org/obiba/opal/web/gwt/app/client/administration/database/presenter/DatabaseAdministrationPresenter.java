@@ -11,13 +11,16 @@ package org.obiba.opal.web.gwt.app.client.administration.database.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.presenter.BreadcrumbDisplay;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
@@ -32,6 +35,7 @@ import org.obiba.opal.web.model.client.opal.AclAction;
 import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -62,12 +66,12 @@ public class DatabaseAdministrationPresenter extends
   @NameToken(Places.databases)
   public interface Proxy extends ProxyPlace<DatabaseAdministrationPresenter> {}
 
-  public interface Display extends View {
+  public interface Display extends View, BreadcrumbDisplay {
 
     String TEST_ACTION = "Test";
 
     enum Slots {
-      Drivers, Permissions
+      Drivers, Permissions, Header
     }
 
     HasActionHandler<JdbcDataSourceDto> getActions();
@@ -77,7 +81,6 @@ public class DatabaseAdministrationPresenter extends
     HasAuthorization getPermissionsAuthorizer();
 
     HasData<JdbcDataSourceDto> getDatabaseTable();
-
   }
 
   private final Provider<DatabasePresenter> jdbcDataSourcePresenter;
@@ -105,7 +108,7 @@ public class DatabaseAdministrationPresenter extends
 
   @Override
   protected void revealInParent() {
-    RevealContentEvent.fire(this, ApplicationPresenter.WORKBENCH, this);
+    RevealContentEvent.fire(this, PageContainerPresenter.CONTENT, this);
   }
 
   @Override
@@ -128,7 +131,13 @@ public class DatabaseAdministrationPresenter extends
   }
 
   @Override
+  public String getTitle() {
+    return translations.pageDatabasesTitle();
+  }
+
+  @Override
   protected void onBind() {
+    super.onBind();
 
     registerHandler(getEventBus().addHandler(DatabaseCreatedEvent.getType(), new DatabaseCreatedEvent.Handler() {
 
@@ -248,6 +257,7 @@ public class DatabaseAdministrationPresenter extends
     @Override
     public void unauthorized() {
       clearSlot(Display.Slots.Permissions);
+      clearSlot(Display.Slots.Header);
     }
 
     @Override

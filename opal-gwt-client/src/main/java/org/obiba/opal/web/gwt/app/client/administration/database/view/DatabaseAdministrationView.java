@@ -9,8 +9,11 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.database.view;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseAdministrationPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsProvider;
@@ -29,7 +32,6 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.HasData;
@@ -62,6 +64,9 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
   Panel permissionsPanel;
 
   @UiField
+  Panel breadcrumbs;
+
+  @UiField
   Panel permissions;
 
   ActionsColumn<JdbcDataSourceDto> actionsColumn = new ActionsColumn<JdbcDataSourceDto>(
@@ -90,7 +95,6 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
     databaseTable.addColumn(Columns.driver, translations.driverLabel());
     databaseTable.addColumn(Columns.username, translations.usernameLabel());
     databaseTable.addColumn(actionsColumn, translations.actionsLabel());
-    databaseTable.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
   }
 
   @Override
@@ -119,6 +123,11 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
   @Override
   public HasData<JdbcDataSourceDto> getDatabaseTable() {
     return databaseTable;
+  }
+
+  @Override
+  public void setBreadcrumbItems(List<BreadcrumbsBuilder.Item> items) {
+    breadcrumbs.add(new BreadcrumbsBuilder().setItems(items).build());
   }
 
   @Override

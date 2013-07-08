@@ -1,12 +1,13 @@
 package org.obiba.opal.web.gwt.app.client.administration.r.presenter;
 
+import org.obiba.opal.web.gwt.app.client.administration.presenter.BreadcrumbDisplay;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -55,11 +56,17 @@ public class RAdministrationPresenter
 
   @Override
   protected void revealInParent() {
-    RevealContentEvent.fire(this, ApplicationPresenter.WORKBENCH, this);
+    RevealContentEvent.fire(this, PageContainerPresenter.CONTENT, this);
+  }
+
+  @Override
+  public String getTitle() {
+    return translations.pageRConfigTitle();
   }
 
   @Override
   protected void onBind() {
+    super.onBind();
     authorizationPresenter.setAclRequest("r", new AclRequest(AclAction.R_SESSION_ALL, "/r/session"));
     addEventHandlers();
   }
@@ -136,7 +143,7 @@ public class RAdministrationPresenter
   @NameToken(Places.r)
   public interface Proxy extends ProxyPlace<RAdministrationPresenter> {}
 
-  public interface Display extends View {
+  public interface Display extends View, BreadcrumbDisplay {
 
     HandlerRegistration addTestRServerHandler(ClickHandler handler);
 

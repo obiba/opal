@@ -1,8 +1,11 @@
 package org.obiba.opal.web.gwt.app.client.administration.presenter;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
+import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -17,7 +20,34 @@ import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
 public class AdministrationPresenter
-    extends Presenter<AdministrationPresenter.Display, AdministrationPresenter.Proxy> {
+    extends Presenter<AdministrationPresenter.Display, AdministrationPresenter.Proxy> implements HasPageTitle {
+
+  @ProxyStandard
+  @NameToken(Places.administration)
+  public interface Proxy extends ProxyPlace<AdministrationPresenter> {}
+
+  public interface Display extends View, BreadcrumbDisplay {
+    Anchor getUsersGroupsPlace();
+    Anchor getUnitsPlace();
+    Anchor getDatabasesPlace();
+    Anchor getMongoDbPlace();
+    Anchor getEsPlace();
+    Anchor getIndexPlace();
+    Anchor getRPlace();
+    Anchor getDataShieldPlace();
+    Anchor getPluginsPlace();
+    Anchor getReportsPlace();
+    Anchor getFilesPlace();
+    Anchor getTasksPlace();
+    Anchor getJavaPlace();
+    Anchor getServerPlace();
+  }
+
+  //
+  // Data members
+  //
+  private static final Translations translations = GWT.create(Translations.class);
+
 
   @Inject
   public AdministrationPresenter(Display display, EventBus eventBus, Proxy proxy) {
@@ -26,13 +56,15 @@ public class AdministrationPresenter
   }
 
   @Override
-  protected void revealInParent() {
-    RevealContentEvent.fire(this, ApplicationPresenter.WORKBENCH, this);
+  public String getTitle() {
+    return translations.pageAdministrationTitle();
   }
 
-  @ProxyStandard
-  @NameToken(Places.administration)
-  public interface Proxy extends ProxyPlace<AdministrationPresenter> {}
+  @Override
+  protected void revealInParent() {
+    RevealContentEvent.fire(this, PageContainerPresenter.CONTENT, this);
+  }
+
 
   //
   // Private Methods
@@ -89,25 +121,6 @@ public class AdministrationPresenter
         getEventBus().fireEvent(new PlaceChangeEvent(Places.datashieldPlace));
       }
     });
-  }
-
-
-
-  public interface Display extends View {
-    Anchor getUsersGroupsPlace();
-    Anchor getUnitsPlace();
-    Anchor getDatabasesPlace();
-    Anchor getMongoDbPlace();
-    Anchor getEsPlace();
-    Anchor getIndexPlace();
-    Anchor getRPlace();
-    Anchor getDataShieldPlace();
-    Anchor getPluginsPlace();
-    Anchor getReportsPlace();
-    Anchor getFilesPlace();
-    Anchor getTasksPlace();
-    Anchor getJavaPlace();
-    Anchor getServerPlace();
   }
 
 }

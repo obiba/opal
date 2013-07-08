@@ -6,25 +6,8 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
+    <g:FlowPanel ui:field="breadcrumbs" />
     <g:FlowPanel addStyleNames="panel">
-      <g:FlowPanel addStyleNames="title">
-        <g:InlineLabel>
-          <ui:msg description="Databases label">Databases</ui:msg>
-        </g:InlineLabel>
-        <o:HelpImage imageSize="16" tooltipWidth="500px" tooltipHeight="350px">
-          <g:HTMLPanel>
-            <g:Label addStyleNames="title">
-              <ui:msg description="Databases label">Databases</ui:msg>
-            </g:Label>
-            <p>
-              <ui:msg description="Databases information">
-                Databases can be registered within Opal so it can later access them. Opal Datasources are connected to
-                these databases.
-              </ui:msg>
-            </p>
-          </g:HTMLPanel>
-        </o:HelpImage>
-      </g:FlowPanel>
       <g:VerticalPanel width="100%" addStyleNames="content">
         <g:Button ui:field="addDatabaseButton" styleName="btn">
           <ui:msg description="Add Database label">Add Database</ui:msg>
