@@ -1109,6 +1109,12 @@
         <version>${rhino-js.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.eclipse.jgit</groupId>
+        <artifactId>org.eclipse.jgit</artifactId>
+        <version>${jgit.version}</version>
+      </dependency>
+
       <!--dependency>
         <groupId>com.wordnik</groupId>
         <artifactId>swagger-jaxrs_2.9.1</artifactId>
@@ -1491,6 +1497,7 @@
     <jetty.version>7.6.8.v20121106</jetty.version>
     <jetty-util.version>6.1.22</jetty-util.version>
     <jewelcli.version>0.6</jewelcli.version>
+    <jgit.version>3.0.0.201306101825-r</jgit.version>
     <jline.version>0.9.94</jline.version>
     <joda-time.version>2.2</joda-time.version>
     <jotm.version>2.2.3</jotm.version>
