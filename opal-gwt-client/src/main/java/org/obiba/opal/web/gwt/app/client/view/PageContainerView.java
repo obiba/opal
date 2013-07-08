@@ -1,16 +1,12 @@
 package org.obiba.opal.web.gwt.app.client.view;
 
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
-import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 
 import com.github.gwtbootstrap.client.ui.PageHeader;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
@@ -59,9 +55,6 @@ public class PageContainerView extends ViewImpl implements PageContainerPresente
 
   @Override
   public void setInSlot(Object slot, Widget content) {
-    GWT.log("History: " + History.getToken());
-    GWT.log("Widget: " + content);
-
     if (PageContainerPresenter.HEADER == slot) {
       header.clear();
       header.add(content);

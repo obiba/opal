@@ -9,7 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.report.view;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresenter;
+import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
@@ -23,6 +26,7 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasWidgets;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -39,6 +43,10 @@ public class ReportTemplateView extends Composite implements ReportTemplatePrese
 
   @UiField
   ScrollPanel reportTemplateListPanel;
+
+  @UiField
+  Panel breadcrumbs;
+
 
   @UiTemplate("ReportTemplateView.ui.xml")
   interface ReportTemplateViewUiBinder extends UiBinder<Widget, ReportTemplateView> {}
@@ -95,6 +103,11 @@ public class ReportTemplateView extends Composite implements ReportTemplatePrese
   @Override
   public HasAuthorization getAddReportTemplateAuthorizer() {
     return new UIObjectAuthorizer(reportTemplateButton);
+  }
+
+  @Override
+  public void setBreadcrumbItems(List<BreadcrumbsBuilder.Item> items) {
+    breadcrumbs.add(new BreadcrumbsBuilder().setItems(items).build());
   }
 
 }

@@ -11,9 +11,12 @@ package org.obiba.opal.web.gwt.app.client.job.presenter;
 
 import javax.annotation.Nullable;
 
+import org.obiba.opal.web.gwt.app.client.administration.presenter.BreadcrumbDisplay;
+import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
@@ -24,6 +27,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.CommandStateDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -45,7 +49,7 @@ import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 /**
  *
  */
-public class JobListPresenter extends Presenter<JobListPresenter.Display, JobListPresenter.Proxy> {
+public class JobListPresenter extends ItemAdministrationPresenter<JobListPresenter.Display, JobListPresenter.Proxy> {
 
   public static final String LOG_ACTION = "Log";
 
@@ -73,11 +77,21 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
 
   @Override
   protected void revealInParent() {
-    RevealContentEvent.fire(this, ApplicationPresenter.WORKBENCH, this);
+    RevealContentEvent.fire(this, PageContainerPresenter.CONTENT, this);
+  }
+
+  @Override
+  public String getName() {
+    return getTitle();
+  }
+
+  @Override
+  public void authorize(HasAuthorization authorizer) {
   }
 
   @Override
   protected void onBind() {
+    super.onBind();
     registerHandler(getView().addClearButtonHandler(new ClearButtonHandler()));
     registerHandler(getView().addRefreshButtonHandler(new RefreshButtonHandler()));
     registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
@@ -185,11 +199,20 @@ public class JobListPresenter extends Presenter<JobListPresenter.Display, JobLis
         ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, "clearJobsList", "confirmClearJobsList"));
   }
 
+  @Override
+  public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
+  }
+
+  @Override
+  public String getTitle() {
+    return translations.pageJobsTitle();
+  }
+
   //
   // Inner Classes / Interfaces
   //
 
-  public interface Display extends View {
+  public interface Display extends View, BreadcrumbDisplay {
 
     @Nullable
     SelectionModel<CommandStateDto> getTableSelection();

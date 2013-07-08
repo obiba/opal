@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.unit.presenter;
 
+import org.obiba.opal.web.gwt.app.client.administration.presenter.BreadcrumbDisplay;
+import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
@@ -35,7 +37,7 @@ import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 public class FunctionalUnitPresenter
     extends SplitPaneWorkbenchPresenter<FunctionalUnitPresenter.Display, FunctionalUnitPresenter.Proxy> {
 
-  public interface Display extends View {
+  public interface Display extends View, BreadcrumbDisplay {
 
     HandlerRegistration addFunctionalUnitClickHandler(ClickHandler handler);
 
@@ -73,6 +75,24 @@ public class FunctionalUnitPresenter
     functionalUnitDetailsPresenter = FunctionalUnitDetailsPresenter;
     functionalUnitListPresenter = FunctionalUnitListPresenter;
     functionalUnitUpdateDialogPresenter = FunctionalUnitUpdateDialogPresenter;
+  }
+
+  @Override
+  public String getName() {
+    return getTitle();
+  }
+
+  @Override
+  public void authorize(HasAuthorization authorizer) {
+  }
+
+  @Override
+  public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
+  }
+
+  @Override
+  public String getTitle() {
+    return translations.pageFunctionalUnitTitle();
   }
 
   @Override

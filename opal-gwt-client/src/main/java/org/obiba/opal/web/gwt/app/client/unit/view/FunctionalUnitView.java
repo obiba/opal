@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.unit.view;
 
+import java.util.List;
+
+import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -22,6 +25,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HasWidgets;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
@@ -47,6 +51,10 @@ public class FunctionalUnitView extends ViewImpl implements FunctionalUnitPresen
 
   @UiField
   ScrollPanel functionalUnitListPanel;
+
+
+  @UiField
+  Panel breadcrumbs;
 
   @UiTemplate("FunctionalUnitView.ui.xml")
   interface FunctionalUnitViewUiBinder extends UiBinder<Widget, FunctionalUnitView> {}
@@ -111,6 +119,11 @@ public class FunctionalUnitView extends ViewImpl implements FunctionalUnitPresen
   @Override
   public HasAuthorization getSyncIdentifiersAuthorizer() {
     return new UIObjectAuthorizer(syncButton);
+  }
+
+  @Override
+  public void setBreadcrumbItems(List<BreadcrumbsBuilder.Item> items) {
+    breadcrumbs.add(new BreadcrumbsBuilder().setItems(items).build());
   }
 
 }
