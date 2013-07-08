@@ -10,9 +10,11 @@
 package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
 
 import java.util.Comparator;
+import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.RadioGroup;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -63,6 +65,9 @@ public class DataShieldConfigView extends ViewImpl implements DataShieldConfigPr
 
   @UiField
   Panel permissions;
+
+  @UiField
+  Panel breadcrumbs;
 
   RadioGroup<DataShieldConfigDto.Level> radioGroup;
 
@@ -127,5 +132,11 @@ public class DataShieldConfigView extends ViewImpl implements DataShieldConfigPr
   public HasAuthorization getPermissionsAuthorizer() {
     return new WidgetAuthorizer(permissionsPanel);
   }
+
+  @Override
+  public void setBreadcrumbItems(List<BreadcrumbsBuilder.Item> items) {
+    breadcrumbs.add(new BreadcrumbsBuilder().setItems(items).build());
+  }
+
 
 }

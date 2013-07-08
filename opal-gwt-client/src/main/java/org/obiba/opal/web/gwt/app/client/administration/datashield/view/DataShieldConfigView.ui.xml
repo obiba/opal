@@ -5,6 +5,7 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
+    <g:FlowPanel ui:field="breadcrumbs" />
     <g:FlowPanel ui:field="packagesPanel" addStyleNames="panel">
       <g:FlowPanel addStyleNames="title">
         <g:InlineLabel>

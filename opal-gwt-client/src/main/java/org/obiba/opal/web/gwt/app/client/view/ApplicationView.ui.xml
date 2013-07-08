@@ -21,25 +21,9 @@
         <b:NavLink ui:field="username">
           <ui:msg description="Administration link text">Administration</ui:msg>
         </b:NavLink>
-        <b:Nav>
-          <b:Dropdown text="Administration" rightDropdown="true">
-            <b:NavLink ui:field="unitsItem">
-              <ui:msg description="Units menu item">Units</ui:msg>
-            </b:NavLink>
-            <b:NavLink ui:field="reportsItem">
-              <ui:msg description="Reports menu item">Reports</ui:msg>
-            </b:NavLink>
-            <b:NavLink ui:field="fileExplorer">
-              <ui:msg description="Files menu item">Files</ui:msg>
-            </b:NavLink>
-            <b:NavLink ui:field="listJobsItem">
-              <ui:msg description="Jobs menu item">Jobs</ui:msg>
-            </b:NavLink>
-            <b:NavLink ui:field="administration">
-              <ui:msg description="Administration link text">Administration</ui:msg>
-            </b:NavLink>
-          </b:Dropdown>
-        </b:Nav>
+        <b:NavLink ui:field="administrationItem">
+          <ui:msg description="Datasources label">Administration</ui:msg>
+        </b:NavLink>
         <b:NavLink ui:field="help">
           <ui:msg description="Help link text">Help</ui:msg>
         </b:NavLink>

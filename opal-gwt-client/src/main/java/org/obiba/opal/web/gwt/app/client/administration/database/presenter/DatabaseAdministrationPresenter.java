@@ -11,12 +11,16 @@ package org.obiba.opal.web.gwt.app.client.administration.database.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.presenter.BreadcrumbDisplay;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
@@ -31,6 +35,7 @@ import org.obiba.opal.web.model.client.opal.AclAction;
 import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -48,9 +53,8 @@ import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
-import com.gwtplatform.mvp.client.annotations.TabInfo;
+import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
-import com.gwtplatform.mvp.client.proxy.TabContentProxyPlace;
 
 import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.EDIT_ACTION;
@@ -59,16 +63,15 @@ public class DatabaseAdministrationPresenter extends
     ItemAdministrationPresenter<DatabaseAdministrationPresenter.Display, DatabaseAdministrationPresenter.Proxy> {
 
   @ProxyStandard
-  @NameToken("!admin.databases")
-  @TabInfo(container = AdministrationPresenter.class, label = "Databases", priority = 1)
-  public interface Proxy extends TabContentProxyPlace<DatabaseAdministrationPresenter> {}
+  @NameToken(Places.databases)
+  public interface Proxy extends ProxyPlace<DatabaseAdministrationPresenter> {}
 
-  public interface Display extends View {
+  public interface Display extends View, BreadcrumbDisplay {
 
     String TEST_ACTION = "Test";
 
     enum Slots {
-      Drivers, Permissions
+      Drivers, Permissions, Header
     }
 
     HasActionHandler<JdbcDataSourceDto> getActions();
@@ -78,7 +81,6 @@ public class DatabaseAdministrationPresenter extends
     HasAuthorization getPermissionsAuthorizer();
 
     HasData<JdbcDataSourceDto> getDatabaseTable();
-
   }
 
   private final Provider<DatabasePresenter> jdbcDataSourcePresenter;
@@ -99,7 +101,6 @@ public class DatabaseAdministrationPresenter extends
   }
 
   @ProxyEvent
-  @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(Resources.databases()).post()
         .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListDatabasesAuthorization())).send();
@@ -107,7 +108,7 @@ public class DatabaseAdministrationPresenter extends
 
   @Override
   protected void revealInParent() {
-    RevealContentEvent.fire(this, AdministrationPresenter.TabSlot, this);
+    RevealContentEvent.fire(this, PageContainerPresenter.CONTENT, this);
   }
 
   @Override
@@ -130,7 +131,13 @@ public class DatabaseAdministrationPresenter extends
   }
 
   @Override
+  public String getTitle() {
+    return translations.pageDatabasesTitle();
+  }
+
+  @Override
   protected void onBind() {
+    super.onBind();
 
     registerHandler(getEventBus().addHandler(DatabaseCreatedEvent.getType(), new DatabaseCreatedEvent.Handler() {
 
@@ -250,6 +257,7 @@ public class DatabaseAdministrationPresenter extends
     @Override
     public void unauthorized() {
       clearSlot(Display.Slots.Permissions);
+      clearSlot(Display.Slots.Header);
     }
 
     @Override

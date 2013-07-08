@@ -9,13 +9,16 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.dashboard.presenter;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
+import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -27,7 +30,10 @@ import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
-public class DashboardPresenter extends Presenter<DashboardPresenter.Display, DashboardPresenter.Proxy> {
+public class DashboardPresenter extends Presenter<DashboardPresenter.Display, DashboardPresenter.Proxy> implements
+    HasPageTitle {
+
+  private static final Translations translations = GWT.create(Translations.class);
 
   @ProxyStandard
   @NameToken(Places.dashboard)
@@ -36,6 +42,11 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
   @Inject
   public DashboardPresenter(Display display, EventBus eventBus, Proxy proxy) {
     super(eventBus, display, proxy);
+  }
+
+  @Override
+  public String getTitle() {
+    return translations.pageDashboardTitle();
   }
 
   @Override
@@ -67,7 +78,7 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
 
   @Override
   protected void revealInParent() {
-    RevealContentEvent.fire(this, ApplicationPresenter.WORKBENCH, this);
+    RevealContentEvent.fire(this, PageContainerPresenter.CONTENT, this);
   }
 
   private void authorize() {

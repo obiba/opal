@@ -78,7 +78,7 @@ def do_command(args):
             request.verbose()
 
         # send request
-        request.method(args.method).resource(args.ws);
+        request.method(args.method).resource(args.ws)
         response = request.send()
 
         # format response

@@ -33,7 +33,6 @@ import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.place.shared.PlaceChangeEvent;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -55,23 +54,15 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
     HasClickHandlers getHelp();
 
-    HasClickHandlers getAdministration();
-
     HasUrl getDownloder();
+
+    NavLink getAdministrationItem();
 
     NavLink getDatasourcesItem();
 
     HasAuthorization getAdministrationAuthorizer();
 
-    NavLink getListJobsItem();
-
-    NavLink getFileExplorerItem();
-
     NavLink getDashboardItem();
-
-    NavLink getReportsItem();
-
-    NavLink getUnitsItem();
 
     void setCurrentSelection(MenuItem selection);
 
@@ -154,38 +145,17 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       }
     });
 
+    getView().getAdministrationItem().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        getEventBus().fireEvent(new PlaceChangeEvent(Places.administrationPlace));
+      }
+    });
+
     getView().getDatasourcesItem().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
         getEventBus().fireEvent(new PlaceChangeEvent(Places.navigatorPlace));
-      }
-    });
-
-    getView().getReportsItem().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.reportTemplatesPlace));
-      }
-    });
-
-    getView().getUnitsItem().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.unitsPlace));
-      }
-    });
-
-    getView().getListJobsItem().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.jobsPlace));
-      }
-    });
-
-    getView().getFileExplorerItem().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.filesPlace));
       }
     });
 
@@ -203,13 +173,6 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       }
     });
 
-    getView().getAdministration().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.administrationPlace));
-      }
-    });
-
     registerUserMessageEventHandler();
   }
 
@@ -223,12 +186,6 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   private void authorize() {
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").get()
         .authorize(new UIObjectAuthorizer(getView().getDatasourcesItem())).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").get()
-        .authorize(new UIObjectAuthorizer(getView().getUnitsItem())).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").get()
-        .authorize(new UIObjectAuthorizer(getView().getReportsItem())).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/commands").get()
-        .authorize(new UIObjectAuthorizer(getView().getListJobsItem())).send();
 
     getEventBus().fireEvent(new RequestAdministrationPermissionEvent(new HasAuthorization() {
 

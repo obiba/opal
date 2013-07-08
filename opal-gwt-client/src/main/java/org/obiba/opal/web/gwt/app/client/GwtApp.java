@@ -104,7 +104,14 @@ public class GwtApp implements EntryPoint {
 
       @Override
       public void onPlaceChange(PlaceChangeEvent event) {
-        opalGinjector.getPlaceManager().revealPlace(new PlaceRequest(((Places.Place) event.getNewPlace()).getName()));
+        Places.Place place = (Places.Place) event.getNewPlace();
+        PlaceRequest request = new PlaceRequest(place.getName());
+        // add the params if any
+        for (String name : place.getParameterNames()) {
+          request = request.with(name, place.getParameter(name, ""));
+        }
+
+        opalGinjector.getPlaceManager().revealPlace(request);
       }
     });
 

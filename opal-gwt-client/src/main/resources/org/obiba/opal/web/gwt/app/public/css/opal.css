@@ -316,6 +316,10 @@ td.link {
   margin-bottom: 1.2em;
 }
 
+.extra-large-bottom-margin {
+  margin-bottom: 3.2em;
+}
+
 .loading {
   display: block;
   margin: auto;
@@ -940,6 +944,14 @@ td.row-actions span {
   font-weight: normal;
   color: #444444;
   border-bottom: solid 1px #444444;
+  margin-bottom: 0.8em;
+  padding-bottom: 0.8em;
+}
+
+.panel .title {
+  font-weight: normal;
+  color: #444444;
+  border-bottom: solid 1px rgba(68, 68, 68, .1);
   margin-bottom: 0.8em;
   padding-bottom: 0.8em;
 }
@@ -2584,4 +2596,10 @@ input.limitSummary {
   width: 3em !important;
   margin-bottom: 0px !important;
   padding: 2px !important;
+}
+
+a.admin-item {
+    color: #205A97;
+    font-size: 14px;
+    text-decoration: underline;
 }

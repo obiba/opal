@@ -13,13 +13,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.event.TableIndicesRefreshEvent;
-import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.presenter.BreadcrumbDisplay;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableIndexStatusRefreshEvent;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
@@ -58,23 +60,21 @@ import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
-import com.gwtplatform.mvp.client.annotations.TabInfo;
+import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
-import com.gwtplatform.mvp.client.proxy.TabContentProxyPlace;
 
 public class IndexAdministrationPresenter
     extends ItemAdministrationPresenter<IndexAdministrationPresenter.Display, IndexAdministrationPresenter.Proxy> {
 
   @ProxyStandard
-  @NameToken("!admin.search")
-  @TabInfo(container = AdministrationPresenter.class, label = "Search", priority = 4)
-  public interface Proxy extends TabContentProxyPlace<IndexAdministrationPresenter> {}
+  @NameToken(Places.index)
+  public interface Proxy extends ProxyPlace<IndexAdministrationPresenter> {}
 
   private static final Translations translations = GWT.create(Translations.class);
 
   private static final int DELAY_MILLIS = 1500;
 
-  public interface Display extends View {
+  public interface Display extends View, BreadcrumbDisplay {
 
     String INDEX_ACTION = "Index now";
 
@@ -143,7 +143,7 @@ public class IndexAdministrationPresenter
 
   @Override
   protected void revealInParent() {
-    RevealContentEvent.fire(this, AdministrationPresenter.TabSlot, this);
+    RevealContentEvent.fire(this, PageContainerPresenter.CONTENT, this);
   }
 
   @Override
@@ -179,7 +179,13 @@ public class IndexAdministrationPresenter
   }
 
   @Override
+  public String getTitle() {
+    return translations.pageSearchIndexTitle();
+  }
+
+  @Override
   protected void onBind() {
+    super.onBind();
     registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEvent.Handler() {
 
       @Override
