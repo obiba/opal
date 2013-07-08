@@ -6,7 +6,7 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-
+    <g:FlowPanel ui:field="breadcrumbs" />
     <g:FlowPanel addStyleNames="panel">
       <g:Label addStyleNames="title">
         <ui:msg description="R server admin label">R Server</ui:msg>

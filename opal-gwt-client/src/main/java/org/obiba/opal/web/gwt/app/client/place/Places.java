@@ -9,6 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.place;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+
 public final class Places {
 
   public static final String dashboard = "!dashboard";
@@ -69,7 +73,15 @@ public final class Places {
     return administration;
   }
 
-  public static final String databases = administration  + ".databases";
+  public static final String admin = "!adminpage";
+
+  public static final Place adminPlace = new Place(admin);
+
+  public static String admin() {
+    return admin;
+  }
+
+  public static final String databases = "!admin.databases";
 
   public static final Place databasesPlace = new Place(databases);
 
@@ -104,13 +116,41 @@ public final class Places {
   public static final class Place extends com.google.gwt.place.shared.Place {
 
     final String place;
+    private Map<String, String> params = new java.util.HashMap<String, String>();
 
-    private Place(String name) {
+
+    public Place(String name) {
       place = name;
     }
 
     public String getName() {
       return place;
+    }
+
+    public Place addParam(String name, String value) {
+      params.put(name, value);
+      return this;
+    }
+
+    public Set<String> getParameterNames() {
+      if (params != null) {
+        return params.keySet();
+      } else {
+        return Collections.emptySet();
+      }
+    }
+
+    public String getParameter(String key, String defaultValue) {
+      String value = null;
+
+      if (params != null) {
+        value = params.get(key);
+      }
+
+      if (value == null) {
+        value = defaultValue;
+      }
+      return value;
     }
   }
 

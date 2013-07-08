@@ -1700,4 +1700,36 @@ public interface Translations extends Constants {
   @Description("Clear filter label")
   @DefaultStringValue("Clear filter")
   String clearFilter();
+
+  @Description("Page Administration title")
+  @DefaultStringValue("Administration")
+  String pageAdministrationTitle();
+
+  @Description("Page Dashboard title")
+  @DefaultStringValue("Dashboard")
+  String pageDashboardTitle();
+
+  @Description("Page Datasources title")
+  @DefaultStringValue("Datasources")
+  String pageDatasourcesTitle();
+
+  @Description("Page Databases title")
+  @DefaultStringValue("Databases")
+  String pageDatabasesTitle();
+
+  @Description("Page DataSHIELD title")
+  @DefaultStringValue("DataSHIELD")
+  String pageDataShieldTitle();
+
+  @Description("Page Search Index title")
+  @DefaultStringValue("Index")
+  String pageSearchIndexTitle();
+
+  @Description("Page R Admin title")
+  @DefaultStringValue("R")
+  String pageRConfigTitle();
+
+  @Description("Page File Explorer title")
+  @DefaultStringValue("File Explorer")
+  String pageFileExplorerTitle();
 }

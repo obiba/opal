@@ -7,9 +7,7 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <b:PageHeader>
-      <ui:msg description="Dashboard label">Administration</ui:msg>
-    </b:PageHeader>
+    <g:FlowPanel ui:field="breadcrumbs" />
     <g:FlowPanel addStyleNames="main">
       <b:FluidRow>
         <b:Column size="6">

@@ -9,7 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.r.view;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
@@ -53,6 +56,10 @@ public class RAdministrationView extends ViewImpl implements RAdministrationPres
   @UiField
   Panel permissions;
 
+  @UiField
+  Panel breadcrumbs;
+
+
   //
   // Constructors
   //
@@ -82,6 +89,11 @@ public class RAdministrationView extends ViewImpl implements RAdministrationPres
   @Override
   public HasAuthorization getPermissionsAuthorizer() {
     return new WidgetAuthorizer(permissionsPanel);
+  }
+
+  @Override
+  public void setBreadcrumbItems(List<BreadcrumbsBuilder.Item> items) {
+    breadcrumbs.add(new BreadcrumbsBuilder().setItems(items).build());
   }
 
 }

@@ -8,9 +8,6 @@
 
 
   <g:FlowPanel>
-    <b:PageHeader>
-      <ui:msg description="Datasources label">Datasources</ui:msg>
-    </b:PageHeader>
     <g:FlowPanel>
       <b:ButtonToolbar addStyleNames="inline">
         <b:ButtonGroup>
