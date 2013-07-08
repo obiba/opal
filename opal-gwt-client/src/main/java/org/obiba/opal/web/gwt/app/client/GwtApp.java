@@ -1,7 +1,5 @@
 package org.obiba.opal.web.gwt.app.client;
 
-import net.customware.gwt.presenter.client.EventBus;
-
 import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.inject.OpalGinjector;
@@ -23,6 +21,7 @@ import org.obiba.opal.web.model.client.opal.Subject;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.place.shared.PlaceChangeEvent;
@@ -107,7 +106,7 @@ public class GwtApp implements EntryPoint {
         Places.Place place = (Places.Place) event.getNewPlace();
         PlaceRequest request = new PlaceRequest(place.getName());
         // add the params if any
-        for (String name : place.getParameterNames()) {
+        for(String name : place.getParameterNames()) {
           request = request.with(name, place.getParameter(name, ""));
         }
 

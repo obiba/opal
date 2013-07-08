@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.inject;
 
-import net.customware.gwt.presenter.client.EventBus;
-
 import org.obiba.opal.web.gwt.app.client.place.DefaultPlace;
 import org.obiba.opal.web.gwt.app.client.place.OpalPlaceManager;
 import org.obiba.opal.web.gwt.app.client.place.Places;
@@ -54,7 +52,6 @@ public class OpalGinModule extends AbstractPresenterModule {
 
   @Override
   protected void configure() {
-    bind(EventBus.class).to(GwtEventBusAdaptor.class).in(Singleton.class);
     bind(RequestUrlBuilder.class).to(DefaultRequestUrlBuilder.class).in(Singleton.class);
     bind(UnhandledResponseNotificationPresenter.Display.class).to(UnhandledResponseNotificationView.class)
         .in(Singleton.class);
@@ -82,8 +79,7 @@ public class OpalGinModule extends AbstractPresenterModule {
     bind(SummaryTabPresenter.Display.class).to(SummaryTabView.class);
     bindPresenterWidget(ScriptEvaluationPresenter.class, ScriptEvaluationPresenter.Display.class,
         ScriptEvaluationView.class);
-    bindPresenterWidget(ValueMapPopupPresenter.class, ValueMapPopupPresenter.Display.class,
-        ValueMapPopupView.class);
+    bindPresenterWidget(ValueMapPopupPresenter.class, ValueMapPopupPresenter.Display.class, ValueMapPopupView.class);
     bindPresenterWidget(ValueSequencePopupPresenter.class, ValueSequencePopupPresenter.Display.class,
         ValueSequencePopupView.class);
 

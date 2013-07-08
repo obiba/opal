@@ -201,9 +201,9 @@ public class IndexAdministrationPresenter
       @Override
       public void onChange(ChangeEvent event) {
         getView();
-        if(getView().getActionsDropdown().getLastSelectedNavLink().getText().equals(Display.CLEAR_ACTION)) {
+        if(getView().getActionsDropdown().getLastSelectedNavLink().getText().trim().equals(Display.CLEAR_ACTION)) {
           doClear();
-        } else if(getView().getActionsDropdown().getLastSelectedNavLink().getText().equals(Display.SCHEDULE)) {
+        } else if(getView().getActionsDropdown().getLastSelectedNavLink().getText().trim().equals(Display.SCHEDULE)) {
           doSchedule();
         }
       }
@@ -257,7 +257,7 @@ public class IndexAdministrationPresenter
       @SuppressWarnings("UnnecessaryFinalOnLocalVariableOrParameter")
       @Override
       public void doAction(final TableIndexStatusDto object, String actionName) {
-        if(actionName.equalsIgnoreCase(Display.CLEAR_ACTION)) {
+        if(actionName.trim().equalsIgnoreCase(Display.CLEAR_ACTION)) {
           ResponseCodeCallback callback = new ResponseCodeCallback() {
 
             @Override
@@ -277,7 +277,7 @@ public class IndexAdministrationPresenter
               .forResource(Resources.index(object.getDatasource(), object.getTable())).accept("application/json")//
               .withCallback(Response.SC_OK, callback)//
               .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).delete().send();
-        } else if(actionName.equalsIgnoreCase(Display.INDEX_ACTION)) {
+        } else if(actionName.trim().equalsIgnoreCase(Display.INDEX_ACTION)) {
           ResponseCodeCallback callback = new ResponseCodeCallback() {
 
             @Override

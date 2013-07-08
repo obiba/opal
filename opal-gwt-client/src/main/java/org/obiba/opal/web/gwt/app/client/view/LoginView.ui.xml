@@ -9,7 +9,7 @@
       <b:Brand href="#">Opal</b:Brand>
     </b:ResponsiveNavbar>
     <g:FlowPanel addStyleNames="main">
-      <g:FlowPanel addStyleNames="content">
+      <g:FlowPanel addStyleNames="content padding50-top">
         <g:FlowPanel addStyleNames="form">
           <g:Label ui:field="errorMessage" addStyleNames="alert-message block-message error">
             <ui:msg description="Authentication failed error message">Authentication Failed</ui:msg>

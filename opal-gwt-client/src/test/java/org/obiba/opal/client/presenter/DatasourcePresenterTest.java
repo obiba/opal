@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.client.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -29,6 +27,7 @@ import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.testing.CountingEventBus;

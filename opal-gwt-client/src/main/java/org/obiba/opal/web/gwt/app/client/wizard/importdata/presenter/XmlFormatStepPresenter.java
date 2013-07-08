@@ -9,14 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter;
 
-import net.customware.gwt.presenter.client.EventBus;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
@@ -30,7 +29,7 @@ public class XmlFormatStepPresenter extends PresenterWidget<XmlFormatStepPresent
 
   @Inject
   public XmlFormatStepPresenter(EventBus eventBus, Display display, FileSelectionPresenter xmlFileSelectionPresenter) {
-    super((com.google.gwt.event.shared.EventBus) eventBus, display);
+    super(eventBus, display);
     this.xmlFileSelectionPresenter = xmlFileSelectionPresenter;
   }
 
