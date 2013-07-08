@@ -9,7 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 
+import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 
 import com.google.gwt.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
@@ -19,8 +21,8 @@ import com.gwtplatform.mvp.client.proxy.Proxy;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
 @SuppressWarnings("rawtypes")
-public abstract class SplitPaneWorkbenchPresenter<D extends View, P extends Proxy<? extends SplitPaneWorkbenchPresenter>>
-    extends Presenter<D, P> {
+public abstract class SplitPaneWorkbenchPresenter<D extends View, P extends Proxy<? extends Presenter<?, ?>>>
+    extends ItemAdministrationPresenter<D, P> {
 
   public enum Slot {
     CENTER, LEFT
@@ -32,7 +34,7 @@ public abstract class SplitPaneWorkbenchPresenter<D extends View, P extends Prox
 
   @Override
   protected void revealInParent() {
-    RevealContentEvent.fire(this, ApplicationPresenter.WORKBENCH, this);
+    RevealContentEvent.fire(this, PageContainerPresenter.CONTENT, this);
   }
 
   @Override

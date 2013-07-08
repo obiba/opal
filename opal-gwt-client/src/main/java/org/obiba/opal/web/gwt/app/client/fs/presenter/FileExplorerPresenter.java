@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
+import org.obiba.opal.web.gwt.app.client.administration.presenter.BreadcrumbDisplay;
+import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
@@ -42,7 +44,7 @@ import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 public class FileExplorerPresenter
     extends SplitPaneWorkbenchPresenter<FileExplorerPresenter.Display, FileExplorerPresenter.Proxy> {
 
-  public interface Display extends View {
+  public interface Display extends View, BreadcrumbDisplay {
 
     HasClickHandlers getFileUploadButton();
 
@@ -99,6 +101,24 @@ public class FileExplorerPresenter
         return fileSystemTreePresenter;
     }
     return null;
+  }
+
+  @Override
+  public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
+  }
+
+  @Override
+  public String getTitle() {
+    return translations.pageFileExplorerTitle();
+  }
+
+  @Override
+  public String getName() {
+    return getTitle();
+  }
+
+  @Override
+  public void authorize(HasAuthorization authorizer) {
   }
 
   @Override

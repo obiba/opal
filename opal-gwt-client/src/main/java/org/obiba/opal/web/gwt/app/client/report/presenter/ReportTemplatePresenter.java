@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.report.presenter;
 
+import org.obiba.opal.web.gwt.app.client.administration.presenter.BreadcrumbDisplay;
+import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SplitPaneWorkbenchPresenter;
@@ -36,7 +38,7 @@ public class ReportTemplatePresenter
 
   Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenterProvider;
 
-  public interface Display extends View {
+  public interface Display extends View, BreadcrumbDisplay {
 
     HandlerRegistration addReportTemplateClickHandler(ClickHandler handler);
 
@@ -59,6 +61,26 @@ public class ReportTemplatePresenter
     this.reportTemplateListPresenter = reportTemplateListPresenter;
     reportTemplateUpdateDialogPresenterProvider = reportTemplateUpdateDialogPresenter;
   }
+
+
+  @Override
+  public String getName() {
+    return getTitle();
+  }
+
+  @Override
+  public void authorize(HasAuthorization authorizer) {
+  }
+
+  @Override
+  public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
+  }
+
+  @Override
+  public String getTitle() {
+    return translations.pageReportTemplatePage();
+  }
+
 
   @Override
   protected PresenterWidget<?> getDefaultPresenter(SplitPaneWorkbenchPresenter.Slot slot) {

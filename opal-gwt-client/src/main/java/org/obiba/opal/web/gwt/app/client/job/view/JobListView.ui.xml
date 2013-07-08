@@ -7,10 +7,7 @@
     ui:generateLocales="default">
 
   <o:WorkbenchLayout>
-    <g:Label>
-      <ui:msg description="Jobs label">Jobs</ui:msg>
-    </g:Label>
-    <g:Label></g:Label>
+    <g:FlowPanel ui:field="breadcrumbs" />
     <g:FlowPanel>
       <g:Button ui:field="refreshButton" styleName="btn iconb i-sync">
         <ui:msg description="Refresh jobs list">Refresh</ui:msg>

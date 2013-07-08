@@ -10,12 +10,14 @@
 package org.obiba.opal.web.gwt.app.client.job.view;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.DateTimeColumn;
@@ -36,6 +38,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.InlineLabel;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SelectionModel;
@@ -67,6 +70,9 @@ public class JobListView extends Composite implements Display {
 
   @UiField
   SimplePager pager;
+
+  @UiField
+  Panel breadcrumbs;
 
   ListDataProvider<CommandStateDto> dataProvider;
 
@@ -219,6 +225,11 @@ public class JobListView extends Composite implements Display {
   private void addTablePager() {
     table.setPageSize(50);
     pager.setDisplay(table);
+  }
+
+  @Override
+  public void setBreadcrumbItems(List<BreadcrumbsBuilder.Item> items) {
+    breadcrumbs.add(new BreadcrumbsBuilder().setItems(items).build());
   }
 
 }
