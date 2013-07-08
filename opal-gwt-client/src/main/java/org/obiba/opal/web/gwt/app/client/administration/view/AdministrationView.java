@@ -9,96 +9,18 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.view;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.workbench.view.AbstractTabLayout;
 
-import com.google.common.collect.Lists;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Hyperlink;
-import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Widget;
-import com.gwtplatform.mvp.client.Tab;
-import com.gwtplatform.mvp.client.TabData;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public class AdministrationView extends ViewImpl implements AdministrationPresenter.Display {
 
-  private final static class AdminTabComparator implements Comparator<AdminTab> {
-
-    private static final AdminTabComparator instance = new AdminTabComparator();
-
-    @Override
-    public int compare(AdminTab o1, AdminTab o2) {
-      if(o1.getPriority() == o2.getPriority()) return 0;
-      return o1.getPriority() < o2.getPriority() ? -1 : 1;
-    }
-  }
-
-  private class AdminTab implements Tab {
-
-    private final TabData tabData;
-
-    private final SimplePanel tabContent;
-
-    private final Hyperlink tab;
-
-    private AdminTab(TabData tabData, String token) {
-      this.tabData = tabData;
-      tabContent = new SimplePanel();
-      tab = new Hyperlink();
-      tab.setTargetHistoryToken(token);
-      // TODO: localise
-      tab.setText(tabData.getLabel());
-      orderedTabs.add(this);
-      Collections.sort(orderedTabs, AdminTabComparator.instance);
-      administrationDisplays.insert(tabContent, tab, getTabIndex());
-    }
-
-    public int getTabIndex() {
-      return orderedTabs.indexOf(this);
-    }
-
-    @Override
-    public void activate() {
-      administrationDisplays.selectTab(tabContent);
-    }
-
-    @Override
-    public Widget asWidget() {
-      return tabContent;
-    }
-
-    @Override
-    public void deactivate() {
-    }
-
-    @Override
-    public float getPriority() {
-      return tabData.getPriority();
-    }
-
-    @Override
-    public String getText() {
-      return tabData.getLabel();
-    }
-
-    @Override
-    public void setTargetHistoryToken(String historyToken) {
-
-    }
-
-    @Override
-    public void setText(String text) {
-
-    }
-  }
 
   @UiTemplate("AdministrationView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, AdministrationView> {}
@@ -107,51 +29,54 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
 
   private final Widget widget;
 
-  private final List<AdminTab> orderedTabs = Lists.newLinkedList();
+  @UiField
+  Anchor usersGroupsPlace;
 
   @UiField
-  AbstractTabLayout administrationDisplays;
+  Anchor unitsPlace;
 
-  private Widget currentTabContent;
+  @UiField
+  Anchor databasesPlace;
+
+  @UiField
+  Anchor mongoDbPlace;
+
+  @UiField
+  Anchor esPlace;
+
+  @UiField
+  Anchor indexPlace;
+
+  @UiField
+  Anchor rPlace;
+
+  @UiField
+  Anchor dataShieldPlace;
+
+  @UiField
+  Anchor pluginsPlace;
+
+  @UiField
+  Anchor reportsPlace;
+
+  @UiField
+  Anchor filesPlace;
+
+  @UiField
+  Anchor tasksPlace;
+
+  @UiField
+  Anchor javaPlace;
+
+  @UiField
+  Anchor serverPlace;
 
   public AdministrationView() {
     widget = uiBinder.createAndBindUi(this);
   }
 
   @Override
-  public Tab addTab(TabData tabData, String historyToken) {
-    return new AdminTab(tabData, historyToken);
-  }
-
-  @Override
-  public void removeTab(Tab tab) {
-    administrationDisplays.remove(((AdminTab) tab).getTabIndex());
-    orderedTabs.remove(tab);
-  }
-
-  @Override
-  public void removeTabs() {
-    administrationDisplays.clear();
-  }
-
-  @Override
-  public void setActiveTab(Tab tab) {
-    AdminTab adminTab = (AdminTab) tab;
-    if(currentTabContent != null) {
-      adminTab.tabContent.setWidget(currentTabContent);
-      currentTabContent = null;
-    }
-    administrationDisplays.selectTab(adminTab.getTabIndex());
-  }
-
-  @Override
   public void setInSlot(Object slot, Widget content) {
-    if(slot == AdministrationPresenter.TabSlot) {
-      // The gwt-platform pattern is that the tab container has only one Panel with the active content being shown.
-      // The AbstractTabLayout does not. At least, it doesn't expose it.
-      // So we keep this around and in "setActiveTab" we associate this widget to its tab
-      currentTabContent = content;
-    }
   }
 
   @Override
@@ -159,4 +84,73 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
     return widget;
   }
 
+  @Override
+  public Anchor getUsersGroupsPlace() {
+    return usersGroupsPlace;
+  }
+
+  @Override
+  public Anchor getUnitsPlace() {
+    return unitsPlace;
+  }
+
+  @Override
+  public Anchor getDatabasesPlace() {
+    return databasesPlace;
+  }
+
+  @Override
+  public Anchor getMongoDbPlace() {
+    return mongoDbPlace;
+  }
+
+  @Override
+  public Anchor getEsPlace() {
+    return esPlace;
+  }
+
+  @Override
+  public Anchor getIndexPlace() {
+    return indexPlace;
+  }
+
+  @Override
+  public Anchor getRPlace() {
+    return rPlace;
+  }
+
+  @Override
+  public Anchor getDataShieldPlace() {
+    return dataShieldPlace;
+  }
+
+  @Override
+  public Anchor getPluginsPlace() {
+    return pluginsPlace;
+  }
+
+  @Override
+  public Anchor getReportsPlace() {
+    return reportsPlace;
+  }
+
+  @Override
+  public Anchor getFilesPlace() {
+    return filesPlace;
+  }
+
+  @Override
+  public Anchor getTasksPlace() {
+    return tasksPlace;
+  }
+
+  @Override
+  public Anchor getJavaPlace() {
+    return javaPlace;
+  }
+
+  @Override
+  public Anchor getServerPlace() {
+    return serverPlace;
+  }
 }

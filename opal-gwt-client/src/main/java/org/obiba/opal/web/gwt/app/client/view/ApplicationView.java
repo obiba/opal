@@ -51,8 +51,11 @@ public class ApplicationView implements ApplicationPresenter.Display {
   @UiField
   NavLink quit;
 
+//  @UiField
+//  NavLink administration;
+
   @UiField
-  NavLink administration;
+  NavLink administrationItem;
 
   @UiField
   NavLink username;
@@ -65,18 +68,18 @@ public class ApplicationView implements ApplicationPresenter.Display {
 
   @UiField
   NavLink datasourcesItem;
+//
+//  @UiField
+//  NavLink listJobsItem;
+//
+//  @UiField
+//  NavLink fileExplorer;
 
-  @UiField
-  NavLink listJobsItem;
-
-  @UiField
-  NavLink fileExplorer;
-
-  @UiField
-  NavLink reportsItem;
-
-  @UiField
-  NavLink unitsItem;
+//  @UiField
+//  NavLink reportsItem;
+//
+//  @UiField
+//  NavLink unitsItem;
 
   @UiField
   Panel workbench;
@@ -108,11 +111,11 @@ public class ApplicationView implements ApplicationPresenter.Display {
   public NavLink getDashboardItem() {
     return dashboardItem;
   }
-
-  @Override
-  public NavLink getListJobsItem() {
-    return listJobsItem;
-  }
+//
+//  @Override
+//  public NavLink getListJobsItem() {
+//    return listJobsItem;
+//  }
 
   @Override
   public HasUrl getDownloder() {
@@ -134,26 +137,28 @@ public class ApplicationView implements ApplicationPresenter.Display {
   public HasClickHandlers getHelp() {
     return help;
   }
-
-  @Override
-  public HasClickHandlers getAdministration() {
-    return administration;
-  }
+//
+//  @Override
+//  public HasClickHandlers getAdministration() {
+//    return administration;
+//  }
 
   @Override
   public Widget asWidget() {
     return dock;
   }
+/*
 
   @Override
   public NavLink getFileExplorerItem() {
     return fileExplorer;
   }
+*/
 
-  @Override
-  public NavLink getReportsItem() {
-    return reportsItem;
-  }
+//  @Override
+//  public NavLink getReportsItem() {
+//    return reportsItem;
+//  }
 
   @Override
   public void setCurrentSelection(MenuItem selection) {
@@ -177,13 +182,18 @@ public class ApplicationView implements ApplicationPresenter.Display {
   }
 
   @Override
-  public NavLink getUnitsItem() {
-    return unitsItem;
+  public NavLink getAdministrationItem() {
+    return administrationItem;
   }
+
+//  @Override
+//  public NavLink getUnitsItem() {
+//    return unitsItem;
+//  }
 
   @Override
   public HasAuthorization getAdministrationAuthorizer() {
-    return new UIObjectAuthorizer(administration) {
+    return new UIObjectAuthorizer(administrationItem) {
       @Override
       public void authorized() {
         super.authorized();

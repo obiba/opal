@@ -9,11 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
-import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallbacks;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -34,17 +35,15 @@ import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
-import com.gwtplatform.mvp.client.annotations.TabInfo;
+import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
-import com.gwtplatform.mvp.client.proxy.TabContentProxyPlace;
 
 public class DataShieldConfigPresenter
     extends ItemAdministrationPresenter<DataShieldConfigPresenter.Display, DataShieldConfigPresenter.Proxy> {
 
   @ProxyStandard
-  @NameToken("!admin.datashield")
-  @TabInfo(container = AdministrationPresenter.class, label = "DataSHIELD", priority = 3)
-  public interface Proxy extends TabContentProxyPlace<DataShieldConfigPresenter> {}
+  @NameToken(Places.datashield)
+  public interface Proxy extends ProxyPlace<DataShieldConfigPresenter> {}
 
   public interface Display extends View {
 
@@ -93,7 +92,7 @@ public class DataShieldConfigPresenter
 
   @Override
   protected void revealInParent() {
-    RevealContentEvent.fire(this, AdministrationPresenter.TabSlot, this);
+    RevealContentEvent.fire(this, ApplicationPresenter.WORKBENCH, this);
   }
 
   @Override

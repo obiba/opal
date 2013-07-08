@@ -33,7 +33,7 @@
       </g:FlowPanel>
 
       <g:Anchor>
-        <ui:msg description="Permissions label">Permissions</ui:msg>
+        <ui:msg description="Permissions label">PermissionsZZZZZ</ui:msg>
       </g:Anchor>
       <g:SimplePanel ui:field="permissions"/>
 
