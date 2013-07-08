@@ -6,11 +6,8 @@
     ui:generateLocales="default">
 
 
-  <o:WorkbenchLayout>
-    <g:Label>
-      <ui:msg description="Reports title">Reports</ui:msg>
-    </g:Label>
-    <g:Label></g:Label>
+  <g:FlowPanel>
+    <g:FlowPanel ui:field="breadcrumbs" />
     <g:FlowPanel>
       <g:Button ui:field="reportTemplateButton" styleName="btn iconb i-plus">
         <ui:msg description="Add Report Template label">Add Report Template</ui:msg>
@@ -28,6 +25,6 @@
         <g:ScrollPanel ui:field="reportTemplateListPanel"/>
       </g:west>
     </g:SplitLayoutPanel>
-  </o:WorkbenchLayout>
+  </g:FlowPanel>
 
 </ui:UiBinder>

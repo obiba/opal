@@ -6,11 +6,8 @@
     ui:generateLocales="default">
 
 
-  <o:WorkbenchLayout>
-    <g:Label>
-      <ui:msg description="Functional Units title">Units</ui:msg>
-    </g:Label>
-    <g:Label></g:Label>
+  <g:FlowPanel>
+    <g:FlowPanel ui:field="breadcrumbs" />
     <g:FlowPanel>
       <g:FlowPanel styleName="btn-group">
         <g:Button ui:field="functionalUnitButton" styleName="btn iconb i-plus">
@@ -36,6 +33,6 @@
         <g:ScrollPanel ui:field="functionalUnitListPanel"/>
       </g:west>
     </g:SplitLayoutPanel>
-  </o:WorkbenchLayout>
+  </g:FlowPanel>
 
 </ui:UiBinder>

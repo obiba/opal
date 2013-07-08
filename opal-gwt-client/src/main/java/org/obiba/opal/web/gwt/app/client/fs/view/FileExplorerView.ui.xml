@@ -6,10 +6,7 @@
     ui:generateLocales="default">
 
   <o:WorkbenchLayout>
-    <g:Label>
-      <ui:msg description="Explorer">File Explorer</ui:msg>
-    </g:Label>
-    <g:Label></g:Label>
+    <g:FlowPanel ui:field="breadcrumbs" />
     <g:FlowPanel>
       <g:FlowPanel styleName="btn-group">
         <g:Button ui:field="createFolderButton" styleName="btn iconb i-plus">

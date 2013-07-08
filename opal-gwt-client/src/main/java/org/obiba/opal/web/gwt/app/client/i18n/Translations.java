@@ -1732,4 +1732,16 @@ public interface Translations extends Constants {
   @Description("Page File Explorer title")
   @DefaultStringValue("File Explorer")
   String pageFileExplorerTitle();
+
+  @Description("Page Functional Unit title")
+  @DefaultStringValue("Units")
+  String pageFunctionalUnitTitle();
+
+  @Description("Page Report Template title")
+  @DefaultStringValue("Reports")
+  String pageReportTemplatePage();
+
+  @Description("Page Jobs title")
+  @DefaultStringValue("Tasks")
+  String pageJobsTitle();
 }

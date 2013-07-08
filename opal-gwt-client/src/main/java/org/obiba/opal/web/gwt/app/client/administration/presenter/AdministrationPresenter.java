@@ -121,6 +121,13 @@ public class AdministrationPresenter
         getEventBus().fireEvent(new PlaceChangeEvent(Places.datashieldPlace));
       }
     });
+
+    getView().getReportsPlace().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        getEventBus().fireEvent(new PlaceChangeEvent(Places.reportTemplatesPlace));
+      }
+    });
   }
 
 }
