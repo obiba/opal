@@ -81,6 +81,14 @@ public final class Places {
     return admin;
   }
 
+  public static final String usersGroups = administration + ".users";
+
+  public static final Place usersGroupsPlace = new Place(usersGroups);
+
+  public static String usersGroups() {
+    return usersGroups;
+  }
+
   public static final String databases = "!admin.databases";
 
   public static final Place databasesPlace = new Place(databases);
@@ -89,7 +97,7 @@ public final class Places {
     return databases;
   }
 
-  public static final String index = administration  + ".index";
+  public static final String index = administration + ".index";
 
   public static final Place indexPlace = new Place(index);
 
@@ -97,7 +105,7 @@ public final class Places {
     return index;
   }
 
-  public static final String datashield = administration  + ".datashield";
+  public static final String datashield = administration + ".datashield";
 
   public static final Place datashieldPlace = new Place(datashield);
 
@@ -105,7 +113,7 @@ public final class Places {
     return datashield;
   }
 
-  public static final String r = administration  + ".r";
+  public static final String r = administration + ".r";
 
   public static final Place rPlace = new Place(r);
 
@@ -116,8 +124,8 @@ public final class Places {
   public static final class Place extends com.google.gwt.place.shared.Place {
 
     final String place;
-    private Map<String, String> params = new java.util.HashMap<String, String>();
 
+    private Map<String, String> params = new java.util.HashMap<String, String>();
 
     public Place(String name) {
       place = name;
@@ -133,7 +141,7 @@ public final class Places {
     }
 
     public Set<String> getParameterNames() {
-      if (params != null) {
+      if(params != null) {
         return params.keySet();
       } else {
         return Collections.emptySet();
@@ -143,11 +151,11 @@ public final class Places {
     public String getParameter(String key, String defaultValue) {
       String value = null;
 
-      if (params != null) {
+      if(params != null) {
         value = params.get(key);
       }
 
-      if (value == null) {
+      if(value == null) {
         value = defaultValue;
       }
       return value;

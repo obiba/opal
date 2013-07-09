@@ -14,8 +14,6 @@ import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseU
 import org.obiba.opal.web.gwt.app.client.administration.presenter.BreadcrumbDisplay;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -35,7 +33,6 @@ import org.obiba.opal.web.model.client.opal.AclAction;
 import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -101,6 +98,7 @@ public class DatabaseAdministrationPresenter extends
   }
 
   @ProxyEvent
+  @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(Resources.databases()).post()
         .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListDatabasesAuthorization())).send();
