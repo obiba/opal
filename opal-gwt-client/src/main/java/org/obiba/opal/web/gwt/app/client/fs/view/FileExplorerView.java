@@ -40,10 +40,10 @@ public class FileExplorerView extends ViewImpl implements Display {
   private final Widget widget;
 
   @UiField
-  ScrollPanel fileSystemTreePanel;
+  Panel fileSystemTreePanel;
 
   @UiField
-  ScrollPanel folderDetailsPanel;
+  Panel folderDetailsPanel;
 
   @UiField
   Button fileUploadButton;
