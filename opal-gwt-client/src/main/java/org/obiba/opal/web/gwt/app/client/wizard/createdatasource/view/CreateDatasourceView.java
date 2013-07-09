@@ -21,8 +21,9 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -80,10 +81,10 @@ public class CreateDatasourceView extends PopupViewImpl implements CreateDatasou
   }
 
   @Override
-  public void setInSlot(Object slot, Widget content) {
+  public void setInSlot(Object slot, IsWidget content) {
     datasourceFormStep.removeStepContent();
     if(content != null) {
-      datasourceFormStep.add(content);
+      datasourceFormStep.add(content.asWidget());
     }
   }
 

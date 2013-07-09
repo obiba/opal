@@ -30,8 +30,9 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -269,24 +270,26 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
 
   @Override
   @SuppressWarnings("PMD.NcssMethodCount")
-  public void setInSlot(Object slot, Widget content) {
+  public void setInSlot(Object slot, IsWidget content) {
     if(!(slot instanceof Slots)) return;
+    Widget wContent = content.asWidget();
+
     switch((Slots) slot) {
       case Destination:
         destinationSelectionStep.removeStepContent();
-        destinationSelectionStep.add(content);
+        destinationSelectionStep.add(wContent);
         break;
       case Unit:
         unitSelectionStep.removeStepContent();
-        unitSelectionStep.add(content);
+        unitSelectionStep.add(wContent);
         break;
       case Values:
         valuesStep.removeStepContent();
-        valuesStep.add(content);
+        valuesStep.add(wContent);
         break;
       case Archive:
         archiveStep.removeStepContent();
-        archiveStep.add(content);
+        archiveStep.add(wContent);
         break;
     }
   }

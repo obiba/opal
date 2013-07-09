@@ -11,7 +11,7 @@ package org.obiba.opal.web.gwt.app.client.validator;
 
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HasValue;
 
 /**

@@ -20,7 +20,7 @@ import org.obiba.opal.web.model.client.opal.LocaleDto;
 
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.shared.EventBus;
+import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.TextBoxBase;
 import com.google.inject.Inject;

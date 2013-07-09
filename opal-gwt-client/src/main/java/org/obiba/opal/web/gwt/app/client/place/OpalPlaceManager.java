@@ -1,7 +1,7 @@
 package org.obiba.opal.web.gwt.app.client.place;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.shared.EventBus;
+import com.google.web.bindery.event.shared.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.gwtplatform.mvp.client.proxy.PlaceManagerImpl;

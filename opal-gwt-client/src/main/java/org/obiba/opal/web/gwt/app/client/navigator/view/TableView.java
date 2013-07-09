@@ -45,7 +45,8 @@ import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -63,7 +64,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.gwtplatform.mvp.client.ViewImpl;
@@ -193,7 +194,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   }
 
   @Override
-  public void setInSlot(Object slot, Widget content) {
+  public void setInSlot(Object slot, IsWidget content) {
     HasWidgets panel = null;
     if(slot == Slots.Permissions) {
       panel = permissions;
@@ -203,7 +204,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     if(panel != null) {
       panel.clear();
       if(content != null) {
-        panel.add(content);
+        panel.add(content.asWidget());
       }
     }
   }

@@ -83,7 +83,7 @@ import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
 
-import com.google.gwt.event.shared.EventBus;
+import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
 import com.google.inject.Provider;

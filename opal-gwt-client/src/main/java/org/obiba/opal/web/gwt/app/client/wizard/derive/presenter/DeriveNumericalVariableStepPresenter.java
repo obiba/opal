@@ -35,8 +35,8 @@ import org.obiba.opal.web.model.client.math.SummaryStatisticsDto;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.View;

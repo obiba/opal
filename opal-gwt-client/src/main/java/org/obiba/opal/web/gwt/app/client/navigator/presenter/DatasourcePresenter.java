@@ -46,7 +46,7 @@ import org.obiba.opal.web.model.client.opal.AclAction;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.event.shared.EventBus;
+import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;

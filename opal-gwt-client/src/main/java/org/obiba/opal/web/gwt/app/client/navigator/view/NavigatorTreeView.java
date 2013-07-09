@@ -9,15 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.navigator.view;
 
-import com.github.gwtbootstrap.client.ui.NavLink;
-
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorTreePresenter;
-import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
+import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;

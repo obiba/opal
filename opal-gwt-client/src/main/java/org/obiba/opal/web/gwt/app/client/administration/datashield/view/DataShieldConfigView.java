@@ -29,6 +29,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
@@ -102,12 +103,12 @@ public class DataShieldConfigView extends ViewImpl implements DataShieldConfigPr
   }
 
   @Override
-  public void addToSlot(Object slot, Widget content) {
+  public void addToSlot(Object slot, IsWidget content) {
     if(slot == DataShieldConfigPresenter.AggregateEnvironmentSlot) {
-      environments.add(content, translations.dataShieldLabelsMap().get("Aggregate"));
+      environments.add(content.asWidget(), translations.dataShieldLabelsMap().get("Aggregate"));
     }
     if(slot == DataShieldConfigPresenter.AssignEnvironmentSlot) {
-      environments.add(content, translations.dataShieldLabelsMap().get("Assign"));
+      environments.add(content.asWidget(), translations.dataShieldLabelsMap().get("Assign"));
     }
     if(slot == DataShieldConfigPresenter.PackageSlot) {
       packages.clear();
@@ -116,7 +117,7 @@ public class DataShieldConfigView extends ViewImpl implements DataShieldConfigPr
   }
 
   @Override
-  public void setInSlot(Object slot, Widget content) {
+  public void setInSlot(Object slot, IsWidget content) {
     if(slot == DataShieldConfigPresenter.PermissionSlot) {
       permissions.clear();
       permissions.add(content);

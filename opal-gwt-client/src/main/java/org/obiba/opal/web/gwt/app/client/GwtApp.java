@@ -21,7 +21,7 @@ import org.obiba.opal.web.model.client.opal.Subject;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.shared.EventBus;
+import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.place.shared.PlaceChangeEvent;

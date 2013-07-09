@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.administration.database.presenter.Datab
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseAdministrationPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
@@ -32,6 +33,7 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.HasData;

@@ -20,7 +20,8 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasBeforeSelectionHandlers;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -243,13 +244,15 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
   }
 
   @Override
-  public void setInSlot(Object slot, Widget content) {
+  public void setInSlot(Object slot, IsWidget content) {
+    Widget wContent = content.asWidget();
+
     if(slot == Slots.Test) {
-      scriptWidgetPanel.add(content);
+      scriptWidgetPanel.add(wContent);
     } else if(slot == Slots.Categories) {
-      categories.add(content);
+      categories.add(wContent);
     } else if(slot == Slots.Attributes) {
-      attributes.add(content);
+      attributes.add(wContent);
     }
   }
 

@@ -17,6 +17,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
@@ -70,17 +71,17 @@ public class ConclusionStepView extends ViewImpl implements ConclusionStepPresen
   }
 
   @Override
-  public void addToSlot(Object slot, Widget content) {
+  public void addToSlot(Object slot, IsWidget content) {
     //To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
-  public void removeFromSlot(Object slot, Widget content) {
+  public void removeFromSlot(Object slot, IsWidget content) {
     //To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
-  public void setInSlot(Object slot, Widget content) {
+  public void setInSlot(Object slot, IsWidget content) {
     //To change body of implemented methods use File | Settings | File Templates.
   }
 

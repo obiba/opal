@@ -16,7 +16,7 @@ import java.util.List;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.google.gwt.event.shared.EventBus;
+import com.google.web.bindery.event.shared.EventBus;
 
 /**
  * Helper class to execute filter queries on variables. Will try to filter variables through ElasticSearch

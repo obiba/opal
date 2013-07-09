@@ -25,7 +25,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Ordering;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.ui.InlineLabel;
 

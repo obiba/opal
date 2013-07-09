@@ -25,7 +25,7 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.common.base.Strings;
-import com.google.gwt.event.shared.EventBus;
+import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.View;

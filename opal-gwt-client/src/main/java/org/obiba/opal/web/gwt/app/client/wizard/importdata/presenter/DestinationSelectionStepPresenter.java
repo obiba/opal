@@ -21,7 +21,7 @@ import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.shared.EventBus;
+import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;

@@ -15,8 +15,9 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -28,7 +29,7 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
 
@@ -104,11 +105,11 @@ public class FileSelectorView extends PopupViewImpl implements Display {
   }
 
   @Override
-  public void setInSlot(Object slot, Widget content) {
+  public void setInSlot(Object slot, IsWidget content) {
     HasWidgets panel = slot == FileSelectorPresenter.LEFT ? fileSystemTreePanel : folderDetailsPanel;
     panel.clear();
     if(content != null) {
-      panel.add(content);
+      panel.add(content.asWidget());
     }
   }
 

@@ -11,7 +11,7 @@ package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 
 import java.util.List;
 
-import com.google.gwt.event.shared.EventBus;
+import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;

@@ -7,6 +7,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
@@ -46,15 +47,15 @@ public class PageContainerView extends ViewImpl implements PageContainerPresente
   }
 
   @Override
-  public void addToSlot(Object slot, Widget content) {
+  public void addToSlot(Object slot, IsWidget content) {
   }
 
   @Override
-  public void removeFromSlot(Object slot, Widget content) {
+  public void removeFromSlot(Object slot, IsWidget content) {
   }
 
   @Override
-  public void setInSlot(Object slot, Widget content) {
+  public void setInSlot(Object slot, IsWidget content) {
     if (PageContainerPresenter.HEADER == slot) {
       header.clear();
       header.add(content);
