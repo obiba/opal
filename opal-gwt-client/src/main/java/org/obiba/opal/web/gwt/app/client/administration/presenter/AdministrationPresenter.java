@@ -19,8 +19,8 @@ import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
-public class AdministrationPresenter
-    extends Presenter<AdministrationPresenter.Display, AdministrationPresenter.Proxy> implements HasPageTitle {
+public class AdministrationPresenter extends Presenter<AdministrationPresenter.Display, AdministrationPresenter.Proxy>
+    implements HasPageTitle {
 
   @ProxyStandard
   @NameToken(Places.administration)
@@ -28,18 +28,31 @@ public class AdministrationPresenter
 
   public interface Display extends View, BreadcrumbDisplay {
     Anchor getUsersGroupsPlace();
+
     Anchor getUnitsPlace();
+
     Anchor getDatabasesPlace();
+
     Anchor getMongoDbPlace();
+
     Anchor getEsPlace();
+
     Anchor getIndexPlace();
+
     Anchor getRPlace();
+
     Anchor getDataShieldPlace();
+
     Anchor getPluginsPlace();
+
     Anchor getReportsPlace();
+
     Anchor getFilesPlace();
+
     Anchor getTasksPlace();
+
     Anchor getJavaPlace();
+
     Anchor getServerPlace();
   }
 
@@ -47,7 +60,6 @@ public class AdministrationPresenter
   // Data members
   //
   private static final Translations translations = GWT.create(Translations.class);
-
 
   @Inject
   public AdministrationPresenter(Display display, EventBus eventBus, Proxy proxy) {
@@ -65,12 +77,18 @@ public class AdministrationPresenter
     RevealContentEvent.fire(this, PageContainerPresenter.CONTENT, this);
   }
 
-
   //
   // Private Methods
   //
 
   private void addHandlers() {
+
+    getView().getUsersGroupsPlace().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        getEventBus().fireEvent(new PlaceChangeEvent(Places.usersGroupsPlace));
+      }
+    });
 
     getView().getDatabasesPlace().addClickHandler(new ClickHandler() {
       @Override
@@ -92,7 +110,6 @@ public class AdministrationPresenter
         getEventBus().fireEvent(new PlaceChangeEvent(Places.rPlace));
       }
     });
-
 
     getView().getUnitsPlace().addClickHandler(new ClickHandler() {
       @Override
