@@ -38,7 +38,7 @@
           <ui:msg description="Workbench label">The Workbench</ui:msg>
         </g:Label>
       </g:FlowPanel>
-      <b:FluidRow addStyleNames="footer content">
+      <b:FluidRow addStyleNames="footer content padding50-top">
         <b:Column size="6">
           <g:Anchor href="http://obiba.org" target="_blank">© 2013 OBiBa</g:Anchor>
         </b:Column>

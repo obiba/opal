@@ -31,6 +31,7 @@ import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.AbstractSafeHtmlCell;
 import com.google.gwt.cell.client.ClickableTextCell;
@@ -475,7 +476,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   private final class PreviousActionCell extends IconActionCell<String> {
 
     private PreviousActionCell() {
-      super(null, "(", new PreviousDelegate());
+      super(IconType.CHEVRON_LEFT, new PreviousDelegate());
     }
 
     @Override
@@ -488,7 +489,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   private final class NextActionCell extends IconActionCell<String> {
 
     private NextActionCell() {
-      super(null, ")", new NextDelegate());
+      super(IconType.CHEVRON_RIGHT, new NextDelegate());
     }
 
     @Override
