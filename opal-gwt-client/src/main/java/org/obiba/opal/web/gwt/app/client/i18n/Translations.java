@@ -1733,7 +1733,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("File Explorer")
   String pageFileExplorerTitle();
 
-<<<<<<< HEAD
   @Description("Page Functional Unit title")
   @DefaultStringValue("Units")
   String pageFunctionalUnitTitle();
@@ -1745,7 +1744,7 @@ public interface Translations extends Constants {
   @Description("Page Jobs title")
   @DefaultStringValue("Tasks")
   String pageJobsTitle();
-=======
+
   @Description("Page Users and Groups title")
   @DefaultStringValue("Users and Groups")
   String pageUsersAndGroupsTitle();
@@ -1769,9 +1768,6 @@ public interface Translations extends Constants {
   @Description("Group Users label")
   @DefaultStringValue("Users")
   String groupUsersLabel();
-<<<<<<< HEAD
->>>>>>> OPAL-1883: Adding a Users and Groups administration page
-=======
 
   @Description("Enabled label")
   @DefaultStringValue("enabled")
@@ -1780,5 +1776,4 @@ public interface Translations extends Constants {
   @Description("Disabled label")
   @DefaultStringValue("disabled")
   String disabledLabel();
->>>>>>> OPAL-1883: Users and groups CellTable
 }
