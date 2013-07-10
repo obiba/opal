@@ -34,7 +34,7 @@ public class OpalViewPersistenceStrategyTest {
   public void setUp() throws Exception {
     System.setProperty(OpalViewPersistenceStrategy.OPAL_HOME_SYSTEM_PROPERTY_NAME, getTestFilesRoot());
     viewPersistenceStrategy = new OpalViewPersistenceStrategy();
-    new MagmaEngine().extend(new MagmaXStreamExtension());
+    if(!MagmaEngine.isInstanciated()) new MagmaEngine().extend(new MagmaXStreamExtension());
   }
 
   @After

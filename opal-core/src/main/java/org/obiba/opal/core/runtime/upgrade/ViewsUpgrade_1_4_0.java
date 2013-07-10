@@ -94,7 +94,7 @@ public class ViewsUpgrade_1_4_0 extends AbstractUpgradeStep {
 
   @VisibleForTesting
   void readOpalConfiguration() {
-    new MagmaEngine().extend(new MagmaJsExtension()).extend(new MagmaXStreamExtension());
+    if(!MagmaEngine.isInstanciated()) new MagmaEngine().extend(new MagmaJsExtension()).extend(new MagmaXStreamExtension());
 
     Reader reader = null;
     try {
