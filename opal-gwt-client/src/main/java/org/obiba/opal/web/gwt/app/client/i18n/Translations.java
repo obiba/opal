@@ -107,7 +107,7 @@ public interface Translations extends Constants {
       "Clear", "Clear",//
       "View", "View",//
       "Remove", "Remove",//
-      "Publish methods", "Publish methods" })
+      "Publish methods", "Publish methods", "Permissions", "Permissions" })
   Map<String, String> actionMap();
 
   @Description("Permission map")
@@ -404,8 +404,8 @@ public interface Translations extends Constants {
       "CopyVariableNameColon", "Variable name '{0}' cannot contain ':'.",//
       "CopyVariableNameAlreadyExists", "Duplicate variable name: {0}.",//
       "CopyVariableIncompatibleEntityType", "Incompatible entity types: {0} / {1}",//
-      "SearchServiceUnavailable", "Search operation failed. Please make sure the service is started."//
-  })
+      "SearchServiceUnavailable", "Search operation failed. Please make sure the service is started.",//
+      "UserStatusChangedOk", "User {0} has been successfully {1}." })
   Map<String, String> userMessageMap();
 
   @Description("You must select a file message")
@@ -1769,5 +1769,16 @@ public interface Translations extends Constants {
   @Description("Group Users label")
   @DefaultStringValue("Users")
   String groupUsersLabel();
+<<<<<<< HEAD
 >>>>>>> OPAL-1883: Adding a Users and Groups administration page
+=======
+
+  @Description("Enabled label")
+  @DefaultStringValue("enabled")
+  String enabledLabel();
+
+  @Description("Disabled label")
+  @DefaultStringValue("disabled")
+  String disabledLabel();
+>>>>>>> OPAL-1883: Users and groups CellTable
 }

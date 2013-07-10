@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.celltable;
 
+import com.github.gwtbootstrap.client.ui.Icon;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.ActionCell;
 import com.google.gwt.cell.client.ValueUpdater;
@@ -42,11 +44,11 @@ public class IconActionCell<C> extends AbstractCell<C> {
     void executeMouseDown(NativeEvent event, T value);
   }
 
-  private final String iconClass;
+  protected final IconType iconType;
 
-  private final SafeHtml message;
+  protected final SafeHtml message;
 
-  private final Delegate<C> delegate;
+  protected Delegate<C> delegate;
 
   /**
    * Construct a new {@link ActionCell}.
@@ -54,19 +56,23 @@ public class IconActionCell<C> extends AbstractCell<C> {
    * @param iconClass the css class of the icon to display
    * @param delegate the delegate that will handle events
    */
-  public IconActionCell(String iconClass, Delegate<C> delegate) {
-    this(iconClass, "", delegate);
+  public IconActionCell(IconType iconType, Delegate<C> delegate) {
+    this(iconType, "", delegate);
   }
 
-  public IconActionCell(String iconClass, String text, Delegate<C> delegate) {
-    this(iconClass, SafeHtmlUtils.fromString(text), delegate);
+  public IconActionCell(IconType iconType, String text, Delegate<C> delegate) {
+    this(iconType, SafeHtmlUtils.fromString(text), delegate);
   }
 
-  public IconActionCell(String iconClass, SafeHtml message, Delegate<C> delegate) {
+  public IconActionCell(IconType iconType, SafeHtml message, Delegate<C> delegate) {
     super("click", "mousedown");
     this.delegate = delegate;
-    this.iconClass = iconClass == null ? "" : iconClass;
+    this.iconType = iconType;
     this.message = message;
+  }
+
+  public void setDelegate(Delegate<C> delegate) {
+    this.delegate = delegate;
   }
 
   @Override
@@ -97,20 +103,23 @@ public class IconActionCell<C> extends AbstractCell<C> {
 
   @Override
   public void render(Context context, C value, SafeHtmlBuilder sb) {
+
     if(isEnabled()) {
-      if(iconClass.isEmpty()) {
-        sb.append(SafeHtmlUtils.fromSafeConstant("<a class=\"icon\">")).append(message)
-            .append(SafeHtmlUtils.fromSafeConstant("</a>"));
+      if(iconType != null) {
+        Icon i = new Icon(iconType);
+        sb.append(SafeHtmlUtils.fromSafeConstant("<a class=\"iconb\">")).appendHtmlConstant(i.toString())
+            .append(message).append(SafeHtmlUtils.fromSafeConstant("</a>"));
       } else {
-        sb.append(SafeHtmlUtils.fromSafeConstant("<a class=\"iconb " + iconClass + "\">")).append(message)
+        sb.append(SafeHtmlUtils.fromSafeConstant("<a class=\"iconb\">")).append(message)
             .append(SafeHtmlUtils.fromSafeConstant("</a>"));
       }
     } else {
-      if(iconClass.isEmpty()) {
-        sb.append(SafeHtmlUtils.fromSafeConstant("<span class=\"icon disabled\">")).append(message)
-            .append(SafeHtmlUtils.fromSafeConstant("</span>"));
+      if(iconType != null) {
+        Icon i = new Icon(iconType);
+        sb.append(SafeHtmlUtils.fromSafeConstant("<span class=\"icon disabled\">")).appendHtmlConstant(i.toString())
+            .append(message).append(SafeHtmlUtils.fromSafeConstant("</span>"));
       } else {
-        sb.append(SafeHtmlUtils.fromSafeConstant("<span class=\"iconb " + iconClass + " disabled\">")).append(message)
+        sb.append(SafeHtmlUtils.fromSafeConstant("<span class=\"iconb disabled\">")).append(message)
             .append(SafeHtmlUtils.fromSafeConstant("</span>"));
       }
     }

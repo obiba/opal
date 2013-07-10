@@ -11,23 +11,27 @@ package org.obiba.opal.web.gwt.app.client.administration.user.view;
 
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
-import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsProvider;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.UserStatusIconActionCell;
 import org.obiba.opal.web.model.client.opal.GroupDto;
 import org.obiba.opal.web.model.client.opal.UserDto;
 
-import com.github.gwtbootstrap.client.ui.DropdownButton;
+import com.github.gwtbootstrap.client.ui.CellTable;
+import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
@@ -36,7 +40,10 @@ import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.ListDataProvider;
 import com.gwtplatform.mvp.client.ViewImpl;
 
-public class UserAdministrationView extends ViewImpl implements UserAdministrationPresenter.Display {
+import static com.github.gwtbootstrap.client.ui.constants.IconType.OK;
+import static org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserAdministrationPresenter.Display;
+
+public class UserAdministrationView extends ViewImpl implements Display {
 
   @UiTemplate("UserAdministrationView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, UserAdministrationView> {}
@@ -48,8 +55,21 @@ public class UserAdministrationView extends ViewImpl implements UserAdministrati
   private final Widget uiWidget;
 
   @UiField
-  DropdownButton actionsDropdown;
+  Panel usersPanel;
 
+  @UiField
+  Panel groupsPanel;
+
+  @UiField
+  NavLink usersLink;
+
+  @UiField
+  NavLink groupsLink;
+
+//  @UiField
+//  DropdownButton actionsDropdown;
+
+  //
   @UiField
   SimplePager indexTablePager;
 
@@ -66,10 +86,10 @@ public class UserAdministrationView extends ViewImpl implements UserAdministrati
 //  Anchor clearSelectionAnchor;
 
   @UiField
-  Table<UserDto> usersTable;
+  CellTable<UserDto> usersTable;
 
   @UiField
-  Table<GroupDto> groupsTable;
+  CellTable<GroupDto> groupsTable;
 
   @UiField
   Panel breadcrumbs;
@@ -78,26 +98,11 @@ public class UserAdministrationView extends ViewImpl implements UserAdministrati
 
   private final ListDataProvider<GroupDto> groupDataProvider = new ListDataProvider<GroupDto>();
 
-//  private final CheckboxColumn<UserDto> checkboxColumn;
-
-//  ActionsIndexColumn<UserDto> actionsColumn = new ActionsIndexColumn<UserDto>(
-//      new ActionsProvider<UserDto>() {
-//
-//        private final String[] all = new String[] { CLEAR_ACTION, INDEX_ACTION };
-//
-//        @Override
-//        public String[] allActions() {
-//          return all;
-//        }
-//
-//        @Override
-//        public String[] getActions(UserDto value) {
-//          return allActions();
-//        }
-//      });
+  Column<UserDto, UserDto> status;
 
   public UserAdministrationView() {
     uiWidget = uiBinder.createAndBindUi(this);
+    usersLink.setActive(true);
     indexTablePager.setDisplay(usersTable);
 
 //    checkboxColumn = new CheckboxColumn<TableIndexStatusDto>(new TableIndexStatusDtoDisplay());
@@ -107,10 +112,48 @@ public class UserAdministrationView extends ViewImpl implements UserAdministrati
 //        selectAllAlert.setVisible(object > 0);
 //      }
 //    });
-    usersTable.addColumn(UserColumns.name, translations.userNameLabel());
-    usersTable.addColumn(UserColumns.groups, translations.userGroupsLabel());
-    usersTable.addColumn(UserColumns.status, translations.userStatusLabel());
-//    indexTable.addColumn(actionsColumn, translations.actionsLabel());
+    Column<UserDto, String> name = new TextColumn<UserDto>() {
+
+      @Override
+      public String getValue(UserDto object) {
+        return object.getName();
+      }
+    };
+
+    Column<UserDto, String> groups = new TextColumn<UserDto>() {
+
+      @Override
+      public String getValue(UserDto object) {
+        return object.getGroupsCount() > 0 ? object.getGroupsArray().join(", ") : "";
+      }
+    };
+
+    status = new Column<UserDto, UserDto>(new UserStatusIconActionCell(OK, null)) {
+
+      @Override
+      public UserDto getValue(UserDto object) {
+        return object;
+      }
+    };
+    ActionsColumn<UserDto> actions = new ActionsColumn<UserDto>(new ActionsProvider<UserDto>() {
+
+      private final String[] all = new String[] { ActionsColumn.EDIT_ACTION, ActionsColumn.DELETE_ACTION,
+          PERMISSIONS_ACTION };
+
+      @Override
+      public String[] allActions() {
+        return all;
+      }
+
+      @Override
+      public String[] getActions(UserDto value) {
+        return allActions();
+      }
+    });
+    usersTable.addColumn(name, translations.userNameLabel());
+    usersTable.addColumn(groups, translations.userGroupsLabel());
+    usersTable.addColumn(status, translations.userStatusLabel());
+    usersTable.addColumn(actions, translations.actionsLabel());
     usersTable.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
 //    indexTable.setColumnWidth(checkboxColumn, 1, Style.Unit.PX);
 
@@ -119,7 +162,13 @@ public class UserAdministrationView extends ViewImpl implements UserAdministrati
     /*Groups*/
     groupsTable.addColumn(GroupColumns.name, translations.groupNameLabel());
     groupsTable.addColumn(GroupColumns.users, translations.groupUsersLabel());
+    groupsTable.addColumn(GroupColumns.actions, translations.actionsLabel());
     groupDataProvider.addDataDisplay(groupsTable);
+  }
+
+  @Override
+  public void setDelegate(IconActionCell.Delegate<UserDto> delegate) {
+    ((IconActionCell<UserDto>) status.getCell()).setDelegate(delegate);
   }
 
   @Override
@@ -131,10 +180,7 @@ public class UserAdministrationView extends ViewImpl implements UserAdministrati
   @Override
   public void clear() {
     renderUserRows((JsArray<UserDto>) JavaScriptObject.createArray());
-
     renderGroupRows((JsArray<GroupDto>) JavaScriptObject.createArray());
-//    checkboxColumn.getSelectionModel().clear();
-//    selectAllAlert.setVisible(false);
   }
 
   @Override
@@ -163,41 +209,78 @@ public class UserAdministrationView extends ViewImpl implements UserAdministrati
     breadcrumbs.add(new BreadcrumbsBuilder().setItems(items).build());
   }
 
-  private static final class UserColumns {
+  @Override
+  public HasClickHandlers getUsersLink() {
+    return usersLink;
+  }
 
-    static final Column<UserDto, String> name = new TextColumn<UserDto>() {
+  @Override
+  public void showUsers() {
+    usersLink.setActive(true);
+    usersPanel.setVisible(true);
+    groupsLink.setActive(false);
+    groupsPanel.setVisible(false);
+  }
 
-      @Override
-      public String getValue(UserDto object) {
-        return object.getName();
-      }
-    };
+  @Override
+  public void showGroups() {
+    usersLink.setActive(false);
+    usersPanel.setVisible(false);
+    groupsLink.setActive(true);
+    groupsPanel.setVisible(true);
+  }
 
-    static final Column<UserDto, String> groups = new TextColumn<UserDto>() {
+  @Override
+  public HasClickHandlers getGroupsLink() {
+    return groupsLink;
+  }
 
-      @Override
-      public String getValue(UserDto object) {
-        return object.getGroupsCount() > 0 ? object.getGroupsArray().join(", ") : "";
-      }
-    };
-
-    static final Column<UserDto, String> status = new TextColumn<UserDto>() {
-
-      @Override
-      public String getValue(UserDto object) {
-        return object.getEnabled() + "";
-      }
-    };
-
-//    static final Column<TableIndexStatusDto, String> status = new Column<TableIndexStatusDto, String>(
-//        new IndexStatusImageCell()) {
+//  private final class UserColumns {
+//
+//    final Column<UserDto, String> name = new TextColumn<UserDto>() {
 //
 //      @Override
-//      public String getValue(TableIndexStatusDto tableIndexStatusDto) {
-//        return IndexStatusImageCell.getSrc(tableIndexStatusDto);
+//      public String getValue(UserDto object) {
+//        return object.getName();
 //      }
 //    };
-  }
+//
+//    final Column<UserDto, String> groups = new TextColumn<UserDto>() {
+//
+//      @Override
+//      public String getValue(UserDto object) {
+//        return object.getGroupsCount() > 0 ? object.getGroupsArray().join(", ") : "";
+//      }
+//    };
+
+//    static final Column<UserDto, String> status = new Column<UserDto, String>(new IconActionCell<String>(IconType.MAP_MARKER, "", new IconActionCell.Delegate<String>() {
+//      @Override
+//      public void executeClick(NativeEvent event, String value) {
+//        //To change body of implemented methods use File | Settings | File Templates.
+//      }
+//
+//      @Override
+//      public void executeMouseDown(NativeEvent event, String value) {
+//        //To change body of implemented methods use File | Settings | File Templates.
+//      }
+//    })) {
+//
+//      @Override
+//      public String getValue(UserDto user) {
+//        return "image/16/bullet_black.png";
+//      }
+//    };
+
+//    static final Column<UserDto, String> status = new ValueColumn<UserDto, String>(
+//        new ClickableTextCell(new ClickableIconRenderer(IconType.DOWNLOAD)) {}) {
+//
+//      @Override
+//      public String getValue(UserDto object) {
+//        return "";
+//      }
+//    };
+
+//  }
 
   private static final class GroupColumns {
 
@@ -216,5 +299,26 @@ public class UserAdministrationView extends ViewImpl implements UserAdministrati
         return object.getUsersCount() > 0 ? object.getUsersArray().join(", ") : "";
       }
     };
+
+    static final ActionsColumn<GroupDto> actions = new ActionsColumn<GroupDto>(new ActionsProvider<GroupDto>() {
+
+      private final String[] all = new String[] { ActionsColumn.DELETE_ACTION, PERMISSIONS_ACTION };
+
+      private final String[] permissions = new String[] { PERMISSIONS_ACTION };
+
+      @Override
+      public String[] allActions() {
+        return all;
+      }
+
+      public String[] permissionsActions() {
+        return permissions;
+      }
+
+      @Override
+      public String[] getActions(GroupDto value) {
+        return value.getUsersCount() > 0 ? permissionsActions() : allActions();
+      }
+    });
   }
 }
