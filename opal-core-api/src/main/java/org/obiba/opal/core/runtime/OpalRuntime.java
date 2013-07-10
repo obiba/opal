@@ -17,6 +17,12 @@ import org.obiba.opal.fs.OpalFileSystem;
 
 public interface OpalRuntime {
 
+  String EXTENSIONS = System.getProperty("OPAL_HOME") + "/extensions";
+
+  String MAGMA_JS_EXTENSION = EXTENSIONS + "/magma-js";
+
+  String WEBAPP_EXTENSION = EXTENSIONS + "/webapp";
+
   Set<Service> getServices();
 
   OpalFileSystem getFileSystem();

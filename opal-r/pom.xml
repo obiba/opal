@@ -33,8 +33,8 @@
       <artifactId>magma-js</artifactId>
     </dependency>
     <dependency>
-      <groupId>rhino</groupId>
-      <artifactId>js</artifactId>
+      <groupId>org.mozilla</groupId>
+      <artifactId>rhino</artifactId>
     </dependency>
 
     <!-- R dependencies -->

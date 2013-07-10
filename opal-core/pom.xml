@@ -165,6 +165,10 @@
       <groupId>de.schlichtherle.io</groupId>
       <artifactId>truezip</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.mozilla</groupId>
+      <artifactId>rhino</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
