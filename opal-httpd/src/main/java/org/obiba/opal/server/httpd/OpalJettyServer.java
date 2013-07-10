@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.server.httpd;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -140,10 +141,12 @@ public class OpalJettyServer implements Service {
 
     HandlerList handlers = new HandlerList();
 
+    // Add webapp extensions
+    handlers.addHandler(createExtensionFileHandler(OpalRuntime.WEBAPP_EXTENSION));
     // Add a file handler that points to the Opal GWT client directory
-    handlers.addHandler(createFileHandler("/webapp"));
+    handlers.addHandler(createDistFileHandler("/webapp"));
     // Add a file handler that points to the Opal BIRT extension update-site
-    handlers.addHandler(createFileHandler("/update-site"));
+    handlers.addHandler(createDistFileHandler("/update-site"));
 
     handlers.addHandler(contextHandler = createServletHandler(ctx, txmgr, securityMgr));
     server.setHandler(handlers);
@@ -228,8 +231,21 @@ public class OpalJettyServer implements Service {
     return contextHandler;
   }
 
-  private Handler createFileHandler(String directory) {
-    String fileUrl = "file://" + System.getProperty("OPAL_DIST") + directory;
+  private Handler createDistFileHandler(String directory) {
+    return createFileHandler("file://" + System.getProperty("OPAL_DIST") + directory);
+  }
+
+  private Handler createExtensionFileHandler(String filePath) {
+    File file = new File(filePath);
+    if(!file.exists()) {
+      if(!file.mkdirs()) {
+        throw new RuntimeException("Cannot create extensions directory: " + file.getAbsolutePath());
+      }
+    }
+    return createFileHandler("file://" + filePath);
+  }
+
+  private Handler createFileHandler(String fileUrl) {
     ResourceHandler resourceHandler = new ResourceHandler();
     try {
       resourceHandler.setBaseResource(new FileResource(new URL(fileUrl)));
