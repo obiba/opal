@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.presenter;
 
 import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -58,7 +59,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
   }
 
   @ProxyStandard
-  @NameToken("login")
+  @NameToken(Places.login)
   @NoGatekeeper
   public interface Proxy extends ProxyPlace<LoginPresenter> {}
 

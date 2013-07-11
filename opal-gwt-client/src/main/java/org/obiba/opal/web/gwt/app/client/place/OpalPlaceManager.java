@@ -31,6 +31,6 @@ public class OpalPlaceManager extends PlaceManagerImpl {
 
   @Override
   public void revealUnauthorizedPlace(String unauthorizedHistoryToken) {
-    revealPlace(new PlaceRequest.Builder().nameToken("login").build(), false);
+    revealPlace(new PlaceRequest.Builder().nameToken(Places.login).build(), false);
   }
 }

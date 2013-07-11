@@ -18,7 +18,6 @@ package org.obiba.opal.web.gwt.app.client;
 //import org.obiba.opal.web.gwt.rest.client.event.RequestEventBus;
 //import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 //import org.obiba.opal.web.model.client.opal.Subject;
-//
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 //import com.google.web.bindery.event.shared.EventBus;
