@@ -48,7 +48,8 @@ public class ScriptEvaluationPopupPresenter extends PresenterWidget<ScriptEvalua
 
       @Override
       public void onSuccess(VariableDto variable) {
-        RevealRootPopupContentEvent.fire(getEventBus(), ScriptEvaluationPopupPresenter.this);
+        RevealRootPopupContentEvent.fire(ScriptEvaluationPopupPresenter.this, ScriptEvaluationPopupPresenter.this);
+//        RevealRootPopupContentEvent.fire(getEventBus(), ScriptEvaluationPopupPresenter.this);
       }
 
       @Override

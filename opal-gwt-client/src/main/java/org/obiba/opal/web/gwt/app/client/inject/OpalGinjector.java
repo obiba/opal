@@ -97,9 +97,9 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
     ReportsModule.class, UnitsModule.class, ImportIdentifiersWizardModule.class })
 public interface OpalGinjector extends Ginjector {
 
-  EventBus getOldEventBus();
+  com.google.gwt.event.shared.EventBus getOldEventBus();
 
-  com.google.gwt.event.shared.EventBus getEventBus();
+  EventBus getEventBus();
 
   PlaceManager getPlaceManager();
 

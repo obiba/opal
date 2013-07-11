@@ -105,7 +105,7 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
   }
 
   @Override
-  public void setInSlot(Object slot, Widget content) {
+  public void setInSlot(Object slot, IsWidget content) {
     if(slot == Display.Slots.Permissions) {
       permissions.clear();
       permissions.add(content);

@@ -16,7 +16,7 @@ public class OpalPlaceManager extends PlaceManagerImpl {
   @Inject
   public OpalPlaceManager(EventBus eventBus, TokenFormatter tokenFormatter, @DefaultPlace String defaultNameToken) {
     super(eventBus, tokenFormatter);
-    defaultPlaceRequest = new PlaceRequest(defaultNameToken);
+    defaultPlaceRequest =  new PlaceRequest.Builder().nameToken(defaultNameToken).build();
   }
 
   @Override
@@ -31,6 +31,6 @@ public class OpalPlaceManager extends PlaceManagerImpl {
 
   @Override
   public void revealUnauthorizedPlace(String unauthorizedHistoryToken) {
-    revealPlace(new PlaceRequest("login"), false);
+    revealPlace(new PlaceRequest.Builder().nameToken("login").build(), false);
   }
 }

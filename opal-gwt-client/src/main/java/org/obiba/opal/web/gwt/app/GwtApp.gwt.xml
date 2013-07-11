@@ -19,15 +19,18 @@
 
   <!-- Use an MVP pattern framework -->
   <inherits name='com.google.gwt.place.Place'/>
-  <!--<inherits name='net.customware.gwt.presenter.Presenter'/>-->
-  <inherits name='com.gwtplatform.mvp.Mvp'/>
 
   <!-- GWT Bootstrap -->
   <inherits name='com.google.gwt.user.theme.standard.Standard'/>
   <inherits name='com.github.gwtbootstrap.Bootstrap'/>
 
-  <define-configuration-property name='gin.ginjector' is-multi-valued='false'/>
-  <set-configuration-property name='gin.ginjector' value='org.obiba.opal.web.gwt.app.client.inject.OpalGinjector'/>
+
+  <!-- Specify the app entry point class. -->
+  <!-- <inherits name='com.gwtplatform.mvp.MvpWithEntryPoint'/> -->
+  <inherits name='com.gwtplatform.mvp.Mvp'/>
+  <entry-point class='org.obiba.opal.web.gwt.app.client.GwtApp'/>
+
+  <set-configuration-property name="gin.ginjector.modules" value="org.obiba.opal.web.gwt.app.client.inject.OpalGinModule"/>
 
   <!-- Client-side REST framework -->
   <inherits name='org.obiba.opal.web.gwt.rest.Rest'/>
@@ -62,12 +65,12 @@
   <!-- Oen Layers Mapping -->
   <inherits name='org.gwtopenmaps.openlayers.OpenLayers'/>
 
-  <!-- Specify the app entry point class. -->
-  <entry-point class='org.obiba.opal.web.gwt.app.client.GwtApp'/>
-
   <extend-property name='locale' values='fr'/>
   <extend-property name='locale' values='en'/>
   <set-property-fallback name='locale' value='en'/>
+
+  <!-- <set-configuration-property name="gwtp.bootstrapper" value="org.obiba.opal.web.gwt.app.client.OpalBootstrapperImpl"/> -->
+
 
   <!-- Specific impl for IE -->
   <replace-with class='org.obiba.opal.web.gwt.app.client.view.IELoginView'>
@@ -79,6 +82,6 @@
   </replace-with>
 
   <!-- This will limit the compile to a single browser: Firefox 3.x -->
-  <!--<set-property name='user.agent' value='gecko1_8'/>-->
+  <set-property name='user.agent' value='gecko1_8'/>
 
 </module>

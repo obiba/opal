@@ -14,6 +14,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  *
@@ -38,5 +39,5 @@ public class SelectScriptVariablesTabViewHelp extends Composite {
   //
 
   @UiTemplate("SelectScriptVariablesTabViewHelp.ui.xml")
-  interface ViewUiBinder extends UiBinder<IsWidget, SelectScriptVariablesTabViewHelp> {}
+  interface ViewUiBinder extends UiBinder<Widget, SelectScriptVariablesTabViewHelp> {}
 }
