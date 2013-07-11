@@ -25,6 +25,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HasWidgets;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -90,11 +91,11 @@ public class FileExplorerView extends ViewImpl implements Display {
   }
 
   @Override
-  public void setInSlot(Object slot, Widget content) {
+  public void setInSlot(Object slot, IsWidget content) {
     HasWidgets panel = slot == SplitPaneWorkbenchPresenter.Slot.LEFT ? fileSystemTreePanel : folderDetailsPanel;
     panel.clear();
     if(content != null) {
-      panel.add(content);
+      panel.add(content.asWidget());
     }
   }
 

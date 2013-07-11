@@ -4,7 +4,7 @@
 <module>
   <!-- Inherit the core Web Toolkit stuff. -->
   <inherits name='com.google.gwt.user.User'/>
-  <inherits name="org.obiba.opal.web.gwt.app.GwtApp"/>
+  <!--<inherits name="org.obiba.opal.web.gwt.app.GwtApp"/>-->
 
   <!--
     This tells GWT to use this concrete implementation whenever a call to GWT.create() is made for the interface type.

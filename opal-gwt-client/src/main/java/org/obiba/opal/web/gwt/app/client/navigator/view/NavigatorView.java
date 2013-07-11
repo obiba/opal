@@ -23,8 +23,9 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -91,7 +92,7 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   }
 
   @Override
-  public void addToSlot(Object slot, Widget content) {
+  public void addToSlot(Object slot, IsWidget content) {
     if(slot == NavigatorPresenter.LEFT_PANE) {
       breadcrumb.add(content);
     } else {
@@ -100,7 +101,7 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   }
 
   @Override
-  public void removeFromSlot(Object slot, Widget content) {
+  public void removeFromSlot(Object slot, IsWidget content) {
     if(slot == NavigatorPresenter.LEFT_PANE) {
       breadcrumb.remove(content);
     } else {
@@ -109,7 +110,7 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   }
 
   @Override
-  public void setInSlot(Object slot, Widget content) {
+  public void setInSlot(Object slot, IsWidget content) {
     if(slot == NavigatorPresenter.LEFT_PANE) {
       breadcrumb.clear();
       breadcrumb.add(content);

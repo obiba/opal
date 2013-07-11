@@ -10,7 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard;
 
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.PopupView;
 
 public interface WizardView extends PopupView {

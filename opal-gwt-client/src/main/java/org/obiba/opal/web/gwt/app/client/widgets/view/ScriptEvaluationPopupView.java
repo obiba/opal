@@ -15,7 +15,8 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -69,10 +70,10 @@ public class ScriptEvaluationPopupView extends PopupViewImpl implements Display 
   }
 
   @Override
-  public void setInSlot(Object slot, Widget display) {
+  public void setInSlot(Object slot, IsWidget display) {
     if(slot == Slots.Evaluation) {
       ScrollPanel scroll = new ScrollPanel();
-      display.addStyleName("small-dual-indent");
+      display.asWidget().addStyleName("small-dual-indent");
       scroll.add(display);
       content.add(scroll);
     }

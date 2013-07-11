@@ -20,6 +20,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
@@ -79,15 +80,15 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   }
 
   @Override
-  public void addToSlot(Object slot, Widget content) {
+  public void addToSlot(Object slot, IsWidget content) {
   }
 
   @Override
-  public void removeFromSlot(Object slot, Widget content) {
+  public void removeFromSlot(Object slot, IsWidget content) {
   }
 
   @Override
-  public void setInSlot(Object slot, Widget content) {
+  public void setInSlot(Object slot, IsWidget content) {
   }
 
   @Override

@@ -15,11 +15,20 @@ import java.util.Set;
 
 public final class Places {
 
+  private Places() {}
+
+  public static final String login = "!login";
+
+  public static final Place loginPlace = new Place(login);
+
+  public static String login() {
+    return dashboard;
+  }
+
   public static final String dashboard = "!dashboard";
 
   public static final Place dashboardPlace = new Place(dashboard);
 
-  private Places() {}
 
   public static String dashboard() {
     return dashboard;

@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.CharacterSetDisplay;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public class CharacterSetView extends Composite implements CharacterSetDisplay {
@@ -40,16 +41,16 @@ public class CharacterSetView extends Composite implements CharacterSetDisplay {
   }
 
   @Override
-  public void addToSlot(Object slot, Widget content) {
+  public void addToSlot(Object slot, IsWidget content) {
   }
 
   @Override
-  public void removeFromSlot(Object slot, Widget content) {
+  public void removeFromSlot(Object slot, IsWidget content) {
 
   }
 
   @Override
-  public void setInSlot(Object slot, Widget content) {
+  public void setInSlot(Object slot, IsWidget content) {
 
   }
 
