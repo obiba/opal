@@ -27,7 +27,6 @@ public abstract class WizardProxy<W extends WizardPresenterWidget<?>> {
         W w = wizardProvider.get();
         w.onWizardRequired(event);
         eventBus.fireEventFromSource(new RevealRootPopupContentEvent(w), proxy);
-//        RevealRootPopupContentEvent.fire(proxy, w, true);
       }
     });
   }

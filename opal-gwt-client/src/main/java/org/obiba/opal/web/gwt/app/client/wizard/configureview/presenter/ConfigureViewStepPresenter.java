@@ -193,7 +193,11 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
       // Set the variables tab widget according to the received ViewDto type.
       setInSlot(Display.Slots.Variables, getVariablesTabWidget());
 
-      RevealRootPopupContentEvent.fire(this, ConfigureViewStepPresenter.this);
+      // TODO: migration code below must be verified and if OK line below must be removed
+      //RevealRootPopupContentEvent.fire(getEventBus(), ConfigureViewStepPresenter.this);
+      getEventBus().fireEventFromSource(new RevealRootPopupContentEvent(ConfigureViewStepPresenter.this),
+          ConfigureViewStepPresenter.this);
+
       if(event.getVariable() != null) {
         getView().displayTab(1);
       }
