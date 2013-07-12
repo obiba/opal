@@ -35,7 +35,9 @@ import org.obiba.opal.web.gwt.app.client.administration.presenter.Administration
 import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.view.RAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.user.view.UserAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.user.view.UserView;
 import org.obiba.opal.web.gwt.app.client.administration.view.AdministrationView;
 
 import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
@@ -76,8 +78,10 @@ public class AdministrationModule extends AbstractPresenterModule {
     bindPresenterWidget(DataShieldMethodPresenter.class, DataShieldMethodPresenter.Display.class,
         DataShieldMethodView.class);
 
+    // User and Groups
     bindPresenter(UserAdministrationPresenter.class, UserAdministrationPresenter.Display.class,
         UserAdministrationView.class, UserAdministrationPresenter.Proxy.class);
+    bindPresenterWidget(UserPresenter.class, UserPresenter.Display.class, UserView.class);
   }
 
 }

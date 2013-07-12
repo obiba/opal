@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.celltable;
 
-import org.obiba.opal.web.model.client.opal.UserDto;
+import org.obiba.opal.web.model.client.opal.GroupDto;
 
 import com.github.gwtbootstrap.client.ui.Icon;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
@@ -19,16 +19,20 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 /**
  * A cell that renders a button and takes a delegate to perform actions on mouseUp.
  */
-public class UserStatusIconActionCell extends IconActionCell<UserDto> {
+public class GroupStatusIconActionCell extends IconActionCell<GroupDto> {
 
-  public UserStatusIconActionCell(IconType iconType, Delegate delegate) {
+  public GroupStatusIconActionCell(IconType iconType, Delegate delegate) {
     super(iconType, delegate);
   }
 
-  @Override
-  public void render(Context context, UserDto value, SafeHtmlBuilder sb) {
+  public boolean isEnabled(GroupDto groupDto) {
+    return false;
+  }
 
-    if(value.getEnabled()) {
+  @Override
+  public void render(Context context, GroupDto value, SafeHtmlBuilder sb) {
+
+    if(isEnabled(value)) {
       Icon i = new Icon(iconType);
       sb.append(SafeHtmlUtils.fromSafeConstant("<a class=\"icon\">")).appendHtmlConstant(i.toString()).append(message)
           .append(SafeHtmlUtils.fromSafeConstant("</a>"));
