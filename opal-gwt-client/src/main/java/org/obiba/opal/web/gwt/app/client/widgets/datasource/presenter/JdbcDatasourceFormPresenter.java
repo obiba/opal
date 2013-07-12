@@ -19,7 +19,7 @@ import org.obiba.opal.web.model.client.magma.JdbcDatasourceSettingsDto;
 import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.shared.EventBus;
+import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;

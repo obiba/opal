@@ -17,6 +17,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.HasWidgets;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -55,7 +56,7 @@ public class AuthorizationView extends ViewImpl implements AuthorizationPresente
   }
 
   @Override
-  public void setInSlot(Object slot, Widget content) {
+  public void setInSlot(Object slot, IsWidget content) {
     HasWidgets panel = null;
     if(slot == Slots.User) {
       panel = users;
@@ -65,7 +66,7 @@ public class AuthorizationView extends ViewImpl implements AuthorizationPresente
     if(panel != null) {
       panel.clear();
       if(content != null) {
-        panel.add(content);
+        panel.add(content.asWidget());
       }
     }
   }

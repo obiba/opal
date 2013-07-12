@@ -83,7 +83,7 @@ import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
 
-import com.google.gwt.event.shared.EventBus;
+import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
 import com.google.inject.Provider;
@@ -97,9 +97,9 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
     ReportsModule.class, UnitsModule.class, ImportIdentifiersWizardModule.class })
 public interface OpalGinjector extends Ginjector {
 
-  EventBus getOldEventBus();
+  com.google.gwt.event.shared.EventBus getOldEventBus();
 
-  com.google.gwt.event.shared.EventBus getEventBus();
+  EventBus getEventBus();
 
   PlaceManager getPlaceManager();
 

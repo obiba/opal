@@ -15,7 +15,8 @@ import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.SelectSc
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -67,7 +68,7 @@ public class SelectScriptVariablesTabView extends ViewImpl implements SelectScri
   }
 
   @Override
-  public void setInSlot(Object slot, Widget content) {
+  public void setInSlot(Object slot, IsWidget content) {
     if(slot == Slots.Test) {
       scriptWidgetPanel.add(content);
     }

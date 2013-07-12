@@ -35,6 +35,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.InlineLabel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
@@ -155,7 +156,7 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
   }
 
   @Override
-  public void setInSlot(Object slot, Widget content) {
+  public void setInSlot(Object slot, IsWidget content) {
     HasWidgets panel = null;
     if(slot == Slots.Permissions) {
       panel = permissions;
@@ -165,7 +166,7 @@ public class VariableView extends ViewImpl implements VariablePresenter.Display 
     if(panel != null) {
       panel.clear();
       if(content != null) {
-        panel.add(content);
+        panel.add(content.asWidget());
       }
     }
   }

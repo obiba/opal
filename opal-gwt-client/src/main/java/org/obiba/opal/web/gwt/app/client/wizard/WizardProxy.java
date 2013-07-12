@@ -11,20 +11,22 @@ package org.obiba.opal.web.gwt.app.client.wizard;
 
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 
-import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.GwtEvent;
 import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.proxy.RevealRootPopupContentEvent;
 
 public abstract class WizardProxy<W extends WizardPresenterWidget<?>> {
 
   protected WizardProxy(final EventBus eventBus, WizardType type, final Provider<W> wizardProvider) {
+    final WizardProxy proxy = this;
     eventBus.addHandler(type, new WizardRequiredEvent.Handler() {
 
       @Override
       public void onWizardRequired(WizardRequiredEvent event) {
         W w = wizardProvider.get();
         w.onWizardRequired(event);
-        RevealRootPopupContentEvent.fire(eventBus, w);
+        eventBus.fireEventFromSource(new RevealRootPopupContentEvent(w), proxy);
       }
     });
   }

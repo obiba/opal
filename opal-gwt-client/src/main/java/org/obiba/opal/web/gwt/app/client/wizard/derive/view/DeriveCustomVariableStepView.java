@@ -22,6 +22,7 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
 
@@ -64,10 +65,10 @@ public class DeriveCustomVariableStepView extends ViewImpl implements DeriveCust
   }
 
   @Override
-  public void setInSlot(Object slot, Widget content) {
+  public void setInSlot(Object slot, IsWidget content) {
     if(slot == Slots.Editor) {
       scriptEditor.clear();
-      scriptEditor.add(content);
+      scriptEditor.add(content.asWidget());
     }
   }
 

@@ -11,7 +11,7 @@ package org.obiba.opal.web.gwt.rest.client.authorization;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 
-import com.google.gwt.event.shared.EventBus;
+import com.google.web.bindery.event.shared.EventBus;
 
 /**
  * Dummy helper class with default implementation.

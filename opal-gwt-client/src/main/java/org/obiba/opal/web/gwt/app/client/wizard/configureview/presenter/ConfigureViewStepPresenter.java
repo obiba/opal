@@ -29,8 +29,10 @@ import com.google.gwt.event.logical.shared.BeforeSelectionEvent;
 import com.google.gwt.event.logical.shared.BeforeSelectionHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.HasHandlers;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.DeckPanel;
@@ -40,7 +42,8 @@ import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.proxy.RevealRootPopupContentEvent;
 
-public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewStepPresenter.Display> {
+public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewStepPresenter.Display>
+    implements HasHandlers {
 
   private final DataTabPresenter dataTabPresenter;
 
@@ -178,7 +181,7 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
 
   }
 
-  class ViewConfigurationRequiredHandler implements ViewConfigurationRequiredEvent.Handler {
+  class ViewConfigurationRequiredHandler implements ViewConfigurationRequiredEvent.Handler, HasHandlers {
 
     @Override
     public void onViewConfigurationRequired(ViewConfigurationRequiredEvent event) {
@@ -190,7 +193,11 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
       // Set the variables tab widget according to the received ViewDto type.
       setInSlot(Display.Slots.Variables, getVariablesTabWidget());
 
-      RevealRootPopupContentEvent.fire(getEventBus(), ConfigureViewStepPresenter.this);
+      // TODO: migration code below must be verified and if OK line below must be removed
+      //RevealRootPopupContentEvent.fire(getEventBus(), ConfigureViewStepPresenter.this);
+      getEventBus().fireEventFromSource(new RevealRootPopupContentEvent(ConfigureViewStepPresenter.this),
+          ConfigureViewStepPresenter.this);
+
       if(event.getVariable() != null) {
         getView().displayTab(1);
       }
@@ -214,6 +221,11 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
       }
 
       return variablesTabWidget;
+    }
+
+    @Override
+    public void fireEvent(GwtEvent<?> event) {
+      //To change body of implemented methods use File | Settings | File Templates.
     }
   }
 
