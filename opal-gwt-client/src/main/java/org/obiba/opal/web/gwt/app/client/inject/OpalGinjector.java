@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPre
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
@@ -83,10 +84,10 @@ import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
 
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
 import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.annotations.DefaultGatekeeper;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
@@ -249,4 +250,6 @@ public interface OpalGinjector extends Ginjector {
   Provider<PageContainerPresenter> getPageContainerPresenter();
 
   Provider<UserAdministrationPresenter> getUserAdministrationPresenter();
+
+  Provider<UserPresenter> getUserPresenter();
 }

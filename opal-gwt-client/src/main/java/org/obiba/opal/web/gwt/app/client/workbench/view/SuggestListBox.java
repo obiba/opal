@@ -9,12 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.workbench.view.CloseableList.ItemRemovedHandler;
 
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.BlurEvent;
-import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.FocusEvent;
@@ -27,7 +26,6 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle;
 
@@ -112,6 +110,10 @@ public class SuggestListBox extends FocusPanel {
     return suggestBox;
   }
 
+  public List<String> getSelectedItemsTexts() {
+    return closeables.getItemTexts();
+  }
+
   private void rebuildSuggestBox() {
     if(suggestBox != null) {
       // do this because not able to clear suggest box text
@@ -159,6 +161,10 @@ public class SuggestListBox extends FocusPanel {
 
   public boolean addItem(String text, VariableSearchListItem.ItemType type) {
     return closeables.addItem(text, false, type);
+  }
+
+  public boolean addItem(String text) {
+    return closeables.addItem(text, false);
   }
 
   public SuggestOracle getSuggestOracle() {

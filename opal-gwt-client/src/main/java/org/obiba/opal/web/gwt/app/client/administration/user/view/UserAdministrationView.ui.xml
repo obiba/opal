@@ -34,7 +34,7 @@
           <ui:msg description="Manage users label">Manage locally defined users.</ui:msg>
         </g:InlineLabel>
         <g:HorizontalPanel addStyleNames="content">
-          <b:Button icon="PLUS" size="SMALL">
+          <b:Button icon="PLUS" size="SMALL" ui:field="addUser">
             <ui:msg description="Add user button label">Add User</ui:msg>
           </b:Button>
         </g:HorizontalPanel>

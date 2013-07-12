@@ -76,7 +76,14 @@ public class UserResource {
     for(String g : userDto.getGroupsList()) {
       Group group = userService.getGroupWithName(g);
 
-      if(group == null) return Response.status(Response.Status.NOT_FOUND).build();
+      if(group == null) {
+        // Create group
+        Group newGroup = new Group();
+        newGroup.setName(g);
+        userService.createGroup(newGroup);
+
+        group = newGroup;
+      }
 
       u.addGroup(group);
     }
@@ -108,7 +115,10 @@ public class UserResource {
     }
 
     User u = userService.getUserWithName(name);
-    u.clearGroups();
+    if(u.getGroups() != null) {
+      u.clearGroups();
+    }
+
     u.setEnabled(userDto.getEnabled());
 
     if(userDto.hasPassword()) {
@@ -118,7 +128,13 @@ public class UserResource {
     for(String g : userDto.getGroupsList()) {
       Group group = userService.getGroupWithName(g);
 
-      if(group == null) return Response.status(Response.Status.NOT_FOUND).build();
+      if(group == null) {
+        // Create group
+        Group newGroup = new Group();
+        newGroup.setName(g);
+        userService.createGroup(newGroup);
+        group = newGroup;
+      }
 
       u.addGroup(group);
     }

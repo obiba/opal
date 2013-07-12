@@ -16,11 +16,13 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsProvider;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.UserStatusIconActionCell;
 import org.obiba.opal.web.model.client.opal.GroupDto;
 import org.obiba.opal.web.model.client.opal.UserDto;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CellTable;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.SimplePager;
@@ -66,6 +68,8 @@ public class UserAdministrationView extends ViewImpl implements Display {
   @UiField
   NavLink groupsLink;
 
+  @UiField
+  Button addUser;
 //  @UiField
 //  DropdownButton actionsDropdown;
 
@@ -99,6 +103,8 @@ public class UserAdministrationView extends ViewImpl implements Display {
   private final ListDataProvider<GroupDto> groupDataProvider = new ListDataProvider<GroupDto>();
 
   Column<UserDto, UserDto> status;
+
+  ActionsColumn<UserDto> actions;
 
   public UserAdministrationView() {
     uiWidget = uiBinder.createAndBindUi(this);
@@ -135,7 +141,7 @@ public class UserAdministrationView extends ViewImpl implements Display {
         return object;
       }
     };
-    ActionsColumn<UserDto> actions = new ActionsColumn<UserDto>(new ActionsProvider<UserDto>() {
+    actions = new ActionsColumn<UserDto>(new ActionsProvider<UserDto>() {
 
       private final String[] all = new String[] { ActionsColumn.EDIT_ACTION, ActionsColumn.DELETE_ACTION,
           PERMISSIONS_ACTION };
@@ -235,52 +241,15 @@ public class UserAdministrationView extends ViewImpl implements Display {
     return groupsLink;
   }
 
-//  private final class UserColumns {
-//
-//    final Column<UserDto, String> name = new TextColumn<UserDto>() {
-//
-//      @Override
-//      public String getValue(UserDto object) {
-//        return object.getName();
-//      }
-//    };
-//
-//    final Column<UserDto, String> groups = new TextColumn<UserDto>() {
-//
-//      @Override
-//      public String getValue(UserDto object) {
-//        return object.getGroupsCount() > 0 ? object.getGroupsArray().join(", ") : "";
-//      }
-//    };
+  @Override
+  public HasClickHandlers getAddUserButton() {
+    return addUser;
+  }
 
-//    static final Column<UserDto, String> status = new Column<UserDto, String>(new IconActionCell<String>(IconType.MAP_MARKER, "", new IconActionCell.Delegate<String>() {
-//      @Override
-//      public void executeClick(NativeEvent event, String value) {
-//        //To change body of implemented methods use File | Settings | File Templates.
-//      }
-//
-//      @Override
-//      public void executeMouseDown(NativeEvent event, String value) {
-//        //To change body of implemented methods use File | Settings | File Templates.
-//      }
-//    })) {
-//
-//      @Override
-//      public String getValue(UserDto user) {
-//        return "image/16/bullet_black.png";
-//      }
-//    };
-
-//    static final Column<UserDto, String> status = new ValueColumn<UserDto, String>(
-//        new ClickableTextCell(new ClickableIconRenderer(IconType.DOWNLOAD)) {}) {
-//
-//      @Override
-//      public String getValue(UserDto object) {
-//        return "";
-//      }
-//    };
-
-//  }
+  @Override
+  public HasActionHandler<UserDto> getActions() {
+    return actions;
+  }
 
   private static final class GroupColumns {
 
