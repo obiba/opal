@@ -12,9 +12,13 @@ package org.obiba.opal.web.gwt.app.client.administration.user.presenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.BreadcrumbDisplay;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
+import org.obiba.opal.web.gwt.app.client.administration.user.event.UsersRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -37,6 +41,7 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.view.client.HasData;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
@@ -51,6 +56,8 @@ public class UserAdministrationPresenter
   @ProxyStandard
   @NameToken(Places.usersGroups)
   public interface Proxy extends ProxyPlace<UserAdministrationPresenter> {}
+
+  private final Provider<UserPresenter> userPresenter;
 
   public interface Display extends View, BreadcrumbDisplay {
 
@@ -70,13 +77,13 @@ public class UserAdministrationPresenter
 
     void clear();
 
-//    DropdownButton getActionsDropdown();
-
-//    HasActionHandler<TableIndexStatusDto> getActions();
+    HasClickHandlers getAddUserButton();
 
     void setDelegate(IconActionCell.Delegate<UserDto> delegate);
 
     HasData<UserDto> getUsersTable();
+
+    HasActionHandler<UserDto> getActions();
 
   }
 
@@ -87,9 +94,11 @@ public class UserAdministrationPresenter
   private Command confirmedCommand;
 
   @Inject
-  public UserAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy) {
+  public UserAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
+      Provider<UserPresenter> userPresenter) {
     super(eventBus, display, proxy);
 //    this.authorizationPresenter = authorizationPresenter.get();
+    this.userPresenter = userPresenter;
   }
 
   @ProxyEvent
@@ -167,6 +176,57 @@ public class UserAdministrationPresenter
           }
         }).get().send();
         getView().showGroups();
+      }
+    });
+
+    // Refresh user list
+    registerHandler(getEventBus().addHandler(UsersRefreshEvent.getType(), new UsersRefreshEvent.Handler() {
+      @Override
+      public void onRefresh(UsersRefreshEvent event) {
+        ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder()//
+            .forResource("/users").withCallback(new ResourceCallback<JsArray<UserDto>>() {
+
+          @Override
+          public void onResource(Response response, JsArray<UserDto> resource) {
+            getView().renderUserRows(resource);
+          }
+        }).get().send();
+        getView().showUsers();
+      }
+    }));
+
+    // Add user
+    getView().getAddUserButton().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        UserPresenter dialog = userPresenter.get();
+        dialog.setDialogMode(UserPresenter.Mode.CREATE);
+        addToPopupSlot(dialog);
+      }
+    });
+
+    // ACTIONS
+    getView().getActions().setActionHandler(new ActionHandler<UserDto>() {
+
+      @Override
+      public void doAction(final UserDto object, String actionName) {
+        if(actionName.trim().equalsIgnoreCase(ActionsColumn.EDIT_ACTION)) {
+          UserPresenter dialog = userPresenter.get();
+          dialog.setDialogMode(UserPresenter.Mode.UPDATE);
+          dialog.setUser(object);
+
+          addToPopupSlot(dialog);
+        } else if(actionName.trim().equalsIgnoreCase(ActionsColumn.DELETE_ACTION)) {
+          ResourceRequestBuilderFactory.newBuilder()//
+              .forResource("/user/" + object.getName()).withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              getEventBus().fireEvent(new UsersRefreshEvent());
+              getEventBus().fireEvent(
+                  NotificationEvent.Builder.newNotification().info("UserDeletedOk").args(object.getName()).build());
+            }
+          }, Response.SC_OK).delete().send();
+        }
       }
     });
   }

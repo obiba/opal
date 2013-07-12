@@ -405,7 +405,13 @@ public interface Translations extends Constants {
       "CopyVariableNameAlreadyExists", "Duplicate variable name: {0}.",//
       "CopyVariableIncompatibleEntityType", "Incompatible entity types: {0} / {1}",//
       "SearchServiceUnavailable", "Search operation failed. Please make sure the service is started.",//
-      "UserStatusChangedOk", "User {0} has been successfully {1}." })
+      "UserStatusChangedOk", "User {0} has been successfully {1}.",//
+      "UserUpdatedOk", "User {0} has been successfully updated.",//
+      "UserCreatedOk", "User {0} has been successfully added.",//
+      "UserPasswordLengthError", "Password must contain at least {0} characters.",//
+      "UserPasswordMatchError", "Passwords do not match.",//
+      "UserDeletedOk", "User {0} has been successfully deleted.", //
+      "UserAlreadyExists", "User {0} already exists." })
   Map<String, String> userMessageMap();
 
   @Description("You must select a file message")
@@ -1776,4 +1782,9 @@ public interface Translations extends Constants {
   @Description("Disabled label")
   @DefaultStringValue("disabled")
   String disabledLabel();
+
+  @Description("Add/Update User label")
+  @DefaultStringValue("Add/Update User")
+  String addUpdateUserLabel();
+
 }
