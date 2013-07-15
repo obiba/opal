@@ -30,18 +30,18 @@ import com.github.gwtbootstrap.client.ui.NavLink;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.ContentSlot;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
-import com.gwtplatform.mvp.client.proxy.RevealRootLayoutContentEvent;
+import com.gwtplatform.mvp.client.proxy.RevealRootContentEvent;
 
 /**
  *
@@ -59,6 +59,8 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     NavLink getAdministrationItem();
 
     NavLink getDatasourcesItem();
+
+    NavLink getProjectsItem();
 
     HasAuthorization getAdministrationAuthorizer();
 
@@ -105,7 +107,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   @Override
   protected void revealInParent() {
-    RevealRootLayoutContentEvent.fire(this, this);
+    RevealRootContentEvent.fire(this, this);
   }
 
   @Override
@@ -156,6 +158,13 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       @Override
       public void onClick(ClickEvent event) {
         getEventBus().fireEvent(new PlaceChangeEvent(Places.navigatorPlace));
+      }
+    });
+
+    getView().getProjectsItem().addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        getEventBus().fireEvent(new PlaceChangeEvent(Places.projectsPlace));
       }
     });
 

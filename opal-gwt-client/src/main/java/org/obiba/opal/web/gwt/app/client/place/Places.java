@@ -34,6 +34,15 @@ public final class Places {
     return dashboard;
   }
 
+  public static final String projects = "!projects";
+
+  public static final Place projectsPlace = new Place(projects);
+
+  public static String projects() {
+    return projects;
+  }
+
+
   public static final String navigator = "!navigator";
 
   public static final Place navigatorPlace = new Place(navigator);

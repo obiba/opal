@@ -6,11 +6,8 @@
 
   <g:FlowPanel>
     <g:FlowPanel ui:field="header">
-      <g:FlowPanel addStyleNames="title">
-        <b:PageHeader ui:field="pageTitle" />
-      </g:FlowPanel>
+      <b:PageHeader ui:field="pageTitle"/>
     </g:FlowPanel>
-
     <g:FlowPanel ui:field="body"/>
   </g:FlowPanel>
 

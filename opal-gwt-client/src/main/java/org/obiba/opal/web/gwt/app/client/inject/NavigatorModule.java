@@ -25,6 +25,8 @@ import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorView;
 import org.obiba.opal.web.gwt.app.client.navigator.view.TableView;
 import org.obiba.opal.web.gwt.app.client.navigator.view.ValuesTableView;
 import org.obiba.opal.web.gwt.app.client.navigator.view.VariableView;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsPresenter;
+import org.obiba.opal.web.gwt.app.client.project.view.ProjectsView;
 import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.CsvDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.DatasourceFormPresenterSubscriber;
 import org.obiba.opal.web.gwt.app.client.widgets.datasource.presenter.ExcelDatasourceFormPresenter;
@@ -70,6 +72,8 @@ public class NavigatorModule extends AbstractOpalModule {
 
   @Override
   protected void configure() {
+    bindPresenter(ProjectsPresenter.class, ProjectsPresenter.Display.class, ProjectsView.class, ProjectsPresenter.Proxy.class);
+
     bindPresenter(NavigatorPresenter.class, NavigatorPresenter.Display.class, NavigatorView.class,
         NavigatorPresenter.Proxy.class);
     bindPresenter(NavigatorTreePresenter.class, NavigatorTreePresenter.Display.class, NavigatorTreeView.class,

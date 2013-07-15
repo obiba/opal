@@ -26,18 +26,16 @@ import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Binder;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
  *
  */
-public class ApplicationView implements ApplicationPresenter.Display {
+public class ApplicationView extends ViewImpl implements ApplicationPresenter.Display {
 
-  @UiTemplate("ApplicationView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Panel, ApplicationView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  private final Panel dock;
+  interface Binder extends UiBinder<Widget, ApplicationView> {}
 
   @UiField
   NavLink help;
@@ -61,6 +59,9 @@ public class ApplicationView implements ApplicationPresenter.Display {
   NavLink datasourcesItem;
 
   @UiField
+  NavLink projectsItem;
+
+  @UiField
   Panel workbench;
 
   @UiField
@@ -68,8 +69,9 @@ public class ApplicationView implements ApplicationPresenter.Display {
 
   MenuItem currentSelection;
 
-  public ApplicationView() {
-    dock = uiBinder.createAndBindUi(this);
+  @Inject
+  public ApplicationView(Binder uiBinder) {
+     initWidget(uiBinder.createAndBindUi(this));
   }
 
   @Override
@@ -115,11 +117,6 @@ public class ApplicationView implements ApplicationPresenter.Display {
   }
 
   @Override
-  public Widget asWidget() {
-    return dock;
-  }
-
-  @Override
   public void setCurrentSelection(MenuItem selection) {
     if(currentSelection != null) {
       currentSelection.removeStyleName("selected");
@@ -138,6 +135,11 @@ public class ApplicationView implements ApplicationPresenter.Display {
   @Override
   public NavLink getDatasourcesItem() {
     return datasourcesItem;
+  }
+
+  @Override
+  public NavLink getProjectsItem() {
+    return projectsItem;
   }
 
   @Override
