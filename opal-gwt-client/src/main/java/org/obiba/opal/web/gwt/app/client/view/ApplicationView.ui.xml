@@ -35,7 +35,7 @@
         </b:NavLink>
       </b:Nav>
     </b:ResponsiveNavbar>
-    <b:FluidContainer>
+    <b:FluidContainer addStyleNames="container">
       <g:FlowPanel ui:field="workbench">
       </g:FlowPanel>
       <b:FluidRow>
