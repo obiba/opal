@@ -1,3 +1,26 @@
 h1 {
   font-size: 1.8em;
 }
+
+li {
+  list-style-type: none;
+}
+
+.footer {
+  margin-top: 40px;
+  font-size: 0.8em;
+}
+
+.footer .container > div {
+  border-top: 1px solid #E5E5E5;
+  padding-top: 20px;
+}
+
+.tags .label {
+  margin-right: 10px;
+}
+
+.items .item {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}

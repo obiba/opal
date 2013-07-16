@@ -7,7 +7,12 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <b:Button ui:field="refresh">Refresh</b:Button>
+    <b:DropdownButton text="Sort by" size="SMALL">
+      <b:NavLink ui:field="nameNav"><ui:msg description="Name label">Name</ui:msg></b:NavLink>
+      <b:NavLink ui:field="tagNav"><ui:msg description="Tag label">Tag</ui:msg></b:NavLink>
+    </b:DropdownButton>
+    <b:Button type="PRIMARY" icon="PLUS" size="SMALL"><ui:msg description="Add Project label">Add Project</ui:msg></b:Button>
+    <g:FlowPanel ui:field="content" addStyleNames="items"></g:FlowPanel>
   </g:FlowPanel>
 
   </ui:UiBinder>

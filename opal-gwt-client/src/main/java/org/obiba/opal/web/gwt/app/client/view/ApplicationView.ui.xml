@@ -38,15 +38,19 @@
     <b:FluidContainer addStyleNames="container">
       <g:FlowPanel ui:field="workbench">
       </g:FlowPanel>
-      <b:FluidRow>
-        <b:Column size="6">
-          <g:Anchor href="http://obiba.org" target="_blank">© 2013 OBiBa</g:Anchor>
-        </b:Column>
-        <b:Column size="6">
-          <g:Label ui:field="version" addStyleNames="pull-right"/>
-        </b:Column>
-      </b:FluidRow>
     </b:FluidContainer>
+    <b:Footer>
+      <b:FluidContainer addStyleNames="container">
+        <b:FluidRow>
+          <b:Column size="6">
+            <b:NavLink target="_blank" href="http://obiba.org">© 2013 OBiBa</b:NavLink>
+          </b:Column>
+          <b:Column size="6">
+            <g:Label ui:field="version" addStyleNames="pull-right"/>
+          </b:Column>
+        </b:FluidRow>
+      </b:FluidContainer>
+    </b:Footer>
     <g:Frame ui:field="frame" visible="false"></g:Frame>
   </g:FlowPanel>
 </ui:UiBinder>

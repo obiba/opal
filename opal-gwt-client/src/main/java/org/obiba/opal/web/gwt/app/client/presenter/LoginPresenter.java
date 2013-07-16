@@ -34,6 +34,7 @@ import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.NoGatekeeper;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import com.gwtplatform.mvp.client.proxy.RevealRootContentEvent;
 import com.gwtplatform.mvp.client.proxy.RevealRootLayoutContentEvent;
 
 public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPresenter.Proxy> {
@@ -107,7 +108,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
 
   @Override
   protected void revealInParent() {
-    RevealRootLayoutContentEvent.fire(this, this);
+    RevealRootContentEvent.fire(this, this);
   }
 
   @Override
