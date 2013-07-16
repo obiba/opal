@@ -18,10 +18,15 @@ import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 
 public class PageContainerPresenter extends Presenter<PageContainerPresenter.Display,PageContainerPresenter.Proxy> {
 
+  @ContentSlot
+  public static final GwtEvent.Type<RevealContentHandler<?>> HEADER = new GwtEvent.Type<RevealContentHandler<?>>();
+
+  @ContentSlot
+  public static final GwtEvent.Type<RevealContentHandler<?>> CONTENT = new GwtEvent.Type<RevealContentHandler<?>>();
 
   @Inject
   public PageContainerPresenter(Display display, EventBus eventBus, Proxy proxy) {
-    super(eventBus, display, proxy);
+    super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
   }
 
   @ProxyStandard
@@ -30,22 +35,6 @@ public class PageContainerPresenter extends Presenter<PageContainerPresenter.Dis
 
   public interface Display extends View {
     void setPageTitle(String title);
-  }
-
-  @ContentSlot
-  public static final GwtEvent.Type<RevealContentHandler<?>> HEADER = new GwtEvent.Type<RevealContentHandler<?>>();
-
-  @ContentSlot
-  public static final GwtEvent.Type<RevealContentHandler<?>> CONTENT = new GwtEvent.Type<RevealContentHandler<?>>();
-
-  @Override
-  protected void onBind() {
-    GWT.log("Binfing container");
-  }
-
-  @Override
-  protected void revealInParent() {
-    RevealContentEvent.fire(this, ApplicationPresenter.WORKBENCH, this);
   }
 
   @Override

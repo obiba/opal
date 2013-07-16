@@ -19,22 +19,19 @@ import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
-import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
 public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, ProjectsPresenter.Proxy>
     implements ProjectsUiHandlers, HasPageTitle {
 
-  private JsArray<ProjectDto> projects;
-
   @Inject
   public ProjectsPresenter(EventBus eventBus, Display display, Proxy proxy) {
-    super(eventBus, display, proxy);
+    super(eventBus, display, proxy, PageContainerPresenter.CONTENT);
     getView().setUiHandlers(this);
   }
 
   @Override
-  protected void revealInParent() {
-    RevealContentEvent.fire(this, PageContainerPresenter.CONTENT, this);
+  protected void onReveal() {
+    super.onReveal();
     refresh();
   }
 
@@ -42,7 +39,6 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
   public String getTitle() {
     return "Projects";
   }
-
 
   public void refresh() {
     ResourceRequestBuilderFactory.<JsArray<ProjectDto>>newBuilder().forResource("/projects").get()
