@@ -2,6 +2,7 @@ package org.obiba.opal.web.gwt.app.client.project.presenter;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
 import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -21,11 +22,11 @@ import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
 public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, ProjectsPresenter.Proxy>
-    implements ProjectsUiHandlers, HasPageTitle {
+    implements ProjectsUiHandlers {
 
   @Inject
   public ProjectsPresenter(EventBus eventBus, Display display, Proxy proxy) {
-    super(eventBus, display, proxy, PageContainerPresenter.CONTENT);
+    super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
   }
 
@@ -33,11 +34,6 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
   protected void onReveal() {
     super.onReveal();
     refresh();
-  }
-
-  @Override
-  public String getTitle() {
-    return "Projects";
   }
 
   public void refresh() {

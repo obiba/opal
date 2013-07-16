@@ -1,18 +1,36 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
-    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <b:DropdownButton text="Sort by" size="SMALL">
-      <b:NavLink ui:field="nameNav"><ui:msg description="Name label">Name</ui:msg></b:NavLink>
-      <b:NavLink ui:field="tagNav"><ui:msg description="Tag label">Tag</ui:msg></b:NavLink>
-    </b:DropdownButton>
-    <b:Button type="PRIMARY" icon="PLUS" size="SMALL"><ui:msg description="Add Project label">Add Project</ui:msg></b:Button>
+    <b:FluidRow addStyleNames="page-header">
+      <b:Column size="9">
+        <b:Heading size="3">
+          <ui:msg description="Projects label">Projects</ui:msg>
+        </b:Heading>
+      </b:Column>
+      <b:Column size="3">
+        <b:ButtonGroup addStyleNames="pull-right">
+          <b:Button type="PRIMARY" icon="PLUS" size="SMALL">
+            <ui:msg description="Add Project label">Add Project</ui:msg>
+          </b:Button>
+        </b:ButtonGroup>
+        <b:ButtonGroup addStyleNames="pull-right">
+          <b:DropdownButton text="Sort by" size="SMALL">
+            <b:NavLink ui:field="nameNav">
+              <ui:msg description="Name label">Name</ui:msg>
+            </b:NavLink>
+            <b:NavLink ui:field="tagNav">
+              <ui:msg description="Tag label">Tag</ui:msg>
+            </b:NavLink>
+          </b:DropdownButton>
+        </b:ButtonGroup>
+      </b:Column>
+    </b:FluidRow>
     <g:FlowPanel ui:field="content" addStyleNames="items"></g:FlowPanel>
   </g:FlowPanel>
 
-  </ui:UiBinder>
+</ui:UiBinder>
