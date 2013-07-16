@@ -14,7 +14,7 @@
       </b:Column>
       <b:Column size="3">
         <b:ButtonGroup addStyleNames="pull-right">
-          <b:Button type="PRIMARY" icon="PLUS" size="SMALL">
+          <b:Button type="PRIMARY" icon="PLUS" size="SMALL" ui:field="add">
             <ui:msg description="Add Project label">Add Project</ui:msg>
           </b:Button>
         </b:ButtonGroup>
@@ -31,6 +31,25 @@
       </b:Column>
     </b:FluidRow>
     <g:FlowPanel ui:field="content" addStyleNames="items"></g:FlowPanel>
+    <b:Modal ui:field="m" closeVisible="true" keyboard="true" animation="false">
+      <g:SimplePanel ui:field="alertPlace"/>
+      <b:ControlGroup ui:field="labelGroup">
+        <b:ControlLabel>
+          <ui:msg description="Name label">Name</ui:msg>
+        </b:ControlLabel>
+        <b:TextBox ui:field="nameTxt"/>
+        <b:HelpBlock>A project must have a unique name.</b:HelpBlock>
+      </b:ControlGroup>
+      <b:ControlLabel>
+        <ui:msg description="Description label">Description</ui:msg>
+      </b:ControlLabel>
+      <b:TextArea ui:field="descriptionTxt" alternateSize="XLARGE" visibleLines="3"/>
+      <b:HelpBlock>Optional description of the project.</b:HelpBlock>
+      <b:ModalFooter>
+        <b:Button icon="FILE" type="PRIMARY" ui:field="save">Save</b:Button>
+        <b:Button ui:field="cancel">Cancel</b:Button>
+      </b:ModalFooter>
+    </b:Modal>
   </g:FlowPanel>
 
 </ui:UiBinder>

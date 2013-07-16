@@ -24,10 +24,6 @@ public class Dtos {
     Projects.ProjectDto.Builder builder = Projects.ProjectDto.newBuilder() //
         .setName(project.getName());
 
-    if(project.hasSummary()) {
-      builder.setSummary(project.getSummary());
-    }
-
     if(project.hasDescription()) {
       builder.setDescription(project.getDescription());
     }

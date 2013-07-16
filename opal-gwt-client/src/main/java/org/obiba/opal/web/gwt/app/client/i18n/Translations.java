@@ -411,7 +411,11 @@ public interface Translations extends Constants {
       "UserPasswordLengthError", "Password must contain at least {0} characters.",//
       "UserPasswordMatchError", "Passwords do not match.",//
       "UserDeletedOk", "User {0} has been successfully deleted.", //
-      "UserAlreadyExists", "User {0} already exists." })
+      "UserAlreadyExists", "User {0} already exists.", //
+      "ProjectNameRequired", "Project name is required.", //
+      "ProjectNameMustBeUnique", "A project already exists with this name.",//
+      "ProjectCreationFailed", "The datasource creation has failed: {0}" //
+       })
   Map<String, String> userMessageMap();
 
   @Description("You must select a file message")
@@ -1787,4 +1791,7 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add/Update User")
   String addUpdateUserLabel();
 
+  @Description("Add Project label")
+  @DefaultStringValue("Add Project")
+  String addProject();
 }

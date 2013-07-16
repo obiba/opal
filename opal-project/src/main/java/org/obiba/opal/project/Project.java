@@ -19,8 +19,6 @@ public class Project {
 
   private String name;
 
-  private String summary;
-
   private String description;
 
   private List<String> tags;
@@ -31,18 +29,6 @@ public class Project {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public boolean hasSummary() {
-    return summary != null;
-  }
-
-  public String getSummary() {
-    return summary;
-  }
-
-  public void setSummary(String summary) {
-    this.summary = summary;
   }
 
   public boolean hasDescription() {
@@ -84,11 +70,6 @@ public class Project {
 
     public Builder name(String name) {
       project.setName(name);
-      return this;
-    }
-
-    public Builder summary(String summary) {
-      project.setSummary(summary);
       return this;
     }
 

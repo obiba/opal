@@ -12,16 +12,33 @@ package org.obiba.opal.web.project;
 import java.util.List;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.obiba.magma.Datasource;
+import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.DuplicateDatasourceNameException;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.MagmaRuntimeException;
+import org.obiba.magma.datasource.nil.support.NullDatasourceFactory;
+import org.obiba.magma.support.DatasourceParsingException;
+import org.obiba.opal.core.cfg.OpalConfiguration;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.project.cfg.ProjectsConfigurationService;
+import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
+import org.obiba.opal.web.magma.support.NoSuchDatasourceFactoryException;
 import org.obiba.opal.web.model.Projects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
+
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
 @Path("/projects")
@@ -29,9 +46,16 @@ public class ProjectsResource extends AbstractProjectResource {
 
   private final ProjectsConfigurationService projectsConfigurationService;
 
+  private final OpalConfigurationService configService;
+
+  private final DatasourceFactoryRegistry datasourceFactoryRegistry;
+
   @Autowired
-  public ProjectsResource(ProjectsConfigurationService projectsConfigurationService) {
+  public ProjectsResource(DatasourceFactoryRegistry datasourceFactoryRegistry, ProjectsConfigurationService projectsConfigurationService,
+      OpalConfigurationService configService) {
+    this.datasourceFactoryRegistry = datasourceFactoryRegistry;
     this.projectsConfigurationService = projectsConfigurationService;
+    this.configService = configService;
   }
 
   @GET
@@ -44,6 +68,46 @@ public class ProjectsResource extends AbstractProjectResource {
     }
 
     return projects;
+  }
+
+  @POST
+  public Response createProject(@Context UriInfo uriInfo, Projects.ProjectFactoryDto projectFactoryDto) {
+    Response.ResponseBuilder response;
+    try {
+      final DatasourceFactory factory;
+      if (projectFactoryDto.hasFactory()) {
+        factory = datasourceFactoryRegistry.parse(projectFactoryDto.getFactory());
+      } else {
+        factory = new NullDatasourceFactory();
+      }
+      factory.setName(projectFactoryDto.getName());
+      Datasource ds = MagmaEngine.get().addDatasource(factory);
+      configService.modifyConfiguration(new OpalConfigurationService.ConfigModificationTask() {
+
+        @Override
+        public void doWithConfig(OpalConfiguration config) {
+          config.getMagmaEngineFactory().withFactory(factory);
+        }
+      });
+      UriBuilder ub = uriInfo.getBaseUriBuilder().path("project").path(ds.getName());
+//      Project project = Project.Builder.create(projectDto.getName()).description(projectDto.getDescription()).build();
+//      projectsConfigurationService.getConfig().putProject(project);
+      response = Response.created(ub.build()).entity(org.obiba.opal.web.magma.Dtos.asDto(ds).build());
+    } catch(NoSuchDatasourceFactoryException noSuchDatasourceFactoryEx) {
+      response = Response.status(BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "UnidentifiedDatasourceFactory").build());
+    } catch(DuplicateDatasourceNameException duplicateDsNameEx) {
+      response = Response.status(BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DuplicateDatasourceName").build());
+    } catch(DatasourceParsingException dsParsingEx) {
+      response = Response.status(BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", dsParsingEx).build());
+    } catch(MagmaRuntimeException dsCreationFailedEx) {
+      response = Response.status(BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", dsCreationFailedEx).build());
+    }
+
+    return response.build();
   }
 
   @Override

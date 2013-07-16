@@ -6,9 +6,15 @@ option java_package = "org.obiba.opal.web.model";
 
 message ProjectDto {
   required string name = 1;
-  optional string link = 2;
+  optional string description = 2;
   required Magma.DatasourceDto datasource = 3;
-  optional string summary = 4;
-  optional string description = 5;
-  repeated string tags = 6;
+  repeated string tags = 4;
+  optional string link = 5;
+}
+
+message ProjectFactoryDto {
+  required string name = 1;
+  optional string description = 2;
+  optional Magma.DatasourceFactoryDto factory = 3;
+  repeated string tags = 4;
 }
