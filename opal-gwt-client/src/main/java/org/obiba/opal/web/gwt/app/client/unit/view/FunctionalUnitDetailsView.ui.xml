@@ -2,26 +2,54 @@
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:c="urn:import:com.google.gwt.user.cellview.client"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
   <g:FlowPanel ui:field="functionalUnitDetails" addStyleNames="item-details">
 
+    <g:FlowPanel addStyleNames="page-header">
+      <b:FluidRow>
+        <b:Column size="9">
+          <b:Breadcrumbs ui:field="breadcrumbs"/>
+        </b:Column>
+        <b:Column size="3">
+
+        </b:Column>
+      </b:FluidRow>
+      <g:InlineLabel ui:field="description"></g:InlineLabel><b:Button type="LINK" icon="PLUS_SIGN" ui:field="ellipsis"/>
+    </g:FlowPanel>
+
+    <g:FlowPanel>
+      <g:FlowPanel>
+        <b:DropdownButton text="Unit" ui:field="unitDropdown" size="SMALL" icon="TASKS">
+          <b:NavLink icon="EDIT" ui:field="updateUnit"><ui:msg description="Add table label">Edit unit...</ui:msg></b:NavLink>
+          <b:NavLink icon="REMOVE"  ui:field="removeUnit"><ui:msg description="Add view label">Remove unit...</ui:msg></b:NavLink>
+        </b:DropdownButton>
+        <b:DropdownButton text="identifiersDropdown" size="SMALL" icon="COG" ui:field="identifiersDropDown">
+          <b:NavLink icon="UPLOAD" ui:field="exportIdentifiers"><ui:msg description="Functional Unit Export identifiers">Export indentifiers...</ui:msg></b:NavLink>
+          <b:NavLink icon="DOWNLOAD" ui:field="exportIdentifiersMapping"><ui:msg description="Functional Unit Export identifiers mapping">Export identifiers mapping...</ui:msg></b:NavLink>
+          <b:NavLink icon="COG" ui:field="generateIdentifiers"><ui:msg description="Functional Unit Generate identifiers">Generate identifiers...</ui:msg></b:NavLink>
+          <b:NavLink icon="FILE_ALT" ui:field="importIdentifiersFromFile"><ui:msg description="Functional Unit Add identifiers from data file">Add identifiers from data file...</ui:msg></b:NavLink>
+        </b:DropdownButton>
+        <b:ButtonGroup>
+          <b:Button icon="PLUS" size="SMALL" ui:field="addCryptographicKey"><ui:msg description="Functional Unit Add Cryptographic key">Add Cryptographic key...</ui:msg></b:Button>
+        </b:ButtonGroup>
+      </g:FlowPanel>
+    </g:FlowPanel>
+
     <g:Label ui:field="noUnit" addStyleNames="small-top-margin small-indent" visible="false">
       <ui:msg description="No Unit">No Unit</ui:msg>
     </g:Label>
 
-    <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
+    <g:FlowPanel>
+      <b:CellTable width="100%" ui:field="unitProperties" addStyleNames="small-top-margin" striped="true" condensed="true"/>
+    </g:FlowPanel>
 
     <o:PropertiesTable ui:field="propertiesPanel" condensed="true" borderedCell="false" zebra="true"
         addStyleNames="small-dual-indent top-margin" keyStyleNames="span2 small-indent">
-      <o:PropertyPanel>
-        <g:Label>
-          <ui:msg description="Functional Unit description">Description</ui:msg>
-        </g:Label>
-        <g:Label ui:field="description"/>
-      </o:PropertyPanel>
+
       <o:PropertyPanel>
         <g:Label>
           <ui:msg description="Identifier Variables Filter label">Identifier Variables Filter</ui:msg>
