@@ -35,6 +35,7 @@ public final class Places {
   }
 
   public static final String projects = "!projects";
+  public static final String project = "!project";
 
   public static final Place projectsPlace = new Place(projects);
 

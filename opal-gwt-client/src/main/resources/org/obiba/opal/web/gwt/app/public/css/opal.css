@@ -29,6 +29,14 @@ li {
   margin-top: 10px;
 }
 
+.page-header .breadcrumb {
+  background: none;
+  font-size: 1.6em;
+  line-height: 40px;
+  margin: 10px 0;
+  padding: 0;
+}
+
 .btn-group + .btn-group.pull-right {
   margin-right: 5px;
 }
