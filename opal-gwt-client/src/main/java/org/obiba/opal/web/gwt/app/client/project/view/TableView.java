@@ -7,33 +7,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.navigator.view;
+package org.obiba.opal.web.gwt.app.client.project.view;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
+import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorMenuBar;
+import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorView;
+import org.obiba.opal.web.gwt.app.client.project.presenter.TablePresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.TableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.VariableAttributeColumn;
-import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.gwt.app.client.workbench.view.TextBoxClearable;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
-import org.obiba.opal.web.gwt.rest.client.authorization.TabAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 
 import com.github.gwtbootstrap.client.ui.Alert;
+import com.github.gwtbootstrap.client.ui.Breadcrumbs;
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.ProgressBar;
+import com.github.gwtbootstrap.client.ui.SimplePager;
+import com.github.gwtbootstrap.client.ui.TabPanel;
+import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
@@ -41,37 +50,33 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
-import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
-import com.google.gwt.user.client.ui.InlineLabel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
-import com.gwtplatform.mvp.client.ViewImpl;
+import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-public class TableView extends ViewImpl implements TablePresenter.Display {
+public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements TablePresenter.Display {
 
-  @UiTemplate("TableView.ui.xml")
   interface TableViewUiBinder extends UiBinder<Widget, TableView> {}
 
   private static final TableViewUiBinder uiBinder = GWT.create(TableViewUiBinder.class);
@@ -82,16 +87,12 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   private static final Integer PERMISSIONS_TAB_INDEX = 2;
 
-  private final Widget widget;
-
   private final List<Anchor> tables = new ArrayList<Anchor>();
 
   private boolean hasLinkAuthorization = true;
 
   @UiField
-  FlowPanel toolbarPanel;
-
-  private final NavigatorMenuBar toolbar;
+  Breadcrumbs magmaCrumbs;
 
   @UiField
   Label entityType;
@@ -136,9 +137,6 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   InlineLabel noVariables;
 
   @UiField
-  HorizontalTabLayout tabs;
-
-  @UiField
   Anchor copyVariables;
 
   @UiField
@@ -157,7 +155,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   Table<VariableDto> table;
 
   @UiField
-  Panel values;
+  Panel valuesPanel;
 
   @UiField
   SimplePager pager;
@@ -166,7 +164,37 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   TextBoxClearable filter;
 
   @UiField
-  Panel permissions;
+  TabPanel tabPanel;
+
+  @UiField
+  NavLink datasourceCrmb;
+
+  @UiField
+  InlineLabel tableCrmb;
+
+  @UiField
+  NavLink exportData;
+
+  @UiField
+  NavLink copyData;
+
+  @UiField
+  NavLink downloadDictionary;
+
+  @UiField
+  NavLink downloadView;
+
+  @UiField
+  Button edit;
+
+  @UiField
+  Button remove;
+
+  @UiField
+  Button previous;
+
+  @UiField
+  Button next;
 
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
 
@@ -176,18 +204,10 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   private final Translations translations = GWT.create(Translations.class);
 
-  private MenuItem removeItem;
-
-  private MenuItem addVariablesToViewItem;
-
-  private MenuItemSeparator removeItemSeparator;
-
   private CheckboxColumn<VariableDto> checkColumn;
 
   public TableView() {
-    widget = uiBinder.createAndBindUi(this);
-    toolbarPanel.add(toolbar = new NavigatorMenuBar());
-
+    initWidget(uiBinder.createAndBindUi(this));
     addTableColumns();
     initializeAnchorTexts();
     initializeFilter();
@@ -196,10 +216,8 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   @Override
   public void setInSlot(Object slot, IsWidget content) {
     HasWidgets panel = null;
-    if(slot == Slots.Permissions) {
-      panel = permissions;
-    } else if(slot == Slots.Values) {
-      panel = values;
+    if(slot == Slots.Values) {
+      panel = valuesPanel;
     }
     if(panel != null) {
       panel.clear();
@@ -281,23 +299,21 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   @Override
   public void beforeRenderRows() {
     pager.setVisible(false);
-    table.setEmptyTableWidget(table.getLoadingIndicator());
-
+    table.showLoadingIndicator(dataProvider);
   }
 
   @Override
   public void afterRenderRows() {
     boolean enableItem = dataProvider.getList().size() > 0;
     pager.setVisible(dataProvider.getList().size() > NavigatorView.PAGE_SIZE);
-    toolbar.setExportVariableDictionaryItemEnabled(enableItem);
-    toolbar.setExportDataItemEnabled(enableItem);
-    toolbar.setCopyDataItemEnabled(enableItem);
-    table.setEmptyTableWidget(noVariables);
+    downloadDictionary.setDisabled(!enableItem);
+    exportData.setDisabled(!enableItem);
+    copyData.setDisabled(!enableItem);
+    table.hideLoadingIndicator();
   }
 
   @Override
   public void renderRows(JsArray<VariableDto> rows) {
-    addVariablesToViewItem.setEnabled(rows.length() > 0);
     dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
     pager.firstPage();
     dataProvider.refresh();
@@ -321,14 +337,11 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
   }
 
   @Override
-  public Widget asWidget() {
-    return widget;
-  }
-
-  @Override
   public void setTable(TableDto dto) {
     entityType.setText(dto.getEntityType());
     entityCount.setText(Integer.toString(dto.getValueSetCount()));
+    datasourceCrmb.setText(dto.getDatasourceName());
+    tableCrmb.setText(dto.getName());
   }
 
   @Override
@@ -360,92 +373,61 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
     return tables;
   }
 
-  @Override
-  public void setExcelDownloadCommand(Command cmd) {
-    toolbar.setExcelDownloadCommand(cmd);
+  @UiHandler("datasourceCrmb")
+  void onDatasourceSelection(ClickEvent event) {
+    getUiHandlers().onDatasourceSelection();
   }
 
-  @Override
-  public void setExportDataCommand(Command cmd) {
-    toolbar.setExportDataCommand(cmd);
+  @UiHandler("downloadDictionary")
+  void onDownloadDictionary(ClickEvent event) {
+    getUiHandlers().onDownloadDictionary();
   }
 
-  @Override
-  public void setCopyDataCommand(Command cmd) {
-    toolbar.setCopyDataCommand(cmd);
+  @UiHandler("downloadView")
+  void onDownloadView(ClickEvent event) {
+    getUiHandlers().onDownloadView();
   }
 
-  @Override
-  public void setViewDownloadCommand(Command cmd) {
-    if(cmd != null) {
-      toolbar.setViewDownloadCommand(cmd);
-    } else {
-      toolbar.removeViewDownloadCommand();
-    }
+  @UiHandler("remove")
+  void onRemove(ClickEvent event) {
+    getUiHandlers().onRemove();
   }
 
-  @Override
-  public void setParentName(String name) {
-    toolbar.setParentName(name);
+  @UiHandler("edit")
+  void onEdit(ClickEvent event) {
+    getUiHandlers().onEdit();
+  }
+
+  @UiHandler("next")
+  void onNext(ClickEvent event) {
+    getUiHandlers().onNextTable();
+  }
+
+  @UiHandler("previous")
+  void onPrevious(ClickEvent event) {
+    getUiHandlers().onPreviousTable();
+  }
+
+  @UiHandler("exportData")
+  void onExportData(ClickEvent event) {
+    getUiHandlers().onExportData();
+  }
+
+  @UiHandler("copyData")
+  void onCopyData(ClickEvent event) {
+    getUiHandlers().onCopyData();
   }
 
   @Override
   public void setNextName(String name) {
-    toolbar.setNextName(name);
+    next.setTitle(name);
+    next.setEnabled(name != null);
   }
 
   @Override
   public void setPreviousName(String name) {
-    toolbar.setPreviousName(name);
-  }
-
-  @Override
-  public void setParentCommand(Command cmd) {
-    toolbar.setParentCommand(cmd);
-  }
-
-  @Override
-  public void setNextCommand(Command cmd) {
-    toolbar.setNextCommand(cmd);
-  }
-
-  @Override
-  public void setPreviousCommand(Command cmd) {
-    toolbar.setPreviousCommand(cmd);
-  }
-
-  @Override
-  public void setRemoveCommand(Command cmd) {
-
-    if(removeItem != null) {
-      toolbar.getToolsMenu().removeSeparator(removeItemSeparator);
-      toolbar.getToolsMenu().removeItem(removeItem);
-    }
-
-    if(cmd != null) {
-      removeItemSeparator = toolbar.getToolsMenu().addSeparator();
-      removeItem = toolbar.getToolsMenu().addItem(new MenuItem(translations.removeLabel(), cmd));
-    }
-
-  }
-
-  @Override
-  public void setAddVariablesToViewCommand(Command cmd) {
-
-    if(addVariablesToViewItem != null) {
-      // toolbar.getToolsMenu().removeSeparator(removeItemSeparator);
-      toolbar.getToolsMenu().removeItem(addVariablesToViewItem);
-    }
-
-    if(cmd != null) {
-      addVariablesToViewItem = toolbar.getToolsMenu().addItem(new MenuItem(translations.addVariablesToView(), cmd));
-    }
-
-  }
-
-  @Override
-  public void setEditCommand(Command cmd) {
-    toolbar.setEditCommand(cmd);
+    previous.setTitle(name);
+    previous.setEnabled(name != null);
   }
 
   private abstract static class VariableClickableColumn extends ClickableColumn<VariableDto> {
@@ -479,42 +461,37 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @Override
   public HasAuthorization getEditAuthorizer() {
-    return new MenuItemAuthorizer(toolbar.getEditItem());
+    return new WidgetAuthorizer(edit);
   }
 
   @Override
   public HasAuthorization getExportDataAuthorizer() {
-    return new MenuItemAuthorizer(toolbar.getExportDataItem());
+    return new WidgetAuthorizer(exportData);
   }
 
   @Override
   public HasAuthorization getCopyDataAuthorizer() {
-    return new MenuItemAuthorizer(toolbar.getCopyDataItem());
+    return new WidgetAuthorizer(copyData);
   }
 
   @Override
   public HasAuthorization getRemoveAuthorizer() {
-    return new CompositeAuthorizer(new MenuItemAuthorizer(removeItem), new UIObjectAuthorizer(removeItemSeparator));
+    return new WidgetAuthorizer(remove);
   }
 
   @Override
   public HasAuthorization getExcelDownloadAuthorizer() {
-    return new MenuItemAuthorizer(toolbar.getExportVariableDictionaryItem());
+    return new WidgetAuthorizer(downloadDictionary);
   }
 
   @Override
   public HasAuthorization getViewDownloadAuthorizer() {
-    return new MenuItemAuthorizer(toolbar.getViewDownloadItem());
+    return new WidgetAuthorizer(downloadView);
   }
 
   @Override
   public HasAuthorization getValuesAuthorizer() {
-    return new TabAuthorizer(tabs, VALUES_TAB_INDEX);
-  }
-
-  @Override
-  public HasAuthorization getPermissionsAuthorizer() {
-    return new TabAuthorizer(tabs, PERMISSIONS_TAB_INDEX);
+    return new TabPanelAuthorizer(tabPanel, VALUES_TAB_INDEX);
   }
 
   @Override
@@ -551,11 +528,10 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @Override
   public void setValuesTabCommand(final Command cmd) {
-    tabs.addSelectionHandler(new SelectionHandler<Integer>() {
-
+    tabPanel.addShownHandler(new TabPanel.ShownEvent.Handler() {
       @Override
-      public void onSelection(SelectionEvent<Integer> event) {
-        if(event.getSelectedItem().equals(VALUES_TAB_INDEX)) {
+      public void onShow(TabPanel.ShownEvent shownEvent) {
+        if(tabPanel.getSelectedTab() == VALUES_TAB_INDEX) {
           cmd.execute();
         }
       }
@@ -564,11 +540,10 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @Override
   public void setVariablesTabCommand(final Command cmd) {
-    tabs.addSelectionHandler(new SelectionHandler<Integer>() {
-
+    tabPanel.addShownHandler(new TabPanel.ShownEvent.Handler() {
       @Override
-      public void onSelection(SelectionEvent<Integer> event) {
-        if(event.getSelectedItem().equals(VARIABLES_TAB_INDEX)) {
+      public void onShow(TabPanel.ShownEvent shownEvent) {
+        if(tabPanel.getSelectedTab() == VARIABLES_TAB_INDEX) {
           cmd.execute();
         }
       }
@@ -577,7 +552,7 @@ public class TableView extends ViewImpl implements TablePresenter.Display {
 
   @Override
   public boolean isValuesTabSelected() {
-    return tabs.getSelectedIndex() == VALUES_TAB_INDEX;
+    return tabPanel.getSelectedTab() == VALUES_TAB_INDEX;
   }
 
   @Override

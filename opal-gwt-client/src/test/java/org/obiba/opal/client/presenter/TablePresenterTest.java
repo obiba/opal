@@ -21,7 +21,7 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPre
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.EntityDialogPresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
@@ -90,13 +90,6 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     expect(displayMock.addVariableSortHandler((ColumnSortEvent.Handler) EasyMock.anyObject()))
         .andReturn(handlerRegistrationMock).once();
 
-    displayMock.setNextCommand((Command) EasyMock.anyObject());
-    displayMock.setPreviousCommand((Command) EasyMock.anyObject());
-    displayMock.setParentCommand((Command) EasyMock.anyObject());
-    displayMock.setExcelDownloadCommand((Command) EasyMock.anyObject());
-    displayMock.setExportDataCommand((Command) EasyMock.anyObject());
-    displayMock.setCopyDataCommand((Command) EasyMock.anyObject());
-    displayMock.setAddVariablesToViewCommand((Command) EasyMock.anyObject());
     displayMock.setVariableNameFieldUpdater((FieldUpdater<VariableDto, String>) EasyMock.anyObject());
     displayMock.setVariableIndexFieldUpdater((FieldUpdater<VariableDto, String>) EasyMock.anyObject());
 

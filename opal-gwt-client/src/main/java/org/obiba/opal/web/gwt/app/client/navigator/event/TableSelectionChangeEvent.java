@@ -39,16 +39,34 @@ public class TableSelectionChangeEvent extends GwtEvent<TableSelectionChangeEven
 
   private final Object source;
 
-  public TableSelectionChangeEvent(Object source, String datasourceName, String tableName) {
-    this(source, datasourceName, tableName, null, null);
+  private final TableDto table;
+
+  public TableSelectionChangeEvent(Object source, TableDto table) {
+    this(source, table.getDatasourceName(), table.getName(), null, null, table);
   }
 
-  public TableSelectionChangeEvent(Object source, String datasourceName, String tableName, @Nullable String previous, @Nullable String next) {
+  public TableSelectionChangeEvent(Object source, TableDto table, String previous,
+      String next) {
+    this(source, table.getDatasourceName(), table.getName(), previous, next, table);
+  }
+
+  public TableSelectionChangeEvent(Object source, String datasourceName, String tableName) {
+    this(source, datasourceName, tableName, null, null, null);
+  }
+
+  public TableSelectionChangeEvent(Object source, String datasourceName, String tableName, String previous,
+      String next) {
+    this(source, datasourceName, tableName, previous, next, null);
+  }
+
+  private TableSelectionChangeEvent(Object source, String datasourceName, String tableName, String previous,
+      String next, TableDto table) {
     this.source = source;
     this.datasourceName = datasourceName;
     this.tableName = tableName;
     this.previous = previous;
     this.next = next;
+    this.table = table;
   }
 
   @Override
@@ -62,6 +80,14 @@ public class TableSelectionChangeEvent extends GwtEvent<TableSelectionChangeEven
 
   public String getTableName() {
     return tableName;
+  }
+
+  public boolean hasTable() {
+    return table != null;
+  }
+
+  public TableDto getTable() {
+    return table;
   }
 
   public String getPrevious() {

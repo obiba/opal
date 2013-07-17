@@ -114,49 +114,13 @@ public class JsArrays {
   }
 
   public static <T extends JavaScriptObject> List<T> toList(@Nullable JsArray<T> jsArray) {
-    final JsArray<T> array = toSafeArray(jsArray);
-    return new AbstractList<T>() {
-
-      @Override
-      public T get(int index) {
-        return array.get(index);
-      }
-
-      @Override
-      public T set(int index, T item) {
-        array.set(index, item);
-        return item;
-      }
-
-      @Override
-      public int size() {
-        return array.length();
-      }
-
-    };
+    JsArray<T> array = toSafeArray(jsArray);
+    return new JavaScriptObjectList<T>(array);
   }
 
   public static List<String> toList(JsArrayString jsArray) {
     final JsArrayString array = jsArray == null ? (JsArrayString) JsArrayString.createArray() : jsArray;
-    return new AbstractList<String>() {
-
-      @Override
-      public String get(int index) {
-        return array.get(index);
-      }
-
-      @Override
-      public String set(int index, String element) {
-        array.set(index, element);
-        return element;
-      }
-
-      @Override
-      public int size() {
-        return array.length();
-      }
-
-    };
+    return new JsArrayStringList(array);
   }
 
   /**
@@ -176,26 +140,7 @@ public class JsArrays {
     if(start < 0 || start > array.length())
       throw new IndexOutOfBoundsException("start index '" + start + "'is invalid");
     if(length < 0) throw new IndexOutOfBoundsException("length '" + length + "'is invalid");
-    return new AbstractList<T>() {
-
-      transient int size = -1;
-
-      @Override
-      public T get(int index) {
-        return array.get(index + start);
-      }
-
-      @Override
-      public int size() {
-        if(size == -1) {
-          // size is either "length" or the number of elements that exist between "start" and the array's last item
-          // "array.lenght()" (array.length() - start)
-          size = start + length > array.length() ? array.length() - start : length;
-        }
-        return size;
-      }
-
-    };
+    return new JavaScriptObjectRangeList<T>(array, start, length);
   }
 
   @SuppressWarnings("unchecked")
@@ -216,4 +161,100 @@ public class JsArrays {
       return value;
   }-*/;
 
+  private static class JavaScriptObjectList<T extends JavaScriptObject> extends AbstractList<T> {
+
+    private JsArray<T> array;
+
+    public JavaScriptObjectList(JsArray<T> array) {
+      this.array = array;
+    }
+
+    @Override
+    public T get(int index) {
+      return array.get(index);
+    }
+
+    @Override
+    public T set(int index, T item) {
+      array.set(index, item);
+      return item;
+    }
+
+    @Override
+    public int size() {
+      return array.length();
+    }
+
+    @Override
+    public void clear() {
+      array = create();
+    }
+  }
+
+  private static class JsArrayStringList extends AbstractList<String> {
+
+    private JsArrayString array;
+
+    public JsArrayStringList(JsArrayString array) {this.array = array;}
+
+    @Override
+    public String get(int index) {
+      return array.get(index);
+    }
+
+    @Override
+    public String set(int index, String element) {
+      array.set(index, element);
+      return element;
+    }
+
+    @Override
+    public int size() {
+      return array.length();
+    }
+
+    @Override
+    public void clear() {
+      array = (JsArrayString) JsArrayString.createArray();
+    }
+  }
+
+  private static class JavaScriptObjectRangeList<T extends JavaScriptObject> extends AbstractList<T> {
+
+    private JsArray<T> array;
+
+    private final int start;
+
+    private final int length;
+
+    transient int size;
+
+    public JavaScriptObjectRangeList(JsArray<T> array, int start, int length) {
+      this.array = array;
+      this.start = start;
+      this.length = length;
+      size = -1;
+    }
+
+    @Override
+    public T get(int index) {
+      return array.get(index + start);
+    }
+
+    @Override
+    public int size() {
+      if(size == -1) {
+        // size is either "length" or the number of elements that exist between "start" and the array's last item
+        // "array.lenght()" (array.length() - start)
+        size = start + length > array.length() ? array.length() - start : length;
+      }
+      return size;
+    }
+
+    @Override
+    public void clear() {
+      array = create();
+      size = -1;
+    }
+  }
 }

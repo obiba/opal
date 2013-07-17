@@ -6,6 +6,87 @@ li {
   list-style-type: none;
 }
 
+.tags .label {
+  margin-right: 10px;
+}
+
+.items .item {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.xsmall-indent {
+  margin-left: 0.4em;
+}
+
+.small-indent {
+  margin-left: 0.8em;
+}
+
+.indent {
+  margin-left: 1.6em;
+}
+
+.large-indent {
+  margin-left: 2.4em;
+}
+
+.xsmall-dual-indent {
+  margin-left: 0.4em;
+  margin-right: 0.4em;
+}
+
+.xsmall-right-indent {
+  margin-right: 0.4em;
+}
+
+.small-dual-indent {
+  margin-left: 0.8em;
+  margin-right: 0.8em;
+}
+
+.dual-indent {
+  margin-left: 1.6em;
+  margin-right: 1.6em;
+}
+
+.large-dual-indent {
+  margin-left: 2.4em;
+  margin-right: 2.4em;
+}
+
+.small-top-margin {
+  margin-top: 0.4em;
+}
+
+.top-margin {
+  margin-top: 0.8em;
+}
+
+.large-top-margin {
+  margin-top: 1.2em;
+}
+
+.small-bottom-margin {
+  margin-bottom: 0.4em;
+}
+
+.bottom-margin {
+  margin-bottom: 0.8em;
+}
+
+.large-bottom-margin {
+  margin-bottom: 1.2em;
+}
+
+.extra-large-bottom-margin {
+  margin-bottom: 3.2em;
+}
+
+/*
+ * Twitter Bootstrap
+ */
+
 .footer {
   margin-top: 40px;
   font-size: 0.8em;
@@ -14,15 +95,6 @@ li {
 .footer .container > div {
   border-top: 1px solid #E5E5E5;
   padding-top: 20px;
-}
-
-.tags .label {
-  margin-right: 10px;
-}
-
-.items .item {
-  margin-top: 10px;
-  margin-bottom: 10px;
 }
 
 .page-header .btn-group {
@@ -34,6 +106,18 @@ li {
   font-size: 1.4em;
   margin: 0;
   padding: 0;
+}
+
+.breadcrumb {
+  background: none;
+  border: none;
+  list-style: none outside none;
+  margin: 0 0 10px;
+  padding: 0;
+}
+
+ul.inline {
+  display: inline;
 }
 
 .btn-group + .btn-group.pull-right {

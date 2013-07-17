@@ -15,11 +15,13 @@ import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorView;
 import org.obiba.opal.web.gwt.app.client.project.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.DatasourceUiHandlers;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
+import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
+import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.NavLink;
@@ -31,7 +33,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
@@ -73,7 +74,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   InlineLabel noTables;
 
   @UiField
-  CellTable<TableDto> table;
+  Table<TableDto> table;
 
   @UiField
   SimplePager pager;
@@ -172,7 +173,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   @Override
   public void beforeRenderRows() {
     pager.setVisible(false);
-    table.setEmptyTableWidget(table.getLoadingIndicator());
+    table.showLoadingIndicator(dataProvider);
   }
 
   @Override
@@ -183,7 +184,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     downloadDictionary.setEnabled(enableItem);
     exportData.setDisabled(!enableItem);
     copyData.setDisabled(!enableItem);
-    table.setEmptyTableWidget(noTables);
+    table.hideLoadingIndicator();
   }
 
   @Override

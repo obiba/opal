@@ -63,13 +63,9 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
 
   private String datasourceName;
 
-  private boolean toUpdate;
-
   private JsArray<TableDto> tables;
 
   private DatasourceDto datasource;
-
-  private Runnable removeDatasourceConfirmation;
 
   private final Provider<AuthorizationPresenter> authorizationPresenter;
 
@@ -84,16 +80,13 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
   @ProxyEvent
   public void onDatasourceSelectionChanged(final DatasourceSelectionChangeEvent e) {
     datasourceName = e.getSelection();
-    if(!isVisible()) {
-      forceReveal();
-      initDatasource();
-    }
+    forceReveal();
+    initDatasource();
   }
 
   @Override
   protected void onBind() {
     super.onBind();
-    registerHandler(getEventBus().addHandler(SiblingTableSelectionEvent.getType(), new SiblingTableSelectionHandler()));
     getView().setTableNameFieldUpdater(new TableNameFieldUpdater());
   }
 
@@ -158,7 +151,6 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
   }
 
   private void updateTable(@Nullable String tableName) {
-    toUpdate = false;
     UriBuilder ub = UriBuilder.URI_DATASOURCE_TABLES.query("counts", "true");
     ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(ub.build(datasourceName)).get()
         .withCallback(new TablesResourceCallback(datasourceName, tableName)).send();
@@ -173,7 +165,6 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     getEventBus().fireEvent(new WizardRequiredEvent(CreateViewStepPresenter.WizardType, datasource));
   }
 
-  @Nullable
   private String getPreviousTableName(int index) {
     TableDto previous = null;
     if(index > 0) {
@@ -182,7 +173,6 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     return previous == null ? null : previous.getName();
   }
 
-  @Nullable
   private String getNextTableName(int index) {
     TableDto next = null;
     if(index < tables.length() - 1) {
@@ -192,16 +182,18 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
   }
 
   private void initDatasource() {
-    ResourceRequestBuilderFactory.<DatasourceDto>newBuilder()
-        .forResource(UriBuilder.URI_DATASOURCE.build(datasourceName)).get()
-        .withCallback(new ResourceCallback<DatasourceDto>() {
-          @Override
-          public void onResource(Response response, DatasourceDto resource) {
-            datasource = resource;
-            displayDatasource(datasource, null);
-          }
+    if(datasource == null || !datasource.getName().equals(datasourceName)) {
+      ResourceRequestBuilderFactory.<DatasourceDto>newBuilder()
+          .forResource(UriBuilder.URI_DATASOURCE.build(datasourceName)).get()
+          .withCallback(new ResourceCallback<DatasourceDto>() {
+            @Override
+            public void onResource(Response response, DatasourceDto resource) {
+              datasource = resource;
+              displayDatasource(datasource, null);
+            }
 
-        }).send();
+          }).send();
+    }
   }
 
   @Override
@@ -290,54 +282,8 @@ public class DatasourcePresenter extends Presenter<DatasourcePresenter.Display, 
     @Override
     public void update(int index, TableDto tableDto, String value) {
       getEventBus().fireEvent(
-          new TableSelectionChangeEvent(DatasourcePresenter.this, tableDto.getDatasourceName(), tableDto.getName(),
-              getPreviousTableName(index), getNextTableName(index)));
-    }
-  }
-
-  class TableSelectionHandler implements TableSelectionChangeEvent.Handler {
-
-    @Override
-    public void onTableSelectionChanged(final TableSelectionChangeEvent event) {
-      if(event.getDatasourceName().equals(datasourceName)) {
-        selectTable(event.getTableName());
-      } else {
-        ResourceRequestBuilderFactory.<DatasourceDto>newBuilder()
-            .forResource(UriBuilder.URI_DATASOURCE.build(event.getDatasourceName())).get()
-            .withCallback(new ResourceCallback<DatasourceDto>() {
-              @Override
-              public void onResource(Response response, DatasourceDto resource) {
-                displayDatasource(resource, event.getTableName());
-              }
-            }).send();
-      }
-    }
-  }
-
-  class SiblingTableSelectionHandler implements SiblingTableSelectionEvent.Handler {
-    @Override
-    public void onSiblingTableSelection(SiblingTableSelectionEvent event) {
-      TableDto siblingSelection = event.getCurrentSelection();
-
-      // Look for the table and its position in the list by its name.
-      // Having an position of the current variable would be more efficient.
-      int siblingIndex = 0;
-      int currentTableIndex = getTableIndex(event.getCurrentSelection().getName());
-      if(event.getDirection() == SiblingTableSelectionEvent.Direction.NEXT && currentTableIndex < tables.length() - 1) {
-        siblingIndex = currentTableIndex + 1;
-      } else if(event.getDirection() == SiblingTableSelectionEvent.Direction.PREVIOUS && currentTableIndex != 0) {
-        siblingIndex = currentTableIndex - 1;
-      } else {
-        siblingIndex = currentTableIndex;
-      }
-      siblingSelection = tables.get(siblingIndex);
-
-      // This fires a TableSelectionChangeEvent if the selection changes
-      getView().setTableSelection(siblingSelection, siblingIndex);
-
-      getEventBus().fireEvent(
-          new TableSelectionChangeEvent(DatasourcePresenter.this, siblingSelection.getDatasourceName(),
-              siblingSelection.getName(), getPreviousTableName(siblingIndex), getNextTableName(siblingIndex)));
+          new TableSelectionChangeEvent(DatasourcePresenter.this, tableDto, getPreviousTableName(index),
+              getNextTableName(index)));
     }
   }
 

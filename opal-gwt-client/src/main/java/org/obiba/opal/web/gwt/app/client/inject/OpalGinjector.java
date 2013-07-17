@@ -37,7 +37,7 @@ import org.obiba.opal.web.gwt.app.client.project.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.EntityDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorTreePresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LoggedInGatekeeper;

@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.navigator.presenter;
+package org.obiba.opal.web.gwt.app.client.project.presenter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +28,9 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.TableIndexStatusRefresh
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.CodingViewDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
+import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.util.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
@@ -43,7 +46,6 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
@@ -73,6 +75,7 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.ProxyEvent;
@@ -86,7 +89,7 @@ import static com.google.gwt.http.client.Response.SC_OK;
 import static com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE;
 
 @SuppressWarnings("OverlyCoupledClass")
-public class TablePresenter extends Presenter<TablePresenter.Display, TablePresenter.Proxy> {
+public class TablePresenter extends Presenter<TablePresenter.Display, TablePresenter.Proxy> implements TableUiHandlers {
 
   private static final int DELAY_MILLIS = 1000;
 
@@ -124,23 +127,19 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   @Inject
   public TablePresenter(Display display, EventBus eventBus, Proxy proxy, ValuesTablePresenter valuesTablePresenter,
       Provider<AuthorizationPresenter> authorizationPresenter, Provider<IndexPresenter> indexPresenter) {
-    super(eventBus, display, proxy);
+    super(eventBus, display, proxy, ProjectPresenter.TABLES_PANE);
     this.valuesTablePresenter = valuesTablePresenter;
     this.authorizationPresenter = authorizationPresenter;
     this.indexPresenter = indexPresenter;
+    getView().setUiHandlers(this);
   }
 
-  @Override
-  protected void revealInParent() {
-    RevealContentEvent.fire(this, NavigatorPresenter.CENTER_PANE, this);
-  }
-
-  // This makes this presenter reveal itself whenever a TableSelectionChangeEvent occurs (anywhere for any reason).
-  @SuppressWarnings("UnusedDeclaration")
   @ProxyEvent
   public void onTableSelectionChanged(TableSelectionChangeEvent e) {
-    if(!isVisible()) {
-      forceReveal();
+    forceReveal();
+    if(e.hasTable()) {
+      updateDisplay(e.getTable(), e.getPrevious(), e.getNext());
+    } else {
       updateDisplay(e.getDatasourceName(), e.getTableName(), e.getPrevious(), e.getNext());
     }
   }
@@ -170,13 +169,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     registerHandler(
         getEventBus().addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
     registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler()));
-    getView().setAddVariablesToViewCommand(new AddVariablesToViewCommand());
-    getView().setExcelDownloadCommand(new ExcelDownloadCommand());
-    getView().setExportDataCommand(new ExportDataCommand());
-    getView().setCopyDataCommand(new CopyDataCommand());
-    getView().setParentCommand(new ParentCommand());
-    getView().setPreviousCommand(new PreviousCommand());
-    getView().setNextCommand(new NextCommand());
     getView().setValuesTabCommand(new ValuesCommand());
     getView().setVariablesTabCommand(new VariablesCommand());
 
@@ -313,7 +305,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   private void authorize() {
-    if (table == null) return;
+    if(table == null) return;
 
     UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName());
     // export variables in excel
@@ -345,17 +337,13 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     // values
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/valueSets").get()
         .authorize(getView().getValuesAuthorizer()).send();
-
-    // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder()
-        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
   private void updateDisplay(String datasourceName, String tableName, final String previous, final String next) {
     if(table != null && table.getDatasourceName().equals(datasourceName) && table.getName().equals(tableName)) {
       updateDisplay(table, previous, next);
     } else {
-      UriBuilder ub = UriBuilder.create().segment("datasource", "{}", "table", "{}").query("counts","true");
+      UriBuilder ub = UriBuilder.create().segment("datasource", "{}", "table", "{}").query("counts", "true");
       ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(datasourceName, tableName)).get()
           .withCallback(new ResourceCallback<TableDto>() {
             @Override
@@ -374,24 +362,11 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     this.next = next;
 
     getView().setTable(tableDto);
-    getView().setParentName(tableDto.getDatasourceName());
     getView().setPreviousName(previous);
     getView().setNextName(next);
-    getView().setRemoveCommand(new RemoveCommand());
 
     if(getView().isValuesTabSelected()) {
       valuesTablePresenter.setTable(tableDto);
-    }
-
-    if(tableIsView()) {
-      getView().setViewDownloadCommand(new DownloadViewCommand());
-      getView().setEditCommand(new EditCommand());
-      showFromTables(tableDto);
-
-    } else {
-      getView().setViewDownloadCommand(null);
-      getView().setEditCommand(null);
-      getView().setFromTables(null);
     }
 
     updateVariables();
@@ -458,7 +433,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   }
 
-  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void downloadMetadata() {
     String downloadUrl = table.getLink() + "/variables/excel";
     getEventBus().fireEvent(new FileDownloadEvent(downloadUrl));
@@ -480,52 +454,66 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     return next;
   }
 
-  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
-  private void removeView() {
-
-    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
-
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == SC_OK) {
-          getEventBus().fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
-          getEventBus().fireEvent(new DatasourceSelectionChangeEvent(table.getDatasourceName()));
-        } else {
-          String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
-        }
-      }
-    };
-
-    ResourceRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).delete()
-        .withCallback(SC_OK, callbackHandler).withCallback(SC_FORBIDDEN, callbackHandler)
-        .withCallback(SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(SC_NOT_FOUND, callbackHandler).send();
-  }
-
-  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
-  private void removeTable() {
-
-    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
-
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == SC_OK) {
-          getEventBus().fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
-          getEventBus().fireEvent(new DatasourceSelectionChangeEvent(table.getDatasourceName()));
-        } else {
-          String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
-        }
-      }
-    };
-
-    ResourceRequestBuilderFactory.newBuilder().forResource(table.getLink()).delete()
-        .withCallback(SC_OK, callbackHandler).withCallback(SC_FORBIDDEN, callbackHandler)
-        .withCallback(SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(SC_NOT_FOUND, callbackHandler).send();
-  }
 
   private boolean tableIsView() {
     return table.hasViewLink();
+  }
+
+  @Override
+  public void onDatasourceSelection() {
+    getEventBus().fireEvent(new DatasourceSelectionChangeEvent(table.getDatasourceName()));
+  }
+
+  @Override
+  public void onNextTable() {
+    getEventBus().fireEvent(new SiblingTableSelectionEvent(table, Direction.NEXT));
+  }
+
+  @Override
+  public void onPreviousTable() {
+    getEventBus().fireEvent(new SiblingTableSelectionEvent(table, Direction.PREVIOUS));
+  }
+
+  @Override
+  public void onExportData() {
+    getEventBus().fireEvent(new WizardRequiredEvent(DataExportPresenter.WizardType, table));
+  }
+
+  @Override
+  public void onCopyData() {
+    getEventBus().fireEvent(new WizardRequiredEvent(DataCopyPresenter.WizardType, table));
+  }
+
+  @Override
+  public void onDownloadDictionary() {
+    downloadMetadata();
+  }
+
+  @Override
+  public void onDownloadView() {
+    String downloadUrl = table.getViewLink() + "/xml";
+    getEventBus().fireEvent(new FileDownloadEvent(downloadUrl));
+  }
+
+  @Override
+  public void onEdit() {
+    if(getView().getSelectedItems().isEmpty()) {
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error("CopyVariableSelectAtLeastOne").build());
+    } else {
+      getEventBus().fireEvent(new CopyVariablesToViewEvent(table, getView().getSelectedItems()));
+    }
+  }
+
+  @Override
+  public void onRemove() {
+    removeConfirmation = new RemoveRunnable();
+
+    ConfirmationRequiredEvent event;
+    event = tableIsView()
+        ? ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "removeView", "confirmRemoveView")
+        : ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "removeTable", "confirmRemoveTable");
+
+    getEventBus().fireEvent(event);
   }
 
   private final class ValuesCommand implements Command {
@@ -550,43 +538,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         String sortColumnName = getView().getClickableColumnName(sortColumn);
         doFilterVariables(sortColumnName);
       }
-    }
-  }
-
-  /**
-   * Update permissions on authorization.
-   */
-  private final class PermissionsUpdate implements HasAuthorization {
-    @Override
-    public void unauthorized() {
-
-    }
-
-    @Override
-    public void beforeAuthorization() {
-
-    }
-
-    @Override
-    public void authorized() {
-      AuthorizationPresenter authz = authorizationPresenter.get();
-      UriBuilder nodeBuilder = UriBuilder.create().segment("datasource", table.getDatasourceName());
-
-      if(table.hasViewLink()) {
-        String node = nodeBuilder.segment("view", table.getName()).build();
-        authz.setAclRequest("view", new AclRequest(AclAction.VIEW_READ, node), //
-            new AclRequest(AclAction.VIEW_VALUES, node), //
-            new AclRequest(AclAction.VIEW_EDIT, node), //
-            new AclRequest(AclAction.VIEW_VALUES_EDIT, node), //
-            new AclRequest(AclAction.VIEW_ALL, node));
-      } else {
-        String node = nodeBuilder.segment("table", table.getName()).build();
-        authz.setAclRequest("table", new AclRequest(AclAction.TABLE_READ, node), //
-            new AclRequest(AclAction.TABLE_VALUES, node), //
-            new AclRequest(AclAction.TABLE_EDIT, node),//
-            new AclRequest(AclAction.TABLE_ALL, node));
-      }
-      setInSlot(Display.Slots.Permissions, authz);
     }
   }
 
@@ -657,85 +608,14 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   private final class NextCommand implements Command {
     @Override
     public void execute() {
-      getEventBus().fireEvent(new SiblingTableSelectionEvent(table, Direction.NEXT));
+
     }
   }
 
   private final class PreviousCommand implements Command {
     @Override
     public void execute() {
-      getEventBus().fireEvent(new SiblingTableSelectionEvent(table, Direction.PREVIOUS));
-    }
-  }
 
-  private final class ParentCommand implements Command {
-    @Override
-    public void execute() {
-      getEventBus().fireEvent(new DatasourceSelectionChangeEvent(table.getDatasourceName()));
-    }
-  }
-
-  private final class ExcelDownloadCommand implements Command {
-    @Override
-    public void execute() {
-      downloadMetadata();
-    }
-  }
-
-  private final class ExportDataCommand implements Command {
-    @Override
-    public void execute() {
-      getEventBus().fireEvent(new WizardRequiredEvent(DataExportPresenter.WizardType, table));
-    }
-  }
-
-  private final class CopyDataCommand implements Command {
-    @Override
-    public void execute() {
-      getEventBus().fireEvent(new WizardRequiredEvent(DataCopyPresenter.WizardType, table));
-    }
-  }
-
-  private final class DownloadViewCommand implements Command {
-    @Override
-    public void execute() {
-      String downloadUrl = table.getViewLink() + "/xml";
-      getEventBus().fireEvent(new FileDownloadEvent(downloadUrl));
-    }
-  }
-
-  private final class RemoveCommand implements Command {
-    @Override
-    public void execute() {
-      removeConfirmation = new Runnable() {
-        @Override
-        public void run() {
-          if(tableIsView()) {
-            removeView();
-          } else {
-            removeTable();
-          }
-        }
-      };
-
-      ConfirmationRequiredEvent event;
-      event = tableIsView()
-          ? ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "removeView", "confirmRemoveView")
-          : ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "removeTable", "confirmRemoveTable");
-
-      getEventBus().fireEvent(event);
-    }
-  }
-
-  private final class AddVariablesToViewCommand implements Command {
-
-    @Override
-    public void execute() {
-      if(getView().getSelectedItems().isEmpty()) {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error("CopyVariableSelectAtLeastOne").build());
-      } else {
-        getEventBus().fireEvent(new CopyVariablesToViewEvent(table, getView().getSelectedItems()));
-      }
     }
   }
 
@@ -893,7 +773,7 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   @ProxyStandard
   public interface Proxy extends com.gwtplatform.mvp.client.proxy.Proxy<TablePresenter> {}
 
-  public interface Display extends View {
+  public interface Display extends View, HasUiHandlers<TableUiHandlers> {
 
     enum Slots {
       Permissions, Values
@@ -911,26 +791,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     void setTable(TableDto dto);
 
-    void setExcelDownloadCommand(Command cmd);
-
-    void setExportDataCommand(Command cmd);
-
-    void setViewDownloadCommand(Command cmd);
-
-    void setParentCommand(Command cmd);
-
-    void setNextCommand(Command cmd);
-
-    void setPreviousCommand(Command cmd);
-
-    void setRemoveCommand(Command cmd);
-
-    void setEditCommand(Command cmd);
-
-    void setAddVariablesToViewCommand(Command cmd);
-
-    void setParentName(String name);
-
     void setPreviousName(String name);
 
     void setNextName(String name);
@@ -938,8 +798,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     void setVariableNameFieldUpdater(FieldUpdater<VariableDto, String> updater);
 
     void setVariableIndexFieldUpdater(FieldUpdater<VariableDto, String> updater);
-
-    void setCopyDataCommand(Command cmd);
 
     HandlerRegistration addVariableSortHandler(ColumnSortEvent.Handler handler);
 
@@ -956,8 +814,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     HasAuthorization getEditAuthorizer();
 
     HasAuthorization getValuesAuthorizer();
-
-    HasAuthorization getPermissionsAuthorizer();
 
     HasAuthorization getTableIndexStatusAuthorizer();
 
@@ -998,4 +854,57 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     void setCancelVisible(boolean b);
   }
 
+  private class RemoveRunnable implements Runnable {
+    @Override
+    public void run() {
+      if(tableIsView()) {
+        removeView();
+      } else {
+        removeTable();
+      }
+    }
+
+    private void removeView() {
+
+      ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          if(response.getStatusCode() == SC_OK) {
+            getEventBus().fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
+            getEventBus().fireEvent(new DatasourceSelectionChangeEvent(table.getDatasourceName()));
+          } else {
+            String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
+            getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
+          }
+        }
+      };
+
+      ResourceRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).delete()
+          .withCallback(SC_OK, callbackHandler).withCallback(SC_FORBIDDEN, callbackHandler)
+          .withCallback(SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(SC_NOT_FOUND, callbackHandler).send();
+    }
+
+    private void removeTable() {
+
+      ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          if(response.getStatusCode() == SC_OK) {
+            getEventBus().fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
+            getEventBus().fireEvent(new DatasourceSelectionChangeEvent(table.getDatasourceName()));
+          } else {
+            String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
+            getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
+          }
+        }
+      };
+
+      ResourceRequestBuilderFactory.newBuilder().forResource(table.getLink()).delete()
+          .withCallback(SC_OK, callbackHandler).withCallback(SC_FORBIDDEN, callbackHandler)
+          .withCallback(SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(SC_NOT_FOUND, callbackHandler).send();
+    }
+
+  }
 }
