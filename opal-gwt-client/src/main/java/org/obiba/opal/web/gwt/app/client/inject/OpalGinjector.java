@@ -33,7 +33,7 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.CodingViewDialogPresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.DatasourcePresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.EntityDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorTreePresenter;

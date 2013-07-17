@@ -9,6 +9,8 @@ public interface ProjectsUiHandlers extends UiHandlers {
 
   void onProjectSelection(ProjectDto project);
 
+  void onProjectTableSelection(ProjectDto project, String table);
+
   boolean onAddProject(ProjectFactoryDto project);
 
 }

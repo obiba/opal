@@ -7,78 +7,76 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.navigator.view;
+package org.obiba.opal.web.gwt.app.client.project.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.DatasourcePresenter;
+import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorView;
+import org.obiba.opal.web.gwt.app.client.project.presenter.DatasourcePresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.DatasourceUiHandlers;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
-import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
-import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
-import org.obiba.opal.web.gwt.rest.client.authorization.TabAuthorizer;
-import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.DropdownButton;
+import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.MenuItem;
-import com.google.gwt.user.client.ui.MenuItemSeparator;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
-import com.gwtplatform.mvp.client.ViewImpl;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-public class DatasourceView extends ViewImpl implements DatasourcePresenter.Display {
+public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> implements DatasourcePresenter.Display {
 
-  @UiTemplate("DatasourceView.ui.xml")
   interface DatasourceViewUiBinder extends UiBinder<Widget, DatasourceView> {}
 
   private static final DatasourceViewUiBinder uiBinder = GWT.create(DatasourceViewUiBinder.class);
 
-  private final Widget widget;
+  @UiField
+  Button downloadDictionary;
 
   @UiField
-  Label datasourceType;
+  DropdownButton tasksBtn;
+
+  @UiField
+  NavLink importData;
+
+  @UiField
+  NavLink exportData;
+
+  @UiField
+  NavLink copyData;
+
+  @UiField
+  DropdownButton addBtn;
+
+  @UiField
+  NavLink addTable;
+
+  @UiField
+  NavLink addView;
 
   @UiField
   InlineLabel noTables;
-
-  @UiField
-  HorizontalTabLayout tabs;
 
   @UiField
   CellTable<TableDto> table;
 
   @UiField
   SimplePager pager;
-
-  @UiField
-  FlowPanel toolbarPanel;
-
-  @UiField
-  Panel permissions;
-
-  private final NavigatorMenuBar toolbar;
-
-  private MenuItem removeMenuItem;
-
-  private MenuItemSeparator removeMenuItemSeparator;
 
   private final ListDataProvider<TableDto> dataProvider = new ListDataProvider<TableDto>();
 
@@ -87,18 +85,38 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
   private final Translations translations = GWT.create(Translations.class);
 
   public DatasourceView() {
-    widget = uiBinder.createAndBindUi(this);
-    toolbarPanel.add(toolbar = new NavigatorMenuBar());
-    toolbar.setParentName(null);
+    initWidget(uiBinder.createAndBindUi(this));
     addTableColumns();
   }
 
-  @Override
-  public void setInSlot(Object slot, IsWidget content) {
-    permissions.clear();
-    if(content != null) {
-      permissions.add(content.asWidget());
-    }
+  @UiHandler("downloadDictionary")
+  void onDownloadDictionary(ClickEvent event) {
+    getUiHandlers().onDownloadDictionary();
+  }
+
+  @UiHandler("importData")
+  void onImportData(ClickEvent event) {
+    getUiHandlers().onImportData();
+  }
+
+  @UiHandler("exportData")
+  void onExportData(ClickEvent event) {
+    getUiHandlers().onExportData();
+  }
+
+  @UiHandler("copyData")
+  void onCopyData(ClickEvent event) {
+    getUiHandlers().onCopyData();
+  }
+
+  @UiHandler("addTable")
+  void onAddTable(ClickEvent event) {
+    getUiHandlers().onAddTable();
+  }
+
+  @UiHandler("addView")
+  void onAddView(ClickEvent event) {
+    getUiHandlers().onAddView();
   }
 
   private void addTableColumns() {
@@ -143,11 +161,6 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
   }
 
   @Override
-  public Widget asWidget() {
-    return widget;
-  }
-
-  @Override
   public void setTableSelection(TableDto tableDto, int index) {
     int pageIndex = index / table.getPageSize();
     if(pageIndex != pager.getPage()) {
@@ -167,62 +180,24 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
     dataProvider.refresh();
     boolean enableItem = table.getRowCount() > 0;
     pager.setVisible(table.getRowCount() > NavigatorView.PAGE_SIZE);
-    toolbar.setExportVariableDictionaryItemEnabled(enableItem);
-    toolbar.setExportDataItemEnabled(enableItem);
-    toolbar.setCopyDataItemEnabled(enableItem);
+    downloadDictionary.setEnabled(enableItem);
+    exportData.setDisabled(!enableItem);
+    copyData.setDisabled(!enableItem);
     table.setEmptyTableWidget(noTables);
   }
 
   @Override
   public void renderRows(JsArray<TableDto> rows) {
-    int length = rows.length();
     dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
     pager.firstPage();
   }
 
   @Override
   public void setDatasource(DatasourceDto dto) {
-    datasourceType.setText(translations.datasourceTypeMap().get(dto.getType()));
-    toolbar.getAddItem().setVisible(false);
+    addBtn.setVisible(false);
     boolean isNull = "null".equals(dto.getType());
-    toolbar.setImportDataItemEnabled(!isNull);
-    toolbar.setAddUpdateTablesItemEnabled(!isNull);
-  }
-
-  @Override
-  public void setNextName(String name) {
-    toolbar.setNextName(name);
-  }
-
-  @Override
-  public void setPreviousName(String name) {
-    toolbar.setPreviousName(name);
-  }
-
-  @Override
-  public void setNextCommand(Command cmd) {
-    toolbar.setNextCommand(cmd);
-  }
-
-  @Override
-  public void setPreviousCommand(Command cmd) {
-    toolbar.setPreviousCommand(cmd);
-  }
-
-  @Override
-  public void setExcelDownloadCommand(Command cmd) {
-    toolbar.setExcelDownloadCommand(cmd);
-  }
-
-  @Override
-  public void setRemoveDatasourceCommand(Command cmd) {
-    removeMenuItemSeparator = toolbar.getToolsMenu().addSeparator();
-    removeMenuItem = toolbar.getToolsMenu().addItem(new MenuItem(translations.removeLabel(), cmd));
-  }
-
-  @Override
-  public void setAddViewCommand(Command cmd) {
-    toolbar.setAddViewCommand(cmd);
+    importData.setDisabled(isNull);
+    addTable.setDisabled(isNull);
   }
 
   @Override
@@ -231,38 +206,13 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
   }
 
   @Override
-  public void setImportDataCommand(Command cmd) {
-    toolbar.setImportDataCommand(cmd);
-  }
-
-  @Override
-  public void setExportDataCommand(Command cmd) {
-    toolbar.setExportDataCommand(cmd);
-  }
-
-  @Override
-  public void setCopyDataCommand(Command cmd) {
-    toolbar.setCopyDataCommand(cmd);
-  }
-
-  @Override
-  public void setAddUpdateTablesCommand(Command cmd) {
-    toolbar.setAddUpdateTablesCommand(cmd);
-  }
-
-  @Override
-  public void enableDatasourceRemoval(boolean enable) {
-    removeMenuItem.setEnabled(enable);
-  }
-
-  @Override
   public HasAuthorization getAddUpdateTablesAuthorizer() {
-    return new MenuItemAuthorizer(toolbar.getAddUpdateTablesItem()) {
+    return new WidgetAuthorizer(addTable) {
 
       @Override
       public void authorized() {
         super.authorized();
-        toolbar.getAddItem().setVisible(true);
+        addBtn.setVisible(true);
       }
 
     };
@@ -270,12 +220,12 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
 
   @Override
   public HasAuthorization getAddViewAuthorizer() {
-    return new MenuItemAuthorizer(toolbar.getAddViewItem()) {
+    return new WidgetAuthorizer(addView) {
 
       @Override
       public void authorized() {
         super.authorized();
-        toolbar.getAddItem().setVisible(true);
+        addBtn.setVisible(true);
       }
 
     };
@@ -283,33 +233,22 @@ public class DatasourceView extends ViewImpl implements DatasourcePresenter.Disp
 
   @Override
   public HasAuthorization getImportDataAuthorizer() {
-    return new MenuItemAuthorizer(toolbar.getImportDataItem());
+    return new WidgetAuthorizer(importData);
   }
 
   @Override
   public HasAuthorization getExportDataAuthorizer() {
-    return new MenuItemAuthorizer(toolbar.getExportDataItem());
+    return new WidgetAuthorizer(exportData);
   }
 
   @Override
   public HasAuthorization getCopyDataAuthorizer() {
-    return new MenuItemAuthorizer(toolbar.getCopyDataItem());
-  }
-
-  @Override
-  public HasAuthorization getRemoveDatasourceAuthorizer() {
-    return new CompositeAuthorizer(new MenuItemAuthorizer(removeMenuItem),
-        new UIObjectAuthorizer(removeMenuItemSeparator));
+    return new WidgetAuthorizer(copyData);
   }
 
   @Override
   public HasAuthorization getExcelDownloadAuthorizer() {
-    return new MenuItemAuthorizer(toolbar.getExportVariableDictionaryItem());
-  }
-
-  @Override
-  public HasAuthorization getPermissionsAuthorizer() {
-    return new TabAuthorizer(tabs, 1);
+    return new WidgetAuthorizer(downloadDictionary);
   }
 
 }

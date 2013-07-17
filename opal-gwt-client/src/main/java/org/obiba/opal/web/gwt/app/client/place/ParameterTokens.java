@@ -19,5 +19,11 @@ package org.obiba.opal.web.gwt.app.client.place;
 public class ParameterTokens {
   public static final String TOKEN_QUERY = "q";
 
-  public static final String TOKEN_ID = "id";
+  public static final String TOKEN_NAME = "name";
+
+  public static final String TOKEN_TABLES = "tables";
+
+  public static final String TOKEN_FILES = "files";
+
+  public static final String TOKEN_ADMIN = "admin";
 }

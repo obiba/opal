@@ -1,0 +1,33 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+
+  <g:FlowPanel>
+    <g:FlowPanel>
+      <b:DropdownButton text="Add" size="SMALL" icon="PLUS_SIGN_ALT" ui:field="addBtn">
+        <b:NavLink icon="TABLE" ui:field="addTable"><ui:msg description="Add table label">Add table...</ui:msg></b:NavLink>
+        <b:NavLink icon="COGS" ui:field="addView"><ui:msg description="Add view label">Add view...</ui:msg></b:NavLink>
+      </b:DropdownButton>
+      <b:ButtonGroup>
+        <b:Button icon="DOWNLOAD" size="SMALL" ui:field="downloadDictionary"><ui:msg description="Download dictionary label">Download dictionary</ui:msg></b:Button>
+      </b:ButtonGroup>
+      <b:DropdownButton text="Tasks" size="SMALL" icon="COG" ui:field="tasksBtn">
+        <b:NavLink icon="SIGNIN" ui:field="importData"><ui:msg description="Import data label">Import data...</ui:msg></b:NavLink>
+        <b:NavLink icon="SIGNOUT" ui:field="exportData"><ui:msg description="Export data label">Export data...</ui:msg></b:NavLink>
+        <b:NavLink icon="COPY" ui:field="copyData"><ui:msg description="Copy data label">Copy data...</ui:msg></b:NavLink>
+      </b:DropdownButton>
+    </g:FlowPanel>
+    <g:FlowPanel>
+      <g:InlineLabel ui:field="noTables">
+        <ui:msg description="No Tables label">No Tables</ui:msg>
+      </g:InlineLabel>
+      <b:SimplePager ui:field="pager" location="RIGHT"/>
+      <o:Table ui:field="table"/>
+    </g:FlowPanel>
+  </g:FlowPanel>
+
+</ui:UiBinder>

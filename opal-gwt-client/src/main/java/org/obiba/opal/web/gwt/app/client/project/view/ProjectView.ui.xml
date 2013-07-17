@@ -6,16 +6,39 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <b:FluidRow addStyleNames="page-header">
-      <b:Column size="9">
-        <b:Breadcrumbs ui:field="breadcrumbs">
-          <b:NavLink ui:field="projects"><ui:msg description="Projects label">Projects</ui:msg></b:NavLink>
-        </b:Breadcrumbs>
-      </b:Column>
-      <b:Column size="3">
+    <g:FlowPanel addStyleNames="page-header">
+      <b:FluidRow>
+        <b:Column size="9">
+          <b:Breadcrumbs ui:field="breadcrumbs">
+            <b:NavLink ui:field="projects">
+              <ui:msg description="Projects label">Projects</ui:msg>
+            </b:NavLink>
+          </b:Breadcrumbs>
+        </b:Column>
+        <b:Column size="3">
 
-      </b:Column>
-    </b:FluidRow>
+        </b:Column>
+      </b:FluidRow>
+      <g:InlineLabel ui:field="description"></g:InlineLabel><b:Button type="LINK" icon="PLUS_SIGN" ui:field="ellipsis"/>
+    </g:FlowPanel>
+    <b:TabPanel tabPosition="right" ui:field="tabPanel">
+      <b:Tab icon="TABLE" heading="Tables" active="true">
+        <g:SimplePanel ui:field="tablesPanel"/>
+      </b:Tab>
+      <b:Tab icon="FILE" heading="Files">
+        <b:Heading size="5">Files</b:Heading>
+        <b:Paragraph>
+          huhuhu hahha
+        </b:Paragraph>
+      </b:Tab>
+      <b:Tab icon="BOOK" heading="Administration">
+        <b:NavPills>
+          <b:NavLink active="true">Settings</b:NavLink>
+          <b:NavLink>Permissions</b:NavLink>
+          <b:NavLink>Units</b:NavLink>
+        </b:NavPills>
+      </b:Tab>
+    </b:TabPanel>
     <g:FlowPanel ui:field="content"></g:FlowPanel>
   </g:FlowPanel>
 

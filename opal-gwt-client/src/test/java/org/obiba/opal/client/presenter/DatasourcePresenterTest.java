@@ -20,7 +20,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChan
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingTableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.DatasourcePresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
@@ -83,14 +83,6 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
         .addHandler((Type<ViewSavedEvent.Handler>) EasyMock.anyObject(), (ViewSavedEvent.Handler) EasyMock.anyObject()))
         .andReturn(handlerRegistrationMock).once();
 
-    displayMock.setExcelDownloadCommand((Command) EasyMock.anyObject());
-    displayMock.setExportDataCommand((Command) EasyMock.anyObject());
-    displayMock.setCopyDataCommand((Command) EasyMock.anyObject());
-    displayMock.setAddUpdateTablesCommand((Command) EasyMock.anyObject());
-    displayMock.setRemoveDatasourceCommand((Command) EasyMock.anyObject());
-    displayMock.setAddViewCommand((Command) EasyMock.anyObject());
-    displayMock.setNextCommand((Command) EasyMock.anyObject());
-    displayMock.setPreviousCommand((Command) EasyMock.anyObject());
     displayMock.setTableNameFieldUpdater((FieldUpdater<TableDto, String>) EasyMock.anyObject());
 
     usersAuthzDisplayMock.addPrincipalHandler((AddPrincipalHandler) EasyMock.anyObject());

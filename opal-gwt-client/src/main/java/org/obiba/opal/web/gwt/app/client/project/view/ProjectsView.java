@@ -16,6 +16,7 @@ import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.Modal;
 import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.base.UnorderedList;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
@@ -163,10 +164,22 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
         for(ProjectDto project : JsArrays.toIterable(projects)) {
           FlowPanel panel = new FlowPanel();
           panel.addStyleName("item");
+
           NavLink projectLink = newProjectLink(handlers, project);
           panel.add(projectLink);
+
           Label descriptionLabel = new Label(project.getDescription());
           panel.add(descriptionLabel);
+
+          JsArrayString tableNames = JsArrays.toSafeArray(project.getDatasource().getTableArray());
+          if (tableNames.length() > 0) {
+            UnorderedList tables = new UnorderedList();
+            for (String table : JsArrays.toIterable(tableNames)) {
+              tables.add(newProjectTableLink(handlers,project, table));
+            }
+            panel.add(tables);
+          }
+
           FlowPanel tagsPanel = new FlowPanel();
           tagsPanel.addStyleName("tags");
           for(String tag : JsArrays.toIterable(JsArrays.toSafeArray(project.getTagsArray()))) {
@@ -229,6 +242,17 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
         @Override
         public void onClick(ClickEvent event) {
           handlers.onProjectSelection(project);
+        }
+      });
+      return link;
+    }
+
+    protected NavLink newProjectTableLink(final ProjectsUiHandlers handlers, final ProjectDto project, final String table) {
+      NavLink link = new NavLink(table);
+      link.addClickHandler(new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          handlers.onProjectTableSelection(project, table);
         }
       });
       return link;

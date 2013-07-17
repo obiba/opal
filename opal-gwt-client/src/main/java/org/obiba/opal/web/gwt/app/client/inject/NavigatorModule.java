@@ -10,7 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.inject;
 
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.CodingViewDialogPresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.DatasourcePresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.EntityDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorTreePresenter;
@@ -18,7 +18,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.view.CodingViewDialogView;
-import org.obiba.opal.web.gwt.app.client.navigator.view.DatasourceView;
+import org.obiba.opal.web.gwt.app.client.project.view.DatasourceView;
 import org.obiba.opal.web.gwt.app.client.navigator.view.EntityDialogView;
 import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorTreeView;
 import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorView;

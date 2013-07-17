@@ -18,7 +18,6 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -67,7 +66,16 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
 
   @Override
   public void onProjectSelection(ProjectDto project) {
-    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.project).with(ParameterTokens.TOKEN_ID, project.getName()).build();
+    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.project)
+        .with(ParameterTokens.TOKEN_NAME, project.getName()).build();
+    placeManager.revealPlace(request);
+  }
+
+  @Override
+  public void onProjectTableSelection(ProjectDto project, String table) {
+    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.project)
+        .with(ParameterTokens.TOKEN_NAME, project.getName())
+        .with(ParameterTokens.TOKEN_TABLES, project.getName() + "." + table).build();
     placeManager.revealPlace(request);
   }
 
