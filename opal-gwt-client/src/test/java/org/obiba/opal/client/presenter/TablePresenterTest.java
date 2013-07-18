@@ -22,7 +22,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingVariableSelectio
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.EntityDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.TablePresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
@@ -35,7 +35,6 @@ import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.testing.CountingEventBus;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
-import com.google.gwt.user.client.Command;
 import com.google.inject.Provider;
 
 import static org.easymock.EasyMock.createMock;

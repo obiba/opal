@@ -21,7 +21,7 @@
       </b:FluidRow>
       <g:InlineLabel ui:field="description"></g:InlineLabel><b:Button type="LINK" icon="PLUS_SIGN" ui:field="ellipsis"/>
     </g:FlowPanel>
-    <b:TabPanel tabPosition="right" ui:field="tabPanel">
+    <b:TabPanel tabPosition="above" ui:field="tabPanel">
       <b:Tab icon="TABLE" heading="Tables" active="true">
         <b:Breadcrumbs ui:field="magmacrumbs"/>
         <g:SimplePanel ui:field="tablesPanel"/>

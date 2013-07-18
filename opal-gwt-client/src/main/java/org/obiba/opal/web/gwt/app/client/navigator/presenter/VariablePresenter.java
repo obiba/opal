@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingVariableSelectio
 import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.util.AttributeDtos;
 import org.obiba.opal.web.gwt.app.client.widgets.event.SummaryRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;

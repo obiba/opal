@@ -7,7 +7,7 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <g:FlowPanel>
+    <g:FlowPanel addStyleNames="bottom-margin">
       <b:DropdownButton text="Add" size="SMALL" icon="PLUS_SIGN_ALT" ui:field="addBtn">
         <b:NavLink icon="TABLE" ui:field="addTable"><ui:msg description="Add table label">Add table...</ui:msg></b:NavLink>
         <b:NavLink icon="COGS" ui:field="addView"><ui:msg description="Add view label">Add view...</ui:msg></b:NavLink>
@@ -21,6 +21,7 @@
         <b:NavLink icon="COPY" ui:field="copyData"><ui:msg description="Copy data label">Copy data...</ui:msg></b:NavLink>
       </b:DropdownButton>
     </g:FlowPanel>
+
     <g:FlowPanel>
       <g:InlineLabel ui:field="noTables">
         <ui:msg description="No Tables label">No Tables</ui:msg>

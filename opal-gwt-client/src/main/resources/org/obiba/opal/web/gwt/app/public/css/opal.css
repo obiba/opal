@@ -6,13 +6,64 @@ li {
   list-style-type: none;
 }
 
+  /*
+   * Twitter Bootstrap
+   */
+
+footer.footer {
+  margin-top: 40px;
+  font-size: 0.8em;
+}
+
+footer.footer .container > div {
+  border-top: 1px solid #E5E5E5;
+  padding-top: 20px;
+}
+
+.page-header .btn-group {
+  margin-top: 10px;
+}
+
+.page-header .breadcrumb {
+  background: none;
+  font-size: 1.4em;
+  margin: 0;
+  padding: 0;
+}
+
+.breadcrumb {
+  background: none;
+  border: none;
+  list-style: none outside none;
+  margin: 0 0 10px;
+  padding: 0;
+}
+
+.btn-group + .btn-group.pull-right {
+  margin-right: 5px;
+}
+
+.help-block {
+  font-size: 0.9em;
+}
+
+.nav-pills > li > i {
+  margin-bottom: 2px;
+  margin-top: 2px;
+  padding-bottom: 8px;
+  padding-top: 8px;
+}
+
+  /*
+   * Opal
+   */
+
 .tags .label {
   margin-right: 10px;
 }
 
 .items .item {
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 30px;
 }
 
 .xsmall-indent {
@@ -83,47 +134,16 @@ li {
   margin-bottom: 3.2em;
 }
 
-/*
- * Twitter Bootstrap
- */
-
-.footer {
-  margin-top: 40px;
-  font-size: 0.8em;
+.block {
+  display: block;
 }
 
-.footer .container > div {
-  border-top: 1px solid #E5E5E5;
-  padding-top: 20px;
-}
-
-.page-header .btn-group {
-  margin-top: 10px;
-}
-
-.page-header .breadcrumb {
-  background: none;
-  font-size: 1.4em;
-  margin: 0;
-  padding: 0;
-}
-
-.breadcrumb {
-  background: none;
-  border: none;
-  list-style: none outside none;
-  margin: 0 0 10px;
-  padding: 0;
-}
-
-ul.inline {
+.inline {
   display: inline;
 }
 
-.btn-group + .btn-group.pull-right {
-  margin-right: 5px;
+.inline-block {
+  display: inline-block;
 }
 
-.help-block {
-  font-size: 0.9em;
-}
+

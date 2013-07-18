@@ -10,7 +10,7 @@
 
   <g:FlowPanel>
 
-    <g:FlowPanel>
+    <g:FlowPanel addStyleNames="bottom-margin">
       <b:DropdownButton text="Download" size="SMALL" icon="DOWNLOAD" ui:field="downloadBtn">
         <b:NavLink ui:field="downloadDictionary">
           <ui:msg description="Download dictionary label">Download dictionary</ui:msg>
@@ -41,63 +41,6 @@
       </b:ButtonGroup>
     </g:FlowPanel>
 
-    <g:FlowPanel ui:field="indexStatus" addStyleNames="small-top-margin" visible="false">
-      <b:Alert ui:field="indexStatusAlert" close="false" visible="true">
-
-        <g:Grid>
-          <g:row>
-            <g:customCell styleName="top-aligned">
-              <g:Label ui:field="indexStatusText" addStyleNames="inline"></g:Label>
-            </g:customCell>
-            <g:customCell styleName="top-aligned">
-
-              <b:ProgressBar ui:field="progress" addStyleNames="xsmall-indent progress"></b:ProgressBar>
-            </g:customCell>
-            <g:customCell styleName="top-aligned">
-
-              <g:Anchor ui:field="clearIndexLink" addStyleNames="inline xsmall-indent action">Clear</g:Anchor>
-            </g:customCell>
-            <g:customCell styleName="top-aligned">
-
-              <g:Anchor ui:field="indexNowLink" addStyleNames="inline xsmall-indent action">Index now</g:Anchor>
-            </g:customCell>
-            <g:customCell styleName="top-aligned">
-
-              <g:Anchor ui:field="scheduleLink" addStyleNames="inline xsmall-indent action">Schedule indexing</g:Anchor>
-            </g:customCell>
-            <g:customCell styleName="top-aligned">
-              <g:Anchor ui:field="cancelLink" addStyleNames="inline xsmall-indent action">Cancel</g:Anchor>
-            </g:customCell>
-          </g:row>
-        </g:Grid>
-      </b:Alert>
-    </g:FlowPanel>
-
-    <o:PropertiesTable condensed="true" borderedCell="false" zebra="true" keyStyleNames="span3 small-indent">
-      <g:FlowPanel>
-        <g:Label>
-          <ui:msg description="Entity type label">Entity Type</ui:msg>
-        </g:Label>
-        <g:Label ui:field="entityType"/>
-      </g:FlowPanel>
-      <g:FlowPanel>
-        <g:Label>
-          <ui:msg description="Current Entity Count label">Current Number of Entity</ui:msg>
-        </g:Label>
-        <g:Label ui:field="entityCount"/>
-      </g:FlowPanel>
-    </o:PropertiesTable>
-
-    <o:PropertiesTable ui:field="fromTable" condensed="true" borderedCell="false" zebra="true"
-        keyStyleNames="span3 small-indent">
-      <g:FlowPanel>
-        <g:Label ui:field="fromTableLabel">
-          <ui:msg description="From table label">Tables included in the view</ui:msg>
-        </g:Label>
-        <g:FlowPanel ui:field="fromTableLinks"/>
-      </g:FlowPanel>
-    </o:PropertiesTable>
-
     <b:TabPanel tabPosition="above" ui:field="tabPanel">
       <b:Tab heading="Variables" active="true">
         <g:FlowPanel>
@@ -107,9 +50,8 @@
 
           <b:Controls>
             <b:InputAddOn prependIcon="FILTER">
-              <o:TextBoxClearable ui:field="filter"></o:TextBoxClearable>
+              <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"></o:TextBoxClearable>
             </b:InputAddOn>
-
           </b:Controls>
 
           <b:SimplePager ui:field="pager" location="RIGHT"/>
@@ -144,6 +86,64 @@
       </b:Tab>
       <b:Tab heading="Values">
         <g:SimplePanel ui:field="valuesPanel"/>
+      </b:Tab>
+      <b:Tab heading="Properties">
+        <g:FlowPanel ui:field="indexStatus" addStyleNames="small-top-margin" visible="false">
+          <b:Alert ui:field="indexStatusAlert" close="false" visible="true">
+
+            <g:Grid>
+              <g:row>
+                <g:customCell styleName="top-aligned">
+                  <g:Label ui:field="indexStatusText" addStyleNames="inline"></g:Label>
+                </g:customCell>
+                <g:customCell styleName="top-aligned">
+
+                  <b:ProgressBar ui:field="progress" addStyleNames="xsmall-indent progress"></b:ProgressBar>
+                </g:customCell>
+                <g:customCell styleName="top-aligned">
+
+                  <g:Anchor ui:field="clearIndexLink" addStyleNames="inline xsmall-indent action">Clear</g:Anchor>
+                </g:customCell>
+                <g:customCell styleName="top-aligned">
+
+                  <g:Anchor ui:field="indexNowLink" addStyleNames="inline xsmall-indent action">Index now</g:Anchor>
+                </g:customCell>
+                <g:customCell styleName="top-aligned">
+
+                  <g:Anchor ui:field="scheduleLink" addStyleNames="inline xsmall-indent action">Schedule indexing</g:Anchor>
+                </g:customCell>
+                <g:customCell styleName="top-aligned">
+                  <g:Anchor ui:field="cancelLink" addStyleNames="inline xsmall-indent action">Cancel</g:Anchor>
+                </g:customCell>
+              </g:row>
+            </g:Grid>
+          </b:Alert>
+        </g:FlowPanel>
+
+        <o:PropertiesTable condensed="true" borderedCell="false" zebra="true" keyStyleNames="span3 small-indent">
+          <g:FlowPanel>
+            <g:Label>
+              <ui:msg description="Entity type label">Entity Type</ui:msg>
+            </g:Label>
+            <g:Label ui:field="entityType"/>
+          </g:FlowPanel>
+          <g:FlowPanel>
+            <g:Label>
+              <ui:msg description="Current Entity Count label">Current Number of Entity</ui:msg>
+            </g:Label>
+            <g:Label ui:field="entityCount"/>
+          </g:FlowPanel>
+        </o:PropertiesTable>
+
+        <o:PropertiesTable ui:field="fromTable" condensed="true" borderedCell="false" zebra="true"
+            keyStyleNames="span3 small-indent">
+          <g:FlowPanel>
+            <g:Label ui:field="fromTableLabel">
+              <ui:msg description="From table label">Tables included in the view</ui:msg>
+            </g:Label>
+            <g:FlowPanel ui:field="fromTableLinks"/>
+          </g:FlowPanel>
+        </o:PropertiesTable>
       </b:Tab>
     </b:TabPanel>
 

@@ -14,11 +14,15 @@ import org.obiba.opal.web.model.client.opal.ProjectFactoryDto;
 import com.github.gwtbootstrap.client.ui.AccordionGroup;
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.github.gwtbootstrap.client.ui.Icon;
 import com.github.gwtbootstrap.client.ui.Modal;
 import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.NavPills;
+import com.github.gwtbootstrap.client.ui.base.ListItem;
 import com.github.gwtbootstrap.client.ui.base.UnorderedList;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
 import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
 import com.google.common.collect.Lists;
@@ -173,11 +177,14 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
           JsArrayString tableNames = JsArrays.toSafeArray(project.getDatasource().getTableArray());
           if (tableNames.length() > 0) {
-            UnorderedList tables = new UnorderedList();
+            NavPills pills = new NavPills();
+            pills.addStyleName("inline");
+            Icon icon = new Icon(IconType.TABLE);
+            pills.add(new ListItem(icon));
             for (String table : JsArrays.toIterable(tableNames)) {
-              tables.add(newProjectTableLink(handlers,project, table));
+              pills.add(newProjectTableLink(handlers,project, table));
             }
-            panel.add(tables);
+            panel.add(pills);
           }
 
           FlowPanel tagsPanel = new FlowPanel();

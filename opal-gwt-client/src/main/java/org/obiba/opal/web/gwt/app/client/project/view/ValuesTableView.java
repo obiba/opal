@@ -7,16 +7,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.navigator.view;
+package org.obiba.opal.web.gwt.app.client.project.view;
 
 import java.util.AbstractList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.DataFetcher;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.ValuesTablePresenter.EntitySelectionHandler;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ValuesTablePresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ValuesTablePresenter.DataFetcher;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ValuesTablePresenter.EntitySelectionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell.Delegate;
