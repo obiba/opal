@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.app.client.unit.presenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitSelectedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
@@ -39,16 +41,25 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.Command;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.gwtplatform.mvp.client.PresenterWidget;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
+import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.annotations.TitleFunction;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
+import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+import com.gwtplatform.mvp.client.proxy.SetPlaceTitleHandler;
 
-public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUnitDetailsPresenter.Display> {
+public class FunctionalUnitDetailsPresenter
+    extends Presenter<FunctionalUnitDetailsPresenter.Display, FunctionalUnitDetailsPresenter.Proxy>
+    implements FunctionalUnitUiHandlers {
 
   public static final String DELETE_ACTION = "Delete";
 
@@ -57,6 +68,8 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
   private Runnable removeConfirmation;
 
   private GenerateConfirmationRunnable generateConfirmation;
+
+  private final PlaceManager placeManager;
 
   private final FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter;
 
@@ -68,7 +81,12 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
 
   private Request countIdentifiersRequest;
 
-  public interface Display extends View {
+  @ProxyStandard
+  @NameToken(Places.unit)
+  public interface Proxy extends ProxyPlace<FunctionalUnitDetailsPresenter> {
+  }
+
+  public interface Display extends View, HasUiHandlers<FunctionalUnitUiHandlers> {
     void setKeyPairs(JsArray<KeyDto> keyPairs);
 
     HasActionHandler<KeyDto> getActionColumn();
@@ -77,25 +95,15 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
 
     FunctionalUnitDto getFunctionalUnitDetails();
 
-    void setRemoveFunctionalUnitCommand(Command command);
-
-    void setDownloadIdentifiersCommand(Command command);
-
-    void setExportIdentifiersCommand(Command command);
-
-    void setUpdateFunctionalUnitCommand(Command command);
-
     String getCurrentCountOfIdentifiers();
 
     void setCurrentCountOfIdentifiers(String count);
 
-    void setAddKeyPairCommand(Command command);
-
-    void setGenerateIdentifiersCommand(Command command);
-
-    void setImportIdentifiersFromDataCommand(Command command);
-
     void setAvailable(boolean available);
+
+    void clearBreadcrumbs();
+
+    void setBreadcrumbs(int index, String title, String history);
 
     HasAuthorization getRemoveFunctionalUnitAuthorizer();
 
@@ -116,19 +124,101 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
   }
 
   @Inject
-  public FunctionalUnitDetailsPresenter(Display display, EventBus eventBus,
+  public FunctionalUnitDetailsPresenter(EventBus eventBus, Display display, Proxy proxy,
       FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter,
       GenerateIdentifiersDialogPresenter generateIdentifiersDialogPresenter,
-      Provider<AddKeyPairDialogPresenter> addKeyPairDialogPresenter) {
-    super(eventBus, display);
+      Provider<AddKeyPairDialogPresenter> addKeyPairDialogPresenter,
+      PlaceManager placeManager) {
+    super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
+    getView().setUiHandlers(this);
     this.functionalUnitUpdateDialogPresenter = functionalUnitUpdateDialogPresenter;
     this.addKeyPairDialogPresenter = addKeyPairDialogPresenter;
     this.generateIdentifiersDialogPresenter = generateIdentifiersDialogPresenter;
+    this.placeManager = placeManager;
+  }
+
+  @TitleFunction
+  public String getPageTitle(PlaceRequest request) {
+    return functionalUnit.getName();
   }
 
   @Override
-  protected void onReveal() {
-    super.onReveal();
+  public void prepareFromRequest(PlaceRequest request) {
+    super.prepareFromRequest(request);
+    String unitName = request.getParameter("name", "");
+    if (!unitName.isEmpty()) retrieveFunctioanUnit(unitName);
+  }
+
+  @Override
+  public void removeUnit() {
+    removeConfirmation = new Runnable() {
+      @Override
+      public void run() {
+        ResponseCodeCallback callbackHandler = new FunctionalUnitDeleteCallback();
+        UriBuilder ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName());
+        ResourceRequestBuilderFactory.newBuilder().forResource(ub.build()).delete()
+            .withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler)
+            .send();
+      }
+    };
+    getEventBus().fireEvent(ConfirmationRequiredEvent
+        .createWithKeys(removeConfirmation, "removeFunctionalUnit", "confirmDeleteFunctionalUnit"));
+  }
+
+  @Override
+  public void updateUnit() {
+    functionalUnitUpdateDialogPresenter.setDialogMode(Mode.UPDATE);
+    FunctionalUnitUpdateDialogPresenter.Display display = functionalUnitUpdateDialogPresenter.getView();
+    FunctionalUnitDto functionalUnit = getView().getFunctionalUnitDetails();
+    display.setName(functionalUnit.getName());
+    display.setDescription(functionalUnit.getDescription());
+    display.setSelect(functionalUnit.getSelect());
+    addToPopupSlot(functionalUnitUpdateDialogPresenter);
+  }
+
+  @Override
+  public void exportIdentifiers() {
+    String url = "/functional-unit/" + functionalUnit.getName() + "/entities/identifiers";
+    getEventBus().fireEvent(new FileDownloadEvent(url));
+  }
+
+  @Override
+  public void exportIdentifiersMapping() {
+    String url = "/functional-unit/" + functionalUnit.getName() + "/entities/csv";
+    getEventBus().fireEvent(new FileDownloadEvent(url));
+  }
+
+  @Override
+  public void importIdentifiersFromFile() {
+    getEventBus().fireEvent(new WizardRequiredEvent(IdentifiersImportPresenter.WizardType, functionalUnit));
+  }
+
+  @Override
+  public void generateIdentifiers() {
+    if(generateConfirmation != null) {
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error("IdentifiersGenerationPending").build());
+    } else {
+      UriBuilder uriBuilder = UriBuilder.create().segment("functional-units", "entities", "table");
+      ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(uriBuilder.build()).get()
+          .withCallback(new ResourceCallback<TableDto>() {
+            @Override
+            public void onResource(Response response, TableDto tableDto) {
+              showGenerateIdentifiersDialog(tableDto);
+            }
+          }).send();
+    }
+  }
+
+  @Override
+  public void addCryptographicKey() {
+    AddKeyPairDialogPresenter popup = addKeyPairDialogPresenter.get();
+    popup.setFunctionalUnit(functionalUnit);
+    addToPopupSlot(popup);
+  }
+
+  @Override
+  protected void onReset() {
+    super.onReset();
     updateCurrentCountOfIdentifiers();
   }
 
@@ -137,7 +227,6 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
     super.onBind();
     initUiComponents();
     addHandlers();
-    setCommands();
   }
 
   private void initUiComponents() {
@@ -171,19 +260,6 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
     registerHandler(eventBus.addHandler(KeyPairCreatedEvent.getType(), new KeyPairCreatedHandler()));
     registerHandler(
         eventBus.addHandler(GenerateIdentifiersConfirmationEvent.getType(), new GenerateIdentifiersHandler()));
-  }
-
-  private void setCommands() {
-    getView().setDownloadIdentifiersCommand(new DownloadIdentifiersCommand());
-    getView().setExportIdentifiersCommand(new ExportIdentifiersCommand());
-    getView().setRemoveFunctionalUnitCommand(new RemoveFunctionalUnitCommand());
-
-    getView().setGenerateIdentifiersCommand(new GenerateIdentifiersCommand());
-    getView().setImportIdentifiersFromDataCommand(new ImportIdentifiersCommand());
-
-    getView().setAddKeyPairCommand(new AddKeyPairCommand());
-
-    getView().setUpdateFunctionalUnitCommand(new EditFunctionalUnitCommand());
   }
 
   private void updateCurrentCountOfIdentifiers() {
@@ -306,7 +382,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
       @Override
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_NOT_FOUND) {
-          refreshKeyPairs(functionalUnit);
+          refreshKeyPairs(functionalUnit.getName());
         } else {
           ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
           getEventBus().fireEvent(NotificationEvent.newBuilder().error(error.getStatus()).build());
@@ -327,55 +403,27 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
     getEventBus().fireEvent(new FileDownloadEvent(ub.build()));
   }
 
+  private void retrieveFunctioanUnit(String unitName) {
+    UriBuilder ub = UriBuilder.create().segment("functional-units", "unit", unitName);
+    ResourceRequestBuilderFactory.<FunctionalUnitDto>newBuilder().forResource(ub.build()).get()
+        .withCallback(new FunctionalUnitFoundCallBack())
+        .withCallback(Response.SC_NOT_FOUND, new FunctionalUnitNotFoundCallBack(unitName)).send();
+    refreshKeyPairs(unitName);
+  }
+
   private void refreshFunctionalUnitDetails(FunctionalUnitDto functionalUnit) {
     if(functionalUnit == null) {
       getView().setAvailable(false);
     } else {
-      String name = functionalUnit.getName();
-      UriBuilder ub = UriBuilder.create().segment("functional-units", "unit", name);
-      ResourceRequestBuilderFactory.<FunctionalUnitDto>newBuilder().forResource(ub.build()).get()
-          .withCallback(new FunctionalUnitFoundCallBack())
-          .withCallback(Response.SC_NOT_FOUND, new FunctionalUnitNotFoundCallBack(name)).send();
-      refreshKeyPairs(functionalUnit);
+      retrieveFunctioanUnit(functionalUnit.getName());
     }
   }
 
-  private void refreshKeyPairs(FunctionalUnitDto functionalUnit) {
-    String name = functionalUnit.getName();
-    UriBuilder ub = UriBuilder.create().segment("functional-unit", name, "keys");
+  private void refreshKeyPairs(String unitName) {
+    UriBuilder ub = UriBuilder.create().segment("functional-unit", unitName, "keys");
     ResourceRequestBuilderFactory.<JsArray<KeyDto>>newBuilder().forResource(ub.build()).get()
         .withCallback(new KeyPairsCallback())
-        .withCallback(Response.SC_NOT_FOUND, new FunctionalUnitNotFoundCallBack(name)).send();
-  }
-
-  private class AddKeyPairCommand implements Command {
-
-    @Override
-    public void execute() {
-      AddKeyPairDialogPresenter popup = addKeyPairDialogPresenter.get();
-      popup.setFunctionalUnit(functionalUnit);
-      addToPopupSlot(popup);
-    }
-
-  }
-
-  private final class GenerateIdentifiersCommand implements Command {
-
-    @Override
-    public void execute() {
-      if(generateConfirmation != null) {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error("IdentifiersGenerationPending").build());
-      } else {
-        UriBuilder uriBuilder = UriBuilder.create().segment("functional-units", "entities", "table");
-        ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(uriBuilder.build()).get()
-            .withCallback(new ResourceCallback<TableDto>() {
-              @Override
-              public void onResource(Response response, TableDto tableDto) {
-                showGenerateIdentifiersDialog(tableDto);
-              }
-            }).send();
-      }
-    }
+        .withCallback(Response.SC_NOT_FOUND, new FunctionalUnitNotFoundCallBack(unitName)).send();
   }
 
   @SuppressWarnings("MethodOnlyUsedFromInnerClass")
@@ -393,13 +441,10 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
     addToPopupSlot(generateIdentifiersDialogPresenter);
   }
 
-  private final class DownloadIdentifiersCommand implements Command {
-    @Override
-    public void execute() {
-      String url = "/functional-unit/" + functionalUnit.getName() + "/entities/identifiers";
-      getEventBus().fireEvent(new FileDownloadEvent(url));
-    }
-  }
+
+  //
+  // Inner classes
+  //
 
   private final class GenerateConfirmationRunnable implements Runnable {
 
@@ -456,58 +501,6 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
     }
   }
 
-  private final class ExportIdentifiersCommand implements Command {
-    @Override
-    public void execute() {
-      String url = "/functional-unit/" + functionalUnit.getName() + "/entities/csv";
-      getEventBus().fireEvent(new FileDownloadEvent(url));
-    }
-  }
-
-  private class EditFunctionalUnitCommand implements Command {
-
-    @Override
-    public void execute() {
-      functionalUnitUpdateDialogPresenter.setDialogMode(Mode.UPDATE);
-      FunctionalUnitUpdateDialogPresenter.Display display = functionalUnitUpdateDialogPresenter.getView();
-      FunctionalUnitDto functionalUnit = getView().getFunctionalUnitDetails();
-      display.setName(functionalUnit.getName());
-      display.setDescription(functionalUnit.getDescription());
-      display.setSelect(functionalUnit.getSelect());
-      addToPopupSlot(functionalUnitUpdateDialogPresenter);
-    }
-
-  }
-
-  private class RemoveFunctionalUnitCommand implements Command {
-
-    @Override
-    public void execute() {
-      removeConfirmation = new Runnable() {
-        @Override
-        public void run() {
-          ResponseCodeCallback callbackHandler = new FunctionalUnitDeleteCallback();
-          UriBuilder ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName());
-          ResourceRequestBuilderFactory.newBuilder().forResource(ub.build()).delete()
-              .withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler)
-              .send();
-        }
-      };
-      getEventBus().fireEvent(ConfirmationRequiredEvent
-          .createWithKeys(removeConfirmation, "removeFunctionalUnit", "confirmDeleteFunctionalUnit"));
-    }
-
-  }
-
-  private class ImportIdentifiersCommand implements Command {
-
-    @Override
-    public void execute() {
-      getEventBus().fireEvent(new WizardRequiredEvent(IdentifiersImportPresenter.WizardType, functionalUnit));
-    }
-
-  }
-
   private class FunctionalUnitUpdatedHandler implements FunctionalUnitUpdatedEvent.Handler {
 
     @Override
@@ -546,6 +539,24 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
       getView().setFunctionalUnitDetails(functionalUnit);
       updateCurrentCountOfIdentifiers();
       authorize();
+      setBreadcrumbs();
+    }
+  }
+
+  // TODO this is a general way of determining breadcrumbs, make it a common mechanism
+  private void setBreadcrumbs() {
+    getView().clearBreadcrumbs();
+
+    final int size = placeManager.getHierarchyDepth();
+
+    for (int i = 0; i < size; i++) {
+      final int index = i;
+      placeManager.getTitle(i, new SetPlaceTitleHandler() {
+        @Override
+        public void onSetPlaceTitle(String title) {
+          getView().setBreadcrumbs(index, title, placeManager.buildRelativeHistoryToken(index + 1));
+        }
+      });
     }
   }
 
@@ -579,7 +590,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
     @Override
     public void onKeyPairCreated(KeyPairCreatedEvent event) {
       if(event.getFunctionalUnit().getName().equals(functionalUnit.getName())) {
-        refreshKeyPairs(functionalUnit);
+        refreshKeyPairs(functionalUnit.getName());
       }
     }
   }

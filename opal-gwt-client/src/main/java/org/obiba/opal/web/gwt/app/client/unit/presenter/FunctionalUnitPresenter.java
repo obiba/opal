@@ -10,103 +10,136 @@
 package org.obiba.opal.web.gwt.app.client.unit.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.BreadcrumbDisplay;
-import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.mapidentifiers.presenter.IdentifiersMapPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.syncidentifiers.presenter.IdentifiersSyncPresenter;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PresenterWidget;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
+import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.annotations.TitleFunction;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
-public class FunctionalUnitPresenter
-    extends SplitPaneWorkbenchPresenter<FunctionalUnitPresenter.Display, FunctionalUnitPresenter.Proxy> {
+public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.Display, FunctionalUnitPresenter.Proxy>
+    implements FunctionalUnitsUiHandlers {
 
-  public interface Display extends View, BreadcrumbDisplay {
 
-    HandlerRegistration addFunctionalUnitClickHandler(ClickHandler handler);
-
-    HandlerRegistration addExportIdentifiersClickHandler(ClickHandler handler);
-
-    HandlerRegistration addImportIdentifiersClickHandler(ClickHandler handler);
-
-    HandlerRegistration addSyncIdentifiersClickHandler(ClickHandler handler);
-
+  public interface Display extends View, HasUiHandlers<FunctionalUnitsUiHandlers>, BreadcrumbDisplay {
     HasAuthorization getAddFunctionalUnitAuthorizer();
-
     HasAuthorization getExportIdentifiersAuthorizer();
-
     HasAuthorization getImportIdentifiersAuthorizer();
-
     HasAuthorization getSyncIdentifiersAuthorizer();
+    void setFunctionalUnits(JsArray<FunctionalUnitDto> templates);
   }
+
+  protected static final Translations translations = GWT.create(Translations.class);
 
   @ProxyStandard
   @NameToken(Places.units)
   public interface Proxy extends ProxyPlace<FunctionalUnitPresenter> {}
 
   final FunctionalUnitDetailsPresenter functionalUnitDetailsPresenter;
-
-  final FunctionalUnitListPresenter functionalUnitListPresenter;
-
   final FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter;
+  private final PlaceManager placeManager;
 
   @Inject
   public FunctionalUnitPresenter(Display display, EventBus eventBus, Proxy proxy,
       FunctionalUnitDetailsPresenter FunctionalUnitDetailsPresenter,
-      FunctionalUnitListPresenter FunctionalUnitListPresenter,
-      FunctionalUnitUpdateDialogPresenter FunctionalUnitUpdateDialogPresenter) {
-    super(eventBus, display, proxy);
+      FunctionalUnitUpdateDialogPresenter FunctionalUnitUpdateDialogPresenter,
+      PlaceManager placeManager) {
+    super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
+    getView().setUiHandlers(this);
     functionalUnitDetailsPresenter = FunctionalUnitDetailsPresenter;
-    functionalUnitListPresenter = FunctionalUnitListPresenter;
     functionalUnitUpdateDialogPresenter = FunctionalUnitUpdateDialogPresenter;
+    this.placeManager = placeManager;
   }
 
   @Override
-  public String getName() {
-    return getTitle();
+  public void addUnit() {
+    functionalUnitUpdateDialogPresenter.setDialogMode(Mode.CREATE);
+    functionalUnitUpdateDialogPresenter.getView().clear();
+    addToPopupSlot(functionalUnitUpdateDialogPresenter);
   }
 
   @Override
-  public void authorize(HasAuthorization authorizer) {
+  public void exportIdentifiers() {
+    getEventBus().fireEvent(new FileDownloadEvent("/functional-units/entities/csv"));
   }
 
   @Override
-  public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
+  public void importIdentifiers() {
+    getEventBus().fireEvent(new WizardRequiredEvent(IdentifiersMapPresenter.WizardType));
   }
 
   @Override
+  public void synchronizeIdentifiers() {
+    getEventBus().fireEvent(new WizardRequiredEvent(IdentifiersSyncPresenter.WizardType));
+  }
+
+  @Override
+  public void selectUnit(FunctionalUnitDto dto) {
+    PlaceRequest.Builder requestBuilder = new PlaceRequest.Builder();
+    requestBuilder.nameToken(Places.unit).with("name", dto.getName());
+    placeManager.revealPlace(requestBuilder.build());
+
+//    getEventBus().fireEvent(new PlaceChangeEvent(Places.unitPlace.addParam()));
+  }
+
+  @TitleFunction
+  public String getPageTitle(PlaceRequest request) {
+    return translations.pageFunctionalUnitTitle();
+  }
+
+  @Override
+  protected void onReveal() {
+    super.onReveal();
+    authorize();
+    refreshFunctionalUnits();
+  }
+
+  @Override
+  protected void onBind() {
+    super.onBind();
+    registerHandler(getEventBus().addHandler(FunctionalUnitDeletedEvent.getType(), new FunctionalUnitDeletedHandler()));
+    registerHandler(getEventBus().addHandler(FunctionalUnitCreatedEvent.getType(), new FunctionalUnitCreatedHandler()));
+  }
+
+//  @Override
   public String getTitle() {
     return translations.pageFunctionalUnitTitle();
   }
 
   @Override
-  protected PresenterWidget<?> getDefaultPresenter(SplitPaneWorkbenchPresenter.Slot slot) {
-    switch(slot) {
-      case CENTER:
-        return functionalUnitDetailsPresenter;
-      case LEFT:
-        return functionalUnitListPresenter;
-    }
-    return null;
+  protected void onReset() {
+    super.onReset();
   }
 
-  @Override
+
+  //  @Override
   protected void authorize() {
     // create unit
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").post()
@@ -125,50 +158,41 @@ public class FunctionalUnitPresenter
         .authorize(getView().getSyncIdentifiersAuthorizer()).send();
   }
 
-  @Override
-  protected void addHandlers() {
-    registerHandler(getView().addFunctionalUnitClickHandler(new AddFunctionalUnitClickHandler()));
-    registerHandler(getView().addExportIdentifiersClickHandler(new ExportIdentifiersClickHandler()));
-    registerHandler(getView().addImportIdentifiersClickHandler(new ImportIdentifiersClickHandler()));
-    registerHandler(getView().addSyncIdentifiersClickHandler(new SyncIdentifiersClickHandler()));
+  private void refreshFunctionalUnits() {
+    ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>>newBuilder().forResource("/functional-units").get()
+        .withCallback(new FunctionalUnitsResourceCallback()).send();
   }
 
   //
   // Inner classes
   //
-
-  public class AddFunctionalUnitClickHandler implements ClickHandler {
+  private class FunctionalUnitsResourceCallback implements ResourceCallback<JsArray<FunctionalUnitDto>> {
 
     @Override
-    public void onClick(ClickEvent event) {
-      functionalUnitUpdateDialogPresenter.setDialogMode(Mode.CREATE);
-      functionalUnitUpdateDialogPresenter.getView().clear();
-      addToPopupSlot(functionalUnitUpdateDialogPresenter);
+    public void onResource(Response response, JsArray<FunctionalUnitDto> resource) {
+      JsArray<FunctionalUnitDto> units = JsArrays.toSafeArray(resource);
+      getView().setFunctionalUnits(units);
+    }
+  }
+
+  private class FunctionalUnitCreatedHandler implements FunctionalUnitCreatedEvent.Handler {
+
+    @Override
+    public void onFunctionalUnitCreated(FunctionalUnitCreatedEvent event) {
+      refreshFunctionalUnits();
     }
 
   }
 
-  public class ExportIdentifiersClickHandler implements ClickHandler {
+  private class FunctionalUnitDeletedHandler implements FunctionalUnitDeletedEvent.Handler {
 
     @Override
-    public void onClick(ClickEvent event) {
-      getEventBus().fireEvent(new FileDownloadEvent("/functional-units/entities/csv"));
+    public void onFunctionalUnitDeleted(FunctionalUnitDeletedEvent event) {
+      refreshFunctionalUnits();
+      // Get back to units to show the remaining units
+      placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.units).build());
     }
 
-  }
-
-  private final class ImportIdentifiersClickHandler implements ClickHandler {
-    @Override
-    public void onClick(ClickEvent arg0) {
-      getEventBus().fireEvent(new WizardRequiredEvent(IdentifiersMapPresenter.WizardType));
-    }
-  }
-
-  private final class SyncIdentifiersClickHandler implements ClickHandler {
-    @Override
-    public void onClick(ClickEvent arg0) {
-      getEventBus().fireEvent(new WizardRequiredEvent(IdentifiersSyncPresenter.WizardType));
-    }
   }
 
 }

@@ -28,12 +28,13 @@ public class UnitsModule extends AbstractPresenterModule {
 
   @Override
   protected void configure() {
+    bindPresenter(FunctionalUnitDetailsPresenter.class, FunctionalUnitDetailsPresenter.Display.class,
+        FunctionalUnitDetailsView.class, FunctionalUnitDetailsPresenter.Proxy.class);
+
     bindPresenter(FunctionalUnitPresenter.class, FunctionalUnitPresenter.Display.class, FunctionalUnitView.class,
         FunctionalUnitPresenter.Proxy.class);
     bindPresenterWidget(FunctionalUnitListPresenter.class, FunctionalUnitListPresenter.Display.class,
         FunctionalUnitListView.class);
-    bindPresenterWidget(FunctionalUnitDetailsPresenter.class, FunctionalUnitDetailsPresenter.Display.class,
-        FunctionalUnitDetailsView.class);
     bindPresenterWidget(FunctionalUnitUpdateDialogPresenter.class, FunctionalUnitUpdateDialogPresenter.Display.class,
         FunctionalUnitUpdateDialogView.class);
     bindPresenterWidget(AddKeyPairDialogPresenter.class, AddKeyPairDialogPresenter.Display.class,

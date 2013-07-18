@@ -12,41 +12,46 @@ package org.obiba.opal.web.gwt.app.client.unit.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitDetailsPresenter;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUiHandlers;
+import org.obiba.opal.web.gwt.app.client.widgets.breadcrumbs.OpalNavLink;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ConstantActionsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
 import org.obiba.opal.web.gwt.app.client.workbench.view.PropertiesTable;
-import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.opal.KeyDto;
 
+import com.github.gwtbootstrap.client.ui.Breadcrumbs;
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.DropdownButton;
+import com.github.gwtbootstrap.client.ui.NavLink;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
-import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.Widget;
-import com.gwtplatform.mvp.client.ViewImpl;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 import static org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitDetailsPresenter.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitDetailsPresenter.DOWNLOAD_ACTION;
 
-public class FunctionalUnitDetailsView extends ViewImpl implements FunctionalUnitDetailsPresenter.Display {
+public class FunctionalUnitDetailsView extends ViewWithUiHandlers<FunctionalUnitUiHandlers>
+    implements FunctionalUnitDetailsPresenter.Display {
 
   @UiTemplate("FunctionalUnitDetailsView.ui.xml")
   interface FunctionalUnitDetailsViewUiBinder extends UiBinder<Widget, FunctionalUnitDetailsView> {}
@@ -88,27 +93,36 @@ public class FunctionalUnitDetailsView extends ViewImpl implements FunctionalUni
   Label currentCountOfIdentifiers;
 
   @UiField
-  FlowPanel toolbarPanel;
+  DropdownButton unitDropdown;
 
-  private MenuBar toolbar;
+  @UiField
+  NavLink updateUnit;
 
-  private MenuBar actionsMenu;
+  @UiField
+  NavLink removeUnit;
 
-  private MenuBar addMenu;
+  @UiField
+  DropdownButton identifiersDropDown;
 
-  private MenuItem remove;
+  @UiField
+  NavLink exportIdentifiers;
 
-  private MenuItem downloadIds;
+  @UiField
+  NavLink exportIdentifiersMapping;
 
-  private MenuItem exportIds;
+  @UiField
+  NavLink generateIdentifiers;
 
-  private MenuItem cryptoKey;
+  @UiField
+  NavLink importIdentifiersFromFile;
 
-  private MenuItem generateIdentifiers;
+  @UiField
+  Button addCryptographicKey;
 
-  private MenuItem importIdentifiersFromData;
+  @UiField
+  Breadcrumbs breadcrumbs;
 
-  private MenuItem update;
+  com.github.gwtbootstrap.client.ui.CellTable<FunctionalUnitDto> unitProperties;
 
   JsArrayDataProvider<KeyDto> dataProvider = new JsArrayDataProvider<KeyDto>();
 
@@ -116,32 +130,38 @@ public class FunctionalUnitDetailsView extends ViewImpl implements FunctionalUni
 
   private FunctionalUnitDto functionalUnit;
 
-  private Label functionalUnitName;
-
-  private MenuItem toolsItem;
-
-  private MenuItem addItem;
-
-  private MenuItemSeparator removeSeparator;
-
-  private MenuItemSeparator keyPairSeparator;
-
   public FunctionalUnitDetailsView() {
     widget = uiBinder.createAndBindUi(this);
     initKeystoreTable();
-    initActionToolbar();
+    initializeTable();
   }
 
-  private void initActionToolbar() {
-    toolbarPanel.add(functionalUnitName = new Label());
-    functionalUnitName.addStyleName("title");
-    toolbarPanel.add(toolbar = new MenuBar());
-    toolbar.setAutoOpen(true);
-    toolsItem = toolbar.addItem("", actionsMenu = new MenuBar(true));
-    toolsItem.addStyleName("tools");
-    actionsMenu.addStyleName("tools");
-    addItem = toolbar.addItem("", addMenu = new MenuBar(true));
-    addItem.addStyleName("add");
+  private void initializeTable() {
+//    Column<FunctionalUnitDto, String> description = new TextColumn<FunctionalUnitDto>() {
+//
+//      @Override
+//      public String getValue(FunctionalUnitDto dto) {
+//        return dto.getName();
+//      }
+//    };
+//
+//    Column<FunctionalUnitDto, String> filter = new TextColumn<FunctionalUnitDto>() {
+//
+//      @Override
+//      public String getValue(FunctionalUnitDto dto) {
+//        return dto.getKeyVariableName();
+//      }
+//    };
+//
+//    Column<FunctionalUnitDto, String> count = new TextColumn<FunctionalUnitDto>() {
+//
+//      @Override
+//      public String getValue(FunctionalUnitDto dto) {
+//        return dto.get();
+//      }
+//    };
+
+
   }
 
   private void initKeystoreTable() {
@@ -199,6 +219,17 @@ public class FunctionalUnitDetailsView extends ViewImpl implements FunctionalUni
   }
 
   @Override
+  public void clearBreadcrumbs() {
+    breadcrumbs.clear();
+  }
+
+  @Override
+  public void setBreadcrumbs(int index, String title, String historyToken) {
+    breadcrumbs.add(new OpalNavLink(title, historyToken));
+;
+  }
+
+  @Override
   public String getCurrentCountOfIdentifiers() {
     return currentCountOfIdentifiers.getText();
   }
@@ -211,10 +242,9 @@ public class FunctionalUnitDetailsView extends ViewImpl implements FunctionalUni
   private void renderFunctionalUnitDetails(FunctionalUnitDto functionalUnitDto) {
     functionalUnitDetails.setVisible(true);
     functionalUnit = functionalUnitDto;
+//    functionalUnitName.setText(functionalUnitDto.getName());
     description.setText(functionalUnitDto.getDescription());
     select.setText(functionalUnitDto.getSelect());
-    functionalUnitName.setText(functionalUnitDto.getName());
-
   }
 
   @Override
@@ -228,132 +258,40 @@ public class FunctionalUnitDetailsView extends ViewImpl implements FunctionalUni
   }
 
   @Override
-  public void setRemoveFunctionalUnitCommand(Command command) {
-    if(remove == null) {
-      removeSeparator = actionsMenu.addSeparator(new MenuItemSeparator());
-      actionsMenu.addItem(remove = new MenuItem(translations.removeLabel(), command));
-    } else {
-      remove.setCommand(command);
-    }
-  }
-
-  @Override
-  public void setDownloadIdentifiersCommand(Command command) {
-    if(downloadIds == null) {
-      actionsMenu.addItem(downloadIds = new MenuItem(translations.downloadUnitIdentifiers(), command));
-    } else {
-      downloadIds.setCommand(command);
-    }
-  }
-
-  @Override
-  public void setExportIdentifiersCommand(Command command) {
-    if(exportIds == null) {
-      actionsMenu.addItem(exportIds = new MenuItem(translations.exportUnitIdentifiersToExcel(), command));
-    } else {
-      exportIds.setCommand(command);
-    }
-  }
-
-  @Override
-  public void setUpdateFunctionalUnitCommand(Command command) {
-    if(update == null) {
-      toolbar.addItem(update = new MenuItem("", command)).addStyleName("edit");
-    } else {
-      update.setCommand(command);
-    }
-  }
-
-  @Override
-  public void setAddKeyPairCommand(Command command) {
-    if(cryptoKey == null) {
-      keyPairSeparator = addMenu.addSeparator(new MenuItemSeparator());
-      addMenu.addItem(cryptoKey = new MenuItem(translations.addCryptoKey(), command));
-    } else {
-      cryptoKey.setCommand(command);
-    }
-  }
-
-  @Override
-  public void setGenerateIdentifiersCommand(Command command) {
-    if(generateIdentifiers == null) {
-      addMenu.addItem(generateIdentifiers = new MenuItem(translations.generateUnitIdentifiers(), command));
-    } else {
-      generateIdentifiers.setCommand(command);
-    }
-  }
-
-  @Override
-  public void setImportIdentifiersFromDataCommand(Command command) {
-    if(importIdentifiersFromData == null) {
-      addMenu.addItem(importIdentifiersFromData = new MenuItem(translations.importUnitIdentifiersFromData(), command));
-    } else {
-      importIdentifiersFromData.setCommand(command);
-    }
-  }
-
-  @Override
   public void setAvailable(boolean available) {
     noUnit.setVisible(!available);
     tabs.setVisible(available);
-    toolbarPanel.setVisible(available);
     propertiesPanel.setVisible(available);
   }
 
   @Override
   public HasAuthorization getRemoveFunctionalUnitAuthorizer() {
-    return new CompositeAuthorizer(new MenuItemAuthorizer(toolsItem), new MenuItemAuthorizer(remove),
-        new UIObjectAuthorizer(removeSeparator)) {
-      @Override
-      public void unauthorized() {
-      }
-    };
+    return new UIObjectAuthorizer(removeUnit);
   }
 
   @Override
   public HasAuthorization getDownloadIdentifiersAuthorizer() {
-    return new CompositeAuthorizer(new MenuItemAuthorizer(toolsItem), new MenuItemAuthorizer(downloadIds)) {
-      @Override
-      public void unauthorized() {
-      }
-    };
+    return new UIObjectAuthorizer(exportIdentifiers);
   }
 
   @Override
   public HasAuthorization getExportIdentifiersAuthorizer() {
-    return new CompositeAuthorizer(new MenuItemAuthorizer(toolsItem), new MenuItemAuthorizer(exportIds)) {
-      @Override
-      public void unauthorized() {
-      }
-    };
+    return new UIObjectAuthorizer(exportIdentifiersMapping);
   }
 
   @Override
   public HasAuthorization getGenerateIdentifiersAuthorizer() {
-    return new CompositeAuthorizer(new MenuItemAuthorizer(addItem), new MenuItemAuthorizer(generateIdentifiers)) {
-      @Override
-      public void unauthorized() {
-      }
-    };
+    return new UIObjectAuthorizer(generateIdentifiers);
   }
 
   @Override
   public HasAuthorization getImportIdentifiersFromDataAuthorizer() {
-    return new CompositeAuthorizer(new MenuItemAuthorizer(addItem), new MenuItemAuthorizer(importIdentifiersFromData)) {
-      @Override
-      public void unauthorized() {
-      }
-    };
+    return new UIObjectAuthorizer(importIdentifiersFromFile);
   }
 
   @Override
   public HasAuthorization getAddKeyPairAuthorizer() {
-    return new CompositeAuthorizer(new MenuItemAuthorizer(addItem), new MenuItemAuthorizer(cryptoKey),
-        new UIObjectAuthorizer(keyPairSeparator)) {
-      @Override
-      public void unauthorized() {
-      }
-    };
+    return new UIObjectAuthorizer(addCryptographicKey);
   }
 
   @Override
@@ -363,7 +301,42 @@ public class FunctionalUnitDetailsView extends ViewImpl implements FunctionalUni
 
   @Override
   public HasAuthorization getUpdateFunctionalUnitAuthorizer() {
-    return new MenuItemAuthorizer(update);
+    return new UIObjectAuthorizer(updateUnit);
+  }
+
+  @UiHandler("updateUnit")
+  void onUpdateUnit(ClickEvent event) {
+    getUiHandlers().updateUnit();
+  }
+
+  @UiHandler("removeUnit")
+  void onRemoveUnit(ClickEvent event) {
+    getUiHandlers().removeUnit();
+  }
+
+  @UiHandler("exportIdentifiers")
+  void onExportIdentifier(ClickEvent event) {
+    getUiHandlers().exportIdentifiers();
+  }
+
+  @UiHandler("exportIdentifiersMapping")
+  void onExportIdentifiersMapping(ClickEvent event) {
+    getUiHandlers().exportIdentifiersMapping();
+  }
+
+  @UiHandler("generateIdentifiers")
+  void onGenerateIdentifiers(ClickEvent event) {
+    getUiHandlers().generateIdentifiers();
+  }
+
+  @UiHandler("importIdentifiersFromFile")
+  void onImportIdentifiersFromFile(ClickEvent event) {
+    getUiHandlers().importIdentifiersFromFile();
+  }
+
+  @UiHandler("addCryptographicKey")
+  void onAddCryptographicKey(ClickEvent event) {
+    getUiHandlers().addCryptographicKey();
   }
 
 }

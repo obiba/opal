@@ -1,6 +1,6 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
-    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -8,31 +8,40 @@
 
   <g:FlowPanel>
     <g:FlowPanel ui:field="breadcrumbs" />
+    <b:FluidRow addStyleNames="page-header">
+      <b:Column size="3">
+        <b:Heading size="3">
+          <ui:msg description="Projects label">Units</ui:msg>
+        </b:Heading>
+      </b:Column>
+      <b:Column size="9">
+        <b:ButtonGroup addStyleNames="pull-right">
+          <b:Button ui:field="functionalUnitButton" type="PRIMARY" icon="PLUS" size="SMALL">
+            <ui:msg description="Add Functional Unit label">Add Unit</ui:msg>
+          </b:Button>
+        </b:ButtonGroup>
+        <b:ButtonGroup addStyleNames="pull-right">
+          <b:Button ui:field="exportButton" type="PRIMARY" icon="DOWNLOAD" size="SMALL">
+            <ui:msg description="Export All Identifiers label">Export All Identifiers</ui:msg>
+          </b:Button>
+        </b:ButtonGroup>
+        <b:ButtonGroup addStyleNames="pull-right">
+          <b:Button ui:field="importButton" type="PRIMARY" icon="EXCHANGE" size="SMALL">
+              <ui:msg description="Map Identifiers label">Map Identifiers</ui:msg>
+          </b:Button>
+        </b:ButtonGroup>
+        <b:ButtonGroup addStyleNames="pull-right">
+          <b:Button ui:field="syncButton" type="PRIMARY" icon="REFRESH  " size="SMALL">
+              <ui:msg description="Sync Identifiers label">Synchronize Identifiers</ui:msg>
+            </b:Button>
+        </b:ButtonGroup>
+      </b:Column>
+    </b:FluidRow>
     <g:FlowPanel>
-      <g:FlowPanel styleName="btn-group">
-        <g:Button ui:field="functionalUnitButton" styleName="btn iconb i-plus">
-          <ui:msg description="Add Functional Unit label">Add Unit</ui:msg>
-        </g:Button>
-        <g:Button ui:field="exportButton" styleName="btn iconb i-down">
-          <ui:msg description="Export All Identifiers label">Export All Identifiers</ui:msg>
-        </g:Button>
-        <g:Button ui:field="importButton" styleName="btn iconb i-move">
-          <ui:msg description="Map Identifiers label">Map Identifiers</ui:msg>
-        </g:Button>
-        <g:Button ui:field="syncButton" styleName="btn iconb i-reblog">
-          <ui:msg description="Sync Identifiers label">Synchronize Identifiers</ui:msg>
-        </g:Button>
-      </g:FlowPanel>
-      <o:HelpImage page="Working+with+Units"></o:HelpImage>
+      <g:FlowPanel ui:field="content" addStyleNames="items"></g:FlowPanel>
+      <g:ScrollPanel ui:field="functionalUnitListPanel"/>
+      <g:ScrollPanel ui:field="functionalUnitDetailsPanel"/>
     </g:FlowPanel>
-    <g:SplitLayoutPanel>
-      <g:center>
-        <g:ScrollPanel width="100%" ui:field="functionalUnitDetailsPanel"/>
-      </g:center>
-      <g:west size='240'>
-        <g:ScrollPanel ui:field="functionalUnitListPanel"/>
-      </g:west>
-    </g:SplitLayoutPanel>
   </g:FlowPanel>
 
 </ui:UiBinder>
