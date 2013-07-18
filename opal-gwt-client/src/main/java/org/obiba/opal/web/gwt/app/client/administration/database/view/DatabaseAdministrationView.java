@@ -9,13 +9,9 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.database.view;
 
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseAdministrationPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
@@ -33,6 +29,7 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
@@ -128,8 +125,8 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
   }
 
   @Override
-  public void setBreadcrumbItems(List<BreadcrumbsBuilder.Item> items) {
-    breadcrumbs.add(new BreadcrumbsBuilder().setItems(items).build());
+  public HasWidgets getBreadcrumbs() {
+    return breadcrumbs;
   }
 
   @Override

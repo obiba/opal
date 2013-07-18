@@ -8,6 +8,10 @@ import com.google.gwt.user.client.History;
 
 public class OpalNavLink extends NavLink {
 
+  public OpalNavLink() {
+    super();
+  }
+
   public OpalNavLink(String text, String historyToken) {
     super(text);
     if (!Strings.isNullOrEmpty(historyToken)) setHistoryToken(historyToken);

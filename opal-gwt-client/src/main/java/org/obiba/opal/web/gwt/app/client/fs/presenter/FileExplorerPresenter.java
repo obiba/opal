@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
-import org.obiba.opal.web.gwt.app.client.administration.presenter.BreadcrumbDisplay;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
@@ -18,6 +17,8 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRefreshedEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
+import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SplitPaneWorkbenchPresenter;
@@ -39,12 +40,13 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
 public class FileExplorerPresenter
     extends SplitPaneWorkbenchPresenter<FileExplorerPresenter.Display, FileExplorerPresenter.Proxy> {
 
-  public interface Display extends View, BreadcrumbDisplay {
+  public interface Display extends View, HasBreadcrumbs {
 
     HasClickHandlers getFileUploadButton();
 
@@ -78,18 +80,22 @@ public class FileExplorerPresenter
 
   CreateFolderDialogPresenter createFolderDialogPresenter;
 
+  private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
+
   private Runnable actionRequiringConfirmation;
 
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public FileExplorerPresenter(Display display, EventBus eventBus, Proxy proxy,
       FileSystemTreePresenter fileSystemTreePresenter, FolderDetailsPresenter folderDetailsPresenter,
-      FileUploadDialogPresenter fileUploadDialogPresenter, CreateFolderDialogPresenter createFolderDialogPresenter) {
+      FileUploadDialogPresenter fileUploadDialogPresenter, CreateFolderDialogPresenter createFolderDialogPresenter,
+      DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     this.fileSystemTreePresenter = fileSystemTreePresenter;
     this.folderDetailsPresenter = folderDetailsPresenter;
     this.fileUploadDialogPresenter = fileUploadDialogPresenter;
     this.createFolderDialogPresenter = createFolderDialogPresenter;
+    this.breadcrumbsHelper = breadcrumbsHelper;
   }
 
   @Override
@@ -108,6 +114,7 @@ public class FileExplorerPresenter
   }
 
   @Override
+  @TitleFunction
   public String getTitle() {
     return translations.pageFileExplorerTitle();
   }
@@ -119,6 +126,12 @@ public class FileExplorerPresenter
 
   @Override
   public void authorize(HasAuthorization authorizer) {
+  }
+
+  @Override
+  protected void onReveal() {
+    super.onReveal();
+    breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
   }
 
   @Override

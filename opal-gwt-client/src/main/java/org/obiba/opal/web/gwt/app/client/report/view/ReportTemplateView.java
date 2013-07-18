@@ -9,27 +9,24 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.report.view;
 
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresenter;
-import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasWidgets;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 
 public class ReportTemplateView extends Composite implements ReportTemplatePresenter.Display {
 
@@ -107,8 +104,8 @@ public class ReportTemplateView extends Composite implements ReportTemplatePrese
   }
 
   @Override
-  public void setBreadcrumbItems(List<BreadcrumbsBuilder.Item> items) {
-    breadcrumbs.add(new BreadcrumbsBuilder().setItems(items).build());
+  public HasWidgets getBreadcrumbs() {
+    return breadcrumbs;
   }
 
 }
