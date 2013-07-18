@@ -7,13 +7,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.navigator.view;
+package org.obiba.opal.web.gwt.app.client.project.view;
 
 import java.util.Comparator;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorView;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.AttributeValueColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.LabelValueColumn;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;

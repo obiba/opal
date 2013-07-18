@@ -7,12 +7,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.navigator.view;
+package org.obiba.opal.web.gwt.app.client.project.view;
 
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.EntityDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.EntityDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueRenderer;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
 import org.obiba.opal.web.gwt.app.client.workbench.view.TableChooser;

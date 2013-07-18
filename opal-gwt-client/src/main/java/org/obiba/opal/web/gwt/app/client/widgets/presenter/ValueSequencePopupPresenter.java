@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.navigator.event.GeoValueDisplayEvent;
+import org.obiba.opal.web.gwt.app.client.project.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;

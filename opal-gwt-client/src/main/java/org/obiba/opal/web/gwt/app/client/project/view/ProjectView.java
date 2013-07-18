@@ -76,6 +76,14 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     magmacrumbs.add(new InlineLabel(table));
   }
 
+  @Override
+  public void selectVariable(String datasource, String table, String variable) {
+    magmacrumbs.clear();
+    magmacrumbs.add(newDatasourceLink(datasource));
+    magmacrumbs.add(newTableLink(datasource, table));
+    magmacrumbs.add(new InlineLabel(variable));
+  }
+
   @UiHandler("projects")
   void onProjectsSelection(ClickEvent event) {
     getUiHandlers().onProjectsSelection();

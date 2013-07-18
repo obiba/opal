@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.obiba.opal.web.gwt.app.client.navigator.util;
+package org.obiba.opal.web.gwt.app.client.support;
 
 import java.util.ArrayList;
 import java.util.List;

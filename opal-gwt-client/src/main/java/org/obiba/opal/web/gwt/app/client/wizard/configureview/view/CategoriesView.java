@@ -11,7 +11,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
-import org.obiba.opal.web.gwt.app.client.navigator.view.CategoriesTable;
+import org.obiba.opal.web.gwt.app.client.project.view.CategoriesTable;
 import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorView;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;

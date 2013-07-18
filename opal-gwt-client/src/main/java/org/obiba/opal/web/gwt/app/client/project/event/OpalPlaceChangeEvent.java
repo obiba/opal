@@ -1,4 +1,4 @@
-package org.obiba.opal.web.gwt.app.client.navigator.event;
+package org.obiba.opal.web.gwt.app.client.project.event;
 
 /**
  * Created with IntelliJ IDEA.

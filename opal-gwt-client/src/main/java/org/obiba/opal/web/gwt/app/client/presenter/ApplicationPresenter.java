@@ -13,7 +13,7 @@ import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdminis
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.GeoValueDisplayEvent;
+import org.obiba.opal.web.gwt.app.client.project.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.ui.HasUrl;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionRequiredEvent;

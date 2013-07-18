@@ -10,7 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.project.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;

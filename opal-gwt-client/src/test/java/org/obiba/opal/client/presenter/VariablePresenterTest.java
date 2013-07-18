@@ -17,8 +17,8 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.AddPrincipalHandler;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
+import org.obiba.opal.web.gwt.app.client.project.event.VariableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.project.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
@@ -70,12 +70,6 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
     expect(eventBusMock.addHandler((Type<VariableSelectionChangeEvent.Handler>) EasyMock.anyObject(),
         (VariableSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
 
-    displayMock.setNextCommand((Command) EasyMock.anyObject());
-    displayMock.setPreviousCommand((Command) EasyMock.anyObject());
-    displayMock.setParentCommand((Command) EasyMock.anyObject());
-    displayMock.setSummaryTabCommand((Command) EasyMock.anyObject());
-    displayMock.setDeriveCategorizeCommand((Command) EasyMock.anyObject());
-    displayMock.setDeriveCustomCommand((Command) EasyMock.anyObject());
     displayMock.setSummaryTabWidget(summaryTabMock);
 
     usersAuthzDisplayMock.addPrincipalHandler((AddPrincipalHandler) EasyMock.anyObject());

@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.derive.view;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.navigator.view.VariableViewHelper;
+import org.obiba.opal.web.gwt.app.client.support.AttributeHelper;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 
 import com.google.common.base.Strings;
@@ -98,7 +98,7 @@ public class ValueMapEntry {
   }
 
   public static Builder fromCategory(CategoryDto cat, double count) {
-    String label = VariableViewHelper.getLabelValue(cat.getAttributesArray());
+    String label = AttributeHelper.getLabelValue(cat.getAttributesArray());
     if(Strings.isNullOrEmpty(label)) {
       label = buildLabel(cat.getName());
     }

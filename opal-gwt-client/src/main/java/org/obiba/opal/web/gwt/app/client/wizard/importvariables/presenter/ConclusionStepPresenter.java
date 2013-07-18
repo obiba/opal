@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.project.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ResourceRequestPresenter.ResourceClickHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.view.ResourceRequestView;

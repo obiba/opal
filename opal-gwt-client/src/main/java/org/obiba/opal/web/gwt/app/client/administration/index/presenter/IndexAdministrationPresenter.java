@@ -19,7 +19,7 @@ import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdminis
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.navigator.event.TableIndexStatusRefreshEvent;
+import org.obiba.opal.web.gwt.app.client.project.event.TableIndexStatusRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;

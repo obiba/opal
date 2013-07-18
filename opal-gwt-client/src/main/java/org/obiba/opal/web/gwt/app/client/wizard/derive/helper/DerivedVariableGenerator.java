@@ -18,7 +18,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.navigator.view.VariableViewHelper;
+import org.obiba.opal.web.gwt.app.client.support.AttributeHelper;
 import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.view.ValueMapEntry.ValueMapEntryType;
@@ -264,7 +264,7 @@ public abstract class DerivedVariableGenerator {
 
     AttributeDto labelDto = AttributeDto.create();
     labelDto.setName("label");
-    labelDto.setLocale(VariableViewHelper.getCurrentLanguage());
+    labelDto.setLocale(AttributeHelper.getCurrentLanguage());
     labelDto.setValue(entry.getLabel());
     return labelDto;
   }

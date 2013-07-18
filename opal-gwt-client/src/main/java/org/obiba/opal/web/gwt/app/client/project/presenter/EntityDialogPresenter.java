@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.navigator.presenter;
+package org.obiba.opal.web.gwt.app.client.project.presenter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,8 +18,8 @@ import java.util.Map;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
-import org.obiba.opal.web.gwt.app.client.navigator.event.GeoValueDisplayEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.util.VariablesFilter;
+import org.obiba.opal.web.gwt.app.client.project.event.GeoValueDisplayEvent;
+import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.TextBoxClearable;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;

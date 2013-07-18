@@ -7,7 +7,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.navigator.event;
+package org.obiba.opal.web.gwt.app.client.project.event;
+
+import java.util.List;
 
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -18,11 +20,11 @@ import com.google.gwt.event.shared.GwtEvent;
 /**
  *
  */
-public class VariableSelectionChangeEvent extends GwtEvent<VariableSelectionChangeEvent.Handler> {
+public class CopyVariablesToViewEvent extends GwtEvent<CopyVariablesToViewEvent.Handler> {
 
   public interface Handler extends EventHandler {
 
-    void onVariableSelectionChanged(VariableSelectionChangeEvent event);
+    void onVariableCopy(CopyVariablesToViewEvent event);
 
   }
 
@@ -30,41 +32,22 @@ public class VariableSelectionChangeEvent extends GwtEvent<VariableSelectionChan
 
   private final TableDto table;
 
-  private final VariableDto selection;
-
-  private final VariableDto previous;
-
-  private final VariableDto next;
+  private final List<VariableDto> selection;
 
   /**
    * @param selectedItem
    */
-  public VariableSelectionChangeEvent(TableDto table, VariableDto selectedItem) {
-    this(table, selectedItem, null, null);
-  }
-
-  public VariableSelectionChangeEvent(TableDto table, VariableDto selectedItem, VariableDto previous,
-      VariableDto next) {
+  public CopyVariablesToViewEvent(TableDto table, List<VariableDto> selectedItems) {
     this.table = table;
-    selection = selectedItem;
-    this.previous = previous;
-    this.next = next;
+    selection = selectedItems;
   }
 
   public TableDto getTable() {
     return table;
   }
 
-  public VariableDto getSelection() {
+  public List<VariableDto> getSelection() {
     return selection;
-  }
-
-  public VariableDto getPrevious() {
-    return previous;
-  }
-
-  public VariableDto getNext() {
-    return next;
   }
 
   public static Type<Handler> getType() {
@@ -73,7 +56,7 @@ public class VariableSelectionChangeEvent extends GwtEvent<VariableSelectionChan
 
   @Override
   protected void dispatch(Handler handler) {
-    handler.onVariableSelectionChanged(this);
+    handler.onVariableCopy(this);
   }
 
   @Override

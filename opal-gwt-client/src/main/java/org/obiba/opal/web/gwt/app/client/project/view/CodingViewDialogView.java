@@ -7,10 +7,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.navigator.view;
+package org.obiba.opal.web.gwt.app.client.project.view;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.CodingViewDialogPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.project.presenter.CodingViewDialogPresenter.Display;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 
 import com.google.gwt.core.client.GWT;

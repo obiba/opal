@@ -9,22 +9,22 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.inject;
 
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.CodingViewDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.CodingViewDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.DatasourcePresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.EntityDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.EntityDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
 import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorTreePresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ValuesTablePresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.VariablePresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.view.CodingViewDialogView;
+import org.obiba.opal.web.gwt.app.client.project.presenter.VariablePresenter;
+import org.obiba.opal.web.gwt.app.client.project.view.CodingViewDialogView;
 import org.obiba.opal.web.gwt.app.client.project.view.DatasourceView;
-import org.obiba.opal.web.gwt.app.client.navigator.view.EntityDialogView;
+import org.obiba.opal.web.gwt.app.client.project.view.EntityDialogView;
 import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorTreeView;
 import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorView;
 import org.obiba.opal.web.gwt.app.client.project.view.TableView;
 import org.obiba.opal.web.gwt.app.client.project.view.ValuesTableView;
-import org.obiba.opal.web.gwt.app.client.navigator.view.VariableView;
+import org.obiba.opal.web.gwt.app.client.project.view.VariableView;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsPresenter;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectView;

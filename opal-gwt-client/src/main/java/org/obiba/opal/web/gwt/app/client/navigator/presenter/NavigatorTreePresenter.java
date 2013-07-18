@@ -10,12 +10,11 @@
 package org.obiba.opal.web.gwt.app.client.navigator.presenter;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourcesRefreshEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.project.event.DatasourceSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.project.event.DatasourcesRefreshEvent;
+import org.obiba.opal.web.gwt.app.client.project.event.TableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.project.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;

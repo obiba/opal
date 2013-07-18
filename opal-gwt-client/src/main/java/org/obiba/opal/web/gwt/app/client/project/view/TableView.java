@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorMenuBar;
 import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorView;
 import org.obiba.opal.web.gwt.app.client.project.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.TableUiHandlers;
@@ -26,7 +25,6 @@ import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.gwt.app.client.workbench.view.TextBoxClearable;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
@@ -36,7 +34,6 @@ import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 
 import com.github.gwtbootstrap.client.ui.Alert;
-import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.ProgressBar;
@@ -51,7 +48,6 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -66,20 +62,17 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.MenuItem;
-import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
+import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements TablePresenter.Display {
 
-  interface TableViewUiBinder extends UiBinder<Widget, TableView> {}
-
-  private static final TableViewUiBinder uiBinder = GWT.create(TableViewUiBinder.class);
+  interface Binder extends UiBinder<Widget, TableView> {}
 
   private static final Integer VARIABLES_TAB_INDEX = 0;
 
@@ -130,9 +123,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @UiField
   InlineLabel noVariables;
-
-  @UiField
-  Anchor copyVariables;
 
   @UiField
   Alert selectAllItemsAlert;
@@ -195,7 +185,8 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   private CheckboxColumn<VariableDto> checkColumn;
 
-  public TableView() {
+  @Inject
+  public TableView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
     addTableColumns();
     initializeAnchorTexts();
@@ -400,6 +391,31 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     getUiHandlers().onCopyData();
   }
 
+  @UiHandler("copyVariables")
+  void onAddVariablesToView(ClickEvent event) {
+    getUiHandlers().onAddVariablesToView(checkColumn.getSelectedItems());
+  }
+
+  @UiHandler("clearIndexLink")
+  void onIndexClear(ClickEvent event) {
+    getUiHandlers().onIndexClear();
+  }
+
+  @UiHandler("indexNowLink")
+  void onIndexNow(ClickEvent event) {
+    getUiHandlers().onIndexNow();
+  }
+
+  @UiHandler("cancelLink")
+  void onIndexCancel(ClickEvent event) {
+    getUiHandlers().onIndexCancel();
+  }
+
+  @UiHandler("scheduleLink")
+  void onIndexSchedule(ClickEvent event) {
+    getUiHandlers().onIndexSchedule();
+  }
+
   @Override
   public void setNextName(String name) {
     next.setTitle(name);
@@ -590,36 +606,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     clearIndexLink.setText(translations.indexActionClear());
     indexNowLink.setText(translations.indexActionIndexNow());
     scheduleLink.setText(translations.indexActionScheduleIndexing());
-  }
-
-  @Override
-  public HasClickHandlers getClear() {
-    return clearIndexLink;
-  }
-
-  @Override
-  public HasClickHandlers getCancel() {
-    return cancelLink;
-  }
-
-  @Override
-  public HasClickHandlers getIndexNow() {
-    return indexNowLink;
-  }
-
-  @Override
-  public HasClickHandlers getScheduleIndexing() {
-    return scheduleLink;
-  }
-
-  @Override
-  public HasClickHandlers getCopyVariables() {
-    return copyVariables;
-  }
-
-  @Override
-  public List<VariableDto> getSelectedItems() {
-    return checkColumn.getSelectedItems();
   }
 
   private class VariableDtoDisplay implements CheckboxColumn.Display<VariableDto> {

@@ -17,18 +17,17 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.navigator.event.CopyVariablesToViewEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingTableSelectionEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingTableSelectionEvent.Direction;
-import org.obiba.opal.web.gwt.app.client.navigator.event.SiblingVariableSelectionEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.TableIndexStatusRefreshEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.VariableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.event.ViewConfigurationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.CodingViewDialogPresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.util.VariablesFilter;
+import org.obiba.opal.web.gwt.app.client.project.event.CopyVariablesToViewEvent;
+import org.obiba.opal.web.gwt.app.client.project.event.DatasourceSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.project.event.DatasourceUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.project.event.SiblingTableSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.project.event.SiblingTableSelectionEvent.Direction;
+import org.obiba.opal.web.gwt.app.client.project.event.SiblingVariableSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.project.event.TableIndexStatusRefreshEvent;
+import org.obiba.opal.web.gwt.app.client.project.event.TableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.project.event.VariableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.project.event.ViewConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
@@ -55,7 +54,6 @@ import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
@@ -82,7 +80,6 @@ import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_OK;
 import static com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE;
 
-@SuppressWarnings("OverlyCoupledClass")
 public class TablePresenter extends Presenter<TablePresenter.Display, TablePresenter.Proxy> implements TableUiHandlers {
 
   private static final int DELAY_MILLIS = 1000;
@@ -166,15 +163,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     getView().setValuesTabCommand(new ValuesCommand());
     getView().setVariablesTabCommand(new VariablesCommand());
 
-    // Copy variables handler
-    getView().getCopyVariables().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new CopyVariablesToViewEvent(table, getView().getSelectedItems()));
-      }
-
-    });
-
     FieldUpdater<VariableDto, String> updater = new VariableNameFieldUpdater();
     getView().setVariableNameFieldUpdater(updater);
     getView().setVariableIndexFieldUpdater(updater);
@@ -190,102 +178,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     registerHandler(
         getEventBus().addHandler(TableIndexStatusRefreshEvent.getType(), new TableIndexStatusRefreshHandler()));
-
-    //Link actions: CLEAR
-    final UriBuilder ub = UriBuilder.create().segment("datasource", "{}", "table", "{}", "index");
-    getView().getClear().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        ResponseCodeCallback callback = new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            if(response.getStatusCode() == SC_OK) {
-              updateIndexStatus();
-            } else {
-              ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-              getEventBus().fireEvent(
-                  NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
-                      .build());
-            }
-          }
-
-        };
-        ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-            .forResource(ub.build(table.getDatasourceName(), table.getName()))//
-            .withCallback(callback, SC_OK, SC_SERVICE_UNAVAILABLE).delete().send();
-      }
-    });
-    getView().getCancel().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        ResponseCodeCallback callback = new ResponseCodeCallback() {
-
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            if(response.getStatusCode() == SC_OK) {
-              cancelIndexation = true;
-              updateIndexStatus();
-            } else {
-              ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-              getEventBus().fireEvent(
-                  NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
-                      .build());
-            }
-          }
-
-        };
-        ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-            .forResource(ub.build(table.getDatasourceName(), table.getName()))//
-            .withCallback(callback, SC_OK, SC_SERVICE_UNAVAILABLE).delete().send();
-      }
-    });
-
-    //Link actions: INDEX NOW
-    getView().getIndexNow().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        ResponseCodeCallback callback = new ResponseCodeCallback() {
-
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            if(response.getStatusCode() == SC_OK) {
-              // Wait a few seconds for the task to launch before checking its status
-              Timer t = new Timer() {
-                @Override
-                public void run() {
-                  updateIndexStatus();
-                }
-              };
-              // Schedule the timer to run once in X seconds.
-              t.schedule(DELAY_MILLIS);
-            } else {
-              getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
-            }
-          }
-
-        };
-        ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-            .forResource(getIndexResource(table.getDatasourceName(), table.getName()))//
-            .withCallback(callback, SC_OK, SC_SERVICE_UNAVAILABLE).put().send();
-      }
-    });
-
-    // Link action: Schedule indexing
-    getView().getScheduleIndexing().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        List<TableIndexStatusDto> objects = new ArrayList<TableIndexStatusDto>();
-        objects.add(statusDto);
-
-        IndexPresenter dialog = indexPresenter.get();
-        dialog.setUpdateMethodCallbackRefreshIndices(false);
-        dialog.setUpdateMethodCallbackRefreshTable(true);
-        dialog.updateSchedules(objects);
-        addToPopupSlot(dialog);
-
-      }
-    });
-
   }
 
   private String getIndexResource(String datasource, String table) {
@@ -427,11 +319,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   }
 
-  private void downloadMetadata() {
-    String downloadUrl = table.getLink() + "/variables/excel";
-    getEventBus().fireEvent(new FileDownloadEvent(downloadUrl));
-  }
-
   private VariableDto getPreviousVariable(int index) {
     VariableDto previous = null;
     if(index > 0) {
@@ -447,7 +334,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
     return next;
   }
-
 
   private boolean tableIsView() {
     return table.hasViewLink();
@@ -475,7 +361,8 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
   @Override
   public void onDownloadDictionary() {
-    downloadMetadata();
+    String downloadUrl = table.getLink() + "/variables/excel";
+    getEventBus().fireEvent(new FileDownloadEvent(downloadUrl));
   }
 
   @Override
@@ -485,12 +372,28 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   @Override
-  public void onEdit() {
-    if(getView().getSelectedItems().isEmpty()) {
+  public void onAddVariablesToView(List<VariableDto> variables) {
+    if(variables.isEmpty()) {
       getEventBus().fireEvent(NotificationEvent.newBuilder().error("CopyVariableSelectAtLeastOne").build());
     } else {
-      getEventBus().fireEvent(new CopyVariablesToViewEvent(table, getView().getSelectedItems()));
+      getEventBus().fireEvent(new CopyVariablesToViewEvent(table, variables));
     }
+  }
+
+  @Override
+  public void onEdit() {
+    UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName(), "view", table.getName());
+    ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(ub.build()).get()
+        .withCallback(new ResourceCallback<ViewDto>() {
+
+          @Override
+          public void onResource(Response response, ViewDto viewDto) {
+            viewDto.setDatasourceName(table.getDatasourceName());
+            viewDto.setName(table.getName());
+
+            getEventBus().fireEvent(new ViewConfigurationRequiredEvent(viewDto));
+          }
+        }).send();
   }
 
   @Override
@@ -503,6 +406,89 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         : ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "removeTable", "confirmRemoveTable");
 
     getEventBus().fireEvent(event);
+  }
+
+  @Override
+  public void onIndexClear() {
+    ResponseCodeCallback callback = new ResponseCodeCallback() {
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        if(response.getStatusCode() == SC_OK) {
+          updateIndexStatus();
+        } else {
+          ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+          getEventBus().fireEvent(
+              NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+                  .build());
+        }
+      }
+
+    };
+    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
+        .forResource(UriBuilder.URI_DATASOURCE_TABLE_INDEX.build(table.getDatasourceName(), table.getName()))//
+        .withCallback(callback, SC_OK, SC_SERVICE_UNAVAILABLE).delete().send();
+  }
+
+  @Override
+  public void onIndexNow() {
+    ResponseCodeCallback callback = new ResponseCodeCallback() {
+
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        if(response.getStatusCode() == SC_OK) {
+          // Wait a few seconds for the task to launch before checking its status
+          Timer t = new Timer() {
+            @Override
+            public void run() {
+              updateIndexStatus();
+            }
+          };
+          // Schedule the timer to run once in X seconds.
+          t.schedule(DELAY_MILLIS);
+        } else {
+          getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
+        }
+      }
+
+    };
+    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
+        .forResource(getIndexResource(table.getDatasourceName(), table.getName()))//
+        .withCallback(callback, SC_OK, SC_SERVICE_UNAVAILABLE).put().send();
+  }
+
+  @Override
+  public void onIndexCancel() {
+    ResponseCodeCallback callback = new ResponseCodeCallback() {
+
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        if(response.getStatusCode() == SC_OK) {
+          cancelIndexation = true;
+          updateIndexStatus();
+        } else {
+          ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+          getEventBus().fireEvent(
+              NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+                  .build());
+        }
+      }
+
+    };
+    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
+        .forResource(UriBuilder.URI_DATASOURCE_TABLE_INDEX.build(table.getDatasourceName(), table.getName()))//
+        .withCallback(callback, SC_OK, SC_SERVICE_UNAVAILABLE).delete().send();
+  }
+
+  @Override
+  public void onIndexSchedule() {
+    List<TableIndexStatusDto> objects = new ArrayList<TableIndexStatusDto>();
+    objects.add(statusDto);
+
+    IndexPresenter dialog = indexPresenter.get();
+    dialog.setUpdateMethodCallbackRefreshIndices(false);
+    dialog.setUpdateMethodCallbackRefreshTable(true);
+    dialog.updateSchedules(objects);
+    addToPopupSlot(dialog);
   }
 
   private final class ValuesCommand implements Command {
@@ -594,20 +580,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
     }
   }
 
-  private final class NextCommand implements Command {
-    @Override
-    public void execute() {
-
-    }
-  }
-
-  private final class PreviousCommand implements Command {
-    @Override
-    public void execute() {
-
-    }
-  }
-
   private class RemoveConfirmationEventHandler implements ConfirmationEvent.Handler {
 
     @Override
@@ -616,24 +588,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
         removeConfirmation.run();
         removeConfirmation = null;
       }
-    }
-  }
-
-  private final class EditCommand implements Command {
-    @Override
-    public void execute() {
-      UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName(), "view", table.getName());
-      ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(ub.build()).get()
-          .withCallback(new ResourceCallback<ViewDto>() {
-
-            @Override
-            public void onResource(Response response, ViewDto viewDto) {
-              viewDto.setDatasourceName(table.getDatasourceName());
-              viewDto.setName(table.getName());
-
-              getEventBus().fireEvent(new ViewConfigurationRequiredEvent(viewDto));
-            }
-          }).send();
     }
   }
 
@@ -820,21 +774,9 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
 
     void setIndexStatusAlert(TableIndexStatusDto statusDto);
 
-    HasClickHandlers getClear();
-
-    HasClickHandlers getCancel();
-
-    HasClickHandlers getIndexNow();
-
-    HasClickHandlers getScheduleIndexing();
-
     void setFromTables(JsArrayString tables);
 
     List<Anchor> getFromTablesAnchor();
-
-    HasClickHandlers getCopyVariables();
-
-    List<VariableDto> getSelectedItems();
 
     HandlerRegistration addFilterVariableHandler(KeyUpHandler handler);
 

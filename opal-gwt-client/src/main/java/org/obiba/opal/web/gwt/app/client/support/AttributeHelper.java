@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.navigator.view;
+package org.obiba.opal.web.gwt.app.client.support;
 
 import javax.annotation.Nonnull;
 
@@ -20,13 +20,13 @@ import com.google.gwt.i18n.client.LocaleInfo;
 /**
  *
  */
-public class VariableViewHelper {
+public class AttributeHelper {
 
   private static final String DEFAULT_LOCALE_NAME = "default";
 
   private static final String LABEL_ATTRIBUTE_NAME = "label";
 
-  private VariableViewHelper() {}
+  private AttributeHelper() {}
 
   /**
    * Get the 'label' attribute value in current language.

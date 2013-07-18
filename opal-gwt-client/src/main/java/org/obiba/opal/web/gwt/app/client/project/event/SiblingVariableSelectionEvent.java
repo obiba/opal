@@ -7,9 +7,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.navigator.event;
+package org.obiba.opal.web.gwt.app.client.project.event;
 
-import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
@@ -17,11 +17,11 @@ import com.google.gwt.event.shared.GwtEvent;
 /**
  *
  */
-public class SiblingTableSelectionEvent extends GwtEvent<SiblingTableSelectionEvent.Handler> {
+public class SiblingVariableSelectionEvent extends GwtEvent<SiblingVariableSelectionEvent.Handler> {
 
   public interface Handler extends EventHandler {
 
-    void onSiblingTableSelection(SiblingTableSelectionEvent event);
+    void onSiblingVariableSelection(SiblingVariableSelectionEvent event);
 
   }
 
@@ -31,16 +31,16 @@ public class SiblingTableSelectionEvent extends GwtEvent<SiblingTableSelectionEv
 
   private static final Type<Handler> TYPE = new Type<Handler>();
 
-  private final TableDto currentSelection;
+  private final VariableDto currentSelection;
 
   private final Direction direction;
 
-  public SiblingTableSelectionEvent(TableDto currentItem, Direction direction) {
+  public SiblingVariableSelectionEvent(VariableDto currentItem, Direction direction) {
     currentSelection = currentItem;
     this.direction = direction;
   }
 
-  public TableDto getCurrentSelection() {
+  public VariableDto getCurrentSelection() {
     return currentSelection;
   }
 
@@ -54,7 +54,7 @@ public class SiblingTableSelectionEvent extends GwtEvent<SiblingTableSelectionEv
 
   @Override
   protected void dispatch(Handler handler) {
-    handler.onSiblingTableSelection(this);
+    handler.onSiblingVariableSelection(this);
   }
 
   @Override

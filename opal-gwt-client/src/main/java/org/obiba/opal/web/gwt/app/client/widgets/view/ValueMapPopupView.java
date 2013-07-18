@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.view;
 
-import org.obiba.opal.web.gwt.app.client.navigator.event.GeoValueDisplayEvent;
+import org.obiba.opal.web.gwt.app.client.project.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.maps.LineStringValueMap;
 import org.obiba.opal.web.gwt.app.client.widgets.maps.PointValueMap;
 import org.obiba.opal.web.gwt.app.client.widgets.maps.PolygonValueMap;
@@ -25,8 +25,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;

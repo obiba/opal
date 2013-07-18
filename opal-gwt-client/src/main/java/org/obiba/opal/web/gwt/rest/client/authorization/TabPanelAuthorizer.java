@@ -10,6 +10,8 @@
 package org.obiba.opal.web.gwt.rest.client.authorization;
 
 import com.github.gwtbootstrap.client.ui.TabPanel;
+import com.github.gwtbootstrap.client.ui.base.ListItem;
+import com.github.gwtbootstrap.client.ui.base.UnorderedList;
 
 /**
  * Authorize a tab panel.
@@ -31,12 +33,12 @@ public class TabPanelAuthorizer implements HasAuthorization {
   public void beforeAuthorization() {
     // if the tab to hide is the selected one, tab selection changes
     selectedIndex = tabs.getSelectedTab();
-    tabs.getWidget(index).setVisible(false);
+    getNavTab(index).setVisible(false);
   }
 
   @Override
   public void authorized() {
-    tabs.getWidget(index).setVisible(true);
+    getNavTab(index).setVisible(true);
     // restore the previous tab selection
     if(selectedIndex == index) {
       tabs.selectTab(index);
@@ -45,6 +47,11 @@ public class TabPanelAuthorizer implements HasAuthorization {
 
   @Override
   public void unauthorized() {
-    tabs.getWidget(index).setVisible(false);
+    getNavTab(index).setVisible(false);
+  }
+
+  private ListItem getNavTab(int i) {
+    UnorderedList ul = (UnorderedList) tabs.getWidget(0);
+    return (ListItem) ul.getWidget(i);
   }
 }
