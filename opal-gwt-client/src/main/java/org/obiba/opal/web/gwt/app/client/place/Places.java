@@ -60,6 +60,14 @@ public final class Places {
     return units;
   }
 
+  public static final String unit = "!unit";
+
+  public static final Place unitPlace = new Place(unit);
+
+  public static String unit() {
+    return units;
+  }
+
   public static final String files = "!files";
 
   public static final Place filesPlace = new Place(files);

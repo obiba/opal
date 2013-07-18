@@ -2,7 +2,6 @@ package org.obiba.opal.web.gwt.app.client.presenter;
 
 import org.obiba.opal.web.gwt.app.client.place.Places;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -13,7 +12,6 @@ import com.gwtplatform.mvp.client.annotations.ContentSlot;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
-import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 
 public class PageContainerPresenter extends Presenter<PageContainerPresenter.Display,PageContainerPresenter.Proxy> {
@@ -41,10 +39,12 @@ public class PageContainerPresenter extends Presenter<PageContainerPresenter.Dis
   public void setInSlot(Object slot, PresenterWidget<?> content) {
 
     if (CONTENT == slot) {
-      HasPageTitle pageHeader = (HasPageTitle)content;
+      if (content instanceof HasPageTitle) {
+        HasPageTitle pageHeader = (HasPageTitle)content;
 
-      if (pageHeader != null) {
-        getView().setPageTitle(pageHeader.getTitle());
+        if (pageHeader != null) {
+          getView().setPageTitle(pageHeader.getTitle());
+        }
       }
 
     }
