@@ -24,18 +24,14 @@ import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 
-import com.github.gwtbootstrap.client.ui.NavLink;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.ContentSlot;
@@ -46,25 +42,38 @@ import com.gwtplatform.mvp.client.proxy.RevealRootContentEvent;
 /**
  *
  */
-public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display, ApplicationPresenter.Proxy> {
+public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display, ApplicationPresenter.Proxy> implements ApplicationUiHandlers {
 
-  public interface Display extends View {
+  @Override
+  public void onDashboard() {
+    getEventBus().fireEvent(new PlaceChangeEvent(Places.dashboardPlace));
+  }
 
-    HasClickHandlers getQuit();
+  @Override
+  public void onProjects() {
+    getEventBus().fireEvent(new PlaceChangeEvent(Places.projectsPlace));
+  }
 
-    HasClickHandlers getHelp();
+  @Override
+  public void onAdministration() {
+    getEventBus().fireEvent(new PlaceChangeEvent(Places.administrationPlace));
+  }
 
-    HasUrl getDownloder();
+  @Override
+  public void onHelp() {
+    HelpUtil.openPage();
+  }
 
-    NavLink getAdministrationItem();
+  @Override
+  public void onQuit() {
+    getEventBus().fireEvent(new SessionEndedEvent());
+  }
 
-    NavLink getDatasourcesItem();
+  public interface Display extends View, HasUiHandlers<ApplicationUiHandlers> {
 
-    NavLink getProjectsItem();
+    HasUrl getDownloader();
 
     HasAuthorization getAdministrationAuthorizer();
-
-    NavLink getDashboardItem();
 
     void setCurrentSelection(MenuItem selection);
 
@@ -74,6 +83,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
     void setVersion(String version);
 
+    HasAuthorization getProjectsAutorizer();
   }
 
   @ContentSlot
@@ -103,6 +113,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     this.fileSelectorPresenter = fileSelectorPresenter;
     this.valueMapPopupPresenter = valueMapPopupPresenter;
     this.urlBuilder = urlBuilder;
+    getView().setUiHandlers(this);
   }
 
   @Override
@@ -136,51 +147,9 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
       @Override
       public void onFileDownload(FileDownloadEvent event) {
-        getView().getDownloder().setUrl(urlBuilder.buildAbsoluteUrl(event.getUrl()));
+        getView().getDownloader().setUrl(urlBuilder.buildAbsoluteUrl(event.getUrl()));
       }
     }));
-
-    getView().getDashboardItem().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.dashboardPlace));
-      }
-    });
-
-    getView().getAdministrationItem().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.administrationPlace));
-      }
-    });
-
-    getView().getDatasourcesItem().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.navigatorPlace));
-      }
-    });
-
-    getView().getProjectsItem().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.projectsPlace));
-      }
-    });
-
-    getView().getQuit().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new SessionEndedEvent());
-      }
-    });
-
-    getView().getHelp().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        HelpUtil.openPage();
-      }
-    });
 
     registerUserMessageEventHandler();
   }
@@ -194,7 +163,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   private void authorize() {
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").get()
-        .authorize(new UIObjectAuthorizer(getView().getDatasourcesItem())).send();
+        .authorize(getView().getProjectsAutorizer()).send();
 
     getEventBus().fireEvent(new RequestAdministrationPermissionEvent(new HasAuthorization() {
 

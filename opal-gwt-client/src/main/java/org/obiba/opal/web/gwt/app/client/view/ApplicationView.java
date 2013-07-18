@@ -10,38 +10,31 @@
 package org.obiba.opal.web.gwt.app.client.view;
 
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.HasUrl;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 
 import com.github.gwtbootstrap.client.ui.NavLink;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Frame;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Binder;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.ViewImpl;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 /**
  *
  */
-public class ApplicationView extends ViewImpl implements ApplicationPresenter.Display {
+public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> implements ApplicationPresenter.Display {
 
   interface Binder extends UiBinder<Widget, ApplicationView> {}
-
-  @UiField
-  NavLink help;
-
-  @UiField
-  NavLink quit;
 
   @UiField
   NavLink administrationItem;
@@ -51,12 +44,6 @@ public class ApplicationView extends ViewImpl implements ApplicationPresenter.Di
 
   @UiField
   Label version;
-
-  @UiField
-  NavLink dashboardItem;
-
-  @UiField
-  NavLink datasourcesItem;
 
   @UiField
   NavLink projectsItem;
@@ -71,32 +58,19 @@ public class ApplicationView extends ViewImpl implements ApplicationPresenter.Di
 
   @Inject
   public ApplicationView(Binder uiBinder) {
-     initWidget(uiBinder.createAndBindUi(this));
-  }
-
-  @Override
-  public void addToSlot(Object slot, IsWidget content) {
-  }
-
-  @Override
-  public void removeFromSlot(Object slot, IsWidget content) {
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {
-    if (ApplicationPresenter.WORKBENCH == slot) {
+    if(ApplicationPresenter.WORKBENCH == slot) {
       workbench.clear();
       workbench.add(content.asWidget());
     }
   }
 
   @Override
-  public NavLink getDashboardItem() {
-    return dashboardItem;
-  }
-
-  @Override
-  public HasUrl getDownloder() {
+  public HasUrl getDownloader() {
     return new HasUrl() {
 
       @Override
@@ -104,16 +78,6 @@ public class ApplicationView extends ViewImpl implements ApplicationPresenter.Di
         frame.setUrl(url);
       }
     };
-  }
-
-  @Override
-  public HasClickHandlers getQuit() {
-    return quit;
-  }
-
-  @Override
-  public HasClickHandlers getHelp() {
-    return help;
   }
 
   @Override
@@ -130,21 +94,6 @@ public class ApplicationView extends ViewImpl implements ApplicationPresenter.Di
   @Override
   public void clearSelection() {
     setCurrentSelection(null);
-  }
-
-  @Override
-  public NavLink getDatasourcesItem() {
-    return datasourcesItem;
-  }
-
-  @Override
-  public NavLink getProjectsItem() {
-    return projectsItem;
-  }
-
-  @Override
-  public NavLink getAdministrationItem() {
-    return administrationItem;
   }
 
   @Override
@@ -170,6 +119,36 @@ public class ApplicationView extends ViewImpl implements ApplicationPresenter.Di
   @Override
   public void setVersion(String version) {
     this.version.setText(version);
+  }
+
+  @Override
+  public HasAuthorization getProjectsAutorizer() {
+    return new UIObjectAuthorizer(projectsItem);
+  }
+
+  @UiHandler("dashboardItem")
+  void onDashboard(ClickEvent event) {
+    getUiHandlers().onDashboard();
+  }
+
+  @UiHandler("projectsItem")
+  void onProjects(ClickEvent event) {
+    getUiHandlers().onProjects();
+  }
+
+  @UiHandler("administrationItem")
+  void onAdministration(ClickEvent event) {
+    getUiHandlers().onAdministration();
+  }
+
+  @UiHandler("helpItem")
+  void onHelp(ClickEvent event) {
+    getUiHandlers().onHelp();
+  }
+
+  @UiHandler("quitItem")
+  void onQuit(ClickEvent event) {
+    getUiHandlers().onQuit();
   }
 
 }

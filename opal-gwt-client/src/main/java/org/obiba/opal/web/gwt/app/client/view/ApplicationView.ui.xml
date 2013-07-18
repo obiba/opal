@@ -14,9 +14,6 @@
         <b:NavLink ui:field="projectsItem">
           <ui:msg description="Projects label">Projects</ui:msg>
         </b:NavLink>
-        <b:NavLink ui:field="datasourcesItem">
-          <ui:msg description="Datasources label">Datasources</ui:msg>
-        </b:NavLink>
       </b:Nav>
 
       <b:Nav alignment="RIGHT">
@@ -27,10 +24,10 @@
         <b:NavLink ui:field="administrationItem">
           <ui:msg description="Datasources label">Administration</ui:msg>
         </b:NavLink>
-        <b:NavLink ui:field="help">
+        <b:NavLink ui:field="helpItem">
           <ui:msg description="Help link text">Help</ui:msg>
         </b:NavLink>
-        <b:NavLink ui:field="quit">
+        <b:NavLink ui:field="quitItem">
           <ui:msg description="Quit link text">Quit</ui:msg>
         </b:NavLink>
       </b:Nav>
