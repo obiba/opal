@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.project.view;
 
+import org.obiba.opal.web.gwt.app.client.workbench.view.DefaultFlexTable;
 import org.obiba.opal.web.gwt.plot.client.FrequencyPlot;
 import org.obiba.opal.web.gwt.plot.client.JqPlot;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
@@ -45,10 +46,7 @@ public class CategoricalSummaryView extends Composite {
   DivElement frequencyElement;
 
   @UiField
-  Grid grid;
-
-  @UiField
-  DisclosurePanel details;
+  DefaultFlexTable grid;
 
   final HTMLPanel widget;
 
@@ -72,7 +70,10 @@ public class CategoricalSummaryView extends Composite {
       frequencyElement.setAttribute("style", "width:" + width + "px;");
 
       FrequencyPlot freqPlot = new FrequencyPlot(frequencyElement.getId());
-      grid.resizeRows(count + 1);
+      grid.clear();
+      grid.setHeader(0, "Category");
+      grid.setHeader(1, "Frequency");
+      grid.setHeader(2, "%");
       for(int i = 0; i < count; i++) {
         FrequencyDto value = categorical.getFrequenciesArray().get(i);
         if(value.hasValue()) {
@@ -84,11 +85,9 @@ public class CategoricalSummaryView extends Composite {
       }
       plot = freqPlot;
 
-      details.setVisible(true);
-
     } else {
       plot = null;
-      details.setVisible(false);
+      grid.clear();
     }
   }
 

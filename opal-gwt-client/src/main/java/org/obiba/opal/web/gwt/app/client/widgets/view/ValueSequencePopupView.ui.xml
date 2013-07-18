@@ -11,7 +11,7 @@
       <g:center>
         <g:ScrollPanel>
           <g:FlowPanel addStyleNames="small-dual-indent top-margin">
-            <o:PropertiesTable condensed="true" borderedCell="false" zebra="true" keyStyleNames="span2 small-indent">
+            <o:PropertiesTable keyStyleNames="span2 small-indent">
               <o:PropertyPanel>
                 <g:FlowPanel>
                   <g:InlineLabel>

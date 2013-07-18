@@ -28,6 +28,8 @@ public class DefaultFlexTable extends FlexTable {
     DOM.insertChild(getElement(), head, 0);
     DOM.insertChild(head, headerTr, 0);
     setStyled(true);
+    setCondensed(true);
+    setZebra(true);
   }
 
   public void setStyled(boolean styled) {
@@ -43,14 +45,6 @@ public class DefaultFlexTable extends FlexTable {
       addStyleName("table-bordered");
     } else {
       removeStyleName("table-bordered");
-    }
-  }
-
-  public void setBorderedCell(boolean bordered) {
-    if(bordered) {
-      removeStyleName("no-bordered-cell");
-    } else {
-      addStyleName("no-bordered-cell");
     }
   }
 

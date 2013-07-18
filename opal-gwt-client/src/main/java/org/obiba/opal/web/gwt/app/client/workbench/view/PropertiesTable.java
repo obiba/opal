@@ -110,10 +110,6 @@ public class PropertiesTable extends FlowPanel {
     innerTable.setBordered(bordered);
   }
 
-  public void setBorderedCell(boolean bordered) {
-    innerTable.setBorderedCell(bordered);
-  }
-
   public void setCondensed(boolean condensed) {
     innerTable.setCondensed(condensed);
   }

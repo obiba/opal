@@ -109,7 +109,8 @@
                 </g:customCell>
                 <g:customCell styleName="top-aligned">
 
-                  <g:Anchor ui:field="scheduleLink" addStyleNames="inline xsmall-indent action">Schedule indexing</g:Anchor>
+                  <g:Anchor ui:field="scheduleLink" addStyleNames="inline xsmall-indent action">Schedule indexing
+                  </g:Anchor>
                 </g:customCell>
                 <g:customCell styleName="top-aligned">
                   <g:Anchor ui:field="cancelLink" addStyleNames="inline xsmall-indent action">Cancel</g:Anchor>
@@ -119,7 +120,7 @@
           </b:Alert>
         </g:FlowPanel>
 
-        <o:PropertiesTable condensed="true" borderedCell="false" zebra="true" keyStyleNames="span3 small-indent">
+        <o:PropertiesTable keyStyleNames="span3 small-indent">
           <g:FlowPanel>
             <g:Label>
               <ui:msg description="Entity type label">Entity Type</ui:msg>
@@ -134,8 +135,7 @@
           </g:FlowPanel>
         </o:PropertiesTable>
 
-        <o:PropertiesTable ui:field="fromTable" condensed="true" borderedCell="false" zebra="true"
-            keyStyleNames="span3 small-indent">
+        <o:PropertiesTable ui:field="fromTable" keyStyleNames="span3 small-indent">
           <g:FlowPanel>
             <g:Label ui:field="fromTableLabel">
               <ui:msg description="From table label">Tables included in the view</ui:msg>

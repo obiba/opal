@@ -15,8 +15,7 @@
       <g:center>
         <g:ScrollPanel>
           <g:FlowPanel addStyleNames="main">
-            <o:PropertiesTable condensed="true" borderedCell="false" zebra="true"
-                keyStyleNames="span2">
+            <o:PropertiesTable keyStyleNames="span2">
               <g:FlowPanel>
                 <g:Label>
                   <ui:msg description="Entity type label">Entity Type</ui:msg>

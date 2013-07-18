@@ -47,8 +47,7 @@
       <b:CellTable width="100%" ui:field="unitProperties" addStyleNames="small-top-margin" striped="true" condensed="true"/>
     </g:FlowPanel>
 
-    <o:PropertiesTable ui:field="propertiesPanel" condensed="true" borderedCell="false" zebra="true"
-        addStyleNames="small-dual-indent top-margin" keyStyleNames="span2 small-indent">
+    <o:PropertiesTable ui:field="propertiesPanel" addStyleNames="small-dual-indent top-margin" keyStyleNames="span2 small-indent">
 
       <o:PropertyPanel>
         <g:Label>
