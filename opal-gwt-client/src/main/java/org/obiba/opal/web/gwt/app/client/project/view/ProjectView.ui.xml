@@ -9,7 +9,7 @@
     <g:FlowPanel addStyleNames="page-header">
       <b:FluidRow>
         <b:Column size="9">
-          <b:Breadcrumbs ui:field="breadcrumbs">
+          <b:Breadcrumbs ui:field="titlecrumbs">
             <b:NavLink ui:field="projects">
               <ui:msg description="Projects label">Projects</ui:msg>
             </b:NavLink>
@@ -23,6 +23,7 @@
     </g:FlowPanel>
     <b:TabPanel tabPosition="right" ui:field="tabPanel">
       <b:Tab icon="TABLE" heading="Tables" active="true">
+        <b:Breadcrumbs ui:field="magmacrumbs"/>
         <g:SimplePanel ui:field="tablesPanel"/>
       </b:Tab>
       <b:Tab icon="FILE" heading="Files">

@@ -460,11 +460,6 @@ public class TablePresenter extends Presenter<TablePresenter.Display, TablePrese
   }
 
   @Override
-  public void onDatasourceSelection() {
-    getEventBus().fireEvent(new DatasourceSelectionChangeEvent(table.getDatasourceName()));
-  }
-
-  @Override
   public void onNextTable() {
     getEventBus().fireEvent(new SiblingTableSelectionEvent(table, Direction.NEXT));
   }

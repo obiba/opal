@@ -11,10 +11,6 @@
   <g:FlowPanel>
 
     <g:FlowPanel>
-      <b:Breadcrumbs ui:field="magmaCrumbs" addStyleNames="inline xsmall-right-indent">
-        <b:NavLink ui:field="datasourceCrmb"></b:NavLink>
-        <b2:InlineLabel ui:field="tableCrmb"></b2:InlineLabel>
-      </b:Breadcrumbs>
       <b:DropdownButton text="Download" size="SMALL" icon="DOWNLOAD" ui:field="downloadBtn">
         <b:NavLink ui:field="downloadDictionary">
           <ui:msg description="Download dictionary label">Download dictionary</ui:msg>

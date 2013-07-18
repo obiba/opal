@@ -2,9 +2,11 @@ package org.obiba.opal.web.gwt.app.client.project.presenter;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.navigator.event.DatasourceSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.navigator.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DatasourceValuesStepPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
@@ -19,13 +21,15 @@ import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.ContentSlot;
 import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 
-public class ProjectPresenter extends Presenter<ProjectPresenter.Display, ProjectPresenter.Proxy> implements ProjectUiHandlers {
+public class ProjectPresenter extends Presenter<ProjectPresenter.Display, ProjectPresenter.Proxy> implements ProjectUiHandlers, DatasourceSelectionChangeEvent.Handler,
+    TableSelectionChangeEvent.Handler {
 
   @ContentSlot
   public static final GwtEvent.Type<RevealContentHandler<?>> TABLES_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
@@ -52,6 +56,13 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     getView().setUiHandlers(this);
     this.translations = translations;
     this.placeManager = placeManager;
+  }
+
+  @Override
+  protected void onBind() {
+    super.onBind();
+    addRegisteredHandler(DatasourceSelectionChangeEvent.getType(), this);
+    addRegisteredHandler(TableSelectionChangeEvent.getType(), this);
   }
 
   @Override
@@ -82,10 +93,33 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     placeManager.revealPlace(request);
   }
 
+  @Override
+  public void onDatasourceSelection(String name) {
+    getEventBus().fireEvent(new DatasourceSelectionChangeEvent(name));
+  }
+
+  @Override
+  public void onTableSelection(String datasource, String table) {
+    getEventBus().fireEvent(new TableSelectionChangeEvent(this, datasource, table));
+  }
+
+  @Override
+  public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
+    getView().selectDatasource(event.getSelection());
+  }
+
+  @Override
+  public void onTableSelectionChanged(TableSelectionChangeEvent event) {
+    getView().selectTable(event.getDatasourceName(), event.getTableName());
+  }
+
   public interface Display extends View, HasUiHandlers<ProjectUiHandlers> {
 
     void setProject(ProjectDto project);
 
+    void selectDatasource(String name);
+
+    void selectTable(String datasource, String table);
   }
 
   @ProxyStandard

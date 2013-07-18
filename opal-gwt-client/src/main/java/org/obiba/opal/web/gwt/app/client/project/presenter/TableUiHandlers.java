@@ -4,8 +4,6 @@ import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface TableUiHandlers extends UiHandlers {
 
-  void onDatasourceSelection();
-
   void onNextTable();
 
   void onPreviousTable();

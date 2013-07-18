@@ -85,14 +85,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   private static final Integer VALUES_TAB_INDEX = 1;
 
-  private static final Integer PERMISSIONS_TAB_INDEX = 2;
-
   private final List<Anchor> tables = new ArrayList<Anchor>();
 
   private boolean hasLinkAuthorization = true;
-
-  @UiField
-  Breadcrumbs magmaCrumbs;
 
   @UiField
   Label entityType;
@@ -165,12 +160,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @UiField
   TabPanel tabPanel;
-
-  @UiField
-  NavLink datasourceCrmb;
-
-  @UiField
-  InlineLabel tableCrmb;
 
   @UiField
   NavLink exportData;
@@ -340,8 +329,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   public void setTable(TableDto dto) {
     entityType.setText(dto.getEntityType());
     entityCount.setText(Integer.toString(dto.getValueSetCount()));
-    datasourceCrmb.setText(dto.getDatasourceName());
-    tableCrmb.setText(dto.getName());
   }
 
   @Override
@@ -371,11 +358,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @Override
   public List<Anchor> getFromTablesAnchor() {
     return tables;
-  }
-
-  @UiHandler("datasourceCrmb")
-  void onDatasourceSelection(ClickEvent event) {
-    getUiHandlers().onDatasourceSelection();
   }
 
   @UiHandler("downloadDictionary")

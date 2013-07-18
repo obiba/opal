@@ -1,45 +1,23 @@
 package org.obiba.opal.web.gwt.app.client.project.view;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectUiHandlers;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsPresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsUiHandlers;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
-import org.obiba.opal.web.model.client.opal.ProjectFactoryDto;
 
-import com.github.gwtbootstrap.client.ui.AccordionGroup;
-import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.ControlGroup;
-import com.github.gwtbootstrap.client.ui.Modal;
 import com.github.gwtbootstrap.client.ui.NavLink;
-import com.github.gwtbootstrap.client.ui.Paragraph;
-import com.github.gwtbootstrap.client.ui.constants.AlertType;
-import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
+import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
-import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
-import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -52,7 +30,7 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   private static final Translations translations = GWT.create(Translations.class);
 
   @UiField
-  Breadcrumbs breadcrumbs;
+  Breadcrumbs titlecrumbs;
 
   @UiField
   HasText description;
@@ -62,6 +40,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
 
   @UiField
   Panel tablesPanel;
+
+  @UiField
+  Breadcrumbs magmacrumbs;
 
   private ProjectDto project;
 
@@ -73,13 +54,26 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   @Override
   public void setProject(ProjectDto project) {
     this.project = project;
-    if(breadcrumbs.getWidgetCount() > 1) {
-      breadcrumbs.remove(1);
+    if(titlecrumbs.getWidgetCount() > 1) {
+      titlecrumbs.remove(1);
     }
-    breadcrumbs.add(new NavLink(project.getName()));
+    titlecrumbs.add(new NavLink(project.getName()));
     String desc = project.getDescription();
     description.setText(desc.substring(0, desc.indexOf('.') + 1));
     ellipsis.setIcon(IconType.PLUS_SIGN);
+  }
+
+  @Override
+  public void selectDatasource(String name) {
+    magmacrumbs.clear();
+    magmacrumbs.add(new InlineLabel(name));
+  }
+
+  @Override
+  public void selectTable(String datasource, String table) {
+    magmacrumbs.clear();
+    magmacrumbs.add(newDatasourceLink(datasource));
+    magmacrumbs.add(new InlineLabel(table));
   }
 
   @UiHandler("projects")
@@ -105,6 +99,28 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
       tablesPanel.clear();
       tablesPanel.add(content);
     }
+  }
+
+  private Widget newDatasourceLink(final String name) {
+    NavLink link = new NavLink(name);
+    link.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+       getUiHandlers().onDatasourceSelection(name);
+      }
+    });
+    return link;
+  }
+
+  private Widget newTableLink(final String datasource, final String table) {
+    NavLink link = new NavLink(table);
+    link.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        getUiHandlers().onTableSelection(datasource, table);
+      }
+    });
+    return link;
   }
 
 }
