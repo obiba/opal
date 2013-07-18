@@ -11,14 +11,15 @@ package org.obiba.opal.web.gwt.app.client.administration.database.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.presenter.BreadcrumbDisplay;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
+import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
@@ -38,7 +39,6 @@ import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
@@ -46,10 +46,12 @@ import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
@@ -59,11 +61,12 @@ import static org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn.
 public class DatabaseAdministrationPresenter extends
     ItemAdministrationPresenter<DatabaseAdministrationPresenter.Display, DatabaseAdministrationPresenter.Proxy> {
 
+
   @ProxyStandard
   @NameToken(Places.databases)
   public interface Proxy extends ProxyPlace<DatabaseAdministrationPresenter> {}
 
-  public interface Display extends View, BreadcrumbDisplay {
+  public interface Display extends View, HasBreadcrumbs {
 
     String TEST_ACTION = "Test";
 
@@ -87,14 +90,18 @@ public class DatabaseAdministrationPresenter extends
   private final ResourceDataProvider<JdbcDataSourceDto> resourceDataProvider
       = new ResourceDataProvider<JdbcDataSourceDto>(Resources.databases());
 
+  private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
+
   private Command confirmedCommand;
 
   @Inject
   public DatabaseAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
-      Provider<DatabasePresenter> jdbcDataSourcePresenter, Provider<AuthorizationPresenter> authorizationPresenter) {
+      Provider<DatabasePresenter> jdbcDataSourcePresenter, Provider<AuthorizationPresenter> authorizationPresenter,
+      DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     this.jdbcDataSourcePresenter = jdbcDataSourcePresenter;
     this.authorizationPresenter = authorizationPresenter.get();
+    this.breadcrumbsHelper = breadcrumbsHelper;
   }
 
   @ProxyEvent
@@ -116,6 +123,8 @@ public class DatabaseAdministrationPresenter extends
 
   @Override
   protected void onReveal() {
+    breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
+
     refresh();
     // set permissions
     AclRequest.newResourceAuthorizationRequestBuilder()
@@ -129,6 +138,7 @@ public class DatabaseAdministrationPresenter extends
   }
 
   @Override
+  @TitleFunction
   public String getTitle() {
     return translations.pageDatabasesTitle();
   }

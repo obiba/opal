@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.datashield.event;
 
-import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
-
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 

@@ -1035,6 +1035,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Provide the Public Certificate definition.")
   String publicKeyStep();
 
+  @Description("Keystore label")
+  @DefaultStringValue("Keystore")
+  String keystoreLabel();
+
+  @Description("Properties label")
+  @DefaultStringValue("Properties")
+  String propertiesLabel();
+
   @Description("Cancel label")
   @DefaultStringValue("Cancel")
   String cancelLabel();

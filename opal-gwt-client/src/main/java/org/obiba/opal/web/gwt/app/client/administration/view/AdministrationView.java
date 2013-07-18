@@ -1,26 +1,13 @@
-/*******************************************************************************
- * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
- *
- * This program and the accompanying materials
- * are made available under the terms of the GNU Public License v3.0.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.view;
 
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
+import org.obiba.opal.web.gwt.app.client.widgets.breadcrumbs.OpalNavLink;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
 
@@ -35,49 +22,46 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   private final Widget widget;
 
   @UiField
-  Anchor usersGroupsPlace;
+  OpalNavLink usersGroupsPlace;
 
   @UiField
-  Anchor unitsPlace;
+  OpalNavLink unitsPlace;
 
   @UiField
-  Anchor databasesPlace;
+  OpalNavLink databasesPlace;
 
   @UiField
-  Anchor mongoDbPlace;
+  OpalNavLink mongoDbPlace;
 
   @UiField
-  Anchor esPlace;
+  OpalNavLink esPlace;
 
   @UiField
-  Anchor indexPlace;
+  OpalNavLink indexPlace;
 
   @UiField
-  Anchor rPlace;
+  OpalNavLink rPlace;
 
   @UiField
-  Anchor dataShieldPlace;
+  OpalNavLink dataShieldPlace;
 
   @UiField
-  Anchor pluginsPlace;
+  OpalNavLink pluginsPlace;
 
   @UiField
-  Anchor reportsPlace;
+  OpalNavLink reportsPlace;
 
   @UiField
-  Anchor filesPlace;
+  OpalNavLink filesPlace;
 
   @UiField
-  Anchor tasksPlace;
+  OpalNavLink tasksPlace;
 
   @UiField
-  Anchor javaPlace;
+  OpalNavLink javaPlace;
 
   @UiField
-  Anchor serverPlace;
-
-  @UiField
-  Panel breadcrumbs;
+  OpalNavLink serverPlace;
 
   public AdministrationView() {
     widget = uiBinder.createAndBindUi(this);
@@ -93,78 +77,73 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   }
 
   @Override
-  public Anchor getUsersGroupsPlace() {
-    return usersGroupsPlace;
+  public void setUsersGroupsHistoryToken(String historyToken) {
+    usersGroupsPlace.setHistoryToken(historyToken);
   }
 
   @Override
-  public Anchor getUnitsPlace() {
-    return unitsPlace;
+  public void setUnitsHistoryToken(String historyToken) {
+    unitsPlace.setHistoryToken(historyToken);
   }
 
   @Override
-  public Anchor getDatabasesPlace() {
-    return databasesPlace;
+  public void setDatabasesHistoryToken(String historyToken) {
+    databasesPlace.setHistoryToken(historyToken);
   }
 
   @Override
-  public Anchor getMongoDbPlace() {
-    return mongoDbPlace;
+  public void setMongoDbHistoryToken(String historyToken) {
+    mongoDbPlace.setHistoryToken(historyToken);
   }
 
   @Override
-  public Anchor getEsPlace() {
-    return esPlace;
+  public void setEsHistoryToken(String historyToken) {
+    esPlace.setHistoryToken(historyToken);
   }
 
   @Override
-  public Anchor getIndexPlace() {
-    return indexPlace;
+  public void setIndexHistoryToken(String historyToken) {
+    indexPlace.setHistoryToken(historyToken);
   }
 
   @Override
-  public Anchor getRPlace() {
-    return rPlace;
+  public void setRHistoryToken(String historyToken) {
+    rPlace.setHistoryToken(historyToken);
   }
 
   @Override
-  public Anchor getDataShieldPlace() {
-    return dataShieldPlace;
+  public void setDataShieldHistoryToken(String historyToken) {
+    dataShieldPlace.setHistoryToken(historyToken);
   }
 
   @Override
-  public Anchor getPluginsPlace() {
-    return pluginsPlace;
+  public void setPluginsHistoryToken(String historyToken) {
+    pluginsPlace.setHistoryToken(historyToken);
   }
 
   @Override
-  public Anchor getReportsPlace() {
-    return reportsPlace;
+  public void setReportsHistoryToken(String historyToken) {
+    reportsPlace.setHistoryToken(historyToken);
   }
 
   @Override
-  public Anchor getFilesPlace() {
-    return filesPlace;
+  public void setFilesHistoryToken(String historyToken) {
+    filesPlace.setHistoryToken(historyToken);
   }
 
   @Override
-  public Anchor getTasksPlace() {
-    return tasksPlace;
+  public void setTasksHistoryToken(String historyToken) {
+    tasksPlace.setHistoryToken(historyToken);
   }
 
   @Override
-  public Anchor getJavaPlace() {
-    return javaPlace;
+  public void setJavaHistoryToken(String historyToken) {
+    javaPlace.setHistoryToken(historyToken);;
   }
 
   @Override
-  public Anchor getServerPlace() {
-    return serverPlace;
-  }
-
-  @Override
-  public void setBreadcrumbItems(List<BreadcrumbsBuilder.Item> items) {
-    breadcrumbs.add(new BreadcrumbsBuilder().setItems(items).build());
+  public void setServerHistoryToken(String historyToken) {
+    serverPlace.setHistoryToken(historyToken);;
   }
 
 }

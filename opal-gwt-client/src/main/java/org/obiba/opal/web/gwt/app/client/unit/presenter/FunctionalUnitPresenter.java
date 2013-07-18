@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.unit.presenter;
 
-import org.obiba.opal.web.gwt.app.client.administration.presenter.BreadcrumbDisplay;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -48,7 +47,7 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
     implements FunctionalUnitsUiHandlers {
 
 
-  public interface Display extends View, HasUiHandlers<FunctionalUnitsUiHandlers>, BreadcrumbDisplay {
+  public interface Display extends View, HasUiHandlers<FunctionalUnitsUiHandlers> {
     HasAuthorization getAddFunctionalUnitAuthorizer();
     HasAuthorization getExportIdentifiersAuthorizer();
     HasAuthorization getImportIdentifiersAuthorizer();
@@ -105,8 +104,6 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
     PlaceRequest.Builder requestBuilder = new PlaceRequest.Builder();
     requestBuilder.nameToken(Places.unit).with("name", dto.getName());
     placeManager.revealPlace(requestBuilder.build());
-
-//    getEventBus().fireEvent(new PlaceChangeEvent(Places.unitPlace.addParam()));
   }
 
   @TitleFunction

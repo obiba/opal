@@ -9,10 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.r.view;
 
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
@@ -22,6 +19,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
@@ -93,8 +91,8 @@ public class RAdministrationView extends ViewImpl implements RAdministrationPres
   }
 
   @Override
-  public void setBreadcrumbItems(List<BreadcrumbsBuilder.Item> items) {
-    breadcrumbs.add(new BreadcrumbsBuilder().setItems(items).build());
+  public HasWidgets getBreadcrumbs() {
+    return breadcrumbs;
   }
 
 }

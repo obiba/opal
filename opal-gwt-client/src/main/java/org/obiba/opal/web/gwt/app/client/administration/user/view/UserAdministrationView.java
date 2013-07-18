@@ -9,11 +9,8 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.user.view;
 
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
@@ -35,6 +32,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
@@ -211,8 +209,8 @@ public class UserAdministrationView extends ViewImpl implements Display {
   }
 
   @Override
-  public void setBreadcrumbItems(List<BreadcrumbsBuilder.Item> items) {
-    breadcrumbs.add(new BreadcrumbsBuilder().setItems(items).build());
+  public HasWidgets getBreadcrumbs() {
+    return breadcrumbs;
   }
 
   @Override

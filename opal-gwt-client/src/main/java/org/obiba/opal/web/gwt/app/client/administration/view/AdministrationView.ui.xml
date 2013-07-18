@@ -1,225 +1,167 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
-    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.widgets.breadcrumbs"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <g:FlowPanel ui:field="breadcrumbs" />
     <g:FlowPanel addStyleNames="main">
       <b:FluidRow>
         <b:Column size="6">
           <g:FlowPanel addStyleNames="extra-large-bottom-margin panel">
-            <g:FlowPanel addStyleNames="title">
-              <g:Label>
-                <ui:msg description="Main Administration Data Access">Data Access</ui:msg>
-              </g:Label>
-            </g:FlowPanel>
-            <g:FlowPanel addStyleNames="large-bottom-margin">
+            <b:WellNavList>
+              <b:NavHeader><ui:msg description="Main Administration Data Access">Data Access</ui:msg></b:NavHeader>
+              <b:Divider />
+              <o:OpalNavLink ui:field="usersGroupsPlace" icon="COG">
+                <ui:msg description="Main Administration Users and Groups title">Users and Groups</ui:msg>
+              </o:OpalNavLink>
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action" ui:field="usersGroupsPlace">
-                  <ui:msg description="Main Administration Users and Groups title">Users and Groups</ui:msg>
-                </g:Anchor>
-              </g:FlowPanel>
-              <g:FlowPanel addStyleNames="large-top-margin">
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Users and Groups help">Add, update, remove users and groups</ui:msg>
+                  <ui:msg description="Main Administration Users and Groups help">Add, update, remove users and groups
+                  </ui:msg>
                 </g:Label>
               </g:FlowPanel>
-            </g:FlowPanel>
-            <g:FlowPanel addStyleNames="large-bottom-margin">
+              <b:Divider />
+              <o:OpalNavLink ui:field="unitsPlace" icon="COG">
+                <ui:msg description="Main Administration Units Identifiers title">Units and Identifiers</ui:msg>
+              </o:OpalNavLink>
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action" ui:field="unitsPlace">
+                <g:Label styleName="help-block">
                   <ui:msg description="Main Administration Units Identifiers title">Units and Identifiers</ui:msg>
-                </g:Anchor>
-              </g:FlowPanel>
-              <g:FlowPanel addStyleNames="large-top-margin">
-                <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Units Identifiers help">Manage units and participant identifiers</ui:msg>
                 </g:Label>
               </g:FlowPanel>
-            </g:FlowPanel>
-          </g:FlowPanel>
+            </b:WellNavList>
 
-          <g:FlowPanel addStyleNames="extra-large-bottom-margin panel">
-            <g:FlowPanel addStyleNames="title">
-              <g:Label>
-                <ui:msg description="Main Administration Databases">Databases</ui:msg>
-              </g:Label>
-            </g:FlowPanel>
-            <g:FlowPanel addStyleNames="large-bottom-margin">
+            <b:WellNavList>
+              <b:NavHeader><ui:msg description="Main Administration Databases">Databases</ui:msg></b:NavHeader>
+              <b:Divider />
+              <o:OpalNavLink ui:field="databasesPlace" icon="COG">
+                <ui:msg description="Main Administration SQL Databases title">SQL Databases</ui:msg>
+              </o:OpalNavLink>
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action" ui:field="databasesPlace">
-                  <ui:msg description="Main Administration SQL Databases title">SQL Databases</ui:msg>
-                </g:Anchor>
-              </g:FlowPanel>
-              <g:FlowPanel addStyleNames="large-top-margin">
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration SQL Databases help">Add, update, remove SQL databases</ui:msg>
+                  <ui:msg description="Main Administration SQL Databases help">Add, update, remove SQL databases
+                  </ui:msg>
                 </g:Label>
               </g:FlowPanel>
-            </g:FlowPanel>
-            <g:FlowPanel addStyleNames="large-bottom-margin">
+              <b:Divider />
+              <o:OpalNavLink ui:field="mongoDbPlace" icon="COG">
+                <ui:msg description="Main Administration MongoDB title">MongoDB Databases</ui:msg>
+              </o:OpalNavLink>
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action" ui:field="mongoDbPlace">
-                  <ui:msg description="Main Administration MongoDB title">MongoDB Databases</ui:msg>
-                </g:Anchor>
-              </g:FlowPanel>
-              <g:FlowPanel addStyleNames="large-top-margin">
                 <g:Label styleName="help-block">
                   <ui:msg description="Main Administration MongoDB help">Configure MongoDB servers</ui:msg>
                 </g:Label>
               </g:FlowPanel>
-            </g:FlowPanel>
-          </g:FlowPanel>
+            </b:WellNavList>
 
-          <g:FlowPanel addStyleNames="extra-large-bottom-margin panel">
-            <g:FlowPanel addStyleNames="title">
-              <g:Label>
-                <ui:msg description="Main Administration Search">Search</ui:msg>
-              </g:Label>
-            </g:FlowPanel>
-            <g:FlowPanel addStyleNames="large-bottom-margin">
+            <b:WellNavList>
+              <b:NavHeader><ui:msg description="Main Administration Search">Search</ui:msg></b:NavHeader>
+              <b:Divider />
+              <o:OpalNavLink ui:field="esPlace" icon="COG">
+                <ui:msg description="Main Administration Elastic Search title">Elastic Search</ui:msg>
+              </o:OpalNavLink>
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action" ui:field="esPlace">
-                  <ui:msg description="Main Administration Elastic Search title">Elastic Search</ui:msg>
-                </g:Anchor>
-              </g:FlowPanel>
-              <g:FlowPanel addStyleNames="large-top-margin">
                 <g:Label styleName="help-block">
                   <ui:msg description="Main Administration Elastic Search help">Configure Elastic Search server</ui:msg>
                 </g:Label>
               </g:FlowPanel>
-            </g:FlowPanel>
-            <g:FlowPanel addStyleNames="large-bottom-margin">
+              <b:Divider />
+              <o:OpalNavLink ui:field="indexPlace" icon="COG">
+                <ui:msg description="Main Administration Index title">Index</ui:msg>
+              </o:OpalNavLink>
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action" ui:field="indexPlace">
-                  <ui:msg description="Main Administration Index title">Index</ui:msg>
-                </g:Anchor>
-              </g:FlowPanel>
-              <g:FlowPanel addStyleNames="large-top-margin">
                 <g:Label styleName="help-block">
                   <ui:msg description="Main Administration Index help">Schedule table indexing</ui:msg>
                 </g:Label>
               </g:FlowPanel>
-            </g:FlowPanel>
+            </b:WellNavList>
           </g:FlowPanel>
         </b:Column>
+
         <b:Column size="6">
-          <g:FlowPanel>
-            <o:HelpImage addStyleNames="pull-right" page="Administrating+Opal"></o:HelpImage>
-          </g:FlowPanel>
           <g:FlowPanel addStyleNames="extra-large-bottom-margin panel">
-            <g:FlowPanel addStyleNames="title">
-              <g:Label>
-                <ui:msg description="Main Administration Data Analysis">Data Analysis</ui:msg>
-              </g:Label>
-            </g:FlowPanel>
-            <g:FlowPanel addStyleNames="large-bottom-margin">
+
+            <b:WellNavList>
+              <b:NavHeader><ui:msg description="Main Administration Data Analysis">Data Analysis</ui:msg></b:NavHeader>
+              <b:Divider />
+              <o:OpalNavLink ui:field="rPlace" icon="COG">
+                <ui:msg description="Main Administration R title">R</ui:msg>
+              </o:OpalNavLink>
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action" ui:field="rPlace">
-                  <ui:msg description="Main Administration R title">R</ui:msg>
-                </g:Anchor>
-              </g:FlowPanel>
-              <g:FlowPanel addStyleNames="large-top-margin">
                 <g:Label styleName="help-block">
                   <ui:msg description="Main Administration R help">Configure R server, grant R permissons</ui:msg>
                 </g:Label>
               </g:FlowPanel>
-            </g:FlowPanel>
-            <g:FlowPanel addStyleNames="large-bottom-margin">
+              <b:Divider />
+              <o:OpalNavLink ui:field="dataShieldPlace" icon="COG">
+                <ui:msg description="Main Administration DatsSHIELD title">DatsSHIELD</ui:msg>
+              </o:OpalNavLink>
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action" ui:field="dataShieldPlace">
-                  <ui:msg description="Main Administration DatsSHIELD title">DatsSHIELD</ui:msg>
-                </g:Anchor>
-              </g:FlowPanel>
-              <g:FlowPanel addStyleNames="large-top-margin">
                 <g:Label styleName="help-block">
                   <ui:msg description="Main Administration DatsSHIELD help">Configure DatsSHIELD, grant DatsSHIELD</ui:msg>
                 </g:Label>
               </g:FlowPanel>
-            </g:FlowPanel>
-            <g:FlowPanel addStyleNames="large-bottom-margin">
+              <b:Divider />
+              <o:OpalNavLink ui:field="pluginsPlace" icon="COG">
+                <ui:msg description="Main Administration Plugins title">Plugins</ui:msg>
+              </o:OpalNavLink>
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action" ui:field="pluginsPlace">
-                  <ui:msg description="Main Administration Plugins title">Plugins</ui:msg>
-                </g:Anchor>
-              </g:FlowPanel>
-              <g:FlowPanel addStyleNames="large-top-margin">
                 <g:Label styleName="help-block">
                   <ui:msg description="Main Administration Plugins help">Add, remove data visualization plugins</ui:msg>
                 </g:Label>
               </g:FlowPanel>
-            </g:FlowPanel>
-            <g:FlowPanel addStyleNames="large-bottom-margin">
+              <b:Divider />
+              <o:OpalNavLink ui:field="reportsPlace" icon="COG">
+                <ui:msg description="Main Administration Reports title">Reports</ui:msg>
+              </o:OpalNavLink>
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action" ui:field="reportsPlace">
-                  <ui:msg description="Main Administration Reports title">Reports</ui:msg>
-                </g:Anchor>
-              </g:FlowPanel>
-              <g:FlowPanel addStyleNames="large-top-margin">
                 <g:Label styleName="help-block">
                   <ui:msg description="Main Administration Reports help">Configure and schedule reports</ui:msg>
                 </g:Label>
               </g:FlowPanel>
-            </g:FlowPanel>
-          </g:FlowPanel>
-          <g:FlowPanel addStyleNames="extra-large-bottom-margin panel">
-            <g:FlowPanel addStyleNames="title">
-              <g:Label>
-                <ui:msg description="Main Administration System">System</ui:msg>
-              </g:Label>
-            </g:FlowPanel>
-            <g:FlowPanel addStyleNames="large-bottom-margin">
+            </b:WellNavList>
+            <b:WellNavList>
+              <b:NavHeader><ui:msg description="Main Administration System">System</ui:msg></b:NavHeader>
+              <b:Divider />
+              <o:OpalNavLink ui:field="filesPlace" icon="COG">
+                <ui:msg description="Main Administration Files title">Files</ui:msg>
+              </o:OpalNavLink>
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action" ui:field="filesPlace">
-                  <ui:msg description="Main Administration Files title">Files</ui:msg>
-                </g:Anchor>
-              </g:FlowPanel>
-              <g:FlowPanel addStyleNames="large-top-margin">
                 <g:Label styleName="help-block">
                   <ui:msg description="Main Administration Files help">Manage file system</ui:msg>
                 </g:Label>
               </g:FlowPanel>
-            </g:FlowPanel>
-            <g:FlowPanel addStyleNames="large-bottom-margin">
+              <b:Divider />
+              <o:OpalNavLink ui:field="tasksPlace" icon="COG">
+                <ui:msg description="Main Administration Tasks title">Tasks</ui:msg>
+              </o:OpalNavLink>
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action" ui:field="tasksPlace">
-                  <ui:msg description="Main Administration Tasks title">Tasks</ui:msg>
-                </g:Anchor>
-              </g:FlowPanel>
-              <g:FlowPanel addStyleNames="large-top-margin">
                 <g:Label styleName="help-block">
                   <ui:msg description="Main Administration Tasks help">Monitor and schedule tasks</ui:msg>
                 </g:Label>
               </g:FlowPanel>
-            </g:FlowPanel>
-            <g:FlowPanel addStyleNames="large-bottom-margin">
+              <b:Divider />
+              <o:OpalNavLink ui:field="javaPlace" icon="COG">
+                <ui:msg description="Main Administration Java title">Java</ui:msg>
+              </o:OpalNavLink>
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action" ui:field="javaPlace">
-                  <ui:msg description="Main Administration Java title">Java</ui:msg>
-                </g:Anchor>
-              </g:FlowPanel>
-              <g:FlowPanel addStyleNames="large-top-margin">
                 <g:Label styleName="help-block">
                   <ui:msg description="Main Administration Java help">Monitor Java virtual machine</ui:msg>
                 </g:Label>
               </g:FlowPanel>
-            </g:FlowPanel>
-            <g:FlowPanel addStyleNames="large-bottom-margin">
+              <b:Divider />
+              <o:OpalNavLink ui:field="serverPlace" icon="COG">
+                <ui:msg description="Main Administration Server title">Server</ui:msg>
+              </o:OpalNavLink>
               <g:FlowPanel>
-                <g:Anchor addStyleNames="admin-item action" ui:field="serverPlace">
-                  <ui:msg description="Main Administration Server title">Server</ui:msg>
-                </g:Anchor>
-              </g:FlowPanel>
-              <g:FlowPanel addStyleNames="large-top-margin">
                 <g:Label styleName="help-block">
                   <ui:msg description="Main Administration Server help">Manage Opal server</ui:msg>
                 </g:Label>
               </g:FlowPanel>
-            </g:FlowPanel>
+            </b:WellNavList>
           </g:FlowPanel>
         </b:Column>
       </b:FluidRow>

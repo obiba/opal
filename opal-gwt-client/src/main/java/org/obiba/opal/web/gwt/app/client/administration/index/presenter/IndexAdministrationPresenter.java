@@ -13,15 +13,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.event.TableIndicesRefreshEvent;
-import org.obiba.opal.web.gwt.app.client.administration.presenter.BreadcrumbDisplay;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.project.event.TableIndexStatusRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
+import org.obiba.opal.web.gwt.app.client.project.event.TableIndexStatusRefreshEvent;
+import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
@@ -46,7 +47,6 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
@@ -56,10 +56,12 @@ import com.google.gwt.view.client.MultiSelectionModel;
 import com.google.gwt.view.client.Range;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
@@ -74,7 +76,7 @@ public class IndexAdministrationPresenter
 
   private static final int DELAY_MILLIS = 1500;
 
-  public interface Display extends View, BreadcrumbDisplay {
+  public interface Display extends View, HasBreadcrumbs {
 
     String INDEX_ACTION = "Index now";
 
@@ -118,6 +120,8 @@ public class IndexAdministrationPresenter
 
   private final Provider<IndexConfigurationPresenter> indexConfigurationPresenter;
 
+  private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
+
   @SuppressWarnings("FieldCanBeLocal")
   private final AuthorizationPresenter authorizationPresenter;
 
@@ -127,11 +131,13 @@ public class IndexAdministrationPresenter
   @Inject
   public IndexAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
       Provider<AuthorizationPresenter> authorizationPresenter, Provider<IndexPresenter> indexPresenter,
-      Provider<IndexConfigurationPresenter> indexConfigurationPresenter) {
+      Provider<IndexConfigurationPresenter> indexConfigurationPresenter,
+      DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     this.indexPresenter = indexPresenter;
     this.authorizationPresenter = authorizationPresenter.get();
     this.indexConfigurationPresenter = indexConfigurationPresenter;
+    this.breadcrumbsHelper = breadcrumbsHelper;
   }
 
   @ProxyEvent
@@ -153,6 +159,8 @@ public class IndexAdministrationPresenter
 
   @Override
   protected void onReveal() {
+    super.onReveal();
+    breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
     // stop start search service
     ResourceRequestBuilderFactory.<ServiceDto>newBuilder().forResource(Resources.searchService()).get()
         .withCallback(new ResourceCallback<ServiceDto>() {
@@ -179,6 +187,7 @@ public class IndexAdministrationPresenter
   }
 
   @Override
+  @TitleFunction
   public String getTitle() {
     return translations.pageSearchIndexTitle();
   }

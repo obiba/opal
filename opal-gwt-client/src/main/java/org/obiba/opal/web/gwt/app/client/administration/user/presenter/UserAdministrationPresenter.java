@@ -9,13 +9,14 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.user.presenter;
 
-import org.obiba.opal.web.gwt.app.client.administration.presenter.BreadcrumbDisplay;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.administration.user.event.UsersRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
+import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
@@ -47,6 +48,7 @@ import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
@@ -59,7 +61,7 @@ public class UserAdministrationPresenter
 
   private final Provider<UserPresenter> userPresenter;
 
-  public interface Display extends View, BreadcrumbDisplay {
+  public interface Display extends View, HasBreadcrumbs {
 
     String PERMISSIONS_ACTION = "Permissions";
 
@@ -90,14 +92,17 @@ public class UserAdministrationPresenter
 //  @SuppressWarnings("FieldCanBeLocal")
 //  private final AuthorizationPresenter authorizationPresenter;
 
+  private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
+
   @SuppressWarnings("UnusedDeclaration")
   private Command confirmedCommand;
 
   @Inject
   public UserAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
-      Provider<UserPresenter> userPresenter) {
+      Provider<UserPresenter> userPresenter, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
 //    this.authorizationPresenter = authorizationPresenter.get();
+    this.breadcrumbsHelper = breadcrumbsHelper;
     this.userPresenter = userPresenter;
   }
 
@@ -120,6 +125,8 @@ public class UserAdministrationPresenter
 
   @Override
   protected void onReveal() {
+    super.onReveal();
+    breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
     // stop start search service
 //    ResourceRequestBuilderFactory.<UserDto>newBuilder().forResource("/users").get()
 //        .withCallback(new ResourceCallback<UserDto>() {
@@ -139,6 +146,7 @@ public class UserAdministrationPresenter
   }
 
   @Override
+  @TitleFunction
   public String getTitle() {
     return translations.pageUsersAndGroupsTitle();
   }

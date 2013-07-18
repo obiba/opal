@@ -1,13 +1,14 @@
 package org.obiba.opal.web.gwt.app.client.administration.r.presenter;
 
-import org.obiba.opal.web.gwt.app.client.administration.presenter.BreadcrumbDisplay;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
+import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -17,15 +18,16 @@ import org.obiba.opal.web.model.client.opal.AclAction;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
@@ -36,11 +38,14 @@ public class RAdministrationPresenter
 
   private final AuthorizationPresenter authorizationPresenter;
 
+  private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
+
   @Inject
   public RAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
-      AuthorizationPresenter authorizationPresenter) {
+      AuthorizationPresenter authorizationPresenter, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     this.authorizationPresenter = authorizationPresenter;
+    this.breadcrumbsHelper = breadcrumbsHelper;
   }
 
   @ProxyEvent
@@ -60,6 +65,7 @@ public class RAdministrationPresenter
   }
 
   @Override
+  @TitleFunction
   public String getTitle() {
     return translations.pageRConfigTitle();
   }
@@ -74,6 +80,7 @@ public class RAdministrationPresenter
   @Override
   protected void onReveal() {
     super.onReveal();
+    breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
     // set permissions
     AclRequest.newResourceAuthorizationRequestBuilder()
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
@@ -143,7 +150,7 @@ public class RAdministrationPresenter
   @NameToken(Places.r)
   public interface Proxy extends ProxyPlace<RAdministrationPresenter> {}
 
-  public interface Display extends View, BreadcrumbDisplay {
+  public interface Display extends View, HasBreadcrumbs {
 
     HandlerRegistration addTestRServerHandler(ClickHandler handler);
 

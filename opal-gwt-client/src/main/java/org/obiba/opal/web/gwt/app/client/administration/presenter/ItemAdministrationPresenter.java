@@ -10,16 +10,11 @@
 package org.obiba.opal.web.gwt.app.client.administration.presenter;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
-import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.web.bindery.event.shared.EventBus;
-import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.proxy.Proxy;
@@ -39,18 +34,4 @@ public abstract class ItemAdministrationPresenter<D extends View, P extends Prox
   public abstract String getName();
 
   public abstract void authorize(HasAuthorization authorizer);
-
-  @Override
-  protected void onBind() {
-    super.onBind();
-    BreadcrumbDisplay view = (BreadcrumbDisplay)getView();
-
-    view.setBreadcrumbItems(
-        new BreadcrumbsBuilder.ItemsBuilder().addItem(translations.pageAdministrationTitle(), new ClickHandler() {
-          @Override
-          public void onClick(ClickEvent event) {
-            getEventBus().fireEvent(new PlaceChangeEvent(Places.administrationPlace));
-          }
-        }).addItem(getTitle()).build());
-  }
 }

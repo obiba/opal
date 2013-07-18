@@ -17,8 +17,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.breadcrumbs.OpalNavLink;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ConstantActionsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
-import org.obiba.opal.web.gwt.app.client.workbench.view.PropertiesTable;
+import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
@@ -29,6 +28,8 @@ import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.SimplePager;
+import com.github.gwtbootstrap.client.ui.Tab;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -36,14 +37,11 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.MenuBar;
-import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
@@ -56,6 +54,8 @@ public class FunctionalUnitDetailsView extends ViewWithUiHandlers<FunctionalUnit
   @UiTemplate("FunctionalUnitDetailsView.ui.xml")
   interface FunctionalUnitDetailsViewUiBinder extends UiBinder<Widget, FunctionalUnitDetailsView> {}
 
+  private static final int MAX_PAGE_SIZE = 100;
+
   private static final FunctionalUnitDetailsViewUiBinder uiBinder = GWT.create(FunctionalUnitDetailsViewUiBinder.class);
 
   private static final Translations translations = GWT.create(Translations.class);
@@ -66,12 +66,6 @@ public class FunctionalUnitDetailsView extends ViewWithUiHandlers<FunctionalUnit
   Label noUnit;
 
   @UiField
-  HorizontalTabLayout tabs;
-
-  @UiField
-  CellTable<KeyDto> keyPairsTable;
-
-  @UiField
   SimplePager pager;
 
   @UiField
@@ -79,9 +73,6 @@ public class FunctionalUnitDetailsView extends ViewWithUiHandlers<FunctionalUnit
 
   @UiField
   FlowPanel functionalUnitDetails;
-
-  @UiField
-  PropertiesTable propertiesPanel;
 
   @UiField
   Label description;
@@ -122,7 +113,14 @@ public class FunctionalUnitDetailsView extends ViewWithUiHandlers<FunctionalUnit
   @UiField
   Breadcrumbs breadcrumbs;
 
-  com.github.gwtbootstrap.client.ui.CellTable<FunctionalUnitDto> unitProperties;
+  @UiField
+  Table<KeyDto> propertiesTable;
+
+  @UiField
+  Tab tabProperties;
+
+  @UiField
+  Tab tabKeystore;
 
   JsArrayDataProvider<KeyDto> dataProvider = new JsArrayDataProvider<KeyDto>();
 
@@ -132,47 +130,26 @@ public class FunctionalUnitDetailsView extends ViewWithUiHandlers<FunctionalUnit
 
   public FunctionalUnitDetailsView() {
     widget = uiBinder.createAndBindUi(this);
-    initKeystoreTable();
-    initializeTable();
+    addTableColumns();
+    initializeTabs();
   }
 
-  private void initializeTable() {
-//    Column<FunctionalUnitDto, String> description = new TextColumn<FunctionalUnitDto>() {
-//
-//      @Override
-//      public String getValue(FunctionalUnitDto dto) {
-//        return dto.getName();
-//      }
-//    };
-//
-//    Column<FunctionalUnitDto, String> filter = new TextColumn<FunctionalUnitDto>() {
-//
-//      @Override
-//      public String getValue(FunctionalUnitDto dto) {
-//        return dto.getKeyVariableName();
-//      }
-//    };
-//
-//    Column<FunctionalUnitDto, String> count = new TextColumn<FunctionalUnitDto>() {
-//
-//      @Override
-//      public String getValue(FunctionalUnitDto dto) {
-//        return dto.get();
-//      }
-//    };
-
-
+  private void initializeTabs() {
+    tabProperties.setHeading(translations.propertiesLabel());
+    tabKeystore.setHeading(translations.keystoreLabel());
   }
 
-  private void initKeystoreTable() {
-    keyPairsTable.addColumn(new TextColumn<KeyDto>() {
+  private void addTableColumns() {
+    pager.setVisible(false);
+
+    propertiesTable.addColumn(new TextColumn<KeyDto>() {
       @Override
       public String getValue(KeyDto keyPair) {
         return keyPair.getAlias();
       }
     }, translations.aliasLabel());
 
-    keyPairsTable.addColumn(new TextColumn<KeyDto>() {
+    propertiesTable.addColumn(new TextColumn<KeyDto>() {
       @Override
       public String getValue(KeyDto keyPair) {
         return translations.keyTypeMap().get(keyPair.getKeyType().getName());
@@ -180,14 +157,8 @@ public class FunctionalUnitDetailsView extends ViewWithUiHandlers<FunctionalUnit
     }, translations.typeLabel());
 
     actionsColumn = new ActionsColumn<KeyDto>(new ConstantActionsProvider<KeyDto>(DOWNLOAD_ACTION, DELETE_ACTION));
-    keyPairsTable.addColumn(actionsColumn, translations.actionsLabel());
-    addTablePager();
-    dataProvider.addDataDisplay(keyPairsTable);
-  }
-
-  private void addTablePager() {
-    keyPairsTable.setPageSize(10);
-    pager.setDisplay(keyPairsTable);
+    propertiesTable.addColumn(actionsColumn, translations.actionsLabel());
+    dataProvider.addDataDisplay(propertiesTable);
   }
 
   @Override
@@ -204,9 +175,7 @@ public class FunctionalUnitDetailsView extends ViewWithUiHandlers<FunctionalUnit
     dataProvider.setArray(kpList);
     pager.firstPage();
     dataProvider.refresh();
-
-    keyPairsTable.setVisible(kpList.length() > 0);
-    pager.setVisible(kpList.length() > 0);
+    pager.setVisible(kpList.length() > MAX_PAGE_SIZE);
     noKeyPairs.setVisible(kpList.length() == 0);
   }
 
@@ -216,17 +185,6 @@ public class FunctionalUnitDetailsView extends ViewWithUiHandlers<FunctionalUnit
     if(functionalUnit != null) {
       renderFunctionalUnitDetails(functionalUnit);
     }
-  }
-
-  @Override
-  public void clearBreadcrumbs() {
-    breadcrumbs.clear();
-  }
-
-  @Override
-  public void setBreadcrumbs(int index, String title, String historyToken) {
-    breadcrumbs.add(new OpalNavLink(title, historyToken));
-;
   }
 
   @Override
@@ -242,7 +200,6 @@ public class FunctionalUnitDetailsView extends ViewWithUiHandlers<FunctionalUnit
   private void renderFunctionalUnitDetails(FunctionalUnitDto functionalUnitDto) {
     functionalUnitDetails.setVisible(true);
     functionalUnit = functionalUnitDto;
-//    functionalUnitName.setText(functionalUnitDto.getName());
     description.setText(functionalUnitDto.getDescription());
     select.setText(functionalUnitDto.getSelect());
   }
@@ -260,8 +217,7 @@ public class FunctionalUnitDetailsView extends ViewWithUiHandlers<FunctionalUnit
   @Override
   public void setAvailable(boolean available) {
     noUnit.setVisible(!available);
-    tabs.setVisible(available);
-    propertiesPanel.setVisible(available);
+    propertiesTable.setVisible(available);
   }
 
   @Override
@@ -296,12 +252,17 @@ public class FunctionalUnitDetailsView extends ViewWithUiHandlers<FunctionalUnit
 
   @Override
   public HasAuthorization getListKeyPairsAuthorizer() {
-    return new WidgetAuthorizer(tabs);
+    return new WidgetAuthorizer(propertiesTable);
   }
 
   @Override
   public HasAuthorization getUpdateFunctionalUnitAuthorizer() {
     return new UIObjectAuthorizer(updateUnit);
+  }
+
+  @Override
+  public HasWidgets getBreadcrumbs() {
+    return breadcrumbs;
   }
 
   @UiHandler("updateUnit")
