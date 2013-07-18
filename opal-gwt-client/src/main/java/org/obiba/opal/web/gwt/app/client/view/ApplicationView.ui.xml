@@ -1,6 +1,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
@@ -17,7 +18,7 @@
       </b:Nav>
 
       <b:Nav alignment="RIGHT">
-        <b:NavSearch size="2" placeholder="Search"/>
+        <o:SuggestListBox ui:field="search" addStyleNames="pull-left navbar-search"></o:SuggestListBox>
         <b:NavLink ui:field="username">
           <ui:msg description="Administration link text">Administration</ui:msg>
         </b:NavLink>

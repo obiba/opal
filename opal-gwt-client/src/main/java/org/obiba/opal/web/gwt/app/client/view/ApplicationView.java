@@ -12,6 +12,8 @@ package org.obiba.opal.web.gwt.app.client.view;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.HasUrl;
+import org.obiba.opal.web.gwt.app.client.workbench.view.SuggestListBox;
+import org.obiba.opal.web.gwt.app.client.workbench.view.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 
@@ -27,6 +29,7 @@ import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 /**
@@ -54,10 +57,17 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
   @UiField
   Frame frame;
 
+  @UiField(provided = true)
+  SuggestListBox search;
+
+  private VariableSuggestOracle oracle;
+
   MenuItem currentSelection;
 
   @Inject
-  public ApplicationView(Binder uiBinder) {
+  public ApplicationView(EventBus eventBus, Binder uiBinder) {
+    oracle = new VariableSuggestOracle(eventBus);
+    search = new SuggestListBox(oracle);
     initWidget(uiBinder.createAndBindUi(this));
   }
 

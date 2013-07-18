@@ -29,7 +29,7 @@
         <g:Grid>
           <g:row>
             <g:customCell styleName="top-aligned">
-              <o:SuggestListBox ui:field="search" addStyleNames="variable-search-box"></o:SuggestListBox>
+              <o:SuggestListBox ui:field="search"></o:SuggestListBox>
             </g:customCell>
             <g:customCell styleName="top-aligned">
               <o:HelpImage page="Working+with+Datasources" imageSize="16" addStyleNames="xsmall-indent"></o:HelpImage>

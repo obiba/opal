@@ -40,9 +40,6 @@ public class TableCompareVariablePanel extends FlowPanel {
 
   private PropertiesTable initProperties() {
     PropertiesTable properties = new PropertiesTable();
-    properties.setZebra(true);
-    properties.setCondensed(true);
-    properties.setBorderedCell(false);
     properties.setKeyStyleNames("span2");
     properties.setValueStyleNames("span8");
 

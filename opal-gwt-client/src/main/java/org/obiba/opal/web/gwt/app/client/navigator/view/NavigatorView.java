@@ -158,10 +158,10 @@ public class NavigatorView extends Composite implements NavigatorPresenter.Displ
   @Override
   public void addSearchItem(String text, VariableSearchListItem.ItemType type) {
     String qText = quoteIfContainsSpace(text);
-    if (VariableSearchListItem.ItemType.DATASOURCE.equals(type)) {
+    if(VariableSearchListItem.ItemType.DATASOURCE.equals(type)) {
       oracle.setDatasource(qText);
     }
-    if (VariableSearchListItem.ItemType.TABLE.equals(type)) {
+    if(VariableSearchListItem.ItemType.TABLE.equals(type)) {
       oracle.setTable(qText);
     }
     search.addItem(qText, type);
