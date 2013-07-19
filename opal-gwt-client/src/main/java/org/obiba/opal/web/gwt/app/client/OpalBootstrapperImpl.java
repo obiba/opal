@@ -98,7 +98,7 @@ public class OpalBootstrapperImpl implements Bootstrapper {
                   .send();
               requestCredentials.invalidate();
             }
-            placeManager.revealDefaultPlace();
+            placeManager.revealCurrentPlace();
           }
         }).send();
 
@@ -153,8 +153,7 @@ public class OpalBootstrapperImpl implements Bootstrapper {
           @Override
           public void onCredentialsExpired(RequestCredentialsExpiredEvent e) {
             requestCredentials.invalidate();
-//            placeManager.revealDefaultPlace();
-            placeManager.revealUnauthorizedPlace("!login");
+            placeManager.revealUnauthorizedPlace(Places.login);
           }
         });
     eventBus.addHandler(SessionCreatedEvent.getType(), new SessionCreatedEvent.Handler() {
