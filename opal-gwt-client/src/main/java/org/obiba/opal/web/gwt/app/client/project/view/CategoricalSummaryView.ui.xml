@@ -22,22 +22,8 @@
     }
   </ui:style>
 
-  <g:HTMLPanel>
-    <table>
-      <tr>
-        <td class="{style.title-light}"><ui:msg description="N (number of observations)">N</ui:msg>:
-        </td>
-        <td>
-          <g:Label addStyleNames="small-indent {style.title}" ui:field="obs">N</g:Label>
-        </td>
-        <td class="{style.title-light}"><ui:msg description="Mode">Mode</ui:msg>:
-        </td>
-        <td>
-          <g:Label addStyleNames="small-indent {style.title}" ui:field="mode">mode</g:Label>
-        </td>
-      </tr>
-    </table>
-    <b:TabPanel tabPosition="left">
+  <g:FlowPanel>
+    <b:TabPanel tabPosition="left" ui:field="tabPanel">
       <b:Tab icon="BAR_CHART" active="true">
         <g:HTMLPanel>
           <div id="plot-container">
@@ -46,10 +32,11 @@
         </g:HTMLPanel>
       </b:Tab>
       <b:Tab icon="TABLE">
-        <o:DefaultFlexTable ui:field="grid"/>
+        <o:DefaultFlexTable ui:field="stats" addStyleNames="span4"/>
+        <o:DefaultFlexTable ui:field="frequencies" addStyleNames="span4"/>
       </b:Tab>
     </b:TabPanel>
 
-  </g:HTMLPanel>
+  </g:FlowPanel>
 
 </ui:UiBinder>

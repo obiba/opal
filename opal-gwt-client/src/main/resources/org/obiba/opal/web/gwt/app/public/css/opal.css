@@ -178,10 +178,8 @@ ul.closeables li.focus, ul.closeables li.focus .label {
 ul.closeables li a {
   display: inline-block;
   color: #FFFFFF;
-  padding-left: 6px;
   text-decoration: none;
 }
-
 
 .obiba-SuggestListBox {
   border: 1px solid #CCCCCC;

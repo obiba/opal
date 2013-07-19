@@ -9,12 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.project.view;
 
+import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
+import org.obiba.opal.web.gwt.app.client.workbench.view.DefaultFlexTable;
 import org.obiba.opal.web.gwt.plot.client.HistogramPlot;
 import org.obiba.opal.web.gwt.plot.client.NormalProbabilityPlot;
 import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.client.math.DescriptiveStatsDto;
 import org.obiba.opal.web.model.client.math.IntervalFrequencyDto;
 
+import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.DivElement;
@@ -31,43 +34,15 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class ContinuousSummaryView extends Composite {
 
-  @UiTemplate("ContinuousSummaryView.ui.xml")
   interface ContinuousSummaryViewUiBinder extends UiBinder<Widget, ContinuousSummaryView> {}
 
   private static final ContinuousSummaryViewUiBinder uiBinder = GWT.create(ContinuousSummaryViewUiBinder.class);
 
   @UiField
-  Label obs;
+  TabPanel tabPanel;
 
   @UiField
-  Label min;
-
-  @UiField
-  Label max;
-
-  @UiField
-  Label mean;
-
-  @UiField
-  Label median;
-
-  @UiField
-  Label stdDev;
-
-  @UiField
-  Label variance;
-
-  @UiField
-  Label skewness;
-
-  @UiField
-  Label kurtosis;
-
-  @UiField
-  Label sum;
-
-  @UiField
-  Label sumsq;
+  DefaultFlexTable grid;
 
   @UiField
   DivElement histogramElement;
@@ -75,31 +50,50 @@ public class ContinuousSummaryView extends Composite {
   @UiField
   DivElement qqPlotElement;
 
-  final Widget widget;
-
   HistogramPlot histogram;
 
   NormalProbabilityPlot qqPlot;
 
   public ContinuousSummaryView(ContinuousSummaryDto continuous) {
-    widget = uiBinder.createAndBindUi(this);
-    initWidget(widget);
+    initWidget(uiBinder.createAndBindUi(this));
+
+    // TODO translation
+    TabPanelHelper.setTabTitle(tabPanel, 0, "Plot");
+    TabPanelHelper.setTabTitle(tabPanel, 1, "Statistics");
+
     histogramElement.setId(HTMLPanel.createUniqueId());
     qqPlotElement.setId(HTMLPanel.createUniqueId());
 
     DescriptiveStatsDto descriptiveStats = continuous.getSummary();
 
-    obs.setText("" + Math.round(descriptiveStats.getN()));
-    max.setText("" + descriptiveStats.getMax());
-    min.setText("" + descriptiveStats.getMin());
-    mean.setText("" + descriptiveStats.getMean());
-    median.setText("" + descriptiveStats.getMedian());
-    stdDev.setText("" + descriptiveStats.getStdDev());
-    variance.setText("" + descriptiveStats.getVariance());
-    skewness.setText("" + descriptiveStats.getSkewness());
-    kurtosis.setText("" + descriptiveStats.getKurtosis());
-    sum.setText("" + descriptiveStats.getSum());
-    sumsq.setText("" + descriptiveStats.getSumsq());
+    // TODO translation
+    grid.clear();
+    grid.setHeader(0, "Descriptive Statistic");
+    grid.setHeader(1, "Value");
+    int row = 0;
+    grid.setWidget(row, 0, new Label("N"));
+    grid.setWidget(row++, 1, new Label("" + Math.round(descriptiveStats.getN())));
+    grid.setWidget(row, 0, new Label("Min"));
+    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getMin()));
+    grid.setWidget(row, 0, new Label("Max"));
+    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getMax()));
+    grid.setWidget(row, 0, new Label("Mean"));
+    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getMean()));
+    grid.setWidget(row, 0, new Label("Median"));
+    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getMedian()));
+    grid.setWidget(row, 0, new Label("Standard Deviation"));
+    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getStdDev()));
+    grid.setWidget(row, 0, new Label("Variance"));
+    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getVariance()));
+    grid.setWidget(row, 0, new Label("Skewness"));
+    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getSkewness()));
+    grid.setWidget(row, 0, new Label("Kurtosis"));
+    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getKurtosis()));
+    grid.setWidget(row, 0, new Label("Sum"));
+    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getSum()));
+    grid.setWidget(row, 0, new Label("Sum of squares"));
+    grid.setWidget(row++, 1, new Label("" + descriptiveStats.getSumsq()));
+
 
     if(descriptiveStats.getVariance() > 0) {
       histogram = new HistogramPlot(histogramElement.getId(), descriptiveStats.getMin(), descriptiveStats.getMax());

@@ -9,57 +9,66 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.project.view;
 
+import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
 import org.obiba.opal.web.gwt.app.client.workbench.view.DefaultFlexTable;
 import org.obiba.opal.web.gwt.plot.client.FrequencyPlot;
 import org.obiba.opal.web.gwt.plot.client.JqPlot;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 
+import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.DisclosurePanel;
-import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  *
  */
 public class CategoricalSummaryView extends Composite {
 
-  @UiTemplate("CategoricalSummaryView.ui.xml")
-  interface CategoricalSummaryViewUiBinder extends UiBinder<HTMLPanel, CategoricalSummaryView> {}
+  interface CategoricalSummaryViewUiBinder extends UiBinder<Widget, CategoricalSummaryView> {}
 
   private static final CategoricalSummaryViewUiBinder uiBinder = GWT.create(CategoricalSummaryViewUiBinder.class);
 
   @UiField
-  Label obs;
-
-  @UiField
-  Label mode;
+  TabPanel tabPanel;
 
   @UiField
   DivElement frequencyElement;
 
   @UiField
-  DefaultFlexTable grid;
+  DefaultFlexTable stats;
 
-  final HTMLPanel widget;
+  @UiField
+  DefaultFlexTable frequencies;
 
   final JqPlot plot;
 
   public CategoricalSummaryView(CategoricalSummaryDto categorical) {
-    widget = uiBinder.createAndBindUi(this);
-    initWidget(widget);
+    initWidget(uiBinder.createAndBindUi(this));
+
+    // TODO translation
+    TabPanelHelper.setTabTitle(tabPanel, 0, "Plot");
+    TabPanelHelper.setTabTitle(tabPanel, 1, "Statistics");
+
     frequencyElement.setId(HTMLPanel.createUniqueId());
     frequencyElement.setAttribute("style", "width:400px;");
 
-    obs.setText("" + Math.round(categorical.getN()));
-    mode.setText(categorical.getMode());
+    // TODO translation
+    stats.clear();
+    stats.setHeader(0, "Descriptive Statistic");
+    stats.setHeader(1, "Value");
+    int row = 0;
+    stats.setWidget(row, 0, new Label("N"));
+    stats.setWidget(row++, 1, new Label("" + Math.round(categorical.getN())));
+    stats.setWidget(row, 0, new Label("Mode"));
+    stats.setWidget(row++, 1, new Label(categorical.getMode()));
 
     if(categorical.getFrequenciesArray() != null) {
       int count = categorical.getFrequenciesArray().length();
@@ -70,24 +79,24 @@ public class CategoricalSummaryView extends Composite {
       frequencyElement.setAttribute("style", "width:" + width + "px;");
 
       FrequencyPlot freqPlot = new FrequencyPlot(frequencyElement.getId());
-      grid.clear();
-      grid.setHeader(0, "Category");
-      grid.setHeader(1, "Frequency");
-      grid.setHeader(2, "%");
+      frequencies.clear();
+      frequencies.setHeader(0, "Category");
+      frequencies.setHeader(1, "Frequency");
+      frequencies.setHeader(2, "%");
       for(int i = 0; i < count; i++) {
         FrequencyDto value = categorical.getFrequenciesArray().get(i);
         if(value.hasValue()) {
           freqPlot.push(value.getValue(), value.getFreq(), value.getPct() * 100);
-          grid.setWidget(i + 1, 0, new Label(value.getValue()));
-          grid.setWidget(i + 1, 1, new Label("" + Math.round(value.getFreq())));
-          grid.setWidget(i + 1, 2, new Label("" + value.getPct() * 100));
+          frequencies.setWidget(i + 1, 0, new Label(value.getValue()));
+          frequencies.setWidget(i + 1, 1, new Label("" + Math.round(value.getFreq())));
+          frequencies.setWidget(i + 1, 2, new Label("" + value.getPct() * 100));
         }
       }
       plot = freqPlot;
 
     } else {
       plot = null;
-      grid.clear();
+      frequencies.clear();
     }
   }
 

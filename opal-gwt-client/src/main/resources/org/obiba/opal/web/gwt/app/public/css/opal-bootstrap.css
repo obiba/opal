@@ -45,3 +45,7 @@ footer.footer .container > div {
   padding-bottom: 8px;
   padding-top: 8px;
 }
+
+.tabs-left > .nav-tabs > li > a, .tabs-right > .nav-tabs > li > a {
+  min-width: 15px;
+}

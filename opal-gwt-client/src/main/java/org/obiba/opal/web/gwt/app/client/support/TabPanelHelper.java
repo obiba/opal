@@ -18,6 +18,16 @@ public class TabPanelHelper {
   }
 
   /**
+   * Set the title of a tab.
+   * @param tabs
+   * @param i
+   * @param title
+   */
+  public static void setTabTitle(TabPanel tabs, int i, String title) {
+    getNavTab(tabs, i).setTitle(title);
+  }
+
+  /**
    * Set a tab visible.
    * @param tabs
    * @param i
