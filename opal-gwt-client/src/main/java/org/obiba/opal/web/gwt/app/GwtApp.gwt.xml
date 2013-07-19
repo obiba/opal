@@ -54,8 +54,8 @@
 
   <!--  Opal css style sheets -->
   <!--stylesheet src='css/bootstrap.min.css'/-->
+  <stylesheet src='css/opal-bootstrap.css'/>
   <stylesheet src='css/opal.css'/>
-  <stylesheet src='css/opal-custom.css'/>
 
   <!--  for ClientBundle -->
   <inherits name='com.google.gwt.resources.Resources'/>

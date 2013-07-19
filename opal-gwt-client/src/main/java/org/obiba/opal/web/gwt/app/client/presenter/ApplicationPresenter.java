@@ -13,24 +13,42 @@ import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdminis
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.project.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.project.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.project.event.TableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.project.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.ui.HasUrl;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FileSelectionRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueMapPopupPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.VariableSearchListItem;
+import org.obiba.opal.web.gwt.app.client.workbench.view.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.user.client.ui.MenuItem;
+import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
@@ -42,49 +60,8 @@ import com.gwtplatform.mvp.client.proxy.RevealRootContentEvent;
 /**
  *
  */
-public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display, ApplicationPresenter.Proxy> implements ApplicationUiHandlers {
-
-  @Override
-  public void onDashboard() {
-    getEventBus().fireEvent(new PlaceChangeEvent(Places.dashboardPlace));
-  }
-
-  @Override
-  public void onProjects() {
-    getEventBus().fireEvent(new PlaceChangeEvent(Places.projectsPlace));
-  }
-
-  @Override
-  public void onAdministration() {
-    getEventBus().fireEvent(new PlaceChangeEvent(Places.administrationPlace));
-  }
-
-  @Override
-  public void onHelp() {
-    HelpUtil.openPage();
-  }
-
-  @Override
-  public void onQuit() {
-    getEventBus().fireEvent(new SessionEndedEvent());
-  }
-
-  public interface Display extends View, HasUiHandlers<ApplicationUiHandlers> {
-
-    HasUrl getDownloader();
-
-    HasAuthorization getAdministrationAuthorizer();
-
-    void setCurrentSelection(MenuItem selection);
-
-    void clearSelection();
-
-    void setUsername(String username);
-
-    void setVersion(String version);
-
-    HasAuthorization getProjectsAutorizer();
-  }
+public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display, ApplicationPresenter.Proxy>
+    implements ApplicationUiHandlers {
 
   @ContentSlot
   public static final GwtEvent.Type<RevealContentHandler<?>> WORKBENCH = new GwtEvent.Type<RevealContentHandler<?>>();
@@ -151,6 +128,36 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       }
     }));
 
+    // Update search box on event
+    registerHandler(getEventBus()
+        .addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionChangeEvent.Handler() {
+          @Override
+          public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
+            getView().clearSearch();
+            getView().addSearchItem(event.getSelection(), VariableSearchListItem.ItemType.DATASOURCE);
+          }
+        }));
+
+    registerHandler(
+        getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
+          @Override
+          public void onTableSelectionChanged(TableSelectionChangeEvent event) {
+            getView().clearSearch();
+            getView().addSearchItem(event.getDatasourceName(), VariableSearchListItem.ItemType.DATASOURCE);
+            getView().addSearchItem(event.getTableName(), VariableSearchListItem.ItemType.TABLE);
+          }
+        }));
+
+    registerHandler(
+        getEventBus().addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionChangeEvent.Handler() {
+          @Override
+          public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
+            getView().clearSearch();
+            getView().addSearchItem(event.getTable().getDatasourceName(), VariableSearchListItem.ItemType.DATASOURCE);
+            getView().addSearchItem(event.getTable().getName(), VariableSearchListItem.ItemType.TABLE);
+          }
+        }));
+
     registerUserMessageEventHandler();
   }
 
@@ -193,5 +200,101 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
         addToPopupSlot(messageDialog, false);
       }
     }));
+  }
+
+  @Override
+  public void onDashboard() {
+    getEventBus().fireEvent(new PlaceChangeEvent(Places.dashboardPlace));
+  }
+
+  @Override
+  public void onProjects() {
+    getEventBus().fireEvent(new PlaceChangeEvent(Places.projectsPlace));
+  }
+
+  @Override
+  public void onAdministration() {
+    getEventBus().fireEvent(new PlaceChangeEvent(Places.administrationPlace));
+  }
+
+  @Override
+  public void onHelp() {
+    HelpUtil.openPage();
+  }
+
+  @Override
+  public void onQuit() {
+    getEventBus().fireEvent(new SessionEndedEvent());
+  }
+
+  @Override
+  public void onSelection(SelectionEvent<SuggestOracle.Suggestion> event) {
+    // Get the table dto to fire the event to select the variable
+    final String datasourceName = ((VariableSuggestOracle.VariableSuggestion) event.getSelectedItem()).getDatasource();
+    final String tableName = ((VariableSuggestOracle.VariableSuggestion) event.getSelectedItem()).getTable();
+    final String variableName = ((VariableSuggestOracle.VariableSuggestion) event.getSelectedItem()).getVariable();
+
+    UriBuilder ub = UriBuilder.URI_DATASOURCE_TABLE;
+    ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(datasourceName, tableName)).get()
+        .withCallback(new ResourceCallback<TableDto>() {
+          @Override
+          public void onResource(Response response, final TableDto tableDto) {
+
+            UriBuilder ub = UriBuilder.URI_DATASOURCE_TABLE_VARIABLES;
+            ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(ub.build(datasourceName, tableName)).get()
+                .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
+
+                  @Override
+                  public void onResource(Response response, JsArray<VariableDto> resource) {
+                    JsArray<VariableDto> variables = JsArrays.toSafeArray(resource);
+
+                    VariableDto previous = null;
+                    VariableDto selection = null;
+                    VariableDto next = null;
+                    for(int i = 0; i < variables.length(); i++) {
+                      if(variables.get(i).getName().equals(variableName)) {
+                        selection = variables.get(i);
+
+                        if(i >= 0) {
+                          previous = variables.get(i - 1);
+                        }
+
+                        if(i < variables.length() - 1) {
+                          next = variables.get(i + 1);
+                        }
+                      }
+                    }
+                    getEventBus().fireEvent(new VariableSelectionChangeEvent(tableDto, selection, previous, next));
+                  }
+                })//
+                .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
+                  @Override
+                  public void onResponseCode(Request request, Response response) {
+                    getEventBus().fireEvent(NotificationEvent.newBuilder().error("SearchServiceUnavailable").build());
+                  }
+                }).send();
+          }
+        }).send();
+  }
+
+  public interface Display extends View, HasUiHandlers<ApplicationUiHandlers> {
+
+    HasUrl getDownloader();
+
+    HasAuthorization getAdministrationAuthorizer();
+
+    void setCurrentSelection(MenuItem selection);
+
+    void clearSelection();
+
+    void setUsername(String username);
+
+    void setVersion(String version);
+
+    HasAuthorization getProjectsAutorizer();
+
+    void addSearchItem(String text, VariableSearchListItem.ItemType type);
+
+    void clearSearch();
   }
 }

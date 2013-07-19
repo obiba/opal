@@ -6,57 +6,9 @@ li {
   list-style-type: none;
 }
 
-  /*
-   * Twitter Bootstrap
-   */
-
-footer.footer {
-  margin-top: 40px;
-  font-size: 0.8em;
-}
-
-footer.footer .container > div {
-  border-top: 1px solid #E5E5E5;
-  padding-top: 20px;
-}
-
-.page-header .btn-group {
-  margin-top: 10px;
-}
-
-.page-header .breadcrumb {
-  background: none;
-  font-size: 1.4em;
-  margin: 0;
-  padding: 0;
-}
-
-.breadcrumb {
-  background: none;
-  border: none;
-  list-style: none outside none;
-  margin: 0 0 10px;
-  padding: 0;
-}
-
-.btn-group + .btn-group.pull-right {
-  margin-right: 5px;
-}
-
-.help-block {
-  font-size: 0.9em;
-}
-
-.nav-pills > li > i {
-  margin-bottom: 2px;
-  margin-top: 2px;
-  padding-bottom: 8px;
-  padding-top: 8px;
-}
-
-  /*
-   * Opal
-   */
+/*
+ * Opal
+ */
 
 .tags .label {
   margin-right: 10px;
@@ -146,4 +98,151 @@ footer.footer .container > div {
   display: inline-block;
 }
 
+  /* Suggest list box */
+
+ul.closeables {
+  float: left;
+  margin-bottom: 0;
+  margin-left: 0;
+}
+
+  /* Truncate labels depending on screen resolution */
+ul.closeables li {
+  float: left;
+  list-style: none outside none;
+  border-radius: 2px 2px 2px 2px;
+  -moz-border-radius: 2px 2px 2px 2px;
+  -webkit-border-radius: 2px 2px 2px 2px;
+  margin-left: 4px;
+  padding: 0px 6px;
+  background-color: #999999;
+  color: #FFFFFF;
+  font-weight: bold;
+  vertical-align: baseline;
+  white-space: nowrap;
+  line-height: 14px;
+  font-size: 1.1em;
+}
+
+  /* Truncate labels depending on screen resolution */
+ul.closeables li span {
+  display: inline-block;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  -ms-text-overflow: ellipsis;
+}
+
+@media all and (max-width: 1189px) {
+  ul.closeables li {
+    max-width: 80px;
+  }
+}
+
+@media all and (max-width: 1529px) and (min-width: 1190px) {
+  ul.closeables li {
+    max-width: 150px;
+  }
+}
+
+@media all and (min-width:1530px) {
+  ul.closeables li {
+    max-width: 250px;
+  }
+}
+
+@media all and (max-width: 1189px) {
+  ul.closeables li span {
+    max-width: 54px;
+  }
+}
+
+@media all and (max-width: 1529px) and (min-width: 1190px) {
+  ul.closeables li span {
+    max-width: 124px;
+  }
+}
+
+@media all and (min-width:1530px) {
+  ul.closeables li span {
+    max-width: 234px;
+  }
+}
+
+ul.closeables li.focus, ul.closeables li.focus .label {
+  background: #d4d4d4;
+}
+
+ul.closeables li a {
+  display: inline-block;
+  color: #FFFFFF;
+  padding-left: 6px;
+  text-decoration: none;
+}
+
+
+.obiba-SuggestListBox {
+  border: 1px solid #CCCCCC;
+  border-radius: 3px 3px 3px 3px;
+  -moz-border-radius: 3px 3px 3px 3px;
+  -webkit-border-radius: 3px 3px 3px 3px;
+  -moz-transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
+}
+
+.obiba-SuggestListBox > div {
+  margin: 0;
+  padding: 0;
+}
+
+.obiba-SuggestListBox input {
+  border: none;
+  box-shadow: none;
+  margin: 0px 0px 0px 4px;
+  padding: 0px;
+}
+
+  /* Width is dependent of screen resolution */
+@media all and (max-width: 1189px) {
+  .obiba-SuggestListBox input {
+    width: 130px;
+  }
+}
+
+@media all and (max-width: 1529px)and (min-width: 1190px) {
+  .obiba-SuggestListBox input {
+    width: 250px;
+  }
+}
+
+@media all and (min-width:1530px) {
+  .obiba-SuggestListBox input {
+    width: 475px;
+  }
+}
+
+.obiba-SuggestListBox input:focus {
+  border: none;
+  box-shadow: none;
+}
+
+div.obiba-SuggestListBox {
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  border-radius: 3px;
+  display: inline-block;
+  padding-right: 4px;
+  vertical-align: middle;
+}
+
+.textbox-clearable-anchor {
+  color: #666;
+}
+
+.obiba-SuggestListBox.pull-left.navbar-search {
+  margin-top: 8px;
+  padding-top: 2px;
+}
 

@@ -2009,7 +2009,7 @@ ul.closeables li a {
   text-decoration: none;
 }
 
-.Box {
+.obiba-SuggestListBox {
   border: 1px solid #CCCCCC;
   border-radius: 3px 3px 3px 3px;
   -moz-border-radius: 3px 3px 3px 3px;
@@ -2018,7 +2018,7 @@ ul.closeables li a {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
 }
 
-.obiba-SuggestListobiba-SuggestListBox > div {
+.obiba-SuggestListBox > div {
   margin: 0;
   padding: 0;
 }

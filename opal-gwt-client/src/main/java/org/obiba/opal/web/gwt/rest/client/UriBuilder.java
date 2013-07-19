@@ -110,6 +110,10 @@ public class UriBuilder {
 
   public static final UriBuilder URI_DATASOURCE_TABLES = UriBuilder.create().segment("datasource","{}","tables");
 
+  public static final UriBuilder URI_DATASOURCE_TABLE = UriBuilder.create().segment("datasource", "{}", "table", "{}");
+
   public static final UriBuilder URI_DATASOURCE_TABLE_INDEX = UriBuilder.create().segment("datasource", "{}", "table", "{}", "index");
+
+  public static final UriBuilder URI_DATASOURCE_TABLE_VARIABLES = UriBuilder.create().segment("datasource", "{}", "table", "{}", "variables");
 
 }
