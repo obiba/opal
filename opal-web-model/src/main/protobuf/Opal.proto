@@ -251,3 +251,61 @@ message GroupDto {
   required string name = 1;
   repeated string users = 2;
 }
+
+// Extracts from RuntimeMXBean
+message OpalEnv {
+  required string version = 1; // opal version
+  required string vmName = 2;
+  required string vmVendor = 3;
+  required string vmVersion = 4;
+  required string javaVersion = 5;
+  repeated EntryDto systemProperties = 6;
+}
+
+// Extracts from MemoryMXBean, ThreadMXBean and GarbageCollectorMXBeans
+message OpalStatus {
+  // http://docs.oracle.com/javase/7/docs/api/java/lang/management/MemoryUsage.html
+  message MemoryUsage {
+    required int64 init = 1;
+    required int64 used = 2;
+    required int64 committed = 3;
+    required int64 max = 4;
+  }
+  message ThreadsUsage {
+    required int64 count = 1;
+    required int64 peak = 2;
+  }
+  message GarbageCollectorUsage {
+    required string name = 1;
+    required int64 collectionCount = 2;
+    required int64 collectionTime = 3;
+  }
+  required int64 timestamp = 1;
+  required int64 uptime = 2;
+  required MemoryUsage heapMemory = 3;
+  required MemoryUsage nonHeapMemory = 4;
+  required ThreadsUsage threads = 5;
+  repeated GarbageCollectorUsage gcs = 6;
+}
+message GeneralConf {
+  required string name = 1 [default = "Opal"];
+  repeated string languages = 2; // replaces the property org.obiba.opal.languages
+  required string defaultCharSet = 3 [default = "ISO-8859-1"]; // replaces the property org.obiba.opal.charset.default
+  optional string publicURL = 4;
+}
+
+
+message AttributeConf {
+  message Attr {
+    required string name = 1;
+    repeated string values = 2; // enumerated values if any
+  }
+  required string namespace = 1 [default = "opal"];
+  optional string description = 2; // description of this set of attributes
+  repeated Attr conf = 3;
+}
+
+message OpalConf {
+  required GeneralConf general = 1;
+  repeated AttributeConf attributes = 2;
+}
