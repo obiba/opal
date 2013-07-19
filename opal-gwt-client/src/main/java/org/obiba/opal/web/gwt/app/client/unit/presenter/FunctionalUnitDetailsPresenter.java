@@ -13,6 +13,8 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
+import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitSelectedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
@@ -52,10 +54,8 @@ import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
-import com.gwtplatform.mvp.client.proxy.SetPlaceTitleHandler;
 
 public class FunctionalUnitDetailsPresenter
     extends Presenter<FunctionalUnitDetailsPresenter.Display, FunctionalUnitDetailsPresenter.Proxy>
@@ -65,11 +65,11 @@ public class FunctionalUnitDetailsPresenter
 
   public static final String DOWNLOAD_ACTION = "DownloadCertificate";
 
+  private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
+
   private Runnable removeConfirmation;
 
   private GenerateConfirmationRunnable generateConfirmation;
-
-  private final PlaceManager placeManager;
 
   private final FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter;
 
@@ -86,7 +86,7 @@ public class FunctionalUnitDetailsPresenter
   public interface Proxy extends ProxyPlace<FunctionalUnitDetailsPresenter> {
   }
 
-  public interface Display extends View, HasUiHandlers<FunctionalUnitUiHandlers> {
+  public interface Display extends View, HasUiHandlers<FunctionalUnitUiHandlers>, HasBreadcrumbs {
     void setKeyPairs(JsArray<KeyDto> keyPairs);
 
     HasActionHandler<KeyDto> getActionColumn();
@@ -100,10 +100,6 @@ public class FunctionalUnitDetailsPresenter
     void setCurrentCountOfIdentifiers(String count);
 
     void setAvailable(boolean available);
-
-    void clearBreadcrumbs();
-
-    void setBreadcrumbs(int index, String title, String history);
 
     HasAuthorization getRemoveFunctionalUnitAuthorizer();
 
@@ -128,13 +124,13 @@ public class FunctionalUnitDetailsPresenter
       FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter,
       GenerateIdentifiersDialogPresenter generateIdentifiersDialogPresenter,
       Provider<AddKeyPairDialogPresenter> addKeyPairDialogPresenter,
-      PlaceManager placeManager) {
+      DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
     this.functionalUnitUpdateDialogPresenter = functionalUnitUpdateDialogPresenter;
     this.addKeyPairDialogPresenter = addKeyPairDialogPresenter;
     this.generateIdentifiersDialogPresenter = generateIdentifiersDialogPresenter;
-    this.placeManager = placeManager;
+    this.breadcrumbsHelper = breadcrumbsHelper;
   }
 
   @TitleFunction
@@ -539,24 +535,9 @@ public class FunctionalUnitDetailsPresenter
       getView().setFunctionalUnitDetails(functionalUnit);
       updateCurrentCountOfIdentifiers();
       authorize();
-      setBreadcrumbs();
-    }
-  }
 
-  // TODO this is a general way of determining breadcrumbs, make it a common mechanism
-  private void setBreadcrumbs() {
-    getView().clearBreadcrumbs();
-
-    final int size = placeManager.getHierarchyDepth();
-
-    for (int i = 0; i < size; i++) {
-      final int index = i;
-      placeManager.getTitle(i, new SetPlaceTitleHandler() {
-        @Override
-        public void onSetPlaceTitle(String title) {
-          getView().setBreadcrumbs(index, title, placeManager.buildRelativeHistoryToken(index + 1));
-        }
-      });
+      breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).setStartingDepth(1)
+          .build();
     }
   }
 

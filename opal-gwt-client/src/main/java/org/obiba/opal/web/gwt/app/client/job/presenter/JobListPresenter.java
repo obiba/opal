@@ -11,12 +11,13 @@ package org.obiba.opal.web.gwt.app.client.job.presenter;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.administration.presenter.BreadcrumbDisplay;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
+import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
@@ -39,10 +40,10 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
@@ -57,13 +58,17 @@ public class JobListPresenter extends ItemAdministrationPresenter<JobListPresent
 
   private final JobDetailsPresenter jobDetailsPresenter;
 
+  private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
+
   private Runnable actionRequiringConfirmation;
 
   @Inject
-  public JobListPresenter(Display display, EventBus eventBus, Proxy proxy, JobDetailsPresenter jobDetailsPresenter) {
+  public JobListPresenter(Display display, EventBus eventBus, Proxy proxy, JobDetailsPresenter jobDetailsPresenter,
+      DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
 
     this.jobDetailsPresenter = jobDetailsPresenter;
+    this.breadcrumbsHelper = breadcrumbsHelper;
 
     getView().getActionsColumn().setActionHandler(new ActionHandler<CommandStateDto>() {
       @Override
@@ -104,6 +109,8 @@ public class JobListPresenter extends ItemAdministrationPresenter<JobListPresent
 
   @Override
   public void onReveal() {
+    super.onReveal();
+    breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
     updateTable();
   }
 
@@ -204,6 +211,7 @@ public class JobListPresenter extends ItemAdministrationPresenter<JobListPresent
   }
 
   @Override
+  @TitleFunction
   public String getTitle() {
     return translations.pageJobsTitle();
   }
@@ -212,7 +220,7 @@ public class JobListPresenter extends ItemAdministrationPresenter<JobListPresent
   // Inner Classes / Interfaces
   //
 
-  public interface Display extends View, BreadcrumbDisplay {
+  public interface Display extends View, HasBreadcrumbs {
 
     @Nullable
     SelectionModel<CommandStateDto> getTableSelection();

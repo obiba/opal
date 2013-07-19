@@ -9,11 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.unit.view;
 
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitPresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitsUiHandlers;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -111,11 +108,6 @@ public class FunctionalUnitView extends ViewWithUiHandlers<FunctionalUnitsUiHand
   @Override
   public HasAuthorization getSyncIdentifiersAuthorizer() {
     return new UIObjectAuthorizer(syncButton);
-  }
-
-  @Override
-  public void setBreadcrumbItems(List<BreadcrumbsBuilder.Item> items) {
-    breadcrumbs.add(new BreadcrumbsBuilder().setItems(items).build());
   }
 
   @UiHandler("functionalUnitButton")

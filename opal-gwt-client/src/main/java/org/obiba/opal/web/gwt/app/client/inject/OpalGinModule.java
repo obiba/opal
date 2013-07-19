@@ -16,6 +16,8 @@ import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
+import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
+import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.view.ApplicationView;
 import org.obiba.opal.web.gwt.app.client.view.NotificationView;
 import org.obiba.opal.web.gwt.app.client.view.PageContainerView;
@@ -52,13 +54,14 @@ public class OpalGinModule extends AbstractPresenterModule {
 
   @Override
   protected void configure() {
+    bind(BreadcrumbsBuilder.class).to(DefaultBreadcrumbsBuilder.class).in(Singleton.class);;
     bind(RequestUrlBuilder.class).to(DefaultRequestUrlBuilder.class).in(Singleton.class);
     bind(UnhandledResponseNotificationPresenter.Display.class).to(UnhandledResponseNotificationView.class)
         .in(Singleton.class);
 
     bindConstant().annotatedWith(DefaultPlace.class).to(Places.dashboard);
 
-    install(new DefaultModule(OpalPlaceManager.class));
+        install(new DefaultModule(OpalPlaceManager.class));
     bindPresenter(ApplicationPresenter.class, ApplicationPresenter.Display.class, ApplicationView.class,
         ApplicationPresenter.Proxy.class);
     bindSingletonPresenterWidget(NotificationPresenter.class, NotificationPresenter.Display.class,

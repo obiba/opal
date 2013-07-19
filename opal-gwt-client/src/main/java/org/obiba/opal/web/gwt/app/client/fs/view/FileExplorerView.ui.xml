@@ -7,7 +7,7 @@
     ui:generateLocales="default">
 
   <o:WorkbenchLayout>
-    <g:FlowPanel ui:field="breadcrumbs" />
+    <b:Breadcrumbs ui:field="breadcrumbs" />
     <g:FlowPanel>
       <g:FlowPanel styleName="btn-group">
         <g:Button ui:field="createFolderButton" styleName="btn iconb i-plus">

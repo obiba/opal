@@ -1,8 +1,8 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
-    xmlns:c="urn:import:com.google.gwt.user.cellview.client"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -15,66 +15,69 @@
           <b:Breadcrumbs ui:field="breadcrumbs"/>
         </b:Column>
         <b:Column size="3">
-
         </b:Column>
       </b:FluidRow>
       <g:InlineLabel ui:field="description"></g:InlineLabel><b:Button type="LINK" icon="PLUS_SIGN" ui:field="ellipsis"/>
     </g:FlowPanel>
 
-    <g:FlowPanel>
-      <g:FlowPanel>
+    <g:FlowPanel addStyleNames="bottom-margin">
+      <b:ButtonGroup>
         <b:DropdownButton text="Unit" ui:field="unitDropdown" size="SMALL" icon="TASKS">
           <b:NavLink icon="EDIT" ui:field="updateUnit"><ui:msg description="Add table label">Edit unit...</ui:msg></b:NavLink>
           <b:NavLink icon="REMOVE"  ui:field="removeUnit"><ui:msg description="Add view label">Remove unit...</ui:msg></b:NavLink>
         </b:DropdownButton>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
         <b:DropdownButton text="identifiersDropdown" size="SMALL" icon="COG" ui:field="identifiersDropDown">
           <b:NavLink icon="UPLOAD" ui:field="exportIdentifiers"><ui:msg description="Functional Unit Export identifiers">Export indentifiers...</ui:msg></b:NavLink>
           <b:NavLink icon="DOWNLOAD" ui:field="exportIdentifiersMapping"><ui:msg description="Functional Unit Export identifiers mapping">Export identifiers mapping...</ui:msg></b:NavLink>
           <b:NavLink icon="COG" ui:field="generateIdentifiers"><ui:msg description="Functional Unit Generate identifiers">Generate identifiers...</ui:msg></b:NavLink>
           <b:NavLink icon="FILE_ALT" ui:field="importIdentifiersFromFile"><ui:msg description="Functional Unit Add identifiers from data file">Add identifiers from data file...</ui:msg></b:NavLink>
         </b:DropdownButton>
-        <b:ButtonGroup>
-          <b:Button icon="PLUS" size="SMALL" ui:field="addCryptographicKey"><ui:msg description="Functional Unit Add Cryptographic key">Add Cryptographic key...</ui:msg></b:Button>
-        </b:ButtonGroup>
-      </g:FlowPanel>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:Button icon="PLUS" size="SMALL" ui:field="addCryptographicKey"><ui:msg description="Functional Unit Add Cryptographic key">Add Cryptographic key...</ui:msg></b:Button>
+      </b:ButtonGroup>
     </g:FlowPanel>
 
-    <g:Label ui:field="noUnit" addStyleNames="small-top-margin small-indent" visible="false">
-      <ui:msg description="No Unit">No Unit</ui:msg>
-    </g:Label>
+    <b:TabPanel tabPosition="above">
+      <b:Tab heading="Properties" active="true" ui:field="tabProperties">
+        <g:FlowPanel>
+          <o:PropertiesTable ui:field="propertiesPanel" condensed="true" zebra="true"
+              keyStyleNames="span3 small-indent">
 
-    <g:FlowPanel>
-      <b:CellTable width="100%" ui:field="unitProperties" addStyleNames="small-top-margin" striped="true" condensed="true"/>
-    </g:FlowPanel>
+          <g:FlowPanel>
+              <g:Label>
+                <ui:msg description="Identifier Variables Filter label">Identifier Variables Filter</ui:msg>
+              </g:Label>
+              <g:Label ui:field="select"/>
+            </g:FlowPanel>
+            <g:FlowPanel>
+              <g:Label>
+                <ui:msg description="Current Count of Identifiers label">Current Count of Identifiers</ui:msg>
+              </g:Label>
+              <g:Label ui:field="currentCountOfIdentifiers"/>
+            </g:FlowPanel>
+          </o:PropertiesTable>
 
-    <o:PropertiesTable ui:field="propertiesPanel" addStyleNames="small-dual-indent top-margin" keyStyleNames="span2 small-indent">
+        </g:FlowPanel>
+      </b:Tab>
+      <b:Tab heading="Keystore" ui:field="tabKeystore">
+        <g:FlowPanel>
+          <b2:InlineLabel ui:field="noUnit">
+            <ui:msg description="No Unit">No Unit</ui:msg>
+          </b2:InlineLabel>
 
-      <o:PropertyPanel>
-        <g:Label>
-          <ui:msg description="Identifier Variables Filter label">Identifier Variables Filter</ui:msg>
-        </g:Label>
-        <g:Label ui:field="select"/>
-      </o:PropertyPanel>
-      <o:PropertyPanel>
-        <g:Label>
-          <ui:msg description="Current Count of Identifiers label">Current Count of Identifiers</ui:msg>
-        </g:Label>
-        <g:Label ui:field="currentCountOfIdentifiers"/>
-      </o:PropertyPanel>
-    </o:PropertiesTable>
-
-    <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
-      <g:Anchor>
-        <ui:msg description="Keystore title">Keystore</ui:msg>
-      </g:Anchor>
-      <g:VerticalPanel width="100%">
-        <g:InlineLabel ui:field="noKeyPairs">
-          <ui:msg description="No Key Pairs label">No Key Pairs</ui:msg>
-        </g:InlineLabel>
-        <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"/>
-        <o:Table ui:field="keyPairsTable" width="100%" addStyleNames="left-aligned gwt-CellTable"/>
-      </g:VerticalPanel>
-    </o:HorizontalTabLayout>
+          <b:SimplePager ui:field="pager" location="RIGHT"/>
+          <o:Table ui:field="propertiesTable" width="100%" addStyleNames="left-aligned"/>
+          <g:VerticalPanel width="100%">
+            <g:InlineLabel ui:field="noKeyPairs">
+              <ui:msg description="No Key Pairs label">No Key Pairs</ui:msg>
+            </g:InlineLabel>
+          </g:VerticalPanel>
+        </g:FlowPanel>
+      </b:Tab>
+    </b:TabPanel>
 
   </g:FlowPanel>
 

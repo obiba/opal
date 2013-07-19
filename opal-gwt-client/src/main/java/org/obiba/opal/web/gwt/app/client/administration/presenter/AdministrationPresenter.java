@@ -6,16 +6,15 @@ import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
 import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.place.shared.PlaceChangeEvent;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.annotations.TitleFunction;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
@@ -26,34 +25,34 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
   @NameToken(Places.administration)
   public interface Proxy extends ProxyPlace<AdministrationPresenter> {}
 
-  public interface Display extends View, BreadcrumbDisplay {
-    Anchor getUsersGroupsPlace();
+  public interface Display extends View {
+    void setUsersGroupsHistoryToken(String historyToken);
 
-    Anchor getUnitsPlace();
+    void setUnitsHistoryToken(String historyToken);
 
-    Anchor getDatabasesPlace();
+    void setDatabasesHistoryToken(String historyToken);
 
-    Anchor getMongoDbPlace();
+    void setMongoDbHistoryToken(String historyToken);
 
-    Anchor getEsPlace();
+    void setEsHistoryToken(String historyToken);
 
-    Anchor getIndexPlace();
+    void setIndexHistoryToken(String historyToken);
 
-    Anchor getRPlace();
+    void setRHistoryToken(String historyToken);
 
-    Anchor getDataShieldPlace();
+    void setDataShieldHistoryToken(String historyToken);
 
-    Anchor getPluginsPlace();
+    void setPluginsHistoryToken(String historyToken);
 
-    Anchor getReportsPlace();
+    void setReportsHistoryToken(String historyToken);
 
-    Anchor getFilesPlace();
+    void setFilesHistoryToken(String historyToken);
 
-    Anchor getTasksPlace();
+    void setTasksHistoryToken(String historyToken);
 
-    Anchor getJavaPlace();
+    void setJavaHistoryToken(String historyToken);
 
-    Anchor getServerPlace();
+    void setServerHistoryToken(String historyToken);
   }
 
   //
@@ -61,13 +60,18 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
   //
   private static final Translations translations = GWT.create(Translations.class);
 
+  private final PlaceManager placeManager;
+
   @Inject
-  public AdministrationPresenter(Display display, EventBus eventBus, Proxy proxy) {
+  public AdministrationPresenter(Display display, EventBus eventBus, Proxy proxy, PlaceManager placeManager) {
     super(eventBus, display, proxy);
-    addHandlers();
+    this.placeManager = placeManager;
+    setHistoryTokens();
+
   }
 
   @Override
+  @TitleFunction
   public String getTitle() {
     return translations.pageAdministrationTitle();
   }
@@ -81,70 +85,21 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
   // Private Methods
   //
 
-  private void addHandlers() {
+  private void setHistoryTokens() {
 
-    getView().getUsersGroupsPlace().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.usersGroupsPlace));
-      }
-    });
+    getView().setUsersGroupsHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.usersGroups)));
+    getView().setDatabasesHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.databases)));
+    getView().setIndexHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.index)));
+    getView().setRHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.r)));
+    getView().setUnitsHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.units)));
+    getView().setFilesHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.files)));
+    getView().setTasksHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.jobs)));
+    getView().setDataShieldHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.datashield)));
+    getView().setReportsHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.reportTemplates)));
+  }
 
-    getView().getDatabasesPlace().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.databasesPlace));
-      }
-    });
-
-    getView().getIndexPlace().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.indexPlace));
-      }
-    });
-
-    getView().getRPlace().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.rPlace));
-      }
-    });
-
-    getView().getUnitsPlace().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.unitsPlace));
-      }
-    });
-
-    getView().getFilesPlace().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.filesPlace));
-      }
-    });
-
-    getView().getTasksPlace().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.jobsPlace));
-      }
-    });
-
-    getView().getDataShieldPlace().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.datashieldPlace));
-      }
-    });
-
-    getView().getReportsPlace().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new PlaceChangeEvent(Places.reportTemplatesPlace));
-      }
-    });
+  private PlaceRequest createRequest(String nameToken) {
+    return new PlaceRequest.Builder().nameToken(nameToken).build();
   }
 
 }

@@ -9,13 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
-import org.obiba.opal.web.gwt.app.client.administration.presenter.BreadcrumbDisplay;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
+import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallbacks;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -27,26 +28,28 @@ import org.obiba.opal.web.model.client.opal.AclAction;
 
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
 public class DataShieldConfigPresenter
     extends ItemAdministrationPresenter<DataShieldConfigPresenter.Display, DataShieldConfigPresenter.Proxy> {
 
+
   @ProxyStandard
   @NameToken(Places.datashield)
   public interface Proxy extends ProxyPlace<DataShieldConfigPresenter> {}
 
-  public interface Display extends View, BreadcrumbDisplay {
+  public interface Display extends View, HasBreadcrumbs {
 
     HasValue<DataShieldConfigDto.Level> levelSelector();
 
@@ -70,12 +73,15 @@ public class DataShieldConfigPresenter
 
   private final AuthorizationPresenter authorizationPresenter;
 
+  private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
+
   private static final String DATASHIELD_NAME = "DataSHIELD";
 
   @Inject
   public DataShieldConfigPresenter(Display display, EventBus eventBus, Proxy proxy,
       Provider<DataShieldAdministrationPresenter> adminPresenterProvider,
-      DataShieldPackageAdministrationPresenter packagePresenter, AuthorizationPresenter authorizationPresenter) {
+      DataShieldPackageAdministrationPresenter packagePresenter, AuthorizationPresenter authorizationPresenter,
+      DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     this.packagePresenter = packagePresenter;
     aggregatePresenter = adminPresenterProvider.get();
@@ -83,6 +89,7 @@ public class DataShieldConfigPresenter
     aggregatePresenter.setEnvironment(DataShieldEnvironment.AGGREGATE);
     assignPresenter.setEnvironment(DataShieldEnvironment.ASSIGN);
     this.authorizationPresenter = authorizationPresenter;
+    this.breadcrumbsHelper = breadcrumbsHelper;
   }
 
   @ProxyEvent
@@ -103,6 +110,8 @@ public class DataShieldConfigPresenter
 
   @Override
   protected void onReveal() {
+    super.onReveal();
+    breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
     ResourceRequestBuilderFactory.<DataShieldConfigDto>newBuilder().forResource("/datashield/cfg")
         .withCallback(new ResourceCallback<DataShieldConfigDto>() {
 
@@ -124,6 +133,7 @@ public class DataShieldConfigPresenter
   }
 
   @Override
+  @TitleFunction
   public String getTitle() {
     return translations.pageDataShieldTitle();
   }

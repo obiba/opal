@@ -9,10 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.report.presenter;
 
-import org.obiba.opal.web.gwt.app.client.administration.presenter.BreadcrumbDisplay;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Mode;
+import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -27,6 +28,7 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
 public class ReportTemplatePresenter
@@ -38,7 +40,7 @@ public class ReportTemplatePresenter
 
   Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenterProvider;
 
-  public interface Display extends View, BreadcrumbDisplay {
+  public interface Display extends View, HasBreadcrumbs {
 
     HandlerRegistration addReportTemplateClickHandler(ClickHandler handler);
 
@@ -51,14 +53,18 @@ public class ReportTemplatePresenter
   @NameToken(Places.reportTemplates)
   public interface Proxy extends ProxyPlace<ReportTemplatePresenter> {}
 
+  private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
+
   @Inject
   public ReportTemplatePresenter(Display display, EventBus eventBus, Proxy proxy,
       ReportTemplateDetailsPresenter reportTemplateDetailsPresenter,
       ReportTemplateListPresenter reportTemplateListPresenter,
-      Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenter) {
+      Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenter,
+      DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     this.reportTemplateDetailsPresenter = reportTemplateDetailsPresenter;
     this.reportTemplateListPresenter = reportTemplateListPresenter;
+    this.breadcrumbsHelper = breadcrumbsHelper;
     reportTemplateUpdateDialogPresenterProvider = reportTemplateUpdateDialogPresenter;
   }
 
@@ -77,8 +83,15 @@ public class ReportTemplatePresenter
   }
 
   @Override
+  @TitleFunction
   public String getTitle() {
     return translations.pageReportTemplatePage();
+  }
+
+  @Override
+  protected void onReveal() {
+    super.onReveal();
+    breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
   }
 
 
