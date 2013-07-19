@@ -29,6 +29,7 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TabPanel;
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -291,13 +292,13 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @Override
   public void setNextName(String name) {
     next.setTitle(name);
-    next.setEnabled(name != null);
+    next.setEnabled(!Strings.isNullOrEmpty(name));
   }
 
   @Override
   public void setPreviousName(String name) {
     previous.setTitle(name);
-    previous.setEnabled(name != null);
+    previous.setEnabled(!Strings.isNullOrEmpty(name));
   }
 
   @Override

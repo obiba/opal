@@ -3,11 +3,13 @@ package org.obiba.opal.web.gwt.app.client.project.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectUiHandlers;
+import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.core.client.GWT;
@@ -39,6 +41,10 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   Button ellipsis;
 
   @UiField
+  TabPanel tabPanel;
+
+
+  @UiField
   Panel tablesPanel;
 
   @UiField
@@ -49,6 +55,11 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   @Inject
   ProjectView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
+
+    // TODO translation
+    TabPanelHelper.setTabTitle(tabPanel, 0, "Tables");
+    TabPanelHelper.setTabTitle(tabPanel, 1, "Files");
+    TabPanelHelper.setTabTitle(tabPanel, 2, "Administration");
   }
 
   @Override

@@ -4,6 +4,6 @@
     >
 
   <g:FlowPanel>
-    <o:Table width="100%" ui:field="table"/>
+    <o:Table ui:field="table"/>
   </g:FlowPanel>
 </ui:UiBinder>

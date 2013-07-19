@@ -1,40 +1,48 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
-    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <o:WorkbenchLayout>
-    <b:Breadcrumbs ui:field="breadcrumbs" />
-    <g:FlowPanel>
-      <g:FlowPanel styleName="btn-group">
-        <g:Button ui:field="createFolderButton" styleName="btn iconb i-plus">
-          <ui:msg description="Create Folder label">Create Folder</ui:msg>
-        </g:Button>
-        <g:Button ui:field="fileUploadButton" styleName="btn iconb i-up">
-          <ui:msg description="Upload File label">Upload</ui:msg>
-        </g:Button>
-        <g:Button ui:field="fileDownloadButton" styleName="btn iconb i-down">
-          <ui:msg description="Download File label">Download</ui:msg>
-        </g:Button>
-      </g:FlowPanel>
-      <g:Button ui:field="fileDeleteButton" styleName="btn iconb i-disapprove left-aligned">
-        <ui:msg description="Delete File label">Delete</ui:msg>
-      </g:Button>
-      <o:HelpImage page="Working+with+Files"></o:HelpImage>
+  <g:FlowPanel>
+    <b:Breadcrumbs ui:field="breadcrumbs"/>
+    <g:FlowPanel addStyleNames="bottom-margin">
+      <b:DropdownButton text="Add" size="SMALL" icon="PLUS" ui:field="deriveBtn">
+        <b:NavLink icon="PLUS" ui:field="addFolder">
+          <ui:msg description="Add Folder label">Add folder...</ui:msg>
+        </b:NavLink>
+        <b:NavLink icon="UPLOAD" ui:field="uploadFile">
+          <ui:msg description="Upload File label">Upload file...</ui:msg>
+        </b:NavLink>
+      </b:DropdownButton>
+      <b:ButtonGroup>
+        <b:Button icon="DOWNLOAD" size="SMALL" ui:field="download">
+          <ui:msg description="Download label">Download</ui:msg>
+        </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:Button icon="COPY" size="SMALL" title="Copy" ui:field="copy">
+        </b:Button>
+        <b:Button icon="CUT" size="SMALL" title="Cut" ui:field="cut">
+        </b:Button>
+        <b:Button icon="PASTE" size="SMALL" title="Paste" ui:field="paste">
+        </b:Button>
+        <b:Button icon="TRASH" size="SMALL" title="Delete" ui:field="remove">
+        </b:Button>
+      </b:ButtonGroup>
     </g:FlowPanel>
+
     <b:FluidRow>
-      <b:Column size="2">
+      <b:Column size="3">
         <g:ScrollPanel ui:field="fileSystemTreePanel">
         </g:ScrollPanel>
       </b:Column>
-      <b:Column size="10">
+      <b:Column size="9">
         <g:ScrollPanel ui:field="folderDetailsPanel">
         </g:ScrollPanel>
       </b:Column>
     </b:FluidRow>
-  </o:WorkbenchLayout>
+  </g:FlowPanel>
 
 </ui:UiBinder>

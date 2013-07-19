@@ -21,18 +21,18 @@
       </b:FluidRow>
       <g:InlineLabel ui:field="description"></g:InlineLabel><b:Button type="LINK" icon="PLUS_SIGN" ui:field="ellipsis"/>
     </g:FlowPanel>
-    <b:TabPanel tabPosition="above" ui:field="tabPanel">
-      <b:Tab icon="TABLE" heading="Tables" active="true">
+    <b:TabPanel tabPosition="right" ui:field="tabPanel">
+      <b:Tab icon="TABLE" active="true">
         <b:Breadcrumbs ui:field="magmacrumbs"/>
         <g:SimplePanel ui:field="tablesPanel"/>
       </b:Tab>
-      <b:Tab icon="FILE" heading="Files">
+      <b:Tab icon="FILE">
         <b:Heading size="5">Files</b:Heading>
         <b:Paragraph>
           huhuhu hahha
         </b:Paragraph>
       </b:Tab>
-      <b:Tab icon="BOOK" heading="Administration">
+      <b:Tab icon="BOOK">
         <b:NavPills>
           <b:NavLink active="true">Settings</b:NavLink>
           <b:NavLink>Permissions</b:NavLink>

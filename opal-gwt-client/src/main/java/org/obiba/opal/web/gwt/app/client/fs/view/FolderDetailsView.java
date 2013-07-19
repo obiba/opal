@@ -32,6 +32,7 @@ import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.json.client.JSONObject;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -92,12 +93,6 @@ public class FolderDetailsView extends ViewImpl implements Display {
         ? (JsArray<FileDto>) JsArray.createArray()
         : filterChildren(folder.getChildrenArray());
 
-    if(!"root".equals(folder.getName())) {
-      FileDto parent = FileDtos.getParent(folder);
-      parent.setName("..");
-      children.unshift(parent);
-    }
-
     int fileCount = children.length();
     table.setPageSize(fileCount);
     table.setRowCount(fileCount, true);
@@ -144,7 +139,8 @@ public class FolderDetailsView extends ViewImpl implements Display {
 
       @Override
       public String getValue(FileDto object) {
-        return object.getType().isFileType(FileDto.FileType.FILE) ? ValueRenderingHelper.getSizeWithUnit(object.getSize()) : "";
+        return object.getType().isFileType(FileDto.FileType.FILE) ? ValueRenderingHelper
+            .getSizeWithUnit(object.getSize()) : "";
       }
 
     }, translations.sizeLabel());
@@ -195,8 +191,16 @@ public class FolderDetailsView extends ViewImpl implements Display {
       super(new ClickableTextCell(new AbstractSafeHtmlRenderer<String>() {
         @Override
         public SafeHtml render(String object) {
-          return new SafeHtmlBuilder().appendHtmlConstant("<a>").appendEscaped(object).appendHtmlConstant("</a>")
-              .toSafeHtml();
+          FileDto file = FileDto.parse(object);
+          String icon = "icon-file";
+          if(file.getType().getName().equals(FileType.FOLDER.getName())) {
+            icon = "icon-folder-close-alt";
+          }
+          if (!file.getReadable()) {
+            icon = "icon-remove";
+          }
+          return new SafeHtmlBuilder().appendHtmlConstant("<i class=\"" + icon + "\"></i> <a>")
+              .appendEscaped(file.getName()).appendHtmlConstant("</a>").toSafeHtml();
         }
       }));
 
@@ -205,24 +209,13 @@ public class FolderDetailsView extends ViewImpl implements Display {
       setFieldUpdater(new FieldUpdater<FileDto, String>() {
         @Override
         public void update(int rowIndex, FileDto dto, String value) {
-          for(FileSelectionHandler handler : fileSelectionHandlers) {
-            handler.onFileSelection(dto);
+          if(dto.getReadable()) {
+            for(FileSelectionHandler handler : fileSelectionHandlers) {
+              handler.onFileSelection(dto);
+            }
           }
         }
       });
-    }
-
-    @Override
-    public String getCellStyleNames(Context context, FileDto dto) {
-      FileType type = dto.getType();
-      if(type.isFileType(FileType.FOLDER) && "..".equals(dto.getName())) {
-        return "folder-up";
-      }
-      String styles = dto.getType().getName().toLowerCase();
-      if(!dto.getReadable()) {
-        styles += " forbidden";
-      }
-      return styles;
     }
 
     public HandlerRegistration addFileSelectionHandler(final FileSelectionHandler handler) {
@@ -239,7 +232,8 @@ public class FolderDetailsView extends ViewImpl implements Display {
 
     @Override
     public String getValue(FileDto dto) {
-      return dto.getName();
+      // hack because we need some info to make the markup
+      return FileDto.stringify(dto);
     }
 
   }

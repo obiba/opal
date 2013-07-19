@@ -36,6 +36,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
@@ -44,29 +45,8 @@ import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
 public class FileExplorerPresenter
-    extends SplitPaneWorkbenchPresenter<FileExplorerPresenter.Display, FileExplorerPresenter.Proxy> {
-
-  public interface Display extends View, HasBreadcrumbs {
-
-    HasClickHandlers getFileUploadButton();
-
-    HasClickHandlers getFileDeleteButton();
-
-    HasClickHandlers getFileDownloadButton();
-
-    HasClickHandlers getCreateFolderButton();
-
-    void setEnabledFileDeleteButton(boolean enabled);
-
-    HasAuthorization getCreateFolderAuthorizer();
-
-    HasAuthorization getFileUploadAuthorizer();
-
-    HasAuthorization getFileDownloadAuthorizer();
-
-    HasAuthorization getFileDeleteAuthorizer();
-
-  }
+    extends SplitPaneWorkbenchPresenter<FileExplorerPresenter.Display, FileExplorerPresenter.Proxy>
+    implements FileExplorerUiHandlers {
 
   @ProxyStandard
   @NameToken(Places.files)
@@ -96,6 +76,7 @@ public class FileExplorerPresenter
     this.fileUploadDialogPresenter = fileUploadDialogPresenter;
     this.createFolderDialogPresenter = createFolderDialogPresenter;
     this.breadcrumbsHelper = breadcrumbsHelper;
+    getView().setUiHandlers(this);
   }
 
   @Override
@@ -187,49 +168,6 @@ public class FileExplorerPresenter
 
   private void addEventHandlers() {
 
-    registerHandler(getView().getFileDeleteButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        // We are either deleting a file or a folder
-        final FileDto fileToDelete = getCurrentSelectionOrFolder();
-        actionRequiringConfirmation = new Runnable() {
-          @Override
-          public void run() {
-            deleteFile(fileToDelete);
-          }
-        };
-
-        getEventBus().fireEvent(
-            ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, "deleteFile", "confirmDeleteFile"));
-      }
-    }));
-
-    registerHandler(getView().getFileDownloadButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        downloadFile(getCurrentSelectionOrFolder());
-      }
-    }));
-
-    registerHandler(getView().getCreateFolderButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        FileDto currentFolder = folderDetailsPresenter.getCurrentFolder();
-        createFolderDialogPresenter.setCurrentFolder(currentFolder);
-        addToPopupSlot(createFolderDialogPresenter);
-      }
-    }));
-
-    registerHandler(getView().getFileUploadButton().addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        FileDto currentFolder = folderDetailsPresenter.getCurrentFolder();
-        fileUploadDialogPresenter.setCurrentFolder(currentFolder);
-        addToPopupSlot(fileUploadDialogPresenter);
-      }
-    }));
-
     registerHandler(
         getEventBus().addHandler(FileSelectionChangeEvent.getType(), new FileSelectionChangeEvent.Handler() {
 
@@ -276,26 +214,86 @@ public class FileExplorerPresenter
     }
   }
 
-  private void deleteFile(final FileDto file) {
-    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+  @Override
+  public void onAddFolder() {
+    FileDto currentFolder = folderDetailsPresenter.getCurrentFolder();
+    createFolderDialogPresenter.setCurrentFolder(currentFolder);
+    addToPopupSlot(createFolderDialogPresenter);
+  }
 
+  @Override
+  public void onUploadFile() {
+    FileDto currentFolder = folderDetailsPresenter.getCurrentFolder();
+    fileUploadDialogPresenter.setCurrentFolder(currentFolder);
+    addToPopupSlot(fileUploadDialogPresenter);
+  }
+
+  @Override
+  public void onDelete() {
+    // We are either deleting a file or a folder
+    final FileDto fileToDelete = getCurrentSelectionOrFolder();
+    actionRequiringConfirmation = new Runnable() {
       @Override
-      public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() != Response.SC_OK) {
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-        } else {
-          getEventBus().fireEvent(new FileDeletedEvent(file));
-        }
+      public void run() {
+        deleteFile(fileToDelete);
+      }
+
+      private void deleteFile(final FileDto file) {
+        ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if(response.getStatusCode() != Response.SC_OK) {
+              getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+            } else {
+              getEventBus().fireEvent(new FileDeletedEvent(file));
+            }
+          }
+        };
+
+        ResourceRequestBuilderFactory.newBuilder().forResource("/files" + file.getPath()).delete()
+            .withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler)
+            .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler)
+            .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
       }
     };
 
-    ResourceRequestBuilderFactory.newBuilder().forResource("/files" + file.getPath()).delete()
-        .withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler)
-        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler)
-        .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
+    getEventBus().fireEvent(
+        ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, "deleteFile", "confirmDeleteFile"));
   }
 
-  private void downloadFile(FileDto file) {
+  @Override
+  public void onDownload() {
+    FileDto file = getCurrentSelectionOrFolder();
     getEventBus().fireEvent(new FileDownloadEvent("/files" + file.getPath()));
+  }
+
+  @Override
+  public void onCopy() {
+    //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  @Override
+  public void onCut() {
+    //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  @Override
+  public void onPaste() {
+    //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  public interface Display extends View, HasBreadcrumbs, HasUiHandlers<FileExplorerUiHandlers> {
+
+    void setEnabledFileDeleteButton(boolean enabled);
+
+    HasAuthorization getCreateFolderAuthorizer();
+
+    HasAuthorization getFileUploadAuthorizer();
+
+    HasAuthorization getFileDownloadAuthorizer();
+
+    HasAuthorization getFileDeleteAuthorizer();
+
   }
 }

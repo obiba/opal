@@ -10,31 +10,27 @@
 package org.obiba.opal.web.gwt.app.client.fs.view;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerUiHandlers;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SplitPaneWorkbenchPresenter;
-import org.obiba.opal.web.gwt.app.client.workbench.view.WorkbenchLayout;
-import org.obiba.opal.web.gwt.rest.client.authorization.FocusWidgetAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.NavLink;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
-import com.gwtplatform.mvp.client.ViewImpl;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-public class FileExplorerView extends ViewImpl implements Display {
+public class FileExplorerView extends ViewWithUiHandlers<FileExplorerUiHandlers> implements Display {
 
-  private static final FileExplorerUiBinder uiBinder = GWT.create(FileExplorerUiBinder.class);
-
-  @UiTemplate("FileExplorerView.ui.xml")
-  interface FileExplorerUiBinder extends UiBinder<WorkbenchLayout, FileExplorerView> {}
-
-  private final Widget widget;
+  interface Binder extends UiBinder<Widget, FileExplorerView> {}
 
   @UiField
   Panel fileSystemTreePanel;
@@ -43,47 +39,23 @@ public class FileExplorerView extends ViewImpl implements Display {
   Panel folderDetailsPanel;
 
   @UiField
-  Button fileUploadButton;
+  NavLink uploadFile;
 
   @UiField
-  Button fileDeleteButton;
+  Button remove;
 
   @UiField
-  Button fileDownloadButton;
+  Button download;
 
   @UiField
-  Button createFolderButton;
+  NavLink addFolder;
 
   @UiField
   Panel breadcrumbs;
 
-  public FileExplorerView() {
-    widget = uiBinder.createAndBindUi(this);
-  }
-
-  @Override
-  public Button getFileDeleteButton() {
-    return fileDeleteButton;
-  }
-
-  @Override
-  public Button getFileDownloadButton() {
-    return fileDownloadButton;
-  }
-
-  @Override
-  public Button getCreateFolderButton() {
-    return createFolderButton;
-  }
-
-  @Override
-  public HasClickHandlers getFileUploadButton() {
-    return fileUploadButton;
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
+  @Inject
+  public FileExplorerView(Binder uiBinder) {
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
   @Override
@@ -97,27 +69,27 @@ public class FileExplorerView extends ViewImpl implements Display {
 
   @Override
   public void setEnabledFileDeleteButton(boolean enabled) {
-    fileDeleteButton.setEnabled(enabled);
+    remove.setEnabled(enabled);
   }
 
   @Override
   public HasAuthorization getCreateFolderAuthorizer() {
-    return new FocusWidgetAuthorizer(createFolderButton);
+    return new WidgetAuthorizer(addFolder);
   }
 
   @Override
   public HasAuthorization getFileUploadAuthorizer() {
-    return new FocusWidgetAuthorizer(fileUploadButton);
+    return new WidgetAuthorizer(uploadFile);
   }
 
   @Override
   public HasAuthorization getFileDownloadAuthorizer() {
-    return new FocusWidgetAuthorizer(fileDownloadButton);
+    return new WidgetAuthorizer(download);
   }
 
   @Override
   public HasAuthorization getFileDeleteAuthorizer() {
-    return new FocusWidgetAuthorizer(fileDeleteButton);
+    return new WidgetAuthorizer(remove);
   }
 
   @Override
@@ -125,4 +97,38 @@ public class FileExplorerView extends ViewImpl implements Display {
     return breadcrumbs;
   }
 
+  @UiHandler("addFolder")
+  void onAddFolder(ClickEvent event) {
+    getUiHandlers().onAddFolder();
+  }
+
+  @UiHandler("uploadFile")
+  void onUploadFile(ClickEvent event) {
+    getUiHandlers().onUploadFile();
+  }
+
+  @UiHandler("download")
+  void onDownload(ClickEvent event) {
+    getUiHandlers().onDownload();
+  }
+
+  @UiHandler("remove")
+  void onDelete(ClickEvent event) {
+    getUiHandlers().onDelete();
+  }
+
+  @UiHandler("copy")
+  void onCopy(ClickEvent event) {
+    getUiHandlers().onCopy();
+  }
+
+  @UiHandler("cut")
+  void onCut(ClickEvent event) {
+    getUiHandlers().onCut();
+  }
+
+  @UiHandler("paste")
+  void onPaste(ClickEvent event) {
+    getUiHandlers().onPaste();
+  }
 }
