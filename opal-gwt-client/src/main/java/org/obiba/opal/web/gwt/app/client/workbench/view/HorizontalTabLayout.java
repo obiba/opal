@@ -9,14 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
+import com.github.gwtbootstrap.client.ui.NavTabs;
+
 /**
  *
  */
-public class HorizontalTabLayout extends AbstractTabLayout {
+public class HorizontalTabLayout extends AbstractTabPanel {
 
   public HorizontalTabLayout() {
-    super("horizontal");
-    addStyleName("horizontal-tabs");
+    super(new NavTabs());
   }
 
 }

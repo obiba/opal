@@ -1,6 +1,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -32,12 +33,46 @@
           huhuhu hahha
         </b:Paragraph>
       </b:Tab>
+      <b:Tab icon="BAR_CHART">
+        <b:Heading size="5">Data visualization</b:Heading>
+        <b:Paragraph>
+          huhuhu hahha
+        </b:Paragraph>
+      </b:Tab>
+      <b:Tab icon="TASKS">
+        <b:Heading size="5">Tasks</b:Heading>
+        <b:Paragraph>
+          huhuhu hahha
+        </b:Paragraph>
+      </b:Tab>
       <b:Tab icon="BOOK">
-        <b:NavPills>
+        <o:PillsTabPanel>
           <b:NavLink active="true">Settings</b:NavLink>
+          <g:FlowPanel>
+            <b:WellForm>
+              <b:ControlGroup>
+                <b:ControlLabel for="input01">Name</b:ControlLabel>
+                <b:Controls>
+                  <b:TextBox alternateSize="XLARGE" b:id="input01"></b:TextBox>
+                  <b:HelpBlock>In addition to freeform text, any HTML5 text-based
+                    input appears like so.</b:HelpBlock>
+                </b:Controls>
+              </b:ControlGroup>
+              <b:ControlGroup>
+                <b:ControlLabel for="textarea">Description</b:ControlLabel>
+                <b:Controls>
+                  <b:TextArea alternateSize="XLARGE" b:id="textarea"
+                      visibleLines="3" />
+                </b:Controls>
+              </b:ControlGroup>
+              <b:SubmitButton addStyleNames="btn">Save</b:SubmitButton><b:Button>Cancel</b:Button>
+            </b:WellForm>
+          </g:FlowPanel>
           <b:NavLink>Permissions</b:NavLink>
+          <g:FlowPanel/>
           <b:NavLink>Units</b:NavLink>
-        </b:NavPills>
+          <g:FlowPanel/>
+        </o:PillsTabPanel>
       </b:Tab>
     </b:TabPanel>
     <g:FlowPanel ui:field="content"></g:FlowPanel>
