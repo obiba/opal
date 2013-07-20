@@ -9,22 +9,21 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.rest.client.authorization;
 
-import org.obiba.opal.web.gwt.app.client.workbench.view.AbstractTabLayout;
+import org.obiba.opal.web.gwt.app.client.workbench.view.AbstractTabPanel;
 import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
-import org.obiba.opal.web.gwt.app.client.workbench.view.VerticalTabLayout;
 
 /**
- * Authorize a tab in {@link HorizontalTabLayout} or a {@link VerticalTabLayout}.
+ * Authorize a tab in {@link HorizontalTabLayout}.
  */
 public class TabAuthorizer implements HasAuthorization {
 
-  private final AbstractTabLayout tabs;
+  private final AbstractTabPanel tabs;
 
   private final int index;
 
   private int selectedIndex;
 
-  public TabAuthorizer(AbstractTabLayout tabs, int index) {
+  public TabAuthorizer(AbstractTabPanel tabs, int index) {
     this.tabs = tabs;
     this.index = index;
   }

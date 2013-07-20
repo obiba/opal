@@ -27,7 +27,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 /**
  * A panel that displays all of its child widgets in a 'deck', where only one can be visible at a time. It is used by
- * {@link AbstractTabLayout}.
+ * {@link AbstractTabPanel}.
  * <p/>
  * <p>
  * Once a widget has been added to a DeckPanel, its visibility, width, and height attributes will be manipulated. When
@@ -55,7 +55,7 @@ class TabDeckPanel extends ComplexPanel implements HasAnimation, InsertPanel.For
     private boolean growing = false;
 
     /**
-     * The fixed height of a {@link AbstractTabLayout} in pixels. If the {@link AbstractTabLayout} does not have a fixed
+     * The fixed height of a {@link AbstractTabPanel} in pixels. If the {@link AbstractTabPanel} does not have a fixed
      * height, this will be set to -1.
      */
     private int fixedWidth = -1;

@@ -25,7 +25,7 @@ public abstract class SplitPaneWorkbenchPresenter<D extends View, P extends Prox
     extends ItemAdministrationPresenter<D, P> {
 
   public enum Slot {
-    CENTER, LEFT
+    TOP, CENTER, LEFT
   }
 
   protected SplitPaneWorkbenchPresenter(EventBus eventBus, D display, P proxy) {

@@ -197,7 +197,7 @@ public class FolderDetailsView extends ViewImpl implements Display {
             icon = "icon-folder-close-alt";
           }
           if (!file.getReadable()) {
-            icon = "icon-remove";
+            icon = "icon-lock";
           }
           return new SafeHtmlBuilder().appendHtmlConstant("<i class=\"" + icon + "\"></i> <a>")
               .appendEscaped(file.getName()).appendHtmlConstant("</a>").toSafeHtml();

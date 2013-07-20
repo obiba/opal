@@ -9,6 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
+import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.NavWidget;
+import com.github.gwtbootstrap.client.ui.base.InlineLabel;
+import com.github.gwtbootstrap.client.ui.base.StackedNav;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -20,18 +24,18 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiChild;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.IndexedPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
  *
  */
-public class AbstractTabLayout extends FlowPanel
+public class AbstractTabPanel extends FlowPanel
     implements IndexedPanel, HasSelectionHandlers<Integer>, HasBeforeSelectionHandlers<Integer> {
 
-  private final UList menu;
+  private final StackedNav menu;
 
   private final TabDeckPanel contentContainer;
 
@@ -39,10 +43,8 @@ public class AbstractTabLayout extends FlowPanel
 
   private int selectedIndex = -1;
 
-  protected AbstractTabLayout(String menuStyleName) {
-    menu = new UList();
-    menu.addStyleName(menuStyleName);
-    menu.addStyleName("tabz");
+  protected AbstractTabPanel(StackedNav menu) {
+    this.menu = menu;
     super.add(menu);
     super.add(contentContainer = new TabDeckPanel());
     contentContainer.addStyleName("content");
@@ -90,10 +92,10 @@ public class AbstractTabLayout extends FlowPanel
     if(beforeIndex < 0 || beforeIndex > getTabCount()) {
       throw new IndexOutOfBoundsException("cannot insert before " + beforeIndex);
     }
-    final ListItem li;
+    final NavWidget li;
     menu.insert(li = newListItem((Widget) item, beforeIndex), beforeIndex);
 
-    item.addClickHandler(new ClickHandler() {
+    li.addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent evt) {
@@ -102,8 +104,14 @@ public class AbstractTabLayout extends FlowPanel
     });
   }
 
-  protected ListItem newListItem(Widget item, int beforeIndex) {
-    return new ListItem(item);
+  protected NavWidget newListItem(Widget item, int beforeIndex) {
+    if (item instanceof NavWidget) {
+      return (NavWidget)item;
+    }
+    if (item instanceof HasText) {
+      return new NavLink(((HasText)item).getText());
+    }
+    return new NavWidget(item);
   }
 
   private void insertContent(Widget content, int beforeIndex) {
@@ -111,7 +119,7 @@ public class AbstractTabLayout extends FlowPanel
   }
 
   public void add(Widget w, String text) {
-    add(w, new Anchor(text));
+    add(w, new InlineLabel(text));
   }
 
   public void add(Widget w, HasClickHandlers item) {

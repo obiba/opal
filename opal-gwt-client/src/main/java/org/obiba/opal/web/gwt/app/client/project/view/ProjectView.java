@@ -59,7 +59,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     // TODO translation
     TabPanelHelper.setTabTitle(tabPanel, 0, "Tables");
     TabPanelHelper.setTabTitle(tabPanel, 1, "Files");
-    TabPanelHelper.setTabTitle(tabPanel, 2, "Administration");
+    TabPanelHelper.setTabTitle(tabPanel, 2, "Data visualization");
+    TabPanelHelper.setTabTitle(tabPanel, 3, "Tasks");
+    TabPanelHelper.setTabTitle(tabPanel, 4, "Administration");
   }
 
   @Override

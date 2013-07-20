@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
+import com.github.gwtbootstrap.client.ui.NavTabs;
+import com.github.gwtbootstrap.client.ui.NavWidget;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.Timer;
@@ -18,7 +20,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  *
  */
-public class BreadCrumbTabLayout extends AbstractTabLayout {
+public class BreadCrumbTabLayout extends AbstractTabPanel {
 
   private final String divider;
 
@@ -27,7 +29,7 @@ public class BreadCrumbTabLayout extends AbstractTabLayout {
   }
 
   public BreadCrumbTabLayout(String divider) {
-    super("breadcrumb");
+    super(new NavTabs());
     addStyleName("breadcrumb-tabs");
     this.divider = divider;
 
@@ -75,8 +77,8 @@ public class BreadCrumbTabLayout extends AbstractTabLayout {
   }
 
   @Override
-  protected ListItem newListItem(Widget item, int beforeIndex) {
-    ListItem li;
+  protected NavWidget newListItem(Widget item, int beforeIndex) {
+    NavWidget li;
     if(beforeIndex > 0) {
       InlineLabel div = new InlineLabel(divider);
       div.setStyleName("divider");

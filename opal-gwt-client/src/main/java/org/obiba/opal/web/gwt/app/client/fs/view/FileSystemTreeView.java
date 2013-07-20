@@ -25,6 +25,10 @@ import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.OpenEvent;
 import com.google.gwt.event.logical.shared.OpenHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.TabPanel;
+import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
@@ -33,14 +37,18 @@ import com.gwtplatform.mvp.client.ViewImpl;
 
 public class FileSystemTreeView extends ViewImpl implements Display {
 
+  interface Binder extends UiBinder<Widget, FileSystemTreeView> {}
+
   private final Translations translations = GWT.create(Translations.class);
 
-  private final Tree fileSystemTree;
+  @UiField
+  Tree fileSystemTree;
 
   private FileDto selectedFile;
 
-  public FileSystemTreeView() {
-    fileSystemTree = new Tree();
+  @Inject
+  public FileSystemTreeView(Binder uiBinder) {
+    initWidget(uiBinder.createAndBindUi(this));
     fileSystemTree.addOpenHandler(new OpenHandler<TreeItem>() {
 
       @Override
@@ -55,11 +63,6 @@ public class FileSystemTreeView extends ViewImpl implements Display {
         event.getTarget().removeStyleName("expanded");
       }
     });
-  }
-
-  @Override
-  public Widget asWidget() {
-    return fileSystemTree;
   }
 
   @Override

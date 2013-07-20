@@ -33,6 +33,9 @@ public class FileExplorerView extends ViewWithUiHandlers<FileExplorerUiHandlers>
   interface Binder extends UiBinder<Widget, FileExplorerView> {}
 
   @UiField
+  Panel filePathPanel;
+
+  @UiField
   Panel fileSystemTreePanel;
 
   @UiField
@@ -50,9 +53,6 @@ public class FileExplorerView extends ViewWithUiHandlers<FileExplorerUiHandlers>
   @UiField
   NavLink addFolder;
 
-  @UiField
-  Panel breadcrumbs;
-
   @Inject
   public FileExplorerView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
@@ -60,7 +60,17 @@ public class FileExplorerView extends ViewWithUiHandlers<FileExplorerUiHandlers>
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {
-    HasWidgets panel = slot == SplitPaneWorkbenchPresenter.Slot.LEFT ? fileSystemTreePanel : folderDetailsPanel;
+    HasWidgets panel;
+    switch((SplitPaneWorkbenchPresenter.Slot) slot) {
+      case TOP:
+        panel = filePathPanel;
+        break;
+      case LEFT:
+        panel = fileSystemTreePanel;
+        break;
+      default:
+        panel = folderDetailsPanel;
+    }
     panel.clear();
     if(content != null) {
       panel.add(content.asWidget());
@@ -90,11 +100,6 @@ public class FileExplorerView extends ViewWithUiHandlers<FileExplorerUiHandlers>
   @Override
   public HasAuthorization getFileDeleteAuthorizer() {
     return new WidgetAuthorizer(remove);
-  }
-
-  @Override
-  public HasWidgets getBreadcrumbs() {
-    return breadcrumbs;
   }
 
   @UiHandler("addFolder")

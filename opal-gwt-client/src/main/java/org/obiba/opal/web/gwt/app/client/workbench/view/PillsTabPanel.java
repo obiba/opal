@@ -9,14 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
-/**
- *
- */
-public class VerticalTabLayout extends AbstractTabLayout {
+import com.github.gwtbootstrap.client.ui.NavPills;
 
-  public VerticalTabLayout() {
-    super("vertical");
-    addStyleName("vertical-tabs");
+/**
+ * Tab panel with pills.
+ */
+public class PillsTabPanel extends AbstractTabPanel {
+
+  public PillsTabPanel() {
+    super(new NavPills());
   }
 
 }
