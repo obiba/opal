@@ -6,10 +6,10 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <b:Breadcrumbs ui:field="breadcrumbs"/>
+    <g:SimplePanel ui:field="filePathPanel"/>
     <g:FlowPanel addStyleNames="bottom-margin">
       <b:DropdownButton text="Add" size="SMALL" icon="PLUS" ui:field="deriveBtn">
-        <b:NavLink icon="PLUS" ui:field="addFolder">
+        <b:NavLink icon="FOLDER_CLOSE" ui:field="addFolder">
           <ui:msg description="Add Folder label">Add folder...</ui:msg>
         </b:NavLink>
         <b:NavLink icon="UPLOAD" ui:field="uploadFile">
@@ -28,17 +28,23 @@
         </b:Button>
         <b:Button icon="PASTE" size="SMALL" title="Paste" ui:field="paste">
         </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:Button icon="BOOKMARK_EMPTY" size="SMALL" title="Bookmark" ui:field="bookmark">
+        </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
         <b:Button icon="TRASH" size="SMALL" title="Delete" ui:field="remove">
         </b:Button>
       </b:ButtonGroup>
     </g:FlowPanel>
 
     <b:FluidRow>
-      <b:Column size="3">
+      <b:Column size="2">
         <g:ScrollPanel ui:field="fileSystemTreePanel">
         </g:ScrollPanel>
       </b:Column>
-      <b:Column size="9">
+      <b:Column size="10">
         <g:ScrollPanel ui:field="folderDetailsPanel">
         </g:ScrollPanel>
       </b:Column>

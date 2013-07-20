@@ -17,8 +17,6 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRefreshedEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
-import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SplitPaneWorkbenchPresenter;
@@ -29,13 +27,10 @@ import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
@@ -52,36 +47,38 @@ public class FileExplorerPresenter
   @NameToken(Places.files)
   public interface Proxy extends ProxyPlace<FileExplorerPresenter> {}
 
-  FileSystemTreePresenter fileSystemTreePresenter;
+  private final FilePathPresenter filePathPresenter;
 
-  FolderDetailsPresenter folderDetailsPresenter;
+  private final FileSystemTreePresenter fileSystemTreePresenter;
 
-  FileUploadDialogPresenter fileUploadDialogPresenter;
+  private final FolderDetailsPresenter folderDetailsPresenter;
 
-  CreateFolderDialogPresenter createFolderDialogPresenter;
+  private final FileUploadDialogPresenter fileUploadDialogPresenter;
 
-  private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
+  private final CreateFolderDialogPresenter createFolderDialogPresenter;
 
   private Runnable actionRequiringConfirmation;
 
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public FileExplorerPresenter(Display display, EventBus eventBus, Proxy proxy,
+      FilePathPresenter filePathPresenter,
       FileSystemTreePresenter fileSystemTreePresenter, FolderDetailsPresenter folderDetailsPresenter,
-      FileUploadDialogPresenter fileUploadDialogPresenter, CreateFolderDialogPresenter createFolderDialogPresenter,
-      DefaultBreadcrumbsBuilder breadcrumbsHelper) {
+      FileUploadDialogPresenter fileUploadDialogPresenter, CreateFolderDialogPresenter createFolderDialogPresenter) {
     super(eventBus, display, proxy);
+    this.filePathPresenter = filePathPresenter;
     this.fileSystemTreePresenter = fileSystemTreePresenter;
     this.folderDetailsPresenter = folderDetailsPresenter;
     this.fileUploadDialogPresenter = fileUploadDialogPresenter;
     this.createFolderDialogPresenter = createFolderDialogPresenter;
-    this.breadcrumbsHelper = breadcrumbsHelper;
     getView().setUiHandlers(this);
   }
 
   @Override
   protected PresenterWidget<?> getDefaultPresenter(SplitPaneWorkbenchPresenter.Slot slot) {
     switch(slot) {
+      case TOP:
+        return filePathPresenter;
       case CENTER:
         return folderDetailsPresenter;
       case LEFT:
@@ -107,12 +104,6 @@ public class FileExplorerPresenter
 
   @Override
   public void authorize(HasAuthorization authorizer) {
-  }
-
-  @Override
-  protected void onReveal() {
-    super.onReveal();
-    breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
   }
 
   @Override
@@ -283,7 +274,7 @@ public class FileExplorerPresenter
     //To change body of implemented methods use File | Settings | File Templates.
   }
 
-  public interface Display extends View, HasBreadcrumbs, HasUiHandlers<FileExplorerUiHandlers> {
+  public interface Display extends View, HasUiHandlers<FileExplorerUiHandlers> {
 
     void setEnabledFileDeleteButton(boolean enabled);
 

@@ -13,6 +13,7 @@ import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderRefreshedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.widgets.event.FolderCreationEvent;
@@ -57,12 +58,9 @@ public class FileSystemTreePresenter extends PresenterWidget<FileSystemTreePrese
 
   }
 
-  private final RequestCredentials credentials;
-
   @Inject
-  public FileSystemTreePresenter(Display display, EventBus eventBus, RequestCredentials credentials) {
+  public FileSystemTreePresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
-    this.credentials = credentials;
   }
 
   @Override
@@ -78,13 +76,13 @@ public class FileSystemTreePresenter extends PresenterWidget<FileSystemTreePrese
           public void onResource(Response response, FileDto root) {
             getView().initTree(root);
             getView().selectFile(root, false);
-            FileDto home = getChildFromName(root, "home");
-            if(home != null) {
-              FileDto userHome = getChildFromName(home, credentials.getUsername());
-              if(userHome != null) {
-                getView().selectFile(userHome, false);
-              }
-            }
+//            FileDto home = getChildFromName(root, "home");
+//            if(home != null) {
+//              FileDto userHome = getChildFromName(home, credentials.getUsername());
+//              if(userHome != null) {
+//                getView().selectFile(userHome, false);
+//              }
+//            }
           }
         }).send();
   }

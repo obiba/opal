@@ -120,6 +120,7 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
 
   @Override
   public void onReveal() {
+
     if(currentFolder != null) {
       updateTable(currentFolder.getPath());
     } else {
@@ -156,7 +157,8 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
       public void onResource(Response response, FileDto file) {
         currentFolder = file;
         getView().renderRows(file);
-        getEventBus().fireEvent(new FolderRefreshedEvent(currentFolder));
+        getEventBus().fireEvent(new FolderSelectionChangeEvent(currentFolder));
+        getEventBus().fireEvent(new FileSelectionChangeEvent(currentFolder));
       }
     }).send();
 
