@@ -15,7 +15,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
-import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
+import org.obiba.opal.web.gwt.app.client.workbench.view.NavTabsPanel;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
@@ -165,7 +165,7 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
 
     void addDataTabWidget(Widget widget);
 
-    HorizontalTabLayout getViewTabs();
+    NavTabsPanel getViewTabs();
 
     void displayTab(int tabNumber);
 

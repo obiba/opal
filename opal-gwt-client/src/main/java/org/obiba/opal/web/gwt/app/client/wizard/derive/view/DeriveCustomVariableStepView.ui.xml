@@ -21,12 +21,12 @@
           </g:CheckBox>
         </g:FlowPanel>
 
-        <o:HorizontalTabLayout>
+        <o:NavTabsPanel>
           <g:Anchor>
             <ui:msg description="Script label">Script</ui:msg>
           </g:Anchor>
           <g:FlowPanel ui:field="scriptEditor"/>
-        </o:HorizontalTabLayout>
+        </o:NavTabsPanel>
 
       </g:FlowPanel>
     </o:WizardStep>

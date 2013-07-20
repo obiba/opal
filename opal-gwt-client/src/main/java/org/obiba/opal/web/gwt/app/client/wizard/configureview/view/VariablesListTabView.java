@@ -11,7 +11,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
 import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.VariablesListTabPresenter;
-import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
+import org.obiba.opal.web.gwt.app.client.workbench.view.NavTabsPanel;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.core.client.GWT;
@@ -85,7 +85,7 @@ public class VariablesListTabView extends ViewImpl implements VariablesListTabPr
   SimplePanel scriptWidgetPanel;
 
   @UiField
-  HorizontalTabLayout variableDetailTabs;
+  NavTabsPanel variableDetailTabs;
 
   @UiField
   SimplePanel summaryTabPanel;

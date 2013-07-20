@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.workbench.view;
 
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.NavWidget;
+import com.github.gwtbootstrap.client.ui.base.ComplexWidget;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.github.gwtbootstrap.client.ui.base.StackedNav;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -24,8 +25,10 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiChild;
+import com.google.gwt.user.client.ui.ComplexPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IndexedPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -35,7 +38,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class AbstractTabPanel extends FlowPanel
     implements IndexedPanel, HasSelectionHandlers<Integer>, HasBeforeSelectionHandlers<Integer> {
 
-  private final StackedNav menu;
+  private final ComplexWidget menu;
 
   private final TabDeckPanel contentContainer;
 
@@ -43,11 +46,12 @@ public class AbstractTabPanel extends FlowPanel
 
   private int selectedIndex = -1;
 
-  protected AbstractTabPanel(StackedNav menu) {
+  protected AbstractTabPanel(ComplexWidget menu) {
     this.menu = menu;
     super.add(menu);
     super.add(contentContainer = new TabDeckPanel());
     contentContainer.addStyleName("content");
+    getWidgetCount();
   }
 
   @UiChild(tagname = "tab")
@@ -93,6 +97,9 @@ public class AbstractTabPanel extends FlowPanel
       throw new IndexOutOfBoundsException("cannot insert before " + beforeIndex);
     }
     final NavWidget li;
+
+
+
     menu.insert(li = newListItem((Widget) item, beforeIndex), beforeIndex);
 
     li.addClickHandler(new ClickHandler() {

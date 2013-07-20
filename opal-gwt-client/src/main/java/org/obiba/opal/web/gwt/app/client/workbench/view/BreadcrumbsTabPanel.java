@@ -10,28 +10,18 @@
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
 import com.github.gwtbootstrap.client.ui.NavTabs;
-import com.github.gwtbootstrap.client.ui.NavWidget;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
  *
  */
-public class BreadCrumbTabLayout extends AbstractTabPanel {
+public class BreadcrumbsTabPanel extends AbstractTabPanel {
 
-  private final String divider;
-
-  public BreadCrumbTabLayout() {
-    this("/");
-  }
-
-  public BreadCrumbTabLayout(String divider) {
+  public BreadcrumbsTabPanel() {
     super(new NavTabs());
-    addStyleName("breadcrumb-tabs");
-    this.divider = divider;
 
     // remove all tabs after the one selected
     addSelectionHandler(new SelectionHandler<Integer>() {
@@ -74,20 +64,6 @@ public class BreadCrumbTabLayout extends AbstractTabPanel {
   @Override
   public boolean isAnimationEnabled() {
     return super.isAnimationEnabled();
-  }
-
-  @Override
-  protected NavWidget newListItem(Widget item, int beforeIndex) {
-    NavWidget li;
-    if(beforeIndex > 0) {
-      InlineLabel div = new InlineLabel(divider);
-      div.setStyleName("divider");
-      li = super.newListItem(div, beforeIndex);
-      li.add(item);
-    } else {
-      li = super.newListItem(item, beforeIndex);
-    }
-    return li;
   }
 
   public void addAndSelect(Widget w, String text) {

@@ -9,15 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
-import com.github.gwtbootstrap.client.ui.NavPills;
+import com.github.gwtbootstrap.client.ui.NavTabs;
 
 /**
- * Tab panel with pills.
+ *
  */
-public class PillsTabPanel extends AbstractTabPanel {
+public class NavTabsPanel extends AbstractTabPanel {
 
-  public PillsTabPanel() {
-    super(new NavPills());
+  public NavTabsPanel() {
+    super(new NavTabs());
   }
 
 }

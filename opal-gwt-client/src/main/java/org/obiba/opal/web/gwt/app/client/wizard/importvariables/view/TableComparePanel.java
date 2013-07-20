@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.importvariables.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
+import org.obiba.opal.web.gwt.app.client.workbench.view.NavTabsPanel;
 import org.obiba.opal.web.gwt.app.client.workbench.view.PropertiesTable;
 import org.obiba.opal.web.model.client.magma.ConflictDto;
 import org.obiba.opal.web.model.client.magma.TableCompareDto;
@@ -58,8 +58,8 @@ public class TableComparePanel extends FlowPanel {
     return properties;
   }
 
-  private HorizontalTabLayout initVariableChangesPanel() {
-    HorizontalTabLayout tabs = new HorizontalTabLayout();
+  private NavTabsPanel initVariableChangesPanel() {
+    NavTabsPanel tabs = new NavTabsPanel();
     tabs.addStyleName("top-margin");
 
     JsArray<VariableDto> newVariables = JsArrays.toSafeArray(tableCompareDto.getNewVariablesArray());
@@ -88,7 +88,7 @@ public class TableComparePanel extends FlowPanel {
     return tabs;
   }
 
-  private void addConflictsTab(JsArray<ConflictDto> conflicts, HorizontalTabLayout variableChangesPanel) {
+  private void addConflictsTab(JsArray<ConflictDto> conflicts, NavTabsPanel variableChangesPanel) {
     TableCompareConflictsTable variableConflictsDetails = new TableCompareConflictsTable();
     variableConflictsDetails.getVariableNameColumn().setFieldUpdater(conflictFieldUpdater);
 
@@ -99,7 +99,7 @@ public class TableComparePanel extends FlowPanel {
     dataProvider.setArray(conflicts);
   }
 
-  private void addVariablesTab(JsArray<VariableDto> variables, HorizontalTabLayout variableChangesPanel,
+  private void addVariablesTab(JsArray<VariableDto> variables, NavTabsPanel variableChangesPanel,
       String tabTitle) {
     TableCompareVariablesTable variablesDetails = new TableCompareVariablesTable();
     variablesDetails.getVariableNameColumn().setFieldUpdater(variableFieldUpdater);
@@ -111,7 +111,7 @@ public class TableComparePanel extends FlowPanel {
     dataProvider.setArray(variables);
   }
 
-  private <T extends JavaScriptObject> SimplePager addTab(HorizontalTabLayout tabs, String tabTitle,
+  private <T extends JavaScriptObject> SimplePager addTab(NavTabsPanel tabs, String tabTitle,
       CellTable<T> table) {
     FlowPanel panel = new FlowPanel();
     SimplePager pager = new SimplePager();

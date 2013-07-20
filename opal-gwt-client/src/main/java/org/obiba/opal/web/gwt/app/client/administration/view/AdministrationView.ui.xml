@@ -167,7 +167,7 @@
       </b:FluidRow>
     </g:FlowPanel>
     <!--<g:HTMLPanel addStyleNames="administration">-->
-      <!--<o:HorizontalTabLayout ui:field="administrationDisplays"/>-->
+      <!--<o:NavTabsPanel ui:field="administrationDisplays"/>-->
     <!--</g:HTMLPanel>-->
   </g:FlowPanel>
 </ui:UiBinder>

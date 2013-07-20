@@ -7,7 +7,7 @@
 
   <g:FlowPanel>
     <g:Label ui:field="explanation" addStyleNames="bottom-margin" visible="false"></g:Label>
-    <o:HorizontalTabLayout addStyleNames="top-margin">
+    <o:NavTabsPanel addStyleNames="top-margin">
       <g:Anchor>
         <ui:msg description="Users label">Users</ui:msg>
       </g:Anchor>
@@ -16,6 +16,6 @@
         <ui:msg description="Groups label">Groups</ui:msg>
       </g:Anchor>
       <g:SimplePanel ui:field="groups"></g:SimplePanel>
-    </o:HorizontalTabLayout>
+    </o:NavTabsPanel>
   </g:FlowPanel>
 </ui:UiBinder>

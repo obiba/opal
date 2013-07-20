@@ -48,7 +48,7 @@
       </g:FlowPanel>
     </o:PropertiesTable>
 
-    <o:HorizontalTabLayout ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
+    <o:NavTabsPanel ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
       <g:Anchor>
         <ui:msg description="Reports title">Reports</ui:msg>
       </g:Anchor>
@@ -65,7 +65,7 @@
       </g:Anchor>
       <g:SimplePanel ui:field="permissions"></g:SimplePanel>
 
-    </o:HorizontalTabLayout>
+    </o:NavTabsPanel>
 
   </g:FlowPanel>
 

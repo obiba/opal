@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.importvariables.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.project.view.AttributesTable;
 import org.obiba.opal.web.gwt.app.client.project.view.CategoriesTable;
-import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
+import org.obiba.opal.web.gwt.app.client.workbench.view.NavTabsPanel;
 import org.obiba.opal.web.gwt.app.client.workbench.view.PropertiesTable;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -55,8 +55,8 @@ public class TableCompareVariablePanel extends FlowPanel {
     return properties;
   }
 
-  private HorizontalTabLayout initTabs() {
-    HorizontalTabLayout tabs = new HorizontalTabLayout();
+  private NavTabsPanel initTabs() {
+    NavTabsPanel tabs = new NavTabsPanel();
     tabs.addStyleName("top-margin");
     tabs.add(initTablePanel(new CategoriesTable(variableDto)), translations.categoriesLabel());
     tabs.add(initTablePanel(new AttributesTable(variableDto)), translations.attributesLabel());

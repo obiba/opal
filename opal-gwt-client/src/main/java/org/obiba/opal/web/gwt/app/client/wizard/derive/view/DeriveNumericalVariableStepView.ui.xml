@@ -14,7 +14,7 @@
 
   <g:FlowPanel>
     <o:WizardStep ui:field="methodStep">
-      <o:HorizontalTabLayout ui:field="tabs" addStyleNames="top-margin">
+      <o:NavTabsPanel ui:field="tabs" addStyleNames="top-margin">
         <g:Anchor>
           <ui:msg description="Options title">Options</ui:msg>
         </g:Anchor>
@@ -115,7 +115,7 @@
           <ui:msg description="Summary tab title">Summary</ui:msg>
         </g:Anchor>
         <g:SimplePanel ui:field="summary" width="100%"/>
-      </o:HorizontalTabLayout>
+      </o:NavTabsPanel>
     </o:WizardStep>
     <o:WizardStep ui:field="mapStep">
       <g:FlowPanel>

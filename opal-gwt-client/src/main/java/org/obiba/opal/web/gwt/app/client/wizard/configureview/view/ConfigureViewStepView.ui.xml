@@ -28,7 +28,7 @@
       <g:center>
         <g:ScrollPanel>
           <g:FlowPanel addStyleNames="{style.content-margin}">
-            <o:HorizontalTabLayout ui:field="viewTabs" addStyleNames="small-top-margin">
+            <o:NavTabsPanel ui:field="viewTabs" addStyleNames="small-top-margin">
               <g:Anchor>
                 <ui:msg description="Data label">Data</ui:msg>
               </g:Anchor>
@@ -37,7 +37,7 @@
                 <ui:msg description="Variables label">Variables</ui:msg>
               </g:Anchor>
               <g:SimplePanel ui:field="variablesTabPanel"/>
-            </o:HorizontalTabLayout>
+            </o:NavTabsPanel>
 
             <g:DeckPanel ui:field="helpPanelDecks">
               <g:FlowPanel>

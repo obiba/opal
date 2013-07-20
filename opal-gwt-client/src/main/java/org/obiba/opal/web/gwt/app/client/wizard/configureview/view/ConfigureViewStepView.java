@@ -10,7 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
-import org.obiba.opal.web.gwt.app.client.workbench.view.HorizontalTabLayout;
+import org.obiba.opal.web.gwt.app.client.workbench.view.NavTabsPanel;
 import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Tooltip;
 
@@ -58,7 +58,7 @@ public class ConfigureViewStepView extends PopupViewImpl implements ConfigureVie
   SimplePanel variablesTabPanel;
 
   @UiField
-  HorizontalTabLayout viewTabs;
+  NavTabsPanel viewTabs;
 
   @UiField
   Button close;
@@ -109,7 +109,7 @@ public class ConfigureViewStepView extends PopupViewImpl implements ConfigureVie
   }
 
   @Override
-  public HorizontalTabLayout getViewTabs() {
+  public NavTabsPanel getViewTabs() {
     return viewTabs;
   }
 

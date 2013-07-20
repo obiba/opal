@@ -57,7 +57,7 @@
       <g:RadioButton ui:field="unrestricted" name="level" addStyleNames="block small-top-margin"><ui:msg description="DataShield Unrestricted Method">Unrestricted</ui:msg></g:RadioButton>
     </g:FlowPanel>
 
-    <o:HorizontalTabLayout ui:field="environments" addStyleNames="panel"/>
+    <o:NavTabsPanel ui:field="environments" addStyleNames="panel"/>
 
     <g:FlowPanel ui:field="permissionsPanel" addStyleNames="panel">
       <g:FlowPanel addStyleNames="title">

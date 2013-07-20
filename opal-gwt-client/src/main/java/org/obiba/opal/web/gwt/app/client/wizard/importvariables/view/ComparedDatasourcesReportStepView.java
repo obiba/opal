@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
-import org.obiba.opal.web.gwt.app.client.workbench.view.BreadCrumbTabLayout;
+import org.obiba.opal.web.gwt.app.client.workbench.view.BreadcrumbsTabPanel;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.model.client.magma.ConflictDto;
 import org.obiba.opal.web.model.client.magma.TableCompareDto;
@@ -59,7 +59,7 @@ public class ComparedDatasourcesReportStepView extends ViewImpl
   HTMLPanel help;
 
   @UiField
-  BreadCrumbTabLayout tableTabs;
+  BreadcrumbsTabPanel tableTabs;
 
   @UiField(provided = true)
   Table<TableComparison> tableList;

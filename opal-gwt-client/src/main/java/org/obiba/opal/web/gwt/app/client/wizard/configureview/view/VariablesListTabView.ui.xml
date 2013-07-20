@@ -93,7 +93,7 @@
       </g:FlowPanel>
     </g:FlowPanel>
 
-    <o:HorizontalTabLayout ui:field="variableDetailTabs" addStyleNames="top-margin">
+    <o:NavTabsPanel ui:field="variableDetailTabs" addStyleNames="top-margin">
       <g:Anchor>
         <ui:msg description="Script label">Script</ui:msg>
       </g:Anchor>
@@ -138,6 +138,6 @@
       </g:Anchor>
       <g:SimplePanel ui:field="summaryTabPanel" width="100%"/>
 
-    </o:HorizontalTabLayout>
+    </o:NavTabsPanel>
   </g:FlowPanel>
 </ui:UiBinder>

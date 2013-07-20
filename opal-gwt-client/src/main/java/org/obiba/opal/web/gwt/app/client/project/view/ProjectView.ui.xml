@@ -46,7 +46,7 @@
         </b:Paragraph>
       </b:Tab>
       <b:Tab icon="BOOK">
-        <o:PillsTabPanel>
+        <o:NavPillsPanel>
           <b:NavLink active="true">Settings</b:NavLink>
           <g:FlowPanel>
             <b:WellForm>
@@ -72,7 +72,7 @@
           <g:FlowPanel/>
           <b:NavLink>Units</b:NavLink>
           <g:FlowPanel/>
-        </o:PillsTabPanel>
+        </o:NavPillsPanel>
       </b:Tab>
     </b:TabPanel>
     <g:FlowPanel ui:field="content"></g:FlowPanel>
