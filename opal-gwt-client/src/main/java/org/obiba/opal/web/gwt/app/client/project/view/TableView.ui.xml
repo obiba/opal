@@ -18,7 +18,7 @@
           <ui:msg description="Download view label">Download view</ui:msg>
         </b:NavLink>
       </b:DropdownButton>
-      <b:DropdownButton text="Tasks" size="SMALL" icon="COG" ui:field="tasksBtn">
+      <b:DropdownButton text="Tasks" size="SMALL" icon="TASKS" ui:field="tasksBtn">
         <b:NavLink icon="SIGNOUT" ui:field="exportData">
           <ui:msg description="Export data label">Export data...</ui:msg>
         </b:NavLink>

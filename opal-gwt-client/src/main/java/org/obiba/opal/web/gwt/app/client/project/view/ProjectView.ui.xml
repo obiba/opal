@@ -20,7 +20,8 @@
 
         </b:Column>
       </b:FluidRow>
-      <g:InlineLabel ui:field="description"></g:InlineLabel><b:Button type="LINK" icon="PLUS_SIGN" ui:field="ellipsis"/>
+      <g:InlineLabel ui:field="description"></g:InlineLabel>
+      <b:Button type="LINK" icon="PLUS_SIGN" ui:field="ellipsis"/>
     </g:FlowPanel>
     <b:TabPanel tabPosition="right" ui:field="tabPanel">
       <b:Tab icon="TABLE" active="true">
@@ -38,8 +39,20 @@
           huhuhu hahha
         </b:Paragraph>
       </b:Tab>
+      <b:Tab icon="FILE_ALT">
+        <b:Heading size="5" addStyleNames="no-top-margin">Reports</b:Heading>
+        <b:Paragraph>
+          huhuhu hahha
+        </b:Paragraph>
+      </b:Tab>
       <b:Tab icon="TASKS">
         <b:Heading size="5" addStyleNames="no-top-margin">Tasks</b:Heading>
+        <b:Paragraph>
+          huhuhu hahha
+        </b:Paragraph>
+      </b:Tab>
+      <b:Tab icon="LOCK">
+        <b:Heading size="5" addStyleNames="no-top-margin">Permissions</b:Heading>
         <b:Paragraph>
           huhuhu hahha
         </b:Paragraph>
@@ -49,28 +62,79 @@
         <o:NavPillsPanel>
           <b:NavLink active="true">Settings</b:NavLink>
           <g:FlowPanel>
-            <b:WellForm>
-              <b:ControlGroup>
-                <b:ControlLabel for="input01">Name</b:ControlLabel>
-                <b:Controls>
-                  <b:TextBox alternateSize="XLARGE" b:id="input01"></b:TextBox>
-                  <b:HelpBlock>In addition to freeform text, any HTML5 text-based
-                    input appears like so.</b:HelpBlock>
-                </b:Controls>
-              </b:ControlGroup>
-              <b:ControlGroup>
-                <b:ControlLabel for="textarea">Description</b:ControlLabel>
-                <b:Controls>
-                  <b:TextArea alternateSize="XLARGE" b:id="textarea"
-                      visibleLines="3" />
-                </b:Controls>
-              </b:ControlGroup>
-              <b:SubmitButton addStyleNames="btn">Save</b:SubmitButton><b:Button>Cancel</b:Button>
-            </b:WellForm>
+            <b:FluidRow>
+              <b:Column size="6">
+
+                <b:WellNavList>
+                  <b:NavHeader>
+                    <ui:msg description="Project Identification label">Project identification</ui:msg>
+                  </b:NavHeader>
+                  <b:Divider/>
+                  <b:Form>
+                    <b:ControlGroup>
+                      <b:ControlLabel for="input01">Name</b:ControlLabel>
+                      <b:Controls>
+                        <b:TextBox alternateSize="XLARGE" b:id="input01"></b:TextBox>
+                        <b:HelpBlock>The project name is unique.
+                        </b:HelpBlock>
+                      </b:Controls>
+                    </b:ControlGroup>
+                    <b:ControlGroup>
+                      <b:ControlLabel for="textarea">Description</b:ControlLabel>
+                      <b:Controls>
+                        <b:TextArea alternateSize="XLARGE" b:id="textarea"
+                            visibleLines="3"/>
+                      </b:Controls>
+                    </b:ControlGroup>
+                    <b:ControlGroup>
+                      <b:ControlLabel for="input03">Tags</b:ControlLabel>
+                      <b:Controls>
+                        <b:TextBox alternateSize="XLARGE" b:id="input03"></b:TextBox>
+                        <b:HelpBlock>Tags that describe this project.
+                        </b:HelpBlock>
+                      </b:Controls>
+                    </b:ControlGroup>
+                    <b:SubmitButton addStyleNames="btn">Save</b:SubmitButton>
+                  </b:Form>
+                </b:WellNavList>
+              </b:Column>
+              <b:Column size="6">
+                <b:WellNavList>
+                  <b:NavHeader>
+                    <ui:msg description="Data Storage label">Data storage</ui:msg>
+                  </b:NavHeader>
+                  <b:Divider/>
+                  <b:Form>
+                    <b:Paragraph>
+                      The type of storage can only be changed if there are no data.
+                    </b:Paragraph>
+                    <b:ControlGroup>
+                      <b:ControlLabel for="input04">Type</b:ControlLabel>
+                      <b:Controls>
+                        <b:TextBox alternateSize="XLARGE" b:id="input04"></b:TextBox>
+                        <b:HelpBlock>This type of storage has the following properties: ...
+                        </b:HelpBlock>
+                      </b:Controls>
+                    </b:ControlGroup>
+                    <b:SubmitButton addStyleNames="btn">Save</b:SubmitButton>
+                  </b:Form>
+                </b:WellNavList>
+                <b:WellNavList>
+                  <b:NavHeader>
+                    <ui:msg description="Danger Zone label">Danger zone</ui:msg>
+                  </b:NavHeader>
+                  <b:Divider/>
+                  <b:Form>
+                    <b:Paragraph>
+                      Deleting a project destroy all associated data and files. It can be a long running task and there is no going back.
+                    </b:Paragraph>
+                    <b:SubmitButton addStyleNames="btn" type="DANGER">Delete Project</b:SubmitButton>
+                  </b:Form>
+                </b:WellNavList>
+              </b:Column>
+            </b:FluidRow>
           </g:FlowPanel>
-          <b:NavLink>Permissions</b:NavLink>
-          <g:FlowPanel/>
-          <b:NavLink>Units</b:NavLink>
+          <b:NavLink>Organizations</b:NavLink>
           <g:FlowPanel/>
         </o:NavPillsPanel>
       </b:Tab>

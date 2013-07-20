@@ -59,11 +59,14 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     initWidget(uiBinder.createAndBindUi(this));
 
     // TODO translation
-    TabPanelHelper.setTabTitle(tabPanel, 0, "Tables");
-    TabPanelHelper.setTabTitle(tabPanel, 1, "Files");
-    TabPanelHelper.setTabTitle(tabPanel, 2, "Data visualization");
-    TabPanelHelper.setTabTitle(tabPanel, 3, "Tasks");
-    TabPanelHelper.setTabTitle(tabPanel, 4, "Administration");
+    int i = 0;
+    TabPanelHelper.setTabTitle(tabPanel, i++, "Tables");
+    TabPanelHelper.setTabTitle(tabPanel, i++, "Files");
+    TabPanelHelper.setTabTitle(tabPanel, i++, "Data visualization");
+    TabPanelHelper.setTabTitle(tabPanel, i++, "Reports");
+    TabPanelHelper.setTabTitle(tabPanel, i++, "Tasks");
+    TabPanelHelper.setTabTitle(tabPanel, i++, "Permissions");
+    TabPanelHelper.setTabTitle(tabPanel, i++, "Administration");
   }
 
   @Override
