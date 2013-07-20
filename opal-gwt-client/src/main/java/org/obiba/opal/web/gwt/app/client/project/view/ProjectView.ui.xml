@@ -24,28 +24,28 @@
     </g:FlowPanel>
     <b:TabPanel tabPosition="right" ui:field="tabPanel">
       <b:Tab icon="TABLE" active="true">
+        <b:Heading size="5" addStyleNames="no-top-margin">Tables</b:Heading>
         <b:Breadcrumbs ui:field="magmacrumbs"/>
         <g:SimplePanel ui:field="tablesPanel"/>
       </b:Tab>
-      <b:Tab icon="FILE">
-        <b:Heading size="5">Files</b:Heading>
-        <b:Paragraph>
-          huhuhu hahha
-        </b:Paragraph>
+      <b:Tab icon="HDD">
+        <b:Heading size="5" addStyleNames="no-top-margin">Files</b:Heading>
+        <g:SimplePanel ui:field="filesPanel"/>
       </b:Tab>
       <b:Tab icon="BAR_CHART">
-        <b:Heading size="5">Data visualization</b:Heading>
+        <b:Heading size="5" addStyleNames="no-top-margin">Data visualization</b:Heading>
         <b:Paragraph>
           huhuhu hahha
         </b:Paragraph>
       </b:Tab>
       <b:Tab icon="TASKS">
-        <b:Heading size="5">Tasks</b:Heading>
+        <b:Heading size="5" addStyleNames="no-top-margin">Tasks</b:Heading>
         <b:Paragraph>
           huhuhu hahha
         </b:Paragraph>
       </b:Tab>
       <b:Tab icon="BOOK">
+        <b:Heading size="5" addStyleNames="no-top-margin">Administration</b:Heading>
         <o:NavPillsPanel>
           <b:NavLink active="true">Settings</b:NavLink>
           <g:FlowPanel>

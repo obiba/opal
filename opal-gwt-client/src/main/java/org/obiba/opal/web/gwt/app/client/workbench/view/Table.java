@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.workbench.view;
 
 import com.github.gwtbootstrap.client.ui.CellTable;
 
+import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
@@ -37,6 +38,7 @@ public class Table<T> extends CellTable<T> {
     super(pageSize);
     setStriped(true);
     setCondensed(true);
+    setEmptyTableWidget(new InlineLabel("No items."));
   }
 
   public Table(int pageSize, ProvidesKey<T> keyProvider) {

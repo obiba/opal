@@ -58,6 +58,10 @@ li {
   margin-right: 2.4em;
 }
 
+.no-top-margin {
+  margin-top: 0;
+}
+
 .small-top-margin {
   margin-top: 0.4em;
 }

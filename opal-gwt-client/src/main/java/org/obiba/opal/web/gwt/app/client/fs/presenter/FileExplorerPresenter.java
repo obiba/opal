@@ -9,14 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
-import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRefreshedEvent;
-import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SplitPaneWorkbenchPresenter;
@@ -34,18 +32,9 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.annotations.NameToken;
-import com.gwtplatform.mvp.client.annotations.ProxyStandard;
-import com.gwtplatform.mvp.client.annotations.TitleFunction;
-import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
-public class FileExplorerPresenter
-    extends SplitPaneWorkbenchPresenter<FileExplorerPresenter.Display, FileExplorerPresenter.Proxy>
+public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter.Display>
     implements FileExplorerUiHandlers {
-
-  @ProxyStandard
-  @NameToken(Places.files)
-  public interface Proxy extends ProxyPlace<FileExplorerPresenter> {}
 
   private final FilePathPresenter filePathPresenter;
 
@@ -61,11 +50,10 @@ public class FileExplorerPresenter
 
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
-  public FileExplorerPresenter(Display display, EventBus eventBus, Proxy proxy,
-      FilePathPresenter filePathPresenter,
+  public FileExplorerPresenter(Display display, EventBus eventBus, FilePathPresenter filePathPresenter,
       FileSystemTreePresenter fileSystemTreePresenter, FolderDetailsPresenter folderDetailsPresenter,
       FileUploadDialogPresenter fileUploadDialogPresenter, CreateFolderDialogPresenter createFolderDialogPresenter) {
-    super(eventBus, display, proxy);
+    super(eventBus, display);
     this.filePathPresenter = filePathPresenter;
     this.fileSystemTreePresenter = fileSystemTreePresenter;
     this.folderDetailsPresenter = folderDetailsPresenter;
@@ -75,6 +63,14 @@ public class FileExplorerPresenter
   }
 
   @Override
+  protected void onBind() {
+    super.onBind();
+    addEventHandlers();
+    for(SplitPaneWorkbenchPresenter.Slot slot : SplitPaneWorkbenchPresenter.Slot.values()) {
+      setInSlot(slot, getDefaultPresenter(slot));
+    }
+  }
+
   protected PresenterWidget<?> getDefaultPresenter(SplitPaneWorkbenchPresenter.Slot slot) {
     switch(slot) {
       case TOP:
@@ -85,31 +81,6 @@ public class FileExplorerPresenter
         return fileSystemTreePresenter;
     }
     return null;
-  }
-
-  @Override
-  public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
-  }
-
-  @Override
-  @TitleFunction
-  public String getTitle() {
-    return translations.pageFileExplorerTitle();
-  }
-
-  @Override
-  public String getName() {
-    return getTitle();
-  }
-
-  @Override
-  public void authorize(HasAuthorization authorizer) {
-  }
-
-  @Override
-  protected void onBind() {
-    super.onBind();
-    addEventHandlers();
   }
 
   private void authorizeFile(FileDto dto) {
@@ -158,7 +129,6 @@ public class FileExplorerPresenter
   }
 
   private void addEventHandlers() {
-
     registerHandler(
         getEventBus().addHandler(FileSelectionChangeEvent.getType(), new FileSelectionChangeEvent.Handler() {
 

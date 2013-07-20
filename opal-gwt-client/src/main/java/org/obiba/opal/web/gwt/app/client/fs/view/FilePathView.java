@@ -27,7 +27,6 @@ public class FilePathView extends ViewImpl implements FilePathPresenter.Display 
 
   private final Breadcrumbs filecrumbs;
 
-  @Inject
   public FilePathView() {
     filecrumbs = new Breadcrumbs();
   }

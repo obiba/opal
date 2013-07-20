@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.administration.presenter;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
+import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
 import com.google.gwt.core.client.GWT;
@@ -18,6 +19,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.proxy.Proxy;
+import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
 /**
  * Base class for presenting administration widgets.
@@ -29,6 +31,11 @@ public abstract class ItemAdministrationPresenter<D extends View, P extends Prox
 
   public ItemAdministrationPresenter(EventBus eventBus, D display, P p) {
     super(eventBus, display, p);
+  }
+
+  @Override
+  protected void revealInParent() {
+    RevealContentEvent.fire(this, PageContainerPresenter.CONTENT, this);
   }
 
   public abstract String getName();

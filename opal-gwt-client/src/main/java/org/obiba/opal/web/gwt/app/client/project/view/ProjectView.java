@@ -43,9 +43,11 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   @UiField
   TabPanel tabPanel;
 
-
   @UiField
   Panel tablesPanel;
+
+  @UiField
+  Panel filesPanel;
 
   @UiField
   Breadcrumbs magmacrumbs;
@@ -119,6 +121,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     if(slot == ProjectPresenter.TABLES_PANE) {
       tablesPanel.clear();
       tablesPanel.add(content);
+    } else if (slot == ProjectPresenter.FILES_PANE) {
+      filesPanel.clear();
+      filesPanel.add(content);
     }
   }
 
@@ -127,7 +132,7 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     link.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-       getUiHandlers().onDatasourceSelection(name);
+        getUiHandlers().onDatasourceSelection(name);
       }
     });
     return link;

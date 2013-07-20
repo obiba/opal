@@ -1747,8 +1747,8 @@ public interface Translations extends Constants {
   @DefaultStringValue("R")
   String pageRConfigTitle();
 
-  @Description("Page File Explorer title")
-  @DefaultStringValue("File Explorer")
+  @Description("Page Files title")
+  @DefaultStringValue("Files")
   String pageFileExplorerTitle();
 
   @Description("Page Functional Unit title")

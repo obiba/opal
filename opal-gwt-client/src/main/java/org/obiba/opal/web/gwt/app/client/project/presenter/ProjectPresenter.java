@@ -1,5 +1,6 @@
 package org.obiba.opal.web.gwt.app.client.project.presenter;
 
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.project.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.project.event.TableSelectionChangeEvent;
@@ -40,6 +41,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   public static final GwtEvent.Type<RevealContentHandler<?>> ADMIN_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
 
 
+  private final FileExplorerPresenter fileExplorerPresenter;
+
   private final PlaceManager placeManager;
 
   private String name;
@@ -50,11 +53,12 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   @Inject
   public ProjectPresenter(EventBus eventBus, Display display, Proxy proxy, Translations translations,
-      PlaceManager placeManager) {
+      PlaceManager placeManager, FileExplorerPresenter fileExplorerPresenter) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
     this.translations = translations;
     this.placeManager = placeManager;
+    this.fileExplorerPresenter = fileExplorerPresenter;
   }
 
   @Override
@@ -63,6 +67,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     addRegisteredHandler(DatasourceSelectionChangeEvent.getType(), this);
     addRegisteredHandler(TableSelectionChangeEvent.getType(), this);
     addRegisteredHandler(VariableSelectionChangeEvent.getType(), this);
+
+    setInSlot(FILES_PANE, fileExplorerPresenter);
   }
 
   @Override

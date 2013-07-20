@@ -35,8 +35,7 @@ public class FileSystemModule extends AbstractPresenterModule {
 
   @Override
   protected void configure() {
-    bindPresenter(FileExplorerPresenter.class, FileExplorerPresenter.Display.class, FileExplorerView.class,
-        FileExplorerPresenter.Proxy.class);
+    bindPresenterWidget(FileExplorerPresenter.class, FileExplorerPresenter.Display.class, FileExplorerView.class);
     bindPresenterWidget(FolderDetailsPresenter.class, FolderDetailsPresenter.Display.class, FolderDetailsView.class);
     bindPresenterWidget(FileSystemTreePresenter.class, FileSystemTreePresenter.Display.class, FileSystemTreeView.class);
     bindPresenterWidget(FilePathPresenter.class, FilePathPresenter.Display.class, FilePathView.class);
