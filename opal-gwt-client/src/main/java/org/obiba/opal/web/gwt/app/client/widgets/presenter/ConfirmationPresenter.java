@@ -14,18 +14,17 @@ import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PopupView;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
 /**
  *
  */
-public class ConfirmationPresenter extends PresenterWidget<ConfirmationPresenter.Display> {
+public class ConfirmationPresenter extends PresenterWidget<ConfirmationPresenter.Display>
+    implements ConfirmationUiHandlers {
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -43,11 +42,13 @@ public class ConfirmationPresenter extends PresenterWidget<ConfirmationPresenter
   public ConfirmationPresenter(Display display, EventBus eventBus, Object confirmationRequiredSource) {
     super(eventBus, display);
     this.confirmationRequiredSource = confirmationRequiredSource;
+    getView().setUiHandlers(this);
   }
 
   @Override
   protected void onBind() {
-    addEventHandlers();
+    super.onBind();
+    registerHandler(getEventBus().addHandler(ConfirmationRequiredEvent.getType(), new ConfirmationRequiredHandler()));
   }
 
   @Override
@@ -59,29 +60,23 @@ public class ConfirmationPresenter extends PresenterWidget<ConfirmationPresenter
   // Methods
   //
 
-  private void addEventHandlers() {
-    addConfirmationRequiredHandler();
-    addYesButtonHandler();
-    addNoButtonHandler();
+  @Override
+  public void onYes() {
+    getEventBus().fireEvent(new ConfirmationEvent(confirmationRequiredSource, true));
+    getView().hideDialog();
   }
 
-  private void addConfirmationRequiredHandler() {
-    registerHandler(getEventBus().addHandler(ConfirmationRequiredEvent.getType(), new ConfirmationRequiredHandler()));
-  }
-
-  private void addYesButtonHandler() {
-    registerHandler(getView().addYesButtonHandler(new YesButtonHandler()));
-  }
-
-  private void addNoButtonHandler() {
-    registerHandler(getView().addNoButtonHandler(new NoButtonHandler()));
+  @Override
+  public void onNo() {
+    getEventBus().fireEvent(new ConfirmationEvent(confirmationRequiredSource, false));
+    getView().hideDialog();
   }
 
   //
   // Inner Classes / Interfaces
   //
 
-  public interface Display extends PopupView {
+  public interface Display extends View, HasUiHandlers<ConfirmationUiHandlers> {
 
     void setConfirmationTitle(String title);
 
@@ -90,10 +85,6 @@ public class ConfirmationPresenter extends PresenterWidget<ConfirmationPresenter
     void showDialog();
 
     void hideDialog();
-
-    HandlerRegistration addYesButtonHandler(ClickHandler clickHandler);
-
-    HandlerRegistration addNoButtonHandler(ClickHandler clickHandler);
   }
 
   class ConfirmationRequiredHandler implements ConfirmationRequiredEvent.Handler {
@@ -108,24 +99,6 @@ public class ConfirmationPresenter extends PresenterWidget<ConfirmationPresenter
           ? event.getMessage()
           : translations.confirmationMessageMap().get(event.getMessageKey()));
       onReveal();
-    }
-  }
-
-  class YesButtonHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent event) {
-      getEventBus().fireEvent(new ConfirmationEvent(confirmationRequiredSource, true));
-      getView().hideDialog();
-    }
-  }
-
-  class NoButtonHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent event) {
-      getEventBus().fireEvent(new ConfirmationEvent(confirmationRequiredSource, false));
-      getView().hideDialog();
     }
   }
 }

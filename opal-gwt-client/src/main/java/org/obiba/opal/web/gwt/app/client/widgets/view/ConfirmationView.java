@@ -10,54 +10,39 @@
 package org.obiba.opal.web.gwt.app.client.widgets.view;
 
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationUiHandlers;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.Modal;
+import com.github.gwtbootstrap.client.ui.Paragraph;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PopupViewImpl;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 /**
  *
  */
-public class ConfirmationView extends PopupViewImpl implements Display {
+public class ConfirmationView extends ViewWithUiHandlers<ConfirmationUiHandlers> implements Display {
 
-  @UiTemplate("ConfirmationView.ui.xml")
-  interface ConfirmationViewUiBinder extends UiBinder<Widget, ConfirmationView> {}
+  interface Binder extends UiBinder<Widget, ConfirmationView> {}
 
   //
   // Constants
   //
-
-  private static final String DIALOG_HEIGHT = "15em";
-
-  private static final String DIALOG_WIDTH = "30em";
-
-  //
-  // Static Variables
-  //
-
-  private static final ConfirmationViewUiBinder uiBinder = GWT.create(ConfirmationViewUiBinder.class);
-
-  private final Widget widget;
 
   //
   // Instance Variables
   //
 
   @UiField
-  DialogBox dialogBox;
+  Modal dialogBox;
 
   @UiField
-  HTML message;
+  Paragraph message;
 
   @UiField
   Button yesButton;
@@ -69,12 +54,8 @@ public class ConfirmationView extends PopupViewImpl implements Display {
   // Constructors
   //
   @Inject
-  public ConfirmationView(EventBus eventBus) {
-    super(eventBus);
-    widget = uiBinder.createAndBindUi(this);
-
-    dialogBox.setHeight(DIALOG_HEIGHT);
-    dialogBox.setWidth(DIALOG_WIDTH);
+  public ConfirmationView(Binder uiBinder) {
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
   //
@@ -83,38 +64,32 @@ public class ConfirmationView extends PopupViewImpl implements Display {
 
   @Override
   public void showDialog() {
-    center();
-    show();
+    dialogBox.show();
   }
 
   @Override
   public void hideDialog() {
-    hide();
+    dialogBox.hide();
   }
 
   @Override
   public void setConfirmationTitle(String title) {
-    dialogBox.setText(title);
+    dialogBox.setTitle(title);
   }
 
   @Override
   public void setConfirmationMessage(String message) {
-    this.message.setHTML(message);
+    this.message.setText(message);
   }
 
-  @Override
-  public HandlerRegistration addYesButtonHandler(ClickHandler clickHandler) {
-    return yesButton.addClickHandler(clickHandler);
+  @UiHandler("yesButton")
+  public void onYes(ClickEvent event) {
+    getUiHandlers().onYes();
   }
 
-  @Override
-  public HandlerRegistration addNoButtonHandler(ClickHandler clickHandler) {
-    return noButton.addClickHandler(clickHandler);
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
+  @UiHandler("noButton")
+  public void onNo(ClickEvent event) {
+    getUiHandlers().onNo();
   }
 
 }
