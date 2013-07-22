@@ -47,6 +47,7 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -76,8 +77,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   private static final Integer VARIABLES_TAB_INDEX = 0;
 
   private static final Integer VALUES_TAB_INDEX = 1;
-
-  private final List<Anchor> tables = new ArrayList<Anchor>();
 
   private boolean hasLinkAuthorization = true;
 
@@ -328,26 +327,23 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     } else {
       fromTable.setVisible(true);
       fromTableLinks.clear();
-      tables.clear();
       for(int i = 0; i < tableNames.length(); i++) {
+        final String tableFullName = tableNames.get(i);
         Anchor a = new Anchor();
-        a.setText(tableNames.get(i));
+        a.setText(tableFullName);
+        a.addClickHandler(new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            getUiHandlers().onFromTable(tableFullName);
+          }
+        });
         fromTableLinks.add(a);
 
-        tables.add(a);
-
         if(i < tableNames.length() - 1) {
-          Label l = new Label(", ");
-          l.addStyleName("inline");
-          fromTableLinks.add(l);
+          fromTableLinks.add(new InlineLabel(", "));
         }
       }
     }
-  }
-
-  @Override
-  public List<Anchor> getFromTablesAnchor() {
-    return tables;
   }
 
   @UiHandler("downloadDictionary")

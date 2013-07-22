@@ -34,4 +34,6 @@ public interface TableUiHandlers extends UiHandlers {
 
   void onIndexSchedule();
 
+  void onFromTable(String tableFullName);
+
 }

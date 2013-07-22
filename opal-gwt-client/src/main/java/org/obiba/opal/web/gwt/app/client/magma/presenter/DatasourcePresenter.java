@@ -179,7 +179,6 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   @Override
   public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
-    GWT.log("ds=" + event.getSelection());
     datasourceName = event.getSelection();
     initDatasource();
   }

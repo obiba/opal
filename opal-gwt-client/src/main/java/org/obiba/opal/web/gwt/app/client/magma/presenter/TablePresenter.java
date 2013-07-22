@@ -27,7 +27,6 @@ import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexStatusRefreshEven
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationRequiredEvent;
@@ -58,8 +57,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.cellview.client.Column;
@@ -69,12 +66,11 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.HasUiHandlers;
-import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.annotations.ProxyEvent;
-import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 
 import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
@@ -82,7 +78,8 @@ import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_OK;
 import static com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE;
 
-public class TablePresenter extends PresenterWidget<TablePresenter.Display> implements TableUiHandlers, TableSelectionChangeEvent.Handler {
+public class TablePresenter extends PresenterWidget<TablePresenter.Display>
+    implements TableUiHandlers, TableSelectionChangeEvent.Handler {
 
   private static final int DELAY_MILLIS = 1000;
 
@@ -113,6 +110,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display> impl
 
   private Column<?, ?> sortColumn;
 
+  private boolean tableUpdatePending = false;
+
   /**
    * @param display
    * @param eventBus
@@ -135,7 +134,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display> impl
       updateDisplay(e.getDatasourceName(), e.getTableName(), e.getPrevious(), e.getNext());
     }
   }
-
 
   @Override
   protected void onBind() {
@@ -186,12 +184,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display> impl
     return UriBuilder.create().segment("datasource", "{}", "table", "{}", "index").build(datasource, table);
   }
 
-  @Override
-  protected void onReveal() {
-    super.onReveal();
-    authorize();
-  }
-
   private void authorize() {
     if(table == null) return;
 
@@ -228,18 +220,21 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display> impl
   }
 
   private void updateDisplay(String datasourceName, String tableName, final String previous, final String next) {
-    if(table != null && table.getDatasourceName().equals(datasourceName) && table.getName().equals(tableName)) {
-      updateDisplay(table, previous, next);
-    } else {
-      UriBuilder ub = UriBuilder.create().segment("datasource", "{}", "table", "{}").query("counts", "true");
-      ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(datasourceName, tableName)).get()
-          .withCallback(new ResourceCallback<TableDto>() {
-            @Override
-            public void onResource(Response response, TableDto resource) {
+    if(table != null && table.getDatasourceName().equals(datasourceName) && table.getName().equals(tableName)) return;
+    if(tableUpdatePending) return;
+
+    tableUpdatePending = true;
+    UriBuilder ub = UriBuilder.create().segment("datasource", "{}", "table", "{}").query("counts", "true");
+    ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(datasourceName, tableName)).get()
+        .withCallback(new ResourceCallback<TableDto>() {
+          @Override
+          public void onResource(Response response, TableDto resource) {
+            if(resource != null) {
               updateDisplay(resource, previous, next);
             }
-          }).send();
-    }
+            tableUpdatePending = false;
+          }
+        }).send();
   }
 
   private void updateDisplay(TableDto tableDto, String previous, String next) {
@@ -253,12 +248,17 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display> impl
     getView().setPreviousName(previous);
     getView().setNextName(next);
 
+    if(tableIsView()) {
+      showFromTables(table);
+    }
+
     if(getView().isValuesTabSelected()) {
       valuesTablePresenter.setTable(tableDto);
     }
 
     updateVariables();
     updateTableIndexStatus();
+    authorize();
   }
 
   private void showFromTables(TableDto tableDto) {// Show from tables
@@ -493,6 +493,12 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display> impl
     addToPopupSlot(dialog);
   }
 
+  @Override
+  public void onFromTable(String tableFullName) {
+    String[] s = tableFullName.split("\\.");
+    getEventBus().fireEvent(new TableSelectionChangeEvent(this, s[0], s[1]));
+  }
+
   private final class ValuesCommand implements Command {
 
     @Override
@@ -636,22 +642,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display> impl
     public void onResource(Response response, JsArray<ViewDto> resource) {
       ViewDto viewDto = ViewDto.get(JsArrays.toSafeArray(resource));
       getView().setFromTables(viewDto.getFromArray());
-
-      // Add click handlers
-      for(Anchor tableLink : getView().getFromTablesAnchor()) {
-        updateFromTableLink(tableLink);
-      }
-    }
-
-    private void updateFromTableLink(Anchor tableLink) {
-      final String[] s = tableLink.getText().split("\\.");
-
-      tableLink.addClickHandler(new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent event) {
-          getEventBus().fireEvent(new TableSelectionChangeEvent(TablePresenter.this, s[0], s[1]));
-        }
-      });
     }
   }
 
@@ -774,8 +764,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display> impl
     void setIndexStatusAlert(TableIndexStatusDto statusDto);
 
     void setFromTables(JsArrayString tables);
-
-    List<Anchor> getFromTablesAnchor();
 
     HandlerRegistration addFilterVariableHandler(KeyUpHandler handler);
 

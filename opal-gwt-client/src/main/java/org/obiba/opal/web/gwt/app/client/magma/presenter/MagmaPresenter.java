@@ -45,12 +45,16 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
 
   @Override
   public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
-    getView().selectDatasource(event.getSelection());
+    if(!equals(event.getSource())) {
+      getView().selectDatasource(event.getSelection());
+    }
   }
 
   @Override
   public void onTableSelectionChanged(TableSelectionChangeEvent event) {
-    getView().selectTable(event.getDatasourceName(), event.getTableName());
+    if(!equals(event.getSource())) {
+      getView().selectTable(event.getDatasourceName(), event.getTableName());
+    }
   }
 
   @Override
