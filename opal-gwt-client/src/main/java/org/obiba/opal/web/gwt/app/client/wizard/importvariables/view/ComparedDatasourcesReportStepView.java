@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.importvariables.view;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.BreadcrumbsTabPanel;
@@ -31,6 +32,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.MultiSelectionModel;
@@ -46,7 +48,7 @@ public class ComparedDatasourcesReportStepView extends ViewImpl
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private final Widget uiWidget;
+  private static final Translations translations = GWT.create(Translations.class);
 
   //
   // Instance Variables
@@ -61,8 +63,7 @@ public class ComparedDatasourcesReportStepView extends ViewImpl
   @UiField
   BreadcrumbsTabPanel tableTabs;
 
-  @UiField(provided = true)
-  Table<TableComparison> tableList;
+  private TableComparisonsTable tableList;
 
   private List<TableComparison> tableComparisons = new ArrayList<TableComparison>();
 
@@ -73,9 +74,8 @@ public class ComparedDatasourcesReportStepView extends ViewImpl
   //
 
   public ComparedDatasourcesReportStepView() {
+    initWidget(uiBinder.createAndBindUi(this));
     initTableList();
-    uiWidget = uiBinder.createAndBindUi(this);
-
     ignoreAllModifications.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 
       @Override
@@ -86,17 +86,17 @@ public class ComparedDatasourcesReportStepView extends ViewImpl
   }
 
   private void initTableList() {
-    TableComparisonsTable table = new TableComparisonsTable() {
+    tableList = new TableComparisonsTable() {
 
       @Override
       protected List<TableComparison> getTableComparisons() {
         return tableComparisons;
       }
     };
-    table.setPageSize(100);
+    tableList.setPageSize(100);
     tableComparisonsProvider = new ListDataProvider<TableComparison>(tableComparisons);
-    tableComparisonsProvider.addDataDisplay(table);
-    table.setEmptyTableWidget(table.getLoadingIndicator());
+    tableComparisonsProvider.addDataDisplay(tableList);
+    tableList.setEmptyTableWidget(tableList.getLoadingIndicator());
 
     SelectionModel<TableComparison> selectionModel = new MultiSelectionModel<TableComparison>(
         new ProvidesKey<TableComparison>() {
@@ -106,11 +106,10 @@ public class ComparedDatasourcesReportStepView extends ViewImpl
             return item.getTableName();
           }
         });
-    table.setSelectionModel(selectionModel);
+    tableList.setSelectionModel(selectionModel);
+    tableList.getTableNameColumn().setFieldUpdater(new TableComparisonFieldUpdater());
 
-    table.getTableNameColumn().setFieldUpdater(new TableComparisonFieldUpdater());
-
-    tableList = table;
+    tableTabs.add(tableList, translations.tablesLabel());
   }
 
   //
@@ -165,11 +164,6 @@ public class ComparedDatasourcesReportStepView extends ViewImpl
     return ignoreAllModifications.isVisible();
   }
 
-  @Override
-  public Widget asWidget() {
-    return uiWidget;
-  }
-
   //
   // Inner Classes / Interfaces
   //
@@ -201,7 +195,6 @@ public class ComparedDatasourcesReportStepView extends ViewImpl
 
   }
 
-  @UiTemplate("ComparedDatasourcesReportStepView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, ComparedDatasourcesReportStepView> {}
 
   @Override

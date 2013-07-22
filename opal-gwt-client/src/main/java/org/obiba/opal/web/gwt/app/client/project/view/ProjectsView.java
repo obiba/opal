@@ -19,7 +19,6 @@ import com.github.gwtbootstrap.client.ui.Modal;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.NavPills;
 import com.github.gwtbootstrap.client.ui.base.ListItem;
-import com.github.gwtbootstrap.client.ui.base.UnorderedList;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
@@ -53,7 +52,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   Panel content;
 
   @UiField
-  Modal m;
+  Modal addProjectModal;
 
   @UiField
   Panel alertPlace;
@@ -77,7 +76,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   ProjectsView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
     // TODO translation
-    m.setTitle(translations.addProject());
+    addProjectModal.setTitle(translations.addProject());
   }
 
   @Override
@@ -129,7 +128,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     nameTxt.setText("");
     descriptionTxt.setText("");
     clearAlert();
-    m.show();
+    addProjectModal.show();
   }
 
   @UiHandler("save")
@@ -139,13 +138,13 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     p.setName(nameTxt.getText());
     p.setDescription(descriptionTxt.getText());
     if(getUiHandlers().onAddProject(p)) {
-      m.hide();
+      addProjectModal.hide();
     }
   }
 
   @UiHandler("cancel")
   void onCancelAddProject(ClickEvent event) {
-    m.hide();
+    addProjectModal.hide();
   }
 
   private void redraw() {

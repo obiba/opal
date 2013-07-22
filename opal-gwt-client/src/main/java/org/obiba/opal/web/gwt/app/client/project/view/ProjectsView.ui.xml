@@ -31,7 +31,7 @@
       </b:Column>
     </b:FluidRow>
     <g:FlowPanel ui:field="content" addStyleNames="items"></g:FlowPanel>
-    <b:Modal ui:field="m" closeVisible="true" keyboard="true" animation="false">
+    <b:Modal ui:field="addProjectModal" closeVisible="true" keyboard="true" animation="false">
       <g:SimplePanel ui:field="alertPlace"/>
       <b:ControlGroup ui:field="labelGroup">
         <b:ControlLabel>
