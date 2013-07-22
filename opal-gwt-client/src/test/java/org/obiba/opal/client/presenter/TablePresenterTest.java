@@ -18,11 +18,11 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.AddPrincipalHandler;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.project.event.SiblingVariableSelectionEvent;
-import org.obiba.opal.web.gwt.app.client.project.event.TableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.project.presenter.EntityDialogPresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.TablePresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ValuesTablePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.event.SiblingVariableSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
@@ -69,7 +69,7 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     ValuesTablePresenter values = new ValuesTablePresenter(null, null,
         new ValueSequencePopupPresenter(null, valueSequenceDisplayMock),
         new EntityDialogPresenter(null, entityDialogDisplayMock, createMock(ValueSequencePopupPresenter.class)));
-    presenter = new TablePresenter(displayMock, new CountingEventBus(), null, values, mockProvider, mockIndexProvider);
+    presenter = new TablePresenter(displayMock, new CountingEventBus(), values, mockProvider, mockIndexProvider);
   }
 
   @SuppressWarnings({ "unchecked", "OverlyLongMethod" })

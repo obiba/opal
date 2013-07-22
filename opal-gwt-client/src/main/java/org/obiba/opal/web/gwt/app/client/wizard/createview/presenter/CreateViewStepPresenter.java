@@ -16,8 +16,8 @@ import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.project.event.DatasourceUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.project.event.ViewConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.HasCollection;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;

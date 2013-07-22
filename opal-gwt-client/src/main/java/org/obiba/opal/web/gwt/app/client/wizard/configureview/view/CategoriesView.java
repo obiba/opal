@@ -11,8 +11,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.configureview.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
-import org.obiba.opal.web.gwt.app.client.project.view.CategoriesTable;
-import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorView;
+import org.obiba.opal.web.gwt.app.client.magma.view.CategoriesTable;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.CategoriesPresenter;
@@ -22,13 +21,13 @@ import org.obiba.opal.web.model.client.magma.CategoryDto;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
@@ -87,7 +86,7 @@ public class CategoriesView extends ViewImpl implements CategoriesPresenter.Disp
     });
     categoryTable.addColumn(actionsColumn, translations.actionsLabel());
 
-    categoryTable.setPageSize(NavigatorView.PAGE_SIZE);
+    categoryTable.setPageSize(Table.DEFAULT_PAGESIZE);
     categoryTablePager.setDisplay(categoryTable);
     categoryProvider.addDataDisplay(categoryTable);
   }

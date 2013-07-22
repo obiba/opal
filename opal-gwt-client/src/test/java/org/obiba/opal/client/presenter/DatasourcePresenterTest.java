@@ -16,11 +16,11 @@ import org.junit.Test;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.AddPrincipalHandler;
-import org.obiba.opal.web.gwt.app.client.project.event.DatasourceSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.project.event.DatasourceUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.project.event.SiblingTableSelectionEvent;
-import org.obiba.opal.web.gwt.app.client.project.event.TableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.project.presenter.DatasourcePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.SiblingTableSelectionEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.wizard.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
@@ -54,13 +54,12 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
   @Before
   public void setUp() {
     displayMock = createMock(DatasourcePresenter.Display.class);
-    DatasourcePresenter.Proxy proxyMock = createMock(DatasourcePresenter.Proxy.class);
     eventBusMock = createMock(EventBus.class);
     usersAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     Provider<AuthorizationPresenter> mockProvider = createMock(Provider.class);
 
-    datasourcePresenter = new DatasourcePresenter(displayMock, new CountingEventBus(), proxyMock, mockProvider);
+    datasourcePresenter = new DatasourcePresenter(displayMock, new CountingEventBus(), mockProvider);
   }
 
   @SuppressWarnings("unchecked")

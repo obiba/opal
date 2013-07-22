@@ -32,13 +32,11 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.CodingViewDialogPresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.DatasourcePresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.EntityDialogPresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorTreePresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.TablePresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.VariablePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.CodingViewDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LoggedInGatekeeper;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
@@ -129,8 +127,6 @@ public interface OpalGinjector extends Ginjector {
 
   Provider<DashboardPresenter> getDashboardPresenter();
 
-  Provider<NavigatorPresenter> getNavigatorPresenter();
-
   Provider<FunctionalUnitPresenter> getFunctionalUnitPresenter();
 
   Provider<ReportTemplatePresenter> getReportTemplatePresenter();
@@ -144,8 +140,6 @@ public interface OpalGinjector extends Ginjector {
   Provider<FileExplorerPresenter> getFileExplorerPresenter();
 
   Provider<VariablePresenter> getVariablePresenter();
-
-  Provider<NavigatorTreePresenter> getNavigatorTreePresenter();
 
   Provider<DatasourcePresenter> getDatasourcePresenter();
 

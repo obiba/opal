@@ -9,7 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.workbench.view;
 
+import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.NavTabs;
+import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.Timer;
@@ -21,7 +23,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class BreadcrumbsTabPanel extends AbstractTabPanel {
 
   public BreadcrumbsTabPanel() {
-    super(new NavTabs());
+    super(new Breadcrumbs());
 
     // remove all tabs after the one selected
     addSelectionHandler(new SelectionHandler<Integer>() {
@@ -70,5 +72,7 @@ public class BreadcrumbsTabPanel extends AbstractTabPanel {
     add(w, text);
     selectTab(w);
   }
+
+
 
 }

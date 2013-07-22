@@ -49,9 +49,6 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   @UiField
   Panel filesPanel;
 
-  @UiField
-  Breadcrumbs magmacrumbs;
-
   private ProjectDto project;
 
   @Inject
@@ -79,27 +76,6 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     String desc = project.getDescription();
     description.setText(desc.substring(0, desc.indexOf('.') + 1));
     ellipsis.setIcon(IconType.PLUS_SIGN);
-  }
-
-  @Override
-  public void selectDatasource(String name) {
-    magmacrumbs.clear();
-    magmacrumbs.add(new InlineLabel(name));
-  }
-
-  @Override
-  public void selectTable(String datasource, String table) {
-    magmacrumbs.clear();
-    magmacrumbs.add(newDatasourceLink(datasource));
-    magmacrumbs.add(new InlineLabel(table));
-  }
-
-  @Override
-  public void selectVariable(String datasource, String table, String variable) {
-    magmacrumbs.clear();
-    magmacrumbs.add(newDatasourceLink(datasource));
-    magmacrumbs.add(newTableLink(datasource, table));
-    magmacrumbs.add(new InlineLabel(variable));
   }
 
   @UiHandler("projects")
@@ -130,26 +106,6 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     }
   }
 
-  private Widget newDatasourceLink(final String name) {
-    NavLink link = new NavLink(name);
-    link.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getUiHandlers().onDatasourceSelection(name);
-      }
-    });
-    return link;
-  }
 
-  private Widget newTableLink(final String datasource, final String table) {
-    NavLink link = new NavLink(table);
-    link.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getUiHandlers().onTableSelection(datasource, table);
-      }
-    });
-    return link;
-  }
 
 }

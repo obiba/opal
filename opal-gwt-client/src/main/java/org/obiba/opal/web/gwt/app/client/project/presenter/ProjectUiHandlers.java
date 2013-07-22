@@ -6,8 +6,4 @@ public interface ProjectUiHandlers extends UiHandlers {
 
   void onProjectsSelection();
 
-  void onDatasourceSelection(String name);
-
-  void onTableSelection(String datasource, String table);
-
 }

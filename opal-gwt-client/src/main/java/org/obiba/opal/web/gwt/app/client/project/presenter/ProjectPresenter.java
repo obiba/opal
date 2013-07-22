@@ -2,12 +2,11 @@ package org.obiba.opal.web.gwt.app.client.project.presenter;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.project.event.DatasourceSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.project.event.TableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
-import org.obiba.opal.web.gwt.app.client.project.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
@@ -28,8 +27,8 @@ import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 
-public class ProjectPresenter extends Presenter<ProjectPresenter.Display, ProjectPresenter.Proxy> implements ProjectUiHandlers, DatasourceSelectionChangeEvent.Handler,
-    TableSelectionChangeEvent.Handler, VariableSelectionChangeEvent.Handler {
+public class ProjectPresenter extends Presenter<ProjectPresenter.Display, ProjectPresenter.Proxy>
+    implements ProjectUiHandlers {
 
   @ContentSlot
   public static final GwtEvent.Type<RevealContentHandler<?>> TABLES_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
@@ -40,6 +39,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   @ContentSlot
   public static final GwtEvent.Type<RevealContentHandler<?>> ADMIN_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
 
+  private final MagmaPresenter magmaPresenter;
 
   private final FileExplorerPresenter fileExplorerPresenter;
 
@@ -53,21 +53,19 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   @Inject
   public ProjectPresenter(EventBus eventBus, Display display, Proxy proxy, Translations translations,
-      PlaceManager placeManager, FileExplorerPresenter fileExplorerPresenter) {
+      PlaceManager placeManager, MagmaPresenter magmaPresenter, FileExplorerPresenter fileExplorerPresenter) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
     this.translations = translations;
     this.placeManager = placeManager;
+    this.magmaPresenter = magmaPresenter;
     this.fileExplorerPresenter = fileExplorerPresenter;
   }
 
   @Override
   protected void onBind() {
     super.onBind();
-    addRegisteredHandler(DatasourceSelectionChangeEvent.getType(), this);
-    addRegisteredHandler(TableSelectionChangeEvent.getType(), this);
-    addRegisteredHandler(VariableSelectionChangeEvent.getType(), this);
-
+    setInSlot(TABLES_PANE, magmaPresenter);
     setInSlot(FILES_PANE, fileExplorerPresenter);
   }
 
@@ -79,7 +77,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   public void refresh() {
-    if (name == null) return;
+    if(name == null) return;
     // TODO handle wrong or missing id
     UriBuilder builder = UriBuilder.create().segment("project", name);
     ResourceRequestBuilderFactory.<ProjectDto>newBuilder().forResource(builder.build()).get()
@@ -88,7 +86,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
           public void onResource(Response response, ProjectDto resource) {
             project = resource;
             getView().setProject(project);
-            getEventBus().fireEvent(new DatasourceSelectionChangeEvent(project.getDatasource()));
+            getEventBus().fireEvent(new DatasourceSelectionChangeEvent(this, project.getDatasource()));
           }
         }).send();
   }
@@ -99,40 +97,10 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     placeManager.revealPlace(request);
   }
 
-  @Override
-  public void onDatasourceSelection(String name) {
-    getEventBus().fireEvent(new DatasourceSelectionChangeEvent(name));
-  }
-
-  @Override
-  public void onTableSelection(String datasource, String table) {
-    getEventBus().fireEvent(new TableSelectionChangeEvent(this, datasource, table));
-  }
-
-  @Override
-  public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
-    getView().selectDatasource(event.getSelection());
-  }
-
-  @Override
-  public void onTableSelectionChanged(TableSelectionChangeEvent event) {
-    getView().selectTable(event.getDatasourceName(), event.getTableName());
-  }
-
-  @Override
-  public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-    getView().selectVariable(event.getDatasourceName(), event.getTableName(), event.getVariableName());
-  }
-
   public interface Display extends View, HasUiHandlers<ProjectUiHandlers> {
 
     void setProject(ProjectDto project);
 
-    void selectDatasource(String name);
-
-    void selectTable(String datasource, String table);
-
-    void selectVariable(String datasource, String table, String variable);
   }
 
   @ProxyStandard

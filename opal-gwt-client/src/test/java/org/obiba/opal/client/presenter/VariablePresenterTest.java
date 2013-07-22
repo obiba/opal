@@ -17,8 +17,8 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.AddPrincipalHandler;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.project.event.VariableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.project.presenter.VariablePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
@@ -26,7 +26,6 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.testing.CountingEventBus;
-import com.google.gwt.user.client.Command;
 import com.google.inject.Provider;
 
 import static org.easymock.EasyMock.createMock;
@@ -57,8 +56,7 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
     groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     Provider<AuthorizationPresenter> mockProvider = createMock(Provider.class);
 
-    variablePresenter = new VariablePresenter(displayMock, new CountingEventBus(),
-        createMock(VariablePresenter.Proxy.class), null, new SummaryTabPresenter(eventBusMock, summaryTabMock),
+    variablePresenter = new VariablePresenter(displayMock, new CountingEventBus(), null, new SummaryTabPresenter(eventBusMock, summaryTabMock),
         mockProvider);
   }
 

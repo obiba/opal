@@ -26,7 +26,6 @@
     <b:TabPanel tabPosition="right" ui:field="tabPanel">
       <b:Tab icon="TABLE" active="true">
         <b:Heading size="5" addStyleNames="no-top-margin">Tables</b:Heading>
-        <b:Breadcrumbs ui:field="magmacrumbs"/>
         <g:SimplePanel ui:field="tablesPanel"/>
       </b:Tab>
       <b:Tab icon="HDD">
@@ -64,7 +63,6 @@
           <g:FlowPanel>
             <b:FluidRow>
               <b:Column size="6">
-
                 <b:WellNavList>
                   <b:NavHeader>
                     <ui:msg description="Project Identification label">Project identification</ui:msg>

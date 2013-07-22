@@ -14,6 +14,7 @@ import com.github.gwtbootstrap.client.ui.NavWidget;
 import com.github.gwtbootstrap.client.ui.base.ComplexWidget;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.github.gwtbootstrap.client.ui.base.StackedNav;
+import com.github.gwtbootstrap.client.ui.base.UnorderedList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -38,7 +39,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class AbstractTabPanel extends FlowPanel
     implements IndexedPanel, HasSelectionHandlers<Integer>, HasBeforeSelectionHandlers<Integer> {
 
-  private final ComplexWidget menu;
+  private final UnorderedList menu;
 
   private final TabDeckPanel contentContainer;
 
@@ -46,7 +47,7 @@ public class AbstractTabPanel extends FlowPanel
 
   private int selectedIndex = -1;
 
-  protected AbstractTabPanel(ComplexWidget menu) {
+  protected AbstractTabPanel(UnorderedList menu) {
     this.menu = menu;
     super.add(menu);
     super.add(contentContainer = new TabDeckPanel());
@@ -96,11 +97,13 @@ public class AbstractTabPanel extends FlowPanel
     if(beforeIndex < 0 || beforeIndex > getTabCount()) {
       throw new IndexOutOfBoundsException("cannot insert before " + beforeIndex);
     }
-    final NavWidget li;
+    final NavWidget li = newListItem((Widget) item, beforeIndex);
 
-
-
-    menu.insert(li = newListItem((Widget) item, beforeIndex), beforeIndex);
+    if(beforeIndex == menu.getWidgetCount()) {
+      menu.add(li);
+    } else {
+      menu.insert(li, beforeIndex);
+    }
 
     li.addClickHandler(new ClickHandler() {
 
@@ -112,11 +115,11 @@ public class AbstractTabPanel extends FlowPanel
   }
 
   protected NavWidget newListItem(Widget item, int beforeIndex) {
-    if (item instanceof NavWidget) {
-      return (NavWidget)item;
+    if(item instanceof NavWidget) {
+      return (NavWidget) item;
     }
-    if (item instanceof HasText) {
-      return new NavLink(((HasText)item).getText());
+    if(item instanceof HasText) {
+      return new NavLink(((HasText) item).getText());
     }
     return new NavWidget(item);
   }

@@ -10,8 +10,8 @@
 package org.obiba.opal.web.gwt.app.client.widgets.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.project.view.CategoricalSummaryView;
-import org.obiba.opal.web.gwt.app.client.project.view.ContinuousSummaryView;
+import org.obiba.opal.web.gwt.app.client.magma.view.CategoricalSummaryView;
+import org.obiba.opal.web.gwt.app.client.magma.view.ContinuousSummaryView;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.NumericTextBox;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;

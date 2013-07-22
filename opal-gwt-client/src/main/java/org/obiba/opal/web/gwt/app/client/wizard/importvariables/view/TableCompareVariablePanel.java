@@ -10,8 +10,8 @@
 package org.obiba.opal.web.gwt.app.client.wizard.importvariables.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.project.view.AttributesTable;
-import org.obiba.opal.web.gwt.app.client.project.view.CategoriesTable;
+import org.obiba.opal.web.gwt.app.client.magma.view.AttributesTable;
+import org.obiba.opal.web.gwt.app.client.magma.view.CategoriesTable;
 import org.obiba.opal.web.gwt.app.client.workbench.view.NavTabsPanel;
 import org.obiba.opal.web.gwt.app.client.workbench.view.PropertiesTable;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;

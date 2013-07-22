@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.view;
 
-import org.obiba.opal.web.gwt.app.client.project.event.GeoValueDisplayEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.widgets.maps.LineStringValueMap;
 import org.obiba.opal.web.gwt.app.client.widgets.maps.PointValueMap;
 import org.obiba.opal.web.gwt.app.client.widgets.maps.PolygonValueMap;

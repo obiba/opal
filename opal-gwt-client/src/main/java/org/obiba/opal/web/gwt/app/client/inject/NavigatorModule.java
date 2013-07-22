@@ -9,22 +9,20 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.inject;
 
-import org.obiba.opal.web.gwt.app.client.project.presenter.CodingViewDialogPresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.DatasourcePresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.EntityDialogPresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorPresenter;
-import org.obiba.opal.web.gwt.app.client.navigator.presenter.NavigatorTreePresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.TablePresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ValuesTablePresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.VariablePresenter;
-import org.obiba.opal.web.gwt.app.client.project.view.CodingViewDialogView;
-import org.obiba.opal.web.gwt.app.client.project.view.DatasourceView;
-import org.obiba.opal.web.gwt.app.client.project.view.EntityDialogView;
-import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorTreeView;
-import org.obiba.opal.web.gwt.app.client.navigator.view.NavigatorView;
-import org.obiba.opal.web.gwt.app.client.project.view.TableView;
-import org.obiba.opal.web.gwt.app.client.project.view.ValuesTableView;
-import org.obiba.opal.web.gwt.app.client.project.view.VariableView;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.CodingViewDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.view.CodingViewDialogView;
+import org.obiba.opal.web.gwt.app.client.magma.view.DatasourceView;
+import org.obiba.opal.web.gwt.app.client.magma.view.EntityDialogView;
+import org.obiba.opal.web.gwt.app.client.magma.view.MagmaView;
+import org.obiba.opal.web.gwt.app.client.magma.view.TableView;
+import org.obiba.opal.web.gwt.app.client.magma.view.ValuesTableView;
+import org.obiba.opal.web.gwt.app.client.magma.view.VariableView;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsPresenter;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectView;
@@ -77,15 +75,10 @@ public class NavigatorModule extends AbstractOpalModule {
     bindPresenter(ProjectsPresenter.class, ProjectsPresenter.Display.class, ProjectsView.class, ProjectsPresenter.Proxy.class);
     bindPresenter(ProjectPresenter.class, ProjectPresenter.Display.class, ProjectView.class, ProjectPresenter.Proxy.class);
 
-    bindPresenter(NavigatorPresenter.class, NavigatorPresenter.Display.class, NavigatorView.class,
-        NavigatorPresenter.Proxy.class);
-    bindPresenter(NavigatorTreePresenter.class, NavigatorTreePresenter.Display.class, NavigatorTreeView.class,
-        NavigatorTreePresenter.Proxy.class);
-    bindPresenter(DatasourcePresenter.class, DatasourcePresenter.Display.class, DatasourceView.class,
-        DatasourcePresenter.Proxy.class);
-    bindPresenter(TablePresenter.class, TablePresenter.Display.class, TableView.class, TablePresenter.Proxy.class);
-    bindPresenter(VariablePresenter.class, VariablePresenter.Display.class, VariableView.class,
-        VariablePresenter.Proxy.class);
+    bindPresenterWidget(MagmaPresenter.class, MagmaPresenter.Display.class, MagmaView.class);
+    bindPresenterWidget(DatasourcePresenter.class, DatasourcePresenter.Display.class, DatasourceView.class);
+    bindPresenterWidget(TablePresenter.class, TablePresenter.Display.class, TableView.class);
+    bindPresenterWidget(VariablePresenter.class, VariablePresenter.Display.class, VariableView.class);
     bindPresenterWidget(ValuesTablePresenter.class, ValuesTablePresenter.Display.class, ValuesTableView.class);
     bindPresenterWidget(EntityDialogPresenter.class, EntityDialogPresenter.Display.class, EntityDialogView.class);
 

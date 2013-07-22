@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.widgets.presenter;
 
-import org.obiba.opal.web.gwt.app.client.project.event.GeoValueDisplayEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
