@@ -43,13 +43,13 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   public interface Display extends View, HasUiHandlers<ProjectUiHandlers>, HasTabPanel {
 
     public enum ProjectTab {
-      TAB_TABLES,
-      TAB_FILES,
-      TAB_DATA_VISUALIZATION,
-      TAB_REPORTS,
-      TAB_TASKS,
-      TAB_PERMISSIONS,
-      TAB_ADMINISTRATION;
+      tables,
+      files,
+      visualisation,
+      reports,
+      tasks,
+      permissions,
+      administration;
     }
 
     void setProject(ProjectDto project);
@@ -76,7 +76,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private String name;
 
-  private int tab = 0;
+  private Display.ProjectTab tab = Display.ProjectTab.tables;
 
   private ProjectDto project;
 
@@ -106,17 +106,17 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   public void prepareFromRequest(PlaceRequest request) {
     super.prepareFromRequest(request);
     name = request.getParameter(ParameterTokens.TOKEN_NAME, null);
-    tab = Integer.parseInt(request.getParameter(ParameterTokens.TOKEN_TAB, "0"));
-    String path = request.getParameter(ParameterTokens.TOKEN_PATH, null);
+    tab = validateTab(request.getParameter(ParameterTokens.TOKEN_TAB, null));
+    String path = validatePath(request.getParameter(ParameterTokens.TOKEN_PATH, null));
 
-    if(tab == Display.ProjectTab.TAB_TABLES.ordinal()) {
-      getView().setTabData(tab, path);
+    if(tab == Display.ProjectTab.tables) {
+      getView().setTabData(tab.ordinal(), path);
     }
     else {
-      getView().setTabData(tab, null);
+      getView().setTabData(tab.ordinal(), null);
     }
 
-    getView().selectTab(tab);
+    getView().selectTab(tab.ordinal());
 
     refresh();
   }
@@ -132,7 +132,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
           public void onResource(Response response, ProjectDto resource) {
             project = resource;
             getView().setProject(project);
-            String path = (String) getView().getTabData(tab);
+            String path = (String) getView().getTabData(tab.ordinal());
             if(!Strings.isNullOrEmpty(path)) {
               MagmaPath.Parser parser = new MagmaPath.Parser().parse(path);
 
@@ -167,14 +167,15 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
         .createRequestBuilderWithParams(placeManager.getCurrentPlaceRequest(),
             Arrays.asList(ParameterTokens.TOKEN_NAME));
 
-    builder.with(ParameterTokens.TOKEN_TAB, String.valueOf(index));
+    Display.ProjectTab tab = Display.ProjectTab.values()[index];
+    builder.with(ParameterTokens.TOKEN_TAB,  tab.toString());
 
-    String uriPathParam = (String) getView().getTabData(index);
+    String queryPathParam = (String) getView().getTabData(index);
 
-    if(!Strings.isNullOrEmpty(uriPathParam)) {
+    if(!Strings.isNullOrEmpty(queryPathParam)) {
 
-      if(index == Display.ProjectTab.TAB_TABLES.ordinal()) {
-        MagmaPath.Parser parser = new MagmaPath.Parser().parse(uriPathParam);
+      if(tab == Display.ProjectTab.tables) {
+        MagmaPath.Parser parser = new MagmaPath.Parser().parse(queryPathParam);
 
         if (Strings.isNullOrEmpty(parser.getVariableName())) {
           getEventBus().fireEventFromSource(
@@ -188,7 +189,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
         }
       }
 
-      builder.with(ParameterTokens.TOKEN_PATH, uriPathParam);
+      builder.with(ParameterTokens.TOKEN_PATH, queryPathParam);
     }
 
     placeManager.updateHistory(builder.build(), true);
@@ -214,16 +215,41 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
         .setTableName(event.getTableName()).setVariableName(event.getVariableName()).build());
   }
 
-  private void updateHistory(String uriPathParam) {
+  private void updateHistory(String queryPathParam) {
     PlaceRequest.Builder builder = PlaceRequestHelper
         .createRequestBuilderWithParams(placeManager.getCurrentPlaceRequest(),
             Arrays.asList(ParameterTokens.TOKEN_NAME, ParameterTokens.TOKEN_TAB));
 
-    if (!Strings.isNullOrEmpty(uriPathParam)) {
-      builder.with(ParameterTokens.TOKEN_PATH, uriPathParam).build();
+    if (!Strings.isNullOrEmpty(queryPathParam)) {
+      builder.with(ParameterTokens.TOKEN_PATH, queryPathParam).build();
     }
 
     placeManager.updateHistory(builder.build(), true);
-    getView().setTabData(tab, uriPathParam);
+    getView().setTabData(tab.ordinal(), queryPathParam);
+  }
+
+  private Display.ProjectTab validateTab(String tab) {
+    if (!Strings.isNullOrEmpty(tab)) {
+      try {
+        return Display.ProjectTab.valueOf(tab);
+      }
+      catch (IllegalArgumentException e) {
+      }
+    }
+
+    return Display.ProjectTab.tables;
+  }
+
+  private String validatePath(String path) {
+    if (!Strings.isNullOrEmpty(path)) {
+      MagmaPath.Parser parser = new MagmaPath.Parser().parse(path);
+      String datasourceName = parser.getDatasourceName();
+      if (!Strings.isNullOrEmpty(datasourceName) && name.equals(datasourceName)) {
+        return  path;
+      }
+    }
+
+    updateHistory(null);
+    return null;
   }
 }

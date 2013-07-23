@@ -1397,22 +1397,14 @@ public interface Translations extends Constants {
   })
   Map<String, String> dataShieldLabelsMap();
 
-  //    TabPanelHelper.setTabTitle(tabPanel, i++, "Tables");
-//    TabPanelHelper.setTabTitle(tabPanel, i++, "Files");
-//    TabPanelHelper.setTabTitle(tabPanel, i++, "Data visualization");
-//    TabPanelHelper.setTabTitle(tabPanel, i++, "Reports");
-//    TabPanelHelper.setTabTitle(tabPanel, i++, "Tasks");
-//    TabPanelHelper.setTabTitle(tabPanel, i++, "Permissions");
-//    TabPanelHelper.setTabTitle(tabPanel, i++, "Administration");
-
   @Description("Project Tab Names")
-  @DefaultStringMapValue({ "TAB_TABLES", "Tables", //
-      "TAB_FILES", "Files", //
-      "TAB_DATA_VISUALIZATION", "Data visualization", //
-      "TAB_REPORTS", "Reports", //
-      "TAB_TASKS", "Tasks", //
-      "TAB_PERMISSIONS", "Permissions", //
-      "TAB_ADMINISTRATION", "Administration" //
+  @DefaultStringMapValue({ "tables", "Tables", //
+      "files", "Files", //
+      "visualisation", "Data visualization", //
+      "reports", "Reports", //
+      "tasks", "Tasks", //
+      "permissions", "Permissions", //
+      "administration", "Administration" //
   })
   Map<String, String> projectTabNameMap();
 

@@ -49,6 +49,7 @@ import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
@@ -162,6 +163,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @SuppressWarnings({ "OverlyLongMethod" })
   private void addEventHandlers() {
     registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
+    registerHandler(getEventBus().addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionChangeHandler()));
     registerHandler(
         getEventBus().addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
     registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler()));
@@ -655,6 +657,13 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     public void onTableSelectionChanged(TableSelectionChangeEvent event) {
       updateDisplay(event.getDatasourceName(), event.getTableName(), event.getPrevious(), event.getNext());
       authorize();
+    }
+  }
+
+  private class VariableSelectionChangeHandler implements VariableSelectionChangeEvent.Handler {
+    @Override
+    public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
+      GWT.log("TablePresenter.onVariableSelectionChanged()");
     }
   }
 
