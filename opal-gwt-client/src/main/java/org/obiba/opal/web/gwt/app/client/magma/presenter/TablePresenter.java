@@ -257,6 +257,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
     if(tableIsView()) {
       showFromTables(table);
+    } else {
+      getView().setFromTables(null);
     }
 
     if(getView().isValuesTabSelected()) {
