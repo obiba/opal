@@ -25,6 +25,7 @@ import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
@@ -45,6 +46,11 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
     getView().setUiHandlers(this);
     this.translations = translations;
     this.placeManager = placeManager;
+  }
+
+  @TitleFunction
+  public String getTitle() {
+    return translations.pageProjectsTitle();
   }
 
   @Override
@@ -75,7 +81,7 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
   public void onProjectTableSelection(ProjectDto project, String table) {
     PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.project)
         .with(ParameterTokens.TOKEN_NAME, project.getName())
-        .with(ParameterTokens.TOKEN_TABLES, project.getName() + "." + table).build();
+        .with(ParameterTokens.TOKEN_PATH, project.getName() + "." + table).build();
     placeManager.revealPlace(request);
   }
 

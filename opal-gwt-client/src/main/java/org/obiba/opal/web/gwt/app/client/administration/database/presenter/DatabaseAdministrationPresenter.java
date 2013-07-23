@@ -90,7 +90,7 @@ public class DatabaseAdministrationPresenter extends
   private final ResourceDataProvider<JdbcDataSourceDto> resourceDataProvider
       = new ResourceDataProvider<JdbcDataSourceDto>(Resources.databases());
 
-  private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
+  private final DefaultBreadcrumbsBuilder breadcrumbsBuilder;
 
   private Command confirmedCommand;
 
@@ -101,7 +101,7 @@ public class DatabaseAdministrationPresenter extends
     super(eventBus, display, proxy);
     this.jdbcDataSourcePresenter = jdbcDataSourcePresenter;
     this.authorizationPresenter = authorizationPresenter.get();
-    this.breadcrumbsHelper = breadcrumbsHelper;
+    this.breadcrumbsBuilder = breadcrumbsHelper;
   }
 
   @ProxyEvent
@@ -123,7 +123,7 @@ public class DatabaseAdministrationPresenter extends
 
   @Override
   protected void onReveal() {
-    breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
+    breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs()).build();
 
     refresh();
     // set permissions
@@ -170,6 +170,8 @@ public class DatabaseAdministrationPresenter extends
         }
       }
     }));
+
+    breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs());
 
     getView().getActions().setActionHandler(new ActionHandler<JdbcDataSourceDto>() {
 

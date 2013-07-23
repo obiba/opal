@@ -262,7 +262,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
                         }
                       }
                     }
-                    getEventBus().fireEvent(new VariableSelectionChangeEvent(tableDto, selection, previous, next));
+                    getEventBus().fireEvent(new VariableSelectionChangeEvent(this, tableDto, selection, previous, next));
                   }
                 })//
                 .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {

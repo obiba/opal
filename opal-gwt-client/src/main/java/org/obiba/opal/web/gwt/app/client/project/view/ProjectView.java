@@ -4,17 +4,16 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectUiHandlers;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
+import org.obiba.opal.web.gwt.app.client.widgets.tab.OpalTabPanel;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.TabPanel;
-import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -41,7 +40,7 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   Button ellipsis;
 
   @UiField
-  TabPanel tabPanel;
+  OpalTabPanel tabPanel;
 
   @UiField
   Panel tablesPanel;
@@ -55,15 +54,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   ProjectView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
 
-    // TODO translation
-    int i = 0;
-    TabPanelHelper.setTabTitle(tabPanel, i++, "Tables");
-    TabPanelHelper.setTabTitle(tabPanel, i++, "Files");
-    TabPanelHelper.setTabTitle(tabPanel, i++, "Data visualization");
-    TabPanelHelper.setTabTitle(tabPanel, i++, "Reports");
-    TabPanelHelper.setTabTitle(tabPanel, i++, "Tasks");
-    TabPanelHelper.setTabTitle(tabPanel, i++, "Permissions");
-    TabPanelHelper.setTabTitle(tabPanel, i++, "Administration");
+    for (ProjectTab tab : ProjectTab.values()) {
+      TabPanelHelper.setTabTitle(tabPanel, tab.ordinal(), translations.projectTabNameMap().get(tab.toString()));
+    }
   }
 
   @Override
@@ -76,6 +69,21 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     String desc = project.getDescription();
     description.setText(desc.substring(0, desc.indexOf('.') + 1));
     ellipsis.setIcon(IconType.PLUS_SIGN);
+  }
+
+  @Override
+  public void selectTab(int tab) {
+    tabPanel.selectTab(tab);
+  }
+
+  @Override
+  public void setTabData(int index, Object data) {
+    tabPanel.setData(index, data);
+  }
+
+  @Override
+  public Object getTabData(int index) {
+    return tabPanel.getData(index);
   }
 
   @UiHandler("projects")
@@ -94,6 +102,13 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
       ellipsis.setIcon(IconType.MINUS_SIGN);
     }
   }
+
+  @UiHandler("tabPanel")
+  void onShown(TabPanel.ShownEvent shownEvent) {
+    if (shownEvent.getTarget() == null) return;
+    getUiHandlers().onTabSelected(tabPanel.getSelectedTab());
+  }
+
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {

@@ -99,7 +99,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
               public void onResource(Response response, JsArray<VariableDto> resource) {
                 if(response.getStatusCode() == SC_OK) {
                   VariableDto dto = VariableDto.get(JsArrays.toSafeArray(resource));
-                  getEventBus().fireEvent(new VariableSelectionChangeEvent(table, dto));
+                  getEventBus().fireEvent(new VariableSelectionChangeEvent(this, table, dto));
                 }
               }
 

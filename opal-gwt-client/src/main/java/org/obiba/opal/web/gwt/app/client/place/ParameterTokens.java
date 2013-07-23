@@ -26,4 +26,8 @@ public class ParameterTokens {
   public static final String TOKEN_FILES = "files";
 
   public static final String TOKEN_ADMIN = "admin";
+
+  public static final String TOKEN_TAB = "tab";
+
+  public static final String TOKEN_PATH = "path";
 }
