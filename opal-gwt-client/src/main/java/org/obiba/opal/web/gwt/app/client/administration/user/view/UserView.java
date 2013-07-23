@@ -13,9 +13,9 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.workbench.view.GroupSuggestOracle;
-import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
-import org.obiba.opal.web.gwt.app.client.workbench.view.SuggestListBox;
+import org.obiba.opal.web.gwt.app.client.ui.GroupSuggestOracle;
+import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
+import org.obiba.opal.web.gwt.app.client.ui.SuggestListBox;
 import org.obiba.opal.web.model.client.opal.GroupDto;
 
 import com.github.gwtbootstrap.client.ui.Button;

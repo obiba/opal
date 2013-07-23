@@ -5,7 +5,7 @@ package org.obiba.opal.web.gwt.app.client;
 //import org.obiba.opal.web.gwt.app.client.inject.OpalGinjector;
 //import org.obiba.opal.web.gwt.app.client.place.Places;
 //import org.obiba.opal.web.gwt.app.client.widgets.presenter.ConfirmationPresenter;
-//import org.obiba.opal.web.gwt.app.client.wizard.configureview.presenter.ConfigureViewStepPresenter;
+//import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.ConfigureViewStepPresenter;
 //import org.obiba.opal.web.gwt.app.client.wizard.variablestoview.presenter.VariablesToViewPresenter;
 //import org.obiba.opal.web.gwt.rest.client.DefaultResourceAuthorizationRequestBuilder;
 //import org.obiba.opal.web.gwt.rest.client.DefaultResourceRequestBuilder;

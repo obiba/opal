@@ -13,8 +13,8 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.WidgetProvider;
-import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
-import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
+import org.obiba.opal.web.gwt.app.client.ui.WizardDialogBox;
+import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;

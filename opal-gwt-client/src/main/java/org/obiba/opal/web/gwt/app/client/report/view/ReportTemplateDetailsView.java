@@ -18,7 +18,7 @@ import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsP
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.DateTimeColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.app.client.workbench.view.NavTabsPanel;
+import org.obiba.opal.web.gwt.app.client.ui.NavTabsPanel;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;

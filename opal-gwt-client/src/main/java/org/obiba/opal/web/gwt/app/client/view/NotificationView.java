@@ -15,7 +15,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationCloseHandler;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter.NotificationType;
 import org.obiba.opal.web.gwt.app.client.view.FadeAnimation.FadedHandler;
-import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
+import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;

@@ -15,7 +15,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.maps.PointValueMap;
 import org.obiba.opal.web.gwt.app.client.widgets.maps.PolygonValueMap;
 import org.obiba.opal.web.gwt.app.client.widgets.maps.ValueMap;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueMapPopupPresenter;
-import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
+import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;

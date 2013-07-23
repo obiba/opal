@@ -21,8 +21,8 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.ConstantActionsProvid
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.EditableColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.view.EditableListBox;
 import org.obiba.opal.web.gwt.app.client.wizard.variablestoview.presenter.VariablesToViewPresenter;
-import org.obiba.opal.web.gwt.app.client.workbench.view.Chooser;
-import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
+import org.obiba.opal.web.gwt.app.client.ui.Chooser;
+import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 

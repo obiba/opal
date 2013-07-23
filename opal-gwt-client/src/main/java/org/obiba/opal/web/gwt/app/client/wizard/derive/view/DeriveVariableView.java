@@ -15,9 +15,9 @@ import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveVariablePresenter;
-import org.obiba.opal.web.gwt.app.client.workbench.view.ModalViewImpl;
-import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
-import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
+import org.obiba.opal.web.gwt.app.client.ui.ModalViewImpl;
+import org.obiba.opal.web.gwt.app.client.ui.WizardDialogBox;
+import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -30,7 +30,6 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PopupViewImpl;
 
 /**
  *

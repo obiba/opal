@@ -9,10 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.rest.client.authorization;
 
-import org.obiba.opal.web.gwt.app.client.workbench.view.AbstractTabPanel;
+import org.obiba.opal.web.gwt.app.client.ui.AbstractTabPanel;
 
 /**
- * Authorize a tab in {@link org.obiba.opal.web.gwt.app.client.workbench.view.NavTabsPanel}.
+ * Authorize a tab in {@link org.obiba.opal.web.gwt.app.client.ui.NavTabsPanel}.
  */
 public class TabAuthorizer implements HasAuthorization {
 

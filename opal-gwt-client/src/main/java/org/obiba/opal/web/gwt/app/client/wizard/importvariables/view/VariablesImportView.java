@@ -22,11 +22,11 @@ import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.Datas
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter;
-import org.obiba.opal.web.gwt.app.client.workbench.view.DatasourceParsingErrorPanel;
-import org.obiba.opal.web.gwt.app.client.workbench.view.DropdownSuggestBox;
-import org.obiba.opal.web.gwt.app.client.workbench.view.ModalViewImpl;
-import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
-import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
+import org.obiba.opal.web.gwt.app.client.ui.DatasourceParsingErrorPanel;
+import org.obiba.opal.web.gwt.app.client.ui.DropdownSuggestBox;
+import org.obiba.opal.web.gwt.app.client.ui.ModalViewImpl;
+import org.obiba.opal.web.gwt.app.client.ui.WizardDialogBox;
+import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
@@ -48,12 +48,10 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PopupViewImpl;
 
 public class VariablesImportView extends ModalViewImpl implements VariablesImportPresenter.Display {
 

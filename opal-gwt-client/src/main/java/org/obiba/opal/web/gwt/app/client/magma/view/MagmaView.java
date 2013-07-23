@@ -2,18 +2,12 @@ package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaUiHandlers;
-import org.obiba.opal.web.gwt.app.client.workbench.view.BreadcrumbsTabPanel;
+import org.obiba.opal.web.gwt.app.client.ui.BreadcrumbsTabPanel;
 
-import com.github.gwtbootstrap.client.ui.Breadcrumbs;
-import com.github.gwtbootstrap.client.ui.NavLink;
-import com.github.gwtbootstrap.client.ui.base.InlineLabel;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;

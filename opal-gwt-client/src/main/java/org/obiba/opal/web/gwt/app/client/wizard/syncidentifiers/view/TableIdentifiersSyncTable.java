@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.syncidentifiers.view;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.model.client.magma.TableIdentifiersSync;
 
 import com.google.gwt.cell.client.CheckboxCell;

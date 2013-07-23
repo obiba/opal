@@ -13,7 +13,7 @@ import org.obiba.opal.web.gwt.app.client.support.LanguageLocale;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.widgets.view.CharacterSetView;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.SpssFormatStepPresenter;
-import org.obiba.opal.web.gwt.app.client.workbench.view.DropdownSuggestBox;
+import org.obiba.opal.web.gwt.app.client.ui.DropdownSuggestBox;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;

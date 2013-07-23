@@ -13,7 +13,7 @@ import org.obiba.opal.web.gwt.app.client.administration.database.presenter.Datab
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabasePresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
+import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
 import org.obiba.opal.web.model.client.opal.JdbcDriverDto;
 
 import com.google.common.base.Strings;

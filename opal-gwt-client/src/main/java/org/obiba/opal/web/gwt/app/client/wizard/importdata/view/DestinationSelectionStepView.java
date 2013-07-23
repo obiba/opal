@@ -15,7 +15,7 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.widgets.view.EditableListBox;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DestinationSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DestinationSelectionStepPresenter.TableSelectionHandler;
-import org.obiba.opal.web.gwt.app.client.workbench.view.Chooser;
+import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 
 import com.google.gwt.core.client.GWT;

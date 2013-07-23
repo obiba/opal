@@ -14,9 +14,9 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueRenderer;
-import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
-import org.obiba.opal.web.gwt.app.client.workbench.view.TableChooser;
-import org.obiba.opal.web.gwt.app.client.workbench.view.TextBoxClearable;
+import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
+import org.obiba.opal.web.gwt.app.client.ui.TableChooser;
+import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 

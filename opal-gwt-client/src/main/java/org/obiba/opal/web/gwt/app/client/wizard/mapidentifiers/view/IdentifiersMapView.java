@@ -16,9 +16,9 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresente
 import org.obiba.opal.web.gwt.app.client.widgets.view.CsvOptionsView;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.mapidentifiers.presenter.IdentifiersMapPresenter;
-import org.obiba.opal.web.gwt.app.client.workbench.view.ModalViewImpl;
-import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
-import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
+import org.obiba.opal.web.gwt.app.client.ui.ModalViewImpl;
+import org.obiba.opal.web.gwt.app.client.ui.WizardDialogBox;
+import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
 import com.github.gwtbootstrap.client.ui.Modal;
@@ -33,11 +33,9 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PopupViewImpl;
 
 public class IdentifiersMapView extends ModalViewImpl implements IdentifiersMapPresenter.Display {
 

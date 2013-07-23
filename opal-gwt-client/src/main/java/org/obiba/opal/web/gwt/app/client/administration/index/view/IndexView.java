@@ -11,8 +11,8 @@ package org.obiba.opal.web.gwt.app.client.administration.index.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.workbench.view.Chooser;
-import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
+import org.obiba.opal.web.gwt.app.client.ui.Chooser;
+import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
 import org.obiba.opal.web.model.client.opal.Day;
 import org.obiba.opal.web.model.client.opal.ScheduleDto;
 import org.obiba.opal.web.model.client.opal.ScheduleType;

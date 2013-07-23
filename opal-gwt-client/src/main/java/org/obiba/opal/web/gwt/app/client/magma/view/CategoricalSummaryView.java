@@ -10,7 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
-import org.obiba.opal.web.gwt.app.client.workbench.view.DefaultFlexTable;
+import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
 import org.obiba.opal.web.gwt.plot.client.FrequencyPlot;
 import org.obiba.opal.web.gwt.plot.client.JqPlot;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;

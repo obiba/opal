@@ -17,10 +17,10 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueOccurrenceColumn
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueOccurrenceColumn.ValueSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.app.client.widgets.presenter.ValueSequencePopupPresenter.ValueSetFetcher;
-import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
-import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
-import org.obiba.opal.web.gwt.app.client.workbench.view.ToggleAnchor;
-import org.obiba.opal.web.gwt.app.client.workbench.view.ToggleAnchor.Delegate;
+import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.ToggleAnchor;
+import org.obiba.opal.web.gwt.app.client.ui.ToggleAnchor.Delegate;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueDto;

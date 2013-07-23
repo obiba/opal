@@ -11,7 +11,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DatasourceValuesStepPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DatasourceValuesStepPresenter.TableSelectionHandler;
-import org.obiba.opal.web.gwt.app.client.workbench.view.DatasourceParsingErrorPanel;
+import org.obiba.opal.web.gwt.app.client.ui.DatasourceParsingErrorPanel;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;

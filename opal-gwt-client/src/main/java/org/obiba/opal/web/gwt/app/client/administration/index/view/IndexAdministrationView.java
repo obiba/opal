@@ -19,7 +19,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.IndexStatusImageCell;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueRenderer;
-import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;

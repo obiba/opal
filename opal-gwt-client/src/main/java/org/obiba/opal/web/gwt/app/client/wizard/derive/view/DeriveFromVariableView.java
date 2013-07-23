@@ -15,9 +15,9 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.wizard.BranchingWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.Skippable;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveFromVariablePresenter;
-import org.obiba.opal.web.gwt.app.client.workbench.view.Chooser;
-import org.obiba.opal.web.gwt.app.client.workbench.view.TableChooser;
-import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
+import org.obiba.opal.web.gwt.app.client.ui.Chooser;
+import org.obiba.opal.web.gwt.app.client.ui.TableChooser;
+import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 

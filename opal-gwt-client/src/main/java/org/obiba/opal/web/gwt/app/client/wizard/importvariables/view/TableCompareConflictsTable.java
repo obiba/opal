@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.app.client.wizard.importvariables.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
-import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.model.client.magma.ConflictDto;
 
 import com.google.gwt.core.client.GWT;

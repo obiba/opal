@@ -11,8 +11,8 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackagePresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.workbench.view.PropertiesTable;
-import org.obiba.opal.web.gwt.app.client.workbench.view.ResizeHandle;
+import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
+import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
 import org.obiba.opal.web.model.client.opal.EntryDto;
 
 import com.google.gwt.core.client.GWT;

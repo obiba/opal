@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.wizard.variablestoview.view;
 
-import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.gwt.user.client.ui.Image;

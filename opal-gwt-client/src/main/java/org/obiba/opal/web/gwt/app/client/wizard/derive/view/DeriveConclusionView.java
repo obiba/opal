@@ -19,8 +19,8 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.Skippable;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveConclusionPresenter;
-import org.obiba.opal.web.gwt.app.client.workbench.view.DropdownSuggestBox;
-import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
+import org.obiba.opal.web.gwt.app.client.ui.DropdownSuggestBox;
+import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 
 import com.google.gwt.core.client.GWT;

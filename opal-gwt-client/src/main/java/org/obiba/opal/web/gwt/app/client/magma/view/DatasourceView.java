@@ -14,7 +14,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourceUiHandlers;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
-import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;

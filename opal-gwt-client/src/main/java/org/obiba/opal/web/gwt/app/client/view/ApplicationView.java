@@ -12,11 +12,11 @@ package org.obiba.opal.web.gwt.app.client.view;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.HasUrl;
-import org.obiba.opal.web.gwt.app.client.workbench.view.CloseableList;
-import org.obiba.opal.web.gwt.app.client.workbench.view.ListItem;
-import org.obiba.opal.web.gwt.app.client.workbench.view.SuggestListBox;
-import org.obiba.opal.web.gwt.app.client.workbench.view.VariableSearchListItem;
-import org.obiba.opal.web.gwt.app.client.workbench.view.VariableSuggestOracle;
+import org.obiba.opal.web.gwt.app.client.ui.CloseableList;
+import org.obiba.opal.web.gwt.app.client.ui.ListItem;
+import org.obiba.opal.web.gwt.app.client.ui.SuggestListBox;
+import org.obiba.opal.web.gwt.app.client.ui.VariableSearchListItem;
+import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 
@@ -36,7 +36,6 @@ import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 /**

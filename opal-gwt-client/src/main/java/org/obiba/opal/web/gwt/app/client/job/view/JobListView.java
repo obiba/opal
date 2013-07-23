@@ -20,7 +20,7 @@ import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.DateTimeColumn;
 import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.app.client.workbench.view.WorkbenchLayout;
+import org.obiba.opal.web.gwt.app.client.ui.WorkbenchLayout;
 import org.obiba.opal.web.model.client.opal.CommandStateDto;
 
 import com.google.gwt.core.client.GWT;
