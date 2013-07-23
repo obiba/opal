@@ -73,7 +73,12 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   @Override
   public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-    updateDisplay(event.getTable(), event.getSelection(), event.getPrevious(), event.getNext());
+    if (event.hasTable()) {
+      updateDisplay(event.getTable(), event.getSelection(), event.getPrevious(), event.getNext());
+    }
+    else {
+      updateDisplay(event.getDatasourceName(), event.getTableName(), event.getVariableName(), null, null);
+    }
   }
 
   @Override
@@ -315,6 +320,10 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
       if (event.hasTable()) {
         updateDisplay(event.getTable(), event.getSelection(), event.getPrevious(), event.getNext());
       }
+      else {
+        updateDisplay(event.getDatasourceName(), event.getTableName(), event.getVariableName(), null, null);
+      }
+
     }
   }
 
