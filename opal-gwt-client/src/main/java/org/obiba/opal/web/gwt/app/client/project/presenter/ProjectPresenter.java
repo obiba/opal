@@ -20,6 +20,7 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.http.client.Response;
@@ -205,14 +206,14 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   public void onTableSelectionChanged(TableSelectionChangeEvent event) {
     if (event.getSource() == this) return;
     updateHistory(
-        new MagmaPath.Builder().setDatasourceName(event.getDatasourceName()).setTableName(event.getTableName()).build());
+        new MagmaPath.Builder().datasource(event.getDatasourceName()).table(event.getTableName()).build());
   }
 
   @Override
   public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
     if (event.getSource() == this) return;
-    updateHistory(new MagmaPath.Builder().setDatasourceName(event.getDatasourceName())
-        .setTableName(event.getTableName()).setVariableName(event.getVariableName()).build());
+    updateHistory(new MagmaPath.Builder().datasource(event.getDatasourceName())
+        .table(event.getTableName()).variable(event.getVariableName()).build());
   }
 
   private void updateHistory(String queryPathParam) {

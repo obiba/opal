@@ -13,12 +13,13 @@ import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdminis
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
+import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.ui.HasUrl;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
@@ -28,19 +29,12 @@ import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.SuggestOracle;
@@ -52,6 +46,8 @@ import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.ContentSlot;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 import com.gwtplatform.mvp.client.proxy.RevealRootContentEvent;
 
@@ -77,17 +73,21 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   private final RequestUrlBuilder urlBuilder;
 
+  private final PlaceManager placeManager;
+
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public ApplicationPresenter(Display display, Proxy proxy, EventBus eventBus, RequestCredentials credentials,
       NotificationPresenter messageDialog, Provider<FileSelectorPresenter> fileSelectorPresenter,
-      Provider<ValueMapPopupPresenter> valueMapPopupPresenter, RequestUrlBuilder urlBuilder) {
+      Provider<ValueMapPopupPresenter> valueMapPopupPresenter, RequestUrlBuilder urlBuilder,
+      PlaceManager placeManager) {
     super(eventBus, display, proxy);
     this.credentials = credentials;
     this.messageDialog = messageDialog;
     this.fileSelectorPresenter = fileSelectorPresenter;
     this.valueMapPopupPresenter = valueMapPopupPresenter;
     this.urlBuilder = urlBuilder;
+    this.placeManager = placeManager;
     getView().setUiHandlers(this);
   }
 
@@ -228,51 +228,17 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   @Override
   public void onSelection(SelectionEvent<SuggestOracle.Suggestion> event) {
     // Get the table dto to fire the event to select the variable
-    final String datasourceName = ((VariableSuggestOracle.VariableSuggestion) event.getSelectedItem()).getDatasource();
-    final String tableName = ((VariableSuggestOracle.VariableSuggestion) event.getSelectedItem()).getTable();
-    final String variableName = ((VariableSuggestOracle.VariableSuggestion) event.getSelectedItem()).getVariable();
+    String datasourceName = ((VariableSuggestOracle.VariableSuggestion) event.getSelectedItem()).getDatasource();
+    String tableName = ((VariableSuggestOracle.VariableSuggestion) event.getSelectedItem()).getTable();
+    String variableName = ((VariableSuggestOracle.VariableSuggestion) event.getSelectedItem()).getVariable();
 
-    UriBuilder ub = UriBuilder.URI_DATASOURCE_TABLE;
-    ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(datasourceName, tableName)).get()
-        .withCallback(new ResourceCallback<TableDto>() {
-          @Override
-          public void onResource(Response response, final TableDto tableDto) {
+    getView().clearSearch();
 
-            UriBuilder ub = UriBuilder.URI_DATASOURCE_TABLE_VARIABLES;
-            ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(ub.build(datasourceName, tableName)).get()
-                .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
+    String path = MagmaPath.Builder.datasource(datasourceName).table(tableName).variable(variableName).build();
 
-                  @Override
-                  public void onResource(Response response, JsArray<VariableDto> resource) {
-                    JsArray<VariableDto> variables = JsArrays.toSafeArray(resource);
-
-                    VariableDto previous = null;
-                    VariableDto selection = null;
-                    VariableDto next = null;
-                    for(int i = 0; i < variables.length(); i++) {
-                      if(variables.get(i).getName().equals(variableName)) {
-                        selection = variables.get(i);
-
-                        if(i >= 0) {
-                          previous = variables.get(i - 1);
-                        }
-
-                        if(i < variables.length() - 1) {
-                          next = variables.get(i + 1);
-                        }
-                      }
-                    }
-                    getEventBus().fireEvent(new VariableSelectionChangeEvent(this, tableDto, selection, previous, next));
-                  }
-                })//
-                .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
-                  @Override
-                  public void onResponseCode(Request request, Response response) {
-                    getEventBus().fireEvent(NotificationEvent.newBuilder().error("SearchServiceUnavailable").build());
-                  }
-                }).send();
-          }
-        }).send();
+    PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.project)
+        .with(ParameterTokens.TOKEN_NAME, datasourceName).with(ParameterTokens.TOKEN_PATH, path);
+    placeManager.revealPlace(builder.build());
   }
 
   public interface Display extends View, HasUiHandlers<ApplicationUiHandlers> {

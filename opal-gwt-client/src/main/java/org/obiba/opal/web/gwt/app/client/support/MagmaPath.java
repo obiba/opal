@@ -1,58 +1,73 @@
 package org.obiba.opal.web.gwt.app.client.support;
 
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 
 public class MagmaPath {
 
-  public static final String PATH_SEPARATOR = ".";
-  public static final String VARIABLE_PATH_SEPARATOR = ":";
-
   public static class Builder {
-    private String datsourceName;
+    private String datasourceName;
     private String tableName;
     private String variableName;
 
-    public Builder setDatasourceName(String value) {
-      datsourceName = value;
-      return this;
+    public static Builder datasource(String value) {
+      Builder b = new Builder();
+      b.datasourceName = value;
+      return b;
     }
 
-    public Builder setTableName(String value) {
+    public Builder table(String value) {
       tableName = value;
       return this;
     }
 
-    public Builder setVariableName(String value) {
+    public Builder variable(String value) {
       variableName = value;
       return this;
     }
 
     public String build() {
-      return datsourceName + (!Strings.isNullOrEmpty(tableName) ? PATH_SEPARATOR + tableName : "") +
-          (!Strings.isNullOrEmpty(variableName) ? VARIABLE_PATH_SEPARATOR + variableName : "");
+      String path = datasourceName;
+      if (!Strings.isNullOrEmpty(tableName)) {
+        path = path + "." + tableName;
+        if (!Strings.isNullOrEmpty(variableName)) {
+          path = path + ":" + variableName;
+        }
+      }
+      return path;
     }
   }
 
   public static class Parser {
-    private String dataSourcename;
+    private String datasourceName;
     private String tableName;
     private String variableName;
 
     public Parser parse(String path) {
-      RegExp pattern = RegExp.compile("(\\w+)[\\.]*(\\w*)[\\:]*(\\w*)");
-      MatchResult matcher = pattern.exec(path);
+      GWT.log("parsing: " + path);
 
-      dataSourcename = matcher.getGroup(1);
-      tableName = matcher.getGroup(2);
-      variableName = matcher.getGroup(3);
+      int tableSep = path.indexOf('.');
+      if (tableSep == -1) {
+        datasourceName = path;
+      } else {
+        datasourceName = path.substring(0, tableSep);
+        String p = path.substring(tableSep + 1);
+        int varSep = p.indexOf(':');
+        if (varSep == -1) {
+          tableName = p;
+        } else {
+          tableName = p.substring(0,varSep);
+          variableName = p.substring(varSep + 1);
+        }
+      }
 
       return this;
     }
 
     public String getDatasourceName() {
-      return dataSourcename;
+      return datasourceName;
     }
 
     public String getTableName() {
