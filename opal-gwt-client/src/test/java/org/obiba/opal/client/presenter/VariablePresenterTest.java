@@ -19,7 +19,7 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPre
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.SummaryTabPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
 import com.google.web.bindery.event.shared.EventBus;

@@ -1,6 +1,6 @@
 package org.obiba.opal.web.gwt.app.client.support;
 
-import org.obiba.opal.web.gwt.app.client.widgets.breadcrumbs.OpalNavLink;
+import org.obiba.opal.web.gwt.app.client.ui.OpalNavLink;
 
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;

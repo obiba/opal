@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.configureview.view;
 
-import org.obiba.opal.web.gwt.app.client.util.VariableDtos;
+import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.VariablesListTabPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.NavTabsPanel;
 import org.obiba.opal.web.model.client.magma.VariableDto;

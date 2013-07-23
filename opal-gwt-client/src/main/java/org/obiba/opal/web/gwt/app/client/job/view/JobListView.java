@@ -16,10 +16,10 @@ import javax.annotation.Nullable;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsProvider;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.DateTimeColumn;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.DateTimeColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.WorkbenchLayout;
 import org.obiba.opal.web.model.client.opal.CommandStateDto;
 

@@ -11,11 +11,11 @@ package org.obiba.opal.web.gwt.app.client.administration.user.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsColumn;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsProvider;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.IconActionCell;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.UserStatusIconActionCell;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.IconActionCell;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.UserStatusIconActionCell;
 import org.obiba.opal.web.model.client.opal.GroupDto;
 import org.obiba.opal.web.model.client.opal.UserDto;
 

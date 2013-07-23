@@ -9,9 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.inject;
 
-import org.obiba.opal.web.gwt.app.client.wizard.WizardPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.wizard.WizardProxy;
-import org.obiba.opal.web.gwt.app.client.wizard.WizardView;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardProxy;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardView;
 
 import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 

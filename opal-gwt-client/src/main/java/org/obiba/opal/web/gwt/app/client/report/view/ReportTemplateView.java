@@ -10,7 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.report.view;
 
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.SplitPaneWorkbenchPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 

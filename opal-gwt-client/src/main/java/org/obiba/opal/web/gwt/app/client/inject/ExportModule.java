@@ -9,10 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.inject;
 
-import org.obiba.opal.web.gwt.app.client.wizard.copydata.presenter.DataCopyPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.copydata.view.DataCopyView;
-import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.exportdata.view.DataExportView;
+import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.copydata.view.DataCopyView;
+import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.exportdata.view.DataExportView;
 
 /**
  * Bind concrete implementations to interfaces within the export wizard.

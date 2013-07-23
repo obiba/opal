@@ -4,7 +4,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectUiHandlers;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
-import org.obiba.opal.web.gwt.app.client.widgets.tab.OpalTabPanel;
+import org.obiba.opal.web.gwt.app.client.ui.OpalTabPanel;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;

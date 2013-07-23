@@ -9,28 +9,28 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.inject;
 
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.ArchiveStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.CsvFormatStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DatasourceValuesStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DestinationSelectionStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.LimesurveyStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.NoFormatStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.RestStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.SpssFormatStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.UnitSelectionStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.XmlFormatStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.ArchiveStepView;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.CsvFormatStepView;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.DataImportView;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.DatasourceValuesStepView;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.DestinationSelectionStepView;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.LimesurveyStepView;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.NoFormatStepView;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.RestStepView;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.SpssFormatStepView;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.UnitSelectionStepView;
-import org.obiba.opal.web.gwt.app.client.wizard.importdata.view.XmlFormatStepView;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.ArchiveStepPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.CsvFormatStepPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DatasourceValuesStepPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DestinationSelectionStepPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.LimesurveyStepPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.NoFormatStepPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.RestStepPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.SpssFormatStepPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.UnitSelectionStepPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.XmlFormatStepPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.view.ArchiveStepView;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.view.CsvFormatStepView;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.view.DataImportView;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.view.DatasourceValuesStepView;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.view.DestinationSelectionStepView;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.view.LimesurveyStepView;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.view.NoFormatStepView;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.view.RestStepView;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.view.SpssFormatStepView;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.view.UnitSelectionStepView;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.view.XmlFormatStepView;
 
 /**
  * Bind concrete implementations to interfaces within the import wizard.

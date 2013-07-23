@@ -1,0 +1,44 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+    xmlns:w="urn:import:org.obiba.opal.web.gwt.app.client.magma.datasource.view"
+    ui:generateFormat="com.google.gwt.i18n.rebind.format.PropertiesFormat"
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+
+  <o:WizardDialogBox ui:field="dialog" title="Map Identifiers">
+    <g:FlowPanel>
+
+      <o:WizardStep ui:field="formatStep">
+        <g:FlowPanel>
+          <w:CsvOptionsView ui:field="csvOptions" advancedOptionsVisible="false"/>
+        </g:FlowPanel>
+      </o:WizardStep>
+
+      <o:WizardStep ui:field="unitStep">
+        <g:HTMLPanel>
+          <table cellspacing="10">
+            <tbody>
+              <tr>
+                <td>
+                  <ui:msg description="Master Unit label">Master Unit</ui:msg>:
+                </td>
+                <td>
+                  <o:Chooser ui:field="unitListBox"/>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </g:HTMLPanel>
+      </o:WizardStep>
+
+      <o:WizardStep ui:field="conclusionStep">
+        <g:SimplePanel ui:field="conclusionPanel"/>
+      </o:WizardStep>
+
+    </g:FlowPanel>
+
+
+  </o:WizardDialogBox>
+
+</ui:UiBinder>

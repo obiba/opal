@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityDialogPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.ValueRenderer;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueRenderer;
 import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
 import org.obiba.opal.web.gwt.app.client.ui.TableChooser;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;

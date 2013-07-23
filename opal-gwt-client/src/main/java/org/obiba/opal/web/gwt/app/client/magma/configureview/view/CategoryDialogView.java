@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.configureview.view;
 
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.LabelListPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.CategoryDialogPresenter;
 
 import com.google.gwt.core.client.GWT;

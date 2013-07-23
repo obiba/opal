@@ -21,10 +21,10 @@ import org.obiba.opal.web.gwt.app.client.fs.view.FilePathView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FileSystemTreeView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FileUploadDialogView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FolderDetailsView;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.view.FileSelectionView;
-import org.obiba.opal.web.gwt.app.client.widgets.view.FileSelectorView;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.view.FileSelectionView;
+import org.obiba.opal.web.gwt.app.client.fs.view.FileSelectorView;
 
 import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 

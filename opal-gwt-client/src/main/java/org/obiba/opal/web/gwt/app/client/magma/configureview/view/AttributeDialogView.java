@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.app.client.magma.configureview.view;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.LabelListPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.LabelListPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.AttributeDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.DropdownSuggestBox;
 import org.obiba.opal.web.model.client.magma.AttributeDto;

@@ -9,12 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.inject;
 
-import org.obiba.opal.web.gwt.app.client.wizard.importidentifiers.presenter.IdentifiersImportPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importidentifiers.view.IdentifiersImportView;
-import org.obiba.opal.web.gwt.app.client.wizard.mapidentifiers.presenter.IdentifiersMapPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.mapidentifiers.view.IdentifiersMapView;
-import org.obiba.opal.web.gwt.app.client.wizard.syncidentifiers.presenter.IdentifiersSyncPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.syncidentifiers.view.IdentifiersSyncView;
+import org.obiba.opal.web.gwt.app.client.unit.importidentifiers.presenter.IdentifiersImportPresenter;
+import org.obiba.opal.web.gwt.app.client.unit.importidentifiers.view.IdentifiersImportView;
+import org.obiba.opal.web.gwt.app.client.unit.mapidentifiers.presenter.IdentifiersMapPresenter;
+import org.obiba.opal.web.gwt.app.client.unit.mapidentifiers.view.IdentifiersMapView;
+import org.obiba.opal.web.gwt.app.client.unit.syncidentifiers.presenter.IdentifiersSyncPresenter;
+import org.obiba.opal.web.gwt.app.client.unit.syncidentifiers.view.IdentifiersSyncView;
 
 /**
  * Bind concrete implementations to interfaces within the Identifier Import Variables wizard.

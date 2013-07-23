@@ -13,10 +13,10 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.Dat
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.ActionsPackageRColumn;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.ClickableColumn;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.ConstantActionsProvider;
-import org.obiba.opal.web.gwt.app.client.widgets.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsPackageRColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ConstantActionsProvider;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.EntryDto;

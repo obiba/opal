@@ -9,12 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.inject;
 
-import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.ConclusionStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.importvariables.view.ComparedDatasourcesReportStepView;
-import org.obiba.opal.web.gwt.app.client.wizard.importvariables.view.ConclusionStepView;
-import org.obiba.opal.web.gwt.app.client.wizard.importvariables.view.VariablesImportView;
+import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.ConclusionStepPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.importvariables.view.ComparedDatasourcesReportStepView;
+import org.obiba.opal.web.gwt.app.client.magma.importvariables.view.ConclusionStepView;
+import org.obiba.opal.web.gwt.app.client.magma.importvariables.view.VariablesImportView;
 
 /**
  * Bind concrete implementations to interfaces within the Import Variables wizard.

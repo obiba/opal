@@ -17,7 +17,7 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.ScriptEditorPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.ScriptEditorPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;

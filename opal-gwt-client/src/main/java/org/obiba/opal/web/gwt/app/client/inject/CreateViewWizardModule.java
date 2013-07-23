@@ -9,10 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.inject;
 
-import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.createview.view.CreateViewStepView;
-import org.obiba.opal.web.gwt.app.client.wizard.variablestoview.presenter.VariablesToViewPresenter;
-import org.obiba.opal.web.gwt.app.client.wizard.variablestoview.view.VariablesToViewView;
+import org.obiba.opal.web.gwt.app.client.magma.createview.presenter.CreateViewStepPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.createview.view.CreateViewStepView;
+import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variablestoview.view.VariablesToViewView;
 
 /**
  * Bind concrete implementations to interfaces within the Create View wizard.

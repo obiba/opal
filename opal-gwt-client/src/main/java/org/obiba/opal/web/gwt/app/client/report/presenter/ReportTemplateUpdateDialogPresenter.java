@@ -23,11 +23,11 @@ import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateUpdatedEvent
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectorPresenter.FileSelectionType;
-import org.obiba.opal.web.gwt.app.client.widgets.presenter.ItemSelectorPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.view.KeyValueItemInputView;
-import org.obiba.opal.web.gwt.app.client.widgets.view.TextBoxItemInputView;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
+import org.obiba.opal.web.gwt.app.client.presenter.ItemSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.view.KeyValueItemInputView;
+import org.obiba.opal.web.gwt.app.client.view.TextBoxItemInputView;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;

@@ -1,8 +1,9 @@
 package org.obiba.opal.web.gwt.app.client.administration.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.widgets.breadcrumbs.OpalNavLink;
+import org.obiba.opal.web.gwt.app.client.ui.OpalNavLink;
 
+import com.github.gwtbootstrap.client.ui.NavLink;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -138,12 +139,12 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
 
   @Override
   public void setJavaHistoryToken(String historyToken) {
-    javaPlace.setHistoryToken(historyToken);;
+    javaPlace.setHistoryToken(historyToken);
   }
 
   @Override
   public void setServerHistoryToken(String historyToken) {
-    serverPlace.setHistoryToken(historyToken);;
+    serverPlace.setHistoryToken(historyToken);
   }
 
 }
