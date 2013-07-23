@@ -1397,6 +1397,26 @@ public interface Translations extends Constants {
   })
   Map<String, String> dataShieldLabelsMap();
 
+  //    TabPanelHelper.setTabTitle(tabPanel, i++, "Tables");
+//    TabPanelHelper.setTabTitle(tabPanel, i++, "Files");
+//    TabPanelHelper.setTabTitle(tabPanel, i++, "Data visualization");
+//    TabPanelHelper.setTabTitle(tabPanel, i++, "Reports");
+//    TabPanelHelper.setTabTitle(tabPanel, i++, "Tasks");
+//    TabPanelHelper.setTabTitle(tabPanel, i++, "Permissions");
+//    TabPanelHelper.setTabTitle(tabPanel, i++, "Administration");
+
+  @Description("Project Tab Names")
+  @DefaultStringMapValue({ "TAB_TABLES", "Tables", //
+      "TAB_FILES", "Files", //
+      "TAB_DATA_VISUALIZATION", "Data visualization", //
+      "TAB_REPORTS", "Reports", //
+      "TAB_TASKS", "Tasks", //
+      "TAB_PERMISSIONS", "Permissions", //
+      "TAB_ADMINISTRATION", "Administration" //
+  })
+  Map<String, String> projectTabNameMap();
+
+
   @Description("Lower Value Limit Required label")
   @DefaultStringValue("Lower value limit is required.")
   String lowerValueLimitRequired();
@@ -1766,6 +1786,10 @@ public interface Translations extends Constants {
   @Description("Page Users and Groups title")
   @DefaultStringValue("Users and Groups")
   String pageUsersAndGroupsTitle();
+
+  @Description("Page Projects title")
+  @DefaultStringValue("Projects")
+  String pageProjectsTitle();
 
   @Description("User Name label")
   @DefaultStringValue("Name")
