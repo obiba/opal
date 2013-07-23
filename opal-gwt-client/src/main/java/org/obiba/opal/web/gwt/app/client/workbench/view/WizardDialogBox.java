@@ -11,27 +11,25 @@ package org.obiba.opal.web.gwt.app.client.workbench.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.ButtonGroup;
+import com.github.gwtbootstrap.client.ui.ModalFooter;
+import com.github.gwtbootstrap.client.ui.constants.ButtonType;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
  *
  */
-public class WizardDialogBox extends DialogBox {
+public class WizardDialogBox extends Modal {
 
   private static final Translations translations = GWT.create(Translations.class);
 
-  private DockLayoutPanel contentLayout;
 
   private SimplePanel step;
 
@@ -53,93 +51,48 @@ public class WizardDialogBox extends DialogBox {
 
   private String helpTooltipHeight;
 
-  /**
-   *
-   */
   public WizardDialogBox() {
     initWidget();
   }
 
-  /**
-   * @param autoHide
-   * @param modal
-   */
-  public WizardDialogBox(boolean autoHide, boolean modal) {
-    super(autoHide, modal);
-    initWidget();
-  }
-
-  public void setAutoHide(boolean autoHide) {
-    setAutoHideEnabled(autoHide);
-  }
-
-  /**
-   * @param autoHide
-   */
-  public WizardDialogBox(boolean autoHide) {
-    super(autoHide);
-    initWidget();
-  }
-
   private void initWidget() {
-    addStyleName("wizard");
-
-    super.setWidget(contentLayout = new DockLayoutPanel(Unit.EM));
-    setSize("45em", "22em");
-
+    // main content
+    super.add(step = new SimplePanel());
+    step.setHeight("25em");
+    //step.setWidth("30em");
     // controls
     initControls();
-
-    // main content
-    ScrollPanel scroll = new ScrollPanel();
-    contentLayout.add(scroll);
-    scroll.setWidget(step = new SimplePanel());
   }
 
   private void initControls() {
-    FlowPanel south;
-    contentLayout.addSouth(south = new FlowPanel(), 4);
-    south.addStyleName("footer");
-
-    ResizeHandle resizeHandle = new ResizeHandle();
-    south.add(resizeHandle);
-    resizeHandle.makeResizable(contentLayout);
-
-    initNavigationControls(south);
-    initHelpControl(south);
+    ModalFooter footer = new ModalFooter();
+    super.add(footer);
+    initNavigationControls(footer);
+    initHelpControl(footer);
   }
 
-  private void initNavigationControls(FlowPanel south) {
-    south.add(cancel = new Button(translations.cancelLabel()));
-    initControlStyle(cancel, "cancel");
-    south.add(close = new Button(translations.closeLabel()));
-    initControlStyle(close, "btn-primary cloze");
-    close.setVisible(false);
-    south.add(finish = new Button(translations.finishLabel()));
-    initControlStyle(finish, "btn-primary finish");
-    south.add(next = new Button(translations.nextLabel()));
-    initControlStyle(next, "btn-info next");
-    south.add(previous = new Button(translations.previousLabel()));
-    initControlStyle(previous, "btn-info previous");
+  private void initNavigationControls(ModalFooter footer) {
+    FlowPanel group = new FlowPanel();
+    group.addStyleName("pull-right");
+    group.add(previous = new Button(translations.previousLabel()));
+    group.add(next = new Button(translations.nextLabel()));
+    group.add(finish = new Button(translations.finishLabel()));
+    group.add(close = new Button(translations.closeLabel()));
+    group.add(cancel = new Button(translations.cancelLabel()));
+    cancel.setType(ButtonType.DEFAULT);
+    close.setType(ButtonType.PRIMARY);
+    finish.setType(ButtonType.PRIMARY);
+    next.setType(ButtonType.INFO);
+    previous.setType(ButtonType.INFO);
+    footer.add(group);
+
     setPreviousEnabled(false);
   }
 
-  private void initHelpControl(FlowPanel south) {
-    south.add(help = new Button(translations.helpLabel()));
-    help.addStyleName("help");
-    help.addStyleName("btn");
-    help.removeStyleName("gwt-Button");
-    help.addStyleName("left-aligned");
-    help.addStyleName("top-margin");
+  private void initHelpControl(ModalFooter footer) {
+    footer.add(help = new Button(translations.helpLabel()));
+    help.addStyleName("pull-left");
     help.setEnabled(false);
-  }
-
-  private void initControlStyle(Button button, String style) {
-    button.addStyleName(style);
-    button.addStyleName("btn");
-    button.removeStyleName("gwt-Button");
-    button.addStyleName("right-aligned");
-    button.addStyleName("top-margin");
   }
 
   public void setHelpEnabled(boolean enabled) {
@@ -173,28 +126,9 @@ public class WizardDialogBox extends DialogBox {
     previous.setVisible(!visible);
   }
 
-  @Override
-  public void setSize(String width, String height) {
-    contentLayout.setSize(width, height);
-  }
-
-  @Override
-  public void setWidth(String width) {
-    contentLayout.setWidth(width);
-  }
-
-  @Override
-  public void setHeight(String height) {
-    contentLayout.setHeight(height);
-  }
-
-  public void setStep(Widget w) {
-    setWidget(w);
-  }
-
-  @Override
   public void setWidget(Widget w) {
-    w.addStyleName("main");
+    step.clear();
+    w.removeFromParent();
     step.setWidget(w);
   }
 

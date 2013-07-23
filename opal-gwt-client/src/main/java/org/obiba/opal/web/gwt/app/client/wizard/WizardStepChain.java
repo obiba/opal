@@ -134,7 +134,6 @@ public class WizardStepChain {
      * @return
      */
     public static Builder create(WizardDialogBox wizard, boolean glass) {
-      wizard.setGlassEnabled(glass);
       return new Builder(wizard);
     }
 

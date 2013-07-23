@@ -1,3 +1,6 @@
+@import "opal-gwt.css";
+@import "opal-bootstrap.css";
+
 h1 {
   font-size: 1.8em;
 }

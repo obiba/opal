@@ -18,11 +18,13 @@ import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.createview.presenter.CreateViewStepPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.ModalViewImpl;
 import org.obiba.opal.web.gwt.app.client.workbench.view.TableChooser;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
+import com.github.gwtbootstrap.client.ui.Modal;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -45,7 +47,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class CreateViewStepView extends PopupViewImpl implements CreateViewStepPresenter.Display {
+public class CreateViewStepView extends ModalViewImpl implements CreateViewStepPresenter.Display {
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -127,6 +129,11 @@ public class CreateViewStepView extends PopupViewImpl implements CreateViewStepP
     addingVariablesOneByOneRadioButton.addValueChangeHandler(handler);
     useAnExistingView.addValueChangeHandler(handler);
     useAnExcelFile.addValueChangeHandler(handler);
+  }
+
+  @Override
+  protected Modal asModal() {
+    return dialog;
   }
 
   private void initWizardDialog() {

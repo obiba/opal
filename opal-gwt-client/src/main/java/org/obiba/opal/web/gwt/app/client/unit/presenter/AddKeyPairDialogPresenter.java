@@ -53,8 +53,6 @@ public class AddKeyPairDialogPresenter extends PresenterWidget<AddKeyPairDialogP
 
     void hideDialog();
 
-    HasCloseHandlers<PopupPanel> getDialog();
-
     HasText getAlias();
 
     // True when a KeyPair is being added

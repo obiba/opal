@@ -18,12 +18,14 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresente
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.exportdata.presenter.DataExportPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.ModalViewImpl;
 import org.obiba.opal.web.gwt.app.client.workbench.view.TableChooser;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
+import com.github.gwtbootstrap.client.ui.Modal;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -50,14 +52,12 @@ import com.gwtplatform.mvp.client.PopupViewImpl;
 /**
  * View of the dialog used to export data from Opal.
  */
-public class DataExportView extends PopupViewImpl implements DataExportPresenter.Display {
-
+public class DataExportView extends ModalViewImpl implements DataExportPresenter.Display {
   private static final Translations translations = GWT.create(Translations.class);
 
   private String username;
 
-  @UiTemplate("DataExportView.ui.xml")
-  interface DataExportUiBinder extends UiBinder<DialogBox, DataExportView> {}
+  interface DataExportUiBinder extends UiBinder<Widget, DataExportView> {}
 
   private static final DataExportUiBinder uiBinder = GWT.create(DataExportUiBinder.class);
 
@@ -198,7 +198,7 @@ public class DataExportView extends PopupViewImpl implements DataExportPresenter
   }
 
   @Override
-  protected PopupPanel asPopupPanel() {
+  protected Modal asModal() {
     return dialog;
   }
 

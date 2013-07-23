@@ -14,9 +14,11 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.createdatasource.presenter.CreateDatasourcePresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.ModalViewImpl;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 
+import com.github.gwtbootstrap.client.ui.Modal;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -37,7 +39,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class CreateDatasourceView extends PopupViewImpl implements CreateDatasourcePresenter.Display {
+public class CreateDatasourceView extends ModalViewImpl implements CreateDatasourcePresenter.Display {
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -156,7 +158,7 @@ public class CreateDatasourceView extends PopupViewImpl implements CreateDatasou
   }
 
   @Override
-  protected PopupPanel asPopupPanel() {
+  protected Modal asModal() {
     return dialog;
   }
 
@@ -164,8 +166,7 @@ public class CreateDatasourceView extends PopupViewImpl implements CreateDatasou
   // Inner Classes / Interfaces
   //
 
-  @UiTemplate("CreateDatasourceView.ui.xml")
-  interface ViewUiBinder extends UiBinder<DialogBox, CreateDatasourceView> {}
+  interface ViewUiBinder extends UiBinder<Widget, CreateDatasourceView> {}
 
   @Override
   public void show() {

@@ -16,10 +16,12 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresente
 import org.obiba.opal.web.gwt.app.client.widgets.view.CsvOptionsView;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.mapidentifiers.presenter.IdentifiersMapPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.ModalViewImpl;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
+import com.github.gwtbootstrap.client.ui.Modal;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -37,7 +39,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class IdentifiersMapView extends PopupViewImpl implements IdentifiersMapPresenter.Display {
+public class IdentifiersMapView extends ModalViewImpl implements IdentifiersMapPresenter.Display {
 
   @UiTemplate("IdentifiersMapView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, IdentifiersMapView> {}
@@ -105,7 +107,7 @@ public class IdentifiersMapView extends PopupViewImpl implements IdentifiersMapP
   }
 
   @Override
-  protected PopupPanel asPopupPanel() {
+  protected Modal asModal() {
     return dialog;
   }
 

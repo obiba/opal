@@ -1,0 +1,4 @@
+/* Ensure dialog box is at same z level as bootstrap modal */
+.gwt-DialogBox {
+  z-index: 1050;
+}

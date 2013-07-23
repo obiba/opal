@@ -5,24 +5,7 @@
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <ui:style>
-    .optionsPanelMsg td {
-      margin: 0.5em 0.5em 0.5em 0.5em;
-    }
-
-    .right-aligned {
-      float: right;
-    }
-
-    .top-margin {
-      margin-top: 0.5em;
-    }
-  </ui:style>
-
-  <o:WizardDialogBox autoHide="false" modal="true" height="35em" width="45em">
-    <g:caption>
-      <ui:msg description="Add Cryptographic Key dialog title">Add Cryptographic Key</ui:msg>
-    </g:caption>
+  <o:WizardDialogBox title="Add Cryptographic Key">
     <g:FlowPanel>
       <o:WizardStep ui:field="keyTypeStep">
         <g:FlowPanel styleName="input">

@@ -15,9 +15,11 @@ import org.obiba.opal.web.gwt.app.client.widgets.presenter.FileSelectionPresente
 import org.obiba.opal.web.gwt.app.client.widgets.view.CsvOptionsView;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.importidentifiers.presenter.IdentifiersImportPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.ModalViewImpl;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 
+import com.github.gwtbootstrap.client.ui.Modal;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.web.bindery.event.shared.EventBus;
@@ -36,9 +38,8 @@ import com.gwtplatform.mvp.client.PopupViewImpl;
 
 import static org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig.ImportFormat;
 
-public class IdentifiersImportView extends PopupViewImpl implements IdentifiersImportPresenter.Display {
+public class IdentifiersImportView extends ModalViewImpl implements IdentifiersImportPresenter.Display {
 
-  @UiTemplate("IdentifiersImportView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, IdentifiersImportView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
@@ -104,7 +105,7 @@ public class IdentifiersImportView extends PopupViewImpl implements IdentifiersI
   }
 
   @Override
-  protected PopupPanel asPopupPanel() {
+  protected Modal asModal() {
     return dialog;
   }
 

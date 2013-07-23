@@ -21,11 +21,13 @@ import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportP
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.DataImportPresenter.ImportDataInputsHandler;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Chooser;
 import org.obiba.opal.web.gwt.app.client.workbench.view.DatasourceParsingErrorPanel;
+import org.obiba.opal.web.gwt.app.client.workbench.view.ModalViewImpl;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.github.gwtbootstrap.client.ui.Modal;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -48,9 +50,8 @@ import com.gwtplatform.mvp.client.PopupViewImpl;
 import static org.obiba.opal.web.gwt.app.client.wizard.importdata.ImportConfig.ImportFormat;
 
 @SuppressWarnings("OverlyCoupledClass")
-public class DataImportView extends PopupViewImpl implements DataImportPresenter.Display {
+public class DataImportView extends ModalViewImpl implements DataImportPresenter.Display {
 
-  @UiTemplate("DataImportView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DataImportView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
@@ -264,7 +265,7 @@ public class DataImportView extends PopupViewImpl implements DataImportPresenter
   }
 
   @Override
-  protected PopupPanel asPopupPanel() {
+  protected Modal asModal() {
     return dialog;
   }
 

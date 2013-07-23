@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.derive.presenter.DeriveVariablePresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.ModalViewImpl;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 
@@ -34,7 +35,7 @@ import com.gwtplatform.mvp.client.PopupViewImpl;
 /**
  *
  */
-public class DeriveVariableView extends PopupViewImpl implements DeriveVariablePresenter.Display {
+public class DeriveVariableView extends ModalViewImpl implements DeriveVariablePresenter.Display {
 
   @UiTemplate("DeriveVariableView.ui.xml")
   interface ViewUiBinder extends UiBinder<WizardDialogBox, DeriveVariableView> {}

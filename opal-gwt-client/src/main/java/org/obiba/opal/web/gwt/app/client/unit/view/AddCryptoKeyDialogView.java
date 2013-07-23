@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.BranchingWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
+import org.obiba.opal.web.gwt.app.client.workbench.view.ModalViewImpl;
 import org.obiba.opal.web.gwt.app.client.workbench.view.NumericTextBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
@@ -47,9 +48,8 @@ import com.gwtplatform.mvp.client.PopupViewImpl;
 /**
  *
  */
-public class AddCryptoKeyDialogView extends PopupViewImpl implements AddKeyPairDialogPresenter.Display {
+public class AddCryptoKeyDialogView extends ModalViewImpl implements AddKeyPairDialogPresenter.Display {
 
-  @UiTemplate("AddCryptoKeyDialogView.ui.xml")
   interface ViewUiBinder extends UiBinder<WizardDialogBox, AddCryptoKeyDialogView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
@@ -344,11 +344,6 @@ public class AddCryptoKeyDialogView extends PopupViewImpl implements AddKeyPairD
   @Override
   public HasText getCountry() {
     return country;
-  }
-
-  @Override
-  public HasCloseHandlers<PopupPanel> getDialog() {
-    return dialog;
   }
 
   @Override

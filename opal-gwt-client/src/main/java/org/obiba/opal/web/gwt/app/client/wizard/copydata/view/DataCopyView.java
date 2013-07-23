@@ -16,12 +16,14 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.copydata.presenter.DataCopyPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.ModalViewImpl;
 import org.obiba.opal.web.gwt.app.client.workbench.view.TableChooser;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
+import com.github.gwtbootstrap.client.ui.Modal;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -44,12 +46,11 @@ import com.gwtplatform.mvp.client.PopupViewImpl;
 /**
  * View of the dialog used to export data from Opal.
  */
-public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Display {
+public class DataCopyView extends ModalViewImpl implements DataCopyPresenter.Display {
 
   private static final Translations translations = GWT.create(Translations.class);
 
-  @UiTemplate("DataCopyView.ui.xml")
-  interface DataCopyUiBinder extends UiBinder<DialogBox, DataCopyView> {}
+  interface DataCopyUiBinder extends UiBinder<Widget, DataCopyView> {}
 
   private static final DataCopyUiBinder uiBinder = GWT.create(DataCopyUiBinder.class);
 
@@ -162,7 +163,7 @@ public class DataCopyView extends PopupViewImpl implements DataCopyPresenter.Dis
   }
 
   @Override
-  protected PopupPanel asPopupPanel() {
+  protected Modal asModal() {
     return dialog;
   }
 

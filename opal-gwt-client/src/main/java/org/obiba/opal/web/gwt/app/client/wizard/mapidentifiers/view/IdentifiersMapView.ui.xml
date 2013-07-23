@@ -6,11 +6,7 @@
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <o:WizardDialogBox ui:field="dialog" autoHide="false" modal="true" height="30em" width="40em">
-    <g:caption>
-      <ui:msg description="Map Identifiers label">Map Identifiers</ui:msg>
-    </g:caption>
-
+  <o:WizardDialogBox ui:field="dialog" title="Map Identifiers">
     <g:FlowPanel>
 
       <o:WizardStep ui:field="formatStep">

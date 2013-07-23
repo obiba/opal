@@ -19,12 +19,14 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.wizard.syncidentifiers.presenter.IdentifiersSyncPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.ModalViewImpl;
 import org.obiba.opal.web.gwt.app.client.workbench.view.Table;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableIdentifiersSync;
 
+import com.github.gwtbootstrap.client.ui.Modal;
 import com.google.common.collect.ImmutableList;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -44,9 +46,8 @@ import com.google.gwt.view.client.SelectionModel;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class IdentifiersSyncView extends PopupViewImpl implements IdentifiersSyncPresenter.Display {
+public class IdentifiersSyncView extends ModalViewImpl implements IdentifiersSyncPresenter.Display {
 
-  @UiTemplate("IdentifiersSyncView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, IdentifiersSyncView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
@@ -138,7 +139,7 @@ public class IdentifiersSyncView extends PopupViewImpl implements IdentifiersSyn
   }
 
   @Override
-  protected PopupPanel asPopupPanel() {
+  protected Modal asModal() {
     return dialog;
   }
 

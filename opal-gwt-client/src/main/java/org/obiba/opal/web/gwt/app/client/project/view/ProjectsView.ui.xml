@@ -1,6 +1,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.workbench.view"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -31,7 +32,7 @@
       </b:Column>
     </b:FluidRow>
     <g:FlowPanel ui:field="content" addStyleNames="items"></g:FlowPanel>
-    <b:Modal ui:field="addProjectModal" closeVisible="true" keyboard="true" animation="false">
+    <o:Modal ui:field="addProjectModal" closeVisible="true" keyboard="true" animation="false">
       <g:SimplePanel ui:field="alertPlace"/>
       <b:ControlGroup ui:field="labelGroup">
         <b:ControlLabel>
@@ -49,7 +50,7 @@
         <b:Button icon="FILE" type="PRIMARY" ui:field="save">Save</b:Button>
         <b:Button ui:field="cancel">Cancel</b:Button>
       </b:ModalFooter>
-    </b:Modal>
+    </o:Modal>
   </g:FlowPanel>
 
 </ui:UiBinder>

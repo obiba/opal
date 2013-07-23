@@ -24,6 +24,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.Conclu
 import org.obiba.opal.web.gwt.app.client.wizard.importvariables.presenter.VariablesImportPresenter;
 import org.obiba.opal.web.gwt.app.client.workbench.view.DatasourceParsingErrorPanel;
 import org.obiba.opal.web.gwt.app.client.workbench.view.DropdownSuggestBox;
+import org.obiba.opal.web.gwt.app.client.workbench.view.ModalViewImpl;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.workbench.view.WizardStep;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -31,6 +32,7 @@ import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.github.gwtbootstrap.client.ui.Modal;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -53,7 +55,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class VariablesImportView extends PopupViewImpl implements VariablesImportPresenter.Display {
+public class VariablesImportView extends ModalViewImpl implements VariablesImportPresenter.Display {
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -337,7 +339,7 @@ public class VariablesImportView extends PopupViewImpl implements VariablesImpor
   }
 
   @Override
-  protected PopupPanel asPopupPanel() {
+  protected Modal asModal() {
     return dialog;
   }
 
