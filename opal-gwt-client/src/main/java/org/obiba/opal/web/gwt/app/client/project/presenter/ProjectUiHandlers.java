@@ -6,4 +6,5 @@ public interface ProjectUiHandlers extends UiHandlers {
 
   void onProjectsSelection();
 
+  void onTabSelected(int index);
 }

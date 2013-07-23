@@ -348,7 +348,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     getView().hide();
     derivationPresenter.onClose();
     if(wizardType == FromWizardType) {
-      getEventBus().fireEvent(new VariableSelectionChangeEvent(table, variable));
+      getEventBus().fireEvent(new VariableSelectionChangeEvent(this, table, variable));
     } else if(deriveConclusionPresenter.getView().isOpenEditorSelected()) {
       getEventBus().fireEvent(new ViewConfigurationRequiredEvent(view, derived));
     }

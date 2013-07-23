@@ -30,6 +30,7 @@ import org.obiba.opal.web.gwt.app.client.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
@@ -63,6 +64,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private TableDto table;
 
+  private boolean variableUpdatePending = false;
+
   @Inject
   public VariablePresenter(Display display, EventBus eventBus, ValuesTablePresenter valuesTablePresenter,
       SummaryTabPresenter summaryTabPresenter, Provider<AuthorizationPresenter> authorizationPresenter) {
@@ -94,6 +97,28 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   protected void onUnbind() {
     super.onUnbind();
     summaryTabPresenter.unbind();
+  }
+
+  private void updateDisplay(String datasourceName, String tableName, String variableName, @Nullable String previous,
+      @Nullable String next) {
+    if(table != null && table.getDatasourceName().equals(datasourceName) && table.getName().equals(tableName) &&
+        variable != null && variable.getName().equals(variableName)) return;
+
+
+    if (variableUpdatePending) return;
+    UriBuilder ub = UriBuilder.create().segment("datasource", "{}", "table", "{}", "variable", "{}");
+    ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(ub.build(datasourceName, tableName, variableName)).get()
+        .withCallback(new ResourceCallback<VariableDto>() {
+          @Override
+          public void onResource(Response response, VariableDto resource) {
+//            if(resource != null) {
+//              updateDisplay(resource, previous, next);
+//            }
+            variableUpdatePending = false;
+          }
+        }).send();
+
+
   }
 
   private void updateDisplay(TableDto tableDto, VariableDto variableDto, @Nullable VariableDto previous,
@@ -292,7 +317,9 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   class VariableSelectionHandler implements VariableSelectionChangeEvent.Handler {
     @Override
     public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-      updateDisplay(event.getTable(), event.getSelection(), event.getPrevious(), event.getNext());
+      if (event.hasTable()) {
+        updateDisplay(event.getTable(), event.getSelection(), event.getPrevious(), event.getNext());
+      }
     }
   }
 

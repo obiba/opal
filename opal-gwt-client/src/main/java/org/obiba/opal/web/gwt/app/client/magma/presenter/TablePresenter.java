@@ -143,7 +143,13 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     addEventHandlers();
   }
 
-  private void updateTableIndexStatus() {
+  @Override
+  protected void onReveal() {
+    super.onReveal();
+  }
+
+
+    private void updateTableIndexStatus() {
     // Table indexation status
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").get()
         .authorize(getView().getTableIndexStatusAuthorizer()).send();
@@ -657,7 +663,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     @Override
     public void update(int index, VariableDto variableDto, String value) {
       getEventBus().fireEvent(
-          new VariableSelectionChangeEvent(table, variableDto, getPreviousVariable(index), getNextVariable(index)));
+          new VariableSelectionChangeEvent(this, table, variableDto, getPreviousVariable(index), getNextVariable(index)));
     }
   }
 
@@ -681,7 +687,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       VariableDto variableDto = variables.get(siblingIndex);
 
       getView().setVariableSelection(variableDto, siblingIndex);
-      getEventBus().fireEvent(new VariableSelectionChangeEvent(table, variableDto, getPreviousVariable(siblingIndex),
+      getEventBus().fireEvent(new VariableSelectionChangeEvent(this, table, variableDto, getPreviousVariable(siblingIndex),
           getNextVariable(siblingIndex)));
     }
   }
