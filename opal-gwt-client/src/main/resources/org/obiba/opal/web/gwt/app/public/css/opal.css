@@ -260,3 +260,10 @@ div.obiba-SuggestListBox {
   padding-top: 2px;
 }
 
+/*
+ * Properties Table
+ */
+.property-key {
+  font-weight: bold;
+}
+
