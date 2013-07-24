@@ -6,7 +6,14 @@ import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
+/**
+ * A Bootstrap Modal, resizable and draggable.
+ */
 public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
+
+  private boolean resizable;
+
+  private boolean draggable;
 
   private boolean resize = false;
 
@@ -31,7 +38,25 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     sinkMouseEvents();
     // modal-header is the drag handle
     setMovePanel(getWidget(0));
-    setBackdrop(BackdropType.STATIC);
+    setAutoHide(false);
+    setDraggable(true);
+    setResizable(true);
+  }
+
+  public void setResizable(boolean resizable) {
+    this.resizable = resizable;
+  }
+
+  public void setDraggable(boolean draggable) {
+    this.draggable = draggable;
+  }
+
+  public void setAutoHide(boolean autoHide) {
+    if (autoHide) {
+      setBackdrop(BackdropType.NORMAL);
+    } else {
+      setBackdrop(BackdropType.STATIC);
+    }
   }
 
   private void sinkMouseEvents() {
@@ -69,9 +94,9 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
 
   private void onMouseOverEvent(Event event) {
     //show different cursors
-    if(isCursorResize(event)) {
+    if(resizable && isCursorResize(event)) {
       DOM.setStyleAttribute(getElement(), "cursor", "se-resize");
-    } else if(isCursorMove(event)) {
+    } else if(draggable && isCursorMove(event)) {
       DOM.setStyleAttribute(movePanel.getElement(), "cursor", "move");
     } else {
       DOM.setStyleAttribute(getElement(), "cursor", "default");
@@ -79,13 +104,13 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   }
 
   private void onMouseDownEvent(Event event) {
-    if(isCursorResize(event)) {
+    if(resizable && isCursorResize(event)) {
       //enable/disable resize
       if(!resize) {
         resize = true;
         DOM.setCapture(getElement());
       }
-    } else if(isCursorMove(event)) {
+    } else if(draggable && isCursorMove(event)) {
       DOM.setCapture(getElement());
       move = true;
       moveStartX = DOM.eventGetClientX(event);
@@ -97,7 +122,6 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     //reset cursor-type
     if(!isCursorResize(event) && !isCursorMove(event)) {
       DOM.setStyleAttribute(getElement(), "cursor", "default");
-      return;
     }
 
     //calculate and set the new size or move
