@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCanceledEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -28,20 +29,17 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<FunctionalUnitUpdateDialogPresenter.Display> {
+public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<FunctionalUnitUpdateDialogPresenter.Display>
+    implements FunctionalUnitUpdateDialogUiHandlers {
 
   @SuppressWarnings("TypeMayBeWeakened")
   private final Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
@@ -53,17 +51,11 @@ public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<Functio
   }
 
   @SuppressWarnings("unused")
-  public interface Display extends PopupView {
+  public interface Display extends PopupView, HasUiHandlers<FunctionalUnitUpdateDialogUiHandlers> {
 
     void hideDialog();
 
     void setDialogMode(Mode dialogMode);
-
-    HasClickHandlers getUpdateFunctionalUnitButton();
-
-    HasClickHandlers getCancelButton();
-
-    HasCloseHandlers<DialogBox> getDialog();
 
     void setName(String name);
 
@@ -86,12 +78,12 @@ public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<Functio
   @Inject
   public FunctionalUnitUpdateDialogPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
+    getView().setUiHandlers(this);
   }
 
   @Override
   protected void onBind() {
     super.onBind();
-    addEventHandlers();
     addValidators();
   }
 
@@ -105,24 +97,33 @@ public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<Functio
     validators.clear();
   }
 
-  private void addEventHandlers() {
-    registerHandler(
-        getView().getUpdateFunctionalUnitButton().addClickHandler(new CreateOrUpdateFunctionalUnitClickHandler()));
-    registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getView().hideDialog();
-      }
-    }));
-  }
-
   public void setDialogMode(Mode dialogMode) {
     this.dialogMode = dialogMode;
     getView().setDialogMode(dialogMode);
   }
 
+  @Override
+  public void updateFunctionaUnit() {
+    if(dialogMode == Mode.CREATE) {
+      createFunctionalUnit();
+    } else if(dialogMode == Mode.UPDATE) {
+      updateFunctionalUnitInternal();
+    }
+  }
+
+  @Override
+  public void onDialogHide() {
+    getView().hideDialog();
+    onDialogHidden();
+  }
+
+  @Override
+  public void onDialogHidden() {
+    getEventBus().fireEvent(new FunctionalUnitCanceledEvent());
+  }
+
   @SuppressWarnings("MethodOnlyUsedFromInnerClass, TypeMayBeWeakened")
-  private void updateFunctionalUnit() {
+  private void updateFunctionalUnitInternal() {
     if(validFunctionalUnit()) {
       FunctionalUnitDto functionalUnit = getFunctionalUnitDto();
       CreateOrUpdateFunctionalUnitCallBack callbackHandler = new CreateOrUpdateFunctionalUnitCallBack(functionalUnit);
@@ -198,19 +199,6 @@ public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<Functio
           .withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler)
           .send();
     }
-  }
-
-  public class CreateOrUpdateFunctionalUnitClickHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent arg0) {
-      if(dialogMode == Mode.CREATE) {
-        createFunctionalUnit();
-      } else if(dialogMode == Mode.UPDATE) {
-        updateFunctionalUnit();
-      }
-    }
-
   }
 
   private class CreateOrUpdateFunctionalUnitCallBack implements ResponseCodeCallback {

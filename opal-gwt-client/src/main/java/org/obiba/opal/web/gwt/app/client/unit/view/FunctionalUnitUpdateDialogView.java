@@ -10,34 +10,33 @@
 package org.obiba.opal.web.gwt.app.client.unit.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
-import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogUiHandlers;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.event.HiddenEvent;
+import com.github.gwtbootstrap.client.ui.event.HiddenHandler;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.logical.shared.HasCloseHandlers;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DisclosurePanel;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PopupViewImpl;
+import com.google.web.bindery.event.shared.EventBus;
 
-public class FunctionalUnitUpdateDialogView extends PopupViewImpl implements Display {
+public class FunctionalUnitUpdateDialogView extends ModalPopupViewWithUiHandlers<FunctionalUnitUpdateDialogUiHandlers> implements Display {
 
-  @UiTemplate("FunctionalUnitUpdateDialogView.ui.xml")
-  interface FunctionalUnitUpdateDialogUiBinder extends UiBinder<DialogBox, FunctionalUnitUpdateDialogView> {}
+  interface FunctionalUnitUpdateDialogUiBinder extends UiBinder<Widget, FunctionalUnitUpdateDialogView> {}
 
   private static final FunctionalUnitUpdateDialogUiBinder uiBinder = GWT.create(FunctionalUnitUpdateDialogUiBinder
       .class);
@@ -45,13 +44,7 @@ public class FunctionalUnitUpdateDialogView extends PopupViewImpl implements Dis
   private static final Translations translations = GWT.create(Translations.class);
 
   @UiField
-  DialogBox dialog;
-
-  @UiField
-  DockLayoutPanel content;
-
-  @UiField
-  ResizeHandle resizeHandle;
+  Modal dialog;
 
   @UiField
   Button updateFunctionalUnitButton;
@@ -78,20 +71,9 @@ public class FunctionalUnitUpdateDialogView extends PopupViewImpl implements Dis
   public FunctionalUnitUpdateDialogView(EventBus eventBus) {
     super(eventBus);
     uiBinder.createAndBindUi(this);
-    dialog.hide();
-    selectEnabled.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<Boolean> evt) {
-        select.setEnabled(evt.getValue());
-        if(!evt.getValue()) {
-          select.setText("");
-        }
-      }
-    });
     selectEnabled.setValue(false);
     select.setEnabled(false);
-    resizeHandle.makeResizable(content);
+    dialog.addHiddenHandler(new DialogHiddenHandler());
   }
 
   @Override
@@ -111,19 +93,22 @@ public class FunctionalUnitUpdateDialogView extends PopupViewImpl implements Dis
     dialog.hide();
   }
 
-  @Override
-  public Button getCancelButton() {
-    return cancelButton;
+  @UiHandler("cancelButton")
+  public void onCancel(ClickEvent event) {
+    getUiHandlers().onDialogHide();
   }
 
-  @Override
-  public Button getUpdateFunctionalUnitButton() {
-    return updateFunctionalUnitButton;
+  @UiHandler("selectEnabled")
+  public void onValueChanged(ValueChangeEvent<Boolean> event) {
+    select.setEnabled(event.getValue());
+    if(!event.getValue()) {
+      select.setText("");
+    }
   }
 
-  @Override
-  public HasCloseHandlers getDialog() {
-    return dialog;
+  @UiHandler("updateFunctionalUnitButton")
+  public void onUpdateFunctionalUnit(ClickEvent event) {
+    getUiHandlers().updateFunctionaUnit();
   }
 
   @Override
@@ -176,15 +161,22 @@ public class FunctionalUnitUpdateDialogView extends PopupViewImpl implements Dis
   public void setDialogMode(Mode dialogMode) {
     functionalUnitName.setEnabled(Mode.CREATE == dialogMode);
     if(Mode.CREATE == dialogMode) {
-      dialog.setText(translations.addUnit());
+      dialog.setTitle(translations.addUnit());
     } else {
-      dialog.setText(translations.editUnit());
+      dialog.setTitle(translations.editUnit());
     }
   }
 
   @Override
   public HasText getSelect() {
     return select;
+  }
+
+  private class DialogHiddenHandler implements HiddenHandler {
+    @Override
+    public void onHidden(HiddenEvent hiddenEvent) {
+      getUiHandlers().onDialogHidden();
+    }
   }
 
 }
