@@ -90,7 +90,8 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
   @Override
   public void onProjectTableSelection(ProjectDto project, String table) {
     PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.project)
-        .with(ParameterTokens.TOKEN_NAME, project.getName())
+        .with(ParameterTokens.TOKEN_NAME, project.getName()) //
+        .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.tables.toString()) //
         .with(ParameterTokens.TOKEN_PATH, project.getName() + "." + table).build();
     placeManager.revealPlace(request);
   }

@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.ui.HasUrl;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequiredEvent;
@@ -238,7 +239,9 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     String path = MagmaPath.Builder.datasource(datasourceName).table(tableName).variable(variableName).build();
 
     PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.project)
-        .with(ParameterTokens.TOKEN_NAME, datasourceName).with(ParameterTokens.TOKEN_PATH, path);
+        .with(ParameterTokens.TOKEN_NAME, datasourceName) //
+        .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.tables.toString()) //
+        .with(ParameterTokens.TOKEN_PATH, path);
     placeManager.revealPlace(builder.build());
   }
 

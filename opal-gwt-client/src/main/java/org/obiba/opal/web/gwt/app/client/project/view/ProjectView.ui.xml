@@ -30,11 +30,16 @@
 
         </b:Column>
       </b:FluidRow>
-      <g:InlineLabel ui:field="description"></g:InlineLabel>
-      <b:Button type="LINK" icon="PLUS_SIGN" ui:field="ellipsis"/>
     </g:FlowPanel>
     <o:OpalTabPanel tabPosition="right" ui:field="tabPanel">
-      <b:Tab icon="TABLE" active="true">
+      <b:Tab icon="HOME" active="true">
+        <b:Heading size="5" addStyleNames="no-top-margin">Home</b:Heading>
+        <g:FlowPanel ui:field="homePanel">
+          <g:InlineLabel ui:field="description"></g:InlineLabel>
+          <b:Button type="LINK" icon="PLUS_SIGN" ui:field="ellipsis"/>
+        </g:FlowPanel>
+      </b:Tab>
+      <b:Tab icon="TABLE">
         <b:Heading size="5" addStyleNames="no-top-margin">Tables</b:Heading>
         <g:SimplePanel ui:field="tablesPanel"/>
       </b:Tab>

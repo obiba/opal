@@ -54,14 +54,15 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   public interface Display extends View, HasUiHandlers<ProjectUiHandlers>, HasTabPanel {
 
-    public enum ProjectTab {
+    enum ProjectTab {
+      home,
       tables,
       files,
       visualisation,
       reports,
       tasks,
       permissions,
-      administration;
+      administration
     }
 
     void setProject(ProjectDto project);
@@ -80,7 +81,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   @ContentSlot
   public static final GwtEvent.Type<RevealContentHandler<?>> ADMIN_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
 
-  private final MagmaPresenter magmaPresenter;
+  private final Provider<MagmaPresenter> magmaPresenterProvider;
 
   private final Provider<FileExplorerPresenter> fileExplorerPresenterProvider;
 
@@ -94,19 +95,21 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private ProjectDto project;
 
+  private MagmaPresenter magmaPresenter;
+
   private FileExplorerPresenter fileExplorerPresenter;
 
   private ProjectAdministrationPresenter projectAdministrationPresenter;
 
   @Inject
   public ProjectPresenter(EventBus eventBus, Display display, Proxy proxy, Translations translations,
-      PlaceManager placeManager, MagmaPresenter magmaPresenter,
+      PlaceManager placeManager, Provider<MagmaPresenter> magmaPresenterProvider,
       Provider<FileExplorerPresenter> fileExplorerPresenterProvider,
       Provider<ProjectAdministrationPresenter> projectAdministrationPresenterProvider) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
     this.placeManager = placeManager;
-    this.magmaPresenter = magmaPresenter;
+    this.magmaPresenterProvider = magmaPresenterProvider;
     this.fileExplorerPresenterProvider = fileExplorerPresenterProvider;
     this.projectAdministrationPresenterProvider = projectAdministrationPresenterProvider;
   }
@@ -114,12 +117,9 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   @Override
   protected void onBind() {
     super.onBind();
-
     addRegisteredHandler(DatasourceSelectionChangeEvent.getType(), this);
     addRegisteredHandler(TableSelectionChangeEvent.getType(), this);
     addRegisteredHandler(VariableSelectionChangeEvent.getType(), this);
-
-    setInSlot(TABLES_PANE, magmaPresenter);
   }
 
   @Override
@@ -151,7 +151,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
             project = resource;
             getView().setProject(project);
             String path = (String) getView().getTabData(tab.ordinal());
-            if(tab.equals(Display.ProjectTab.tables) && !Strings.isNullOrEmpty(path)){
+            if(tab.equals(Display.ProjectTab.tables) && !Strings.isNullOrEmpty(path)) {
+              onTablesTabSelected();
               MagmaPath.Parser parser = new MagmaPath.Parser().parse(path);
               if(parser.hasVariable()) {
                 magmaPresenter.show(parser.getDatasource(), parser.getTable(), parser.getVariable());
@@ -160,7 +161,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
               } else {
                 magmaPresenter.show(project.getDatasource().getName());
               }
-            }else{
+            } else {
               getEventBus()
                   .fireEventFromSource(new DatasourceSelectionChangeEvent(this, project.getDatasource()), eventSource);
             }
@@ -181,6 +182,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
     switch(tab) {
       case tables:
+        onTablesTabSelected();
         break;
       case files:
         onFilesTabSelected();
@@ -218,6 +220,16 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     }
 
     placeManager.updateHistory(builder.build(), true);
+  }
+
+  private void onTablesTabSelected() {
+    GWT.log("onTablesSelected");
+    if(magmaPresenter == null) {
+      GWT.log(" new magmaPresenter");
+      magmaPresenter = magmaPresenterProvider.get();
+      setInSlot(TABLES_PANE, magmaPresenter);
+      //magmaPresenter.show(project.getName());
+    }
   }
 
   private void onFilesTabSelected() {
@@ -276,11 +288,11 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       }
     }
 
-    return Display.ProjectTab.tables;
+    return Display.ProjectTab.home;
   }
 
   private String validatePath(String path) {
-    if(!Strings.isNullOrEmpty(path)) {
+    if(tab == Display.ProjectTab.tables && !Strings.isNullOrEmpty(path)) {
       MagmaPath.Parser parser = new MagmaPath.Parser().parse(path);
       String datasourceName = parser.getDatasource();
       if(!Strings.isNullOrEmpty(datasourceName) && name.equals(datasourceName)) {
