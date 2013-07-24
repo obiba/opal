@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.project.NoSuchProjectException;
-import org.obiba.opal.project.Project;
+import org.obiba.opal.project.domain.Project;
 
 public class ProjectsConfiguration implements OpalConfigurationExtension, Serializable {
 
@@ -44,9 +44,14 @@ public class ProjectsConfiguration implements OpalConfigurationExtension, Serial
    * @param project
    */
   public void putProject(Project project) {
+    removeProject(project.getName());
+    projects.add(project);
+  }
+
+  public void removeProject(String name) {
     Project found = null;
     for(Project p : getProjects()) {
-      if(project.getName().equals(p.getName())) {
+      if(p.getName().equals(name)) {
         found = p;
         break;
       }
@@ -54,7 +59,6 @@ public class ProjectsConfiguration implements OpalConfigurationExtension, Serial
     if(found != null) {
       projects.remove(found);
     }
-    projects.add(project);
   }
 
   /**

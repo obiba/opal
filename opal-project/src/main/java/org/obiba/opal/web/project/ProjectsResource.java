@@ -28,6 +28,7 @@ import org.obiba.magma.datasource.nil.support.NullDatasourceFactory;
 import org.obiba.magma.support.DatasourceParsingException;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.project.ProjectService;
 import org.obiba.opal.project.cfg.ProjectsConfigurationService;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
@@ -42,19 +43,19 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
 @Path("/projects")
-public class ProjectsResource extends AbstractProjectResource {
+public class ProjectsResource {
 
-  private final ProjectsConfigurationService projectsConfigurationService;
+  private final ProjectService projectService;
 
   private final OpalConfigurationService configService;
 
   private final DatasourceFactoryRegistry datasourceFactoryRegistry;
 
   @Autowired
-  public ProjectsResource(DatasourceFactoryRegistry datasourceFactoryRegistry, ProjectsConfigurationService projectsConfigurationService,
+  public ProjectsResource(DatasourceFactoryRegistry datasourceFactoryRegistry, ProjectService projectService,
       OpalConfigurationService configService) {
     this.datasourceFactoryRegistry = datasourceFactoryRegistry;
-    this.projectsConfigurationService = projectsConfigurationService;
+    this.projectService = projectService;
     this.configService = configService;
   }
 
@@ -64,7 +65,9 @@ public class ProjectsResource extends AbstractProjectResource {
 
     // one project per datasource
     for(Datasource ds : MagmaEngine.get().getDatasources()) {
-      projects.add(Dtos.asDto(getProject(ds), ds).build());
+      projects.add(
+          Dtos.asDto(projectService.getOrCreateProject(ds), ds, projectService.getProjectDirectoryPath(ds.getName()))
+              .build());
     }
 
     return projects;
@@ -75,7 +78,7 @@ public class ProjectsResource extends AbstractProjectResource {
     Response.ResponseBuilder response;
     try {
       final DatasourceFactory factory;
-      if (projectFactoryDto.hasFactory()) {
+      if(projectFactoryDto.hasFactory()) {
         factory = datasourceFactoryRegistry.parse(projectFactoryDto.getFactory());
       } else {
         factory = new NullDatasourceFactory();
@@ -90,8 +93,7 @@ public class ProjectsResource extends AbstractProjectResource {
         }
       });
       UriBuilder ub = uriInfo.getBaseUriBuilder().path("project").path(ds.getName());
-//      Project project = Project.Builder.create(projectDto.getName()).description(projectDto.getDescription()).build();
-//      projectsConfigurationService.getConfig().putProject(project);
+      projectService.getOrCreateProject(ds);
       response = Response.created(ub.build()).entity(org.obiba.opal.web.magma.Dtos.asDto(ds).build());
     } catch(NoSuchDatasourceFactoryException noSuchDatasourceFactoryEx) {
       response = Response.status(BAD_REQUEST)
@@ -108,10 +110,5 @@ public class ProjectsResource extends AbstractProjectResource {
     }
 
     return response.build();
-  }
-
-  @Override
-  protected ProjectsConfigurationService getProjectsConfigurationService() {
-    return projectsConfigurationService;
   }
 }

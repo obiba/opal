@@ -10,6 +10,7 @@ message ProjectDto {
   required Magma.DatasourceDto datasource = 3;
   repeated string tags = 4;
   optional string link = 5;
+  optional string directory = 6;
 }
 
 message ProjectFactoryDto {

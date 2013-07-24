@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.project;
+package org.obiba.opal.project.domain;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +75,14 @@ public class Project {
 
     public Builder description(String description) {
       project.setDescription(description);
+      return this;
+    }
+
+    public Builder tags(List<String> tags) {
+      if (tags == null) return this;
+      for(String tag : tags) {
+        project.addTag(tag);
+      }
       return this;
     }
 
