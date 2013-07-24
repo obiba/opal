@@ -260,8 +260,6 @@ public class SuggestListBox extends FocusPanel {
       // Hide the popup if there are no suggestions to display.
       boolean anySuggestions = (suggestions != null && suggestions.size() > 0);
       if(!anySuggestions) {
-        GWT.log("no suggestions!");
-
         hideSuggestions();
         return;
       }
