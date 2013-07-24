@@ -23,8 +23,10 @@ import org.obiba.opal.web.gwt.app.client.magma.view.MagmaView;
 import org.obiba.opal.web.gwt.app.client.magma.view.TableView;
 import org.obiba.opal.web.gwt.app.client.magma.view.ValuesTableView;
 import org.obiba.opal.web.gwt.app.client.magma.view.VariableView;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsPresenter;
+import org.obiba.opal.web.gwt.app.client.project.view.ProjectAdministrationView;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectView;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectsView;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.CsvDatasourceFormPresenter;
@@ -74,6 +76,7 @@ public class NavigatorModule extends AbstractOpalModule {
   protected void configure() {
     bindPresenter(ProjectsPresenter.class, ProjectsPresenter.Display.class, ProjectsView.class, ProjectsPresenter.Proxy.class);
     bindPresenter(ProjectPresenter.class, ProjectPresenter.Display.class, ProjectView.class, ProjectPresenter.Proxy.class);
+    bindPresenterWidget(ProjectAdministrationPresenter.class, ProjectAdministrationPresenter.Display.class, ProjectAdministrationView.class);
 
     bindPresenterWidget(MagmaPresenter.class, MagmaPresenter.Display.class, MagmaView.class);
     bindPresenterWidget(DatasourcePresenter.class, DatasourcePresenter.Display.class, DatasourceView.class);

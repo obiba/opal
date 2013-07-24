@@ -58,6 +58,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   @UiField
   Panel filesPanel;
 
+  @UiField
+  Panel adminPanel;
+
   private ProjectDto project;
 
   @Inject
@@ -128,6 +131,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     } else if (slot == ProjectPresenter.FILES_PANE) {
       filesPanel.clear();
       filesPanel.add(content);
+    } else if (slot == ProjectPresenter.ADMIN_PANE) {
+      adminPanel.clear();
+      adminPanel.add(content);
     }
   }
 

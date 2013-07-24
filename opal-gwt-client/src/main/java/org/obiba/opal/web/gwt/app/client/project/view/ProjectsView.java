@@ -24,6 +24,7 @@ import org.obiba.opal.web.model.client.opal.ProjectFactoryDto;
 import com.github.gwtbootstrap.client.ui.AccordionGroup;
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.Icon;
 import com.github.gwtbootstrap.client.ui.Modal;
 import com.github.gwtbootstrap.client.ui.NavLink;
@@ -179,7 +180,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
           FlowPanel panel = new FlowPanel();
           panel.addStyleName("item");
 
-          NavLink projectLink = newProjectLink(handlers, project);
+          Widget projectLink = newProjectLink(handlers, project);
           panel.add(projectLink);
 
           Label descriptionLabel = new Label(project.getDescription());
@@ -253,7 +254,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
      */
     abstract void sort(ProjectsUiHandlers handlers, Panel content, JsArray<ProjectDto> projects);
 
-    protected NavLink newProjectLink(final ProjectsUiHandlers handlers, final ProjectDto project) {
+    protected Widget newProjectLink(final ProjectsUiHandlers handlers, final ProjectDto project) {
       NavLink link = new NavLink(project.getName());
       link.addClickHandler(new ClickHandler() {
         @Override
@@ -261,7 +262,11 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
           handlers.onProjectSelection(project);
         }
       });
-      return link;
+
+      Heading head = new Heading(5);
+      head.add(link);
+
+      return head;
     }
 
     protected NavLink newProjectTableLink(final ProjectsUiHandlers handlers, final ProjectDto project, final String table) {

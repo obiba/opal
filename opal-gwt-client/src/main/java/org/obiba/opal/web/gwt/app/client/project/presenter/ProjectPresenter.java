@@ -84,6 +84,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private final Provider<FileExplorerPresenter> fileExplorerPresenterProvider;
 
+  private final Provider<ProjectAdministrationPresenter> projectAdministrationPresenterProvider;
+
   private final PlaceManager placeManager;
 
   private String name;
@@ -94,15 +96,19 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private FileExplorerPresenter fileExplorerPresenter;
 
+  private ProjectAdministrationPresenter projectAdministrationPresenter;
+
   @Inject
   public ProjectPresenter(EventBus eventBus, Display display, Proxy proxy, Translations translations,
       PlaceManager placeManager, MagmaPresenter magmaPresenter,
-      Provider<FileExplorerPresenter> fileExplorerPresenterProvider) {
+      Provider<FileExplorerPresenter> fileExplorerPresenterProvider,
+      Provider<ProjectAdministrationPresenter> projectAdministrationPresenterProvider) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
     this.placeManager = placeManager;
     this.magmaPresenter = magmaPresenter;
     this.fileExplorerPresenterProvider = fileExplorerPresenterProvider;
+    this.projectAdministrationPresenterProvider = projectAdministrationPresenterProvider;
   }
 
   @Override
@@ -179,6 +185,9 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       case files:
         onFilesTabSelected();
         break;
+      case administration:
+        onAdminTabSelected();
+        break;
     }
 
     PlaceRequest.Builder builder = PlaceRequestHelper
@@ -213,11 +222,18 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private void onFilesTabSelected() {
     if(fileExplorerPresenter == null) {
-      GWT.log("fileExplorerPresenter");
       fileExplorerPresenter = fileExplorerPresenterProvider.get();
       setInSlot(FILES_PANE, fileExplorerPresenter);
     }
     // TODO set project to home the first time tab is visited for this project
+  }
+
+  private void onAdminTabSelected() {
+    if(projectAdministrationPresenter == null) {
+      projectAdministrationPresenter = projectAdministrationPresenterProvider.get();
+      setInSlot(ADMIN_PANE, projectAdministrationPresenter);
+    }
+    projectAdministrationPresenter.setProject(project);
   }
 
   @Override
