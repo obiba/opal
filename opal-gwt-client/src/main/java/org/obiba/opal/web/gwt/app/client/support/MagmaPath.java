@@ -64,15 +64,23 @@ public class MagmaPath {
       return this;
     }
 
-    public String getDatasourceName() {
+    public String getDatasource() {
       return datasourceName;
     }
 
-    public String getTableName() {
+    public boolean hasTable() {
+      return tableName != null;
+    }
+
+    public String getTable() {
       return tableName;
     }
 
-    public String getVariableName() {
+    public boolean hasVariable() {
+      return variableName != null;
+    }
+
+    public String getVariable() {
       return variableName;
     }
 

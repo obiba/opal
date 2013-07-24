@@ -86,7 +86,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   @Inject
   public ProjectPresenter(EventBus eventBus, Display display, Proxy proxy, Translations translations,
-      PlaceManager placeManager, MagmaPresenter magmaPresenter, Provider<FileExplorerPresenter> fileExplorerPresenterProvider) {
+      PlaceManager placeManager, MagmaPresenter magmaPresenter,
+      Provider<FileExplorerPresenter> fileExplorerPresenterProvider) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
     this.placeManager = placeManager;
@@ -113,13 +114,11 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     String path = validatePath(request.getParameter(ParameterTokens.TOKEN_PATH, null));
 
     if(tab == Display.ProjectTab.tables) {
+      // TODO check that datasource name is the one of project
       getView().setTabData(tab.ordinal(), path);
-    }
-    else {
+    } else {
       getView().setTabData(tab.ordinal(), null);
     }
-
-    getView().selectTab(tab.ordinal());
 
     refresh();
   }
@@ -136,24 +135,20 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
             project = resource;
             getView().setProject(project);
             String path = (String) getView().getTabData(tab.ordinal());
-            if(!Strings.isNullOrEmpty(path)) {
+            if(tab.equals(Display.ProjectTab.tables) && !Strings.isNullOrEmpty(path)){
               MagmaPath.Parser parser = new MagmaPath.Parser().parse(path);
-
-              if (Strings.isNullOrEmpty(parser.getVariableName())) {
-                getEventBus().fireEventFromSource(
-                    new TableSelectionChangeEvent(eventSource, parser.getDatasourceName(), parser.getTableName()),
-                    eventSource);
+              if(parser.hasVariable()) {
+                magmaPresenter.show(parser.getDatasource(), parser.getTable(), parser.getVariable());
+              } else if(parser.hasTable()) {
+                magmaPresenter.show(parser.getDatasource(), parser.getTable());
+              } else {
+                magmaPresenter.show(project.getDatasource().getName());
               }
-              else {
-                getEventBus().fireEventFromSource(
-                    new VariableSelectionChangeEvent(eventSource, parser.getDatasourceName(), parser.getTableName(),
-                      parser.getVariableName()), eventSource);
-              }
-            } else {
+            }else{
               getEventBus()
                   .fireEventFromSource(new DatasourceSelectionChangeEvent(this, project.getDatasource()), eventSource);
             }
-
+            getView().selectTab(tab.ordinal());
           }
         }).send();
   }
@@ -166,9 +161,9 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   @Override
   public void onTabSelected(int index) {
-    Display.ProjectTab tab = Display.ProjectTab.values()[index];
+    tab = Display.ProjectTab.values()[index];
 
-    switch (tab) {
+    switch(tab) {
       case tables:
         break;
       case files:
@@ -180,7 +175,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
         .createRequestBuilderWithParams(placeManager.getCurrentPlaceRequest(),
             Arrays.asList(ParameterTokens.TOKEN_NAME));
 
-    builder.with(ParameterTokens.TOKEN_TAB,  tab.toString());
+    builder.with(ParameterTokens.TOKEN_TAB, tab.toString());
 
     String queryPathParam = (String) getView().getTabData(index);
 
@@ -189,15 +184,14 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       if(tab == Display.ProjectTab.tables) {
         MagmaPath.Parser parser = new MagmaPath.Parser().parse(queryPathParam);
 
-        if (Strings.isNullOrEmpty(parser.getVariableName())) {
+        if(Strings.isNullOrEmpty(parser.getVariable())) {
+          getEventBus()
+              .fireEventFromSource(new TableSelectionChangeEvent(this, parser.getDatasource(), parser.getTable()),
+                  this);
+        } else {
           getEventBus().fireEventFromSource(
-              new TableSelectionChangeEvent(this, parser.getDatasourceName(), parser.getTableName()),
+              new VariableSelectionChangeEvent(this, parser.getDatasource(), parser.getTable(), parser.getVariable()),
               this);
-        }
-        else {
-          getEventBus().fireEventFromSource(
-              new VariableSelectionChangeEvent(this, parser.getDatasourceName(), parser.getTableName(),
-                  parser.getVariableName()), this);
         }
       }
 
@@ -208,7 +202,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   private void onFilesTabSelected() {
-    if (fileExplorerPresenter == null) {
+    if(fileExplorerPresenter == null) {
       GWT.log("fileExplorerPresenter");
       fileExplorerPresenter = fileExplorerPresenterProvider.get();
       setInSlot(FILES_PANE, fileExplorerPresenter);
@@ -218,22 +212,21 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   @Override
   public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
-    if (event.getSource() == this) return;
+    if(event.getSource() == this) return;
     updateHistory(null);
   }
 
   @Override
   public void onTableSelectionChanged(TableSelectionChangeEvent event) {
-    if (event.getSource() == this) return;
-    updateHistory(
-        MagmaPath.Builder.datasource(event.getDatasourceName()).table(event.getTableName()).build());
+    if(event.getSource() == this) return;
+    updateHistory(MagmaPath.Builder.datasource(event.getDatasourceName()).table(event.getTableName()).build());
   }
 
   @Override
   public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-    if (event.getSource() == this) return;
-    updateHistory(new MagmaPath.Builder().datasource(event.getDatasourceName())
-        .table(event.getTableName()).variable(event.getVariableName()).build());
+    if(event.getSource() == this) return;
+    updateHistory(new MagmaPath.Builder().datasource(event.getDatasourceName()).table(event.getTableName())
+        .variable(event.getVariableName()).build());
   }
 
   private void updateHistory(String queryPathParam) {
@@ -241,7 +234,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
         .createRequestBuilderWithParams(placeManager.getCurrentPlaceRequest(),
             Arrays.asList(ParameterTokens.TOKEN_NAME, ParameterTokens.TOKEN_TAB));
 
-    if (!Strings.isNullOrEmpty(queryPathParam)) {
+    if(!Strings.isNullOrEmpty(queryPathParam)) {
       builder.with(ParameterTokens.TOKEN_PATH, queryPathParam).build();
     }
 
@@ -250,11 +243,10 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   private Display.ProjectTab validateTab(String tab) {
-    if (!Strings.isNullOrEmpty(tab)) {
+    if(!Strings.isNullOrEmpty(tab)) {
       try {
         return Display.ProjectTab.valueOf(tab);
-      }
-      catch (IllegalArgumentException e) {
+      } catch(IllegalArgumentException e) {
       }
     }
 
@@ -262,11 +254,11 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   private String validatePath(String path) {
-    if (!Strings.isNullOrEmpty(path)) {
+    if(!Strings.isNullOrEmpty(path)) {
       MagmaPath.Parser parser = new MagmaPath.Parser().parse(path);
-      String datasourceName = parser.getDatasourceName();
-      if (!Strings.isNullOrEmpty(datasourceName) && name.equals(datasourceName)) {
-        return  path;
+      String datasourceName = parser.getDatasource();
+      if(!Strings.isNullOrEmpty(datasourceName) && name.equals(datasourceName)) {
+        return path;
       }
     }
 
