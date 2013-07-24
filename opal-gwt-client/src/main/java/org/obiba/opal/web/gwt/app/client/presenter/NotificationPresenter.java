@@ -21,23 +21,17 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
 /**
  * Presenter used to display error, warning and info messages in a dialog box.
  */
 public class NotificationPresenter extends PresenterWidget<NotificationPresenter.Display> {
 
-  public interface Display extends PopupView {
+  public interface Display extends View {
 
-    void setMessages(List<String> messages);
+    void setNotification(NotificationEvent event);
 
-    void setCaption(String txt);
-
-    void setNotificationType(NotificationType type);
-
-    void setSticky(boolean sticky);
-
-    void addNotificationCloseHandler(NotificationCloseHandler handler);
   }
 
   public interface NotificationCloseHandler {
@@ -49,61 +43,13 @@ public class NotificationPresenter extends PresenterWidget<NotificationPresenter
     void onClose(CloseEvent<?> event);
   }
 
-  private final Translations translations;
-
   @Inject
-  public NotificationPresenter(Display display, EventBus eventBus, Translations translations) {
+  public NotificationPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
-    this.translations = translations;
   }
 
   public void setNotification(NotificationEvent event) {
-    setMessageDialogType(event.getNotificationType());
-
-    if(event.getTitle() != null) {
-      getView().setCaption(event.getTitle());
-    }
-
-    List<String> translatedMessages = new ArrayList<String>();
-    for(String message : event.getMessages()) {
-      if(translations.userMessageMap().containsKey(message)) {
-        String msg = TranslationsUtils
-            .replaceArguments(translations.userMessageMap().get(message), event.getMessageArgs());
-        translatedMessages.add(msg);
-      } else {
-        translatedMessages.add(message);
-      }
-    }
-    setMessages(translatedMessages);
-
-    getView().setSticky(event.isSticky());
-
-    addNotificationCloseHandler(event.getNotificationCloseHandler());
-  }
-
-  private void setMessages(List<String> messages) {
-    getView().setMessages(messages);
-  }
-
-  private void setMessageDialogType(NotificationType messageDialogType) {
-    getView().setNotificationType(messageDialogType);
-    switch(messageDialogType) {
-      case ERROR:
-        getView().setCaption(translations.errorDialogTitle());
-        break;
-      case WARNING:
-        getView().setCaption(translations.warningDialogTitle());
-        break;
-      case INFO:
-        getView().setCaption(translations.infoDialogTitle());
-        break;
-    }
-  }
-
-  private void addNotificationCloseHandler(NotificationCloseHandler handler) {
-    if(handler != null) {
-      getView().addNotificationCloseHandler(handler);
-    }
+    getView().setNotification(event);
   }
 
   public enum NotificationType {

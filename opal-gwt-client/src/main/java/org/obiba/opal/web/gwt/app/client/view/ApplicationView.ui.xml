@@ -34,6 +34,7 @@
       </b:Nav>
     </b:ResponsiveNavbar>
     <b:FluidContainer addStyleNames="container">
+      <g:SimplePanel ui:field="notification"/>
       <g:FlowPanel ui:field="workbench">
       </g:FlowPanel>
     </b:FluidContainer>

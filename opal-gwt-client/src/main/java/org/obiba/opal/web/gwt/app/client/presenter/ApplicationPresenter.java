@@ -60,6 +60,9 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   @ContentSlot
   public static final GwtEvent.Type<RevealContentHandler<?>> WORKBENCH = new GwtEvent.Type<RevealContentHandler<?>>();
 
+  @ContentSlot
+  public static final GwtEvent.Type<RevealContentHandler<?>> NOTIFICATION = new GwtEvent.Type<RevealContentHandler<?>>();
+
   @ProxyStandard
   public interface Proxy extends com.gwtplatform.mvp.client.proxy.Proxy<ApplicationPresenter> {}
 
@@ -98,7 +101,6 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   @Override
   protected void onBind() {
-
     registerHandler(
         getEventBus().addHandler(FileSelectionRequiredEvent.getType(), new FileSelectionRequiredEvent.Handler() {
 
@@ -194,8 +196,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       @Override
       public void onUserMessage(NotificationEvent event) {
         messageDialog.setNotification(event);
-        // false : don't center the dialog
-        addToPopupSlot(messageDialog, false);
+        setInSlot(NOTIFICATION, messageDialog);
       }
     }));
   }
@@ -246,10 +247,6 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     HasUrl getDownloader();
 
     HasAuthorization getAdministrationAuthorizer();
-
-    void setCurrentSelection(MenuItem selection);
-
-    void clearSelection();
 
     void setUsername(String username);
 

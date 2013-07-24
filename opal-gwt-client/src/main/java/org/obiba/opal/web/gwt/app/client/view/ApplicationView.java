@@ -9,6 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.view;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.HasUrl;
@@ -20,7 +27,10 @@ import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 
+import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.base.UnorderedList;
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -28,6 +38,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Frame;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuItem;
@@ -58,6 +69,9 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
   NavLink projectsItem;
 
   @UiField
+  Panel notification;
+
+  @UiField
   Panel workbench;
 
   @UiField
@@ -66,9 +80,7 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
   @UiField(provided = true)
   SuggestListBox search;
 
-  private VariableSuggestOracle oracle;
-
-  MenuItem currentSelection;
+  private final VariableSuggestOracle oracle;
 
   @Inject
   public ApplicationView(EventBus eventBus, Binder uiBinder) {
@@ -105,6 +117,8 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
     if(ApplicationPresenter.WORKBENCH == slot) {
       workbench.clear();
       workbench.add(content.asWidget());
+    } else {
+      notification.add(content);
     }
   }
 
@@ -117,22 +131,6 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
         frame.setUrl(url);
       }
     };
-  }
-
-  @Override
-  public void setCurrentSelection(MenuItem selection) {
-    if(currentSelection != null) {
-      currentSelection.removeStyleName("selected");
-    }
-    if(selection != null) {
-      selection.addStyleName("selected");
-    }
-    currentSelection = selection;
-  }
-
-  @Override
-  public void clearSelection() {
-    setCurrentSelection(null);
   }
 
   @Override
