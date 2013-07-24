@@ -17,6 +17,9 @@
 package org.obiba.opal.web.gwt.app.client.ui;
 
 import com.github.gwtbootstrap.client.ui.Modal;
+import com.github.gwtbootstrap.client.ui.event.HiddenEvent;
+import com.github.gwtbootstrap.client.ui.event.HiddenHandler;
+import com.github.gwtbootstrap.client.ui.event.HideHandler;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.PopupView;
@@ -36,84 +39,92 @@ import com.gwtplatform.mvp.client.proxy.NavigationHandler;
  */
 public abstract class ModalViewImpl extends ViewImpl implements PopupView {
 
-    private HandlerRegistration autoHideHandler;
+  private HandlerRegistration autoHideHandler;
 
-    private HandlerRegistration closeHandlerRegistration;
-    private final EventBus eventBus;
+  private HandlerRegistration closeHandlerRegistration;
 
-    /**
-     * The {@link ModalViewImpl} class uses the {@link com.google.web.bindery.event.shared.EventBus} to listen to
-     * {@link com.gwtplatform.mvp.client.proxy.NavigationEvent} in order to automatically close when this event is
-     * fired, if desired. See
-     * {@link #setAutoHideOnNavigationEventEnabled(boolean)} for details.
-     *
-     * @param eventBus The {@link com.google.web.bindery.event.shared.EventBus}.
-     */
-    protected ModalViewImpl(EventBus eventBus) {
-        this.eventBus = eventBus;
-    }
+  private final EventBus eventBus;
 
-    @Override
-    public void center() {
-    }
+  /**
+   * The {@link ModalViewImpl} class uses the {@link com.google.web.bindery.event.shared.EventBus} to listen to
+   * {@link com.gwtplatform.mvp.client.proxy.NavigationEvent} in order to automatically close when this event is
+   * fired, if desired. See
+   * {@link #setAutoHideOnNavigationEventEnabled(boolean)} for details.
+   *
+   * @param eventBus The {@link com.google.web.bindery.event.shared.EventBus}.
+   */
+  protected ModalViewImpl(EventBus eventBus) {
+    this.eventBus = eventBus;
+  }
 
-    @Override
-    public void hide() {
-        asModal().hide();
-    }
+  @Override
+  public void center() {
+  }
 
-    @Override
-    public void setAutoHideOnNavigationEventEnabled(boolean autoHide) {
-        if (autoHide) {
-            if (autoHideHandler != null) {
-                return;
-            }
-            autoHideHandler = eventBus.addHandler(NavigationEvent.getType(),
-                    new NavigationHandler() {
-                        @Override
-                        public void onNavigation(NavigationEvent navigationEvent) {
-                            hide();
-                        }
-                    });
-        } else {
-            if (autoHideHandler != null) {
-                autoHideHandler.removeHandler();
-            }
+  @Override
+  public void hide() {
+    asModal().hide();
+  }
+
+  public void addHideHandler(HideHandler handler) {
+    asModal().addHideHandler(handler);
+  }
+
+  public void addHiddneHandler(HiddenHandler handler) {
+    asModal().addHiddenHandler(handler);
+  }
+
+  @Override
+  public void setAutoHideOnNavigationEventEnabled(boolean autoHide) {
+    if(autoHide) {
+      if(autoHideHandler != null) {
+        return;
+      }
+      autoHideHandler = eventBus.addHandler(NavigationEvent.getType(), new NavigationHandler() {
+        @Override
+        public void onNavigation(NavigationEvent navigationEvent) {
+          hide();
         }
+      });
+    } else {
+      if(autoHideHandler != null) {
+        autoHideHandler.removeHandler();
+      }
     }
+  }
 
-    @Override
-    public void setCloseHandler(final PopupViewCloseHandler popupViewCloseHandler) {
-        if (closeHandlerRegistration != null) {
-            closeHandlerRegistration.removeHandler();
-        }
-        if (popupViewCloseHandler == null) {
-            closeHandlerRegistration = null;
-        } else {
+  @Override
+  public void setCloseHandler(final PopupViewCloseHandler popupViewCloseHandler) {
+    if(closeHandlerRegistration != null) {
+      closeHandlerRegistration.removeHandler();
+    }
+    if(popupViewCloseHandler == null) {
+      closeHandlerRegistration = null;
+    } else {
 //            closeHandlerRegistration = asModal().addCloseHandler(new CloseHandler<PopupPanel>() {
 //              @Override
 //              public void onClose(CloseEvent<PopupPanel> event) {
 //                popupViewCloseHandler.onClose();
 //              }
 //            });
-        }
     }
+  }
 
-    @Override
-    public void setPosition(int left, int top) {
-    }
+  @Override
+  public void setPosition(int left, int top) {
+  }
 
-    @Override
-    public void show() {
-        asModal().show();
-    }
+  @Override
+  public void show() {
+    asModal().show();
+  }
 
-    /**
-     * Retrieves this view as a {@link com.google.gwt.user.client.ui.PopupPanel}. See {@link #asWidget()}.
-     *
-     * @return This view as a {@link com.google.gwt.user.client.ui.PopupPanel} object.
-     */
-    protected Modal asModal() {
-        return (Modal) asWidget();
-    }
+  /**
+   * Retrieves this view as a {@link com.google.gwt.user.client.ui.PopupPanel}. See {@link #asWidget()}.
+   *
+   * @return This view as a {@link com.google.gwt.user.client.ui.PopupPanel} object.
+   */
+  protected Modal asModal() {
+    return (Modal) asWidget();
+  }
 }

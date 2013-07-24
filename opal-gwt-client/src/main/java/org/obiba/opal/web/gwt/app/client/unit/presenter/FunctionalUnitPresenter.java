@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCanceledEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
@@ -121,6 +122,7 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
   @Override
   protected void onBind() {
     super.onBind();
+    registerHandler(getEventBus().addHandler(FunctionalUnitCanceledEvent.getType(), new FunctionalUnitCanceledHandler()));
     registerHandler(getEventBus().addHandler(FunctionalUnitDeletedEvent.getType(), new FunctionalUnitDeletedHandler()));
     registerHandler(getEventBus().addHandler(FunctionalUnitCreatedEvent.getType(), new FunctionalUnitCreatedHandler()));
   }
@@ -192,4 +194,11 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
 
   }
 
+  private class FunctionalUnitCanceledHandler implements FunctionalUnitCanceledEvent.Handler {
+
+    @Override
+    public void onFunctionalUnitCanceled(FunctionalUnitCanceledEvent event) {
+      removeFromPopupSlot(functionalUnitUpdateDialogPresenter);
+    }
+  }
 }
