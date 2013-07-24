@@ -25,6 +25,7 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.Presenter;
@@ -71,7 +72,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private final MagmaPresenter magmaPresenter;
 
-  private final FileExplorerPresenter fileExplorerPresenter;
+  private final Provider<FileExplorerPresenter> fileExplorerPresenterProvider;
 
   private final PlaceManager placeManager;
 
@@ -81,14 +82,16 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private ProjectDto project;
 
+  private FileExplorerPresenter fileExplorerPresenter;
+
   @Inject
   public ProjectPresenter(EventBus eventBus, Display display, Proxy proxy, Translations translations,
-      PlaceManager placeManager, MagmaPresenter magmaPresenter, FileExplorerPresenter fileExplorerPresenter) {
+      PlaceManager placeManager, MagmaPresenter magmaPresenter, Provider<FileExplorerPresenter> fileExplorerPresenterProvider) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
     this.placeManager = placeManager;
     this.magmaPresenter = magmaPresenter;
-    this.fileExplorerPresenter = fileExplorerPresenter;
+    this.fileExplorerPresenterProvider = fileExplorerPresenterProvider;
   }
 
   @Override
@@ -100,7 +103,6 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     addRegisteredHandler(VariableSelectionChangeEvent.getType(), this);
 
     setInSlot(TABLES_PANE, magmaPresenter);
-    setInSlot(FILES_PANE, fileExplorerPresenter);
   }
 
   @Override
@@ -164,11 +166,20 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   @Override
   public void onTabSelected(int index) {
+    Display.ProjectTab tab = Display.ProjectTab.values()[index];
+
+    switch (tab) {
+      case tables:
+        break;
+      case files:
+        onFilesTabSelected();
+        break;
+    }
+
     PlaceRequest.Builder builder = PlaceRequestHelper
         .createRequestBuilderWithParams(placeManager.getCurrentPlaceRequest(),
             Arrays.asList(ParameterTokens.TOKEN_NAME));
 
-    Display.ProjectTab tab = Display.ProjectTab.values()[index];
     builder.with(ParameterTokens.TOKEN_TAB,  tab.toString());
 
     String queryPathParam = (String) getView().getTabData(index);
@@ -196,6 +207,15 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     placeManager.updateHistory(builder.build(), true);
   }
 
+  private void onFilesTabSelected() {
+    if (fileExplorerPresenter == null) {
+      GWT.log("fileExplorerPresenter");
+      fileExplorerPresenter = fileExplorerPresenterProvider.get();
+      setInSlot(FILES_PANE, fileExplorerPresenter);
+    }
+    // TODO set project to home the first time tab is visited for this project
+  }
+
   @Override
   public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
     if (event.getSource() == this) return;
@@ -206,7 +226,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   public void onTableSelectionChanged(TableSelectionChangeEvent event) {
     if (event.getSource() == this) return;
     updateHistory(
-        new MagmaPath.Builder().datasource(event.getDatasourceName()).table(event.getTableName()).build());
+        MagmaPath.Builder.datasource(event.getDatasourceName()).table(event.getTableName()).build());
   }
 
   @Override
