@@ -46,8 +46,6 @@ public class MagmaPath {
     private String variableName;
 
     public Parser parse(String path) {
-      GWT.log("parsing: " + path);
-
       int tableSep = path.indexOf('.');
       if (tableSep == -1) {
         datasourceName = path;
