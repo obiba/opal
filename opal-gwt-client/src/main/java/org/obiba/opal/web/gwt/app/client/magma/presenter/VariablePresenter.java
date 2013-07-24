@@ -24,6 +24,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEv
 import org.obiba.opal.web.gwt.app.client.magma.event.SummaryRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveVariablePresenter;
+import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -156,9 +157,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
       getView().setDerivedVariable(false, "");
       return;
     }
-
-    // Show the edit variable with a null script ????
-    getView().setDerivedVariable(true, "null");
+    getView().setDerivedVariable(true, VariableDtos.getScript(variable));
   }
 
   private void authorize() {

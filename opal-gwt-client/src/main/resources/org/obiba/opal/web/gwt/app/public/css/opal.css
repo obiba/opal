@@ -10,6 +10,15 @@ li {
 }
 
 /*
+ * Pretty print
+ */
+.container pre.prettyprint {
+  border: 1px dashed #CCCCCC;
+  padding: 10px;
+  margin-bottom: 0;
+}
+
+/*
  * Opal
  */
 
