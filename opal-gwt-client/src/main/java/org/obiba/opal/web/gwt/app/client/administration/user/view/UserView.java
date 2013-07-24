@@ -12,17 +12,20 @@ package org.obiba.opal.web.gwt.app.client.administration.user.view;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.GroupSuggestOracle;
-import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.SuggestListBox;
 import org.obiba.opal.web.model.client.opal.GroupDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.Modal;
 import com.github.gwtbootstrap.client.ui.PasswordTextBox;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
@@ -31,23 +34,22 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.PopupViewImpl;
 
 /**
  *
  */
-public class UserView extends PopupViewImpl implements UserPresenter.Display {
+public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> implements UserPresenter.Display {
 
   @UiTemplate("UserView.ui.xml")
-  interface ViewUiBinder extends UiBinder<DialogBox, UserView> {}
+  interface ViewUiBinder extends UiBinder<Widget, UserView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -56,13 +58,7 @@ public class UserView extends PopupViewImpl implements UserPresenter.Display {
   private final Widget widget;
 
   @UiField
-  DialogBox dialog;
-
-  //  @UiField
-//  DockLayoutPanel contentLayout;
-//
-  @UiField
-  ResizeHandle resizeHandle;
+  Modal dialog;
 
   @UiField
   Button saveButton;
@@ -99,7 +95,7 @@ public class UserView extends PopupViewImpl implements UserPresenter.Display {
     groups = new SuggestListBox(oracle);
 
     widget = uiBinder.createAndBindUi(this);
-    dialog.setText(translations.addUpdateUserLabel());
+    dialog.setTitle(translations.addUpdateUserLabel());
 
     groups.getSuggestBox().getValueBox().addKeyUpHandler(new KeyUpHandler() {
 
@@ -169,14 +165,14 @@ public class UserView extends PopupViewImpl implements UserPresenter.Display {
     dialog.hide();
   }
 
-  @Override
-  public HasClickHandlers getSaveButton() {
-    return saveButton;
+  @UiHandler("saveButton")
+  public void onSave(ClickEvent event) {
+    getUiHandlers().save();
   }
 
-  @Override
-  public HasClickHandlers getCancelButton() {
-    return cancelButton;
+  @UiHandler("cancelButton")
+  public void onCancel(ClickEvent event) {
+    getUiHandlers().cancel();
   }
 
   @Override
