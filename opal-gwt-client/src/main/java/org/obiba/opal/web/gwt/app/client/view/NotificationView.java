@@ -65,8 +65,6 @@ public class NotificationView extends ViewImpl implements NotificationPresenter.
 
   private final Translations translations;
 
-  private boolean sticky = false;
-
   @Inject
   public NotificationView(Translations translations) {
     initWidget(uiBinder.createAndBindUi(this));
@@ -92,7 +90,12 @@ public class NotificationView extends ViewImpl implements NotificationPresenter.
     if(event.getTitle() != null) {
       alert.setHeading(event.getTitle());
     }
+    addMessages(alert, event);
+    alertPanel.add(alert);
+    if(!event.isSticky()) runSticky(alert);
+  }
 
+  private void addMessages(final Alert alert, NotificationEvent event) {
     List<String> translatedMessages = new ArrayList<String>();
     for(String message : event.getMessages()) {
       if(translations.userMessageMap().containsKey(message)) {
@@ -114,21 +117,17 @@ public class NotificationView extends ViewImpl implements NotificationPresenter.
       }
       alert.add(list);
     }
-    alertPanel.add(alert);
-    runSticky(alert);
   }
 
   private void runSticky(final Alert alert) {
-    if(!sticky) {
-      Timer nonStickyTimer = new Timer() {
+    Timer nonStickyTimer = new Timer() {
 
-        @Override
-        public void run() {
-          alert.close();
-        }
-      };
-      nonStickyTimer.schedule(5000);
-    }
+      @Override
+      public void run() {
+        alert.close();
+      }
+    };
+    nonStickyTimer.schedule(5000);
   }
 
 }
