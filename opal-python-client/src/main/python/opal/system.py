@@ -31,6 +31,7 @@ def do_ws(args):
     Build the web service resource path
     """
     if args.version:
+        args.json = 'store_false'
         return "/system/version"
     if args.env:
         return "/system/env"
