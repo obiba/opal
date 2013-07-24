@@ -23,8 +23,8 @@
     <g:FlowPanel addStyleNames="bottom-margin">
       <b:ButtonGroup>
         <b:DropdownButton text="Unit" ui:field="unitDropdown" size="SMALL" icon="TASKS">
-          <b:NavLink icon="EDIT" ui:field="updateUnit"><ui:msg description="Add table label">Edit unit...</ui:msg></b:NavLink>
-          <b:NavLink icon="REMOVE"  ui:field="removeUnit"><ui:msg description="Add view label">Remove unit...</ui:msg></b:NavLink>
+          <b:NavLink icon="EDIT" ui:field="updateUnit"><ui:msg description="Add Functional Unit label">Edit unit...</ui:msg></b:NavLink>
+          <b:NavLink icon="REMOVE"  ui:field="removeUnit"><ui:msg description="Remove Functional Unit abel">Remove unit...</ui:msg></b:NavLink>
         </b:DropdownButton>
       </b:ButtonGroup>
       <b:ButtonGroup>
