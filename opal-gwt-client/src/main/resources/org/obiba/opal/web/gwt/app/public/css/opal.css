@@ -267,3 +267,14 @@ div.obiba-SuggestListBox {
   font-weight: bold;
 }
 
+/*
+ * Ace editor
+ */
+.ace-editor {
+  height: 200px;
+  border: 1px solid #DDD;
+  border-radius: 4px;
+  border-bottom-right-radius: 0;
+  margin-bottom: 5px;
+}
+
