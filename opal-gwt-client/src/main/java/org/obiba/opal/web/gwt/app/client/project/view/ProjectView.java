@@ -22,6 +22,7 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -84,6 +85,7 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     String desc = project.getDescription();
     description.setText(desc.substring(0, desc.indexOf('.') + 1));
     ellipsis.setIcon(IconType.PLUS_SIGN);
+    ellipsis.setVisible(!Strings.isNullOrEmpty(description.getText()));
   }
 
   @Override
