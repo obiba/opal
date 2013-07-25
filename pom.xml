@@ -1115,6 +1115,12 @@
         <version>${jgit.version}</version>
       </dependency>
 
+      <!--<dependency>-->
+        <!--<groupId>org.gitective</groupId>-->
+        <!--<artifactId>gitective-core</artifactId>-->
+        <!--<version>0.9.10-SNAPSHOT</version>-->
+      <!--</dependency>-->
+
       <dependency>
         <groupId>org.mozilla</groupId>
         <artifactId>rhino</artifactId>
@@ -1513,7 +1519,7 @@
     <jta.version>1.0.1B</jta.version>
     <junit.version>4.7</junit.version>
     <liquibase.version>1.9.4</liquibase.version>
-    <magma.version>1.7.2</magma.version>
+    <magma.version>1.8-SNAPSHOT</magma.version>
     <public-datasources.version>1.0</public-datasources.version>
     <mail.version>1.4</mail.version>
     <mockftpserver.version>2.1</mockftpserver.version>

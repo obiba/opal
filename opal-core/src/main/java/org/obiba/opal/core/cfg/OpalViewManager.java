@@ -10,13 +10,16 @@
 package org.obiba.opal.core.cfg;
 
 import org.obiba.magma.views.DefaultViewManagerImpl;
+import org.obiba.opal.audit.OpalUserProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class OpalViewManager extends DefaultViewManagerImpl {
 
-  public OpalViewManager() {
-    super(new OpalViewPersistenceStrategy());
+  @Autowired
+  public OpalViewManager(OpalUserProvider opalUserProvider) {
+    super(new OpalViewPersistenceStrategy(opalUserProvider));
   }
 
 }

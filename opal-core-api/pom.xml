@@ -64,6 +64,10 @@
       <groupId>org.eclipse.jgit</groupId>
       <artifactId>org.eclipse.jgit</artifactId>
     </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.gitective</groupId>-->
+      <!--<artifactId>gitective-core</artifactId>-->
+    <!--</dependency>-->
   </dependencies>
 
 </project>
