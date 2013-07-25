@@ -1398,7 +1398,8 @@ public interface Translations extends Constants {
   Map<String, String> dataShieldLabelsMap();
 
   @Description("Project Tab Names")
-  @DefaultStringMapValue({ "tables", "Tables", //
+  @DefaultStringMapValue({ "home","Home", //
+      "tables", "Tables", //
       "files", "Files", //
       "visualisation", "Data visualization", //
       "reports", "Reports", //

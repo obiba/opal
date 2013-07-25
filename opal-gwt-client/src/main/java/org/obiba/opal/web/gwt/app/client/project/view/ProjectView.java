@@ -67,8 +67,10 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   ProjectView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
 
-    for (ProjectTab tab : ProjectTab.values()) {
-      TabPanelHelper.setTabTitle(tabPanel, tab.ordinal(), translations.projectTabNameMap().get(tab.toString()));
+    for(ProjectTab tab : ProjectTab.values()) {
+      String title = translations.projectTabNameMap().get(tab.toString());
+      TabPanelHelper.setTabTitle(tabPanel, tab.ordinal(), title);
+      TabPanelHelper.setTabText(tabPanel, tab.ordinal(), title);
     }
   }
 
@@ -118,25 +120,32 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
 
   @UiHandler("tabPanel")
   void onShown(TabPanel.ShownEvent shownEvent) {
-    if (shownEvent.getTarget() == null) return;
+    if(shownEvent.getTarget() == null) return;
+
+    showTabTexts(tabPanel.getSelectedTab() == 0);
+
     getUiHandlers().onTabSelected(tabPanel.getSelectedTab());
   }
 
+  private void showTabTexts(boolean show) {
+    for(ProjectTab tab : ProjectTab.values()) {
+      TabPanelHelper
+          .setTabText(tabPanel, tab.ordinal(), show ? translations.projectTabNameMap().get(tab.toString()) : "");
+    }
+  }
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {
     if(slot == ProjectPresenter.TABLES_PANE) {
       tablesPanel.clear();
       tablesPanel.add(content);
-    } else if (slot == ProjectPresenter.FILES_PANE) {
+    } else if(slot == ProjectPresenter.FILES_PANE) {
       filesPanel.clear();
       filesPanel.add(content);
-    } else if (slot == ProjectPresenter.ADMIN_PANE) {
+    } else if(slot == ProjectPresenter.ADMIN_PANE) {
       adminPanel.clear();
       adminPanel.add(content);
     }
   }
-
-
 
 }
