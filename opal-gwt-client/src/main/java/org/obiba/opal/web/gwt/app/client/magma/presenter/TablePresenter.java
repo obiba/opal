@@ -137,7 +137,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-    if(event.hasTable()) {
+    if(this != event.getSource() && event.hasTable() && event.getTable().hasValueSetCount()) {
       updateDisplay(event.getTable(), null, null);
     }
   }
@@ -238,7 +238,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     if(tableUpdatePending) return;
 
     tableUpdatePending = true;
-    UriBuilder ub = UriBuilder.create().segment("datasource", "{}", "table", "{}").query("counts", "true");
+    UriBuilder ub = UriBuilder.URI_DATASOURCE_TABLE.query("counts", "true");
     ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(datasourceName, tableName)).get()
         .withCallback(new ResourceCallback<TableDto>() {
           @Override
@@ -666,7 +666,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   private class VariableNameFieldUpdater implements FieldUpdater<VariableDto, String> {
     @Override
     public void update(int index, VariableDto variableDto, String value) {
-      getEventBus().fireEvent(new VariableSelectionChangeEvent(this, table, variableDto, getPreviousVariable(index),
+      getEventBus().fireEvent(new VariableSelectionChangeEvent(TablePresenter.this, table, variableDto, getPreviousVariable(index),
           getNextVariable(index)));
     }
   }
@@ -692,7 +692,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
       getView().setVariableSelection(variableDto, siblingIndex);
       getEventBus().fireEvent(
-          new VariableSelectionChangeEvent(this, table, variableDto, getPreviousVariable(siblingIndex),
+          new VariableSelectionChangeEvent(TablePresenter.this, table, variableDto, getPreviousVariable(siblingIndex),
               getNextVariable(siblingIndex)));
     }
   }
@@ -801,7 +801,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         public void onResponseCode(Request request, Response response) {
           if(response.getStatusCode() == SC_OK) {
             getEventBus().fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
-            getEventBus().fireEvent(new DatasourceSelectionChangeEvent(this, table.getDatasourceName()));
+            getEventBus().fireEvent(new DatasourceSelectionChangeEvent(TablePresenter.this, table.getDatasourceName()));
           } else {
             String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
             getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
@@ -822,7 +822,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         public void onResponseCode(Request request, Response response) {
           if(response.getStatusCode() == SC_OK) {
             getEventBus().fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
-            getEventBus().fireEvent(new DatasourceSelectionChangeEvent(this, table.getDatasourceName()));
+            getEventBus().fireEvent(new DatasourceSelectionChangeEvent(TablePresenter.this, table.getDatasourceName()));
           } else {
             String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
             getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());

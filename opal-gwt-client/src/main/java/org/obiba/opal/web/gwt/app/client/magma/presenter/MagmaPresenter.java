@@ -109,7 +109,8 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
   }
 
   private void show(final String datasource, final String table, final String variable) {
-    UriBuilder ub = UriBuilder.URI_DATASOURCE_TABLE;
+    // table counts are required for having variable summary and values
+    UriBuilder ub = UriBuilder.URI_DATASOURCE_TABLE.query("counts", "true");
     ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(datasource, table)).get()
         .withCallback(new ResourceCallback<TableDto>() {
           @Override
@@ -140,12 +141,14 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
                     }
                   }
                 }
-                getEventBus().fireEvent(new VariableSelectionChangeEvent(this, tableDto, selection, previous, next));
+                getEventBus().fireEvent(
+                    new VariableSelectionChangeEvent(MagmaPresenter.this, tableDto, selection, previous, next));
               }
             })//
                 .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
                   @Override
                   public void onResponseCode(Request request, Response response) {
+                    // TODO fix error message
                     getEventBus().fireEvent(NotificationEvent.newBuilder().error("SearchServiceUnavailable").build());
                   }
                 }).send();
