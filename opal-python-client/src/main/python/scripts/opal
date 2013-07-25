@@ -1,5 +1,7 @@
 #! /usr/bin/env python
 #
+import argparse
+
 import opal.rest
 import opal.dictionary
 import opal.data
@@ -14,7 +16,7 @@ import opal.export_xml
 import opal.export_csv
 import opal.user
 import opal.group
-import argparse
+import opal.system
 
 
 def add_opal_arguments(parser):
@@ -68,6 +70,7 @@ add_subcommand('user', 'Manage users.', opal.user.add_arguments, opal.user.do_co
 add_subcommand('group', 'Manage groups.', opal.group.add_arguments, opal.group.do_command)
 add_subcommand('rest', 'Request directly the Opal REST API, for advanced users.', opal.rest.add_arguments,
                opal.rest.do_command)
+add_subcommand('system', 'Query for system configuration', opal.system.add_arguments, opal.system.do_command)
 
 # Execute selected command
 args = parser.parse_args()
