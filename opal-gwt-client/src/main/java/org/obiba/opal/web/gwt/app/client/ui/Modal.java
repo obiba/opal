@@ -11,7 +11,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
 
-  private boolean resizable;
+  private boolean resizable = false;
 
   private boolean draggable;
 
@@ -40,7 +40,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     setMovePanel(getWidget(0));
     setAutoHide(false);
     setDraggable(true);
-    setResizable(true);
+    setResizable(false);
   }
 
   public void setResizable(boolean resizable) {
