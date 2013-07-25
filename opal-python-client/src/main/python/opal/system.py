@@ -11,9 +11,6 @@ def add_arguments(parser):
     """
     Add system command specific options
     """
-    parser.add_argument('--method', '-m', required=False,
-                        help='HTTP method (default is GET, others are POST, PUT, DELETE, OPTIONS)')
-    parser.add_argument('--accept', '-a', required=False, help='Accept header (default is application/json)')
     parser.add_argument('--json', '-j', action='store_true', help='Pretty JSON formatting of the response')
 
     parser.add_argument('--version', action='store_true', required=False,
@@ -31,14 +28,14 @@ def do_ws(args):
     Build the web service resource path
     """
     if args.version:
-        args.json = 'store_false'
+        args.json = False
         return "/system/version"
     if args.env:
         return "/system/env"
     if args.status:
-        return "system/status"
+        return "/system/status"
     if args.conf:
-        return "system/conf"
+        return "/system/conf"
     return "/system/conf/general"
 
 
@@ -51,18 +48,14 @@ def do_command(args):
         request = opal.core.OpalClient.build(opal.core.OpalClient.LoginInfo.parse(args)).new_request()
         request.fail_on_error()
 
-        if args.accept:
-            request.accept(args.accept)
-        else:
-            request.accept_json()
+        request.accept_json()
 
         if args.verbose:
             request.verbose()
 
         # send request
-        request.method(args.method).resource(do_ws(args))
+        request.get().resource(do_ws(args))
         response = request.send()
-
 
         # format response
         res = response.content
