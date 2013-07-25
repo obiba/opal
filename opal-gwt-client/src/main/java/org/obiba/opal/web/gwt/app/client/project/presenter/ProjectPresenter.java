@@ -15,6 +15,7 @@ import java.util.Arrays;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.MagmaPathSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
@@ -149,22 +150,9 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
           @Override
           public void onResource(Response response, ProjectDto resource) {
             project = resource;
+            // TODO check project is null
             getView().setProject(project);
-            String path = (String) getView().getTabData(tab.ordinal());
-            if(tab.equals(Display.ProjectTab.tables) && !Strings.isNullOrEmpty(path)) {
-              onTablesTabSelected();
-              MagmaPath.Parser parser = new MagmaPath.Parser().parse(path);
-              if(parser.hasVariable()) {
-                magmaPresenter.show(parser.getDatasource(), parser.getTable(), parser.getVariable());
-              } else if(parser.hasTable()) {
-                magmaPresenter.show(parser.getDatasource(), parser.getTable());
-              } else {
-                magmaPresenter.show(project.getDatasource().getName());
-              }
-            } else {
-              getEventBus()
-                  .fireEventFromSource(new DatasourceSelectionChangeEvent(this, project.getDatasource()), eventSource);
-            }
+            onTabSelected(tab.ordinal());
             getView().selectTab(tab.ordinal());
           }
         }).send();
@@ -179,60 +167,44 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   @Override
   public void onTabSelected(int index) {
     tab = Display.ProjectTab.values()[index];
+    PlaceRequest.Builder builder = PlaceRequestHelper
+        .createRequestBuilderWithParams(placeManager.getCurrentPlaceRequest(),
+            Arrays.asList(ParameterTokens.TOKEN_NAME));
+    builder.with(ParameterTokens.TOKEN_TAB, tab.toString());
+    String queryPathParam = (String) getView().getTabData(index);
 
     switch(tab) {
       case tables:
-        onTablesTabSelected();
+        onTablesTabSelected(queryPathParam);
         break;
       case files:
-        onFilesTabSelected();
+        onFilesTabSelected(queryPathParam);
         break;
       case administration:
         onAdminTabSelected();
         break;
     }
 
-    PlaceRequest.Builder builder = PlaceRequestHelper
-        .createRequestBuilderWithParams(placeManager.getCurrentPlaceRequest(),
-            Arrays.asList(ParameterTokens.TOKEN_NAME));
-
-    builder.with(ParameterTokens.TOKEN_TAB, tab.toString());
-
-    String queryPathParam = (String) getView().getTabData(index);
-
     if(!Strings.isNullOrEmpty(queryPathParam)) {
-
-      if(tab == Display.ProjectTab.tables) {
-        MagmaPath.Parser parser = new MagmaPath.Parser().parse(queryPathParam);
-
-        if(Strings.isNullOrEmpty(parser.getVariable())) {
-          getEventBus()
-              .fireEventFromSource(new TableSelectionChangeEvent(this, parser.getDatasource(), parser.getTable()),
-                  this);
-        } else {
-          getEventBus().fireEventFromSource(
-              new VariableSelectionChangeEvent(this, parser.getDatasource(), parser.getTable(), parser.getVariable()),
-              this);
-        }
-      }
-
       builder.with(ParameterTokens.TOKEN_PATH, queryPathParam);
     }
 
     placeManager.updateHistory(builder.build(), true);
   }
 
-  private void onTablesTabSelected() {
-    GWT.log("onTablesSelected");
+  private void onTablesTabSelected(String path) {
     if(magmaPresenter == null) {
-      GWT.log(" new magmaPresenter");
       magmaPresenter = magmaPresenterProvider.get();
       setInSlot(TABLES_PANE, magmaPresenter);
-      //magmaPresenter.show(project.getName());
+    }
+    if(!Strings.isNullOrEmpty(path)) {
+      fireEvent(new MagmaPathSelectionEvent(this, path));
+    } else {
+      fireEvent(new MagmaPathSelectionEvent(this, project.getDatasource().getName()));
     }
   }
 
-  private void onFilesTabSelected() {
+  private void onFilesTabSelected(String path) {
     if(fileExplorerPresenter == null) {
       fileExplorerPresenter = fileExplorerPresenterProvider.get();
       setInSlot(FILES_PANE, fileExplorerPresenter);

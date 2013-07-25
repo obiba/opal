@@ -79,7 +79,7 @@ import static com.google.gwt.http.client.Response.SC_OK;
 import static com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE;
 
 public class TablePresenter extends PresenterWidget<TablePresenter.Display>
-    implements TableUiHandlers, TableSelectionChangeEvent.Handler {
+    implements TableUiHandlers, TableSelectionChangeEvent.Handler, VariableSelectionChangeEvent.Handler {
 
   private static final int DELAY_MILLIS = 1000;
 
@@ -127,11 +127,18 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   }
 
   @Override
-  public void onTableSelectionChanged(TableSelectionChangeEvent e) {
-    if(e.hasTable()) {
-      updateDisplay(e.getTable(), e.getPrevious(), e.getNext());
+  public void onTableSelectionChanged(TableSelectionChangeEvent event) {
+    if(event.hasTable()) {
+      updateDisplay(event.getTable(), event.getPrevious(), event.getNext());
     } else {
-      updateDisplay(e.getDatasourceName(), e.getTableName(), e.getPrevious(), e.getNext());
+      updateDisplay(event.getDatasourceName(), event.getTableName(), event.getPrevious(), event.getNext());
+    }
+  }
+
+  @Override
+  public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
+    if(event.hasTable()) {
+      updateDisplay(event.getTable(), null, null);
     }
   }
 
@@ -148,8 +155,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     super.onReveal();
   }
 
-
-    private void updateTableIndexStatus() {
+  private void updateTableIndexStatus() {
     // Table indexation status
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").get()
         .authorize(getView().getTableIndexStatusAuthorizer()).send();
@@ -162,8 +168,9 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @SuppressWarnings({ "OverlyLongMethod" })
   private void addEventHandlers() {
-    registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeHandler()));
-    registerHandler(getEventBus().addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionChangeHandler()));
+    registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), this));
+    registerHandler(
+        getEventBus().addHandler(VariableSelectionChangeEvent.getType(), this));
     registerHandler(
         getEventBus().addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
     registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler()));
@@ -245,29 +252,31 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   }
 
   private void updateDisplay(TableDto tableDto, String previous, String next) {
-    getView().clear(table == null || !table.getLink().equals(tableDto.getLink()));
+    if(table == null || !table.getLink().equals(tableDto.getLink())) {
+      getView().clear(true);
 
-    table = tableDto;
-    this.previous = previous;
-    this.next = next;
+      table = tableDto;
+      this.previous = previous;
+      this.next = next;
 
-    getView().setTable(tableDto);
-    getView().setPreviousName(previous);
-    getView().setNextName(next);
+      getView().setTable(tableDto);
+      getView().setPreviousName(previous);
+      getView().setNextName(next);
 
-    if(tableIsView()) {
-      showFromTables(table);
-    } else {
-      getView().setFromTables(null);
+      if(tableIsView()) {
+        showFromTables(table);
+      } else {
+        getView().setFromTables(null);
+      }
+
+      if(getView().isValuesTabSelected()) {
+        valuesTablePresenter.setTable(tableDto);
+      }
+
+      updateVariables();
+      updateTableIndexStatus();
+      authorize();
     }
-
-    if(getView().isValuesTabSelected()) {
-      valuesTablePresenter.setTable(tableDto);
-    }
-
-    updateVariables();
-    updateTableIndexStatus();
-    authorize();
   }
 
   private void showFromTables(TableDto tableDto) {// Show from tables
@@ -654,26 +663,11 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     }
   }
 
-  private class TableSelectionChangeHandler implements TableSelectionChangeEvent.Handler {
-    @Override
-    public void onTableSelectionChanged(TableSelectionChangeEvent event) {
-      updateDisplay(event.getDatasourceName(), event.getTableName(), event.getPrevious(), event.getNext());
-      authorize();
-    }
-  }
-
-  private class VariableSelectionChangeHandler implements VariableSelectionChangeEvent.Handler {
-    @Override
-    public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-      GWT.log("TablePresenter.onVariableSelectionChanged()");
-    }
-  }
-
   private class VariableNameFieldUpdater implements FieldUpdater<VariableDto, String> {
     @Override
     public void update(int index, VariableDto variableDto, String value) {
-      getEventBus().fireEvent(
-          new VariableSelectionChangeEvent(this, table, variableDto, getPreviousVariable(index), getNextVariable(index)));
+      getEventBus().fireEvent(new VariableSelectionChangeEvent(this, table, variableDto, getPreviousVariable(index),
+          getNextVariable(index)));
     }
   }
 
@@ -697,8 +691,9 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       VariableDto variableDto = variables.get(siblingIndex);
 
       getView().setVariableSelection(variableDto, siblingIndex);
-      getEventBus().fireEvent(new VariableSelectionChangeEvent(this, table, variableDto, getPreviousVariable(siblingIndex),
-          getNextVariable(siblingIndex)));
+      getEventBus().fireEvent(
+          new VariableSelectionChangeEvent(this, table, variableDto, getPreviousVariable(siblingIndex),
+              getNextVariable(siblingIndex)));
     }
   }
 

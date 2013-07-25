@@ -35,6 +35,7 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.AclAction;
 
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
@@ -178,6 +179,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   @Override
   public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
+    GWT.log("onDatasourceSelectionChanged=" + event.getSelection());
     datasourceName = event.getSelection();
     initDatasource();
   }

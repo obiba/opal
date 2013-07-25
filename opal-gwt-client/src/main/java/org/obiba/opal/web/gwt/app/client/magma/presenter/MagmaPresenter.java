@@ -3,8 +3,10 @@ package org.obiba.opal.web.gwt.app.client.magma.presenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.MagmaPathSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -22,8 +24,8 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
 public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
-    implements MagmaUiHandlers, DatasourceSelectionChangeEvent.Handler, TableSelectionChangeEvent.Handler,
-    VariableSelectionChangeEvent.Handler {
+    implements MagmaUiHandlers, MagmaPathSelectionEvent.Handler, DatasourceSelectionChangeEvent.Handler,
+    TableSelectionChangeEvent.Handler, VariableSelectionChangeEvent.Handler {
 
   private final DatasourcePresenter datasourcePresenter;
 
@@ -45,6 +47,7 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
   protected void onBind() {
     super.onBind();
 
+    addRegisteredHandler(MagmaPathSelectionEvent.getType(), this);
     addRegisteredHandler(DatasourceSelectionChangeEvent.getType(), this);
     addRegisteredHandler(TableSelectionChangeEvent.getType(), this);
     addRegisteredHandler(VariableSelectionChangeEvent.getType(), this);
@@ -75,62 +78,71 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
 
   @Override
   public void onDatasourceSelection(String name) {
-    //getView().selectDatasource(name);
     getEventBus().fireEvent(new DatasourceSelectionChangeEvent(this, name));
   }
 
   @Override
   public void onTableSelection(String datasource, String table) {
-    //
     getEventBus().fireEvent(new TableSelectionChangeEvent(this, datasource, table));
   }
 
-  public void show(String datasource) {
+  @Override
+  public void onMagmaPathSelection(MagmaPathSelectionEvent event) {
+    MagmaPath.Parser parser = event.getParser();
+    if(parser.hasVariable()) {
+      show(parser.getDatasource(), parser.getTable(), parser.getVariable());
+    } else if(parser.hasTable()) {
+      show(parser.getDatasource(), parser.getTable());
+    } else {
+      show(parser.getDatasource());
+    }
+  }
+
+  private void show(String datasource) {
     getView().selectDatasource(datasource);
+    onDatasourceSelection(datasource);
   }
 
-  public void show(String datasource, String table) {
+  private void show(String datasource, String table) {
     getView().selectTable(datasource, table);
+    onTableSelection(datasource, table);
   }
 
-  public void show(final String datasource, final String table, final String variable) {
-    //getView().selectVariable(datasource, table, variable);
+  private void show(final String datasource, final String table, final String variable) {
     UriBuilder ub = UriBuilder.URI_DATASOURCE_TABLE;
     ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(datasource, table)).get()
         .withCallback(new ResourceCallback<TableDto>() {
           @Override
           public void onResource(Response response, final TableDto tableDto) {
-            if (tableDto == null) return;
-
-            getEventBus().fireEvent(new TableSelectionChangeEvent(this, tableDto));
+            if(tableDto == null) return;
 
             UriBuilder ub = UriBuilder.URI_DATASOURCE_TABLE_VARIABLES;
-            ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(ub.build(datasource, table)).get()
-                .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
+            ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(ub.build(datasource, table))
+                .get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
 
-                  @Override
-                  public void onResource(Response response, JsArray<VariableDto> resource) {
-                    JsArray<VariableDto> variables = JsArrays.toSafeArray(resource);
+              @Override
+              public void onResource(Response response, JsArray<VariableDto> resource) {
+                JsArray<VariableDto> variables = JsArrays.toSafeArray(resource);
 
-                    VariableDto previous = null;
-                    VariableDto selection = null;
-                    VariableDto next = null;
-                    for(int i = 0; i < variables.length(); i++) {
-                      if(variables.get(i).getName().equals(variable)) {
-                        selection = variables.get(i);
+                VariableDto previous = null;
+                VariableDto selection = null;
+                VariableDto next = null;
+                for(int i = 0; i < variables.length(); i++) {
+                  if(variables.get(i).getName().equals(variable)) {
+                    selection = variables.get(i);
 
-                        if(i >= 0) {
-                          previous = variables.get(i - 1);
-                        }
-
-                        if(i < variables.length() - 1) {
-                          next = variables.get(i + 1);
-                        }
-                      }
+                    if(i >= 0) {
+                      previous = variables.get(i - 1);
                     }
-                    getEventBus().fireEvent(new VariableSelectionChangeEvent(this, tableDto, selection, previous, next));
+
+                    if(i < variables.length() - 1) {
+                      next = variables.get(i + 1);
+                    }
                   }
-                })//
+                }
+                getEventBus().fireEvent(new VariableSelectionChangeEvent(this, tableDto, selection, previous, next));
+              }
+            })//
                 .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
                   @Override
                   public void onResponseCode(Request request, Response response) {
@@ -140,7 +152,6 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
           }
         }).send();
   }
-
 
   public interface Display extends View, HasUiHandlers<MagmaUiHandlers> {
 

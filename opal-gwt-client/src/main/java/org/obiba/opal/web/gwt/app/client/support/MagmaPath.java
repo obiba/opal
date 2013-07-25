@@ -45,23 +45,24 @@ public class MagmaPath {
     private String tableName;
     private String variableName;
 
-    public Parser parse(String path) {
+    public static Parser parse(String path) {
+      Parser parser = new Parser();
       int tableSep = path.indexOf('.');
       if (tableSep == -1) {
-        datasourceName = path;
+        parser.datasourceName = path;
       } else {
-        datasourceName = path.substring(0, tableSep);
+        parser.datasourceName = path.substring(0, tableSep);
         String p = path.substring(tableSep + 1);
         int varSep = p.indexOf(':');
         if (varSep == -1) {
-          tableName = p;
+          parser.tableName = p;
         } else {
-          tableName = p.substring(0,varSep);
-          variableName = p.substring(varSep + 1);
+          parser.tableName = p.substring(0,varSep);
+          parser.variableName = p.substring(varSep + 1);
         }
       }
 
-      return this;
+      return parser;
     }
 
     public String getDatasource() {
