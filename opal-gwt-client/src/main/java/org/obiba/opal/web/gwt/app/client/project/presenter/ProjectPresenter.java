@@ -141,11 +141,9 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   public void refresh() {
+    // TODO handle wrong or missing project name
     if(name == null) return;
-    // TODO handle wrong or missing id
-    UriBuilder builder = UriBuilder.create().segment("project", name);
-    final HasHandlers eventSource = this;
-    ResourceRequestBuilderFactory.<ProjectDto>newBuilder().forResource(builder.build()).get()
+    ResourceRequestBuilderFactory.<ProjectDto>newBuilder().forResource(UriBuilder.URI_PROJECT.build(name)).get()
         .withCallback(new ResourceCallback<ProjectDto>() {
           @Override
           public void onResource(Response response, ProjectDto resource) {
