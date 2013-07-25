@@ -24,6 +24,8 @@ public abstract class AbstractFieldValidator implements FieldValidator {
 
   private List<String> args = new ArrayList<String>();
 
+  private int id;
+
   //
   // Constructors
   //
@@ -47,6 +49,15 @@ public abstract class AbstractFieldValidator implements FieldValidator {
 
   public List<String> getArgs() {
     return args;
+  }
+
+  public AbstractFieldValidator setId(int value) {
+    id = value;
+    return this;
+  }
+
+  public int getId() {
+    return id;
   }
 
   //

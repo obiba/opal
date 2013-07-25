@@ -9,56 +9,66 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.report.view;
 
-import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
-import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
+import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
+import com.github.gwtbootstrap.client.ui.event.HiddenEvent;
+import com.github.gwtbootstrap.client.ui.event.HiddenHandler;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PopupViewImpl;
+import com.google.web.bindery.event.shared.EventBus;
 
-public class ReportTemplateUpdateDialogView extends PopupViewImpl implements Display {
+public class ReportTemplateUpdateDialogView extends ModalPopupViewWithUiHandlers<ReportTemplateUpdateDialogUiHandlers>
+    implements Display {
 
-  @UiTemplate("ReportTemplateUpdateDialogView.ui.xml")
-  interface ReportTemplateUpdateDialogUiBinder extends UiBinder<DialogBox, ReportTemplateUpdateDialogView> {}
+
+  interface ReportTemplateUpdateDialogUiBinder extends UiBinder<Widget, ReportTemplateUpdateDialogView> {}
 
   private static final ReportTemplateUpdateDialogUiBinder uiBinder = GWT
       .create(ReportTemplateUpdateDialogUiBinder.class);
 
   @UiField
-  DialogBox dialog;
-
-  @UiField
-  DockLayoutPanel contentLayout;
-
-  @UiField
-  ResizeHandle resizeHandle;
+  Modal dialog;
 
   @UiField
   Button updateReportTemplateButton;
 
   @UiField
   Button cancelButton;
+
+  @UiField
+  ControlGroup labelName;
+
+  @UiField
+  ControlGroup labelTempleFile;
+
+  @UiField
+  ControlGroup labelSchedule;
 
   @UiField
   TextBox reportTemplateName;
@@ -87,14 +97,19 @@ public class ReportTemplateUpdateDialogView extends PopupViewImpl implements Dis
   @UiField
   Anchor cronLink;
 
+
+  @UiField
+  Panel alertPlace;
+
+
   private FileSelectionPresenter.Display fileSelection;
+
+  private static final Translations translations = GWT.create(Translations.class);
 
   @Inject
   public ReportTemplateUpdateDialogView(EventBus eventBus) {
     super(eventBus);
     uiBinder.createAndBindUi(this);
-    resizeHandle.makeResizable(contentLayout);
-    dialog.hide();
     cronLink.addClickHandler(new ClickHandler() {
 
       @Override
@@ -102,17 +117,39 @@ public class ReportTemplateUpdateDialogView extends PopupViewImpl implements Dis
         Window.open("http://www.quartz-scheduler.org/docs/tutorials/crontrigger.html", "_blank", null);
       }
     });
+
+    dialog.setTitle(translations.reportTemplateDialogTitle());
+    dialog.addHiddenHandler(new DialogHiddenHandler());
   }
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {
     Display.Slots s = (Display.Slots) slot;
     switch(s) {
+      case ERROR:
+        alertPlace.add(content);
+        break;
       case EMAIL:
         notificationEmailsPanel.add(content);
         break;
       case REPORT_PARAMS:
         reportParametersPanel.add(content);
+        break;
+    }
+  }
+
+  @Override
+  public void removeFromSlot(Object slot, IsWidget content) {
+    Display.Slots s = (Display.Slots) slot;
+    switch(s) {
+      case ERROR:
+        alertPlace.remove(content);
+        break;
+      case EMAIL:
+        notificationEmailsPanel.remove(content);
+        break;
+      case REPORT_PARAMS:
+        reportParametersPanel.remove(content);
         break;
     }
   }
@@ -133,14 +170,24 @@ public class ReportTemplateUpdateDialogView extends PopupViewImpl implements Dis
     hide();
   }
 
-  @Override
-  public Button getCancelButton() {
-    return cancelButton;
+  @UiHandler("cancelButton")
+  public void onCancelButton(ClickEvent event) {
+    getUiHandlers().onDialogHide();
   }
 
-  @Override
-  public Button getUpdateReportTemplateButton() {
-    return updateReportTemplateButton;
+  @UiHandler("updateReportTemplateButton")
+  public void getUpdateReportTemplateButton(ClickEvent event) {
+    getUiHandlers().updateReportTemplate();
+  }
+
+  @UiHandler("schedule")
+  public void onSchedule(ClickEvent event) {
+    getUiHandlers().enableSchedule();
+  }
+
+  @UiHandler("runManuallyRadio")
+  public void onRunManually(ClickEvent event) {
+    getUiHandlers().disableSchedule();
   }
 
   @Override
@@ -169,16 +216,6 @@ public class ReportTemplateUpdateDialogView extends PopupViewImpl implements Dis
     fileSelection = display;
     fileSelection.setEnabled(true);
     fileSelection.setFieldWidth("20em");
-  }
-
-  @Override
-  public HandlerRegistration addEnableScheduleClickHandler(ClickHandler handler) {
-    return schedule.addClickHandler(handler);
-  }
-
-  @Override
-  public HandlerRegistration addDisableScheduleClickHandler(ClickHandler handler) {
-    return runManuallyRadio.addClickHandler(handler);
   }
 
   @Override
@@ -225,6 +262,43 @@ public class ReportTemplateUpdateDialogView extends PopupViewImpl implements Dis
   @Override
   public HasValue<Boolean> isScheduled() {
     return scheduleRadio;
+  }
+
+  @Override
+  public void setErrors(List<String> message, List<FormField> ids) {
+
+    for (FormField id : ids) {
+    switch(id) {
+      case NAME:
+        labelName.setType(ControlGroupType.ERROR);
+        break;
+
+      case TEMPLE_FILE:
+        labelTempleFile.setType(ControlGroupType.ERROR);
+        break;
+
+      case CRON_EXPRESSION:
+        labelSchedule.setType(ControlGroupType.ERROR);
+        break;
+
+      default:
+        break;
+    }
+    }
+  }
+
+  @Override
+  public void clearErrors() {
+    labelName.setType(ControlGroupType.NONE);
+    labelTempleFile.setType(ControlGroupType.NONE);
+    labelSchedule.setType(ControlGroupType.NONE);
+  }
+
+  private class DialogHiddenHandler implements HiddenHandler {
+    @Override
+    public void onHidden(HiddenEvent hiddenEvent) {
+      getUiHandlers().onDialogHidden();
+    }
   }
 
 }

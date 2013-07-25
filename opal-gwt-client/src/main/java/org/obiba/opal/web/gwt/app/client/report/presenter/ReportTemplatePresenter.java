@@ -12,9 +12,11 @@ package org.obiba.opal.web.gwt.app.client.report.presenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
+import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCanceledEvent;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
+import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCanceledEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
@@ -38,7 +40,7 @@ public class ReportTemplatePresenter
 
   ReportTemplateListPresenter reportTemplateListPresenter;
 
-  Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenterProvider;
+  ReportTemplateUpdateDialogPresenter reportTemplateUpdateDialogPresenter;
 
   public interface Display extends View, HasBreadcrumbs {
 
@@ -59,13 +61,13 @@ public class ReportTemplatePresenter
   public ReportTemplatePresenter(Display display, EventBus eventBus, Proxy proxy,
       ReportTemplateDetailsPresenter reportTemplateDetailsPresenter,
       ReportTemplateListPresenter reportTemplateListPresenter,
-      Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenter,
+      Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenterProvider,
       DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     this.reportTemplateDetailsPresenter = reportTemplateDetailsPresenter;
     this.reportTemplateListPresenter = reportTemplateListPresenter;
     this.breadcrumbsHelper = breadcrumbsHelper;
-    reportTemplateUpdateDialogPresenterProvider = reportTemplateUpdateDialogPresenter;
+    reportTemplateUpdateDialogPresenter = reportTemplateUpdateDialogPresenterProvider.get();
   }
 
 
@@ -94,7 +96,6 @@ public class ReportTemplatePresenter
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
   }
 
-
   @Override
   protected PresenterWidget<?> getDefaultPresenter(SplitPaneWorkbenchPresenter.Slot slot) {
     switch(slot) {
@@ -108,6 +109,7 @@ public class ReportTemplatePresenter
 
   @Override
   protected void addHandlers() {
+    registerHandler(getEventBus().addHandler(ReportTemplateCanceledEvent.getType(), new ReportTemplateCanceledHandler()));
     registerHandler(getView().addReportTemplateClickHandler(new AddReportTemplateClickHandler()));
     registerHandler(getView().refreshClickHandler(new ClickHandler() {
 
@@ -129,11 +131,18 @@ public class ReportTemplatePresenter
 
     @Override
     public void onClick(ClickEvent event) {
-      ReportTemplateUpdateDialogPresenter presenter = reportTemplateUpdateDialogPresenterProvider.get();
+      ReportTemplateUpdateDialogPresenter presenter = reportTemplateUpdateDialogPresenter;
       presenter.setDialogMode(Mode.CREATE);
       addToPopupSlot(presenter);
     }
 
   }
 
+  private class ReportTemplateCanceledHandler implements ReportTemplateCanceledEvent.Handler {
+
+    @Override
+    public void onReportTemplateCanceled(ReportTemplateCanceledEvent event) {
+      removeFromPopupSlot(reportTemplateUpdateDialogPresenter);
+    }
+  }
 }

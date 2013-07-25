@@ -17,15 +17,18 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.presenter.ItemSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
+import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCanceledEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCanceledEvent;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
-import org.obiba.opal.web.gwt.app.client.presenter.ItemSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.view.KeyValueItemInputView;
 import org.obiba.opal.web.gwt.app.client.view.TextBoxItemInputView;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -36,30 +39,32 @@ import org.obiba.opal.web.model.client.opal.ParameterDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
+import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportTemplateUpdateDialogPresenter.Display> {
+public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportTemplateUpdateDialogPresenter.Display>
+    implements ReportTemplateUpdateDialogUiHandlers {
 
   private final FileSelectionPresenter fileSelectionPresenter;
 
   private final ItemSelectorPresenter emailSelectorPresenter;
 
   private final ItemSelectorPresenter parametersSelectorPresenter;
+
+  private final NotificationPresenter errorNotificationPresenter;
 
   private final Collection<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
@@ -69,17 +74,20 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
     CREATE, UPDATE
   }
 
-  public interface Display extends PopupView {
+  public interface Display extends PopupView, HasUiHandlers<ReportTemplateUpdateDialogUiHandlers> {
+
+    public enum FormField {
+      NAME,
+      TEMPLE_FILE,
+      EMAILS,
+      CRON_EXPRESSION
+    }
 
     enum Slots {
-      EMAIL, REPORT_PARAMS
+      ERROR, EMAIL, REPORT_PARAMS
     }
 
     void hideDialog();
-
-    HasClickHandlers getUpdateReportTemplateButton();
-
-    HasClickHandlers getCancelButton();
 
     void setName(String name);
 
@@ -99,37 +107,39 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
 
     HasValue<Boolean> isScheduled();
 
-    HandlerRegistration addDisableScheduleClickHandler(ClickHandler handler);
-
-    HandlerRegistration addEnableScheduleClickHandler(ClickHandler handler);
-
     void setDesignFileWidgetDisplay(FileSelectionPresenter.Display display);
 
     void setEnabledReportTemplateName(boolean enabled);
 
+    void setErrors(List<String> messages, List<FormField> ids);
+
+    void clearErrors();
   }
 
   @Inject
   public ReportTemplateUpdateDialogPresenter(Display display, EventBus eventBus,
       Provider<FileSelectionPresenter> fileSelectionPresenterProvider,
-      Provider<ItemSelectorPresenter> itemSelectorPresenterProvider) {
+      Provider<ItemSelectorPresenter> itemSelectorPresenterProvider, Provider<NotificationPresenter> errorNotificationPresenterProvider) {
     super(eventBus, display);
     fileSelectionPresenter = fileSelectionPresenterProvider.get();
     emailSelectorPresenter = itemSelectorPresenterProvider.get();
     parametersSelectorPresenter = itemSelectorPresenterProvider.get();
     parametersSelectorPresenter.getView().setItemInputDisplay(new KeyValueItemInputView());
     emailSelectorPresenter.getView().setItemInputDisplay(new TextBoxItemInputView());
+    errorNotificationPresenter = errorNotificationPresenterProvider.get();
+    getView().setUiHandlers(this);
   }
 
   @Override
   protected void onBind() {
     initDisplayComponents();
-    addEventHandlers();
     addValidators();
   }
 
   private void addValidators() {
-    validators.add(new RequiredTextValidator(getView().getName(), "ReportTemplateNameIsRequired"));
+    validators.add(new RequiredTextValidator(getView().getName(), "ReportTemplateNameIsRequired")
+        .setId(Display.FormField.TEMPLE_FILE.ordinal()));
+
     validators.add(new FieldValidator() {
 
       @Nullable
@@ -140,9 +150,17 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
         }
         return null;
       }
+
+      @Override
+      public int getId() {
+        return Display.FormField.NAME.ordinal();
+      }
     });
+
     validators.add(new ConditionalValidator(getView().isScheduled(),
-        new RequiredTextValidator(getView().getShedule(), "CronExpressionIsRequired")));
+        new RequiredTextValidator(getView().getShedule(), "CronExpressionIsRequired"))
+        .setId(Display.FormField.CRON_EXPRESSION.ordinal()));
+
     validators.add(new FieldValidator() {
 
       @Nullable
@@ -156,6 +174,12 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
         }
         return null;
       }
+
+      @Override
+      public int getId() {
+        return Display.FormField.EMAILS.ordinal();
+      }
+
     });
   }
 
@@ -167,6 +191,7 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
   }
 
   protected void initDisplayComponents() {
+    setInSlot(Display.Slots.ERROR, errorNotificationPresenter);
     setInSlot(Display.Slots.EMAIL, emailSelectorPresenter);
     setInSlot(Display.Slots.REPORT_PARAMS, parametersSelectorPresenter);
 
@@ -176,31 +201,40 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
 
   }
 
-  private void addEventHandlers() {
-    registerHandler(
-        getView().getUpdateReportTemplateButton().addClickHandler(new CreateOrUpdateReportTemplateClickHandler()));
-
-    registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getView().hideDialog();
-      }
-    }));
-
-    registerHandler(getView().addEnableScheduleClickHandler(new EnableScheduleClickHandler()));
-    registerHandler(getView().addDisableScheduleClickHandler(new DisableScheduleClickHandler()));
-
-  }
-
   public void setDialogMode(Mode dialogMode) {
     this.dialogMode = dialogMode;
     getView().setEnabledReportTemplateName(this.dialogMode == Mode.CREATE);
   }
 
-  private void updateReportTemplate() {
-    if(validReportTemplate()) {
-      doUpdateReportTemplate();
+  @Override
+  public void onDialogHidden() {
+    errorNotificationPresenter.close();
+    getView().clearErrors();
+    getEventBus().fireEvent(new ReportTemplateCanceledEvent());
+  }
+
+  @Override
+  public void updateReportTemplate() {
+    if(dialogMode == Mode.CREATE) {
+      createReportTemplate();
+    } else if(dialogMode == Mode.UPDATE) {
+      updateReportTemplateInternal();
     }
+  }
+
+  @Override
+  public void onDialogHide() {
+    getView().hideDialog();
+  }
+
+  @Override
+  public void enableSchedule() {
+    getView().isScheduled().setValue(true);
+  }
+
+  @Override
+  public void disableSchedule() {
+    getView().getShedule().setText("");
   }
 
   private void createReportTemplate() {
@@ -215,22 +249,38 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
     }
   }
 
+  private void updateReportTemplateInternal() {
+    if(validReportTemplate()) {
+      doUpdateReportTemplate();
+    }
+  }
+
   private boolean validReportTemplate() {
+    errorNotificationPresenter.close();
+    getView().clearErrors();
+
+    List<Display.FormField> validatorIds = new ArrayList<Display.FormField>();
     List<String> messages = new ArrayList<String>();
     String message;
     for(FieldValidator validator : validators) {
       message = validator.validate();
       if(message != null) {
         messages.add(message);
+        validatorIds.add(Display.FormField.values()[validator.getId()]);
       }
     }
 
     if(messages.size() > 0) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error(messages).build());
+      errorNotificationPresenter
+          .setNotification(NotificationPresenter.NotificationType.ERROR, messages, null, null, true,
+              new ErrorNotificationErrorCloseHandler());
+
+      getView().setErrors(messages, validatorIds);
       return false;
     } else {
       return true;
     }
+
   }
 
   private ReportTemplateDto getReportTemplateDto() {
@@ -300,35 +350,6 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
     }
   }
 
-  public class CreateOrUpdateReportTemplateClickHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent arg0) {
-      if(dialogMode == Mode.CREATE) {
-        createReportTemplate();
-      } else if(dialogMode == Mode.UPDATE) {
-        updateReportTemplate();
-      }
-    }
-
-  }
-
-  private class EnableScheduleClickHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent event) {
-      getView().isScheduled().setValue(true);
-    }
-  }
-
-  private class DisableScheduleClickHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent event) {
-      getView().getShedule().setText("");
-    }
-  }
-
   private class CreateOrUpdateReportTemplateCallBack implements ResponseCodeCallback {
 
     ReportTemplateDto reportTemplate;
@@ -378,4 +399,11 @@ public class ReportTemplateUpdateDialogPresenter extends PresenterWidget<ReportT
     getView().setSchedule(reportTemplate.getCron());
   }
 
+  private class ErrorNotificationErrorCloseHandler implements ClosedHandler {
+
+    @Override
+    public void onClosed(ClosedEvent closedEvent) {
+      getView().clearErrors();
+    }
+  }
 }
