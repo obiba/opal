@@ -32,10 +32,11 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class UserPresenter extends PresenterWidget<UserPresenter.Display> {
+public class UserPresenter extends PresenterWidget<UserPresenter.Display> implements UserUiHandlers {
 
   private static final int MIN_PASSWORD_LENGTH = 6;
 
@@ -56,95 +57,89 @@ public class UserPresenter extends PresenterWidget<UserPresenter.Display> {
   @Inject
   public UserPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
+    getView().setUiHandlers(this);
+  }
+
+  @Override
+  public void cancel() {
+    getView().hideDialog();
+  }
+
+  @Override
+  public void save() {
+
+    if(dialogMode.equals(Mode.CREATE)) {
+      userDto = UserDto.create();
+      userDto.setName(getView().getUserName());
+    }
+
+    // Update password
+    if(getView().getPassword().length() < MIN_PASSWORD_LENGTH) {
+      getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error("UserPasswordLengthError")
+          .args(String.valueOf(MIN_PASSWORD_LENGTH)).build());
+      getView().setPasswordError(true);
+      return;
+    }
+    if(!getView().getPassword().equals(getView().getConfirmPassword())) {
+      getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error("UserPasswordMatchError").build());
+      getView().setPasswordError(true);
+      return;
+    }
+
+    if(getView().getPassword().equals(getView().getConfirmPassword())) {
+      userDto.setPassword(getView().getPassword());
+    }
+
+    // update groups
+    userDto.clearGroupsArray();
+    userDto.setGroupsArray(getView().getGroups());
+
+    if(dialogMode.equals(Mode.CREATE)) {
+      // Create
+      ResourceRequestBuilderFactory.newBuilder()//
+          .forResource("/users").withResourceBody(UserDto.stringify(userDto)).accept("application/json")//
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              if(response.getStatusCode() == Response.SC_OK) {
+                getEventBus().fireEvent(new UsersRefreshEvent());
+                getEventBus().fireEvent(
+                    NotificationEvent.Builder.newNotification().info("UserCreatedOk").args(userDto.getName()).build());
+                getView().hideDialog();
+              } else if(response.getStatusCode() == Response.SC_CONFLICT) {
+                getEventBus().fireEvent(
+                    NotificationEvent.Builder.newNotification().error("UserAlreadyExists").args(userDto.getName())
+                        .build());
+              } else {
+                getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
+                getView().hideDialog();
+              }
+            }
+          }, Response.SC_OK, Response.SC_CONFLICT).post().send();
+    } else {
+      // Update
+      ResourceRequestBuilderFactory.newBuilder()//
+          .forResource("/user/" + userDto.getName()).withResourceBody(UserDto.stringify(userDto))
+          .accept("application/json")//
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              if(response.getStatusCode() == Response.SC_OK) {
+                getEventBus().fireEvent(new UsersRefreshEvent());
+                getEventBus().fireEvent(
+                    NotificationEvent.Builder.newNotification().info("UserUpdatedOk").args(userDto.getName()).build());
+              } else {
+                getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
+              }
+            }
+          }, Response.SC_OK, Response.SC_PRECONDITION_FAILED, Response.SC_INTERNAL_SERVER_ERROR).put().send();
+      getView().hideDialog();
+    }
+
   }
 
   @Override
   protected void onBind() {
-    registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getView().hideDialog();
-      }
-    }));
-
-    registerHandler(getView().getSaveButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-
-        if(dialogMode.equals(Mode.CREATE)) {
-          userDto = UserDto.create();
-          userDto.setName(getView().getUserName());
-        }
-
-        // Update password
-        if(getView().getPassword().length() < MIN_PASSWORD_LENGTH) {
-          getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error("UserPasswordLengthError")
-              .args(String.valueOf(MIN_PASSWORD_LENGTH)).build());
-          getView().setPasswordError(true);
-          return;
-        }
-        if(!getView().getPassword().equals(getView().getConfirmPassword())) {
-          getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error("UserPasswordMatchError").build());
-          getView().setPasswordError(true);
-          return;
-        }
-
-        if(getView().getPassword().equals(getView().getConfirmPassword())) {
-          userDto.setPassword(getView().getPassword());
-        }
-
-        // update groups
-        userDto.clearGroupsArray();
-        userDto.setGroupsArray(getView().getGroups());
-
-        if(dialogMode.equals(Mode.CREATE)) {
-          // Create
-          ResourceRequestBuilderFactory.newBuilder()//
-              .forResource("/users").withResourceBody(UserDto.stringify(userDto)).accept("application/json")//
-              .withCallback(new ResponseCodeCallback() {
-                @Override
-                public void onResponseCode(Request request, Response response) {
-                  if(response.getStatusCode() == Response.SC_OK) {
-                    getEventBus().fireEvent(new UsersRefreshEvent());
-                    getEventBus().fireEvent(
-                        NotificationEvent.Builder.newNotification().info("UserCreatedOk").args(userDto.getName())
-                            .build());
-                    getView().hideDialog();
-                  } else if(response.getStatusCode() == Response.SC_CONFLICT) {
-                    getEventBus().fireEvent(
-                        NotificationEvent.Builder.newNotification().error("UserAlreadyExists").args(userDto.getName())
-                            .build());
-                  } else {
-                    getEventBus()
-                        .fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
-                    getView().hideDialog();
-                  }
-                }
-              }, Response.SC_OK, Response.SC_CONFLICT).post().send();
-        } else {
-          // Update
-          ResourceRequestBuilderFactory.newBuilder()//
-              .forResource("/user/" + userDto.getName()).withResourceBody(UserDto.stringify(userDto))
-              .accept("application/json")//
-              .withCallback(new ResponseCodeCallback() {
-                @Override
-                public void onResponseCode(Request request, Response response) {
-                  if(response.getStatusCode() == Response.SC_OK) {
-                    getEventBus().fireEvent(new UsersRefreshEvent());
-                    getEventBus().fireEvent(
-                        NotificationEvent.Builder.newNotification().info("UserUpdatedOk").args(userDto.getName())
-                            .build());
-                  } else {
-                    getEventBus()
-                        .fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
-                  }
-                }
-              }, Response.SC_OK, Response.SC_PRECONDITION_FAILED, Response.SC_INTERNAL_SERVER_ERROR).put().send();
-          getView().hideDialog();
-        }
-
-      }
-    }));
 
     // Groups selection handler
     registerHandler(getView().addSearchSelectionHandler(new GroupSuggestionSelectionHandler()));
@@ -164,13 +159,9 @@ public class UserPresenter extends PresenterWidget<UserPresenter.Display> {
     dialogMode = mode;
   }
 
-  public interface Display extends PopupView {
+  public interface Display extends PopupView, HasUiHandlers<UserUiHandlers> {
 
     void hideDialog();
-
-    HasClickHandlers getSaveButton();
-
-    HasClickHandlers getCancelButton();
 
     void setUser(String originalUserName, List<String> originalGroups);
 
