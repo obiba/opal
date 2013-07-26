@@ -29,10 +29,14 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.NoMessageException;
+import org.eclipse.jgit.api.errors.WrongRepositoryStateException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Repository;
 import org.obiba.core.util.FileUtil;
 import org.obiba.core.util.StreamUtil;
+import org.obiba.core.util.StringUtil;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.Variable;
@@ -42,7 +46,6 @@ import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.audit.OpalUserProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import com.gitblit.utils.JGitUtils;
 import com.google.common.base.Charsets;
@@ -95,11 +98,50 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   }
 
   @Override
+  public void dispose() {
+    //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  @Override
+  public void initialise() {
+    //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  @Override
   public void writeViews(@Nonnull String datasourceName, @Nonnull Set<View> views) {
     w.lock();
     try {
-      doWriteViews(datasourceName, views);
       doWriteGitViews(datasourceName, views);
+    } finally {
+      w.unlock();
+    }
+  }
+
+  @Override
+  public void writeView(@Nonnull String datasourceName, @Nonnull View view) {
+    w.lock();
+    try {
+      doWriteGitViews(datasourceName, ImmutableSet.of(view));
+    } finally {
+      w.unlock();
+    }
+  }
+
+  @Override
+  public void removeView(@Nonnull String datasourceName, @Nonnull String viewName) {
+    w.lock();
+    try {
+      doRemoveGitView(datasourceName, viewName);
+    } finally {
+      w.unlock();
+    }
+  }
+
+  @Override
+  public void removeViews(String datasourceName) {
+    w.lock();
+    try {
+      doRemoveGitViews(datasourceName);
     } finally {
       w.unlock();
     }
@@ -120,23 +162,27 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     }
   }
 
+  private void doCommitPush(Git git, String message) throws GitAPIException {
+    git.commit().setAuthor(getAuthorName(), "opal@obiba.org").setCommitter("opal", "opal@obiba.org").setMessage(message)
+        .call();
+    git.push().setPushAll().setRemote("origin").call();
+  }
+
   private void doWriteGitViews(@Nonnull String datasourceName, @Nonnull Collection<View> views) {
-    File targetDir = getDatasourceViewsGit(datasourceName);
-
+    File localRepo = null;
     try {
-      // Create datasource views bare git repo
-      Repository newRepo = new FileRepository(targetDir);
-      if(!targetDir.exists()) {
-        newRepo.create(true);
-      }
-
       // Fetch or clone a tmp working directory
-      File localRepo = cloneDatasourceViewsGit(targetDir);
+      localRepo = cloneDatasourceViewsGit(datasourceName);
 
       // Serialize all view files in the repo
       List<String> varFilesToRemove = Lists.newArrayList();
+      StringBuilder message = new StringBuilder();
       for(View view : views) {
         doWriteGitView(localRepo, view, varFilesToRemove);
+        if (message.length()>0) {
+          message.append(", ");
+        }
+        message.append(view.getName());
       }
 
       // Push changes
@@ -145,17 +191,71 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
         git.rm().addFilepattern(toRemove).call();
       }
       git.add().addFilepattern(".").call();
-      git.commit().setAuthor(getAuthorName(), "opal@obiba.org").setCommitter("opal", "opal@obiba.org")
-          .setMessage(Long.toString(System.nanoTime())).call();
-      git.push().setPushAll().setRemote("origin").call();
+      doCommitPush(git, "Update " + message);
 
-      localRepo.delete();
     } catch(Exception e) {
       throw new RuntimeException("Failed writing views in git for datasource: " + datasourceName, e);
+    } finally {
+      if(localRepo != null) localRepo.delete();
     }
   }
 
-  private File cloneDatasourceViewsGit(File targetDir) throws Exception {
+  private void doRemoveGitView(@Nonnull String datasourceName, @Nonnull String viewName) {
+    File localRepo = null;
+    try {
+      localRepo = cloneDatasourceViewsGit(datasourceName);
+      Git git = new Git(new FileRepository(new File(localRepo, ".git")));
+      git.rm().addFilepattern(viewName);
+      doCommitPush(git, "Remove " + viewName);
+    } catch(Exception e) {
+      throw new RuntimeException("Failed removing view '" + viewName + "' from git for datasource: " + datasourceName,
+          e);
+    } finally {
+      if(localRepo != null) localRepo.delete();
+    }
+  }
+
+  private void doRemoveGitViews(@Nonnull String datasourceName) {
+    File localRepo = null;
+    try {
+      localRepo = cloneDatasourceViewsGit(datasourceName);
+      Git git = new Git(new FileRepository(new File(localRepo, ".git")));
+
+      StringBuilder message = new StringBuilder();
+      for(File f : listViewDirectories(localRepo)) {
+        git.rm().addFilepattern(f.getName());
+        if (message.length()>0) {
+          message.append(", ");
+        }
+        message.append(f.getName());
+      }
+      doCommitPush(git, "Remove " + message);
+    } catch(Exception e) {
+      throw new RuntimeException("Failed removing views from git for datasource: " + datasourceName,
+          e);
+    } finally {
+      if(localRepo != null) localRepo.delete();
+    }
+  }
+
+  private File[] listViewDirectories(File localRepo) {
+    return localRepo.listFiles(new FileFilter() {
+      @Override
+      public boolean accept(File pathname) {
+        return pathname.isDirectory() && !pathname.getName().equals(".git") && new File(pathname,VIEW_FILE_NAME).exists();
+      }
+    });
+  }
+
+  private File cloneDatasourceViewsGit(String datasourceName) throws Exception {
+    File targetDir = getDatasourceViewsGit(datasourceName);
+
+    // Create datasource views bare git repo
+    Repository newRepo = new FileRepository(targetDir);
+    if(!targetDir.exists()) {
+      newRepo.create(true);
+    }
+
     String remoteUrl = "file://" + targetDir.getAbsolutePath();
     File tmp = getTmpDirectory();
     File localRepo = new File(tmp, "opal-" + Long.toString(System.nanoTime()));
@@ -285,15 +385,9 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
 
     File localRepo = null;
     try {
-      File targetDir = getDatasourceViewsGit(datasourceName);
-      localRepo = cloneDatasourceViewsGit(targetDir);
+      localRepo = cloneDatasourceViewsGit(datasourceName);
 
-      for(File f : localRepo.listFiles(new FileFilter() {
-        @Override
-        public boolean accept(File pathname) {
-          return pathname.isDirectory() && !pathname.getName().equals(".git");
-        }
-      })) {
+      for(File f : listViewDirectories(localRepo)) {
         View view = doReadGitView(f);
         if(view != null) {
           builder.add(view);
@@ -302,7 +396,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     } catch(Exception e) {
       throw new RuntimeException("Failed reading views from git for datasource: " + datasourceName, e);
     } finally {
-      if (localRepo != null) {
+      if(localRepo != null) {
         localRepo.delete();
       }
     }
@@ -348,5 +442,4 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   private File getDatasourceViewsFile(String datasourceName) {
     return new File(viewsDirectory, normalizeDatasourceName(datasourceName) + ".xml");
   }
-
 }
