@@ -186,11 +186,11 @@
       </g:FlowPanel>
     </g:FlowPanel>
     <b:ModalFooter>
-      <b:Button ui:field="cancelButton" styleName="btn right-aligned top-margin">
-        <ui:msg description="Cancel button label">Cancel</ui:msg>
-      </b:Button>
       <b:Button ui:field="updateReportTemplateButton" styleName="btn btn-primary right-aligned top-margin">
         <ui:msg description="Save button label">Save</ui:msg>
+      </b:Button>
+      <b:Button ui:field="cancelButton" styleName="btn right-aligned top-margin">
+        <ui:msg description="Cancel button label">Cancel</ui:msg>
       </b:Button>
     </b:ModalFooter>
   </o:Modal>

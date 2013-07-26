@@ -23,18 +23,17 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter.Display> {
+public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter.Display>
+    implements FileSelectorUiHandlers {
 
   public static final Object LEFT = new Object();
 
@@ -67,6 +66,8 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
     selectionResolverChain.add(new AnyFolderSelectionResolver());
     selectionResolverChain.add(new NewFileOrFolderSelectionResolver());
     selectionResolverChain.add(new ExistingFileOrFolderSelectionResolver());
+
+    getView().setUiHandlers(this);
   }
 
   public void handle(FileSelectionRequiredEvent event) {
@@ -78,8 +79,6 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
   protected void onBind() {
     setInSlot(LEFT, fileSystemTreePresenter);
     setInSlot(CENTER, folderDetailsPresenter);
-
-    addEventHandlers();
   }
 
   @Override
@@ -118,32 +117,6 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
   public boolean allowsFolderCreation() {
     return fileSelectionType == FileSelectionType.FILE || fileSelectionType == FileSelectionType.FOLDER ||
         fileSelectionType == FileSelectionType.FILE_OR_FOLDER;
-  }
-
-  private void addEventHandlers() {
-    addSelectButtonHandler();
-    addCancelButtonHandler();
-    addCreateFolderButtonHandler();
-    registerHandler(getView().addUploadButtonHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        fileUploadDialogPresenter.setCurrentFolder(getCurrentFolder());
-        addToPopupSlot(fileUploadDialogPresenter);
-      }
-    }));
-  }
-
-  private void addCreateFolderButtonHandler() {
-    registerHandler(getView().addCreateFolderButtonHandler(new CreateFolderButtonHandler()));
-  }
-
-  private void addSelectButtonHandler() {
-    registerHandler(getView().addSelectButtonHandler(new SelectButtonHandler()));
-  }
-
-  private void addCancelButtonHandler() {
-    registerHandler(getView().addCancelButtonHandler(new CancelButtonHandler()));
   }
 
   private void createFolder(String destination, String folder) {
@@ -193,11 +166,44 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
     return selection;
   }
 
+  @Override
+  public void uploadFile() {
+    fileUploadDialogPresenter.setCurrentFolder(getCurrentFolder());
+    addToPopupSlot(fileUploadDialogPresenter);
+  }
+
+  @Override
+  public void selectFolder() {
+    FileSelection selection = getSelection();
+    if(selection != null) {
+      getEventBus().fireEvent(new FileSelectionEvent(fileSelectionSource, selection));
+    }
+    getView().hideDialog();
+  }
+
+  @Override
+  public void cancel() {
+    getView().hideDialog();
+  }
+
+  @Override
+  public void createFolder() {
+    String newFolder = getView().getCreateFolderName().getText().trim();
+    FileDto currentFolder = getCurrentFolder();
+    if(currentFolder != null && newFolder.length() != 0) {
+      if("/".equals(currentFolder.getPath())) { // create under root
+        createFolder("/", newFolder);
+      } else {
+        createFolder(currentFolder.getPath(), newFolder);
+      }
+    }
+  }
+
   public enum FileSelectionType {
     FILE, EXISTING_FILE, FOLDER, EXISTING_FOLDER, FILE_OR_FOLDER, EXISTING_FILE_OR_FOLDER
   }
 
-  public interface Display extends PopupView {
+  public interface Display extends PopupView, HasUiHandlers<FileSelectorUiHandlers> {
 
     void setDisplaysUploadFile(boolean displaysFiles);
 
@@ -207,14 +213,6 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
 
     void setNewFolderPanelVisible(boolean visible);
 
-    HandlerRegistration addUploadButtonHandler(ClickHandler handler);
-
-    HandlerRegistration addSelectButtonHandler(ClickHandler handler);
-
-    HandlerRegistration addCancelButtonHandler(ClickHandler handler);
-
-    HandlerRegistration addCreateFolderButtonHandler(ClickHandler handler);
-
     String getNewFileName();
 
     void clearNewFileName();
@@ -222,42 +220,6 @@ public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter
     HasText getCreateFolderName();
 
     void clearNewFolderName();
-  }
-
-  class CreateFolderButtonHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent event) {
-      String newFolder = getView().getCreateFolderName().getText().trim();
-      FileDto currentFolder = getCurrentFolder();
-      if(currentFolder != null && newFolder.length() != 0) {
-        if("/".equals(currentFolder.getPath())) { // create under root
-          createFolder("/", newFolder);
-        } else {
-          createFolder(currentFolder.getPath(), newFolder);
-        }
-      }
-    }
-  }
-
-  class SelectButtonHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent event) {
-      FileSelection selection = getSelection();
-      if(selection != null) {
-        getEventBus().fireEvent(new FileSelectionEvent(fileSelectionSource, selection));
-      }
-      getView().hideDialog();
-    }
-  }
-
-  class CancelButtonHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent event) {
-      getView().hideDialog();
-    }
   }
 
   public static class FileSelection {
