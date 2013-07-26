@@ -56,7 +56,7 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
     groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     Provider<AuthorizationPresenter> mockProvider = createMock(Provider.class);
 
-    variablePresenter = new VariablePresenter(displayMock, new CountingEventBus(), null, new SummaryTabPresenter(eventBusMock, summaryTabMock),
+    variablePresenter = new VariablePresenter(displayMock, new CountingEventBus(), null, new SummaryTabPresenter(eventBusMock, summaryTabMock), null,
         mockProvider);
   }
 

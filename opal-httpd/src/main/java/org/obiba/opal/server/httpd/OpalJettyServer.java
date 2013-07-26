@@ -141,10 +141,10 @@ public class OpalJettyServer implements Service {
 
     HandlerList handlers = new HandlerList();
 
-    // Add webapp extensions
-    handlers.addHandler(createExtensionFileHandler(OpalRuntime.WEBAPP_EXTENSION));
     // Add a file handler that points to the Opal GWT client directory
     handlers.addHandler(createDistFileHandler("/webapp"));
+    // Add webapp extensions
+    handlers.addHandler(createExtensionFileHandler(OpalRuntime.WEBAPP_EXTENSION));
     // Add a file handler that points to the Opal BIRT extension update-site
     handlers.addHandler(createDistFileHandler("/update-site"));
 

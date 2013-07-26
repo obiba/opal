@@ -21,7 +21,7 @@ public interface OpalRuntime {
 
   String MAGMA_JS_EXTENSION = EXTENSIONS + "/magma-js";
 
-  String WEBAPP_EXTENSION = EXTENSIONS + "/webapp";
+  String WEBAPP_EXTENSION = EXTENSIONS + "/web";
 
   Set<Service> getServices();
 

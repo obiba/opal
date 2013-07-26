@@ -320,40 +320,6 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     return tmp.getParentFile();
   }
 
-  private void doWriteViews(@Nonnull String datasourceName, @Nonnull Collection<View> views) {
-    createViewsDirectory(); // Creates the views directory if it doesn't exist.
-    if(views.isEmpty()) {
-      if(getDatasourceViewsFile(datasourceName).exists()) {
-        if(!getDatasourceViewsFile(datasourceName).delete()) {
-          // Ignore, but this may be a problem.
-        }
-      }
-      // Do nothing. The file containing the views has already been deleted.
-    } else {
-      OutputStreamWriter writer = null;
-      try {
-        // OPAL-1285 tmp file prefix must be at least 3 chars
-        File tmpFile = File.createTempFile("opal-" + datasourceName, ".xml");
-        writer = new OutputStreamWriter(new FileOutputStream(tmpFile), Charsets.UTF_8);
-        getXStream().toXML(views, writer);
-
-        FileUtil.copyFile(tmpFile, getDatasourceViewsFile(datasourceName));
-        if(!tmpFile.delete()) {
-          // ignore;
-        }
-
-      } catch(FileNotFoundException e) {
-        throw new RuntimeException(
-            "Could not find the views file '" + getDatasourceViewsFile(datasourceName).getAbsolutePath() + "'. " + e);
-      } catch(IOException e) {
-        throw new RuntimeException(
-            "Failed to create the views file '" + getDatasourceViewsFile(datasourceName).getAbsolutePath() + "'. " + e);
-      } finally {
-        StreamUtil.silentSafeClose(writer);
-      }
-    }
-  }
-
   @SuppressWarnings("unchecked")
   @Nonnull
   private Set<View> doReadViews(@Nonnull String datasourceName) {
