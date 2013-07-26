@@ -16,26 +16,28 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class WidgetAuthorizer implements HasAuthorization {
 
-  private final Widget w;
+  private final Widget[] widgets;
 
-  public WidgetAuthorizer(Widget w) {
-    this.w = w;
+  public WidgetAuthorizer(Widget... widgets) {
+    this.widgets = widgets;
   }
 
   @Override
   public void beforeAuthorization() {
-    w.setVisible(false);
+    for(Widget w : widgets)
+      w.setVisible(false);
   }
 
   @Override
   public void authorized() {
-    w.setVisible(true);
+    for(Widget w : widgets)
+      w.setVisible(true);
   }
 
   @Override
   public void unauthorized() {
-    w.setVisible(false);
-    // w.removeFromParent();
+    for(Widget w : widgets)
+      w.setVisible(false);
   }
 
 }

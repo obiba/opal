@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.magma.view;
 import org.obiba.opal.web.gwt.ace.client.AceEditor;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ScriptEditorPresenter;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -19,7 +20,6 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
 

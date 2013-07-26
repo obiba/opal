@@ -26,8 +26,6 @@
         </b:NavLink>
       </b:DropdownButton>
       <b:ButtonGroup>
-        <b:Button icon="EDIT" size="SMALL" ui:field="edit">
-        </b:Button>
         <b:Button icon="TRASH" size="SMALL" ui:field="remove">
         </b:Button>
       </b:ButtonGroup>
@@ -43,11 +41,19 @@
 
     <b:TabPanel tabPosition="above" ui:field="tabPanel">
       <b:Tab heading="Categories" active="true">
+        <b:Button icon="EDIT" size="SMALL" type="INFO" title="Edit categories..." ui:field="editCategories"
+            addStyleNames="bottom-margin">
+          <ui:msg description="Edit label">Edit</ui:msg>
+        </b:Button>
         <b:SimplePager ui:field="categoryTablePager" location="RIGHT"/>
         <o:Table ui:field="categoryTable"/>
       </b:Tab>
 
       <b:Tab heading="Attributes">
+        <b:Button icon="EDIT" size="SMALL" type="INFO" title="Edit attributes..." ui:field="editAttributes"
+            addStyleNames="bottom-margin">
+          <ui:msg description="Edit label">Edit</ui:msg>
+        </b:Button>
         <b:SimplePager ui:field="attributeTablePager" location="RIGHT"/>
         <o:Table ui:field="attributeTable"/>
       </b:Tab>
@@ -56,10 +62,72 @@
         <b2:InlineLabel ui:field="notDerived">
           <ui:msg description="Not Derived Variable label">Not a Derived Variable</ui:msg>
         </b2:InlineLabel>
-        <b2:InlineLabel ui:field="noScript">
-          <ui:msg description="No Script label">No Script</ui:msg>
-        </b2:InlineLabel>
-        <pretty:PrettyPrintLabel ui:field="script"/>
+        <g:FlowPanel addStyleNames="bottom-margin">
+          <b:Button icon="EDIT" size="SMALL" type="INFO" title="Edit script..." ui:field="editScript">
+            <ui:msg description="Edit label">Edit</ui:msg>
+          </b:Button>
+          <b:ButtonGroup>
+            <b:Button size="SMALL" type="PRIMARY" ui:field="saveScript">
+              <ui:msg description="Save label">Save</ui:msg>
+            </b:Button>
+          </b:ButtonGroup>
+          <b:ButtonGroup>
+            <b:Button size="SMALL" ui:field="cancelScript">
+              <ui:msg description="Cancel label">Cancel</ui:msg>
+            </b:Button>
+          </b:ButtonGroup>
+        </g:FlowPanel>
+        <g:DeckPanel ui:field="scriptDeck">
+          <g:FlowPanel>
+            <b2:InlineLabel ui:field="noScript">
+              <ui:msg description="No Script label">No Script</ui:msg>
+            </b2:InlineLabel>
+            <pretty:PrettyPrintLabel ui:field="script"/>
+          </g:FlowPanel>
+          <g:FlowPanel>
+            <g:HorizontalPanel>
+              <o:Chooser ui:field="valueTypes" addStyleNames="inline">
+                <g:item value="text">
+                  <ui:msg description="Text label">text</ui:msg>
+                </g:item>
+                <g:item value="decimal">
+                  <ui:msg description="Decimal label">decimal</ui:msg>
+                </g:item>
+                <g:item value="integer">
+                  <ui:msg description="Integer label">integer</ui:msg>
+                </g:item>
+                <g:item value="binary">
+                  <ui:msg description="Binary label">binary</ui:msg>
+                </g:item>
+                <g:item value="boolean">
+                  <ui:msg description="Boolean label">boolean</ui:msg>
+                </g:item>
+                <g:item value="datetime">
+                  <ui:msg description="Datetime label">datetime</ui:msg>
+                </g:item>
+                <g:item value="date">
+                  <ui:msg description="Date label">date</ui:msg>
+                </g:item>
+                <g:item value="point">
+                  <ui:msg description="Point label">point</ui:msg>
+                </g:item>
+                <g:item value="linestring">
+                  <ui:msg description="LineString label">line</ui:msg>
+                </g:item>
+                <g:item value="polygon">
+                  <ui:msg description="Polygon label">polygon</ui:msg>
+                </g:item>
+                <g:item value="locale">
+                  <ui:msg description="Locale label">locale</ui:msg>
+                </g:item>
+              </o:Chooser>
+              <b:CheckBox addStyleNames="small-indent">
+                <ui:msg description="Repeatable label">Repeatable</ui:msg>
+              </b:CheckBox>
+            </g:HorizontalPanel>
+            <g:SimplePanel ui:field="scriptEditor"/>
+          </g:FlowPanel>
+        </g:DeckPanel>
       </b:Tab>
 
       <b:Tab heading="Summary">
@@ -71,7 +139,10 @@
       </b:Tab>
 
       <b:Tab heading="Properties">
-
+        <b:Button icon="EDIT" size="SMALL" type="INFO" title="Edit properties..." ui:field="editProperties"
+            addStyleNames="bottom-margin">
+          <ui:msg description="Edit label">Edit</ui:msg>
+        </b:Button>
         <b:FluidRow>
           <b:Column size="6">
             <o:PropertiesTable keyStyleNames="span2">

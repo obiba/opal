@@ -54,7 +54,11 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private final ValuesTablePresenter valuesTablePresenter;
 
+  private final ScriptEditorPresenter scriptEditorPresenter;
+
   private final Provider<AuthorizationPresenter> authorizationPresenter;
+
+
 
   private VariableDto variable;
 
@@ -64,11 +68,12 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   @Inject
   public VariablePresenter(Display display, EventBus eventBus, ValuesTablePresenter valuesTablePresenter,
-      SummaryTabPresenter summaryTabPresenter, Provider<AuthorizationPresenter> authorizationPresenter) {
+      SummaryTabPresenter summaryTabPresenter, ScriptEditorPresenter scriptEditorPresenter, Provider<AuthorizationPresenter> authorizationPresenter) {
     super(eventBus, display);
     this.valuesTablePresenter = valuesTablePresenter;
     this.summaryTabPresenter = summaryTabPresenter;
     this.authorizationPresenter = authorizationPresenter;
+    this.scriptEditorPresenter = scriptEditorPresenter;
     getView().setUiHandlers(this);
   }
 
@@ -86,6 +91,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   protected void onBind() {
     super.onBind();
     setInSlot(Display.Slots.Values, valuesTablePresenter);
+    setInSlot(Display.Slots.ScriptEditor, scriptEditorPresenter);
 
     registerHandler(getEventBus().addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionHandler()));
     registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
@@ -157,7 +163,9 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
       getView().setDerivedVariable(false, "");
       return;
     }
-    getView().setDerivedVariable(true, VariableDtos.getScript(variable));
+    String script = VariableDtos.getScript(variable);
+    getView().setDerivedVariable(true, script);
+    scriptEditorPresenter.setScript(script);
   }
 
   private void authorize() {
@@ -222,6 +230,11 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
             getEventBus().fireEvent(new ViewConfigurationRequiredEvent(viewDto, variable));
           }
         }).send();
+  }
+
+  @Override
+  public void onEditScript() {
+    updateDerivedVariableDisplay();
   }
 
   @Override
@@ -329,7 +342,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   public interface Display extends View, HasUiHandlers<VariableUiHandlers> {
 
     enum Slots {
-      Permissions, Values
+      Permissions, Values, ScriptEditor
     }
 
     void setVariable(VariableDto variable);

@@ -10,6 +10,8 @@ public interface VariableUiHandlers extends UiHandlers {
 
   void onEdit();
 
+  void onEditScript();
+
   void onRemove();
 
   void onAddToView();

@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.prettify.client.PrettyPrintLabel;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
@@ -36,6 +37,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.DeckPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -130,7 +132,31 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   Button next;
 
   @UiField
-  Button edit;
+  Button remove;
+
+  @UiField
+  Button editCategories;
+
+  @UiField
+  Button editAttributes;
+
+  @UiField
+  DeckPanel scriptDeck;
+
+  @UiField
+  Button editScript;
+
+  @UiField
+  Button saveScript;
+
+  @UiField
+  Button cancelScript;
+
+  @UiField
+  Panel scriptEditor;
+
+  @UiField
+  Button editProperties;
 
   @UiField
   NavLink addToView;
@@ -167,8 +193,13 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @Override
   public void setInSlot(Object slot, IsWidget content) {
     HasWidgets panel = null;
-    if(slot == Slots.Values) {
-      panel = values;
+    switch((Slots) slot) {
+      case Values:
+        panel = values;
+        break;
+      case ScriptEditor:
+        panel = scriptEditor;
+        break;
     }
     if(panel != null) {
       panel.clear();
@@ -208,9 +239,27 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     getUiHandlers().onPreviousVariable();
   }
 
-  @UiHandler("edit")
-  void onEdit(ClickEvent event) {
+  @UiHandler("editProperties")
+  void onEditProperties(ClickEvent event) {
     getUiHandlers().onEdit();
+  }
+
+  @UiHandler("editScript")
+  void onEditScript(ClickEvent event) {
+    getUiHandlers().onEditScript();
+    showScriptEditor(true);
+  }
+
+  @UiHandler("cancelScript")
+  void onCancelScript(ClickEvent event) {
+    showScriptEditor(false);
+  }
+
+  private void showScriptEditor(boolean visible) {
+    editScript.setVisible(!visible);
+    saveScript.setVisible(visible);
+    cancelScript.setVisible(visible);
+    scriptDeck.showWidget(visible ? 1 : 0);
   }
 
   //
@@ -307,7 +356,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   @Override
   public HasAuthorization getEditAuthorizer() {
-    return new WidgetAuthorizer(edit);
+    return new WidgetAuthorizer(editCategories, editAttributes, editScript, editProperties, remove);
   }
 
   private void initCategoryTable() {
@@ -331,6 +380,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     noScript.setVisible(derived && value.isEmpty());
     script.setVisible(derived && value.length() > 0);
     script.setText(value);
+    showScriptEditor(false);
   }
 
   @Override
