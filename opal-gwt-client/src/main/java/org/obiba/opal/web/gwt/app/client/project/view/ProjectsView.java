@@ -87,7 +87,6 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   @Inject
   ProjectsView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
-    // TODO translation
     addProjectModal.setTitle(translations.addProject());
   }
 

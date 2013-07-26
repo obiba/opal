@@ -23,4 +23,6 @@ public interface FieldValidator {
    */
   @Nullable
   String validate();
+
+  int getId();
 }

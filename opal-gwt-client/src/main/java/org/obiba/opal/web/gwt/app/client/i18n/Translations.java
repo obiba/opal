@@ -36,6 +36,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Information")
   String infoDialogTitle();
 
+  @Description("Report template update dialog title")
+  @DefaultStringValue("Add/Edit Report Template")
+  String reportTemplateDialogTitle();
+
   @Description("Name label")
   @DefaultStringValue("Name")
   String nameLabel();

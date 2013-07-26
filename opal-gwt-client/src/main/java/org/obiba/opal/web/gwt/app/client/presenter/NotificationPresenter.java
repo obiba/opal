@@ -9,19 +9,18 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.presenter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 
+import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
 import com.google.gwt.event.logical.shared.CloseEvent;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PopupView;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
  * Presenter used to display error, warning and info messages in a dialog box.
@@ -32,6 +31,10 @@ public class NotificationPresenter extends PresenterWidget<NotificationPresenter
 
     void setNotification(NotificationEvent event);
 
+    void setNotification(NotificationType type, List<String> message, @Nullable List<String> messageArgs,
+        @Nullable String title, boolean isSticky, ClosedHandler handler);
+
+    void close();
   }
 
   public interface NotificationCloseHandler {
@@ -50,6 +53,15 @@ public class NotificationPresenter extends PresenterWidget<NotificationPresenter
 
   public void setNotification(NotificationEvent event) {
     getView().setNotification(event);
+  }
+
+  public void setNotification(NotificationType type, List<String> messages, @Nullable List<String> messageArgs,
+      @Nullable String title, boolean isSticky, ClosedHandler handler) {
+    getView().setNotification(type, messages, messageArgs, title, isSticky, handler);
+  }
+
+  public void close() {
+    getView().close();
   }
 
   public enum NotificationType {
