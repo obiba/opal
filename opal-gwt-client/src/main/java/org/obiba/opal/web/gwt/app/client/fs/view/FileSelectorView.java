@@ -9,37 +9,40 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.view;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorUiHandlers;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasWidgets;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PopupViewImpl;
+import com.google.web.bindery.event.shared.EventBus;
 
 /**
  *
  */
-public class FileSelectorView extends PopupViewImpl implements Display {
+public class FileSelectorView extends ModalPopupViewWithUiHandlers<FileSelectorUiHandlers> implements Display {
 
   @UiTemplate("FileSelectorView.ui.xml")
-  interface FileSelectorViewUiBinder extends UiBinder<DialogBox, FileSelectorView> {}
+  interface FileSelectorViewUiBinder extends UiBinder<Widget, FileSelectorView> {}
+
+  private static final int MAX_COLUMN_SIZE = 12;
 
   private static final String DIALOG_HEIGHT = "38.5em";
 
@@ -51,10 +54,11 @@ public class FileSelectorView extends PopupViewImpl implements Display {
 
   private static final Translations translations = GWT.create(Translations.class);
 
-  private final DialogBox dialog;
+  @UiField
+  Modal dialog;
 
   @UiField
-  DockLayoutPanel content;
+  Panel content;
 
   @UiField
   HTMLPanel namePanel;
@@ -69,7 +73,7 @@ public class FileSelectorView extends PopupViewImpl implements Display {
   ScrollPanel folderDetailsPanel;
 
   @UiField
-  HTMLPanel createFolderPanel;
+  Panel createFolderPanel;
 
   @UiField
   TextBox createFolderName;
@@ -89,12 +93,12 @@ public class FileSelectorView extends PopupViewImpl implements Display {
   @Inject
   public FileSelectorView(EventBus eventBus) {
     super(eventBus);
-    dialog = uiBinder.createAndBindUi(this);
+    uiBinder.createAndBindUi(this);
 
     content.setHeight(DIALOG_HEIGHT);
     content.setWidth(DIALOG_WIDTH);
 
-    dialog.setText(translations.fileSelectorTitle());
+    dialog.setTitle(translations.fileSelectorTitle());
     dialog.setHeight(DIALOG_HEIGHT);
     dialog.setWidth(DIALOG_WIDTH);
   }
@@ -134,19 +138,24 @@ public class FileSelectorView extends PopupViewImpl implements Display {
     uploadButton.setVisible(visible);
   }
 
-  @Override
-  public HandlerRegistration addSelectButtonHandler(ClickHandler handler) {
-    return selectButton.addClickHandler(handler);
+  @UiHandler("selectButton")
+  public void onSelect(ClickEvent event) {
+    getUiHandlers().selectFolder();
   }
 
-  @Override
-  public HandlerRegistration addCancelButtonHandler(ClickHandler handler) {
-    return cancelButton.addClickHandler(handler);
+  @UiHandler("cancelButton")
+  public void onCancel(ClickEvent event) {
+    getUiHandlers().cancel();
   }
 
-  @Override
-  public HandlerRegistration addCreateFolderButtonHandler(ClickHandler handler) {
-    return createFolderButton.addClickHandler(handler);
+  @UiHandler("createFolderButton")
+  public void onCreate(ClickEvent event) {
+    getUiHandlers().createFolder();
+  }
+
+  @UiHandler("uploadButton")
+  public void onUpload(ClickEvent event) {
+    getUiHandlers().uploadFile();
   }
 
   @Override
@@ -174,8 +183,4 @@ public class FileSelectorView extends PopupViewImpl implements Display {
     return dialog;
   }
 
-  @Override
-  public HandlerRegistration addUploadButtonHandler(ClickHandler handler) {
-    return uploadButton.addClickHandler(handler);
-  }
 }
