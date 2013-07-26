@@ -30,13 +30,10 @@ import javax.annotation.Nonnull;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.NoMessageException;
-import org.eclipse.jgit.api.errors.WrongRepositoryStateException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Repository;
 import org.obiba.core.util.FileUtil;
 import org.obiba.core.util.StreamUtil;
-import org.obiba.core.util.StringUtil;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.Variable;
@@ -98,13 +95,11 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   }
 
   @Override
-  public void dispose() {
-    //To change body of implemented methods use File | Settings | File Templates.
+  public void initialise() {
   }
 
   @Override
-  public void initialise() {
-    //To change body of implemented methods use File | Settings | File Templates.
+  public void dispose() {
   }
 
   @Override
@@ -179,7 +174,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
       StringBuilder message = new StringBuilder();
       for(View view : views) {
         doWriteGitView(localRepo, view, varFilesToRemove);
-        if (message.length()>0) {
+        if(message.length() > 0) {
           message.append(", ");
         }
         message.append(view.getName());
@@ -224,15 +219,14 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
       StringBuilder message = new StringBuilder();
       for(File f : listViewDirectories(localRepo)) {
         git.rm().addFilepattern(f.getName());
-        if (message.length()>0) {
+        if(message.length() > 0) {
           message.append(", ");
         }
         message.append(f.getName());
       }
       doCommitPush(git, "Remove " + message);
     } catch(Exception e) {
-      throw new RuntimeException("Failed removing views from git for datasource: " + datasourceName,
-          e);
+      throw new RuntimeException("Failed removing views from git for datasource: " + datasourceName, e);
     } finally {
       if(localRepo != null) localRepo.delete();
     }
@@ -242,7 +236,8 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     return localRepo.listFiles(new FileFilter() {
       @Override
       public boolean accept(File pathname) {
-        return pathname.isDirectory() && !pathname.getName().equals(".git") && new File(pathname,VIEW_FILE_NAME).exists();
+        return pathname.isDirectory() && !pathname.getName().equals(".git") &&
+            new File(pathname, VIEW_FILE_NAME).exists();
       }
     });
   }
