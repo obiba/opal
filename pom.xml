@@ -226,6 +226,12 @@
 
       <dependency>
         <groupId>org.obiba.magma</groupId>
+        <artifactId>magma-datasource-mongodb</artifactId>
+        <version>${magma.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.obiba.magma</groupId>
         <artifactId>magma-datasource-null</artifactId>
         <version>${magma.version}</version>
       </dependency>

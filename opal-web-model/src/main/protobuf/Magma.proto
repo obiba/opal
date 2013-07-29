@@ -150,6 +150,14 @@ message GNPostalCodesDatasourceFactoryDto {
   }
 }
 
+message MongoDBDatasourceFactoryDto {
+  required string host = 1 [default = "localhost"];
+  required int32 port = 2 [default = 27017];
+  extend DatasourceFactoryDto {
+    optional MongoDBDatasourceFactoryDto params = 1012;
+  }
+}
+
 message DatasourceParsingErrorDto {
   required string defaultMessage = 1;
   required string key = 2;
