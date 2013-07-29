@@ -33,10 +33,12 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display> {
+public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display>
+    implements DatabaseAdministratorUiHandlers {
 
   private Mode dialogMode;
 
@@ -49,20 +51,26 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
   @Inject
   public DatabasePresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
+    getView().setUiHandlers(this);
+  }
+
+  @Override
+  public void save() {
+    if(dialogMode == Mode.CREATE) {
+      createDatabase();
+    } else if(dialogMode == Mode.UPDATE) {
+      updateDatabase();
+    }
+  }
+
+  @Override
+  public void cancel() {
+    getView().hideDialog();
   }
 
   @Override
   protected void onBind() {
     setDialogMode(Mode.CREATE);
-
-    registerHandler(getView().getSaveButton().addClickHandler(new CreateOrUpdateMethodClickHandler()));
-
-    registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getView().hideDialog();
-      }
-    }));
 
     ResourceRequestBuilderFactory.<JsArray<JdbcDriverDto>>newBuilder().forResource(Resources.drivers())
         .withCallback(new ResourceCallback<JsArray<JdbcDriverDto>>() {
@@ -194,19 +202,6 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
     }
   }
 
-  public class CreateOrUpdateMethodClickHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent arg0) {
-      if(dialogMode == Mode.CREATE) {
-        createDatabase();
-      } else if(dialogMode == Mode.UPDATE) {
-        updateDatabase();
-      }
-    }
-
-  }
-
   private class CreateOrUpdateMethodCallBack implements ResponseCodeCallback {
 
     JdbcDataSourceDto dto;
@@ -228,17 +223,13 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
     }
   }
 
-  public interface Display extends PopupView {
+  public interface Display extends PopupView, HasUiHandlers<DatabaseAdministratorUiHandlers> {
 
     void hideDialog();
 
     void setAvailableDrivers(JsArray<JdbcDriverDto> resource);
 
     void setDialogMode(Mode dialogMode);
-
-    HasClickHandlers getSaveButton();
-
-    HasClickHandlers getCancelButton();
 
     HasText getName();
 

@@ -9,42 +9,41 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.database.view;
 
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseAdministratorUiHandlers;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabasePresenter.Display;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabasePresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.model.client.opal.JdbcDriverDto;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.PopupViewImpl;
 
 /**
  *
  */
-public class DatabaseView extends PopupViewImpl implements Display {
+public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseAdministratorUiHandlers> implements Display {
 
   @UiTemplate("DatabaseView.ui.xml")
-  interface ViewUiBinder extends UiBinder<DialogBox, DatabaseView> {}
+  interface ViewUiBinder extends UiBinder<Widget, DatabaseView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -53,13 +52,7 @@ public class DatabaseView extends PopupViewImpl implements Display {
   private final Widget widget;
 
   @UiField
-  DialogBox dialog;
-
-  @UiField
-  DockLayoutPanel contentLayout;
-
-  @UiField
-  ResizeHandle resizeHandle;
+  Modal dialog;
 
   @UiField
   Button saveButton;
@@ -113,7 +106,7 @@ public class DatabaseView extends PopupViewImpl implements Display {
   private void initWidgets() {
     dialog.hide();
     properties.getElement().setAttribute("placeholder", translations.keyValueLabel());
-    resizeHandle.makeResizable(contentLayout);
+
     driver.addChangeHandler(new ChangeHandler() {
 
       @Override
@@ -133,11 +126,6 @@ public class DatabaseView extends PopupViewImpl implements Display {
   }
 
   @Override
-  protected PopupPanel asPopupPanel() {
-    return dialog;
-  }
-
-  @Override
   public void show() {
     name.setFocus(true);
     super.show();
@@ -152,20 +140,20 @@ public class DatabaseView extends PopupViewImpl implements Display {
   public void setDialogMode(Mode dialogMode) {
     name.setEnabled(Mode.CREATE == dialogMode);
     if(Mode.CREATE == dialogMode) {
-      dialog.setText(translations.addDatabase());
+      dialog.setTitle(translations.addDatabase());
     } else {
-      dialog.setText(translations.editDatabase());
+      dialog.setTitle(translations.editDatabase());
     }
   }
 
-  @Override
-  public HasClickHandlers getSaveButton() {
-    return saveButton;
+  @UiHandler("saveButton")
+  public void onSave(ClickEvent event) {
+    getUiHandlers().save();
   }
 
-  @Override
-  public HasClickHandlers getCancelButton() {
-    return cancelButton;
+  @UiHandler("cancelButton")
+  public void onCancel(ClickEvent event) {
+    getUiHandlers().cancel();
   }
 
   @Override
