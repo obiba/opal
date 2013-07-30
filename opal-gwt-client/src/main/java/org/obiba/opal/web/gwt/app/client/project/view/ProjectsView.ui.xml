@@ -57,8 +57,12 @@
       <b:TextArea ui:field="descriptionTxt" alternateSize="XLARGE" visibleLines="3"/>
       <b:HelpBlock>Optional description of the project.</b:HelpBlock>
       <b:ModalFooter>
-        <b:Button icon="FILE" type="PRIMARY" ui:field="save">Save</b:Button>
-        <b:Button ui:field="cancel">Cancel</b:Button>
+        <b:Button type="PRIMARY" ui:field="save">
+          <ui:msg description="Save label">Save</ui:msg>
+        </b:Button>
+        <b:Button ui:field="cancel">
+          <ui:msg description="Cancel label">Cancel</ui:msg>
+        </b:Button>
       </b:ModalFooter>
     </o:Modal>
   </g:FlowPanel>

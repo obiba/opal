@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
+import org.obiba.opal.web.gwt.app.client.ui.EditorPanel;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.prettify.client.PrettyPrintLabel;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
@@ -141,16 +142,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   Button editAttributes;
 
   @UiField
-  DeckPanel scriptDeck;
-
-  @UiField
-  Button editScript;
-
-  @UiField
-  Button saveScript;
-
-  @UiField
-  Button cancelScript;
+  EditorPanel scriptEditorPanel;
 
   @UiField
   Panel scriptEditor;
@@ -188,6 +180,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
         }
       }
     });
+    scriptEditorPanel.setHandler(new ScriptEditorHandler());
   }
 
   @Override
@@ -242,24 +235,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @UiHandler("editProperties")
   void onEditProperties(ClickEvent event) {
     getUiHandlers().onEdit();
-  }
-
-  @UiHandler("editScript")
-  void onEditScript(ClickEvent event) {
-    getUiHandlers().onEditScript();
-    showScriptEditor(true);
-  }
-
-  @UiHandler("cancelScript")
-  void onCancelScript(ClickEvent event) {
-    showScriptEditor(false);
-  }
-
-  private void showScriptEditor(boolean visible) {
-    editScript.setVisible(!visible);
-    saveScript.setVisible(visible);
-    cancelScript.setVisible(visible);
-    scriptDeck.showWidget(visible ? 1 : 0);
   }
 
   //
@@ -356,7 +331,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   @Override
   public HasAuthorization getEditAuthorizer() {
-    return new WidgetAuthorizer(editCategories, editAttributes, editScript, editProperties, remove);
+    return new WidgetAuthorizer(editCategories, editAttributes, scriptEditorPanel.getEditWidget(), editProperties, remove);
   }
 
   private void initCategoryTable() {
@@ -380,7 +355,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     noScript.setVisible(derived && value.isEmpty());
     script.setVisible(derived && value.length() > 0);
     script.setText(value);
-    showScriptEditor(false);
   }
 
   @Override
@@ -400,4 +374,21 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     deriveCustom.setDisabled(!available);
   }
 
+  private class ScriptEditorHandler implements EditorPanel.Handler {
+    @Override
+    public void onEdit() {
+      // TODO
+      getUiHandlers().onEditScript();
+    }
+
+    @Override
+    public void onSave() {
+      // TODO
+    }
+
+    @Override
+    public void onCancel() {
+      // TODO
+    }
+  }
 }

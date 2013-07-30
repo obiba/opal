@@ -62,22 +62,7 @@
         <b2:InlineLabel ui:field="notDerived">
           <ui:msg description="Not Derived Variable label">Not a Derived Variable</ui:msg>
         </b2:InlineLabel>
-        <g:FlowPanel addStyleNames="bottom-margin">
-          <b:Button icon="EDIT" size="SMALL" type="INFO" title="Edit script..." ui:field="editScript">
-            <ui:msg description="Edit label">Edit</ui:msg>
-          </b:Button>
-          <b:ButtonGroup>
-            <b:Button size="SMALL" type="PRIMARY" ui:field="saveScript">
-              <ui:msg description="Save label">Save</ui:msg>
-            </b:Button>
-          </b:ButtonGroup>
-          <b:ButtonGroup>
-            <b:Button size="SMALL" ui:field="cancelScript">
-              <ui:msg description="Cancel label">Cancel</ui:msg>
-            </b:Button>
-          </b:ButtonGroup>
-        </g:FlowPanel>
-        <g:DeckPanel ui:field="scriptDeck">
+        <o:EditorPanel size="SMALL" ui:field="scriptEditorPanel">
           <g:FlowPanel>
             <b2:InlineLabel ui:field="noScript">
               <ui:msg description="No Script label">No Script</ui:msg>
@@ -127,7 +112,7 @@
             </g:HorizontalPanel>
             <g:SimplePanel ui:field="scriptEditor"/>
           </g:FlowPanel>
-        </g:DeckPanel>
+        </o:EditorPanel>
       </b:Tab>
 
       <b:Tab heading="Summary">

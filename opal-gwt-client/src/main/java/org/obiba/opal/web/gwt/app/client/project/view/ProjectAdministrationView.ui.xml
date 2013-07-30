@@ -60,24 +60,36 @@
               <ui:msg description="Data Storage label">Data storage</ui:msg>
             </b:NavHeader>
             <b:Divider/>
-            <b:Form>
-              <b:Paragraph>
-                The type of storage can only be changed if there are no data.
-              </b:Paragraph>
-              <b:ControlGroup>
-                <b:ControlLabel for="input04">Type</b:ControlLabel>
-                <b:Controls>
-                  <o:Chooser ui:field="datasourceType">
-                    <g:item value="hibernate"></g:item>
-                    <g:item value="jdbc"></g:item>
-                    <g:item value="null"></g:item>
-                  </o:Chooser>
-                  <b:HelpBlock>This type of storage has the following properties: ...
-                  </b:HelpBlock>
-                </b:Controls>
-              </b:ControlGroup>
-              <b:Button type="PRIMARY" ui:field="saveStorage">Save</b:Button>
-            </b:Form>
+            <b:Paragraph>
+              The type of storage can only be changed if there are no tables.
+            </b:Paragraph>
+            <o:EditorPanel ui:field="storageEditor">
+              <g:FlowPanel>
+                <b:Paragraph>
+                  Current type of storage:
+                </b:Paragraph>
+                <b:Paragraph addStyleNames="indent" ui:field="storageType">
+                </b:Paragraph>
+                <b:Paragraph>
+                  This type of storage has the following properties: ...
+                </b:Paragraph>
+              </g:FlowPanel>
+              <b:Form>
+                <b:ControlGroup>
+                  <b:ControlLabel for="input04">Type</b:ControlLabel>
+                  <b:Controls>
+                    <o:Chooser ui:field="datasourceType">
+                      <g:item value="mongodb"></g:item>
+                      <g:item value="hibernate"></g:item>
+                      <g:item value="jdbc"></g:item>
+                      <g:item value="null"></g:item>
+                    </o:Chooser>
+                    <b:HelpBlock>For more information see ....
+                    </b:HelpBlock>
+                  </b:Controls>
+                </b:ControlGroup>
+              </b:Form>
+            </o:EditorPanel>
           </b:WellNavList>
           <b:WellNavList>
             <b:NavHeader>

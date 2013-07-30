@@ -1134,7 +1134,9 @@ public interface Translations extends Constants {
   String csvFormatOptionsStep();
 
   @Description("Datasource Type map")
-  @DefaultStringMapValue({ "hibernate", "Opal SQL", //
+  @DefaultStringMapValue({
+      "mongodb", "MongoDB", //
+      "hibernate", "Opal SQL", //
       "jdbc", "Custom SQL", //
       "fs", "XML", //
       "csv", "CSV", //
