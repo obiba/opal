@@ -89,7 +89,7 @@
     <when-type-assignable class='org.obiba.opal.web.gwt.app.client.view.LoginView'/>
     <any>
       <when-property-is name='user.agent' value='ie6'/>
-      <when-property-is name='user.agent' value='ie8'/>
+      <when-property-is name='user.agent' value='ie7'/>
     </any>
   </replace-with>
 
