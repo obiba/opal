@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
@@ -83,7 +84,7 @@ public class DatabaseAdministrationPresenter extends
     HasData<JdbcDataSourceDto> getDatabaseTable();
   }
 
-  private final Provider<DatabasePresenter> jdbcDataSourcePresenter;
+  private final ModalProvider<DatabasePresenter> databaseModalProvider;
 
   private final AuthorizationPresenter authorizationPresenter;
 
@@ -96,10 +97,10 @@ public class DatabaseAdministrationPresenter extends
 
   @Inject
   public DatabaseAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
-      Provider<DatabasePresenter> jdbcDataSourcePresenter, Provider<AuthorizationPresenter> authorizationPresenter,
+      ModalProvider<DatabasePresenter> databaseModalProvider, Provider<AuthorizationPresenter> authorizationPresenter,
       DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
-    this.jdbcDataSourcePresenter = jdbcDataSourcePresenter;
+    this.databaseModalProvider = databaseModalProvider.setContainer(this);
     this.authorizationPresenter = authorizationPresenter.get();
     this.breadcrumbsBuilder = breadcrumbsHelper;
   }
@@ -185,9 +186,8 @@ public class DatabaseAdministrationPresenter extends
             }
           }, "deleteDatabase", "confirmDeleteDatabase"));
         } else if(object.getEditable() && actionName.equalsIgnoreCase(EDIT_ACTION)) {
-          DatabasePresenter dialog = jdbcDataSourcePresenter.get();
+          DatabasePresenter dialog = databaseModalProvider.get();
           dialog.updateDatabase(object);
-          addToPopupSlot(dialog);
         } else if(actionName.equalsIgnoreCase(Display.TEST_ACTION)) {
           ResponseCodeCallback callback = new ResponseCodeCallback() {
 
@@ -217,9 +217,8 @@ public class DatabaseAdministrationPresenter extends
 
       @Override
       public void onClick(ClickEvent event) {
-        DatabasePresenter dialog = jdbcDataSourcePresenter.get();
+        DatabasePresenter dialog = databaseModalProvider.get();
         dialog.createNewDatabase();
-        addToPopupSlot(dialog);
       }
 
     }));

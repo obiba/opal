@@ -16,7 +16,6 @@ import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCanceledEven
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
-import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCanceledEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 

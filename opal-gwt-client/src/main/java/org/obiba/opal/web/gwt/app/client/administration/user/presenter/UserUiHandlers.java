@@ -1,8 +1,8 @@
 package org.obiba.opal.web.gwt.app.client.administration.user.presenter;
 
-import com.gwtplatform.mvp.client.UiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
-public interface UserUiHandlers extends UiHandlers {
+public interface UserUiHandlers extends ModalUiHandlers {
   void cancel();
   void save();
 }

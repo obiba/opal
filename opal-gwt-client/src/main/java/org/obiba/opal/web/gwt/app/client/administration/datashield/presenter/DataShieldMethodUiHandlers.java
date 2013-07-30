@@ -1,9 +1,8 @@
 package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
-import com.gwtplatform.mvp.client.UiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
-public interface DataShieldMethodUiHandlers extends UiHandlers {
+public interface DataShieldMethodUiHandlers extends ModalUiHandlers {
   void save();
   void cancel();
-  void onDialogHidden();
 }

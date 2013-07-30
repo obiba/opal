@@ -23,8 +23,6 @@ import com.github.gwtbootstrap.client.ui.ControlLabel;
 import com.github.gwtbootstrap.client.ui.Dropdown;
 import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.TextBox;
-import com.github.gwtbootstrap.client.ui.event.HiddenEvent;
-import com.github.gwtbootstrap.client.ui.event.HiddenHandler;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -107,8 +105,6 @@ public class DataShieldMethodView extends ModalPopupViewWithUiHandlers<DataShiel
         updateForm(getType());
       }
     });
-
-    dialog.addHiddenHandler(new DialogHiddenHandler());
   }
 
   private void updateForm(MethodType type) {
@@ -230,10 +226,4 @@ public class DataShieldMethodView extends ModalPopupViewWithUiHandlers<DataShiel
     return MethodType.valueOf(typeList.getValue(typeList.getSelectedIndex()));
   }
 
-  private class DialogHiddenHandler implements HiddenHandler {
-    @Override
-    public void onHidden(HiddenEvent hiddenEvent) {
-      getUiHandlers().onDialogHidden();
-    }
-  }
 }

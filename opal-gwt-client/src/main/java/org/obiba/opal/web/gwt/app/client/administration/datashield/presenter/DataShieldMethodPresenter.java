@@ -12,11 +12,10 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCanceledEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCanceledEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -37,9 +36,8 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodPresenter.Display>
+public class DataShieldMethodPresenter extends ModalPresenterWidget<DataShieldMethodPresenter.Display>
     implements DataShieldMethodUiHandlers {
 
   private Mode dialogMode;
@@ -74,11 +72,6 @@ public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodP
   @Override
   public void cancel() {
     getView().hideDialog();
-  }
-
-  @Override
-  public void onDialogHidden() {
-    getEventBus().fireEvent(new DataShieldMethodCanceledEvent());
   }
 
   public void setEnvironement(String environement) {
