@@ -25,7 +25,7 @@
       </b:Column>
       <b:Column size="3">
         <b:ButtonGroup addStyleNames="pull-right">
-          <b:Button type="PRIMARY" icon="PLUS" size="SMALL" ui:field="add">
+          <b:Button type="INFO" icon="PLUS" size="SMALL" ui:field="add">
             <ui:msg description="Add Project label">Add Project</ui:msg>
           </b:Button>
         </b:ButtonGroup>

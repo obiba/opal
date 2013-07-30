@@ -1823,4 +1823,8 @@ public interface Translations extends Constants {
   @Description("Add Project label")
   @DefaultStringValue("Add Project")
   String addProject();
+
+  @Description("All Tables label")
+  @DefaultStringValue("All tables")
+  String allTablesLabel();
 }

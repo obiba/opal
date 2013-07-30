@@ -1,9 +1,13 @@
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.BreadcrumbsTabPanel;
 
+import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -14,6 +18,8 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 public class MagmaView extends ViewWithUiHandlers<MagmaUiHandlers> implements MagmaPresenter.Display {
+
+  private static final Translations translations = GWT.create(Translations.class);
 
   interface Binder extends UiBinder<Widget, MagmaView> {}
 
@@ -67,7 +73,7 @@ public class MagmaView extends ViewWithUiHandlers<MagmaUiHandlers> implements Ma
   public void selectDatasource(String name) {
     datasource = name;
     tabPanel.clear();
-    tabPanel.addAndSelect(datasourceWidget, name);
+    tabPanel.addAndSelect(datasourceWidget, translations.allTablesLabel());
   }
 
   @Override
@@ -75,7 +81,7 @@ public class MagmaView extends ViewWithUiHandlers<MagmaUiHandlers> implements Ma
     this.datasource = datasource;
     this.table = table;
     tabPanel.clear();
-    tabPanel.add(datasourceWidget, datasource);
+    tabPanel.add(datasourceWidget, getDatasourceLink(datasource));
     tabPanel.addAndSelect(tableWidget, table);
   }
 
@@ -85,9 +91,16 @@ public class MagmaView extends ViewWithUiHandlers<MagmaUiHandlers> implements Ma
     this.table = table;
     this.variable = variable;
     tabPanel.clear();
-    tabPanel.add(datasourceWidget, datasource);
+    tabPanel.add(datasourceWidget, getDatasourceLink(datasource));
     tabPanel.add(tableWidget, table);
     tabPanel.addAndSelect(variableWidget, variable);
+  }
+
+  private NavLink getDatasourceLink(String name) {
+    NavLink link = new NavLink();
+    link.setIcon(IconType.TABLE);
+    link.setTitle(translations.allTablesLabel());
+    return link;
   }
 
 }

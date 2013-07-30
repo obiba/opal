@@ -278,3 +278,9 @@ div.obiba-SuggestListBox {
   margin-bottom: 5px;
 }
 
+/*
+ * Magma widget
+ */
+.magma {
+  min-height: 200px;
+}
