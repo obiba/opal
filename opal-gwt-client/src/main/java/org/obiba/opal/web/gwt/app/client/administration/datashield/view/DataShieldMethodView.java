@@ -12,39 +12,41 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodPresenter.MethodType;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodPresenter.Mode;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
-import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.ControlLabel;
+import com.github.gwtbootstrap.client.ui.Dropdown;
+import com.github.gwtbootstrap.client.ui.TextArea;
+import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.event.HiddenEvent;
+import com.github.gwtbootstrap.client.ui.event.HiddenHandler;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.TextArea;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.PopupViewImpl;
 
 /**
  *
  */
-public class DataShieldMethodView extends PopupViewImpl implements Display {
+public class DataShieldMethodView extends ModalPopupViewWithUiHandlers<DataShieldMethodUiHandlers> implements Display {
 
   @UiTemplate("DataShieldMethodView.ui.xml")
-  interface DataShieldMethodViewUiBinder extends UiBinder<DialogBox, DataShieldMethodView> {}
+  interface DataShieldMethodViewUiBinder extends UiBinder<Widget, DataShieldMethodView> {}
 
   private static final DataShieldMethodViewUiBinder uiBinder = GWT.create(DataShieldMethodViewUiBinder.class);
 
@@ -53,13 +55,7 @@ public class DataShieldMethodView extends PopupViewImpl implements Display {
   private final Widget widget;
 
   @UiField
-  DialogBox dialog;
-
-  @UiField
-  DockLayoutPanel contentLayout;
-
-  @UiField
-  ResizeHandle resizeHandle;
+  Modal dialog;
 
   @UiField
   Button saveButton;
@@ -70,17 +66,19 @@ public class DataShieldMethodView extends PopupViewImpl implements Display {
   @UiField
   TextBox name;
 
+  Dropdown types;
+
   @UiField
   ListBox typeList;
 
   @UiField
-  Label scriptLabel;
+  ControlLabel scriptLabel;
 
   @UiField
   TextArea script;
 
   @UiField
-  Label functionLabel;
+  ControlLabel functionLabel;
 
   @UiField
   TextBox function;
@@ -98,7 +96,6 @@ public class DataShieldMethodView extends PopupViewImpl implements Display {
 
   private void initWidgets() {
     dialog.hide();
-    resizeHandle.makeResizable(contentLayout);
     typeList.addItem(translations.rFunctionLabel(), MethodType.RFUNCTION.toString());
     typeList.addItem(translations.rScriptLabel(), MethodType.RSCRIPT.toString());
     script.setVisible(false);
@@ -110,6 +107,8 @@ public class DataShieldMethodView extends PopupViewImpl implements Display {
         updateForm(getType());
       }
     });
+
+    dialog.addHiddenHandler(new DialogHiddenHandler());
   }
 
   private void updateForm(MethodType type) {
@@ -122,11 +121,6 @@ public class DataShieldMethodView extends PopupViewImpl implements Display {
   @Override
   public Widget asWidget() {
     return widget;
-  }
-
-  @Override
-  protected PopupPanel asPopupPanel() {
-    return dialog;
   }
 
   @Override
@@ -145,20 +139,20 @@ public class DataShieldMethodView extends PopupViewImpl implements Display {
     name.setEnabled(Mode.CREATE == dialogMode);
     typeList.setEnabled(Mode.CREATE == dialogMode);
     if(Mode.CREATE == dialogMode) {
-      dialog.setText(translations.addDataShieldMethod());
+      dialog.setTitle(translations.addDataShieldMethod());
     } else {
-      dialog.setText(translations.editDataShieldMethod());
+      dialog.setTitle(translations.editDataShieldMethod());
     }
   }
 
-  @Override
-  public HasClickHandlers getSaveButton() {
-    return saveButton;
+  @UiHandler("saveButton")
+  public void onSave(ClickEvent event) {
+    getUiHandlers().save();
   }
 
-  @Override
-  public HasClickHandlers getCancelButton() {
-    return cancelButton;
+  @UiHandler("cancelButton")
+  public void onCancel(ClickEvent event) {
+    getUiHandlers().cancel();
   }
 
   @Override
@@ -234,5 +228,12 @@ public class DataShieldMethodView extends PopupViewImpl implements Display {
 
   private MethodType getType() {
     return MethodType.valueOf(typeList.getValue(typeList.getSelectedIndex()));
+  }
+
+  private class DialogHiddenHandler implements HiddenHandler {
+    @Override
+    public void onHidden(HiddenEvent hiddenEvent) {
+      getUiHandlers().onDialogHidden();
+    }
   }
 }

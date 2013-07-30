@@ -1,5 +1,6 @@
 package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCanceledEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageRemovedEvent;
@@ -10,6 +11,7 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCanceledEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -63,7 +65,7 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
   }
 
   private void addEventHandlers() {
-
+    registerHandler(getEventBus().addHandler(DataShieldMethodCanceledEvent.getType(), new DataShieldMethodCanceledHandler()));
     getView().getDataShieldMethodActionsColumn().setActionHandler(new ActionHandler<DataShieldMethodDto>() {
       @Override
       public void doAction(DataShieldMethodDto dto, String actionName) {
@@ -260,6 +262,16 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
     }
 
   }
+
+
+  private class DataShieldMethodCanceledHandler implements DataShieldMethodCanceledEvent.Handler {
+
+    @Override
+    public void onDataShieldMethodCanceled(DataShieldMethodCanceledEvent event) {
+      removeFromPopupSlot(dataShieldMethodPresenter);
+    }
+  }
+
 
   public interface Display extends View {
 
