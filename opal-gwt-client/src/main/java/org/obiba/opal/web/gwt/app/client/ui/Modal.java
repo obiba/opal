@@ -1,6 +1,10 @@
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import java.util.Stack;
+
 import com.github.gwtbootstrap.client.ui.constants.BackdropType;
+import com.github.gwtbootstrap.client.ui.event.ShowEvent;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -10,6 +14,8 @@ import com.google.gwt.user.client.ui.Widget;
  * A Bootstrap Modal, resizable and draggable.
  */
 public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
+
+  private static ModalStack modalStack = new ModalStack();
 
   private boolean resizable = false;
 
@@ -24,6 +30,8 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   private int moveStartY;
 
   private Widget movePanel;
+
+  private boolean hiddenOnStack = false;
 
   public Modal() {
     this(false);
@@ -59,6 +67,46 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     }
   }
 
+  @Override
+  public void show() {
+
+    if (!modalStack.isEmty() && !modalStack.has(this)) {
+      modalStack.hideCurrent();
+    }
+
+    modalStack.push(this);
+
+    super.show();
+  }
+
+  @Override
+  protected void onShow(Event e) {
+    if (!hiddenOnStack) fireEvent(new ShowEvent(e));
+  }
+
+  @Override
+  protected void onShown(Event e) {
+    if (!hiddenOnStack) super.onShown(e);
+    hiddenOnStack = false;
+  }
+
+  protected void onHide(Event e) {
+    if (!hiddenOnStack) super.onHide(e);
+  }
+
+  /**
+   * This method is called once the widget is completely hidden.
+   */
+  protected void onHidden(Event e) {
+    if (!hiddenOnStack) {
+      super.onHidden(e);
+
+      modalStack.pop(this);
+      modalStack.showCurrent();
+    }
+
+  }
+
   private void sinkMouseEvents() {
     //listen to mouse-events
     DOM.sinkEvents(getElement(), Event.ONMOUSEDOWN |
@@ -67,13 +115,13 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
         Event.ONMOUSEOVER);
   }
 
-  /**
-   * processes the mouse-events to show cursor or change states
-   * - mouseover
-   * - mousedown
-   * - mouseup
-   * - mousemove
-   */
+    /**
+     * processes the mouse-events to showCurrent cursor or change states
+     * - mouseover
+     * - mousedown
+     * - mouseup
+     * - mousemove
+     */
   @Override
   public void onBrowserEvent(Event event) {
     switch(DOM.eventGetType(event)) {
@@ -93,7 +141,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   }
 
   private void onMouseOverEvent(Event event) {
-    //show different cursors
+    //showCurrent different cursors
     if(resizable && isCursorResize(event)) {
       DOM.setStyleAttribute(getElement(), "cursor", "se-resize");
     } else if(draggable && isCursorMove(event)) {
@@ -185,7 +233,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   }
 
   /**
-   * returns if mousepointer is in region to show cursor-resize
+   * returns if mousepointer is in region to showCurrent cursor-resize
    *
    * @param event
    * @return true if in region
@@ -232,4 +280,53 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
           initialX + width >= cursorX);
     } else return false;
   }
+
+  // These class is part of a temporary HACK until get-bootstrap library supports stacked modal dialogs.
+  // Currently this is not supported: https://github.com/twbs/bootstrap/issues/8785
+
+  private static class ModalStack {
+
+    private Stack<Modal> currentlyShown = new Stack<Modal>();
+
+    public boolean isEmty() {
+      return currentlyShown.size() == 0;
+    }
+
+    public boolean has(Modal modal) {
+      return currentlyShown.search(modal) != -1;
+    }
+
+    private void push(Modal modal) {
+      if (!modal.hiddenOnStack && currentlyShown.search(modal) == -1) currentlyShown.push(modal);
+      GWT.log("push() :: " + currentlyShown.size());
+    }
+
+    private void pop(Modal modal) {
+      Modal top = currentlyShown.peek();
+
+      if (!top.equals(modal)) {
+        throw new IllegalArgumentException("Modal dialog is not on the stack");
+      }
+
+      currentlyShown.pop();
+
+      GWT.log("push() :: " + currentlyShown.size());
+    }
+
+    public void hideCurrent() {
+      Modal current = currentlyShown.peek();
+      if (current != null) {
+        current.hiddenOnStack = true;
+        current.hide();
+      }
+    }
+
+    public void showCurrent() {
+      if (currentlyShown.size() > 0) {
+        Modal current = currentlyShown.peek();
+        current.show();
+      }
+    }
+  }
+
 }
