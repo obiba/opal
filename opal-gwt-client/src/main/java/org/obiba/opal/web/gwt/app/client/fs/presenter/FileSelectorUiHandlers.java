@@ -1,8 +1,8 @@
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
-import com.gwtplatform.mvp.client.UiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
-public interface FileSelectorUiHandlers extends UiHandlers {
+public interface FileSelectorUiHandlers extends ModalUiHandlers {
 
   void uploadFile();
   void selectFolder();

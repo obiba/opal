@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitSelectedEvent;
@@ -41,6 +42,7 @@ import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.opal.KeyDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
@@ -71,7 +73,7 @@ public class FunctionalUnitDetailsPresenter
 
   private GenerateConfirmationRunnable generateConfirmation;
 
-  private final FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter;
+  private final ModalProvider<FunctionalUnitUpdateDialogPresenter> functionalUnitModalProvider;
 
   private final Provider<AddKeyPairDialogPresenter> addKeyPairDialogPresenter;
 
@@ -121,13 +123,13 @@ public class FunctionalUnitDetailsPresenter
 
   @Inject
   public FunctionalUnitDetailsPresenter(EventBus eventBus, Display display, Proxy proxy,
-      FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter,
+      ModalProvider<FunctionalUnitUpdateDialogPresenter> functionalUnitModalProvider,
       GenerateIdentifiersDialogPresenter generateIdentifiersDialogPresenter,
       Provider<AddKeyPairDialogPresenter> addKeyPairDialogPresenter,
       DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
-    this.functionalUnitUpdateDialogPresenter = functionalUnitUpdateDialogPresenter;
+    this.functionalUnitModalProvider = functionalUnitModalProvider.setContainer(this);
     this.addKeyPairDialogPresenter = addKeyPairDialogPresenter;
     this.generateIdentifiersDialogPresenter = generateIdentifiersDialogPresenter;
     this.breadcrumbsHelper = breadcrumbsHelper;
@@ -163,13 +165,13 @@ public class FunctionalUnitDetailsPresenter
 
   @Override
   public void updateUnit() {
-    functionalUnitUpdateDialogPresenter.setDialogMode(Mode.UPDATE);
-    FunctionalUnitUpdateDialogPresenter.Display display = functionalUnitUpdateDialogPresenter.getView();
+    FunctionalUnitUpdateDialogPresenter presenter = functionalUnitModalProvider.get();
+    presenter.setDialogMode(Mode.UPDATE);
+    FunctionalUnitUpdateDialogPresenter.Display display = presenter.getView();
     FunctionalUnitDto functionalUnit = getView().getFunctionalUnitDetails();
     display.setName(functionalUnit.getName());
     display.setDescription(functionalUnit.getDescription());
     display.setSelect(functionalUnit.getSelect());
-    addToPopupSlot(functionalUnitUpdateDialogPresenter);
   }
 
   @Override

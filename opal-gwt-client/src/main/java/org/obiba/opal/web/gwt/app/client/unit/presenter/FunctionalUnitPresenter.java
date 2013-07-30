@@ -14,12 +14,12 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
-import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCanceledEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitDeletedEvent;
-import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.unit.mapidentifiers.presenter.IdentifiersMapPresenter;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.unit.syncidentifiers.presenter.IdentifiersSyncPresenter;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -33,6 +33,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.Presenter;
@@ -63,26 +64,26 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
   public interface Proxy extends ProxyPlace<FunctionalUnitPresenter> {}
 
   final FunctionalUnitDetailsPresenter functionalUnitDetailsPresenter;
-  final FunctionalUnitUpdateDialogPresenter functionalUnitUpdateDialogPresenter;
   private final PlaceManager placeManager;
+  private final ModalProvider<FunctionalUnitUpdateDialogPresenter> functionalUnitModalProvider;
 
   @Inject
   public FunctionalUnitPresenter(Display display, EventBus eventBus, Proxy proxy,
       FunctionalUnitDetailsPresenter FunctionalUnitDetailsPresenter,
-      FunctionalUnitUpdateDialogPresenter FunctionalUnitUpdateDialogPresenter,
+      ModalProvider<FunctionalUnitUpdateDialogPresenter> functionalUnitModalProvider,
       PlaceManager placeManager) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
     functionalUnitDetailsPresenter = FunctionalUnitDetailsPresenter;
-    functionalUnitUpdateDialogPresenter = FunctionalUnitUpdateDialogPresenter;
+    this.functionalUnitModalProvider = functionalUnitModalProvider.setContainer(this);
     this.placeManager = placeManager;
   }
 
   @Override
   public void addUnit() {
-    functionalUnitUpdateDialogPresenter.setDialogMode(Mode.CREATE);
-    functionalUnitUpdateDialogPresenter.getView().clear();
-    addToPopupSlot(functionalUnitUpdateDialogPresenter);
+    FunctionalUnitUpdateDialogPresenter presenter = functionalUnitModalProvider.get();
+    presenter.setDialogMode(Mode.CREATE);
+    presenter.getView().clear();
   }
 
   @Override
@@ -122,7 +123,6 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
   @Override
   protected void onBind() {
     super.onBind();
-    registerHandler(getEventBus().addHandler(FunctionalUnitCanceledEvent.getType(), new FunctionalUnitCanceledHandler()));
     registerHandler(getEventBus().addHandler(FunctionalUnitDeletedEvent.getType(), new FunctionalUnitDeletedHandler()));
     registerHandler(getEventBus().addHandler(FunctionalUnitCreatedEvent.getType(), new FunctionalUnitCreatedHandler()));
   }
@@ -192,13 +192,5 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
       placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.units).build());
     }
 
-  }
-
-  private class FunctionalUnitCanceledHandler implements FunctionalUnitCanceledEvent.Handler {
-
-    @Override
-    public void onFunctionalUnitCanceled(FunctionalUnitCanceledEvent event) {
-      removeFromPopupSlot(functionalUnitUpdateDialogPresenter);
-    }
   }
 }
