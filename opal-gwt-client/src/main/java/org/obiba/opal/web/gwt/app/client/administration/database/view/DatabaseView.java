@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.database.view;
 
-import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseAdministratorUiHandlers;
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseUiHandlers;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabasePresenter.Display;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabasePresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -40,7 +40,7 @@ import com.google.web.bindery.event.shared.EventBus;
 /**
  *
  */
-public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseAdministratorUiHandlers> implements Display {
+public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandlers> implements Display {
 
   @UiTemplate("DatabaseView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DatabaseView> {}

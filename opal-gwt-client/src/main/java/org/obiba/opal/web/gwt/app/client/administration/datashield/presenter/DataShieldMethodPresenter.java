@@ -12,9 +12,11 @@ package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCanceledEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCanceledEvent;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -27,19 +29,18 @@ import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
 import org.obiba.opal.web.model.client.datashield.RFunctionDataShieldMethodDto;
 import org.obiba.opal.web.model.client.datashield.RScriptDataShieldMethodDto;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodPresenter.Display> {
+public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodPresenter.Display>
+    implements DataShieldMethodUiHandlers {
 
   private Mode dialogMode;
 
@@ -58,6 +59,26 @@ public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodP
   @Inject
   public DataShieldMethodPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
+    getView().setUiHandlers(this);
+  }
+
+  @Override
+  public void save() {
+    if(dialogMode == Mode.CREATE) {
+      createMethod();
+    } else if(dialogMode == Mode.UPDATE) {
+      updateMethod();
+    }
+  }
+
+  @Override
+  public void cancel() {
+    getView().hideDialog();
+  }
+
+  @Override
+  public void onDialogHidden() {
+    getEventBus().fireEvent(new DataShieldMethodCanceledEvent());
   }
 
   public void setEnvironement(String environement) {
@@ -67,15 +88,6 @@ public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodP
   @Override
   protected void onBind() {
     setDialogMode(Mode.CREATE);
-
-    registerHandler(getView().getSaveButton().addClickHandler(new CreateOrUpdateMethodClickHandler()));
-
-    registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getView().hideDialog();
-      }
-    }));
 
     methodValidationHandler = new MethodValidationHandler(getEventBus());
   }
@@ -231,19 +243,6 @@ public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodP
     }
   }
 
-  public class CreateOrUpdateMethodClickHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent arg0) {
-      if(dialogMode == Mode.CREATE) {
-        createMethod();
-      } else if(dialogMode == Mode.UPDATE) {
-        updateMethod();
-      }
-    }
-
-  }
-
   private class CreateOrUpdateMethodCallBack implements ResponseCodeCallback {
 
     DataShieldMethodDto dto;
@@ -265,15 +264,11 @@ public class DataShieldMethodPresenter extends PresenterWidget<DataShieldMethodP
     }
   }
 
-  public interface Display extends PopupView {
+  public interface Display extends PopupView, HasUiHandlers<DataShieldMethodUiHandlers> {
 
     void hideDialog();
 
     void setDialogMode(Mode dialogMode);
-
-    HasClickHandlers getSaveButton();
-
-    HasClickHandlers getCancelButton();
 
     void setName(String name);
 
