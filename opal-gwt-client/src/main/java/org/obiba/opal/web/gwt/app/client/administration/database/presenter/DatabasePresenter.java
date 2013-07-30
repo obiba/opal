@@ -25,9 +25,6 @@ import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
 import org.obiba.opal.web.model.client.opal.JdbcDriverDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -38,7 +35,7 @@ import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
 public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display>
-    implements DatabaseAdministratorUiHandlers {
+    implements DatabaseUiHandlers {
 
   private Mode dialogMode;
 
@@ -223,7 +220,7 @@ public class DatabasePresenter extends PresenterWidget<DatabasePresenter.Display
     }
   }
 
-  public interface Display extends PopupView, HasUiHandlers<DatabaseAdministratorUiHandlers> {
+  public interface Display extends PopupView, HasUiHandlers<DatabaseUiHandlers> {
 
     void hideDialog();
 
