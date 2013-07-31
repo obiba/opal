@@ -23,7 +23,6 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ItemSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
-import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCanceledEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
@@ -209,7 +208,6 @@ public class ReportTemplateUpdateDialogPresenter extends ModalPresenterWidget<Re
   public void onDialogHidden() {
     errorNotificationPresenter.close();
     getView().clearErrors();
-    getEventBus().fireEvent(new ReportTemplateCanceledEvent());
   }
 
   @Override
