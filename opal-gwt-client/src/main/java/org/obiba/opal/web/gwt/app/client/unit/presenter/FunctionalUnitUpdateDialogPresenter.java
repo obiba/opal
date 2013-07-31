@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCanceledEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -36,9 +36,8 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<FunctionalUnitUpdateDialogPresenter.Display>
+public class FunctionalUnitUpdateDialogPresenter extends ModalPresenterWidget<FunctionalUnitUpdateDialogPresenter.Display>
     implements FunctionalUnitUpdateDialogUiHandlers {
 
   @SuppressWarnings("TypeMayBeWeakened")
@@ -114,12 +113,7 @@ public class FunctionalUnitUpdateDialogPresenter extends PresenterWidget<Functio
   @Override
   public void onDialogHide() {
     getView().hideDialog();
-    onDialogHidden();
-  }
-
-  @Override
-  public void onDialogHidden() {
-    getEventBus().fireEvent(new FunctionalUnitCanceledEvent());
+    onModalHidden();
   }
 
   @SuppressWarnings("MethodOnlyUsedFromInnerClass, TypeMayBeWeakened")

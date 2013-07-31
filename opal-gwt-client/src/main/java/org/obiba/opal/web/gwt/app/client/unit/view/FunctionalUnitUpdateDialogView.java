@@ -73,7 +73,6 @@ public class FunctionalUnitUpdateDialogView extends ModalPopupViewWithUiHandlers
     uiBinder.createAndBindUi(this);
     selectEnabled.setValue(false);
     select.setEnabled(false);
-    dialog.addHiddenHandler(new DialogHiddenHandler());
   }
 
   @Override
@@ -170,13 +169,6 @@ public class FunctionalUnitUpdateDialogView extends ModalPopupViewWithUiHandlers
   @Override
   public HasText getSelect() {
     return select;
-  }
-
-  private class DialogHiddenHandler implements HiddenHandler {
-    @Override
-    public void onHidden(HiddenEvent hiddenEvent) {
-      getUiHandlers().onDialogHidden();
-    }
   }
 
 }

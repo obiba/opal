@@ -1,9 +1,8 @@
 package org.obiba.opal.web.gwt.app.client.unit.presenter;
 
-import com.gwtplatform.mvp.client.UiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
-public interface FunctionalUnitUpdateDialogUiHandlers extends UiHandlers {
+public interface FunctionalUnitUpdateDialogUiHandlers extends ModalUiHandlers {
   void updateFunctionaUnit();
   void onDialogHide();
-  void onDialogHidden();
 }

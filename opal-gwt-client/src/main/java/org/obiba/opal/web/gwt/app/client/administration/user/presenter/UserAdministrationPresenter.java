@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.administration.user.event.UsersRefreshE
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
@@ -59,7 +60,7 @@ public class UserAdministrationPresenter
   @NameToken(Places.usersGroups)
   public interface Proxy extends ProxyPlace<UserAdministrationPresenter> {}
 
-  private final Provider<UserPresenter> userPresenter;
+  private final ModalProvider<UserPresenter> userModalProvider;
 
   public interface Display extends View, HasBreadcrumbs {
 
@@ -99,11 +100,11 @@ public class UserAdministrationPresenter
 
   @Inject
   public UserAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
-      Provider<UserPresenter> userPresenter, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
+      ModalProvider<UserPresenter> userModalProvider, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
 //    this.authorizationPresenter = authorizationPresenter.get();
     this.breadcrumbsHelper = breadcrumbsHelper;
-    this.userPresenter = userPresenter;
+    this.userModalProvider = userModalProvider.setContainer(this);
   }
 
   @ProxyEvent
@@ -207,9 +208,8 @@ public class UserAdministrationPresenter
     getView().getAddUserButton().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        UserPresenter dialog = userPresenter.get();
+        UserPresenter dialog = userModalProvider.get();
         dialog.setDialogMode(UserPresenter.Mode.CREATE);
-        addToPopupSlot(dialog);
       }
     });
 
@@ -219,11 +219,9 @@ public class UserAdministrationPresenter
       @Override
       public void doAction(final UserDto object, String actionName) {
         if(actionName.trim().equalsIgnoreCase(ActionsColumn.EDIT_ACTION)) {
-          UserPresenter dialog = userPresenter.get();
+          UserPresenter dialog = userModalProvider.get();
           dialog.setDialogMode(UserPresenter.Mode.UPDATE);
           dialog.setUser(object);
-
-          addToPopupSlot(dialog);
         } else if(actionName.trim().equalsIgnoreCase(ActionsColumn.DELETE_ACTION)) {
           ResourceRequestBuilderFactory.newBuilder()//
               .forResource("/user/" + object.getName()).withCallback(new ResponseCodeCallback() {

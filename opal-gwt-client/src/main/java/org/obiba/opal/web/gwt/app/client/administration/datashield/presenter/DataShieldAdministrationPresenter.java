@@ -1,17 +1,16 @@
 package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
-import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCanceledEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageRemovedEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCanceledEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -23,6 +22,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -43,19 +43,18 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
 
   private Runnable removeMethodConfirmation;
 
-  private final DataShieldMethodPresenter dataShieldMethodPresenter;
+  private final ModalProvider<DataShieldMethodPresenter> datashieldModalProvider;
 
   @Inject
   public DataShieldAdministrationPresenter(Display display, EventBus eventBus,
-      DataShieldMethodPresenter dataShieldMethodPresenter) {
+      ModalProvider<DataShieldMethodPresenter> datashieldModalProvider) {
     super(eventBus, display);
-    this.dataShieldMethodPresenter = dataShieldMethodPresenter;
+    this.datashieldModalProvider = datashieldModalProvider.setContainer(this);
   }
 
   void setEnvironment(String env) {
     this.env = env;
     getView().setEnvironment(env);
-    dataShieldMethodPresenter.setEnvironement(env);
   }
 
   @Override
@@ -65,7 +64,6 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
   }
 
   private void addEventHandlers() {
-    registerHandler(getEventBus().addHandler(DataShieldMethodCanceledEvent.getType(), new DataShieldMethodCanceledHandler()));
     getView().getDataShieldMethodActionsColumn().setActionHandler(new ActionHandler<DataShieldMethodDto>() {
       @Override
       public void doAction(DataShieldMethodDto dto, String actionName) {
@@ -79,8 +77,9 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
 
       @Override
       public void onClick(ClickEvent event) {
-        dataShieldMethodPresenter.createNewMethod();
-        addToPopupSlot(dataShieldMethodPresenter);
+        DataShieldMethodPresenter presenter = datashieldModalProvider.get();
+        if (!Strings.isNullOrEmpty(env)) presenter.setEnvironement(env);
+        presenter.createNewMethod();
       }
     }));
     registerHandler(
@@ -175,8 +174,8 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
 
         @Override
         public void authorized() {
-          dataShieldMethodPresenter.updateMethod(dto);
-          addToPopupSlot(dataShieldMethodPresenter);
+          DataShieldMethodPresenter presenter = datashieldModalProvider.get();
+          presenter.updateMethod(dto);
         }
       });
 
@@ -262,16 +261,6 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
     }
 
   }
-
-
-  private class DataShieldMethodCanceledHandler implements DataShieldMethodCanceledEvent.Handler {
-
-    @Override
-    public void onDataShieldMethodCanceled(DataShieldMethodCanceledEvent event) {
-      removeFromPopupSlot(dataShieldMethodPresenter);
-    }
-  }
-
 
   public interface Display extends View {
 

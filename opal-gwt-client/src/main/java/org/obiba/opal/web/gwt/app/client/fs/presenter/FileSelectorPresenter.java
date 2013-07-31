@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreationEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -32,7 +33,7 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class FileSelectorPresenter extends PresenterWidget<FileSelectorPresenter.Display>
+public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPresenter.Display>
     implements FileSelectorUiHandlers {
 
   public static final Object LEFT = new Object();

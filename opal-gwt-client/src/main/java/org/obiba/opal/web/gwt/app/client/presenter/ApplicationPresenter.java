@@ -1,3 +1,4 @@
+
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
  *
@@ -71,7 +72,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   private final NotificationPresenter messageDialog;
 
-  private final Provider<FileSelectorPresenter> fileSelectorPresenter;
+  private final ModalProvider<FileSelectorPresenter> fileSelectorProvider;
 
   private final Provider<ValueMapPopupPresenter> valueMapPopupPresenter;
 
@@ -82,13 +83,13 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public ApplicationPresenter(Display display, Proxy proxy, EventBus eventBus, RequestCredentials credentials,
-      NotificationPresenter messageDialog, Provider<FileSelectorPresenter> fileSelectorPresenter,
+      NotificationPresenter messageDialog, ModalProvider<FileSelectorPresenter> fileSelectorProvider,
       Provider<ValueMapPopupPresenter> valueMapPopupPresenter, RequestUrlBuilder urlBuilder,
       PlaceManager placeManager) {
     super(eventBus, display, proxy);
     this.credentials = credentials;
     this.messageDialog = messageDialog;
-    this.fileSelectorPresenter = fileSelectorPresenter;
+    this.fileSelectorProvider = fileSelectorProvider.setContainer(this);
     this.valueMapPopupPresenter = valueMapPopupPresenter;
     this.urlBuilder = urlBuilder;
     this.placeManager = placeManager;
@@ -107,9 +108,8 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
           @Override
           public void onFileSelectionRequired(FileSelectionRequiredEvent event) {
-            FileSelectorPresenter fsp = fileSelectorPresenter.get();
+            FileSelectorPresenter fsp = fileSelectorProvider.get();
             fsp.handle(event);
-            addToPopupSlot(fsp);
           }
         }));
     registerHandler(getEventBus().addHandler(GeoValueDisplayEvent.getType(), new GeoValueDisplayEvent.Handler() {
