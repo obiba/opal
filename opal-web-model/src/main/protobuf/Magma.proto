@@ -151,6 +151,7 @@ message GNPostalCodesDatasourceFactoryDto {
 }
 
 message MongoDBDatasourceFactoryDto {
+  required string database = 1;
   extend DatasourceFactoryDto {
     optional MongoDBDatasourceFactoryDto params = 1012;
   }
