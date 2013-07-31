@@ -21,7 +21,7 @@ import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitSelectedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.GenerateIdentifiersConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.KeyPairCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateModalPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
@@ -42,7 +42,6 @@ import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.opal.KeyDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
@@ -73,11 +72,11 @@ public class FunctionalUnitDetailsPresenter
 
   private GenerateConfirmationRunnable generateConfirmation;
 
-  private final ModalProvider<FunctionalUnitUpdateDialogPresenter> functionalUnitModalProvider;
+  private final ModalProvider<FunctionalUnitUpdateModalPresenter> functionalUnitModalProvider;
 
-  private final Provider<AddKeyPairDialogPresenter> addKeyPairDialogPresenter;
+  private final Provider<AddKeyPairModalPresenter> addKeyPairModalPresenter;
 
-  private final GenerateIdentifiersDialogPresenter generateIdentifiersDialogPresenter;
+  private final GenerateIdentifiersModalPresenter generateIdentifiersModalPresenter;
 
   private FunctionalUnitDto functionalUnit;
 
@@ -123,15 +122,15 @@ public class FunctionalUnitDetailsPresenter
 
   @Inject
   public FunctionalUnitDetailsPresenter(EventBus eventBus, Display display, Proxy proxy,
-      ModalProvider<FunctionalUnitUpdateDialogPresenter> functionalUnitModalProvider,
-      GenerateIdentifiersDialogPresenter generateIdentifiersDialogPresenter,
-      Provider<AddKeyPairDialogPresenter> addKeyPairDialogPresenter,
+      ModalProvider<FunctionalUnitUpdateModalPresenter> functionalUnitModalProvider,
+      GenerateIdentifiersModalPresenter generateIdentifiersModalPresenter,
+      Provider<AddKeyPairModalPresenter> addKeyPairModalPresenter,
       DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
     this.functionalUnitModalProvider = functionalUnitModalProvider.setContainer(this);
-    this.addKeyPairDialogPresenter = addKeyPairDialogPresenter;
-    this.generateIdentifiersDialogPresenter = generateIdentifiersDialogPresenter;
+    this.addKeyPairModalPresenter = addKeyPairModalPresenter;
+    this.generateIdentifiersModalPresenter = generateIdentifiersModalPresenter;
     this.breadcrumbsHelper = breadcrumbsHelper;
   }
 
@@ -165,9 +164,9 @@ public class FunctionalUnitDetailsPresenter
 
   @Override
   public void updateUnit() {
-    FunctionalUnitUpdateDialogPresenter presenter = functionalUnitModalProvider.get();
+    FunctionalUnitUpdateModalPresenter presenter = functionalUnitModalProvider.get();
     presenter.setDialogMode(Mode.UPDATE);
-    FunctionalUnitUpdateDialogPresenter.Display display = presenter.getView();
+    FunctionalUnitUpdateModalPresenter.Display display = presenter.getView();
     FunctionalUnitDto functionalUnit = getView().getFunctionalUnitDetails();
     display.setName(functionalUnit.getName());
     display.setDescription(functionalUnit.getDescription());
@@ -209,7 +208,7 @@ public class FunctionalUnitDetailsPresenter
 
   @Override
   public void addCryptographicKey() {
-    AddKeyPairDialogPresenter popup = addKeyPairDialogPresenter.get();
+    AddKeyPairModalPresenter popup = addKeyPairModalPresenter.get();
     popup.setFunctionalUnit(functionalUnit);
     addToPopupSlot(popup);
   }
@@ -435,8 +434,8 @@ public class FunctionalUnitDetailsPresenter
               .build());
       return;
     }
-    generateIdentifiersDialogPresenter.setAffectedEntitiesCount(affectedCount);
-    addToPopupSlot(generateIdentifiersDialogPresenter);
+    generateIdentifiersModalPresenter.setAffectedEntitiesCount(affectedCount);
+    addToPopupSlot(generateIdentifiersModalPresenter);
   }
 
 

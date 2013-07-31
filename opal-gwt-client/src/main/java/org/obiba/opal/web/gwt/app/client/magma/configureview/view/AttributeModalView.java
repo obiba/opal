@@ -12,8 +12,8 @@ package org.obiba.opal.web.gwt.app.client.magma.configureview.view;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.AttributeModalPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LabelListPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.AttributeDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.DropdownSuggestBox;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 
@@ -32,10 +32,10 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
 
-public class AttributeDialogView extends ViewImpl implements AttributeDialogPresenter.Display {
+public class AttributeModalView extends ViewImpl implements AttributeModalPresenter.Display {
 
-  @UiTemplate("AttributeDialogView.ui.xml")
-  interface MyUiBinder extends UiBinder<DialogBox, AttributeDialogView> {
+  @UiTemplate("AttributeModalView.ui.xml")
+  interface MyUiBinder extends UiBinder<DialogBox, AttributeModalView> {
 
   }
 
@@ -65,7 +65,7 @@ public class AttributeDialogView extends ViewImpl implements AttributeDialogPres
   @UiField
   Button cancelButton;
 
-  public AttributeDialogView() {
+  public AttributeModalView() {
     uiWidget = uiBinder.createAndBindUi(this);
     uiBinder.createAndBindUi(this);
     registerHandlers();

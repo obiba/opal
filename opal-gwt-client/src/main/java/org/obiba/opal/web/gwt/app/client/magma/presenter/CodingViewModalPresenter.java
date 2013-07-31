@@ -49,7 +49,7 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
-public class CodingViewDialogPresenter extends PresenterWidget<CodingViewDialogPresenter.Display> {
+public class CodingViewModalPresenter extends PresenterWidget<CodingViewModalPresenter.Display> {
 
   private final Collection<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
@@ -58,7 +58,7 @@ public class CodingViewDialogPresenter extends PresenterWidget<CodingViewDialogP
   private JsArray<VariableDto> variables;
 
   @Inject
-  public CodingViewDialogPresenter(EventBus eventBus, Display display) {
+  public CodingViewModalPresenter(EventBus eventBus, Display display) {
     super(eventBus, display);
   }
 

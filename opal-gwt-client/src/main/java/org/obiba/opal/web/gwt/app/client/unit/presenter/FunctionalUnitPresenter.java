@@ -19,7 +19,7 @@ import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.mapidentifiers.presenter.IdentifiersMapPresenter;
-import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateModalPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.unit.syncidentifiers.presenter.IdentifiersSyncPresenter;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -33,7 +33,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.Presenter;
@@ -65,12 +64,12 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
 
   final FunctionalUnitDetailsPresenter functionalUnitDetailsPresenter;
   private final PlaceManager placeManager;
-  private final ModalProvider<FunctionalUnitUpdateDialogPresenter> functionalUnitModalProvider;
+  private final ModalProvider<FunctionalUnitUpdateModalPresenter> functionalUnitModalProvider;
 
   @Inject
   public FunctionalUnitPresenter(Display display, EventBus eventBus, Proxy proxy,
       FunctionalUnitDetailsPresenter FunctionalUnitDetailsPresenter,
-      ModalProvider<FunctionalUnitUpdateDialogPresenter> functionalUnitModalProvider,
+      ModalProvider<FunctionalUnitUpdateModalPresenter> functionalUnitModalProvider,
       PlaceManager placeManager) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
@@ -81,7 +80,7 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
 
   @Override
   public void addUnit() {
-    FunctionalUnitUpdateDialogPresenter presenter = functionalUnitModalProvider.get();
+    FunctionalUnitUpdateModalPresenter presenter = functionalUnitModalProvider.get();
     presenter.setDialogMode(Mode.CREATE);
     presenter.getView().clear();
   }

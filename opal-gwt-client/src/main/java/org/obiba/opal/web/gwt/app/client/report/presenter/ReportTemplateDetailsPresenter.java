@@ -20,7 +20,7 @@ import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateDeletedEvent
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateListReceivedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Mode;
+import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateModalPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
@@ -59,7 +59,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
   private Runnable actionRequiringConfirmation;
 
-  private final Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenterProvider;
+  private final Provider<ReportTemplateUpdateModalPresenter> reportTemplateUpdateModalPresenterProvider;
 
   private final Provider<AuthorizationPresenter> authorizationPresenter;
 
@@ -67,10 +67,10 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
   @Inject
   public ReportTemplateDetailsPresenter(Display display, EventBus eventBus,
-      Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenterProvider,
+      Provider<ReportTemplateUpdateModalPresenter> reportTemplateUpdateModalPresenterProvider,
       Provider<AuthorizationPresenter> authorizationPresenter) {
     super(eventBus, display);
-    this.reportTemplateUpdateDialogPresenterProvider = reportTemplateUpdateDialogPresenterProvider;
+    this.reportTemplateUpdateModalPresenterProvider = reportTemplateUpdateModalPresenterProvider;
     this.authorizationPresenter = authorizationPresenter;
   }
 
@@ -279,7 +279,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
     @Override
     public void execute() {
-      ReportTemplateUpdateDialogPresenter presenter = reportTemplateUpdateDialogPresenterProvider.get();
+      ReportTemplateUpdateModalPresenter presenter = reportTemplateUpdateModalPresenterProvider.get();
       presenter.setDialogMode(Mode.UPDATE);
       presenter.setReportTemplate(getView().getReportTemplateDetails());
       addToPopupSlot(presenter);

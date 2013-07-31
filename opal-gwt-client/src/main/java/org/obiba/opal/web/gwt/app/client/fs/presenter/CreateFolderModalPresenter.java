@@ -29,7 +29,7 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class CreateFolderDialogPresenter extends PresenterWidget<CreateFolderDialogPresenter.Display> {
+public class CreateFolderModalPresenter extends PresenterWidget<CreateFolderModalPresenter.Display> {
 
   public interface Display extends PopupView {
 
@@ -48,7 +48,7 @@ public class CreateFolderDialogPresenter extends PresenterWidget<CreateFolderDia
   private FileDto currentFolder;
 
   @Inject
-  public CreateFolderDialogPresenter(Display display, EventBus eventBus) {
+  public CreateFolderModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
   }
 

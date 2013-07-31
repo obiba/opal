@@ -46,7 +46,7 @@ public class AttributesPresenter extends PresenterWidget<AttributesPresenter.Dis
   private static final TranslationMessages translationMessages = GWT.create(TranslationMessages.class);
 
   @Inject
-  private Provider<AttributeDialogPresenter> attributeDialogPresenterProvider;
+  private Provider<AttributeModalPresenter> attributeModalPresenterProvider;
 
   private VariableDto currentVariable;
 
@@ -90,12 +90,12 @@ public class AttributesPresenter extends PresenterWidget<AttributesPresenter.Dis
   }
 
   private void prepareAttributeDialog(AttributeDto attributeDto) {
-    AttributeDialogPresenter attributeDialogPresenter = attributeDialogPresenterProvider.get();
-    attributeDialogPresenter.bind();
-    attributeDialogPresenter.setViewDto(viewDto);
-    attributeDialogPresenter.setAttribute(attributeDto);
-    attributeDialogPresenter.setAttributes(currentVariable.getAttributesArray());
-    attributeDialogPresenter.onReveal();
+    AttributeModalPresenter attributeModalPresenter = attributeModalPresenterProvider.get();
+    attributeModalPresenter.bind();
+    attributeModalPresenter.setViewDto(viewDto);
+    attributeModalPresenter.setAttribute(attributeDto);
+    attributeModalPresenter.setAttributes(currentVariable.getAttributesArray());
+    attributeModalPresenter.onReveal();
   }
 
   private class AddAttributeHandler implements ClickHandler {

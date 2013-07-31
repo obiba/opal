@@ -63,23 +63,6 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   @UiField
   Panel content;
 
-  @UiField
-  Modal addProjectModal;
-
-  @UiField
-  Panel alertPlace;
-
-  Alert alert;
-
-  @UiField
-  ControlGroup labelGroup;
-
-  @UiField
-  HasText nameTxt;
-
-  @UiField
-  HasText descriptionTxt;
-
   private SortBy sortBy = SortBy.NAME;
 
   private JsArray<ProjectDto> projects;
@@ -87,7 +70,6 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   @Inject
   ProjectsView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
-    addProjectModal.setTitle(translations.addProject());
   }
 
   @Override
@@ -98,23 +80,6 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     } else {
       redraw();
     }
-  }
-
-  @Override
-  public void setNameError(String message) {
-    clearAlert();
-    labelGroup.setType(ControlGroupType.ERROR);
-    alert = new Alert(message);
-    alert.setType(AlertType.ERROR);
-    alert.setAnimation(true);
-    alert.setClose(true);
-    alert.addClosedHandler(new ClosedHandler() {
-      @Override
-      public void onClosed(ClosedEvent closedEvent) {
-        clearAlert();
-      }
-    });
-    alertPlace.add(alert);
   }
 
   @UiHandler("nameNav")
@@ -135,40 +100,12 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
   @UiHandler("add")
   void onShowAddProject(ClickEvent event) {
-    // clear and show
-    nameTxt.setText("");
-    descriptionTxt.setText("");
-    clearAlert();
-    addProjectModal.show();
-  }
-
-  @UiHandler("save")
-  void onSaveProject(ClickEvent event) {
-    // validate
-    ProjectFactoryDto p = ProjectFactoryDto.create();
-    p.setName(nameTxt.getText());
-    p.setDescription(descriptionTxt.getText());
-    if(getUiHandlers().onAddProject(p)) {
-      addProjectModal.hide();
-    }
-  }
-
-  @UiHandler("cancel")
-  void onCancelAddProject(ClickEvent event) {
-    addProjectModal.hide();
+    getUiHandlers().showAddProject();
   }
 
   private void redraw() {
     content.clear();
     sortBy.sort(getUiHandlers(), content, projects);
-  }
-
-  private void clearAlert() {
-    labelGroup.setType(ControlGroupType.NONE);
-    if (alert != null && alert.getElement().hasParentElement()) {
-      alert.removeFromParent();
-    }
-    alertPlace.clear();
   }
 
   private enum SortBy {

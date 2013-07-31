@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
-import org.obiba.opal.web.gwt.app.client.unit.presenter.GenerateIdentifiersDialogPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.GenerateIdentifiersModalPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
 import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
 
@@ -42,10 +42,10 @@ import com.gwtplatform.mvp.client.PopupViewImpl;
 /**
  *
  */
-public class GenerateIdentifiersDialogView extends PopupViewImpl implements Display {
+public class GenerateIdentifiersModalView extends PopupViewImpl implements Display {
 
-  @UiTemplate("GenerateIdentifiersDialogView.ui.xml")
-  interface GenerateIdentifiersDialogUiBinder extends UiBinder<DialogBox, GenerateIdentifiersDialogView> {}
+  @UiTemplate("GenerateIdentifiersModalView.ui.xml")
+  interface GenerateIdentifiersModalUiBinder extends UiBinder<DialogBox, GenerateIdentifiersModalView> {}
 
   //
   // Constants
@@ -55,7 +55,7 @@ public class GenerateIdentifiersDialogView extends PopupViewImpl implements Disp
 
   private static final int MAX_IDENTIFIER_SIZE = 20;
 
-  private static final GenerateIdentifiersDialogUiBinder uiBinder = GWT.create(GenerateIdentifiersDialogUiBinder.class);
+  private static final GenerateIdentifiersModalUiBinder uiBinder = GWT.create(GenerateIdentifiersModalUiBinder.class);
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -102,7 +102,7 @@ public class GenerateIdentifiersDialogView extends PopupViewImpl implements Disp
   // Constructors
   //
   @Inject
-  public GenerateIdentifiersDialogView(EventBus eventBus) {
+  public GenerateIdentifiersModalView(EventBus eventBus) {
     super(eventBus);
     uiBinder.createAndBindUi(this);
     initializeTexts();

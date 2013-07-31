@@ -9,18 +9,18 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.inject;
 
-import org.obiba.opal.web.gwt.app.client.unit.presenter.AddKeyPairDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.AddKeyPairModalPresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitListPresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitPresenter;
-import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter;
-import org.obiba.opal.web.gwt.app.client.unit.presenter.GenerateIdentifiersDialogPresenter;
-import org.obiba.opal.web.gwt.app.client.unit.view.AddCryptoKeyDialogView;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateModalPresenter;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.GenerateIdentifiersModalPresenter;
+import org.obiba.opal.web.gwt.app.client.unit.view.AddCryptoKeyModalView;
 import org.obiba.opal.web.gwt.app.client.unit.view.FunctionalUnitDetailsView;
 import org.obiba.opal.web.gwt.app.client.unit.view.FunctionalUnitListView;
-import org.obiba.opal.web.gwt.app.client.unit.view.FunctionalUnitUpdateDialogView;
+import org.obiba.opal.web.gwt.app.client.unit.view.FunctionalUnitUpdateModalView;
 import org.obiba.opal.web.gwt.app.client.unit.view.FunctionalUnitView;
-import org.obiba.opal.web.gwt.app.client.unit.view.GenerateIdentifiersDialogView;
+import org.obiba.opal.web.gwt.app.client.unit.view.GenerateIdentifiersModalView;
 
 import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 
@@ -35,12 +35,12 @@ public class UnitsModule extends AbstractPresenterModule {
         FunctionalUnitPresenter.Proxy.class);
     bindPresenterWidget(FunctionalUnitListPresenter.class, FunctionalUnitListPresenter.Display.class,
         FunctionalUnitListView.class);
-    bindPresenterWidget(FunctionalUnitUpdateDialogPresenter.class, FunctionalUnitUpdateDialogPresenter.Display.class,
-        FunctionalUnitUpdateDialogView.class);
-    bindPresenterWidget(AddKeyPairDialogPresenter.class, AddKeyPairDialogPresenter.Display.class,
-        AddCryptoKeyDialogView.class);
-    bindPresenterWidget(GenerateIdentifiersDialogPresenter.class, GenerateIdentifiersDialogPresenter.Display.class,
-        GenerateIdentifiersDialogView.class);
+    bindPresenterWidget(FunctionalUnitUpdateModalPresenter.class, FunctionalUnitUpdateModalPresenter.Display.class,
+        FunctionalUnitUpdateModalView.class);
+    bindPresenterWidget(AddKeyPairModalPresenter.class, AddKeyPairModalPresenter.Display.class,
+        AddCryptoKeyModalView.class);
+    bindPresenterWidget(GenerateIdentifiersModalPresenter.class, GenerateIdentifiersModalPresenter.Display.class,
+        GenerateIdentifiersModalView.class);
   }
 
 }

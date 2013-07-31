@@ -5,13 +5,13 @@
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <o:WizardDialogBox title="Derive Variable">
+  <o:WizardModalBox title="Derive Variable">
     <g:FlowPanel ui:field="stepsFlow">
 
       <o:WizardStep ui:field="scriptEvaluationStep"/>
 
     </g:FlowPanel>
 
-  </o:WizardDialogBox>
+  </o:WizardModalBox>
 
 </ui:UiBinder>

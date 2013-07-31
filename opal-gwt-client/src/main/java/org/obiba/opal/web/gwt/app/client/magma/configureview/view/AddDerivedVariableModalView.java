@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.configureview.view;
 
-import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.AddDerivedVariableDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.AddDerivedVariableModalPresenter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -27,12 +27,11 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class AddDerivedVariableDialogView extends PopupViewImpl implements AddDerivedVariableDialogPresenter.Display {
+public class AddDerivedVariableModalView extends PopupViewImpl implements AddDerivedVariableModalPresenter.Display {
 
-  @UiTemplate("AddDerivedVariableDialogView.ui.xml")
-  interface AddDerivedVariableDialogUiBinder extends UiBinder<DialogBox, AddDerivedVariableDialogView> {}
+  interface AddDerivedVariableModalUiBinder extends UiBinder<DialogBox, AddDerivedVariableModalView> {}
 
-  private static final AddDerivedVariableDialogUiBinder uiBinder = GWT.create(AddDerivedVariableDialogUiBinder.class);
+  private static final AddDerivedVariableModalUiBinder uiBinder = GWT.create(AddDerivedVariableModalUiBinder.class);
 
   @UiField
   DialogBox dialog;
@@ -49,7 +48,7 @@ public class AddDerivedVariableDialogView extends PopupViewImpl implements AddDe
   MultiWordSuggestOracle suggestions;
 
   @Inject
-  public AddDerivedVariableDialogView(EventBus eventBus) {
+  public AddDerivedVariableModalView(EventBus eventBus) {
     super(eventBus);
     variableNameSuggestBox = new SuggestBox(suggestions = new MultiWordSuggestOracle());
     uiBinder.createAndBindUi(this);

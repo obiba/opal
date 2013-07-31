@@ -20,7 +20,7 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPre
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.magma.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
@@ -62,13 +62,13 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     ValueSequencePopupPresenter.Display valueSequenceDisplayMock = createMock(
         ValueSequencePopupPresenter.Display.class);
-    EntityDialogPresenter.Display entityDialogDisplayMock = createMock(EntityDialogPresenter.Display.class);
+    EntityModalPresenter.Display entityModalDisplayMock = createMock(EntityModalPresenter.Display.class);
     Provider<AuthorizationPresenter> mockProvider = createMock(Provider.class);
     Provider<IndexPresenter> mockIndexProvider = createMock(Provider.class);
 
     ValuesTablePresenter values = new ValuesTablePresenter(null, null,
         new ValueSequencePopupPresenter(null, valueSequenceDisplayMock),
-        new EntityDialogPresenter(null, entityDialogDisplayMock, createMock(ValueSequencePopupPresenter.class)));
+        new EntityModalPresenter(null, entityModalDisplayMock, createMock(ValueSequencePopupPresenter.class)));
     presenter = new TablePresenter(displayMock, new CountingEventBus(), values, mockProvider, mockIndexProvider);
   }
 

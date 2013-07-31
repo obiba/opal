@@ -31,7 +31,6 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.PresenterWidget;
 
 public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPresenter.Display>
     implements FileSelectorUiHandlers {
@@ -44,7 +43,7 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
 
   FolderDetailsPresenter folderDetailsPresenter;
 
-  FileUploadDialogPresenter fileUploadDialogPresenter;
+  FileUploadModalPresenter fileUploadModalPresenter;
 
   private Object fileSelectionSource;
 
@@ -54,12 +53,12 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
 
   @Inject
   public FileSelectorPresenter(Display display, EventBus eventBus, FileSystemTreePresenter fileSystemTreePresenter,
-      FolderDetailsPresenter folderDetailsPresenter, FileUploadDialogPresenter fileUploadDialogPresenter) {
+      FolderDetailsPresenter folderDetailsPresenter, FileUploadModalPresenter fileUploadModalPresenter) {
     super(eventBus, display);
 
     this.fileSystemTreePresenter = fileSystemTreePresenter;
     this.folderDetailsPresenter = folderDetailsPresenter;
-    this.fileUploadDialogPresenter = fileUploadDialogPresenter;
+    this.fileUploadModalPresenter = fileUploadModalPresenter;
 
     selectionResolverChain = new ArrayList<SelectionResolver>();
     selectionResolverChain.add(new FileSelectionResolver());
@@ -169,8 +168,8 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
 
   @Override
   public void uploadFile() {
-    fileUploadDialogPresenter.setCurrentFolder(getCurrentFolder());
-    addToPopupSlot(fileUploadDialogPresenter);
+    fileUploadModalPresenter.setCurrentFolder(getCurrentFolder());
+    addToPopupSlot(fileUploadModalPresenter);
   }
 
   @Override

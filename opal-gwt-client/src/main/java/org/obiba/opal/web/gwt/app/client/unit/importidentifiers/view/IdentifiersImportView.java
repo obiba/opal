@@ -13,10 +13,10 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.view.CsvOptionsView;
+import org.obiba.opal.web.gwt.app.client.ui.WizardModalBox;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.unit.importidentifiers.presenter.IdentifiersImportPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.ModalViewImpl;
-import org.obiba.opal.web.gwt.app.client.ui.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 
 import com.github.gwtbootstrap.client.ui.Modal;
@@ -46,7 +46,7 @@ public class IdentifiersImportView extends ModalViewImpl implements IdentifiersI
   private final Widget widget;
 
   @UiField
-  WizardDialogBox dialog;
+  WizardModalBox dialog;
 
   @UiField
   WizardStep formatSelectionStep;
