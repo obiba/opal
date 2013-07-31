@@ -9,17 +9,17 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.inject;
 
-import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderModalPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FilePathPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadModalPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
-import org.obiba.opal.web.gwt.app.client.fs.view.CreateFolderDialogView;
+import org.obiba.opal.web.gwt.app.client.fs.view.CreateFolderModalView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FileExplorerView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FilePathView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FileSystemTreeView;
-import org.obiba.opal.web.gwt.app.client.fs.view.FileUploadDialogView;
+import org.obiba.opal.web.gwt.app.client.fs.view.FileUploadModalView;
 import org.obiba.opal.web.gwt.app.client.fs.view.FolderDetailsView;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
@@ -39,10 +39,10 @@ public class FileSystemModule extends AbstractPresenterModule {
     bindPresenterWidget(FolderDetailsPresenter.class, FolderDetailsPresenter.Display.class, FolderDetailsView.class);
     bindPresenterWidget(FileSystemTreePresenter.class, FileSystemTreePresenter.Display.class, FileSystemTreeView.class);
     bindPresenterWidget(FilePathPresenter.class, FilePathPresenter.Display.class, FilePathView.class);
-    bindPresenterWidget(CreateFolderDialogPresenter.class, CreateFolderDialogPresenter.Display.class,
-        CreateFolderDialogView.class);
-    bindPresenterWidget(FileUploadDialogPresenter.class, FileUploadDialogPresenter.Display.class,
-        FileUploadDialogView.class);
+    bindPresenterWidget(CreateFolderModalPresenter.class, CreateFolderModalPresenter.Display.class,
+        CreateFolderModalView.class);
+    bindPresenterWidget(FileUploadModalPresenter.class, FileUploadModalPresenter.Display.class,
+        FileUploadModalView.class);
     bindPresenterWidget(FileSelectorPresenter.class, FileSelectorPresenter.Display.class, FileSelectorView.class);
 
     bind(FileSelectionPresenter.Display.class).to(FileSelectionView.class);

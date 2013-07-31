@@ -48,7 +48,7 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
-public class AttributeDialogPresenter extends PresenterWidget<AttributeDialogPresenter.Display> {
+public class AttributeModalPresenter extends PresenterWidget<AttributeModalPresenter.Display> {
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -64,7 +64,7 @@ public class AttributeDialogPresenter extends PresenterWidget<AttributeDialogPre
 
   @SuppressWarnings("unchecked")
   @Inject
-  public AttributeDialogPresenter(EventBus eventBus, Display display, LabelListPresenter labelListPresenter) {
+  public AttributeModalPresenter(EventBus eventBus, Display display, LabelListPresenter labelListPresenter) {
     super(eventBus, display);
     this.labelListPresenter = labelListPresenter;
     attributes = (JsArray<AttributeDto>) JsArray.createArray();

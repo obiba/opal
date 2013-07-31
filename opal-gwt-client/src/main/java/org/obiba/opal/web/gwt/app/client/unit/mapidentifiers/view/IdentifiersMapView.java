@@ -11,13 +11,13 @@ package org.obiba.opal.web.gwt.app.client.unit.mapidentifiers.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.ui.WizardModalBox;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.view.CsvOptionsView;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.unit.mapidentifiers.presenter.IdentifiersMapPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.ModalViewImpl;
-import org.obiba.opal.web.gwt.app.client.ui.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
@@ -49,7 +49,7 @@ public class IdentifiersMapView extends ModalViewImpl implements IdentifiersMapP
   private final Widget widget;
 
   @UiField
-  WizardDialogBox dialog;
+  WizardModalBox dialog;
 
   @UiField
   WizardStep formatStep;

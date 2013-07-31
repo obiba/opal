@@ -5,7 +5,7 @@
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <o:WizardDialogBox title="Add Cryptographic Key">
+  <o:WizardModalBox title="Add Cryptographic Key">
     <g:FlowPanel>
       <o:WizardStep ui:field="keyTypeStep">
         <g:FlowPanel styleName="input">
@@ -122,6 +122,6 @@
       </o:WizardStep>
     </g:FlowPanel>
 
-  </o:WizardDialogBox>
+  </o:WizardModalBox>
 
 </ui:UiBinder>

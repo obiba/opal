@@ -9,13 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.view;
 
-import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderDialogPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderModalPresenter.Display;
 
 import com.google.gwt.core.client.GWT;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasText;
@@ -23,14 +21,14 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class CreateFolderDialogView extends PopupViewImpl implements Display {
+public class CreateFolderModalView extends PopupViewImpl implements Display {
 
-  @UiTemplate("CreateFolderDialogView.ui.xml")
-  interface CreateFolderDialogUiBinder extends UiBinder<DialogBox, CreateFolderDialogView> {}
+  interface CreateFolderModalUiBinder extends UiBinder<DialogBox, CreateFolderModalView> {}
 
-  private static final CreateFolderDialogUiBinder uiBinder = GWT.create(CreateFolderDialogUiBinder.class);
+  private static final CreateFolderModalUiBinder uiBinder = GWT.create(CreateFolderModalUiBinder.class);
 
   private final Widget widget;
 
@@ -47,7 +45,7 @@ public class CreateFolderDialogView extends PopupViewImpl implements Display {
   TextBox folderToCreate;
 
   @Inject
-  public CreateFolderDialogView(EventBus eventBus) {
+  public CreateFolderModalView(EventBus eventBus) {
     super(eventBus);
     widget = uiBinder.createAndBindUi(this);
     uiBinder.createAndBindUi(this);

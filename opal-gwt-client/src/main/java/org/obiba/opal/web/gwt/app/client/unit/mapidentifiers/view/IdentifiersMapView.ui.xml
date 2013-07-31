@@ -6,7 +6,7 @@
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <o:WizardDialogBox ui:field="dialog" title="Map Identifiers">
+  <o:WizardModalBox ui:field="dialog" title="Map Identifiers">
     <g:FlowPanel>
 
       <o:WizardStep ui:field="formatStep">
@@ -39,6 +39,6 @@
     </g:FlowPanel>
 
 
-  </o:WizardDialogBox>
+  </o:WizardModalBox>
 
 </ui:UiBinder>

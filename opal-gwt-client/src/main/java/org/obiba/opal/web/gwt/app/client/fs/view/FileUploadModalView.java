@@ -9,14 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.view;
 
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadDialogPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadModalPresenter.Display;
 
 import com.google.gwt.core.client.GWT;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FileUpload;
@@ -29,14 +26,15 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class FileUploadDialogView extends PopupViewImpl implements Display {
+public class FileUploadModalView extends PopupViewImpl implements Display {
 
-  @UiTemplate("FileUploadDialogView.ui.xml")
-  interface FileUploadDialogUiBinder extends UiBinder<DialogBox, FileUploadDialogView> {}
+  interface FileUploadModalUiBinder extends UiBinder<DialogBox, FileUploadModalView> {}
 
-  private static final FileUploadDialogUiBinder uiBinder = GWT.create(FileUploadDialogUiBinder.class);
+  private static final FileUploadModalUiBinder uiBinder = GWT.create(FileUploadModalUiBinder.class);
 
   private final Widget widget;
 
@@ -65,7 +63,7 @@ public class FileUploadDialogView extends PopupViewImpl implements Display {
   Image uploadingText;
 
   @Inject
-  public FileUploadDialogView(EventBus eventBus) {
+  public FileUploadModalView(EventBus eventBus) {
     super(eventBus);
     widget = uiBinder.createAndBindUi(this);
     dialog.setGlassEnabled(false);

@@ -5,7 +5,7 @@
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <o:WizardDialogBox ui:field="dialog" title="Add View">
+  <o:WizardModalBox ui:field="dialog" title="Add View">
     <g:FlowPanel>
       <o:WizardStep ui:field="selectTypeStep">
         <g:FlowPanel>
@@ -121,6 +121,6 @@
       </g:HTMLPanel>
 
     </g:FlowPanel>
-  </o:WizardDialogBox>
+  </o:WizardModalBox>
 
 </ui:UiBinder>

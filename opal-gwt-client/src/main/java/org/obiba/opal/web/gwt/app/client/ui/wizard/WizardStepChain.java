@@ -9,11 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.ui.wizard;
 
+import org.obiba.opal.web.gwt.app.client.ui.WizardModalBox;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.WidgetProvider;
-import org.obiba.opal.web.gwt.app.client.ui.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -26,7 +26,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class WizardStepChain {
 
-  private WizardDialogBox wizard;
+  private WizardModalBox wizard;
 
   private WizardStepController first;
 
@@ -111,7 +111,7 @@ public class WizardStepChain {
 
     private HandlerRegistration registration;
 
-    private Builder(WizardDialogBox wizard) {
+    private Builder(WizardModalBox wizard) {
       chain = new WizardStepChain();
       chain.wizard = wizard;
     }
@@ -122,7 +122,7 @@ public class WizardStepChain {
      * @param wizard
      * @return
      */
-    public static Builder create(WizardDialogBox wizard) {
+    public static Builder create(WizardModalBox wizard) {
       return create(wizard, true);
     }
 
@@ -133,7 +133,7 @@ public class WizardStepChain {
      * @param glass
      * @return
      */
-    public static Builder create(WizardDialogBox wizard, boolean glass) {
+    public static Builder create(WizardModalBox wizard, boolean glass) {
       return new Builder(wizard);
     }
 

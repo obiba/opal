@@ -49,7 +49,6 @@ import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
@@ -98,7 +97,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   private final Provider<AuthorizationPresenter> authorizationPresenter;
 
   @Inject
-  private CodingViewDialogPresenter codingViewDialogPresenter;
+  private CodingViewModalPresenter codingViewModalPresenter;
 
   private final ValuesTablePresenter valuesTablePresenter;
 

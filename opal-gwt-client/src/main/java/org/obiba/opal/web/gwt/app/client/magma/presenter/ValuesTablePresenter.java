@@ -55,14 +55,14 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private final ValueSequencePopupPresenter valueSequencePopupPresenter;
 
-  private final EntityDialogPresenter entityDialogPresenter;
+  private final EntityModalPresenter entityModalPresenter;
 
   @Inject
   public ValuesTablePresenter(Display display, EventBus eventBus,
-      ValueSequencePopupPresenter valueSequencePopupPresenter, EntityDialogPresenter entityDialogPresenter) {
+      ValueSequencePopupPresenter valueSequencePopupPresenter, EntityModalPresenter entityModalPresenter) {
     super(eventBus, display);
     this.valueSequencePopupPresenter = valueSequencePopupPresenter;
-    this.entityDialogPresenter = entityDialogPresenter;
+    this.entityModalPresenter = entityModalPresenter;
   }
 
   public void setTable(TableDto table) {
@@ -132,7 +132,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   private void hidePopups(TableDto newTable) {
     if(table != null && !table.getName().equals(newTable.getName())) {
       valueSequencePopupPresenter.getView().hide();
-      entityDialogPresenter.getView().hide();
+      entityModalPresenter.getView().hide();
     }
   }
 
@@ -338,8 +338,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     @Override
     public void requestEntityDialog(String entityType, String entityId) {
-      entityDialogPresenter.initialize(table, entityType, entityId, getView().getFilterText());
-      addToPopupSlot(entityDialogPresenter);
+      entityModalPresenter.initialize(table, entityType, entityId, getView().getFilterText());
+      addToPopupSlot(entityModalPresenter);
     }
 
     @Override

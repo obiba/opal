@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.magma.importvariables.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.support.LanguageLocale;
+import org.obiba.opal.web.gwt.app.client.ui.WizardModalBox;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter.Display;
@@ -25,7 +26,6 @@ import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.Variabl
 import org.obiba.opal.web.gwt.app.client.ui.DatasourceParsingErrorPanel;
 import org.obiba.opal.web.gwt.app.client.ui.DropdownSuggestBox;
 import org.obiba.opal.web.gwt.app.client.ui.ModalViewImpl;
-import org.obiba.opal.web.gwt.app.client.ui.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
@@ -62,7 +62,7 @@ public class VariablesImportView extends ModalViewImpl implements VariablesImpor
   private final Widget widget;
 
   @UiField
-  WizardDialogBox dialog;
+  WizardModalBox dialog;
 
   @UiField
   WizardStep fileSelectionStep;

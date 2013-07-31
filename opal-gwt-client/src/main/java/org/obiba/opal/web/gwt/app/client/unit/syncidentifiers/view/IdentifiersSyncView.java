@@ -16,12 +16,12 @@ import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.ui.WizardModalBox;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.unit.syncidentifiers.presenter.IdentifiersSyncPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.ModalViewImpl;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.gwt.app.client.ui.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableIdentifiersSync;
@@ -54,7 +54,7 @@ public class IdentifiersSyncView extends ModalViewImpl implements IdentifiersSyn
   private final Widget widget;
 
   @UiField
-  WizardDialogBox dialog;
+  WizardModalBox dialog;
 
   @UiField
   WizardStep datasourceStep;

@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.configureview.view;
 
+import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.CategoryModalPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LabelListPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.CategoryDialogPresenter;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.HasCloseHandlers;
@@ -27,12 +27,11 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
 
-public class CategoryDialogView extends ViewImpl implements CategoryDialogPresenter.Display {
+public class CategoryModalView extends ViewImpl implements CategoryModalPresenter.Display {
 
-  @UiTemplate("CategoryDialogView.ui.xml")
-  interface CategoryDialogUiBinder extends UiBinder<DialogBox, CategoryDialogView> {}
+  interface CategoryModalUiBinder extends UiBinder<DialogBox, CategoryModalView> {}
 
-  private static final CategoryDialogUiBinder uiBinder = GWT.create(CategoryDialogUiBinder.class);
+  private static final CategoryModalUiBinder uiBinder = GWT.create(CategoryModalUiBinder.class);
 
   private final Widget uiWidget;
 
@@ -56,7 +55,7 @@ public class CategoryDialogView extends ViewImpl implements CategoryDialogPresen
 
   private LabelListPresenter.Display inputField;
 
-  public CategoryDialogView() {
+  public CategoryModalView() {
     uiWidget = uiBinder.createAndBindUi(this);
     uiBinder.createAndBindUi(this);
   }

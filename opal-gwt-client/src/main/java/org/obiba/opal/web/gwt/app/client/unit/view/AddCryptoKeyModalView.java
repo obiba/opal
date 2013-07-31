@@ -10,7 +10,8 @@
 package org.obiba.opal.web.gwt.app.client.unit.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.unit.presenter.AddKeyPairDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.ui.WizardModalBox;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.AddKeyPairModalPresenter;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.BranchingWizardStepController;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
@@ -18,7 +19,6 @@ import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.ui.ModalViewImpl;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
-import org.obiba.opal.web.gwt.app.client.ui.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 
 import com.google.gwt.core.client.GWT;
@@ -44,15 +44,15 @@ import com.google.inject.Inject;
 /**
  *
  */
-public class AddCryptoKeyDialogView extends ModalViewImpl implements AddKeyPairDialogPresenter.Display {
+public class AddCryptoKeyModalView extends ModalViewImpl implements AddKeyPairModalPresenter.Display {
 
-  interface ViewUiBinder extends UiBinder<WizardDialogBox, AddCryptoKeyDialogView> {}
+  interface ViewUiBinder extends UiBinder<WizardModalBox, AddCryptoKeyModalView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private static final Translations translations = GWT.create(Translations.class);
 
-  private final WizardDialogBox dialog;
+  private final WizardModalBox dialog;
 
   @UiField
   WizardStep keyTypeStep;
@@ -134,7 +134,7 @@ public class AddCryptoKeyDialogView extends ModalViewImpl implements AddKeyPairD
   private WizardStepChain stepChain;
 
   @Inject
-  public AddCryptoKeyDialogView(EventBus eventBus) {
+  public AddCryptoKeyModalView(EventBus eventBus) {
     super(eventBus);
     dialog = uiBinder.createAndBindUi(this);
   }

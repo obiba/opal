@@ -37,8 +37,8 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
-public class FunctionalUnitUpdateDialogPresenter extends ModalPresenterWidget<FunctionalUnitUpdateDialogPresenter.Display>
-    implements FunctionalUnitUpdateDialogUiHandlers {
+public class FunctionalUnitUpdateModalPresenter extends ModalPresenterWidget<FunctionalUnitUpdateModalPresenter.Display>
+    implements FunctionalUnitUpdateModalUiHandlers {
 
   @SuppressWarnings("TypeMayBeWeakened")
   private final Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
@@ -50,7 +50,7 @@ public class FunctionalUnitUpdateDialogPresenter extends ModalPresenterWidget<Fu
   }
 
   @SuppressWarnings("unused")
-  public interface Display extends PopupView, HasUiHandlers<FunctionalUnitUpdateDialogUiHandlers> {
+  public interface Display extends PopupView, HasUiHandlers<FunctionalUnitUpdateModalUiHandlers> {
 
     void hideDialog();
 
@@ -75,7 +75,7 @@ public class FunctionalUnitUpdateDialogPresenter extends ModalPresenterWidget<Fu
   }
 
   @Inject
-  public FunctionalUnitUpdateDialogPresenter(Display display, EventBus eventBus) {
+  public FunctionalUnitUpdateModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
     getView().setUiHandlers(this);
   }

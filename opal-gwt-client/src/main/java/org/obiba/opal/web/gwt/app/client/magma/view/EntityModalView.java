@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.app.client.magma.view;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityModalPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueRenderer;
 import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
 import org.obiba.opal.web.gwt.app.client.ui.TableChooser;
@@ -59,12 +59,12 @@ import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class EntityDialogView extends PopupViewImpl implements EntityDialogPresenter.Display {
+public class EntityModalView extends PopupViewImpl implements EntityModalPresenter.Display {
 
   private static final int PAGE_SIZE = 20;
 
-  @UiTemplate("EntityDialogView.ui.xml")
-  interface EntityViewUiBinder extends UiBinder<DialogBox, EntityDialogView> {}
+  @UiTemplate("EntityModalView.ui.xml")
+  interface EntityViewUiBinder extends UiBinder<DialogBox, EntityModalView> {}
 
   private static final EntityViewUiBinder uiBinder = GWT.create(EntityViewUiBinder.class);
 
@@ -81,7 +81,7 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
   Label entityId;
 
   @UiField
-  CellTable<EntityDialogPresenter.VariableValueRow> table;
+  CellTable<EntityModalPresenter.VariableValueRow> table;
 
   @UiField
   SimplePager pager;
@@ -105,17 +105,17 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
 
   private final Translations translations = GWT.create(Translations.class);
 
-  private final ListDataProvider<EntityDialogPresenter.VariableValueRow> dataProvider
-      = new ListDataProvider<EntityDialogPresenter.VariableValueRow>();
+  private final ListDataProvider<EntityModalPresenter.VariableValueRow> dataProvider
+      = new ListDataProvider<EntityModalPresenter.VariableValueRow>();
 
   private final ValueSelectionHandlerImpl valueSelectionHandler;
 
-  private EntityDialogPresenter.VariablesFilterHandler variablesFilterHandler;
+  private EntityModalPresenter.VariablesFilterHandler variablesFilterHandler;
 
-  private EntityDialogPresenter.ValueViewHandler valueViewHandler;
+  private EntityModalPresenter.ValueViewHandler valueViewHandler;
 
   @Inject
-  public EntityDialogView(EventBus eventBus) {
+  public EntityModalView(EventBus eventBus) {
     super(eventBus);
     tableChooser = new TableChooser(false);
     widget = uiBinder.createAndBindUi(this);
@@ -164,12 +164,12 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
   }
 
   @Override
-  public void setValueViewHandler(EntityDialogPresenter.ValueViewHandler handler) {
+  public void setValueViewHandler(EntityModalPresenter.ValueViewHandler handler) {
     valueViewHandler = handler;
   }
 
   @Override
-  public void setVariablesFilterHandler(EntityDialogPresenter.VariablesFilterHandler handler) {
+  public void setVariablesFilterHandler(EntityModalPresenter.VariablesFilterHandler handler) {
     variablesFilterHandler = handler;
   }
 
@@ -201,7 +201,7 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
   }
 
   @Override
-  public void renderRows(List<EntityDialogPresenter.VariableValueRow> rows) {
+  public void renderRows(List<EntityModalPresenter.VariableValueRow> rows) {
     dataProvider.setList(rows);
     pager.firstPage();
     dataProvider.refresh();
@@ -225,9 +225,9 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
   private void addTableColumns() {
 
     // Variable name column
-    table.addColumn(new TextColumn<EntityDialogPresenter.VariableValueRow>() {
+    table.addColumn(new TextColumn<EntityModalPresenter.VariableValueRow>() {
       @Override
-      public String getValue(EntityDialogPresenter.VariableValueRow object) {
+      public String getValue(EntityModalPresenter.VariableValueRow object) {
         return object.getVariableName();
       }
     }, translations.variableLabel());
@@ -236,10 +236,10 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
     VariableValueRowClickableColumn valueColumn = new VariableValueRowClickableColumn();
 
     valueColumn.setFieldUpdater(
-        new FieldUpdater<EntityDialogPresenter.VariableValueRow, EntityDialogPresenter.VariableValueRow>() {
+        new FieldUpdater<EntityModalPresenter.VariableValueRow, EntityModalPresenter.VariableValueRow>() {
           @Override
-          public void update(int index, EntityDialogPresenter.VariableValueRow variableValueRow,
-              EntityDialogPresenter.VariableValueRow value) {
+          public void update(int index, EntityModalPresenter.VariableValueRow variableValueRow,
+              EntityModalPresenter.VariableValueRow value) {
             valueSelectionHandler.onValueSelection(variableValueRow);
           }
         });
@@ -257,10 +257,10 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
   /**
    * Class used to request the appropriate variable value view
    */
-  private final class ValueSelectionHandlerImpl implements EntityDialogPresenter.ValueSelectionHandler {
+  private final class ValueSelectionHandlerImpl implements EntityModalPresenter.ValueSelectionHandler {
 
     @Override
-    public void onValueSelection(EntityDialogPresenter.VariableValueRow variableValueRow) {
+    public void onValueSelection(EntityModalPresenter.VariableValueRow variableValueRow) {
 
       VariableDto variable = variableValueRow.getVariableDto();
 
@@ -278,14 +278,14 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
    * Specialized column class using ClickableValueCell
    */
   private static class VariableValueRowClickableColumn
-      extends Column<EntityDialogPresenter.VariableValueRow, EntityDialogPresenter.VariableValueRow> {
+      extends Column<EntityModalPresenter.VariableValueRow, EntityModalPresenter.VariableValueRow> {
 
     private VariableValueRowClickableColumn() {
       super(new ClickableValueCell());
     }
 
     @Override
-    public EntityDialogPresenter.VariableValueRow getValue(EntityDialogPresenter.VariableValueRow object) {
+    public EntityModalPresenter.VariableValueRow getValue(EntityModalPresenter.VariableValueRow object) {
       return object;
     }
 
@@ -294,12 +294,12 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
   /**
    * Specialized class to render each cell depending on the variable type (text, repeatable, binary)
    */
-  public static class ClickableValueCell extends AbstractSafeHtmlCell<EntityDialogPresenter.VariableValueRow> {
+  public static class ClickableValueCell extends AbstractSafeHtmlCell<EntityModalPresenter.VariableValueRow> {
 
     public ClickableValueCell() {
-      this(new AbstractSafeHtmlRenderer<EntityDialogPresenter.VariableValueRow>() {
+      this(new AbstractSafeHtmlRenderer<EntityModalPresenter.VariableValueRow>() {
         @Override
-        public SafeHtml render(EntityDialogPresenter.VariableValueRow object) {
+        public SafeHtml render(EntityModalPresenter.VariableValueRow object) {
           String valueStr = renderValue(object);
           if(valueStr == null || valueStr.trim().isEmpty()) return new SafeHtmlBuilder().toSafeHtml();
           if(object.getVariableDto().getIsRepeatable()) {
@@ -322,20 +322,20 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
               .appendEscaped(valueStr).appendHtmlConstant("</a>").toSafeHtml();
         }
 
-        private String renderValue(EntityDialogPresenter.VariableValueRow row) {
+        private String renderValue(EntityModalPresenter.VariableValueRow row) {
           ValueRenderer valueRender = ValueRenderer.valueOf(row.getVariableDto().getValueType().toUpperCase());
           return valueRender.render(row.getValueDto(), row.getVariableDto().getIsRepeatable());
         }
       });
     }
 
-    public ClickableValueCell(SafeHtmlRenderer<EntityDialogPresenter.VariableValueRow> renderer) {
+    public ClickableValueCell(SafeHtmlRenderer<EntityModalPresenter.VariableValueRow> renderer) {
       super(renderer, "click", "keydown");
     }
 
     @Override
-    public void onBrowserEvent(Context context, Element parent, EntityDialogPresenter.VariableValueRow value,
-        NativeEvent event, ValueUpdater<EntityDialogPresenter.VariableValueRow> valueUpdater) {
+    public void onBrowserEvent(Context context, Element parent, EntityModalPresenter.VariableValueRow value,
+        NativeEvent event, ValueUpdater<EntityModalPresenter.VariableValueRow> valueUpdater) {
       super.onBrowserEvent(context, parent, value, event, valueUpdater);
       if("click".equals(event.getType())) {
         onEnterKeyDown(context, parent, value, event, valueUpdater);
@@ -343,8 +343,8 @@ public class EntityDialogView extends PopupViewImpl implements EntityDialogPrese
     }
 
     @Override
-    protected void onEnterKeyDown(Context context, Element parent, EntityDialogPresenter.VariableValueRow value,
-        NativeEvent event, ValueUpdater<EntityDialogPresenter.VariableValueRow> valueUpdater) {
+    protected void onEnterKeyDown(Context context, Element parent, EntityModalPresenter.VariableValueRow value,
+        NativeEvent event, ValueUpdater<EntityModalPresenter.VariableValueRow> valueUpdater) {
       if(valueUpdater != null) {
         valueUpdater.update(value);
       }

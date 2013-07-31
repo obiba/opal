@@ -6,7 +6,7 @@
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <o:WizardDialogBox ui:field="dialog" title="Add/Update Tables">
+  <o:WizardModalBox ui:field="dialog" title="Add/Update Tables">
     <g:FlowPanel>
       <o:WizardStep ui:field="fileSelectionStep">
         <g:FlowPanel>
@@ -116,6 +116,6 @@
 
       </g:HTMLPanel>
     </g:FlowPanel>
-  </o:WizardDialogBox>
+  </o:WizardModalBox>
 
 </ui:UiBinder>

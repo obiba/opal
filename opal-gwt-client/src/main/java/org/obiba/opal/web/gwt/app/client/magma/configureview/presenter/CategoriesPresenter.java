@@ -45,7 +45,7 @@ public class CategoriesPresenter extends PresenterWidget<CategoriesPresenter.Dis
   private static final TranslationMessages translationMessages = GWT.create(TranslationMessages.class);
 
   @Inject
-  private Provider<CategoryDialogPresenter> categoryDialogPresenterProvider;
+  private Provider<CategoryModalPresenter> categoryModalPresenterProvider;
 
   private VariableDto currentVariable;
 
@@ -88,12 +88,12 @@ public class CategoriesPresenter extends PresenterWidget<CategoriesPresenter.Dis
   }
 
   private void prepareCategoryDialog(CategoryDto categoryDto) {
-    CategoryDialogPresenter categoryDialogPresenter = categoryDialogPresenterProvider.get();
-    categoryDialogPresenter.bind();
-    categoryDialogPresenter.setViewDto(viewDto);
-    categoryDialogPresenter.setCategoryDto(categoryDto);
-    categoryDialogPresenter.setCategories(currentVariable.getCategoriesArray());
-    categoryDialogPresenter.onReveal();
+    CategoryModalPresenter categoryModalPresenter = categoryModalPresenterProvider.get();
+    categoryModalPresenter.bind();
+    categoryModalPresenter.setViewDto(viewDto);
+    categoryModalPresenter.setCategoryDto(categoryDto);
+    categoryModalPresenter.setCategories(currentVariable.getCategoriesArray());
+    categoryModalPresenter.onReveal();
   }
 
   private class AddCategoryHandler implements ClickHandler {

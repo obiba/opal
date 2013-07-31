@@ -13,7 +13,7 @@ import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdminis
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Mode;
+import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateModalPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -38,7 +38,7 @@ public class ReportTemplatePresenter
 
   ReportTemplateListPresenter reportTemplateListPresenter;
 
-  ModalProvider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenterProvider;
+  ModalProvider<ReportTemplateUpdateModalPresenter> reportTemplateUpdateModalPresenterProvider;
 
   public interface Display extends View, HasBreadcrumbs {
 
@@ -59,13 +59,13 @@ public class ReportTemplatePresenter
   public ReportTemplatePresenter(Display display, EventBus eventBus, Proxy proxy,
       ReportTemplateDetailsPresenter reportTemplateDetailsPresenter,
       ReportTemplateListPresenter reportTemplateListPresenter,
-      ModalProvider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenterProvider,
+      ModalProvider<ReportTemplateUpdateModalPresenter> reportTemplateUpdateModalPresenterProvider,
       DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     this.reportTemplateDetailsPresenter = reportTemplateDetailsPresenter;
     this.reportTemplateListPresenter = reportTemplateListPresenter;
     this.breadcrumbsHelper = breadcrumbsHelper;
-    this.reportTemplateUpdateDialogPresenterProvider = reportTemplateUpdateDialogPresenterProvider.setContainer(this);
+    this.reportTemplateUpdateModalPresenterProvider = reportTemplateUpdateModalPresenterProvider.setContainer(this);
   }
 
 
@@ -128,7 +128,7 @@ public class ReportTemplatePresenter
 
     @Override
     public void onClick(ClickEvent event) {
-      ReportTemplateUpdateDialogPresenter presenter = reportTemplateUpdateDialogPresenterProvider.get();
+      ReportTemplateUpdateModalPresenter presenter = reportTemplateUpdateModalPresenterProvider.get();
       presenter.setDialogMode(Mode.CREATE);
     }
 

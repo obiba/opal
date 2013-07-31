@@ -30,7 +30,7 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class FileUploadDialogPresenter extends PresenterWidget<FileUploadDialogPresenter.Display> {
+public class FileUploadModalPresenter extends PresenterWidget<FileUploadModalPresenter.Display> {
 
   public interface Display extends PopupView {
 
@@ -58,7 +58,7 @@ public class FileUploadDialogPresenter extends PresenterWidget<FileUploadDialogP
   private final RequestUrlBuilder urlBuilder;
 
   @Inject
-  public FileUploadDialogPresenter(Display display, EventBus eventBus, RequestUrlBuilder urlBuilder,
+  public FileUploadModalPresenter(Display display, EventBus eventBus, RequestUrlBuilder urlBuilder,
       Translations translations) {
     super(eventBus, display);
     this.translations = translations;

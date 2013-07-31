@@ -45,7 +45,7 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
-public class CategoryDialogPresenter extends PresenterWidget<CategoryDialogPresenter.Display> {
+public class CategoryModalPresenter extends PresenterWidget<CategoryModalPresenter.Display> {
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -59,7 +59,7 @@ public class CategoryDialogPresenter extends PresenterWidget<CategoryDialogPrese
 
   @SuppressWarnings("unchecked")
   @Inject
-  public CategoryDialogPresenter(EventBus eventBus, Display display, LabelListPresenter labelListPresenter) {
+  public CategoryModalPresenter(EventBus eventBus, Display display, LabelListPresenter labelListPresenter) {
     super(eventBus, display);
     this.labelListPresenter = labelListPresenter;
     categories = (JsArray<CategoryDto>) JsArray.createArray();

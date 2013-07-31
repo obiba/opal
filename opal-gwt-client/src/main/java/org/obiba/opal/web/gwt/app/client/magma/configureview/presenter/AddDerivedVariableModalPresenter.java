@@ -25,8 +25,8 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupView;
 
-public class AddDerivedVariableDialogPresenter
-    extends ValidatableWidgetPresenter<AddDerivedVariableDialogPresenter.Display> {
+public class AddDerivedVariableModalPresenter
+    extends ValidatableWidgetPresenter<AddDerivedVariableModalPresenter.Display> {
 
   public interface Display extends PopupView {
 
@@ -44,7 +44,7 @@ public class AddDerivedVariableDialogPresenter
   }
 
   @Inject
-  public AddDerivedVariableDialogPresenter(Display display, EventBus eventBus) {
+  public AddDerivedVariableModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
   }
 
