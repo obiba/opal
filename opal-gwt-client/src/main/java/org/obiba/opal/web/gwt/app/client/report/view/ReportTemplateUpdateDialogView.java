@@ -119,6 +119,7 @@ public class ReportTemplateUpdateDialogView extends ModalPopupViewWithUiHandlers
     });
 
     dialog.setTitle(translations.reportTemplateDialogTitle());
+    dialog.addHiddenHandler(new DialogHiddenHandler());
   }
 
   @Override
@@ -291,6 +292,13 @@ public class ReportTemplateUpdateDialogView extends ModalPopupViewWithUiHandlers
     labelName.setType(ControlGroupType.NONE);
     labelTempleFile.setType(ControlGroupType.NONE);
     labelSchedule.setType(ControlGroupType.NONE);
+  }
+
+  private class DialogHiddenHandler implements HiddenHandler {
+    @Override
+    public void onHidden(HiddenEvent hiddenEvent) {
+      getUiHandlers().onDialogHidden();
+    }
   }
 
 }
