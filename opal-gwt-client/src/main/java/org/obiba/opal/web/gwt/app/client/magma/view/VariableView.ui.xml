@@ -112,6 +112,11 @@
             </g:HorizontalPanel>
             <g:SimplePanel ui:field="scriptEditor"/>
           </g:FlowPanel>
+          <g:FlowPanel>
+            <b:Paragraph>
+              Git history...
+            </b:Paragraph>
+          </g:FlowPanel>
         </o:EditorPanel>
       </b:Tab>
 

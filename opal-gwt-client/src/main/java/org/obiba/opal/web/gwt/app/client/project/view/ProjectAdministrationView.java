@@ -98,5 +98,10 @@ public class ProjectAdministrationView extends ViewImpl implements ProjectAdmini
     public void onCancel() {
       // TODO
     }
+
+    @Override
+    public void onHistory() {
+      // not applicable
+    }
   }
 }

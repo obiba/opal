@@ -10,6 +10,9 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
+
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.constants.ButtonType;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
@@ -23,11 +26,15 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class EditorPanel extends FlowPanel {
 
+  private FlowPanel controls;
+
   private final Button edit;
 
   private final Button save;
 
   private final Button cancel;
+
+  private Button history;
 
   private final DeckPanel deck;
 
@@ -37,15 +44,15 @@ public class EditorPanel extends FlowPanel {
 
   public EditorPanel() {
     // TODO translate
+    controls = new FlowPanel();
     edit = new Button("Edit");
     save = new Button("Save");
     cancel = new Button("Cancel");
-    addControls();
+    initControls();
     super.add(deck = new DeckPanel());
   }
 
-  private void addControls() {
-    FlowPanel controls = new FlowPanel();
+  private void initControls() {
     controls.addStyleName("bottom-margin");
     edit.setIcon(IconType.EDIT);
     edit.setType(ButtonType.INFO);
@@ -53,7 +60,7 @@ public class EditorPanel extends FlowPanel {
       @Override
       public void onClick(ClickEvent event) {
         showEditor(true);
-        if (handler != null) handler.onEdit();
+        if(handler != null) handler.onEdit();
       }
     });
     controls.add(edit);
@@ -63,7 +70,7 @@ public class EditorPanel extends FlowPanel {
       @Override
       public void onClick(ClickEvent event) {
         showEditor(false);
-        if (handler != null) handler.onSave();
+        if(handler != null) handler.onSave();
       }
     });
     save.setVisible(false);
@@ -73,7 +80,7 @@ public class EditorPanel extends FlowPanel {
       @Override
       public void onClick(ClickEvent event) {
         showEditor(false);
-        if (handler != null) handler.onCancel();
+        if(handler != null) handler.onCancel();
       }
     });
     cancel.addStyleName("small-indent");
@@ -86,15 +93,39 @@ public class EditorPanel extends FlowPanel {
   @Override
   public void add(IsWidget child) {
     deck.add(child);
+    initDeck();
   }
 
   @Override
   public void add(Widget w) {
     deck.add(w);
+    initDeck();
+  }
+
+  private void initDeck() {
+    deck.showWidget(0);
+    if(deck.getWidgetCount() == 3) {
+      // TODO translate
+      history = new Button("History");
+      history.setType(ButtonType.LINK);
+      //history.addStyleName("pull-right");
+      history.addClickHandler(new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          edit.setVisible(true);
+          save.setVisible(false);
+          cancel.setVisible(false);
+          deck.showWidget(2);
+          if(handler != null) handler.onHistory();
+        }
+      });
+      controls.add(history);
+    }
   }
 
   /**
    * Set the control buttons size.
+   *
    * @param size
    */
   public void setSize(ButtonSize size) {
@@ -109,13 +140,16 @@ public class EditorPanel extends FlowPanel {
 
   public void showEditor(boolean visible) {
     edit.setVisible(!visible);
+    if (history != null) {
+      history.setVisible(!visible);
+    }
     save.setVisible(visible);
     cancel.setVisible(visible);
     deck.showWidget(visible ? 1 : 0);
   }
 
-  public Widget getEditWidget() {
-    return edit;
+  public HasAuthorization getAuthorizer() {
+    return new WidgetAuthorizer(edit);
   }
 
   public interface Handler {
@@ -125,5 +159,7 @@ public class EditorPanel extends FlowPanel {
     void onSave();
 
     void onCancel();
+
+    void onHistory();
   }
 }

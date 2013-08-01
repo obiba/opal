@@ -331,7 +331,8 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   @Override
   public HasAuthorization getEditAuthorizer() {
-    return new WidgetAuthorizer(editCategories, editAttributes, scriptEditorPanel.getEditWidget(), editProperties, remove);
+    return new CompositeAuthorizer(new WidgetAuthorizer(editCategories, editAttributes, editProperties, remove),
+        scriptEditorPanel.getAuthorizer());
   }
 
   private void initCategoryTable() {
@@ -388,6 +389,11 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
     @Override
     public void onCancel() {
+      // TODO
+    }
+
+    @Override
+    public void onHistory() {
       // TODO
     }
   }
