@@ -16,6 +16,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.datasource.hibernate.HibernateDatasource;
+import org.obiba.magma.datasource.mongodb.MongoDBDatasource;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
@@ -32,6 +33,9 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import com.google.common.base.Strings;
+import com.mongodb.MongoClientURI;
+
 /**
  *
  */
@@ -45,6 +49,8 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
 
   private final String entityType;
 
+  private final String mongoURI;
+
   private MagmaEngineReferenceResolver tableResolver;
 
   private SessionFactory keysSession;
@@ -54,7 +60,8 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   @Autowired
   public DefaultIdentifiersTableService(PlatformTransactionManager txManager,
       @Value("${org.obiba.opal.keys.tableReference}") String keysTableReference,
-      @Value("${org.obiba.opal.keys.entityType}") String keysTableEntityType) {
+      @Value("${org.obiba.opal.keys.entityType}") String keysTableEntityType,
+      @Value("${org.obiba.opal.mongo.ids.uri}") String mongoURI) {
     if(txManager == null) throw new IllegalArgumentException("txManager cannot be null");
     if(keysTableReference == null) throw new IllegalArgumentException("keysTableReference cannot be null");
     if(keysTableEntityType == null) throw new IllegalArgumentException("keysTableEntityType cannot be null");
@@ -62,6 +69,7 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
     this.txManager = txManager;
     tableReference = keysTableReference;
     entityType = keysTableEntityType;
+    this.mongoURI = mongoURI;
   }
 
   public void setKeysSessionFactory(SessionFactory keysSession) {
@@ -117,7 +125,15 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
 
   @Override
   public void start() {
-    initialise(new HibernateDatasource(getDatasourceName(), keysSession));
+    Datasource ds;
+    if (!Strings.isNullOrEmpty(mongoURI)) {
+      log.info("Identifiers table storage is a MongoDB database");
+      ds = new MongoDBDatasource(getDatasourceName(), new MongoClientURI(mongoURI));
+    } else {
+      log.info("Identifiers table storage is a SQL database");
+      ds = new HibernateDatasource(getDatasourceName(), keysSession);
+    }
+    initialise(ds);
   }
 
   @Override

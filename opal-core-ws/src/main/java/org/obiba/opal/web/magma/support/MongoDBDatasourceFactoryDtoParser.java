@@ -17,7 +17,11 @@ import org.obiba.magma.datasource.mongodb.MongoDBDatasourceFactory;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.ExcelDatasourceFactoryDto;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import com.google.common.base.Strings;
 
 /**
  *
@@ -25,12 +29,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class MongoDBDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoParser {
 
+  private final String mongoURI;
+
+  @Autowired
+  public MongoDBDatasourceFactoryDtoParser(@Value("${org.obiba.opal.mongo.data.uri}") String mongoURI) {
+    this.mongoURI = mongoURI;
+  }
+
   @Nonnull
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
     MongoDBDatasourceFactory factory = new MongoDBDatasourceFactory();
     Magma.MongoDBDatasourceFactoryDto mongoDto = dto.getExtension(Magma.MongoDBDatasourceFactoryDto.params);
-    factory.setDatabase(mongoDto.getDatabase());
+    if (mongoDto.hasUri()) {
+      factory.setConnectionURI(mongoDto.getUri());
+    } else {
+      factory.setConnectionURI(mongoURI);
+    }
     // TODO get registered host port for ths database
     return factory;
   }
