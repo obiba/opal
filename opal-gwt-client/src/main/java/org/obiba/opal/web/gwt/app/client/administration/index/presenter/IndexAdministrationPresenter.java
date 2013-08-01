@@ -20,6 +20,7 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexStatusRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
@@ -118,7 +119,7 @@ public class IndexAdministrationPresenter
 
   private final Provider<IndexPresenter> indexPresenter;
 
-  private final Provider<IndexConfigurationPresenter> indexConfigurationPresenter;
+  private final ModalProvider<IndexConfigurationPresenter> indexConfigurationProvider;
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
@@ -131,12 +132,12 @@ public class IndexAdministrationPresenter
   @Inject
   public IndexAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
       Provider<AuthorizationPresenter> authorizationPresenter, Provider<IndexPresenter> indexPresenter,
-      Provider<IndexConfigurationPresenter> indexConfigurationPresenter,
+      ModalProvider<IndexConfigurationPresenter> indexConfigurationProvider,
       DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     this.indexPresenter = indexPresenter;
     this.authorizationPresenter = authorizationPresenter.get();
-    this.indexConfigurationPresenter = indexConfigurationPresenter;
+    this.indexConfigurationProvider = indexConfigurationProvider.setContainer(this);
     this.breadcrumbsHelper = breadcrumbsHelper;
   }
 
@@ -403,8 +404,7 @@ public class IndexAdministrationPresenter
     getView().getConfigureButton().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        IndexConfigurationPresenter dialog = indexConfigurationPresenter.get();
-        addToPopupSlot(dialog);
+        indexConfigurationProvider.get();
       }
     });
   }
