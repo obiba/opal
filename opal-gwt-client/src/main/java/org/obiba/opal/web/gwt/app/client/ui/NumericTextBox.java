@@ -11,13 +11,14 @@ package org.obiba.opal.web.gwt.app.client.ui;
 
 import javax.annotation.Nullable;
 
+import com.github.gwtbootstrap.client.ui.base.TextBox;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.user.client.ui.TextBox;
+
 
 public class NumericTextBox extends TextBox {
 
