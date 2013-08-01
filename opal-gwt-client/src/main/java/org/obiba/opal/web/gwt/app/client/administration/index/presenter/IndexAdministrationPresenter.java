@@ -16,17 +16,17 @@ import org.obiba.opal.web.gwt.app.client.administration.index.event.TableIndices
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexStatusRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexStatusRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -117,7 +117,7 @@ public class IndexAdministrationPresenter
 
   }
 
-  private final Provider<IndexPresenter> indexPresenter;
+  private final ModalProvider<IndexPresenter> indexModalProvider;
 
   private final ModalProvider<IndexConfigurationPresenter> indexConfigurationProvider;
 
@@ -131,11 +131,11 @@ public class IndexAdministrationPresenter
 
   @Inject
   public IndexAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
-      Provider<AuthorizationPresenter> authorizationPresenter, Provider<IndexPresenter> indexPresenter,
+      Provider<AuthorizationPresenter> authorizationPresenter, ModalProvider<IndexPresenter> indexModalProvider,
       ModalProvider<IndexConfigurationPresenter> indexConfigurationProvider,
       DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
-    this.indexPresenter = indexPresenter;
+    this.indexModalProvider = indexModalProvider.setContainer(this);
     this.authorizationPresenter = authorizationPresenter.get();
     this.indexConfigurationProvider = indexConfigurationProvider.setContainer(this);
     this.breadcrumbsHelper = breadcrumbsHelper;
@@ -254,10 +254,8 @@ public class IndexAdministrationPresenter
             objects.add(object);
           }
 
-          IndexPresenter dialog = indexPresenter.get();
+          IndexPresenter dialog = indexModalProvider.get();
           dialog.updateSchedules(objects);
-          addToPopupSlot(dialog);
-
         }
       }
     });

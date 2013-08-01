@@ -23,6 +23,8 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
 
   private static final int INDEX_BODY = 1;
 
+  private static final int RESIZE_CURSOR_MARGIN = 30; // pixel
+
   private static ModalStack modalStack = new ModalStack();
 
   private boolean resizable = false;
@@ -42,6 +44,10 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   private boolean hiddenOnStack = false;
 
   private int bodyVerticalMargin = 0;
+
+  private int minHeight = 0;
+
+  private int minWidth = 0;
 
   public Modal() {
     this(false);
@@ -101,6 +107,17 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     hiddenOnStack = false;
     // calculate once the modal is shown, too expensive to do this on every mouse move
     calculateBodyVerticalMargin();
+    setInitialDimension();
+  }
+
+  public void setMinWidth(int width) {
+    if (width < 0 ) return;
+    minWidth = width;
+  }
+
+  public void setMinHeight(int height) {
+    if (height < 0 ) return;
+    minHeight = height;
   }
 
   protected void onHide(Event e) {
@@ -118,6 +135,23 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
       modalStack.showCurrent();
     }
 
+  }
+
+  private void setInitialDimension() {
+    setInitialWidth();
+    setInitialHeight();
+  }
+
+  private void setInitialHeight() {
+    if (minHeight == 0 || getOffsetHeight() > minHeight) return;
+
+    resizeBodyVertically(minHeight);
+    setHeight(minHeight + "px");
+  }
+
+  private void setInitialWidth() {
+    if (minWidth == 0 || getOffsetWidth() > minWidth) return;
+    setWidth(minWidth + "px");
   }
 
   private void sinkMouseEvents() {
@@ -220,9 +254,8 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     int originalY = getAbsoluteTop();
     //do not allow mirror-functionality
     if(absY > originalY && absX > originalX) {
-      Widget body = getBodyWidget();
-      Integer height = absY - originalY + 2;
-      Integer width = absX - originalX + 2;
+      Integer height = Math.max(minHeight, absY - originalY + 2);
+      Integer width = Math.max(minWidth, absX - originalX + 2);
       resizeBodyVertically(height);
       setHeight(height + "px");
       setWidth(width + "px");
@@ -297,16 +330,12 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
    */
   protected boolean isCursorResize(Event event) {
     int cursorY = DOM.eventGetClientY(event);
-    int initialY = getAbsoluteTop();
-    int height = getOffsetHeight();
-
     int cursorX = DOM.eventGetClientX(event);
-    int initialX = getAbsoluteLeft();
-    int width = getOffsetWidth();
+    int xBound = getAbsoluteLeft() + getOffsetWidth();
+    int yBound = getAbsoluteTop() + getOffsetHeight();
 
-    //only in bottom right corner (area of 10 pixels in square)
-    return (((initialX + width - 20) < cursorX && cursorX <= (initialX + width + 20)) &&
-        ((initialY + height - 20) < cursorY && cursorY <= (initialY + height + 20)));
+    return ((xBound - RESIZE_CURSOR_MARGIN < cursorX && cursorX <= xBound + RESIZE_CURSOR_MARGIN) &&
+        (yBound - RESIZE_CURSOR_MARGIN < cursorY && cursorY <= yBound + RESIZE_CURSOR_MARGIN));
   }
 
   /**
