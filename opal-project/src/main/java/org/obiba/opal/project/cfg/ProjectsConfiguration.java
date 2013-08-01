@@ -17,12 +17,14 @@ import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.project.NoSuchProjectException;
 import org.obiba.opal.project.domain.Project;
 
+import com.google.common.collect.Lists;
+
 public class ProjectsConfiguration implements OpalConfigurationExtension, Serializable {
 
   private List<Project> projects;
 
   public List<Project> getProjects() {
-    return projects == null ? projects = new ArrayList<Project>() : projects;
+    return projects == null ? projects = Lists.newArrayList() : projects;
   }
 
   /**
