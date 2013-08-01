@@ -14,6 +14,7 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.administration.index.event.TableIndicesRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexStatusRefreshEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.Day;
@@ -23,17 +24,32 @@ import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
+public class IndexPresenter extends ModalPresenterWidget<IndexPresenter.Display> implements IndexUiHandlers {
+
+
+  public interface Display extends PopupView, HasUiHandlers<IndexUiHandlers> {
+
+    void hideDialog();
+
+    void setDialogMode(Mode dialogMode);
+
+    String getSelectedType();
+
+    String getSelectedDay();
+
+    int getSelectedHours();
+
+    int getSelectedMinutes();
+
+    void setSchedule(ScheduleDto dto);
+  }
 
   private Mode dialogMode;
 
@@ -50,20 +66,19 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
   @Inject
   public IndexPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
+    getView().setUiHandlers(this);
+  }
+
+  @Override
+  public void save() {
+    if(dialogMode == Mode.UPDATE) {
+      updateSchedule();
+    }
   }
 
   @Override
   protected void onBind() {
     setDialogMode(Mode.UPDATE);
-
-    registerHandler(getView().getSaveButton().addClickHandler(new CreateOrUpdateMethodClickHandler()));
-
-    registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getView().hideDialog();
-      }
-    }));
   }
 
   private void setDialogMode(Mode dialogMode) {
@@ -138,50 +153,36 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
     return Day.MONDAY;
   }
 
-  //
-  // Inner classes and interfaces
-  //
-  public class CreateOrUpdateMethodClickHandler implements ClickHandler {
+  private void updateSchedule() {
+    ScheduleDto dto = getScheduleDto();
+    for(TableIndexStatusDto tableIndexStatusDto : tableIndexStatusDtos) {
+      putSchedule(tableIndexStatusDto.getDatasource(), tableIndexStatusDto.getTable(), dto);
+    }
+  }
 
-    @Override
-    public void onClick(ClickEvent arg0) {
-      if(dialogMode == Mode.UPDATE) {
-        updateSchedule();
-      }
+  private ScheduleDto getScheduleDto() {
+    ScheduleDto dto = ScheduleDto.create();
+    ScheduleType type = getScheduleTypeFromName(getView().getSelectedType());
+    dto.setType(type);
+
+    if(type.equals(ScheduleType.HOURLY)) {
+      dto.setMinutes(getView().getSelectedMinutes());
+    } else if(type.equals(ScheduleType.DAILY)) {
+      dto.setHours(getView().getSelectedHours());
+      dto.setMinutes(getView().getSelectedMinutes());
+    } else if(type.equals(ScheduleType.WEEKLY)) {
+      dto.setHours(getView().getSelectedHours());
+      dto.setMinutes(getView().getSelectedMinutes());
+      dto.setDay(getDayFromName(getView().getSelectedDay()));
     }
 
-    private void updateSchedule() {
-      ScheduleDto dto = getScheduleDto();
-      for(TableIndexStatusDto tableIndexStatusDto : tableIndexStatusDtos) {
-        putSchedule(tableIndexStatusDto.getDatasource(), tableIndexStatusDto.getTable(), dto);
-      }
-    }
+    return dto;
+  }
 
-    private ScheduleDto getScheduleDto() {
-      ScheduleDto dto = ScheduleDto.create();
-      ScheduleType type = getScheduleTypeFromName(getView().getSelectedType());
-      dto.setType(type);
-
-      if(type.equals(ScheduleType.HOURLY)) {
-        dto.setMinutes(getView().getSelectedMinutes());
-      } else if(type.equals(ScheduleType.DAILY)) {
-        dto.setHours(getView().getSelectedHours());
-        dto.setMinutes(getView().getSelectedMinutes());
-      } else if(type.equals(ScheduleType.WEEKLY)) {
-        dto.setHours(getView().getSelectedHours());
-        dto.setMinutes(getView().getSelectedMinutes());
-        dto.setDay(getDayFromName(getView().getSelectedDay()));
-      }
-
-      return dto;
-    }
-
-    private void putSchedule(String datasource, String table, ScheduleDto dto) {
-      ResourceRequestBuilderFactory.newBuilder().forResource(Resources.updateSchedule(datasource, table)).put()//
-          .withResourceBody(ScheduleDto.stringify(dto))//
-          .withCallback(Response.SC_OK, new CreateOrUpdateMethodCallBack(dto)).send();
-    }
-
+  private void putSchedule(String datasource, String table, ScheduleDto dto) {
+    ResourceRequestBuilderFactory.newBuilder().forResource(Resources.updateSchedule(datasource, table)).put()//
+        .withResourceBody(ScheduleDto.stringify(dto))//
+        .withCallback(Response.SC_OK, new CreateOrUpdateMethodCallBack(dto)).send();
   }
 
   private class CreateOrUpdateMethodCallBack implements ResponseCodeCallback {
@@ -214,26 +215,4 @@ public class IndexPresenter extends PresenterWidget<IndexPresenter.Display> {
   public void setUpdateMethodCallbackRefreshTable(boolean b) {
     refreshTable = b;
   }
-
-  public interface Display extends PopupView {
-
-    void hideDialog();
-
-    void setDialogMode(Mode dialogMode);
-
-    HasClickHandlers getSaveButton();
-
-    HasClickHandlers getCancelButton();
-
-    String getSelectedType();
-
-    String getSelectedDay();
-
-    int getSelectedHours();
-
-    int getSelectedMinutes();
-
-    void setSchedule(ScheduleDto dto);
-  }
-
 }

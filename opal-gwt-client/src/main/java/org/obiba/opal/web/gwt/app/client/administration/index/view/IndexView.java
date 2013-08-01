@@ -10,38 +10,36 @@
 package org.obiba.opal.web.gwt.app.client.administration.index.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
-import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.model.client.opal.Day;
 import org.obiba.opal.web.model.client.opal.ScheduleDto;
 import org.obiba.opal.web.model.client.opal.ScheduleType;
 
+import com.github.gwtbootstrap.client.ui.ControlLabel;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.PopupViewImpl;
+import com.watopi.chosen.client.event.ChosenChangeEvent;
 
 /**
  *
  */
-public class IndexView extends PopupViewImpl implements IndexPresenter.Display {
+public class IndexView extends ModalPopupViewWithUiHandlers<IndexUiHandlers> implements IndexPresenter.Display {
 
-  @UiTemplate("IndexView.ui.xml")
-  interface ViewUiBinder extends UiBinder<DialogBox, IndexView> {}
+  private static final int DIALOG_MIN_WIDTH = 400;
+
+  private static final int DIALOG_MIN_HEIGHT = 400;
+
+  interface ViewUiBinder extends UiBinder<Widget, IndexView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -50,19 +48,7 @@ public class IndexView extends PopupViewImpl implements IndexPresenter.Display {
   private final Widget widget;
 
   @UiField
-  DialogBox dialog;
-
-  @UiField
-  DockLayoutPanel contentLayout;
-
-  @UiField
-  ResizeHandle resizeHandle;
-
-  @UiField
-  Button saveButton;
-
-  @UiField
-  Button cancelButton;
+  Modal dialog;
 
   @UiField
   Chooser type;
@@ -77,12 +63,10 @@ public class IndexView extends PopupViewImpl implements IndexPresenter.Display {
   Chooser minutes;
 
   @UiField
-  Label on;
+  ControlLabel on;
 
   @UiField
-  Label at;
-
-  JsArray<ScheduleType> availableTypes;
+  ControlLabel at;
 
   @Override
   public String getSelectedType() {
@@ -129,9 +113,6 @@ public class IndexView extends PopupViewImpl implements IndexPresenter.Display {
   }
 
   private void initWidgets() {
-    dialog.hide();
-    resizeHandle.makeResizable(contentLayout);
-
     initTypeWidget();
     initDayWidget();
     initHourWidget();
@@ -144,6 +125,9 @@ public class IndexView extends PopupViewImpl implements IndexPresenter.Display {
     day.setVisible(false);
     hour.setVisible(false);
     minutes.setVisible(false);
+
+    dialog.setMinWidth(DIALOG_MIN_WIDTH);
+    dialog.setMinHeight(DIALOG_MIN_HEIGHT);
   }
 
   private void initTypeWidget() {
@@ -155,14 +139,13 @@ public class IndexView extends PopupViewImpl implements IndexPresenter.Display {
     type.addItem(translations.hourlyLabel(), ScheduleType.HOURLY.getName());
     type.addItem(translations.dailyLabel(), ScheduleType.DAILY.getName());
     type.addItem(translations.weeklyLabel(), ScheduleType.WEEKLY.getName());
-    type.addChangeHandler(new ChangeHandler() {
+    type.addChosenChangeHandler(new ChosenChangeEvent.ChosenChangeHandler() {
 
       @Override
-      public void onChange(ChangeEvent event) {
+      public void onChange(ChosenChangeEvent chosenChangeEvent) {
         setDefaults();
       }
     });
-    //if (!type.getValue(type.getSelectedIndex()).equals(ScheduleType.NOT_SCHEDULED.getName())){
   }
 
   private void initDayWidget() {
@@ -218,11 +201,6 @@ public class IndexView extends PopupViewImpl implements IndexPresenter.Display {
   }
 
   @Override
-  protected PopupPanel asPopupPanel() {
-    return dialog;
-  }
-
-  @Override
   public void show() {
     //name.setFocus(true);
     super.show();
@@ -236,17 +214,17 @@ public class IndexView extends PopupViewImpl implements IndexPresenter.Display {
   @Override
   public void setDialogMode(IndexPresenter.Mode dialogMode) {
     //name.setEnabled(IndexPresenter.Mode.UPDATE.equals(dialogMode));
-    dialog.setText(translations.editScheduleLabel());
+    dialog.setTitle(translations.editScheduleLabel());
   }
 
-  @Override
-  public HasClickHandlers getSaveButton() {
-    return saveButton;
+  @UiHandler("saveButton")
+  public void onSaveButton(ClickEvent event) {
+    getUiHandlers().save();
   }
 
-  @Override
-  public HasClickHandlers getCancelButton() {
-    return cancelButton;
+  @UiHandler("cancelButton")
+  public void onCancelButton(ClickEvent event) {
+    dialog.hide();
   }
 
 }

@@ -7,56 +7,39 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <ui:style>
-    .optionsPanelMsg td {
-      margin: 0.5em 0.5em 0.5em 0.5em;
-    }
-  </ui:style>
+  <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false">
+    <b:ControlGroup>
+      <b:Controls>
+        <b:ControlLabel addStyleNames="key">
+          <ui:msg description="Index Schedule type label">Check index for update</ui:msg>
+        </b:ControlLabel>
+        <o:Chooser name="type" ui:field="type"/>
+        <b:ControlLabel addStyleNames="Index Schedule on" ui:field="on">
+          <ui:msg description="on">on</ui:msg>
+        </b:ControlLabel>
+        <o:Chooser name="day" ui:field="day"/>
+        <b:ControlLabel addStyleNames="key" ui:field="at">
+          <ui:msg description="Index Schedule at">at</ui:msg>
+        </b:ControlLabel>
+        <o:Chooser name="hour" ui:field="hour"/>
+        <o:Chooser name="minutes" ui:field="minutes"/>
+      </b:Controls>
+    </b:ControlGroup>
 
-  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
-    <g:DockLayoutPanel ui:field="contentLayout" unit="EM" height="35em" width="40em">
-      <g:center>
-        <g:ScrollPanel>
-          <g:FlowPanel addStyleNames="main {style.optionsPanelMsg}">
-
-            <g:FlowPanel styleName="input">
-              <g:Label addStyleNames="key">
-                <ui:msg description="Schedule type label">Check index for update</ui:msg>
-              </g:Label>
-              <o:Chooser name="type" ui:field="type"/>
-              <g:Label addStyleNames="key" ui:field="on">
-                <ui:msg description="on">on</ui:msg>
-              </g:Label>
-              <o:Chooser name="day" ui:field="day"/>
-              <g:Label addStyleNames="key" ui:field="at">
-                <ui:msg description="at">at</ui:msg>
-              </g:Label>
-              <o:Chooser name="hour" ui:field="hour"/>
-              <o:Chooser name="minutes" ui:field="minutes"/>
-            </g:FlowPanel>
-
-          </g:FlowPanel>
-        </g:ScrollPanel>
-      </g:center>
-
-      <g:south size="4">
-        <g:FlowPanel addStyleNames="footer">
-          <o:ResizeHandle ui:field="resizeHandle"></o:ResizeHandle>
-          <g:Button ui:field="cancelButton" styleName="btn right-aligned top-margin">
-            <ui:msg description="Cancel button label">Cancel</ui:msg>
-          </g:Button>
-          <g:Button ui:field="saveButton" styleName="btn btn-primary right-aligned top-margin">
-            <ui:msg description="Save button label">Save</ui:msg>
-          </g:Button>
-        </g:FlowPanel>
-      </g:south>
-
-    </g:DockLayoutPanel>
-  </g:DialogBox>
+    <b:ModalFooter>
+      <b:Button ui:field="saveButton" type="PRIMARY">
+        <ui:msg description="Index Save button label">Save</ui:msg>
+      </b:Button>
+      <b:Button ui:field="cancelButton">
+        <ui:msg description="Index Cancel button label">Cancel</ui:msg>
+      </b:Button>
+    </b:ModalFooter>
+  </o:Modal>
 
 </ui:UiBinder>
