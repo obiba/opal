@@ -10,36 +10,38 @@
 package org.obiba.opal.web.gwt.app.client.fs.view;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadModalPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadModalUiHandlers;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.FileUpload;
+import com.github.gwtbootstrap.client.ui.Form;
+import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.FileUpload;
-import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
-import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
-import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class FileUploadModalView extends PopupViewImpl implements Display {
+public class FileUploadModalView extends ModalPopupViewWithUiHandlers<FileUploadModalUiHandlers> implements Display {
 
-  interface FileUploadModalUiBinder extends UiBinder<DialogBox, FileUploadModalView> {}
+  interface FileUploadModalUiBinder extends UiBinder<Widget, FileUploadModalView> {}
 
   private static final FileUploadModalUiBinder uiBinder = GWT.create(FileUploadModalUiBinder.class);
+
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget widget;
 
   @UiField
-  DialogBox dialog;
+  Modal dialog;
 
   @UiField
   Button uploadButton;
@@ -51,10 +53,10 @@ public class FileUploadModalView extends PopupViewImpl implements Display {
   FileUpload fileToUpload;
 
   @UiField
-  Label remoteFolderName;
+  InlineLabel remoteFolderName;
 
   @UiField
-  FormPanel form;
+  Form form;
 
   @UiField
   Panel inputFieldPanel;
@@ -66,18 +68,12 @@ public class FileUploadModalView extends PopupViewImpl implements Display {
   public FileUploadModalView(EventBus eventBus) {
     super(eventBus);
     widget = uiBinder.createAndBindUi(this);
-    dialog.setGlassEnabled(false);
-    dialog.hide();
+    dialog.setTitle(translations.uploadFileModalTitle());
   }
 
   @Override
   public Widget asWidget() {
     return widget;
-  }
-
-  @Override
-  protected PopupPanel asPopupPanel() {
-    return dialog;
   }
 
   @Override
@@ -93,24 +89,19 @@ public class FileUploadModalView extends PopupViewImpl implements Display {
     dialog.hide();
   }
 
-  @Override
-  public Button getCancelButton() {
-    return cancelButton;
+  @UiHandler("cancelButton")
+  public void onCancelButton(ClickEvent event) {
+    hideDialog();
   }
 
-  @Override
-  public Button getUploadButton() {
-    return uploadButton;
+  @UiHandler("uploadButton")
+  public void onUploadButton(ClickEvent event) {
+    getUiHandlers().uploadFile(fileToUpload.getFilename());
   }
 
-  @Override
-  public String getFilename() {
-    return fileToUpload.getFilename();
-  }
-
-  @Override
-  public HandlerRegistration addSubmitCompleteHandler(SubmitCompleteHandler handler) {
-    return form.addSubmitCompleteHandler(handler);
+  @UiHandler("form")
+  public void onSubmitCompleted(Form.SubmitCompleteEvent event) {
+    getUiHandlers().submit();
   }
 
   @Override
@@ -121,8 +112,8 @@ public class FileUploadModalView extends PopupViewImpl implements Display {
   }
 
   @Override
-  public HasText getRemoteFolderName() {
-    return remoteFolderName;
+  public void setRemoteFolderName(String folderName) {
+    remoteFolderName.setText(folderName);
   }
 
   private void setUploading(boolean isUploading) {

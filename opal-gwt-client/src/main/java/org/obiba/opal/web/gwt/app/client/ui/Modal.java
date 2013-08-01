@@ -274,7 +274,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
 
   private void resizeBodyVertically(int height) {
     Widget body = getBodyWidget();
-    body.setHeight((height - bodyVerticalMargin) + "px");
+    body.setHeight((Math.max(0, height - bodyVerticalMargin)) + "px");
   }
 
   private Widget getWidgetAt(int index) {

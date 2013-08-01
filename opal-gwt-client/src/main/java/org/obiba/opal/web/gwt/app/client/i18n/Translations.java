@@ -1829,4 +1829,12 @@ public interface Translations extends Constants {
   @Description("All Tables label")
   @DefaultStringValue("All tables")
   String allTablesLabel();
+
+  @Description("Create Folder Modal title")
+  @DefaultStringValue("Create Folder")
+  String createFolderModalTitle();
+
+  @Description("Upload File Modal title")
+  @DefaultStringValue("File Upload")
+  String uploadFileModalTitle();
 }
