@@ -10,7 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.CodingViewDialogPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.CodingViewModalPresenter.Display;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 
 import com.google.gwt.core.client.GWT;
@@ -32,12 +32,11 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
 
-public class CodingViewDialogView extends ViewImpl implements Display {
+public class CodingViewModalView extends ViewImpl implements Display {
 
-  @UiTemplate("CodingViewDialogView.ui.xml")
-  interface CodingViewDialogUiBinder extends UiBinder<DialogBox, CodingViewDialogView> {}
+  interface CodingViewModalUiBinder extends UiBinder<DialogBox, CodingViewModalView> {}
 
-  private static final CodingViewDialogUiBinder uiBinder = GWT.create(CodingViewDialogUiBinder.class);
+  private static final CodingViewModalUiBinder uiBinder = GWT.create(CodingViewModalUiBinder.class);
 
   private final Widget uiWidget;
 
@@ -59,7 +58,7 @@ public class CodingViewDialogView extends ViewImpl implements Display {
   @UiField
   CheckBox duplicateCheck;
 
-  public CodingViewDialogView() {
+  public CodingViewModalView() {
     uiWidget = uiBinder.createAndBindUi(this);
     uiBinder.createAndBindUi(this);
     dialog.hide();

@@ -5,8 +5,11 @@ import java.util.Stack;
 import com.github.gwtbootstrap.client.ui.constants.BackdropType;
 import com.github.gwtbootstrap.client.ui.event.ShowEvent;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -49,6 +52,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     setAutoHide(false);
     setDraggable(true);
     setResizable(false);
+    History.addValueChangeHandler(new HistoryChangeValueHandler());
   }
 
   public void setResizable(boolean resizable) {
@@ -279,6 +283,15 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
       return (initialY <= cursorY && initialY + height >= cursorY && initialX <= cursorX &&
           initialX + width >= cursorX);
     } else return false;
+  }
+
+  private class HistoryChangeValueHandler implements ValueChangeHandler<String> {
+
+    @Override
+    public void onValueChange(ValueChangeEvent<String> event) {
+      Modal modal = Modal.this;
+      if (modal.isVisible()) modal.hide();
+    }
   }
 
   // These class is part of a temporary HACK until get-bootstrap library supports stacked modal dialogs.

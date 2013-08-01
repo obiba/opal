@@ -22,7 +22,7 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 /**
  *
  */
-public class GenerateIdentifiersDialogPresenter extends PresenterWidget<GenerateIdentifiersDialogPresenter.Display> {
+public class GenerateIdentifiersModalPresenter extends PresenterWidget<GenerateIdentifiersModalPresenter.Display> {
 
   //
   // Instance Variables
@@ -33,7 +33,7 @@ public class GenerateIdentifiersDialogPresenter extends PresenterWidget<Generate
   //
 
   @Inject
-  public GenerateIdentifiersDialogPresenter(Display display, EventBus eventBus) {
+  public GenerateIdentifiersModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
   }
 

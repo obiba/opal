@@ -6,7 +6,7 @@
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <o:WizardDialogBox ui:field="dialog" title="Import Identifiers from Data File">
+  <o:WizardModalBox ui:field="dialog" title="Import Identifiers from Data File">
     <g:FlowPanel>
 
       <o:WizardStep ui:field="formatSelectionStep">
@@ -37,6 +37,6 @@
 
     </g:FlowPanel>
 
-  </o:WizardDialogBox>
+  </o:WizardModalBox>
 
 </ui:UiBinder>

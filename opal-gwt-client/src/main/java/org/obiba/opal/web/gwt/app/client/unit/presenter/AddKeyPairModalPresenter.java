@@ -33,19 +33,17 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.HasCloseHandlers;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class AddKeyPairDialogPresenter extends PresenterWidget<AddKeyPairDialogPresenter.Display> {
+public class AddKeyPairModalPresenter extends PresenterWidget<AddKeyPairModalPresenter.Display> {
 
   private FunctionalUnitDto functionalUnit;
 
@@ -115,7 +113,7 @@ public class AddKeyPairDialogPresenter extends PresenterWidget<AddKeyPairDialogP
   }
 
   @Inject
-  public AddKeyPairDialogPresenter(Display display, EventBus eventBus) {
+  public AddKeyPairModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
   }
 

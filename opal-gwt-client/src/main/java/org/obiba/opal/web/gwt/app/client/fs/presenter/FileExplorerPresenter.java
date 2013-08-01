@@ -42,9 +42,9 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
 
   private final FolderDetailsPresenter folderDetailsPresenter;
 
-  private final FileUploadDialogPresenter fileUploadDialogPresenter;
+  private final FileUploadModalPresenter fileUploadModalPresenter;
 
-  private final CreateFolderDialogPresenter createFolderDialogPresenter;
+  private final CreateFolderModalPresenter createFolderModalPresenter;
 
   private Runnable actionRequiringConfirmation;
 
@@ -52,13 +52,13 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public FileExplorerPresenter(Display display, EventBus eventBus, FilePathPresenter filePathPresenter,
       FileSystemTreePresenter fileSystemTreePresenter, FolderDetailsPresenter folderDetailsPresenter,
-      FileUploadDialogPresenter fileUploadDialogPresenter, CreateFolderDialogPresenter createFolderDialogPresenter) {
+      FileUploadModalPresenter fileUploadModalPresenter, CreateFolderModalPresenter createFolderModalPresenter) {
     super(eventBus, display);
     this.filePathPresenter = filePathPresenter;
     this.fileSystemTreePresenter = fileSystemTreePresenter;
     this.folderDetailsPresenter = folderDetailsPresenter;
-    this.fileUploadDialogPresenter = fileUploadDialogPresenter;
-    this.createFolderDialogPresenter = createFolderDialogPresenter;
+    this.fileUploadModalPresenter = fileUploadModalPresenter;
+    this.createFolderModalPresenter = createFolderModalPresenter;
     getView().setUiHandlers(this);
   }
 
@@ -178,15 +178,15 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
   @Override
   public void onAddFolder() {
     FileDto currentFolder = folderDetailsPresenter.getCurrentFolder();
-    createFolderDialogPresenter.setCurrentFolder(currentFolder);
-    addToPopupSlot(createFolderDialogPresenter);
+    createFolderModalPresenter.setCurrentFolder(currentFolder);
+    addToPopupSlot(createFolderModalPresenter);
   }
 
   @Override
   public void onUploadFile() {
     FileDto currentFolder = folderDetailsPresenter.getCurrentFolder();
-    fileUploadDialogPresenter.setCurrentFolder(currentFolder);
-    addToPopupSlot(fileUploadDialogPresenter);
+    fileUploadModalPresenter.setCurrentFolder(currentFolder);
+    addToPopupSlot(fileUploadModalPresenter);
   }
 
   @Override
