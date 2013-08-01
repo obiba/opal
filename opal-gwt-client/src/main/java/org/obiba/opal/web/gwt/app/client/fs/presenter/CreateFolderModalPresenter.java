@@ -12,35 +12,25 @@ package org.obiba.opal.web.gwt.app.client.fs.presenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreationEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class CreateFolderModalPresenter extends PresenterWidget<CreateFolderModalPresenter.Display> {
+public class CreateFolderModalPresenter extends ModalPresenterWidget<CreateFolderModalPresenter.Display>
+    implements CreateFolderUiHandlers {
 
-  public interface Display extends PopupView {
-
+  public interface Display extends PopupView, HasUiHandlers<CreateFolderUiHandlers> {
     void hideDialog();
-
-    HasClickHandlers getCreateFolderButton();
-
-    HasClickHandlers getCancelButton();
-
-    HasText getFolderToCreate();
-
   }
 
   private final Translations translations = GWT.create(Translations.class);
@@ -50,43 +40,22 @@ public class CreateFolderModalPresenter extends PresenterWidget<CreateFolderModa
   @Inject
   public CreateFolderModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
+   getView().setUiHandlers(this);
   }
+
 
   @Override
-  protected void onBind() {
-    addEventHandlers();
+  public void createFolder(String folderName) {
+    if("".equals(folderName)) {
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.folderNameIsRequired()).build());
+    } else if(".".equals(folderName) || "..".equals(folderName)) {
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.dotNamesAreInvalid()).build());
+    } else {
+      createRemoteFolder(currentFolder.getPath(), folderName);
+    }
   }
 
-  @Override
-  public void onReveal() {
-    getView().getFolderToCreate().setText("");
-  }
-
-  private void addEventHandlers() {
-    registerHandler(getView().getCreateFolderButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        String folderToCreate = getView().getFolderToCreate().getText();
-        if("".equals(folderToCreate)) {
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.folderNameIsRequired()).build());
-        } else if(".".equals(folderToCreate) || "..".equals(folderToCreate)) {
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.dotNamesAreInvalid()).build());
-        } else {
-          createFolder(currentFolder.getPath(), folderToCreate);
-        }
-      }
-    }));
-
-    registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getView().hideDialog();
-      }
-    }));
-
-  }
-
-  private void createFolder(String destination, String folder) {
+  private void createRemoteFolder(String destination, String folder) {
 
     ResourceCallback<FileDto> createdCallback = new ResourceCallback<FileDto>() {
 

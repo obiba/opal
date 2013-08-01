@@ -10,30 +10,34 @@
 package org.obiba.opal.web.gwt.app.client.fs.view;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderModalPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderUiHandlers;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.PopupViewImpl;
 
-public class CreateFolderModalView extends PopupViewImpl implements Display {
+public class CreateFolderModalView extends ModalPopupViewWithUiHandlers<CreateFolderUiHandlers> implements Display {
 
-  interface CreateFolderModalUiBinder extends UiBinder<DialogBox, CreateFolderModalView> {}
+  interface CreateFolderModalUiBinder extends UiBinder<Widget, CreateFolderModalView> {}
 
   private static final CreateFolderModalUiBinder uiBinder = GWT.create(CreateFolderModalUiBinder.class);
+
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget widget;
 
   @UiField
-  DialogBox dialog;
+  Modal dialog;
 
   @UiField
   Button createFolderButton;
@@ -48,19 +52,12 @@ public class CreateFolderModalView extends PopupViewImpl implements Display {
   public CreateFolderModalView(EventBus eventBus) {
     super(eventBus);
     widget = uiBinder.createAndBindUi(this);
-    uiBinder.createAndBindUi(this);
-    dialog.setGlassEnabled(false);
-    dialog.hide();
+    dialog.setTitle(translations.createFolderModalTitle());
   }
 
   @Override
   public Widget asWidget() {
     return widget;
-  }
-
-  @Override
-  protected PopupPanel asPopupPanel() {
-    return dialog;
   }
 
   @Override
@@ -74,19 +71,14 @@ public class CreateFolderModalView extends PopupViewImpl implements Display {
     dialog.hide();
   }
 
-  @Override
-  public Button getCancelButton() {
-    return cancelButton;
+  @UiHandler("cancelButton")
+  public void onCancelButton(ClickEvent event) {
+    dialog.hide();
   }
 
-  @Override
-  public Button getCreateFolderButton() {
-    return createFolderButton;
-  }
-
-  @Override
-  public HasText getFolderToCreate() {
-    return folderToCreate;
+  @UiHandler("createFolderButton")
+  public void onCreateFolderButton(ClickEvent event) {
+    getUiHandlers().createFolder(folderToCreate.getText());
   }
 
 }

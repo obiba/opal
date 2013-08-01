@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionC
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRefreshedEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -42,9 +43,9 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
 
   private final FolderDetailsPresenter folderDetailsPresenter;
 
-  private final FileUploadModalPresenter fileUploadModalPresenter;
+  private final ModalProvider<FileUploadModalPresenter> fileUploadModalProvider;
 
-  private final CreateFolderModalPresenter createFolderModalPresenter;
+  private final ModalProvider<CreateFolderModalPresenter> createFolderModalProvider;
 
   private Runnable actionRequiringConfirmation;
 
@@ -52,13 +53,14 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public FileExplorerPresenter(Display display, EventBus eventBus, FilePathPresenter filePathPresenter,
       FileSystemTreePresenter fileSystemTreePresenter, FolderDetailsPresenter folderDetailsPresenter,
-      FileUploadModalPresenter fileUploadModalPresenter, CreateFolderModalPresenter createFolderModalPresenter) {
+      ModalProvider<FileUploadModalPresenter> fileUploadModalProvider,
+      ModalProvider<CreateFolderModalPresenter> createFolderModalProvider) {
     super(eventBus, display);
     this.filePathPresenter = filePathPresenter;
     this.fileSystemTreePresenter = fileSystemTreePresenter;
     this.folderDetailsPresenter = folderDetailsPresenter;
-    this.fileUploadModalPresenter = fileUploadModalPresenter;
-    this.createFolderModalPresenter = createFolderModalPresenter;
+    this.fileUploadModalProvider = fileUploadModalProvider.setContainer(this);
+    this.createFolderModalProvider = createFolderModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -178,15 +180,15 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
   @Override
   public void onAddFolder() {
     FileDto currentFolder = folderDetailsPresenter.getCurrentFolder();
-    createFolderModalPresenter.setCurrentFolder(currentFolder);
-    addToPopupSlot(createFolderModalPresenter);
+    CreateFolderModalPresenter createFolderModal = createFolderModalProvider.get();
+    createFolderModal.setCurrentFolder(currentFolder);
   }
 
   @Override
   public void onUploadFile() {
     FileDto currentFolder = folderDetailsPresenter.getCurrentFolder();
-    fileUploadModalPresenter.setCurrentFolder(currentFolder);
-    addToPopupSlot(fileUploadModalPresenter);
+    FileUploadModalPresenter fileUploadModal = fileUploadModalProvider.get();
+    fileUploadModal.setCurrentFolder(currentFolder);
   }
 
   @Override
