@@ -13,8 +13,8 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogUiHandlers;
+import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateModalPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 
@@ -43,14 +43,14 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-public class ReportTemplateUpdateDialogView extends ModalPopupViewWithUiHandlers<ReportTemplateUpdateDialogUiHandlers>
+public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<ReportTemplateUpdateModalUiHandlers>
     implements Display {
 
 
-  interface ReportTemplateUpdateDialogUiBinder extends UiBinder<Widget, ReportTemplateUpdateDialogView> {}
+  interface ReportTemplateUpdateModalUiBinder extends UiBinder<Widget, ReportTemplateUpdateModalView> {}
 
-  private static final ReportTemplateUpdateDialogUiBinder uiBinder = GWT
-      .create(ReportTemplateUpdateDialogUiBinder.class);
+  private static final ReportTemplateUpdateModalUiBinder uiBinder = GWT
+      .create(ReportTemplateUpdateModalUiBinder.class);
 
   @UiField
   Modal dialog;
@@ -107,7 +107,7 @@ public class ReportTemplateUpdateDialogView extends ModalPopupViewWithUiHandlers
   private static final Translations translations = GWT.create(Translations.class);
 
   @Inject
-  public ReportTemplateUpdateDialogView(EventBus eventBus) {
+  public ReportTemplateUpdateModalView(EventBus eventBus) {
     super(eventBus);
     uiBinder.createAndBindUi(this);
     cronLink.addClickHandler(new ClickHandler() {
@@ -119,6 +119,7 @@ public class ReportTemplateUpdateDialogView extends ModalPopupViewWithUiHandlers
     });
 
     dialog.setTitle(translations.reportTemplateDialogTitle());
+    dialog.addHiddenHandler(new DialogHiddenHandler());
   }
 
   @Override
@@ -291,6 +292,13 @@ public class ReportTemplateUpdateDialogView extends ModalPopupViewWithUiHandlers
     labelName.setType(ControlGroupType.NONE);
     labelTempleFile.setType(ControlGroupType.NONE);
     labelSchedule.setType(ControlGroupType.NONE);
+  }
+
+  private class DialogHiddenHandler implements HiddenHandler {
+    @Override
+    public void onHidden(HiddenEvent hiddenEvent) {
+      getUiHandlers().onDialogHidden();
+    }
   }
 
 }

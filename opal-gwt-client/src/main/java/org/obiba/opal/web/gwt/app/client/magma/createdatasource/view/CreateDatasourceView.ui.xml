@@ -5,7 +5,7 @@
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <o:WizardDialogBox ui:field="dialog" title="Create Datasource">
+  <o:WizardModalBox ui:field="dialog" title="Create Datasource">
     <g:FlowPanel>
       <o:WizardStep ui:field="selectTypeStep">
         <g:FlowPanel>
@@ -88,6 +88,6 @@
       </g:HTMLPanel>
 
     </g:FlowPanel>
-  </o:WizardDialogBox>
+  </o:WizardModalBox>
 
 </ui:UiBinder>

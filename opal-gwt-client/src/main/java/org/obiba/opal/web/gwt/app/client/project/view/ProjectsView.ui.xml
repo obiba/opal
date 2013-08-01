@@ -11,7 +11,6 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
-    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -42,29 +41,6 @@
       </b:Column>
     </b:FluidRow>
     <g:FlowPanel ui:field="content" addStyleNames="items"></g:FlowPanel>
-    <o:Modal ui:field="addProjectModal" closeVisible="true" keyboard="true" animation="false">
-      <g:SimplePanel ui:field="alertPlace"/>
-      <b:ControlGroup ui:field="labelGroup">
-        <b:ControlLabel>
-          <ui:msg description="Name label">Name</ui:msg>
-        </b:ControlLabel>
-        <b:TextBox ui:field="nameTxt"/>
-        <b:HelpBlock>A project must have a unique name.</b:HelpBlock>
-      </b:ControlGroup>
-      <b:ControlLabel>
-        <ui:msg description="Description label">Description</ui:msg>
-      </b:ControlLabel>
-      <b:TextArea ui:field="descriptionTxt" alternateSize="XLARGE" visibleLines="3"/>
-      <b:HelpBlock>Optional description of the project.</b:HelpBlock>
-      <b:ModalFooter>
-        <b:Button type="PRIMARY" ui:field="save">
-          <ui:msg description="Save label">Save</ui:msg>
-        </b:Button>
-        <b:Button ui:field="cancel">
-          <ui:msg description="Cancel label">Cancel</ui:msg>
-        </b:Button>
-      </b:ModalFooter>
-    </o:Modal>
   </g:FlowPanel>
 
 </ui:UiBinder>

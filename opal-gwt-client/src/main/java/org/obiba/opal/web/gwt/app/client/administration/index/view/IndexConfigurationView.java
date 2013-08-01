@@ -10,33 +10,30 @@
 package org.obiba.opal.web.gwt.app.client.administration.index.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexConfigurationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexConfigurationUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
-import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
 
+import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.PopupViewImpl;
 
 /**
  *
  */
-public class IndexConfigurationView extends PopupViewImpl implements IndexConfigurationPresenter.Display {
+public class IndexConfigurationView extends ModalPopupViewWithUiHandlers<IndexConfigurationUiHandlers>
+    implements IndexConfigurationPresenter.Display {
 
-  @UiTemplate("IndexConfigurationView.ui.xml")
-  interface ViewUiBinder extends UiBinder<DialogBox, IndexConfigurationView> {}
+  interface ViewUiBinder extends UiBinder<Widget, IndexConfigurationView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -45,19 +42,7 @@ public class IndexConfigurationView extends PopupViewImpl implements IndexConfig
   private final Widget widget;
 
   @UiField
-  DialogBox dialog;
-
-  @UiField
-  DockLayoutPanel contentLayout;
-
-  @UiField
-  ResizeHandle resizeHandle;
-
-  @UiField
-  Button saveButton;
-
-  @UiField
-  Button cancelButton;
+  Modal dialog;
 
   @UiField
   TextBox clusterName;
@@ -83,7 +68,6 @@ public class IndexConfigurationView extends PopupViewImpl implements IndexConfig
 
   private void initWidgets() {
     dialog.hide();
-    resizeHandle.makeResizable(contentLayout);
   }
 
   @Override
@@ -92,13 +76,8 @@ public class IndexConfigurationView extends PopupViewImpl implements IndexConfig
   }
 
   @Override
-  protected PopupPanel asPopupPanel() {
-    return dialog;
-  }
-
-  @Override
   public void show() {
-    //name.setFocus(true);
+    indexName.setFocus(true);
     super.show();
   }
 
@@ -110,17 +89,17 @@ public class IndexConfigurationView extends PopupViewImpl implements IndexConfig
   @Override
   public void setDialogMode(IndexConfigurationPresenter.Mode dialogMode) {
     //name.setEnabled(IndexPresenter.Mode.UPDATE.equals(dialogMode));
-    dialog.setText(translations.esConfigurationLabel());
+    dialog.setTitle(translations.esConfigurationLabel());
   }
 
-  @Override
-  public HasClickHandlers getSaveButton() {
-    return saveButton;
+  @UiHandler("saveButton")
+  public void onSaveButton(ClickEvent event) {
+    getUiHandlers().save();
   }
 
-  @Override
-  public HasClickHandlers getCancelButton() {
-    return cancelButton;
+  @UiHandler("cancelButton")
+  public void onCancelButton(ClickEvent event) {
+    dialog.hide();
   }
 
   @Override
@@ -139,18 +118,18 @@ public class IndexConfigurationView extends PopupViewImpl implements IndexConfig
   }
 
   @Override
-  public TextBox getClusterName() {
-    return clusterName;
+  public String getClusterName() {
+    return clusterName.getText();
   }
 
   @Override
-  public TextBox getIndexName() {
-    return indexName;
+  public String getIndexName() {
+    return indexName.getText();
   }
 
   @Override
-  public HasText getSettings() {
-    return settings;
+  public String getSettings() {
+    return settings.getText();
   }
 
   @Override

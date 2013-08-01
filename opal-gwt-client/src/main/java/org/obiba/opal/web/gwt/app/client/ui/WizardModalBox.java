@@ -25,7 +25,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  *
  */
-public class WizardDialogBox extends Modal {
+public class WizardModalBox extends Modal {
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -50,7 +50,7 @@ public class WizardDialogBox extends Modal {
 
   private String helpTooltipHeight;
 
-  public WizardDialogBox() {
+  public WizardModalBox() {
     initWidget();
   }
 

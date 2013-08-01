@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.administration.index.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.event.TableIndicesRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -26,10 +27,39 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class IndexConfigurationPresenter extends PresenterWidget<IndexConfigurationPresenter.Display> {
+public class IndexConfigurationPresenter extends ModalPresenterWidget<IndexConfigurationPresenter.Display>
+    implements IndexConfigurationUiHandlers {
+
+  public interface Display extends PopupView, HasUiHandlers<IndexConfigurationUiHandlers> {
+
+    void hideDialog();
+
+    void setDialogMode(Mode dialogMode);
+
+    void setClusterName(String clusterName);
+
+    String getClusterName();
+
+    void setIndexName(String indexName);
+
+    String getIndexName();
+
+    void setSettings(String settings);
+
+    String getSettings();
+
+    Number getNbShards();
+
+    void setNbShards(int nb);
+
+    Number getNbReplicas();
+
+    void setNbReplicas(int nb);
+  }
+
 
   private Mode dialogMode;
 
@@ -44,6 +74,14 @@ public class IndexConfigurationPresenter extends PresenterWidget<IndexConfigurat
   @Inject
   public IndexConfigurationPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
+    getView().setUiHandlers(this);
+  }
+
+  @Override
+  public void save() {
+    if(dialogMode == Mode.UPDATE) {
+      updateConfig();
+    }
   }
 
   @Override
@@ -70,15 +108,6 @@ public class IndexConfigurationPresenter extends PresenterWidget<IndexConfigurat
   @Override
   protected void onBind() {
     setDialogMode(Mode.UPDATE);
-
-    registerHandler(getView().getSaveButton().addClickHandler(new CreateOrUpdateMethodClickHandler()));
-
-    registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getView().hideDialog();
-      }
-    }));
   }
 
   private void setDialogMode(Mode dialogMode) {
@@ -86,45 +115,31 @@ public class IndexConfigurationPresenter extends PresenterWidget<IndexConfigurat
     getView().setDialogMode(dialogMode);
   }
 
-  //
-  // Inner classes and interfaces
-  //
-  public class CreateOrUpdateMethodClickHandler implements ClickHandler {
+  private void updateConfig() {
+    ServiceCfgDto dto = ServiceCfgDto.create();
 
-    @Override
-    public void onClick(ClickEvent arg0) {
-      if(dialogMode == Mode.UPDATE) {
-        updateConfig();
-      }
-    }
+    dto.setName("search");
 
-    private void updateConfig() {
-      ServiceCfgDto dto = ServiceCfgDto.create();
+    ESCfgDto config = ESCfgDto.create();
+    config.setEnabled(isEnabled);
+    config.setClusterName(getView().getClusterName());
+    config.setIndexName(getView().getIndexName());
+    config.setDataNode(dataNode);
+    config.setShards(getView().getNbShards().intValue());
+    config.setReplicas(getView().getNbReplicas().intValue());
+    config.setSettings(getView().getSettings());
 
-      dto.setName("search");
+    dto.setExtension("Opal.ESCfgDto.params", config);
 
-      ESCfgDto config = ESCfgDto.create();
-      config.setEnabled(isEnabled);
-      config.setClusterName(getView().getClusterName().getText());
-      config.setIndexName(getView().getIndexName().getText());
-      config.setDataNode(dataNode);
-      config.setShards(getView().getNbShards().intValue());
-      config.setReplicas(getView().getNbReplicas().intValue());
-      config.setSettings(getView().getSettings().getText());
+    putESCfg(dto);
 
-      dto.setExtension("Opal.ESCfgDto.params", config);
+  }
 
-      putESCfg(dto);
-
-    }
-
-    private void putESCfg(ServiceCfgDto dto) {
-      ResponseCodeCallback callbackHandler = new CreateOrUpdateMethodCallBack(dto);
-      ResourceRequestBuilderFactory.newBuilder().forResource("/service/search/cfg").put()//
-          .withResourceBody(ServiceCfgDto.stringify(dto))//
-          .withCallback(callbackHandler, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR).send();
-    }
-
+  private void putESCfg(ServiceCfgDto dto) {
+    ResponseCodeCallback callbackHandler = new CreateOrUpdateMethodCallBack(dto);
+    ResourceRequestBuilderFactory.newBuilder().forResource("/service/search/cfg").put()//
+        .withResourceBody(ServiceCfgDto.stringify(dto))//
+        .withCallback(callbackHandler, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR).send();
   }
 
   private class CreateOrUpdateMethodCallBack implements ResponseCodeCallback {
@@ -143,37 +158,6 @@ public class IndexConfigurationPresenter extends PresenterWidget<IndexConfigurat
         getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
       }
     }
-  }
-
-  public interface Display extends PopupView {
-
-    void hideDialog();
-
-    void setDialogMode(Mode dialogMode);
-
-    HasClickHandlers getSaveButton();
-
-    HasClickHandlers getCancelButton();
-
-    void setClusterName(String clusterName);
-
-    TextBox getClusterName();
-
-    void setIndexName(String indexName);
-
-    TextBox getIndexName();
-
-    void setSettings(String settings);
-
-    HasText getSettings();
-
-    Number getNbShards();
-
-    void setNbShards(int nb);
-
-    Number getNbReplicas();
-
-    void setNbReplicas(int nb);
   }
 
 }

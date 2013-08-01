@@ -25,16 +25,16 @@ import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserPrese
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.CreateFolderModalPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSystemTreePresenter;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileUploadModalPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.CodingViewDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.CodingViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
@@ -49,7 +49,7 @@ import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplatePresente
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitDetailsPresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitListPresenter;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitPresenter;
-import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.ExcelDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.FsDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.HibernateDatasourceFormPresenter;
@@ -119,7 +119,7 @@ public interface OpalGinjector extends Ginjector {
 
   UnhandledResponseNotificationPresenter getUnhandledResponseNotificationPresenter();
 
-  Provider<NotificationPresenter> getErrorDialogPresenter();
+  Provider<NotificationPresenter> getErrorModalPresenter();
 
   Provider<ApplicationPresenter> getApplicationPresenter();
 
@@ -145,19 +145,19 @@ public interface OpalGinjector extends Ginjector {
 
   Provider<TablePresenter> getTablePresenter();
 
-  Provider<EntityDialogPresenter> getEntityDialogPresenter();
+  Provider<EntityModalPresenter> getEntityModalPresenter();
 
   Provider<FunctionalUnitListPresenter> getFunctionalUnitListPresenter();
 
   Provider<FunctionalUnitDetailsPresenter> getFunctionalUnitDetailsPresenter();
 
-  Provider<FunctionalUnitUpdateDialogPresenter> getFunctionalUnitUpdateDialogPresenter();
+  Provider<FunctionalUnitUpdateModalPresenter> getFunctionalUnitUpdateModalPresenter();
 
   Provider<FileSystemTreePresenter> getFileSystemTreePresenter();
 
   Provider<FolderDetailsPresenter> getFolderDetailsPresenter();
 
-  FileUploadDialogPresenter getFileUploadDialogPresenter();
+  FileUploadModalPresenter getFileUploadModalPresenter();
 
   Provider<FileSelectorPresenter> getFileSelectorPresenter();
 
@@ -171,7 +171,7 @@ public interface OpalGinjector extends Ginjector {
 
   ValueSequencePopupPresenter getValueSequencePopupPresenter();
 
-  Provider<CreateFolderDialogPresenter> getCreateFolderDialogPresenter();
+  Provider<CreateFolderModalPresenter> getCreateFolderModalPresenter();
 
   DataImportPresenter getDataImportPresenter();
 
@@ -217,7 +217,7 @@ public interface OpalGinjector extends Ginjector {
 
   DeriveVariablePresenter getDeriveVariablePresenter();
 
-  CodingViewDialogPresenter getCodingViewDialogPresenter();
+  CodingViewModalPresenter getCodingViewModalPresenter();
 
   Translations getTranslations();
 

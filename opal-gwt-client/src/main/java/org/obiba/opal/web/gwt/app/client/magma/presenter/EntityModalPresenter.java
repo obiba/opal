@@ -53,7 +53,7 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 /**
  *
  */
-public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter.Display> {
+public class EntityModalPresenter extends PresenterWidget<EntityModalPresenter.Display> {
 
   private String entityType;
 
@@ -68,7 +68,7 @@ public class EntityDialogPresenter extends PresenterWidget<EntityDialogPresenter
   private static final TranslationMessages translationMessages = GWT.create(TranslationMessages.class);
 
   @Inject
-  public EntityDialogPresenter(EventBus eventBus, Display display,
+  public EntityModalPresenter(EventBus eventBus, Display display,
       ValueSequencePopupPresenter valueSequencePopupPresenter) {
     super(eventBus, display);
     this.valueSequencePopupPresenter = valueSequencePopupPresenter;

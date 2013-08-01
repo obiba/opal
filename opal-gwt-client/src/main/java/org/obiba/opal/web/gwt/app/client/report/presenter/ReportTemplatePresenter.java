@@ -12,8 +12,8 @@ package org.obiba.opal.web.gwt.app.client.report.presenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
-import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCanceledEvent;
-import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateDialogPresenter.Mode;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateModalPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -24,7 +24,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
@@ -39,7 +38,7 @@ public class ReportTemplatePresenter
 
   ReportTemplateListPresenter reportTemplateListPresenter;
 
-  ReportTemplateUpdateDialogPresenter reportTemplateUpdateDialogPresenter;
+  ModalProvider<ReportTemplateUpdateModalPresenter> reportTemplateUpdateModalPresenterProvider;
 
   public interface Display extends View, HasBreadcrumbs {
 
@@ -60,13 +59,13 @@ public class ReportTemplatePresenter
   public ReportTemplatePresenter(Display display, EventBus eventBus, Proxy proxy,
       ReportTemplateDetailsPresenter reportTemplateDetailsPresenter,
       ReportTemplateListPresenter reportTemplateListPresenter,
-      Provider<ReportTemplateUpdateDialogPresenter> reportTemplateUpdateDialogPresenterProvider,
+      ModalProvider<ReportTemplateUpdateModalPresenter> reportTemplateUpdateModalPresenterProvider,
       DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     this.reportTemplateDetailsPresenter = reportTemplateDetailsPresenter;
     this.reportTemplateListPresenter = reportTemplateListPresenter;
     this.breadcrumbsHelper = breadcrumbsHelper;
-    reportTemplateUpdateDialogPresenter = reportTemplateUpdateDialogPresenterProvider.get();
+    this.reportTemplateUpdateModalPresenterProvider = reportTemplateUpdateModalPresenterProvider.setContainer(this);
   }
 
 
@@ -108,7 +107,6 @@ public class ReportTemplatePresenter
 
   @Override
   protected void addHandlers() {
-    registerHandler(getEventBus().addHandler(ReportTemplateCanceledEvent.getType(), new ReportTemplateCanceledHandler()));
     registerHandler(getView().addReportTemplateClickHandler(new AddReportTemplateClickHandler()));
     registerHandler(getView().refreshClickHandler(new ClickHandler() {
 
@@ -130,18 +128,10 @@ public class ReportTemplatePresenter
 
     @Override
     public void onClick(ClickEvent event) {
-      ReportTemplateUpdateDialogPresenter presenter = reportTemplateUpdateDialogPresenter;
+      ReportTemplateUpdateModalPresenter presenter = reportTemplateUpdateModalPresenterProvider.get();
       presenter.setDialogMode(Mode.CREATE);
-      addToPopupSlot(presenter);
     }
 
   }
 
-  private class ReportTemplateCanceledHandler implements ReportTemplateCanceledEvent.Handler {
-
-    @Override
-    public void onReportTemplateCanceled(ReportTemplateCanceledEvent event) {
-      removeFromPopupSlot(reportTemplateUpdateDialogPresenter);
-    }
-  }
 }

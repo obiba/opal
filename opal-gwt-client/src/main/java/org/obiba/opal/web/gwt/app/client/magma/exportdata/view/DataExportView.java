@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.WizardModalBox;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepChain;
@@ -20,7 +21,6 @@ import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.ResetHan
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.ModalViewImpl;
 import org.obiba.opal.web.gwt.app.client.ui.TableChooser;
-import org.obiba.opal.web.gwt.app.client.ui.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
@@ -60,7 +60,7 @@ public class DataExportView extends ModalViewImpl implements DataExportPresenter
   private final Widget widget;
 
   @UiField
-  WizardDialogBox dialog;
+  WizardModalBox dialog;
 
   @UiField
   WizardStep tablesStep;

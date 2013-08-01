@@ -10,13 +10,13 @@
 package org.obiba.opal.web.gwt.app.client.magma.derive.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.WizardModalBox;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.BranchingWizardStepController;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveVariablePresenter;
 import org.obiba.opal.web.gwt.app.client.ui.ModalViewImpl;
-import org.obiba.opal.web.gwt.app.client.ui.WizardDialogBox;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 
 import com.google.gwt.core.client.GWT;
@@ -37,7 +37,7 @@ import com.google.inject.Inject;
 public class DeriveVariableView extends ModalViewImpl implements DeriveVariablePresenter.Display {
 
   @UiTemplate("DeriveVariableView.ui.xml")
-  interface ViewUiBinder extends UiBinder<WizardDialogBox, DeriveVariableView> {}
+  interface ViewUiBinder extends UiBinder<WizardModalBox, DeriveVariableView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -49,7 +49,7 @@ public class DeriveVariableView extends ModalViewImpl implements DeriveVariableP
   @UiField
   WizardStep scriptEvaluationStep;
 
-  private final WizardDialogBox dialog;
+  private final WizardModalBox dialog;
 
   private WizardStepChain stepChain;
 

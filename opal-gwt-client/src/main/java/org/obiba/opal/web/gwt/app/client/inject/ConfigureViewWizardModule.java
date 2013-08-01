@@ -9,22 +9,22 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.inject;
 
+import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.AddDerivedVariableModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.AttributeModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.CategoryModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.configureview.view.AddDerivedVariableModalView;
+import org.obiba.opal.web.gwt.app.client.magma.configureview.view.AttributeModalView;
+import org.obiba.opal.web.gwt.app.client.magma.configureview.view.CategoryModalView;
 import org.obiba.opal.web.gwt.app.client.presenter.LabelListPresenter;
 import org.obiba.opal.web.gwt.app.client.view.LabelListView;
-import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.AddDerivedVariableDialogPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.AttributeDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.AttributesPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.CategoriesPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.CategoryDialogPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.DataTabPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.SelectScriptVariablesTabPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.VariablesListTabPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.configureview.view.AddDerivedVariableDialogView;
-import org.obiba.opal.web.gwt.app.client.magma.configureview.view.AttributeDialogView;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.view.AttributesView;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.view.CategoriesView;
-import org.obiba.opal.web.gwt.app.client.magma.configureview.view.CategoryDialogView;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.view.ConfigureViewStepView;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.view.DataTabView;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.view.SelectScriptVariablesTabView;
@@ -42,8 +42,8 @@ public class ConfigureViewWizardModule extends AbstractPresenterModule {
     bindSingletonPresenterWidget(ConfigureViewStepPresenter.class, ConfigureViewStepPresenter.Display.class,
         ConfigureViewStepView.class);
 
-    bindPresenterWidget(AddDerivedVariableDialogPresenter.class, AddDerivedVariableDialogPresenter.Display.class,
-        AddDerivedVariableDialogView.class);
+    bindPresenterWidget(AddDerivedVariableModalPresenter.class, AddDerivedVariableModalPresenter.Display.class,
+        AddDerivedVariableModalView.class);
     bindPresenterWidget(VariablesListTabPresenter.class, VariablesListTabPresenter.Display.class,
         VariablesListTabView.class);
     bindPresenterWidget(CategoriesPresenter.class, CategoriesPresenter.Display.class, CategoriesView.class);
@@ -52,8 +52,8 @@ public class ConfigureViewWizardModule extends AbstractPresenterModule {
     bindPresenterWidget(SelectScriptVariablesTabPresenter.class, SelectScriptVariablesTabPresenter.Display.class,
         SelectScriptVariablesTabView.class);
 
-    bind(AttributeDialogPresenter.Display.class).to(AttributeDialogView.class);
-    bind(CategoryDialogPresenter.Display.class).to(CategoryDialogView.class);
+    bind(AttributeModalPresenter.Display.class).to(AttributeModalView.class);
+    bind(CategoryModalPresenter.Display.class).to(CategoryModalView.class);
     bind(DataTabPresenter.Display.class).to(DataTabView.class);
     bind(LabelListPresenter.Display.class).to(LabelListView.class);
   }

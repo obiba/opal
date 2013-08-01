@@ -2,11 +2,15 @@ package org.obiba.opal.web.gwt.app.client.ui;
 
 import java.util.Stack;
 
+import com.github.gwtbootstrap.client.ui.ModalFooter;
 import com.github.gwtbootstrap.client.ui.constants.BackdropType;
 import com.github.gwtbootstrap.client.ui.event.ShowEvent;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -14,6 +18,10 @@ import com.google.gwt.user.client.ui.Widget;
  * A Bootstrap Modal, resizable and draggable.
  */
 public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
+
+  private static final int INDEX_HEADER = 0;
+
+  private static final int INDEX_BODY = 1;
 
   private static ModalStack modalStack = new ModalStack();
 
@@ -33,6 +41,8 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
 
   private boolean hiddenOnStack = false;
 
+  private int bodyVerticalMargin = 0;
+
   public Modal() {
     this(false);
   }
@@ -49,6 +59,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     setAutoHide(false);
     setDraggable(true);
     setResizable(false);
+    History.addValueChangeHandler(new HistoryChangeValueHandler());
   }
 
   public void setResizable(boolean resizable) {
@@ -60,7 +71,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   }
 
   public void setAutoHide(boolean autoHide) {
-    if (autoHide) {
+    if(autoHide) {
       setBackdrop(BackdropType.NORMAL);
     } else {
       setBackdrop(BackdropType.STATIC);
@@ -70,7 +81,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   @Override
   public void show() {
 
-    if (!modalStack.isEmty() && !modalStack.has(this)) {
+    if(!modalStack.isEmty() && !modalStack.has(this)) {
       modalStack.hideCurrent();
     }
 
@@ -81,24 +92,26 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
 
   @Override
   protected void onShow(Event e) {
-    if (!hiddenOnStack) fireEvent(new ShowEvent(e));
+    if(!hiddenOnStack) fireEvent(new ShowEvent(e));
   }
 
   @Override
   protected void onShown(Event e) {
-    if (!hiddenOnStack) super.onShown(e);
+    if(!hiddenOnStack) super.onShown(e);
     hiddenOnStack = false;
+    // calculate once the modal is shown, too expensive to do this on every mouse move
+    calculateBodyVerticalMargin();
   }
 
   protected void onHide(Event e) {
-    if (!hiddenOnStack) super.onHide(e);
+    if(!hiddenOnStack) super.onHide(e);
   }
 
   /**
    * This method is called once the widget is completely hidden.
    */
   protected void onHidden(Event e) {
-    if (!hiddenOnStack) {
+    if(!hiddenOnStack) {
       super.onHidden(e);
 
       modalStack.pop(this);
@@ -115,13 +128,13 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
         Event.ONMOUSEOVER);
   }
 
-    /**
-     * processes the mouse-events to showCurrent cursor or change states
-     * - mouseover
-     * - mousedown
-     * - mouseup
-     * - mousemove
-     */
+  /**
+   * processes the mouse-events to showCurrent cursor or change states
+   * - mouseover
+   * - mousedown
+   * - mouseup
+   * - mousemove
+   */
   @Override
   public void onBrowserEvent(Event event) {
     switch(DOM.eventGetType(event)) {
@@ -138,6 +151,25 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
         onMouseUpEvent(event);
         break;
     }
+  }
+
+  protected Widget getHeaderWidget() {
+    return getWidgetAt(INDEX_HEADER);
+  }
+
+  protected Widget getBodyWidget() {
+    return getWidgetAt(INDEX_BODY);
+  }
+
+  protected Widget getFooterWidget() {
+
+    for(Widget child : getChildren()) {
+      if (child instanceof ModalFooter) {
+        return child;
+      }
+    }
+
+    return null;
   }
 
   private void onMouseOverEvent(Event event) {
@@ -188,12 +220,37 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     int originalY = getAbsoluteTop();
     //do not allow mirror-functionality
     if(absY > originalY && absX > originalX) {
+      Widget body = getBodyWidget();
       Integer height = absY - originalY + 2;
-      setHeight(height + "px");
-
       Integer width = absX - originalX + 2;
+      resizeBodyVertically(height);
+      setHeight(height + "px");
       setWidth(width + "px");
+      setMaxHeigth(height + "px");
     }
+  }
+
+  private void calculateBodyVerticalMargin() {
+    Widget header = getHeaderWidget();
+    Widget footer = getFooterWidget();
+
+    int headerHeight = header == null ? 0 : header.getOffsetHeight();
+    int footerHeight = footer == null ? 0 : footer.getOffsetHeight();
+    bodyVerticalMargin = headerHeight + footerHeight;
+  }
+
+  private void resizeBodyVertically(int height) {
+    Widget body = getBodyWidget();
+    body.setHeight((height - bodyVerticalMargin) + "px");
+  }
+
+  private Widget getWidgetAt(int index) {
+    try {
+      return getWidget(index);
+    } catch(IndexOutOfBoundsException e) {
+    }
+
+    return null;
   }
 
   private void doMove(Event event) {
@@ -281,6 +338,15 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     } else return false;
   }
 
+  private class HistoryChangeValueHandler implements ValueChangeHandler<String> {
+
+    @Override
+    public void onValueChange(ValueChangeEvent<String> event) {
+      Modal modal = Modal.this;
+      if(modal.isVisible()) modal.hide();
+    }
+  }
+
   // These class is part of a temporary HACK until get-bootstrap library supports stacked modal dialogs.
   // Currently this is not supported: https://github.com/twbs/bootstrap/issues/8785
 
@@ -297,14 +363,14 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     }
 
     private void push(Modal modal) {
-      if (!modal.hiddenOnStack && currentlyShown.search(modal) == -1) currentlyShown.push(modal);
+      if(!modal.hiddenOnStack && currentlyShown.search(modal) == -1) currentlyShown.push(modal);
       GWT.log("push() :: " + currentlyShown.size());
     }
 
     private void pop(Modal modal) {
       Modal top = currentlyShown.peek();
 
-      if (!top.equals(modal)) {
+      if(!top.equals(modal)) {
         throw new IllegalArgumentException("Modal dialog is not on the stack");
       }
 
@@ -315,14 +381,14 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
 
     public void hideCurrent() {
       Modal current = currentlyShown.peek();
-      if (current != null) {
+      if(current != null) {
         current.hiddenOnStack = true;
         current.hide();
       }
     }
 
     public void showCurrent() {
-      if (currentlyShown.size() > 0) {
+      if(currentlyShown.size() > 0) {
         Modal current = currentlyShown.peek();
         current.show();
       }

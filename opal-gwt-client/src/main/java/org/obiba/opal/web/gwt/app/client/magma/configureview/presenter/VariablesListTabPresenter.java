@@ -97,7 +97,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
   private final SummaryTabPresenter summaryPresenter;
 
-  private final AddDerivedVariableDialogPresenter addDerivedVariableDialogPresenter;
+  private final AddDerivedVariableModalPresenter addDerivedVariableModalPresenter;
 
   /**
    * Widget for entering, and testing, the "select" script.
@@ -124,11 +124,11 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
   @Inject
   @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
   public VariablesListTabPresenter(Display display, EventBus eventBus, SummaryTabPresenter summaryPresenter,
-      AddDerivedVariableDialogPresenter addDerivedVariableDialogPresenter, ScriptEditorPresenter scriptEditorPresenter,
+      AddDerivedVariableModalPresenter addDerivedVariableModalPresenter, ScriptEditorPresenter scriptEditorPresenter,
       CategoriesPresenter categoriesPresenter, AttributesPresenter attributesPresenter) {
     super(eventBus, display);
     this.summaryPresenter = summaryPresenter;
-    this.addDerivedVariableDialogPresenter = addDerivedVariableDialogPresenter;
+    this.addDerivedVariableModalPresenter = addDerivedVariableModalPresenter;
     this.scriptEditorPresenter = scriptEditorPresenter;
     this.categoriesPresenter = categoriesPresenter;
     this.attributesPresenter = attributesPresenter;
@@ -151,7 +151,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
   @Override
   protected void onUnbind() {
     super.onUnbind();
-    addDerivedVariableDialogPresenter.unbind();
+    addDerivedVariableModalPresenter.unbind();
     summaryPresenter.unbind();
   }
 
@@ -480,8 +480,8 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
     @Override
     public void onClick(ClickEvent event) {
-      addDerivedVariableDialogPresenter.getView().getVariableName().setText("");
-      addToPopupSlot(addDerivedVariableDialogPresenter);
+      addDerivedVariableModalPresenter.getView().getVariableName().setText("");
+      addToPopupSlot(addDerivedVariableModalPresenter);
     }
   }
 
@@ -799,7 +799,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
       getView().navigationEnabled(true);
       updateSelectedVariableName();
       if(getVariableList().size() > 0) getView().removeButtonEnabled(true);
-      addDerivedVariableDialogPresenter.refreshVariableNameSuggestions(viewDto);
+      addDerivedVariableModalPresenter.refreshVariableNameSuggestions(viewDto);
     }
 
   }

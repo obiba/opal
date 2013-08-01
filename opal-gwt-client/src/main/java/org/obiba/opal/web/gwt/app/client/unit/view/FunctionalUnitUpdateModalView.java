@@ -12,13 +12,11 @@ package org.obiba.opal.web.gwt.app.client.unit.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
-import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogPresenter.Mode;
-import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateDialogUiHandlers;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateModalPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateModalPresenter.Mode;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateModalUiHandlers;
 
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.event.HiddenEvent;
-import com.github.gwtbootstrap.client.ui.event.HiddenHandler;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -34,11 +32,12 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-public class FunctionalUnitUpdateDialogView extends ModalPopupViewWithUiHandlers<FunctionalUnitUpdateDialogUiHandlers> implements Display {
+public class FunctionalUnitUpdateModalView extends ModalPopupViewWithUiHandlers<FunctionalUnitUpdateModalUiHandlers>
+    implements Display {
 
-  interface FunctionalUnitUpdateDialogUiBinder extends UiBinder<Widget, FunctionalUnitUpdateDialogView> {}
+  interface FunctionalUnitUpdateModalUiBinder extends UiBinder<Widget, FunctionalUnitUpdateModalView> {}
 
-  private static final FunctionalUnitUpdateDialogUiBinder uiBinder = GWT.create(FunctionalUnitUpdateDialogUiBinder
+  private static final FunctionalUnitUpdateModalUiBinder uiBinder = GWT.create(FunctionalUnitUpdateModalUiBinder
       .class);
 
   private static final Translations translations = GWT.create(Translations.class);
@@ -68,7 +67,7 @@ public class FunctionalUnitUpdateDialogView extends ModalPopupViewWithUiHandlers
   DisclosurePanel options;
 
   @Inject
-  public FunctionalUnitUpdateDialogView(EventBus eventBus) {
+  public FunctionalUnitUpdateModalView(EventBus eventBus) {
     super(eventBus);
     uiBinder.createAndBindUi(this);
     selectEnabled.setValue(false);

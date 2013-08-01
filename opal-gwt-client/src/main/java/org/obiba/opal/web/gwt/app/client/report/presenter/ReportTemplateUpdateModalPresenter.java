@@ -23,7 +23,6 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ItemSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
-import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCanceledEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
@@ -54,8 +53,8 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
-public class ReportTemplateUpdateDialogPresenter extends ModalPresenterWidget<ReportTemplateUpdateDialogPresenter.Display>
-    implements ReportTemplateUpdateDialogUiHandlers {
+public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<ReportTemplateUpdateModalPresenter.Display>
+    implements ReportTemplateUpdateModalUiHandlers {
 
   private final FileSelectionPresenter fileSelectionPresenter;
 
@@ -73,7 +72,7 @@ public class ReportTemplateUpdateDialogPresenter extends ModalPresenterWidget<Re
     CREATE, UPDATE
   }
 
-  public interface Display extends PopupView, HasUiHandlers<ReportTemplateUpdateDialogUiHandlers> {
+  public interface Display extends PopupView, HasUiHandlers<ReportTemplateUpdateModalUiHandlers> {
 
     public enum FormField {
       NAME,
@@ -116,9 +115,10 @@ public class ReportTemplateUpdateDialogPresenter extends ModalPresenterWidget<Re
   }
 
   @Inject
-  public ReportTemplateUpdateDialogPresenter(Display display, EventBus eventBus,
+  public ReportTemplateUpdateModalPresenter(Display display, EventBus eventBus,
       Provider<FileSelectionPresenter> fileSelectionPresenterProvider,
-      Provider<ItemSelectorPresenter> itemSelectorPresenterProvider, Provider<NotificationPresenter> errorNotificationPresenterProvider) {
+      Provider<ItemSelectorPresenter> itemSelectorPresenterProvider,
+      Provider<NotificationPresenter> errorNotificationPresenterProvider) {
     super(eventBus, display);
     fileSelectionPresenter = fileSelectionPresenterProvider.get();
     emailSelectorPresenter = itemSelectorPresenterProvider.get();
@@ -209,7 +209,6 @@ public class ReportTemplateUpdateDialogPresenter extends ModalPresenterWidget<Re
   public void onDialogHidden() {
     errorNotificationPresenter.close();
     getView().clearErrors();
-    getEventBus().fireEvent(new ReportTemplateCanceledEvent());
   }
 
   @Override
