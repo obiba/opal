@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
@@ -27,26 +28,20 @@ import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class FileUploadModalPresenter extends PresenterWidget<FileUploadModalPresenter.Display> {
+public class FileUploadModalPresenter extends ModalPresenterWidget<FileUploadModalPresenter.Display>
+    implements FileUploadModalUiHandlers {
 
-  public interface Display extends PopupView {
+  public interface Display extends PopupView, HasUiHandlers<FileUploadModalUiHandlers> {
 
     void hideDialog();
 
-    HasClickHandlers getUploadButton();
-
-    HasClickHandlers getCancelButton();
-
-    String getFilename();
-
-    HandlerRegistration addSubmitCompleteHandler(FormPanel.SubmitCompleteHandler handler);
-
     void submit(String url);
 
-    HasText getRemoteFolderName();
+    void setRemoteFolderName(String folderName);
   }
 
   private final Translations translations;
@@ -63,6 +58,7 @@ public class FileUploadModalPresenter extends PresenterWidget<FileUploadModalPre
     super(eventBus, display);
     this.translations = translations;
     this.urlBuilder = urlBuilder;
+    getView().setUiHandlers(this);
   }
 
   public void setCurrentFolder(FileDto currentFolder) {
@@ -70,37 +66,35 @@ public class FileUploadModalPresenter extends PresenterWidget<FileUploadModalPre
   }
 
   @Override
-  protected void onBind() {
-    registerHandler(getView().getUploadButton().addClickHandler(new ClickHandler() {
+  public void uploadFile(String fileName) {
+
+    actionRequiringConfirmation = new Runnable() {
       @Override
-      public void onClick(ClickEvent event) {
-        uploadFile();
+      public void run() {
+        submitFile();
       }
-    }));
+    };
 
-    registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getView().hideDialog();
-      }
-    }));
+    if("".equals(fileName)) {
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.fileMustBeSelected()).build());
+    } else if(fileExist(fileName)) {
+      getEventBus().fireEvent(ConfirmationRequiredEvent
+          .createWithKeys(actionRequiringConfirmation, "replaceExistingFile", "confirmReplaceExistingFile"));
+    } else {
+      submitFile();
+    }
+  }
 
-    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
-
-    registerHandler(getView().addSubmitCompleteHandler(new FormPanel.SubmitCompleteHandler() {
-      @Override
-      public void onSubmitComplete(SubmitCompleteEvent event) {
-        getView().hideDialog();
-        getEventBus().fireEvent(new FileUploadedEvent());
-      }
-    }));
-
+  @Override
+  public void submit() {
+    getView().hideDialog();
+    getEventBus().fireEvent(new FileUploadedEvent());
   }
 
   @Override
   public void onReveal() {
     String folderName = currentFolder.getName();
-    getView().getRemoteFolderName().setText("root".equals(folderName) ? translations.fileSystemLabel() : folderName);
+    getView().setRemoteFolderName("root".equals(folderName) ? translations.fileSystemLabel() : folderName);
   }
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
@@ -132,27 +126,6 @@ public class FileUploadModalPresenter extends PresenterWidget<FileUploadModalPre
     }
 
     return false;
-  }
-
-  private void uploadFile() {
-
-    actionRequiringConfirmation = new Runnable() {
-      @Override
-      public void run() {
-        submitFile();
-      }
-    };
-
-    String fileName = getView().getFilename();
-    if("".equals(fileName)) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.fileMustBeSelected()).build());
-    } else if(fileExist(fileName)) {
-      getEventBus().fireEvent(ConfirmationRequiredEvent
-          .createWithKeys(actionRequiringConfirmation, "replaceExistingFile", "confirmReplaceExistingFile"));
-    } else {
-      submitFile();
-    }
-
   }
 
   private void submitFile() {
