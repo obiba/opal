@@ -32,7 +32,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-public class FunctionalUnitUpdateModalView extends ModalPopupViewWithUiHandlers<FunctionalUnitUpdateModalUiHandlers> implements Display {
+public class FunctionalUnitUpdateModalView extends ModalPopupViewWithUiHandlers<FunctionalUnitUpdateModalUiHandlers>
+    implements Display {
 
   interface FunctionalUnitUpdateModalUiBinder extends UiBinder<Widget, FunctionalUnitUpdateModalView> {}
 
