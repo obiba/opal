@@ -45,7 +45,7 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
 
   private NotificationCloseHandler notificationCloseHandler;
 
-  private boolean sticky = true;
+  private boolean sticky = false;
 
   //
   // Constructors
