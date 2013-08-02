@@ -6,36 +6,36 @@
 
   <ui:style>
     .inline {
-    display: inline;
+      display: inline;
     }
 
     .left-aligned {
-    float: left;
+      float: left;
     }
 
     .right-aligned {
-    float: right;
+      float: right;
     }
 
     .left-margin {
-    padding-left: 5px;
+      padding-left: 5px;
     }
 
     .right-margin {
-    padding-right: 5px;
+      padding-right: 5px;
     }
 
     .top-margin {
-    padding-top: 0.5em;
+      padding-top: 0.5em;
     }
 
     .bottom-margin {
-    padding-bottom: 5px;
-    border-bottom: #BBBBBB 1px solid;
+      padding-bottom: 5px;
+      border-bottom: #BBBBBB 1px solid;
     }
 
     .name-input {
-    width: 90%;
+      width: 90%;
     }
   </ui:style>
   <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false">
@@ -61,30 +61,29 @@
           </b:Column>
         </b:FluidRow>
       </g:FlowPanel>
-
-      <b:ModalFooter>
-        <g:FlowPanel addStyleNames="pull-left" >
-          <g:FlowPanel ui:field="createFolderPanel">
-            <b:Controls>
+    </g:FlowPanel>
+    <b:ModalFooter>
+      <g:FlowPanel addStyleNames="pull-left">
+        <g:FlowPanel ui:field="createFolderPanel">
+          <b:Controls>
             <b:TextBox ui:field="createFolderName" addStyleNames="inline-block"/>
-            <b:Button ui:field="createFolderButton" >
+            <b:Button ui:field="createFolderButton">
               <ui:msg description="Create Folder button label">Create Folder</ui:msg>
             </b:Button>
-            </b:Controls>
-          </g:FlowPanel>
-          <b:Button ui:field="uploadButton">
-            <ui:msg description="Upload File label">Upload</ui:msg>
-          </b:Button>
+          </b:Controls>
         </g:FlowPanel>
-        <g:FlowPanel addStyleNames="pull-right">
-          <b:Button ui:field="selectButton" type="PRIMARY">
-            <ui:msg description="Select button label">Select</ui:msg>
-          </b:Button>
-          <b:Button ui:field="cancelButton">
-            <ui:msg description="Cancel button label">Cancel</ui:msg>
-          </b:Button>
-        </g:FlowPanel>
-      </b:ModalFooter>
-    </g:FlowPanel>
+        <b:Button ui:field="uploadButton">
+          <ui:msg description="Upload File label">Upload</ui:msg>
+        </b:Button>
+      </g:FlowPanel>
+      <g:FlowPanel addStyleNames="pull-right">
+        <b:Button ui:field="selectButton" type="PRIMARY">
+          <ui:msg description="Select button label">Select</ui:msg>
+        </b:Button>
+        <b:Button ui:field="cancelButton">
+          <ui:msg description="Cancel button label">Cancel</ui:msg>
+        </b:Button>
+      </g:FlowPanel>
+    </b:ModalFooter>
   </o:Modal>
 </ui:UiBinder>
