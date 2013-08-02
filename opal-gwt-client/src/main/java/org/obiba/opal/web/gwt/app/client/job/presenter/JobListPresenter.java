@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdminis
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
@@ -56,18 +57,18 @@ public class JobListPresenter extends ItemAdministrationPresenter<JobListPresent
 
   public static final String CANCEL_ACTION = "Cancel";
 
-  private final JobDetailsPresenter jobDetailsPresenter;
+  private final ModalProvider<JobDetailsPresenter> jobDetailsModalProvider;
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
   private Runnable actionRequiringConfirmation;
 
   @Inject
-  public JobListPresenter(Display display, EventBus eventBus, Proxy proxy, JobDetailsPresenter jobDetailsPresenter,
-      DefaultBreadcrumbsBuilder breadcrumbsHelper) {
+  public JobListPresenter(Display display, EventBus eventBus, Proxy proxy,
+      ModalProvider<JobDetailsPresenter> jobDetailsModalProvider, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
 
-    this.jobDetailsPresenter = jobDetailsPresenter;
+    this.jobDetailsModalProvider = jobDetailsModalProvider.setContainer(this);
     this.breadcrumbsHelper = breadcrumbsHelper;
 
     getView().getActionsColumn().setActionHandler(new ActionHandler<CommandStateDto>() {
@@ -144,8 +145,8 @@ public class JobListPresenter extends ItemAdministrationPresenter<JobListPresent
 
   private void doActionImpl(final CommandStateDto dto, String actionName) {
     if(LOG_ACTION.equals(actionName)) {
+      JobDetailsPresenter jobDetailsPresenter = jobDetailsModalProvider.get();
       jobDetailsPresenter.setJob(dto);
-      addToPopupSlot(jobDetailsPresenter);
     } else if(CANCEL_ACTION.equals(actionName)) {
       authorizeCancelJob(dto, new Authorizer(getEventBus()) {
 

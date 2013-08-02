@@ -14,35 +14,31 @@ import java.util.Date;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.job.presenter.JobDetailsPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.DateTimeColumn;
-import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
 import org.obiba.opal.web.model.client.opal.CommandStateDto;
 import org.obiba.opal.web.model.client.opal.Message;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PopupViewImpl;
+import com.google.web.bindery.event.shared.EventBus;
 
-public class JobDetailsView extends PopupViewImpl implements Display {
+public class JobDetailsView extends ModalPopupViewWithUiHandlers<ModalUiHandlers> implements Display {
 
-  private static final String DIALOG_HEIGHT = "30em";
+  private static int DIALOG_HEIGHT = 400;
 
-  private static final String DIALOG_WIDTH = "40em";
+  private static final int DIALOG_WIDTH = 480;
 
-  @UiTemplate("JobDetailsView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, JobDetailsView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
@@ -52,16 +48,7 @@ public class JobDetailsView extends PopupViewImpl implements Display {
   private final Widget widget;
 
   @UiField
-  DialogBox dialogBox;
-
-  @UiField
-  DockLayoutPanel content;
-
-  @UiField
-  Button closeButton;
-
-  @UiField
-  ResizeHandle resizeHandle;
+  Modal dialogBox;
 
   @UiField
   CellTable<Message> table;
@@ -70,18 +57,15 @@ public class JobDetailsView extends PopupViewImpl implements Display {
   public JobDetailsView(EventBus eventBus) {
     super(eventBus);
     widget = uiBinder.createAndBindUi(this);
-    resizeHandle.makeResizable(content);
-    content.setHeight(DIALOG_HEIGHT);
-    content.setWidth(DIALOG_WIDTH);
+    dialogBox.setMinHeight(DIALOG_HEIGHT);
+    dialogBox.setMinWidth(DIALOG_WIDTH);
 
     initTable();
-
-    addDialogCloseHandler();
   }
 
   @Override
   public void setJob(CommandStateDto commandStateDto) {
-    dialogBox.setText(translations.jobLabel() + " #" + commandStateDto.getId());
+    dialogBox.setTitle(translations.jobLabel() + " #" + commandStateDto.getId());
 
     JsArray<Message> jobMessages = JsArrays.toSafeArray(commandStateDto.getMessagesArray());
 
@@ -114,13 +98,8 @@ public class JobDetailsView extends PopupViewImpl implements Display {
     }, translations.messageLabel());
   }
 
-  private void addDialogCloseHandler() {
-    closeButton.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        hide();
-      }
-    });
+  @UiHandler("closeButton")
+  public void onCloseButton(ClickEvent event) {
+    dialogBox.hide();
   }
 }
