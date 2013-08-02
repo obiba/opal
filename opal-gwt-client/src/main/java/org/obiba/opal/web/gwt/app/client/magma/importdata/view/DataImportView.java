@@ -179,7 +179,12 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
           }
         }).title(translations.dataImportFileStep())//
 
-        .append(destinationSelectionStep, destinationSelectionHelp)//
+        .append(destinationSelectionStep, destinationSelectionHelp, new Skippable() {
+          @Override
+          public boolean skip() {
+            return !ImportFormat.CSV.name().equals(formatChooser.getSelectedValue());
+          }
+        })//
         .title(translations.dataImportDestinationStep())//
         .onValidate(new ValidationHandler() {
 
