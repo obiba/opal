@@ -9,24 +9,25 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.job.presenter;
 
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 import org.obiba.opal.web.model.client.opal.CommandStateDto;
 
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class JobDetailsPresenter extends PresenterWidget<JobDetailsPresenter.Display> {
+public class JobDetailsPresenter extends ModalPresenterWidget<JobDetailsPresenter.Display> {
 
-  public interface Display extends PopupView {
-
+  public interface Display extends PopupView, HasUiHandlers<ModalUiHandlers> {
     void setJob(CommandStateDto commandStateDto);
-
   }
 
   @Inject
   public JobDetailsPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
+    getView().setUiHandlers(this);
   }
 
   public void setJob(CommandStateDto dto) {

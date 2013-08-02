@@ -25,6 +25,8 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
 
   private static final int RESIZE_CURSOR_MARGIN = 30; // pixel
 
+  private static final int DEFAULT_MINIMUM_WIDTH = 200;
+
   private static ModalStack modalStack = new ModalStack();
 
   private boolean resizable = false;
@@ -47,7 +49,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
 
   private int minHeight = 0;
 
-  private int minWidth = 0;
+  private int minWidth = DEFAULT_MINIMUM_WIDTH;
 
   public Modal() {
     this(false);
@@ -111,7 +113,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   }
 
   public void setMinWidth(int width) {
-    if (width < 0 ) return;
+    if (width < DEFAULT_MINIMUM_WIDTH ) return;
     minWidth = width;
   }
 
@@ -146,7 +148,9 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     if (minHeight == 0 || getOffsetHeight() > minHeight) return;
 
     resizeBodyVertically(minHeight);
-    setHeight(minHeight + "px");
+    // NOTE: setting the height and the body height causes footer draw glitches
+    // for now we only set the width on the body
+//    setHeight(minHeight + "px");
   }
 
   private void setInitialWidth() {
@@ -257,7 +261,9 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
       Integer height = Math.max(minHeight, absY - originalY + 2);
       Integer width = Math.max(minWidth, absX - originalX + 2);
       resizeBodyVertically(height);
-      setHeight(height + "px");
+      // NOTE: setting the height and the body height causes footer draw glitches
+      // for now we only set the width on the body
+//      setHeight(height + "px");
       setWidth(width + "px");
       setMaxHeigth(height + "px");
     }
@@ -270,11 +276,13 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     int headerHeight = header == null ? 0 : header.getOffsetHeight();
     int footerHeight = footer == null ? 0 : footer.getOffsetHeight();
     bodyVerticalMargin = headerHeight + footerHeight;
+    minHeight = Math.max(bodyVerticalMargin, minHeight);
   }
 
   private void resizeBodyVertically(int height) {
     Widget body = getBodyWidget();
-    body.setHeight((Math.max(0, height - bodyVerticalMargin)) + "px");
+    int newHeight = (Math.max(minHeight - bodyVerticalMargin, height - bodyVerticalMargin));
+    body.setHeight(newHeight + "px");
   }
 
   private Widget getWidgetAt(int index) {
