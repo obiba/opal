@@ -419,7 +419,7 @@ public interface Translations extends Constants {
       "ProjectNameRequired", "Project name is required.", //
       "ProjectNameMustBeUnique", "A project already exists with this name.",//
       "ProjectCreationFailed", "The datasource creation has failed: {0}" //
-       })
+  })
   Map<String, String> userMessageMap();
 
   @Description("You must select a file message")
@@ -1134,8 +1134,7 @@ public interface Translations extends Constants {
   String csvFormatOptionsStep();
 
   @Description("Datasource Type map")
-  @DefaultStringMapValue({
-      "mongodb", "MongoDB", //
+  @DefaultStringMapValue({ "mongodb", "MongoDB", //
       "hibernate", "Opal SQL", //
       "jdbc", "Custom SQL", //
       "fs", "XML", //
@@ -1404,7 +1403,7 @@ public interface Translations extends Constants {
   Map<String, String> dataShieldLabelsMap();
 
   @Description("Project Tab Names")
-  @DefaultStringMapValue({ "home","Home", //
+  @DefaultStringMapValue({ "home", "Home", //
       "tables", "Tables", //
       "files", "Files", //
       "visualisation", "Data visualization", //
@@ -1414,7 +1413,6 @@ public interface Translations extends Constants {
       "administration", "Administration" //
   })
   Map<String, String> projectTabNameMap();
-
 
   @Description("Lower Value Limit Required label")
   @DefaultStringValue("Lower value limit is required.")
@@ -1837,4 +1835,16 @@ public interface Translations extends Constants {
   @Description("Upload File Modal title")
   @DefaultStringValue("File Upload")
   String uploadFileModalTitle();
+
+  @Description("Edit label")
+  @DefaultStringValue("Edit")
+  String editLabel();
+
+  @Description("Save label")
+  @DefaultStringValue("Save")
+  String saveLabel();
+
+  @Description("History label")
+  @DefaultStringValue("History")
+  String historyLabel();
 }

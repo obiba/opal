@@ -55,6 +55,10 @@ li {
   margin-right: 0.4em;
 }
 
+.small-right-indent {
+  margin-right: 0.8em;
+}
+
 .small-dual-indent {
   margin-left: 0.8em;
   margin-right: 0.8em;

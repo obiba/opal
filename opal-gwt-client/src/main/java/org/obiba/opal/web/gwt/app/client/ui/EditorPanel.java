@@ -10,13 +10,17 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.ButtonGroup;
 import com.github.gwtbootstrap.client.ui.constants.ButtonType;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.github.gwtbootstrap.client.ui.constants.ToggleType;
 import com.github.gwtbootstrap.client.ui.resources.ButtonSize;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.DeckPanel;
@@ -26,7 +30,9 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class EditorPanel extends FlowPanel {
 
-  private FlowPanel controls;
+  private static final Translations translations = GWT.create(Translations.class);
+
+  private final FlowPanel controls;
 
   private final Button edit;
 
@@ -34,20 +40,17 @@ public class EditorPanel extends FlowPanel {
 
   private final Button cancel;
 
-  private Button history;
-
   private final DeckPanel deck;
+
+  private Button history;
 
   private Handler handler;
 
-  private Object editWidget;
-
   public EditorPanel() {
-    // TODO translate
     controls = new FlowPanel();
-    edit = new Button("Edit");
-    save = new Button("Save");
-    cancel = new Button("Cancel");
+    edit = new Button(translations.editLabel());
+    save = new Button(translations.saveLabel());
+    cancel = new Button(translations.cancelLabel());
     initControls();
     super.add(deck = new DeckPanel());
   }
@@ -56,6 +59,7 @@ public class EditorPanel extends FlowPanel {
     controls.addStyleName("bottom-margin");
     edit.setIcon(IconType.EDIT);
     edit.setType(ButtonType.INFO);
+    edit.addStyleName("small-right-indent");
     edit.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
@@ -66,6 +70,7 @@ public class EditorPanel extends FlowPanel {
     controls.add(edit);
 
     save.setType(ButtonType.PRIMARY);
+    save.addStyleName("small-right-indent");
     save.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
@@ -83,7 +88,6 @@ public class EditorPanel extends FlowPanel {
         if(handler != null) handler.onCancel();
       }
     });
-    cancel.addStyleName("small-indent");
     cancel.setVisible(false);
     controls.add(cancel);
 
@@ -105,18 +109,15 @@ public class EditorPanel extends FlowPanel {
   private void initDeck() {
     deck.showWidget(0);
     if(deck.getWidgetCount() == 3) {
-      // TODO translate
-      history = new Button("History");
-      history.setType(ButtonType.LINK);
-      //history.addStyleName("pull-right");
+      history = new Button(translations.historyLabel());
+      //history.setType(ButtonType.LINK);
+      history.setSize(edit.getSize());
       history.addClickHandler(new ClickHandler() {
         @Override
         public void onClick(ClickEvent event) {
-          edit.setVisible(true);
-          save.setVisible(false);
-          cancel.setVisible(false);
-          deck.showWidget(2);
-          if(handler != null) handler.onHistory();
+          boolean visible = deck.getVisibleWidget() == 2;
+          if(!visible && handler != null) handler.onHistory();
+          showHistory(!visible);
         }
       });
       controls.add(history);
@@ -132,6 +133,9 @@ public class EditorPanel extends FlowPanel {
     edit.setSize(size);
     save.setSize(size);
     cancel.setSize(size);
+    if (history != null) {
+      history.setSize(size);
+    }
   }
 
   public void setHandler(Handler handler) {
@@ -140,12 +144,25 @@ public class EditorPanel extends FlowPanel {
 
   public void showEditor(boolean visible) {
     edit.setVisible(!visible);
-    if (history != null) {
-      history.setVisible(!visible);
-    }
     save.setVisible(visible);
     cancel.setVisible(visible);
     deck.showWidget(visible ? 1 : 0);
+    if(history != null) {
+      history.setVisible(!visible);
+      history.setText(translations.historyLabel());
+    }
+  }
+
+  public void showHistory(boolean visible) {
+    edit.setVisible(true);
+    save.setVisible(false);
+    cancel.setVisible(false);
+    deck.showWidget(visible ? 2 : 0);
+    if(visible) {
+      history.setText(translations.viewLabel());
+    } else {
+      history.setText(translations.historyLabel());
+    }
   }
 
   public HasAuthorization getAuthorizer() {
