@@ -1133,6 +1133,12 @@
         <version>${rhino-js.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.mongodb</groupId>
+        <artifactId>mongo-java-driver</artifactId>
+        <version>${mongodb-driver.version}</version>
+      </dependency>
+
       <!--dependency>
         <groupId>com.wordnik</groupId>
         <artifactId>swagger-jaxrs_2.9.1</artifactId>
@@ -1529,6 +1535,7 @@
     <public-datasources.version>1.0</public-datasources.version>
     <mail.version>1.4</mail.version>
     <mockftpserver.version>2.1</mockftpserver.version>
+    <mongodb-driver.version>2.11.1</mongodb-driver.version>
     <mysql-connector-java.version>5.1.24</mysql-connector-java.version>
     <obiba-commons.version>1.4.0</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
