@@ -13,6 +13,7 @@ package org.obiba.opal.core.cfg;
 import java.util.List;
 
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,6 +21,7 @@ public class TaxonomiesConfigurationService implements TaxonomyService {
 
   private final ExtensionConfigurationSupplier<TaxonomiesConfiguration> configSupplier;
 
+  @Autowired
   public TaxonomiesConfigurationService(OpalConfigurationService configService) {
     configSupplier = new ExtensionConfigurationSupplier<TaxonomiesConfiguration>(configService,
         TaxonomiesConfiguration.class);
