@@ -13,7 +13,10 @@ import java.util.List;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
+import org.obiba.magma.Attribute;
 import org.obiba.magma.Datasource;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
 import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.runtime.OpalRuntime;
@@ -23,6 +26,9 @@ import org.obiba.opal.project.ProjectService;
 import org.obiba.opal.project.domain.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 @Component
 public class ProjectsConfigurationService implements ProjectService {
@@ -83,7 +89,10 @@ public class ProjectsConfigurationService implements ProjectService {
     if(hasProject(ds.getName())) {
       project = getProject(ds.getName());
     } else {
-      Project.Builder builder = Project.Builder.create(ds.getName());
+      Project.Builder builder = Project.Builder.create(ds.getName()) //
+          .title(ds.getName()) //
+          .tags(getAttributeNamespaces(ds));
+
       addOrReplaceProject(project = builder.build());
     }
     return project;
@@ -118,5 +127,20 @@ public class ProjectsConfigurationService implements ProjectService {
     } catch(FileSystemException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private List<String> getAttributeNamespaces(Datasource ds) {
+    List<String> namespaces = Lists.newArrayList();
+    for (ValueTable table : ds.getValueTables()) {
+      for (Variable variable : table.getVariables()) {
+        for (Attribute attr : variable.getAttributes()) {
+          String ns = attr.getNamespace();
+          if (!Strings.isNullOrEmpty(ns) && !ns.equals("opal") && !namespaces.contains(ns)) {
+            namespaces.add(ns);
+          }
+        }
+      }
+    }
+    return namespaces;
   }
 }

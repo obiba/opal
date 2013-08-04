@@ -26,15 +26,19 @@ public class Dtos {
     Projects.ProjectDto.Builder builder = Projects.ProjectDto.newBuilder() //
         .setName(project.getName());
 
+    builder.setTitle(project.hasTitle() ? project.getTitle() : project.getName());
+
     if(project.hasDescription()) {
       builder.setDescription(project.getDescription());
     }
 
-    if (project.hasTags()) {
+    if(project.hasTags()) {
       builder.addAllTags(project.getTags());
     }
 
-    if (directory != null) {
+    builder.setArchived(project.isArchived());
+
+    if(directory != null) {
       builder.setDirectory(directory);
     }
 
@@ -46,9 +50,12 @@ public class Dtos {
   }
 
   public static Project fromDto(Projects.ProjectDto projectDto) {
-    Project.Builder builder = Project.Builder.create(projectDto.getName()).tags(projectDto.getTagsList());
+    Project.Builder builder = Project.Builder.create(projectDto.getName()) //
+        .title(projectDto.getTitle()) //
+        .archived(projectDto.getArchived()) //
+        .tags(projectDto.getTagsList());
 
-    if (projectDto.hasDescription()) {
+    if(projectDto.hasDescription()) {
       builder.description(projectDto.getDescription());
     }
 

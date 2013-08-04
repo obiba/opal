@@ -61,7 +61,10 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   private static final Translations translations = GWT.create(Translations.class);
 
   @UiField
-  Panel content;
+  Panel activePanel;
+
+  @UiField
+  Panel archivedPanel;
 
   private SortBy sortBy = SortBy.NAME;
 
@@ -76,7 +79,8 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   public void setProjects(JsArray<ProjectDto> projects) {
     this.projects = projects;
     if(projects.length() == 0) {
-      content.clear();
+      activePanel.clear();
+      archivedPanel.clear();
     } else {
       redraw();
     }
@@ -104,8 +108,19 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   }
 
   private void redraw() {
-    content.clear();
-    sortBy.sort(getUiHandlers(), content, projects);
+    activePanel.clear();
+    archivedPanel.clear();
+    JsArray<ProjectDto> activeProjects = JsArrays.create();
+    JsArray<ProjectDto> archivedProjects = JsArrays.create();
+    for(ProjectDto project : JsArrays.toIterable(projects)) {
+      if(project.hasArchived() && project.getArchived()) {
+        archivedProjects.push(project);
+      } else {
+        activeProjects.push(project);
+      }
+    }
+    sortBy.sort(getUiHandlers(), activePanel, activeProjects);
+    sortBy.sort(getUiHandlers(), archivedPanel, archivedProjects);
   }
 
   private enum SortBy {
@@ -119,27 +134,30 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
           Widget projectLink = newProjectLink(handlers, project);
           panel.add(projectLink);
 
-          Label descriptionLabel = new Label(project.getDescription());
-          panel.add(descriptionLabel);
-
-          JsArrayString tableNames = JsArrays.toSafeArray(project.getDatasource().getTableArray());
-          if (tableNames.length() > 0) {
-            NavPills pills = new NavPills();
-            pills.addStyleName("inline");
-            Icon icon = new Icon(IconType.TABLE);
-            pills.add(new ListItem(icon));
-            for (String table : JsArrays.toIterable(tableNames)) {
-              pills.add(newProjectTableLink(handlers,project, table));
-            }
-            panel.add(pills);
-          }
-
           FlowPanel tagsPanel = new FlowPanel();
-          tagsPanel.addStyleName("tags");
+          tagsPanel.addStyleName("tags inline-block");
           for(String tag : JsArrays.toIterable(JsArrays.toSafeArray(project.getTagsArray()))) {
             tagsPanel.add(new com.github.gwtbootstrap.client.ui.Label(tag));
           }
           panel.add(tagsPanel);
+
+          if(project.hasDescription()) {
+            Label descriptionLabel = new Label(project.getDescription());
+            panel.add(descriptionLabel);
+          }
+
+          JsArrayString tableNames = JsArrays.toSafeArray(project.getDatasource().getTableArray());
+          if(tableNames.length() > 0) {
+            NavPills pills = new NavPills();
+            pills.addStyleName("inline");
+            Icon icon = new Icon(IconType.TABLE);
+            pills.add(new ListItem(icon));
+            for(String table : JsArrays.toIterable(tableNames)) {
+              pills.add(newProjectTableLink(handlers, project, table));
+            }
+            panel.add(pills);
+          }
+
           content.add(panel);
         }
       }
@@ -150,7 +168,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
         Map<String, JsArray<ProjectDto>> tagMap = Maps.newHashMap();
         for(ProjectDto project : JsArrays.toIterable(projects)) {
           JsArrayString tags = JsArrays.toSafeArray(project.getTagsArray());
-          if (tags.length() == 0) {
+          if(tags.length() == 0) {
             addToTagMap(tagMap, "N/A", project);
           }
           for(String tag : JsArrays.toIterable(tags)) {
@@ -191,7 +209,8 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     abstract void sort(ProjectsUiHandlers handlers, Panel content, JsArray<ProjectDto> projects);
 
     protected Widget newProjectLink(final ProjectsUiHandlers handlers, final ProjectDto project) {
-      NavLink link = new NavLink(project.getName());
+      NavLink link = new NavLink(project.getTitle());
+      link.setTitle(project.getName());
       link.addClickHandler(new ClickHandler() {
         @Override
         public void onClick(ClickEvent event) {
@@ -199,13 +218,15 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
         }
       });
 
-      Heading head = new Heading(5);
+      Heading head = new Heading(4);
+      head.addStyleName("inline-block small-right-indent");
       head.add(link);
 
       return head;
     }
 
-    protected NavLink newProjectTableLink(final ProjectsUiHandlers handlers, final ProjectDto project, final String table) {
+    protected NavLink newProjectTableLink(final ProjectsUiHandlers handlers, final ProjectDto project,
+        final String table) {
       NavLink link = new NavLink(table);
       link.addClickHandler(new ClickHandler() {
         @Override

@@ -18,10 +18,12 @@ import javax.ws.rs.core.Response;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.ValueTable;
 import org.obiba.opal.project.NoSuchProjectException;
 import org.obiba.opal.project.ProjectService;
 import org.obiba.opal.project.cfg.ProjectsConfigurationService;
 import org.obiba.opal.project.domain.Project;
+import org.obiba.opal.web.magma.DatasourceResource;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Projects;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,9 +76,15 @@ public class ProjectResource {
       projectService.removeProject(name);
 
     }
-    // TODO remove all tables, permissions, folders etc.
+    // TODO remove all tables, permissions, folders, index etc.
     if (MagmaEngine.get().hasDatasource(name)) {
-      MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource(name));
+      Datasource ds = MagmaEngine.get().getDatasource(name);
+      MagmaEngine.get().removeDatasource(ds);
+      for (ValueTable table : ds.getValueTables()) {
+        if (ds.canDropTable(table.getName())) {
+          ds.dropTable(table.getName());
+        }
+      }
     }
     return Response.ok().build();
   }

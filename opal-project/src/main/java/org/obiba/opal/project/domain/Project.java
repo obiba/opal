@@ -12,6 +12,8 @@ package org.obiba.opal.project.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.base.Strings;
+
 /**
  * Description of a project in Opal.
  */
@@ -19,9 +21,13 @@ public class Project {
 
   private String name;
 
+  private String title;
+
   private String description;
 
   private List<String> tags;
+
+  private boolean archived;
 
   public String getName() {
     return name;
@@ -31,8 +37,20 @@ public class Project {
     this.name = name;
   }
 
+  public boolean hasTitle() {
+    return !Strings.isNullOrEmpty(title);
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
   public boolean hasDescription() {
-    return description != null;
+    return !Strings.isNullOrEmpty(description);
   }
 
   public String getDescription() {
@@ -44,7 +62,7 @@ public class Project {
   }
 
   public boolean hasTags() {
-    return getTags().size()>0;
+    return getTags().size() > 0;
   }
 
   public List<String> getTags() {
@@ -55,6 +73,14 @@ public class Project {
     if(!getTags().contains(tag)) {
       getTags().add(tag);
     }
+  }
+
+  public boolean isArchived() {
+    return archived;
+  }
+
+  public void setArchived(boolean archived) {
+    this.archived = archived;
   }
 
   public static class Builder {
@@ -73,13 +99,18 @@ public class Project {
       return this;
     }
 
+    public Builder title(String title) {
+      project.setTitle(title);
+      return this;
+    }
+
     public Builder description(String description) {
       project.setDescription(description);
       return this;
     }
 
     public Builder tags(List<String> tags) {
-      if (tags == null) return this;
+      if(tags == null) return this;
       for(String tag : tags) {
         project.addTag(tag);
       }
@@ -87,11 +118,20 @@ public class Project {
     }
 
     public Builder tags(String... tags) {
-      if (tags == null) return this;
+      if(tags == null) return this;
       for(String tag : tags) {
         project.addTag(tag);
       }
       return this;
+    }
+
+    public Builder archived(boolean archived) {
+      project.setArchived(archived);
+      return this;
+    }
+
+    public Builder archived() {
+      return archived(true);
     }
 
     public Project build() {

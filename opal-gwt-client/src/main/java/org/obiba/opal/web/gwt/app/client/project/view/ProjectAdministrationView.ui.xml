@@ -36,16 +36,24 @@
                 </b:Controls>
               </b:ControlGroup>
               <b:ControlGroup>
+                <b:ControlLabel for="input02">Title</b:ControlLabel>
+                <b:Controls>
+                  <b:TextBox ui:field="title" alternateSize="XLARGE" b:id="input01"></b:TextBox>
+                  <b:HelpBlock>The project title (name for human beings).
+                  </b:HelpBlock>
+                </b:Controls>
+              </b:ControlGroup>
+              <b:ControlGroup>
                 <b:ControlLabel for="textarea">Description</b:ControlLabel>
                 <b:Controls>
-                  <b:TextArea alternateSize="XLARGE" b:id="textarea"
+                  <b:TextArea ui:field="description" alternateSize="XLARGE" b:id="textarea"
                       visibleLines="3"/>
                 </b:Controls>
               </b:ControlGroup>
               <b:ControlGroup>
                 <b:ControlLabel for="input03">Tags</b:ControlLabel>
                 <b:Controls>
-                  <b:TextBox alternateSize="XLARGE" b:id="input03"></b:TextBox>
+                  <b:TextBox ui:field="tags" alternateSize="XLARGE" b:id="input03"></b:TextBox>
                   <b:HelpBlock>Tags that describe this project.
                   </b:HelpBlock>
                 </b:Controls>

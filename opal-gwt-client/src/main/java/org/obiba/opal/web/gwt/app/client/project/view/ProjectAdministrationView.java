@@ -11,12 +11,14 @@
 package org.obiba.opal.web.gwt.app.client.project.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.EditorPanel;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.github.gwtbootstrap.client.ui.Paragraph;
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -34,6 +36,15 @@ public class ProjectAdministrationView extends ViewImpl implements ProjectAdmini
 
   @UiField
   HasText name;
+
+  @UiField
+  HasText title;
+
+  @UiField
+  HasText description;
+
+  @UiField
+  HasText tags;
 
   @UiField
   Paragraph storageType;
@@ -61,7 +72,20 @@ public class ProjectAdministrationView extends ViewImpl implements ProjectAdmini
   @Override
   public void setProject(ProjectDto project) {
     this.project = project;
+
     name.setText(project.getName());
+    title.setText(project.getTitle());
+    description.setText(project.getDescription());
+    String tt = "";
+    for(String t : JsArrays.toIterable(JsArrays.toSafeArray(project.getTagsArray()))) {
+      if(Strings.isNullOrEmpty(tt)) {
+        tt = t;
+      } else {
+        tt += " " + t;
+      }
+    }
+    tags.setText(tt);
+
     storageType.setText(translations.datasourceTypeMap().get(project.getDatasource().getType()));
     storageEditor.showEditor(false);
   }

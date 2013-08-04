@@ -11,6 +11,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -40,7 +41,14 @@
         </b:ButtonGroup>
       </b:Column>
     </b:FluidRow>
-    <g:FlowPanel ui:field="content" addStyleNames="items"></g:FlowPanel>
+    <b:NavPills>
+    </b:NavPills>
+    <o:NavPillsPanel>
+      <b:NavLink active="true">Active</b:NavLink>
+      <g:FlowPanel ui:field="activePanel" addStyleNames="items"></g:FlowPanel>
+      <b:NavLink>Archived</b:NavLink>
+      <g:FlowPanel ui:field="archivedPanel" addStyleNames="items"></g:FlowPanel>
+    </o:NavPillsPanel>
   </g:FlowPanel>
 
 </ui:UiBinder>
