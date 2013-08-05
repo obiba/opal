@@ -12,8 +12,8 @@ package org.obiba.opal.core.service.impl;
 import java.util.List;
 
 import org.obiba.core.service.impl.PersistenceManagerAwareService;
-import org.obiba.opal.core.user.Group;
-import org.obiba.opal.core.user.User;
+import org.obiba.opal.core.domain.user.Group;
+import org.obiba.opal.core.domain.user.User;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
