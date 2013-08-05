@@ -81,7 +81,7 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     if(titlecrumbs.getWidgetCount() > 1) {
       titlecrumbs.remove(1);
     }
-    titlecrumbs.add(new NavLink(project.getName()));
+    titlecrumbs.add(new NavLink(project.getTitle()));
     String desc = project.getDescription();
     description.setText(desc.substring(0, desc.indexOf('.') + 1));
     ellipsis.setIcon(IconType.PLUS_SIGN);
