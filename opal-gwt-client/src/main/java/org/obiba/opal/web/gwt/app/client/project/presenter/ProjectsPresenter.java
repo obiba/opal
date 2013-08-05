@@ -92,7 +92,8 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
   @Override
   public void onProjectSelection(ProjectDto project) {
     PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.project)
-        .with(ParameterTokens.TOKEN_NAME, project.getName()).build();
+        .with(ParameterTokens.TOKEN_NAME, project.getName())
+        .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.home.toString()).build();
     placeManager.revealPlace(request);
   }
 
