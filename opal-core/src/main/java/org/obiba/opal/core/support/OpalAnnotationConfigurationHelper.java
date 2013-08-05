@@ -6,8 +6,8 @@ import java.util.Set;
 
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
-import org.obiba.opal.core.user.Group;
-import org.obiba.opal.core.user.User;
+import org.obiba.opal.core.domain.user.Group;
+import org.obiba.opal.core.domain.user.User;
 import org.springframework.beans.factory.FactoryBean;
 
 import com.google.common.collect.ImmutableSet;
