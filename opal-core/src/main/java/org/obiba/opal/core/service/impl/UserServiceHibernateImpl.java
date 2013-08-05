@@ -14,7 +14,7 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.obiba.core.service.impl.hibernate.AssociationCriteria;
-import org.obiba.opal.core.user.User;
+import org.obiba.opal.core.domain.user.User;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
