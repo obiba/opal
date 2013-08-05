@@ -87,15 +87,15 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
 
   private void setHistoryTokens() {
 
-    getView().setUsersGroupsHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.usersGroups)));
-    getView().setDatabasesHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.databases)));
-    getView().setIndexHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.index)));
-    getView().setRHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.r)));
-    getView().setUnitsHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.units)));
-    getView().setFilesHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.files)));
-    getView().setTasksHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.jobs)));
-    getView().setDataShieldHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.datashield)));
-    getView().setReportsHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.reportTemplates)));
+    getView().setUsersGroupsHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.usersGroups), 1));
+    getView().setDatabasesHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.databases), 1));
+    getView().setIndexHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.index), 1));
+    getView().setRHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.r), 1));
+    getView().setUnitsHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.units), 1));
+    getView().setFilesHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.files), 1));
+    getView().setTasksHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.jobs), 1));
+    getView().setDataShieldHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.datashield), 1));
+    getView().setReportsHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.reportTemplates), 1));
   }
 
   private PlaceRequest createRequest(String nameToken) {
