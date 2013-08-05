@@ -95,7 +95,7 @@ public class SummaryTabView extends ViewImpl implements SummaryTabPresenter.Disp
     } else if(dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical) != null) {
       CategoricalSummaryDto categorical = dto
           .getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();
-      summary.add(new CategoricalSummaryView(categorical));
+      summary.add(new CategoricalSummaryView(dto.getResource(), categorical));
     } else {
       renderNoSummary();
     }

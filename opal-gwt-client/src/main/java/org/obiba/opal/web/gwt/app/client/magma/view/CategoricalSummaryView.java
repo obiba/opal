@@ -10,20 +10,23 @@
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
+import org.obiba.opal.web.gwt.app.client.ui.AbstractTabPanel;
 import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
-import org.obiba.opal.web.gwt.plot.client.FrequencyPlot;
-import org.obiba.opal.web.gwt.plot.client.JqPlot;
+import org.obiba.opal.web.gwt.plot.client.FrequencyChartFactory;
 import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 
 import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.DivElement;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -39,7 +42,13 @@ public class CategoricalSummaryView extends Composite {
   TabPanel tabPanel;
 
   @UiField
-  DivElement frequencyElement;
+  AbstractTabPanel chartsPanel;
+
+  @UiField
+  SimplePanel freqPanel;
+
+  @UiField
+  SimplePanel pctPanel;
 
   @UiField
   DefaultFlexTable stats;
@@ -47,17 +56,14 @@ public class CategoricalSummaryView extends Composite {
   @UiField
   DefaultFlexTable frequencies;
 
-  final JqPlot plot;
+  private FrequencyChartFactory chartFactory = null;
 
-  public CategoricalSummaryView(CategoricalSummaryDto categorical) {
+  public CategoricalSummaryView(final String title, CategoricalSummaryDto categorical) {
     initWidget(uiBinder.createAndBindUi(this));
 
     // TODO translation
     TabPanelHelper.setTabTitle(tabPanel, 0, "Plot");
     TabPanelHelper.setTabTitle(tabPanel, 1, "Statistics");
-
-    frequencyElement.setId(HTMLPanel.createUniqueId());
-    frequencyElement.setAttribute("style", "width:400px;");
 
     // TODO translation
     stats.clear();
@@ -69,41 +75,38 @@ public class CategoricalSummaryView extends Composite {
     stats.setWidget(row, 0, new Label("Mode"));
     stats.setWidget(row++, 1, new Label(categorical.getMode()));
 
+    chartsPanel.addSelectionHandler(new SelectionHandler<Integer>() {
+      @Override
+      public void onSelection(SelectionEvent<Integer> event) {
+        if (event.getSelectedItem() == 1 && chartFactory != null && pctPanel.getWidget() == null) {
+          pctPanel.setWidget(chartFactory.createPercentageChart(title));
+        }
+      }
+    }
+    );
+
+    freqPanel.clear();
+    pctPanel.clear();
     if(categorical.getFrequenciesArray() != null) {
       int count = categorical.getFrequenciesArray().length();
-      int width = 400;
-      if(count > 10) {
-        width = 400 + 20 * (count - 10);
-      }
-      frequencyElement.setAttribute("style", "width:" + width + "px;");
-
-      FrequencyPlot freqPlot = new FrequencyPlot(frequencyElement.getId());
+      chartFactory = new FrequencyChartFactory();
       frequencies.clear();
+      // TODO translation
       frequencies.setHeader(0, "Category");
       frequencies.setHeader(1, "Frequency");
       frequencies.setHeader(2, "%");
       for(int i = 0; i < count; i++) {
         FrequencyDto value = categorical.getFrequenciesArray().get(i);
         if(value.hasValue()) {
-          freqPlot.push(value.getValue(), value.getFreq(), value.getPct() * 100);
+          chartFactory.push(value.getValue(), value.getFreq(), value.getPct() * 100);
           frequencies.setWidget(i + 1, 0, new Label(value.getValue()));
           frequencies.setWidget(i + 1, 1, new Label("" + Math.round(value.getFreq())));
           frequencies.setWidget(i + 1, 2, new Label("" + value.getPct() * 100));
         }
       }
-      plot = freqPlot;
-
+      freqPanel.setWidget(chartFactory.createValueChart(title));
     } else {
-      plot = null;
       frequencies.clear();
-    }
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    if(plot != null) {
-      plot.plotOrRedraw();
     }
   }
 

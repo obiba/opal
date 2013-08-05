@@ -25,11 +25,12 @@
   <g:FlowPanel>
     <b:TabPanel tabPosition="left" ui:field="tabPanel">
       <b:Tab icon="BAR_CHART" active="true">
-        <g:HTMLPanel>
-          <div id="plot-container">
-            <div ui:field="frequencyElement" class="{style.plot}"/>
-          </div>
-        </g:HTMLPanel>
+        <o:NavPillsPanel ui:field="chartsPanel">
+          <b:NavLink active="true">Frequency</b:NavLink>
+          <g:SimplePanel ui:field="freqPanel"></g:SimplePanel>
+          <b:NavLink>Percentage</b:NavLink>
+          <g:SimplePanel ui:field="pctPanel"></g:SimplePanel>
+        </o:NavPillsPanel>
       </b:Tab>
       <b:Tab icon="TABLE">
         <o:DefaultFlexTable ui:field="stats" addStyleNames="span4"/>

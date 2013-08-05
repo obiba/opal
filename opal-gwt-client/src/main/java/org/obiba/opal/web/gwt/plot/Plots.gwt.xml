@@ -2,7 +2,10 @@
     'http://google-web-toolkit.googlecode.com/svn/tags/2.4.0/distro-source/core/src/gwt-module.dtd'>
 <module>
   <inherits name="com.google.gwt.core.Core"/>
+  <inherits name="org.moxieapps.gwt.highcharts.Highcharts"/>
+  <inherits name="com.google.common.collect.Collect"/>
   <script src="js/jquery-1.7.1.min.js"/>
+  <script src="highcharts/highcharts.js"/>
   <script src="jqplot/jquery.jqplot.js"/>
   <script src="jqplot/plugins/jqplot.categoryAxisRenderer.min.js"/>
   <script src="jqplot/plugins/jqplot.barRenderer.min.js"/>
