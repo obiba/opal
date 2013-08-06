@@ -29,10 +29,10 @@
         <b:Button icon="TRASH" size="SMALL" ui:field="remove">
         </b:Button>
       </b:ButtonGroup>
-      <b:ButtonGroup>
-        <b:Button icon="CHEVRON_LEFT" size="SMALL" ui:field="previous">
+      <b:ButtonGroup addStyleNames="pull-right">
+        <b:Button icon="CHEVRON_UP" size="SMALL" ui:field="previous">
         </b:Button>
-        <b:Button icon="CHEVRON_RIGHT" size="SMALL" ui:field="next">
+        <b:Button icon="CHEVRON_DOWN" size="SMALL" ui:field="next">
         </b:Button>
       </b:ButtonGroup>
     </g:FlowPanel>

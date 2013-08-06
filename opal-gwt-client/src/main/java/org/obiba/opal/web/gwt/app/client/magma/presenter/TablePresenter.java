@@ -259,8 +259,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       this.next = next;
 
       getView().setTable(tableDto);
-      getView().setPreviousName(previous);
-      getView().setNextName(next);
 
       if(tableIsView()) {
         showFromTables(table);
@@ -732,10 +730,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     void clear(boolean cleanFilter);
 
     void setTable(TableDto dto);
-
-    void setPreviousName(String name);
-
-    void setNextName(String name);
 
     void setVariableNameFieldUpdater(FieldUpdater<VariableDto, String> updater);
 

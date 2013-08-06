@@ -164,12 +164,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiField
   Button remove;
 
-  @UiField
-  Button previous;
-
-  @UiField
-  Button next;
-
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
 
   private VariableClickableColumn variableNameColumn;
@@ -315,6 +309,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   public void setTable(TableDto dto) {
     entityType.setText(dto.getEntityType());
     entityCount.setText(Integer.toString(dto.getValueSetCount()));
+    edit.setVisible(dto.hasViewLink());
   }
 
   @Override
@@ -363,16 +358,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     getUiHandlers().onEdit();
   }
 
-  @UiHandler("next")
-  void onNext(ClickEvent event) {
-    getUiHandlers().onNextTable();
-  }
-
-  @UiHandler("previous")
-  void onPrevious(ClickEvent event) {
-    getUiHandlers().onPreviousTable();
-  }
-
   @UiHandler("exportData")
   void onExportData(ClickEvent event) {
     getUiHandlers().onExportData();
@@ -406,18 +391,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiHandler("scheduleLink")
   void onIndexSchedule(ClickEvent event) {
     getUiHandlers().onIndexSchedule();
-  }
-
-  @Override
-  public void setNextName(String name) {
-    next.setTitle(name);
-    next.setEnabled(name != null);
-  }
-
-  @Override
-  public void setPreviousName(String name) {
-    previous.setTitle(name);
-    previous.setEnabled(name != null);
   }
 
   private abstract static class VariableClickableColumn extends ClickableColumn<VariableDto> {
