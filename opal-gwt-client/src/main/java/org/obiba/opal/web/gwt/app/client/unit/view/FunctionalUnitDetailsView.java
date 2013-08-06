@@ -27,6 +27,7 @@ import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.Tab;
 import com.google.gwt.core.client.GWT;
@@ -74,7 +75,7 @@ public class FunctionalUnitDetailsView extends ViewWithUiHandlers<FunctionalUnit
   FlowPanel functionalUnitDetails;
 
   @UiField
-  Label description;
+  Paragraph description;
 
   @UiField
   Label select;

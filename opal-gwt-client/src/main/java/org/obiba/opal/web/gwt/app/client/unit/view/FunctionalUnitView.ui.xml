@@ -7,12 +7,9 @@
 
 
   <g:FlowPanel>
-    <g:FlowPanel ui:field="breadcrumbs" />
     <b:FluidRow addStyleNames="page-header">
       <b:Column size="3">
-        <b:Heading size="3">
-          <ui:msg description="Projects label">Units</ui:msg>
-        </b:Heading>
+        <b:Breadcrumbs ui:field="breadcrumbs"/>
       </b:Column>
       <b:Column size="9">
         <b:ButtonGroup addStyleNames="pull-right">

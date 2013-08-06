@@ -15,6 +15,7 @@ import java.util.Set;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldMethodUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
@@ -24,18 +25,16 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.opal.r.RPackageDto;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShieldPackageCreatePresenter.Display> {
+public class DataShieldPackageCreatePresenter extends ModalPresenterWidget<DataShieldPackageCreatePresenter.Display>
+    implements DataShieldPackageCreateUiHandlers {
 
   private PackageValidationHandler packageValidationHandler;
 
@@ -43,19 +42,11 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
   @Inject
   public DataShieldPackageCreatePresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
+    getView().setUiHandlers(this);
   }
 
   @Override
   protected void onBind() {
-    registerHandler(getView().getInstallButton().addClickHandler(new CreatePackageClickHandler()));
-
-    registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getView().hideDialog();
-      }
-    }));
-
     packageValidationHandler = new PackageValidationHandler(getEventBus());
   }
 
@@ -88,6 +79,20 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
     dto.setName(getView().getName().getText());
 
     return dto;
+  }
+
+  @Override
+  public void installPackage() {
+    if(packageValidationHandler.validate()) {
+      getView().setInstallButtonEnabled(false);
+      getView().setCancelButtonEnabled(false);
+      ResponseCodeCallback createCallback = new CreatePackageCallBack();
+      ResourceCallback alreadyExistCallback = new AlreadyExistMethodCallBack();
+      ResourceRequestBuilderFactory.<RPackageDto>newBuilder().forResource(packageR(getView().getName().getText()))
+          .get()//
+          .withCallback(alreadyExistCallback)//
+          .withCallback(Response.SC_NOT_FOUND, createCallback).send();
+    }
   }
 
   //
@@ -153,24 +158,6 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
     }
   }
 
-  public class CreatePackageClickHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent arg0) {
-      if(packageValidationHandler.validate()) {
-        getView().setInstallButtonEnabled(false);
-        getView().setCancelButtonEnabled(false);
-        ResponseCodeCallback createCallback = new CreatePackageCallBack();
-        ResourceCallback alreadyExistCallback = new AlreadyExistMethodCallBack();
-        ResourceRequestBuilderFactory.<RPackageDto>newBuilder().forResource(packageR(getView().getName().getText()))
-            .get()//
-            .withCallback(alreadyExistCallback)//
-            .withCallback(Response.SC_NOT_FOUND, createCallback).send();
-      }
-    }
-
-  }
-
   private class CreateOrUpdatePackageCallBack implements ResponseCodeCallback {
 
     RPackageDto dto;
@@ -193,15 +180,11 @@ public class DataShieldPackageCreatePresenter extends PresenterWidget<DataShield
     }
   }
 
-  public interface Display extends PopupView {
+  public interface Display extends PopupView, HasUiHandlers<DataShieldPackageCreateUiHandlers> {
 
     String DATASHIELD_ALL_PKG = "datashield";
 
     void hideDialog();
-
-    HasClickHandlers getInstallButton();
-
-    HasClickHandlers getCancelButton();
 
     void setName(String name);
 

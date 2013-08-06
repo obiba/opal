@@ -14,7 +14,9 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitDeletedEvent;
@@ -47,8 +49,7 @@ import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.Display, FunctionalUnitPresenter.Proxy>
     implements FunctionalUnitsUiHandlers {
 
-
-  public interface Display extends View, HasUiHandlers<FunctionalUnitsUiHandlers> {
+  public interface Display extends View, HasUiHandlers<FunctionalUnitsUiHandlers>, HasBreadcrumbs {
     HasAuthorization getAddFunctionalUnitAuthorizer();
     HasAuthorization getExportIdentifiersAuthorizer();
     HasAuthorization getImportIdentifiersAuthorizer();
@@ -65,16 +66,19 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
   final FunctionalUnitDetailsPresenter functionalUnitDetailsPresenter;
   private final PlaceManager placeManager;
   private final ModalProvider<FunctionalUnitUpdateModalPresenter> functionalUnitModalProvider;
+  private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
   @Inject
   public FunctionalUnitPresenter(Display display, EventBus eventBus, Proxy proxy,
       FunctionalUnitDetailsPresenter FunctionalUnitDetailsPresenter,
       ModalProvider<FunctionalUnitUpdateModalPresenter> functionalUnitModalProvider,
+      DefaultBreadcrumbsBuilder breadcrumbsHelper,
       PlaceManager placeManager) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
     functionalUnitDetailsPresenter = FunctionalUnitDetailsPresenter;
     this.functionalUnitModalProvider = functionalUnitModalProvider.setContainer(this);
+    this.breadcrumbsHelper = breadcrumbsHelper;
     this.placeManager = placeManager;
   }
 
@@ -117,6 +121,7 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
     super.onReveal();
     authorize();
     refreshFunctionalUnits();
+    breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
   }
 
   @Override

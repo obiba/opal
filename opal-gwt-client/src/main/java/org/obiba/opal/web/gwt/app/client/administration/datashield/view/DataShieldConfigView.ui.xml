@@ -6,7 +6,10 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <b:Breadcrumbs ui:field="breadcrumbs" />
+    <g:FlowPanel addStyleNames="page-header">
+      <b:Breadcrumbs ui:field="breadcrumbs" />
+    </g:FlowPanel>
+
     <g:FlowPanel ui:field="packagesPanel" addStyleNames="panel">
       <g:FlowPanel addStyleNames="title">
         <g:InlineLabel>

@@ -33,11 +33,6 @@ public abstract class SplitPaneWorkbenchPresenter<D extends View, P extends Prox
   }
 
   @Override
-  protected void revealInParent() {
-    RevealContentEvent.fire(this, PageContainerPresenter.CONTENT, this);
-  }
-
-  @Override
   protected void onReveal() {
     super.onReveal();
     authorize();

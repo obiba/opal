@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
+import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -24,6 +25,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
@@ -60,7 +62,8 @@ public class FunctionalUnitView extends ViewWithUiHandlers<FunctionalUnitsUiHand
   Panel content;
 
   @UiField
-  Panel breadcrumbs;
+  Breadcrumbs breadcrumbs;
+
 
   private final PlaceManager placeManager;
 
@@ -108,6 +111,11 @@ public class FunctionalUnitView extends ViewWithUiHandlers<FunctionalUnitsUiHand
   @Override
   public HasAuthorization getSyncIdentifiersAuthorizer() {
     return new UIObjectAuthorizer(syncButton);
+  }
+
+  @Override
+  public HasWidgets getBreadcrumbs() {
+    return breadcrumbs;
   }
 
   @UiHandler("functionalUnitButton")

@@ -15,16 +15,15 @@ import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministra
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
-import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
+import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceDataProvider;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -54,7 +53,6 @@ import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
-import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
@@ -91,18 +89,18 @@ public class DatabaseAdministrationPresenter extends
   private final ResourceDataProvider<JdbcDataSourceDto> resourceDataProvider
       = new ResourceDataProvider<JdbcDataSourceDto>(Resources.databases());
 
-  private final DefaultBreadcrumbsBuilder breadcrumbsBuilder;
+  private final BreadcrumbsBuilder breadcrumbsBuilder;
 
   private Command confirmedCommand;
 
   @Inject
   public DatabaseAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
       ModalProvider<DatabasePresenter> databaseModalProvider, Provider<AuthorizationPresenter> authorizationPresenter,
-      DefaultBreadcrumbsBuilder breadcrumbsHelper) {
+      BreadcrumbsBuilder breadcrumbsBuilder) {
     super(eventBus, display, proxy);
     this.databaseModalProvider = databaseModalProvider.setContainer(this);
     this.authorizationPresenter = authorizationPresenter.get();
-    this.breadcrumbsBuilder = breadcrumbsHelper;
+    this.breadcrumbsBuilder = breadcrumbsBuilder;
   }
 
   @ProxyEvent
@@ -110,11 +108,6 @@ public class DatabaseAdministrationPresenter extends
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(Resources.databases()).post()
         .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListDatabasesAuthorization())).send();
-  }
-
-  @Override
-  protected void revealInParent() {
-    RevealContentEvent.fire(this, PageContainerPresenter.CONTENT, this);
   }
 
   @Override

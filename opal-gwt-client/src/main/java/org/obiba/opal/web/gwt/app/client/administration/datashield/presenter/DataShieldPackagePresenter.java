@@ -9,33 +9,27 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.datashield.presenter;
 
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 import org.obiba.opal.web.model.client.opal.EntryDto;
 import org.obiba.opal.web.model.client.opal.r.RPackageDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class DataShieldPackagePresenter extends PresenterWidget<DataShieldPackagePresenter.Display> {
+public class DataShieldPackagePresenter extends ModalPresenterWidget<DataShieldPackagePresenter.Display> {
 
   @Inject
   public DataShieldPackagePresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
+    getView().setUiHandlers(this);
   }
 
   @Override
   protected void onBind() {
-    registerHandler(getView().getCloseButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getView().hideDialog();
-      }
-    }));
   }
 
   public void displayPackage(RPackageDto dto) {
@@ -51,11 +45,7 @@ public class DataShieldPackagePresenter extends PresenterWidget<DataShieldPackag
   // Inner classes and interfaces
   //
 
-  public interface Display extends PopupView {
-
-    void hideDialog();
-
-    HasClickHandlers getCloseButton();
+  public interface Display extends PopupView, HasUiHandlers<ModalUiHandlers> {
 
     void addProperty(EntryDto dto);
 

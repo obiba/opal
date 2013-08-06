@@ -11,8 +11,8 @@ package org.obiba.opal.web.gwt.app.client.dashboard.presenter;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
-import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -41,7 +41,7 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
 
   @Inject
   public DashboardPresenter(Display display, EventBus eventBus, Proxy proxy) {
-    super(eventBus, display, proxy);
+    super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
   }
 
   @Override
@@ -74,11 +74,6 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
         .withCallback(Response.SC_METHOD_NOT_ALLOWED, noOp)//
         .send();
 
-  }
-
-  @Override
-  protected void revealInParent() {
-    RevealContentEvent.fire(this, PageContainerPresenter.CONTENT, this);
   }
 
   private void authorize() {
