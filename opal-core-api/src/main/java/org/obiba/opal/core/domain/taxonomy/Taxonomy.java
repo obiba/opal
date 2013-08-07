@@ -24,6 +24,10 @@ public class Taxonomy {
   @Nullable
   private String name;
 
+  private List<Text> titles;
+
+  private List<Text> descriptions;
+
   private List<Vocabulary> vocabularies;
 
   public Taxonomy(@Nullable String name) {
@@ -37,6 +41,30 @@ public class Taxonomy {
 
   public void setName(@Nullable String name) {
     this.name = name;
+  }
+
+  public List<Text> getTitles() {
+    return titles == null ? titles = Lists.newArrayList() : titles;
+  }
+
+  public void setTitles(List<Text> titles) {
+    this.titles = titles;
+  }
+
+  public void addTitle(Text title) {
+    getTitles().add(title);
+  }
+
+  public List<Text> getDescriptions() {
+    return descriptions == null ? descriptions = Lists.newArrayList() : descriptions;
+  }
+
+  public void addDescription(Text description) {
+    getDescriptions().add(description);
+  }
+
+  public void setDescriptions(List<Text> descriptions) {
+    this.descriptions = descriptions;
   }
 
   public List<Vocabulary> getVocabularies() {

@@ -11,8 +11,13 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
 
+import org.obiba.opal.core.cfg.TaxonomyService;
+import org.obiba.opal.core.domain.taxonomy.Taxonomy;
+import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.runtime.Version;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +29,12 @@ public class SystemResource {
 
   private final Version opalVersion;
 
+  private final TaxonomyService taxonomyService;
+
   @Autowired
-  public SystemResource(Version opalVersion) {
+  public SystemResource(Version opalVersion, TaxonomyService taxonomyService) {
     this.opalVersion = opalVersion;
+    this.taxonomyService = taxonomyService;
   }
 
   @GET
@@ -99,6 +107,32 @@ public class SystemResource {
         .setCollectionCount(garbageCollectorMXBean.getCollectionCount())//
         .setCollectionTime(garbageCollectorMXBean.getCollectionTime())//
         .build();
+  }
+
+  @GET
+  @Path("/conf")
+  public Opal.OpalConf getOpalConfiguration() {
+    Collection<Opal.TaxonomyDto> taxonomies = new ArrayList<Opal.TaxonomyDto>();
+    for(Taxonomy taxonomy : taxonomyService.getTaxonomies()) {
+      taxonomies.add(Dtos.asDto(taxonomy));
+    }
+    return Opal.OpalConf.newBuilder()//
+        .setGeneral(Opal.GeneralConf.getDefaultInstance())//TODO
+        .addAllTaxonomies(taxonomies)//
+        .build();
+  }
+
+  @GET //TODO
+  @Path("/conf/general")
+  public Opal.GeneralConf getOpalGeneralConfiguration() {
+
+    return Opal.GeneralConf.getDefaultInstance();
+  }
+
+  @PUT //TODO
+  @Path("/conf/general")
+  public Response updateGeneralConfigurations() {
+    return Response.ok().build();
   }
 
 }
