@@ -47,6 +47,8 @@ public class TaxonomyServiceTest {
     taxonomy.add(vocabulary);
 
     taxonomyService.addOrReplaceTaxonomy(taxonomy);
+    assertThat(taxonomy.getName(), is(taxonomyService.getTaxonomies().get(0).getName()));
+    assertThat(root, is(taxonomyService.getTaxonomies().get(0).getVocabularies().get(0).getRoot()));
     assertThat(taxonomy, is(taxonomyService.getTaxonomies().get(0)));
   }
 }
