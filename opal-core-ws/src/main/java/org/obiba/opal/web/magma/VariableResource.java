@@ -12,18 +12,23 @@ package org.obiba.opal.web.magma;
 import java.util.List;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.jboss.resteasy.annotations.cache.Cache;
+import org.obiba.magma.NoSuchVariableException;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
+import org.obiba.magma.lang.Closeables;
 import org.obiba.opal.core.domain.VariableNature;
 import org.obiba.opal.search.StatsIndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
@@ -67,6 +72,34 @@ public class VariableResource {
     String tableUri = uriBuilder.build().toString();
     Magma.LinkDto linkDto = Magma.LinkDto.newBuilder().setLink(tableUri).setRel(valueTable.getName()).build();
     return Dtos.asDto(linkDto, vvs.getVariable()).build();
+  }
+
+  @PUT
+  public Response updateVariable(VariableDto variable) {
+
+    ValueTableWriter vtw = null;
+    ValueTableWriter.VariableWriter vw = null;
+    try {
+      // The variable must exist
+      Variable v = getValueTable().getVariable(variable.getName());
+
+      if(!v.getEntityType().equals(variable.getEntityType())) {
+        return Response.status(Response.Status.BAD_REQUEST).build();
+      }
+
+      vtw = getValueTable().getDatasource().createWriter(getValueTable().getName(), getValueTable().getEntityType());
+
+      vw = vtw.writeVariables();
+      vw.writeVariable(Dtos.fromDto(variable));
+
+      return Response.ok().build();
+
+    } catch(NoSuchVariableException e) {
+      return Response.status(Response.Status.NOT_FOUND).build();
+    } finally {
+      Closeables.closeQuietly(vw);
+      Closeables.closeQuietly(vtw);
+    }
   }
 
   @Path("/summary")
