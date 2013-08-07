@@ -42,13 +42,17 @@ public class TaxonomyServiceTest {
 
     Vocabulary vocabulary = new Vocabulary(root);
     vocabulary.setRepeatable(true);
-    taxonomy.addTitle(new Text("Mealestrom research taxonomy", "en"));
+    taxonomy.addTitle(new Text("Maelstrom research taxonomy", "en"));
     taxonomy.addDescription(new Text("The maelstrom research taxonomy is blabla", "en"));
     taxonomy.add(vocabulary);
 
     taxonomyService.addOrReplaceTaxonomy(taxonomy);
-    assertThat(taxonomy.getName(), is(taxonomyService.getTaxonomies().get(0).getName()));
-    assertThat(root, is(taxonomyService.getTaxonomies().get(0).getVocabularies().get(0).getRoot()));
-    assertThat(taxonomy, is(taxonomyService.getTaxonomies().get(0)));
+    Taxonomy savedTaxonomy = taxonomyService.getTaxonomy(taxonomy.getName());
+    Vocabulary savedVocabulary = savedTaxonomy.getVocabularies().get(0);
+
+    assertThat(taxonomy.getName(), is(savedTaxonomy.getName()));
+    assertThat(taxonomyService.getTaxonomies().size(), is(0));
+    assertThat(savedVocabulary.getRoot().getTerms().containsAll(terms), is(true));
+    assertThat(savedVocabulary.getRoot().getTitles().containsAll(titles), is(true));
   }
 }
