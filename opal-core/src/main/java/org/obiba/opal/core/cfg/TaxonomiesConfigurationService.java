@@ -46,26 +46,41 @@ public class TaxonomiesConfigurationService implements TaxonomyService {
 
   @Override
   public void removeTaxonomy(final String name) {
-    configSupplier.modify(new ExtensionConfigurationSupplier.ExtensionConfigModificationTask<TaxonomiesConfiguration>() {
-      @Override
-      public void doWithConfig(TaxonomiesConfiguration config) {
-        config.removeTaxonomy(name);
-      }
-    });
+    configSupplier
+        .modify(new ExtensionConfigurationSupplier.ExtensionConfigModificationTask<TaxonomiesConfiguration>() {
+          @Override
+          public void doWithConfig(TaxonomiesConfiguration config) {
+            config.removeTaxonomy(name);
+          }
+        });
   }
 
   @Override
-  public void addOrReplaceTaxonomy(Taxonomy taxonomy) {
-    //To change body of implemented methods use File | Settings | File Templates.
+  public void addOrReplaceTaxonomy(final Taxonomy taxonomy) {
+    configSupplier
+        .modify(new ExtensionConfigurationSupplier.ExtensionConfigModificationTask<TaxonomiesConfiguration>() {
+          @Override
+          public void doWithConfig(TaxonomiesConfiguration config) {
+            config.addOrReplaceTaxonomy(taxonomy);
+          }
+        });
   }
 
   @Override
-  public Taxonomy getOrCreateTaxonomy(String name) {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+  public Taxonomy getOrCreateTaxonomy(final String name) {
+    final Taxonomy[] taxonomy = new Taxonomy[1];
+    configSupplier
+        .modify(new ExtensionConfigurationSupplier.ExtensionConfigModificationTask<TaxonomiesConfiguration>() {
+          @Override
+          public void doWithConfig(TaxonomiesConfiguration config) {
+            taxonomy[0] = config.getOrCreateTaxonomy(name);
+          }
+        });
+    return taxonomy[0];
   }
 
   @Override
   public Taxonomy getTaxonomy(String name) {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+    return getConfig().getTaxonomy(name);
   }
 }

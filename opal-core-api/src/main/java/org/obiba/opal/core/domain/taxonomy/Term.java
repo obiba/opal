@@ -18,6 +18,10 @@ public class Term {
 
   private String name;
 
+  private List<Text> titles;
+
+  private List<Text> descriptions;
+
   private List<Term> terms;
 
   public Term(String name) {
@@ -30,6 +34,30 @@ public class Term {
 
   public String getName() {
     return name;
+  }
+
+  public List<Text> getTitles() {
+    return titles == null ? titles = Lists.newArrayList() : titles;
+  }
+
+  public void setTitles(List<Text> titles) {
+    this.titles = titles;
+  }
+
+  public void addTitle(Text title) {
+    getTitles().add(title);
+  }
+
+  public List<Text> getDescriptions() {
+    return descriptions == null ? descriptions = Lists.newArrayList() : descriptions;
+  }
+
+  public void setDescriptions(List<Text> descriptions) {
+    this.descriptions = descriptions;
+  }
+
+  public void addDescription(Text description) {
+    getDescriptions().add(description);
   }
 
   public void setTerms(List<Term> terms) {

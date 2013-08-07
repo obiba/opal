@@ -10,13 +10,45 @@
 
 package org.obiba.opal.web.system;
 
-import javax.ws.rs.Path;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
+
+import org.obiba.opal.core.cfg.TaxonomyService;
+import org.obiba.opal.core.domain.taxonomy.Taxonomy;
+import org.obiba.opal.web.magma.Dtos;
+import org.obiba.opal.web.model.Opal.TaxonomyDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 @Path("/system/conf/taxonomies")
 public class TaxonomiesResource {
 
+  private final TaxonomyService taxonomyService;
 
+  @Autowired
+  public TaxonomiesResource(TaxonomyService taxonomyService) {
+    this.taxonomyService = taxonomyService;
+  }
+
+  @GET
+  public List<TaxonomyDto> getTaxonomies() {
+    List<TaxonomyDto> taxonomies = new ArrayList<TaxonomyDto>();
+    for(Taxonomy taxonomy : taxonomyService.getTaxonomies()) {
+      taxonomies.add(Dtos.asDto(taxonomy));
+    }
+    return taxonomies;
+  }
+
+  @POST
+  public Response addTaxonomy(TaxonomyDto taxonomy) {
+    taxonomyService.addOrReplaceTaxonomy(Dtos.fromDto(taxonomy));
+    return Response.ok().build();
+  }
 }
+
