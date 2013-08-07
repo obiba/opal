@@ -22,9 +22,6 @@ import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.opal.UserDto;
 
 import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -35,7 +32,6 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.PresenterWidget;
 
 public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> implements UserUiHandlers {
 
@@ -74,21 +70,23 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
       userDto.setName(getView().getUserName());
     }
 
-    // Update password
-    if(getView().getPassword().length() < MIN_PASSWORD_LENGTH) {
-      getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error("UserPasswordLengthError")
-          .args(String.valueOf(MIN_PASSWORD_LENGTH)).build());
-      getView().setPasswordError(true);
-      return;
-    }
-    if(!getView().getPassword().equals(getView().getConfirmPassword())) {
-      getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error("UserPasswordMatchError").build());
-      getView().setPasswordError(true);
-      return;
-    }
+    // Update password only when password is not empty (to allow updating groups only)
+    if(!getView().getPassword().isEmpty()) {
+      if(getView().getPassword().length() < MIN_PASSWORD_LENGTH) {
+        getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error("UserPasswordLengthError")
+            .args(String.valueOf(MIN_PASSWORD_LENGTH)).build());
+        getView().setPasswordError(true);
+        return;
+      }
+      if(!getView().getPassword().equals(getView().getConfirmPassword())) {
+        getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error("UserPasswordMatchError").build());
+        getView().setPasswordError(true);
+        return;
+      }
 
-    if(getView().getPassword().equals(getView().getConfirmPassword())) {
-      userDto.setPassword(getView().getPassword());
+      if(getView().getPassword().equals(getView().getConfirmPassword())) {
+        userDto.setPassword(getView().getPassword());
+      }
     }
 
     // update groups
