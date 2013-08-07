@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.administration.user.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
+import org.obiba.opal.web.gwt.app.client.administration.user.event.GroupsRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.administration.user.event.UsersRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
@@ -84,8 +85,9 @@ public class UserAdministrationPresenter
 
     HasData<UserDto> getUsersTable();
 
-    HasActionHandler<UserDto> getActions();
+    HasActionHandler<UserDto> getUsersActions();
 
+    HasActionHandler<GroupDto> getGroupsActions();
   }
 
 //  @SuppressWarnings("FieldCanBeLocal")
@@ -196,6 +198,21 @@ public class UserAdministrationPresenter
         getView().showUsers();
       }
     }));
+    // Refresh group list
+    registerHandler(getEventBus().addHandler(GroupsRefreshEvent.getType(), new GroupsRefreshEvent.Handler() {
+      @Override
+      public void onRefresh(GroupsRefreshEvent event) {
+        ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder()//
+            .forResource("/groups").withCallback(new ResourceCallback<JsArray<GroupDto>>() {
+
+          @Override
+          public void onResource(Response response, JsArray<GroupDto> resource) {
+            getView().renderGroupRows(resource);
+          }
+        }).get().send();
+        getView().showGroups();
+      }
+    }));
 
     // Add user
     getView().getAddUserButton().addClickHandler(new ClickHandler() {
@@ -207,7 +224,7 @@ public class UserAdministrationPresenter
     });
 
     // ACTIONS
-    getView().getActions().setActionHandler(new ActionHandler<UserDto>() {
+    getView().getUsersActions().setActionHandler(new ActionHandler<UserDto>() {
 
       @Override
       public void doAction(final UserDto object, String actionName) {
@@ -223,6 +240,24 @@ public class UserAdministrationPresenter
               getEventBus().fireEvent(new UsersRefreshEvent());
               getEventBus().fireEvent(
                   NotificationEvent.Builder.newNotification().info("UserDeletedOk").args(object.getName()).build());
+            }
+          }, Response.SC_OK).delete().send();
+        }
+      }
+    });
+
+    getView().getGroupsActions().setActionHandler(new ActionHandler<GroupDto>() {
+
+      @Override
+      public void doAction(final GroupDto object, String actionName) {
+        if(actionName.trim().equalsIgnoreCase(ActionsColumn.DELETE_ACTION)) {
+          ResourceRequestBuilderFactory.newBuilder()//
+              .forResource("/group/" + object.getName()).withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              getEventBus().fireEvent(new GroupsRefreshEvent());
+              getEventBus().fireEvent(
+                  NotificationEvent.Builder.newNotification().info("GroupDeletedOk").args(object.getName()).build());
             }
           }, Response.SC_OK).delete().send();
         }
