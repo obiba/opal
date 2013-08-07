@@ -25,15 +25,16 @@ public class TaxonomiesConfiguration implements OpalConfigurationExtension, Seri
   private Map<String, Taxonomy> taxonomies;
 
   public List<Taxonomy> getTaxonomies() {
+    if(taxonomies == null) return Lists.newArrayList();
     return Lists.newArrayList(taxonomies.values());
   }
 
   public boolean hasTaxonomy(String name) {
-    return taxonomies.containsKey(name);
+    return taxonomies != null && taxonomies.containsKey(name);
   }
 
   public void removeTaxonomy(String name) {
-    taxonomies.remove(name);
+    if(taxonomies != null) taxonomies.remove(name);
   }
 
   public Taxonomy getTaxonomy(String name) {
