@@ -294,7 +294,6 @@ message GeneralConf {
   optional string publicURL = 4;
 }
 
-
 message AttributeConf {
   message Attr {
     required string name = 1;
@@ -305,7 +304,30 @@ message AttributeConf {
   repeated Attr conf = 3;
 }
 
+message TaxonomyDto {
+  message TermDto {
+    required string name = 1;
+    repeated TextDto titles = 2;
+    repeated TextDto descriptions = 3;
+    repeated TermDto terms = 4; // children which path are mapped to attribute values, free value if none
+  }
+  message VocabularyDto {
+    required TermDto root = 1; // mapped to attribute name
+    required bool repeatable = 2 [default = false]; // allows the corresponding attribute name to be applied multiple times
+  }
+
+  message TextDto {
+      required string locale = 1 [default = "en"];
+      required string text = 2;
+  }
+
+  optional string name = 1; // mapped to attribute namespace
+  repeated TextDto titles = 2;
+  repeated TextDto descriptions = 3;
+  repeated VocabularyDto vocabularies = 4;
+}
+
 message OpalConf {
   required GeneralConf general = 1;
-  repeated AttributeConf attributes = 2;
+  repeated TaxonomyDto taxonomies = 2;
 }

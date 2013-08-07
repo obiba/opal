@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -30,6 +32,10 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.math.stat.IntervalFrequency;
 import org.obiba.magma.type.BinaryType;
+import org.obiba.opal.core.domain.taxonomy.Taxonomy;
+import org.obiba.opal.core.domain.taxonomy.Term;
+import org.obiba.opal.core.domain.taxonomy.Text;
+import org.obiba.opal.core.domain.taxonomy.Vocabulary;
 import org.obiba.opal.core.magma.math.CategoricalVariableSummary;
 import org.obiba.opal.core.magma.math.ContinuousVariableSummary;
 import org.obiba.opal.web.model.Magma;
@@ -42,7 +48,9 @@ import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
 import org.obiba.opal.web.model.Math;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.LocaleDto;
+import org.obiba.opal.web.model.Opal.TaxonomyDto;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
@@ -423,6 +431,106 @@ public final class Dtos {
       return input.toString();
     }
 
+  }
+
+  public static TaxonomyDto asDto(Taxonomy taxonomy) {
+    Opal.TaxonomyDto.Builder builder = Opal.TaxonomyDto.newBuilder();
+    builder.setName(taxonomy.getName());
+    builder.addAllTitles(toTextDtoList(taxonomy.getTitles()));
+    builder.addAllDescriptions(toTextDtoList(taxonomy.getDescriptions()));
+
+    Collection<TaxonomyDto.VocabularyDto> vocabularyDtos = new ArrayList<TaxonomyDto.VocabularyDto>();
+    for(Vocabulary v : taxonomy.getVocabularies()) {
+      vocabularyDtos.add(asDto(v));
+    }
+    builder.addAllVocabularies(vocabularyDtos);
+    return builder.build();
+  }
+
+  public static Taxonomy fromDto(TaxonomyDto dto) {
+    Taxonomy taxonomy = new Taxonomy(dto.getName());
+    taxonomy.setTitles(fromTextDtoList(dto.getTitlesList()));
+    taxonomy.setDescriptions(fromTextDtoList(dto.getDescriptionsList()));
+
+    List<Vocabulary> vocabularies = new ArrayList<Vocabulary>();
+    for(TaxonomyDto.VocabularyDto v : dto.getVocabulariesList()) {
+      vocabularies.add(fromDto(v));
+    }
+    taxonomy.setVocabularies(vocabularies);
+    return new Taxonomy(dto.getName());
+  }
+
+  public static TaxonomyDto.TextDto asDto(Text text) {
+    TaxonomyDto.TextDto.Builder builder = TaxonomyDto.TextDto.newBuilder()//
+        .setText(text.getText())//
+        .setLocale(text.getLocale());
+    return builder.build();
+  }
+
+  public static Text fromDto(TaxonomyDto.TextDto from) {
+    return new Text(from.getText(), from.getLocale());
+  }
+
+  public static TaxonomyDto.TermDto asDto(Term term) {
+    TaxonomyDto.TermDto.Builder builder = TaxonomyDto.TermDto.newBuilder();
+    builder.setName(term.getName());
+    builder.addAllTitles(toTextDtoList(term.getTitles()));
+    builder.addAllDescriptions(toTextDtoList(term.getDescriptions()));
+    builder.addAllTerms(asDto(term.getTerms()));
+    return builder.build();
+  }
+
+  private static Iterable<TaxonomyDto.TextDto> toTextDtoList(Iterable<Text> texts) {
+    Collection<TaxonomyDto.TextDto> textsDto = new ArrayList<TaxonomyDto.TextDto>();
+    for(Text t : texts) {
+      textsDto.add(asDto(t));
+    }
+    return textsDto;
+  }
+
+  private static List<Text> fromTextDtoList(Iterable<TaxonomyDto.TextDto> textDtos) {
+    List<Text> texts = new ArrayList<Text>();
+    for(TaxonomyDto.TextDto t : textDtos) {
+      texts.add(fromDto(t));
+    }
+    return texts;
+  }
+
+  private static Iterable<TaxonomyDto.TermDto> asDto(Iterable<Term> terms) {
+    Collection<TaxonomyDto.TermDto> termDto = new ArrayList<TaxonomyDto.TermDto>();
+    for(Term t : terms) {
+      termDto.add(asDto(t));
+    }
+    return termDto;
+  }
+
+  private static List<Term> fromDto(Iterable<TaxonomyDto.TermDto> termDtos) {
+    List<Term> termDto = new ArrayList<Term>();
+    for(TaxonomyDto.TermDto t : termDtos) {
+      termDto.add(fromDto(t));
+    }
+    return termDto;
+  }
+
+  public static Term fromDto(TaxonomyDto.TermDto from) {
+    Term term = new Term(from.getName());
+    term.setTitles(fromTextDtoList(from.getTitlesList()));
+    term.setDescriptions(fromTextDtoList(from.getDescriptionsList()));
+    term.setTerms(fromDto(from.getTermsList()));
+    return null;
+  }
+
+  public static TaxonomyDto.VocabularyDto asDto(Vocabulary vocabulary) {
+    TaxonomyDto.VocabularyDto.Builder builder = TaxonomyDto.VocabularyDto.newBuilder();
+    builder.setRoot(asDto(vocabulary.getRoot()));
+    builder.setRepeatable(vocabulary.isRepeatable());
+    return builder.build();
+  }
+
+  public static Vocabulary fromDto(TaxonomyDto.VocabularyDto dto) {
+    Vocabulary vocabulary = new Vocabulary(fromDto(dto.getRoot()));
+    vocabulary.setRepeatable(dto.getRepeatable());
+    return vocabulary;
   }
 
 }

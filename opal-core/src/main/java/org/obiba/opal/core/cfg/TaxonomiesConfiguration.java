@@ -12,46 +12,42 @@ package org.obiba.opal.core.cfg;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 public class TaxonomiesConfiguration implements OpalConfigurationExtension, Serializable {
 
-  private List<Taxonomy> taxonomies;
+  private static final long serialVersionUID = -3948159539937931629L;
+
+  private Map<String, Taxonomy> taxonomies;
 
   public List<Taxonomy> getTaxonomies() {
-    return taxonomies == null ? taxonomies = Lists.newArrayList() : taxonomies;
+    return Lists.newArrayList(taxonomies.values());
   }
 
   public boolean hasTaxonomy(String name) {
-    for (Taxonomy t : getTaxonomies()) {
-      if (!Strings.isNullOrEmpty(t.getName()) && t.getName().equals(name)) {
-        return true;
-      }
-      if (Strings.isNullOrEmpty(t.getName()) && Strings.isNullOrEmpty(name)) {
-        return true;
-      }
-    }
-    return false;
+    return taxonomies.containsKey(name);
   }
 
   public void removeTaxonomy(String name) {
-    Taxonomy tax = null;
-    for (Taxonomy t : getTaxonomies()) {
-      if (!Strings.isNullOrEmpty(t.getName()) && t.getName().equals(name)) {
-        tax = t;
-        break;
-      }
-      if (Strings.isNullOrEmpty(t.getName()) && Strings.isNullOrEmpty(name)) {
-        tax = t;
-        break;
-      }
+    taxonomies.remove(name);
+  }
+
+  public Taxonomy getTaxonomy(String name) {
+    return taxonomies.get(name);
+  }
+
+  public void addOrReplaceTaxonomy(Taxonomy taxonomy) {
+    taxonomies.put(taxonomy.getName(), taxonomy);
+  }
+
+  public Taxonomy getOrCreateTaxonomy(String name) {
+    if(!taxonomies.containsKey(name)) {
+      taxonomies.put(name, new Taxonomy(name));
     }
-    if (tax != null) {
-      getTaxonomies().remove(tax);
-    }
+    return getTaxonomy(name);
   }
 }
