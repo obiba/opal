@@ -29,7 +29,6 @@ import org.obiba.magma.support.DatasourceParsingException;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.project.ProjectService;
-import org.obiba.opal.project.cfg.ProjectsConfigurationService;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.magma.support.NoSuchDatasourceFactoryException;
@@ -78,11 +77,9 @@ public class ProjectsResource {
     Response.ResponseBuilder response;
     try {
       final DatasourceFactory factory;
-      if(projectFactoryDto.hasFactory()) {
-        factory = datasourceFactoryRegistry.parse(projectFactoryDto.getFactory());
-      } else {
-        factory = new NullDatasourceFactory();
-      }
+      factory = projectFactoryDto.hasFactory()
+          ? datasourceFactoryRegistry.parse(projectFactoryDto.getFactory())
+          : new NullDatasourceFactory();
       factory.setName(projectFactoryDto.getName());
       Datasource ds = MagmaEngine.get().addDatasource(factory);
       configService.modifyConfiguration(new OpalConfigurationService.ConfigModificationTask() {
@@ -108,7 +105,6 @@ public class ProjectsResource {
       response = Response.status(BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", dsCreationFailedEx).build());
     }
-
     return response.build();
   }
 }

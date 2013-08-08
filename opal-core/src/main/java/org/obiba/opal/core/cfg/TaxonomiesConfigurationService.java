@@ -27,10 +27,14 @@ public class TaxonomiesConfigurationService implements TaxonomyService {
         TaxonomiesConfiguration.class);
   }
 
-  private TaxonomiesConfiguration getConfig() {
+  public void registerExtension() {
     if(!configSupplier.hasExtension()) {
       configSupplier.addExtension(new TaxonomiesConfiguration());
     }
+  }
+
+  private TaxonomiesConfiguration getConfig() {
+    registerExtension();
     return configSupplier.get();
   }
 
@@ -41,46 +45,52 @@ public class TaxonomiesConfigurationService implements TaxonomyService {
 
   @Override
   public boolean hasTaxonomy(String name) {
-    return getConfig().hasTaxonomy(name);
+    return getConfig().has(name);
   }
 
   @Override
   public void removeTaxonomy(final String name) {
+    registerExtension();
     configSupplier
         .modify(new ExtensionConfigurationSupplier.ExtensionConfigModificationTask<TaxonomiesConfiguration>() {
           @Override
           public void doWithConfig(TaxonomiesConfiguration config) {
-            config.removeTaxonomy(name);
+            config.remove(name);
           }
         });
   }
 
   @Override
   public void addOrReplaceTaxonomy(final Taxonomy taxonomy) {
+    registerExtension();
     configSupplier
         .modify(new ExtensionConfigurationSupplier.ExtensionConfigModificationTask<TaxonomiesConfiguration>() {
           @Override
           public void doWithConfig(TaxonomiesConfiguration config) {
-            config.addOrReplaceTaxonomy(taxonomy);
+            config.put(taxonomy);
           }
         });
   }
 
   @Override
-  public Taxonomy getOrCreateTaxonomy(final String name) {
-    final Taxonomy[] taxonomy = new Taxonomy[1];
+  public Taxonomy getOrCreateTaxonomy(String name) {
+    if(hasTaxonomy(name)) {
+      return getTaxonomy(name);
+    }
+    final Taxonomy taxonomy = new Taxonomy(name);
     configSupplier
         .modify(new ExtensionConfigurationSupplier.ExtensionConfigModificationTask<TaxonomiesConfiguration>() {
           @Override
           public void doWithConfig(TaxonomiesConfiguration config) {
-            taxonomy[0] = config.getOrCreateTaxonomy(name);
+            config.put(taxonomy);
           }
         });
-    return taxonomy[0];
+    return taxonomy;
   }
 
   @Override
   public Taxonomy getTaxonomy(String name) {
-    return getConfig().getTaxonomy(name);
+    return getConfig().get(name);
   }
+
 }

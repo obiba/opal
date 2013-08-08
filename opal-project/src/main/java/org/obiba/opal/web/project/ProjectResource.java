@@ -21,10 +21,6 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.project.NoSuchProjectException;
 import org.obiba.opal.project.ProjectService;
-import org.obiba.opal.project.cfg.ProjectsConfigurationService;
-import org.obiba.opal.project.domain.Project;
-import org.obiba.opal.web.magma.DatasourceResource;
-import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Projects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -49,7 +45,8 @@ public class ProjectResource {
   public Projects.ProjectDto get() {
     if(MagmaEngine.get().hasDatasource(name)) {
       Datasource ds = MagmaEngine.get().getDatasource(name);
-      return Dtos.asDto(projectService.getOrCreateProject(ds), ds, projectService.getProjectDirectoryPath(name)).build();
+      return Dtos.asDto(projectService.getOrCreateProject(ds), ds, projectService.getProjectDirectoryPath(name))
+          .build();
     } else {
       throw new NoSuchProjectException(name);
     }
@@ -58,9 +55,9 @@ public class ProjectResource {
   @PUT
   public Response update(Projects.ProjectDto projectDto) {
     // will throw a no such project exception
-    Project project = projectService.getProject(name);
+    projectService.getProject(name);
 
-    if (!name.equals(projectDto.getName())) {
+    if(!name.equals(projectDto.getName())) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
@@ -74,14 +71,13 @@ public class ProjectResource {
     // silently ignore project not found
     if(projectService.hasProject(name)) {
       projectService.removeProject(name);
-
     }
     // TODO remove all tables, permissions, folders, index etc.
-    if (MagmaEngine.get().hasDatasource(name)) {
+    if(MagmaEngine.get().hasDatasource(name)) {
       Datasource ds = MagmaEngine.get().getDatasource(name);
       MagmaEngine.get().removeDatasource(ds);
-      for (ValueTable table : ds.getValueTables()) {
-        if (ds.canDropTable(table.getName())) {
+      for(ValueTable table : ds.getValueTables()) {
+        if(ds.canDropTable(table.getName())) {
           ds.dropTable(table.getName());
         }
       }

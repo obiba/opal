@@ -11,44 +11,38 @@
 package org.obiba.opal.core.cfg;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 
 public class TaxonomiesConfiguration implements OpalConfigurationExtension, Serializable {
 
   private static final long serialVersionUID = -3948159539937931629L;
 
-  private Map<String, Taxonomy> taxonomies;
+  private final HashMap<String, Taxonomy> taxonomies = Maps.newHashMap();
 
   public List<Taxonomy> getTaxonomies() {
-    if(taxonomies == null) return Lists.newArrayList();
-    return Lists.newArrayList(taxonomies.values());
+    return ImmutableList.copyOf(taxonomies.values());
   }
 
-  public boolean hasTaxonomy(String name) {
-    return taxonomies != null && taxonomies.containsKey(name);
+  public boolean has(String name) {
+    return taxonomies.containsKey(name);
   }
 
-  public void removeTaxonomy(String name) {
-    if(taxonomies != null) taxonomies.remove(name);
+  public void remove(String name) {
+    taxonomies.remove(name);
   }
 
-  public Taxonomy getTaxonomy(String name) {
+  public Taxonomy get(String name) {
     return taxonomies.get(name);
   }
 
-  public void addOrReplaceTaxonomy(Taxonomy taxonomy) {
+  public void put(Taxonomy taxonomy) {
     taxonomies.put(taxonomy.getName(), taxonomy);
   }
 
-  public Taxonomy getOrCreateTaxonomy(String name) {
-    if(!taxonomies.containsKey(name)) {
-      taxonomies.put(name, new Taxonomy(name));
-    }
-    return getTaxonomy(name);
-  }
 }

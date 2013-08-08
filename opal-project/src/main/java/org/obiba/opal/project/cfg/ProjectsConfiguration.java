@@ -21,7 +21,9 @@ import com.google.common.collect.Lists;
 
 public class ProjectsConfiguration implements OpalConfigurationExtension, Serializable {
 
-  private List<Project> projects;
+  private static final long serialVersionUID = -126713933511732481L;
+
+  private ArrayList<Project> projects;
 
   public List<Project> getProjects() {
     return projects == null ? projects = Lists.newArrayList() : projects;
@@ -29,6 +31,7 @@ public class ProjectsConfiguration implements OpalConfigurationExtension, Serial
 
   /**
    * Check that there is a project with the given name.
+   *
    * @param name
    * @return
    */
@@ -43,6 +46,7 @@ public class ProjectsConfiguration implements OpalConfigurationExtension, Serial
 
   /**
    * Add or update a project.
+   *
    * @param project
    */
   public void putProject(Project project) {
@@ -65,6 +69,7 @@ public class ProjectsConfiguration implements OpalConfigurationExtension, Serial
 
   /**
    * Get the project by its name.
+   *
    * @param name
    * @return
    * @throws NoSuchProjectException if project cannot be found with the given name
