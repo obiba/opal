@@ -19,6 +19,9 @@ public class Vocabulary {
 
   private boolean repeatable;
 
+  public Vocabulary() {
+  }
+
   public Vocabulary(@Nonnull Term root) {
     this.root = root;
   }

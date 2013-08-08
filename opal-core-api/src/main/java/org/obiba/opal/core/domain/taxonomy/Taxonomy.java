@@ -30,6 +30,9 @@ public class Taxonomy {
 
   private List<Vocabulary> vocabularies;
 
+  public Taxonomy() {
+  }
+
   public Taxonomy(@Nullable String name) {
     this.name = name;
   }

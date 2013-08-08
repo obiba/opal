@@ -6,6 +6,9 @@ public class Text {
 
   private String text;
 
+  public Text() {
+  }
+
   public Text(String text, String locale) {
     this.text = text;
     this.locale = locale;

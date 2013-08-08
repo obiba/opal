@@ -24,6 +24,9 @@ public class Term {
 
   private List<Term> terms;
 
+  public Term() {
+  }
+
   public Term(String name) {
     this.name = name;
   }
