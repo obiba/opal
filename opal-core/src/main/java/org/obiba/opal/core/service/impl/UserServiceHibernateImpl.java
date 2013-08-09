@@ -35,18 +35,18 @@ public class UserServiceHibernateImpl extends DefaultUserServiceImpl {
     return factory.getCurrentSession();
   }
 
+  @Override
   public List<User> getUsers() {
     return getUserCriteria().list();
   }
 
+  @Override
   public int getUserCount() {
     return getUserCriteria().count();
   }
 
   private AssociationCriteria getUserCriteria() {
-    AssociationCriteria criteria = AssociationCriteria.create(User.class, getSession());
-
-    return criteria;
+    return AssociationCriteria.create(User.class, getSession());
   }
 
 }

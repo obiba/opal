@@ -1,12 +1,11 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
-  <import resource="datasource.xml"/>
   <import resource="hibernate-session.xml"/>
 
   <bean id="persistenceManager" class="org.obiba.core.service.impl.hibernate.PersistenceManagerHibernateImpl">
-    <qualifier value="opal-data"/>
-    <property name="sessionFactory" ref="opalSessionFactory"/>
+    <qualifier value="opal-config"/>
+    <property name="sessionFactory" ref="sessionFactory"/>
   </bean>
 
   <bean id="importService" class="org.obiba.opal.core.service.impl.DefaultImportService"/>
@@ -18,15 +17,14 @@
   </bean>
 
   <bean id="auditLogManager" class="org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager">
-    <property name="sessionFactory" ref="opalSessionFactory"/>
+    <property name="sessionFactory" ref="sessionFactory"/>
     <property name="userProvider" ref="userProvider"/>
   </bean>
 
   <bean id="userProvider" class="org.obiba.opal.audit.OpalUserProvider"/>
 
-  <bean id="userService"
-      class="org.obiba.opal.core.service.impl.UserServiceHibernateImpl" scope="singleton">
-    <property name="sessionFactory" ref="opalSessionFactory"/>
+  <bean id="userService" class="org.obiba.opal.core.service.impl.UserServiceHibernateImpl">
+    <property name="sessionFactory" ref="sessionFactory"/>
     <property name="persistenceManager" ref="persistenceManager"/>
   </bean>
 

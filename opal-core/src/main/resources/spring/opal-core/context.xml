@@ -10,16 +10,12 @@
   <import resource="version.xml"/>
   <import resource="quartz.xml"/>
   <import resource="email.xml"/>
-
   <import resource="classpath*:/META-INF/opal/context.xml"/>
 
   <bean id="participantIdentifier"
-      class="org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl">
-  </bean>
+      class="org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl"/>
 
-  <bean id="identifiersTableService" class="org.obiba.opal.core.service.impl.DefaultIdentifiersTableService">
-    <property name="keysSessionFactory" ref="keySessionFactory"/>
-  </bean>
+  <bean id="identifiersTableService" class="org.obiba.opal.core.service.impl.DefaultIdentifiersTableService"/>
 
   <bean class="org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor"/>
 
