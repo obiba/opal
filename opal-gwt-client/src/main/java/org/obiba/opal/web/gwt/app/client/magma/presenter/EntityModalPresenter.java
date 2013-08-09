@@ -19,6 +19,8 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -47,13 +49,15 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Event;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
 /**
  *
  */
-public class EntityModalPresenter extends PresenterWidget<EntityModalPresenter.Display> {
+public class EntityModalPresenter extends ModalPresenterWidget<EntityModalPresenter.Display>
+    implements EntityModalUiHandlers {
 
   private String entityType;
 
@@ -63,15 +67,15 @@ public class EntityModalPresenter extends PresenterWidget<EntityModalPresenter.D
 
   private Map<String, VariableDto> variablesMap = new HashMap<String, VariableDto>();
 
-  private final ValueSequencePopupPresenter valueSequencePopupPresenter;
+  private final ModalProvider<ValueSequencePopupPresenter> valueSequencePopupProvider;
 
   private static final TranslationMessages translationMessages = GWT.create(TranslationMessages.class);
 
   @Inject
   public EntityModalPresenter(EventBus eventBus, Display display,
-      ValueSequencePopupPresenter valueSequencePopupPresenter) {
+      ModalProvider<ValueSequencePopupPresenter> valueSequencePopupProvider) {
     super(eventBus, display);
-    this.valueSequencePopupPresenter = valueSequencePopupPresenter;
+    this.valueSequencePopupProvider = valueSequencePopupProvider.setContainer(this);
   }
 
   @SuppressWarnings("ParameterHidesMemberVariable")
@@ -79,63 +83,40 @@ public class EntityModalPresenter extends PresenterWidget<EntityModalPresenter.D
     selectedTable = table;
     this.entityType = entityType;
     this.entityId = entityId;
-    getView().getFilter().setText(filterText);
-  }
-
-  @Override
-  protected void onBind() {
-    addChangeHandlers();
-    addCloseHandler();
-  }
-
-  private void addChangeHandlers() {
-    getView().getTableChooser().addChangeHandler(new ChangeHandler() {
-      @Override
-      public void onChange(ChangeEvent event) {
-        TableDto table = getView().getSelectedTable();
-        if(table != null) {
-          // Fetch table info
-          UriBuilder uriBuilder = UriBuilder.create()
-              .segment("datasource", table.getDatasourceName(), "table", table.getName());
-          ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(uriBuilder.build()).get()
-              .withCallback(new ResourceCallback<TableDto>() {
-                @Override
-                public void onResource(Response response, TableDto resource) {
-                  selectedTable = resource;
-                  loadVariables(selectedTable, getView().getFilter().getText());
-                }
-              }).send();
-        }
-      }
-    });
-    getView().getFilter().getClear().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        loadVariables(selectedTable, "");
-      }
-    });
-  }
-
-  private void addCloseHandler() {
-    registerHandler(getView().getButton().addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        getView().hide();
-      }
-    }));
-    // TODO disabled the ESCAPE key event handling to be implemented in the next sprint. Currently it causes a bug when two dialogs are on top of each other.
-//    setEscapeKeyUpHandler();
-  }
-
-  @Override
-  public void onReveal() {
+    getView().setUiHandlers(this);
+    getView().setFilterText(filterText);
     getView().setEntityType(entityType);
     getView().setEntityId(entityId);
     getView().setValueViewHandler(new ValueSequenceHandlerImpl());
-    getView().setVariablesFilterHandler(new VariablesFilterHandlerImpl());
 
     loadTables();
+  }
+
+  @Override
+  public void selectTable(TableDto table) {
+    if(table != null) {
+      // Fetch table info
+      UriBuilder uriBuilder = UriBuilder.create()
+          .segment("datasource", table.getDatasourceName(), "table", table.getName());
+      ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(uriBuilder.build()).get()
+          .withCallback(new ResourceCallback<TableDto>() {
+            @Override
+            public void onResource(Response response, TableDto resource) {
+              selectedTable = resource;
+              loadVariablesInternal(selectedTable, getView().getFilterText());
+            }
+          }).send();
+    }
+  }
+
+  @Override
+  public void loadVariables() {
+    loadVariablesInternal(selectedTable, "");
+  }
+
+  @Override
+  public void filterVariables(String filter) {
+    loadVariablesInternal(selectedTable, filter);
   }
 
   /**
@@ -151,12 +132,12 @@ public class EntityModalPresenter extends PresenterWidget<EntityModalPresenter.D
           @Override
           public void onResource(Response response, JsArray<TableDto> resource) {
             getView().setTables(resource, selectedTable);
-            loadVariables(selectedTable, getView().getFilter().getText());
+            loadVariablesInternal(selectedTable, getView().getFilterText());
           }
         }).send();
   }
 
-  private void loadVariables(final TableDto table, String select) {
+  private void loadVariablesInternal(final TableDto table, String select) {
     new VariablesFilter() {
       @Override
       public void beforeVariableResourceCallback() {
@@ -215,21 +196,6 @@ public class EntityModalPresenter extends PresenterWidget<EntityModalPresenter.D
         .withVariable(true)//
         .withLimit(table.getVariableCount())//
         .filter(getEventBus(), table);
-  }
-
-  // TODO Generalized this function so other Presenters can use it
-  private void setEscapeKeyUpHandler() {
-    Event.addNativePreviewHandler(new Event.NativePreviewHandler() {
-      @Override
-      public void onPreviewNativeEvent(Event.NativePreviewEvent event) {
-        Event nativeEvent = Event.as(event.getNativeEvent());
-        if(nativeEvent.getTypeInt() == Event.ONKEYUP) {
-          if(KeyCodes.KEY_ESCAPE == nativeEvent.getKeyCode()) {
-            getView().hide();
-          }
-        }
-      }
-    });
   }
 
   private static class ResponseErrorCallback implements ResponseCodeCallback {
@@ -293,7 +259,7 @@ public class EntityModalPresenter extends PresenterWidget<EntityModalPresenter.D
     }
   }
 
-  public interface Display extends PopupView {
+  public interface Display extends PopupView, HasUiHandlers<EntityModalUiHandlers> {
 
     void setEntityType(String entityType);
 
@@ -303,17 +269,11 @@ public class EntityModalPresenter extends PresenterWidget<EntityModalPresenter.D
 
     void setValueViewHandler(ValueViewHandler handler);
 
-    void setVariablesFilterHandler(VariablesFilterHandler handler);
-
     void renderRows(List<VariableValueRow> rows);
 
-    HasClickHandlers getButton();
+    String getFilterText();
 
-    TableDto getSelectedTable();
-
-    HasChangeHandlers getTableChooser();
-
-    TextBoxClearable getFilter();
+    void setFilterText(String filter);
   }
 
   public static class VariableValueRow {
@@ -365,8 +325,8 @@ public class EntityModalPresenter extends PresenterWidget<EntityModalPresenter.D
 
     @Override
     public void requestValueSequenceView(VariableDto variableDto) {
+      ValueSequencePopupPresenter valueSequencePopupPresenter = valueSequencePopupProvider.get();
       valueSequencePopupPresenter.initialize(selectedTable, variableDto, entityId, true);
-      addToPopupSlot(valueSequencePopupPresenter);
     }
 
     @Override
@@ -381,17 +341,4 @@ public class EntityModalPresenter extends PresenterWidget<EntityModalPresenter.D
       getEventBus().fireEvent(new GeoValueDisplayEvent(variable, entityId, value));
     }
   }
-
-  public interface VariablesFilterHandler {
-    void filterVariables(String filter);
-  }
-
-  private class VariablesFilterHandlerImpl implements VariablesFilterHandler {
-
-    @Override
-    public void filterVariables(String filter) {
-      loadVariables(selectedTable, filter);
-    }
-  }
-
 }

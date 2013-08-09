@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
@@ -55,14 +56,15 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private final ValueSequencePopupPresenter valueSequencePopupPresenter;
 
-  private final EntityModalPresenter entityModalPresenter;
+  private final ModalProvider<EntityModalPresenter> entityModalProvider;
 
   @Inject
   public ValuesTablePresenter(Display display, EventBus eventBus,
-      ValueSequencePopupPresenter valueSequencePopupPresenter, EntityModalPresenter entityModalPresenter) {
+      ValueSequencePopupPresenter valueSequencePopupPresenter,
+      ModalProvider<EntityModalPresenter> entityModalProvider) {
     super(eventBus, display);
     this.valueSequencePopupPresenter = valueSequencePopupPresenter;
-    this.entityModalPresenter = entityModalPresenter;
+    this.entityModalProvider = entityModalProvider.setContainer(this);
   }
 
   public void setTable(TableDto table) {
@@ -132,7 +134,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   private void hidePopups(TableDto newTable) {
     if(table != null && !table.getName().equals(newTable.getName())) {
       valueSequencePopupPresenter.getView().hide();
-      entityModalPresenter.getView().hide();
     }
   }
 
@@ -338,8 +339,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     @Override
     public void requestEntityDialog(String entityType, String entityId) {
+      EntityModalPresenter entityModalPresenter = entityModalProvider.get();
       entityModalPresenter.initialize(table, entityType, entityId, getView().getFilterText());
-      addToPopupSlot(entityModalPresenter);
     }
 
     @Override

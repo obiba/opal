@@ -16,6 +16,8 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileResourceRequest;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
+import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -41,14 +43,17 @@ public class FilesAdministrationPresenter
 
   private final FileExplorerPresenter fileExplorerPresenter;
 
+  private final BreadcrumbsBuilder breadcrumbsBuilder;
+
   private FileDto currentFolder;
 
   @Inject
   public FilesAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy, RequestCredentials credentials,
-      FileExplorerPresenter fileExplorerPresenter) {
+      FileExplorerPresenter fileExplorerPresenter, BreadcrumbsBuilder breadcrumbsBuilder) {
     super(eventBus, display, proxy);
     this.credentials = credentials;
     this.fileExplorerPresenter = fileExplorerPresenter;
+    this.breadcrumbsBuilder = breadcrumbsBuilder;
   }
 
   @Override
@@ -84,6 +89,7 @@ public class FilesAdministrationPresenter
     } else {
       updateTable(getDefaultPath());
     }
+    breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs()).build();
   }
 
   private void updateTable(String path) {
@@ -101,7 +107,7 @@ public class FilesAdministrationPresenter
     return credentials.getUsername() == null ? "/" : "/home/" + credentials.getUsername();
   }
 
-  public interface Display extends View {
+  public interface Display extends View, HasBreadcrumbs {
 
   }
 }

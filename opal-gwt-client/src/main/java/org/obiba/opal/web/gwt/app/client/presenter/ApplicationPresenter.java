@@ -14,18 +14,18 @@ import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdminis
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
-import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
-import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueMapPopupPresenter;
+import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
+import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.ui.HasUrl;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueMapPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.VariableSearchListItem;
 import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
@@ -34,11 +34,8 @@ import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFac
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.place.shared.PlaceChangeEvent;
-import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -204,17 +201,17 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   @Override
   public void onDashboard() {
-    getEventBus().fireEvent(new PlaceChangeEvent(Places.dashboardPlace));
+    placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.dashboard).build());
   }
 
   @Override
   public void onProjects() {
-    getEventBus().fireEvent(new PlaceChangeEvent(Places.projectsPlace));
+    placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.projects).build());
   }
 
   @Override
   public void onAdministration() {
-    getEventBus().fireEvent(new PlaceChangeEvent(Places.administrationPlace));
+    placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.administration).build());
   }
 
   @Override

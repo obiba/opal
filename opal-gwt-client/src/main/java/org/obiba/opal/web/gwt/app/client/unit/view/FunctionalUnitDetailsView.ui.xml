@@ -10,33 +10,45 @@
   <g:FlowPanel ui:field="functionalUnitDetails" addStyleNames="item-details">
 
     <g:FlowPanel addStyleNames="page-header">
-      <b:FluidRow>
-        <b:Column size="9">
-          <b:Breadcrumbs ui:field="breadcrumbs"/>
-        </b:Column>
-        <b:Column size="3">
-        </b:Column>
-      </b:FluidRow>
-      <g:InlineLabel ui:field="description"></g:InlineLabel><b:Button type="LINK" icon="PLUS_SIGN" ui:field="ellipsis"/>
+      <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
 
     <g:FlowPanel addStyleNames="bottom-margin">
+      <g:FlowPanel addStyleNames="content bottom-margin">
+          <b:Paragraph ui:field="description"></b:Paragraph>
+      </g:FlowPanel>
+
       <b:ButtonGroup>
         <b:DropdownButton text="Unit" ui:field="unitDropdown" size="SMALL" icon="TASKS">
-          <b:NavLink icon="EDIT" ui:field="updateUnit"><ui:msg description="Add Functional Unit label">Edit unit...</ui:msg></b:NavLink>
-          <b:NavLink icon="REMOVE"  ui:field="removeUnit"><ui:msg description="Remove Functional Unit abel">Remove unit...</ui:msg></b:NavLink>
+          <b:NavLink icon="EDIT" ui:field="updateUnit">
+            <ui:msg description="Add Functional Unit label">Edit unit...</ui:msg>
+          </b:NavLink>
+          <b:NavLink icon="REMOVE" ui:field="removeUnit">
+            <ui:msg description="Remove Functional Unit abel">Remove unit...</ui:msg>
+          </b:NavLink>
         </b:DropdownButton>
       </b:ButtonGroup>
       <b:ButtonGroup>
         <b:DropdownButton text="identifiersDropdown" size="SMALL" icon="COG" ui:field="identifiersDropDown">
-          <b:NavLink icon="UPLOAD" ui:field="exportIdentifiers"><ui:msg description="Functional Unit Export identifiers">Export indentifiers...</ui:msg></b:NavLink>
-          <b:NavLink icon="DOWNLOAD" ui:field="exportIdentifiersMapping"><ui:msg description="Functional Unit Export identifiers mapping">Export identifiers mapping...</ui:msg></b:NavLink>
-          <b:NavLink icon="COG" ui:field="generateIdentifiers"><ui:msg description="Functional Unit Generate identifiers">Generate identifiers...</ui:msg></b:NavLink>
-          <b:NavLink icon="FILE_ALT" ui:field="importIdentifiersFromFile"><ui:msg description="Functional Unit Add identifiers from data file">Add identifiers from data file...</ui:msg></b:NavLink>
+          <b:NavLink icon="UPLOAD" ui:field="exportIdentifiers">
+            <ui:msg description="Functional Unit Export identifiers">Export indentifiers...</ui:msg>
+          </b:NavLink>
+          <b:NavLink icon="DOWNLOAD" ui:field="exportIdentifiersMapping">
+            <ui:msg description="Functional Unit Export identifiers mapping">Export identifiers mapping...</ui:msg>
+          </b:NavLink>
+          <b:NavLink icon="COG" ui:field="generateIdentifiers">
+            <ui:msg description="Functional Unit Generate identifiers">Generate identifiers...</ui:msg>
+          </b:NavLink>
+          <b:NavLink icon="FILE_ALT" ui:field="importIdentifiersFromFile">
+            <ui:msg description="Functional Unit Add identifiers from data file">Add identifiers from data file...
+            </ui:msg>
+          </b:NavLink>
         </b:DropdownButton>
       </b:ButtonGroup>
       <b:ButtonGroup>
-        <b:Button icon="PLUS" size="SMALL" ui:field="addCryptographicKey"><ui:msg description="Functional Unit Add Cryptographic key">Add Cryptographic key...</ui:msg></b:Button>
+        <b:Button icon="PLUS" size="SMALL" ui:field="addCryptographicKey">
+          <ui:msg description="Functional Unit Add Cryptographic key">Add Cryptographic key...</ui:msg>
+        </b:Button>
       </b:ButtonGroup>
     </g:FlowPanel>
 
@@ -46,7 +58,7 @@
           <o:PropertiesTable ui:field="propertiesPanel" condensed="true" zebra="true"
               keyStyleNames="span3 small-indent">
 
-          <g:FlowPanel>
+            <g:FlowPanel>
               <g:Label>
                 <ui:msg description="Identifier Variables Filter label">Identifier Variables Filter</ui:msg>
               </g:Label>

@@ -12,60 +12,58 @@ package org.obiba.opal.web.gwt.app.client.magma.view;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueOccurrenceColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueOccurrenceColumn.ValueOccurrence;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueOccurrenceColumn.ValueSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueSequencePopupPresenter.ValueSetFetcher;
-import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueSequencePopupUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.ToggleAnchor;
 import org.obiba.opal.web.gwt.app.client.ui.ToggleAnchor.Delegate;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueOccurrenceColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueOccurrenceColumn.ValueOccurrence;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueOccurrenceColumn.ValueSelectionHandler;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.Header;
-import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PopupViewImpl;
+import com.google.web.bindery.event.shared.EventBus;
 
 /**
  *
  */
-public class ValueSequencePopupView extends PopupViewImpl implements ValueSequencePopupPresenter.Display {
+public class ValueSequencePopupView extends ModalPopupViewWithUiHandlers<ValueSequencePopupUiHandlers>
+    implements ValueSequencePopupPresenter.Display {
 
-  @UiTemplate("ValueSequencePopupView.ui.xml")
   interface ValueSequencePopupViewUiBinder extends UiBinder<Widget, ValueSequencePopupView> {}
 
   private static final ValueSequencePopupViewUiBinder uiBinder = GWT.create(ValueSequencePopupViewUiBinder.class);
 
+  private static final int MIN_WIDTH = 480;
+  private static final int MIN_HEIGHT = 400;
+
   private final Widget widget;
 
   @UiField
-  DialogBox dialogBox;
-
-  @UiField
-  DockLayoutPanel content;
+  Modal dialogBox;
 
   @UiField
   Label occurrenceGroup;
@@ -85,9 +83,6 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
   @UiField
   Button closeButton;
 
-  @UiField
-  ResizeHandle resizeHandle;
-
   private VariableDto variable;
 
   private ListDataProvider<ValueOccurrence> dataProvider;
@@ -100,7 +95,6 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
   public ValueSequencePopupView(EventBus eventBus) {
     super(eventBus);
     widget = uiBinder.createAndBindUi(this);
-    resizeHandle.makeResizable(content);
     toggleGroup.setShowHideTexts();
     toggleGroup.setDelegate(new Delegate() {
 
@@ -132,8 +126,10 @@ public class ValueSequencePopupView extends PopupViewImpl implements ValueSequen
 
   @Override
   public void initialize(TableDto table, VariableDto variable, String entityIdentifier, boolean modal) {
-    dialogBox.setModal(modal);
-    dialogBox.setText(variable.getName() + " - " + entityIdentifier);
+    dialogBox.setTitle(variable.getName() + " - " + entityIdentifier);
+    dialogBox.setMinWidth(MIN_WIDTH);
+    dialogBox.setMinHeight(MIN_HEIGHT);
+
     occurrenceGroup.setText(variable.getOccurrenceGroup());
     toggleGroup.setVisible(variable.getOccurrenceGroup() != null && !variable.getOccurrenceGroup().isEmpty());
     toggleGroup.setOn(true);

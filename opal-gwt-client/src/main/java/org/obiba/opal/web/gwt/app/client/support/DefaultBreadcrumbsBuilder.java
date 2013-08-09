@@ -12,6 +12,7 @@ public class DefaultBreadcrumbsBuilder implements BreadcrumbsBuilder {
   private final PlaceManager placeManager;
 
   private HasWidgets breadcrumbsView;
+
   private int startingDepth = 0;
 
   @Inject
@@ -20,10 +21,9 @@ public class DefaultBreadcrumbsBuilder implements BreadcrumbsBuilder {
   }
 
   public DefaultBreadcrumbsBuilder setStartingDepth(int startingDepth) {
-    if (startingDepth < 0) {
+    if(startingDepth < 0) {
       throw new IndexOutOfBoundsException("Starting depth cannot be negative");
-    }
-    else if (startingDepth > placeManager.getHierarchyDepth()) {
+    } else if(startingDepth > placeManager.getHierarchyDepth()) {
       throw new IndexOutOfBoundsException("Starting depth cannot exceed the current number of depths");
     }
 
@@ -38,7 +38,7 @@ public class DefaultBreadcrumbsBuilder implements BreadcrumbsBuilder {
   }
 
   public void build() {
-    if (breadcrumbsView == null) {
+    if(breadcrumbsView == null) {
       throw new NullPointerException("Breadcrumbs view cannot be NULL");
     }
 
@@ -46,7 +46,7 @@ public class DefaultBreadcrumbsBuilder implements BreadcrumbsBuilder {
 
     final int size = placeManager.getHierarchyDepth();
 
-      for (int i = startingDepth; i < size; i++) {
+    for(int i = startingDepth; i < size; i++) {
       final int index = i;
       placeManager.getTitle(i, new SetPlaceTitleHandler() {
         @Override

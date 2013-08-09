@@ -2,11 +2,11 @@ package org.obiba.opal.web.gwt.app.client;
 
 import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
-import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.ConfirmationPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ConfirmationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
 import org.obiba.opal.web.gwt.rest.client.DefaultResourceAuthorizationRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.DefaultResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
@@ -22,7 +22,6 @@ import org.obiba.opal.web.model.client.opal.Subject;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.ClosingEvent;
 import com.google.gwt.user.client.Window.ClosingHandler;
@@ -30,7 +29,6 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Bootstrapper;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.RevealRootPopupContentEvent;
 
 public class OpalBootstrapperImpl implements Bootstrapper {
@@ -118,21 +116,6 @@ public class OpalBootstrapperImpl implements Bootstrapper {
   }
 
   private void registerHandlers() {
-
-    eventBus.addHandler(PlaceChangeEvent.TYPE, new PlaceChangeEvent.Handler() {
-
-      @Override
-      public void onPlaceChange(PlaceChangeEvent event) {
-        Places.Place place = (Places.Place) event.getNewPlace();
-        PlaceRequest request = new PlaceRequest.Builder().nameToken(place.getName()).build();
-        // add the params if any
-        for(String name : place.getParameterNames()) {
-          request = request.with(name, place.getParameter(name, ""));
-        }
-
-        placeManager.revealPlace(request);
-      }
-    });
 
     eventBus.addHandler(UnhandledResponseEvent.getType(), new UnhandledResponseEvent.Handler() {
       @Override
