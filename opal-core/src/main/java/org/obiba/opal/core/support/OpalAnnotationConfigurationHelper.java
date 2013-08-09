@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.obiba.opal.core.domain.database.MongoDbDatabase;
+import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
 import org.obiba.opal.core.domain.user.Group;
@@ -17,7 +19,8 @@ import com.google.common.collect.Lists;
 public class OpalAnnotationConfigurationHelper implements FactoryBean<Set<Class<?>>> {
 
   private final Set<Class<?>> annotatedClasses = new ImmutableSet.Builder<Class<?>>()
-      .add(UnitKeyStoreState.class, SubjectAcl.class, User.class, Group.class).build();
+      .add(UnitKeyStoreState.class, SubjectAcl.class, User.class, Group.class, SqlDatabase.class, MongoDbDatabase.class)
+      .build();
 
   private final List<Class<?>> additionalClasses = Lists.newArrayList();
 

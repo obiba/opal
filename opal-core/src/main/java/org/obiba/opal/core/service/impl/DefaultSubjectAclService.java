@@ -44,8 +44,8 @@ public class DefaultSubjectAclService implements SubjectAclService {
   private final Set<SubjectAclChangeCallback> callbacks = Sets.newHashSet();
 
   @Autowired
-  public DefaultSubjectAclService(@Qualifier("opal-data") PersistenceManager persistenceManager,
-      @Qualifier("opal-data") SessionFactory sessionFactory) {
+  public DefaultSubjectAclService(@Qualifier("opal-config") PersistenceManager persistenceManager,
+      @Qualifier("opal-config") SessionFactory sessionFactory) {
     this.persistenceManager = persistenceManager;
     this.sessionFactory = sessionFactory;
   }

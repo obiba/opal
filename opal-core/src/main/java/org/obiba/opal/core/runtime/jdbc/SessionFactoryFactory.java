@@ -13,6 +13,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.sql.DataSource;
 import javax.transaction.TransactionManager;
@@ -56,7 +57,8 @@ public class SessionFactoryFactory {
     asfb.setJtaTransactionManager(txmgr);
     asfb.setHibernateProperties(hibernateProperties);
     asfb.getHibernateProperties().setProperty(Environment.DIALECT, determineDialect(dataSource).getClass().getName());
-    asfb.setAnnotatedClasses(new AnnotationConfigurationHelper().getAnnotatedTypes().toArray(new Class[] { }));
+    Set<Class<?>> annotatedTypes = new AnnotationConfigurationHelper().getAnnotatedTypes();
+    asfb.setAnnotatedClasses(annotatedTypes.toArray(new Class[annotatedTypes.size()]));
     asfb.setNamingStrategy(new MagmaNamingStrategy());
     asfb.setExposeTransactionAwareSessionFactory(false);
 
@@ -71,7 +73,7 @@ public class SessionFactoryFactory {
 
   protected void onSessionFactoryBeanCreated(AnnotationSessionFactoryBean asfb) {
     try {
-      log.info("Veryfying database schema.");
+      log.info("Verifying database schema.");
       asfb.validateDatabaseSchema();
     } catch(DataAccessException dae) {
       log.info("Invalid schema for hibernate datasource; updating schema.");
