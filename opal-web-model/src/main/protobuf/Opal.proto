@@ -76,6 +76,7 @@ message JdbcDriverDto {
   optional string version = 4;
 }
 
+//TODO delete this JdbcDataSourceDto
 message JdbcDataSourceDto {
   required string name = 1;
   required string url = 2;
@@ -84,6 +85,42 @@ message JdbcDataSourceDto {
   optional string password = 5;
   optional bool editable = 6 [default = true];
   optional string properties = 7;
+}
+
+message DatabaseDto {
+  enum DbType {
+    IMPORT = 0;
+    STORAGE = 1;
+    EXPORT = 2;
+  }
+  required string name = 1;
+  optional string description = 2;
+  optional bool editable = 3 [default = true];
+  required bool defaultStorage = 4 [default = false];
+  required DbType type = 5;
+  extensions 1000 to max;
+}
+
+message SqlDatabaseDto {
+  required string url = 1; // jdbc:{mysql|mariadb|postgresql}://{hostname}:{port}/{databaseName}
+  required string driverClass = 2;
+  required string username = 3;
+  optional string password = 4;
+  optional string properties = 5;
+  required string magmaDatasourceType = 6; // datasource name that can be built on this database: hibernate, jdbc or limesurvey
+  extend DatabaseDto {
+    optional SqlDatabaseDto settings = 1000;
+  }
+}
+
+message MongoDbDatabaseDto {
+  required string url = 1; // mongodb://{hostname}:{port}/{databaseName}
+  optional string username =2;
+  optional string password = 3;
+  optional string properties = 4;
+  extend DatabaseDto {
+    optional MongoDbDatabaseDto settings = 1001;
+  }
 }
 
 message ReportTemplateDto {

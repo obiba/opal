@@ -20,17 +20,14 @@ import javax.sql.DataSource;
 
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.domain.database.SqlDatabase;
+import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
-import org.obiba.opal.core.runtime.jdbc.DefaultJdbcDataSourceRegistry;
-import org.obiba.opal.core.runtime.jdbc.JdbcDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- *
- */
 @Component
 public class UpgradeUtils {
 
@@ -38,19 +35,16 @@ public class UpgradeUtils {
 
   private final DataSourceFactory dataSourceFactory;
 
-  private final DataSource opalDataSource;
-
-  private final DataSource keyDataSource;
-
   private final OpalConfigurationService configurationService;
+
+  private final DatabaseRegistry databaseRegistry;
 
   @Autowired
   public UpgradeUtils(OpalConfigurationService configurationService, DataSourceFactory dataSourceFactory,
-      DataSource opalDataSource, DataSource keyDataSource) {
+      DatabaseRegistry databaseRegistry) {
     this.configurationService = configurationService;
     this.dataSourceFactory = dataSourceFactory;
-    this.opalDataSource = opalDataSource;
-    this.keyDataSource = keyDataSource;
+    this.databaseRegistry = databaseRegistry;
   }
 
   public static boolean hasHibernateDatasource(DataSource dataSource) {
@@ -68,15 +62,11 @@ public class UpgradeUtils {
 
   public Map<DataSource, String> getConfiguredDatasources() {
     Map<DataSource, String> dataSourceNames = new LinkedHashMap<DataSource, String>();
-    dataSourceNames.put(opalDataSource, "Default");
-    dataSourceNames.put(keyDataSource, "Key");
 
     OpalConfiguration configuration = configurationService.getOpalConfiguration();
     try {
-      DefaultJdbcDataSourceRegistry.JdbcDataSourcesConfig dataSourcesConfig = configuration
-          .getExtension(DefaultJdbcDataSourceRegistry.JdbcDataSourcesConfig.class);
-      for(JdbcDataSource jdbcDataSource : dataSourcesConfig.getDatasources()) {
-        dataSourceNames.put(dataSourceFactory.createDataSource(jdbcDataSource), jdbcDataSource.getName());
+      for(SqlDatabase database : databaseRegistry.list(SqlDatabase.class)) {
+        dataSourceNames.put(dataSourceFactory.createDataSource(database), database.getName());
       }
     } catch(NoSuchElementException e) {
       // ignore

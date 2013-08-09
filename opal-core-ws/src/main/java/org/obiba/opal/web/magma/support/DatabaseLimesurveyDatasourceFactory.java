@@ -15,7 +15,7 @@ import org.obiba.magma.AbstractDatasourceFactory;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.Disposable;
 import org.obiba.magma.datasource.limesurvey.LimesurveyDatasource;
-import org.obiba.opal.core.runtime.jdbc.JdbcDataSourceRegistry;
+import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.base.Preconditions;
@@ -29,7 +29,7 @@ public class DatabaseLimesurveyDatasourceFactory extends AbstractDatasourceFacto
   // transient because of XML serialization
   @SuppressWarnings("TransientFieldInNonSerializableClass")
   @Autowired
-  private transient JdbcDataSourceRegistry dataSourceRegistry;
+  private transient DatabaseRegistry databaseRegistry;
 
   // empty public constructor because of XML serialization
   @SuppressWarnings("UnusedDeclaration")
@@ -43,26 +43,26 @@ public class DatabaseLimesurveyDatasourceFactory extends AbstractDatasourceFacto
    * @param dataSourceRegistry
    */
   public DatabaseLimesurveyDatasourceFactory(String name, String databaseName, String tablePrefix,
-      JdbcDataSourceRegistry dataSourceRegistry) {
+      DatabaseRegistry databaseRegistry) {
     setName(name);
     Preconditions.checkArgument(name != null);
     Preconditions.checkArgument(databaseName != null);
-    Preconditions.checkArgument(dataSourceRegistry != null);
+    Preconditions.checkArgument(databaseRegistry != null);
 
     this.databaseName = databaseName;
     this.tablePrefix = tablePrefix;
-    this.dataSourceRegistry = dataSourceRegistry;
+    this.databaseRegistry = databaseRegistry;
   }
 
   @Nonnull
   @Override
   protected Datasource internalCreate() {
-    return new LimesurveyDatasource(getName(), dataSourceRegistry.getDataSource(databaseName, getName()), tablePrefix);
+    return new LimesurveyDatasource(getName(), databaseRegistry.getDataSource(databaseName, getName()), tablePrefix);
   }
 
   @Override
   public void dispose() {
-    dataSourceRegistry.unregister(databaseName, getName());
+    databaseRegistry.unregister(databaseName, getName());
   }
 
 }

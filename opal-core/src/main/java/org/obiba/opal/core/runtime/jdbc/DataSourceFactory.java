@@ -13,6 +13,7 @@ import javax.transaction.TransactionManager;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.dbcp.managed.BasicManagedDataSource;
+import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,25 +29,24 @@ public class DataSourceFactory {
     this.txmgr = txmgr;
   }
 
-  public BasicDataSource createDataSource(JdbcDataSource datasource) {
+  public BasicDataSource createDataSource(SqlDatabase database) {
     BasicManagedDataSource bmds = new BasicManagedDataSource();
 
     BeanWrapperImpl bw = new BeanWrapperImpl(bmds);
     // Set values, ignoring unknown/invalid entries
-    bw.setPropertyValues(new MutablePropertyValues(datasource.readProperties()), true, true);
+    bw.setPropertyValues(new MutablePropertyValues(database.readProperties()), true, true);
 
     // Set other properties
     bmds.setTransactionManager(txmgr);
-    bmds.setUrl(datasource.getUrl());
-    bmds.setDriverClassName(datasource.getDriverClass());
-    bmds.setUsername(datasource.getUsername());
-    bmds.setPassword(datasource.getPassword());
+    bmds.setUrl(database.getUrl());
+    bmds.setDriverClassName(database.getDriverClass());
+    bmds.setUsername(database.getUsername());
+    bmds.setPassword(database.getPassword());
 
     if(bmds.getMaxWait() < 0) {
       // Wait for 10 seconds maximum
       bmds.setMaxWait(10 * 1000);
     }
-
     return bmds;
   }
 
