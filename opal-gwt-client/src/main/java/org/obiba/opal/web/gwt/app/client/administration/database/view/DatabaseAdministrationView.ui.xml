@@ -7,7 +7,10 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <b:Breadcrumbs ui:field="breadcrumbs" />
+    <g:FlowPanel addStyleNames="page-header">
+      <b:Breadcrumbs ui:field="breadcrumbs" />
+    </g:FlowPanel>
+
     <g:FlowPanel addStyleNames="panel">
       <g:VerticalPanel width="100%" addStyleNames="content">
         <g:Button ui:field="addDatabaseButton" styleName="btn">

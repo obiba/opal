@@ -10,10 +10,12 @@
 package org.obiba.opal.web.gwt.app.client.dashboard.view;
 
 import org.obiba.opal.web.gwt.app.client.dashboard.presenter.DashboardPresenter;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
+import com.github.gwtbootstrap.client.ui.PageHeader;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -31,6 +33,11 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   interface ViewUiBinder extends UiBinder<Widget, DashboardView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+
+  private static final Translations translations = GWT.create(Translations.class);
+
+  @UiField
+  PageHeader pageTitle;
 
   @UiField
   Label participantCount;
@@ -72,6 +79,7 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
     getReportsLink().setHref("#" + Places.reportTemplates);
     getJobsLink().setHref("#" + Places.jobs);
     getFilesLink().setHref("#" + Places.files);
+    pageTitle.setText(translations.pageDashboardTitle());
   }
 
   @Override

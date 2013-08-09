@@ -12,12 +12,15 @@ package org.obiba.opal.web.gwt.app.client.ui;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.HasKeyUpHandlers;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 
-public class TextBoxClearable extends FlowPanel {
+public class TextBoxClearable extends FlowPanel implements HasKeyUpHandlers, HasClickHandlers {
 
   private final TextBox textBox;
 
@@ -78,4 +81,13 @@ public class TextBoxClearable extends FlowPanel {
     return clear;
   }
 
+  @Override
+  public HandlerRegistration addKeyUpHandler(KeyUpHandler handler) {
+    return addDomHandler(handler, KeyUpEvent.getType());
+  }
+
+  @Override
+  public HandlerRegistration addClickHandler(ClickHandler handler) {
+    return addDomHandler(handler, ClickEvent.getType());
+  }
 }

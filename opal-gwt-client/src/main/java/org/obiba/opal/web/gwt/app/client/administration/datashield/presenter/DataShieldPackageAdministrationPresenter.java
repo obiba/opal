@@ -5,13 +5,14 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShi
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.event.DataShieldPackageRemovedEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsPackageRColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -43,17 +44,17 @@ public class DataShieldPackageAdministrationPresenter
 
   private Runnable publishMethodsConfirmation;
 
-  private final DataShieldPackageCreatePresenter dataShieldPackageCreatePresenter;
+  private final ModalProvider<DataShieldPackageCreatePresenter> dataShieldPackageCreateModalProvider;
 
-  private final DataShieldPackagePresenter dataShieldPackagePresenter;
+  private final ModalProvider<DataShieldPackagePresenter> dataShieldPackageModalProvider;
 
   @Inject
   public DataShieldPackageAdministrationPresenter(Display display, EventBus eventBus,
-      DataShieldPackageCreatePresenter dataShieldPackagePresenter,
-      DataShieldPackagePresenter dataShieldPackagePresenter1) {
+      ModalProvider<DataShieldPackageCreatePresenter> dataShieldPackageCreateModalProvider,
+      ModalProvider<DataShieldPackagePresenter> dataShieldPackageModalProvider) {
     super(eventBus, display);
-    dataShieldPackageCreatePresenter = dataShieldPackagePresenter;
-    this.dataShieldPackagePresenter = dataShieldPackagePresenter1;
+    this.dataShieldPackageCreateModalProvider = dataShieldPackageCreateModalProvider.setContainer(this);
+    this.dataShieldPackageModalProvider = dataShieldPackageModalProvider.setContainer(this);
   }
 
   @Override
@@ -77,8 +78,8 @@ public class DataShieldPackageAdministrationPresenter
 
       @Override
       public void onClick(ClickEvent event) {
+        DataShieldPackageCreatePresenter dataShieldPackageCreatePresenter = dataShieldPackageCreateModalProvider.get();
         dataShieldPackageCreatePresenter.addNewPackage();
-        addToPopupSlot(dataShieldPackageCreatePresenter);
       }
     }));
     registerHandler(
@@ -255,8 +256,8 @@ public class DataShieldPackageAdministrationPresenter
 
         @Override
         public void authorized() {
+          DataShieldPackagePresenter dataShieldPackagePresenter = dataShieldPackageModalProvider.get();
           dataShieldPackagePresenter.displayPackage(dto);
-          addToPopupSlot(dataShieldPackagePresenter);
         }
       });
     }

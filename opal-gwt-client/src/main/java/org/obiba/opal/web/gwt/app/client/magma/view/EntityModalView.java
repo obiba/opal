@@ -13,14 +13,17 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityModalPresenter;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueRenderer;
-import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityModalUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.TableChooser;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueRenderer;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.github.gwtbootstrap.client.ui.Icon;
+import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.constants.IconSize;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.cell.client.AbstractSafeHtmlCell;
@@ -30,12 +33,10 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
-import com.google.gwt.event.dom.client.HasChangeHandlers;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
@@ -43,36 +44,30 @@ import com.google.gwt.text.shared.SafeHtmlRenderer;
 import com.google.gwt.text.shared.SimpleSafeHtmlRenderer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PopupViewImpl;
+import com.google.web.bindery.event.shared.EventBus;
 
-public class EntityModalView extends PopupViewImpl implements EntityModalPresenter.Display {
+public class EntityModalView extends ModalPopupViewWithUiHandlers<EntityModalUiHandlers>
+    implements EntityModalPresenter.Display {
 
   private static final int PAGE_SIZE = 20;
+  private static final int MIN_WIDTH = 580;
+  private static final int MIN_HEIGHT = 500;
 
-  @UiTemplate("EntityModalView.ui.xml")
-  interface EntityViewUiBinder extends UiBinder<DialogBox, EntityModalView> {}
+  interface EntityViewUiBinder extends UiBinder<Widget, EntityModalView> {}
 
   private static final EntityViewUiBinder uiBinder = GWT.create(EntityViewUiBinder.class);
 
   @UiField
-  DialogBox dialog;
-
-  @UiField
-  DockLayoutPanel content;
+  Modal dialog;
 
   @UiField
   Label entityType;
@@ -95,12 +90,6 @@ public class EntityModalView extends PopupViewImpl implements EntityModalPresent
   @UiField
   TextBoxClearable filter;
 
-  @UiField
-  Button closeButton;
-
-  @UiField
-  ResizeHandle resizeHandle;
-
   private final Widget widget;
 
   private final Translations translations = GWT.create(Translations.class);
@@ -110,8 +99,6 @@ public class EntityModalView extends PopupViewImpl implements EntityModalPresent
 
   private final ValueSelectionHandlerImpl valueSelectionHandler;
 
-  private EntityModalPresenter.VariablesFilterHandler variablesFilterHandler;
-
   private EntityModalPresenter.ValueViewHandler valueViewHandler;
 
   @Inject
@@ -119,31 +106,25 @@ public class EntityModalView extends PopupViewImpl implements EntityModalPresent
     super(eventBus);
     tableChooser = new TableChooser(false);
     widget = uiBinder.createAndBindUi(this);
-    resizeHandle.makeResizable(content);
     valueSelectionHandler = new ValueSelectionHandlerImpl();
     initializeTable();
     initializeDisplayOptions();
-    dialog.hide();
+    dialog.setTitle(translations.entityDetailsModalTitle());
+    dialog.setMinWidth(MIN_WIDTH);
+    dialog.setMinHeight(MIN_HEIGHT);
   }
 
   private void initializeDisplayOptions() {
     filter.getClear().setTitle(translations.clearFilter());
     filter.getTextBox().setPlaceholder(translations.filterVariables());
-    filter.getTextBox().addKeyUpHandler(new KeyUpHandler() {
-      @Override
-      public void onKeyUp(KeyUpEvent event) {
-        if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER || filter.getTextBox().getText().isEmpty()) {
-          // variables list has changed so update all
-          variablesFilterHandler.filterVariables(filter.getTextBox().getText());
-        }
-      }
-    });
   }
 
-  @Override
-  public void show() {
-    dialog.center();
-    super.show();
+  @UiHandler("filter")
+  public void onFilterSelected(KeyUpEvent event) {
+    if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER || filter.getTextBox().getText().isEmpty()) {
+      // variables list has changed so update all
+      getUiHandlers().filterVariables(filter.getTextBox().getText());
+    }
   }
 
   @Override
@@ -168,21 +149,9 @@ public class EntityModalView extends PopupViewImpl implements EntityModalPresent
     valueViewHandler = handler;
   }
 
-  @Override
-  public void setVariablesFilterHandler(EntityModalPresenter.VariablesFilterHandler handler) {
-    variablesFilterHandler = handler;
-  }
-
-  @Override
-  public TableDto getSelectedTable() {
-    List<TableDto> tables = tableChooser.getSelectedTables();
-    // there is only one table since the chooser is not multi select
-    return tables.isEmpty() ? null : tables.get(0);
-  }
-
-  @Override
-  public HasChangeHandlers getTableChooser() {
-    return tableChooser;
+  @UiHandler("tableChooser")
+  public void onTableChooserChanged(ChangeEvent event) {
+    getUiHandlers().selectTable(getSelectedTable());
   }
 
   @Override
@@ -190,14 +159,9 @@ public class EntityModalView extends PopupViewImpl implements EntityModalPresent
     return widget;
   }
 
-  @Override
-  protected PopupPanel asPopupPanel() {
-    return dialog;
-  }
-
-  @Override
-  public HasClickHandlers getButton() {
-    return closeButton;
+  @UiHandler("closeButton")
+  public void onCloseButton(ClickEvent event) {
+    dialog.hide();
   }
 
   @Override
@@ -205,11 +169,22 @@ public class EntityModalView extends PopupViewImpl implements EntityModalPresent
     dataProvider.setList(rows);
     pager.firstPage();
     dataProvider.refresh();
+    pager.setVisible(dataProvider.getList().size() > pager.getPageSize());
+  }
+
+  @UiHandler("filter")
+  public void onFilterSelected(ClickEvent event) {
+    getUiHandlers().loadVariables();
   }
 
   @Override
-  public TextBoxClearable getFilter() {
-    return filter;
+  public String getFilterText() {
+    return filter.getText();
+  }
+
+  @Override
+  public void setFilterText(String text) {
+    filter.setText(text);
   }
 
   private void clear() {
@@ -252,6 +227,12 @@ public class EntityModalView extends PopupViewImpl implements EntityModalPresent
     table.setPageSize(PAGE_SIZE);
     table.setEmptyTableWidget(noTables);
     pager.setDisplay(table);
+  }
+
+  private TableDto getSelectedTable() {
+    List<TableDto> tables = tableChooser.getSelectedTables();
+    // there is only one table since the chooser is not multi select
+    return tables.isEmpty() ? null : tables.get(0);
   }
 
   /**

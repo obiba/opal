@@ -8,7 +8,10 @@
     ui:generateLocales="default">
 
   <o:WorkbenchLayout>
-    <b:Breadcrumbs ui:field="breadcrumbs" />
+    <g:FlowPanel addStyleNames="page-header">
+      <b:Breadcrumbs ui:field="breadcrumbs" />
+    </g:FlowPanel>
+
     <g:FlowPanel>
       <g:Button ui:field="refreshButton" styleName="btn iconb i-sync">
         <ui:msg description="Refresh jobs list">Refresh</ui:msg>

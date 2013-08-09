@@ -537,8 +537,7 @@ public class FunctionalUnitDetailsPresenter
       updateCurrentCountOfIdentifiers();
       authorize();
 
-      breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).setStartingDepth(1)
-          .build();
+      breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
     }
   }
 

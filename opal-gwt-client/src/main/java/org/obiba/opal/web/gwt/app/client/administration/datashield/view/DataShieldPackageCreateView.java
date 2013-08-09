@@ -10,35 +10,35 @@
 package org.obiba.opal.web.gwt.app.client.administration.datashield.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackageCreatePresenter.Display;
+import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldPackageCreateUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.RadioButton;
+import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.RadioButton;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.PopupViewImpl;
 
 /**
  *
  */
-public class DataShieldPackageCreateView extends PopupViewImpl implements Display {
+public class DataShieldPackageCreateView extends ModalPopupViewWithUiHandlers<DataShieldPackageCreateUiHandlers>
+    implements Display {
 
   @UiTemplate("DataShieldPackageCreateView.ui.xml")
-  interface DataShieldPackageCreateViewUiBinder extends UiBinder<DialogBox, DataShieldPackageCreateView> {}
+  interface DataShieldPackageCreateViewUiBinder extends UiBinder<Modal, DataShieldPackageCreateView> {}
 
   private static final DataShieldPackageCreateViewUiBinder uiBinder = GWT
       .create(DataShieldPackageCreateViewUiBinder.class);
@@ -48,13 +48,7 @@ public class DataShieldPackageCreateView extends PopupViewImpl implements Displa
   private final Widget widget;
 
   @UiField
-  DialogBox dialog;
-
-  @UiField
-  DockLayoutPanel contentLayout;
-
-  @UiField
-  ResizeHandle resizeHandle;
+  Modal dialog;
 
   @UiField
   Button installButton;
@@ -86,8 +80,6 @@ public class DataShieldPackageCreateView extends PopupViewImpl implements Displa
   }
 
   private void initWidgets() {
-    dialog.hide();
-    resizeHandle.makeResizable(contentLayout);
     allPkg.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
       @Override
       public void onValueChange(ValueChangeEvent<Boolean> event) {
@@ -109,13 +101,8 @@ public class DataShieldPackageCreateView extends PopupViewImpl implements Displa
   }
 
   @Override
-  protected PopupPanel asPopupPanel() {
-    return dialog;
-  }
-
-  @Override
   public void show() {
-    dialog.setText(translations.addDataShieldPackage());
+    dialog.setTitle(translations.addDataShieldPackage());
     name.setFocus(true);
     super.show();
   }
@@ -123,18 +110,16 @@ public class DataShieldPackageCreateView extends PopupViewImpl implements Displa
   @Override
   public void hideDialog() {
     dialog.hide();
-    setInstallButtonEnabled(true);
-    setCancelButtonEnabled(true);
   }
 
-  @Override
-  public HasClickHandlers getInstallButton() {
-    return installButton;
+  @UiHandler("cancelButton")
+  public void onCancelButton(ClickEvent event) {
+    hideDialog();
   }
 
-  @Override
-  public HasClickHandlers getCancelButton() {
-    return cancelButton;
+  @UiHandler("installButton")
+  public void onInstallButton(ClickEvent event) {
+    getUiHandlers().installPackage();
   }
 
   @Override

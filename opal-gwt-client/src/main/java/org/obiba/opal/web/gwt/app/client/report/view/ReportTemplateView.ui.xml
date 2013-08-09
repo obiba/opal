@@ -8,7 +8,10 @@
 
 
   <g:FlowPanel>
-    <b:Breadcrumbs ui:field="breadcrumbs" />
+    <g:FlowPanel addStyleNames="page-header">
+      <b:Breadcrumbs ui:field="breadcrumbs" />
+    </g:FlowPanel>
+
     <g:FlowPanel>
       <g:Button ui:field="reportTemplateButton" styleName="btn iconb i-plus">
         <ui:msg description="Add Report Template label">Add Report Template</ui:msg>
