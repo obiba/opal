@@ -24,7 +24,7 @@ public abstract class Database extends AbstractEntity {
 
   private String description;
 
-  private boolean editable;
+  private boolean editable = true;
 
   private boolean defaultStorage;
 

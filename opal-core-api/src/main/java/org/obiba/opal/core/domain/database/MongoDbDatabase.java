@@ -1,9 +1,13 @@
 package org.obiba.opal.core.domain.database;
 
+import java.net.UnknownHostException;
+
 import javax.annotation.Nonnull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+
+import com.mongodb.MongoClient;
 
 @Entity
 @Table(name = "database_mongodb")
@@ -23,6 +27,10 @@ public class MongoDbDatabase extends Database {
   private String password;
 
   private String properties;
+
+  public MongoClient createMongoClient() throws UnknownHostException {
+    return new MongoClient(url);
+  }
 
   public String getPassword() {
     return password;

@@ -14,7 +14,7 @@ import javax.annotation.Nonnull;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
 import org.obiba.magma.datasource.jdbc.JdbcValueTableSettings;
-import org.obiba.opal.core.runtime.jdbc.JdbcDataSourceRegistry;
+import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.JdbcDatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.JdbcDatasourceSettingsDto;
@@ -27,11 +27,11 @@ import com.google.common.collect.ImmutableSet;
 @Component
 public class JdbcDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoParser {
 
-  private final JdbcDataSourceRegistry jdbcDataSourceRegistry;
+  private final DatabaseRegistry databaseRegistry;
 
   @Autowired
-  public JdbcDatasourceFactoryDtoParser(JdbcDataSourceRegistry jdbcDataSourceRegistry) {
-    this.jdbcDataSourceRegistry = jdbcDataSourceRegistry;
+  public JdbcDatasourceFactoryDtoParser(DatabaseRegistry databaseRegistry) {
+    this.databaseRegistry = databaseRegistry;
   }
 
   @Override
@@ -44,7 +44,7 @@ public class JdbcDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDto
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
     JdbcDatasourceFactoryDto jdbcDto = dto.getExtension(JdbcDatasourceFactoryDto.params);
     return new DatabaseJdbcDatasourceFactory(dto.getName(), jdbcDto.getDatabase(), parseSettings(jdbcDto.getSettings()),
-        jdbcDataSourceRegistry);
+        databaseRegistry);
   }
 
   private JdbcDatasourceSettings parseSettings(JdbcDatasourceSettingsDto dto) {

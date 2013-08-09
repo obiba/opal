@@ -1,9 +1,15 @@
 package org.obiba.opal.core.domain.database;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
 import javax.annotation.Nonnull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+
+import com.google.common.base.Strings;
 
 @Entity
 @Table(name = "database_sql")
@@ -32,16 +38,7 @@ public class SqlDatabase extends Database {
    * datasource name that can be built on this database: hibernate, jdbc or limesurvey
    */
   @Nonnull
-  private String datasource;
-
-  @Nonnull
-  public String getDatasource() {
-    return datasource;
-  }
-
-  public void setDatasource(@Nonnull String datasource) {
-    this.datasource = datasource;
-  }
+  private String magmaDatasourceType;
 
   @Nonnull
   public String getDriverClass() {
@@ -68,6 +65,18 @@ public class SqlDatabase extends Database {
     this.properties = properties;
   }
 
+  public Properties readProperties() {
+    Properties prop = new Properties();
+    try {
+      if(!Strings.isNullOrEmpty(properties)) {
+        prop.load(new ByteArrayInputStream(properties.getBytes()));
+      }
+    } catch(IOException e) {
+      // can't really happen
+    }
+    return prop;
+  }
+
   @Nonnull
   public String getUrl() {
     return url;
@@ -84,5 +93,14 @@ public class SqlDatabase extends Database {
 
   public void setUsername(@Nonnull String username) {
     this.username = username;
+  }
+
+  @Nonnull
+  public String getMagmaDatasourceType() {
+    return magmaDatasourceType;
+  }
+
+  public void setMagmaDatasourceType(@Nonnull String magmaDatasourceType) {
+    this.magmaDatasourceType = magmaDatasourceType;
   }
 }
