@@ -16,7 +16,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.Disposable;
 import org.obiba.magma.datasource.jdbc.JdbcDatasource;
 import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
-import org.obiba.opal.core.runtime.jdbc.JdbcDataSourceRegistry;
+import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class DatabaseJdbcDatasourceFactory extends AbstractDatasourceFactory implements Disposable {
@@ -28,7 +28,7 @@ public class DatabaseJdbcDatasourceFactory extends AbstractDatasourceFactory imp
   // transient because of XML serialization
   @SuppressWarnings("TransientFieldInNonSerializableClass")
   @Autowired
-  private transient JdbcDataSourceRegistry dataSourceRegistry;
+  private transient DatabaseRegistry databaseRegistry;
 
   // empty public constructor because of XML serialization
   @SuppressWarnings("UnusedDeclaration")
@@ -41,22 +41,22 @@ public class DatabaseJdbcDatasourceFactory extends AbstractDatasourceFactory imp
    * @param parseSettings
    */
   public DatabaseJdbcDatasourceFactory(String name, String databaseName, JdbcDatasourceSettings settings,
-      JdbcDataSourceRegistry dataSourceRegistry) {
+      DatabaseRegistry databaseRegistry) {
     setName(name);
     this.databaseName = databaseName;
     this.settings = settings;
-    this.dataSourceRegistry = dataSourceRegistry;
+    this.databaseRegistry = databaseRegistry;
   }
 
   @Nonnull
   @Override
   protected Datasource internalCreate() {
-    return new JdbcDatasource(getName(), dataSourceRegistry.getDataSource(databaseName, getName()), settings);
+    return new JdbcDatasource(getName(), databaseRegistry.getDataSource(databaseName, getName()), settings);
   }
 
   @Override
   public void dispose() {
-    dataSourceRegistry.unregister(databaseName, getName());
+    databaseRegistry.unregister(databaseName, getName());
   }
 
 }

@@ -14,7 +14,7 @@ import javax.annotation.Nonnull;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory;
 import org.obiba.magma.datasource.hibernate.support.SpringBeanSessionFactoryProvider;
-import org.obiba.opal.core.runtime.jdbc.JdbcDataSourceRegistry;
+import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.HibernateDatasourceFactoryDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,13 +29,12 @@ public class HibernateDatasourceFactoryDtoParser extends AbstractDatasourceFacto
 
   private final ApplicationContext applicationContext;
 
-  private final JdbcDataSourceRegistry jdbcDataSourceRegistry;
+  private final DatabaseRegistry databaseRegistry;
 
   @Autowired
-  public HibernateDatasourceFactoryDtoParser(ApplicationContext applicationContext,
-      JdbcDataSourceRegistry jdbcDataSourceRegistry) {
+  public HibernateDatasourceFactoryDtoParser(ApplicationContext applicationContext, DatabaseRegistry databaseRegistry) {
     this.applicationContext = applicationContext;
-    this.jdbcDataSourceRegistry = jdbcDataSourceRegistry;
+    this.databaseRegistry = databaseRegistry;
   }
 
   @Nonnull
@@ -48,13 +47,12 @@ public class HibernateDatasourceFactoryDtoParser extends AbstractDatasourceFacto
     } else {
       if(hDto.hasDatabase()) {
         factory.setSessionFactoryProvider(
-            new DatabaseSessionFactoryProvider(dto.getName(), jdbcDataSourceRegistry, hDto.getDatabase()));
+            new DatabaseSessionFactoryProvider(dto.getName(), databaseRegistry, hDto.getDatabase()));
       } else {
         factory
             .setSessionFactoryProvider(new SpringBeanSessionFactoryProvider(applicationContext, "opalSessionFactory"));
       }
     }
-
     factory.setName(dto.getName());
     return factory;
   }
