@@ -1836,6 +1836,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("File Upload")
   String uploadFileModalTitle();
 
+  @Description("Entity Details Modal title")
+  @DefaultStringValue("Entity Details")
+  String entityDetailsModalTitle();
+
   @Description("Edit label")
   @DefaultStringValue("Edit")
   String editLabel();

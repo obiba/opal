@@ -15,6 +15,7 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -29,13 +30,15 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
 /**
  *
  */
-public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePopupPresenter.Display> {
+public class ValueSequencePopupPresenter extends ModalPresenterWidget<ValueSequencePopupPresenter.Display>
+    implements ValueSequencePopupUiHandlers {
 
   private TableDto table;
 
@@ -51,6 +54,7 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
   @Inject
   public ValueSequencePopupPresenter(EventBus eventBus, Display view) {
     super(eventBus, view);
+    getView().setUiHandlers(this);
   }
 
   @Override
@@ -141,7 +145,7 @@ public class ValueSequencePopupPresenter extends PresenterWidget<ValueSequencePo
     }
   }
 
-  public interface Display extends PopupView {
+  public interface Display extends PopupView, HasUiHandlers<ValueSequencePopupUiHandlers> {
 
     void initialize(TableDto table, VariableDto variable, String entityIdentifier, boolean modal);
 
