@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 public class OpalRealm extends JdbcRealm {
 
   @Autowired
-  public OpalRealm(@Qualifier("opal-datasource") DataSource opalDataSource) {
+  public OpalRealm(@Qualifier("opal-config") DataSource opalDataSource) {
     setDataSource(opalDataSource);
     setAuthenticationQuery("select password from user where name = ? and enabled is true");
     setUserRolesQuery(

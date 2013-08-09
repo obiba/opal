@@ -123,7 +123,7 @@ public class DefaultJdbcDataSourceRegistry implements JdbcDataSourceRegistry, Se
 
   @Autowired
   public DefaultJdbcDataSourceRegistry(DataSourceFactory dataSourceFactory, SessionFactoryFactory sessionFactoryFactory,
-      OpalConfigurationService opalConfigService, @Qualifier("opal-datasource") DataSource opalDataSource) {
+      OpalConfigurationService opalConfigService, @Qualifier("opal-config") DataSource opalDataSource) {
     this.dataSourceFactory = dataSourceFactory;
     this.sessionFactoryFactory = sessionFactoryFactory;
     configSupplier = new ExtensionConfigurationSupplier<JdbcDataSourcesConfig>(opalConfigService,

@@ -18,18 +18,11 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * Command to perform an upgrade (i.e., invoke the upgrade manager).
  */
 public class UpgradeCommand {
-  //
-  // Constants
-  //
 
   private static final String[] CONTEXT_PATHS = { "classpath:/META-INF/spring/opal-server/upgrade.xml" };
 
-  //
-  // AbstractContextLoadingCommand Methods
-  //
-
   public void execute() {
-    ConfigurableApplicationContext ctx = loadContext();
+    ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(CONTEXT_PATHS);
 
     try {
       UpgradeManager upgradeManager = (UpgradeManager) ctx.getBean("upgradeManager");
@@ -43,7 +36,4 @@ public class UpgradeCommand {
     }
   }
 
-  private ConfigurableApplicationContext loadContext() {
-    return new ClassPathXmlApplicationContext(CONTEXT_PATHS);
-  }
 }

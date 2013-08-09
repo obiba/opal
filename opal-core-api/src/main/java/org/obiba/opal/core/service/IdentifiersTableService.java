@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.core.service;
 
+import javax.annotation.Nonnull;
+
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.opal.core.runtime.Service;
@@ -44,6 +46,7 @@ public interface IdentifiersTableService extends Service {
    *
    * @return
    */
+  @Nonnull
   String getTableReference();
 
   /**
@@ -51,6 +54,7 @@ public interface IdentifiersTableService extends Service {
    *
    * @return
    */
+  @Nonnull
   String getEntityType();
 
   /**
