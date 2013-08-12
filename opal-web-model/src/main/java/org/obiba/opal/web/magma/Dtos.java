@@ -32,6 +32,9 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.math.stat.IntervalFrequency;
 import org.obiba.magma.type.BinaryType;
+import org.obiba.opal.core.domain.database.Database;
+import org.obiba.opal.core.domain.database.MongoDbDatabase;
+import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.obiba.opal.core.domain.taxonomy.HasTerms;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.domain.taxonomy.Term;
@@ -62,7 +65,7 @@ import com.google.common.collect.Lists;
 /**
  * Utilities for manipulating Magma Dto instances
  */
-@SuppressWarnings("OverlyCoupledClass")
+@SuppressWarnings({ "OverlyCoupledClass", "OverlyComplexClass" })
 public final class Dtos {
 
   // private static final Logger log = LoggerFactory.getLogger(Dtos.class);
@@ -518,7 +521,7 @@ public final class Dtos {
     term.setTitles(fromTextDtoList(from.getTitlesList()));
     term.setDescriptions(fromTextDtoList(from.getDescriptionsList()));
     term.setTerms(fromDto(from.getTermsList()));
-    return null;
+    return term;
   }
 
   public static TaxonomyDto.VocabularyDto asDto(Vocabulary vocabulary) {
@@ -540,4 +543,74 @@ public final class Dtos {
     return vocabulary;
   }
 
+  public static Database fromDto(Opal.DatabaseDto dto) {
+    Opal.SqlDatabaseDto sqlDto = dto.getExtension(Opal.SqlDatabaseDto.settings);
+    if(sqlDto != null) return fromDto(dto, sqlDto);
+    Opal.MongoDbDatabaseDto mongoDto = dto.getExtension(Opal.MongoDbDatabaseDto.settings);
+    if(mongoDto != null) return fromDto(dto, mongoDto);
+    throw new IllegalArgumentException("Unsupported DatabaseDto extension");
+  }
+
+  private static SqlDatabase fromDto(Opal.DatabaseDto dto, Opal.SqlDatabaseDto sqlDto) {
+    SqlDatabase db = new SqlDatabase();
+    db.setDriverClass(sqlDto.getDriverClass());
+    db.setMagmaDatasourceType(sqlDto.getMagmaDatasourceType());
+    db.setEditable(dto.getEditable());
+    db.setUrl(sqlDto.getUrl());
+    db.setUsername(sqlDto.getUsername());
+    db.setPassword(sqlDto.getPassword());
+    db.setProperties(sqlDto.getProperties());
+    db.setDefaultStorage(dto.getDefaultStorage());
+    db.setDescription(dto.getDescription());
+    db.setName(dto.getName());
+    db.setType(Database.Type.valueOf(sqlDto.getMagmaDatasourceType()));
+    return db;
+  }
+
+  private static MongoDbDatabase fromDto(Opal.DatabaseDto dto, Opal.MongoDbDatabaseDto mongoDto) {
+    MongoDbDatabase db = new MongoDbDatabase();
+    db.setEditable(dto.getEditable());
+    db.setUrl(mongoDto.getUrl());
+    db.setUsername(mongoDto.getUsername());
+    db.setPassword(mongoDto.getPassword());
+    db.setProperties(mongoDto.getProperties());
+    db.setDefaultStorage(dto.getDefaultStorage());
+    db.setDescription(dto.getDescription());
+    db.setName(dto.getName());
+    return db;
+  }
+
+  public static Opal.DatabaseDto asDto(Database db) {
+    Opal.DatabaseDto.Builder builder = Opal.DatabaseDto.newBuilder() //
+        .setName(db.getName()) //
+        .setDescription(db.getDescription()) //
+        .setDefaultStorage(db.isDefaultStorage()) //
+        .setEditable(db.isEditable()) //
+        .setType(Opal.DatabaseDto.DbType.valueOf(db.getType().name()));
+    if(db instanceof SqlDatabase) {
+      return builder.setExtension(Opal.SqlDatabaseDto.settings, asDto((SqlDatabase) db)).build();
+    }
+    if(db instanceof MongoDbDatabase) {
+      return builder.setExtension(Opal.MongoDbDatabaseDto.settings, asDto((MongoDbDatabase) db)).build();
+    }
+    throw new IllegalArgumentException("Unsupported database class " + db.getClass());
+  }
+
+  private static Opal.SqlDatabaseDto asDto(SqlDatabase db) {
+    return Opal.SqlDatabaseDto.newBuilder() //
+        .setDriverClass(db.getDriverClass()) //
+        .setMagmaDatasourceType(db.getMagmaDatasourceType()) //
+        .setUrl(db.getUrl()) //
+        .setUsername(db.getUsername()) //
+        .setPassword(db.getPassword()) //
+        .setProperties(db.getProperties()).build();
+  }
+
+  private static Opal.MongoDbDatabaseDto asDto(MongoDbDatabase db) {
+    return Opal.MongoDbDatabaseDto.newBuilder() //
+        .setUrl(db.getUrl()) //
+        .setUsername(db.getUsername()) //
+        .setPassword(db.getPassword()) //
+        .setProperties(db.getProperties()).build();
+  }
 }

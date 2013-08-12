@@ -140,7 +140,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
   }
 
   @Override
-  public void updateDatabase(@Nonnull Database database) {
+  public void addOrReplaceDatabase(@Nonnull Database database) {
     getCurrentSession().update(database);
     destroyDataSource(database.getName());
   }
@@ -160,7 +160,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
     if(Strings.isNullOrEmpty(usedByDatasource)) return;
     Database database = getDatabase(databaseName);
     database.setEditable(false);
-    updateDatabase(database);
+    addOrReplaceDatabase(database);
     registrations.put(databaseName, usedByDatasource);
   }
 
@@ -168,7 +168,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
   public void unregister(@Nonnull String databaseName, String usedByDatasource) {
     Database database = getDatabase(databaseName);
     database.setEditable(true);
-    updateDatabase(database);
+    addOrReplaceDatabase(database);
     registrations.remove(databaseName, usedByDatasource);
   }
 
