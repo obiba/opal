@@ -18,8 +18,8 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
+import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -37,11 +37,11 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
@@ -54,16 +54,16 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private DataFetcher fetcher;
 
-  private final ValueSequencePopupPresenter valueSequencePopupPresenter;
+  private final ModalProvider<ValueSequencePopupPresenter> valueSequencePopupProvider;
 
   private final ModalProvider<EntityModalPresenter> entityModalProvider;
 
   @Inject
   public ValuesTablePresenter(Display display, EventBus eventBus,
-      ValueSequencePopupPresenter valueSequencePopupPresenter,
+      ModalProvider<ValueSequencePopupPresenter> valueSequencePopupProvider,
       ModalProvider<EntityModalPresenter> entityModalProvider) {
     super(eventBus, display);
-    this.valueSequencePopupPresenter = valueSequencePopupPresenter;
+    this.valueSequencePopupProvider = valueSequencePopupProvider.setContainer(this);
     this.entityModalProvider = entityModalProvider.setContainer(this);
   }
 
@@ -72,7 +72,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   public void setTable(TableDto table, VariableDto variable) {
-    hidePopups(table);
     this.table = table;
 
     getView().setTable(table);
@@ -82,7 +81,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   public void setTable(final TableDto table, String select) {
-    hidePopups(table);
     this.table = table;
 
     getView().clearTable();
@@ -126,15 +124,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         fetcher.updateVariables(getView().getFilter().getTextBox().getText());
       }
     }));
-  }
-
-  /**
-   * Hide entity details & value sequence popup if table is about to be changed.
-   */
-  private void hidePopups(TableDto newTable) {
-    if(table != null && !table.getName().equals(newTable.getName())) {
-      valueSequencePopupPresenter.getView().hide();
-    }
   }
 
   public void setViewMode(ViewMode mode) {
@@ -333,8 +322,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     @Override
     public void requestValueSequence(VariableDto variable, String entityIdentifier) {
+      ValueSequencePopupPresenter valueSequencePopupPresenter = valueSequencePopupProvider.get();
       valueSequencePopupPresenter.initialize(table, variable, entityIdentifier, false);
-      addToPopupSlot(valueSequencePopupPresenter);
     }
 
     @Override

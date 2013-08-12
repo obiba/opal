@@ -95,6 +95,8 @@ public class ValueSequencePopupView extends ModalPopupViewWithUiHandlers<ValueSe
   public ValueSequencePopupView(EventBus eventBus) {
     super(eventBus);
     widget = uiBinder.createAndBindUi(this);
+    dialogBox.setMinWidth(MIN_WIDTH);
+    dialogBox.setMinHeight(MIN_HEIGHT);
     toggleGroup.setShowHideTexts();
     toggleGroup.setDelegate(new Delegate() {
 
@@ -127,8 +129,6 @@ public class ValueSequencePopupView extends ModalPopupViewWithUiHandlers<ValueSe
   @Override
   public void initialize(TableDto table, VariableDto variable, String entityIdentifier, boolean modal) {
     dialogBox.setTitle(variable.getName() + " - " + entityIdentifier);
-    dialogBox.setMinWidth(MIN_WIDTH);
-    dialogBox.setMinHeight(MIN_HEIGHT);
 
     occurrenceGroup.setText(variable.getOccurrenceGroup());
     toggleGroup.setVisible(variable.getOccurrenceGroup() != null && !variable.getOccurrenceGroup().isEmpty());
