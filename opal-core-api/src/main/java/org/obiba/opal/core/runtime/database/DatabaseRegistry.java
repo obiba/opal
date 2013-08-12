@@ -17,7 +17,7 @@ public interface DatabaseRegistry {
 
   Database getDatabase(@Nonnull String name);
 
-  void updateDatabase(@Nonnull Database database);
+  void addOrReplaceDatabase(@Nonnull Database database);
 
   void deleteDatabase(@Nonnull Database database);
 

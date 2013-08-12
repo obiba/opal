@@ -35,7 +35,6 @@ public class JdbcDriversResource {
   private JdbcDriverRegistry jdbcDriverRegistry;
 
   @GET
-  @Path("/drivers")
   public Iterable<Opal.JdbcDriverDto> getJdbcDrivers() {
     return Iterables.transform(jdbcDriverRegistry.listDrivers(), new Function<Driver, Opal.JdbcDriverDto>() {
 
@@ -50,12 +49,11 @@ public class JdbcDriversResource {
     });
   }
 
-  @SuppressWarnings("unchecked")
   @POST
   @Consumes("multipart/form-data")
   @Produces("text/html")
   @AuthenticatedByCookie
-  @Path("/drivers")
+  @SuppressWarnings("unchecked")
   public Response addDriver(@Context UriInfo uriInfo, @Context HttpServletRequest request)
       throws FileUploadException, IOException {
     ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory());
