@@ -34,7 +34,7 @@ public class DatabasesResource {
 
   @POST
   public Response addDatabase(Opal.DatabaseDto database) {
-    databaseRegistry.updateDatabase(Dtos.fromDto(database));
+    databaseRegistry.addOrReplaceDatabase(Dtos.fromDto(database));
     return Response.ok().build();
   }
 
