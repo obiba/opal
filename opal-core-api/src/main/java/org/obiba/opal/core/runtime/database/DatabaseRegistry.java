@@ -17,7 +17,8 @@ public interface DatabaseRegistry {
 
   Database getDatabase(@Nonnull String name);
 
-  void addOrReplaceDatabase(@Nonnull Database database) throws DuplicateDatabaseNameException;
+  void addOrReplaceDatabase(@Nonnull Database database)
+      throws DuplicateDatabaseNameException, MultipleIdentifiersDatabaseException;
 
   void deleteDatabase(@Nonnull Database database);
 
@@ -26,4 +27,7 @@ public interface DatabaseRegistry {
   SessionFactory getSessionFactory(@Nonnull String name, @Nullable String usedByDatasource);
 
   void unregister(@Nonnull String databaseName, @Nullable String usedByDatasource);
+
+  @Nullable
+  Database getIdentifiersDatabase();
 }

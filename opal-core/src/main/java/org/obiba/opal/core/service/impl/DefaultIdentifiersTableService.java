@@ -25,8 +25,12 @@ import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.core.domain.database.Database;
+import org.obiba.opal.core.domain.database.MongoDbDatabase;
+import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.ServiceNotRunningException;
+import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +42,6 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
-import com.google.common.base.Strings;
 import com.mongodb.MongoClientURI;
 
 /**
@@ -57,33 +60,25 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   @Nonnull
   private final String entityType;
 
-  @Nullable
-  private final String mongoURI;
-
   private MagmaEngineReferenceResolver tableResolver;
-
-  @Nullable
-  private SessionFactory keysSession;
 
   @Nullable
   private Datasource datasource;
 
+  private final DatabaseRegistry databaseRegistry;
+
   @Autowired
   public DefaultIdentifiersTableService(@Nonnull PlatformTransactionManager txManager,
       @Nonnull @Value("${org.obiba.opal.keys.tableReference}") String tableReference,
-      @Nonnull @Value("${org.obiba.opal.keys.entityType}") String entityType,
-      @Nullable @Value("${org.obiba.opal.mongo.ids.uri}") String mongoURI) {
+      @Nonnull @Value("${org.obiba.opal.keys.entityType}") String entityType, DatabaseRegistry databaseRegistry) {
     Assert.notNull(txManager, "txManager cannot be null");
     Assert.notNull(tableReference, "tableReference cannot be null");
     Assert.notNull(entityType, "entityType cannot be null");
+    Assert.notNull(databaseRegistry, "databaseRegistry cannot be null");
     this.txManager = txManager;
     this.tableReference = tableReference;
     this.entityType = entityType;
-    this.mongoURI = mongoURI;
-  }
-
-  public void setKeysSessionFactory(SessionFactory keysSession) {
-    this.keysSession = keysSession;
+    this.databaseRegistry = databaseRegistry;
   }
 
   @Override
@@ -146,12 +141,17 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
 
   @Override
   public void start() {
-    if(Strings.isNullOrEmpty(mongoURI) && keysSession != null) {
-      log.info("Identifiers table storage is a SQL database");
-      datasource = new HibernateDatasource(getDatasourceName(), keysSession);
-    } else {
-      log.info("Identifiers table storage is a MongoDB database");
-      datasource = new MongoDBDatasource(getDatasourceName(), new MongoClientURI(mongoURI));
+    Database database = databaseRegistry.getIdentifiersDatabase();
+    if(database != null) {
+      if(database instanceof SqlDatabase) {
+        log.info("Identifiers table storage is a SQL database");
+        SessionFactory keysSession = databaseRegistry.getSessionFactory(database.getName(), getDatasourceName());
+        datasource = new HibernateDatasource(getDatasourceName(), keysSession);
+      } else if(database instanceof MongoDbDatabase) {
+        log.info("Identifiers table storage is a MongoDB database");
+        datasource = new MongoDBDatasource(getDatasourceName(),
+            new MongoClientURI(((MongoDbDatabase) database).getUrl()));
+      }
     }
     initialise();
   }

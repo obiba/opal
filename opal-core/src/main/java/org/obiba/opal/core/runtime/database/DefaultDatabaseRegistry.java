@@ -6,7 +6,6 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.sql.DataSource;
-import javax.transaction.TransactionManager;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.HibernateException;
@@ -44,9 +43,6 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
 
   @Autowired
   private SessionFactory sessionFactory;
-
-  @Autowired
-  private TransactionManager transactionManager;
 
   @Autowired
   private SessionFactoryFactory sessionFactoryFactory;
@@ -141,22 +137,30 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
   }
 
   @Override
-  public void addOrReplaceDatabase(@Nonnull Database database) throws DuplicateDatabaseNameException {
-    if(!isNameUnique(database)) {
-      throw new DuplicateDatabaseNameException(database.getName());
-    }
+  public void addOrReplaceDatabase(@Nonnull Database database)
+      throws DuplicateDatabaseNameException, MultipleIdentifiersDatabaseException {
+    validUniqueName(database);
+    validUniqueIdentifiersDatabase(database);
     getCurrentSession().update(database);
     destroyDataSource(database.getName());
   }
 
-  private boolean isNameUnique(Database database) {
+  private void validUniqueName(Database database) throws DuplicateDatabaseNameException {
     for(Database existing : list()) {
       if(database.getName().equalsIgnoreCase(existing.getName()) &&
           !Objects.equals(existing.getId(), database.getId())) {
-        return false;
+        throw new DuplicateDatabaseNameException(database.getName());
       }
     }
-    return true;
+  }
+
+  private void validUniqueIdentifiersDatabase(Database database) throws MultipleIdentifiersDatabaseException {
+    if(database.isUsedForIdentifiers()) {
+      Database identifiersDatabase = getIdentifiersDatabase();
+      if(identifiersDatabase != null && !Objects.equals(identifiersDatabase.getId(), database.getId())) {
+        throw new MultipleIdentifiersDatabaseException(identifiersDatabase, database);
+      }
+    }
   }
 
   @Override
@@ -184,6 +188,13 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
     database.setEditable(true);
     addOrReplaceDatabase(database);
     registrations.remove(databaseName, usedByDatasource);
+  }
+
+  @Nullable
+  @Override
+  public Database getIdentifiersDatabase() {
+    return (Database) getCurrentSession().createCriteria(Database.class)
+        .add(Restrictions.eq("usedForIdentifiers", true)).uniqueResult();
   }
 
   private Session getCurrentSession() {
