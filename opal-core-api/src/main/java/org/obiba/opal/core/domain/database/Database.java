@@ -28,6 +28,8 @@ public abstract class Database extends AbstractEntity {
 
   private boolean defaultStorage;
 
+  private boolean usedForIdentifiers;
+
   public boolean isDefaultStorage() {
     return defaultStorage;
   }
@@ -68,5 +70,13 @@ public abstract class Database extends AbstractEntity {
 
   public void setType(@Nonnull Type type) {
     this.type = type;
+  }
+
+  public boolean isUsedForIdentifiers() {
+    return usedForIdentifiers;
+  }
+
+  public void setUsedForIdentifiers(boolean usedForIdentifiers) {
+    this.usedForIdentifiers = usedForIdentifiers;
   }
 }
