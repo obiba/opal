@@ -1,6 +1,7 @@
 package org.obiba.opal.core.runtime.database;
 
 import java.sql.SQLException;
+import java.util.Objects;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -140,9 +141,22 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
   }
 
   @Override
-  public void addOrReplaceDatabase(@Nonnull Database database) {
+  public void addOrReplaceDatabase(@Nonnull Database database) throws DuplicateDatabaseNameException {
+    if(!isNameUnique(database)) {
+      throw new DuplicateDatabaseNameException(database.getName());
+    }
     getCurrentSession().update(database);
     destroyDataSource(database.getName());
+  }
+
+  private boolean isNameUnique(Database database) {
+    for(Database existing : list()) {
+      if(database.getName().equalsIgnoreCase(existing.getName()) &&
+          !Objects.equals(existing.getId(), database.getId())) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override
