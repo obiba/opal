@@ -98,6 +98,7 @@ message DatabaseDto {
   optional bool editable = 3 [default = true];
   required bool defaultStorage = 4 [default = false];
   required DbType type = 5;
+  optional bool usedForIdentifiers = 6;
   extensions 1000 to max;
 }
 

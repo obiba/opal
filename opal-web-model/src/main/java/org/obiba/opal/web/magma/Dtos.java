@@ -557,6 +557,7 @@ public final class Dtos {
     db.setDescription(dto.getDescription());
     db.setName(dto.getName());
     db.setType(Database.Type.valueOf(sqlDto.getMagmaDatasourceType()));
+    db.setUsedForIdentifiers(dto.getUsedForIdentifiers());
     return db;
   }
 
@@ -570,6 +571,7 @@ public final class Dtos {
     db.setDefaultStorage(dto.getDefaultStorage());
     db.setDescription(dto.getDescription());
     db.setName(dto.getName());
+    db.setUsedForIdentifiers(dto.getUsedForIdentifiers());
     return db;
   }
 
@@ -579,6 +581,7 @@ public final class Dtos {
         .setDescription(db.getDescription()) //
         .setDefaultStorage(db.isDefaultStorage()) //
         .setEditable(db.isEditable()) //
+        .setUsedForIdentifiers(db.isUsedForIdentifiers()) //
         .setType(Opal.DatabaseDto.DbType.valueOf(db.getType().name()));
     if(db instanceof SqlDatabase) {
       return builder.setExtension(Opal.SqlDatabaseDto.settings, asDto((SqlDatabase) db)).build();
