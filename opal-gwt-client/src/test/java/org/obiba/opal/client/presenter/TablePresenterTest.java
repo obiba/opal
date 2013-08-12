@@ -26,6 +26,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
@@ -68,7 +69,7 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
 
     ValuesTablePresenter values = new ValuesTablePresenter(null, null,
         new ValueSequencePopupPresenter(null, valueSequenceDisplayMock),
-        new EntityModalPresenter(null, entityModalDisplayMock, createMock(ValueSequencePopupPresenter.class)));
+        new EntityModalPresenter(null, entityModalDisplayMock, createMock(ModalProvider<ValueSequencePopupPresenter.class)));
     presenter = new TablePresenter(displayMock, new CountingEventBus(), values, mockProvider, mockIndexProvider);
   }
 
