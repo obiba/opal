@@ -11,6 +11,7 @@ import javax.persistence.Table;
 
 import com.google.common.base.Strings;
 
+@SuppressWarnings("ParameterHidesMemberVariable")
 @Entity
 @Table(name = "database_sql")
 public class SqlDatabase extends Database {
@@ -103,4 +104,53 @@ public class SqlDatabase extends Database {
   public void setMagmaDatasourceType(@Nonnull String magmaDatasourceType) {
     this.magmaDatasourceType = magmaDatasourceType;
   }
+
+  public static class Builder extends Database.Builder<SqlDatabase, Builder> {
+
+    @Override
+    protected SqlDatabase createDatabase() {
+      return new SqlDatabase();
+    }
+
+    @Override
+    protected Builder createBuilder() {
+      return this;
+    }
+
+    public Builder driverClass(String driverClass) {
+      database.driverClass = driverClass;
+      return this;
+    }
+
+    public Builder url(String url) {
+      database.url = url;
+      return this;
+    }
+
+    public Builder username(String username) {
+      database.username = username;
+      return this;
+    }
+
+    public Builder password(String password) {
+      database.password = password;
+      return this;
+    }
+
+    public Builder properties(String properties) {
+      database.properties = properties;
+      return this;
+    }
+
+    public Builder magmaDatasourceType(String magmaDatasourceType) {
+      database.magmaDatasourceType = magmaDatasourceType;
+      return this;
+    }
+
+    public SqlDatabase build() {
+      return database;
+    }
+
+  }
+
 }

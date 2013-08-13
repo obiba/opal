@@ -6,6 +6,7 @@ import javax.persistence.MappedSuperclass;
 
 import org.obiba.core.domain.AbstractEntity;
 
+@SuppressWarnings("ParameterHidesMemberVariable")
 @MappedSuperclass
 public abstract class Database extends AbstractEntity {
 
@@ -79,4 +80,52 @@ public abstract class Database extends AbstractEntity {
   public void setUsedForIdentifiers(boolean usedForIdentifiers) {
     this.usedForIdentifiers = usedForIdentifiers;
   }
+
+  public static abstract class Builder<TDatabase extends Database, TBuilder extends Builder<TDatabase, TBuilder>> {
+
+    protected final TDatabase database;
+
+    protected final TBuilder builder;
+
+    protected Builder() {
+      database = createDatabase();
+      builder = createBuilder();
+    }
+
+    protected abstract TDatabase createDatabase();
+
+    protected abstract TBuilder createBuilder();
+
+    public TBuilder defaultStorage(boolean defaultStorage) {
+      database.setDefaultStorage(defaultStorage);
+      return builder;
+    }
+
+    public TBuilder description(String description) {
+      database.setDescription(description);
+      return builder;
+    }
+
+    public TBuilder editable(boolean editable) {
+      database.setEditable(editable);
+      return builder;
+    }
+
+    public TBuilder name(String name) {
+      database.setName(name);
+      return builder;
+    }
+
+    public TBuilder type(Type type) {
+      database.setType(type);
+      return builder;
+    }
+
+    public TBuilder usedForIdentifiers(boolean usedForIdentifiers) {
+      database.setUsedForIdentifiers(usedForIdentifiers);
+      return builder;
+    }
+
+  }
+
 }
