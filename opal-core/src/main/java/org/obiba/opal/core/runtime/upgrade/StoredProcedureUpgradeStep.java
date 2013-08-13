@@ -21,7 +21,7 @@ import org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.CallableStatementCallback;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
@@ -34,23 +34,31 @@ public class StoredProcedureUpgradeStep extends SqlScriptUpgradeStep {
 
   private String procedureName;
 
+  public StoredProcedureUpgradeStep() {
+  }
+
+  public StoredProcedureUpgradeStep(DataSource dataSource, String scriptBasename, Resource scriptPath,
+      String procedureName) {
+    super(dataSource, scriptBasename, scriptPath);
+    this.procedureName = procedureName;
+  }
+
   public void setProcedureName(String procedureName) {
     this.procedureName = procedureName;
   }
 
   @Override
   protected void executeScript(DataSource dataSource, Resource script) {
-    SimpleJdbcTemplate template = new SimpleJdbcTemplate(dataSource);
+    JdbcTemplate template = new JdbcTemplate(dataSource);
     String sql = readFully(script);
     template.update(sql);
-    template.getJdbcOperations().execute("CALL " + procedureName + "()", new CallableStatementCallback<Boolean>() {
+    template.execute("CALL " + procedureName + "()", new CallableStatementCallback<Boolean>() {
 
       @Override
       public Boolean doInCallableStatement(CallableStatement cs) throws SQLException, DataAccessException {
         return cs.execute();
       }
     });
-
     template.update("DROP PROCEDURE " + procedureName);
   }
 

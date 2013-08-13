@@ -39,7 +39,7 @@ public class OpalRealm extends JdbcRealm {
 
   @Override
   protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-    Collection thisPrincipals = principals.fromRealm(getName());
+    Collection<?> thisPrincipals = principals.fromRealm(getName());
     if(thisPrincipals != null && !thisPrincipals.isEmpty()) {
       Object primary = thisPrincipals.iterator().next();
       return super.doGetAuthorizationInfo(new SimplePrincipalCollection(primary, getName()));
