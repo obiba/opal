@@ -14,10 +14,11 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.VariableEntityBean;
+import org.obiba.opal.core.domain.database.Database;
+import org.obiba.opal.core.domain.database.SqlDatabase;
+import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
 import org.slf4j.Logger;
@@ -36,37 +37,41 @@ public class IdentifiersSyncUpgradeStep extends AbstractUpgradeStep {
 
   private static final Logger log = LoggerFactory.getLogger(IdentifiersSyncUpgradeStep.class);
 
-  private DataSource opalDataSource;
-
-  private DataSource keyDataSource;
+  private DatabaseRegistry databaseRegistry;
 
   private String tableReference;
 
   @Override
   public void execute(Version currentVersion) {
-    SimpleJdbcTemplate dataTemplate = new SimpleJdbcTemplate(opalDataSource);
-    SimpleJdbcTemplate keyTemplate = new SimpleJdbcTemplate(keyDataSource);
 
-    // get variable entities from both databases
-    log.info("Extracting entities from opal-data and opal-key databases...");
-    String sql = "select * from variable_entity";
-    List<VariableEntityStateDao> dataEntities = dataTemplate.query(sql, new VariableEntityMapper());
-    final List<VariableEntityStateDao> keyEntities = keyTemplate.query(sql, new VariableEntityMapper());
-    log.info("Found {} entities in opal-data and {} entities in opal-key.", dataEntities.size(), keyEntities.size());
+    Database identifiersDatabase = databaseRegistry.getIdentifiersDatabase();
+    SimpleJdbcTemplate keyTemplate = new SimpleJdbcTemplate(
+        databaseRegistry.getDataSource(identifiersDatabase.getName(), null));
 
-    log.info("Looking for missing entities in opal-key database...");
-    insertMissingEntities(keyTemplate, Iterables.filter(dataEntities, new Predicate<VariableEntityStateDao>() {
+    for(SqlDatabase database : databaseRegistry.list(SqlDatabase.class)) {
+      SimpleJdbcTemplate dataTemplate = new SimpleJdbcTemplate(
+          databaseRegistry.getDataSource(database.getName(), null));
+      // get variable entities from both databases
+      log.info("Extracting entities from opal-data and opal-key databases...");
+      String sql = "select * from variable_entity";
+      List<VariableEntityStateDao> dataEntities = dataTemplate.query(sql, new VariableEntityMapper());
+      final List<VariableEntityStateDao> keyEntities = keyTemplate.query(sql, new VariableEntityMapper());
+      log.info("Found {} entities in opal-data and {} entities in opal-key.", dataEntities.size(), keyEntities.size());
 
-      @Override
-      public boolean apply(VariableEntityStateDao input) {
-        for(VariableEntityStateDao keyEntity : keyEntities) {
-          if(keyEntity.equals(input)) {
-            return false;
+      log.info("Looking for missing entities in opal-key database...");
+      insertMissingEntities(keyTemplate, Iterables.filter(dataEntities, new Predicate<VariableEntityStateDao>() {
+
+        @Override
+        public boolean apply(VariableEntityStateDao input) {
+          for(VariableEntityStateDao keyEntity : keyEntities) {
+            if(keyEntity.equals(input)) {
+              return false;
+            }
           }
+          return true;
         }
-        return true;
-      }
-    }));
+      }));
+    }
   }
 
   private void insertMissingEntities(SimpleJdbcTemplate keyTemplate, Iterable<VariableEntityStateDao> missingEntities) {
@@ -124,12 +129,8 @@ public class IdentifiersSyncUpgradeStep extends AbstractUpgradeStep {
     }
   }
 
-  public void setOpalDataSource(DataSource opalDataSource) {
-    this.opalDataSource = opalDataSource;
-  }
-
-  public void setKeyDataSource(DataSource keyDataSource) {
-    this.keyDataSource = keyDataSource;
+  public void setDatabaseRegistry(DatabaseRegistry databaseRegistry) {
+    this.databaseRegistry = databaseRegistry;
   }
 
   public void setTableReference(String tableReference) {

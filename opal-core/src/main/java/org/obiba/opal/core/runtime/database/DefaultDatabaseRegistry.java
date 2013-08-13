@@ -165,6 +165,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
 
   @Override
   public void deleteDatabase(@Nonnull Database database) {
+    //TODO check if this database has data 
     getCurrentSession().delete(database);
     destroyDataSource(database.getName());
   }
