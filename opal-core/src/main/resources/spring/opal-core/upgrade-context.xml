@@ -230,8 +230,16 @@
           <property name="appliesTo" value="1.14.6"/>
         </bean>
 
-        <!-- 2.0 User and User_groups tables -->
-        <bean id="opal-schemaUpgrade-2.0" parent="updateOpalSchema">
+        <!-- 2.0.0 / extract opal_config schema -->
+        <bean class="org.obiba.opal.core.runtime.upgrade.database.ExtractOpalJdbcConfigToDatabaseUpgradeStep">
+          <property name="description" value="Extract database config from properties file to Opal config database"/>
+          <property name="appliesTo" value="2.0.0"/>
+        </bean>
+
+        <bean class="org.obiba.runtime.upgrade.support.MethodInvokingUpgradeStep">
+          <property name="description" value="Create new Opal Config Schema."/>
+          <property name="methodOwner" ref="&amp;sessionFactory"/>
+          <property name="methodName" value="createDatabaseSchema"/>
           <property name="appliesTo" value="2.0.0"/>
         </bean>
 
