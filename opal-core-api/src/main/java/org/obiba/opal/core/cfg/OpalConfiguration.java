@@ -41,6 +41,8 @@ public class OpalConfiguration {
 
   private boolean binariesMigrated;
 
+  private boolean migratedToOpal2;
+
   public OpalConfiguration() {
     functionalUnits = Sets.newLinkedHashSet();
     reportTemplates = Sets.newLinkedHashSet();
@@ -140,4 +142,13 @@ public class OpalConfiguration {
   public void setBinariesMigrated(boolean binariesMigrated) {
     this.binariesMigrated = binariesMigrated;
   }
+
+  public boolean isMigratedToOpal2() {
+    return migratedToOpal2;
+  }
+
+  public void setMigratedToOpal2(boolean migratedToOpal2) {
+    this.migratedToOpal2 = migratedToOpal2;
+  }
+
 }
