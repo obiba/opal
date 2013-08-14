@@ -9,10 +9,22 @@
  ******************************************************************************/
 package org.obiba.opal.server;
 
+import java.io.File;
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.obiba.runtime.upgrade.UpgradeException;
 import org.obiba.runtime.upgrade.UpgradeManager;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
+import com.google.common.base.Strings;
 
 /**
  * Command to perform an upgrade (i.e., invoke the upgrade manager).
@@ -21,9 +33,17 @@ public class UpgradeCommand {
 
   private static final String[] CONTEXT_PATHS = { "classpath:/META-INF/spring/opal-server/upgrade.xml" };
 
-  public void execute() {
-    ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(CONTEXT_PATHS);
+  private static final String[] OPAL2_CONTEXT_PATHS = { "classpath:/META-INF/spring/opal-server/upgrade-2.0.xml" };
 
+  public void execute() {
+    if(!isMigratedToOpal2()) {
+      opal2Upgrade();
+    }
+    standardUpgrade();
+  }
+
+  private void standardUpgrade() {
+    ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(CONTEXT_PATHS);
     try {
       UpgradeManager upgradeManager = (UpgradeManager) ctx.getBean("upgradeManager");
       try {
@@ -36,4 +56,55 @@ public class UpgradeCommand {
     }
   }
 
+  /**
+   * Load opal-config.xml and search for migratedToOpal2 node
+   */
+  private boolean isMigratedToOpal2() {
+    String opalHome = System.getenv().get("OPAL_HOME");
+    if(Strings.isNullOrEmpty(opalHome)) {
+      throw new RuntimeException("Environment variable OPAL_HOME is not defined, cannot upgrade Opal!");
+    }
+    try {
+      SAXParser saxParser = SAXParserFactory.newInstance().newSAXParser();
+      ConfigurationHandler handler = new ConfigurationHandler();
+      saxParser.parse(new File(opalHome + "/conf/opal-config.xml"), handler);
+      return handler.isMigrated();
+    } catch(SAXException e) {
+      throw new RuntimeException("An error occurred while reading opal-config.xml during upgrade", e);
+    } catch(IOException e) {
+      throw new RuntimeException("An error occurred while reading opal-config.xml during upgrade", e);
+    } catch(ParserConfigurationException e) {
+      throw new RuntimeException("An error occurred while reading opal-config.xml during upgrade", e);
+    }
+  }
+
+  private void opal2Upgrade() {
+    ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(OPAL2_CONTEXT_PATHS);
+    try {
+      UpgradeManager upgradeManager = (UpgradeManager) ctx.getBean("upgradeManager");
+      try {
+        upgradeManager.executeUpgrade();
+      } catch(UpgradeException upgradeFailed) {
+        throw new RuntimeException("An error occurred while running the opal2 upgrade manager", upgradeFailed);
+      }
+    } finally {
+      ctx.close();
+    }
+  }
+
+  private static class ConfigurationHandler extends DefaultHandler {
+
+    private boolean migrated;
+
+    @Override
+    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+      if("migratedToOpal2".equals(qName)) {
+        migrated = true;
+      }
+    }
+
+    private boolean isMigrated() {
+      return migrated;
+    }
+  }
 }
