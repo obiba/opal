@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
@@ -26,6 +27,7 @@ import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -48,6 +50,7 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
     extractOpalDatasource();
     importExtraDatasources();
     deleteJdbcDataSourcesFromConfig();
+    commentDeprecatedProperties();
   }
 
   private void addOpalConfigProperties() {
@@ -92,28 +95,42 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
           .build();
       databaseRegistry.addOrReplaceDatabase(opalKey);
 
-      deleteDeprecatedProperties(prop);
-
-      prop.store(new FileOutputStream(propertiesFile), null);
     } catch(IOException e) {
       throw new RuntimeException(e);
     }
   }
 
-  private void deleteDeprecatedProperties(Properties prop) {
-    prop.remove("org.obiba.opal.datasource.opal.url");
-    prop.remove("org.obiba.opal.datasource.opal.driver");
-    prop.remove("org.obiba.opal.datasource.opal.username");
-    prop.remove("org.obiba.opal.datasource.opal.password");
-    prop.remove("org.obiba.opal.datasource.opal.dialect");
-    prop.remove("org.obiba.opal.datasource.opal.validationQuery");
+  private void commentDeprecatedProperties() {
+    try {
+      List<String> comments = Lists.newArrayList();
+      comments.add("Deprecated datasources configuration moved to Opal configuration database");
 
-    prop.remove("org.obiba.opal.datasource.key.url");
-    prop.remove("org.obiba.opal.datasource.key.driver");
-    prop.remove("org.obiba.opal.datasource.key.username");
-    prop.remove("org.obiba.opal.datasource.key.password");
-    prop.remove("org.obiba.opal.datasource.key.dialect");
-    prop.remove("org.obiba.opal.datasource.key.validationQuery");
+      Properties prop = new Properties();
+      prop.load(new FileInputStream(propertiesFile));
+
+      removeAndAddComment("org.obiba.opal.datasource.opal.url", comments, prop);
+      removeAndAddComment("org.obiba.opal.datasource.opal.driver", comments, prop);
+      removeAndAddComment("org.obiba.opal.datasource.opal.username", comments, prop);
+      removeAndAddComment("org.obiba.opal.datasource.opal.password", comments, prop);
+      removeAndAddComment("org.obiba.opal.datasource.opal.dialect", comments, prop);
+      removeAndAddComment("org.obiba.opal.datasource.opal.validationQuery", comments, prop);
+
+      removeAndAddComment("org.obiba.opal.datasource.key.url", comments, prop);
+      removeAndAddComment("org.obiba.opal.datasource.key.driver", comments, prop);
+      removeAndAddComment("org.obiba.opal.datasource.key.username", comments, prop);
+      removeAndAddComment("org.obiba.opal.datasource.key.password", comments, prop);
+      removeAndAddComment("org.obiba.opal.datasource.key.dialect", comments, prop);
+      removeAndAddComment("org.obiba.opal.datasource.key.validationQuery", comments, prop);
+
+      prop.store(new FileOutputStream(propertiesFile), StringUtils.collectionToDelimitedString(comments, "\n"));
+    } catch(IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void removeAndAddComment(String key, Collection<String> comments, Properties prop) {
+    comments.add(key + " = " + prop.getProperty(key));
+    prop.remove(key);
   }
 
   private void importExtraDatasources() {
