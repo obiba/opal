@@ -1185,6 +1185,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <!-- Internally, we'll use log4j when unit-testing (scope is defined above) -->
