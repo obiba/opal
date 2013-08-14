@@ -18,6 +18,8 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.obiba.runtime.upgrade.UpgradeException;
 import org.obiba.runtime.upgrade.UpgradeManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.xml.sax.Attributes;
@@ -30,6 +32,8 @@ import com.google.common.base.Strings;
  * Command to perform an upgrade (i.e., invoke the upgrade manager).
  */
 public class UpgradeCommand {
+
+  private static final Logger log = LoggerFactory.getLogger(UpgradeCommand.class);
 
   private static final String[] CONTEXT_PATHS = { "classpath:/META-INF/spring/opal-server/upgrade.xml" };
 
@@ -79,6 +83,7 @@ public class UpgradeCommand {
   }
 
   private void opal2Upgrade() {
+    log.info("Prepare upgrade to Opal 2.0");
     ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(OPAL2_CONTEXT_PATHS);
     try {
       UpgradeManager upgradeManager = (UpgradeManager) ctx.getBean("upgradeManager");
