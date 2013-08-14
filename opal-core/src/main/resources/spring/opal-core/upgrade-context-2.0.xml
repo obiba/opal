@@ -18,7 +18,7 @@
     <property name="maxActive" value="100"/>
     <property name="maxWait" value="10000"/>
     <property name="initialSize" value="2"/>
-    <property name="validationQuery" value="${org.obiba.opal.datasource.opal.validationQuery}"/>
+    <property name="validationQuery" value="${org.obiba.opal.datasource.validationQuery}"/>
     <property name="testOnBorrow" value="true"/>
   </bean>
 
