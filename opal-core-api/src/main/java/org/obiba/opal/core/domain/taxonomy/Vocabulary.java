@@ -10,33 +10,89 @@
 
 package org.obiba.opal.core.domain.taxonomy;
 
-import javax.annotation.Nonnull;
+import java.util.List;
+
+import com.google.common.collect.Lists;
 
 public class Vocabulary {
 
-  @Nonnull
-  private Term root;
+  private String name;
+
+  private List<Text> titles;
+
+  private List<Text> descriptions;
+
+  private List<Term> terms;
 
   private boolean repeatable;
 
   public Vocabulary() {
   }
 
-  public Vocabulary(@Nonnull Term root) {
-    this.root = root;
+  public Vocabulary(String name) {
+    this.name = name;
   }
 
   public String getName() {
-    return root.getName();
+    return name;
   }
 
-  @Nonnull
-  public Term getRoot() {
-    return root;
+  public List<Text> getTitles() {
+    return titles == null ? titles = Lists.newArrayList() : titles;
   }
 
-  public void setRoot(@Nonnull Term root) {
-    this.root = root;
+  public void setTitles(List<Text> titles) {
+    this.titles = titles;
+  }
+
+  public void addTitle(Text title) {
+    getTitles().add(title);
+  }
+
+  public List<Text> getDescriptions() {
+    return descriptions == null ? descriptions = Lists.newArrayList() : descriptions;
+  }
+
+  public void setDescriptions(List<Text> descriptions) {
+    this.descriptions = descriptions;
+  }
+
+  public void addDescription(Text description) {
+    getDescriptions().add(description);
+  }
+
+  public void setTerms(List<Term> terms) {
+    this.terms = terms;
+  }
+
+  public void add(Term term) {
+    getTerms().add(term);
+  }
+
+  public boolean hasTerm(String termName) {
+    for(Term t : getTerms()) {
+      if(t.getName().equals(termName)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public void removeTerm(String termName) {
+    Term term = null;
+    for(Term t : getTerms()) {
+      if(t.getName().equals(termName)) {
+        term = t;
+        break;
+      }
+    }
+    if(term != null) {
+      getTerms().remove(term);
+    }
+  }
+
+  public List<Term> getTerms() {
+    return terms == null ? terms = Lists.newArrayList() : terms;
   }
 
   public boolean isRepeatable() {

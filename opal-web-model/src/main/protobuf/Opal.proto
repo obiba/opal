@@ -312,8 +312,11 @@ message TaxonomyDto {
     repeated TermDto terms = 4; // children which path are mapped to attribute values, free value if none
   }
   message VocabularyDto {
-    required TermDto root = 1; // mapped to attribute name
-    required bool repeatable = 2 [default = false]; // allows the corresponding attribute name to be applied multiple times
+    required string name = 1;
+    repeated TextDto titles = 2;
+    repeated TextDto descriptions = 3;
+    repeated TermDto terms = 4;
+    required bool repeatable = 5 [default = false]; // allows the corresponding attribute name to be applied multiple times
   }
 
   message TextDto {

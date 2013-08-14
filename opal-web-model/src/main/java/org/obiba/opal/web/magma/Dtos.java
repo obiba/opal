@@ -522,13 +522,19 @@ public final class Dtos {
 
   public static TaxonomyDto.VocabularyDto asDto(Vocabulary vocabulary) {
     TaxonomyDto.VocabularyDto.Builder builder = TaxonomyDto.VocabularyDto.newBuilder();
-    builder.setRoot(asDto(vocabulary.getRoot()));
+    builder.setName(vocabulary.getName());
+    builder.addAllTitles(toTextDtoList(vocabulary.getTitles()));
+    builder.addAllDescriptions(toTextDtoList(vocabulary.getDescriptions()));
+    builder.addAllTerms(asDto(vocabulary.getTerms()));
     builder.setRepeatable(vocabulary.isRepeatable());
     return builder.build();
   }
 
   public static Vocabulary fromDto(TaxonomyDto.VocabularyDto dto) {
-    Vocabulary vocabulary = new Vocabulary(fromDto(dto.getRoot()));
+    Vocabulary vocabulary = new Vocabulary(dto.getName());
+    vocabulary.setTitles(fromTextDtoList(dto.getTitlesList()));
+    vocabulary.setDescriptions(fromTextDtoList(dto.getDescriptionsList()));
+    vocabulary.setTerms(fromDto(dto.getTermsList()));
     vocabulary.setRepeatable(dto.getRepeatable());
     return vocabulary;
   }
