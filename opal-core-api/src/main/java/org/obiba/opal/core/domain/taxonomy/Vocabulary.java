@@ -10,7 +10,7 @@
 
 package org.obiba.opal.core.domain.taxonomy;
 
-public class Vocabulary extends HasTerm {
+public class Vocabulary extends HasTerms {
 
   private boolean repeatable;
 

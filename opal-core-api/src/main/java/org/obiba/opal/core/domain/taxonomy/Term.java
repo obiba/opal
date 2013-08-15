@@ -10,7 +10,7 @@
 
 package org.obiba.opal.core.domain.taxonomy;
 
-public class Term extends HasTerm {
+public class Term extends HasTerms {
 
   public Term() {
   }
