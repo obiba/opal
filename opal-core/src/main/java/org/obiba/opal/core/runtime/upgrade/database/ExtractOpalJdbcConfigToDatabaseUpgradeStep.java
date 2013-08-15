@@ -2,7 +2,6 @@ package org.obiba.opal.core.runtime.upgrade.database;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -21,6 +20,10 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.PropertiesConfigurationLayout;
 import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.runtime.Version;
@@ -55,16 +58,18 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
 
   private void addOpalConfigProperties() {
     try {
-      Properties prop = new Properties();
-      prop.load(new FileInputStream(propertiesFile));
-      prop.setProperty("org.obiba.opal.datasource.driver", "org.hsqldb.jdbcDriver");
-      prop.setProperty("org.obiba.opal.datasource.url", "jdbc:hsqldb:file:opal_config;shutdown=true;hsqldb.tx=mvcc");
-      prop.setProperty("org.obiba.opal.datasource.username", "sa");
-      prop.setProperty("org.obiba.opal.datasource.password", null);
-      prop.setProperty("org.obiba.opal.datasource.dialect", "org.hibernate.dialect.HSQLDialect");
-      prop.setProperty("org.obiba.opal.datasource.validationQuery", "select 1 from INFORMATION_SCHEMA.SYSTEM_USERS");
-      prop.store(new FileOutputStream(propertiesFile), null);
-    } catch(IOException e) {
+      PropertiesConfiguration config = new PropertiesConfiguration(propertiesFile);
+      PropertiesConfigurationLayout layout = config.getLayout();
+      config.setProperty("org.obiba.opal.datasource.driver", "org.hsqldb.jdbcDriver");
+      config
+          .setProperty("org.obiba.opal.datasource.url", "jdbc:hsqldb:file:opal_config.db;shutdown=true;hsqldb.tx=mvcc");
+      config.setProperty("org.obiba.opal.datasource.username", "sa");
+      config.setProperty("org.obiba.opal.datasource.password", "");
+      config.setProperty("org.obiba.opal.datasource.dialect", "org.hibernate.dialect.HSQLDialect");
+      config.setProperty("org.obiba.opal.datasource.validationQuery", "select 1 from INFORMATION_SCHEMA.SYSTEM_USERS");
+      layout.setComment("org.obiba.opal.datasource.driver", "\nOpal internal database settings");
+      config.save(propertiesFile);
+    } catch(ConfigurationException e) {
       throw new RuntimeException(e);
     }
   }
@@ -103,34 +108,34 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
   private void commentDeprecatedProperties() {
     try {
       List<String> comments = Lists.newArrayList();
-      comments.add("Deprecated datasources configuration moved to Opal configuration database");
+      comments.add("\nDeprecated datasources configuration moved to Opal configuration database");
 
-      Properties prop = new Properties();
-      prop.load(new FileInputStream(propertiesFile));
+      PropertiesConfiguration config = new PropertiesConfiguration(propertiesFile);
 
-      removeAndAddComment("org.obiba.opal.datasource.opal.url", comments, prop);
-      removeAndAddComment("org.obiba.opal.datasource.opal.driver", comments, prop);
-      removeAndAddComment("org.obiba.opal.datasource.opal.username", comments, prop);
-      removeAndAddComment("org.obiba.opal.datasource.opal.password", comments, prop);
-      removeAndAddComment("org.obiba.opal.datasource.opal.dialect", comments, prop);
-      removeAndAddComment("org.obiba.opal.datasource.opal.validationQuery", comments, prop);
+      removeAndAddComment("org.obiba.opal.datasource.opal.url", comments, config);
+      removeAndAddComment("org.obiba.opal.datasource.opal.driver", comments, config);
+      removeAndAddComment("org.obiba.opal.datasource.opal.username", comments, config);
+      removeAndAddComment("org.obiba.opal.datasource.opal.password", comments, config);
+      removeAndAddComment("org.obiba.opal.datasource.opal.dialect", comments, config);
+      removeAndAddComment("org.obiba.opal.datasource.opal.validationQuery", comments, config);
 
-      removeAndAddComment("org.obiba.opal.datasource.key.url", comments, prop);
-      removeAndAddComment("org.obiba.opal.datasource.key.driver", comments, prop);
-      removeAndAddComment("org.obiba.opal.datasource.key.username", comments, prop);
-      removeAndAddComment("org.obiba.opal.datasource.key.password", comments, prop);
-      removeAndAddComment("org.obiba.opal.datasource.key.dialect", comments, prop);
-      removeAndAddComment("org.obiba.opal.datasource.key.validationQuery", comments, prop);
+      removeAndAddComment("org.obiba.opal.datasource.key.url", comments, config);
+      removeAndAddComment("org.obiba.opal.datasource.key.driver", comments, config);
+      removeAndAddComment("org.obiba.opal.datasource.key.username", comments, config);
+      removeAndAddComment("org.obiba.opal.datasource.key.password", comments, config);
+      removeAndAddComment("org.obiba.opal.datasource.key.dialect", comments, config);
+      removeAndAddComment("org.obiba.opal.datasource.key.validationQuery", comments, config);
 
-      prop.store(new FileOutputStream(propertiesFile), StringUtils.collectionToDelimitedString(comments, "\n"));
-    } catch(IOException e) {
+      config.setHeader(config.getHeader() + "\n" + StringUtils.collectionToDelimitedString(comments, "\n"));
+      config.save(propertiesFile);
+    } catch(ConfigurationException e) {
       throw new RuntimeException(e);
     }
   }
 
-  private void removeAndAddComment(String key, Collection<String> comments, Properties prop) {
-    comments.add(key + " = " + prop.getProperty(key));
-    prop.remove(key);
+  private void removeAndAddComment(String key, Collection<String> comments, Configuration config) {
+    comments.add(key + " = " + config.getProperty(key));
+    config.clearProperty(key);
   }
 
   private void importExtraDatasources() {

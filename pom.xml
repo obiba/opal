@@ -547,6 +547,18 @@
         <version>${commons-collections.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>commons-configuration</groupId>
+        <artifactId>commons-configuration</artifactId>
+        <version>${commons-configuration.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
       <!-- Use commons-dbcp as the DataSource implementation -->
       <dependency>
         <groupId>commons-dbcp</groupId>
@@ -1499,6 +1511,7 @@
     <cglib-nodep.version>2.2.2</cglib-nodep.version>
     <commons-codec.version>1.3</commons-codec.version>
     <commons-collections.version>3.2</commons-collections.version>
+    <commons-configuration.version>1.9</commons-configuration.version>
     <commons-daemon.version>1.0.3</commons-daemon.version>
     <commons-dbcp.version>1.4</commons-dbcp.version>
     <commons-fileupload.version>1.2.2</commons-fileupload.version>
