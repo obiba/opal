@@ -32,6 +32,7 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.math.stat.IntervalFrequency;
 import org.obiba.magma.type.BinaryType;
+import org.obiba.opal.core.domain.taxonomy.HasTerms;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.domain.taxonomy.Term;
 import org.obiba.opal.core.domain.taxonomy.Text;
@@ -496,16 +497,16 @@ public final class Dtos {
     return texts;
   }
 
-  private static Iterable<TaxonomyDto.TermDto> asDto(Iterable<Term> terms) {
+  private static Iterable<TaxonomyDto.TermDto> asDto(Iterable<HasTerms> terms) {
     Collection<TaxonomyDto.TermDto> termDto = new ArrayList<TaxonomyDto.TermDto>();
-    for(Term t : terms) {
-      termDto.add(asDto(t));
+    for(HasTerms t : terms) {
+      termDto.add(asDto((Term) t));
     }
     return termDto;
   }
 
-  private static List<Term> fromDto(Iterable<TaxonomyDto.TermDto> termDtos) {
-    List<Term> termDto = new ArrayList<Term>();
+  private static List<HasTerms> fromDto(Iterable<TaxonomyDto.TermDto> termDtos) {
+    List<HasTerms> termDto = new ArrayList<HasTerms>();
     for(TaxonomyDto.TermDto t : termDtos) {
       termDto.add(fromDto(t));
     }
@@ -522,13 +523,19 @@ public final class Dtos {
 
   public static TaxonomyDto.VocabularyDto asDto(Vocabulary vocabulary) {
     TaxonomyDto.VocabularyDto.Builder builder = TaxonomyDto.VocabularyDto.newBuilder();
-    builder.setRoot(asDto(vocabulary.getRoot()));
+    builder.setName(vocabulary.getName());
+    builder.addAllTitles(toTextDtoList(vocabulary.getTitles()));
+    builder.addAllDescriptions(toTextDtoList(vocabulary.getDescriptions()));
+    builder.addAllTerms(asDto(vocabulary.getTerms()));
     builder.setRepeatable(vocabulary.isRepeatable());
     return builder.build();
   }
 
   public static Vocabulary fromDto(TaxonomyDto.VocabularyDto dto) {
-    Vocabulary vocabulary = new Vocabulary(fromDto(dto.getRoot()));
+    Vocabulary vocabulary = new Vocabulary(dto.getName());
+    vocabulary.setTitles(fromTextDtoList(dto.getTitlesList()));
+    vocabulary.setDescriptions(fromTextDtoList(dto.getDescriptionsList()));
+    vocabulary.setTerms(fromDto(dto.getTermsList()));
     vocabulary.setRepeatable(dto.getRepeatable());
     return vocabulary;
   }

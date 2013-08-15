@@ -10,33 +10,15 @@
 
 package org.obiba.opal.core.domain.taxonomy;
 
-import javax.annotation.Nonnull;
-
-public class Vocabulary {
-
-  @Nonnull
-  private Term root;
+public class Vocabulary extends HasTerms {
 
   private boolean repeatable;
 
   public Vocabulary() {
   }
 
-  public Vocabulary(@Nonnull Term root) {
-    this.root = root;
-  }
-
-  public String getName() {
-    return root.getName();
-  }
-
-  @Nonnull
-  public Term getRoot() {
-    return root;
-  }
-
-  public void setRoot(@Nonnull Term root) {
-    this.root = root;
+  public Vocabulary(String name) {
+    super(name);
   }
 
   public boolean isRepeatable() {
