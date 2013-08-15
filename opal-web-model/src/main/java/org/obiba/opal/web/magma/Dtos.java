@@ -32,6 +32,7 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.math.stat.IntervalFrequency;
 import org.obiba.magma.type.BinaryType;
+import org.obiba.opal.core.domain.taxonomy.AsTerm;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.domain.taxonomy.Term;
 import org.obiba.opal.core.domain.taxonomy.Text;
@@ -496,16 +497,16 @@ public final class Dtos {
     return texts;
   }
 
-  private static Iterable<TaxonomyDto.TermDto> asDto(Iterable<Term> terms) {
+  private static Iterable<TaxonomyDto.TermDto> asDto(Iterable<AsTerm> terms) {
     Collection<TaxonomyDto.TermDto> termDto = new ArrayList<TaxonomyDto.TermDto>();
-    for(Term t : terms) {
-      termDto.add(asDto(t));
+    for(AsTerm t : terms) {
+      termDto.add(asDto((Term) t));
     }
     return termDto;
   }
 
-  private static List<Term> fromDto(Iterable<TaxonomyDto.TermDto> termDtos) {
-    List<Term> termDto = new ArrayList<Term>();
+  private static List<AsTerm> fromDto(Iterable<TaxonomyDto.TermDto> termDtos) {
+    List<AsTerm> termDto = new ArrayList<AsTerm>();
     for(TaxonomyDto.TermDto t : termDtos) {
       termDto.add(fromDto(t));
     }
