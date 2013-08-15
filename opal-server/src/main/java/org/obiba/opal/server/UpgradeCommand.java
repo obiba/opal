@@ -16,6 +16,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.obiba.opal.core.runtime.upgrade.database.Opal2DatabaseConfigurator;
 import org.obiba.runtime.upgrade.UpgradeException;
 import org.obiba.runtime.upgrade.UpgradeManager;
 import org.slf4j.Logger;
@@ -84,6 +85,7 @@ public class UpgradeCommand {
 
   private void opal2Upgrade() {
     log.info("Prepare upgrade to Opal 2.0");
+    new Opal2DatabaseConfigurator().configureDatabase();
     ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(OPAL2_CONTEXT_PATHS);
     try {
       UpgradeManager upgradeManager = (UpgradeManager) ctx.getBean("upgradeManager");

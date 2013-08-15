@@ -141,7 +141,11 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
       throws DuplicateDatabaseNameException, MultipleIdentifiersDatabaseException {
     validUniqueName(database);
     validUniqueIdentifiersDatabase(database);
-    getCurrentSession().update(database);
+    if(database.getId() == null) {
+      getCurrentSession().persist(database);
+    } else {
+      getCurrentSession().update(database);
+    }
     destroyDataSource(database.getName());
   }
 

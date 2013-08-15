@@ -23,7 +23,6 @@
     <dependency>
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-core</artifactId>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>

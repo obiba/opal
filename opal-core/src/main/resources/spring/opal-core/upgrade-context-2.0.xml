@@ -18,7 +18,6 @@
     <property name="maxActive" value="100"/>
     <property name="maxWait" value="10000"/>
     <property name="initialSize" value="2"/>
-    <property name="validationQuery" value="${org.obiba.opal.datasource.validationQuery}"/>
     <property name="testOnBorrow" value="true"/>
   </bean>
 
@@ -31,7 +30,13 @@
       <bean class="org.obiba.magma.hibernate.cfg.MagmaNamingStrategy"/>
     </property>
     <property name="annotatedClasses">
-      <bean factory-bean="datasourceClasses" factory-method="getAnnotatedTypes"/>
+      <bean class="org.obiba.opal.core.support.OpalAnnotationConfigurationHelper">
+        <property name="additionalClasses">
+          <list>
+            <bean factory-bean="datasourceClasses" factory-method="getAnnotatedTypes"/>
+          </list>
+        </property>
+      </bean>
     </property>
     <property name="jtaTransactionManager" ref="jotm"/>
     <property name="exposeTransactionAwareSessionFactory" value="false"/>
@@ -83,6 +88,14 @@
 
   <bean id="databaseRegistry" class="org.obiba.opal.core.runtime.database.DefaultDatabaseRegistry"/>
 
+  <bean id="configurationService" class="org.obiba.opal.core.cfg.DefaultOpalConfigurationService">
+    <constructor-arg>
+      <bean class="org.obiba.opal.core.cfg.OpalConfigurationIo">
+        <constructor-arg value="${OPAL_HOME}/conf/opal-config.xml"/>
+      </bean>
+    </constructor-arg>
+  </bean>
+
   <bean id="upgradeManager" class="org.obiba.runtime.upgrade.support.DefaultUpgradeManager">
     <property name="currentVersionProvider">
       <bean class="org.obiba.runtime.upgrade.support.JdbcVersionModifier">
@@ -120,6 +133,13 @@
           <property name="configFile" value="file:${OPAL_HOME}/conf/opal-config.xml"/>
           <property name="propertiesFile" value="file:${OPAL_HOME}/conf/opal-config.properties"/>
           <property name="databaseRegistry" ref="databaseRegistry"/>
+        </bean>
+
+        <!-- 2.0.0 / update Opal Configuration -->
+        <bean class="org.obiba.opal.core.runtime.upgrade.database.UpdateOpalConfigurationFlagUpgradeStep">
+          <property name="description" value="Update Opal Configuration to indicate we've migrated databases."/>
+          <property name="configurationService" ref="configurationService"/>
+          <property name="appliesTo" value="2.0.0"/>
         </bean>
 
       </list>
