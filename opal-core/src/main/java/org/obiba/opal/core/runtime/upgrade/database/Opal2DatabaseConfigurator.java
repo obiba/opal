@@ -1,17 +1,12 @@
 package org.obiba.opal.core.runtime.upgrade.database;
 
-import java.sql.SQLException;
-
 import javax.annotation.Nonnull;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.PropertiesConfigurationLayout;
-import org.apache.commons.dbcp.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.google.common.base.Strings;
 
@@ -41,10 +36,7 @@ public class Opal2DatabaseConfigurator {
   public void configureDatabase() {
     try {
       addOpalConfigProperties();
-      createDatabase();
     } catch(ConfigurationException e) {
-      throw new RuntimeException(e);
-    } catch(SQLException e) {
       throw new RuntimeException(e);
     }
   }
@@ -69,23 +61,5 @@ public class Opal2DatabaseConfigurator {
     config.setProperty(VALIDATION_QUERY, "select 1 from INFORMATION_SCHEMA.SYSTEM_USERS");
     layout.setComment(DRIVER, "\nOpal internal database settings");
     config.save(propertiesFile);
-
   }
-
-  private void createDatabase() throws ConfigurationException, SQLException {
-    log.debug("Create new opal-config database");
-    Configuration config = new PropertiesConfiguration(propertiesFile);
-    BasicDataSource dataSource = new BasicDataSource();
-    dataSource.setDriverClassName(config.getString(DRIVER));
-    dataSource.setUrl(config.getString(URL));
-    dataSource.setUsername(config.getString(USERNAME));
-    dataSource.setPassword(config.getString(PASSWORD));
-
-    JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-    jdbcTemplate.execute("CREATE TABLE test(id int)");
-    jdbcTemplate.execute("DROP TABLE test");
-
-    dataSource.close();
-  }
-
 }

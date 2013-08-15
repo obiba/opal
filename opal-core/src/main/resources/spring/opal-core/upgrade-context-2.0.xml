@@ -88,14 +88,6 @@
 
   <bean id="databaseRegistry" class="org.obiba.opal.core.runtime.database.DefaultDatabaseRegistry"/>
 
-  <bean id="configurationService" class="org.obiba.opal.core.cfg.DefaultOpalConfigurationService">
-    <constructor-arg>
-      <bean class="org.obiba.opal.core.cfg.OpalConfigurationIo">
-        <constructor-arg value="${OPAL_HOME}/conf/opal-config.xml"/>
-      </bean>
-    </constructor-arg>
-  </bean>
-
   <bean id="upgradeManager" class="org.obiba.runtime.upgrade.support.DefaultUpgradeManager">
     <property name="currentVersionProvider">
       <bean class="org.obiba.runtime.upgrade.support.JdbcVersionModifier">
@@ -136,11 +128,7 @@
         </bean>
 
         <!-- 2.0.0 / update Opal Configuration -->
-        <bean class="org.obiba.opal.core.runtime.upgrade.database.UpdateOpalConfigurationFlagUpgradeStep">
-          <property name="description" value="Update Opal Configuration to indicate we've migrated databases."/>
-          <property name="configurationService" ref="configurationService"/>
-          <property name="appliesTo" value="2.0.0"/>
-        </bean>
+        <bean class="org.obiba.opal.core.runtime.upgrade.database.UpdateOpalConfigurationFlagUpgradeStep"/>
 
       </list>
     </property>
