@@ -23,11 +23,12 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.configuration.PropertiesConfigurationLayout;
 import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.util.StringUtils;
@@ -41,6 +42,8 @@ import com.google.common.collect.Lists;
 
 public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeStep {
 
+  private static final Logger log = LoggerFactory.getLogger(ExtractOpalJdbcConfigToDatabaseUpgradeStep.class);
+
   private File configFile;
 
   private File propertiesFile;
@@ -49,29 +52,10 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
 
   @Override
   public void execute(Version currentVersion) {
-    addOpalConfigProperties();
     extractOpalDatasource();
     importExtraDatasources();
     deleteJdbcDataSourcesFromConfig();
     commentDeprecatedProperties();
-  }
-
-  private void addOpalConfigProperties() {
-    try {
-      PropertiesConfiguration config = new PropertiesConfiguration(propertiesFile);
-      PropertiesConfigurationLayout layout = config.getLayout();
-      config.setProperty("org.obiba.opal.datasource.driver", "org.hsqldb.jdbcDriver");
-      config
-          .setProperty("org.obiba.opal.datasource.url", "jdbc:hsqldb:file:opal_config.db;shutdown=true;hsqldb.tx=mvcc");
-      config.setProperty("org.obiba.opal.datasource.username", "sa");
-      config.setProperty("org.obiba.opal.datasource.password", "");
-      config.setProperty("org.obiba.opal.datasource.dialect", "org.hibernate.dialect.HSQLDialect");
-      config.setProperty("org.obiba.opal.datasource.validationQuery", "select 1 from INFORMATION_SCHEMA.SYSTEM_USERS");
-      layout.setComment("org.obiba.opal.datasource.driver", "\nOpal internal database settings");
-      config.save(propertiesFile);
-    } catch(ConfigurationException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   private void extractOpalDatasource() {
@@ -87,6 +71,7 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
           .password(prop.getProperty("org.obiba.opal.datasource.opal.password")) //
           .editable(false) //
           .build();
+      log.debug("Import opalData: {}", opalData);
       databaseRegistry.addOrReplaceDatabase(opalData);
 
       SqlDatabase opalKey = new SqlDatabase.Builder() //
@@ -98,6 +83,8 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
           .editable(false) //
           .usedForIdentifiers(true) //
           .build();
+      log.debug("Import opalKey: {}", opalKey);
+
       databaseRegistry.addOrReplaceDatabase(opalKey);
 
     } catch(IOException e) {
@@ -106,6 +93,8 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
   }
 
   private void commentDeprecatedProperties() {
+    log.debug("Comment deprecated config");
+
     try {
       List<String> comments = Lists.newArrayList();
       comments.add("\nDeprecated datasources configuration moved to Opal configuration database");
@@ -150,6 +139,7 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
             .properties(dataSource.properties) //
             .editable(dataSource.editable) //
             .build();
+        log.debug("Import sqlDatabase: {}", sqlDatabase);
         databaseRegistry.addOrReplaceDatabase(sqlDatabase);
       }
     } catch(XPathExpressionException e) {
@@ -202,12 +192,14 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
   }
 
   private void deleteJdbcDataSourcesFromConfig() {
+    log.debug("Delete JdbcDataSources from config file");
     try {
       Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(configFile);
       XPath xPath = XPathFactory.newInstance().newXPath();
       Node node = (Node) xPath
           .compile("//org.obiba.opal.core.runtime.jdbc.DefaultJdbcDataSourceRegistry_-JdbcDataSourcesConfig")
           .evaluate(doc.getDocumentElement(), XPathConstants.NODE);
+      log.debug("node: {}", node);
       node.getParentNode().removeChild(node);
       Transformer transformer = TransformerFactory.newInstance().newTransformer();
       transformer.transform(new DOMSource(doc), new StreamResult(configFile));

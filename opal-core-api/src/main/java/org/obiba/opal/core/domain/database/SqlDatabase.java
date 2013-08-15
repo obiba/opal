@@ -9,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 
 @SuppressWarnings("ParameterHidesMemberVariable")
@@ -103,6 +104,13 @@ public class SqlDatabase extends Database {
 
   public void setMagmaDatasourceType(@Nonnull String magmaDatasourceType) {
     this.magmaDatasourceType = magmaDatasourceType;
+  }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this).omitNullValues().add("driverClass", driverClass).add("url", url)
+        .add("username", username).add("password", password).add("properties", properties)
+        .add("magmaDatasourceType", magmaDatasourceType).toString();
   }
 
   public static class Builder extends Database.Builder<SqlDatabase, Builder> {

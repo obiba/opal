@@ -6,6 +6,8 @@ import javax.persistence.MappedSuperclass;
 
 import org.obiba.core.domain.AbstractEntity;
 
+import com.google.common.base.Objects;
+
 @SuppressWarnings("ParameterHidesMemberVariable")
 @MappedSuperclass
 public abstract class Database extends AbstractEntity {
@@ -79,6 +81,13 @@ public abstract class Database extends AbstractEntity {
 
   public void setUsedForIdentifiers(boolean usedForIdentifiers) {
     this.usedForIdentifiers = usedForIdentifiers;
+  }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this).add("defaultStorage", defaultStorage).add("name", name).add("type", type)
+        .add("description", description).add("editable", editable).add("usedForIdentifiers", usedForIdentifiers)
+        .toString();
   }
 
   public static abstract class Builder<TDatabase extends Database, TBuilder extends Builder<TDatabase, TBuilder>> {
