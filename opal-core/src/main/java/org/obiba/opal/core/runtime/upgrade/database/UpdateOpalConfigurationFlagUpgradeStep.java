@@ -1,25 +1,27 @@
 package org.obiba.opal.core.runtime.upgrade.database;
 
-import org.obiba.opal.core.cfg.OpalConfiguration;
-import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.runtime.upgrade.AbstractConfigurationUpgradeStep;
 import org.obiba.runtime.Version;
-import org.obiba.runtime.upgrade.AbstractUpgradeStep;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
-public class UpdateOpalConfigurationFlagUpgradeStep extends AbstractUpgradeStep {
-
-  private OpalConfigurationService configurationService;
+public class UpdateOpalConfigurationFlagUpgradeStep extends AbstractConfigurationUpgradeStep {
 
   @Override
-  public void execute(Version currentVersion) {
-    configurationService.modifyConfiguration(new OpalConfigurationService.ConfigModificationTask() {
-      @Override
-      public void doWithConfig(OpalConfiguration config) {
-        config.setMigratedToOpal2(true);
-      }
-    });
+  protected void doWithConfig(Document opalConfig) {
+    Node migratedToOpal2 = opalConfig.createElement("migratedToOpal2");
+    migratedToOpal2.setTextContent("true");
+    opalConfig.getFirstChild().appendChild(migratedToOpal2);
   }
 
-  public void setConfigurationService(OpalConfigurationService configurationService) {
-    this.configurationService = configurationService;
+  @Override
+  public String getDescription() {
+    return "Update Opal Configuration to indicate we've migrated databases.";
   }
+
+  @Override
+  public Version getAppliesTo() {
+    return new Version(2, 0, 0);
+  }
+
 }
