@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-public abstract class AsTerm {
+public abstract class HasTerm {
 
   private String name;
 
@@ -12,12 +12,12 @@ public abstract class AsTerm {
 
   private List<Text> descriptions;
 
-  private List<AsTerm> terms;
+  private List<HasTerm> terms;
 
-  AsTerm() {
+  HasTerm() {
   }
 
-  AsTerm(String name) {
+  HasTerm(String name) {
     this.name = name;
   }
 
@@ -53,16 +53,16 @@ public abstract class AsTerm {
     getDescriptions().add(description);
   }
 
-  public void setTerms(List<AsTerm> terms) {
+  public void setTerms(List<HasTerm> terms) {
     this.terms = terms;
   }
 
-  public void add(AsTerm term) {
+  public void add(HasTerm term) {
     getTerms().add(term);
   }
 
   public boolean hasTerm(String termName) {
-    for(AsTerm t : getTerms()) {
+    for(HasTerm t : getTerms()) {
       if(t.getName().equals(termName)) {
         return true;
       }
@@ -71,8 +71,8 @@ public abstract class AsTerm {
   }
 
   public void removeTerm(String termName) {
-    AsTerm term = null;
-    for(AsTerm t : getTerms()) {
+    HasTerm term = null;
+    for(HasTerm t : getTerms()) {
       if(t.getName().equals(termName)) {
         term = t;
         break;
@@ -83,7 +83,7 @@ public abstract class AsTerm {
     }
   }
 
-  public List<AsTerm> getTerms() {
+  public List<HasTerm> getTerms() {
     return terms == null ? terms = Lists.newArrayList() : terms;
   }
 }
