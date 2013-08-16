@@ -1,9 +1,6 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean id="datasourceClasses" class="org.obiba.magma.datasource.hibernate.support.AnnotationConfigurationHelper"/>
-  <bean id="auditClasses" class="org.obiba.magma.audit.hibernate.support.AnnotationConfigurationHelper"/>
-
   <!-- Datasource used for opal internal configuration -->
   <bean id="dataSource" class="org.apache.commons.dbcp.managed.BasicManagedDataSource" destroy-method="close">
     <qualifier value="opal-config"/>
@@ -31,13 +28,7 @@
       <bean class="org.obiba.magma.hibernate.cfg.MagmaNamingStrategy"/>
     </property>
     <property name="annotatedClasses">
-      <bean class="org.obiba.opal.core.support.OpalAnnotationConfigurationHelper">
-        <property name="additionalClasses">
-          <list>
-            <bean factory-bean="datasourceClasses" factory-method="getAnnotatedTypes"/>
-          </list>
-        </property>
-      </bean>
+      <bean class="org.obiba.opal.core.support.OpalAnnotationConfigurationHelper"/>
     </property>
 
     <!-- This is required to allow Hibernate to register transaction synchronisations. -->

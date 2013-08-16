@@ -42,43 +42,45 @@ public class SessionFactoryFactory {
   private final static Logger log = LoggerFactory.getLogger(SessionFactoryFactory.class);
 
   @Autowired
-  private ApplicationContext ac;
+  private ApplicationContext applicationContext;
 
   @Autowired
-  private TransactionManager txmgr;
+  private TransactionManager transactionManager;
 
   @Autowired
   @Qualifier("hibernate")
   private Properties hibernateProperties;
 
   public SessionFactory getSessionFactory(DataSource dataSource) {
-    AnnotationSessionFactoryBean asfb = new CustomSessionFactoryBean();
-    asfb.setDataSource(dataSource);
-    asfb.setJtaTransactionManager(txmgr);
-    asfb.setHibernateProperties(hibernateProperties);
-    asfb.getHibernateProperties().setProperty(Environment.DIALECT, determineDialect(dataSource).getClass().getName());
+
+    AnnotationSessionFactoryBean factoryBean = new CustomSessionFactoryBean();
+    factoryBean.setDataSource(dataSource);
+    factoryBean.setJtaTransactionManager(transactionManager);
+    factoryBean.setHibernateProperties(hibernateProperties);
+    factoryBean.getHibernateProperties()
+        .setProperty(Environment.DIALECT, determineDialect(dataSource).getClass().getName());
     Set<Class<?>> annotatedTypes = new AnnotationConfigurationHelper().getAnnotatedTypes();
-    asfb.setAnnotatedClasses(annotatedTypes.toArray(new Class[annotatedTypes.size()]));
-    asfb.setNamingStrategy(new MagmaNamingStrategy());
-    asfb.setExposeTransactionAwareSessionFactory(false);
+    factoryBean.setAnnotatedClasses(annotatedTypes.toArray(new Class[annotatedTypes.size()]));
+    factoryBean.setNamingStrategy(new MagmaNamingStrategy());
+    factoryBean.setExposeTransactionAwareSessionFactory(false);
 
     // Inject dependencies
-    asfb = (AnnotationSessionFactoryBean) ac.getAutowireCapableBeanFactory()
-        .initializeBean(asfb, dataSource.hashCode() + "-session");
+    factoryBean = (AnnotationSessionFactoryBean) applicationContext.getAutowireCapableBeanFactory()
+        .initializeBean(factoryBean, dataSource.hashCode() + "-session");
 
-    onSessionFactoryBeanCreated(asfb);
+    onSessionFactoryBeanCreated(factoryBean);
 
-    return asfb.getObject();
+    return factoryBean.getObject();
   }
 
-  protected void onSessionFactoryBeanCreated(AnnotationSessionFactoryBean asfb) {
+  protected void onSessionFactoryBeanCreated(AnnotationSessionFactoryBean factoryBean) {
     try {
       log.info("Verifying database schema.");
-      asfb.validateDatabaseSchema();
+      factoryBean.validateDatabaseSchema();
     } catch(DataAccessException dae) {
       log.info("Invalid schema for hibernate datasource; updating schema.");
       try {
-        asfb.updateDatabaseSchema();
+        factoryBean.updateDatabaseSchema();
       } catch(RuntimeException e) {
         log.error("Failed to update schema: {}", e.getMessage());
         throw e;
