@@ -4,13 +4,13 @@ import javax.annotation.Nonnull;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
-import org.obiba.core.domain.AbstractEntity;
+import org.obiba.magma.datasource.hibernate.domain.AbstractTimestampedEntity;
 
 import com.google.common.base.Objects;
 
 @SuppressWarnings("ParameterHidesMemberVariable")
 @MappedSuperclass
-public abstract class Database extends AbstractEntity {
+public abstract class Database extends AbstractTimestampedEntity {
 
   private static final long serialVersionUID = 7804325269326932874L;
 
