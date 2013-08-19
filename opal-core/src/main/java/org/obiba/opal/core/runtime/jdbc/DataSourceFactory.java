@@ -19,35 +19,46 @@ import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Strings;
+
 @Component
 public class DataSourceFactory {
 
-  private final TransactionManager txmgr;
+  private final TransactionManager transactionManager;
 
   @Autowired
-  public DataSourceFactory(TransactionManager txmgr) {
-    this.txmgr = txmgr;
+  public DataSourceFactory(TransactionManager transactionManager) {
+    this.transactionManager = transactionManager;
   }
 
   public BasicDataSource createDataSource(SqlDatabase database) {
-    BasicManagedDataSource bmds = new BasicManagedDataSource();
+    BasicManagedDataSource dataSource = new BasicManagedDataSource();
 
-    BeanWrapperImpl bw = new BeanWrapperImpl(bmds);
-    // Set values, ignoring unknown/invalid entries
-    bw.setPropertyValues(new MutablePropertyValues(database.readProperties()), true, true);
+    if(!Strings.isNullOrEmpty(database.getProperties())) {
+      BeanWrapperImpl bw = new BeanWrapperImpl(dataSource);
+      // Set values, ignoring unknown/invalid entries
+      bw.setPropertyValues(new MutablePropertyValues(database.readProperties()), true, true);
+    }
 
     // Set other properties
-    bmds.setTransactionManager(txmgr);
-    bmds.setUrl(database.getUrl());
-    bmds.setDriverClassName(database.getDriverClass());
-    bmds.setUsername(database.getUsername());
-    bmds.setPassword(database.getPassword());
+    dataSource.setTransactionManager(transactionManager);
+    dataSource.setUrl(database.getUrl());
+    dataSource.setDriverClassName(database.getDriverClass());
+    dataSource.setUsername(database.getUsername());
+    dataSource.setPassword(database.getPassword());
 
-    if(bmds.getMaxWait() < 0) {
-      // Wait for 10 seconds maximum
-      bmds.setMaxWait(10 * 1000);
+    if("com.mysql.jdbc.Driver".equals(dataSource.getDriverClassName())) {
+      dataSource.setValidationQuery("select 1");
+    } else if("org.hsqldb.jdbcDriver".equals(dataSource.getDriverClassName())) {
+      dataSource.setValidationQuery("select 1 from INFORMATION_SCHEMA.SYSTEM_USERS");
     }
-    return bmds;
+    //TODO validation query for PostgreSQL
+
+    if(dataSource.getMaxWait() < 0) {
+      // Wait for 10 seconds maximum
+      dataSource.setMaxWait(10 * 1000);
+    }
+    return dataSource;
   }
 
 }
