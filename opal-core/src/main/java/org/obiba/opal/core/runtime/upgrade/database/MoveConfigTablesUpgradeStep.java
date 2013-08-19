@@ -1,5 +1,7 @@
 package org.obiba.opal.core.runtime.upgrade.database;
 
+import javax.sql.DataSource;
+
 import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
 import org.obiba.opal.core.domain.database.MongoDbDatabase;
@@ -28,6 +30,10 @@ public class MoveConfigTablesUpgradeStep extends AbstractUpgradeStep {
   }
 
   private void copyConfigData() {
+
+    DataSource dataSource = databaseRegistry.getDataSource("opal-data", null);
+    System.out.println(new JdbcTemplate(dataSource).queryForList("select * from version"));
+
     SessionFactory dataSessionFactory = databaseRegistry.getSessionFactory("opal-data", null);
     Session dataSession = dataSessionFactory.getCurrentSession();
     Session configSession = configSessionFactory.getObject().getCurrentSession();
