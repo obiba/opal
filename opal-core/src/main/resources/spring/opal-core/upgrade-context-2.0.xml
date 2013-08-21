@@ -35,7 +35,6 @@
   </bean>
 
   <bean id="configSessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
-    <qualifier value="opal-config"/>
     <property name="dataSource" ref="configDataSource"/>
     <property name="namingStrategy">
       <bean class="org.obiba.magma.hibernate.cfg.MagmaNamingStrategy"/>
@@ -174,12 +173,20 @@
           <property name="databaseRegistry" ref="databaseRegistry"/>
         </bean>
 
+        <!-- 2.0.0 / create config schema -->
+        <bean class="org.obiba.runtime.upgrade.support.MethodInvokingUpgradeStep">
+          <property name="description" value="Install Opal Schema."/>
+          <property name="methodOwner" ref="&amp;configSessionFactory"/>
+          <property name="methodName" value="createDatabaseSchema"/>
+          <property name="appliesTo" value="2.0.0"/>
+        </bean>
+
         <!-- 2.0.0 / move config tables -->
         <bean class="org.obiba.opal.core.runtime.upgrade.database.MoveConfigTablesUpgradeStep">
           <property name="description" value="Move config tables to config database"/>
           <property name="appliesTo" value="2.0.0"/>
+          <property name="configDataSource" ref="configDataSource"/>
           <property name="databaseRegistry" ref="databaseRegistry"/>
-          <property name="configSessionFactory" ref="&amp;sessionFactory"/>
         </bean>
 
         <!-- 2.0.0 / update Opal Configuration -->
