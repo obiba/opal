@@ -181,6 +181,15 @@
           <property name="appliesTo" value="2.0.0"/>
         </bean>
 
+        <!-- 2.0.0 / create quartz config schema -->
+        <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
+          <property name="description" value="Install Quartz Schema."/>
+          <property name="dataSource" ref="configDataSource"/>
+          <property name="scriptPath" value="classpath:/META-INF/opal/install-scripts/quartz/"/>
+          <property name="scriptBasename" value="tables"/>
+          <property name="appliesTo" value="2.0.0"/>
+        </bean>
+
         <!-- 2.0.0 / move config tables -->
         <bean class="org.obiba.opal.core.runtime.upgrade.database.MoveConfigTablesUpgradeStep">
           <property name="description" value="Move config tables to config database"/>

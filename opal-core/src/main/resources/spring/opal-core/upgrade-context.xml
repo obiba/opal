@@ -232,18 +232,19 @@
           <property name="appliesTo" value="1.14.6"/>
         </bean>
 
+        <!-- 2.0.0 / drop version table from opal-data database -->
+        <bean class="org.obiba.opal.core.runtime.upgrade.database.DeleteVersionTableUpgradeStep">
+          <property name="description"
+              value="Drop version table from previous opal-data database because it's now moved to opal-config database"/>
+          <property name="appliesTo" value="2.0.0"/>
+        </bean>
+
         <!-- 2.0.0 / extract opal_config schema -->
         <bean class="org.obiba.opal.core.runtime.upgrade.database.ExtractOpalJdbcConfigToDatabaseUpgradeStep">
           <property name="description" value="Extract database config from properties file to Opal config database"/>
           <property name="appliesTo" value="2.0.0"/>
         </bean>
 
-        <bean class="org.obiba.runtime.upgrade.support.MethodInvokingUpgradeStep">
-          <property name="description" value="Create new Opal Config Schema."/>
-          <property name="methodOwner" ref="&amp;sessionFactory"/>
-          <property name="methodName" value="createDatabaseSchema"/>
-          <property name="appliesTo" value="2.0.0"/>
-        </bean>
 
       </list>
     </property>
