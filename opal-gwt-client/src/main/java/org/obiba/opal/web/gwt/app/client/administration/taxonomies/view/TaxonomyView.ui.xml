@@ -1,53 +1,39 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
-    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns="urn:import:com.github.gwtbootstrap.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <b:FluidRow addStyleNames="page-header">
-      <b:Column size="9">
-        <b:Heading size="3">
+    <FluidRow addStyleNames="page-header">
+      <Column size="9">
+        <Heading size="3">
           <ui:msg description="Taxonomy label">Taxonomy</ui:msg>
-        </b:Heading>
-      </b:Column>
-      <b:Column size="3">
-        <b:ButtonGroup addStyleNames="pull-right">
-          <b:Button type="INFO" size="SMALL" ui:field="edit">
-            <ui:msg description="Add Taxonomy label">Edit Vocabulary</ui:msg>
-          </b:Button>
-        </b:ButtonGroup>
-        <b:ButtonGroup addStyleNames="pull-right">
-          <b:Button type="INFO" icon="PLUS" size="SMALL" ui:field="add">
+        </Heading>
+      </Column>
+      <Column size="3">
+        <ButtonGroup addStyleNames="pull-right">
+          <Button type="INFO" size="SMALL" ui:field="edit">
+            <ui:msg description="Add Taxonomy label">Edit Taxonomy</ui:msg>
+          </Button>
+        </ButtonGroup>
+        <ButtonGroup addStyleNames="pull-right">
+          <Button type="INFO" icon="PLUS" size="SMALL" ui:field="add">
             <ui:msg description="Add Taxonomy label">Add Vocabulary</ui:msg>
-          </b:Button>
-        </b:ButtonGroup>
-      </b:Column>
-    </b:FluidRow>
-    <g:FlowPanel ui:field="details">
-      <b:ControlLabel>
-        <!--<ui:msg description="Name label"/>-->
-        <ui:msg description="Title label">Title</ui:msg>
-      </b:ControlLabel>
-      <b:ControlLabel>
-        <ui:msg description="Description label">Description</ui:msg>
-      </b:ControlLabel>
-      <!--<b:ControlGroup addStyleNames="block">-->
-      <!--<b:Controls>-->
-      <!--<b:ControlLabel>-->
-      <!--<ui:msg description="Description label">Description</ui:msg>-->
-      <!--</b:ControlLabel>-->
-      <!--<b:Label>en</b:Label>-->
-      <!--<b:ControlLabel>-->
-      <!--<ui:msg description="Description label">blabla</ui:msg>-->
-      <!--</b:ControlLabel>-->
-      <!--</b:Controls>-->
-      <!--</b:ControlGroup>-->
-      <b:ControlLabel>
-        <ui:msg description="List of vocabularies">Vocabularies</ui:msg>
-      </b:ControlLabel>
-      <b:Label>en</b:Label>
+          </Button>
+        </ButtonGroup>
+      </Column>
+    </FluidRow>
+    <g:FlowPanel ui:field="titlePanel">
+      <FluidRow>
+        <Column size="1">
+          <g:InlineLabel>Title</g:InlineLabel>
+        </Column>
+        <!--<Column size="11">-->
+        <!--<o:LocalizedLabel ui:field="titlePanel"/>-->
+        <!--</Column>-->
+      </FluidRow>
     </g:FlowPanel>
     <g:FlowPanel ui:field="panel" addStyleNames="items"></g:FlowPanel>
   </g:FlowPanel>

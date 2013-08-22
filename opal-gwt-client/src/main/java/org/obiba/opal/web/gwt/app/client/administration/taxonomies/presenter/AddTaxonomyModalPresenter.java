@@ -14,7 +14,6 @@ import org.obiba.opal.web.model.client.opal.GeneralConf;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -28,7 +27,7 @@ import com.gwtplatform.mvp.client.PopupView;
 public class AddTaxonomyModalPresenter extends ModalPresenterWidget<AddTaxonomyModalPresenter.Display>
     implements AddTaxonomyModalUiHandlers {
 
-  private JsArray<TaxonomyDto> taxonomies;
+  private TaxonomyDto taxonomy;
 
   public interface Display extends PopupView, HasUiHandlers<AddTaxonomyModalUiHandlers> {
     void setAvailableLocales(List<String> locales);
@@ -73,8 +72,8 @@ public class AddTaxonomyModalPresenter extends ModalPresenterWidget<AddTaxonomyM
     return true;
   }
 
-  public void setTaxonomies(JsArray<TaxonomyDto> taxonomies) {
-    this.taxonomies = taxonomies;
+  public void setTaxonomy(TaxonomyDto taxonomy) {
+    this.taxonomy = taxonomy;
   }
 
   private void setLocales() {

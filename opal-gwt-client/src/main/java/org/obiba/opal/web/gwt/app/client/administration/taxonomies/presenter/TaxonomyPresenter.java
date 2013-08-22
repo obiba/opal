@@ -3,6 +3,7 @@ package org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter;
 import org.obiba.opal.web.gwt.app.client.administration.configuration.presenter.ConfigurationPresenter;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
@@ -29,13 +30,17 @@ public class TaxonomyPresenter extends Presenter<TaxonomyPresenter.Display, Taxo
     void setTaxonomy(TaxonomyDto taxonomyDto);
   }
 
-  private TaxonomyDto taxonomy;
+  private final ModalProvider<AddTaxonomyModalPresenter> addTaxonomyModalProvider;
 
   private String name;
 
+  private TaxonomyDto taxonomy;
+
   @Inject
-  public TaxonomyPresenter(Display display, EventBus eventBus, Proxy proxy) {
+  public TaxonomyPresenter(Display display, EventBus eventBus, Proxy proxy,
+      ModalProvider<AddTaxonomyModalPresenter> addTaxonomyModalProvider) {
     super(eventBus, display, proxy, ConfigurationPresenter.CONTENT);
+    this.addTaxonomyModalProvider = addTaxonomyModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -64,7 +69,9 @@ public class TaxonomyPresenter extends Presenter<TaxonomyPresenter.Display, Taxo
 
   @Override
   public void showEditTaxonomy() {
-    //To change body of implemented methods use File | Settings | File Templates.
+    AddTaxonomyModalPresenter presenter = addTaxonomyModalProvider.get();
+    presenter.setTaxonomy(taxonomy);
+//    presenter.setTaxonomies(taxonomies);
   }
 
 }

@@ -102,6 +102,6 @@ public class TaxonomiesPresenter extends Presenter<TaxonomiesPresenter.Display, 
   @Override
   public void showAddTaxonomy() {
     AddTaxonomyModalPresenter presenter = addTaxonomyModalProvider.get();
-    presenter.setTaxonomies(taxonomies);
+//    presenter.setTaxonomies(taxonomies);
   }
 }

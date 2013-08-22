@@ -3,8 +3,8 @@ package org.obiba.opal.web.gwt.app.client.administration.taxonomies.view;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomyPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomyUiHandlers;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.ui.LocalizedLabel;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
-import org.obiba.opal.web.model.client.opal.TaxonomyDto.TextDto;
 
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.NavPills;
@@ -15,8 +15,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.InlineLabel;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
@@ -27,6 +25,9 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
 
   @UiField
   FlowPanel panel;
+
+  @UiField
+  FlowPanel titlePanel;
 
   private TaxonomyDto taxonomy;
 
@@ -60,12 +61,19 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
 
     panel.setTitle(taxonomy.getName());
 
-    for(TextDto title : JsArrays.toIterable(taxonomy.getTitlesArray())) {
-      Label locale = new Label(title.getLocale());
-      InlineLabel text = new InlineLabel(title.getText());
-      panel.add(locale);
-      panel.add(text);
-    }
+    LocalizedLabel label = new LocalizedLabel();
+//    label.setWidgetTitle("Title");
+    label.setLocale("en");
+    label.setText("Enfin:)");
+
+    titlePanel.add(label);
+    panel.add(titlePanel);
+//    for(TaxonomyDto.TextDto title : JsArrays.toIterable(taxonomy.getTitlesArray())) {
+//      Label locale = new Label(title.getLocale());
+//      InlineLabel text = new InlineLabel(title.getText());
+//      panel.add(locale);
+//      panel.add(text);
+//    }
 
     FlowPanel vocabulariesPanel = new FlowPanel();
     vocabulariesPanel.addStyleName("item");
