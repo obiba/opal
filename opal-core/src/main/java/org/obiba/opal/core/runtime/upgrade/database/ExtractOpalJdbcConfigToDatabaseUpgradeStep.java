@@ -80,6 +80,7 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
     extractOpalDatasource();
     importExtraDatasources();
     deleteJdbcDataSourcesFromConfig();
+    deleteHibernateDatasourceFactoryFromConfig();
     commentDeprecatedProperties();
   }
 
@@ -225,6 +226,40 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
       XPath xPath = XPathFactory.newInstance().newXPath();
       Node node = (Node) xPath
           .compile("//org.obiba.opal.core.runtime.jdbc.DefaultJdbcDataSourceRegistry_-JdbcDataSourcesConfig")
+          .evaluate(doc.getDocumentElement(), XPathConstants.NODE);
+      node.getParentNode().removeChild(node);
+      Transformer transformer = TransformerFactory.newInstance().newTransformer();
+      transformer.transform(new DOMSource(doc), new StreamResult(configFile));
+    } catch(TransformerConfigurationException e) {
+      throw new RuntimeException(e);
+    } catch(SAXException e) {
+      throw new RuntimeException(e);
+    } catch(ParserConfigurationException e) {
+      throw new RuntimeException(e);
+    } catch(XPathExpressionException e) {
+      throw new RuntimeException(e);
+    } catch(TransformerException e) {
+      throw new RuntimeException(e);
+    } catch(IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  //  <factories>
+//    <org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
+//      <name>opal-data</name>
+//      <sessionFactoryProvider class="org.obiba.magma.datasource.hibernate.support.SpringBeanSessionFactoryProvider">
+//        <beanName>opalSessionFactory</beanName>
+//      </sessionFactoryProvider>
+//    </org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
+//  </factories>
+  private void deleteHibernateDatasourceFactoryFromConfig() {
+    log.debug("Delete opal-data HibernateDatasourceFactory from config file");
+    try {
+      Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(configFile);
+      XPath xPath = XPathFactory.newInstance().newXPath();
+      Node node = (Node) xPath
+          .compile("//org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory[name='opal-data']")
           .evaluate(doc.getDocumentElement(), XPathConstants.NODE);
       log.debug("node: {}", node);
       node.getParentNode().removeChild(node);
