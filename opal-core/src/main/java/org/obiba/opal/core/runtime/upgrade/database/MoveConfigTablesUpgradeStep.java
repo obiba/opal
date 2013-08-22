@@ -11,6 +11,9 @@ import javax.sql.DataSource;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
+import org.obiba.runtime.upgrade.support.VersionTableInstallStep;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -20,12 +23,17 @@ import static org.springframework.util.StringUtils.collectionToDelimitedString;
 
 public class MoveConfigTablesUpgradeStep extends AbstractUpgradeStep {
 
-  private static final String[] TABLES = { "user", "groups", "user_groups", "database_sql", "database_mongodb",
-      "unit_key_store", "subject_acl" };
+  private static final Logger log = LoggerFactory.getLogger(MoveConfigTablesUpgradeStep.class);
 
-  // order is important because of foreign keys
+  private static final String[] TABLES = { "user", "groups", "user_groups", "database_sql", "database_mongodb",
+      "unit_key_store", "subject_acl", "version", "QRTZ_BLOB_TRIGGERS", "QRTZ_CALENDARS", "QRTZ_CRON_TRIGGERS",
+      "QRTZ_FIRED_TRIGGERS", "QRTZ_JOB_DETAILS", "QRTZ_JOB_LISTENERS", "QRTZ_PAUSED_TRIGGER_GRPS",
+      "QRTZ_SCHEDULER_STATE", "QRTZ_SIMPLE_TRIGGERS", "QRTZ_TRIGGER_LISTENERS", "QRTZ_TRIGGERS" };
+
   private static final String[] DELETE_TABLES = { "user_groups", "user", "groups", "database_sql", "database_mongodb",
-      "unit_key_store", "subject_acl" };
+      "unit_key_store", "subject_acl", "QRTZ_BLOB_TRIGGERS", "QRTZ_CALENDARS", "QRTZ_CRON_TRIGGERS",
+      "QRTZ_FIRED_TRIGGERS", "QRTZ_JOB_LISTENERS", "QRTZ_PAUSED_TRIGGER_GRPS", "QRTZ_SCHEDULER_STATE",
+      "QRTZ_SIMPLE_TRIGGERS", "QRTZ_TRIGGER_LISTENERS", "QRTZ_TRIGGERS", "QRTZ_JOB_DETAILS", "QRTZ_LOCKS" };
 
   private DatabaseRegistry databaseRegistry;
 
@@ -35,15 +43,22 @@ public class MoveConfigTablesUpgradeStep extends AbstractUpgradeStep {
   public void execute(Version currentVersion) {
     JdbcTemplate dataJdbcTemplate = new JdbcTemplate(databaseRegistry.getDataSource("opal-data", null));
     JdbcTemplate configJdbcTemplate = new JdbcTemplate(configDataSource);
+
+    // create version table
+    VersionTableInstallStep versionTableStep = new VersionTableInstallStep();
+    versionTableStep.setDataSource(configDataSource);
+    versionTableStep.execute(null);
+
     for(String table : TABLES) {
       copyTable(table, dataJdbcTemplate, configJdbcTemplate);
     }
+    // do not delete version table here
     for(String table : DELETE_TABLES) {
       dataJdbcTemplate.execute("drop table " + table);
     }
   }
 
-  private void copyTable(String table, JdbcTemplate dataJdbcTemplate, JdbcTemplate configJdbcTemplate) {
+  private void copyTable(final String table, JdbcTemplate dataJdbcTemplate, JdbcTemplate configJdbcTemplate) {
     final List<Map<String, Object>> rows = dataJdbcTemplate.queryForList("select * from " + table);
 
     if(!rows.isEmpty()) {
@@ -55,6 +70,7 @@ public class MoveConfigTablesUpgradeStep extends AbstractUpgradeStep {
         @Override
         public void setValues(PreparedStatement ps, int i) throws SQLException {
           Map<String, Object> row = rows.get(i);
+          log.debug("{} row {}: {}", table, i, row);
           for(int colIndex = 0; colIndex < columns.size(); colIndex++) {
             ps.setObject(colIndex + 1, row.get(columns.get(colIndex)));
           }
