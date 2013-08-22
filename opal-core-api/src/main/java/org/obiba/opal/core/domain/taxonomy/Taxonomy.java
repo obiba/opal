@@ -17,7 +17,7 @@ import javax.annotation.Nullable;
 import com.google.common.collect.Lists;
 
 /**
- * A taxonomy is a set of vocabularies that allows to describe the attributes.
+ * A taxonomies is a set of vocabularies that allows to describe the attributes.
  */
 public class Taxonomy {
 

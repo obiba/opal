@@ -1,0 +1,20 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator">
+
+  <g:FlowPanel ui:field="panel">
+    <b:ControlLabel>
+      <ui:msg description="Title label">Title</ui:msg>
+    </b:ControlLabel>
+    <b:TextBox ui:field="titleTxt"/>
+    <b:HelpBlock>Optional taxonomy title</b:HelpBlock>
+    <b:ControlLabel>
+      <ui:msg description="Description label">Description</ui:msg>
+    </b:ControlLabel>
+    <b:TextArea ui:field="descriptionTxt" alternateSize="XLARGE" visibleLines="3"/>
+    <b:HelpBlock>Optional description of the taxonomy.</b:HelpBlock>
+  </g:FlowPanel>
+
+</ui:UiBinder>

@@ -463,7 +463,7 @@ public final class Dtos {
       vocabularies.add(fromDto(v));
     }
     taxonomy.setVocabularies(vocabularies);
-    return new Taxonomy(dto.getName());
+    return taxonomy;
   }
 
   public static TaxonomyDto.TextDto asDto(Text text) {

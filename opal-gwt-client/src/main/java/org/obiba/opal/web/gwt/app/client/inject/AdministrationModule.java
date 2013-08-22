@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.gwt.app.client.inject;
 
+import org.obiba.opal.web.gwt.app.client.administration.configuration.presenter.ConfigurationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.configuration.view.ConfigurationView;
+import org.obiba.opal.web.gwt.app.client.administration.configuration.presenter.ConfigurationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabasePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.view.DatabaseAdministrationView;
@@ -40,6 +43,12 @@ import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrat
 import org.obiba.opal.web.gwt.app.client.administration.r.view.RAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.server.presenter.ServerPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.server.view.ServerView;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.AddTaxonomyModalPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomiesPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomyPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.AddTaxonomyModalView;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomiesView;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomyView;
 import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.user.view.UserAdministrationView;
@@ -97,6 +106,20 @@ public class AdministrationModule extends AbstractPresenterModule {
 
     bindPresenter(FilesAdministrationPresenter.class, FilesAdministrationPresenter.Display.class,
         FilesAdministrationView.class, FilesAdministrationPresenter.Proxy.class);
+    
+    bindPresenter(ConfigurationPresenter.class, ConfigurationPresenter.Display.class, ConfigurationView.class,
+        ConfigurationPresenter.Proxy.class);
+
+    // Taxonomies
+    bindPresenter(TaxonomiesPresenter.class, TaxonomiesPresenter.Display.class, TaxonomiesView.class,
+        TaxonomiesPresenter.Proxy.class);
+    bindPresenterWidget(AddTaxonomyModalPresenter.class, AddTaxonomyModalPresenter.Display.class,
+        AddTaxonomyModalView.class);
+
+    //Taxonomy
+    bindPresenter(TaxonomyPresenter.class, TaxonomyPresenter.Display.class, TaxonomyView.class,
+        TaxonomyPresenter.Proxy.class);
+
   }
 
 }

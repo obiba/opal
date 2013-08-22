@@ -2124,4 +2124,16 @@ public interface Translations extends Constants {
   @Description("Report templates header")
   @DefaultStringValue("{0} Reports")
   String reportTemplatesHeader();
+
+  @Description("Page Configuration title")
+  @DefaultStringValue("Configuration")
+  String pageConfigurationTitle();
+
+  @Description("Page Taxonomies title")
+  @DefaultStringValue("Taxonomies")
+  String pageTaxonomiesTitle();
+
+  @Description("Add Taxonomy label")
+  @DefaultStringValue("Add Taxonomy")
+  String addTaxonomy();
 }
