@@ -13,12 +13,12 @@ import javax.annotation.Nonnull;
 
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory;
-import org.obiba.magma.datasource.hibernate.support.SpringBeanSessionFactoryProvider;
+import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
+import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.HibernateDatasourceFactoryDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,32 +27,36 @@ import org.springframework.stereotype.Component;
 @Component
 public class HibernateDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoParser {
 
-  private final ApplicationContext applicationContext;
-
   private final DatabaseRegistry databaseRegistry;
 
+  private final IdentifiersTableService identifiersTableService;
+
   @Autowired
-  public HibernateDatasourceFactoryDtoParser(ApplicationContext applicationContext, DatabaseRegistry databaseRegistry) {
-    this.applicationContext = applicationContext;
+  public HibernateDatasourceFactoryDtoParser(IdentifiersTableService identifiersTableService,
+      DatabaseRegistry databaseRegistry) {
+    this.identifiersTableService = identifiersTableService;
     this.databaseRegistry = databaseRegistry;
   }
 
   @Nonnull
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
-    HibernateDatasourceFactory factory = new HibernateDatasourceFactory();
-    HibernateDatasourceFactoryDto hDto = dto.getExtension(HibernateDatasourceFactoryDto.params);
-    if(hDto.getKey()) {
-      factory.setSessionFactoryProvider(new SpringBeanSessionFactoryProvider(applicationContext, "keySessionFactory"));
-    } else {
-      if(hDto.hasDatabase()) {
-        factory.setSessionFactoryProvider(
-            new DatabaseSessionFactoryProvider(dto.getName(), databaseRegistry, hDto.getDatabase()));
-      } else {
-        factory
-            .setSessionFactoryProvider(new SpringBeanSessionFactoryProvider(applicationContext, "opalSessionFactory"));
+    DatabaseSessionFactoryProvider sessionFactoryProvider = null;
+    HibernateDatasourceFactoryDto factoryDto = dto.getExtension(HibernateDatasourceFactoryDto.params);
+    if(factoryDto.getKey()) {
+      Database identifiersDatabase = databaseRegistry.getIdentifiersDatabase();
+      if(identifiersDatabase == null) {
+        throw new RuntimeException("There is no identifiers database configured!");
       }
+      sessionFactoryProvider = new DatabaseSessionFactoryProvider(identifiersTableService.getDatasourceName(),
+          databaseRegistry, identifiersDatabase.getName());
+    } else {
+      // fallback to default settings
+      String database = factoryDto.hasDatabase() ? factoryDto.getDatabase() : "opal-data";
+      sessionFactoryProvider = new DatabaseSessionFactoryProvider(dto.getName(), databaseRegistry, database);
     }
+    HibernateDatasourceFactory factory = new HibernateDatasourceFactory();
+    factory.setSessionFactoryProvider(sessionFactoryProvider);
     factory.setName(dto.getName());
     return factory;
   }
