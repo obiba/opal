@@ -1,7 +1,9 @@
 package org.obiba.opal.web.gwt.app.client.administration.taxonomies.view;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.AddVocabularyModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.AddVocabularyModalUiHandlers;
@@ -52,7 +54,7 @@ public class AddVocabularyModalView extends ModalPopupViewWithUiHandlers<AddVoca
   HasText nameTxt;
 
   @UiField
-  Chooser taxonomies;
+  Chooser chooser;
 
   @UiField
   TabPanel localesTabs;
@@ -64,7 +66,7 @@ public class AddVocabularyModalView extends ModalPopupViewWithUiHandlers<AddVoca
 
   private List<TaxonomiesOrVocabulariesModalPanel> panelList;
 
-  private JsArray<TaxonomyDto> taxonomiesList;
+  private final Map<String, TaxonomyDto> taxonomies = new HashMap<String, TaxonomyDto>();
 
   private TaxonomyDto taxonomy;
 
@@ -76,7 +78,7 @@ public class AddVocabularyModalView extends ModalPopupViewWithUiHandlers<AddVoca
   public AddVocabularyModalView(EventBus eventBus) {
     super(eventBus);
     uiBinder.createAndBindUi(this);
-    modal.setTitle(translations.addTaxonomy());
+    modal.setTitle(translations.addVocabulary());
   }
 
   @Override
@@ -95,27 +97,43 @@ public class AddVocabularyModalView extends ModalPopupViewWithUiHandlers<AddVoca
   }
 
   @Override
-  public void setEditionMode(boolean edit, TaxonomyDto taxonomyDto, TaxonomyDto.VocabularyDto vocabularyDto) {
+  public void setEditionMode(boolean edit, JsArray<TaxonomyDto> taxonomiesList, TaxonomyDto taxonomy,
+      TaxonomyDto.VocabularyDto vocabulary) {
     editionMode = edit;
-    taxonomy = taxonomyDto;
-    vocabulary = vocabularyDto;
+    this.taxonomy = taxonomy;
+    this.vocabulary = vocabulary;
   }
 
   @Override
   public void setTaxonomies(JsArray<TaxonomyDto> taxonomiesList) {
-    this.taxonomiesList = taxonomiesList;
     for(int i = 0; i < taxonomiesList.length(); i++) {
-      taxonomies.addItem(taxonomiesList.get(i).getName());
+      taxonomies.put(taxonomiesList.get(i).getName(), taxonomiesList.get(i));
+      chooser.addItem(taxonomiesList.get(i).getName());
     }
   }
 
   @UiHandler("save")
-  void onSaveTaxonomy(ClickEvent event) {
-    TaxonomyDto taxonomyDto = TaxonomyDto.create();
-    GWT.log("onSaveTaxonomy() " + taxonomies.getSelectedValue());
-    taxonomyDto.setName(taxonomies.getSelectedValue());
+    //TODO
+  void onSaveVocabulary(ClickEvent event) {
+    TaxonomyDto taxonomyDto;
+    taxonomyDto = chooser.getSelectedValue().equals(taxonomy.getName())
+        ? taxonomy
+        : taxonomies.get(chooser.getSelectedValue());
 
     VocabularyDto vocabularyDto = VocabularyDto.create();
+    vocabularyDto.setName(nameTxt.getText());
+    vocabularyDto = setTitleAndDescription(vocabularyDto);
+    vocabularyDto.setRepeatable(isRepeatable.getValue());
+
+    if(editionMode) vocabularyDto.setTermsArray(vocabulary.getTermsArray());
+    taxonomyDto.getVocabulariesArray().push(vocabularyDto); //TODO gerer la duplication
+
+    if(getUiHandlers().addTaxonomyNewVocabulary(taxonomyDto)) {
+      modal.hide();
+    }
+  }
+
+  private VocabularyDto setTitleAndDescription(VocabularyDto vocabularyDto) {
     JsArray<TaxonomyDto.TextDto> titles = JsArrays.create();
     JsArray<TaxonomyDto.TextDto> descriptions = JsArrays.create();
 
@@ -127,19 +145,9 @@ public class AddVocabularyModalView extends ModalPopupViewWithUiHandlers<AddVoca
         descriptions.push(asTextDto(panelList.get(i).getDescriptionTxt(), availableLocales.get(i)));
       }
     }
-    GWT.log("Titles: " + titles.join(", "));
-    vocabularyDto.setName(nameTxt.getText());
-    vocabularyDto.setTitlesArray(JsArrays.toSafeArray(titles));
+    vocabularyDto.setTitlesArray(titles);
     vocabularyDto.setDescriptionsArray(descriptions);
-    vocabularyDto.setRepeatable(isRepeatable.getValue());
-
-    if(editionMode) vocabularyDto.setTermsArray(vocabulary.getTermsArray());
-    taxonomyDto.setVocabulariesArray(taxonomy.getVocabulariesArray());
-    taxonomyDto.addVocabularies(vocabularyDto);
-
-    if(getUiHandlers().addTaxonomyNewVocabulary(taxonomyDto)) {
-      modal.hide();
-    }
+    return vocabularyDto;
   }
 
   private TaxonomyDto.TextDto asTextDto(String text, String locale) {
@@ -159,7 +167,7 @@ public class AddVocabularyModalView extends ModalPopupViewWithUiHandlers<AddVoca
       nameTxt.setText(vocabulary.getName());
       isRepeatable.setValue(vocabulary.getRepeatable());
     }
-    taxonomies.setSelectedValue(taxonomy.getName());
+//    taxonomies.setSelectedValue(taxonomy.getName());
     panelList = new ArrayList<TaxonomiesOrVocabulariesModalPanel>(availableLocales.size());
     createLocaleTabs();
   }

@@ -53,7 +53,7 @@
     <g:FlowPanel>
       <FluidRow>
         <Column size="1">
-          <b:Heading size="5">Taxonomy</b:Heading>
+          <b:Heading size="5">Taxonomy:</b:Heading>
         </Column>
         <b:Column size="11">
           <g:InlineLabel ui:field="taxonomyName"/>

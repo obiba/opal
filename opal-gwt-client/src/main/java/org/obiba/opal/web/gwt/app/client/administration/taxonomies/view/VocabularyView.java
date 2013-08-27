@@ -70,7 +70,7 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
       termsPanel.clear();
       isRepeatable.setValue(false);
     } else {
-      redraw();
+      draw();
     }
   }
 
@@ -89,7 +89,7 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
     getUiHandlers().showAddTerm(taxonomy, vocabulary);
   }
 
-  private void redraw() {
+  private void draw() {
     titlePanel.clear();
     descriptionPanel.clear();
     termsPanel.clear();

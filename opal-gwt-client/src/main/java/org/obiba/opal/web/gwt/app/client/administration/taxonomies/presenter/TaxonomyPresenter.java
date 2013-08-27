@@ -93,7 +93,8 @@ public class TaxonomyPresenter extends Presenter<TaxonomyPresenter.Display, Taxo
 
   @Override
   public void showAddVocabulary(TaxonomyDto taxonomyDto) {
-    addVocabularyModalProvider.get();
+    AddVocabularyModalPresenter presenter = addVocabularyModalProvider.get();
+    presenter.setTaxonomy(taxonomy);
   }
 
   @Override

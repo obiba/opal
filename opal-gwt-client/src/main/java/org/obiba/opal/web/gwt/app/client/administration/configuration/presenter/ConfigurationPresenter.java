@@ -2,8 +2,8 @@ package org.obiba.opal.web.gwt.app.client.administration.configuration.presenter
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
-import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 
 import com.google.gwt.core.client.GWT;
@@ -45,7 +45,7 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
   @Inject
   public ConfigurationPresenter(Display display, EventBus eventBus, Proxy proxy, PlaceManager placeManager,
       BreadcrumbsBuilder breadcrumbsBuilder) {
-    super(eventBus, display, proxy, PageContainerPresenter.CONTENT);
+    super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     this.placeManager = placeManager;
     this.breadcrumbsBuilder = breadcrumbsBuilder;
     getView().setUiHandlers(this);

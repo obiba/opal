@@ -13,9 +13,6 @@ public class LocalizedLabel extends Composite {
   interface LocalizedLabelUiBinder extends UiBinder<Widget, LocalizedLabel> {}
 
   private static final LocalizedLabelUiBinder uiBinder = GWT.create(LocalizedLabelUiBinder.class);
-//
-//  @UiField
-//  InlineLabel title;
 
   @UiField
   Label locale;
@@ -26,10 +23,6 @@ public class LocalizedLabel extends Composite {
   public LocalizedLabel() {
     initWidget(uiBinder.createAndBindUi(this));
   }
-
-//  public void setWidgetTitle(String title) {
-//    this.title.setText(title);
-//  }
 
   public void setLocale(String locale) {
     this.locale.setText(locale);

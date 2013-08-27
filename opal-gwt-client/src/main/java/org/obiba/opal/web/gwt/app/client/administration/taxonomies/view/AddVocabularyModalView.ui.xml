@@ -20,7 +20,7 @@
         <b:ControlLabel>
           <ui:msg description="Add Taxonomy Modal Name ">Taxonomy</ui:msg>
         </b:ControlLabel>
-        <o:Chooser ui:field="taxonomies"/>
+        <o:Chooser ui:field="chooser"/>
         <!--<b:DropdownButton ui:field="taxonomies"/>-->
         <b:HelpBlock>Taxonomy name</b:HelpBlock>
       </b:ControlGroup>

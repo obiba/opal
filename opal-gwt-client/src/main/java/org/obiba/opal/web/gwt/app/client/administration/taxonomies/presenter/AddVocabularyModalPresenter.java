@@ -30,7 +30,8 @@ public class AddVocabularyModalPresenter extends ModalPresenterWidget<AddVocabul
   public interface Display extends PopupView, HasUiHandlers<AddVocabularyModalUiHandlers> {
     void setAvailableLocales(List<String> locales);
 
-    void setEditionMode(boolean edit, TaxonomyDto taxonomyDto, VocabularyDto vocabularyDto);
+    void setEditionMode(boolean edit, JsArray<TaxonomyDto> taxonomiesList, TaxonomyDto taxonomyDto,
+        VocabularyDto vocabularyDto);
 
     void setTaxonomies(JsArray<TaxonomyDto> taxonomiesList);
   }
@@ -69,7 +70,11 @@ public class AddVocabularyModalPresenter extends ModalPresenterWidget<AddVocabul
   }
 
   public void setEditionMode(TaxonomyDto taxonomyDto, VocabularyDto vocabularyDto) {
-    getView().setEditionMode(true, taxonomyDto, vocabularyDto);
+    getView().setEditionMode(true, taxonomiesList, taxonomyDto, vocabularyDto);
+  }
+
+  public void setTaxonomy(TaxonomyDto taxonomyDto) {
+    getView().setEditionMode(false, taxonomiesList, taxonomyDto, null);
   }
 
   private void setTaxonomies() {
