@@ -31,9 +31,7 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -195,10 +193,10 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       magmaPresenter = magmaPresenterProvider.get();
       setInSlot(TABLES_PANE, magmaPresenter);
     }
-    if(!Strings.isNullOrEmpty(path)) {
-      fireEvent(new MagmaPathSelectionEvent(this, path));
-    } else {
+    if(Strings.isNullOrEmpty(path)) {
       fireEvent(new MagmaPathSelectionEvent(this, project.getDatasource().getName()));
+    } else {
+      fireEvent(new MagmaPathSelectionEvent(this, path));
     }
   }
 
@@ -254,7 +252,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     if(!Strings.isNullOrEmpty(tab)) {
       try {
         return Display.ProjectTab.valueOf(tab);
-      } catch(IllegalArgumentException e) {
+      } catch(IllegalArgumentException ignored) {
       }
     }
 

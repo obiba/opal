@@ -31,7 +31,7 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.AclAction;
-import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
+import org.obiba.opal.web.model.client.opal.DatabaseDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -60,7 +60,6 @@ import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_
 public class DatabaseAdministrationPresenter extends
     ItemAdministrationPresenter<DatabaseAdministrationPresenter.Display, DatabaseAdministrationPresenter.Proxy> {
 
-
   @ProxyStandard
   @NameToken(Places.databases)
   public interface Proxy extends ProxyPlace<DatabaseAdministrationPresenter> {}
@@ -73,21 +72,21 @@ public class DatabaseAdministrationPresenter extends
       Drivers, Permissions, Header
     }
 
-    HasActionHandler<JdbcDataSourceDto> getActions();
+    HasActionHandler<DatabaseDto> getActions();
 
     HasClickHandlers getAddButton();
 
     HasAuthorization getPermissionsAuthorizer();
 
-    HasData<JdbcDataSourceDto> getDatabaseTable();
+    HasData<DatabaseDto> getDatabaseTable();
   }
 
   private final ModalProvider<DatabasePresenter> databaseModalProvider;
 
   private final AuthorizationPresenter authorizationPresenter;
 
-  private final ResourceDataProvider<JdbcDataSourceDto> resourceDataProvider
-      = new ResourceDataProvider<JdbcDataSourceDto>(Resources.databases());
+  private final ResourceDataProvider<DatabaseDto> resourceDataProvider = new ResourceDataProvider<DatabaseDto>(
+      Resources.sqlDatabases());
 
   private final BreadcrumbsBuilder breadcrumbsBuilder;
 
@@ -106,13 +105,13 @@ public class DatabaseAdministrationPresenter extends
   @ProxyEvent
   @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(Resources.databases()).post()
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(Resources.sqlDatabases()).post()
         .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListDatabasesAuthorization())).send();
   }
 
   @Override
   public String getName() {
-    return "Databases";
+    return "SQL Databases";
   }
 
   @Override
@@ -127,7 +126,7 @@ public class DatabaseAdministrationPresenter extends
 
   @Override
   public void authorize(HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(Resources.databases()).post()
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(Resources.sqlDatabases()).post()
         .authorize(authorizer).send();
   }
 
@@ -167,16 +166,30 @@ public class DatabaseAdministrationPresenter extends
 
     breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs());
 
-    getView().getActions().setActionHandler(new ActionHandler<JdbcDataSourceDto>() {
+    getView().getActions().setActionHandler(new ActionHandler<DatabaseDto>() {
 
       @Override
-      public void doAction(final JdbcDataSourceDto object, String actionName) {
+      public void doAction(final DatabaseDto object, String actionName) {
         if(object.getEditable() && actionName.equalsIgnoreCase(DELETE_ACTION)) {
           getEventBus().fireEvent(ConfirmationRequiredEvent.createWithKeys(confirmedCommand = new Command() {
             @Override
             public void execute() {
               deleteDatabase(object);
             }
+
+            private void deleteDatabase(DatabaseDto database) {
+              ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder()
+                  .forResource(Resources.database(database.getName()))
+                  .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+
+                    @Override
+                    public void onResponseCode(Request request, Response response) {
+                      refresh();
+                    }
+
+                  }).delete().send();
+            }
+
           }, "deleteDatabase", "confirmDeleteDatabase"));
         } else if(object.getEditable() && actionName.equalsIgnoreCase(EDIT_ACTION)) {
           DatabasePresenter dialog = databaseModalProvider.get();
@@ -186,7 +199,7 @@ public class DatabaseAdministrationPresenter extends
 
             @Override
             public void onResponseCode(Request request, Response response) {
-              if(response.getStatusCode() == 200) {
+              if(response.getStatusCode() == Response.SC_OK) {
                 getEventBus()
                     .fireEvent(NotificationEvent.Builder.newNotification().info("DatabaseConnectionOk").build());
               } else {
@@ -198,9 +211,10 @@ public class DatabaseAdministrationPresenter extends
             }
 
           };
-          ResourceRequestBuilderFactory.<JsArray<JdbcDataSourceDto>>newBuilder()//
+          ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder()//
               .forResource(Resources.database(object.getName(), "connections")).accept("application/json")//
-              .withCallback(200, callback).withCallback(503, callback).post().send();
+              .withCallback(Response.SC_OK, callback).withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).post()
+              .send();
         }
       }
 
@@ -216,19 +230,8 @@ public class DatabaseAdministrationPresenter extends
 
     }));
 
-    authorizationPresenter.setAclRequest("databases", new AclRequest(AclAction.DATABASES_ALL, Resources.databases()));
-  }
-
-  private void deleteDatabase(JdbcDataSourceDto database) {
-    ResourceRequestBuilderFactory.<JsArray<JdbcDataSourceDto>>newBuilder()
-        .forResource(Resources.database(database.getName())).withCallback(200, new ResponseCodeCallback() {
-
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        refresh();
-      }
-
-    }).delete().send();
+    authorizationPresenter
+        .setAclRequest("databases", new AclRequest(AclAction.DATABASES_ALL, Resources.sqlDatabases()));
   }
 
   private void refresh() {

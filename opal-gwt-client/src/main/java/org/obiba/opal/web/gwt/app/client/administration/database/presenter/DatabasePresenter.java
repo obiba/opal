@@ -22,8 +22,9 @@ import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
+import org.obiba.opal.web.model.client.opal.DatabaseDto;
 import org.obiba.opal.web.model.client.opal.JdbcDriverDto;
+import org.obiba.opal.web.model.client.opal.SqlDatabaseDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
@@ -33,16 +34,14 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Display>
-    implements DatabaseUiHandlers {
-
-  private Mode dialogMode;
+public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Display> implements DatabaseUiHandlers {
 
   public enum Mode {
     CREATE, UPDATE
   }
+
+  private Mode dialogMode;
 
   private MethodValidationHandler methodValidationHandler;
 
@@ -54,10 +53,13 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
 
   @Override
   public void save() {
-    if(dialogMode == Mode.CREATE) {
-      createDatabase();
-    } else if(dialogMode == Mode.UPDATE) {
-      updateDatabase();
+    switch(dialogMode) {
+      case CREATE:
+        createDatabase();
+        break;
+      case UPDATE:
+        updateDatabase();
+        break;
     }
   }
 
@@ -99,18 +101,19 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
    *
    * @param dto method to update
    */
-  public void updateDatabase(JdbcDataSourceDto dto) {
+  public void updateDatabase(DatabaseDto dto) {
     setDialogMode(Mode.UPDATE);
     displayDatabase(dto.getName(), dto);
   }
 
-  private void displayDatabase(String name, JdbcDataSourceDto dto) {
+  private void displayDatabase(String name, DatabaseDto dto) {
+    SqlDatabaseDto sqlDatabaseDto = (SqlDatabaseDto) dto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings);
     getView().getName().setText(name);
-    getView().getDriver().setText(dto.getDriverClass());
-    getView().getUrl().setText(dto.getUrl());
-    getView().getUsername().setText(dto.getUsername());
-    getView().getPassword().setText(dto.getPassword());
-    getView().getProperties().setText(dto.getProperties());
+    getView().getDriver().setText(sqlDatabaseDto.getDriverClass());
+    getView().getUrl().setText(sqlDatabaseDto.getUrl());
+    getView().getUsername().setText(sqlDatabaseDto.getUsername());
+    getView().getPassword().setText(sqlDatabaseDto.getPassword());
+    getView().getProperties().setText(sqlDatabaseDto.getProperties());
   }
 
   private void updateDatabase() {
@@ -121,39 +124,43 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
 
   private void createDatabase() {
     if(methodValidationHandler.validate()) {
-      ResourceRequestBuilderFactory.<JdbcDataSourceDto>newBuilder()
+      ResourceRequestBuilderFactory.<DatabaseDto>newBuilder()
           .forResource(Resources.database(getView().getName().getText())).get()//
           .withCallback(new AlreadyExistMethodCallBack())//
           .withCallback(Response.SC_NOT_FOUND, new CreateMethodCallBack()).send();
     }
   }
 
-  private void postDatabase(JdbcDataSourceDto dto) {
+  private void postDatabase(DatabaseDto dto) {
     ResponseCodeCallback callbackHandler = new CreateOrUpdateMethodCallBack(dto);
-    ResourceRequestBuilderFactory.newBuilder().forResource(Resources.databases()).post()//
-        .withResourceBody(JdbcDataSourceDto.stringify(dto))//
+    ResourceRequestBuilderFactory.newBuilder().forResource(Resources.sqlDatabases()).post()//
+        .withResourceBody(DatabaseDto.stringify(dto))//
         .withCallback(Response.SC_OK, callbackHandler)//
         .withCallback(Response.SC_CREATED, callbackHandler)//
         .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
   }
 
-  private void putDatabase(JdbcDataSourceDto dto) {
+  private void putDatabase(DatabaseDto dto) {
     ResponseCodeCallback callbackHandler = new CreateOrUpdateMethodCallBack(dto);
     ResourceRequestBuilderFactory.newBuilder().forResource(Resources.database(getView().getName().getText())).put()//
-        .withResourceBody(JdbcDataSourceDto.stringify(dto))//
+        .withResourceBody(DatabaseDto.stringify(dto))//
         .withCallback(Response.SC_OK, callbackHandler)//
         .withCallback(Response.SC_CREATED, callbackHandler)//
         .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
   }
 
-  private JdbcDataSourceDto getJdbcDataSourceDto() {
-    JdbcDataSourceDto dto = JdbcDataSourceDto.create();
+  private DatabaseDto getJdbcDataSourceDto() {
+    DatabaseDto dto = DatabaseDto.create();
+    SqlDatabaseDto sqlDto = SqlDatabaseDto.create();
+
     dto.setName(getView().getName().getText());
-    dto.setUrl(getView().getUrl().getText());
-    dto.setDriverClass(getView().getDriver().getText());
-    dto.setUsername(getView().getUsername().getText());
-    dto.setPassword(getView().getPassword().getText());
-    dto.setProperties(getView().getProperties().getText());
+    sqlDto.setUrl(getView().getUrl().getText());
+    sqlDto.setDriverClass(getView().getDriver().getText());
+    sqlDto.setUsername(getView().getUsername().getText());
+    sqlDto.setPassword(getView().getPassword().getText());
+    sqlDto.setProperties(getView().getProperties().getText());
+
+    dto.setExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings, sqlDto);
     return dto;
   }
 
@@ -183,10 +190,10 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
 
   }
 
-  private class AlreadyExistMethodCallBack implements ResourceCallback<JdbcDataSourceDto> {
+  private class AlreadyExistMethodCallBack implements ResourceCallback<DatabaseDto> {
 
     @Override
-    public void onResource(Response response, JdbcDataSourceDto resource) {
+    public void onResource(Response response, DatabaseDto resource) {
       getEventBus().fireEvent(NotificationEvent.newBuilder().error("DatabaseAlreadyExists").build());
     }
 
@@ -202,9 +209,9 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
 
   private class CreateOrUpdateMethodCallBack implements ResponseCodeCallback {
 
-    JdbcDataSourceDto dto;
+    DatabaseDto dto;
 
-    private CreateOrUpdateMethodCallBack(JdbcDataSourceDto dto) {
+    private CreateOrUpdateMethodCallBack(DatabaseDto dto) {
       this.dto = dto;
     }
 

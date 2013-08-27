@@ -81,13 +81,12 @@ public class FilesAdministrationPresenter
     setInSlot("Explorer", fileExplorerPresenter);
   }
 
-
   @Override
   public void onReveal() {
-    if(currentFolder != null) {
-      updateTable(currentFolder.getPath());
-    } else {
+    if(currentFolder == null) {
       updateTable(getDefaultPath());
+    } else {
+      updateTable(currentFolder.getPath());
     }
     breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs()).build();
   }

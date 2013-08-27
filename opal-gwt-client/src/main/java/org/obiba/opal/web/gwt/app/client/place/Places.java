@@ -29,12 +29,12 @@ public final class Places {
 
   public static final Place dashboardPlace = new Place(dashboard);
 
-
   public static String dashboard() {
     return dashboard;
   }
 
   public static final String projects = "!projects";
+
   public static final String project = "!project";
 
   public static final Place projectsPlace = new Place(projects);
@@ -42,7 +42,6 @@ public final class Places {
   public static String projects() {
     return projects;
   }
-
 
   public static final String navigator = "!navigator";
 
@@ -122,6 +121,14 @@ public final class Places {
 
   public static String databases() {
     return databases;
+  }
+
+  public static final String sqlDatabases = "!admin.databases.sql";
+
+  public static final Place sqlDatabasesPlace = new Place(sqlDatabases);
+
+  public static String sqlDatabases() {
+    return sqlDatabases;
   }
 
   public static final String index = administration + ".index";

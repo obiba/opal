@@ -17,6 +17,7 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
+
     <b:FluidRow addStyleNames="page-header">
       <b:Column size="9">
         <b:Heading size="3">
@@ -41,14 +42,17 @@
         </b:ButtonGroup>
       </b:Column>
     </b:FluidRow>
+
     <b:NavPills>
     </b:NavPills>
+
     <o:NavPillsPanel>
       <b:NavLink active="true">Active</b:NavLink>
       <g:FlowPanel ui:field="activePanel" addStyleNames="items"></g:FlowPanel>
       <b:NavLink>Archived</b:NavLink>
       <g:FlowPanel ui:field="archivedPanel" addStyleNames="items"></g:FlowPanel>
     </o:NavPillsPanel>
+
   </g:FlowPanel>
 
 </ui:UiBinder>

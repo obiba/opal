@@ -96,7 +96,6 @@ public class UserAdministrationPresenter
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
-  @SuppressWarnings("UnusedDeclaration")
   private Command confirmedCommand;
 
   @Inject
