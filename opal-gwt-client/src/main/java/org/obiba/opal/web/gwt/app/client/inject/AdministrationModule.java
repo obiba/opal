@@ -44,10 +44,12 @@ import org.obiba.opal.web.gwt.app.client.administration.r.view.RAdministrationVi
 import org.obiba.opal.web.gwt.app.client.administration.server.presenter.ServerPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.server.view.ServerView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.AddTaxonomyModalPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.AddVocabularyModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomiesPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomyPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.VocabularyPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.AddTaxonomyModalView;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.AddVocabularyModalView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomiesView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomyView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.VocabularyView;
@@ -124,6 +126,8 @@ public class AdministrationModule extends AbstractPresenterModule {
     //Vocabulary
     bindPresenter(VocabularyPresenter.class, VocabularyPresenter.Display.class, VocabularyView.class,
         VocabularyPresenter.Proxy.class);
+    bindPresenterWidget(AddVocabularyModalPresenter.class, AddVocabularyModalPresenter.Display.class,
+        AddVocabularyModalView.class);
 
   }
 

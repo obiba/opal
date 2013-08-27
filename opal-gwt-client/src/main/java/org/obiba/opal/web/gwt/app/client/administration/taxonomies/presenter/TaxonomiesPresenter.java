@@ -5,8 +5,8 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -54,7 +54,7 @@ public class TaxonomiesPresenter extends Presenter<TaxonomiesPresenter.Display, 
   public TaxonomiesPresenter(Display display, EventBus eventBus, Proxy proxy, PlaceManager placeManager,
       Translations translations, ModalProvider<AddTaxonomyModalPresenter> addTaxonomyModalProvider,
       BreadcrumbsBuilder breadcrumbsBuilder) {
-    super(eventBus, display, proxy, PageContainerPresenter.CONTENT);
+    super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     this.placeManager = placeManager;
     this.breadcrumbsBuilder = breadcrumbsBuilder;
     getView().setUiHandlers(this);

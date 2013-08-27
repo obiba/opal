@@ -2,8 +2,8 @@ package org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter;
 
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -19,6 +19,7 @@ import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
@@ -40,6 +41,8 @@ public class TaxonomyPresenter extends Presenter<TaxonomyPresenter.Display, Taxo
 
   private final ModalProvider<AddTaxonomyModalPresenter> addTaxonomyModalProvider;
 
+  private final ModalProvider<AddVocabularyModalPresenter> addVocabularyModalProvider;
+
   private final BreadcrumbsBuilder breadcrumbsBuilder;
 
   private String name;
@@ -49,18 +52,23 @@ public class TaxonomyPresenter extends Presenter<TaxonomyPresenter.Display, Taxo
   @Inject
   public TaxonomyPresenter(Display display, EventBus eventBus, Proxy proxy,
       ModalProvider<AddTaxonomyModalPresenter> addTaxonomyModalProvider, PlaceManager placeManager,
-      BreadcrumbsBuilder breadcrumbsBuilder) {
-    super(eventBus, display, proxy, PageContainerPresenter.CONTENT);
+      ModalProvider<AddVocabularyModalPresenter> addVocabularyModalProvider, BreadcrumbsBuilder breadcrumbsBuilder) {
+    super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     this.placeManager = placeManager;
     this.breadcrumbsBuilder = breadcrumbsBuilder;
     this.addTaxonomyModalProvider = addTaxonomyModalProvider.setContainer(this);
+    this.addVocabularyModalProvider = addVocabularyModalProvider.setContainer(this);
     getView().setUiHandlers(this);
+  }
+
+  @TitleFunction
+  public String getTitle() {
+    return taxonomy.getName();
   }
 
   @Override
   protected void onReveal() {
     super.onReveal();
-    breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs()).build();
     refresh();
   }
 
@@ -78,13 +86,14 @@ public class TaxonomyPresenter extends Presenter<TaxonomyPresenter.Display, Taxo
           public void onResource(Response response, TaxonomyDto resource) {
             taxonomy = resource;
             getView().setTaxonomy(taxonomy);
+            breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs()).build();
           }
         }).send();
   }
 
   @Override
   public void showAddVocabulary(TaxonomyDto taxonomyDto) {
-    //To change body of implemented methods use File | Settings | File Templates.
+    addVocabularyModalProvider.get();
   }
 
   @Override

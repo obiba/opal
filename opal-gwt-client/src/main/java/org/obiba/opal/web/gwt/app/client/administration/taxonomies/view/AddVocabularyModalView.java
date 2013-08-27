@@ -3,15 +3,17 @@ package org.obiba.opal.web.gwt.app.client.administration.taxonomies.view;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.AddTaxonomyModalPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.AddTaxonomyModalUiHandlers;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.AddVocabularyModalPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.AddVocabularyModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.TaxonomiesOrVocabulariesModalPanel;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
-import org.obiba.opal.web.model.client.opal.TaxonomyDto.TextDto;
+import org.obiba.opal.web.model.client.opal.TaxonomyDto.VocabularyDto;
 
+import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.Modal;
 import com.github.gwtbootstrap.client.ui.Tab;
@@ -28,12 +30,12 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-public class AddTaxonomyModalView extends ModalPopupViewWithUiHandlers<AddTaxonomyModalUiHandlers>
-    implements AddTaxonomyModalPresenter.Display {
+public class AddVocabularyModalView extends ModalPopupViewWithUiHandlers<AddVocabularyModalUiHandlers>
+    implements AddVocabularyModalPresenter.Display {
 
-  interface AddTaxonomyModalViewUiBinder extends UiBinder<Widget, AddTaxonomyModalView> {}
+  interface AddVocabularyModalViewUiBinder extends UiBinder<Widget, AddVocabularyModalView> {}
 
-  private static final AddTaxonomyModalViewUiBinder uiBinder = GWT.create(AddTaxonomyModalViewUiBinder.class);
+  private static final AddVocabularyModalViewUiBinder uiBinder = GWT.create(AddVocabularyModalViewUiBinder.class);
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -50,18 +52,28 @@ public class AddTaxonomyModalView extends ModalPopupViewWithUiHandlers<AddTaxono
   HasText nameTxt;
 
   @UiField
+  Chooser taxonomies;
+
+  @UiField
   TabPanel localesTabs;
+
+  @UiField
+  CheckBox isRepeatable;
 
   private List<String> availableLocales;
 
   private List<TaxonomiesOrVocabulariesModalPanel> panelList;
 
+  private JsArray<TaxonomyDto> taxonomiesList;
+
   private TaxonomyDto taxonomy;
+
+  private VocabularyDto vocabulary;
 
   private boolean editionMode;
 
   @Inject
-  public AddTaxonomyModalView(EventBus eventBus) {
+  public AddVocabularyModalView(EventBus eventBus) {
     super(eventBus);
     uiBinder.createAndBindUi(this);
     modal.setTitle(translations.addTaxonomy());
@@ -78,23 +90,34 @@ public class AddTaxonomyModalView extends ModalPopupViewWithUiHandlers<AddTaxono
     if(locales.isEmpty()) {
       localesTabs.clear();
     } else {
-      redraw();
+      draw();
     }
   }
 
   @Override
-  public void setEditionMode(boolean edit, TaxonomyDto taxonomy) {
+  public void setEditionMode(boolean edit, TaxonomyDto taxonomyDto, TaxonomyDto.VocabularyDto vocabularyDto) {
     editionMode = edit;
-    this.taxonomy = taxonomy;
+    taxonomy = taxonomyDto;
+    vocabulary = vocabularyDto;
+  }
+
+  @Override
+  public void setTaxonomies(JsArray<TaxonomyDto> taxonomiesList) {
+    this.taxonomiesList = taxonomiesList;
+    for(int i = 0; i < taxonomiesList.length(); i++) {
+      taxonomies.addItem(taxonomiesList.get(i).getName());
+    }
   }
 
   @UiHandler("save")
   void onSaveTaxonomy(ClickEvent event) {
     TaxonomyDto taxonomyDto = TaxonomyDto.create();
-    taxonomyDto.setName(nameTxt.getText());
+    GWT.log("onSaveTaxonomy() " + taxonomies.getSelectedValue());
+    taxonomyDto.setName(taxonomies.getSelectedValue());
 
-    JsArray<TextDto> titles = JsArrays.create();
-    JsArray<TextDto> descriptions = JsArrays.create();
+    VocabularyDto vocabularyDto = VocabularyDto.create();
+    JsArray<TaxonomyDto.TextDto> titles = JsArrays.create();
+    JsArray<TaxonomyDto.TextDto> descriptions = JsArrays.create();
 
     for(int i = 0; i < availableLocales.size(); i++) {
       if(!panelList.get(i).getTitleTxt().isEmpty()) {
@@ -104,17 +127,23 @@ public class AddTaxonomyModalView extends ModalPopupViewWithUiHandlers<AddTaxono
         descriptions.push(asTextDto(panelList.get(i).getDescriptionTxt(), availableLocales.get(i)));
       }
     }
+    GWT.log("Titles: " + titles.join(", "));
+    vocabularyDto.setName(nameTxt.getText());
+    vocabularyDto.setTitlesArray(JsArrays.toSafeArray(titles));
+    vocabularyDto.setDescriptionsArray(descriptions);
+    vocabularyDto.setRepeatable(isRepeatable.getValue());
 
-    taxonomyDto.setTitlesArray(JsArrays.toSafeArray(titles));
-    taxonomyDto.setDescriptionsArray(descriptions);
-    if(editionMode) taxonomyDto.setVocabulariesArray(taxonomy.getVocabulariesArray());
-    if(getUiHandlers().addTaxonomy(taxonomyDto)) {
+    if(editionMode) vocabularyDto.setTermsArray(vocabulary.getTermsArray());
+    taxonomyDto.setVocabulariesArray(taxonomy.getVocabulariesArray());
+    taxonomyDto.addVocabularies(vocabularyDto);
+
+    if(getUiHandlers().addTaxonomyNewVocabulary(taxonomyDto)) {
       modal.hide();
     }
   }
 
-  private TextDto asTextDto(String text, String locale) {
-    TextDto dto = TextDto.create();
+  private TaxonomyDto.TextDto asTextDto(String text, String locale) {
+    TaxonomyDto.TextDto dto = TaxonomyDto.TextDto.create();
     dto.setText(text);
     dto.setLocale(locale);
     return dto;
@@ -125,8 +154,12 @@ public class AddTaxonomyModalView extends ModalPopupViewWithUiHandlers<AddTaxono
     modal.hide();
   }
 
-  private void redraw() {
-    if(editionMode) nameTxt.setText(taxonomy.getName());
+  private void draw() {
+    if(editionMode) {
+      nameTxt.setText(vocabulary.getName());
+      isRepeatable.setValue(vocabulary.getRepeatable());
+    }
+    taxonomies.setSelectedValue(taxonomy.getName());
     panelList = new ArrayList<TaxonomiesOrVocabulariesModalPanel>(availableLocales.size());
     createLocaleTabs();
   }
@@ -137,8 +170,8 @@ public class AddTaxonomyModalView extends ModalPopupViewWithUiHandlers<AddTaxono
       tab.setHeading(locale);
       TaxonomiesOrVocabulariesModalPanel panel = new TaxonomiesOrVocabulariesModalPanel();
       if(editionMode) {
-        String title = getText(taxonomy.getTitlesArray(), locale);
-        String description = getText(taxonomy.getDescriptionsArray(), locale);
+        String title = getText(vocabulary.getTitlesArray(), locale);
+        String description = getText(vocabulary.getDescriptionsArray(), locale);
         if(title != null) {
           panel.setTitleTxt(title);
         }
@@ -153,7 +186,7 @@ public class AddTaxonomyModalView extends ModalPopupViewWithUiHandlers<AddTaxono
     modal.add(localesTabs);
   }
 
-  private String getText(JsArray<TextDto> array, String locale) {
+  private String getText(JsArray<TaxonomyDto.TextDto> array, String locale) {
     for(int i = 0; i < array.length(); i++) {
       if(array.get(i).getLocale().equals(locale)) {
         return array.get(i).getText();
@@ -161,5 +194,4 @@ public class AddTaxonomyModalView extends ModalPopupViewWithUiHandlers<AddTaxono
     }
     return null;
   }
-
 }

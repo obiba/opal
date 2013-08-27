@@ -8,12 +8,12 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 
-public class TaxonomiesModalPanel extends Composite {
+public class TaxonomiesOrVocabulariesModalPanel extends Composite {
 
-  //  @UiTemplate("TaxonomiesModalPanel.ui.xml")
-  interface TaxonomiesModalPanelUiBinder extends UiBinder<Widget, TaxonomiesModalPanel> {}
+  interface TaxonomiesOrVocabulariesModalUiBinder extends UiBinder<Widget, TaxonomiesOrVocabulariesModalPanel> {}
 
-  private static final TaxonomiesModalPanelUiBinder uiBinder = GWT.create(TaxonomiesModalPanelUiBinder.class);
+  private static final TaxonomiesOrVocabulariesModalUiBinder uiBinder = GWT
+      .create(TaxonomiesOrVocabulariesModalUiBinder.class);
 
   @UiField
   Panel panel;
@@ -24,15 +24,15 @@ public class TaxonomiesModalPanel extends Composite {
   @UiField
   HasText descriptionTxt;
 
-  public TaxonomiesModalPanel() {
+  public TaxonomiesOrVocabulariesModalPanel() {
     initWidget(uiBinder.createAndBindUi(this));
   }
 
-  public String getTaxonomyTitle() {
+  public String getTitleTxt() {
     return titleTxt.getText();
   }
 
-  public String getTaxonomyDescription() {
+  public String getDescriptionTxt() {
     return descriptionTxt.getText();
   }
 

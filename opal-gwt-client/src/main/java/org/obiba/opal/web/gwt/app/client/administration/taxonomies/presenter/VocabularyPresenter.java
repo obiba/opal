@@ -2,6 +2,7 @@ package org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter;
 
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -9,6 +10,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto.VocabularyDto;
 
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
@@ -36,7 +38,11 @@ public class VocabularyPresenter extends Presenter<VocabularyPresenter.Display, 
 
   private final BreadcrumbsBuilder breadcrumbsBuilder;
 
+  private final ModalProvider<AddVocabularyModalPresenter> addVocabularyModalProvider;
+
   private TaxonomyDto taxonomy;
+
+  private JsArray<TaxonomyDto> taxonomies;
 
   private VocabularyDto vocabulary;
 
@@ -45,9 +51,11 @@ public class VocabularyPresenter extends Presenter<VocabularyPresenter.Display, 
   private String vocabularyName;
 
   @Inject
-  public VocabularyPresenter(Display display, EventBus eventBus, Proxy proxy, BreadcrumbsBuilder breadcrumbsBuilder) {
+  public VocabularyPresenter(Display display, EventBus eventBus, Proxy proxy, BreadcrumbsBuilder breadcrumbsBuilder,
+      ModalProvider<AddVocabularyModalPresenter> addVocabularyModalProvider) {
     super(eventBus, display, proxy, PageContainerPresenter.CONTENT);
     this.breadcrumbsBuilder = breadcrumbsBuilder;
+    this.addVocabularyModalProvider = addVocabularyModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -81,20 +89,22 @@ public class VocabularyPresenter extends Presenter<VocabularyPresenter.Display, 
             getView().setTaxonomyAndVocabulary(taxonomy, vocabulary);
           }
         }).send();
+
   }
 
   @Override
   public void showEditVocabulary() {
+    AddVocabularyModalPresenter presenter = addVocabularyModalProvider.get();
+    presenter.setEditionMode(taxonomy, vocabulary);
+  }
+
+  @Override
+  public void showAddTerm(TaxonomyDto taxonomyDto, VocabularyDto vocabularyDto) {
     //To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
-  public void showAddTerm(TaxonomyDto taxonomyDto, VocabularyDto vocabulary) {
-    //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public void onTermSelection(TaxonomyDto taxonomyDto, VocabularyDto vocabulary, TaxonomyDto.TermDto termDto) {
+  public void onTermSelection(TaxonomyDto taxonomyDto, VocabularyDto vocabularyDto, TaxonomyDto.TermDto termDto) {
     //To change body of implemented methods use File | Settings | File Templates.
   }
 
