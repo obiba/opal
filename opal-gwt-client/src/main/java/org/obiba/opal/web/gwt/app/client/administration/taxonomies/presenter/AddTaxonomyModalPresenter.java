@@ -27,27 +27,24 @@ import com.gwtplatform.mvp.client.PopupView;
 public class AddTaxonomyModalPresenter extends ModalPresenterWidget<AddTaxonomyModalPresenter.Display>
     implements AddTaxonomyModalUiHandlers {
 
-  private TaxonomyDto taxonomy;
-
   public interface Display extends PopupView, HasUiHandlers<AddTaxonomyModalUiHandlers> {
     void setAvailableLocales(List<String> locales);
+
+    void setEditionMode(boolean edit, TaxonomyDto taxonomyDto);
   }
 
   @UiField
   FlowPanel panel;
 
-  private final Translations translations;// TODO NEEDED??
-
   @Inject
   public AddTaxonomyModalPresenter(EventBus eventBus, Display display, Translations translations) {
     super(eventBus, display);
-    this.translations = translations;
     getView().setUiHandlers(this);
     setLocales();
   }
 
   @Override
-  public boolean addTaxonomy(final TaxonomyDto taxonomy) {
+  public boolean addTaxonomy(TaxonomyDto taxonomyDto) {
     ResponseCodeCallback callback = new ResponseCodeCallback() {
       @Override
       public void onResponseCode(Request request, Response response) {
@@ -58,22 +55,19 @@ public class AddTaxonomyModalPresenter extends ModalPresenterWidget<AddTaxonomyM
           getEventBus().fireEvent(
               NotificationEvent.newBuilder().error("TaxonomyCreationFailed").args(errorDto.getArgumentsArray())
                   .build());
-        } else {
-          getEventBus()
-              .fireEvent(NotificationEvent.newBuilder().error(translations.datasourceCreationFailed()).build());
         }
       }
     };
     ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder().forResource("/system/conf/taxonomies").post()//
-        .withResourceBody(TaxonomyDto.stringify(taxonomy))//
+        .withResourceBody(TaxonomyDto.stringify(taxonomyDto))//
         .withCallback(Response.SC_CREATED, callback).withCallback(Response.SC_BAD_REQUEST, callback)
         .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback).send();
 
     return true;
   }
 
-  public void setTaxonomy(TaxonomyDto taxonomy) {
-    this.taxonomy = taxonomy;
+  public void setEditionMode(TaxonomyDto taxonomy) {
+    getView().setEditionMode(true, taxonomy);
   }
 
   private void setLocales() {

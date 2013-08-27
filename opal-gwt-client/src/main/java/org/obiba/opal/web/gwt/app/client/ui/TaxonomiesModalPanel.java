@@ -35,4 +35,12 @@ public class TaxonomiesModalPanel extends Composite {
   public String getTaxonomyDescription() {
     return descriptionTxt.getText();
   }
+
+  public void setTitleTxt(String title) {
+    titleTxt.setText(title);
+  }
+
+  public void setDescriptionTxt(String description) {
+    descriptionTxt.setText(description);
+  }
 }

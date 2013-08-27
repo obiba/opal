@@ -6,6 +6,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.ListItem;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 
+import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.Icon;
 import com.github.gwtbootstrap.client.ui.NavLink;
@@ -18,6 +19,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
@@ -27,6 +29,9 @@ import static org.obiba.opal.web.model.client.opal.TaxonomyDto.VocabularyDto;
 public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> implements TaxonomiesPresenter.Display {
 
   interface ViewUiBinder extends UiBinder<Widget, TaxonomiesView> {}
+
+  @UiField
+  Breadcrumbs breadcrumbs;
 
   @UiField
   FlowPanel panel;
@@ -46,6 +51,11 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
     } else {
       redraw();
     }
+  }
+
+  @Override
+  public HasWidgets getBreadcrumbs() {
+    return breadcrumbs;
   }
 
   @UiHandler("add")

@@ -1,11 +1,15 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     xmlns="urn:import:com.github.gwtbootstrap.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
   <g:FlowPanel>
+    <g:FlowPanel addStyleNames="page-header">
+      <b:Breadcrumbs ui:field="breadcrumbs"/>
+    </g:FlowPanel>
     <FluidRow addStyleNames="page-header">
       <Column size="9">
         <Heading size="3">
@@ -25,16 +29,28 @@
         </ButtonGroup>
       </Column>
     </FluidRow>
-    <g:FlowPanel ui:field="titlePanel">
+    <b:Heading size="4" ui:field="taxonomyName"/>
+    <g:FlowPanel>
       <FluidRow>
         <Column size="1">
-          <g:InlineLabel>Title</g:InlineLabel>
+          <b:Heading size="5">Title</b:Heading>
         </Column>
-        <!--<Column size="11">-->
-        <!--<o:LocalizedLabel ui:field="titlePanel"/>-->
-        <!--</Column>-->
+        <b:Column size="11">
+          <g:FlowPanel ui:field="titlePanel"/>
+        </b:Column>
       </FluidRow>
     </g:FlowPanel>
-    <g:FlowPanel ui:field="panel" addStyleNames="items"></g:FlowPanel>
+    <g:FlowPanel>
+      <FluidRow>
+        <Column size="1">
+          <b:Heading size="5">Description</b:Heading>
+        </Column>
+        <b:Column size="11">
+          <g:FlowPanel ui:field="descriptionPanel"/>
+        </b:Column>
+      </FluidRow>
+    </g:FlowPanel>
+    <b:Heading size="5">Vocabularies</b:Heading>
+    <g:FlowPanel ui:field="vocabulariesPanel" addStyleNames="items"></g:FlowPanel>
   </g:FlowPanel>
 </ui:UiBinder>

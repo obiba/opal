@@ -56,6 +56,10 @@ public class AddTaxonomyModalView extends ModalPopupViewWithUiHandlers<AddTaxono
 
   private List<TaxonomiesModalPanel> panelList;
 
+  private TaxonomyDto taxonomy;
+
+  private boolean editionMode;
+
   @Inject
   public AddTaxonomyModalView(EventBus eventBus) {
     super(eventBus);
@@ -79,6 +83,12 @@ public class AddTaxonomyModalView extends ModalPopupViewWithUiHandlers<AddTaxono
     }
   }
 
+  @Override
+  public void setEditionMode(boolean edit, TaxonomyDto taxonomy) {
+    editionMode = edit;
+    this.taxonomy = taxonomy;
+  }
+
   @UiHandler("save")
   void onSaveTaxonomy(ClickEvent event) {
     TaxonomyDto taxonomyDto = TaxonomyDto.create();
@@ -98,6 +108,7 @@ public class AddTaxonomyModalView extends ModalPopupViewWithUiHandlers<AddTaxono
 
     taxonomyDto.setTitlesArray(JsArrays.toSafeArray(titles));
     taxonomyDto.setDescriptionsArray(descriptions);
+    if(editionMode) taxonomyDto.setVocabulariesArray(taxonomy.getVocabulariesArray());
     if(getUiHandlers().addTaxonomy(taxonomyDto)) {
       modal.hide();
     }
@@ -116,6 +127,7 @@ public class AddTaxonomyModalView extends ModalPopupViewWithUiHandlers<AddTaxono
   }
 
   private void redraw() {
+    if(editionMode) nameTxt.setText(taxonomy.getName());
     panelList = new ArrayList<TaxonomiesModalPanel>(availableLocales.size());
     createLocaleTabs();
   }
@@ -125,11 +137,30 @@ public class AddTaxonomyModalView extends ModalPopupViewWithUiHandlers<AddTaxono
       Tab tab = new Tab();
       tab.setHeading(locale);
       TaxonomiesModalPanel panel = new TaxonomiesModalPanel();
+      if(editionMode) {
+        String title = getText(taxonomy.getTitlesArray(), locale);
+        String description = getText(taxonomy.getDescriptionsArray(), locale);
+        if(title != null) {
+          panel.setTitleTxt(title);
+        }
+        if(description != null) {
+          panel.setDescriptionTxt(description);
+        }
+      }
       panelList.add(panel);
       tab.add(panel);
       localesTabs.add(tab);
     }
     modal.add(localesTabs);
+  }
+
+  private String getText(JsArray<TextDto> array, String locale) {
+    for(int i = 0; i < array.length(); i++) {
+      if(array.get(i).getLocale().equals(locale)) {
+        return array.get(i).getText();
+      }
+    }
+    return null;
   }
 
 }

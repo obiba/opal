@@ -6,7 +6,10 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <b:FluidRow addStyleNames="page-header">
+    <g:FlowPanel addStyleNames="page-header">
+      <b:Breadcrumbs ui:field="breadcrumbs"/>
+    </g:FlowPanel>
+    <b:FluidRow>
       <b:Column size="9">
         <b:Heading size="3">
           <ui:msg description="Taxonomies label">Taxonomies</ui:msg>
