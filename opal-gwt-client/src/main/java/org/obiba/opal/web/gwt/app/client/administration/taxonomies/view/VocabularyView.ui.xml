@@ -62,5 +62,6 @@
     </g:FlowPanel>
     <b:Heading size="5">Terms</b:Heading>
     <g:FlowPanel ui:field="termsPanel" addStyleNames="items"></g:FlowPanel>
+    <b:CheckBox ui:field="isRepeatable">Repeatable</b:CheckBox>
   </g:FlowPanel>
 </ui:UiBinder>

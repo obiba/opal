@@ -9,6 +9,7 @@ import org.obiba.opal.web.model.client.opal.TaxonomyDto.TermDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto.VocabularyDto;
 
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
+import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.NavPills;
@@ -26,6 +27,7 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> implements VocabularyPresenter.Display {
+
   interface ViewUiBinder extends UiBinder<Widget, VocabularyView> {}
 
   @UiField
@@ -46,6 +48,9 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
   @UiField
   FlowPanel termsPanel;
 
+  @UiField
+  CheckBox isRepeatable;
+
   private TaxonomyDto taxonomy;
 
   private VocabularyDto vocabulary;
@@ -63,6 +68,7 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
       titlePanel.clear();
       descriptionPanel.clear();
       termsPanel.clear();
+      isRepeatable.setValue(false);
     } else {
       redraw();
     }
@@ -87,6 +93,7 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
     titlePanel.clear();
     descriptionPanel.clear();
     termsPanel.clear();
+    isRepeatable.setValue(false);
 
     vocabularyName.setText(vocabulary.getName());
     taxonomyName.setText(taxonomy.getName());
@@ -100,6 +107,10 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
       for(int i = 0; i < terms.length(); i++)
         pills.add(newTermLink(terms.get(i)));
       termsPanel.add(pills);
+    }
+
+    if(vocabulary.getRepeatable()) {
+      isRepeatable.setValue(true);
     }
   }
 

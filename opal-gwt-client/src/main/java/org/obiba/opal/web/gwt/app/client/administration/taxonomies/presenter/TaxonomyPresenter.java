@@ -95,7 +95,9 @@ public class TaxonomyPresenter extends Presenter<TaxonomyPresenter.Display, Taxo
 
   @Override
   public void onVocabularySelection(TaxonomyDto taxonomyDto, VocabularyDto vocabulary) {
-    //To change body of implemented methods use File | Settings | File Templates.
+    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.vocabulary)
+        .with(ParameterTokens.TOKEN_NAME, taxonomyDto.getName() + "/" + vocabulary.getName()).build();
+    placeManager.revealPlace(request);
   }
 
 }
