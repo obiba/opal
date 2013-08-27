@@ -8,6 +8,7 @@ import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
+import org.obiba.opal.web.model.client.opal.TaxonomyDto.VocabularyDto;
 
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasWidgets;
@@ -90,6 +91,11 @@ public class TaxonomyPresenter extends Presenter<TaxonomyPresenter.Display, Taxo
   public void showEditTaxonomy() {
     AddTaxonomyModalPresenter presenter = addTaxonomyModalProvider.get();
     presenter.setEditionMode(taxonomy);
+  }
+
+  @Override
+  public void onVocabularySelection(TaxonomyDto taxonomyDto, VocabularyDto vocabulary) {
+    //To change body of implemented methods use File | Settings | File Templates.
   }
 
 }

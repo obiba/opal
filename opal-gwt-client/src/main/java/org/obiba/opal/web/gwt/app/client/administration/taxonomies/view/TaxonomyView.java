@@ -6,6 +6,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.LocalizedLabel;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto.TextDto;
+import org.obiba.opal.web.model.client.opal.TaxonomyDto.VocabularyDto;
 
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.Heading;
@@ -104,13 +105,12 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
     }
   }
 
-  private Widget newVocabularyLink(TaxonomyDto.VocabularyDto vocabulary) {
+  private Widget newVocabularyLink(final VocabularyDto vocabulary) {
     NavLink link = new NavLink(vocabulary.getName());
     link.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent clickEvent) {
-        getUiHandlers().showAddVocabulary(taxonomy);
-//        uiHandlers.onVocabularySelection(taxonomy, vocabulary);//TODO need to create links to taxonomies UiHandlers
+        getUiHandlers().onVocabularySelection(taxonomy, vocabulary);
       }
     });
     return link;

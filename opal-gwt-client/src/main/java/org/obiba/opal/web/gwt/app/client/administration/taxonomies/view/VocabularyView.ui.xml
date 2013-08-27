@@ -1,0 +1,66 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns="urn:import:com.github.gwtbootstrap.client.ui"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+
+  <g:FlowPanel>
+    <g:FlowPanel addStyleNames="page-header">
+      <b:Breadcrumbs ui:field="breadcrumbs"/>
+    </g:FlowPanel>
+    <FluidRow addStyleNames="page-header">
+      <Column size="9">
+        <Heading size="3">
+          <ui:msg description="Vocabulary label">Vocabulary</ui:msg>
+        </Heading>
+      </Column>
+      <Column size="3">
+        <ButtonGroup addStyleNames="pull-right">
+          <Button type="INFO" size="SMALL" ui:field="edit">
+            <ui:msg description="Edit Vocabulary">Edit Vocabulary</ui:msg>
+          </Button>
+        </ButtonGroup>
+        <ButtonGroup addStyleNames="pull-right">
+          <Button type="INFO" icon="PLUS" size="SMALL" ui:field="add">
+            <ui:msg description="Add Term">Add Term</ui:msg>
+          </Button>
+        </ButtonGroup>
+      </Column>
+    </FluidRow>
+    <b:Heading size="4" ui:field="vocabularyName"/>
+    <g:FlowPanel>
+      <FluidRow>
+        <Column size="1">
+          <b:Heading size="5">Title</b:Heading>
+        </Column>
+        <b:Column size="11">
+          <g:FlowPanel ui:field="titlePanel"/>
+        </b:Column>
+      </FluidRow>
+    </g:FlowPanel>
+    <g:FlowPanel>
+      <FluidRow>
+        <Column size="1">
+          <b:Heading size="5">Description</b:Heading>
+        </Column>
+        <b:Column size="11">
+          <g:FlowPanel ui:field="descriptionPanel"/>
+        </b:Column>
+      </FluidRow>
+    </g:FlowPanel>
+    <g:FlowPanel>
+      <FluidRow>
+        <Column size="1">
+          <b:Heading size="5">Taxonomy</b:Heading>
+        </Column>
+        <b:Column size="11">
+          <g:InlineLabel ui:field="taxonomyName"/>
+        </b:Column>
+      </FluidRow>
+    </g:FlowPanel>
+    <b:Heading size="5">Terms</b:Heading>
+    <g:FlowPanel ui:field="termsPanel" addStyleNames="items"></g:FlowPanel>
+  </g:FlowPanel>
+</ui:UiBinder>

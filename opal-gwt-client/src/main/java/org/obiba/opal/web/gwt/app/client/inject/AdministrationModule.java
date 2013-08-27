@@ -46,9 +46,11 @@ import org.obiba.opal.web.gwt.app.client.administration.server.view.ServerView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.AddTaxonomyModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomiesPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomyPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.VocabularyPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.AddTaxonomyModalView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomiesView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomyView;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.VocabularyView;
 import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.user.view.UserAdministrationView;
@@ -119,6 +121,9 @@ public class AdministrationModule extends AbstractPresenterModule {
     //Taxonomy
     bindPresenter(TaxonomyPresenter.class, TaxonomyPresenter.Display.class, TaxonomyView.class,
         TaxonomyPresenter.Proxy.class);
+    //Vocabulary
+    bindPresenter(VocabularyPresenter.class, VocabularyPresenter.Display.class, VocabularyView.class,
+        VocabularyPresenter.Proxy.class);
 
   }
 
