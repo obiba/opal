@@ -50,7 +50,6 @@ import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
-import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
 public class UserAdministrationPresenter
     extends ItemAdministrationPresenter<UserAdministrationPresenter.Display, UserAdministrationPresenter.Proxy> {
@@ -212,7 +211,7 @@ public class UserAdministrationPresenter
     });
 
     // User Actions
-    getView().getActions().setActionHandler(new ActionHandler<UserDto>() {
+    getView().getUsersActions().setActionHandler(new ActionHandler<UserDto>() {
 
       @Override
       public void doAction(final UserDto object, String actionName) {
@@ -235,7 +234,7 @@ public class UserAdministrationPresenter
     });
 
     // Groups actions
-    getView().getGroupActions().setActionHandler(new ActionHandler<GroupDto>() {
+    getView().getGroupsActions().setActionHandler(new ActionHandler<GroupDto>() {
 
       @Override
       public void doAction(final GroupDto object, String actionName) {

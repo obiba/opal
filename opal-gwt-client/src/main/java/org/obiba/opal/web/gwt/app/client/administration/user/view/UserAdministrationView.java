@@ -256,11 +256,6 @@ public class UserAdministrationView extends ViewImpl implements Display {
     return groupActions;
   }
 
-  @Override
-  public HasActionHandler<GroupDto> getGroupActions() {
-    return GroupColumns.actions;
-  }
-
   private static final class GroupColumns {
 
     static final Column<GroupDto, String> name = new TextColumn<GroupDto>() {
