@@ -38,6 +38,7 @@ public class UsersResource extends AbstractUserGroupResource {
   @GET
   public List<Opal.UserDto> getUsers() {
 
+    //TODO: Use TimestampedResponses.evaluate(request, ...); ?
     Iterable<User> users = userService.list();
 
     List<Opal.UserDto> userDtos = Lists.newArrayList();

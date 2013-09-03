@@ -38,6 +38,7 @@ public class UserResource extends AbstractUserGroupResource {
 
   @GET
   public Response getUser() {
+    //TODO: Use TimestampedResponses.evaluate(request, ...); ?
     User user = userService.getUserWithName(name);
 
     if(user == null) {
