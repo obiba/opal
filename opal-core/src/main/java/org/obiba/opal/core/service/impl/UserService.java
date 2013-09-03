@@ -22,7 +22,7 @@ public interface UserService {
    *
    * @return a list of user instances
    */
-  List<User> getUsers();
+  Iterable<User> list();
 
   /**
    * Returns the count of users that match the specified template

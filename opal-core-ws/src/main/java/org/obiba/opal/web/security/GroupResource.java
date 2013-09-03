@@ -9,83 +9,45 @@
  ******************************************************************************/
 package org.obiba.opal.web.security;
 
-import java.util.List;
-
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.user.Group;
-import org.obiba.opal.core.domain.user.User;
 import org.obiba.opal.core.service.impl.UserService;
-import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Lists;
-
 @SuppressWarnings("UnusedDeclaration")
 @Component
 @Scope("request")
-@Path("/")
-public class GroupResource {
+@Path("/group/{name}")
+public class GroupResource extends AbstractUserGroupResource {
 
-  private final UserService userService;
+  @PathParam("name")
+  private String name;
 
   @Autowired
-  public GroupResource(UserService userService) {
-    this.userService = userService;
+  GroupResource(UserService userService) {
+    super(userService);
   }
 
   @GET
-  @Path("/groups")
-  public List<Opal.GroupDto> getGroups() {
-
-    List<Group> groups = userService.getGroups();
-
-    List<Opal.GroupDto> groupDtos = Lists.newArrayList();
-
-    for(Group g : groups) {
-      groupDtos.add(toDto(g));
-    }
-
-    return groupDtos;
-  }
-
-  @POST
-  @Path("/groups")
-  public Response createGroup(Opal.GroupDto groupDto) {
-
-    Group g = new Group();
-    g.setName(groupDto.getName());
-
-    if(userService.getGroupWithName(groupDto.getName()) != null) {
-      return Response.status(Response.Status.NOT_MODIFIED).build();
-    }
-
-    userService.createGroup(g);
-    return Response.ok().build();
-  }
-
-  @GET
-  @Path("/group/{name}")
-  public Response getGroup(@PathParam("name") String name) {
+  public Response getGroup() {
 
     Group group = userService.getGroupWithName(name);
     if(group == null) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
 
-    return Response.ok().entity(toDto(group)).build();
+    return Response.ok().entity(asDto(group)).build();
   }
 
   @DELETE
-  @Path("/group/{name}")
-  public Response deleteGroup(@PathParam("name") String name) {
+  public Response deleteGroup() {
     Group group = userService.getGroupWithName(name);
     if(group != null && !group.getUsers().isEmpty()) {
       // cannot delete a group with users
@@ -98,17 +60,4 @@ public class GroupResource {
 
     return Response.ok().build();
   }
-
-  private Opal.GroupDto toDto(Group group) {
-
-    List<String> users = Lists.newArrayList();
-    if(group.getUsers() != null) {
-      for(User u : group.getUsers()) {
-        users.add(u.getName());
-      }
-    }
-
-    return Opal.GroupDto.newBuilder().setName(group.getName()).addAllUsers(users).build();
-  }
-
 }

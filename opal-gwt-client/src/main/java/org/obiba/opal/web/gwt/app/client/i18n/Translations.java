@@ -416,6 +416,7 @@ public interface Translations extends Constants {
       "UserPasswordMatchError", "Passwords do not match.",//
       "UserDeletedOk", "User {0} has been successfully deleted.", //
       "UserAlreadyExists", "User {0} already exists.", //
+      "GroupDeletedOk", "Group {0} has been successfully deleted.", //
       "ProjectNameRequired", "Project name is required.", //
       "ProjectNameMustBeUnique", "A project already exists with this name.",//
       "ProjectCreationFailed", "The datasource creation has failed: {0}" //

@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.administration.user.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
+import org.obiba.opal.web.gwt.app.client.administration.user.event.GroupsRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.administration.user.event.UsersRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
@@ -49,7 +50,6 @@ import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
-import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
 public class UserAdministrationPresenter
     extends ItemAdministrationPresenter<UserAdministrationPresenter.Display, UserAdministrationPresenter.Proxy> {
@@ -84,12 +84,10 @@ public class UserAdministrationPresenter
 
     HasData<UserDto> getUsersTable();
 
-    HasActionHandler<UserDto> getActions();
+    HasActionHandler<UserDto> getUsersActions();
 
+    HasActionHandler<GroupDto> getGroupsActions();
   }
-
-//  @SuppressWarnings("FieldCanBeLocal")
-//  private final AuthorizationPresenter authorizationPresenter;
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
@@ -100,7 +98,6 @@ public class UserAdministrationPresenter
   public UserAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
       ModalProvider<UserPresenter> userModalProvider, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
-//    this.authorizationPresenter = authorizationPresenter.get();
     this.breadcrumbsHelper = breadcrumbsHelper;
     this.userModalProvider = userModalProvider.setContainer(this);
   }
@@ -121,22 +118,13 @@ public class UserAdministrationPresenter
   protected void onReveal() {
     super.onReveal();
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
-    // stop start search service
-//    ResourceRequestBuilderFactory.<UserDto>newBuilder().forResource("/users").get()
-//        .withCallback(new ResourceCallback<UserDto>() {
-//
-//          }
-//        }).send();
-
     getView().showUsers();
     getView().getUsersTable().setVisibleRange(0, 10);
-//    refresh();
   }
 
   @Override
   public void authorize(HasAuthorization authorizer) {
-//    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(Resources.indices()).get().authorize(authorizer)
-//        .send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/users").post().authorize(authorizer).send();
   }
 
   @Override
@@ -197,6 +185,22 @@ public class UserAdministrationPresenter
       }
     }));
 
+    // Refresh group list
+    registerHandler(getEventBus().addHandler(GroupsRefreshEvent.getType(), new GroupsRefreshEvent.Handler() {
+      @Override
+      public void onRefresh(GroupsRefreshEvent event) {
+        ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder()//
+            .forResource("/groups").withCallback(new ResourceCallback<JsArray<GroupDto>>() {
+
+          @Override
+          public void onResource(Response response, JsArray<GroupDto> resource) {
+            getView().renderGroupRows(resource);
+          }
+        }).get().send();
+        getView().showGroups();
+      }
+    }));
+
     // Add user
     getView().getAddUserButton().addClickHandler(new ClickHandler() {
       @Override
@@ -206,8 +210,8 @@ public class UserAdministrationPresenter
       }
     });
 
-    // ACTIONS
-    getView().getActions().setActionHandler(new ActionHandler<UserDto>() {
+    // User Actions
+    getView().getUsersActions().setActionHandler(new ActionHandler<UserDto>() {
 
       @Override
       public void doAction(final UserDto object, String actionName) {
@@ -223,6 +227,25 @@ public class UserAdministrationPresenter
               getEventBus().fireEvent(new UsersRefreshEvent());
               getEventBus().fireEvent(
                   NotificationEvent.Builder.newNotification().info("UserDeletedOk").args(object.getName()).build());
+            }
+          }, Response.SC_OK).delete().send();
+        }
+      }
+    });
+
+    // Groups actions
+    getView().getGroupsActions().setActionHandler(new ActionHandler<GroupDto>() {
+
+      @Override
+      public void doAction(final GroupDto object, String actionName) {
+        if(actionName.trim().equalsIgnoreCase(ActionsColumn.DELETE_ACTION)) {
+          ResourceRequestBuilderFactory.newBuilder()//
+              .forResource("/group/" + object.getName()).withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              getEventBus().fireEvent(new GroupsRefreshEvent());
+              getEventBus().fireEvent(
+                  NotificationEvent.Builder.newNotification().info("GroupDeletedOk").args(object.getName()).build());
             }
           }, Response.SC_OK).delete().send();
         }
@@ -266,9 +289,6 @@ public class UserAdministrationPresenter
     }
   }
 
-  //  private static void refreshUsers(JsArray<UserDto> resource){
-//    getView().renderUserRows(resource);
-//  }
   public class UserStatusChangeDelegate implements IconActionCell.Delegate<UserDto> {
     @Override
     public void executeClick(NativeEvent event, final UserDto value) {

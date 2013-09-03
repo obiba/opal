@@ -14,6 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -21,33 +22,37 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.obiba.core.domain.AbstractEntity;
 import org.obiba.core.util.HexUtil;
+import org.obiba.magma.datasource.hibernate.domain.AbstractTimestampedEntity;
 
 @SuppressWarnings("UnusedDeclaration")
 @Entity
 @Table(name = "user")
-@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-public class User extends AbstractEntity {
+//@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+public class User extends AbstractTimestampedEntity {
 
   private static final long serialVersionUID = -2200053643926715563L;
 
+  @Nonnull
   @Column(length = 250, nullable = false, unique = true)
   private String name;
 
   @Column(length = 250)
   private String password;
 
-  @Column(nullable = false)
-  private Boolean enabled;
+  private boolean enabled;
 
   @ManyToMany
   @JoinTable(name = "user_groups", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = @JoinColumn(
       name = "group_id"))
-  @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
   private Set<Group> groups;
+
+  public User() {
+  }
+
+  public User(String name) {
+    this.name = name;
+  }
 
   public String getName() {
     return name;
@@ -66,7 +71,7 @@ public class User extends AbstractEntity {
   }
 
   public Set<Group> getGroups() {
-    return groups != null ? groups : (groups = new HashSet<Group>());
+    return groups == null ? (groups = new HashSet<Group>()) : groups;
   }
 
   public void setGroups(Set<Group> groups) {
@@ -79,15 +84,19 @@ public class User extends AbstractEntity {
     }
   }
 
-  public void clearGroups() {
-    groups = new HashSet<Group>();
+  public boolean hasGroup(Group g) {
+    return groups.contains(g);
+  }
+
+  public void removeGroup(Group g) {
+    if(getGroups().remove(g)) g.getUsers().remove(this);
   }
 
   public boolean getEnabled() {
     return enabled;
   }
 
-  public void setEnabled(Boolean b) {
+  public void setEnabled(boolean b) {
     enabled = b;
   }
 

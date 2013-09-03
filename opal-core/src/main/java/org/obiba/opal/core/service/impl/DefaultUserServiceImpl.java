@@ -11,22 +11,51 @@ package org.obiba.opal.core.service.impl;
 
 import java.util.List;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.obiba.core.service.impl.PersistenceManagerAwareService;
 import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.User;
+import org.obiba.opal.core.service.SubjectAclService;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Default implementation of User Service
  */
 @Transactional
-public abstract class DefaultUserServiceImpl extends PersistenceManagerAwareService implements UserService {
+public class DefaultUserServiceImpl extends PersistenceManagerAwareService implements UserService {
+
+  private SessionFactory factory;
+
+  private SubjectAclService aclService;
+
+  public void setSubjectAclService(SubjectAclService aclService) {
+    this.aclService = aclService;
+  }
+
+  public void setSessionFactory(SessionFactory factory) {
+    this.factory = factory;
+  }
+
+  private Session getCurrentSession() {
+    return factory.getCurrentSession();
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Iterable<User> list() {
+    return getCurrentSession().createCriteria(User.class).list();
+  }
+
+  @Override
+  public int getUserCount() {
+    return 0;
+  }
 
   @Override
   public User getUserWithName(String name) {
-    User template = new User();
-    template.setName(name);
-    return getPersistenceManager().matchOne(template);
+    return (User) getCurrentSession().createCriteria(User.class).add(Restrictions.eq("name", name)).uniqueResult();
   }
 
   @Override
@@ -43,12 +72,18 @@ public abstract class DefaultUserServiceImpl extends PersistenceManagerAwareServ
 
   @Override
   public void createOrUpdateUser(User user) {
-    getPersistenceManager().save(user);
+    factory.getCurrentSession().saveOrUpdate(user);
   }
 
   @Override
   public void deleteUser(User user) {
+    SubjectAclService.Subject aclSubject = SubjectAclService.SubjectType
+        .valueOf(SubjectAclService.SubjectType.USER.name()).subjectFor(user.getName());
+
     getPersistenceManager().delete(user);
+
+    // Delete user's permissions
+    aclService.deleteSubjectPermissions("opal", null, aclSubject);
   }
 
   @Override
@@ -63,13 +98,18 @@ public abstract class DefaultUserServiceImpl extends PersistenceManagerAwareServ
 
   @Override
   public Group getGroupWithName(String name) {
-    Group template = new Group();
-    template.setName(name);
-    return getPersistenceManager().matchOne(template);
+    return (Group) getCurrentSession().createCriteria(Group.class).add(Restrictions.eq("name", name)).uniqueResult();
   }
 
   @Override
   public void deleteGroup(Group group) {
+    SubjectAclService.Subject aclSubject = SubjectAclService.SubjectType
+        .valueOf(SubjectAclService.SubjectType.GROUP.name()).subjectFor(group.getName());
+
     getPersistenceManager().delete(group);
+
+    // Delete group's permissions
+    aclService.deleteSubjectPermissions("opal", null, aclSubject);
+
   }
 }
