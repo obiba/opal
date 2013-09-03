@@ -123,16 +123,8 @@ public class UserAdministrationPresenter
   protected void onReveal() {
     super.onReveal();
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
-    // stop start search service
-//    ResourceRequestBuilderFactory.<UserDto>newBuilder().forResource("/users").get()
-//        .withCallback(new ResourceCallback<UserDto>() {
-//
-//          }
-//        }).send();
-
     getView().showUsers();
     getView().getUsersTable().setVisibleRange(0, 10);
-//    refresh();
   }
 
   @Override
@@ -223,8 +215,8 @@ public class UserAdministrationPresenter
       }
     });
 
-    // ACTIONS
-    getView().getUsersActions().setActionHandler(new ActionHandler<UserDto>() {
+    // User Actions
+    getView().getActions().setActionHandler(new ActionHandler<UserDto>() {
 
       @Override
       public void doAction(final UserDto object, String actionName) {
@@ -246,7 +238,8 @@ public class UserAdministrationPresenter
       }
     });
 
-    getView().getGroupsActions().setActionHandler(new ActionHandler<GroupDto>() {
+    // Groups actions
+    getView().getGroupActions().setActionHandler(new ActionHandler<GroupDto>() {
 
       @Override
       public void doAction(final GroupDto object, String actionName) {
@@ -301,9 +294,6 @@ public class UserAdministrationPresenter
     }
   }
 
-  //  private static void refreshUsers(JsArray<UserDto> resource){
-//    getView().renderUserRows(resource);
-//  }
   public class UserStatusChangeDelegate implements IconActionCell.Delegate<UserDto> {
     @Override
     public void executeClick(NativeEvent event, final UserDto value) {
