@@ -17,6 +17,7 @@ import org.hibernate.criterion.Restrictions;
 import org.obiba.core.service.impl.PersistenceManagerAwareService;
 import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.User;
+import org.obiba.opal.core.service.SubjectAclService;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -26,6 +27,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class DefaultUserServiceImpl extends PersistenceManagerAwareService implements UserService {
 
   private SessionFactory factory;
+
+  private SubjectAclService aclService;
+
+  public void setSubjectAclService(SubjectAclService aclService) {
+    this.aclService = aclService;
+  }
 
   public void setSessionFactory(SessionFactory factory) {
     this.factory = factory;
@@ -70,7 +77,13 @@ public class DefaultUserServiceImpl extends PersistenceManagerAwareService imple
 
   @Override
   public void deleteUser(User user) {
+    SubjectAclService.Subject aclSubject = SubjectAclService.SubjectType
+        .valueOf(SubjectAclService.SubjectType.USER.name()).subjectFor(user.getName());
+
     getPersistenceManager().delete(user);
+
+    // Delete user's permissions
+    aclService.deleteSubjectPermissions("opal", null, aclSubject);
   }
 
   @Override
@@ -90,6 +103,13 @@ public class DefaultUserServiceImpl extends PersistenceManagerAwareService imple
 
   @Override
   public void deleteGroup(Group group) {
+    SubjectAclService.Subject aclSubject = SubjectAclService.SubjectType
+        .valueOf(SubjectAclService.SubjectType.GROUP.name()).subjectFor(group.getName());
+
     getPersistenceManager().delete(group);
+
+    // Delete group's permissions
+    aclService.deleteSubjectPermissions("opal", null, aclSubject);
+
   }
 }
