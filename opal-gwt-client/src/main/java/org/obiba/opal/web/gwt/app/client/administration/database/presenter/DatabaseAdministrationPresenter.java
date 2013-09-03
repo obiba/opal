@@ -69,7 +69,7 @@ public class DatabaseAdministrationPresenter extends
     String TEST_ACTION = "Test";
 
     enum Slots {
-      Drivers, Permissions, Header
+      DRIVERS, PERMISSIONS, HEADER
     }
 
     HasActionHandler<DatabaseDto> getActions();
@@ -105,8 +105,11 @@ public class DatabaseAdministrationPresenter extends
   @ProxyEvent
   @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(Resources.sqlDatabases()).post()
-        .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListDatabasesAuthorization())).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(Resources.sqlDatabases()) //
+        .get() //
+        .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListDatabasesAuthorization())) //
+        .send();
   }
 
   @Override
@@ -119,6 +122,7 @@ public class DatabaseAdministrationPresenter extends
     breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs()).build();
 
     refresh();
+
     // set permissions
     AclRequest.newResourceAuthorizationRequestBuilder()
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
@@ -126,8 +130,11 @@ public class DatabaseAdministrationPresenter extends
 
   @Override
   public void authorize(HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(Resources.sqlDatabases()).post()
-        .authorize(authorizer).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(Resources.sqlDatabases()) //
+        .get() //
+        .authorize(authorizer) //
+        .send();
   }
 
   @Override
@@ -169,12 +176,12 @@ public class DatabaseAdministrationPresenter extends
     getView().getActions().setActionHandler(new ActionHandler<DatabaseDto>() {
 
       @Override
-      public void doAction(final DatabaseDto object, String actionName) {
-        if(object.getEditable() && actionName.equalsIgnoreCase(DELETE_ACTION)) {
+      public void doAction(final DatabaseDto dto, String actionName) {
+        if(dto.getEditable() && actionName.equalsIgnoreCase(DELETE_ACTION)) {
           getEventBus().fireEvent(ConfirmationRequiredEvent.createWithKeys(confirmedCommand = new Command() {
             @Override
             public void execute() {
-              deleteDatabase(object);
+              deleteDatabase(dto);
             }
 
             private void deleteDatabase(DatabaseDto database) {
@@ -191,9 +198,8 @@ public class DatabaseAdministrationPresenter extends
             }
 
           }, "deleteDatabase", "confirmDeleteDatabase"));
-        } else if(object.getEditable() && actionName.equalsIgnoreCase(EDIT_ACTION)) {
-          DatabasePresenter dialog = databaseModalProvider.get();
-          dialog.updateDatabase(object);
+        } else if(dto.getEditable() && actionName.equalsIgnoreCase(EDIT_ACTION)) {
+          databaseModalProvider.get().updateDatabase(dto);
         } else if(actionName.equalsIgnoreCase(Display.TEST_ACTION)) {
           ResponseCodeCallback callback = new ResponseCodeCallback() {
 
@@ -212,7 +218,7 @@ public class DatabaseAdministrationPresenter extends
 
           };
           ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder()//
-              .forResource(Resources.database(object.getName(), "connections")).accept("application/json")//
+              .forResource(Resources.database(dto.getName(), "connections")).accept("application/json")//
               .withCallback(Response.SC_OK, callback).withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).post()
               .send();
         }
@@ -261,8 +267,8 @@ public class DatabaseAdministrationPresenter extends
   private final class PermissionsUpdate implements HasAuthorization {
     @Override
     public void unauthorized() {
-      clearSlot(Display.Slots.Permissions);
-      clearSlot(Display.Slots.Header);
+      clearSlot(Display.Slots.PERMISSIONS);
+      clearSlot(Display.Slots.HEADER);
     }
 
     @Override
@@ -272,7 +278,7 @@ public class DatabaseAdministrationPresenter extends
 
     @Override
     public void authorized() {
-      setInSlot(Display.Slots.Permissions, authorizationPresenter);
+      setInSlot(Display.Slots.PERMISSIONS, authorizationPresenter);
     }
   }
 

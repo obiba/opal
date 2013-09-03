@@ -13,7 +13,7 @@
         <b:Breadcrumbs ui:field="breadcrumbs"/>
       </b:Column>
       <b:Column size="3">
-        <b:Button ui:field="addDatabaseButton" type="INFO" icon="PLUS" size="SMALL">
+        <b:Button ui:field="addDatabaseButton" type="INFO" icon="PLUS" size="SMALL" addStyleNames="pull-right">
           <ui:msg description="Add SQL database label">Add SQL database</ui:msg>
         </b:Button>
       </b:Column>

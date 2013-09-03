@@ -12,7 +12,7 @@ package org.obiba.opal.web.magma;
 import java.util.Arrays;
 import java.util.Collections;
 
-import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.Response;
 
 import org.mozilla.javascript.RhinoException;
 import org.obiba.magma.support.DatasourceParsingException;
@@ -29,85 +29,85 @@ public class ClientErrorDtos {
 
   private static final Logger log = LoggerFactory.getLogger(ClientErrorDtos.class);
 
-  public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus) {
-    return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode())
-        .setStatus(errorStatus != null ? errorStatus : "");
+  private ClientErrorDtos() {}
+
+  public static ClientErrorDto.Builder getErrorMessage(Response.StatusType responseStatus, String errorStatus,
+      String... args) {
+    return ClientErrorDto.newBuilder() //
+        .setCode(responseStatus.getStatusCode()) //
+        .setStatus(errorStatus == null ? "" : errorStatus) //
+        .addAllArguments(args == null ? Collections.<String>emptyList() : Arrays.asList(args));
   }
 
-  public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, String... args) {
-    return ClientErrorDto.newBuilder().setCode(responseStatus.getStatusCode())
-        .setStatus(errorStatus != null ? errorStatus : "")
-        .addAllArguments(args != null ? Arrays.asList(args) : Collections.<String>emptyList());
+  @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+  public static ClientErrorDto.Builder getErrorMessage(Response.StatusType responseStatus, String errorStatus,
+      Exception e) {
+    ClientErrorDto.Builder builder = getErrorMessage(responseStatus, errorStatus);
+    Throwable cause = getRootCause(e);
+    builder.addArguments(cause.getMessage() == null ? cause.getClass().getName() : cause.getMessage());
+    return builder;
   }
 
-  public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, Exception e) {
-    ClientErrorDto.Builder clientError = getErrorMessage(responseStatus, errorStatus);
-    Throwable cause = e;
-    while(cause.getCause() != null) {
-      cause = cause.getCause();
-    }
-    clientError.addArguments(cause.getMessage() != null ? cause.getMessage() : cause.getClass().getName());
-    return clientError;
-  }
-
-  public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus, RuntimeException e) {
+  @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+  public static ClientErrorDto.Builder getErrorMessage(Response.StatusType responseStatus, String errorStatus,
+      RuntimeException e) {
     log.warn(errorStatus, e);
+    Throwable cause = getRootCause(e);
+    return getErrorMessage(responseStatus, errorStatus)
+        .addArguments(cause.getMessage() == null ? cause.getClass().getName() : cause.getMessage());
+  }
+
+  private static Throwable getRootCause(Exception e) {
     Throwable cause = e;
     while(cause.getCause() != null) {
       cause = cause.getCause();
     }
-    ClientErrorDto.Builder clientError = getErrorMessage(responseStatus, errorStatus);
-    clientError.addArguments(cause.getMessage() != null ? cause.getMessage() : cause.getClass().getName());
-    return clientError;
+    return cause;
   }
 
-  public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus,
+  public static ClientErrorDto.Builder getErrorMessage(Response.StatusType responseStatus, String errorStatus,
       DatasourceParsingException pe) {
-    ClientErrorDto.Builder clientError = getErrorMessage(responseStatus, errorStatus);
-    clientError.addArguments(pe.getMessage());
+    ClientErrorDto.Builder builder = getErrorMessage(responseStatus, errorStatus);
+    builder.addArguments(pe.getMessage());
     // build a parsing error dto list
     if(pe.getChildren().isEmpty()) {
-      clientError.addExtension(DatasourceParsingErrorDto.errors, newDatasourceParsingErrorDto(pe).build());
+      builder.addExtension(DatasourceParsingErrorDto.errors, newDatasourceParsingErrorDto(pe).build());
     } else {
       for(DatasourceParsingException child : pe.getChildrenAsList()) {
-        clientError.addExtension(DatasourceParsingErrorDto.errors, newDatasourceParsingErrorDto(child).build());
+        builder.addExtension(DatasourceParsingErrorDto.errors, newDatasourceParsingErrorDto(child).build());
       }
     }
-    return clientError;
+    return builder;
   }
 
-  public static ClientErrorDto.Builder getErrorMessage(Status responseStatus, String errorStatus,
+  public static ClientErrorDto.Builder getErrorMessage(Response.StatusType responseStatus, String errorStatus,
       RhinoException exception) {
-    ClientErrorDto.Builder clientError = getErrorMessage(responseStatus, errorStatus);
-    clientError.addArguments(exception.getMessage());
-    clientError.addExtension(JavaScriptErrorDto.errors, newJavaScriptErrorDto(exception).build());
-
-    return clientError;
+    return getErrorMessage(responseStatus, errorStatus) //
+        .addArguments(exception.getMessage()) //
+        .addExtension(JavaScriptErrorDto.errors, newJavaScriptErrorDto(exception).build());
   }
 
   private static DatasourceParsingErrorDto.Builder newDatasourceParsingErrorDto(DatasourceParsingException pe) {
-    DatasourceParsingErrorDto.Builder parsingError = DatasourceParsingErrorDto.newBuilder();
-    parsingError.setDefaultMessage(pe.getMessage());
-    parsingError.setKey(pe.getKey());
+    DatasourceParsingErrorDto.Builder builder = DatasourceParsingErrorDto.newBuilder() //
+        .setDefaultMessage(pe.getMessage()) //
+        .setKey(pe.getKey());
     for(Object arg : pe.getParameters()) {
-      parsingError.addArguments(arg.toString());
+      builder.addArguments(arg.toString());
     }
-    return parsingError;
+    return builder;
   }
 
   private static JavaScriptErrorDto.Builder newJavaScriptErrorDto(RhinoException exception) {
-    JavaScriptErrorDto.Builder javaScriptErrorDtoBuilder = JavaScriptErrorDto.newBuilder() //
+    JavaScriptErrorDto.Builder builder = JavaScriptErrorDto.newBuilder() //
         .setMessage(exception.details()) //
         .setSourceName(exception.sourceName()) //
         .setLineNumber(exception.lineNumber()); //
-
     if(exception.lineSource() != null) {
-      javaScriptErrorDtoBuilder.setLineSource(exception.lineSource());
+      builder.setLineSource(exception.lineSource());
     }
     if(exception.columnNumber() != 0) { // column number is 0 if unknown
-      javaScriptErrorDtoBuilder.setColumnNumber(exception.columnNumber());
+      builder.setColumnNumber(exception.columnNumber());
     }
-
-    return javaScriptErrorDtoBuilder;
+    return builder;
   }
 }

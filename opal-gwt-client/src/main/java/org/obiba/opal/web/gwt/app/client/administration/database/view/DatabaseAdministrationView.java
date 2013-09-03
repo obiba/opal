@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.administration.database.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseAdministrationPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
@@ -61,30 +60,13 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
   Table<DatabaseDto> databaseTable;
 
   @UiField
-  Panel permissionsPanel;
-
-  @UiField
   Panel breadcrumbs;
 
   @UiField
+  Panel permissionsPanel;
+
+  @UiField
   Panel permissions;
-
-  ActionsColumn<DatabaseDto> actionsColumn = new ActionsColumn<DatabaseDto>(new ActionsProvider<DatabaseDto>() {
-
-    private final String[] all = new String[] { TEST_ACTION, EDIT_ACTION, DELETE_ACTION };
-
-    private final String[] immutable = new String[] { TEST_ACTION };
-
-    @Override
-    public String[] allActions() {
-      return all;
-    }
-
-    @Override
-    public String[] getActions(DatabaseDto value) {
-      return value.getEditable() ? allActions() : immutable;
-    }
-  });
 
   public DatabaseAdministrationView() {
     uiWidget = uiBinder.createAndBindUi(this);
@@ -93,7 +75,7 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
     databaseTable.addColumn(Columns.URL, translations.urlLabel());
     databaseTable.addColumn(Columns.DRIVER, translations.driverLabel());
     databaseTable.addColumn(Columns.USERNAME, translations.usernameLabel());
-    databaseTable.addColumn(actionsColumn, translations.actionsLabel());
+    databaseTable.addColumn(Columns.ACTIONS, translations.actionsLabel());
   }
 
   @Override
@@ -103,7 +85,7 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {
-    if(slot == Display.Slots.Permissions) {
+    if(slot == Slots.PERMISSIONS) {
       permissions.clear();
       permissions.add(content);
     }
@@ -116,7 +98,7 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
 
   @Override
   public HasActionHandler<DatabaseDto> getActions() {
-    return actionsColumn;
+    return Columns.ACTIONS;
   }
 
   @Override
@@ -139,8 +121,8 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
     static final Column<DatabaseDto, String> NAME = new TextColumn<DatabaseDto>() {
 
       @Override
-      public String getValue(DatabaseDto object) {
-        return object.getName();
+      public String getValue(DatabaseDto dto) {
+        return dto.getName();
       }
     };
 
@@ -168,6 +150,19 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
       }
     };
 
+    static final ActionsColumn<DatabaseDto> ACTIONS = new ActionsColumn<DatabaseDto>(
+        new ActionsProvider<DatabaseDto>() {
+
+          @Override
+          public String[] allActions() {
+            return new String[] { TEST_ACTION, EDIT_ACTION, DELETE_ACTION };
+          }
+
+          @Override
+          public String[] getActions(DatabaseDto dto) {
+            return dto.getEditable() ? allActions() : new String[] { TEST_ACTION };
+          }
+        });
   }
 
 }

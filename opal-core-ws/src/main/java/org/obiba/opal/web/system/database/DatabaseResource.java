@@ -25,6 +25,9 @@ import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
+
 @Component
 @Scope("request")
 @Path("/system/database/{name}")
@@ -49,7 +52,7 @@ public class DatabaseResource {
   public Response delete() {
     Database database = getDatabase();
     if(!database.isEditable()) {
-      return Response.status(Response.Status.BAD_REQUEST).build();
+      return Response.status(BAD_REQUEST).build();
     }
     databaseRegistry.deleteDatabase(database);
     return Response.ok().build();
@@ -57,9 +60,10 @@ public class DatabaseResource {
 
   @PUT
   public Response update(Opal.DatabaseDto dto) {
+    //TODO check that name did not change
     Database database = Dtos.fromDto(dto);
     if(!database.isEditable()) {
-      return Response.status(Response.Status.BAD_REQUEST).build();
+      return Response.status(BAD_REQUEST).build();
     }
     databaseRegistry.addOrReplaceDatabase(database);
     return Response.ok().build();
@@ -76,8 +80,7 @@ public class DatabaseResource {
   }
 
   private Response testSqlConnection() {
-    Ws.ClientErrorDto error = ClientErrorDtos
-        .getErrorMessage(Response.Status.SERVICE_UNAVAILABLE, "DatabaseConnectionFailed", "").build();
+    Ws.ClientErrorDto error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed").build();
     try {
       JdbcTemplate t = new JdbcTemplate(databaseRegistry.getDataSource(name, null));
       Boolean result = t.execute(new ConnectionCallback<Boolean>() {
@@ -88,14 +91,12 @@ public class DatabaseResource {
         }
       });
       if(result != null && result) return Response.ok().build();
-    } catch(DataAccessException dae) {
-      error = ClientErrorDtos.getErrorMessage(Response.Status.SERVICE_UNAVAILABLE, "DatabaseConnectionFailed", dae)
-          .build();
+    } catch(DataAccessException e) {
+      error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed", e).build();
     } catch(RuntimeException e) {
-      error = ClientErrorDtos.getErrorMessage(Response.Status.SERVICE_UNAVAILABLE, "DatabaseConnectionFailed", e)
-          .build();
+      error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed", e).build();
     }
-    return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(error).build();
+    return Response.status(SERVICE_UNAVAILABLE).entity(error).build();
   }
 
 }

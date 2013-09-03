@@ -28,7 +28,6 @@ import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
-import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
 public class RAdministrationPresenter
     extends ItemAdministrationPresenter<RAdministrationPresenter.Display, RAdministrationPresenter.Proxy> {
