@@ -58,6 +58,7 @@ import org.obiba.opal.web.model.Opal.TaxonomyDto;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -583,13 +584,13 @@ public final class Dtos {
   }
 
   public static Opal.DatabaseDto asDto(Database db) {
-    Opal.DatabaseDto.Builder builder = Opal.DatabaseDto.newBuilder() //
-        .setName(db.getName()) //
-        .setDescription(db.getDescription()) //
-        .setDefaultStorage(db.isDefaultStorage()) //
-        .setEditable(db.isEditable()) //
-        .setUsedForIdentifiers(db.isUsedForIdentifiers()) //
-        .setType(Opal.DatabaseDto.DbType.valueOf(db.getType().name()));
+    Opal.DatabaseDto.Builder builder = Opal.DatabaseDto.newBuilder();
+    builder.setName(db.getName());
+    if(!Strings.isNullOrEmpty(db.getDescription())) builder.setDescription(db.getDescription());
+    builder.setDefaultStorage(db.isDefaultStorage());
+    builder.setEditable(db.isEditable());
+    builder.setUsedForIdentifiers(db.isUsedForIdentifiers());
+    builder.setType(Opal.DatabaseDto.DbType.valueOf(db.getType().name()));
     if(db instanceof SqlDatabase) {
       return builder.setExtension(Opal.SqlDatabaseDto.settings, asDto((SqlDatabase) db)).build();
     }
@@ -600,20 +601,22 @@ public final class Dtos {
   }
 
   private static Opal.SqlDatabaseDto asDto(SqlDatabase db) {
-    return Opal.SqlDatabaseDto.newBuilder() //
+    Opal.SqlDatabaseDto.Builder builder = Opal.SqlDatabaseDto.newBuilder() //
         .setDriverClass(db.getDriverClass()) //
         .setMagmaDatasourceType(db.getMagmaDatasourceType()) //
         .setUrl(db.getUrl()) //
-        .setUsername(db.getUsername()) //
-        .setPassword(db.getPassword()) //
-        .setProperties(db.getProperties()).build();
+        .setUsername(db.getUsername());
+    if(!Strings.isNullOrEmpty(db.getPassword())) builder.setPassword(db.getPassword());
+    if(!Strings.isNullOrEmpty(db.getProperties())) builder.setProperties(db.getProperties());
+    return builder.build();
   }
 
   private static Opal.MongoDbDatabaseDto asDto(MongoDbDatabase db) {
-    return Opal.MongoDbDatabaseDto.newBuilder() //
-        .setUrl(db.getUrl()) //
-        .setUsername(db.getUsername()) //
-        .setPassword(db.getPassword()) //
-        .setProperties(db.getProperties()).build();
+    Opal.MongoDbDatabaseDto.Builder builder = Opal.MongoDbDatabaseDto.newBuilder() //
+        .setUrl(db.getUrl());
+    if(!Strings.isNullOrEmpty(db.getUsername())) builder.setUsername(db.getUsername());
+    if(!Strings.isNullOrEmpty(db.getPassword())) builder.setPassword(db.getPassword());
+    if(!Strings.isNullOrEmpty(db.getProperties())) builder.setProperties(db.getProperties());
+    return builder.build();
   }
 }
