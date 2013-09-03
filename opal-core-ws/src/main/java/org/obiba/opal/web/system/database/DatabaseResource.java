@@ -19,12 +19,14 @@ import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Ws;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
+@Scope("request")
 @Path("/system/database/{name}")
 public class DatabaseResource {
 
