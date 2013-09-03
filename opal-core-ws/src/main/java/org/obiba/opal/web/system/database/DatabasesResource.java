@@ -42,6 +42,12 @@ public class DatabasesResource {
     return asDto(databaseRegistry.list(MongoDbDatabase.class));
   }
 
+  @GET
+  @Path("/identifiers")
+  public Opal.DatabaseDto getIdentifiersDatabase() {
+    return Dtos.asDto(databaseRegistry.getIdentifiersDatabase());
+  }
+
   private List<Opal.DatabaseDto> asDto(Iterable<? extends Database> databases) {
     List<Opal.DatabaseDto> dtos = new ArrayList<Opal.DatabaseDto>();
     for(Database database : databases) {

@@ -101,26 +101,34 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
   @SuppressWarnings("unchecked")
   @Override
   public Iterable<Database> list() {
-    return getCurrentSession().createCriteria(Database.class).list();
+    return getCurrentSession().createCriteria(Database.class) //
+        .add(Restrictions.eq("usedForIdentifiers", false)) //
+        .list();
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <T extends Database> Iterable<T> list(@Nonnull Class<T> databaseClass) {
-    return getCurrentSession().createCriteria(databaseClass).list();
+    return getCurrentSession().createCriteria(databaseClass) //
+        .add(Restrictions.eq("usedForIdentifiers", false)) //
+        .list();
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public Iterable<Database> list(@Nullable String type) {
-    return Strings.isNullOrEmpty(type)
-        ? list()
-        : getCurrentSession().createCriteria(Database.class).add(Restrictions.eq("type", type)).list();
+    return Strings.isNullOrEmpty(type) //
+        ? list() //
+        : getCurrentSession().createCriteria(Database.class) //
+            .add(Restrictions.eq("usedForIdentifiers", false)) //
+            .add(Restrictions.eq("type", type)) //
+            .list();
   }
 
   @Override
   public Database getDatabase(@Nonnull String name) {
-    return (Database) getCurrentSession().createCriteria(Database.class).add(Restrictions.eq("name", name))
+    return (Database) getCurrentSession().createCriteria(Database.class) //
+        .add(Restrictions.eq("name", name)) //
         .uniqueResult();
   }
 
@@ -138,12 +146,13 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
 
   @Override
   public void addOrReplaceDatabase(@Nonnull Database database)
-      throws DuplicateDatabaseNameException, MultipleIdentifiersDatabaseException {
+      throws DuplicateDatabaseNameException, MultipleIdentifiersDatabaseException, CannotChangeDatabaseNameException {
     validUniqueName(database);
     validUniqueIdentifiersDatabase(database);
     if(database.getId() == null) {
       getCurrentSession().persist(database);
     } else {
+      validUnchangedName(database);
       getCurrentSession().update(database);
     }
     destroyDataSource(database.getName());
@@ -155,6 +164,13 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
           !Objects.equals(existing.getId(), database.getId())) {
         throw new DuplicateDatabaseNameException(database.getName());
       }
+    }
+  }
+
+  private void validUnchangedName(Database database) throws CannotChangeDatabaseNameException {
+    Database existing = (Database) getCurrentSession().get(database.getClass(), database.getId());
+    if(!Objects.equals(existing.getName(), database.getName())) {
+      throw new CannotChangeDatabaseNameException(existing.getName(), database.getName());
     }
   }
 
@@ -198,8 +214,9 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
   @Nullable
   @Override
   public Database getIdentifiersDatabase() {
-    return (Database) getCurrentSession().createCriteria(Database.class)
-        .add(Restrictions.eq("usedForIdentifiers", true)).uniqueResult();
+    return (Database) getCurrentSession().createCriteria(Database.class) //
+        .add(Restrictions.eq("usedForIdentifiers", true)) //
+        .uniqueResult();
   }
 
   private Session getCurrentSession() {

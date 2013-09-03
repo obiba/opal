@@ -18,7 +18,7 @@ public interface DatabaseRegistry {
   Database getDatabase(@Nonnull String name);
 
   void addOrReplaceDatabase(@Nonnull Database database)
-      throws DuplicateDatabaseNameException, MultipleIdentifiersDatabaseException;
+      throws DuplicateDatabaseNameException, MultipleIdentifiersDatabaseException, CannotChangeDatabaseNameException;
 
   void deleteDatabase(@Nonnull Database database);
 
