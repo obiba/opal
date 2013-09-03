@@ -90,9 +90,6 @@ public class UserAdministrationPresenter
     HasActionHandler<GroupDto> getGroupsActions();
   }
 
-//  @SuppressWarnings("FieldCanBeLocal")
-//  private final AuthorizationPresenter authorizationPresenter;
-
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
   @SuppressWarnings("UnusedDeclaration")
@@ -102,7 +99,6 @@ public class UserAdministrationPresenter
   public UserAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
       ModalProvider<UserPresenter> userModalProvider, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
-//    this.authorizationPresenter = authorizationPresenter.get();
     this.breadcrumbsHelper = breadcrumbsHelper;
     this.userModalProvider = userModalProvider.setContainer(this);
   }
@@ -129,8 +125,7 @@ public class UserAdministrationPresenter
 
   @Override
   public void authorize(HasAuthorization authorizer) {
-//    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(Resources.indices()).get().authorize(authorizer)
-//        .send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/users").post().authorize(authorizer).send();
   }
 
   @Override
@@ -190,6 +185,7 @@ public class UserAdministrationPresenter
         getView().showUsers();
       }
     }));
+
     // Refresh group list
     registerHandler(getEventBus().addHandler(GroupsRefreshEvent.getType(), new GroupsRefreshEvent.Handler() {
       @Override

@@ -68,24 +68,9 @@ public class UserAdministrationView extends ViewImpl implements Display {
 
   @UiField
   Button addUser;
-//  @UiField
-//  DropdownButton actionsDropdown;
 
-  //
   @UiField
   SimplePager indexTablePager;
-
-//  @UiField
-//  Alert selectAllAlert;
-//
-//  @UiField
-//  Label selectAllStatus;
-//
-//  @UiField
-//  Anchor selectAllAnchor;
-//
-//  @UiField
-//  Anchor clearSelectionAnchor;
 
   @UiField
   CellTable<UserDto> usersTable;
@@ -111,13 +96,6 @@ public class UserAdministrationView extends ViewImpl implements Display {
     usersLink.setActive(true);
     indexTablePager.setDisplay(usersTable);
 
-//    checkboxColumn = new CheckboxColumn<TableIndexStatusDto>(new TableIndexStatusDtoDisplay());
-//    checkboxColumn.setActionHandler(new ActionHandler<Integer>() {
-//      @Override
-//      public void doAction(Integer object, String actionName) {
-//        selectAllAlert.setVisible(object > 0);
-//      }
-//    });
     Column<UserDto, String> name = new TextColumn<UserDto>() {
 
       @Override
