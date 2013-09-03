@@ -277,6 +277,11 @@
           <property name="appliesTo" value="1.14.6"/>
         </bean>
 
+        <!-- 2.0 User and User_groups tables -->
+        <bean id="opal-schemaUpgrade-2.0" parent="updateOpalSchema">
+          <property name="appliesTo" value="2.0.0"/>
+        </bean>
+
       </list>
     </property>
 

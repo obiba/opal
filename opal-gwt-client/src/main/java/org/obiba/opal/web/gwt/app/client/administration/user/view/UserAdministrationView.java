@@ -68,24 +68,9 @@ public class UserAdministrationView extends ViewImpl implements Display {
 
   @UiField
   Button addUser;
-//  @UiField
-//  DropdownButton actionsDropdown;
 
-  //
   @UiField
   SimplePager indexTablePager;
-
-//  @UiField
-//  Alert selectAllAlert;
-//
-//  @UiField
-//  Label selectAllStatus;
-//
-//  @UiField
-//  Anchor selectAllAnchor;
-//
-//  @UiField
-//  Anchor clearSelectionAnchor;
 
   @UiField
   CellTable<UserDto> usersTable;
@@ -102,20 +87,15 @@ public class UserAdministrationView extends ViewImpl implements Display {
 
   Column<UserDto, UserDto> status;
 
-  ActionsColumn<UserDto> actions;
+  ActionsColumn<UserDto> userActions;
+
+  ActionsColumn<GroupDto> groupActions;
 
   public UserAdministrationView() {
     uiWidget = uiBinder.createAndBindUi(this);
     usersLink.setActive(true);
     indexTablePager.setDisplay(usersTable);
 
-//    checkboxColumn = new CheckboxColumn<TableIndexStatusDto>(new TableIndexStatusDtoDisplay());
-//    checkboxColumn.setActionHandler(new ActionHandler<Integer>() {
-//      @Override
-//      public void doAction(Integer object, String actionName) {
-//        selectAllAlert.setVisible(object > 0);
-//      }
-//    });
     Column<UserDto, String> name = new TextColumn<UserDto>() {
 
       @Override
@@ -139,7 +119,7 @@ public class UserAdministrationView extends ViewImpl implements Display {
         return object;
       }
     };
-    actions = new ActionsColumn<UserDto>(new ActionsProvider<UserDto>() {
+    userActions = new ActionsColumn<UserDto>(new ActionsProvider<UserDto>() {
 
       private final String[] all = new String[] { ActionsColumn.EDIT_ACTION, ActionsColumn.DELETE_ACTION,
           PERMISSIONS_ACTION };
@@ -154,10 +134,32 @@ public class UserAdministrationView extends ViewImpl implements Display {
         return allActions();
       }
     });
+
+    groupActions = new ActionsColumn<GroupDto>(new ActionsProvider<GroupDto>() {
+
+      private final String[] all = new String[] { ActionsColumn.DELETE_ACTION, PERMISSIONS_ACTION };
+
+      private final String[] permissions = new String[] { PERMISSIONS_ACTION };
+
+      @Override
+      public String[] allActions() {
+        return all;
+      }
+
+      public String[] permissionsActions() {
+        return permissions;
+      }
+
+      @Override
+      public String[] getActions(GroupDto value) {
+        return value.getUsersCount() > 0 ? permissionsActions() : allActions();
+      }
+    });
+//  }
     usersTable.addColumn(name, translations.userNameLabel());
     usersTable.addColumn(groups, translations.userGroupsLabel());
     usersTable.addColumn(status, translations.userStatusLabel());
-    usersTable.addColumn(actions, translations.actionsLabel());
+    usersTable.addColumn(userActions, translations.actionsLabel());
     usersTable.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
 //    indexTable.setColumnWidth(checkboxColumn, 1, Style.Unit.PX);
 
@@ -166,7 +168,7 @@ public class UserAdministrationView extends ViewImpl implements Display {
     /*Groups*/
     groupsTable.addColumn(GroupColumns.name, translations.groupNameLabel());
     groupsTable.addColumn(GroupColumns.users, translations.groupUsersLabel());
-    groupsTable.addColumn(GroupColumns.actions, translations.actionsLabel());
+    groupsTable.addColumn(groupActions, translations.actionsLabel());
     groupDataProvider.addDataDisplay(groupsTable);
   }
 
@@ -245,8 +247,13 @@ public class UserAdministrationView extends ViewImpl implements Display {
   }
 
   @Override
-  public HasActionHandler<UserDto> getActions() {
-    return actions;
+  public HasActionHandler<UserDto> getUsersActions() {
+    return userActions;
+  }
+
+  @Override
+  public HasActionHandler<GroupDto> getGroupsActions() {
+    return groupActions;
   }
 
   private static final class GroupColumns {
@@ -266,26 +273,5 @@ public class UserAdministrationView extends ViewImpl implements Display {
         return object.getUsersCount() > 0 ? object.getUsersArray().join(", ") : "";
       }
     };
-
-    static final ActionsColumn<GroupDto> actions = new ActionsColumn<GroupDto>(new ActionsProvider<GroupDto>() {
-
-      private final String[] all = new String[] { ActionsColumn.DELETE_ACTION, PERMISSIONS_ACTION };
-
-      private final String[] permissions = new String[] { PERMISSIONS_ACTION };
-
-      @Override
-      public String[] allActions() {
-        return all;
-      }
-
-      public String[] permissionsActions() {
-        return permissions;
-      }
-
-      @Override
-      public String[] getActions(GroupDto value) {
-        return value.getUsersCount() > 0 ? permissionsActions() : allActions();
-      }
-    });
   }
 }

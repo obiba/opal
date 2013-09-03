@@ -146,8 +146,10 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
 
   public void setUser(UserDto userDto) {
     this.userDto = userDto;
-    for(int i = 0; i < userDto.getGroupsArray().length(); i++) {
-      getView().addSearchItem(userDto.getGroups(i));
+    if(userDto.getGroupsArray() != null) {
+      for(int i = 0; i < userDto.getGroupsArray().length(); i++) {
+        getView().addSearchItem(userDto.getGroups(i));
+      }
     }
 
     getView().setUser(userDto.getName(), JsArrays.toList(userDto.getGroupsArray()));
