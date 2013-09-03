@@ -9,37 +9,37 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.inject;
 
+import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.DatasourceSelectorPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.datasource.view.DatasourceSelectorView;
+import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.ScriptEvaluationPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.derive.view.ScriptEvaluationView;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.ScriptEditorPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.ScriptEvaluationPopupPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueMapPopupPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueSequencePopupPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.view.ScriptEditorView;
+import org.obiba.opal.web.gwt.app.client.magma.view.ScriptEvaluationPopupView;
+import org.obiba.opal.web.gwt.app.client.magma.view.SummaryTabView;
+import org.obiba.opal.web.gwt.app.client.magma.view.ValueMapPopupView;
+import org.obiba.opal.web.gwt.app.client.magma.view.ValueSequencePopupView;
 import org.obiba.opal.web.gwt.app.client.place.DefaultPlace;
 import org.obiba.opal.web.gwt.app.client.place.OpalPlaceManager;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.ConfirmationPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.ItemSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.view.ApplicationView;
+import org.obiba.opal.web.gwt.app.client.view.ConfirmationView;
+import org.obiba.opal.web.gwt.app.client.view.ItemSelectorView;
 import org.obiba.opal.web.gwt.app.client.view.NotificationView;
 import org.obiba.opal.web.gwt.app.client.view.PageContainerView;
 import org.obiba.opal.web.gwt.app.client.view.UnhandledResponseNotificationView;
-import org.obiba.opal.web.gwt.app.client.presenter.ConfirmationPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.DatasourceSelectorPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.ItemSelectorPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.ScriptEditorPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.ScriptEvaluationPopupPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueMapPopupPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueSequencePopupPresenter;
-import org.obiba.opal.web.gwt.app.client.view.ConfirmationView;
-import org.obiba.opal.web.gwt.app.client.magma.datasource.view.DatasourceSelectorView;
-import org.obiba.opal.web.gwt.app.client.view.ItemSelectorView;
-import org.obiba.opal.web.gwt.app.client.magma.view.ScriptEditorView;
-import org.obiba.opal.web.gwt.app.client.magma.view.ScriptEvaluationPopupView;
-import org.obiba.opal.web.gwt.app.client.magma.view.SummaryTabView;
-import org.obiba.opal.web.gwt.app.client.magma.view.ValueMapPopupView;
-import org.obiba.opal.web.gwt.app.client.magma.view.ValueSequencePopupView;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.ScriptEvaluationPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.derive.view.ScriptEvaluationView;
 import org.obiba.opal.web.gwt.rest.client.DefaultRequestUrlBuilder;
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 
@@ -54,14 +54,15 @@ public class OpalGinModule extends AbstractPresenterModule {
 
   @Override
   protected void configure() {
-    bind(BreadcrumbsBuilder.class).to(DefaultBreadcrumbsBuilder.class).in(Singleton.class);;
+    bind(BreadcrumbsBuilder.class).to(DefaultBreadcrumbsBuilder.class).in(Singleton.class);
+    ;
     bind(RequestUrlBuilder.class).to(DefaultRequestUrlBuilder.class).in(Singleton.class);
     bind(UnhandledResponseNotificationPresenter.Display.class).to(UnhandledResponseNotificationView.class)
         .in(Singleton.class);
 
-    bindConstant().annotatedWith(DefaultPlace.class).to(Places.dashboard);
+    bindConstant().annotatedWith(DefaultPlace.class).to(Places.DASHBOARD);
 
-        install(new DefaultModule(OpalPlaceManager.class));
+    install(new DefaultModule(OpalPlaceManager.class));
     bindPresenter(ApplicationPresenter.class, ApplicationPresenter.Display.class, ApplicationView.class,
         ApplicationPresenter.Proxy.class);
     bindSingletonPresenterWidget(NotificationPresenter.class, NotificationPresenter.Display.class,

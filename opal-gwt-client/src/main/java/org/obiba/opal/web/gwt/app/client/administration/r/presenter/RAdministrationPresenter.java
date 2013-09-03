@@ -140,7 +140,7 @@ public class RAdministrationPresenter
   }
 
   @ProxyStandard
-  @NameToken(Places.r)
+  @NameToken(Places.R)
   public interface Proxy extends ProxyPlace<RAdministrationPresenter> {}
 
   public interface Display extends View, HasBreadcrumbs {

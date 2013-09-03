@@ -68,7 +68,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   @ProxyStandard
-  @NameToken(Places.project)
+  @NameToken(Places.PROJECT)
   public interface Proxy extends ProxyPlace<ProjectPresenter> {}
 
   @ContentSlot
@@ -156,7 +156,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   @Override
   public void onProjectsSelection() {
-    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.projects).build();
+    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.PROJECTS).build();
     placeManager.revealPlace(request);
   }
 

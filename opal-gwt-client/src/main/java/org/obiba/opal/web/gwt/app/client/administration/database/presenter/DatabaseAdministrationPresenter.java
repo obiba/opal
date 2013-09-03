@@ -61,7 +61,7 @@ public class DatabaseAdministrationPresenter extends
     ItemAdministrationPresenter<DatabaseAdministrationPresenter.Display, DatabaseAdministrationPresenter.Proxy> {
 
   @ProxyStandard
-  @NameToken(Places.databases)
+  @NameToken(Places.SQL_DATABASES)
   public interface Proxy extends ProxyPlace<DatabaseAdministrationPresenter> {}
 
   public interface Display extends View, HasBreadcrumbs {

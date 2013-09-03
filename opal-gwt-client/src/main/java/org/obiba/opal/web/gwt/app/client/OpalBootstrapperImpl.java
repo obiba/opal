@@ -55,7 +55,6 @@ public class OpalBootstrapperImpl implements Bootstrapper {
   @Inject
   UnhandledResponseNotificationPresenter unhandledResponseNotificationPresenter;
 
-
   @Inject
   public OpalBootstrapperImpl(PlaceManager placeManager) {
     this.placeManager = placeManager;
@@ -92,8 +91,7 @@ public class OpalBootstrapperImpl implements Bootstrapper {
             } else {
               // Force logout/login
               ResourceRequestBuilderFactory.newBuilder()
-                  .forResource("/auth/session/" + requestCredentials.extractCredentials()).delete()
-                  .send();
+                  .forResource("/auth/session/" + requestCredentials.extractCredentials()).delete().send();
               requestCredentials.invalidate();
             }
             placeManager.revealCurrentPlace();
@@ -131,14 +129,13 @@ public class OpalBootstrapperImpl implements Bootstrapper {
         GWT.log("Request error: ", e.getException());
       }
     });
-    eventBus
-        .addHandler(RequestCredentialsExpiredEvent.getType(), new RequestCredentialsExpiredEvent.Handler() {
-          @Override
-          public void onCredentialsExpired(RequestCredentialsExpiredEvent e) {
-            requestCredentials.invalidate();
-            placeManager.revealUnauthorizedPlace(Places.login);
-          }
-        });
+    eventBus.addHandler(RequestCredentialsExpiredEvent.getType(), new RequestCredentialsExpiredEvent.Handler() {
+      @Override
+      public void onCredentialsExpired(RequestCredentialsExpiredEvent e) {
+        requestCredentials.invalidate();
+        placeManager.revealUnauthorizedPlace(Places.LOGIN);
+      }
+    });
     eventBus.addHandler(SessionCreatedEvent.getType(), new SessionCreatedEvent.Handler() {
       @Override
       public void onSessionCreated(SessionCreatedEvent event) {

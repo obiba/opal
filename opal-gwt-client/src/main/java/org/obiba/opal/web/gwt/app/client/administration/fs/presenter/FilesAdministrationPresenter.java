@@ -36,7 +36,7 @@ public class FilesAdministrationPresenter
     extends ItemAdministrationPresenter<FilesAdministrationPresenter.Display, FilesAdministrationPresenter.Proxy> {
 
   @ProxyStandard
-  @NameToken(Places.files)
+  @NameToken(Places.FILES)
   public interface Proxy extends ProxyPlace<FilesAdministrationPresenter> {}
 
   private final RequestCredentials credentials;

@@ -13,17 +13,17 @@ import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdminis
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateModalPresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
-import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
-import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
@@ -50,7 +50,7 @@ public class ReportTemplatePresenter
   }
 
   @ProxyStandard
-  @NameToken(Places.reportTemplates)
+  @NameToken(Places.REPORT_TEMPLATES)
   public interface Proxy extends ProxyPlace<ReportTemplatePresenter> {}
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
@@ -67,7 +67,6 @@ public class ReportTemplatePresenter
     this.breadcrumbsHelper = breadcrumbsHelper;
     this.reportTemplateUpdateModalPresenterProvider = reportTemplateUpdateModalPresenterProvider.setContainer(this);
   }
-
 
   @Override
   public String getName() {

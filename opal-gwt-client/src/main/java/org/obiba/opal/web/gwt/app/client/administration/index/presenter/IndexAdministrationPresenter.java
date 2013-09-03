@@ -66,7 +66,7 @@ public class IndexAdministrationPresenter
     extends ItemAdministrationPresenter<IndexAdministrationPresenter.Display, IndexAdministrationPresenter.Proxy> {
 
   @ProxyStandard
-  @NameToken(Places.index)
+  @NameToken(Places.INDEX)
   public interface Proxy extends ProxyPlace<IndexAdministrationPresenter> {}
 
   private static final int DELAY_MILLIS = 1500;

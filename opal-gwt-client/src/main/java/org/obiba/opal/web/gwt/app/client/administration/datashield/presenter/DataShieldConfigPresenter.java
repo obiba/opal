@@ -43,7 +43,7 @@ public class DataShieldConfigPresenter
     extends ItemAdministrationPresenter<DataShieldConfigPresenter.Display, DataShieldConfigPresenter.Proxy> {
 
   @ProxyStandard
-  @NameToken(Places.datashield)
+  @NameToken(Places.DATASHIELD)
   public interface Proxy extends ProxyPlace<DataShieldConfigPresenter> {}
 
   public interface Display extends View, HasBreadcrumbs {

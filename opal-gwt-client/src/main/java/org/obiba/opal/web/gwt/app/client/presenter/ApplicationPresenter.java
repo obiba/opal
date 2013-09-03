@@ -1,4 +1,3 @@
-
 /*******************************************************************************
  * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
  *
@@ -60,7 +59,8 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   public static final GwtEvent.Type<RevealContentHandler<?>> WORKBENCH = new GwtEvent.Type<RevealContentHandler<?>>();
 
   @ContentSlot
-  public static final GwtEvent.Type<RevealContentHandler<?>> NOTIFICATION = new GwtEvent.Type<RevealContentHandler<?>>();
+  public static final GwtEvent.Type<RevealContentHandler<?>> NOTIFICATION
+      = new GwtEvent.Type<RevealContentHandler<?>>();
 
   @ProxyStandard
   public interface Proxy extends com.gwtplatform.mvp.client.proxy.Proxy<ApplicationPresenter> {}
@@ -201,17 +201,17 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   @Override
   public void onDashboard() {
-    placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.dashboard).build());
+    placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.DASHBOARD).build());
   }
 
   @Override
   public void onProjects() {
-    placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.projects).build());
+    placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.PROJECTS).build());
   }
 
   @Override
   public void onAdministration() {
-    placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.administration).build());
+    placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.ADMINISTRATION).build());
   }
 
   @Override
@@ -235,7 +235,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
     String path = MagmaPath.Builder.datasource(datasourceName).table(tableName).variable(variableName).build();
 
-    PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.project)
+    PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECT)
         .with(ParameterTokens.TOKEN_NAME, datasourceName) //
         .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.tables.toString()) //
         .with(ParameterTokens.TOKEN_PATH, path);
