@@ -18,7 +18,6 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.ui.GroupSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.opal.UserDto;
 
 import com.google.gwt.core.client.JsArrayString;
@@ -36,12 +35,6 @@ import com.gwtplatform.mvp.client.PopupView;
 public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> implements UserUiHandlers {
 
   private static final int MIN_PASSWORD_LENGTH = 6;
-
-  private List<TableIndexStatusDto> tableIndexStatusDtos;
-
-  private boolean refreshIndices = true;
-
-  private boolean refreshTable = false;
 
   private UserDto userDto;
 
