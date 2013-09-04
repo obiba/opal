@@ -19,6 +19,12 @@ public class SqlDatabase extends Database {
 
   private static final long serialVersionUID = 2224211432668278011L;
 
+  public static final String MAGMA_HIBERNATE_DATASOURCE = "hibernate";
+
+  public static final String MAGMA_JDBC_DATASOURCE = "jdbc";
+
+  public static final String MAGMA_LIMESURVEY_DATASOURCE = "limesurvey";
+
   /**
    * jdbc:{mysql|mariadb|postgresql}://{hostname}:{port}/{databaseName}
    */

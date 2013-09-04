@@ -74,11 +74,11 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
 
   public DashboardView() {
     initWidget(uiBinder.createAndBindUi(this));
-    getDatasourcesLink().setHref("#" + Places.navigator);
-    getUnitsLink().setHref("#" + Places.units);
-    getReportsLink().setHref("#" + Places.reportTemplates);
-    getJobsLink().setHref("#" + Places.jobs);
-    getFilesLink().setHref("#" + Places.files);
+    getDatasourcesLink().setHref("#" + Places.NAVIGATOR);
+    getUnitsLink().setHref("#" + Places.UNITS);
+    getReportsLink().setHref("#" + Places.REPORT_TEMPLATES);
+    getJobsLink().setHref("#" + Places.JOBS);
+    getFilesLink().setHref("#" + Places.FILES);
     pageTitle.setText(translations.pageDashboardTitle());
   }
 

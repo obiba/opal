@@ -2,6 +2,8 @@ package org.obiba.opal.core.domain.database;
 
 import javax.annotation.Nonnull;
 import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.MappedSuperclass;
 
 import org.obiba.magma.datasource.hibernate.domain.AbstractTimestampedEntity;
@@ -23,6 +25,7 @@ public abstract class Database extends AbstractTimestampedEntity {
   private String name;
 
   @Nonnull
+  @Enumerated(EnumType.STRING)
   private Type type;
 
   private String description;

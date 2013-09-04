@@ -32,7 +32,7 @@ public class MongoDbDatabase extends Database {
   public MongoClient createMongoClient() throws UnknownHostException {
     return new MongoClient(url);
   }
-
+  
   public String getPassword() {
     return password;
   }

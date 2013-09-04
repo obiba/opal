@@ -18,7 +18,6 @@ import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdminis
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexStatusRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
@@ -39,7 +38,6 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -68,10 +66,8 @@ public class IndexAdministrationPresenter
     extends ItemAdministrationPresenter<IndexAdministrationPresenter.Display, IndexAdministrationPresenter.Proxy> {
 
   @ProxyStandard
-  @NameToken(Places.index)
+  @NameToken(Places.INDEX)
   public interface Proxy extends ProxyPlace<IndexAdministrationPresenter> {}
-
-  private static final Translations translations = GWT.create(Translations.class);
 
   private static final int DELAY_MILLIS = 1500;
 

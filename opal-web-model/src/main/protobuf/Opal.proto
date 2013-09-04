@@ -76,17 +76,6 @@ message JdbcDriverDto {
   optional string version = 4;
 }
 
-//TODO delete this JdbcDataSourceDto
-message JdbcDataSourceDto {
-  required string name = 1;
-  required string url = 2;
-  required string driverClass = 3;
-  required string username = 4;
-  optional string password = 5;
-  optional bool editable = 6 [default = true];
-  optional string properties = 7;
-}
-
 message DatabaseDto {
   enum DbType {
     IMPORT = 0;

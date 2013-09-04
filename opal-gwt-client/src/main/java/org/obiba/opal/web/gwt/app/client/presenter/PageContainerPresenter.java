@@ -14,7 +14,7 @@ import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 
-public class PageContainerPresenter extends Presenter<PageContainerPresenter.Display,PageContainerPresenter.Proxy> {
+public class PageContainerPresenter extends Presenter<PageContainerPresenter.Display, PageContainerPresenter.Proxy> {
 
   @ContentSlot
   public static final GwtEvent.Type<RevealContentHandler<?>> HEADER = new GwtEvent.Type<RevealContentHandler<?>>();
@@ -28,7 +28,7 @@ public class PageContainerPresenter extends Presenter<PageContainerPresenter.Dis
   }
 
   @ProxyStandard
-  @NameToken(Places.admin)
+  @NameToken(Places.ADMIN)
   public interface Proxy extends ProxyPlace<PageContainerPresenter> {}
 
   public interface Display extends View {
@@ -38,11 +38,11 @@ public class PageContainerPresenter extends Presenter<PageContainerPresenter.Dis
   @Override
   public void setInSlot(Object slot, PresenterWidget<?> content) {
 
-    if (CONTENT == slot) {
-      if (content instanceof HasPageTitle) {
-        HasPageTitle pageHeader = (HasPageTitle)content;
+    if(CONTENT == slot) {
+      if(content instanceof HasPageTitle) {
+        HasPageTitle pageHeader = (HasPageTitle) content;
 
-        if (pageHeader != null) {
+        if(pageHeader != null) {
           getView().setPageTitle(pageHeader.getTitle());
         }
       }

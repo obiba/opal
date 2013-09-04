@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.place;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,142 +17,81 @@ public final class Places {
 
   private Places() {}
 
-  public static final String login = "!login";
+  public static final String LOGIN = "!login";
 
-  public static final Place loginPlace = new Place(login);
+  public static final Place LOGIN_PLACE = new Place(LOGIN);
 
-  public static String login() {
-    return dashboard;
-  }
+  public static final String DASHBOARD = "!dashboard";
 
-  public static final String dashboard = "!dashboard";
+  public static final Place DASHBOARD_PLACE = new Place(DASHBOARD);
 
-  public static final Place dashboardPlace = new Place(dashboard);
+  public static final String PROJECTS = "!projects";
 
+  public static final Place PROJECTS_PLACE = new Place(PROJECTS);
 
-  public static String dashboard() {
-    return dashboard;
-  }
+  public static final String PROJECT = "!project";
 
-  public static final String projects = "!projects";
-  public static final String project = "!project";
+  public static final String NAVIGATOR = "!navigator";
 
-  public static final Place projectsPlace = new Place(projects);
+  public static final Place NAVIGATOR_PLACE = new Place(NAVIGATOR);
 
-  public static String projects() {
-    return projects;
-  }
+  public static final String UNITS = "!units";
 
+  public static final Place unitsPlace = new Place(UNITS);
 
-  public static final String navigator = "!navigator";
+  public static final String UNIT = "!unit";
 
-  public static final Place navigatorPlace = new Place(navigator);
+  public static final Place UNIT_PLACE = new Place(UNIT);
 
-  public static String navigator() {
-    return navigator;
-  }
+  public static final String FILES = "!files";
 
-  public static final String units = "!units";
+  public static final Place FILES_PLACE = new Place(FILES);
 
-  public static final Place unitsPlace = new Place(units);
+  public static final String REPORT_TEMPLATES = "!reports";
 
-  public static String units() {
-    return units;
-  }
+  public static final Place REPORT_TEMPLATES_PLACE = new Place(REPORT_TEMPLATES);
 
-  public static final String unit = "!unit";
+  public static final String JOBS = "!jobs";
 
-  public static final Place unitPlace = new Place(unit);
+  public static final Place JOBS_PLACE = new Place(JOBS);
 
-  public static String unit() {
-    return units;
-  }
+  public static final String ADMINISTRATION = "!admin";
 
-  public static final String files = "!files";
+  public static final Place ADMINISTRATION_PLACE = new Place(ADMINISTRATION);
 
-  public static final Place filesPlace = new Place(files);
+  public static final String ADMIN = "!adminpage";
 
-  public static String files() {
-    return files;
-  }
+  public static final Place ADMIN_PLACE = new Place(ADMIN);
 
-  public static final String reportTemplates = "!reports";
+  public static final String USERS_GROUPS = ADMINISTRATION + ".users";
 
-  public static final Place reportTemplatesPlace = new Place(reportTemplates);
+  public static final Place USERS_GROUPS_PLACE = new Place(USERS_GROUPS);
 
-  public static String reportTemplates() {
-    return reportTemplates;
-  }
+  public static final String DATABASES = "!admin.databases";
 
-  public static final String jobs = "!jobs";
+  public static final Place DATABASES_PLACE = new Place(DATABASES);
 
-  public static final Place jobsPlace = new Place(jobs);
+  public static final String SQL_DATABASES = "!admin.databases.sql";
 
-  public static String jobs() {
-    return jobs;
-  }
+  public static final Place SQL_DATABASES_PLACE = new Place(SQL_DATABASES);
 
-  public static final String administration = "!admin";
+  public static final String INDEX = ADMINISTRATION + ".index";
 
-  public static final Place administrationPlace = new Place(administration);
+  public static final Place INDEX_PLACE = new Place(INDEX);
 
-  public static String administration() {
-    return administration;
-  }
+  public static final String DATASHIELD = ADMINISTRATION + ".datashield";
 
-  public static final String admin = "!adminpage";
+  public static final Place DATASHIELD_PLACE = new Place(DATASHIELD);
 
-  public static final Place adminPlace = new Place(admin);
+  public static final String R = ADMINISTRATION + ".r";
 
-  public static String admin() {
-    return admin;
-  }
-
-  public static final String usersGroups = administration + ".users";
-
-  public static final Place usersGroupsPlace = new Place(usersGroups);
-
-  public static String usersGroups() {
-    return usersGroups;
-  }
-
-  public static final String databases = "!admin.databases";
-
-  public static final Place databasesPlace = new Place(databases);
-
-  public static String databases() {
-    return databases;
-  }
-
-  public static final String index = administration + ".index";
-
-  public static final Place indexPlace = new Place(index);
-
-  public static String index() {
-    return index;
-  }
-
-  public static final String datashield = administration + ".datashield";
-
-  public static final Place datashieldPlace = new Place(datashield);
-
-  public static String datashield() {
-    return datashield;
-  }
-
-  public static final String r = administration + ".r";
-
-  public static final Place rPlace = new Place(r);
-
-  public static String r() {
-    return r;
-  }
+  public static final Place R_PLACE = new Place(R);
 
   public static final class Place extends com.google.gwt.place.shared.Place {
 
-    final String place;
+    private final String place;
 
-    private Map<String, String> params = new java.util.HashMap<String, String>();
+    private final Map<String, String> params = new HashMap<String, String>();
 
     public Place(String name) {
       place = name;
@@ -168,24 +107,12 @@ public final class Places {
     }
 
     public Set<String> getParameterNames() {
-      if(params != null) {
-        return params.keySet();
-      } else {
-        return Collections.emptySet();
-      }
+      return params.keySet();
     }
 
     public String getParameter(String key, String defaultValue) {
-      String value = null;
-
-      if(params != null) {
-        value = params.get(key);
-      }
-
-      if(value == null) {
-        value = defaultValue;
-      }
-      return value;
+      String value = params.get(key);
+      return value == null ? defaultValue : value;
     }
   }
 

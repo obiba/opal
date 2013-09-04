@@ -23,6 +23,7 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.runtime.Version;
@@ -44,6 +45,30 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
 
   private static final Logger log = LoggerFactory.getLogger(ExtractOpalJdbcConfigToDatabaseUpgradeStep.class);
 
+  private static final String OPAL_URL = "org.obiba.opal.datasource.opal.url";
+
+  private static final String OPAL_DRIVER = "org.obiba.opal.datasource.opal.driver";
+
+  private static final String OPAL_USERNAME = "org.obiba.opal.datasource.opal.username";
+
+  private static final String OPAL_PASSWORD = "org.obiba.opal.datasource.opal.password";
+
+  private static final String OPAL_DIALECT = "org.obiba.opal.datasource.opal.dialect";
+
+  private static final String OPAL_VALIDATION_QUERY = "org.obiba.opal.datasource.opal.validationQuery";
+
+  private static final String KEY_URL = "org.obiba.opal.datasource.key.url";
+
+  private static final String KEY_DRIVER = "org.obiba.opal.datasource.key.driver";
+
+  private static final String KEY_USERNAME = "org.obiba.opal.datasource.key.username";
+
+  private static final String KEY_PASSWORD = "org.obiba.opal.datasource.key.password";
+
+  private static final String KEY_DIALECT = "org.obiba.opal.datasource.key.dialect";
+
+  private static final String KEY_VALIDATION_QUERY = "org.obiba.opal.datasource.key.validationQuery";
+
   private File configFile;
 
   private File propertiesFile;
@@ -55,6 +80,7 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
     extractOpalDatasource();
     importExtraDatasources();
     deleteJdbcDataSourcesFromConfig();
+    deleteHibernateDatasourceFactoryFromConfig();
     commentDeprecatedProperties();
   }
 
@@ -65,23 +91,27 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
 
       SqlDatabase opalData = new SqlDatabase.Builder() //
           .name("opal-data") //
-          .url(prop.getProperty("org.obiba.opal.datasource.opal.url")) //
-          .driverClass(prop.getProperty("org.obiba.opal.datasource.opal.driver")) //
-          .username(prop.getProperty("org.obiba.opal.datasource.opal.username")) //
-          .password(prop.getProperty("org.obiba.opal.datasource.opal.password")) //
+          .url(prop.getProperty(OPAL_URL)) //
+          .driverClass(prop.getProperty(OPAL_DRIVER)) //
+          .username(prop.getProperty(OPAL_USERNAME)) //
+          .password(prop.getProperty(OPAL_PASSWORD)) //
           .editable(false) //
+          .type(Database.Type.STORAGE) //
+          .magmaDatasourceType(SqlDatabase.MAGMA_HIBERNATE_DATASOURCE) //
           .build();
       log.debug("Import opalData: {}", opalData);
       databaseRegistry.addOrReplaceDatabase(opalData);
 
       SqlDatabase opalKey = new SqlDatabase.Builder() //
           .name("opal-key") //
-          .url(prop.getProperty("org.obiba.opal.datasource.key.url")) //
-          .driverClass(prop.getProperty("org.obiba.opal.datasource.key.driver")) //
-          .username(prop.getProperty("org.obiba.opal.datasource.key.username")) //
-          .password(prop.getProperty("org.obiba.opal.datasource.key.password")) //
+          .url(prop.getProperty(KEY_URL)) //
+          .driverClass(prop.getProperty(KEY_DRIVER)) //
+          .username(prop.getProperty(KEY_USERNAME)) //
+          .password(prop.getProperty(KEY_PASSWORD)) //
           .editable(false) //
           .usedForIdentifiers(true) //
+          .type(Database.Type.STORAGE) //
+          .magmaDatasourceType(SqlDatabase.MAGMA_HIBERNATE_DATASOURCE) //
           .build();
       log.debug("Import opalKey: {}", opalKey);
 
@@ -101,19 +131,19 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
 
       PropertiesConfiguration config = new PropertiesConfiguration(propertiesFile);
 
-      removeAndAddComment("org.obiba.opal.datasource.opal.url", comments, config);
-      removeAndAddComment("org.obiba.opal.datasource.opal.driver", comments, config);
-      removeAndAddComment("org.obiba.opal.datasource.opal.username", comments, config);
-      removeAndAddComment("org.obiba.opal.datasource.opal.password", comments, config);
-      removeAndAddComment("org.obiba.opal.datasource.opal.dialect", comments, config);
-      removeAndAddComment("org.obiba.opal.datasource.opal.validationQuery", comments, config);
+      removeAndAddComment(OPAL_URL, comments, config);
+      removeAndAddComment(OPAL_DRIVER, comments, config);
+      removeAndAddComment(OPAL_USERNAME, comments, config);
+      removeAndAddComment(OPAL_PASSWORD, comments, config);
+      removeAndAddComment(OPAL_DIALECT, comments, config);
+      removeAndAddComment(OPAL_VALIDATION_QUERY, comments, config);
 
-      removeAndAddComment("org.obiba.opal.datasource.key.url", comments, config);
-      removeAndAddComment("org.obiba.opal.datasource.key.driver", comments, config);
-      removeAndAddComment("org.obiba.opal.datasource.key.username", comments, config);
-      removeAndAddComment("org.obiba.opal.datasource.key.password", comments, config);
-      removeAndAddComment("org.obiba.opal.datasource.key.dialect", comments, config);
-      removeAndAddComment("org.obiba.opal.datasource.key.validationQuery", comments, config);
+      removeAndAddComment(KEY_URL, comments, config);
+      removeAndAddComment(KEY_DRIVER, comments, config);
+      removeAndAddComment(KEY_USERNAME, comments, config);
+      removeAndAddComment(KEY_PASSWORD, comments, config);
+      removeAndAddComment(KEY_DIALECT, comments, config);
+      removeAndAddComment(KEY_VALIDATION_QUERY, comments, config);
 
       config.setHeader(config.getHeader() + "\n" + StringUtils.collectionToDelimitedString(comments, "\n"));
       config.save(propertiesFile);
@@ -138,6 +168,8 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
             .password(dataSource.password) //
             .properties(dataSource.properties) //
             .editable(dataSource.editable) //
+            .type(Database.Type.STORAGE) //
+            .magmaDatasourceType(SqlDatabase.MAGMA_HIBERNATE_DATASOURCE) //
             .build();
         log.debug("Import sqlDatabase: {}", sqlDatabase);
         databaseRegistry.addOrReplaceDatabase(sqlDatabase);
@@ -198,6 +230,40 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
       XPath xPath = XPathFactory.newInstance().newXPath();
       Node node = (Node) xPath
           .compile("//org.obiba.opal.core.runtime.jdbc.DefaultJdbcDataSourceRegistry_-JdbcDataSourcesConfig")
+          .evaluate(doc.getDocumentElement(), XPathConstants.NODE);
+      node.getParentNode().removeChild(node);
+      Transformer transformer = TransformerFactory.newInstance().newTransformer();
+      transformer.transform(new DOMSource(doc), new StreamResult(configFile));
+    } catch(TransformerConfigurationException e) {
+      throw new RuntimeException(e);
+    } catch(SAXException e) {
+      throw new RuntimeException(e);
+    } catch(ParserConfigurationException e) {
+      throw new RuntimeException(e);
+    } catch(XPathExpressionException e) {
+      throw new RuntimeException(e);
+    } catch(TransformerException e) {
+      throw new RuntimeException(e);
+    } catch(IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  //  <factories>
+//    <org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
+//      <name>opal-data</name>
+//      <sessionFactoryProvider class="org.obiba.magma.datasource.hibernate.support.SpringBeanSessionFactoryProvider">
+//        <beanName>opalSessionFactory</beanName>
+//      </sessionFactoryProvider>
+//    </org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
+//  </factories>
+  private void deleteHibernateDatasourceFactoryFromConfig() {
+    log.debug("Delete opal-data HibernateDatasourceFactory from config file");
+    try {
+      Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(configFile);
+      XPath xPath = XPathFactory.newInstance().newXPath();
+      Node node = (Node) xPath
+          .compile("//org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory[name='opal-data']")
           .evaluate(doc.getDocumentElement(), XPathConstants.NODE);
       log.debug("node: {}", node);
       node.getParentNode().removeChild(node);

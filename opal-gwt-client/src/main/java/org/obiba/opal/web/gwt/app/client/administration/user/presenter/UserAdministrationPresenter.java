@@ -58,7 +58,7 @@ public class UserAdministrationPresenter
     extends ItemAdministrationPresenter<UserAdministrationPresenter.Display, UserAdministrationPresenter.Proxy> {
 
   @ProxyStandard
-  @NameToken(Places.usersGroups)
+  @NameToken(Places.USERS_GROUPS)
   public interface Proxy extends ProxyPlace<UserAdministrationPresenter> {}
 
   private final ModalProvider<UserPresenter> userModalProvider;
@@ -96,7 +96,6 @@ public class UserAdministrationPresenter
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
-  @SuppressWarnings("UnusedDeclaration")
   private Command confirmedCommand;
 
   @Inject

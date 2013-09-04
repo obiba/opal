@@ -1,9 +1,9 @@
 package org.obiba.opal.web.gwt.app.client.place;
 
 import com.google.gwt.core.client.GWT;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.proxy.PlaceManagerImpl;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.TokenFormatter;
@@ -16,7 +16,7 @@ public class OpalPlaceManager extends PlaceManagerImpl {
   @Inject
   public OpalPlaceManager(EventBus eventBus, TokenFormatter tokenFormatter, @DefaultPlace String defaultNameToken) {
     super(eventBus, tokenFormatter);
-    defaultPlaceRequest =  new PlaceRequest.Builder().nameToken(defaultNameToken).build();
+    defaultPlaceRequest = new PlaceRequest.Builder().nameToken(defaultNameToken).build();
   }
 
   @Override
@@ -31,6 +31,6 @@ public class OpalPlaceManager extends PlaceManagerImpl {
 
   @Override
   public void revealUnauthorizedPlace(String unauthorizedHistoryToken) {
-    revealPlace(new PlaceRequest.Builder().nameToken(Places.login).build(), false);
+    revealPlace(new PlaceRequest.Builder().nameToken(Places.LOGIN).build(), false);
   }
 }

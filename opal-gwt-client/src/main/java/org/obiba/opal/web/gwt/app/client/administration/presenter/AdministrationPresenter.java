@@ -22,7 +22,7 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
     implements HasPageTitle {
 
   @ProxyStandard
-  @NameToken(Places.administration)
+  @NameToken(Places.ADMINISTRATION)
   public interface Proxy extends ProxyPlace<AdministrationPresenter> {}
 
   public interface Display extends View {
@@ -87,15 +87,15 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
 
   private void setHistoryTokens() {
 
-    getView().setUsersGroupsHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.usersGroups), 1));
-    getView().setDatabasesHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.databases), 1));
-    getView().setIndexHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.index), 1));
-    getView().setRHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.r), 1));
-    getView().setUnitsHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.units), 1));
-    getView().setFilesHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.files), 1));
-    getView().setTasksHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.jobs), 1));
-    getView().setDataShieldHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.datashield), 1));
-    getView().setReportsHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.reportTemplates), 1));
+    getView().setUsersGroupsHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.USERS_GROUPS), 1));
+    getView().setDatabasesHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.SQL_DATABASES), 1));
+    getView().setIndexHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.INDEX), 1));
+    getView().setRHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.R), 1));
+    getView().setUnitsHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.UNITS), 1));
+    getView().setFilesHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.FILES), 1));
+    getView().setTasksHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.JOBS), 1));
+    getView().setDataShieldHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.DATASHIELD), 1));
+    getView().setReportsHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.REPORT_TEMPLATES), 1));
   }
 
   private PlaceRequest createRequest(String nameToken) {

@@ -36,7 +36,8 @@ import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
-public class FunctionalUnitView extends ViewWithUiHandlers<FunctionalUnitsUiHandlers> implements FunctionalUnitPresenter.Display {
+public class FunctionalUnitView extends ViewWithUiHandlers<FunctionalUnitsUiHandlers>
+    implements FunctionalUnitPresenter.Display {
 
   interface Binder extends UiBinder<Widget, FunctionalUnitView> {}
 
@@ -64,7 +65,6 @@ public class FunctionalUnitView extends ViewWithUiHandlers<FunctionalUnitsUiHand
   @UiField
   Breadcrumbs breadcrumbs;
 
-
   private final PlaceManager placeManager;
 
   @Inject
@@ -81,8 +81,9 @@ public class FunctionalUnitView extends ViewWithUiHandlers<FunctionalUnitsUiHand
       FlowPanel panel = new FlowPanel();
       panel.addStyleName("item");
       PlaceRequest.Builder requestBuilder = new PlaceRequest.Builder();
-      requestBuilder.nameToken(Places.unit).with("name", unit.getName());
-      Hyperlink unitLink = new Hyperlink(unit.getName(), placeManager.buildRelativeHistoryToken(requestBuilder.build()));
+      requestBuilder.nameToken(Places.UNIT).with("name", unit.getName());
+      Hyperlink unitLink = new Hyperlink(unit.getName(),
+          placeManager.buildRelativeHistoryToken(requestBuilder.build()));
       panel.add(unitLink);
       Label descriptionLabel = new Label(unit.getDescription());
       panel.add(descriptionLabel);

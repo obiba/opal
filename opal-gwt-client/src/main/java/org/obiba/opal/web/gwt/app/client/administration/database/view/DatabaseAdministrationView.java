@@ -10,25 +10,25 @@
 package org.obiba.opal.web.gwt.app.client.administration.database.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseAdministrationPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
-import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
+import org.obiba.opal.web.model.client.opal.DatabaseDto;
+import org.obiba.opal.web.model.client.opal.SqlDatabaseDto;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
@@ -57,43 +57,25 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
   SimplePager databaseTablePager;
 
   @UiField
-  Table<JdbcDataSourceDto> databaseTable;
-
-  @UiField
-  Panel permissionsPanel;
+  Table<DatabaseDto> databaseTable;
 
   @UiField
   Panel breadcrumbs;
 
   @UiField
+  Panel permissionsPanel;
+
+  @UiField
   Panel permissions;
-
-  ActionsColumn<JdbcDataSourceDto> actionsColumn = new ActionsColumn<JdbcDataSourceDto>(
-      new ActionsProvider<JdbcDataSourceDto>() {
-
-        private final String[] all = new String[] { TEST_ACTION, EDIT_ACTION, DELETE_ACTION };
-
-        private final String[] immutable = new String[] { TEST_ACTION };
-
-        @Override
-        public String[] allActions() {
-          return all;
-        }
-
-        @Override
-        public String[] getActions(JdbcDataSourceDto value) {
-          return value.getEditable() ? allActions() : immutable;
-        }
-      });
 
   public DatabaseAdministrationView() {
     uiWidget = uiBinder.createAndBindUi(this);
     databaseTablePager.setDisplay(databaseTable);
-    databaseTable.addColumn(Columns.name, translations.nameLabel());
-    databaseTable.addColumn(Columns.url, translations.urlLabel());
-    databaseTable.addColumn(Columns.driver, translations.driverLabel());
-    databaseTable.addColumn(Columns.username, translations.usernameLabel());
-    databaseTable.addColumn(actionsColumn, translations.actionsLabel());
+    databaseTable.addColumn(Columns.NAME, translations.nameLabel());
+    databaseTable.addColumn(Columns.URL, translations.urlLabel());
+    databaseTable.addColumn(Columns.DRIVER, translations.driverLabel());
+    databaseTable.addColumn(Columns.USERNAME, translations.usernameLabel());
+    databaseTable.addColumn(Columns.ACTIONS, translations.actionsLabel());
   }
 
   @Override
@@ -103,7 +85,7 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {
-    if(slot == Display.Slots.Permissions) {
+    if(slot == Slots.PERMISSIONS) {
       permissions.clear();
       permissions.add(content);
     }
@@ -115,12 +97,12 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
   }
 
   @Override
-  public HasActionHandler<JdbcDataSourceDto> getActions() {
-    return actionsColumn;
+  public HasActionHandler<DatabaseDto> getActions() {
+    return Columns.ACTIONS;
   }
 
   @Override
-  public HasData<JdbcDataSourceDto> getDatabaseTable() {
+  public HasData<DatabaseDto> getDatabaseTable() {
     return databaseTable;
   }
 
@@ -136,38 +118,51 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
 
   private static final class Columns {
 
-    static Column<JdbcDataSourceDto, String> name = new TextColumn<JdbcDataSourceDto>() {
+    static final Column<DatabaseDto, String> NAME = new TextColumn<DatabaseDto>() {
 
       @Override
-      public String getValue(JdbcDataSourceDto object) {
-        return object.getName();
+      public String getValue(DatabaseDto dto) {
+        return dto.getName();
       }
     };
 
-    static Column<JdbcDataSourceDto, String> url = new TextColumn<JdbcDataSourceDto>() {
+    static final Column<DatabaseDto, String> URL = new TextColumn<DatabaseDto>() {
 
       @Override
-      public String getValue(JdbcDataSourceDto object) {
-        return object.getUrl();
+      public String getValue(DatabaseDto dto) {
+        return ((SqlDatabaseDto) dto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings)).getUrl();
       }
     };
 
-    static Column<JdbcDataSourceDto, String> driver = new TextColumn<JdbcDataSourceDto>() {
+    static final Column<DatabaseDto, String> DRIVER = new TextColumn<DatabaseDto>() {
 
       @Override
-      public String getValue(JdbcDataSourceDto object) {
-        return object.getDriverClass();
+      public String getValue(DatabaseDto dto) {
+        return ((SqlDatabaseDto) dto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings)).getDriverClass();
       }
     };
 
-    static Column<JdbcDataSourceDto, String> username = new TextColumn<JdbcDataSourceDto>() {
+    static final Column<DatabaseDto, String> USERNAME = new TextColumn<DatabaseDto>() {
 
       @Override
-      public String getValue(JdbcDataSourceDto object) {
-        return object.getUsername();
+      public String getValue(DatabaseDto dto) {
+        return ((SqlDatabaseDto) dto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings)).getUsername();
       }
     };
 
+    static final ActionsColumn<DatabaseDto> ACTIONS = new ActionsColumn<DatabaseDto>(
+        new ActionsProvider<DatabaseDto>() {
+
+          @Override
+          public String[] allActions() {
+            return new String[] { TEST_ACTION, EDIT_ACTION, DELETE_ACTION };
+          }
+
+          @Override
+          public String[] getActions(DatabaseDto dto) {
+            return dto.getEditable() ? allActions() : new String[] { TEST_ACTION };
+          }
+        });
   }
 
 }

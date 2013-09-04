@@ -19,24 +19,23 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
 import com.google.gwt.core.client.GWT;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
-import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 
-public class DashboardPresenter extends Presenter<DashboardPresenter.Display, DashboardPresenter.Proxy> implements
-    HasPageTitle {
+public class DashboardPresenter extends Presenter<DashboardPresenter.Display, DashboardPresenter.Proxy>
+    implements HasPageTitle {
 
   private static final Translations translations = GWT.create(Translations.class);
 
   @ProxyStandard
-  @NameToken(Places.dashboard)
+  @NameToken(Places.DASHBOARD)
   public interface Proxy extends ProxyPlace<DashboardPresenter> {}
 
   @Inject

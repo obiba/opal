@@ -15,19 +15,19 @@ final class Resources {
 
   private Resources() {}
 
-  static String databases() {
-    return "/jdbc/databases";
+  static String sqlDatabases() {
+    return "/system/databases/sql";
   }
 
   static String database(String name) {
-    return UriBuilder.create().segment("jdbc", "database", name).build();
+    return UriBuilder.create().segment("system", "database", name).build();
   }
 
   static String database(String name, String... more) {
-    return UriBuilder.create().segment("jdbc", "database", name).segment(more).build();
+    return UriBuilder.create().segment("system", "database", name).segment(more).build();
   }
 
   public static String drivers() {
-    return "/jdbc/drivers";
+    return "/system/databases/jdbc-drivers";
   }
 }

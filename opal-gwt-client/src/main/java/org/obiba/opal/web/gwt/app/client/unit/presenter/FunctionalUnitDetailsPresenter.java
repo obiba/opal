@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.unit.presenter;
 
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
@@ -16,18 +18,16 @@ import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitSelectedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.FunctionalUnitUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.GenerateIdentifiersConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.unit.event.KeyPairCreatedEvent;
-import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateModalPresenter.Mode;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.unit.importidentifiers.presenter.IdentifiersImportPresenter;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateModalPresenter.Mode;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -83,9 +83,8 @@ public class FunctionalUnitDetailsPresenter
   private Request countIdentifiersRequest;
 
   @ProxyStandard
-  @NameToken(Places.unit)
-  public interface Proxy extends ProxyPlace<FunctionalUnitDetailsPresenter> {
-  }
+  @NameToken(Places.UNIT)
+  public interface Proxy extends ProxyPlace<FunctionalUnitDetailsPresenter> {}
 
   public interface Display extends View, HasUiHandlers<FunctionalUnitUiHandlers>, HasBreadcrumbs {
     void setKeyPairs(JsArray<KeyDto> keyPairs);
@@ -124,8 +123,7 @@ public class FunctionalUnitDetailsPresenter
   public FunctionalUnitDetailsPresenter(EventBus eventBus, Display display, Proxy proxy,
       ModalProvider<FunctionalUnitUpdateModalPresenter> functionalUnitModalProvider,
       GenerateIdentifiersModalPresenter generateIdentifiersModalPresenter,
-      Provider<AddKeyPairModalPresenter> addKeyPairModalPresenter,
-      DefaultBreadcrumbsBuilder breadcrumbsHelper) {
+      Provider<AddKeyPairModalPresenter> addKeyPairModalPresenter, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
     this.functionalUnitModalProvider = functionalUnitModalProvider.setContainer(this);
@@ -143,7 +141,7 @@ public class FunctionalUnitDetailsPresenter
   public void prepareFromRequest(PlaceRequest request) {
     super.prepareFromRequest(request);
     String unitName = request.getParameter("name", "");
-    if (!unitName.isEmpty()) retrieveFunctioanUnit(unitName);
+    if(!unitName.isEmpty()) retrieveFunctioanUnit(unitName);
   }
 
   @Override
@@ -154,8 +152,7 @@ public class FunctionalUnitDetailsPresenter
         ResponseCodeCallback callbackHandler = new FunctionalUnitDeleteCallback();
         UriBuilder ub = UriBuilder.create().segment("functional-unit", functionalUnit.getName());
         ResourceRequestBuilderFactory.newBuilder().forResource(ub.build()).delete()
-            .withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler)
-            .send();
+            .withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
       }
     };
     getEventBus().fireEvent(ConfirmationRequiredEvent
@@ -437,7 +434,6 @@ public class FunctionalUnitDetailsPresenter
     generateIdentifiersModalPresenter.setAffectedEntitiesCount(affectedCount);
     addToPopupSlot(generateIdentifiersModalPresenter);
   }
-
 
   //
   // Inner classes

@@ -36,7 +36,7 @@ public class FilesAdministrationPresenter
     extends ItemAdministrationPresenter<FilesAdministrationPresenter.Display, FilesAdministrationPresenter.Proxy> {
 
   @ProxyStandard
-  @NameToken(Places.files)
+  @NameToken(Places.FILES)
   public interface Proxy extends ProxyPlace<FilesAdministrationPresenter> {}
 
   private final RequestCredentials credentials;
@@ -81,13 +81,12 @@ public class FilesAdministrationPresenter
     setInSlot("Explorer", fileExplorerPresenter);
   }
 
-
   @Override
   public void onReveal() {
-    if(currentFolder != null) {
-      updateTable(currentFolder.getPath());
-    } else {
+    if(currentFolder == null) {
       updateTable(getDefaultPath());
+    } else {
+      updateTable(currentFolder.getPath());
     }
     breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs()).build();
   }

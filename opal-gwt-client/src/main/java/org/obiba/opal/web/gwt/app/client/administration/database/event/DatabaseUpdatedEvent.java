@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.database.event;
 
-import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
+import org.obiba.opal.web.model.client.opal.DatabaseDto;
 
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
@@ -22,13 +22,13 @@ public class DatabaseUpdatedEvent extends GwtEvent<DatabaseUpdatedEvent.Handler>
 
   private static final Type<Handler> TYPE = new Type<Handler>();
 
-  private final JdbcDataSourceDto dto;
+  private final DatabaseDto dto;
 
-  public DatabaseUpdatedEvent(JdbcDataSourceDto dto) {
+  public DatabaseUpdatedEvent(DatabaseDto dto) {
     this.dto = dto;
   }
 
-  public JdbcDataSourceDto getJdbcDataSourceDto() {
+  public DatabaseDto getDatabaseDto() {
     return dto;
   }
 

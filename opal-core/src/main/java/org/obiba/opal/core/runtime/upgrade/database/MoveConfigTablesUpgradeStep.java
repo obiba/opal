@@ -1,67 +1,94 @@
 package org.obiba.opal.core.runtime.upgrade.database;
 
-import org.hibernate.SessionFactory;
-import org.hibernate.classic.Session;
-import org.obiba.opal.core.domain.database.MongoDbDatabase;
-import org.obiba.opal.core.domain.database.SqlDatabase;
-import org.obiba.opal.core.domain.security.SubjectAcl;
-import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
-import org.obiba.opal.core.domain.user.Group;
-import org.obiba.opal.core.domain.user.User;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
+import org.obiba.runtime.upgrade.support.VersionTableInstallStep;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
+
+import com.google.common.collect.Lists;
+
+import static org.springframework.util.StringUtils.collectionToDelimitedString;
 
 public class MoveConfigTablesUpgradeStep extends AbstractUpgradeStep {
 
+  private static final Logger log = LoggerFactory.getLogger(MoveConfigTablesUpgradeStep.class);
+
+  private static final String[] TABLES = { "user", "groups", "user_groups", "database_sql", "database_mongodb",
+      "unit_key_store", "subject_acl", "version", "QRTZ_BLOB_TRIGGERS", "QRTZ_CALENDARS", "QRTZ_CRON_TRIGGERS",
+      "QRTZ_FIRED_TRIGGERS", "QRTZ_JOB_DETAILS", "QRTZ_JOB_LISTENERS", "QRTZ_PAUSED_TRIGGER_GRPS",
+      "QRTZ_SCHEDULER_STATE", "QRTZ_SIMPLE_TRIGGERS", "QRTZ_TRIGGER_LISTENERS", "QRTZ_TRIGGERS" };
+
+  private static final String[] DELETE_TABLES = { "user_groups", "user", "groups", "database_sql", "database_mongodb",
+      "unit_key_store", "subject_acl", "QRTZ_BLOB_TRIGGERS", "QRTZ_CALENDARS", "QRTZ_CRON_TRIGGERS",
+      "QRTZ_FIRED_TRIGGERS", "QRTZ_JOB_LISTENERS", "QRTZ_PAUSED_TRIGGER_GRPS", "QRTZ_SCHEDULER_STATE",
+      "QRTZ_SIMPLE_TRIGGERS", "QRTZ_TRIGGER_LISTENERS", "QRTZ_TRIGGERS", "QRTZ_JOB_DETAILS", "QRTZ_LOCKS" };
+
   private DatabaseRegistry databaseRegistry;
 
-  private LocalSessionFactoryBean configSessionFactory;
+  private DataSource configDataSource;
 
   @Override
   public void execute(Version currentVersion) {
-    configSessionFactory.createDatabaseSchema();
-    copyConfigData();
-    deleteTables();
-  }
+    JdbcTemplate dataJdbcTemplate = new JdbcTemplate(databaseRegistry.getDataSource("opal-data", null));
+    JdbcTemplate configJdbcTemplate = new JdbcTemplate(configDataSource);
 
-  private void copyConfigData() {
-    SessionFactory dataSessionFactory = databaseRegistry.getSessionFactory("opal-data", null);
-    Session dataSession = dataSessionFactory.getCurrentSession();
-    Session configSession = configSessionFactory.getObject().getCurrentSession();
-    copy(User.class, dataSession, configSession);
-    copy(Group.class, dataSession, configSession);
-    copy(SqlDatabase.class, dataSession, configSession);
-    copy(MongoDbDatabase.class, dataSession, configSession);
-    copy(UnitKeyStoreState.class, dataSession, configSession);
-    copy(SubjectAcl.class, dataSession, configSession);
-    dataSessionFactory.close();
-  }
+    // create version table
+    VersionTableInstallStep versionTableStep = new VersionTableInstallStep();
+    versionTableStep.setDataSource(configDataSource);
+    versionTableStep.execute(null);
 
-  @SuppressWarnings("TypeMayBeWeakened")
-  private void copy(Class<?> clazz, Session dataSession, Session configSession) {
-    for(Object o : dataSession.createCriteria(clazz).list()) {
-      configSession.persist(o);
+    for(String table : TABLES) {
+      copyTable(table, dataJdbcTemplate, configJdbcTemplate);
+    }
+    // do not delete version table here
+    for(String table : DELETE_TABLES) {
+      dataJdbcTemplate.execute("drop table " + table);
     }
   }
 
-  private void deleteTables() {
-    JdbcTemplate jdbcTemplate = new JdbcTemplate(databaseRegistry.getDataSource("opal-data", null));
-    jdbcTemplate.execute("drop table user");
-    jdbcTemplate.execute("drop table groups");
-    jdbcTemplate.execute("drop table database_sql");
-    jdbcTemplate.execute("drop table database_mongodb");
-    jdbcTemplate.execute("drop table unit_key_store");
-    jdbcTemplate.execute("drop table subject_acl");
+  private void copyTable(final String table, JdbcTemplate dataJdbcTemplate, JdbcTemplate configJdbcTemplate) {
+    final List<Map<String, Object>> rows = dataJdbcTemplate.queryForList("select * from " + table);
+
+    if(!rows.isEmpty()) {
+      Map<String, Object> map = rows.get(0);
+      final List<String> columns = Lists.newArrayList(map.keySet());
+      String sql = "insert into " + table + " (" + collectionToDelimitedString(columns, ", ") +
+          ") values (" + collectionToDelimitedString(Collections.nCopies(map.size(), "?"), ", ") + ")";
+      configJdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+        @Override
+        public void setValues(PreparedStatement ps, int i) throws SQLException {
+          Map<String, Object> row = rows.get(i);
+          log.debug("{} row {}: {}", table, i, row);
+          for(int colIndex = 0; colIndex < columns.size(); colIndex++) {
+            ps.setObject(colIndex + 1, row.get(columns.get(colIndex)));
+          }
+        }
+
+        @Override
+        public int getBatchSize() {
+          return rows.size();
+        }
+      });
+    }
   }
 
   public void setDatabaseRegistry(DatabaseRegistry databaseRegistry) {
     this.databaseRegistry = databaseRegistry;
   }
 
-  public void setConfigSessionFactory(LocalSessionFactoryBean configSessionFactory) {
-    this.configSessionFactory = configSessionFactory;
+  public void setConfigDataSource(DataSource configDataSource) {
+    this.configDataSource = configDataSource;
   }
 }

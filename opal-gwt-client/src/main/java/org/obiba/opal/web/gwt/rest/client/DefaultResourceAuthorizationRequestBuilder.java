@@ -12,6 +12,8 @@ package org.obiba.opal.web.gwt.rest.client;
 import java.util.Collection;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
 import com.google.gwt.http.client.Request;
@@ -23,10 +25,12 @@ import com.google.gwt.http.client.Response;
 @SuppressWarnings("ParameterHidesMemberVariable")
 public class DefaultResourceAuthorizationRequestBuilder implements ResourceAuthorizationRequestBuilder {
 
+  @Nonnull
   private String resource;
 
   private HttpMethod method;
 
+  @Nonnull
   private HasAuthorization toAuthorize;
 
   private static ResourceAuthorizationCache authorizationCache;
@@ -36,20 +40,20 @@ public class DefaultResourceAuthorizationRequestBuilder implements ResourceAutho
   }
 
   @Override
-  public DefaultResourceAuthorizationRequestBuilder authorize(HasAuthorization toAuthorize) {
+  public DefaultResourceAuthorizationRequestBuilder authorize(@Nonnull HasAuthorization toAuthorize) {
     if(toAuthorize == null) throw new IllegalArgumentException("UI object to authorize cannot be null");
     this.toAuthorize = toAuthorize;
     return this;
   }
 
   @Override
-  public ResourceAuthorizationRequestBuilder request(String resource, HttpMethod method) {
+  public ResourceAuthorizationRequestBuilder request(@Nonnull String resource, HttpMethod method) {
     forResource(resource);
     return method(method);
   }
 
   @Override
-  public ResourceAuthorizationRequestBuilder forResource(String resource) {
+  public ResourceAuthorizationRequestBuilder forResource(@Nonnull String resource) {
     if(resource == null) throw new IllegalArgumentException("path cannot be null");
     this.resource = resource;
     return this;
@@ -83,11 +87,12 @@ public class DefaultResourceAuthorizationRequestBuilder implements ResourceAutho
   @Override
   public void send() {
     beforeAuthorization();
-
     if(authorizationCache.contains(resource)) {
       apply(authorizationCache.get(resource));
     } else {
-      ResourceRequestBuilderFactory.newBuilder().forResource(resource).options()
+      ResourceRequestBuilderFactory.newBuilder() //
+          .forResource(resource) //
+          .options() //
           .withAuthorizationCallback(new AuthorizationCallback() {
 
             @Override
@@ -95,14 +100,15 @@ public class DefaultResourceAuthorizationRequestBuilder implements ResourceAutho
               apply(allowed);
             }
 
-          })//
+          }) //
           .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
 
             @Override
             public void onResponseCode(Request request, Response response) {
               unauthorized();
             }
-          }).send();
+          }) //
+          .send();
     }
   }
 

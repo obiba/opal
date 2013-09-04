@@ -51,29 +51,35 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
 
   public interface Display extends View, HasUiHandlers<FunctionalUnitsUiHandlers>, HasBreadcrumbs {
     HasAuthorization getAddFunctionalUnitAuthorizer();
+
     HasAuthorization getExportIdentifiersAuthorizer();
+
     HasAuthorization getImportIdentifiersAuthorizer();
+
     HasAuthorization getSyncIdentifiersAuthorizer();
+
     void setFunctionalUnits(JsArray<FunctionalUnitDto> templates);
   }
 
   protected static final Translations translations = GWT.create(Translations.class);
 
   @ProxyStandard
-  @NameToken(Places.units)
+  @NameToken(Places.UNITS)
   public interface Proxy extends ProxyPlace<FunctionalUnitPresenter> {}
 
   final FunctionalUnitDetailsPresenter functionalUnitDetailsPresenter;
+
   private final PlaceManager placeManager;
+
   private final ModalProvider<FunctionalUnitUpdateModalPresenter> functionalUnitModalProvider;
+
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
   @Inject
   public FunctionalUnitPresenter(Display display, EventBus eventBus, Proxy proxy,
       FunctionalUnitDetailsPresenter FunctionalUnitDetailsPresenter,
       ModalProvider<FunctionalUnitUpdateModalPresenter> functionalUnitModalProvider,
-      DefaultBreadcrumbsBuilder breadcrumbsHelper,
-      PlaceManager placeManager) {
+      DefaultBreadcrumbsBuilder breadcrumbsHelper, PlaceManager placeManager) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
     functionalUnitDetailsPresenter = FunctionalUnitDetailsPresenter;
@@ -107,7 +113,7 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
   @Override
   public void selectUnit(FunctionalUnitDto dto) {
     PlaceRequest.Builder requestBuilder = new PlaceRequest.Builder();
-    requestBuilder.nameToken(Places.unit).with("name", dto.getName());
+    requestBuilder.nameToken(Places.UNIT).with("name", dto.getName());
     placeManager.revealPlace(requestBuilder.build());
   }
 
@@ -131,7 +137,7 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
     registerHandler(getEventBus().addHandler(FunctionalUnitCreatedEvent.getType(), new FunctionalUnitCreatedHandler()));
   }
 
-//  @Override
+  //  @Override
   public String getTitle() {
     return translations.pageFunctionalUnitTitle();
   }
@@ -140,7 +146,6 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
   protected void onReset() {
     super.onReset();
   }
-
 
   //  @Override
   protected void authorize() {
@@ -193,7 +198,7 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
     public void onFunctionalUnitDeleted(FunctionalUnitDeletedEvent event) {
       refreshFunctionalUnits();
       // Get back to units to show the remaining units
-      placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.units).build());
+      placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.UNITS).build());
     }
 
   }

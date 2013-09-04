@@ -16,14 +16,14 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.JdbcDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.JdbcDatasourceSettingsDto;
-import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
+import org.obiba.opal.web.model.client.opal.DatabaseDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
 public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<JdbcDatasourceFormPresenter.Display>
@@ -55,11 +55,11 @@ public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<Jdbc
 
   @Override
   protected void onReveal() {
-    ResourceRequestBuilderFactory.<JsArray<JdbcDataSourceDto>>newBuilder().forResource("/jdbc/databases")
-        .withCallback(new ResourceCallback<JsArray<JdbcDataSourceDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder().forResource("/system/databases/sql")
+        .withCallback(new ResourceCallback<JsArray<DatabaseDto>>() {
 
           @Override
-          public void onResource(Response response, JsArray<JdbcDataSourceDto> resource) {
+          public void onResource(Response response, JsArray<DatabaseDto> resource) {
             getView().setDatabases(resource);
           }
         }).get().send();
@@ -109,7 +109,7 @@ public class JdbcDatasourceFormPresenter extends ValidatablePresenterWidget<Jdbc
 
   public interface Display extends DatasourceFormPresenter.Display {
 
-    void setDatabases(JsArray<JdbcDataSourceDto> resource);
+    void setDatabases(JsArray<DatabaseDto> resource);
 
     String getSelectedDatabase();
 

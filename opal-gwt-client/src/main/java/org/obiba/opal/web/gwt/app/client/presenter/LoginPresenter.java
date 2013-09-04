@@ -23,11 +23,11 @@ import com.google.gwt.event.dom.client.HasKeyUpHandlers;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
@@ -35,7 +35,6 @@ import com.gwtplatform.mvp.client.annotations.NoGatekeeper;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealRootContentEvent;
-import com.gwtplatform.mvp.client.proxy.RevealRootLayoutContentEvent;
 
 public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPresenter.Proxy> {
 
@@ -60,7 +59,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
   }
 
   @ProxyStandard
-  @NameToken(Places.login)
+  @NameToken(Places.LOGIN)
   @NoGatekeeper
   public interface Proxy extends ProxyPlace<LoginPresenter> {}
 

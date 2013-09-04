@@ -277,7 +277,7 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
 
     @Override
     public void onClick(ClickEvent arg0) {
-      placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.jobs).build());
+      placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.JOBS).build());
     }
   }
 

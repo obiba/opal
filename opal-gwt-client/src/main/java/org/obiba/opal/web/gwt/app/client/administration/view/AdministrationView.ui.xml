@@ -12,8 +12,10 @@
         <b:Column size="6">
           <g:FlowPanel addStyleNames="extra-large-bottom-margin panel">
             <b:WellNavList>
-              <b:NavHeader><ui:msg description="Main Administration Data Access">Data Access</ui:msg></b:NavHeader>
-              <b:Divider />
+              <b:NavHeader>
+                <ui:msg description="Main Administration Data Access">Data Access</ui:msg>
+              </b:NavHeader>
+              <b:Divider/>
               <o:OpalNavLink ui:field="usersGroupsPlace" icon="COG">
                 <ui:msg description="Main Administration Users and Groups title">Users and Groups</ui:msg>
               </o:OpalNavLink>
@@ -23,40 +25,43 @@
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>
-              <b:Divider />
+              <b:Divider/>
               <o:OpalNavLink ui:field="unitsPlace" icon="COG">
                 <ui:msg description="Main Administration Organizations title">Organizations</ui:msg>
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Organizations title">Manage organizations identification</ui:msg>
+                  <ui:msg description="Main Administration Organizations title">Manage organizations identification
+                  </ui:msg>
                 </g:Label>
               </g:FlowPanel>
             </b:WellNavList>
 
             <b:WellNavList>
-              <b:NavHeader><ui:msg description="Main Administration Databases">Databases</ui:msg></b:NavHeader>
-              <b:Divider />
+              <b:NavHeader>
+                <ui:msg description="Main Administration Databases">Databases</ui:msg>
+              </b:NavHeader>
+              <b:Divider/>
               <o:OpalNavLink ui:field="identifiersPlace" icon="COG">
                 <ui:msg description="Main Administration Identifiers Database title">Identifiers Database</ui:msg>
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Identifiers Databases help">Configure the identifiers database
+                  <ui:msg description="Main Administration Identifiers Databases help">Configure the identifiers
+                    database
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>
-              <b:Divider />
+              <b:Divider/>
               <o:OpalNavLink ui:field="databasesPlace" icon="COG">
                 <ui:msg description="Main Administration SQL Databases title">SQL Databases</ui:msg>
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration SQL Databases help">Manage SQL databases
-                  </ui:msg>
+                  <ui:msg description="Main Administration SQL Databases help">Manage SQL databases</ui:msg>
                 </g:Label>
               </g:FlowPanel>
-              <b:Divider />
+              <b:Divider/>
               <o:OpalNavLink ui:field="mongoDbPlace" icon="COG">
                 <ui:msg description="Main Administration MongoDB title">MongoDB Databases</ui:msg>
               </o:OpalNavLink>
@@ -68,8 +73,10 @@
             </b:WellNavList>
 
             <b:WellNavList>
-              <b:NavHeader><ui:msg description="Main Administration Search">Search</ui:msg></b:NavHeader>
-              <b:Divider />
+              <b:NavHeader>
+                <ui:msg description="Main Administration Search">Search</ui:msg>
+              </b:NavHeader>
+              <b:Divider/>
               <o:OpalNavLink ui:field="esPlace" icon="COG">
                 <ui:msg description="Main Administration Elastic Search title">Elastic Search</ui:msg>
               </o:OpalNavLink>
@@ -78,7 +85,7 @@
                   <ui:msg description="Main Administration Elastic Search help">Configure Elastic Search server</ui:msg>
                 </g:Label>
               </g:FlowPanel>
-              <b:Divider />
+              <b:Divider/>
               <o:OpalNavLink ui:field="indexPlace" icon="COG">
                 <ui:msg description="Main Administration Index title">Index</ui:msg>
               </o:OpalNavLink>
@@ -95,26 +102,31 @@
           <g:FlowPanel addStyleNames="extra-large-bottom-margin panel">
 
             <b:WellNavList>
-              <b:NavHeader><ui:msg description="Main Administration Data Analysis">Data Analysis</ui:msg></b:NavHeader>
-              <b:Divider />
+              <b:NavHeader>
+                <ui:msg description="Main Administration Data Analysis">Data Analysis</ui:msg>
+              </b:NavHeader>
+              <b:Divider/>
               <o:OpalNavLink ui:field="rPlace" icon="COG">
                 <ui:msg description="Main Administration R title">R</ui:msg>
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration R help">Configure R server, grant access to R service</ui:msg>
+                  <ui:msg description="Main Administration R help">Configure R server, grant access to R service
+                  </ui:msg>
                 </g:Label>
               </g:FlowPanel>
-              <b:Divider />
+              <b:Divider/>
               <o:OpalNavLink ui:field="dataShieldPlace" icon="COG">
                 <ui:msg description="Main Administration DataSHIELD title">DataSHIELD</ui:msg>
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration DataSHIELD help">Configure DataSHIELD, grant access to DataSHIELD service</ui:msg>
+                  <ui:msg description="Main Administration DataSHIELD help">Configure DataSHIELD, grant access to
+                    DataSHIELD service
+                  </ui:msg>
                 </g:Label>
               </g:FlowPanel>
-              <b:Divider />
+              <b:Divider/>
               <o:OpalNavLink ui:field="reportsPlace" icon="COG">
                 <ui:msg description="Main Administration Reports title">Reports</ui:msg>
               </o:OpalNavLink>
@@ -126,17 +138,20 @@
             </b:WellNavList>
 
             <b:WellNavList>
-              <b:NavHeader><ui:msg description="Main Administration System">System</ui:msg></b:NavHeader>
-              <b:Divider />
+              <b:NavHeader>
+                <ui:msg description="Main Administration System">System</ui:msg>
+              </b:NavHeader>
+              <b:Divider/>
               <o:OpalNavLink ui:field="serverPlace" icon="COG">
                 <ui:msg description="Main Administration General Settings title">General Settings</ui:msg>
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration General Settings help">Manage general server configuration</ui:msg>
+                  <ui:msg description="Main Administration General Settings help">Manage general server configuration
+                  </ui:msg>
                 </g:Label>
               </g:FlowPanel>
-              <b:Divider />
+              <b:Divider/>
               <o:OpalNavLink ui:field="filesPlace" icon="COG">
                 <ui:msg description="Main Administration Files title">Files</ui:msg>
               </o:OpalNavLink>
@@ -145,7 +160,7 @@
                   <ui:msg description="Main Administration Files help">Manage file system</ui:msg>
                 </g:Label>
               </g:FlowPanel>
-              <b:Divider />
+              <b:Divider/>
               <o:OpalNavLink ui:field="tasksPlace" icon="COG">
                 <ui:msg description="Main Administration Tasks title">Tasks</ui:msg>
               </o:OpalNavLink>
@@ -154,16 +169,18 @@
                   <ui:msg description="Main Administration Tasks help">Monitor and schedule tasks</ui:msg>
                 </g:Label>
               </g:FlowPanel>
-              <b:Divider />
+              <b:Divider/>
               <o:OpalNavLink ui:field="pluginsPlace" icon="COG">
                 <ui:msg description="Main Administration Plugins title">Plugins</ui:msg>
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Plugins help">Add, remove plugins for data visualization or system monitoring</ui:msg>
+                  <ui:msg description="Main Administration Plugins help">Add, remove plugins for data visualization or
+                    system monitoring
+                  </ui:msg>
                 </g:Label>
               </g:FlowPanel>
-              <b:Divider />
+              <b:Divider/>
               <o:OpalNavLink ui:field="javaPlace" icon="COG">
                 <ui:msg description="Main Administration Java title">Java</ui:msg>
               </o:OpalNavLink>
@@ -178,7 +195,7 @@
       </b:FluidRow>
     </g:FlowPanel>
     <!--<g:HTMLPanel addStyleNames="administration">-->
-      <!--<o:NavTabsPanel ui:field="administrationDisplays"/>-->
+    <!--<o:NavTabsPanel ui:field="administrationDisplays"/>-->
     <!--</g:HTMLPanel>-->
   </g:FlowPanel>
 </ui:UiBinder>

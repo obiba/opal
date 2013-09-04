@@ -10,6 +10,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.database.Database;
+import org.obiba.opal.core.domain.database.MongoDbDatabase;
+import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Opal;
@@ -25,11 +27,33 @@ public class DatabasesResource {
 
   @GET
   public List<Opal.DatabaseDto> getDatabases(@QueryParam("type") String type) {
-    List<Opal.DatabaseDto> databases = new ArrayList<Opal.DatabaseDto>();
-    for(Database database : databaseRegistry.list(type)) {
-      databases.add(Dtos.asDto(database));
+    return asDto(databaseRegistry.list(type));
+  }
+
+  @GET
+  @Path("/sql")
+  public List<Opal.DatabaseDto> getSqlDatabases() {
+    return asDto(databaseRegistry.list(SqlDatabase.class));
+  }
+
+  @GET
+  @Path("/mongodb")
+  public List<Opal.DatabaseDto> getMongoDbDatabases() {
+    return asDto(databaseRegistry.list(MongoDbDatabase.class));
+  }
+
+  @GET
+  @Path("/identifiers")
+  public Opal.DatabaseDto getIdentifiersDatabase() {
+    return Dtos.asDto(databaseRegistry.getIdentifiersDatabase());
+  }
+
+  private List<Opal.DatabaseDto> asDto(Iterable<? extends Database> databases) {
+    List<Opal.DatabaseDto> dtos = new ArrayList<Opal.DatabaseDto>();
+    for(Database database : databases) {
+      dtos.add(Dtos.asDto(database));
     }
-    return databases;
+    return dtos;
   }
 
   @POST

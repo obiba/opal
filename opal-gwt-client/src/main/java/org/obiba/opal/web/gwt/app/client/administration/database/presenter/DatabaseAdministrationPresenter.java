@@ -31,7 +31,7 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.AclAction;
-import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
+import org.obiba.opal.web.model.client.opal.DatabaseDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -60,9 +60,8 @@ import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_
 public class DatabaseAdministrationPresenter extends
     ItemAdministrationPresenter<DatabaseAdministrationPresenter.Display, DatabaseAdministrationPresenter.Proxy> {
 
-
   @ProxyStandard
-  @NameToken(Places.databases)
+  @NameToken(Places.SQL_DATABASES)
   public interface Proxy extends ProxyPlace<DatabaseAdministrationPresenter> {}
 
   public interface Display extends View, HasBreadcrumbs {
@@ -70,24 +69,24 @@ public class DatabaseAdministrationPresenter extends
     String TEST_ACTION = "Test";
 
     enum Slots {
-      Drivers, Permissions, Header
+      DRIVERS, PERMISSIONS, HEADER
     }
 
-    HasActionHandler<JdbcDataSourceDto> getActions();
+    HasActionHandler<DatabaseDto> getActions();
 
     HasClickHandlers getAddButton();
 
     HasAuthorization getPermissionsAuthorizer();
 
-    HasData<JdbcDataSourceDto> getDatabaseTable();
+    HasData<DatabaseDto> getDatabaseTable();
   }
 
   private final ModalProvider<DatabasePresenter> databaseModalProvider;
 
   private final AuthorizationPresenter authorizationPresenter;
 
-  private final ResourceDataProvider<JdbcDataSourceDto> resourceDataProvider
-      = new ResourceDataProvider<JdbcDataSourceDto>(Resources.databases());
+  private final ResourceDataProvider<DatabaseDto> resourceDataProvider = new ResourceDataProvider<DatabaseDto>(
+      Resources.sqlDatabases());
 
   private final BreadcrumbsBuilder breadcrumbsBuilder;
 
@@ -106,13 +105,16 @@ public class DatabaseAdministrationPresenter extends
   @ProxyEvent
   @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(Resources.databases()).post()
-        .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListDatabasesAuthorization())).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(Resources.sqlDatabases()) //
+        .get() //
+        .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListDatabasesAuthorization())) //
+        .send();
   }
 
   @Override
   public String getName() {
-    return "Databases";
+    return "SQL Databases";
   }
 
   @Override
@@ -120,6 +122,7 @@ public class DatabaseAdministrationPresenter extends
     breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs()).build();
 
     refresh();
+
     // set permissions
     AclRequest.newResourceAuthorizationRequestBuilder()
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
@@ -127,8 +130,11 @@ public class DatabaseAdministrationPresenter extends
 
   @Override
   public void authorize(HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(Resources.databases()).post()
-        .authorize(authorizer).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(Resources.sqlDatabases()) //
+        .get() //
+        .authorize(authorizer) //
+        .send();
   }
 
   @Override
@@ -167,26 +173,39 @@ public class DatabaseAdministrationPresenter extends
 
     breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs());
 
-    getView().getActions().setActionHandler(new ActionHandler<JdbcDataSourceDto>() {
+    getView().getActions().setActionHandler(new ActionHandler<DatabaseDto>() {
 
       @Override
-      public void doAction(final JdbcDataSourceDto object, String actionName) {
-        if(object.getEditable() && actionName.equalsIgnoreCase(DELETE_ACTION)) {
+      public void doAction(final DatabaseDto dto, String actionName) {
+        if(dto.getEditable() && actionName.equalsIgnoreCase(DELETE_ACTION)) {
           getEventBus().fireEvent(ConfirmationRequiredEvent.createWithKeys(confirmedCommand = new Command() {
             @Override
             public void execute() {
-              deleteDatabase(object);
+              deleteDatabase(dto);
             }
+
+            private void deleteDatabase(DatabaseDto database) {
+              ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder()
+                  .forResource(Resources.database(database.getName()))
+                  .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+
+                    @Override
+                    public void onResponseCode(Request request, Response response) {
+                      refresh();
+                    }
+
+                  }).delete().send();
+            }
+
           }, "deleteDatabase", "confirmDeleteDatabase"));
-        } else if(object.getEditable() && actionName.equalsIgnoreCase(EDIT_ACTION)) {
-          DatabasePresenter dialog = databaseModalProvider.get();
-          dialog.updateDatabase(object);
+        } else if(dto.getEditable() && actionName.equalsIgnoreCase(EDIT_ACTION)) {
+          databaseModalProvider.get().updateDatabase(dto);
         } else if(actionName.equalsIgnoreCase(Display.TEST_ACTION)) {
           ResponseCodeCallback callback = new ResponseCodeCallback() {
 
             @Override
             public void onResponseCode(Request request, Response response) {
-              if(response.getStatusCode() == 200) {
+              if(response.getStatusCode() == Response.SC_OK) {
                 getEventBus()
                     .fireEvent(NotificationEvent.Builder.newNotification().info("DatabaseConnectionOk").build());
               } else {
@@ -198,9 +217,10 @@ public class DatabaseAdministrationPresenter extends
             }
 
           };
-          ResourceRequestBuilderFactory.<JsArray<JdbcDataSourceDto>>newBuilder()//
-              .forResource(Resources.database(object.getName(), "connections")).accept("application/json")//
-              .withCallback(200, callback).withCallback(503, callback).post().send();
+          ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder()//
+              .forResource(Resources.database(dto.getName(), "connections")).accept("application/json")//
+              .withCallback(Response.SC_OK, callback).withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).post()
+              .send();
         }
       }
 
@@ -216,19 +236,8 @@ public class DatabaseAdministrationPresenter extends
 
     }));
 
-    authorizationPresenter.setAclRequest("databases", new AclRequest(AclAction.DATABASES_ALL, Resources.databases()));
-  }
-
-  private void deleteDatabase(JdbcDataSourceDto database) {
-    ResourceRequestBuilderFactory.<JsArray<JdbcDataSourceDto>>newBuilder()
-        .forResource(Resources.database(database.getName())).withCallback(200, new ResponseCodeCallback() {
-
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        refresh();
-      }
-
-    }).delete().send();
+    authorizationPresenter
+        .setAclRequest("databases", new AclRequest(AclAction.DATABASES_ALL, Resources.sqlDatabases()));
   }
 
   private void refresh() {
@@ -258,8 +267,8 @@ public class DatabaseAdministrationPresenter extends
   private final class PermissionsUpdate implements HasAuthorization {
     @Override
     public void unauthorized() {
-      clearSlot(Display.Slots.Permissions);
-      clearSlot(Display.Slots.Header);
+      clearSlot(Display.Slots.PERMISSIONS);
+      clearSlot(Display.Slots.HEADER);
     }
 
     @Override
@@ -269,7 +278,7 @@ public class DatabaseAdministrationPresenter extends
 
     @Override
     public void authorized() {
-      setInSlot(Display.Slots.Permissions, authorizationPresenter);
+      setInSlot(Display.Slots.PERMISSIONS, authorizationPresenter);
     }
   }
 

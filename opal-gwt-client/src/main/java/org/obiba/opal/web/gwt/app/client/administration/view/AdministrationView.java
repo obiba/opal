@@ -3,7 +3,6 @@ package org.obiba.opal.web.gwt.app.client.administration.view;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.OpalNavLink;
 
-import com.github.gwtbootstrap.client.ui.NavLink;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -13,7 +12,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public class AdministrationView extends ViewImpl implements AdministrationPresenter.Display {
-
 
   @UiTemplate("AdministrationView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, AdministrationView> {}

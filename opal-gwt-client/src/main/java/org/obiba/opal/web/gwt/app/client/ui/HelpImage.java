@@ -22,6 +22,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * This image can be automatically link to a Opal Documentation Wiki page.
  */
+//TODO replace this by a popover
 public class HelpImage extends Image implements HasWidgets {
 
   private Tooltip tooltip;

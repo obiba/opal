@@ -11,7 +11,7 @@ package org.obiba.opal.web.gwt.app.client.magma.datasource.view;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.JdbcDatasourceFormPresenter;
-import org.obiba.opal.web.model.client.opal.JdbcDataSourceDto;
+import org.obiba.opal.web.model.client.opal.DatabaseDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -63,9 +63,9 @@ public class JdbcDatasourceFormView extends ViewImpl implements JdbcDatasourceFo
   }
 
   @Override
-  public void setDatabases(JsArray<JdbcDataSourceDto> resource) {
+  public void setDatabases(JsArray<DatabaseDto> resource) {
     database.clear();
-    for(JdbcDataSourceDto dto : JsArrays.toIterable(resource)) {
+    for(DatabaseDto dto : JsArrays.toIterable(resource)) {
       database.addItem(dto.getName());
     }
   }

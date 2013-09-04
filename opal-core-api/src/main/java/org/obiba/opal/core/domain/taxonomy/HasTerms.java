@@ -14,10 +14,10 @@ public abstract class HasTerms {
 
   private List<HasTerms> terms;
 
-  HasTerms() {
+  public HasTerms() {
   }
 
-  HasTerms(String name) {
+  public HasTerms(String name) {
     this.name = name;
   }
 

@@ -15,14 +15,8 @@
       <org.obiba.magma.security.MagmaSecurityExtension/>
     </extensions>
 
-    <factories>
-      <org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
-        <name>opal-data</name>
-        <sessionFactoryProvider class="org.obiba.magma.datasource.hibernate.support.SpringBeanSessionFactoryProvider">
-          <beanName>opalSessionFactory</beanName>
-        </sessionFactoryProvider>
-      </org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory>
-    </factories>
+    <factories/>
+
   </magmaEngineFactory>
 
   <extensions>
@@ -60,4 +54,7 @@
       </environments>
     </org.obiba.opal.datashield.cfg.DatashieldConfiguration>
   </extensions>
+
+  <migratedToOpal2>true</migratedToOpal2>
+
 </org.obiba.opal.core.cfg.OpalConfiguration>

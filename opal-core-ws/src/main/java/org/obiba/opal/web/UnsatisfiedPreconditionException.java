@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web;
 
+import javax.annotation.Nonnull;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import com.google.common.base.Preconditions;
@@ -22,7 +23,7 @@ public class UnsatisfiedPreconditionException extends RuntimeException {
 
   private final ResponseBuilder builder;
 
-  public UnsatisfiedPreconditionException(ResponseBuilder builder) {
+  public UnsatisfiedPreconditionException(@Nonnull ResponseBuilder builder) {
     Preconditions.checkArgument(builder != null, "builder cannot be null");
     this.builder = builder;
   }

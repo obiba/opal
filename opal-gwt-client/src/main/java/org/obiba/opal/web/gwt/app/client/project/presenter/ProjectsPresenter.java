@@ -91,7 +91,7 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
 
   @Override
   public void onProjectSelection(ProjectDto project) {
-    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.project)
+    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.PROJECT)
         .with(ParameterTokens.TOKEN_NAME, project.getName())
         .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.home.toString()).build();
     placeManager.revealPlace(request);
@@ -99,7 +99,7 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
 
   @Override
   public void onProjectTableSelection(ProjectDto project, String table) {
-    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.project)
+    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.PROJECT)
         .with(ParameterTokens.TOKEN_NAME, project.getName()) //
         .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.tables.toString()) //
         .with(ParameterTokens.TOKEN_PATH, project.getName() + "." + table).build();
@@ -112,13 +112,12 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
     presenter.setProjects(projects);
   }
 
-
   public interface Display extends View, HasUiHandlers<ProjectsUiHandlers> {
     void setProjects(JsArray<ProjectDto> projects);
   }
 
   @ProxyStandard
-  @NameToken(Places.projects)
+  @NameToken(Places.PROJECTS)
   public interface Proxy extends ProxyPlace<ProjectsPresenter> {}
 
 }
