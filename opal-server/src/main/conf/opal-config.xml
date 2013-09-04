@@ -54,4 +54,7 @@
       </environments>
     </org.obiba.opal.datashield.cfg.DatashieldConfiguration>
   </extensions>
+
+  <migratedToOpal2>true</migratedToOpal2>
+
 </org.obiba.opal.core.cfg.OpalConfiguration>
