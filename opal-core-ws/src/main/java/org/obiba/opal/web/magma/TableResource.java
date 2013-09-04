@@ -243,7 +243,7 @@ public class TableResource extends AbstractValueTableResource {
   @Path("/variable/{variable}")
   public VariableResource getVariable(@Context Request request, @PathParam("variable") String name) {
     TimestampedResponses.evaluate(request, getValueTable());
-    return getVariableResource(getValueTable().getVariableValueSource(name));
+    return getVariableResource(getValueTable().getVariableValueSource(name), name);
   }
 
   /**
@@ -264,7 +264,7 @@ public class TableResource extends AbstractValueTableResource {
       @FormParam("category") List<String> categoriesFP) {
     JavascriptVariableValueSource jvvs = getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP,
         categoriesQP, scriptFP, categoriesFP);
-    return getVariableResource(jvvs);
+    return getVariableResource(jvvs, null);
   }
 
   /**
@@ -387,8 +387,8 @@ public class TableResource extends AbstractValueTableResource {
     }
   }
 
-  private VariableResource getVariableResource(VariableValueSource source) {
-    return new VariableResource(getValueTable(), source, opalSearchService, statsIndexManager, esProvider);
+  private VariableResource getVariableResource(VariableValueSource source, String name) {
+    return new VariableResource(getValueTable(), source, opalSearchService, statsIndexManager, esProvider, name);
   }
 
   private JavascriptVariableValueSource getJavascriptVariableValueSource(String valueTypeName, Boolean repeatable,
