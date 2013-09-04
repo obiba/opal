@@ -28,13 +28,13 @@ import com.google.common.collect.Iterables;
 
 @Component
 @Scope("request")
-@Path("/authz-subject/{resource:.*}")
+@Path("/authz-subject/{subject:.*}")
 public class UserGroupAuthorizationResource {
 
   private final SubjectAclService subjectAclService;
 
-  @PathParam("resource")
-  private String resource;
+  @PathParam("subject")
+  private String subject;
 
   @Autowired
   public UserGroupAuthorizationResource(SubjectAclService subjectAclService) {
@@ -45,7 +45,7 @@ public class UserGroupAuthorizationResource {
   public Iterable<Opal.Acl> get(@QueryParam("domain") @DefaultValue("opal") String domain,
       @QueryParam("type") SubjectAclService.SubjectType type) {
 
-    SubjectAclService.Subject aclSubject = type.subjectFor(resource);
+    SubjectAclService.Subject aclSubject = type.subjectFor(subject);
 
     Set<SubjectAclService.Permissions> permissions = new HashSet<SubjectAclService.Permissions>();
     for(SubjectAclService.Permissions p : subjectAclService.getSubjectPermissions(aclSubject)) {
