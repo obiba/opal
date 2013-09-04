@@ -593,7 +593,7 @@ public interface Translations extends Constants {
       "confirmPublishDataShieldMethods", "Please confirm that you want to publish this package methods.",//
       "confirmDeleteDatabase", "Please confirm that you want to remove this database.",//
       "confirmRemoveGroup", "Please confirm that you want to remove the group {0}.",//
-      "confirmRemoveUser", "Please confirm that you want to remove the user {0}.",//
+      "confirmRemoveUser", "Please confirm that you want to remove the user {0}."//
   })
   Map<String, String> confirmationMessageMap();
 
