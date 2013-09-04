@@ -13,6 +13,8 @@ import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministra
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.administration.user.event.GroupsRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.administration.user.event.UsersRefreshEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
@@ -26,6 +28,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFac
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.GroupDto;
@@ -59,6 +62,8 @@ public class UserAdministrationPresenter
   public interface Proxy extends ProxyPlace<UserAdministrationPresenter> {}
 
   private final ModalProvider<UserPresenter> userModalProvider;
+
+  private Runnable removeConfirmation;
 
   public interface Display extends View, HasBreadcrumbs {
 
@@ -138,6 +143,10 @@ public class UserAdministrationPresenter
     super.onBind();
 
     getView().setDelegate(new UserStatusChangeDelegate());
+
+    // Register event handlers
+    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler()));
+
     getView().getUsersLink().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
@@ -214,21 +223,16 @@ public class UserAdministrationPresenter
     getView().getUsersActions().setActionHandler(new ActionHandler<UserDto>() {
 
       @Override
-      public void doAction(final UserDto object, String actionName) {
+      public void doAction(UserDto object, String actionName) {
         if(actionName.trim().equalsIgnoreCase(ActionsColumn.EDIT_ACTION)) {
           UserPresenter dialog = userModalProvider.get();
           dialog.setDialogMode(UserPresenter.Mode.UPDATE);
           dialog.setUser(object);
         } else if(actionName.trim().equalsIgnoreCase(ActionsColumn.DELETE_ACTION)) {
-          ResourceRequestBuilderFactory.newBuilder()//
-              .forResource("/user/" + object.getName()).withCallback(new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              getEventBus().fireEvent(new UsersRefreshEvent());
-              getEventBus().fireEvent(
-                  NotificationEvent.Builder.newNotification().info("UserDeletedOk").args(object.getName()).build());
-            }
-          }, Response.SC_OK).delete().send();
+          removeConfirmation = new RemoveRunnable(object.getName(), true);
+          fireEvent(ConfirmationRequiredEvent
+              .createWithMessages(removeConfirmation, translations.confirmationTitleMap().get("removeUser"),
+                  translations.confirmationMessageMap().get("confirmRemoveUser").replace("{0}", object.getName())));
         }
       }
     });
@@ -237,17 +241,12 @@ public class UserAdministrationPresenter
     getView().getGroupsActions().setActionHandler(new ActionHandler<GroupDto>() {
 
       @Override
-      public void doAction(final GroupDto object, String actionName) {
+      public void doAction(GroupDto object, String actionName) {
         if(actionName.trim().equalsIgnoreCase(ActionsColumn.DELETE_ACTION)) {
-          ResourceRequestBuilderFactory.newBuilder()//
-              .forResource("/group/" + object.getName()).withCallback(new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              getEventBus().fireEvent(new GroupsRefreshEvent());
-              getEventBus().fireEvent(
-                  NotificationEvent.Builder.newNotification().info("GroupDeletedOk").args(object.getName()).build());
-            }
-          }, Response.SC_OK).delete().send();
+          removeConfirmation = new RemoveRunnable(object.getName(), false);
+          fireEvent(ConfirmationRequiredEvent
+              .createWithMessages(removeConfirmation, translations.confirmationTitleMap().get("removeGroup"),
+                  translations.confirmationMessageMap().get("confirmRemoveGroup").replace("{0}", object.getName())));
         }
       }
     });
@@ -335,4 +334,42 @@ public class UserAdministrationPresenter
     }
   }
 
+  // Remove group/user confirmation event
+  private class RemoveRunnable implements Runnable {
+
+    private final String name;
+
+    private final boolean isUser;
+
+    RemoveRunnable(String name, boolean isUser) {
+      this.name = name;
+      this.isUser = isUser;
+    }
+
+    @Override
+    public void run() {
+      ResourceRequestBuilderFactory.newBuilder()//
+          .forResource(UriBuilder.create().segment(isUser ? "user" : "group", name).build())
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              getEventBus().fireEvent(isUser ? new UsersRefreshEvent() : new GroupsRefreshEvent());
+              getEventBus().fireEvent(
+                  NotificationEvent.Builder.newNotification().info(isUser ? "UserDeletedOk" : "GroupDeletedOk")
+                      .args(name).build());
+            }
+          }, Response.SC_OK).delete().send();
+    }
+  }
+
+  private class RemoveConfirmationEventHandler implements ConfirmationEvent.Handler {
+
+    @Override
+    public void onConfirmation(ConfirmationEvent event) {
+      if(removeConfirmation != null && event.getSource().equals(removeConfirmation) && event.isConfirmed()) {
+        removeConfirmation.run();
+        removeConfirmation = null;
+      }
+    }
+  }
 }
