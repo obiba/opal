@@ -107,32 +107,25 @@ public class VariableResource {
   }
 
   @DELETE
-  public Response deleteVariable(VariableDto variable) {
-    // TODO: Uncomment once ValueTableWriter implements removeVariable();
-//    ValueTableWriter vtw = null;
-//    ValueTableWriter.VariableWriter vw = null;
-//    try {
-//      // The variable must exist
-//      Variable v = getValueTable().getVariable(variable.getName());
-//
-//      if(!v.getEntityType().equals(variable.getEntityType())) {
-//        return Response.status(Response.Status.BAD_REQUEST).build();
-//      }
-//
-//      vtw = getValueTable().getDatasource().createWriter(getValueTable().getName(), getValueTable().getEntityType());
-//
-//      vw = vtw.writeVariables();
-//      vw.removeVariable(Dtos.fromDto(variable));
-//
-//      return Response.ok().build();
-//
-//    } catch(NoSuchVariableException e) {
-//      return Response.status(Response.Status.NOT_FOUND).build();
-//    } finally {
-//      Closeables.closeQuietly(vw);
-//      Closeables.closeQuietly(vtw);
-//    }
-    return Response.ok().build();
+  public Response deleteVariable() {
+    ValueTableWriter vtw = null;
+    ValueTableWriter.VariableWriter vw = null;
+    try {
+      // The variable must exist
+      Variable v = getValueTable().getVariable(name);
+      vtw = getValueTable().getDatasource().createWriter(getValueTable().getName(), getValueTable().getEntityType());
+
+      vw = vtw.writeVariables();
+      vw.removeVariable(v);
+
+      return Response.ok().build();
+
+    } catch(NoSuchVariableException e) {
+      return Response.status(Response.Status.NOT_FOUND).build();
+    } finally {
+      Closeables.closeQuietly(vw);
+      Closeables.closeQuietly(vtw);
+    }
   }
 
   @Path("/summary")

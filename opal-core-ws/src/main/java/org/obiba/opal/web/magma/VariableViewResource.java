@@ -20,6 +20,7 @@ import org.obiba.magma.NoSuchVariableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
+import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
@@ -52,8 +53,7 @@ public class VariableViewResource extends VariablesViewResource {
 
       // Rename existing variable
       if(!variable.getName().equals(v.getName())) {
-        // TODO: Uncomment once ValueTableWriter implements removeVariable();
-        // vw.removeVariable(v);
+        vw.removeVariable(v);
       }
       vw.writeVariable(Dtos.fromDto(variable));
       viewManager.addView(getDatasource().getName(), view);
@@ -68,23 +68,22 @@ public class VariableViewResource extends VariablesViewResource {
 
   @DELETE
   public Response deleteVariable() {
-    // TODO: Uncomment once ValueTableWriter implements removeVariable();
-//    ValueTableWriter.VariableWriter vw = null;
-//    try {
-//      View view = getValueTableAsView();
-//      vw = view.getListClause().createWriter();
-//
-//      // Remove from listClause
-//      for (VariableValueSource v: view.getListClause().getVariableValueSources()){
-//        if (v.getVariable().getName().equals(name)){
-//          vw.removeVariable(v);
-//          break;
-//        }
-//      }
-//
-//    } finally {
-//      Closeables.closeQuietly(vw);
-//    }
+    ValueTableWriter.VariableWriter vw = null;
+    try {
+      View view = getValueTableAsView();
+      vw = view.getListClause().createWriter();
+
+      // Remove from listClause
+      for(VariableValueSource v : view.getListClause().getVariableValueSources()) {
+        if(v.getVariable().getName().equals(name)) {
+          vw.removeVariable(v.getVariable());
+          break;
+        }
+      }
+
+    } finally {
+      Closeables.closeQuietly(vw);
+    }
 
     return Response.ok().build();
   }
