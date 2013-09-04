@@ -545,7 +545,10 @@ public interface Translations extends Constants {
       "deleteDataShieldAssignMethod", "Delete Assigning Method",//
       "deleteDataShieldPackage", "Delete Package",//
       "publishDataShieldMethods", "Publish Package Methods",//
-      "deleteDatabase", "Delete Database" })
+      "deleteDatabase", "Delete Database",//
+      "removeGroup", "Remove Group",//
+      "removeUser", "Remove User"//
+  })
   Map<String, String> confirmationTitleMap();
 
   @Description("Confirmation message map")
@@ -588,7 +591,10 @@ public interface Translations extends Constants {
       "confirmDeleteDataShieldAggregateMethod", "Please confirm that you want to remove this aggregating method.",//
       "confirmDeleteDataShieldPackage", "Please confirm that you want to remove this package and all its methods.",//
       "confirmPublishDataShieldMethods", "Please confirm that you want to publish this package methods.",//
-      "confirmDeleteDatabase", "Please confirm that you want to remove this database." })
+      "confirmDeleteDatabase", "Please confirm that you want to remove this database.",//
+      "confirmRemoveGroup", "Please confirm that you want to remove the group {0}.",//
+      "confirmRemoveUser", "Please confirm that you want to remove the user {0}.",//
+  })
   Map<String, String> confirmationMessageMap();
 
   @Description("A name is required when creating a new folder")
