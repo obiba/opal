@@ -17,7 +17,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.lang.Closeables;
@@ -28,9 +27,9 @@ import org.obiba.opal.web.model.Magma.VariableDto;
 
 public class VariablesViewResource extends VariablesResource {
 
-  private final ViewManager viewManager;
+  protected final ViewManager viewManager;
 
-  private final ViewDtos viewDtos;
+  protected final ViewDtos viewDtos;
 
   public VariablesViewResource(ViewManager viewManager, ViewDtos viewDtos, ValueTable valueTable, Set<Locale> locales) {
     super(valueTable, locales);
@@ -80,7 +79,7 @@ public class VariablesViewResource extends VariablesResource {
   // private methods
   //
 
-  private View getValueTableAsView() {
+  protected View getValueTableAsView() {
     return viewManager.getView(getDatasource().getName(), getValueTable().getName());
   }
 

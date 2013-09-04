@@ -19,6 +19,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
@@ -132,6 +133,19 @@ public class ViewResource extends AbstractValueTableResource {
   @Path("/locales")
   public LocalesResource getLocalesResource() {
     return super.getLocalesResource();
+  }
+
+  /**
+   * Get variable resource.
+   *
+   * @param request
+   * @param name
+   * @return
+   */
+  @Path("/variable/{variable}")
+  public VariableViewResource getVariable(@Context Request request, @PathParam("variable") String name) {
+//    TimestampedResponses.evaluate(request, getValueTable());
+    return new VariableViewResource(viewManager, viewDtos, getValueTable(), getLocales(), name);
   }
 
   protected View asView() {
