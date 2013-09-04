@@ -30,7 +30,7 @@ public class OpalRealm extends JdbcRealm {
   @Autowired
   public OpalRealm(@Qualifier("opal-config") DataSource opalDataSource) {
     setDataSource(opalDataSource);
-    setAuthenticationQuery("select password from user where name = ? and enabled is true");
+    setAuthenticationQuery("select password from user where name = ? and enabled = TRUE");
     setUserRolesQuery(
         "select g.name from user_groups as ug, user as u, groups as g where u.name = ? and u.id = ug.user_id and ug.group_id = g.id");
     setCacheManager(new MemoryConstrainedCacheManager());

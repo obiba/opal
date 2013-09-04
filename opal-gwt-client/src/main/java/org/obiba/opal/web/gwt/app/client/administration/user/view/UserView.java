@@ -26,7 +26,6 @@ import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
@@ -150,6 +149,11 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
     JsArrayString g = JsArrayString.createArray().cast();
     for(String s : groups.getSelectedItemsTexts()) {
       g.push(s);
+    }
+
+    // add the group from the textbox (if the user has not entered ',')
+    if(!groups.getSuggestBox().getText().isEmpty()) {
+      g.push(groups.getSuggestBox().getText());
     }
 
     return g;
