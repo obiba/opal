@@ -1,7 +1,6 @@
 package org.obiba.opal.core.runtime.database;
 
 import java.sql.SQLException;
-import java.util.Objects;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -161,7 +161,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
   private void validUniqueName(Database database) throws DuplicateDatabaseNameException {
     for(Database existing : list()) {
       if(database.getName().equalsIgnoreCase(existing.getName()) &&
-          !Objects.equals(existing.getId(), database.getId())) {
+          !Objects.equal(existing.getId(), database.getId())) {
         throw new DuplicateDatabaseNameException(database.getName());
       }
     }
@@ -169,7 +169,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
 
   private void validUnchangedName(Database database) throws CannotChangeDatabaseNameException {
     Database existing = (Database) getCurrentSession().get(database.getClass(), database.getId());
-    if(!Objects.equals(existing.getName(), database.getName())) {
+    if(!Objects.equal(existing.getName(), database.getName())) {
       throw new CannotChangeDatabaseNameException(existing.getName(), database.getName());
     }
   }
@@ -177,7 +177,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
   private void validUniqueIdentifiersDatabase(Database database) throws MultipleIdentifiersDatabaseException {
     if(database.isUsedForIdentifiers()) {
       Database identifiersDatabase = getIdentifiersDatabase();
-      if(identifiersDatabase != null && !Objects.equals(identifiersDatabase.getId(), database.getId())) {
+      if(identifiersDatabase != null && !Objects.equal(identifiersDatabase.getId(), database.getId())) {
         throw new MultipleIdentifiersDatabaseException(identifiersDatabase, database);
       }
     }
