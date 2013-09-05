@@ -155,7 +155,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   private void initExtension(String directory) {
     File ext = new File(directory);
-    if (!ext.exists() && !ext.mkdirs()) {
+    if(!ext.exists() && !ext.mkdirs()) {
       log.warn("Cannot create directory: {}", directory);
     }
   }

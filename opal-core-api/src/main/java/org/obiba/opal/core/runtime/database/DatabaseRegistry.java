@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import javax.sql.DataSource;
 
 import org.hibernate.SessionFactory;
+import org.obiba.magma.Datasource;
 import org.obiba.opal.core.domain.database.Database;
 
 public interface DatabaseRegistry {
@@ -18,7 +19,7 @@ public interface DatabaseRegistry {
   Database getDatabase(@Nonnull String name);
 
   void addOrReplaceDatabase(@Nonnull Database database)
-      throws DuplicateDatabaseNameException, MultipleIdentifiersDatabaseException, CannotChangeDatabaseNameException;
+      throws DatabaseAlreadyExistsException, MultipleIdentifiersDatabaseException, CannotChangeDatabaseNameException;
 
   void deleteDatabase(@Nonnull Database database);
 
@@ -30,4 +31,6 @@ public interface DatabaseRegistry {
 
   @Nullable
   Database getIdentifiersDatabase();
+
+  Datasource createStorageMagmaDatasource(String datasourceName, Database database);
 }

@@ -11,8 +11,12 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
+import org.obiba.magma.Datasource;
+import org.obiba.magma.datasource.hibernate.HibernateDatasource;
+import org.obiba.magma.datasource.mongodb.MongoDBDatasource;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.domain.database.Database;
+import org.obiba.opal.core.domain.database.MongoDbDatabase;
 import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.Service;
@@ -25,6 +29,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -146,7 +151,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
 
   @Override
   public void addOrReplaceDatabase(@Nonnull Database database)
-      throws DuplicateDatabaseNameException, MultipleIdentifiersDatabaseException, CannotChangeDatabaseNameException {
+      throws DatabaseAlreadyExistsException, MultipleIdentifiersDatabaseException, CannotChangeDatabaseNameException {
     validUniqueName(database);
     validUniqueIdentifiersDatabase(database);
     if(database.getId() == null) {
@@ -158,11 +163,11 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
     destroyDataSource(database.getName());
   }
 
-  private void validUniqueName(Database database) throws DuplicateDatabaseNameException {
+  private void validUniqueName(Database database) throws DatabaseAlreadyExistsException {
     for(Database existing : list()) {
       if(database.getName().equalsIgnoreCase(existing.getName()) &&
           !Objects.equal(existing.getId(), database.getId())) {
-        throw new DuplicateDatabaseNameException(database.getName());
+        throw new DatabaseAlreadyExistsException(database.getName());
       }
     }
   }
@@ -217,6 +222,23 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
     return (Database) getCurrentSession().createCriteria(Database.class) //
         .add(Restrictions.eq("usedForIdentifiers", true)) //
         .uniqueResult();
+  }
+
+  @Override
+  public Datasource createStorageMagmaDatasource(String datasourceName, Database database) {
+    Preconditions.checkArgument(database.getType() == Database.Type.STORAGE,
+        "Cannot create datasource for non storage database " + database.getName());
+
+    if(database instanceof SqlDatabase) {
+      SqlDatabase sqlDatabase = (SqlDatabase) database;
+      if(sqlDatabase.isHibernateDatasourceType()) {
+        return new HibernateDatasource(datasourceName, getSessionFactory(database.getName(), datasourceName));
+      }
+    }
+    if(database instanceof MongoDbDatabase) {
+      return new MongoDBDatasource(datasourceName, ((MongoDbDatabase) database).createMongoClientURI());
+    }
+    throw new IllegalArgumentException("Unknown datasource config for database " + database);
   }
 
   private Session getCurrentSession() {

@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
 
 @SuppressWarnings("ParameterHidesMemberVariable")
 @Entity
@@ -32,7 +33,11 @@ public class MongoDbDatabase extends Database {
   public MongoClient createMongoClient() throws UnknownHostException {
     return new MongoClient(url);
   }
-  
+
+  public MongoClientURI createMongoClientURI() {
+    return new MongoClientURI(url);
+  }
+
   public String getPassword() {
     return password;
   }

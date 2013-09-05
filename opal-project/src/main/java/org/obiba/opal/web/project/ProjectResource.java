@@ -47,9 +47,8 @@ public class ProjectResource {
       Datasource ds = MagmaEngine.get().getDatasource(name);
       return Dtos.asDto(projectService.getOrCreateProject(ds), ds, projectService.getProjectDirectoryPath(name))
           .build();
-    } else {
-      throw new NoSuchProjectException(name);
     }
+    throw new NoSuchProjectException(name);
   }
 
   @PUT

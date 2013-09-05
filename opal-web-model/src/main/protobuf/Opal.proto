@@ -77,16 +77,11 @@ message JdbcDriverDto {
 }
 
 message DatabaseDto {
-  enum DbType {
-    IMPORT = 0;
-    STORAGE = 1;
-    EXPORT = 2;
-  }
   required string name = 1;
   optional string description = 2;
   optional bool editable = 3 [default = true];
   required bool defaultStorage = 4 [default = false];
-  required DbType type = 5;
+  required string type = 5; // IMPORT|STORAGE|EXPORT
   optional bool usedForIdentifiers = 6;
   extensions 1000 to max;
 }

@@ -112,6 +112,18 @@ public class SqlDatabase extends Database {
     this.magmaDatasourceType = magmaDatasourceType;
   }
 
+  public boolean isHibernateDatasourceType() {
+    return MAGMA_HIBERNATE_DATASOURCE.equals(magmaDatasourceType);
+  }
+
+  public boolean isJdbcDatasourceType() {
+    return MAGMA_JDBC_DATASOURCE.equals(magmaDatasourceType);
+  }
+
+  public boolean isLimesurveyDatasourceType() {
+    return MAGMA_LIMESURVEY_DATASOURCE.equals(magmaDatasourceType);
+  }
+
   @Override
   public String toString() {
     return Objects.toStringHelper(this).omitNullValues().add("driverClass", driverClass).add("url", url)

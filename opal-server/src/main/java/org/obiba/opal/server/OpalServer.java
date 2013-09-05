@@ -54,6 +54,9 @@ public class OpalServer {
     if(ctx.isActive()) {
       ctx.getBean(OpalRuntime.class).start();
       System.out.println("Opal Server successfully started.");
+
+      System.out.println("Create default config...");
+      ctx.getBean(TempDefaultConfig.class).createDefaultConfig();
     }
   }
 

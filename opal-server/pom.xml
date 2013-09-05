@@ -68,7 +68,6 @@
     <dependency>
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-project</artifactId>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>

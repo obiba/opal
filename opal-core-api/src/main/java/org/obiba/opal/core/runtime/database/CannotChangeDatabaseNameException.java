@@ -9,7 +9,7 @@ public class CannotChangeDatabaseNameException extends RuntimeException {
   private final String newName;
 
   public CannotChangeDatabaseNameException(String previousName, String newName) {
-    super("Cannot change '" + previousName + "' database name");
+    super("Database name cannot be changed.");
     this.previousName = previousName;
     this.newName = newName;
   }

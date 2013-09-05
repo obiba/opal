@@ -9,8 +9,10 @@
  */
 package org.obiba.opal.project.domain;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import javax.annotation.Nonnull;
 
 import com.google.common.base.Strings;
 
@@ -19,8 +21,10 @@ import com.google.common.base.Strings;
  */
 public class Project {
 
+  @Nonnull
   private String name;
 
+  @Nonnull
   private String title;
 
   private String description;
@@ -29,11 +33,14 @@ public class Project {
 
   private boolean archived;
 
+  private String database;
+
+  @Nonnull
   public String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(@Nonnull String name) {
     this.name = name;
   }
 
@@ -41,11 +48,12 @@ public class Project {
     return !Strings.isNullOrEmpty(title);
   }
 
+  @Nonnull
   public String getTitle() {
     return title;
   }
 
-  public void setTitle(String title) {
+  public void setTitle(@Nonnull String title) {
     this.title = title;
   }
 
@@ -66,7 +74,7 @@ public class Project {
   }
 
   public List<String> getTags() {
-    return tags == null ? tags = new ArrayList<String>() : tags;
+    return tags == null ? tags = Collections.emptyList() : tags;
   }
 
   public void addTag(String tag) {
@@ -83,6 +91,15 @@ public class Project {
     this.archived = archived;
   }
 
+  public String getDatabase() {
+    return database;
+  }
+
+  public void setDatabase(String database) {
+    this.database = database;
+  }
+
+  @SuppressWarnings("ParameterHidesMemberVariable")
   public static class Builder {
 
     private Project project;
@@ -109,7 +126,7 @@ public class Project {
       return this;
     }
 
-    public Builder tags(List<String> tags) {
+    public Builder tags(Iterable<String> tags) {
       if(tags == null) return this;
       for(String tag : tags) {
         project.addTag(tag);
@@ -132,6 +149,11 @@ public class Project {
 
     public Builder archived() {
       return archived(true);
+    }
+
+    public Builder database(String database) {
+      project.setDatabase(database);
+      return this;
     }
 
     public Project build() {

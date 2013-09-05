@@ -36,6 +36,7 @@ public interface ProjectService {
 
   /**
    * Get project directory, create it if it does not exist.
+   *
    * @param name
    * @return
    * @throws NoSuchFunctionalUnitException

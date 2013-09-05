@@ -13,6 +13,7 @@ message ProjectDto {
   optional string link = 6;
   optional string directory = 7;
   required bool archived = 8 [default = false];
+  optional string database = 9;
 }
 
 message ProjectFactoryDto {

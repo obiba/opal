@@ -14,20 +14,15 @@ import java.io.IOException;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.hibernate.SessionFactory;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
-import org.obiba.magma.datasource.hibernate.HibernateDatasource;
-import org.obiba.magma.datasource.mongodb.MongoDBDatasource;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.domain.database.Database;
-import org.obiba.opal.core.domain.database.MongoDbDatabase;
-import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.ServiceNotRunningException;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
@@ -41,8 +36,6 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
-
-import com.mongodb.MongoClientURI;
 
 /**
  *
@@ -142,17 +135,7 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   @Override
   public void start() {
     Database database = databaseRegistry.getIdentifiersDatabase();
-    if(database != null) {
-      if(database instanceof SqlDatabase) {
-        log.info("Identifiers table storage is a SQL database");
-        SessionFactory keysSession = databaseRegistry.getSessionFactory(database.getName(), getDatasourceName());
-        datasource = new HibernateDatasource(getDatasourceName(), keysSession);
-      } else if(database instanceof MongoDbDatabase) {
-        log.info("Identifiers table storage is a MongoDB database");
-        datasource = new MongoDBDatasource(getDatasourceName(),
-            new MongoClientURI(((MongoDbDatabase) database).getUrl()));
-      }
-    }
+    datasource = database == null ? null : databaseRegistry.createStorageMagmaDatasource(getDatasourceName(), database);
     initialise();
   }
 

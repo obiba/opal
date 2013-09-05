@@ -552,34 +552,35 @@ public final class Dtos {
     throw new IllegalArgumentException("Unsupported DatabaseDto extension");
   }
 
+  private static void fromDto(Database db, Opal.DatabaseDto dto) {
+    db.setEditable(dto.getEditable());
+    db.setDefaultStorage(dto.getDefaultStorage());
+    db.setDescription(dto.getDescription());
+    db.setName(dto.getName());
+    db.setType(Database.Type.valueOf(dto.getType()));
+    db.setUsedForIdentifiers(dto.getUsedForIdentifiers());
+  }
+
   private static SqlDatabase fromDto(Opal.DatabaseDto dto, Opal.SqlDatabaseDto sqlDto) {
     SqlDatabase db = new SqlDatabase();
+    fromDto(db, dto);
     db.setDriverClass(sqlDto.getDriverClass());
     db.setMagmaDatasourceType(sqlDto.getMagmaDatasourceType());
-    db.setEditable(dto.getEditable());
     db.setUrl(sqlDto.getUrl());
     db.setUsername(sqlDto.getUsername());
     db.setPassword(sqlDto.getPassword());
     db.setProperties(sqlDto.getProperties());
-    db.setDefaultStorage(dto.getDefaultStorage());
-    db.setDescription(dto.getDescription());
-    db.setName(dto.getName());
-    db.setType(Database.Type.valueOf(sqlDto.getMagmaDatasourceType()));
-    db.setUsedForIdentifiers(dto.getUsedForIdentifiers());
+
     return db;
   }
 
   private static MongoDbDatabase fromDto(Opal.DatabaseDto dto, Opal.MongoDbDatabaseDto mongoDto) {
     MongoDbDatabase db = new MongoDbDatabase();
-    db.setEditable(dto.getEditable());
+    fromDto(db, dto);
     db.setUrl(mongoDto.getUrl());
     db.setUsername(mongoDto.getUsername());
     db.setPassword(mongoDto.getPassword());
     db.setProperties(mongoDto.getProperties());
-    db.setDefaultStorage(dto.getDefaultStorage());
-    db.setDescription(dto.getDescription());
-    db.setName(dto.getName());
-    db.setUsedForIdentifiers(dto.getUsedForIdentifiers());
     return db;
   }
 
@@ -590,7 +591,7 @@ public final class Dtos {
     builder.setDefaultStorage(db.isDefaultStorage());
     builder.setEditable(db.isEditable());
     builder.setUsedForIdentifiers(db.isUsedForIdentifiers());
-    builder.setType(Opal.DatabaseDto.DbType.valueOf(db.getType().name()));
+    builder.setType(db.getType().name());
     if(db instanceof SqlDatabase) {
       return builder.setExtension(Opal.SqlDatabaseDto.settings, asDto((SqlDatabase) db)).build();
     }

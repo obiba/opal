@@ -120,22 +120,21 @@ public class ProjectsConfigurationService implements ProjectService {
 
   @Override
   public String getProjectDirectoryPath(String name) {
-    FileObject fo = null;
     try {
-      fo = getProjectDirectory(name);
+      FileObject fo = getProjectDirectory(name);
       return fo.getURL().getPath().substring(2);
     } catch(FileSystemException e) {
       throw new RuntimeException(e);
     }
   }
 
-  private List<String> getAttributeNamespaces(Datasource ds) {
+  private Iterable<String> getAttributeNamespaces(Datasource ds) {
     List<String> namespaces = Lists.newArrayList();
-    for (ValueTable table : ds.getValueTables()) {
-      for (Variable variable : table.getVariables()) {
-        for (Attribute attr : variable.getAttributes()) {
+    for(ValueTable table : ds.getValueTables()) {
+      for(Variable variable : table.getVariables()) {
+        for(Attribute attr : variable.getAttributes()) {
           String ns = attr.getNamespace();
-          if (!Strings.isNullOrEmpty(ns) && !ns.equals("opal") && !namespaces.contains(ns)) {
+          if(!Strings.isNullOrEmpty(ns) && !"opal".equals(ns) && !namespaces.contains(ns)) {
             namespaces.add(ns);
           }
         }
