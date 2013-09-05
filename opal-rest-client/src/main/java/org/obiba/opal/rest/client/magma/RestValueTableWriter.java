@@ -72,6 +72,11 @@ class RestValueTableWriter implements ValueTableWriter {
         variables.add(variable);
       }
 
+      @Override
+      public void removeVariable(@Nonnull Variable variable) {
+        //To change body of implemented methods use File | Settings | File Templates.
+      }
+
     };
   }
 

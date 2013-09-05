@@ -1,14 +1,17 @@
 package org.obiba.opal.server;
 
 import org.obiba.magma.Datasource;
+import org.obiba.magma.MagmaEngine;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.project.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 //TODO to be deleted once UI is fully working
+@Transactional
 @Component
 @Deprecated
 public class TempDefaultConfig {
@@ -20,6 +23,10 @@ public class TempDefaultConfig {
   private ProjectService projectService;
 
   public void createDefaultConfig() {
+
+    if(databaseRegistry.getDatabase("opal-data") != null) return;
+
+    System.out.println("Create default config...");
 
     SqlDatabase opalData = new SqlDatabase.Builder() //
         .name("opal-data") //
@@ -47,6 +54,8 @@ public class TempDefaultConfig {
     databaseRegistry.addOrReplaceDatabase(opalKey);
 
     Datasource datasource = databaseRegistry.createStorageMagmaDatasource("opal-data", opalData);
+    MagmaEngine.get().addDatasource(datasource);
+
     projectService.getOrCreateProject(datasource);
 
   }
