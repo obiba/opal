@@ -30,7 +30,9 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.Event;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
@@ -72,7 +74,7 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
   protected void onBind() {
     setDialogMode(Mode.CREATE);
 
-    ResourceRequestBuilderFactory.<JsArray<JdbcDriverDto>>newBuilder().forResource(Resources.drivers())
+    ResourceRequestBuilderFactory.<JsArray<JdbcDriverDto>>newBuilder().forResource(DatabaseResources.drivers())
         .withCallback(new ResourceCallback<JsArray<JdbcDriverDto>>() {
 
           @Override
@@ -103,70 +105,66 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
    */
   public void updateDatabase(DatabaseDto dto) {
     setDialogMode(Mode.UPDATE);
-    displayDatabase(dto.getName(), dto);
+    displayDatabase(dto);
   }
 
-  private void displayDatabase(String name, DatabaseDto dto) {
+  private void displayDatabase(DatabaseDto dto) {
     SqlDatabaseDto sqlDatabaseDto = (SqlDatabaseDto) dto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings);
-    getView().getName().setText(name);
+    getView().getName().setText(dto.getName());
+    getView().getType().setText(dto.getType());
     getView().getDriver().setText(sqlDatabaseDto.getDriverClass());
+    getView().getDefaultStorage().setValue(dto.getDefaultStorage());
     getView().getUrl().setText(sqlDatabaseDto.getUrl());
     getView().getUsername().setText(sqlDatabaseDto.getUsername());
     getView().getPassword().setText(sqlDatabaseDto.getPassword());
     getView().getProperties().setText(sqlDatabaseDto.getProperties());
+    getView().getMagmaDatasourceType().setText(sqlDatabaseDto.getMagmaDatasourceType());
   }
 
-  private void updateDatabase() {
-    if(methodValidationHandler.validate()) {
-      putDatabase(getJdbcDataSourceDto());
-    }
-  }
-
-  private void createDatabase() {
-    if(methodValidationHandler.validate()) {
-      ResourceRequestBuilderFactory.<DatabaseDto>newBuilder()
-          .forResource(Resources.database(getView().getName().getText())).get()//
-          .withCallback(new AlreadyExistMethodCallBack())//
-          .withCallback(Response.SC_NOT_FOUND, new CreateMethodCallBack()).send();
-    }
-  }
-
-  private void postDatabase(DatabaseDto dto) {
-    ResponseCodeCallback callbackHandler = new CreateOrUpdateMethodCallBack(dto);
-    ResourceRequestBuilderFactory.newBuilder().forResource(Resources.sqlDatabases()).post()//
-        .withResourceBody(DatabaseDto.stringify(dto))//
-        .withCallback(Response.SC_OK, callbackHandler)//
-        .withCallback(Response.SC_CREATED, callbackHandler)//
-        .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
-  }
-
-  private void putDatabase(DatabaseDto dto) {
-    ResponseCodeCallback callbackHandler = new CreateOrUpdateMethodCallBack(dto);
-    ResourceRequestBuilderFactory.newBuilder().forResource(Resources.database(getView().getName().getText())).put()//
-        .withResourceBody(DatabaseDto.stringify(dto))//
-        .withCallback(Response.SC_OK, callbackHandler)//
-        .withCallback(Response.SC_CREATED, callbackHandler)//
-        .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
-  }
-
-  private DatabaseDto getJdbcDataSourceDto() {
+  private DatabaseDto getDto() {
     DatabaseDto dto = DatabaseDto.create();
     SqlDatabaseDto sqlDto = SqlDatabaseDto.create();
 
     dto.setName(getView().getName().getText());
+    dto.setType(getView().getType().getText());
+    dto.setDefaultStorage(getView().getDefaultStorage().getValue());
+
     sqlDto.setUrl(getView().getUrl().getText());
     sqlDto.setDriverClass(getView().getDriver().getText());
     sqlDto.setUsername(getView().getUsername().getText());
     sqlDto.setPassword(getView().getPassword().getText());
     sqlDto.setProperties(getView().getProperties().getText());
+    sqlDto.setMagmaDatasourceType(getView().getMagmaDatasourceType().getText());
 
     dto.setExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings, sqlDto);
     return dto;
   }
 
-  //
-  // Inner classes and interfaces
-  //
+  private void updateDatabase() {
+    if(methodValidationHandler.validate()) {
+      DatabaseDto dto = getDto();
+      ResponseCodeCallback callbackHandler = new CreateOrUpdateCallBack(dto);
+      ResourceRequestBuilderFactory.newBuilder().forResource(DatabaseResources.database(dto.getName())) //
+          .put() //
+          .withResourceBody(DatabaseDto.stringify(dto)) //
+          .withCallback(Response.SC_OK, callbackHandler) //
+          .withCallback(Response.SC_CREATED, callbackHandler) //
+          .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+    }
+  }
+
+  private void createDatabase() {
+    if(methodValidationHandler.validate()) {
+      DatabaseDto dto = getDto();
+      ResponseCodeCallback callbackHandler = new CreateOrUpdateCallBack(dto);
+      ResourceRequestBuilderFactory.newBuilder().forResource(DatabaseResources.databases()) //
+          .post() //
+          .withResourceBody(DatabaseDto.stringify(dto)) //
+          .withCallback(Response.SC_OK, callbackHandler) //
+          .withCallback(Response.SC_CREATED, callbackHandler) //
+          .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+    }
+  }
 
   private class MethodValidationHandler extends AbstractValidationHandler {
 
@@ -184,47 +182,38 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
         validators.add(new RequiredTextValidator(getView().getDriver(), "DriverIsRequired"));
         validators.add(new RequiredTextValidator(getView().getUrl(), "UrlIsRequired"));
         validators.add(new RequiredTextValidator(getView().getUsername(), "UsernameIsRequired"));
+        validators.add(new RequiredTextValidator(getView().getType(), "TypeIsRequired"));
+        validators.add(new RequiredTextValidator(getView().getMagmaDatasourceType(), "MagmaDatasourceTypeIsRequired"));
       }
       return validators;
     }
 
   }
 
-  private class AlreadyExistMethodCallBack implements ResourceCallback<DatabaseDto> {
+  private class CreateOrUpdateCallBack implements ResponseCodeCallback {
 
-    @Override
-    public void onResource(Response response, DatabaseDto resource) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error("DatabaseAlreadyExists").build());
-    }
+    private final DatabaseDto dto;
 
-  }
-
-  private class CreateMethodCallBack implements ResponseCodeCallback {
-
-    @Override
-    public void onResponseCode(Request request, Response response) {
-      postDatabase(getJdbcDataSourceDto());
-    }
-  }
-
-  private class CreateOrUpdateMethodCallBack implements ResponseCodeCallback {
-
-    DatabaseDto dto;
-
-    private CreateOrUpdateMethodCallBack(DatabaseDto dto) {
+    private CreateOrUpdateCallBack(DatabaseDto dto) {
       this.dto = dto;
     }
 
     @Override
     public void onResponseCode(Request request, Response response) {
       getView().hideDialog();
-      if(response.getStatusCode() == Response.SC_OK) {
-        getEventBus().fireEvent(new DatabaseUpdatedEvent(dto));
-      } else if(response.getStatusCode() == Response.SC_CREATED) {
-        getEventBus().fireEvent(new DatabaseCreatedEvent(dto));
-      } else {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+      Event<?> event = null;
+      switch(response.getStatusCode()) {
+        case Response.SC_OK:
+          event = new DatabaseUpdatedEvent(dto);
+          break;
+        case Response.SC_CREATED:
+          event = new DatabaseCreatedEvent(dto);
+          break;
+        default:
+          //TODO supports DatabaseAlreadyExists
+          event = NotificationEvent.newBuilder().error(response.getText()).build();
       }
+      getEventBus().fireEvent(event);
     }
   }
 
@@ -238,6 +227,10 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
 
     HasText getName();
 
+    HasText getType();
+
+    HasText getMagmaDatasourceType();
+
     HasText getUrl();
 
     HasText getDriver();
@@ -247,6 +240,8 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
     HasText getPassword();
 
     HasText getProperties();
+
+    HasValue<Boolean> getDefaultStorage();
 
   }
 

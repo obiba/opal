@@ -13,13 +13,13 @@ package org.obiba.opal.web.gwt.app.client.project.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectEditionUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.EditorPanel;
-import org.obiba.opal.web.model.client.magma.DatasourceDto;
+import org.obiba.opal.web.model.client.opal.DatabaseDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.github.gwtbootstrap.client.ui.Paragraph;
-import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -28,9 +28,10 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.ViewImpl;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-public class ProjectAdministrationView extends ViewImpl implements ProjectAdministrationPresenter.Display {
+public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectEditionUiHandlers>
+    implements ProjectAdministrationPresenter.Display {
 
   interface Binder extends UiBinder<Widget, ProjectAdministrationView> {}
 
@@ -47,24 +48,21 @@ public class ProjectAdministrationView extends ViewImpl implements ProjectAdmini
   HasText tags;
 
   @UiField
-  Paragraph storageType;
+  Paragraph database;
 
   @UiField
-  ListBox datasourceType;
+  ListBox databases;
 
   @UiField
   EditorPanel storageEditor;
-
-  private final Translations translations;
 
   private ProjectDto project;
 
   @Inject
   public ProjectAdministrationView(Binder uiBinder, Translations translations) {
     initWidget(uiBinder.createAndBindUi(this));
-    this.translations = translations;
-    for(int i = 0; i < datasourceType.getItemCount(); i++) {
-      datasourceType.setItemText(i, translations.datasourceTypeMap().get(datasourceType.getValue(i)));
+    for(int i = 0; i < databases.getItemCount(); i++) {
+      databases.setItemText(i, translations.datasourceTypeMap().get(databases.getValue(i)));
     }
     storageEditor.setHandler(new StorageEditorHandler());
   }
@@ -76,18 +74,29 @@ public class ProjectAdministrationView extends ViewImpl implements ProjectAdmini
     name.setText(project.getName());
     title.setText(project.getTitle());
     description.setText(project.getDescription());
-    String tt = "";
-    for(String t : JsArrays.toIterable(JsArrays.toSafeArray(project.getTagsArray()))) {
-      if(Strings.isNullOrEmpty(tt)) {
-        tt = t;
-      } else {
-        tt += " " + t;
+    StringBuilder tagsStr = new StringBuilder();
+    for(String tag : JsArrays.toIterable(JsArrays.toSafeArray(project.getTagsArray()))) {
+      if(tagsStr.length() != 0) {
+        tagsStr.append(" ");
       }
+      tagsStr.append(tag);
     }
-    tags.setText(tt);
+    tags.setText(tagsStr.toString());
 
-    storageType.setText(translations.datasourceTypeMap().get(project.getDatasource().getType()));
+    database.setText(project.getDatabase());
     storageEditor.showEditor(false);
+  }
+
+  @Override
+  public ProjectDto getProject() {
+    return project;
+  }
+
+  @Override
+  public void setAvailableDatabases(JsArray<DatabaseDto> dtos) {
+    for(DatabaseDto dto : JsArrays.toIterable(dtos)) {
+      databases.addItem(dto.getName());
+    }
   }
 
   @UiHandler("saveIdentification")
@@ -104,10 +113,9 @@ public class ProjectAdministrationView extends ViewImpl implements ProjectAdmini
 
     @Override
     public void onEdit() {
-      DatasourceDto datasource = project.getDatasource();
-      for(int i = 0; i < datasourceType.getItemCount(); i++) {
-        if(datasourceType.getValue(i).equals(datasource.getType())) {
-          datasourceType.setSelectedIndex(i);
+      for(int i = 0; i < databases.getItemCount(); i++) {
+        if(databases.getValue(i).equals(project.getDatabase())) {
+          databases.setSelectedIndex(i);
           break;
         }
       }
@@ -115,7 +123,7 @@ public class ProjectAdministrationView extends ViewImpl implements ProjectAdmini
 
     @Override
     public void onSave() {
-      // TODO
+      getUiHandlers().saveStorage(databases.getValue(databases.getSelectedIndex()));
     }
 
     @Override

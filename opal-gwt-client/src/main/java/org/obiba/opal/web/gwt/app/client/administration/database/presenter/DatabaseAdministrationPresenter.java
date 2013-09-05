@@ -86,7 +86,7 @@ public class DatabaseAdministrationPresenter extends
   private final AuthorizationPresenter authorizationPresenter;
 
   private final ResourceDataProvider<DatabaseDto> resourceDataProvider = new ResourceDataProvider<DatabaseDto>(
-      Resources.sqlDatabases());
+      DatabaseResources.sqlDatabases());
 
   private final BreadcrumbsBuilder breadcrumbsBuilder;
 
@@ -106,7 +106,7 @@ public class DatabaseAdministrationPresenter extends
   @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
     ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-        .forResource(Resources.sqlDatabases()) //
+        .forResource(DatabaseResources.sqlDatabases()) //
         .get() //
         .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListDatabasesAuthorization())) //
         .send();
@@ -131,7 +131,7 @@ public class DatabaseAdministrationPresenter extends
   @Override
   public void authorize(HasAuthorization authorizer) {
     ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-        .forResource(Resources.sqlDatabases()) //
+        .forResource(DatabaseResources.sqlDatabases()) //
         .get() //
         .authorize(authorizer) //
         .send();
@@ -186,7 +186,7 @@ public class DatabaseAdministrationPresenter extends
 
             private void deleteDatabase(DatabaseDto database) {
               ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder()
-                  .forResource(Resources.database(database.getName()))
+                  .forResource(DatabaseResources.database(database.getName()))
                   .withCallback(Response.SC_OK, new ResponseCodeCallback() {
 
                     @Override
@@ -218,7 +218,7 @@ public class DatabaseAdministrationPresenter extends
 
           };
           ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder()//
-              .forResource(Resources.database(dto.getName(), "connections")).accept("application/json")//
+              .forResource(DatabaseResources.database(dto.getName(), "connections")).accept("application/json")//
               .withCallback(Response.SC_OK, callback).withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).post()
               .send();
         }
@@ -237,7 +237,7 @@ public class DatabaseAdministrationPresenter extends
     }));
 
     authorizationPresenter
-        .setAclRequest("databases", new AclRequest(AclAction.DATABASES_ALL, Resources.sqlDatabases()));
+        .setAclRequest("databases", new AclRequest(AclAction.DATABASES_ALL, DatabaseResources.sqlDatabases()));
   }
 
   private void refresh() {

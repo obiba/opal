@@ -93,7 +93,7 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
   public void onProjectSelection(ProjectDto project) {
     PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.PROJECT)
         .with(ParameterTokens.TOKEN_NAME, project.getName())
-        .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.home.toString()).build();
+        .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.HOME.toString()).build();
     placeManager.revealPlace(request);
   }
 
@@ -101,7 +101,7 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
   public void onProjectTableSelection(ProjectDto project, String table) {
     PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.PROJECT)
         .with(ParameterTokens.TOKEN_NAME, project.getName()) //
-        .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.tables.toString()) //
+        .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString()) //
         .with(ParameterTokens.TOKEN_PATH, project.getName() + "." + table).build();
     placeManager.revealPlace(request);
   }

@@ -47,9 +47,8 @@ public abstract class AbstractValidationHandler implements ValidationHandler {
     if(messages.size() > 0) {
       eventBus.fireEvent(NotificationEvent.newBuilder().error(messages).args(args).build());
       return false;
-    } else {
-      return true;
     }
+    return true;
   }
 
 }

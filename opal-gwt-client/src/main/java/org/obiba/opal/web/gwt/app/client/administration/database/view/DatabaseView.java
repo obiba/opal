@@ -9,9 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.database.view;
 
-import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseUiHandlers;
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabasePresenter.Display;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabasePresenter.Mode;
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
@@ -19,6 +21,10 @@ import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.model.client.opal.JdbcDriverDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.CheckBox;
+import com.github.gwtbootstrap.client.ui.PasswordTextBox;
+import com.github.gwtbootstrap.client.ui.TextArea;
+import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -30,9 +36,8 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.TextArea;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -70,37 +75,30 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   ListBox driver;
 
   @UiField
+  ListBox type;
+
+  @UiField
+  ListBox magmaDatasourceType;
+
+  @UiField
   TextBox username;
 
   @UiField
-  TextBox password;
+  PasswordTextBox password;
 
   @UiField
   TextArea properties;
 
-  String driverClass;
+  @UiField
+  CheckBox defaultStorage;
 
-  HasText hasTextListBox;
-
-  JsArray<JdbcDriverDto> availableDrivers;
+  private JsArray<JdbcDriverDto> availableDrivers;
 
   @Inject
   public DatabaseView(EventBus eventBus) {
     super(eventBus);
     widget = uiBinder.createAndBindUi(this);
     initWidgets();
-    hasTextListBox = new HasText() {
-
-      @Override
-      public String getText() {
-        return driver.getValue(driver.getSelectedIndex());
-      }
-
-      @Override
-      public void setText(String text) {
-        driverClass = text;
-      }
-    };
   }
 
   private void initWidgets() {
@@ -139,11 +137,7 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   @Override
   public void setDialogMode(Mode dialogMode) {
     name.setEnabled(Mode.CREATE == dialogMode);
-    if(Mode.CREATE == dialogMode) {
-      dialog.setTitle(translations.addDatabase());
-    } else {
-      dialog.setTitle(translations.editDatabase());
-    }
+    dialog.setTitle(Mode.CREATE == dialogMode ? translations.addDatabase() : translations.editDatabase());
   }
 
   @UiHandler("saveButton")
@@ -162,13 +156,66 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   }
 
   @Override
+  public HasText getMagmaDatasourceType() {
+    return new HasText() {
+
+      @Override
+      public String getText() {
+        return magmaDatasourceType.getValue(magmaDatasourceType.getSelectedIndex());
+      }
+
+      @Override
+      public void setText(String text) {
+        for(int i = 0; i < magmaDatasourceType.getItemCount(); i++) {
+          if(magmaDatasourceType.getValue(i).equals(text)) {
+            magmaDatasourceType.setSelectedIndex(i);
+            break;
+          }
+        }
+      }
+    };
+  }
+
+  @Override
+  public HasText getType() {
+    return new HasText() {
+
+      @Override
+      public String getText() {
+        return type.getValue(type.getSelectedIndex());
+      }
+
+      @Override
+      public void setText(String text) {
+        for(int i = 0; i < type.getItemCount(); i++) {
+          if(type.getValue(i).equals(text)) {
+            type.setSelectedIndex(i);
+            break;
+          }
+        }
+      }
+    };
+  }
+
+  @Override
   public HasText getUrl() {
     return url;
   }
 
   @Override
   public HasText getDriver() {
-    return hasTextListBox;
+    return new HasText() {
+
+      @Override
+      public String getText() {
+        return driver.getValue(driver.getSelectedIndex());
+      }
+
+      @Override
+      public void setText(String text) {
+        updateDriverSelection(text);
+      }
+    };
   }
 
   @Override
@@ -187,24 +234,30 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   }
 
   @Override
-  public void setAvailableDrivers(JsArray<JdbcDriverDto> resource) {
-    availableDrivers = resource;
-    for(JdbcDriverDto driver : JsArrays.toIterable(resource)) {
-      this.driver.addItem(driver.getDriverName(), driver.getDriverClass());
-    }
-    updateDriverSelection();
+  public HasValue<Boolean> getDefaultStorage() {
+    return defaultStorage;
   }
 
-  private JdbcDriverDto getDriver(String driverClass) {
-    for(JdbcDriverDto driver : JsArrays.toIterable(availableDrivers)) {
-      if(driver.getDriverClass().equals(driverClass)) {
-        return driver;
+  @Override
+  public void setAvailableDrivers(JsArray<JdbcDriverDto> resource) {
+    availableDrivers = resource;
+    for(JdbcDriverDto driverDto : JsArrays.toIterable(resource)) {
+      driver.addItem(driverDto.getDriverName(), driverDto.getDriverClass());
+    }
+    updateDriverSelection(null);
+  }
+
+  @Nullable
+  private JdbcDriverDto getDriver(@SuppressWarnings("ParameterHidesMemberVariable") String driverClass) {
+    for(JdbcDriverDto driverDto : JsArrays.toIterable(availableDrivers)) {
+      if(driverDto.getDriverClass().equals(driverClass)) {
+        return driverDto;
       }
     }
     return null;
   }
 
-  private void updateDriverSelection() {
+  private void updateDriverSelection(String driverClass) {
     for(int i = 0; i < driver.getItemCount(); i++) {
       if(driver.getValue(i).equals(driverClass)) {
         driver.setSelectedIndex(i);
@@ -212,7 +265,7 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
       }
     }
     if(Strings.isNullOrEmpty(getUrl().getText())) {
-      JdbcDriverDto dto = getDriver(hasTextListBox.getText());
+      JdbcDriverDto dto = getDriver(getDriver().getText());
       if(dto != null) {
         getUrl().setText(dto.getJdbcUrlTemplate());
       }

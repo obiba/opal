@@ -377,6 +377,8 @@ public interface Translations extends Constants {
       "DatabaseConnectionFailed", "Failed to connect: {0}.",//
       "NameIsRequired", "A name is required.",//
       "DriverIsRequired", "A driver is required.",//
+      "TypeIsRequired", "Database type is required.",//
+      "MagmaDatasourceTypeIsRequired", "Magma datasource type is required.",//
       "LimeSurveyDatabaseIsRequired", "LimeSurvey database is required.",//
       "UrlIsRequired", "A url is required.",//
       "UsernameIsRequired", "A username is required.",//

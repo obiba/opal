@@ -54,14 +54,14 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   public interface Display extends View, HasUiHandlers<ProjectUiHandlers>, HasTabPanel {
 
     enum ProjectTab {
-      home,
-      tables,
-      files,
-      visualisation,
-      reports,
-      tasks,
-      permissions,
-      administration
+      HOME,
+      TABLES,
+      FILES,
+      VISUALISATION,
+      REPORTS,
+      TASKS,
+      PERMISSIONS,
+      ADMINISTRATION
     }
 
     void setProject(ProjectDto project);
@@ -90,7 +90,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private String name;
 
-  private Display.ProjectTab tab = Display.ProjectTab.tables;
+  private Display.ProjectTab tab = Display.ProjectTab.TABLES;
 
   private ProjectDto project;
 
@@ -128,7 +128,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     tab = validateTab(request.getParameter(ParameterTokens.TOKEN_TAB, null));
     String path = validatePath(request.getParameter(ParameterTokens.TOKEN_PATH, null));
 
-    if(tab == Display.ProjectTab.tables) {
+    if(tab == Display.ProjectTab.TABLES) {
       // TODO check that datasource name is the one of project
       getView().setTabData(tab.ordinal(), path);
     } else {
@@ -170,13 +170,13 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     String queryPathParam = (String) getView().getTabData(index);
 
     switch(tab) {
-      case tables:
+      case TABLES:
         onTablesTabSelected(queryPathParam);
         break;
-      case files:
+      case FILES:
         onFilesTabSelected(queryPathParam);
         break;
-      case administration:
+      case ADMINISTRATION:
         onAdminTabSelected();
         break;
     }
@@ -256,11 +256,11 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       }
     }
 
-    return Display.ProjectTab.home;
+    return Display.ProjectTab.HOME;
   }
 
   private String validatePath(String path) {
-    if(tab == Display.ProjectTab.tables && !Strings.isNullOrEmpty(path)) {
+    if(tab == Display.ProjectTab.TABLES && !Strings.isNullOrEmpty(path)) {
       MagmaPath.Parser parser = new MagmaPath.Parser().parse(path);
       String datasourceName = parser.getDatasource();
       if(!Strings.isNullOrEmpty(datasourceName) && name.equals(datasourceName)) {

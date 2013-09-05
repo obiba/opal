@@ -41,7 +41,7 @@ public class AddProjectModalPresenter extends ModalPresenterWidget<AddProjectMod
   }
 
   @Override
-  public boolean addProject(final ProjectFactoryDto project) {
+  public boolean addProject(ProjectFactoryDto project) {
     if(Strings.isNullOrEmpty(project.getName())) {
       getView().setNameError(translations.userMessageMap().get("ProjectNameRequired"));
       return false;
@@ -56,7 +56,7 @@ public class AddProjectModalPresenter extends ModalPresenterWidget<AddProjectMod
       @Override
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == Response.SC_CREATED) {
-          getEventBus().fireEvent(new ProjectCreatedEvent());
+          getEventBus().fireEvent(new ProjectCreatedEvent(null));
         } else if(response.getText() != null && response.getText().length() != 0) {
           ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
           getEventBus().fireEvent(

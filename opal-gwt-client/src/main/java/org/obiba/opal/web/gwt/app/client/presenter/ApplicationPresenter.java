@@ -237,7 +237,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
     PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECT)
         .with(ParameterTokens.TOKEN_NAME, datasourceName) //
-        .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.tables.toString()) //
+        .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString()) //
         .with(ParameterTokens.TOKEN_PATH, path);
     placeManager.revealPlace(builder.build());
   }

@@ -3,9 +3,11 @@ package org.obiba.opal.web.gwt.app.client.ui;
 import com.github.gwtbootstrap.client.ui.event.HiddenEvent;
 import com.github.gwtbootstrap.client.ui.event.HiddenHandler;
 import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 
 public abstract class ModalPopupViewWithUiHandlers<C extends ModalUiHandlers> extends ModalViewImpl
-    implements com.gwtplatform.mvp.client.HasUiHandlers<C> {
+    implements HasUiHandlers<C> {
+
   private C uiHandlers;
 
   protected ModalPopupViewWithUiHandlers(EventBus eventBus) {

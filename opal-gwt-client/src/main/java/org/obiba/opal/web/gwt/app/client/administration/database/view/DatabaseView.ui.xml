@@ -4,48 +4,62 @@
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <ui:style>
-    .optionsPanelMsg td {
-    margin: 0.5em 0.5em 0.5em 0.5em;
-    }
-  </ui:style>
-
   <o:Modal ui:field="dialog" resizable="false" closeVisible="true" keyboard="true" animation="false">
-    <g:FlowPanel addStyleNames="main {style.optionsPanelMsg}">
-      <g:FlowPanel styleName="input">
-        <g:Label addStyleNames="key">
-          <ui:msg description="Name label">Name</ui:msg>
-        </g:Label>
-        <g:TextBox name="name" ui:field="name"/>
-      </g:FlowPanel>
 
-      <g:FlowPanel styleName="input">
-        <g:Label addStyleNames="key">
-          <ui:msg description="Driver label">Driver</ui:msg>
-        </g:Label>
-        <o:Chooser name="driver" ui:field="driver"/>
-      </g:FlowPanel>
+    <b:WellForm>
 
-      <g:FlowPanel styleName="input">
-        <g:Label addStyleNames="key">
-          <ui:msg description="Url label">Url</ui:msg>
-        </g:Label>
-        <g:TextBox name="url" ui:field="url" addStyleNames="span4"/>
-      </g:FlowPanel>
+      <b:ControlLabel for="name">
+        <ui:msg description="Name label">Name</ui:msg>
+      </b:ControlLabel>
+      <b:TextBox ui:field="name" b:id="name"/>
 
-      <g:FlowPanel styleName="input">
-        <g:Label addStyleNames="key">
-          <ui:msg description="Username label">Username</ui:msg>
-        </g:Label>
-        <g:TextBox name="username" ui:field="username"/>
-      </g:FlowPanel>
+      <b:CheckBox ui:field="defaultStorage">
+        <ui:msg description="Default storage label">Default storage</ui:msg>
+      </b:CheckBox>
 
-      <g:FlowPanel styleName="input">
-        <g:Label addStyleNames="key">
-          <ui:msg description="Password label">Password</ui:msg>
-        </g:Label>
-        <g:PasswordTextBox name="password" ui:field="password"/>
-      </g:FlowPanel>
+      <b:ControlLabel for="type">
+        <ui:msg description="Type label">Type</ui:msg>
+      </b:ControlLabel>
+      <o:Chooser ui:field="type" name="type">
+        <g:item value="IMPORT">
+          <ui:msg description="Import label">Import</ui:msg>
+        </g:item>
+        <g:item value="STORAGE">
+          <ui:msg description="Storage label">Storage</ui:msg>
+        </g:item>
+        <g:item value="EXPORT">
+          <ui:msg description="Export label">Export</ui:msg>
+        </g:item>
+      </o:Chooser>
+
+      <b:ControlLabel for="magmaDatasourceType">
+        <ui:msg description="Magma datasource type label">Magma datasource type</ui:msg>
+      </b:ControlLabel>
+      <o:Chooser ui:field="magmaDatasourceType" name="magmaDatasourceType">
+        <g:item value="hibernate"/>
+        <g:item value="jdbc"/>
+        <g:item value="limesurvey"/>
+      </o:Chooser>
+
+      <b:ControlLabel for="driver">
+        <ui:msg description="Driver label">Driver</ui:msg>
+      </b:ControlLabel>
+      <o:Chooser ui:field="driver" name="driver"/>
+
+      <b:ControlLabel for="url">
+        <ui:msg description="Url label">Url</ui:msg>
+      </b:ControlLabel>
+      <b:TextBox ui:field="url" b:id="url" alternateSize="XLARGE"/>
+
+      <b:ControlLabel for="username">
+        <ui:msg description="Username label">Username</ui:msg>
+      </b:ControlLabel>
+      <b:TextBox ui:field="username" b:id="username"/>
+
+      <b:ControlLabel for="password">
+        <ui:msg description="Password label">Password</ui:msg>
+      </b:ControlLabel>
+      <b:PasswordTextBox ui:field="password" b:id="password"/>
 
       <g:DisclosurePanel>
         <g:customHeader>
@@ -54,21 +68,21 @@
           </g:Label>
         </g:customHeader>
         <g:FlowPanel>
-          <g:FlowPanel styleName="input">
-            <g:Label addStyleNames="key">
-              <ui:msg description="Properties">Properties</ui:msg>
-            </g:Label>
-            <g:TextArea ui:field="properties"/>
-          </g:FlowPanel>
+          <b:ControlLabel for="properties">
+            <ui:msg description="Properties label">Properties</ui:msg>
+          </b:ControlLabel>
+          <b:TextArea ui:field="properties" b:id="properties"/>
         </g:FlowPanel>
       </g:DisclosurePanel>
-    </g:FlowPanel>
+
+    </b:WellForm>
+
     <b:ModalFooter>
-      <b:Button ui:field="cancelButton">
-        <ui:msg description="Cancel button label">Cancel</ui:msg>
-      </b:Button>
       <b:Button ui:field="saveButton" type="PRIMARY">
         <ui:msg description="Save button label">Save</ui:msg>
+      </b:Button>
+      <b:Button ui:field="cancelButton">
+        <ui:msg description="Cancel button label">Cancel</ui:msg>
       </b:Button>
     </b:ModalFooter>
 

@@ -11,19 +11,23 @@ package org.obiba.opal.web.gwt.app.client.administration.database.presenter;
 
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 
-final class Resources {
+public final class DatabaseResources {
 
-  private Resources() {}
+  private DatabaseResources() {}
 
-  static String sqlDatabases() {
-    return "/system/databases/sql";
+  public static String databases() {
+    return "/system/databases";
   }
 
-  static String database(String name) {
+  public static String sqlDatabases() {
+    return databases() + "/sql";
+  }
+
+  public static String database(String name) {
     return UriBuilder.create().segment("system", "database", name).build();
   }
 
-  static String database(String name, String... more) {
+  public static String database(String name, String... more) {
     return UriBuilder.create().segment("system", "database", name).segment(more).build();
   }
 
