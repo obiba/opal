@@ -1,4 +1,4 @@
-package org.obiba.opal.web.magma.support;
+package org.obiba.opal.core.runtime.jdbc;
 
 import javax.annotation.Nonnull;
 

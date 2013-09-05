@@ -2,9 +2,13 @@ package org.obiba.opal.server;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory;
+import org.obiba.opal.core.cfg.OpalConfiguration;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
+import org.obiba.opal.core.runtime.jdbc.DatabaseSessionFactoryProvider;
 import org.obiba.opal.project.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,6 +25,9 @@ public class TempDefaultConfig {
 
   @Autowired
   private ProjectService projectService;
+
+  @Autowired
+  private OpalConfigurationService configService;
 
   public void createDefaultConfig() {
 
@@ -55,6 +62,15 @@ public class TempDefaultConfig {
 
     Datasource datasource = databaseRegistry.createStorageMagmaDatasource("opal-data", opalData);
     MagmaEngine.get().addDatasource(datasource);
+
+    configService.modifyConfiguration(new OpalConfigurationService.ConfigModificationTask() {
+
+      @Override
+      public void doWithConfig(OpalConfiguration config) {
+        config.getMagmaEngineFactory().withFactory(new HibernateDatasourceFactory("opal-data",
+            new DatabaseSessionFactoryProvider("opal-data", databaseRegistry, "opal-data")));
+      }
+    });
 
     projectService.getOrCreateProject(datasource);
 
