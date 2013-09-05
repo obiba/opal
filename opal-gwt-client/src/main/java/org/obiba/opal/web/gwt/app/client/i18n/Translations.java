@@ -1412,14 +1412,14 @@ public interface Translations extends Constants {
   Map<String, String> dataShieldLabelsMap();
 
   @Description("Project Tab Names")
-  @DefaultStringMapValue({ "home", "Home", //
-      "tables", "Tables", //
-      "files", "Files", //
-      "visualisation", "Data visualization", //
-      "reports", "Reports", //
-      "tasks", "Tasks", //
-      "permissions", "Permissions", //
-      "administration", "Administration" //
+  @DefaultStringMapValue({ "HOME", "Home", //
+      "TABLES", "Tables", //
+      "FILES", "Files", //
+      "VISUALISATION", "Data visualization", //
+      "REPORTS", "Reports", //
+      "TASKS", "Tasks", //
+      "PERMISSIONS", "Permissions", //
+      "ADMINISTRATION", "Administration" //
   })
   Map<String, String> projectTabNameMap();
 

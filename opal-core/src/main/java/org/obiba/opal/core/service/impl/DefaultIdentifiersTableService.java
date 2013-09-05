@@ -76,26 +76,26 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
 
   @Override
   public ValueTable getValueTable() {
-    if(datasource == null) {
+    if(getDatasource() == null) {
       throw new ServiceNotRunningException(getName(), "IdentifiersTableService has no datasource configured");
     }
-    return datasource.getValueTable(getTableName());
+    return getDatasource().getValueTable(getTableName());
   }
 
   @Override
   public ValueTableWriter createValueTableWriter() {
-    if(datasource == null) {
+    if(getDatasource() == null) {
       throw new ServiceNotRunningException(getName(), "IdentifiersTableService has no datasource configured");
     }
-    return datasource.createWriter(getTableName(), entityType);
+    return getDatasource().createWriter(getTableName(), entityType);
   }
 
   @Override
   public boolean hasValueTable() {
-    if(datasource == null) {
+    if(getDatasource() == null) {
       throw new ServiceNotRunningException(getName(), "IdentifiersTableService has no datasource configured");
     }
-    return datasource.hasValueTable(getTableName());
+    return getDatasource().hasValueTable(getTableName());
   }
 
   @Override
@@ -129,14 +129,12 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
 
   @Override
   public boolean isRunning() {
-    return datasource != null;
+    return getDatasource() != null;
   }
 
   @Override
   public void start() {
-    Database database = databaseRegistry.getIdentifiersDatabase();
-    datasource = database == null ? null : databaseRegistry.createStorageMagmaDatasource(getDatasourceName(), database);
-    initialise();
+    getDatasource();
   }
 
   @Override
@@ -145,7 +143,7 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
       @Override
       protected void doInTransactionWithoutResult(TransactionStatus status) {
         try {
-          Disposables.dispose(datasource);
+          Disposables.dispose(getDatasource());
         } catch(RuntimeException e) {
           log.warn("Ignoring exception during shutdown sequence.", e);
         }
@@ -161,6 +159,17 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   @Override
   public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
     throw new NoSuchServiceConfigurationException(getName());
+  }
+
+  private Datasource getDatasource() {
+    if(datasource == null) {
+      Database database = databaseRegistry.getIdentifiersDatabase();
+      if(database != null) {
+        datasource = databaseRegistry.createStorageMagmaDatasource(getDatasourceName(), database);
+        initialise();
+      }
+    }
+    return datasource;
   }
 
   private void initialise() {
