@@ -16,10 +16,15 @@ public class OpalServer {
 
   }
 
-  private final GenericApplicationContext ctx;
+  private GenericApplicationContext ctx;
 
   OpalServer(OpalServerOptions options) {
-    // Tell Carol not to initialize its CMI component. This helps us minimize dependencies brought in by JOTM.
+    setProperties();
+    upgrade();
+    start();
+  }
+
+  private void setProperties() {// Tell Carol not to initialize its CMI component. This helps us minimize dependencies brought in by JOTM.
     // See http://wiki.obiba.org/confluence/display/CAG/Technical+Requirements for details.
     System.setProperty("cmi.disabled", "true");
 
@@ -27,11 +32,15 @@ public class OpalServer {
     // http://martijndashorst.com/blog/2011/02/21/ehcache-and-quartz-phone-home-during-startup
     System.setProperty("net.sf.ehcache.skipUpdateCheck", "true");
     System.setProperty("org.terracotta.quartz.skipUpdateCheck", "true");
+  }
 
+  private void upgrade() {
     System.out.println("Upgrading Opal.");
     new UpgradeCommand().execute();
     System.out.println("Upgrade successful.");
+  }
 
+  private void start() {
     System.out.println("Starting Opal.");
     ctx = new GenericApplicationContext();
     try {
@@ -55,6 +64,7 @@ public class OpalServer {
       ctx.getBean(OpalRuntime.class).start();
       System.out.println("Opal Server successfully started.");
 
+      //TODO remove these default config data
       ctx.getBean(TempDefaultConfig.class).createDefaultConfig();
     }
   }

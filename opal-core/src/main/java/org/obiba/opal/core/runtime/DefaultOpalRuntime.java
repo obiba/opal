@@ -105,7 +105,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
         MagmaEngine.get().shutdown();
       }
     });
-
   }
 
   @Override

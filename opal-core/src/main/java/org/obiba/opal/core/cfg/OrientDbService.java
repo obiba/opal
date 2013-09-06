@@ -20,4 +20,5 @@ public interface OrientDbService {
 
   @Nullable
   <T> T uniqueResult(String sql, String paramName, Object paramValue);
+
 }
