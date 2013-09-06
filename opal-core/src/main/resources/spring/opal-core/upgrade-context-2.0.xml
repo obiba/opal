@@ -132,6 +132,8 @@
 
   <bean id="sessionFactoryFactory" class="org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory"/>
 
+  <bean id="orientDbService" class="org.obiba.opal.core.cfg.OrientDbServiceImpl"/>
+
   <bean id="databaseRegistry" class="org.obiba.opal.core.runtime.database.DefaultDatabaseRegistry"/>
 
   <bean id="upgradeManager" class="org.obiba.runtime.upgrade.support.DefaultUpgradeManager">
