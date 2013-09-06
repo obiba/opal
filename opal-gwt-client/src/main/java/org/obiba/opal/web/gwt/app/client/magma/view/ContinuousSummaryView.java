@@ -11,8 +11,8 @@ package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
 import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
-import org.obiba.opal.web.gwt.plot.client.HistogramPlot;
-import org.obiba.opal.web.gwt.plot.client.NormalProbabilityPlot;
+import org.obiba.opal.web.gwt.plot.client.HistogramChartFactory;
+import org.obiba.opal.web.gwt.plot.client.NormalProbabilityChartFactory;
 import org.obiba.opal.web.model.client.math.ContinuousSummaryDto;
 import org.obiba.opal.web.model.client.math.DescriptiveStatsDto;
 import org.obiba.opal.web.model.client.math.IntervalFrequencyDto;
@@ -26,6 +26,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -49,9 +50,15 @@ public class ContinuousSummaryView extends Composite {
   @UiField
   DivElement qqPlotElement;
 
-  HistogramPlot histogram;
+  @UiField
+  SimplePanel histogramPanel;
 
-  NormalProbabilityPlot qqPlot;
+  @UiField
+  SimplePanel normalProbability;
+
+  HistogramChartFactory histogram;
+
+  NormalProbabilityChartFactory qqPlot;
 
   public ContinuousSummaryView(ContinuousSummaryDto continuous) {
     initWidget(uiBinder.createAndBindUi(this));
@@ -93,18 +100,19 @@ public class ContinuousSummaryView extends Composite {
     grid.setWidget(row, 0, new Label("Sum of squares"));
     grid.setWidget(row++, 1, new Label("" + descriptiveStats.getSumsq()));
 
-
     if(descriptiveStats.getVariance() > 0) {
-      histogram = new HistogramPlot(histogramElement.getId(), descriptiveStats.getMin(), descriptiveStats.getMax());
+      histogram = new HistogramChartFactory();
+
+//      histogram = new HistogramPlot(histogramElement.getId(), descriptiveStats.getMin(), descriptiveStats.getMax());
       JsArray<IntervalFrequencyDto> frequencyArray = continuous.getIntervalFrequencyArray();
       if(frequencyArray != null) {
         int length = frequencyArray.length();
         for(int i = 0; i < length; i++) {
           IntervalFrequencyDto value = frequencyArray.get(i);
-          histogram.push(value.getLower(), value.getUpper(), value.getDensity());
+          histogram.push(value.getDensity(), value.getLower(), value.getUpper());
         }
       }
-      qqPlot = new NormalProbabilityPlot(qqPlotElement.getId(), descriptiveStats.getMin(), descriptiveStats.getMax());
+      qqPlot = new NormalProbabilityChartFactory(descriptiveStats.getMin(), descriptiveStats.getMax());
       qqPlot.push(descriptiveStats.getPercentilesArray(), continuous.getDistributionPercentilesArray());
     }
   }
@@ -113,10 +121,10 @@ public class ContinuousSummaryView extends Composite {
   protected void onLoad() {
     super.onLoad();
     if(histogram != null) {
-      histogram.plotOrRedraw();
+      histogramPanel.add(histogram.createChart("Histogram", "Density"));
     }
     if(qqPlot != null) {
-      qqPlot.plotOrRedraw();
+      normalProbability.add(qqPlot.createChart("Normal Probability"));
     }
   }
 

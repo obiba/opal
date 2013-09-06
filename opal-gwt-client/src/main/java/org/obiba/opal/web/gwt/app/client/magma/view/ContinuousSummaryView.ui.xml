@@ -7,9 +7,9 @@
 
   <ui:style>
     .plot {
-      width: 400px;
-      float: left;
-      margin-right: 2em
+    width: 400px;
+    float: left;
+    margin-right: 2em
     }
   </ui:style>
 
@@ -18,8 +18,12 @@
       <b:Tab icon="BAR_CHART" active="true">
         <g:HTMLPanel>
           <div id="plot-container">
-            <div ui:field="histogramElement" class="{style.plot}" style="width:400px"/>
-            <div ui:field="qqPlotElement" class="{style.plot}" style="width:400px"/>
+            <div ui:field="histogramElement" class="{style.plot}" style="width:400px">
+              <g:SimplePanel ui:field="histogramPanel"/>
+            </div>
+            <div ui:field="qqPlotElement" class="{style.plot}" style="width:400px">
+              <g:SimplePanel ui:field="normalProbability"/>
+            </div>
           </div>
         </g:HTMLPanel>
       </b:Tab>
