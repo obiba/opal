@@ -33,10 +33,10 @@
       <b:HelpBlock>Optional description of the project.</b:HelpBlock>
       <b:ModalFooter>
         <b:Button type="PRIMARY" ui:field="save">
-          <ui:msg description="Add Project Modal Save label">Save</ui:msg>
+          <ui:msg description="Save button label">Save</ui:msg>
         </b:Button>
         <b:Button ui:field="cancel">
-          <ui:msg description="Add Project Modal Cancel label">Cancel</ui:msg>
+          <ui:msg description="Cancel button label">Cancel</ui:msg>
         </b:Button>
       </b:ModalFooter>
     </o:Modal>

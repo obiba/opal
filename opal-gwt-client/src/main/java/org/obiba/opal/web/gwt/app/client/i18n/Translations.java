@@ -1825,9 +1825,13 @@ public interface Translations extends Constants {
   @DefaultStringValue("disabled")
   String disabledLabel();
 
-  @Description("Add/Update User label")
-  @DefaultStringValue("Add/Update User")
-  String addUpdateUserLabel();
+  @Description("Add User label")
+  @DefaultStringValue("Add User")
+  String addUserLabel();
+
+  @Description("Edit User label")
+  @DefaultStringValue("Edit User")
+  String editUserLabel();
 
   @Description("Add Project label")
   @DefaultStringValue("Add Project")

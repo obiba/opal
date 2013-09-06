@@ -77,24 +77,14 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
   @UiField
   PasswordTextBox confirmPassword;
 
-  private final ListDataProvider<GroupDto> groupDataProvider = new ListDataProvider<GroupDto>();
-
-  private GroupSuggestOracle oracle;
-
-  Column<GroupDto, GroupDto> status;
-
-  private String originalUserName;
-
-  private List<String> originalGroups;
 
   @Inject
   public UserView(EventBus eventBus) {
     super(eventBus);
-    oracle = new GroupSuggestOracle(eventBus);
-    groups = new SuggestListBox(oracle);
+    groups = new SuggestListBox(new GroupSuggestOracle(eventBus));
 
     widget = uiBinder.createAndBindUi(this);
-    dialog.setTitle(translations.addUpdateUserLabel());
+    dialog.setTitle(translations.addUserLabel());
 
     groups.getSuggestBox().getValueBox().addKeyUpHandler(new KeyUpHandler() {
 
@@ -111,14 +101,13 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
 
   @Override
   public void setUser(String originalUserName, List<String> originalGroups) {
-    this.originalUserName = originalUserName;
-    this.originalGroups = originalGroups;
     userName.setText(originalUserName);
   }
 
   @Override
   public void usernameSetEnabled(boolean b) {
     userName.setEnabled(b);
+    dialog.setTitle(b ? translations.addUserLabel() : translations.editUserLabel());
   }
 
   @Override

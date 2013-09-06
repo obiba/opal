@@ -305,9 +305,6 @@ public class UserAdministrationPresenter
                 @Override
                 public void onResource(Response response, JsArray<UserDto> resource) {
                   getView().renderUserRows(resource);
-                  getEventBus().fireEvent(NotificationEvent.Builder.newNotification().info("UserStatusChangedOk")
-                      .args(value.getName(),
-                          value.getEnabled() ? translations.enabledLabel() : translations.disabledLabel()).build());
 
                 }
               }).get().send();
@@ -353,9 +350,6 @@ public class UserAdministrationPresenter
             @Override
             public void onResponseCode(Request request, Response response) {
               getEventBus().fireEvent(isUser ? new UsersRefreshEvent() : new GroupsRefreshEvent());
-              getEventBus().fireEvent(
-                  NotificationEvent.Builder.newNotification().info(isUser ? "UserDeletedOk" : "GroupDeletedOk")
-                      .args(name).build());
             }
           }, Response.SC_OK).delete().send();
     }

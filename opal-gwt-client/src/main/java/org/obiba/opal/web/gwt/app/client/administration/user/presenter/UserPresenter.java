@@ -95,8 +95,6 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
             public void onResponseCode(Request request, Response response) {
               if(response.getStatusCode() == Response.SC_OK) {
                 getEventBus().fireEvent(new UsersRefreshEvent());
-                getEventBus().fireEvent(
-                    NotificationEvent.Builder.newNotification().info("UserCreatedOk").args(userDto.getName()).build());
                 getView().hideDialog();
               } else if(response.getStatusCode() == Response.SC_CONFLICT) {
                 getEventBus().fireEvent(
@@ -118,8 +116,6 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
             public void onResponseCode(Request request, Response response) {
               if(response.getStatusCode() == Response.SC_OK) {
                 getEventBus().fireEvent(new UsersRefreshEvent());
-                getEventBus().fireEvent(
-                    NotificationEvent.Builder.newNotification().info("UserUpdatedOk").args(userDto.getName()).build());
               } else {
                 getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
               }

@@ -14,68 +14,52 @@
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <ui:style>
-    .optionsPanelMsg td {
-    margin: 0.5em 0.5em 0.5em 0.5em;
-    }
-  </ui:style>
-
   <o:Modal ui:field="dialog" resizable="false" closeVisible="true" keyboard="true" animation="false">
-    <g:FlowPanel addStyleNames="main {style.optionsPanelMsg}">
-      <b:Form type="VERTICAL">
-        <b:Fieldset>
-          <b:ControlGroup>
-            <b:ControlLabel>
-              <ui:msg description="User Name label">User Name</ui:msg>
-            </b:ControlLabel>
-            <b:Controls>
-              <b:TextBox ui:field="userName"></b:TextBox>
-            </b:Controls>
-          </b:ControlGroup>
-          <b:ControlGroup>
-            <b:ControlLabel>
-              <ui:msg description="Password label">Password</ui:msg>
-            </b:ControlLabel>
-            <b:Controls>
-              <b:PasswordTextBox ui:field="password"></b:PasswordTextBox>
-              <b:HelpBlock>
-                <ui:msg description="Password min. number of characters help">The password must contain at least 6
-                  characters.
-                </ui:msg>
-              </b:HelpBlock>
-            </b:Controls>
-            <b:ControlLabel>
-              <ui:msg description="Confirm Password label">Confirm Password</ui:msg>
-            </b:ControlLabel>
-            <b:Controls>
-              <b:PasswordTextBox ui:field="confirmPassword"></b:PasswordTextBox>
-            </b:Controls>
-          </b:ControlGroup>
-
-          <b:ControlGroup>
-            <b:ControlLabel>
-              <ui:msg description="Groups label">Groups</ui:msg>
-            </b:ControlLabel>
-            <b:Controls>
-              <!--<b:CellTable width="100%" ui:field="groupsTable" addStyleNames="small-top-margin" striped="true"-->
-              <!--condensed="true"/>-->
-              <o:SuggestListBox ui:field="groups"></o:SuggestListBox>
-              <b:HelpBlock>
-                <ui:msg description="Groups help label">Press comma (',') to add new group not from the list.
-                </ui:msg>
-              </b:HelpBlock>
-            </b:Controls>
-          </b:ControlGroup>
-
-        </b:Fieldset>
-      </b:Form>
-    </g:FlowPanel>
+    <b:ControlGroup>
+      <b:ControlLabel>
+        <ui:msg description="User Name label">User Name</ui:msg>
+      </b:ControlLabel>
+      <b:Controls>
+        <b:TextBox ui:field="userName"></b:TextBox>
+      </b:Controls>
+    </b:ControlGroup>
+    <b:ControlGroup>
+      <b:ControlLabel>
+        <ui:msg description="Password label">Password</ui:msg>
+      </b:ControlLabel>
+      <b:Controls>
+        <b:PasswordTextBox ui:field="password"></b:PasswordTextBox>
+        <b:HelpBlock>
+          <ui:msg description="Password min. number of characters help">The password must contain at least 6
+            characters.
+          </ui:msg>
+        </b:HelpBlock>
+      </b:Controls>
+      <b:ControlLabel>
+        <ui:msg description="Confirm Password label">Confirm Password</ui:msg>
+      </b:ControlLabel>
+      <b:Controls>
+        <b:PasswordTextBox ui:field="confirmPassword"></b:PasswordTextBox>
+      </b:Controls>
+    </b:ControlGroup>
+    <b:ControlGroup>
+      <b:ControlLabel>
+        <ui:msg description="Groups label">Groups</ui:msg>
+      </b:ControlLabel>
+      <b:Controls>
+        <o:SuggestListBox ui:field="groups"></o:SuggestListBox>
+        <b:HelpBlock>
+          <ui:msg description="Groups help label">Press comma (',') to add a group that is not in the suggestion list.
+          </ui:msg>
+        </b:HelpBlock>
+      </b:Controls>
+    </b:ControlGroup>
     <b:ModalFooter>
-      <b:Button ui:field="cancelButton" styleName="btn right-aligned top-margin">
-        <ui:msg description="Cancel button label">Cancel</ui:msg>
-      </b:Button>
-      <b:Button ui:field="saveButton" styleName="btn btn-primary right-aligned top-margin">
+      <b:Button ui:field="saveButton" type="PRIMARY">
         <ui:msg description="Save button label">Save</ui:msg>
+      </b:Button>
+      <b:Button ui:field="cancelButton">
+        <ui:msg description="Cancel button label">Cancel</ui:msg>
       </b:Button>
     </b:ModalFooter>
   </o:Modal>
