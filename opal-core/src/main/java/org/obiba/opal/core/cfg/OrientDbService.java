@@ -3,13 +3,21 @@ package org.obiba.opal.core.cfg;
 import java.util.List;
 import java.util.Map;
 
-import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+import javax.annotation.Nullable;
 
 public interface OrientDbService {
 
-  <T> T execute(OrientTransactionCallback<T> action);
+  <T> T execute(OrientDbTransactionCallback<T> action);
 
-  List<ODocument> query(OSQLSynchQuery<ODocument> query, Map<String, Object> params);
+  void registerEntityClass(Class<?>... classes);
 
+  <T> List<T> list(String sql, Map<String, Object> params);
+
+  <T> List<T> list(String sql, String paramName, Object paramValue);
+
+  @Nullable
+  <T> T uniqueResult(String sql, Map<String, Object> params);
+
+  @Nullable
+  <T> T uniqueResult(String sql, String paramName, Object paramValue);
 }

@@ -1,7 +1,11 @@
 package org.obiba.opal.core.cfg;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.Nullable;
+import javax.persistence.NonUniqueResultException;
 
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.Service;
@@ -10,11 +14,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.db.ODatabase;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import com.orientechnologies.orient.core.tx.OTransaction;
+import com.orientechnologies.orient.object.db.OObjectDatabasePool;
+import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 import com.orientechnologies.orient.server.OServer;
 import com.orientechnologies.orient.server.OServerMain;
 
@@ -47,10 +51,11 @@ public class OrientDbServiceImpl implements Service, OrientDbService {
       server.activate();
 
       // create database
-      ODatabaseDocumentTx documentTx = new ODatabaseDocumentTx(getUrl());
-      if(!documentTx.exists()) {
-        ODatabaseDocumentTx db = documentTx.create();
+      ODatabase database = new OObjectDatabaseTx(getUrl());
+      if(!database.exists()) {
+        database.create();
       }
+      database.close();
 
     } catch(Exception e) {
       throw new RuntimeException("Cannot start OrientDB service", e);
@@ -72,11 +77,11 @@ public class OrientDbServiceImpl implements Service, OrientDbService {
   }
 
   @Override
-  public <T> T execute(OrientTransactionCallback<T> action) {
-    ODatabaseDocumentTx db = getDatabaseDocumentTx();
+  public <T> T execute(OrientDbTransactionCallback<T> action) {
+    OObjectDatabaseTx db = getDatabaseDocumentTx();
     try {
       db.begin(OTransaction.TXTYPE.OPTIMISTIC);
-      T t = action.doInTransaction();
+      T t = action.doInTransaction(db);
       db.commit();
       return t;
     } catch(Exception e) {
@@ -88,18 +93,57 @@ public class OrientDbServiceImpl implements Service, OrientDbService {
   }
 
   @Override
-  public List<ODocument> query(OSQLSynchQuery<ODocument> query, Map<String, Object> params) {
-    ODatabaseDocumentTx db = getDatabaseDocumentTx();
+  public <T> List<T> list(String sql, Map<String, Object> params) {
+    OObjectDatabaseTx db = getDatabaseDocumentTx();
     try {
-
-      return db.command(query).execute(params);
+      return db.command(new OSQLSynchQuery(sql)).execute(params);
     } finally {
       db.close();
     }
   }
 
-  private ODatabaseDocumentTx getDatabaseDocumentTx() {
-    return ODatabaseDocumentPool.global().acquire(getUrl(), username, password);
+  @Nullable
+  @Override
+  public <T> T uniqueResult(String sql, Map<String, Object> params) {
+    OObjectDatabaseTx db = getDatabaseDocumentTx();
+    try {
+      List<T> list = db.command(new OSQLSynchQuery(sql)).execute(params);
+      if(list.size() > 1) throw new NonUniqueResultException();
+      return list.isEmpty() ? null : list.get(0);
+    } finally {
+      db.close();
+    }
+  }
+
+  @Override
+  public <T> List<T> list(String sql, String paramName, Object paramValue) {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put(paramName, paramValue);
+    return list(sql, params);
+  }
+
+  @Nullable
+  @Override
+  public <T> T uniqueResult(String sql, String paramName, Object paramValue) {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put(paramName, paramValue);
+    return uniqueResult(sql, params);
+  }
+
+  @Override
+  public void registerEntityClass(Class<?>... classes) {
+    OObjectDatabaseTx db = getDatabaseDocumentTx();
+    try {
+      for(Class<?> clazz : classes) {
+        db.getEntityManager().registerEntityClass(clazz);
+      }
+    } finally {
+      db.close();
+    }
+  }
+
+  private OObjectDatabaseTx getDatabaseDocumentTx() {
+    return OObjectDatabasePool.global().acquire(getUrl(), username, password);
   }
 
   @Override
