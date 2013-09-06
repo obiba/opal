@@ -15,6 +15,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 /**
  * Description of a project in Opal.
@@ -74,7 +75,7 @@ public class Project {
   }
 
   public List<String> getTags() {
-    return tags == null ? tags = Collections.emptyList() : tags;
+    return tags == null ? tags = Lists.newArrayList() : tags;
   }
 
   public void addTag(String tag) {
