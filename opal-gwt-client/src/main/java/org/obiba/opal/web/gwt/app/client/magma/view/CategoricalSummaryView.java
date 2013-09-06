@@ -23,9 +23,7 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -78,12 +76,11 @@ public class CategoricalSummaryView extends Composite {
     chartsPanel.addSelectionHandler(new SelectionHandler<Integer>() {
       @Override
       public void onSelection(SelectionEvent<Integer> event) {
-        if (event.getSelectedItem() == 1 && chartFactory != null && pctPanel.getWidget() == null) {
+        if(event.getSelectedItem() == 1 && chartFactory != null && pctPanel.getWidget() == null) {
           pctPanel.setWidget(chartFactory.createPercentageChart(title));
         }
       }
-    }
-    );
+    });
 
     freqPanel.clear();
     pctPanel.clear();
