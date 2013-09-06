@@ -9,8 +9,10 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.user.view;
 
+import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserAdministrationUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.ui.NavPillsPanel;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -27,6 +29,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -39,11 +43,12 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.ListDataProvider;
 import com.gwtplatform.mvp.client.ViewImpl;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 import static com.github.gwtbootstrap.client.ui.constants.IconType.OK;
 import static org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserAdministrationPresenter.Display;
 
-public class UserAdministrationView extends ViewImpl implements Display {
+public class UserAdministrationView extends ViewWithUiHandlers<UserAdministrationUiHandlers> implements Display {
 
   @UiTemplate("UserAdministrationView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, UserAdministrationView> {}
@@ -55,16 +60,7 @@ public class UserAdministrationView extends ViewImpl implements Display {
   private final Widget uiWidget;
 
   @UiField
-  Panel usersPanel;
-
-  @UiField
-  Panel groupsPanel;
-
-  @UiField
-  NavLink usersLink;
-
-  @UiField
-  NavLink groupsLink;
+  NavPillsPanel userGroupPanel;
 
   @UiField
   Button addUser;
@@ -93,8 +89,18 @@ public class UserAdministrationView extends ViewImpl implements Display {
 
   public UserAdministrationView() {
     uiWidget = uiBinder.createAndBindUi(this);
-    usersLink.setActive(true);
     indexTablePager.setDisplay(usersTable);
+
+    userGroupPanel.addSelectionHandler(new SelectionHandler<Integer>() {
+      @Override
+      public void onSelection(SelectionEvent<Integer> event) {
+        if(event.getSelectedItem() == 0) {
+          getUiHandlers().onUsersSelected();
+        } else {
+          getUiHandlers().onGroupsSelected();
+        }
+      }
+    });
 
     Column<UserDto, String> name = new TextColumn<UserDto>() {
 
@@ -213,32 +219,6 @@ public class UserAdministrationView extends ViewImpl implements Display {
   @Override
   public HasWidgets getBreadcrumbs() {
     return breadcrumbs;
-  }
-
-  @Override
-  public HasClickHandlers getUsersLink() {
-    return usersLink;
-  }
-
-  @Override
-  public void showUsers() {
-    usersLink.setActive(true);
-    usersPanel.setVisible(true);
-    groupsLink.setActive(false);
-    groupsPanel.setVisible(false);
-  }
-
-  @Override
-  public void showGroups() {
-    usersLink.setActive(false);
-    usersPanel.setVisible(false);
-    groupsLink.setActive(true);
-    groupsPanel.setVisible(true);
-  }
-
-  @Override
-  public HasClickHandlers getGroupsLink() {
-    return groupsLink;
   }
 
   @Override

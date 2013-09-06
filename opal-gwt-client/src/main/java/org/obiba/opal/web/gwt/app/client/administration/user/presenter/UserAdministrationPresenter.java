@@ -47,6 +47,7 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.view.client.HasData;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyEvent;
@@ -55,7 +56,7 @@ import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
 public class UserAdministrationPresenter
-    extends ItemAdministrationPresenter<UserAdministrationPresenter.Display, UserAdministrationPresenter.Proxy> {
+    extends ItemAdministrationPresenter<UserAdministrationPresenter.Display, UserAdministrationPresenter.Proxy>  implements UserAdministrationUiHandlers {
 
   @ProxyStandard
   @NameToken(Places.USERS_GROUPS)
@@ -65,17 +66,9 @@ public class UserAdministrationPresenter
 
   private Runnable removeConfirmation;
 
-  public interface Display extends View, HasBreadcrumbs {
+  public interface Display extends View, HasBreadcrumbs, HasUiHandlers<UserAdministrationUiHandlers> {
 
     String PERMISSIONS_ACTION = "Permissions";
-
-    HasClickHandlers getUsersLink();
-
-    void showUsers();
-
-    void showGroups();
-
-    HasClickHandlers getGroupsLink();
 
     void renderUserRows(JsArray<UserDto> rows);
 
@@ -96,12 +89,11 @@ public class UserAdministrationPresenter
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
-  private Command confirmedCommand;
-
   @Inject
   public UserAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
       ModalProvider<UserPresenter> userModalProvider, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
+    getView().setUiHandlers(this);
     this.breadcrumbsHelper = breadcrumbsHelper;
     this.userModalProvider = userModalProvider.setContainer(this);
   }
@@ -122,7 +114,6 @@ public class UserAdministrationPresenter
   protected void onReveal() {
     super.onReveal();
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
-    getView().showUsers();
     getView().getUsersTable().setVisibleRange(0, 10);
   }
 
@@ -138,6 +129,31 @@ public class UserAdministrationPresenter
   }
 
   @Override
+  public void onUsersSelected() {
+    ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder()//
+        .forResource("/users").withCallback(new ResourceCallback<JsArray<UserDto>>() {
+
+      @Override
+      public void onResource(Response response, JsArray<UserDto> resource) {
+        getView().renderUserRows(resource);
+      }
+    }).get().send();
+  }
+
+  @Override
+  public void onGroupsSelected() {
+    // Fetch all groups
+    ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder()//
+        .forResource("/groups").withCallback(new ResourceCallback<JsArray<GroupDto>>() {
+
+      @Override
+      public void onResource(Response response, JsArray<GroupDto> resource) {
+        getView().renderGroupRows(resource);
+      }
+    }).get().send();
+  }
+
+  @Override
   protected void onBind() {
     super.onBind();
 
@@ -145,37 +161,6 @@ public class UserAdministrationPresenter
 
     // Register event handlers
     registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler()));
-
-    getView().getUsersLink().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder()//
-            .forResource("/users").withCallback(new ResourceCallback<JsArray<UserDto>>() {
-
-          @Override
-          public void onResource(Response response, JsArray<UserDto> resource) {
-            getView().renderUserRows(resource);
-          }
-        }).get().send();
-        getView().showUsers();
-      }
-    });
-
-    getView().getGroupsLink().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        // Fetch all groups
-        ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder()//
-            .forResource("/groups").withCallback(new ResourceCallback<JsArray<GroupDto>>() {
-
-          @Override
-          public void onResource(Response response, JsArray<GroupDto> resource) {
-            getView().renderGroupRows(resource);
-          }
-        }).get().send();
-        getView().showGroups();
-      }
-    });
 
     // Refresh user list
     registerHandler(getEventBus().addHandler(UsersRefreshEvent.getType(), new UsersRefreshEvent.Handler() {
@@ -189,7 +174,6 @@ public class UserAdministrationPresenter
             getView().renderUserRows(resource);
           }
         }).get().send();
-        getView().showUsers();
       }
     }));
 
@@ -205,7 +189,6 @@ public class UserAdministrationPresenter
             getView().renderGroupRows(resource);
           }
         }).get().send();
-        getView().showGroups();
       }
     }));
 
