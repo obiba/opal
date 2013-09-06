@@ -5,16 +5,11 @@ import java.io.IOException;
 import java.util.Properties;
 
 import javax.annotation.Nonnull;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 
 @SuppressWarnings("ParameterHidesMemberVariable")
-@Entity
-@Table(name = "database_sql")
 public class SqlDatabase extends Database {
 
   private static final long serialVersionUID = 2224211432668278011L;
@@ -29,7 +24,6 @@ public class SqlDatabase extends Database {
    * jdbc:{mysql|mariadb|postgresql}://{hostname}:{port}/{databaseName}
    */
   @Nonnull
-  @Column(nullable = false, unique = true)
   private String url;
 
   @Nonnull

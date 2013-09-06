@@ -2,7 +2,6 @@ package org.obiba.opal.core.runtime.database;
 
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -11,15 +10,13 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.datasource.hibernate.HibernateDatasource;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasource;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.cfg.OrientDbService;
-import org.obiba.opal.core.cfg.OrientTransactionCallback;
+import org.obiba.opal.core.cfg.OrientDbTransactionCallback;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbDatabase;
 import org.obiba.opal.core.domain.database.SqlDatabase;
@@ -31,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -44,17 +40,12 @@ import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
-import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
 @Component
-@Transactional
 public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultDatabaseRegistry.class);
-
-  @Autowired
-  private SessionFactory sessionFactory;
 
   @Autowired
   private SessionFactoryFactory sessionFactoryFactory;
@@ -113,41 +104,34 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
   private final SetMultimap<String, String> registrations = Multimaps
       .synchronizedSetMultimap(HashMultimap.<String, String>create());
 
-  @SuppressWarnings("unchecked")
   @Override
   public Iterable<Database> list() {
-    return getCurrentSession().createCriteria(Database.class) //
-        .add(Restrictions.eq("usedForIdentifiers", false)) //
-        .list();
+    return list(Database.class);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public <T extends Database> Iterable<T> list(@Nonnull Class<T> databaseClass) {
-    return getCurrentSession().createCriteria(databaseClass) //
-        .add(Restrictions.eq("usedForIdentifiers", false)) //
-        .list();
+    return orientDbService
+        .list("select from " + databaseClass.getSimpleName() + " where usedForIdentifiers = :usedForIdentifiers",
+            "usedForIdentifiers", false);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public Iterable<Database> list(@Nullable String type) {
-    return Strings.isNullOrEmpty(type) //
-        ? list() //
-        : getCurrentSession().createCriteria(Database.class) //
-            .add(Restrictions.eq("usedForIdentifiers", false)) //
-            .add(Restrictions.eq("type", type)) //
-            .list();
+    if(Strings.isNullOrEmpty(type)) {
+      return list();
+    }
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("usedForIdentifiers", false);
+    params.put("type", type);
+    return orientDbService.list("select from " + Database.class.getSimpleName() +
+        " where usedForIdentifiers = :usedForIdentifiers and type = :type", params);
   }
 
   @Override
   public Database getDatabase(@Nonnull String name) {
-
-    Map<String, Object> params = new HashMap<String, Object>();
-    params.put("name", name);
-    List<ODocument> list = orientDbService
-        .query(new OSQLSynchQuery<ODocument>("select from Database where name = :name"), params);
-    return DatabaseConverter.unmarshall(list.isEmpty() ? null : list.get(0));
+    return orientDbService
+        .uniqueResult("select from " + Database.class.getSimpleName() + " where name = :name", "name", name);
   }
 
   @Override
@@ -163,56 +147,36 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
   }
 
   @Override
-  public void addOrReplaceDatabase(@Nonnull final Database database)
-      throws DatabaseAlreadyExistsException, MultipleIdentifiersDatabaseException, CannotChangeDatabaseNameException {
-
-    orientDbService.execute(new OrientTransactionCallback<Object>() {
+  public void addOrReplaceDatabase(@Nonnull final Database database) throws MultipleIdentifiersDatabaseException {
+    validUniqueIdentifiersDatabase(database);
+    orientDbService.execute(new OrientDbTransactionCallback<Object>() {
       @Override
-      public Object doInTransaction() {
-        return DatabaseConverter.marshall(database).save();
+      public Object doInTransaction(OObjectDatabaseTx db) {
+        return db.save(database);
       }
     });
-
-//    validUniqueName(database);
-//    validUniqueIdentifiersDatabase(database);
-//    if(database.getId() == null) {
-//      getCurrentSession().persist(database);
-//    } else {
-//      validUnchangedName(database);
-//      getCurrentSession().update(database);
-//    }
-//    destroyDataSource(database.getName());
-  }
-
-  private void validUniqueName(Database database) throws DatabaseAlreadyExistsException {
-    for(Database existing : list()) {
-      if(database.getName().equalsIgnoreCase(existing.getName()) &&
-          !Objects.equal(existing.getId(), database.getId())) {
-        throw new DatabaseAlreadyExistsException(database.getName());
-      }
-    }
-  }
-
-  private void validUnchangedName(Database database) throws CannotChangeDatabaseNameException {
-    Database existing = (Database) getCurrentSession().get(database.getClass(), database.getId());
-    if(!Objects.equal(existing.getName(), database.getName())) {
-      throw new CannotChangeDatabaseNameException(existing.getName(), database.getName());
-    }
+    //TODO do we need this?
+    destroyDataSource(database.getName());
   }
 
   private void validUniqueIdentifiersDatabase(Database database) throws MultipleIdentifiersDatabaseException {
     if(database.isUsedForIdentifiers()) {
       Database identifiersDatabase = getIdentifiersDatabase();
-      if(identifiersDatabase != null && !Objects.equal(identifiersDatabase.getId(), database.getId())) {
+      if(identifiersDatabase != null && !Objects.equal(identifiersDatabase.getName(), database.getName())) {
         throw new MultipleIdentifiersDatabaseException(identifiersDatabase, database);
       }
     }
   }
 
   @Override
-  public void deleteDatabase(@Nonnull Database database) {
+  public void deleteDatabase(@Nonnull final Database database) {
     //TODO check if this database has data 
-    getCurrentSession().delete(database);
+    orientDbService.execute(new OrientDbTransactionCallback<Object>() {
+      @Override
+      public Object doInTransaction(OObjectDatabaseTx db) {
+        return db.delete(database);
+      }
+    });
     destroyDataSource(database.getName());
   }
 
@@ -240,9 +204,9 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
   @Nullable
   @Override
   public Database getIdentifiersDatabase() {
-    return (Database) getCurrentSession().createCriteria(Database.class) //
-        .add(Restrictions.eq("usedForIdentifiers", true)) //
-        .uniqueResult();
+    return orientDbService.uniqueResult(
+        "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = :usedForIdentifiers",
+        "usedForIdentifiers", true);
   }
 
   @Override
@@ -262,10 +226,6 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
     throw new IllegalArgumentException("Unknown datasource config for database " + database);
   }
 
-  private Session getCurrentSession() {
-    return sessionFactory.getCurrentSession();
-  }
-
   @Override
   public boolean isRunning() {
     return true;
@@ -273,6 +233,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
 
   @Override
   public void start() {
+    orientDbService.registerEntityClass(Database.class, SqlDatabase.class, MongoDbDatabase.class);
   }
 
   @Override
