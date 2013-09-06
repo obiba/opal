@@ -2,8 +2,12 @@ package org.obiba.opal.web.gwt.app.client.ui;
 
 import java.util.Stack;
 
+import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.ModalFooter;
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.BackdropType;
+import com.github.gwtbootstrap.client.ui.event.CloseHandler;
+import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
 import com.github.gwtbootstrap.client.ui.event.ShowEvent;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -11,7 +15,9 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -28,6 +34,8 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   private static final int DEFAULT_MINIMUM_WIDTH = 200;
 
   private static ModalStack modalStack = new ModalStack();
+
+  private Panel alertPlace;
 
   private boolean resizable = false;
 
@@ -68,6 +76,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     setDraggable(true);
     setResizable(false);
     History.addValueChangeHandler(new HistoryChangeValueHandler());
+    add(alertPlace = new SimplePanel());
   }
 
   public void setResizable(boolean resizable) {
@@ -113,12 +122,12 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   }
 
   public void setMinWidth(int width) {
-    if (width < DEFAULT_MINIMUM_WIDTH ) return;
+    if(width < DEFAULT_MINIMUM_WIDTH) return;
     minWidth = width;
   }
 
   public void setMinHeight(int height) {
-    if (height < 0 ) return;
+    if(height < 0) return;
     minHeight = height;
   }
 
@@ -145,7 +154,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   }
 
   private void setInitialHeight() {
-    if (minHeight == 0 || getOffsetHeight() > minHeight) return;
+    if(minHeight == 0 || getOffsetHeight() > minHeight) return;
 
     resizeBodyVertically(minHeight);
     // NOTE: setting the height and the body height causes footer draw glitches
@@ -154,7 +163,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   }
 
   private void setInitialWidth() {
-    if (minWidth == 0 || getOffsetWidth() > minWidth) return;
+    if(minWidth == 0 || getOffsetWidth() > minWidth) return;
     setWidth(minWidth + "px");
   }
 
@@ -202,7 +211,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   protected Widget getFooterWidget() {
 
     for(Widget child : getChildren()) {
-      if (child instanceof ModalFooter) {
+      if(child instanceof ModalFooter) {
         return child;
       }
     }
@@ -373,6 +382,27 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
       return (initialY <= cursorY && initialY + height >= cursorY && initialX <= cursorX &&
           initialX + width >= cursorX);
     } else return false;
+  }
+
+  public void clearAlert() {
+    alertPlace.clear();
+  }
+
+  public void addAlert(Alert alert) {
+    alertPlace.add(alert);
+  }
+
+  public void addAlert(String message, AlertType type) {
+    addAlert(message, type, null);
+  }
+
+  public void addAlert(String message, AlertType type, ClosedHandler handler) {
+    Alert alert = new Alert(message);
+    alert.setType(type);
+    alert.setAnimation(true);
+    alert.setClose(true);
+    if(handler != null) alert.addClosedHandler(handler);
+    addAlert(alert);
   }
 
   private class HistoryChangeValueHandler implements ValueChangeHandler<String> {

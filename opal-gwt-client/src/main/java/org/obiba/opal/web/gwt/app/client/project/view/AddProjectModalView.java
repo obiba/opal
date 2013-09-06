@@ -3,12 +3,12 @@ package org.obiba.opal.web.gwt.app.client.project.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.project.presenter.AddProjectModalPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.AddProjectModalUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.model.client.opal.ProjectFactoryDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
-import com.github.gwtbootstrap.client.ui.Modal;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
@@ -35,9 +35,6 @@ public class AddProjectModalView extends ModalPopupViewWithUiHandlers<AddProject
 
   @UiField
   Modal modal;
-
-  @UiField
-  Panel alertPlace;
 
   @UiField
   ControlGroup labelGroup;
@@ -80,27 +77,19 @@ public class AddProjectModalView extends ModalPopupViewWithUiHandlers<AddProject
 
   private void clearAlert() {
     labelGroup.setType(ControlGroupType.NONE);
-    if(alert != null && alert.getElement().hasParentElement()) {
-      alert.removeFromParent();
-    }
-    alertPlace.clear();
+    modal.clearAlert();
   }
 
   @Override
   public void setNameError(String message) {
     clearAlert();
     labelGroup.setType(ControlGroupType.ERROR);
-    alert = new Alert(message);
-    alert.setType(AlertType.ERROR);
-    alert.setAnimation(true);
-    alert.setClose(true);
-    alert.addClosedHandler(new ClosedHandler() {
+    modal.addAlert(message, AlertType.ERROR, new ClosedHandler() {
       @Override
       public void onClosed(ClosedEvent closedEvent) {
         clearAlert();
       }
     });
-    alertPlace.add(alert);
   }
 
 }
