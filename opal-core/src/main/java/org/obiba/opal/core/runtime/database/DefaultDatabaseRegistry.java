@@ -6,6 +6,8 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
@@ -14,14 +16,11 @@ import org.hibernate.SessionFactory;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.datasource.hibernate.HibernateDatasource;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasource;
-import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.cfg.OrientDbService;
 import org.obiba.opal.core.cfg.OrientDbTransactionCallback;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbDatabase;
 import org.obiba.opal.core.domain.database.SqlDatabase;
-import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
-import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
 import org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory;
 import org.slf4j.Logger;
@@ -43,7 +42,7 @@ import com.google.common.collect.SetMultimap;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
 @Component
-public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
+public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultDatabaseRegistry.class);
 
@@ -226,29 +225,15 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
     throw new IllegalArgumentException("Unknown datasource config for database " + database);
   }
 
-  @Override
-  public boolean isRunning() {
-    return true;
-  }
-
-  @Override
+  @PostConstruct
   public void start() {
     orientDbService.registerEntityClass(Database.class, SqlDatabase.class, MongoDbDatabase.class);
   }
 
-  @Override
+  @PreDestroy
   public void stop() {
     sessionFactoryCache.invalidateAll();
     dataSourceCache.invalidateAll();
   }
 
-  @Override
-  public String getName() {
-    return "databases";
-  }
-
-  @Override
-  public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
-    throw new NoSuchServiceConfigurationException(getName());
-  }
 }

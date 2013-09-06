@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.persistence.NonUniqueResultException;
 
-import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
-import org.obiba.opal.core.runtime.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +23,7 @@ import com.orientechnologies.orient.server.OServer;
 import com.orientechnologies.orient.server.OServerMain;
 
 @Component
-public class OrientDbServiceImpl implements Service, OrientDbService {
+public class OrientDbServiceImpl implements OrientDbService {
 
   private static final Logger log = LoggerFactory.getLogger(OrientDbServiceImpl.class);
 
@@ -38,17 +38,12 @@ public class OrientDbServiceImpl implements Service, OrientDbService {
 
   private OServer server;
 
-  @Override
-  public boolean isRunning() {
-    return server != null;
-  }
-
-  @Override
+  @PostConstruct
   public void start() {
+    log.info("Start OrientDB server ({})", getUrl());
     try {
-      server = OServerMain.create();
-      server.startup();
-      server.activate();
+      server = OServerMain.create().startup(getClass().getResourceAsStream("/orientdb-server-config.xml")).activate();
+      server = new OServer().startup().activate();
 
       // create database
       ODatabase database = new OObjectDatabaseTx(getUrl());
@@ -58,7 +53,8 @@ public class OrientDbServiceImpl implements Service, OrientDbService {
       database.close();
 
     } catch(Exception e) {
-      throw new RuntimeException("Cannot start OrientDB service", e);
+      log.error("Cannot start OrientDB server", e);
+      throw new RuntimeException("Cannot start OrientDB server", e);
     }
   }
 
@@ -66,14 +62,10 @@ public class OrientDbServiceImpl implements Service, OrientDbService {
     return "local:" + path;
   }
 
-  @Override
+  @PreDestroy
   public void stop() {
+    log.info("Stop OrientDB server ({})", getUrl());
     if(server != null) server.shutdown();
-  }
-
-  @Override
-  public String getName() {
-    return "OrientDB";
   }
 
   @Override
@@ -146,9 +138,4 @@ public class OrientDbServiceImpl implements Service, OrientDbService {
     return OObjectDatabasePool.global().acquire(getUrl(), username, password);
   }
 
-  @Override
-  public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
-    throw new NoSuchServiceConfigurationException(getName());
-
-  }
 }

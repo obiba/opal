@@ -13,12 +13,11 @@ import javax.annotation.Nonnull;
 
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
-import org.obiba.opal.core.runtime.Service;
 
 /**
  *
  */
-public interface IdentifiersTableService extends Service {
+public interface IdentifiersTableService  {
 
   /**
    * Get the identifiers value table.
