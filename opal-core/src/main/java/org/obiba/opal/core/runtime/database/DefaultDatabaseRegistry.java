@@ -1,6 +1,9 @@
 package org.obiba.opal.core.runtime.database;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -15,6 +18,8 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.datasource.hibernate.HibernateDatasource;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasource;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.core.cfg.OrientDbService;
+import org.obiba.opal.core.cfg.OrientTransactionCallback;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbDatabase;
 import org.obiba.opal.core.domain.database.SqlDatabase;
@@ -39,6 +44,8 @@ import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
+import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 @Component
 @Transactional
@@ -54,6 +61,9 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
 
   @Autowired
   private DataSourceFactory dataSourceFactory;
+
+  @Autowired
+  private OrientDbService orientDbService;
 
   private final LoadingCache<String, BasicDataSource> dataSourceCache = CacheBuilder.newBuilder()
       .removalListener(new RemovalListener<String, BasicDataSource>() {
@@ -132,9 +142,12 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
 
   @Override
   public Database getDatabase(@Nonnull String name) {
-    return (Database) getCurrentSession().createCriteria(Database.class) //
-        .add(Restrictions.eq("name", name)) //
-        .uniqueResult();
+
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("name", name);
+    List<ODocument> list = orientDbService
+        .query(new OSQLSynchQuery<ODocument>("select from Database where name = :name"), params);
+    return DatabaseConverter.unmarshall(list.isEmpty() ? null : list.get(0));
   }
 
   @Override
@@ -150,17 +163,25 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
   }
 
   @Override
-  public void addOrReplaceDatabase(@Nonnull Database database)
+  public void addOrReplaceDatabase(@Nonnull final Database database)
       throws DatabaseAlreadyExistsException, MultipleIdentifiersDatabaseException, CannotChangeDatabaseNameException {
-    validUniqueName(database);
-    validUniqueIdentifiersDatabase(database);
-    if(database.getId() == null) {
-      getCurrentSession().persist(database);
-    } else {
-      validUnchangedName(database);
-      getCurrentSession().update(database);
-    }
-    destroyDataSource(database.getName());
+
+    orientDbService.execute(new OrientTransactionCallback<Object>() {
+      @Override
+      public Object doInTransaction() {
+        return DatabaseConverter.marshall(database).save();
+      }
+    });
+
+//    validUniqueName(database);
+//    validUniqueIdentifiersDatabase(database);
+//    if(database.getId() == null) {
+//      getCurrentSession().persist(database);
+//    } else {
+//      validUnchangedName(database);
+//      getCurrentSession().update(database);
+//    }
+//    destroyDataSource(database.getName());
   }
 
   private void validUniqueName(Database database) throws DatabaseAlreadyExistsException {
@@ -267,6 +288,6 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
 
   @Override
   public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+    throw new NoSuchServiceConfigurationException(getName());
   }
 }

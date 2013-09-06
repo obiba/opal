@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class BackgroundJobService implements Service {
 
-  private final Logger log = LoggerFactory.getLogger(getClass());
+  private static final Logger log = LoggerFactory.getLogger(BackgroundJobService.class);
 
   private boolean isRunning;
 
@@ -60,13 +60,9 @@ public class BackgroundJobService implements Service {
   public void stop() {
     if(isRunning) {
       for(Map.Entry<String, Thread> background : jobThreads.entrySet()) {
-        try {
-          if(background.getValue().isAlive()) {
-            log.info("Interrupting job [{}]", background.getKey());
-            background.getValue().interrupt();
-          }
-        } finally {
-
+        if(background.getValue().isAlive()) {
+          log.info("Interrupting job [{}]", background.getKey());
+          background.getValue().interrupt();
         }
       }
       jobThreads.clear();
