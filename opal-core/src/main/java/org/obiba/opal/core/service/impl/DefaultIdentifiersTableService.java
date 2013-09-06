@@ -13,6 +13,7 @@ import java.io.IOException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.PreDestroy;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
@@ -21,10 +22,7 @@ import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
-import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.domain.database.Database;
-import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
-import org.obiba.opal.core.runtime.ServiceNotRunningException;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.slf4j.Logger;
@@ -77,7 +75,7 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   @Override
   public ValueTable getValueTable() {
     if(getDatasource() == null) {
-      throw new ServiceNotRunningException(getName(), "IdentifiersTableService has no datasource configured");
+      throw new RuntimeException("IdentifiersTableService has no datasource configured");
     }
     return getDatasource().getValueTable(getTableName());
   }
@@ -85,7 +83,7 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   @Override
   public ValueTableWriter createValueTableWriter() {
     if(getDatasource() == null) {
-      throw new ServiceNotRunningException(getName(), "IdentifiersTableService has no datasource configured");
+      throw new RuntimeException("IdentifiersTableService has no datasource configured");
     }
     return getDatasource().createWriter(getTableName(), entityType);
   }
@@ -93,7 +91,7 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   @Override
   public boolean hasValueTable() {
     if(getDatasource() == null) {
-      throw new ServiceNotRunningException(getName(), "IdentifiersTableService has no datasource configured");
+      throw new RuntimeException("IdentifiersTableService has no datasource configured");
     }
     return getDatasource().hasValueTable(getTableName());
   }
@@ -127,18 +125,9 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
     return tableResolver;
   }
 
-  @Override
-  public boolean isRunning() {
-    return getDatasource() != null;
-  }
-
-  @Override
-  public void start() {
-    getDatasource();
-  }
-
-  @Override
-  public void stop() {
+  @PreDestroy
+  public void destroy() {
+    if(datasource == null) return;
     new TransactionTemplate(txManager).execute(new TransactionCallbackWithoutResult() {
       @Override
       protected void doInTransactionWithoutResult(TransactionStatus status) {
@@ -151,43 +140,28 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
     });
   }
 
-  @Override
-  public String getName() {
-    return "identifiers";
-  }
-
-  @Override
-  public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
-    throw new NoSuchServiceConfigurationException(getName());
-  }
-
   private Datasource getDatasource() {
     if(datasource == null) {
       Database database = databaseRegistry.getIdentifiersDatabase();
       if(database != null) {
         datasource = databaseRegistry.createStorageMagmaDatasource(getDatasourceName(), database);
-        initialise();
+        new TransactionTemplate(txManager).execute(new TransactionCallbackWithoutResult() {
+
+          @Override
+          protected void doInTransactionWithoutResult(TransactionStatus status) {
+            try {
+              Initialisables.initialise(datasource);
+              if(!datasource.hasValueTable(getTableName())) {
+                datasource.createWriter(getTableName(), getEntityType()).close();
+              }
+            } catch(IOException e) {
+              throw new RuntimeException(e);
+            }
+          }
+        });
       }
     }
     return datasource;
-  }
-
-  private void initialise() {
-    if(datasource == null) return;
-    new TransactionTemplate(txManager).execute(new TransactionCallbackWithoutResult() {
-
-      @Override
-      protected void doInTransactionWithoutResult(TransactionStatus status) {
-        try {
-          Initialisables.initialise(datasource);
-          if(!datasource.hasValueTable(getTableName())) {
-            datasource.createWriter(getTableName(), getEntityType()).close();
-          }
-        } catch(IOException e) {
-          throw new RuntimeException(e);
-        }
-      }
-    });
   }
 
 }
