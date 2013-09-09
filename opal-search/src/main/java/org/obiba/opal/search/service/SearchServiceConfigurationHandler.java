@@ -3,6 +3,7 @@ package org.obiba.opal.search.service;
 import java.io.File;
 import java.io.IOException;
 
+import org.obiba.core.util.FileUtil;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.search.es.ElasticSearchConfiguration;
 import org.obiba.opal.search.es.ElasticSearchConfigurationService;
@@ -47,20 +48,21 @@ public class SearchServiceConfigurationHandler implements ServiceConfigurationHa
 
     boolean flushIndices = false;
     // When changing cluster name, index name, shards number or replicas number
-    if(!config.getClusterName().equals(serviceDto.getExtension(Opal.ESCfgDto.params).getClusterName()) ||
-        !config.getIndexName().equals(serviceDto.getExtension(Opal.ESCfgDto.params).getIndexName()) ||
-        config.getShards() != serviceDto.getExtension(Opal.ESCfgDto.params).getShards() ||
-        config.getReplicas() != serviceDto.getExtension(Opal.ESCfgDto.params).getReplicas()) {
+    Opal.ESCfgDto esCfgDto = serviceDto.getExtension(Opal.ESCfgDto.params);
+    if(!config.getClusterName().equals(esCfgDto.getClusterName()) ||
+        !config.getIndexName().equals(esCfgDto.getIndexName()) ||
+        config.getShards() != esCfgDto.getShards() ||
+        config.getReplicas() != esCfgDto.getReplicas()) {
       flushIndices = true;
     }
 
-    config.setClusterName(serviceDto.getExtension(Opal.ESCfgDto.params).getClusterName());
-    config.setDataNode(serviceDto.getExtension(Opal.ESCfgDto.params).getDataNode());
-    config.setEnabled(serviceDto.getExtension(Opal.ESCfgDto.params).getEnabled());
-    config.setEsSettings(serviceDto.getExtension(Opal.ESCfgDto.params).getSettings());
-    config.setIndexName(serviceDto.getExtension(Opal.ESCfgDto.params).getIndexName());
-    config.setReplicas(serviceDto.getExtension(Opal.ESCfgDto.params).getReplicas());
-    config.setShards(serviceDto.getExtension(Opal.ESCfgDto.params).getShards());
+    config.setClusterName(esCfgDto.getClusterName());
+    config.setDataNode(esCfgDto.getDataNode());
+    config.setEnabled(esCfgDto.getEnabled());
+    config.setEsSettings(esCfgDto.getSettings());
+    config.setIndexName(esCfgDto.getIndexName());
+    config.setReplicas(esCfgDto.getReplicas());
+    config.setShards(esCfgDto.getShards());
 
     // delete indices and restart service
     if(flushIndices) {
@@ -73,9 +75,7 @@ public class SearchServiceConfigurationHandler implements ServiceConfigurationHa
     log.info("Clear Elastic Search indexes: {}", indexPath);
     try {
       File indexDir = new File(indexPath);
-      if(indexDir.exists() && indexDir.isDirectory()) {
-        deleteDirectoryContents(indexDir);
-      } else {
+      if(!FileUtil.delete(indexDir)) {
         log.warn("Cannot find Elastic Search indexes: {}", indexPath);
       }
     } catch(IOException e) {
@@ -93,34 +93,4 @@ public class SearchServiceConfigurationHandler implements ServiceConfigurationHa
     return serviceDto.hasExtension(Opal.ESCfgDto.params);
   }
 
-  /**
-   * Copied form deprecated com.google.common.io.Files#deleteDirectoryContents(java.io.File) as we don't have symlinks here
-   *
-   * @param directory
-   * @throws IOException
-   */
-  private static void deleteDirectoryContents(File directory) throws IOException {
-    File[] files = directory.listFiles();
-    if(files == null) {
-      throw new IOException("Error listing files for " + directory);
-    }
-    for(File file : files) {
-      deleteRecursively(file);
-    }
-  }
-
-  /**
-   * Copied form deprecated com.google.common.io.Files#deleteRecursively(java.io.File) as we don't have symlinks here
-   *
-   * @param directory
-   * @throws IOException
-   */
-  private static void deleteRecursively(File file) throws IOException {
-    if(file.isDirectory()) {
-      deleteDirectoryContents(file);
-    }
-    if(!file.delete()) {
-      throw new IOException("Failed to delete " + file);
-    }
-  }
 }
