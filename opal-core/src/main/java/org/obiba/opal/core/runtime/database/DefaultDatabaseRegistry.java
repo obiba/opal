@@ -154,8 +154,6 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
         return db.save(database);
       }
     });
-    //TODO do we need this?
-    destroyDataSource(database.getName());
   }
 
   private void validUniqueIdentifiersDatabase(Database database) throws MultipleIdentifiersDatabaseException {
