@@ -1,8 +1,7 @@
 <ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="ehcache.xsd"
-    updateCheck="false">
+    xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd" updateCheck="false">
 
-  <diskStore path="${OPAL_HOME}/work"/>
+  <diskStore path="${OPAL_HOME}/work/ehcache"/>
   <defaultCache
       maxElementsInMemory="10000"
       eternal="false"
@@ -12,6 +11,6 @@
       maxElementsOnDisk="10000000"
       diskPersistent="false"
       diskExpiryThreadIntervalSeconds="120"
-      memoryStoreEvictionPolicy="LRU"
-      />
+      memoryStoreEvictionPolicy="LRU"/>
+
 </ehcache>

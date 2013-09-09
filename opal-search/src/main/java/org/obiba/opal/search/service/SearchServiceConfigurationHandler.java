@@ -17,12 +17,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class SearchServiceConfigurationHandler implements ServiceConfigurationHandler {
 
+  private static final Logger log = LoggerFactory.getLogger(SearchServiceConfigurationHandler.class);
+
   private final ElasticSearchConfigurationService configService;
 
-  @Value("${OPAL_HOME}/data")
+  @Value("${OPAL_HOME}/work/elastic-search")
   private String indexPath;
-
-  private static final Logger log = LoggerFactory.getLogger(SearchServiceConfigurationHandler.class);
 
   @Autowired
   public SearchServiceConfigurationHandler(ElasticSearchConfigurationService configService) {
