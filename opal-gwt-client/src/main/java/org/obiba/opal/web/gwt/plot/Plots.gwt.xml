@@ -1,9 +1,9 @@
 <!DOCTYPE module PUBLIC '//gwt-module/'
-    'http://google-web-toolkit.googlecode.com/svn/tags/2.4.0/distro-source/core/src/gwt-module.dtd'>
+    'http://google-web-toolkit.googlecode.com/svn/tags/2.5.1/distro-source/core/src/gwt-module.dtd'>
 <module>
   <inherits name="com.google.gwt.core.Core"/>
   <inherits name="org.moxieapps.gwt.highcharts.Highcharts"/>
   <inherits name="com.google.common.collect.Collect"/>
-  <script src="js/jquery-1.7.1.min.js"/>
+  <script src="js/jquery-1.10.2.min.js"/>
   <script src="highcharts/highcharts.js"/>
 </module>
