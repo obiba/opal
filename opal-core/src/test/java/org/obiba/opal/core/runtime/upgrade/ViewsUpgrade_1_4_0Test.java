@@ -21,9 +21,10 @@ public class ViewsUpgrade_1_4_0Test {
 
   private ViewPersistenceStrategy viewPersistenceStrategy;
 
-  private File originalOpalConfigFile = new File(getTestFilesRoot() + File.separator + "original-opal-config.xml");
+  private final File originalOpalConfigFile = new File(
+      getTestFilesRoot() + File.separator + "original-opal-config.xml");
 
-  private File workingOpalConfigFile = new File(getTestFilesRoot() + File.separator + "opal-config.xml");
+  private final File workingOpalConfigFile = new File(getTestFilesRoot() + File.separator + "opal-config.xml");
 
   @Before
   public void setUp() throws Exception {
