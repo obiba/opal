@@ -69,14 +69,12 @@ public class DatabaseAdministrationPresenter extends
     String TEST_ACTION = "Test";
 
     enum Slots {
-      DRIVERS, PERMISSIONS, HEADER
+      DRIVERS, HEADER
     }
 
     HasActionHandler<DatabaseDto> getActions();
 
     HasClickHandlers getAddButton();
-
-    HasAuthorization getPermissionsAuthorizer();
 
     HasData<DatabaseDto> getDatabaseTable();
   }
@@ -120,12 +118,7 @@ public class DatabaseAdministrationPresenter extends
   @Override
   protected void onReveal() {
     breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs()).build();
-
     refresh();
-
-    // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder()
-        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
   @Override
@@ -262,24 +255,6 @@ public class DatabaseAdministrationPresenter extends
     public void unauthorized() {
     }
 
-  }
-
-  private final class PermissionsUpdate implements HasAuthorization {
-    @Override
-    public void unauthorized() {
-      clearSlot(Display.Slots.PERMISSIONS);
-      clearSlot(Display.Slots.HEADER);
-    }
-
-    @Override
-    public void beforeAuthorization() {
-
-    }
-
-    @Override
-    public void authorized() {
-      setInSlot(Display.Slots.PERMISSIONS, authorizationPresenter);
-    }
   }
 
 }

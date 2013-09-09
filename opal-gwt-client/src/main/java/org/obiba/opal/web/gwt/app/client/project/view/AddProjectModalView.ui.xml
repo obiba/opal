@@ -18,7 +18,6 @@
 
   <g:FlowPanel>
     <o:Modal ui:field="modal" closeVisible="true" keyboard="true" animation="false">
-      <g:SimplePanel ui:field="alertPlace"/>
       <b:ControlGroup ui:field="labelGroup">
         <b:ControlLabel>
           <ui:msg description="Add Project Modal Name label">Name</ui:msg>

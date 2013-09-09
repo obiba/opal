@@ -23,7 +23,7 @@ public class ConditionalValidator implements FieldValidator {
 
   private final FieldValidator delegate;
 
-  private int id;
+  private String id;
 
   //
   // Constructors
@@ -46,13 +46,13 @@ public class ConditionalValidator implements FieldValidator {
     return null;
   }
 
-  public ConditionalValidator setId(int value) {
+  public ConditionalValidator setId(String value) {
     id = value;
     return this;
   }
 
   @Override
-  public int getId() {
+  public String getId() {
     return id;
   }
 }

@@ -20,11 +20,12 @@ import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.model.client.opal.JdbcDriverDto;
 
-import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CheckBox;
+import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.PasswordTextBox;
 import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -34,7 +35,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.ListBox;
@@ -47,7 +47,6 @@ import com.google.web.bindery.event.shared.EventBus;
  */
 public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandlers> implements Display {
 
-  @UiTemplate("DatabaseView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, DatabaseView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
@@ -60,10 +59,16 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   Modal dialog;
 
   @UiField
-  Button saveButton;
+  ControlGroup nameGroup;
 
   @UiField
-  Button cancelButton;
+  ControlGroup urlGroup;
+
+  @UiField
+  ControlGroup usernameGroup;
+
+  @UiField
+  ControlGroup passwordGroup;
 
   @UiField
   TextBox name;
@@ -75,7 +80,7 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   ListBox driver;
 
   @UiField
-  ListBox type;
+  ListBox usage;
 
   @UiField
   ListBox magmaDatasourceType;
@@ -140,6 +145,30 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
     dialog.setTitle(Mode.CREATE == dialogMode ? translations.addDatabase() : translations.editDatabase());
   }
 
+  @Override
+  public void showError(FormField formField, String message) {
+    ControlGroup group = null;
+    switch(formField) {
+      case NAME:
+        group = nameGroup;
+        break;
+      case URL:
+        group = urlGroup;
+        break;
+      case USERNAME:
+        group = usernameGroup;
+        break;
+      case PASSWORD:
+        group = passwordGroup;
+        break;
+    }
+    if(group != null) {
+      dialog.addAlert(message, AlertType.ERROR, group);
+    } else {
+      dialog.addAlert(message, AlertType.ERROR);
+    }
+  }
+
   @UiHandler("saveButton")
   public void onSave(ClickEvent event) {
     getUiHandlers().save();
@@ -156,7 +185,7 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   }
 
   @Override
-  public HasText getMagmaDatasourceType() {
+  public HasText getSQLSchema() {
     return new HasText() {
 
       @Override
@@ -177,19 +206,19 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   }
 
   @Override
-  public HasText getType() {
+  public HasText getUsage() {
     return new HasText() {
 
       @Override
       public String getText() {
-        return type.getValue(type.getSelectedIndex());
+        return usage.getValue(usage.getSelectedIndex());
       }
 
       @Override
       public void setText(String text) {
-        for(int i = 0; i < type.getItemCount(); i++) {
-          if(type.getValue(i).equals(text)) {
-            type.setSelectedIndex(i);
+        for(int i = 0; i < usage.getItemCount(); i++) {
+          if(usage.getValue(i).equals(text)) {
+            usage.setSelectedIndex(i);
             break;
           }
         }

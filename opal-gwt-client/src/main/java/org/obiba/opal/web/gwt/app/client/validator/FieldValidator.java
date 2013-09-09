@@ -24,5 +24,9 @@ public interface FieldValidator {
   @Nullable
   String validate();
 
-  int getId();
+  /**
+   * Unique identifier of the form field.
+   * @return
+   */
+  String getId();
 }
