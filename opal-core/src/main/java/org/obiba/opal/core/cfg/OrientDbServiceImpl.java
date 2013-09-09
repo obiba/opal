@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.persistence.NonUniqueResultException;
 
 import org.slf4j.Logger;
@@ -36,17 +34,18 @@ public class OrientDbServiceImpl implements OrientDbService {
   //  @Value("${org.obiba.opal.config.password}")
   private String password = "admin";
 
-  private OServer server;
+  private static OServer server;
 
-  @PostConstruct
-  public void start() {
-    log.info("Start OrientDB server ({})", getUrl());
+  //  @PostConstruct
+  public static void start(String url) {
+    log.info("Start OrientDB server ({})", url);
     try {
-      server = OServerMain.create().startup(getClass().getResourceAsStream("/orientdb-server-config.xml")).activate();
+      server = OServerMain.create()
+          .startup(OrientDbServiceImpl.class.getResourceAsStream("/orientdb-server-config.xml")).activate();
       server = new OServer().startup().activate();
 
       // create database
-      ODatabase database = new OObjectDatabaseTx(getUrl());
+      ODatabase database = new OObjectDatabaseTx(url);
       if(!database.exists()) {
         database.create();
       }
@@ -62,9 +61,9 @@ public class OrientDbServiceImpl implements OrientDbService {
     return "local:" + path;
   }
 
-  @PreDestroy
-  public void stop() {
-    log.info("Stop OrientDB server ({})", getUrl());
+  //  @PreDestroy
+  public static void stop() {
+//    log.info("Stop OrientDB server ({})", getUrl());
     if(server != null) server.shutdown();
   }
 
