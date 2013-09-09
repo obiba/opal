@@ -20,6 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Deprecated
 public class TempDefaultConfig {
 
+  public static final String USERNAME = "root";
+
+  public static final String PASSWORD = "1234";
+
   @Autowired
   private DatabaseRegistry databaseRegistry;
 
@@ -39,8 +43,8 @@ public class TempDefaultConfig {
         .name("opal-data") //
         .url("jdbc:mysql://localhost:3306/opal?characterEncoding=UTF-8") //
         .driverClass("com.mysql.jdbc.Driver") //
-        .username("root") //
-        .password("1234") //
+        .username(USERNAME) //
+        .password(PASSWORD) //
         .editable(false) //
         .type(Database.Type.STORAGE) //
         .magmaDatasourceType(SqlDatabase.MAGMA_HIBERNATE_DATASOURCE) //
@@ -51,8 +55,8 @@ public class TempDefaultConfig {
         .name("opal-key") //
         .url("jdbc:mysql://localhost:3306/key?characterEncoding=UTF-8") //
         .driverClass("com.mysql.jdbc.Driver") //
-        .username("root") //
-        .password("1234") //
+        .username(USERNAME) //
+        .password(PASSWORD) //
         .editable(false) //
         .usedForIdentifiers(true) //
         .type(Database.Type.STORAGE) //
@@ -60,20 +64,22 @@ public class TempDefaultConfig {
         .build();
     databaseRegistry.addOrReplaceDatabase(opalKey);
 
-    Datasource datasource = databaseRegistry.createStorageMagmaDatasource("opal-data", opalData);
-    MagmaEngine.get().addDatasource(datasource);
+    createDatasourceAndProject("opal-data", opalData);
+    createDatasourceAndProject("opal-data2", opalData);
+  }
 
+  private void createDatasourceAndProject(String datasourceName, final SqlDatabase opalData) {
+    final Datasource datasource = databaseRegistry.createStorageMagmaDatasource(datasourceName, opalData);
+    MagmaEngine.get().addDatasource(datasource);
     configService.modifyConfiguration(new OpalConfigurationService.ConfigModificationTask() {
 
       @Override
       public void doWithConfig(OpalConfiguration config) {
-        config.getMagmaEngineFactory().withFactory(new HibernateDatasourceFactory("opal-data",
-            new DatabaseSessionFactoryProvider("opal-data", databaseRegistry, "opal-data")));
+        config.getMagmaEngineFactory().withFactory(new HibernateDatasourceFactory(datasource.getName(),
+            new DatabaseSessionFactoryProvider(datasource.getName(), databaseRegistry, opalData.getName())));
       }
     });
-
     projectService.getOrCreateProject(datasource);
-
   }
 
 }
