@@ -16,6 +16,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.obiba.opal.core.runtime.upgrade.ConfigFolderUpgrade;
 import org.obiba.opal.core.runtime.upgrade.database.Opal2DatabaseConfigurator;
 import org.obiba.runtime.upgrade.UpgradeException;
 import org.obiba.runtime.upgrade.UpgradeManager;
@@ -26,8 +27,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import com.google.common.base.Strings;
 
 /**
  * Command to perform an upgrade (i.e., invoke the upgrade manager).
@@ -66,9 +65,6 @@ public class UpgradeCommand {
    */
   private boolean isMigratedToOpal2() {
     String opalHome = System.getenv().get("OPAL_HOME");
-    if(Strings.isNullOrEmpty(opalHome)) {
-      throw new RuntimeException("Environment variable OPAL_HOME is not defined, cannot upgrade Opal!");
-    }
     try {
       SAXParser saxParser = SAXParserFactory.newInstance().newSAXParser();
       ConfigurationHandler handler = new ConfigurationHandler();
@@ -85,7 +81,11 @@ public class UpgradeCommand {
 
   private void opal2Upgrade() {
     log.info("Prepare upgrade to Opal 2.0");
+
+    // need to be run out of Spring context
     new Opal2DatabaseConfigurator().configureDatabase();
+    ConfigFolderUpgrade.cleanDirectories();
+
     ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(OPAL2_CONTEXT_PATHS);
     try {
       UpgradeManager upgradeManager = (UpgradeManager) ctx.getBean("upgradeManager");
