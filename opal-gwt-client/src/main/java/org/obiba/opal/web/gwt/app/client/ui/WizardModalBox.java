@@ -29,7 +29,6 @@ public class WizardModalBox extends Modal {
 
   private static final Translations translations = GWT.create(Translations.class);
 
-
   private SimplePanel step;
 
   private Button finish;
@@ -133,7 +132,12 @@ public class WizardModalBox extends Modal {
 
   @Override
   public void add(Widget w) {
-    setWidget(w);
+    if(step == null) {
+      // before step container is defined = header
+      super.add(w);
+    } else {
+      setWidget(w);
+    }
   }
 
   public HandlerRegistration addPreviousClickHandler(ClickHandler handler) {
