@@ -25,7 +25,9 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   private static final Logger log = LoggerFactory.getLogger(OrientDbServiceImpl.class);
 
-  @Value("${OPAL_HOME}/opal-config-db")
+  public static final String PATH = "${OPAL_HOME}/data/orientdb/opal-config";
+
+  @Value(PATH)
   private String path;
 
   //  @Value("${org.obiba.opal.config.username}")
@@ -58,6 +60,10 @@ public class OrientDbServiceImpl implements OrientDbService {
   }
 
   private String getUrl() {
+    return getUrl(path);
+  }
+
+  public static String getUrl(String path) {
     return "local:" + path;
   }
 
