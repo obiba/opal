@@ -106,7 +106,8 @@ public class OrientDbServiceImpl implements OrientDbService {
     try {
       List<T> list = db.command(new OSQLSynchQuery(sql)).execute(params);
       if(list.size() > 1) throw new NonUniqueResultException();
-      return list.isEmpty() ? null : list.get(0);
+      //noinspection RedundantCast
+      return list.isEmpty() ? null : (T) db.detach(list.get(0), true);
     } finally {
       db.close();
     }

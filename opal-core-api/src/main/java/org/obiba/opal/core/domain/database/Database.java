@@ -78,19 +78,6 @@ public abstract class Database extends AbstractTimestamped {
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hashCode(name);
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if(this == obj) return true;
-    //noinspection SimplifiableIfStatement
-    if(obj == null || getClass() != obj.getClass()) return false;
-    return Objects.equal(name, ((Database) obj).name);
-  }
-
-  @Override
   public String toString() {
     return Objects.toStringHelper(this).add("defaultStorage", defaultStorage).add("name", name).add("type", type)
         .add("description", description).add("editable", editable).add("usedForIdentifiers", usedForIdentifiers)

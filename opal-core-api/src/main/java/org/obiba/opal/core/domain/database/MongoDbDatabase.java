@@ -10,8 +10,6 @@ import com.mongodb.MongoClientURI;
 @SuppressWarnings("ParameterHidesMemberVariable")
 public class MongoDbDatabase extends Database {
 
-  private static final long serialVersionUID = 2224211432668278011L;
-
   /**
    * mongodb://{hostname}:{port}/{databaseName}
    */

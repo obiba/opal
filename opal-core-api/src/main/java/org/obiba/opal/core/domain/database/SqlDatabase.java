@@ -12,8 +12,6 @@ import com.google.common.base.Strings;
 @SuppressWarnings("ParameterHidesMemberVariable")
 public class SqlDatabase extends Database {
 
-  private static final long serialVersionUID = 2224211432668278011L;
-
   public static final String MAGMA_HIBERNATE_DATASOURCE = "hibernate";
 
   public static final String MAGMA_JDBC_DATASOURCE = "jdbc";
