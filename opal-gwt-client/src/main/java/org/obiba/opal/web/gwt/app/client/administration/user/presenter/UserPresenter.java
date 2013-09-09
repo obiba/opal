@@ -9,10 +9,13 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.user.presenter;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.user.event.UsersRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.ui.GroupSuggestOracle;
@@ -20,6 +23,8 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.UserDto;
 
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -35,6 +40,8 @@ import com.gwtplatform.mvp.client.PopupView;
 public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> implements UserUiHandlers {
 
   private static final int MIN_PASSWORD_LENGTH = 6;
+
+  private static final Translations translations = GWT.create(Translations.class);
 
   private UserDto userDto;
 
@@ -60,19 +67,31 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
 
     if(dialogMode.equals(Mode.CREATE)) {
       userDto = UserDto.create();
+      if(getView().getUserName().isEmpty()) {
+        getView().addAlert(translations.userMessageMap().get("UserNameRequiredError"), AlertType.ERROR);
+        return;
+      }
+
+      // Password must be set when creating a user
+      if(getView().getPassword().isEmpty() || getView().getConfirmPassword().isEmpty()) {
+        getView().addAlert(translations.userMessageMap().get("UserPasswordRequiredError"), AlertType.ERROR);
+        return;
+      }
+
       userDto.setName(getView().getUserName());
     }
 
     // Update password only when password is not empty (to allow updating groups only)
     if(!getView().getPassword().isEmpty()) {
       if(getView().getPassword().length() < MIN_PASSWORD_LENGTH) {
-        getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error("UserPasswordLengthError")
-            .args(String.valueOf(MIN_PASSWORD_LENGTH)).build());
+        getView().addAlert(TranslationsUtils
+            .replaceArguments(translations.userMessageMap().get("UserPasswordLengthError"),
+                Arrays.asList(String.valueOf(MIN_PASSWORD_LENGTH))), AlertType.ERROR);
         getView().setPasswordError(true);
         return;
       }
       if(!getView().getPassword().equals(getView().getConfirmPassword())) {
-        getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error("UserPasswordMatchError").build());
+        getView().addAlert(translations.userMessageMap().get("UserPasswordMatchError"), AlertType.ERROR);
         getView().setPasswordError(true);
         return;
       }
@@ -97,15 +116,15 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
                 getEventBus().fireEvent(new UsersRefreshEvent());
                 getView().hideDialog();
               } else if(response.getStatusCode() == Response.SC_CONFLICT) {
-                getEventBus().fireEvent(
-                    NotificationEvent.Builder.newNotification().error("UserAlreadyExists").args(userDto.getName())
-                        .build());
+                getView().addAlert(TranslationsUtils
+                    .replaceArguments(translations.userMessageMap().get("UserAlreadyExists"),
+                        Arrays.asList(userDto.getName())), AlertType.ERROR);
               } else {
-                getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
                 getView().hideDialog();
+                getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
               }
             }
-          }, Response.SC_OK, Response.SC_CONFLICT).post().send();
+          }, Response.SC_OK, Response.SC_CONFLICT, Response.SC_PRECONDITION_FAILED).post().send();
     } else {
       // Update
       ResourceRequestBuilderFactory.newBuilder()//
@@ -117,7 +136,7 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
               if(response.getStatusCode() == Response.SC_OK) {
                 getEventBus().fireEvent(new UsersRefreshEvent());
               } else {
-                getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
+                getView().addAlert(response.getText(), AlertType.ERROR);
               }
             }
           }, Response.SC_OK, Response.SC_PRECONDITION_FAILED, Response.SC_INTERNAL_SERVER_ERROR).put().send();
@@ -170,6 +189,8 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
     void addSearchItem(String text);
 
     HandlerRegistration addSearchSelectionHandler(SelectionHandler<SuggestOracle.Suggestion> handler);
+
+    void addAlert(String message, AlertType type);
 
   }
 

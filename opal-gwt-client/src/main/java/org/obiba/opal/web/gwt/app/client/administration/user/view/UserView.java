@@ -15,14 +15,14 @@ import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserPrese
 import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.GroupSuggestOracle;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.SuggestListBox;
-import org.obiba.opal.web.model.client.opal.GroupDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.Modal;
 import com.github.gwtbootstrap.client.ui.PasswordTextBox;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -35,10 +35,8 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
@@ -76,7 +74,6 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
 
   @UiField
   PasswordTextBox confirmPassword;
-
 
   @Inject
   public UserView(EventBus eventBus) {
@@ -184,5 +181,11 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
         handler.onSelection(event);
       }
     });
+  }
+
+  @Override
+  public void addAlert(String message, AlertType type) {
+    dialog.clearAlert();
+    dialog.addAlert(message, type);
   }
 }
