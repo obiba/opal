@@ -12,7 +12,9 @@ public class TimestampedHook extends ORecordHookAbstract {
   @Override
   public RESULT onRecordBeforeCreate(ORecord<?> record) {
     if(record instanceof ODocument) {
-      ((ODocument) record).field("created", new Date());
+      Date now = new Date();
+      ((ODocument) record).field("created", now);
+      ((ODocument) record).field("updated", now);
       return RESULT.RECORD_CHANGED;
     }
     return RESULT.RECORD_NOT_CHANGED;
