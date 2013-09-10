@@ -24,6 +24,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.CopyVariablesToViewEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
@@ -60,10 +61,12 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPresenter.Display> {
+public class VariablesToViewPresenter extends ModalPresenterWidget<VariablesToViewPresenter.Display>
+    implements VariablesToViewUiHandlers {
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -78,7 +81,51 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
   @Inject
   public VariablesToViewPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
+    getView().setUiHandlers(this);
   }
+
+  @Override
+  public void saveVariable() {
+    variableCopyValidationHandler = new VariableCopyValidationHandler(getEventBus());
+    if(variableCopyValidationHandler.validate()) {
+      createOrUpdateViewWithVariables();
+    }
+  }
+
+  @Override
+  public void rename() {
+    boolean renameCategory = getView().isRenameSelected();
+    JsArray<VariableDto> derivedVariables = JsArrays.create();
+
+    for(VariableDto variable : variables) {
+      if(renameCategory) {
+        // Keep new name if changed
+        derivedVariables.push(getDerivedVariable(variable, renameCategory));
+      } else {
+        derivedVariables.push(new VariableDuplicationHelper(variable).getDerivedVariable());
+      }
+    }
+
+    getView().renderRows(variables, derivedVariables, false);
+  }
+
+  public void initialize(TableDto table, List<VariableDto> variables) {
+    this.table = table;
+    this.variables = variables;
+
+    refreshDatasources();
+
+    // Prepare the array of variableDto
+    JsArray<VariableDto> derivedVariables = JsArrays.create();
+    for(VariableDto variable : variables) {
+      derivedVariables.push(new VariableDuplicationHelper(variable).getDerivedVariable());
+    }
+
+    getView().clear();
+    getView().renderRows(variables, derivedVariables, true);
+    getView().showDialog();
+  }
+
 
   @Override
   protected void onBind() {
@@ -86,10 +133,6 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
   }
 
   private void addEventHandlers() {
-    // Event CopyVariablesToViewEvent
-    registerHandler(
-        getEventBus().addHandler(CopyVariablesToViewEvent.getType(), new CopyVariablesToViewEventHandler()));
-
     // Remove action
     getView().getActions().setActionHandler(new ActionHandler<VariableDto>() {
       @Override
@@ -135,71 +178,30 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
         variables.removeAll(removeVariables);
       }
     });
+  }
 
-    // Recode category
-    registerHandler(getView().getRenameButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        // Prepare the array of variableDto
-        boolean renameCategory = getView().isRenameSelected();
-        JsArray<VariableDto> derivedVariables = JsArrays.create();
+  private void createOrUpdateViewWithVariables() {
+    ViewDto view = ViewDtoBuilder.newBuilder().setName(getView().getViewName().getText()).fromTables(table)
+        .defaultVariableListView().build();
+    VariableListViewDto derivedVariables = (VariableListViewDto) view
+        .getExtension(VariableListViewDto.ViewDtoExtensions.view);
 
-        for(VariableDto variable : variables) {
-          if(renameCategory) {
-            // Keep new name if changed
-            derivedVariables.push(getDerivedVariable(variable, renameCategory));
-          } else {
-            derivedVariables.push(new VariableDuplicationHelper(variable).getDerivedVariable());
-          }
-        }
+    JsArray<VariableDto> variablesDto = JsArrays.create();
+    for(VariableDto v : getView().getVariables(true)) {
+      // Push with the right name if it was changed
+      variablesDto.push(v);
+    }
+    derivedVariables.setVariablesArray(variablesDto);
 
-        getView().renderRows(variables, derivedVariables, false);
-      }
-    }));
+    ResponseCodeCallback createCodingViewCallback = new CreateViewCallBack(view);
+    ResourceCallback<ViewDto> alreadyExistCodingViewCallback = new UpdateExistViewCallBack(variablesDto);
+    UriBuilder uriBuilder = UriBuilder.create();
+    uriBuilder.segment("datasource", getView().getDatasourceName(), "view", getView().getViewName().getText());
 
-    // Save button
-    registerHandler(getView().getSaveButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        variableCopyValidationHandler = new VariableCopyValidationHandler(getEventBus());
-        if(variableCopyValidationHandler.validate()) {
-          createOrUpdateViewWithVariables();
-        }
-      }
-
-      private void createOrUpdateViewWithVariables() {
-        ViewDto view = ViewDtoBuilder.newBuilder().setName(getView().getViewName().getText()).fromTables(table)
-            .defaultVariableListView().build();
-        VariableListViewDto derivedVariables = (VariableListViewDto) view
-            .getExtension(VariableListViewDto.ViewDtoExtensions.view);
-
-        JsArray<VariableDto> variablesDto = JsArrays.create();
-        for(VariableDto v : getView().getVariables(true)) {
-          // Push with the right name if it was changed
-          variablesDto.push(v);
-        }
-        derivedVariables.setVariablesArray(variablesDto);
-
-        ResponseCodeCallback createCodingViewCallback = new CreateViewCallBack(view);
-        ResourceCallback<ViewDto> alreadyExistCodingViewCallback = new UpdateExistViewCallBack(variablesDto);
-        UriBuilder uriBuilder = UriBuilder.create();
-        uriBuilder.segment("datasource", getView().getDatasourceName(), "view", getView().getViewName().getText());
-
-        ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(uriBuilder.build()).get()
-            .withCallback(alreadyExistCodingViewCallback)//
-            .withCallback(Response.SC_NOT_FOUND, createCodingViewCallback)//
-            .send();
-      }
-
-    }));
-
-    // Cancel button
-    registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getView().hideDialog();
-      }
-    }));
+    ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(uriBuilder.build()).get()
+        .withCallback(alreadyExistCodingViewCallback)//
+        .withCallback(Response.SC_NOT_FOUND, createCodingViewCallback)//
+        .send();
   }
 
   private VariableDto getDerivedVariable(VariableDto variable, boolean recodeName) {
@@ -332,48 +334,23 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
     }
   }
 
-  class CopyVariablesToViewEventHandler implements CopyVariablesToViewEvent.Handler {
-
-    private void refreshDatasources() {
-      ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
-          .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-            @Override
-            public void onResource(Response response, JsArray<DatasourceDto> resource) {
-              datasources = JsArrays.toSafeArray(resource);
-              for(int i = 0; i < datasources.length(); i++) {
-                DatasourceDto d = datasources.get(i);
-                d.setViewArray(JsArrays.toSafeArray(d.getViewArray()));
-              }
-
-              getView().setDatasources(datasources, table.getDatasourceName());
+  private void refreshDatasources() {
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
+        .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<DatasourceDto> resource) {
+            datasources = JsArrays.toSafeArray(resource);
+            for(int i = 0; i < datasources.length(); i++) {
+              DatasourceDto d = datasources.get(i);
+              d.setViewArray(JsArrays.toSafeArray(d.getViewArray()));
             }
-          }).send();
-    }
 
-    @Override
-    public void onVariableCopy(CopyVariablesToViewEvent event) {
-      table = event.getTable();
-      variables = event.getSelection();
-
-      refreshDatasources();
-
-      // Prepare the array of variableDto
-      JsArray<VariableDto> derivedVariables = JsArrays.create();
-      for(VariableDto variable : variables) {
-        derivedVariables.push(new VariableDuplicationHelper(variable).getDerivedVariable());
-      }
-
-      getView().clear();
-      getView().renderRows(variables, derivedVariables, true);
-      getView().showDialog();
-    }
+            getView().setDatasources(datasources, table.getDatasourceName());
+          }
+        }).send();
   }
 
-  public interface Display extends PopupView {
-
-    HasClickHandlers getSaveButton();
-
-    HasClickHandlers getCancelButton();
+  public interface Display extends PopupView, HasUiHandlers<VariablesToViewUiHandlers> {
 
     void clear();
 
@@ -398,8 +375,6 @@ public class VariablesToViewPresenter extends PresenterWidget<VariablesToViewPre
     String getDatasourceName();
 
     boolean isRenameSelected();
-
-    HasClickHandlers getRenameButton();
 
     Boolean gotoView();
 

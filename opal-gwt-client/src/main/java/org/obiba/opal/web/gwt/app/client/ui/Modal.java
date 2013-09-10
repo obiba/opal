@@ -450,8 +450,10 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     }
 
     private void push(Modal modal) {
-      if(!modal.hiddenOnStack && currentlyShown.search(modal) == -1) currentlyShown.push(modal);
-      GWT.log("push() :: " + currentlyShown.size());
+      if(!modal.hiddenOnStack && currentlyShown.search(modal) == -1) {
+        currentlyShown.push(modal);
+        GWT.log("push() :: " + currentlyShown.size());
+      }
     }
 
     private void pop(Modal modal) {
@@ -463,7 +465,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
 
       currentlyShown.pop();
 
-      GWT.log("push() :: " + currentlyShown.size());
+      GWT.log("pop() :: " + currentlyShown.size());
     }
 
     public void hideCurrent() {

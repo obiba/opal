@@ -9,44 +9,41 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.configureview.view;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.ConfigureViewStepPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.ConfigureViewStepUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.NavTabsPanel;
-import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
 import org.obiba.opal.web.gwt.app.client.ui.Tooltip;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DeckPanel;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PopupViewImpl;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 
-public class ConfigureViewStepView extends PopupViewImpl implements ConfigureViewStepPresenter.Display {
+public class ConfigureViewStepView extends ModalPopupViewWithUiHandlers<ConfigureViewStepUiHandlers>
+    implements ConfigureViewStepPresenter.Display {
 
-  @UiTemplate("ConfigureViewStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<DialogBox, ConfigureViewStepView> {}
+  interface ViewUiBinder extends UiBinder<Widget, ConfigureViewStepView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  @UiField
-  DialogBox dialog;
+  private static final Translations translations = GWT.create(Translations.class);
+
+  private final Widget widget;
 
   @UiField
-  DockLayoutPanel contentLayout;
-
-  @UiField
-  ResizeHandle resizeHandle;
+  Modal dialog;
 
   @UiField
   DeckPanel helpPanelDecks;
@@ -69,8 +66,8 @@ public class ConfigureViewStepView extends PopupViewImpl implements ConfigureVie
   @Inject
   public ConfigureViewStepView(EventBus eventBus) {
     super(eventBus);
-    uiBinder.createAndBindUi(this);
-    resizeHandle.makeResizable(contentLayout);
+    widget = uiBinder.createAndBindUi(this);
+    dialog.setTitle(translations.configureViewModalTitle());
     initHelpTooltip();
   }
 
@@ -90,7 +87,7 @@ public class ConfigureViewStepView extends PopupViewImpl implements ConfigureVie
 
   @Override
   public Widget asWidget() {
-    return dialog;
+    return widget;
   }
 
   @Override

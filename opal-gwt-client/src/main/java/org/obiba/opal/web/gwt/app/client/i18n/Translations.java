@@ -1855,6 +1855,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Entity Details")
   String entityDetailsModalTitle();
 
+  @Description("Configure View Modal title")
+  @DefaultStringValue("Configure View")
+  String configureViewModalTitle();
+
+  @Description("Add derived variable Modal title")
+  @DefaultStringValue("Add Derived Variable")
+  String addDerivedvariableModalTitle();
+
   @Description("Edit label")
   @DefaultStringValue("Edit")
   String editLabel();
