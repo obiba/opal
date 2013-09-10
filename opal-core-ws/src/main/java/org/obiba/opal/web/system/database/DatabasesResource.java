@@ -12,11 +12,16 @@ import javax.ws.rs.core.Response;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbDatabase;
 import org.obiba.opal.core.domain.database.SqlDatabase;
+import org.obiba.opal.core.runtime.database.DatabaseAlreadyExistsException;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
+import org.obiba.opal.core.runtime.database.MultipleIdentifiersDatabaseException;
+import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
 @Path("/system/databases")
@@ -58,7 +63,15 @@ public class DatabasesResource {
 
   @POST
   public Response addDatabase(Opal.DatabaseDto database) {
-    databaseRegistry.addOrReplaceDatabase(Dtos.fromDto(database));
+    try {
+      databaseRegistry.addOrReplaceDatabase(Dtos.fromDto(database));
+    } catch(MultipleIdentifiersDatabaseException e) {
+      return Response.status(BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "MultipleIdentifiersDatabase", e).build()).build();
+    } catch(DatabaseAlreadyExistsException e) {
+      return Response.status(BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatabaseAlreadyExists", e).build()).build();
+    }
     return Response.ok().build();
   }
 

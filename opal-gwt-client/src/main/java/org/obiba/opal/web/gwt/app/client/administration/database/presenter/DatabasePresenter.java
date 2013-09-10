@@ -12,12 +12,14 @@ package org.obiba.opal.web.gwt.app.client.administration.database.presenter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
@@ -28,14 +30,16 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.DatabaseDto;
 import org.obiba.opal.web.model.client.opal.JdbcDriverDto;
 import org.obiba.opal.web.model.client.opal.SqlDatabaseDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.Event;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
@@ -45,6 +49,10 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
   public enum Mode {
     CREATE, UPDATE
   }
+
+  private static final Translations translations = GWT.create(Translations.class);
+
+  private static final TranslationMessages translationMessages = GWT.create(TranslationMessages.class);
 
   private Mode dialogMode;
 
@@ -205,20 +213,23 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      getView().hideDialog();
-      Event<?> event = null;
       switch(response.getStatusCode()) {
         case Response.SC_OK:
-          event = new DatabaseUpdatedEvent(dto);
+          getView().hideDialog();
+          getEventBus().fireEvent(new DatabaseUpdatedEvent(dto));
           break;
         case Response.SC_CREATED:
-          event = new DatabaseCreatedEvent(dto);
+          getView().hideDialog();
+          getEventBus().fireEvent(new DatabaseCreatedEvent(dto));
           break;
         default:
-          //TODO supports DatabaseAlreadyExists
-          event = NotificationEvent.newBuilder().error(response.getText()).build();
+          ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+          String errorMessage = translations.userMessageMap().get(error.getStatus());
+          getView().showError(null, errorMessage == null
+              ? translationMessages
+              .unknownResponse(error.getStatus(), String.valueOf(JsArrays.toList(error.getArgumentsArray())))
+              : errorMessage);
       }
-      getEventBus().fireEvent(event);
     }
   }
 
@@ -237,7 +248,7 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
 
     void setDialogMode(Mode dialogMode);
 
-    void showError(FormField formField, String message);
+    void showError(@Nullable FormField formField, String message);
 
     HasText getName();
 

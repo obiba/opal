@@ -12,46 +12,36 @@ package org.obiba.opal.core.domain.user;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.annotation.Nonnull;
 
-import org.obiba.magma.datasource.hibernate.domain.AbstractTimestampedEntity;
+import org.obiba.opal.core.domain.AbstractTimestamped;
 
-@SuppressWarnings("UnusedDeclaration")
-@Entity(name = "groups") // 'group' is a mysql reserved word
-public class Group extends AbstractTimestampedEntity implements Comparable<Group> {
+@SuppressWarnings("ComparableImplementedButEqualsNotOverridden")
+public class Group extends AbstractTimestamped implements Comparable<Group> {
 
-  private static final long serialVersionUID = -5985745491689725964L;
+  @Nonnull
+  private String name;
 
-  @Column(nullable = false, unique = true)
-  private String name = null;
-
-  @ManyToMany
-  @JoinTable(name = "user_groups",
-      joinColumns = { @JoinColumn(name = "group_id") },
-      inverseJoinColumns = { @JoinColumn(name = "user_id") })
   private Set<User> users;
 
   public Group() {
   }
 
-  public Group(String name) {
+  public Group(@Nonnull String name) {
     this.name = name;
   }
 
+  @Nonnull
   public String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(@Nonnull String name) {
     this.name = name;
   }
 
   public Set<User> getUsers() {
-    return users != null ? users : (users = new HashSet<User>());
+    return users == null ? (users = new HashSet<User>()) : users;
   }
 
   @Override
@@ -60,22 +50,8 @@ public class Group extends AbstractTimestampedEntity implements Comparable<Group
   }
 
   @Override
-  public int compareTo(Group o) {
-    return name.compareTo(o.name);
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if(obj instanceof Group) {
-      Group o = (Group) obj;
-      return name.equals(o.name);
-    }
-    return super.equals(obj);
-  }
-
-  @Override
-  public int hashCode() {
-    return name.hashCode();
+  public int compareTo(Group group) {
+    return name.compareTo(group.name);
   }
 
 }

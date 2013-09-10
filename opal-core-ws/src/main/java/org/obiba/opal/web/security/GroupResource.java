@@ -16,8 +16,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.user.Group;
-import org.obiba.opal.core.service.impl.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -30,19 +28,12 @@ public class GroupResource extends AbstractUserGroupResource {
   @PathParam("name")
   private String name;
 
-  @Autowired
-  GroupResource(UserService userService) {
-    super(userService);
-  }
-
   @GET
   public Response getGroup() {
-
     Group group = userService.getGroupWithName(name);
     if(group == null) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
-
     return Response.ok().entity(asDto(group)).build();
   }
 

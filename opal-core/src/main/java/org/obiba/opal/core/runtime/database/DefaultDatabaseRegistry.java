@@ -4,29 +4,27 @@ import java.sql.SQLException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.datasource.hibernate.HibernateDatasource;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasource;
-import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.core.cfg.OrientDbService;
+import org.obiba.opal.core.cfg.OrientDbTransactionCallbackWithoutResult;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbDatabase;
 import org.obiba.opal.core.domain.database.SqlDatabase;
-import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
-import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
 import org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -39,21 +37,24 @@ import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
+import com.orientechnologies.orient.core.index.OIndexException;
+import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
+import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
 @Component
-@Transactional
-public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
+public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultDatabaseRegistry.class);
-
-  @Autowired
-  private SessionFactory sessionFactory;
 
   @Autowired
   private SessionFactoryFactory sessionFactoryFactory;
 
   @Autowired
   private DataSourceFactory dataSourceFactory;
+
+  @Autowired
+  private OrientDbService orientDbService;
 
   private final LoadingCache<String, BasicDataSource> dataSourceCache = CacheBuilder.newBuilder()
       .removalListener(new RemovalListener<String, BasicDataSource>() {
@@ -103,38 +104,45 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
   private final SetMultimap<String, String> registrations = Multimaps
       .synchronizedSetMultimap(HashMultimap.<String, String>create());
 
-  @SuppressWarnings("unchecked")
+  @Override
+  @PostConstruct
+  public void start() {
+    orientDbService.registerEntityClass(Database.class, SqlDatabase.class, MongoDbDatabase.class);
+    // don't create index on abstract base class or it will fail
+    orientDbService.createUniqueIndex(SqlDatabase.class, "name", OType.STRING);
+    orientDbService.createUniqueIndex(MongoDbDatabase.class, "name", OType.STRING);
+  }
+
+  @Override
+  @PreDestroy
+  public void stop() {
+    sessionFactoryCache.invalidateAll();
+    dataSourceCache.invalidateAll();
+  }
+
   @Override
   public Iterable<Database> list() {
-    return getCurrentSession().createCriteria(Database.class) //
-        .add(Restrictions.eq("usedForIdentifiers", false)) //
-        .list();
+    return list(Database.class);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public <T extends Database> Iterable<T> list(@Nonnull Class<T> databaseClass) {
-    return getCurrentSession().createCriteria(databaseClass) //
-        .add(Restrictions.eq("usedForIdentifiers", false)) //
-        .list();
+    return orientDbService
+        .list("select from " + databaseClass.getSimpleName() + " where usedForIdentifiers = ?", false);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public Iterable<Database> list(@Nullable String type) {
-    return Strings.isNullOrEmpty(type) //
-        ? list() //
-        : getCurrentSession().createCriteria(Database.class) //
-            .add(Restrictions.eq("usedForIdentifiers", false)) //
-            .add(Restrictions.eq("type", type)) //
-            .list();
+    if(Strings.isNullOrEmpty(type)) {
+      return list();
+    }
+    return orientDbService.list("select from Database where usedForIdentifiers = ? and type = ?", false, type);
   }
 
+  @Nullable
   @Override
   public Database getDatabase(@Nonnull String name) {
-    return (Database) getCurrentSession().createCriteria(Database.class) //
-        .add(Restrictions.eq("name", name)) //
-        .uniqueResult();
+    return orientDbService.uniqueResult("select from Database where name = ?", name);
   }
 
   @Override
@@ -150,48 +158,42 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
   }
 
   @Override
-  public void addOrReplaceDatabase(@Nonnull Database database)
-      throws DatabaseAlreadyExistsException, MultipleIdentifiersDatabaseException, CannotChangeDatabaseNameException {
-    validUniqueName(database);
+  public void addOrReplaceDatabase(@Nonnull final Database database)
+      throws MultipleIdentifiersDatabaseException, DatabaseAlreadyExistsException {
+    //TODO bean validation
     validUniqueIdentifiersDatabase(database);
-    if(database.getId() == null) {
-      getCurrentSession().persist(database);
-    } else {
-      validUnchangedName(database);
-      getCurrentSession().update(database);
-    }
-    destroyDataSource(database.getName());
-  }
-
-  private void validUniqueName(Database database) throws DatabaseAlreadyExistsException {
-    for(Database existing : list()) {
-      if(database.getName().equalsIgnoreCase(existing.getName()) &&
-          !Objects.equal(existing.getId(), database.getId())) {
-        throw new DatabaseAlreadyExistsException(database.getName());
-      }
-    }
-  }
-
-  private void validUnchangedName(Database database) throws CannotChangeDatabaseNameException {
-    Database existing = (Database) getCurrentSession().get(database.getClass(), database.getId());
-    if(!Objects.equal(existing.getName(), database.getName())) {
-      throw new CannotChangeDatabaseNameException(existing.getName(), database.getName());
+    try {
+      orientDbService.execute(new OrientDbTransactionCallbackWithoutResult() {
+        @Override
+        protected void doInTransactionWithoutResult(OObjectDatabaseTx db) {
+          db.save(database);
+        }
+      });
+    } catch(OIndexException e) {
+      throw new DatabaseAlreadyExistsException(database.getName());
+    } catch(ORecordDuplicatedException e) {
+      throw new DatabaseAlreadyExistsException(database.getName());
     }
   }
 
   private void validUniqueIdentifiersDatabase(Database database) throws MultipleIdentifiersDatabaseException {
     if(database.isUsedForIdentifiers()) {
       Database identifiersDatabase = getIdentifiersDatabase();
-      if(identifiersDatabase != null && !Objects.equal(identifiersDatabase.getId(), database.getId())) {
-        throw new MultipleIdentifiersDatabaseException(identifiersDatabase, database);
+      if(identifiersDatabase != null && !Objects.equal(identifiersDatabase.getName(), database.getName())) {
+        throw new MultipleIdentifiersDatabaseException(identifiersDatabase.getName(), database.getName());
       }
     }
   }
 
   @Override
-  public void deleteDatabase(@Nonnull Database database) {
+  public void deleteDatabase(@Nonnull final Database database) throws CannotDeleteDatabaseWithDataException {
     //TODO check if this database has data 
-    getCurrentSession().delete(database);
+    orientDbService.execute(new OrientDbTransactionCallbackWithoutResult() {
+      @Override
+      public void doInTransactionWithoutResult(OObjectDatabaseTx db) {
+        db.delete(database);
+      }
+    });
     destroyDataSource(database.getName());
   }
 
@@ -203,14 +205,22 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
   private void register(String databaseName, String usedByDatasource) {
     if(Strings.isNullOrEmpty(usedByDatasource)) return;
     Database database = getDatabase(databaseName);
-    database.setEditable(false);
-    addOrReplaceDatabase(database);
+    if(database == null) {
+      throw new IllegalArgumentException("Cannot find database " + databaseName);
+    }
+    if(database.isEditable()) {
+      database.setEditable(false);
+      addOrReplaceDatabase(database);
+    }
     registrations.put(databaseName, usedByDatasource);
   }
 
   @Override
   public void unregister(@Nonnull String databaseName, String usedByDatasource) {
     Database database = getDatabase(databaseName);
+    if(database == null) {
+      throw new IllegalArgumentException("Cannot find database " + databaseName);
+    }
     database.setEditable(true);
     addOrReplaceDatabase(database);
     registrations.remove(databaseName, usedByDatasource);
@@ -219,9 +229,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
   @Nullable
   @Override
   public Database getIdentifiersDatabase() {
-    return (Database) getCurrentSession().createCriteria(Database.class) //
-        .add(Restrictions.eq("usedForIdentifiers", true)) //
-        .uniqueResult();
+    return orientDbService.uniqueResult("select from Database where usedForIdentifiers = ?", true);
   }
 
   @Override
@@ -241,32 +249,4 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, Service {
     throw new IllegalArgumentException("Unknown datasource config for database " + database);
   }
 
-  private Session getCurrentSession() {
-    return sessionFactory.getCurrentSession();
-  }
-
-  @Override
-  public boolean isRunning() {
-    return true;
-  }
-
-  @Override
-  public void start() {
-  }
-
-  @Override
-  public void stop() {
-    sessionFactoryCache.invalidateAll();
-    dataSourceCache.invalidateAll();
-  }
-
-  @Override
-  public String getName() {
-    return "databases";
-  }
-
-  @Override
-  public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
-  }
 }

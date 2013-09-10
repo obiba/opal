@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.view;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -68,7 +67,7 @@ public class NotificationView extends ViewImpl implements NotificationPresenter.
     Alert alert = new Alert();
     alert.setAnimation(true);
     alert.setClose(true);
-    if (handler != null) alert.addClosedHandler(handler);
+    if(handler != null) alert.addClosedHandler(handler);
 
     switch(type) {
       case ERROR:
@@ -85,7 +84,7 @@ public class NotificationView extends ViewImpl implements NotificationPresenter.
       alert.setHeading(title);
     }
 
-    addMessages(alert, messages, messageArgs == null ?  new ArrayList<String>() : messageArgs);
+    addMessages(alert, messages, messageArgs == null ? new ArrayList<String>() : messageArgs);
     alertPanel.add(alert);
     if(!isSticky) runSticky(alert);
 
@@ -104,12 +103,11 @@ public class NotificationView extends ViewImpl implements NotificationPresenter.
     alertPanel.clear();
   }
 
-  private void addMessages(final Alert alert, List<String> messages, List<String> messageArgs) {
+  private void addMessages(Alert alert, Iterable<String> messages, List<String> messageArgs) {
     List<String> translatedMessages = new ArrayList<String>();
     for(String message : messages) {
       if(translations.userMessageMap().containsKey(message)) {
-        String msg = TranslationsUtils
-            .replaceArguments(translations.userMessageMap().get(message), messageArgs);
+        String msg = TranslationsUtils.replaceArguments(translations.userMessageMap().get(message), messageArgs);
         translatedMessages.add(msg);
       } else {
         translatedMessages.add(message);
@@ -120,9 +118,8 @@ public class NotificationView extends ViewImpl implements NotificationPresenter.
       alert.setText(translatedMessages.get(0));
     } else {
       UnorderedList list = new UnorderedList();
-      Iterator<String> iter = translatedMessages.iterator();
-      while(iter.hasNext()) {
-        list.add(new ListItem(new HTMLPanel(iter.next())));
+      for(String translatedMessage : translatedMessages) {
+        list.add(new ListItem(new HTMLPanel(translatedMessage)));
       }
       alert.add(list);
     }

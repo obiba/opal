@@ -4,14 +4,14 @@ public class DatabaseAlreadyExistsException extends RuntimeException {
 
   private static final long serialVersionUID = 2416927981990092192L;
 
-  private final String name;
+  private final String existing;
 
-  public DatabaseAlreadyExistsException(String name) {
-    super("Database with name '" + name + "' already exists in Opal.");
-    this.name = name;
+  public DatabaseAlreadyExistsException(String existing) {
+    super("Database named '" + existing + "' already exists.");
+    this.existing = existing;
   }
 
-  public String getName() {
-    return name;
+  public String getExisting() {
+    return existing;
   }
 }

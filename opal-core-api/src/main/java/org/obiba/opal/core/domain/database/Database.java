@@ -1,31 +1,21 @@
 package org.obiba.opal.core.domain.database;
 
 import javax.annotation.Nonnull;
-import javax.persistence.Column;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.MappedSuperclass;
 
-import org.obiba.magma.datasource.hibernate.domain.AbstractTimestampedEntity;
+import org.obiba.opal.core.domain.AbstractTimestamped;
 
 import com.google.common.base.Objects;
 
-@SuppressWarnings("ParameterHidesMemberVariable")
-@MappedSuperclass
-public abstract class Database extends AbstractTimestampedEntity {
-
-  private static final long serialVersionUID = 7804325269326932874L;
+public abstract class Database extends AbstractTimestamped {
 
   public enum Type {
     IMPORT, STORAGE, EXPORT
   }
 
   @Nonnull
-  @Column(nullable = false, unique = true)
   private String name;
 
   @Nonnull
-  @Enumerated(EnumType.STRING)
   private Type type;
 
   private String description;
@@ -87,12 +77,26 @@ public abstract class Database extends AbstractTimestampedEntity {
   }
 
   @Override
+  public int hashCode() {
+    return Objects.hashCode(name);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if(this == obj) return true;
+    //noinspection SimplifiableIfStatement
+    if(obj == null || getClass() != obj.getClass()) return false;
+    return Objects.equal(name, ((Database) obj).name);
+  }
+
+  @Override
   public String toString() {
     return Objects.toStringHelper(this).add("defaultStorage", defaultStorage).add("name", name).add("type", type)
         .add("description", description).add("editable", editable).add("usedForIdentifiers", usedForIdentifiers)
         .toString();
   }
 
+  @SuppressWarnings("ParameterHidesMemberVariable")
   public static abstract class Builder<TDatabase extends Database, TBuilder extends Builder<TDatabase, TBuilder>> {
 
     protected final TDatabase database;

@@ -17,9 +17,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.user.User;
-import org.obiba.opal.core.service.impl.UserService;
+import org.obiba.opal.core.service.impl.UserAlreadyExistsException;
 import org.obiba.opal.web.model.Opal;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -30,11 +29,6 @@ public class UserResource extends AbstractUserGroupResource {
 
   @PathParam("name")
   private String name;
-
-  @Autowired
-  public UserResource(UserService userService) {
-    super(userService);
-  }
 
   @GET
   public Response getUser() {
@@ -57,28 +51,28 @@ public class UserResource extends AbstractUserGroupResource {
     }
 
     User user = fromDto(userDto);
-
     if(userDto.hasPassword()) {
       user.setPassword(User.digest(userDto.getPassword()));
     }
 
-    userService.createOrUpdateUser(user);
-
+    try {
+      userService.createOrUpdateUser(user);
+    } catch(UserAlreadyExistsException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    }
     return Response.ok().build();
   }
 
   @DELETE
   public Response deleteUser() {
 
-    User u = userService.getUserWithName(name);
-
-    // Delete user
-    if(u != null) {
-      userService.deleteUser(u);
+    User user = userService.getUserWithName(name);
+    if(user == null) {
+      return Response.status(Response.Status.NOT_FOUND).build();
     }
+    userService.deleteUser(user);
 
     // TODO: Clear Acl permission
-
     return Response.ok().build();
   }
 }

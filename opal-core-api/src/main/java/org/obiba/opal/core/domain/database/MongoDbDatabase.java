@@ -3,25 +3,17 @@ package org.obiba.opal.core.domain.database;
 import java.net.UnknownHostException;
 
 import javax.annotation.Nonnull;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 
 @SuppressWarnings("ParameterHidesMemberVariable")
-@Entity
-@Table(name = "database_mongodb")
 public class MongoDbDatabase extends Database {
-
-  private static final long serialVersionUID = 2224211432668278011L;
 
   /**
    * mongodb://{hostname}:{port}/{databaseName}
    */
   @Nonnull
-  @Column(nullable = false, unique = true)
   private String url;
 
   private String username;

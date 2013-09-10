@@ -15,58 +15,49 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
 
 import org.obiba.core.util.HexUtil;
-import org.obiba.magma.datasource.hibernate.domain.AbstractTimestampedEntity;
+import org.obiba.opal.core.domain.AbstractTimestamped;
 
-@SuppressWarnings("UnusedDeclaration")
-@Entity
-@Table(name = "user")
-//@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-public class User extends AbstractTimestampedEntity {
+@SuppressWarnings("ComparableImplementedButEqualsNotOverridden")
+public class User extends AbstractTimestamped implements Comparable<User> {
 
-  private static final long serialVersionUID = -2200053643926715563L;
+  public enum Status {
+    ACTIVE, INACTIVE
+  }
 
   @Nonnull
-  @Column(length = 250, nullable = false, unique = true)
   private String name;
 
-  @Column(length = 250)
+  @Nonnull
   private String password;
 
   private boolean enabled;
 
-  @ManyToMany
-  @JoinTable(name = "user_groups", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = @JoinColumn(
-      name = "group_id"))
   private Set<Group> groups;
 
   public User() {
   }
 
-  public User(String name) {
+  public User(@Nonnull String name) {
     this.name = name;
   }
 
+  @Nonnull
   public String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(@Nonnull String name) {
     this.name = name;
   }
 
+  @Nonnull
   public String getPassword() {
     return password;
   }
 
-  public void setPassword(String password) {
+  public void setPassword(@Nonnull String password) {
     this.password = password;
   }
 
@@ -84,20 +75,20 @@ public class User extends AbstractTimestampedEntity {
     }
   }
 
-  public boolean hasGroup(Group g) {
-    return groups.contains(g);
+  public boolean hasGroup(Group group) {
+    return groups.contains(group);
   }
 
-  public void removeGroup(Group g) {
-    if(getGroups().remove(g)) g.getUsers().remove(this);
+  public void removeGroup(Group group) {
+    if(getGroups().remove(group)) group.getUsers().remove(this);
   }
 
   public boolean getEnabled() {
     return enabled;
   }
 
-  public void setEnabled(boolean b) {
-    enabled = b;
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
   }
 
   /**
@@ -106,17 +97,17 @@ public class User extends AbstractTimestampedEntity {
    * @param password
    * @return
    */
-  @SuppressWarnings("CallToPrintStackTrace")
   public static String digest(String password) {
     try {
       return HexUtil.bytesToHex(MessageDigest.getInstance("SHA").digest(password.getBytes()));
     } catch(NoSuchAlgorithmException e) {
-      e.printStackTrace();
-      return password;
+      throw new RuntimeException(e);
     }
   }
 
-//  public boolean isActive() {
-//    return getStatus() == ACTIVE;
-//  }
+  @Override
+  public int compareTo(User user) {
+    return name.compareTo(user.name);
+  }
+
 }

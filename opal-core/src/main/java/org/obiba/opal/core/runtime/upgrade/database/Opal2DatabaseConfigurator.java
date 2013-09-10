@@ -8,8 +8,6 @@ import org.apache.commons.configuration.PropertiesConfigurationLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
-
 public class Opal2DatabaseConfigurator {
 
   private static final Logger log = LoggerFactory.getLogger(Opal2DatabaseConfigurator.class);
@@ -42,11 +40,7 @@ public class Opal2DatabaseConfigurator {
   }
 
   private String getPropertiesFile() {
-    String opalHome = System.getenv().get("OPAL_HOME");
-    if(Strings.isNullOrEmpty(opalHome)) {
-      throw new RuntimeException("Environment variable OPAL_HOME is not defined, cannot upgrade Opal!");
-    }
-    return opalHome + "/conf/opal-config.properties";
+    return System.getenv().get("OPAL_HOME") + "/conf/opal-config.properties";
   }
 
   private void addOpalConfigProperties() throws ConfigurationException {

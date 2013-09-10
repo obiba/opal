@@ -425,7 +425,9 @@ public interface Translations extends Constants {
       "ProjectNameMustBeUnique", "A project already exists with this name.",//
       "ProjectCreationFailed", "The datasource creation has failed: {0}", //
       "FileNotFound", "File not found: {0}",//
-      "FileNotAccessible", "File not accessible: {0}"//
+      "FileNotAccessible", "File not accessible: {0}",//
+      "MultipleIdentifiersDatabase", "Database for identifiers already exists: {0}", //
+      "DatabaseAlreadyExists", "Database named {0} already exists" //
   })
   Map<String, String> userMessageMap();
 
@@ -1863,7 +1865,7 @@ public interface Translations extends Constants {
 
   @Description("Add derived variable Modal title")
   @DefaultStringValue("Add Derived Variable")
-  String addDerivedvariableModalTitle();
+  String addDerivedVariableModalTitle();
 
   @Description("Edit label")
   @DefaultStringValue("Edit")
