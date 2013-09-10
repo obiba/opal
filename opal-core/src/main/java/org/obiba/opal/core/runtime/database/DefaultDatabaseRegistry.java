@@ -17,7 +17,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.datasource.hibernate.HibernateDatasource;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasource;
 import org.obiba.opal.core.cfg.OrientDbService;
-import org.obiba.opal.core.cfg.OrientDbTransactionCallback;
+import org.obiba.opal.core.cfg.OrientDbTransactionCallbackWithoutResult;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbDatabase;
 import org.obiba.opal.core.domain.database.SqlDatabase;
@@ -39,6 +39,8 @@ import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
+import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
 @Component
@@ -104,6 +106,22 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
       .synchronizedSetMultimap(HashMultimap.<String, String>create());
 
   @Override
+  @PostConstruct
+  public void start() {
+    orientDbService.registerEntityClass(Database.class, SqlDatabase.class, MongoDbDatabase.class);
+    orientDbService.createUniqueIndex(Database.class, "name", OType.STRING);
+    orientDbService.createUniqueIndex(SqlDatabase.class, "name", OType.STRING);
+    orientDbService.createUniqueIndex(MongoDbDatabase.class, "name", OType.STRING);
+  }
+
+  @Override
+  @PreDestroy
+  public void stop() {
+    sessionFactoryCache.invalidateAll();
+    dataSourceCache.invalidateAll();
+  }
+
+  @Override
   public Iterable<Database> list() {
     return list(Database.class);
   }
@@ -123,14 +141,14 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("usedForIdentifiers", false);
     params.put("type", type);
-    return orientDbService.list("select from " + Database.class.getSimpleName() +
-        " where usedForIdentifiers = :usedForIdentifiers and type = :type", params);
+    return orientDbService
+        .list("select from Database where usedForIdentifiers = :usedForIdentifiers and type = :type", params);
   }
 
+  @Nullable
   @Override
   public Database getDatabase(@Nonnull String name) {
-    return orientDbService
-        .uniqueResult("select from " + Database.class.getSimpleName() + " where name = :name", "name", name);
+    return orientDbService.uniqueResult("select from Database where name = :name", "name", name);
   }
 
   @Override
@@ -146,32 +164,38 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   }
 
   @Override
-  public void addOrReplaceDatabase(@Nonnull final Database database) throws MultipleIdentifiersDatabaseException {
+  public void addOrReplaceDatabase(@Nonnull final Database database)
+      throws MultipleIdentifiersDatabaseException, DatabaseAlreadyExistsException {
+    //TODO bean validation
     validUniqueIdentifiersDatabase(database);
-    orientDbService.execute(new OrientDbTransactionCallback<Object>() {
-      @Override
-      public Object doInTransaction(OObjectDatabaseTx db) {
-        return db.save(database);
-      }
-    });
+    try {
+      orientDbService.execute(new OrientDbTransactionCallbackWithoutResult() {
+        @Override
+        protected void doInTransactionWithoutResult(OObjectDatabaseTx db) {
+          db.save(database);
+        }
+      });
+    } catch(ORecordDuplicatedException e) {
+      throw new DatabaseAlreadyExistsException(database.getName());
+    }
   }
 
   private void validUniqueIdentifiersDatabase(Database database) throws MultipleIdentifiersDatabaseException {
     if(database.isUsedForIdentifiers()) {
       Database identifiersDatabase = getIdentifiersDatabase();
       if(identifiersDatabase != null && !Objects.equal(identifiersDatabase.getName(), database.getName())) {
-        throw new MultipleIdentifiersDatabaseException(identifiersDatabase, database);
+        throw new MultipleIdentifiersDatabaseException(identifiersDatabase.getName(), database.getName());
       }
     }
   }
 
   @Override
-  public void deleteDatabase(@Nonnull final Database database) {
+  public void deleteDatabase(@Nonnull final Database database) throws CannotDeleteDatabaseWithDataException {
     //TODO check if this database has data 
-    orientDbService.execute(new OrientDbTransactionCallback<Object>() {
+    orientDbService.execute(new OrientDbTransactionCallbackWithoutResult() {
       @Override
-      public Object doInTransaction(OObjectDatabaseTx db) {
-        return db.delete(database);
+      public void doInTransactionWithoutResult(OObjectDatabaseTx db) {
+        db.delete(database);
       }
     });
     destroyDataSource(database.getName());
@@ -185,14 +209,22 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   private void register(String databaseName, String usedByDatasource) {
     if(Strings.isNullOrEmpty(usedByDatasource)) return;
     Database database = getDatabase(databaseName);
-    database.setEditable(false);
-    addOrReplaceDatabase(database);
+    if(database == null) {
+      throw new IllegalArgumentException("Cannot find database " + databaseName);
+    }
+    if(database.isEditable()) {
+      database.setEditable(false);
+      addOrReplaceDatabase(database);
+    }
     registrations.put(databaseName, usedByDatasource);
   }
 
   @Override
   public void unregister(@Nonnull String databaseName, String usedByDatasource) {
     Database database = getDatabase(databaseName);
+    if(database == null) {
+      throw new IllegalArgumentException("Cannot find database " + databaseName);
+    }
     database.setEditable(true);
     addOrReplaceDatabase(database);
     registrations.remove(databaseName, usedByDatasource);
@@ -201,9 +233,9 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Nullable
   @Override
   public Database getIdentifiersDatabase() {
-    return orientDbService.uniqueResult(
-        "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = :usedForIdentifiers",
-        "usedForIdentifiers", true);
+    return orientDbService
+        .uniqueResult("select from Database where usedForIdentifiers = :usedForIdentifiers", "usedForIdentifiers",
+            true);
   }
 
   @Override
@@ -221,17 +253,6 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
       return new MongoDBDatasource(datasourceName, ((MongoDbDatabase) database).createMongoClientURI());
     }
     throw new IllegalArgumentException("Unknown datasource config for database " + database);
-  }
-
-  @PostConstruct
-  public void start() {
-    orientDbService.registerEntityClass(Database.class, SqlDatabase.class, MongoDbDatabase.class);
-  }
-
-  @PreDestroy
-  public void stop() {
-    sessionFactoryCache.invalidateAll();
-    dataSourceCache.invalidateAll();
   }
 
 }

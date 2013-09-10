@@ -210,7 +210,6 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
           event = new DatabaseCreatedEvent(dto);
           break;
         default:
-          //TODO supports DatabaseAlreadyExists
           event = NotificationEvent.newBuilder().error(response.getText()).build();
       }
       getEventBus().fireEvent(event);

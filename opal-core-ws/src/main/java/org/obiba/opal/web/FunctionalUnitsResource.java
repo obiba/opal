@@ -81,6 +81,8 @@ import com.google.common.collect.Lists;
 
 import au.com.bytecode.opencsv.CSVReader;
 
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+
 @Component
 @Path("/functional-units")
 public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
@@ -160,8 +162,8 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
   @POST
   public Response createFunctionalUnit(Opal.FunctionalUnitDto unit) {
     if(getFunctionalUnitService().hasFunctionalUnit(unit.getName())) {
-      return Response.status(Status.BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "FunctionalUnitAlreadyExists").build()).build();
+      return Response.status(BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "FunctionalUnitAlreadyExists").build()).build();
     }
 
     ResponseBuilder response = null;
@@ -174,13 +176,13 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
         response = Response.created(UriBuilder.fromPath("/").path(FunctionalUnitResource.class).build(unit.getName()));
       } catch(IOException e) {
         getFunctionalUnitService().removeFunctionalUnit(unit.getName());
-        response = Response.status(Status.BAD_REQUEST)
-            .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "FunctionalUnitCreationFailed", e).build());
+        response = Response.status(BAD_REQUEST)
+            .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "FunctionalUnitCreationFailed", e).build());
       }
 
     } catch(RuntimeException e) {
-      response = Response.status(Status.BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "FunctionalUnitCreationFailed", e).build());
+      response = Response.status(BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "FunctionalUnitCreationFailed", e).build());
     }
 
     return response.build();

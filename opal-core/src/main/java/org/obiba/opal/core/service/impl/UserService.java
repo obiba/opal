@@ -9,13 +9,12 @@
  */
 package org.obiba.opal.core.service.impl;
 
-import java.util.List;
-
 import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.User;
+import org.obiba.opal.core.service.SystemService;
 
 @SuppressWarnings("UnusedDeclaration")
-public interface UserService {
+public interface UserService extends SystemService {
 
   /**
    * Returns the list of users
@@ -29,7 +28,7 @@ public interface UserService {
    *
    * @return the number of users that match the template
    */
-  int getUserCount();
+  long getUserCount();
 
   /**
    * Returns the user with the specified login
@@ -40,27 +39,11 @@ public interface UserService {
   User getUserWithName(String name);
 
   /**
-   * Change the status of the specified user
-   *
-   * @param user
-   * @param enabled
-   */
-  void updateEnabled(User user, boolean enabled);
-
-  /**
-   * Update the password of the specified user
-   *
-   * @param template
-   * @param password
-   */
-  void updatePassword(User user, String password);
-
-  /**
    * Create a user when id is not provided, otherwise, updates the changed fields
    *
    * @param user
    */
-  void createOrUpdateUser(User user);
+  void createOrUpdateUser(User user) throws UserAlreadyExistsException;
 
   /**
    * Deletes a user from user table and from subject_acl
@@ -72,18 +55,16 @@ public interface UserService {
   /**
    * Create the given group.
    *
-   * @param role
    * @return
    */
-  Group createGroup(Group group);
+  void createOrUpdateGroup(Group group) throws GroupAlreadyExistsException;
 
   /**
    * Returns the list of groups
    *
-   * @param clauses
    * @return
    */
-  List<Group> getGroups();
+  Iterable<Group> getGroups();
 
   /**
    * Returns the group with the specified name
@@ -99,4 +80,6 @@ public interface UserService {
    * @param group
    */
   void deleteGroup(Group group);
+
+  long getGroupCount();
 }

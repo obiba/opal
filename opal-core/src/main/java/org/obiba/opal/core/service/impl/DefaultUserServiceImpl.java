@@ -9,107 +9,138 @@
  */
 package org.obiba.opal.core.service.impl;
 
-import java.util.List;
+import javax.annotation.PostConstruct;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
-import org.obiba.core.service.impl.PersistenceManagerAwareService;
+import org.obiba.opal.core.cfg.OrientDbService;
+import org.obiba.opal.core.cfg.OrientDbTransactionCallback;
 import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.User;
 import org.obiba.opal.core.service.SubjectAclService;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
+import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
 /**
  * Default implementation of User Service
  */
-@Transactional
-public class DefaultUserServiceImpl extends PersistenceManagerAwareService implements UserService {
+@Component
+public class DefaultUserServiceImpl implements UserService {
 
-  private SessionFactory factory;
-
+  @Autowired
   private SubjectAclService aclService;
 
-  public void setSubjectAclService(SubjectAclService aclService) {
-    this.aclService = aclService;
+  @Autowired
+  private OrientDbService orientDbService;
+
+  @Override
+  @PostConstruct
+  public void start() {
+    orientDbService.registerEntityClass(User.class, Group.class);
+    orientDbService.createUniqueIndex(User.class, "name", OType.STRING);
+    orientDbService.createUniqueIndex(Group.class, "name", OType.STRING);
   }
 
-  public void setSessionFactory(SessionFactory factory) {
-    this.factory = factory;
+  @Override
+  public void stop() {
+
   }
 
-  private Session getCurrentSession() {
-    return factory.getCurrentSession();
-  }
-
-  @SuppressWarnings("unchecked")
   @Override
   public Iterable<User> list() {
-    return getCurrentSession().createCriteria(User.class).list();
+    return orientDbService.list(User.class);
   }
 
   @Override
-  public int getUserCount() {
-    return 0;
+  public long getUserCount() {
+    return orientDbService.count(User.class);
+  }
+
+  @Override
+  public long getGroupCount() {
+    return orientDbService.count(Group.class);
   }
 
   @Override
   public User getUserWithName(String name) {
-    return (User) getCurrentSession().createCriteria(User.class).add(Restrictions.eq("name", name)).uniqueResult();
+    return orientDbService.uniqueResult("select from User where name = :name", "name", name);
   }
 
   @Override
-  public void updateEnabled(User user, boolean enabled) {
-    user.setEnabled(enabled);
-    getPersistenceManager().save(user);
+  public void createOrUpdateUser(final User user) throws UserAlreadyExistsException {
+
+    //TODO bean validation
+
+    try {
+      orientDbService.execute(new OrientDbTransactionCallback<Object>() {
+        @Override
+        public Object doInTransaction(OObjectDatabaseTx db) {
+          return db.save(user);
+        }
+      });
+    } catch(ORecordDuplicatedException e) {
+      throw new UserAlreadyExistsException(user.getName());
+    }
   }
 
   @Override
-  public void updatePassword(User user, String password) {
-    user.setPassword(password);
-    getPersistenceManager().save(user);
-  }
-
-  @Override
-  public void createOrUpdateUser(User user) {
-    factory.getCurrentSession().saveOrUpdate(user);
-  }
-
-  @Override
-  public void deleteUser(User user) {
+  public void deleteUser(final User user) {
     SubjectAclService.Subject aclSubject = SubjectAclService.SubjectType
         .valueOf(SubjectAclService.SubjectType.USER.name()).subjectFor(user.getName());
 
-    getPersistenceManager().delete(user);
+    orientDbService.execute(new OrientDbTransactionCallback<Object>() {
+      @Override
+      public Object doInTransaction(OObjectDatabaseTx db) {
+        return db.delete(user);
+      }
+    });
 
     // Delete user's permissions
     aclService.deleteSubjectPermissions("opal", null, aclSubject);
   }
 
   @Override
-  public Group createGroup(Group group) {
-    return getPersistenceManager().save(group);
+  public void createOrUpdateGroup(final Group group) throws GroupAlreadyExistsException {
+    //TODO bean validation
+    try {
+      orientDbService.execute(new OrientDbTransactionCallback<Object>() {
+        @Override
+        public Object doInTransaction(OObjectDatabaseTx db) {
+          return db.save(group);
+        }
+      });
+    } catch(Exception e) {
+      throw new GroupAlreadyExistsException(group.getName());
+    }
   }
 
   @Override
-  public List<Group> getGroups() {
-    return getPersistenceManager().list(Group.class);
+  public Iterable<Group> getGroups() {
+    return orientDbService.list(Group.class);
   }
 
   @Override
   public Group getGroupWithName(String name) {
-    return (Group) getCurrentSession().createCriteria(Group.class).add(Restrictions.eq("name", name)).uniqueResult();
+    return orientDbService.uniqueResult("select from Group where name = :name", "name", name);
   }
 
   @Override
-  public void deleteGroup(Group group) {
+  public void deleteGroup(final Group group) {
     SubjectAclService.Subject aclSubject = SubjectAclService.SubjectType
         .valueOf(SubjectAclService.SubjectType.GROUP.name()).subjectFor(group.getName());
 
-    getPersistenceManager().delete(group);
+    orientDbService.execute(new OrientDbTransactionCallback<Object>() {
+      @Override
+      public Object doInTransaction(OObjectDatabaseTx db) {
+        return db.delete(group);
+      }
+    });
 
     // Delete group's permissions
     aclService.deleteSubjectPermissions("opal", null, aclSubject);
 
   }
+
 }

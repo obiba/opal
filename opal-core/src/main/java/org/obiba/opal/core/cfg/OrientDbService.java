@@ -5,6 +5,8 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import com.orientechnologies.orient.core.metadata.schema.OType;
+
 public interface OrientDbService {
 
   <T> T execute(OrientDbTransactionCallback<T> action);
@@ -21,4 +23,9 @@ public interface OrientDbService {
   @Nullable
   <T> T uniqueResult(String sql, String paramName, Object paramValue);
 
+  long count(Class<?> clazz);
+
+  <T> Iterable<T> list(Class<T> clazz);
+
+  void createUniqueIndex(Class<?> clazz, String property, OType type);
 }

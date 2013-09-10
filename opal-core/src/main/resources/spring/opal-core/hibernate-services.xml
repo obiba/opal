@@ -23,12 +23,4 @@
 
   <bean id="userProvider" class="org.obiba.opal.audit.OpalUserProvider"/>
 
-  <bean id="subjectAclService" class="org.obiba.opal.core.service.impl.DefaultSubjectAclService"/>
-
-  <bean id="userService" class="org.obiba.opal.core.service.impl.DefaultUserServiceImpl">
-    <property name="sessionFactory" ref="sessionFactory"/>
-    <property name="persistenceManager" ref="persistenceManager"/>
-    <property name="subjectAclService" ref="subjectAclService"/>
-  </bean>
-
 </beans>

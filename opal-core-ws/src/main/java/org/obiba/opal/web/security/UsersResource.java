@@ -17,9 +17,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.user.User;
-import org.obiba.opal.core.service.impl.UserService;
+import org.obiba.opal.core.service.impl.UserAlreadyExistsException;
 import org.obiba.opal.web.model.Opal;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -29,11 +28,6 @@ import com.google.common.collect.Lists;
 @Scope("request")
 @Path("/users")
 public class UsersResource extends AbstractUserGroupResource {
-
-  @Autowired
-  public UsersResource(UserService userService) {
-    super(userService);
-  }
 
   @GET
   public List<Opal.UserDto> getUsers() {
@@ -65,7 +59,11 @@ public class UsersResource extends AbstractUserGroupResource {
     User u = fromDto(userDto);
     u.setPassword(User.digest(userDto.getPassword()));
 
-    userService.createOrUpdateUser(u);
+    try {
+      userService.createOrUpdateUser(u);
+    } catch(UserAlreadyExistsException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    }
     return Response.ok().build();
   }
 }

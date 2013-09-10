@@ -1,7 +1,5 @@
 package org.obiba.opal.web.security;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import org.obiba.opal.core.domain.user.Group;
@@ -10,45 +8,34 @@ import org.obiba.opal.core.service.impl.UserService;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 abstract class AbstractUserGroupResource {
 
-  protected final UserService userService;
-
   @Autowired
-  AbstractUserGroupResource(UserService userService) {
-    this.userService = userService;
-  }
+  protected UserService userService;
 
   protected User fromDto(Opal.UserDto dto) {
     User user = userService.getUserWithName(dto.getName());
-
     if(user == null) {
       user = new User(dto.getName());
     }
-
     user.setEnabled(dto.getEnabled());
 
     // Remove groups that are not in userDto
-    Collection<Group> toRemove = new HashSet<Group>();
-    for(Group g : user.getGroups()) {
-      if(!dto.getGroupsList().contains(g.getName())) {
-        toRemove.add(g);
+    for(Group group : ImmutableList.copyOf(user.getGroups())) {
+      if(!dto.getGroupsList().contains(group.getName())) {
+        user.removeGroup(group);
       }
     }
-    for(Group g : toRemove) {
-      user.removeGroup(g);
-    }
 
-    // Groups fetch or create
+    // Groups fetch
     for(String groupName : dto.getGroupsList()) {
       Group group = userService.getGroupWithName(groupName);
       if(group == null) {
         group = new Group(groupName);
-        userService.createGroup(group);
       }
-
       user.addGroup(group);
     }
 

@@ -13,7 +13,6 @@ public abstract class Database extends AbstractTimestamped {
   }
 
   @Nonnull
-  //TODO unique
   private String name;
 
   @Nonnull

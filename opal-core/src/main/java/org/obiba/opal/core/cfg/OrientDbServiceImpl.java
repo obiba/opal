@@ -13,6 +13,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.orientechnologies.orient.core.db.ODatabase;
+import com.orientechnologies.orient.core.index.OIndexManager;
+import com.orientechnologies.orient.core.index.ONullOutputListener;
+import com.orientechnologies.orient.core.index.OPropertyIndexDefinition;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import com.orientechnologies.orient.core.tx.OTransaction;
 import com.orientechnologies.orient.object.db.OObjectDatabasePool;
@@ -90,6 +95,16 @@ public class OrientDbServiceImpl implements OrientDbService {
   }
 
   @Override
+  public <T> Iterable<T> list(Class<T> clazz) {
+    OObjectDatabaseTx db = getDatabaseDocumentTx();
+    try {
+      return db.browseClass(clazz);
+    } finally {
+      db.close();
+    }
+  }
+
+  @Override
   public <T> List<T> list(String sql, Map<String, Object> params) {
     OObjectDatabaseTx db = getDatabaseDocumentTx();
     try {
@@ -129,12 +144,37 @@ public class OrientDbServiceImpl implements OrientDbService {
   }
 
   @Override
+  public long count(Class<?> clazz) {
+    OObjectDatabaseTx db = getDatabaseDocumentTx();
+    try {
+      return db.countClass(clazz);
+    } finally {
+      db.close();
+    }
+  }
+
+  @Override
   public void registerEntityClass(Class<?>... classes) {
     OObjectDatabaseTx db = getDatabaseDocumentTx();
     try {
       for(Class<?> clazz : classes) {
         db.getEntityManager().registerEntityClass(clazz);
       }
+    } finally {
+      db.close();
+    }
+  }
+
+  @Override
+  public void createUniqueIndex(Class<?> clazz, String property, OType type) {
+    OObjectDatabaseTx db = getDatabaseDocumentTx();
+    try {
+      String className = clazz.getSimpleName();
+      int clusterId = db.getClusterIdByName(className.toLowerCase());
+      OIndexManager indexManager = db.getMetadata().getIndexManager();
+      indexManager.createIndex(className + "." + property, OClass.INDEX_TYPE.UNIQUE.name(),
+          new OPropertyIndexDefinition(className, property, type), new int[] { clusterId },
+          ONullOutputListener.INSTANCE);
     } finally {
       db.close();
     }

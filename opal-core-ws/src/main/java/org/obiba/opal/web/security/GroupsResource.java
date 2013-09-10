@@ -18,9 +18,8 @@ import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.User;
-import org.obiba.opal.core.service.impl.UserService;
+import org.obiba.opal.core.service.impl.GroupAlreadyExistsException;
 import org.obiba.opal.web.model.Opal;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -32,48 +31,40 @@ import com.google.common.collect.Lists;
 @Path("/groups")
 public class GroupsResource extends AbstractUserGroupResource {
 
-  @Autowired
-  public GroupsResource(UserService userService) {
-    super(userService);
-  }
-
   @GET
   public List<Opal.GroupDto> getGroups() {
-
-    List<Group> groups = userService.getGroups();
-
+    Iterable<Group> groups = userService.getGroups();
     List<Opal.GroupDto> groupDtos = Lists.newArrayList();
-
-    for(Group g : groups) {
-      groupDtos.add(toDto(g));
+    for(Group group : groups) {
+      groupDtos.add(toDto(group));
     }
-
     return groupDtos;
   }
 
   @POST
   public Response createGroup(Opal.GroupDto groupDto) {
 
-    Group g = new Group();
-    g.setName(groupDto.getName());
-
     if(userService.getGroupWithName(groupDto.getName()) != null) {
       return Response.status(Response.Status.NOT_MODIFIED).build();
     }
 
-    userService.createGroup(g);
+    try {
+      Group group = new Group();
+      group.setName(groupDto.getName());
+      userService.createOrUpdateGroup(group);
+    } catch(GroupAlreadyExistsException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    }
     return Response.ok().build();
   }
 
   private Opal.GroupDto toDto(Group group) {
-
     List<String> users = Lists.newArrayList();
     if(group.getUsers() != null) {
       for(User u : group.getUsers()) {
         users.add(u.getName());
       }
     }
-
     return Opal.GroupDto.newBuilder().setName(group.getName()).addAllUsers(users).build();
   }
 

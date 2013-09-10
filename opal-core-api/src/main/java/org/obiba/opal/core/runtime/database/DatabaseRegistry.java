@@ -7,8 +7,9 @@ import javax.sql.DataSource;
 import org.hibernate.SessionFactory;
 import org.obiba.magma.Datasource;
 import org.obiba.opal.core.domain.database.Database;
+import org.obiba.opal.core.service.SystemService;
 
-public interface DatabaseRegistry {
+public interface DatabaseRegistry extends SystemService {
 
   Iterable<Database> list();
 
@@ -16,11 +17,13 @@ public interface DatabaseRegistry {
 
   Iterable<Database> list(@Nullable String type);
 
+  @Nullable
   Database getDatabase(@Nonnull String name);
 
-  void addOrReplaceDatabase(@Nonnull Database database) throws MultipleIdentifiersDatabaseException;
+  void addOrReplaceDatabase(@Nonnull Database database)
+      throws MultipleIdentifiersDatabaseException, DatabaseAlreadyExistsException;
 
-  void deleteDatabase(@Nonnull Database database);
+  void deleteDatabase(@Nonnull Database database) throws CannotDeleteDatabaseWithDataException;
 
   DataSource getDataSource(@Nonnull String name, @Nullable String usedByDatasource);
 

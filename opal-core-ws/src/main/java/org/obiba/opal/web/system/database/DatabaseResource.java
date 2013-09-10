@@ -13,7 +13,9 @@ import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.SqlDatabase;
+import org.obiba.opal.core.runtime.database.DatabaseAlreadyExistsException;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
+import org.obiba.opal.core.runtime.database.MultipleIdentifiersDatabaseException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Opal;
@@ -65,7 +67,15 @@ public class DatabaseResource {
     if(!database.isEditable()) {
       return Response.status(BAD_REQUEST).build();
     }
-    databaseRegistry.addOrReplaceDatabase(database);
+    try {
+      databaseRegistry.addOrReplaceDatabase(database);
+    } catch(MultipleIdentifiersDatabaseException e) {
+      return Response.status(BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "MultipleIdentifiersDatabase", e).build()).build();
+    } catch(DatabaseAlreadyExistsException e) {
+      return Response.status(BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatabaseAlreadyExists", e).build()).build();
+    }
     return Response.ok().build();
   }
 
@@ -82,8 +92,8 @@ public class DatabaseResource {
   private Response testSqlConnection() {
     Ws.ClientErrorDto error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed").build();
     try {
-      JdbcTemplate t = new JdbcTemplate(databaseRegistry.getDataSource(name, null));
-      Boolean result = t.execute(new ConnectionCallback<Boolean>() {
+      JdbcTemplate jdbcTemplate = new JdbcTemplate(databaseRegistry.getDataSource(name, null));
+      Boolean result = jdbcTemplate.execute(new ConnectionCallback<Boolean>() {
 
         @Override
         public Boolean doInConnection(Connection con) throws SQLException, DataAccessException {

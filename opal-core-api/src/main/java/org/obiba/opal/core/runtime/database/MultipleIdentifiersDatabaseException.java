@@ -1,26 +1,24 @@
 package org.obiba.opal.core.runtime.database;
 
-import org.obiba.opal.core.domain.database.Database;
-
 public class MultipleIdentifiersDatabaseException extends RuntimeException {
 
   private static final long serialVersionUID = 2416927981990092192L;
 
-  private final Database existing;
+  private final String existing;
 
-  private final Database database;
+  private final String database;
 
-  public MultipleIdentifiersDatabaseException(Database existing, Database database) {
-    super("Database for identifiers already exists: '" + existing.getName() + "'.");
+  public MultipleIdentifiersDatabaseException(String existing, String database) {
+    super("Database for identifiers already exists: '" + existing + "'.");
     this.existing = existing;
     this.database = database;
   }
 
-  public Database getDatabase() {
+  public String getDatabase() {
     return database;
   }
 
-  public Database getExisting() {
+  public String getExisting() {
     return existing;
   }
 }
