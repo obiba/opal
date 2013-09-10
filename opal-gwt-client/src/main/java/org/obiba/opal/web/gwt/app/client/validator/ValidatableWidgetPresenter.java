@@ -13,12 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 
 import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
-public abstract class ValidatableWidgetPresenter<D extends View> extends PresenterWidget<D> {
+public abstract class ValidatableWidgetPresenter<D extends PopupView> extends ModalPresenterWidget<D> {
 
   private final List<FieldValidator> validators = new ArrayList<FieldValidator>();
 

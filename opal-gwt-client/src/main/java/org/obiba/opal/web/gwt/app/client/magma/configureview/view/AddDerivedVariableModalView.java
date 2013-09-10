@@ -9,38 +9,37 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.configureview.view;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.AddDerivedVariableModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.AddDerivedVariableModalUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PopupViewImpl;
+import com.google.web.bindery.event.shared.EventBus;
 
-public class AddDerivedVariableModalView extends PopupViewImpl implements AddDerivedVariableModalPresenter.Display {
+public class AddDerivedVariableModalView extends ModalPopupViewWithUiHandlers<AddDerivedVariableModalUiHandlers>
+    implements AddDerivedVariableModalPresenter.Display {
 
-  interface AddDerivedVariableModalUiBinder extends UiBinder<DialogBox, AddDerivedVariableModalView> {}
+  interface AddDerivedVariableModalUiBinder extends UiBinder<Widget, AddDerivedVariableModalView> {}
 
   private static final AddDerivedVariableModalUiBinder uiBinder = GWT.create(AddDerivedVariableModalUiBinder.class);
 
-  @UiField
-  DialogBox dialog;
+  private static final Translations translations = GWT.create(Translations.class);
+
+  private final Widget widget;
 
   @UiField
-  Button addButton;
-
-  @UiField
-  Button cancelButton;
+  Modal dialog;
 
   @UiField(provided = true)
   SuggestBox variableNameSuggestBox;
@@ -51,12 +50,13 @@ public class AddDerivedVariableModalView extends PopupViewImpl implements AddDer
   public AddDerivedVariableModalView(EventBus eventBus) {
     super(eventBus);
     variableNameSuggestBox = new SuggestBox(suggestions = new MultiWordSuggestOracle());
-    uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
+    dialog.setTitle(translations.entityDetailsModalTitle());
   }
 
   @Override
   public Widget asWidget() {
-    return dialog;
+    return widget ;
   }
 
   @Override
@@ -64,24 +64,19 @@ public class AddDerivedVariableModalView extends PopupViewImpl implements AddDer
     dialog.hide();
   }
 
-  @Override
-  public HandlerRegistration addCancelClickHandler(ClickHandler handler) {
-    return cancelButton.addClickHandler(handler);
+  @UiHandler("cancelButton")
+  public void onCancelClicked(ClickEvent event) {
+    dialog.hide();
   }
 
-  @Override
-  public HandlerRegistration addAddVariableClickHandler(ClickHandler handler) {
-    return addButton.addClickHandler(handler);
+  @UiHandler("addButton")
+  public void onAddVariableClicked(ClickEvent event) {
+    getUiHandlers().addVariable(getVariableName().getText());
   }
 
   @Override
   public HasText getVariableName() {
     return variableNameSuggestBox;
-  }
-
-  @Override
-  public void addVariableSuggestion(String suggestion) {
-    suggestions.add(suggestion);
   }
 
   @Override

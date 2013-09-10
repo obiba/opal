@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.CopyVariablesToViewEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
@@ -27,6 +28,8 @@ import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexStatusRefreshEven
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
@@ -96,6 +99,10 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final Provider<AuthorizationPresenter> authorizationPresenter;
 
+  private final ModalProvider<ConfigureViewStepPresenter> configureViewStepProvider;
+
+  private final ModalProvider<VariablesToViewPresenter> variablesToViewProvider;
+
   @Inject
   private CodingViewModalPresenter codingViewModalPresenter;
 
@@ -117,11 +124,15 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
    */
   @Inject
   public TablePresenter(Display display, EventBus eventBus, ValuesTablePresenter valuesTablePresenter,
-      Provider<AuthorizationPresenter> authorizationPresenter, Provider<IndexPresenter> indexPresenter) {
+      Provider<AuthorizationPresenter> authorizationPresenter, Provider<IndexPresenter> indexPresenter,
+      ModalProvider<ConfigureViewStepPresenter> configureViewStepProvider,
+      ModalProvider<VariablesToViewPresenter> variablesToViewProvider) {
     super(eventBus, display);
     this.valuesTablePresenter = valuesTablePresenter;
     this.authorizationPresenter = authorizationPresenter;
     this.indexPresenter = indexPresenter;
+    this.configureViewStepProvider = configureViewStepProvider.setContainer(this);
+    this.variablesToViewProvider = variablesToViewProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -393,7 +404,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     if(variables.isEmpty()) {
       getEventBus().fireEvent(NotificationEvent.newBuilder().error("CopyVariableSelectAtLeastOne").build());
     } else {
-      getEventBus().fireEvent(new CopyVariablesToViewEvent(table, variables));
+      VariablesToViewPresenter variablesToViewPresenter = variablesToViewProvider.get();
+      variablesToViewPresenter.initialize(table, variables);
     }
   }
 
@@ -407,8 +419,10 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           public void onResource(Response response, ViewDto viewDto) {
             viewDto.setDatasourceName(table.getDatasourceName());
             viewDto.setName(table.getName());
-
+            // TODO: this popup is going to die soon and won't need a ModalProvider
+            configureViewStepProvider.get();
             getEventBus().fireEvent(new ViewConfigurationRequiredEvent(viewDto));
+
           }
         }).send();
   }

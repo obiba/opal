@@ -9,12 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.configureview.presenter;
 
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavePendingEvent;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSaveRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.ui.NavTabsPanel;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -31,19 +32,19 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HasHandlers;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.DeckPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
-import com.gwtplatform.mvp.client.proxy.RevealRootPopupContentEvent;
 
-public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewStepPresenter.Display>
-    implements HasHandlers {
+public class ConfigureViewStepPresenter extends ModalPresenterWidget<ConfigureViewStepPresenter.Display>
+    implements HasHandlers, ConfigureViewStepUiHandlers {
 
   private final DataTabPresenter dataTabPresenter;
 
@@ -75,6 +76,7 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
     this.dataTabPresenter = dataTabPresenter;
     this.selectScriptVariablesTabPresenter = selectScriptVariablesTabPresenter;
     this.variablesListTabPresenter = variablesListTabPresenter;
+    getView().setUiHandlers(this);
   }
 
   @Override
@@ -154,7 +156,7 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
   // Inner Classes / Interfaces
   //
 
-  public interface Display extends PopupView {
+  public interface Display extends PopupView, HasUiHandlers<ConfigureViewStepUiHandlers> {
     enum Slots {
       Variables
     }
@@ -192,11 +194,6 @@ public class ConfigureViewStepPresenter extends PresenterWidget<ConfigureViewSte
 
       // Set the variables tab widget according to the received ViewDto type.
       setInSlot(Display.Slots.Variables, getVariablesTabWidget());
-
-      // TODO: migration code below must be verified and if OK line below must be removed
-      //RevealRootPopupContentEvent.fire(getEventBus(), ConfigureViewStepPresenter.this);
-      getEventBus().fireEventFromSource(new RevealRootPopupContentEvent(ConfigureViewStepPresenter.this),
-          ConfigureViewStepPresenter.this);
 
       if(event.getVariable() != null) {
         getView().displayTab(1);
