@@ -169,8 +169,7 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
 
   @Override
   public void addSearchItem(String text) {
-    String qText = text;
-    groups.addItem(qText);
+    groups.addItem(text);
   }
 
   @Override
@@ -187,40 +186,12 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
 
   @Override
   public void setNameError(String message) {
-    clearNameAlert();
-    usernameGroup.setType(ControlGroupType.ERROR);
-    dialog.addAlert(message, AlertType.ERROR, new ClosedHandler() {
-      @Override
-      public void onClosed(ClosedEvent closedEvent) {
-        clearNameAlert();
-      }
-    });
+    dialog.addAlert(message, AlertType.ERROR, usernameGroup);
   }
 
   @Override
   public void setPasswordError(String message) {
-    clearPasswordAlert();
-    passwordGroup.setType(ControlGroupType.ERROR);
-    dialog.addAlert(message, AlertType.ERROR, new ClosedHandler() {
-      @Override
-      public void onClosed(ClosedEvent closedEvent) {
-        clearPasswordAlert();
-      }
-    });
+    dialog.addAlert(message, AlertType.ERROR, passwordGroup);
   }
 
-  @Override
-  public void setError(String message) {
-    dialog.addAlert(message, AlertType.ERROR);
-  }
-
-  private void clearNameAlert() {
-    usernameGroup.setType(ControlGroupType.NONE);
-    dialog.clearAlert();
-  }
-
-  private void clearPasswordAlert() {
-    passwordGroup.setType(ControlGroupType.NONE);
-    dialog.clearAlert();
-  }
 }
