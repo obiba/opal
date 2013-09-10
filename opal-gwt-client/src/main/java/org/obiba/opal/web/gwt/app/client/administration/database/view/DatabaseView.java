@@ -56,7 +56,7 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   private final Widget widget;
 
   @UiField
-  Modal dialog;
+  Modal modal;
 
   @UiField
   ControlGroup nameGroup;
@@ -107,7 +107,7 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   }
 
   private void initWidgets() {
-    dialog.hide();
+    modal.hide();
     properties.getElement().setAttribute("placeholder", translations.keyValueLabel());
 
     driver.addChangeHandler(new ChangeHandler() {
@@ -136,36 +136,38 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
 
   @Override
   public void hideDialog() {
-    dialog.hide();
+    modal.hide();
   }
 
   @Override
   public void setDialogMode(Mode dialogMode) {
     name.setEnabled(Mode.CREATE == dialogMode);
-    dialog.setTitle(Mode.CREATE == dialogMode ? translations.addDatabase() : translations.editDatabase());
+    modal.setTitle(Mode.CREATE == dialogMode ? translations.addDatabase() : translations.editDatabase());
   }
 
   @Override
-  public void showError(FormField formField, String message) {
+  public void showError(@Nullable FormField formField, String message) {
     ControlGroup group = null;
-    switch(formField) {
-      case NAME:
-        group = nameGroup;
-        break;
-      case URL:
-        group = urlGroup;
-        break;
-      case USERNAME:
-        group = usernameGroup;
-        break;
-      case PASSWORD:
-        group = passwordGroup;
-        break;
+    if(formField != null) {
+      switch(formField) {
+        case NAME:
+          group = nameGroup;
+          break;
+        case URL:
+          group = urlGroup;
+          break;
+        case USERNAME:
+          group = usernameGroup;
+          break;
+        case PASSWORD:
+          group = passwordGroup;
+          break;
+      }
     }
-    if(group != null) {
-      dialog.addAlert(message, AlertType.ERROR, group);
+    if(group == null) {
+      modal.addAlert(message, AlertType.ERROR);
     } else {
-      dialog.addAlert(message, AlertType.ERROR);
+      modal.addAlert(message, AlertType.ERROR, group);
     }
   }
 

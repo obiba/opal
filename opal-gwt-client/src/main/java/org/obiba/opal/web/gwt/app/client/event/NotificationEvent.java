@@ -67,15 +67,6 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
     this(notificationType, messages, messageArgs, null);
   }
 
-  private NotificationEvent(NotificationType notificationType, String message, List<String> messageArgs,
-      NotificationCloseHandler notificationCloseHandler) {
-    this(notificationType, Arrays.asList(message), messageArgs, notificationCloseHandler);
-  }
-
-  private NotificationEvent(NotificationType notificationType, String message, List<String> messageArgs) {
-    this(notificationType, message, messageArgs, null);
-  }
-
   //
   // GwtEvent Methods
   //
@@ -133,7 +124,7 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
   }
 
   public List<String> getMessages() {
-    return messages != null ? messages : (messages = new ArrayList<String>());
+    return messages == null ? (messages = new ArrayList<String>()) : messages;
   }
 
   public List<String> getMessageArgs() {
@@ -160,6 +151,7 @@ public class NotificationEvent extends GwtEvent<NotificationEvent.Handler> {
     return new Builder();
   }
 
+  @SuppressWarnings("ParameterHidesMemberVariable")
   public static class Builder {
     private NotificationEvent event;
 

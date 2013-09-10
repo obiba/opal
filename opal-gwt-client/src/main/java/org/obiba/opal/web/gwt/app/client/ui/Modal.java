@@ -8,7 +8,6 @@ import com.github.gwtbootstrap.client.ui.ModalFooter;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.BackdropType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
-import com.github.gwtbootstrap.client.ui.event.CloseHandler;
 import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
 import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
 import com.github.gwtbootstrap.client.ui.event.ShowEvent;
@@ -21,7 +20,6 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -397,7 +395,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   }
 
   public void addAlert(String message, AlertType type) {
-    addAlert(message, type, (ClosedHandler)null);
+    addAlert(message, type, (ClosedHandler) null);
   }
 
   public void addAlert(String message, AlertType type, final ControlGroup group) {

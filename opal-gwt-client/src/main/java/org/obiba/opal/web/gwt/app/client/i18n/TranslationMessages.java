@@ -36,4 +36,8 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Please confirm that you want to remove this attribute:<br />{0}")
   String confirmDeleteAttribute(String name);
 
+  @Description("Unknown Response")
+  @DefaultMessage("Unknown response {0}: {1}")
+  String unknownResponse(String statusText, String text);
+
 }

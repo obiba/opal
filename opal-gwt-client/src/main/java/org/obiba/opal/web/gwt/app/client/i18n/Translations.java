@@ -1863,7 +1863,7 @@ public interface Translations extends Constants {
 
   @Description("Add derived variable Modal title")
   @DefaultStringValue("Add Derived Variable")
-  String addDerivedvariableModalTitle();
+  String addDerivedVariableModalTitle();
 
   @Description("Edit label")
   @DefaultStringValue("Edit")

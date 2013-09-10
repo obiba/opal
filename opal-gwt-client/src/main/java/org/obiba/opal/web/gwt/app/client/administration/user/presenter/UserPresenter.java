@@ -64,7 +64,7 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
   @Override
   public void save() {
 
-    if(dialogMode.equals(Mode.CREATE)) {
+    if(dialogMode == Mode.CREATE) {
       userDto = UserDto.create();
       if(getView().getUserName().isEmpty()) {
         getView().setNameError(translations.userMessageMap().get("UserNameRequiredError"));
@@ -102,7 +102,7 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
     userDto.clearGroupsArray();
     userDto.setGroupsArray(getView().getGroups());
 
-    if(dialogMode.equals(Mode.CREATE)) {
+    if(dialogMode == Mode.CREATE) {
       // Create
       ResourceRequestBuilderFactory.newBuilder()//
           .forResource("/users").withResourceBody(UserDto.stringify(userDto)).accept("application/json")//
