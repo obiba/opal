@@ -185,11 +185,6 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
     });
   }
 
-  private void clearNameAlert() {
-    usernameGroup.setType(ControlGroupType.NONE);
-    dialog.clearAlert();
-  }
-
   @Override
   public void setNameError(String message) {
     clearNameAlert();
@@ -202,11 +197,6 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
     });
   }
 
-  private void clearPasswordAlert() {
-    passwordGroup.setType(ControlGroupType.NONE);
-    dialog.clearAlert();
-  }
-
   @Override
   public void setPasswordError(String message) {
     clearPasswordAlert();
@@ -217,5 +207,20 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
         clearPasswordAlert();
       }
     });
+  }
+
+  @Override
+  public void setError(String message) {
+    dialog.addAlert(message, AlertType.ERROR);
+  }
+
+  private void clearNameAlert() {
+    usernameGroup.setType(ControlGroupType.NONE);
+    dialog.clearAlert();
+  }
+
+  private void clearPasswordAlert() {
+    passwordGroup.setType(ControlGroupType.NONE);
+    dialog.clearAlert();
   }
 }

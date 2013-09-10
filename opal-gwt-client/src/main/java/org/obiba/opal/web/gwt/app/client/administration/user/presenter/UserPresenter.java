@@ -133,7 +133,7 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
               if(response.getStatusCode() == Response.SC_OK) {
                 getEventBus().fireEvent(new UsersRefreshEvent());
               } else {
-//                getView().addAlert(response.getText());
+                getView().setError(response.getText());
               }
             }
           }, Response.SC_OK, Response.SC_PRECONDITION_FAILED, Response.SC_INTERNAL_SERVER_ERROR).put().send();
@@ -189,6 +189,7 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
 
     void setNameError(String message);
 
+    void setError(String message);
   }
 
   private class GroupSuggestionSelectionHandler implements SelectionHandler<SuggestOracle.Suggestion> {
