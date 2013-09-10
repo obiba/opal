@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.app.client.administration.user.view;
 import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserAdministrationUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.ui.NavPillsPanel;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -23,16 +22,15 @@ import org.obiba.opal.web.model.client.opal.UserDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CellTable;
-import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
@@ -42,7 +40,6 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.ListDataProvider;
-import com.gwtplatform.mvp.client.ViewImpl;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 import static com.github.gwtbootstrap.client.ui.constants.IconType.OK;
@@ -58,9 +55,6 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
   private static final Translations translations = GWT.create(Translations.class);
 
   private final Widget uiWidget;
-
-  @UiField
-  NavPillsPanel userGroupPanel;
 
   @UiField
   Button addUser;
@@ -90,17 +84,6 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
   public UserAdministrationView() {
     uiWidget = uiBinder.createAndBindUi(this);
     indexTablePager.setDisplay(usersTable);
-
-    userGroupPanel.addSelectionHandler(new SelectionHandler<Integer>() {
-      @Override
-      public void onSelection(SelectionEvent<Integer> event) {
-        if(event.getSelectedItem() == 0) {
-          getUiHandlers().onUsersSelected();
-        } else {
-          getUiHandlers().onGroupsSelected();
-        }
-      }
-    });
 
     Column<UserDto, String> name = new TextColumn<UserDto>() {
 
@@ -161,13 +144,12 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
         return value.getUsersCount() > 0 ? permissionsActions() : allActions();
       }
     });
-//  }
+
     usersTable.addColumn(name, translations.userNameLabel());
     usersTable.addColumn(groups, translations.userGroupsLabel());
     usersTable.addColumn(status, translations.userStatusLabel());
     usersTable.addColumn(userActions, translations.actionsLabel());
     usersTable.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
-//    indexTable.setColumnWidth(checkboxColumn, 1, Style.Unit.PX);
 
     userDataProvider.addDataDisplay(usersTable);
 
@@ -175,7 +157,17 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
     groupsTable.addColumn(GroupColumns.name, translations.groupNameLabel());
     groupsTable.addColumn(GroupColumns.users, translations.groupUsersLabel());
     groupsTable.addColumn(groupActions, translations.actionsLabel());
+
     groupDataProvider.addDataDisplay(groupsTable);
+  }
+
+  @UiHandler("userGroupPanel")
+  public void onUserGroupSelection(SelectionEvent<Integer> event) {
+    if(event.getSelectedItem() == 0) {
+      getUiHandlers().onUsersSelected();
+    } else {
+      getUiHandlers().onGroupsSelected();
+    }
   }
 
   @Override

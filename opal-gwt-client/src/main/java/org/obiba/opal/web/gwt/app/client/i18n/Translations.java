@@ -377,8 +377,8 @@ public interface Translations extends Constants {
       "DatabaseConnectionFailed", "Failed to connect: {0}.",//
       "NameIsRequired", "A name is required.",//
       "DriverIsRequired", "A driver is required.",//
-      "TypeIsRequired", "Database type is required.",//
-      "MagmaDatasourceTypeIsRequired", "Magma datasource type is required.",//
+      "DatabaseUsageIsRequired", "Database usage is required.",//
+      "SQLSchemaIsRequired", "SQL schema is required.",//
       "LimeSurveyDatabaseIsRequired", "LimeSurvey database is required.",//
       "UrlIsRequired", "A url is required.",//
       "UsernameIsRequired", "A username is required.",//
@@ -418,6 +418,8 @@ public interface Translations extends Constants {
       "UserPasswordMatchError", "Passwords do not match.",//
       "UserDeletedOk", "User {0} has been successfully deleted.", //
       "UserAlreadyExists", "User {0} already exists.", //
+      "UserNameRequiredError", "User name is required.",//
+      "UserPasswordRequiredError", "Password is required.",//
       "GroupDeletedOk", "Group {0} has been successfully deleted.", //
       "ProjectNameRequired", "Project name is required.", //
       "ProjectNameMustBeUnique", "A project already exists with this name.",//
@@ -1854,6 +1856,14 @@ public interface Translations extends Constants {
   @Description("Entity Details Modal title")
   @DefaultStringValue("Entity Details")
   String entityDetailsModalTitle();
+
+  @Description("Configure View Modal title")
+  @DefaultStringValue("Configure View")
+  String configureViewModalTitle();
+
+  @Description("Add derived variable Modal title")
+  @DefaultStringValue("Add Derived Variable")
+  String addDerivedvariableModalTitle();
 
   @Description("Edit label")
   @DefaultStringValue("Edit")

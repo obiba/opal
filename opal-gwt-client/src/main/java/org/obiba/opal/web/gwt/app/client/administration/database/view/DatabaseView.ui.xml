@@ -5,22 +5,25 @@
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <o:Modal ui:field="dialog" resizable="false" closeVisible="true" keyboard="true" animation="false">
-
-    <b:WellForm>
-
+    <b:ControlGroup ui:field="nameGroup">
       <b:ControlLabel for="name">
         <ui:msg description="Name label">Name</ui:msg>
       </b:ControlLabel>
       <b:TextBox ui:field="name" b:id="name"/>
+      <b:HelpBlock>A SQL database must have a unique name.</b:HelpBlock>
+    </b:ControlGroup>
 
+    <b:ControlGroup>
       <b:CheckBox ui:field="defaultStorage">
         <ui:msg description="Default storage label">Default storage</ui:msg>
       </b:CheckBox>
+    </b:ControlGroup>
 
-      <b:ControlLabel for="type">
-        <ui:msg description="Type label">Type</ui:msg>
+    <b:ControlGroup>
+      <b:ControlLabel for="usage">
+        <ui:msg description="Usage label">Usage</ui:msg>
       </b:ControlLabel>
-      <o:Chooser ui:field="type" name="type">
+      <o:Chooser ui:field="usage" name="usage">
         <g:item value="IMPORT">
           <ui:msg description="Import label">Import</ui:msg>
         </g:item>
@@ -31,51 +34,62 @@
           <ui:msg description="Export label">Export</ui:msg>
         </g:item>
       </o:Chooser>
+      <b:HelpBlock>Determine if this database will be proposed at import/export time or as a project's data storage.
+      </b:HelpBlock>
+    </b:ControlGroup>
 
+    <b:ControlGroup>
       <b:ControlLabel for="magmaDatasourceType">
-        <ui:msg description="Magma datasource type label">Magma datasource type</ui:msg>
+        <ui:msg description="SQL Schema label">SQL Schema</ui:msg>
       </b:ControlLabel>
       <o:Chooser ui:field="magmaDatasourceType" name="magmaDatasourceType">
-        <g:item value="hibernate"/>
-        <g:item value="jdbc"/>
-        <g:item value="limesurvey"/>
+        <g:item value="hibernate">Opal SQL</g:item>
+        <g:item value="jdbc">Custom SQL</g:item>
+        <g:item value="limesurvey">Limesurvey</g:item>
       </o:Chooser>
+    </b:ControlGroup>
 
+    <b:ControlGroup>
       <b:ControlLabel for="driver">
         <ui:msg description="Driver label">Driver</ui:msg>
       </b:ControlLabel>
       <o:Chooser ui:field="driver" name="driver"/>
+    </b:ControlGroup>
 
+    <b:ControlGroup ui:field="urlGroup">
       <b:ControlLabel for="url">
         <ui:msg description="Url label">Url</ui:msg>
       </b:ControlLabel>
       <b:TextBox ui:field="url" b:id="url" alternateSize="XLARGE"/>
+    </b:ControlGroup>
 
+    <b:ControlGroup ui:field="usernameGroup">
       <b:ControlLabel for="username">
         <ui:msg description="Username label">Username</ui:msg>
       </b:ControlLabel>
       <b:TextBox ui:field="username" b:id="username"/>
+    </b:ControlGroup>
 
+    <b:ControlGroup ui:field="passwordGroup">
       <b:ControlLabel for="password">
         <ui:msg description="Password label">Password</ui:msg>
       </b:ControlLabel>
       <b:PasswordTextBox ui:field="password" b:id="password"/>
+    </b:ControlGroup>
 
-      <g:DisclosurePanel>
-        <g:customHeader>
-          <g:Label>
-            <ui:msg description="Advanced Options label">Advanced Options</ui:msg>
-          </g:Label>
-        </g:customHeader>
-        <g:FlowPanel>
-          <b:ControlLabel for="properties">
-            <ui:msg description="Properties label">Properties</ui:msg>
-          </b:ControlLabel>
-          <b:TextArea ui:field="properties" b:id="properties"/>
-        </g:FlowPanel>
-      </g:DisclosurePanel>
-
-    </b:WellForm>
+    <g:DisclosurePanel>
+      <g:customHeader>
+        <g:Label>
+          <ui:msg description="Advanced Options label">Advanced Options</ui:msg>
+        </g:Label>
+      </g:customHeader>
+      <g:FlowPanel>
+        <b:ControlLabel for="properties">
+          <ui:msg description="Properties label">Properties</ui:msg>
+        </b:ControlLabel>
+        <b:TextArea ui:field="properties" b:id="properties"/>
+      </g:FlowPanel>
+    </g:DisclosurePanel>
 
     <b:ModalFooter>
       <b:Button ui:field="saveButton" type="PRIMARY">

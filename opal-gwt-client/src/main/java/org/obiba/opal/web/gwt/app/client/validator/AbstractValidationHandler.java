@@ -29,6 +29,7 @@ public abstract class AbstractValidationHandler implements ValidationHandler {
 
   @Override
   public boolean validate() {
+
     List<String> messages = new ArrayList<String>();
     List<String> args = new ArrayList<String>();
 

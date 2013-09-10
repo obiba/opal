@@ -15,10 +15,13 @@ import java.util.Set;
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
+import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -45,7 +48,7 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
 
   private Mode dialogMode;
 
-  private MethodValidationHandler methodValidationHandler;
+  private ValidationHandler methodValidationHandler;
 
   @Inject
   public DatabasePresenter(Display display, EventBus eventBus) {
@@ -83,7 +86,7 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
           }
         }).get().send();
 
-    methodValidationHandler = new MethodValidationHandler(getEventBus());
+    methodValidationHandler = new MethodValidationHandler();
   }
 
   private void setDialogMode(Mode dialogMode) {
@@ -111,14 +114,14 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
   private void displayDatabase(DatabaseDto dto) {
     SqlDatabaseDto sqlDatabaseDto = (SqlDatabaseDto) dto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings);
     getView().getName().setText(dto.getName());
-    getView().getType().setText(dto.getType());
+    getView().getUsage().setText(dto.getType());
     getView().getDriver().setText(sqlDatabaseDto.getDriverClass());
     getView().getDefaultStorage().setValue(dto.getDefaultStorage());
     getView().getUrl().setText(sqlDatabaseDto.getUrl());
     getView().getUsername().setText(sqlDatabaseDto.getUsername());
     getView().getPassword().setText(sqlDatabaseDto.getPassword());
     getView().getProperties().setText(sqlDatabaseDto.getProperties());
-    getView().getMagmaDatasourceType().setText(sqlDatabaseDto.getMagmaDatasourceType());
+    getView().getSQLSchema().setText(sqlDatabaseDto.getMagmaDatasourceType());
   }
 
   private DatabaseDto getDto() {
@@ -126,7 +129,7 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
     SqlDatabaseDto sqlDto = SqlDatabaseDto.create();
 
     dto.setName(getView().getName().getText());
-    dto.setType(getView().getType().getText());
+    dto.setType(getView().getUsage().getText());
     dto.setDefaultStorage(getView().getDefaultStorage().getValue());
 
     sqlDto.setUrl(getView().getUrl().getText());
@@ -134,7 +137,7 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
     sqlDto.setUsername(getView().getUsername().getText());
     sqlDto.setPassword(getView().getPassword().getText());
     sqlDto.setProperties(getView().getProperties().getText());
-    sqlDto.setMagmaDatasourceType(getView().getMagmaDatasourceType().getText());
+    sqlDto.setMagmaDatasourceType(getView().getSQLSchema().getText());
 
     dto.setExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings, sqlDto);
     return dto;
@@ -166,11 +169,7 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
     }
   }
 
-  private class MethodValidationHandler extends AbstractValidationHandler {
-
-    private MethodValidationHandler(EventBus eventBus) {
-      super(eventBus);
-    }
+  private class MethodValidationHandler extends ViewValidationHandler {
 
     private Set<FieldValidator> validators;
 
@@ -178,16 +177,22 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
     protected Set<FieldValidator> getValidators() {
       if(validators == null) {
         validators = new LinkedHashSet<FieldValidator>();
-        validators.add(new RequiredTextValidator(getView().getName(), "NameIsRequired"));
-        validators.add(new RequiredTextValidator(getView().getDriver(), "DriverIsRequired"));
-        validators.add(new RequiredTextValidator(getView().getUrl(), "UrlIsRequired"));
-        validators.add(new RequiredTextValidator(getView().getUsername(), "UsernameIsRequired"));
-        validators.add(new RequiredTextValidator(getView().getType(), "TypeIsRequired"));
-        validators.add(new RequiredTextValidator(getView().getMagmaDatasourceType(), "MagmaDatasourceTypeIsRequired"));
+        validators
+            .add(new RequiredTextValidator(getView().getName(), "NameIsRequired").setId(Display.FormField.NAME.name()));
+        validators
+            .add(new RequiredTextValidator(getView().getUrl(), "UrlIsRequired").setId(Display.FormField.URL.name()));
+        validators.add(new RequiredTextValidator(getView().getUsername(), "UsernameIsRequired")
+            .setId(Display.FormField.USERNAME.name()));
+        validators.add(new RequiredTextValidator(getView().getPassword(), "PasswordIsRequired")
+            .setId(Display.FormField.PASSWORD.name()));
       }
       return validators;
     }
 
+    @Override
+    protected void showMessage(String id, String message) {
+      getView().showError(Display.FormField.valueOf(id), message);
+    }
   }
 
   private class CreateOrUpdateCallBack implements ResponseCodeCallback {
@@ -218,17 +223,26 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
 
   public interface Display extends PopupView, HasUiHandlers<DatabaseUiHandlers> {
 
+    enum FormField {
+      NAME,
+      URL,
+      USERNAME,
+      PASSWORD
+    }
+
     void hideDialog();
 
     void setAvailableDrivers(JsArray<JdbcDriverDto> resource);
 
     void setDialogMode(Mode dialogMode);
 
+    void showError(FormField formField, String message);
+
     HasText getName();
 
-    HasText getType();
+    HasText getUsage();
 
-    HasText getMagmaDatasourceType();
+    HasText getSQLSchema();
 
     HasText getUrl();
 

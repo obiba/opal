@@ -37,9 +37,8 @@ public class ModalProvider<M extends ModalPresenterWidget> implements Provider<M
   private final Provider<M> modalProvider;
   private final EventBus eventBus;
   private PresenterWidget container;
-  private HandlerRegistration handlerRegistration;
 
-  private final Map<M, M> sources = new HashMap<M, M>();
+  private final Map<M, ModalListData<M>> modals = new HashMap<M, ModalListData<M>>();
 
   @Inject
   public ModalProvider(EventBus eventBus, Provider<M> modalProvider) {
@@ -58,10 +57,10 @@ public class ModalProvider<M extends ModalPresenterWidget> implements Provider<M
       throw new NullPointerException("Modal container is not set. Call ModalProvider.setContainer(PresenterWidget)");
     }
 
-    handlerRegistration = eventBus.addHandler(ModalClosedEvent.getType(), new ModalClosedHandler());
+    HandlerRegistration closeHandler = eventBus.addHandler(ModalClosedEvent.getType(), new ModalClosedHandler());
     M modal = modalProvider.get();
     container.addToPopupSlot(modal);
-    sources.put(modal, modal);
+    modals.put(modal, new ModalListData<M>(modal, closeHandler));
     return modal;
   }
 
@@ -69,13 +68,33 @@ public class ModalProvider<M extends ModalPresenterWidget> implements Provider<M
 
     @Override
     public void onModalClosed(ModalClosedEvent event) {
-      handlerRegistration.removeHandler();
-      M modal = sources.get(event.getSource());
+      ModalListData<M> modalListData = modals.get(event.getSource());
 
-      if (modal != null) {
+      if (modalListData != null) {
+        M modal = modalListData.getModal();
+        modalListData.getCloseHandler().removeHandler();
         container.removeFromPopupSlot(modal);
-        sources.remove(modal);
+        modals.remove(modal);
       }
     }
   }
+
+  private class ModalListData<M> {
+    private final M modal;
+    private final HandlerRegistration closeHandler;
+
+    public ModalListData(M modal, HandlerRegistration closeHandler) {
+      this.modal = modal;
+      this.closeHandler = closeHandler;
+    }
+
+    public M getModal() {
+      return modal;
+    }
+
+    public HandlerRegistration getCloseHandler() {
+      return closeHandler;
+    }
+  }
+
 }

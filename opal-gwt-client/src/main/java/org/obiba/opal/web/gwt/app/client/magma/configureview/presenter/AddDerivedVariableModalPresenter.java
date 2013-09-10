@@ -10,42 +10,43 @@
 package org.obiba.opal.web.gwt.app.client.magma.configureview.presenter;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.configureview.event.VariableAddRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidatableWidgetPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.configureview.event.VariableAddRequiredEvent;
 import org.obiba.opal.web.model.client.magma.VariableListViewDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
 public class AddDerivedVariableModalPresenter
-    extends ValidatableWidgetPresenter<AddDerivedVariableModalPresenter.Display> {
+    extends ValidatableWidgetPresenter<AddDerivedVariableModalPresenter.Display>
+    implements AddDerivedVariableModalUiHandlers {
 
-  public interface Display extends PopupView {
+  @Override
+  public void addVariable(String variableName) {
+    getView().hideDialog();
+    getEventBus().fireEvent(new VariableAddRequiredEvent(variableName));
+
+  }
+
+  public interface Display extends PopupView, HasUiHandlers<AddDerivedVariableModalUiHandlers> {
 
     void hideDialog();
-
-    void addVariableSuggestion(String suggestion);
 
     void clearVariableSuggestions();
 
     HasText getVariableName();
-
-    HandlerRegistration addCancelClickHandler(ClickHandler handler);
-
-    HandlerRegistration addAddVariableClickHandler(ClickHandler handler);
   }
 
   @Inject
   public AddDerivedVariableModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
+    getView().setUiHandlers(this);
   }
 
   @Override
@@ -59,8 +60,6 @@ public class AddDerivedVariableModalPresenter
   }
 
   private void addHandlers() {
-    registerHandler(getView().addAddVariableClickHandler(new AddVariableClickHandler()));
-    registerHandler(getView().addCancelClickHandler(new CancelClickHandler()));
     registerHandler(
         getEventBus().addHandler(ViewConfigurationRequiredEvent.getType(), new ViewConfigurationRequiredHandler()));
   }
@@ -81,31 +80,5 @@ public class AddDerivedVariableModalPresenter
 
       refreshVariableNameSuggestions(event.getView());
     }
-
-  }
-
-  private class CancelClickHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent event) {
-      getView().hideDialog();
-    }
-
-  }
-
-  private class AddVariableClickHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent event) {
-      if(validate()) {
-        getView().hideDialog();
-        getEventBus().fireEvent(new VariableAddRequiredEvent(getVariableName()));
-      }
-    }
-
-    private String getVariableName() {
-      return getView().getVariableName().getText();
-    }
-
   }
 }

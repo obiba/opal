@@ -44,12 +44,6 @@ public class OpalBootstrapperImpl implements Bootstrapper {
   RequestCredentials requestCredentials;
 
   @Inject
-  VariablesToViewPresenter variablesToViewPresenter;
-
-  @Inject
-  ConfigureViewStepPresenter configureViewStepPresenter;
-
-  @Inject
   ConfirmationPresenter confirmationPresenter;
 
   @Inject
@@ -78,8 +72,6 @@ public class OpalBootstrapperImpl implements Bootstrapper {
     DefaultResourceAuthorizationRequestBuilder.setup(authorizationCache);
 
     initConfirmationPresenter();
-    initViewWizards();
-    initCopyVariablesPresenter();
 
     ResourceRequestBuilderFactory.<Subject>newBuilder()
         .forResource("/auth/session/" + requestCredentials.extractCredentials() + "/username").get()
@@ -103,14 +95,6 @@ public class OpalBootstrapperImpl implements Bootstrapper {
 
   private void initConfirmationPresenter() {
     confirmationPresenter.bind();
-  }
-
-  private void initViewWizards() {
-    configureViewStepPresenter.bind();
-  }
-
-  private void initCopyVariablesPresenter() {
-    variablesToViewPresenter.bind();
   }
 
   private void registerHandlers() {

@@ -45,8 +45,6 @@ public class AddProjectModalView extends ModalPopupViewWithUiHandlers<AddProject
   @UiField
   HasText descriptionTxt;
 
-  Alert alert;
-
   @Inject
   public AddProjectModalView(EventBus eventBus) {
     super(eventBus);
@@ -75,21 +73,11 @@ public class AddProjectModalView extends ModalPopupViewWithUiHandlers<AddProject
     modal.hide();
   }
 
-  private void clearAlert() {
-    labelGroup.setType(ControlGroupType.NONE);
-    modal.clearAlert();
-  }
-
   @Override
   public void setNameError(String message) {
-    clearAlert();
+    modal.clearAlert();
     labelGroup.setType(ControlGroupType.ERROR);
-    modal.addAlert(message, AlertType.ERROR, new ClosedHandler() {
-      @Override
-      public void onClosed(ClosedEvent closedEvent) {
-        clearAlert();
-      }
-    });
+    modal.addAlert(message, AlertType.ERROR, labelGroup);
   }
 
 }

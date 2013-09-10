@@ -15,8 +15,6 @@ import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.DatabaseDto;
 import org.obiba.opal.web.model.client.opal.SqlDatabaseDto;
 
@@ -30,7 +28,6 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.HasWidgets;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.HasData;
@@ -62,12 +59,6 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
   @UiField
   Panel breadcrumbs;
 
-  @UiField
-  Panel permissionsPanel;
-
-  @UiField
-  Panel permissions;
-
   public DatabaseAdministrationView() {
     uiWidget = uiBinder.createAndBindUi(this);
     databaseTablePager.setDisplay(databaseTable);
@@ -81,14 +72,6 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
   @Override
   public Widget asWidget() {
     return uiWidget;
-  }
-
-  @Override
-  public void setInSlot(Object slot, IsWidget content) {
-    if(slot == Slots.PERMISSIONS) {
-      permissions.clear();
-      permissions.add(content);
-    }
   }
 
   @Override
@@ -109,11 +92,6 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
   @Override
   public HasWidgets getBreadcrumbs() {
     return breadcrumbs;
-  }
-
-  @Override
-  public HasAuthorization getPermissionsAuthorizer() {
-    return new WidgetAuthorizer(permissionsPanel);
   }
 
   private static final class Columns {

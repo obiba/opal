@@ -22,7 +22,7 @@ public class ListBoxItemConditionalValidator implements FieldValidator {
 
   private final FieldValidator delegate;
 
-  private int id = -1;
+  private String id;
 
   //
   // Constructors
@@ -46,13 +46,13 @@ public class ListBoxItemConditionalValidator implements FieldValidator {
     return null;
   }
 
-  public ListBoxItemConditionalValidator setId(int value) {
+  public ListBoxItemConditionalValidator setId(String value) {
     id = value;
     return this;
   }
 
   @Override
-  public int getId() {
+  public String getId() {
     return id;
   }
 }

@@ -74,7 +74,7 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
 
   public interface Display extends PopupView, HasUiHandlers<ReportTemplateUpdateModalUiHandlers> {
 
-    public enum FormField {
+    enum FormField {
       NAME,
       TEMPLE_FILE,
       EMAILS,
@@ -137,7 +137,7 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
 
   private void addValidators() {
     validators.add(new RequiredTextValidator(getView().getName(), "ReportTemplateNameIsRequired")
-        .setId(Display.FormField.TEMPLE_FILE.ordinal()));
+        .setId(Display.FormField.TEMPLE_FILE.name()));
 
     validators.add(new FieldValidator() {
 
@@ -151,14 +151,14 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
       }
 
       @Override
-      public int getId() {
-        return Display.FormField.NAME.ordinal();
+      public String getId() {
+        return Display.FormField.NAME.name();
       }
     });
 
     validators.add(new ConditionalValidator(getView().isScheduled(),
         new RequiredTextValidator(getView().getShedule(), "CronExpressionIsRequired"))
-        .setId(Display.FormField.CRON_EXPRESSION.ordinal()));
+        .setId(Display.FormField.CRON_EXPRESSION.name()));
 
     validators.add(new FieldValidator() {
 
@@ -175,8 +175,8 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
       }
 
       @Override
-      public int getId() {
-        return Display.FormField.EMAILS.ordinal();
+      public String getId() {
+        return Display.FormField.EMAILS.name();
       }
 
     });
@@ -264,7 +264,7 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
       message = validator.validate();
       if(message != null) {
         messages.add(message);
-        validatorIds.add(Display.FormField.values()[validator.getId()]);
+        validatorIds.add(Display.FormField.valueOf(validator.getId()));
       }
     }
 

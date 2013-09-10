@@ -6,7 +6,6 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-
     <b:FluidRow addStyleNames="page-header">
       <b:Column size="9">
         <b:Breadcrumbs ui:field="breadcrumbs"/>
@@ -17,45 +16,10 @@
         </b:Button>
       </b:Column>
     </b:FluidRow>
-
     <g:FlowPanel>
       <b:SimplePager ui:field="databaseTablePager" location="RIGHT"/>
       <o:Table ui:field="databaseTable" width="100%"/>
     </g:FlowPanel>
-
-    <g:FlowPanel ui:field="permissionsPanel" addStyleNames="panel">
-
-      <g:FlowPanel addStyleNames="title">
-        <g:InlineLabel>
-          <ui:msg description="Permissions label">Permissions</ui:msg>
-        </g:InlineLabel>
-
-        <!-- TODO replace this by a popover -->
-        <o:HelpImage imageSize="16" tooltipWidth="500px" tooltipHeight="350px">
-          <g:HTMLPanel>
-            <g:Label addStyleNames="title">
-              <ui:msg description="Database Permissions label">Database Permissions</ui:msg>
-            </g:Label>
-            <p>
-              <ui:msg description="Database Permissions information">
-                Permissions for creating new databases that Opal can then connect to.
-              </ui:msg>
-            </p>
-            <g:Label addStyleNames="title">
-              <ui:msg description="Database Administrators label">Administrators</ui:msg>
-            </g:Label>
-            <p>
-              <ui:msg description="Database Administrators information">
-                Database Administrators are allowed to create new and edit existing databases.
-              </ui:msg>
-            </p>
-          </g:HTMLPanel>
-        </o:HelpImage>
-      </g:FlowPanel>
-
-      <g:SimplePanel ui:field="permissions"/>
-
-    </g:FlowPanel>
-
   </g:FlowPanel>
+
 </ui:UiBinder>

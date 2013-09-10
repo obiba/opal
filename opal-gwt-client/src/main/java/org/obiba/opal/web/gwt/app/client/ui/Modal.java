@@ -3,10 +3,13 @@ package org.obiba.opal.web.gwt.app.client.ui;
 import java.util.Stack;
 
 import com.github.gwtbootstrap.client.ui.Alert;
+import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.ModalFooter;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.BackdropType;
+import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.github.gwtbootstrap.client.ui.event.CloseHandler;
+import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
 import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
 import com.github.gwtbootstrap.client.ui.event.ShowEvent;
 import com.google.gwt.core.client.GWT;
@@ -15,6 +18,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -76,7 +80,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     setDraggable(true);
     setResizable(false);
     History.addValueChangeHandler(new HistoryChangeValueHandler());
-    add(alertPlace = new SimplePanel());
+    add(alertPlace = new FlowPanel());
   }
 
   public void setResizable(boolean resizable) {
@@ -393,15 +397,31 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   }
 
   public void addAlert(String message, AlertType type) {
-    addAlert(message, type, null);
+    addAlert(message, type, (ClosedHandler)null);
+  }
+
+  public void addAlert(String message, AlertType type, final ControlGroup group) {
+    group.setType(ControlGroupType.ERROR);
+    addAlert(message, type, new ClosedHandler() {
+      @Override
+      public void onClosed(ClosedEvent closedEvent) {
+        group.setType(ControlGroupType.NONE);
+      }
+    });
   }
 
   public void addAlert(String message, AlertType type, ClosedHandler handler) {
-    Alert alert = new Alert(message);
+    final Alert alert = new Alert(message);
     alert.setType(type);
     alert.setAnimation(true);
     alert.setClose(true);
     if(handler != null) alert.addClosedHandler(handler);
+    alert.addClosedHandler(new ClosedHandler() {
+      @Override
+      public void onClosed(ClosedEvent closedEvent) {
+        alert.removeFromParent();
+      }
+    });
     addAlert(alert);
   }
 
@@ -430,8 +450,10 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     }
 
     private void push(Modal modal) {
-      if(!modal.hiddenOnStack && currentlyShown.search(modal) == -1) currentlyShown.push(modal);
-      GWT.log("push() :: " + currentlyShown.size());
+      if(!modal.hiddenOnStack && currentlyShown.search(modal) == -1) {
+        currentlyShown.push(modal);
+        GWT.log("push() :: " + currentlyShown.size());
+      }
     }
 
     private void pop(Modal modal) {
@@ -443,7 +465,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
 
       currentlyShown.pop();
 
-      GWT.log("push() :: " + currentlyShown.size());
+      GWT.log("pop() :: " + currentlyShown.size());
     }
 
     public void hideCurrent() {
