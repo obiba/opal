@@ -16,9 +16,11 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreationEvent;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 
+import com.google.gwt.http.client.Request;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
@@ -143,17 +145,20 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
     FileResourceRequest.newBuilder(file.getPath()).withCallback(new ResourceCallback<FileDto>() {
       @Override
       public void onResource(Response response, FileDto resource) {
-        if(response.getStatusCode() == Response.SC_OK) {
-          currentFolder = resource;
-          getView().renderRows(resource);
-          fireEvent(new FolderSelectionChangeEvent(currentFolder));
-        } else if(response.getStatusCode() == Response.SC_NOT_FOUND) {
+        currentFolder = resource;
+        getView().renderRows(resource);
+        fireEvent(new FolderSelectionChangeEvent(currentFolder));
+      }
+    }).withCallback(new ResponseCodeCallback() {
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        if(response.getStatusCode() == Response.SC_NOT_FOUND) {
           fireEvent(NotificationEvent.newBuilder().error("FileNotFound").args(file.getPath()).build());
         } else {
           fireEvent(NotificationEvent.newBuilder().error("FileNotAccessible").args(file.getPath()).build());
         }
       }
-    }).send();
+    }, Response.SC_NOT_FOUND, Response.SC_UNAUTHORIZED, Response.SC_INTERNAL_SERVER_ERROR).send();
 
   }
 }
