@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.core.runtime.security;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,12 +21,12 @@ import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
-import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.User;
 import org.obiba.opal.core.service.impl.UserService;
@@ -62,20 +63,24 @@ public class OrientDbRealm extends AuthorizingRealm {
 
   @Override
   protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-    // Null username is invalid
-    if(principals == null) {
-      throw new AuthorizationException("PrincipalCollection method argument cannot be null.");
-    }
+    Collection<?> thisPrincipals = principals.fromRealm(getName());
+    if(thisPrincipals != null && !thisPrincipals.isEmpty()) {
+      Object primary = thisPrincipals.iterator().next();
+      PrincipalCollection simplePrincipals = new SimplePrincipalCollection(primary, getName());
 
-    Set<String> roleNames = new HashSet<String>();
-    String username = (String) getAvailablePrincipal(principals);
-    User user = userService.getUserWithName(username);
-    if(user != null) {
-      for(Group group : user.getGroups()) {
-        roleNames.add(group.getName());
+      Set<String> roleNames = new HashSet<String>();
+      String username = (String) getAvailablePrincipal(simplePrincipals);
+      User user = userService.getUserWithName(username);
+      if(user != null) {
+        for(Group group : user.getGroups()) {
+          roleNames.add(group.getName());
+        }
       }
+      return new SimpleAuthorizationInfo(roleNames);
+
     }
-    return new SimpleAuthorizationInfo(roleNames);
+    return new SimpleAuthorizationInfo();
+
   }
 
 }
