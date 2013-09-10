@@ -43,7 +43,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.view.client.HasData;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -56,7 +55,8 @@ import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
 public class UserAdministrationPresenter
-    extends ItemAdministrationPresenter<UserAdministrationPresenter.Display, UserAdministrationPresenter.Proxy>  implements UserAdministrationUiHandlers {
+    extends ItemAdministrationPresenter<UserAdministrationPresenter.Display, UserAdministrationPresenter.Proxy>
+    implements UserAdministrationUiHandlers {
 
   @ProxyStandard
   @NameToken(Places.USERS_GROUPS)
@@ -272,7 +272,7 @@ public class UserAdministrationPresenter
 
   public class UserStatusChangeDelegate implements IconActionCell.Delegate<UserDto> {
     @Override
-    public void executeClick(NativeEvent event, final UserDto value) {
+    public void executeClick(NativeEvent event, UserDto value) {
       // Enable/Disable user all groups
       value.setEnabled(!value.getEnabled());
       ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder()//

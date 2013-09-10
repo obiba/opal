@@ -418,6 +418,8 @@ public interface Translations extends Constants {
       "UserPasswordMatchError", "Passwords do not match.",//
       "UserDeletedOk", "User {0} has been successfully deleted.", //
       "UserAlreadyExists", "User {0} already exists.", //
+      "UserNameRequiredError", "User name is required.",//
+      "UserPasswordRequiredError", "Password is required.",//
       "GroupDeletedOk", "Group {0} has been successfully deleted.", //
       "ProjectNameRequired", "Project name is required.", //
       "ProjectNameMustBeUnique", "A project already exists with this name.",//
