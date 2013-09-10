@@ -65,7 +65,7 @@ public class DefaultUserServiceImpl implements UserService {
 
   @Override
   public User getUserWithName(String name) {
-    return orientDbService.uniqueResult("select from User where name = :name", "name", name);
+    return orientDbService.uniqueResult("select from User where name = ?", name);
   }
 
   @Override
@@ -123,7 +123,7 @@ public class DefaultUserServiceImpl implements UserService {
 
   @Override
   public Group getGroupWithName(String name) {
-    return orientDbService.uniqueResult("select from Group where name = :name", "name", name);
+    return orientDbService.uniqueResult("select from Group where name = ?", name);
   }
 
   @Override

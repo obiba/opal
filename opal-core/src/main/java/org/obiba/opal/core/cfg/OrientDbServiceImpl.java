@@ -1,8 +1,6 @@
 package org.obiba.opal.core.cfg;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Arrays;
 
 import javax.annotation.Nullable;
 import javax.persistence.NonUniqueResultException;
@@ -12,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
 import com.orientechnologies.orient.core.db.ODatabase;
 import com.orientechnologies.orient.core.index.OIndexManager;
 import com.orientechnologies.orient.core.index.ONullOutputListener;
@@ -98,49 +98,40 @@ public class OrientDbServiceImpl implements OrientDbService {
   public <T> Iterable<T> list(Class<T> clazz) {
     OObjectDatabaseTx db = getDatabaseDocumentTx();
     try {
-      return db.browseClass(clazz);
+      return detachAll(db.browseClass(clazz), db);
     } finally {
       db.close();
     }
   }
 
   @Override
-  public <T> List<T> list(String sql, Map<String, Object> params) {
+  public <T> Iterable<T> list(String sql, Object... params) {
     OObjectDatabaseTx db = getDatabaseDocumentTx();
     try {
-      return db.command(new OSQLSynchQuery(sql)).execute(params);
+      return detachAll(db.command(new OSQLSynchQuery(sql)).<Iterable<T>>execute(params), db);
     } finally {
       db.close();
     }
   }
 
+  private <T> Iterable<T> detachAll(Iterable<T> iterable, final OObjectDatabaseTx db) {
+    return Iterables.transform(iterable, new Function<T, T>() {
+      @Override
+      public T apply(T input) {
+        return db.detach(input, true);
+      }
+    });
+  }
+
+  @SuppressWarnings("unchecked")
   @Nullable
   @Override
-  public <T> T uniqueResult(String sql, Map<String, Object> params) {
-    OObjectDatabaseTx db = getDatabaseDocumentTx();
+  public <T> T uniqueResult(String sql, Object... params) {
     try {
-      List<T> list = db.command(new OSQLSynchQuery(sql)).execute(params);
-      if(list.size() > 1) throw new NonUniqueResultException();
-      //noinspection RedundantCast
-      return list.isEmpty() ? null : (T) db.detach(list.get(0), true);
-    } finally {
-      db.close();
+      return (T) Iterables.getOnlyElement(list(sql, params), null);
+    } catch(IllegalArgumentException e) {
+      throw new NonUniqueResultException("Non unique result for query " + sql + " with args: " + Arrays.asList(params));
     }
-  }
-
-  @Override
-  public <T> List<T> list(String sql, String paramName, Object paramValue) {
-    Map<String, Object> params = new HashMap<String, Object>();
-    params.put(paramName, paramValue);
-    return list(sql, params);
-  }
-
-  @Nullable
-  @Override
-  public <T> T uniqueResult(String sql, String paramName, Object paramValue) {
-    Map<String, Object> params = new HashMap<String, Object>();
-    params.put(paramName, paramValue);
-    return uniqueResult(sql, params);
   }
 
   @Override

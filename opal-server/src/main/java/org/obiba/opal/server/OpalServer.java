@@ -1,17 +1,18 @@
 package org.obiba.opal.server;
 
-import java.io.IOException;
-
 import org.obiba.opal.core.cfg.OrientDbServiceImpl;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 
-import uk.co.flamingpenguin.jewel.cli.ArgumentValidationException;
 import uk.co.flamingpenguin.jewel.cli.CliFactory;
 
 @SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class OpalServer {
+
+  private static final Logger log = LoggerFactory.getLogger(OpalServer.class);
 
   public interface OpalServerOptions {
 
@@ -94,19 +95,24 @@ public class OpalServer {
     }
   }
 
-  public static void main(String... args) throws ArgumentValidationException, IOException {
-    checkSystemProperty("OPAL_HOME", "OPAL_DIST");
+  public static void main(String... args) throws Exception {
+    try {
+      checkSystemProperty("OPAL_HOME", "OPAL_DIST");
 
-    final OpalServer opal = new OpalServer(CliFactory.parseArguments(OpalServerOptions.class, args));
-    opal.boot();
-    Runtime.getRuntime().addShutdownHook(new Thread() {
-      @Override
-      public void run() {
-        opal.shutdown();
-      }
-    });
-    System.out.println("Opal is attached to this console. Press ctrl-c to stop.");
-    // We can exit the main thread because other non-daemon threads will keep the JVM alive
+      final OpalServer opal = new OpalServer(CliFactory.parseArguments(OpalServerOptions.class, args));
+      opal.boot();
+      Runtime.getRuntime().addShutdownHook(new Thread() {
+        @Override
+        public void run() {
+          opal.shutdown();
+        }
+      });
+      System.out.println("Opal is attached to this console. Press ctrl-c to stop.");
+      // We can exit the main thread because other non-daemon threads will keep the JVM alive
+    } catch(Exception e) {
+      log.error("Exception", e);
+      throw e;
+    }
   }
 
 }

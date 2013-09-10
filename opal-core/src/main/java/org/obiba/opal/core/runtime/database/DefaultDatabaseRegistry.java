@@ -1,8 +1,6 @@
 package org.obiba.opal.core.runtime.database;
 
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -39,6 +37,7 @@ import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
+import com.orientechnologies.orient.core.index.OIndexException;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
@@ -109,7 +108,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @PostConstruct
   public void start() {
     orientDbService.registerEntityClass(Database.class, SqlDatabase.class, MongoDbDatabase.class);
-    orientDbService.createUniqueIndex(Database.class, "name", OType.STRING);
+    // don't create index on abstract base class or it will fail
     orientDbService.createUniqueIndex(SqlDatabase.class, "name", OType.STRING);
     orientDbService.createUniqueIndex(MongoDbDatabase.class, "name", OType.STRING);
   }
@@ -129,8 +128,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Override
   public <T extends Database> Iterable<T> list(@Nonnull Class<T> databaseClass) {
     return orientDbService
-        .list("select from " + databaseClass.getSimpleName() + " where usedForIdentifiers = :usedForIdentifiers",
-            "usedForIdentifiers", false);
+        .list("select from " + databaseClass.getSimpleName() + " where usedForIdentifiers = ?", false);
   }
 
   @Override
@@ -138,17 +136,13 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     if(Strings.isNullOrEmpty(type)) {
       return list();
     }
-    Map<String, Object> params = new HashMap<String, Object>();
-    params.put("usedForIdentifiers", false);
-    params.put("type", type);
-    return orientDbService
-        .list("select from Database where usedForIdentifiers = :usedForIdentifiers and type = :type", params);
+    return orientDbService.list("select from Database where usedForIdentifiers = ? and type = ?", false, type);
   }
 
   @Nullable
   @Override
   public Database getDatabase(@Nonnull String name) {
-    return orientDbService.uniqueResult("select from Database where name = :name", "name", name);
+    return orientDbService.uniqueResult("select from Database where name = ?", name);
   }
 
   @Override
@@ -175,6 +169,8 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
           db.save(database);
         }
       });
+    } catch(OIndexException e) {
+      throw new DatabaseAlreadyExistsException(database.getName());
     } catch(ORecordDuplicatedException e) {
       throw new DatabaseAlreadyExistsException(database.getName());
     }
@@ -233,9 +229,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Nullable
   @Override
   public Database getIdentifiersDatabase() {
-    return orientDbService
-        .uniqueResult("select from Database where usedForIdentifiers = :usedForIdentifiers", "usedForIdentifiers",
-            true);
+    return orientDbService.uniqueResult("select from Database where usedForIdentifiers = ?", true);
   }
 
   @Override

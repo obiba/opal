@@ -1,8 +1,5 @@
 package org.obiba.opal.core.cfg;
 
-import java.util.List;
-import java.util.Map;
-
 import javax.annotation.Nullable;
 
 import com.orientechnologies.orient.core.metadata.schema.OType;
@@ -13,15 +10,10 @@ public interface OrientDbService {
 
   void registerEntityClass(Class<?>... classes);
 
-  <T> List<T> list(String sql, Map<String, Object> params);
-
-  <T> List<T> list(String sql, String paramName, Object paramValue);
+  <T> Iterable<T> list(String sql, Object... params);
 
   @Nullable
-  <T> T uniqueResult(String sql, Map<String, Object> params);
-
-  @Nullable
-  <T> T uniqueResult(String sql, String paramName, Object paramValue);
+  <T> T uniqueResult(String sql, Object... params);
 
   long count(Class<?> clazz);
 
