@@ -96,6 +96,7 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
     getView().setTasksHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.JOBS), 1));
     getView().setDataShieldHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.DATASHIELD), 1));
     getView().setReportsHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.REPORT_TEMPLATES), 1));
+    getView().setJavaHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.JVM), 1));
   }
 
   private PlaceRequest createRequest(String nameToken) {

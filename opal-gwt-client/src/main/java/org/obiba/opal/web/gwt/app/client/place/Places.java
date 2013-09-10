@@ -87,6 +87,10 @@ public final class Places {
 
   public static final Place R_PLACE = new Place(R);
 
+  public static final String JVM = ADMINISTRATION + ".jvm";
+
+  public static final Place JVM_PLACE = new Place(JVM);
+
   public static final class Place extends com.google.gwt.place.shared.Place {
 
     private final String place;
