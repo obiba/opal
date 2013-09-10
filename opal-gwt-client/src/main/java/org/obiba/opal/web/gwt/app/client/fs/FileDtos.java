@@ -9,8 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs;
 
+import java.util.List;
+
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.FileDto.FileType;
+
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 /**
  *
@@ -29,6 +34,57 @@ public class FileDtos {
     return FileDto.FileType.FILE.isFileType(dto.getType());
   }
 
+  public static FileDto users() {
+    return create("home");
+  }
+
+  public static FileDto user(String name) {
+    return Strings.isNullOrEmpty(name) ? users() : create("home", name);
+  }
+
+  public static FileDto projects() {
+    return create("projects");
+  }
+
+  public static FileDto project(String name) {
+    return Strings.isNullOrEmpty(name) ? projects() : create("projects", name);
+  }
+
+  public static FileDto units() {
+    return create("units");
+  }
+
+  public static FileDto unit(String name) {
+    return Strings.isNullOrEmpty(name) ? units() : create("units", name);
+  }
+
+  public static FileDto reports() {
+    return create("reports");
+  }
+
+  public static FileDto report(String name) {
+    return Strings.isNullOrEmpty(name) ? reports() : create("reports", name);
+  }
+
+  public static FileDto create(String... segments) {
+    FileDto file = FileDto.create();
+    file.setType(FileType.FOLDER);
+    if(segments == null || segments.length == 0) {
+      file.setName("");
+      file.setPath("/");
+    } else {
+      file.setName(segments[segments.length - 1]);
+      String path = "";
+      for(String segment : segments) {
+        if(!Strings.isNullOrEmpty(segment)) {
+          path = path + "/" + segment;
+        }
+      }
+      file.setPath(path);
+    }
+    return file;
+  }
+
   public static FileDto getParent(FileDto dto) {
     FileDto parentDto = FileDto.create();
     parentDto.setType(FileType.FOLDER);
@@ -36,6 +92,36 @@ public class FileDtos {
     parentDto.setName(getFolderName(parentDto.getPath()));
     parentDto.setReadable(dto.getReadable());
     return parentDto;
+  }
+
+  public static List<FileDto> getParents(FileDto dto) {
+    String[] segments = getPathSegments(dto);
+    List<FileDto> parents = Lists.newArrayList();
+    if(segments.length == 0) return parents;
+
+    FileDto current = null;
+    for(int i = 0; i < segments.length - 1; i++) {
+      String segment = segments[i];
+      FileDto parentDto = FileDto.create();
+      parentDto.setType(FileType.FOLDER);
+      parentDto.setName(segment);
+      parentDto.setReadable(dto.getReadable());
+      if(current == null) {
+        parentDto.setPath("/");
+      } else if(current.getName().isEmpty()) {
+        parentDto.setPath("/" + segment);
+      } else {
+        parentDto.setPath(current.getPath() + "/" + segment);
+      }
+      parents.add(parentDto);
+      current = parentDto;
+    }
+
+    return parents;
+  }
+
+  public static String[] getPathSegments(FileDto file) {
+    return file.getPath().split("/");
   }
 
   private static String getParentFolderPath(String childPath) {

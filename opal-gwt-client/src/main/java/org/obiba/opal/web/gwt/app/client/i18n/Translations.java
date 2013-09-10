@@ -423,7 +423,9 @@ public interface Translations extends Constants {
       "GroupDeletedOk", "Group {0} has been successfully deleted.", //
       "ProjectNameRequired", "Project name is required.", //
       "ProjectNameMustBeUnique", "A project already exists with this name.",//
-      "ProjectCreationFailed", "The datasource creation has failed: {0}" //
+      "ProjectCreationFailed", "The datasource creation has failed: {0}", //
+      "FileNotFound", "File not found: {0}",//
+      "FileNotAccessible", "File not accessible: {0}"//
   })
   Map<String, String> userMessageMap();
 

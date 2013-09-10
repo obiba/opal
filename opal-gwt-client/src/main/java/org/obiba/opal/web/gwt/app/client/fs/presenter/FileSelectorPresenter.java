@@ -15,10 +15,13 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -38,8 +41,9 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
   public static final Object LEFT = new Object();
 
   public static final Object CENTER = new Object();
+  private final RequestCredentials credentials;
 
-  FileSystemTreePresenter fileSystemTreePresenter;
+  FilePlacesPresenter fileSystemTreePresenter;
 
   FolderDetailsPresenter folderDetailsPresenter;
 
@@ -52,13 +56,14 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
   private final List<SelectionResolver> selectionResolverChain;
 
   @Inject
-  public FileSelectorPresenter(Display display, EventBus eventBus, FileSystemTreePresenter fileSystemTreePresenter,
-      FolderDetailsPresenter folderDetailsPresenter, FileUploadModalPresenter fileUploadModalPresenter) {
+  public FileSelectorPresenter(Display display, EventBus eventBus, FilePlacesPresenter fileSystemTreePresenter,
+      FolderDetailsPresenter folderDetailsPresenter, FileUploadModalPresenter fileUploadModalPresenter, RequestCredentials credentials) {
     super(eventBus, display);
 
     this.fileSystemTreePresenter = fileSystemTreePresenter;
     this.folderDetailsPresenter = folderDetailsPresenter;
     this.fileUploadModalPresenter = fileUploadModalPresenter;
+    this.credentials = credentials;
 
     selectionResolverChain = new ArrayList<SelectionResolver>();
     selectionResolverChain.add(new FileSelectionResolver());
@@ -93,6 +98,8 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
     getView().setNewFilePanelVisible(allowsFileCreation());
     getView().setNewFolderPanelVisible(allowsFolderCreation());
     getView().setDisplaysUploadFile(displaysFiles());
+
+    fireEvent(new FileSelectionChangeEvent(FileDtos.user(credentials.getUsername())));
   }
 
   public void setFileSelectionSource(Object fileSelectionSource) {

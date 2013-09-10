@@ -9,26 +9,35 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.view;
 
+import java.util.List;
+
+import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FilePathPresenter;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
-import com.github.gwtbootstrap.client.ui.Icon;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public class FilePathView extends ViewImpl implements FilePathPresenter.Display {
 
+  private final EventBus eventBus;
+
   private final Breadcrumbs filecrumbs;
 
-  public FilePathView() {
+  @Inject
+  public FilePathView(EventBus eventBus) {
     filecrumbs = new Breadcrumbs();
+    this.eventBus = eventBus;
   }
 
   @Override
@@ -37,29 +46,35 @@ public class FilePathView extends ViewImpl implements FilePathPresenter.Display 
   }
 
   @Override
-  public void setFile(FileDto file) {
-    String[] segments = file.getPath().split("/");
+  public void setFile(final FileDto file) {
     filecrumbs.clear();
-    if(segments.length == 0) {
+    List<FileDto> parents = FileDtos.getParents(file);
+    if(parents.isEmpty()) {
       NavLink link = new NavLink();
       link.setIcon(IconType.HDD);
       filecrumbs.add(link);
       // need this otherwise root icon does not show up
       filecrumbs.add(new NavLink());
     } else {
-      for(String segment : segments) {
-        NavLink link = new NavLink(segment);
-        if(Strings.isNullOrEmpty(segment)) {
-          link.setIcon(IconType.HDD);
-        }
-        filecrumbs.add(link);
-        link.addClickHandler(new ClickHandler() {
-          @Override
-          public void onClick(ClickEvent event) {
-            // TODO UiHandler callback
-          }
-        });
+      for(final FileDto parent : parents) {
+        addFileLink(parent);
       }
+      addFileLink(file);
     }
+  }
+
+  private void addFileLink(final FileDto file) {
+    GWT.log("[" + file.getName() + "] [" + file.getPath() + "]");
+    NavLink link = new NavLink(file.getName());
+    if(Strings.isNullOrEmpty(file.getName())) {
+      link.setIcon(IconType.HDD);
+    }
+    filecrumbs.add(link);
+    link.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        eventBus.fireEvent(new FileSelectionChangeEvent(file));
+      }
+    });
   }
 }

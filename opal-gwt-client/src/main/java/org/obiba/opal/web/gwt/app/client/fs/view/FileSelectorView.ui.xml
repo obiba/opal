@@ -5,18 +5,6 @@
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <ui:style>
-    .inline {
-      display: inline;
-    }
-
-    .left-aligned {
-      float: left;
-    }
-
-    .right-aligned {
-      float: right;
-    }
-
     .left-margin {
       padding-left: 5px;
     }

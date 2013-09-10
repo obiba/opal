@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreationEvent;
@@ -55,12 +55,9 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
    */
   private FileDto currentFolder;
 
-  private final RequestCredentials credentials;
-
   @Inject
-  public FolderDetailsPresenter(Display display, EventBus eventBus, RequestCredentials credentials) {
+  public FolderDetailsPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
-    this.credentials = credentials;
   }
 
   @Override
@@ -72,7 +69,7 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
       public void onFileSelection(FileDto fileDto) {
         if(!fileDto.getType().isFileType(FileType.FILE) && fileDto.getReadable()) {
           getEventBus().fireEvent(new FolderSelectionChangeEvent(fileDto));
-          updateTable(fileDto.getPath());
+          updateTable(fileDto);
         }
       }
     });
@@ -89,13 +86,14 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
 
     }));
 
-    registerHandler(getEventBus().addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(),
-        new FileSystemTreeFolderSelectionChangeEvent.Handler() {
+    registerHandler(
+        getEventBus().addHandler(FileSelectionChangeEvent.getType(), new FileSelectionChangeEvent.Handler() {
 
           @Override
-          public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
-            updateTable(event.getFolder().getPath());
+          public void onFileSelectionChange(FileSelectionChangeEvent event) {
+            updateTable(event.getFile());
           }
+
         }));
 
     registerHandler(getEventBus().addHandler(FileUploadedEvent.getType(), new FileUploadedEvent.Handler() {
@@ -103,7 +101,7 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
       @Override
       public void onFileUploaded(FileUploadedEvent event) {
         // Refresh the current folder since a new file was probably added to it.
-        updateTable(currentFolder.getPath());
+        updateTable(currentFolder);
       }
     }));
 
@@ -112,28 +110,14 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
       @Override
       public void onFolderCreation(FolderCreationEvent event) {
         getEventBus().fireEvent(new FolderSelectionChangeEvent(event.getFolder()));
-        updateTable(event.getFolder().getPath());
+        updateTable(event.getFolder());
       }
     }));
   }
 
   @Override
-  public void onReveal() {
-
-    if(currentFolder != null) {
-      updateTable(currentFolder.getPath());
-    } else {
-      updateTable(getDefaultPath());
-    }
-  }
-
-  @Override
-  public void onReset() {
-    updateTable(getDefaultPath());
-  }
-
-  private String getDefaultPath() {
-    return credentials.getUsername() == null ? "/" : "/home/" + credentials.getUsername();
+  protected void onReveal() {
+    if(currentFolder != null) getAndUpdateTable(currentFolder);
   }
 
   public FileDto getCurrentFolder() {
@@ -148,16 +132,26 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
     return getView().getTableSelectionModel().getSelectedObject();
   }
 
-  private void updateTable(String path) {
-    getView().clearSelection();
+  private void updateTable(final FileDto file) {
+    currentFolder = file;
+    if(!isVisible()) return;
+    getAndUpdateTable(file);
+  }
 
-    FileResourceRequest.newBuilder(getEventBus()).path(path).withCallback(new ResourceCallback<FileDto>() {
+  private void getAndUpdateTable(final FileDto file) {
+    getView().clearSelection();
+    FileResourceRequest.newBuilder(file.getPath()).withCallback(new ResourceCallback<FileDto>() {
       @Override
-      public void onResource(Response response, FileDto file) {
-        currentFolder = file;
-        getView().renderRows(file);
-        getEventBus().fireEvent(new FolderSelectionChangeEvent(currentFolder));
-        getEventBus().fireEvent(new FileSelectionChangeEvent(currentFolder));
+      public void onResource(Response response, FileDto resource) {
+        if(response.getStatusCode() == Response.SC_OK) {
+          currentFolder = resource;
+          getView().renderRows(resource);
+          fireEvent(new FolderSelectionChangeEvent(currentFolder));
+        } else if(response.getStatusCode() == Response.SC_NOT_FOUND) {
+          fireEvent(NotificationEvent.newBuilder().error("FileNotFound").args(file.getPath()).build());
+        } else {
+          fireEvent(NotificationEvent.newBuilder().error("FileNotAccessible").args(file.getPath()).build());
+        }
       }
     }).send();
 

@@ -12,6 +12,8 @@ package org.obiba.opal.web.gwt.app.client.project.presenter;
 
 import java.util.Arrays;
 
+import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
@@ -49,7 +51,7 @@ import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 
 public class ProjectPresenter extends Presenter<ProjectPresenter.Display, ProjectPresenter.Proxy>
     implements ProjectUiHandlers, DatasourceSelectionChangeEvent.Handler, TableSelectionChangeEvent.Handler,
-    VariableSelectionChangeEvent.Handler {
+    VariableSelectionChangeEvent.Handler, FileSelectionChangeEvent.Handler {
 
   public interface Display extends View, HasUiHandlers<ProjectUiHandlers>, HasTabPanel {
 
@@ -119,6 +121,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     addRegisteredHandler(DatasourceSelectionChangeEvent.getType(), this);
     addRegisteredHandler(TableSelectionChangeEvent.getType(), this);
     addRegisteredHandler(VariableSelectionChangeEvent.getType(), this);
+    addRegisteredHandler(FileSelectionChangeEvent.getType(), this);
   }
 
   @Override
@@ -205,7 +208,12 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       fileExplorerPresenter = fileExplorerPresenterProvider.get();
       setInSlot(FILES_PANE, fileExplorerPresenter);
     }
-    // TODO set project to home the first time tab is visited for this project
+    fileExplorerPresenter.showProject(name);
+    if(Strings.isNullOrEmpty(path)) {
+      fireEvent(new FileSelectionChangeEvent(FileDtos.project(name)));
+    } else {
+      fireEvent(new FileSelectionChangeEvent(FileDtos.create(path.split("/"))));
+    }
   }
 
   private void onAdminTabSelected() {
@@ -233,6 +241,11 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     if(event.getSource() == this) return;
     updateHistory(new MagmaPath.Builder().datasource(event.getDatasourceName()).table(event.getTableName())
         .variable(event.getVariableName()).build());
+  }
+
+  @Override
+  public void onFileSelectionChange(FileSelectionChangeEvent event) {
+    updateHistory(event.getFile().getPath());
   }
 
   private void updateHistory(String queryPathParam) {

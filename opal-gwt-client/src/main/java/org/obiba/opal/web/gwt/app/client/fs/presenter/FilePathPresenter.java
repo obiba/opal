@@ -10,8 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
 import com.google.inject.Inject;

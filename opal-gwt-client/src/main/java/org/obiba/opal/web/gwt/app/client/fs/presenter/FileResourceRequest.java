@@ -29,29 +29,23 @@ public class FileResourceRequest {
   private FileResourceRequest() {
   }
 
-  public FileResourceRequest(EventBus eventBus, String path, ResourceCallback<FileDto> callback) {
-    this.eventBus = eventBus;
-    this.path = path;
-    this.callback = callback;
-  }
-
   public void send() {
     String resource = "/files/_meta" + path + "/";
     ResourceRequestBuilderFactory.<FileDto>newBuilder().forResource(resource).get()//
         .withCallback(callback).send();
   }
 
-  public static Builder newBuilder(EventBus eventBus) {
-    return new Builder(eventBus);
+  public static Builder newBuilder(String path) {
+    return new Builder(path);
   }
 
   public static class Builder {
 
     private final FileResourceRequest request;
 
-    protected Builder(EventBus eventBus) {
+    protected Builder(String path) {
       request = new FileResourceRequest();
-      request.eventBus = eventBus;
+      request.path = path;
     }
 
     public Builder path(String path) {

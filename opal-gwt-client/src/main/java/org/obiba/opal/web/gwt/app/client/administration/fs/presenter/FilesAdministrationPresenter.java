@@ -11,19 +11,15 @@ package org.obiba.opal.web.gwt.app.client.administration.fs.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
+import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileResourceRequest;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.opal.FileDto;
 
-import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.View;
@@ -44,8 +40,6 @@ public class FilesAdministrationPresenter
   private final FileExplorerPresenter fileExplorerPresenter;
 
   private final BreadcrumbsBuilder breadcrumbsBuilder;
-
-  private FileDto currentFolder;
 
   @Inject
   public FilesAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy, RequestCredentials credentials,
@@ -83,27 +77,8 @@ public class FilesAdministrationPresenter
 
   @Override
   public void onReveal() {
-    if(currentFolder == null) {
-      updateTable(getDefaultPath());
-    } else {
-      updateTable(currentFolder.getPath());
-    }
+    fireEvent(new FileSelectionChangeEvent(FileDtos.user(credentials.getUsername())));
     breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs()).build();
-  }
-
-  private void updateTable(String path) {
-    FileResourceRequest.newBuilder(getEventBus()).path(path).withCallback(new ResourceCallback<FileDto>() {
-      @Override
-      public void onResource(Response response, FileDto file) {
-        currentFolder = file;
-        getEventBus().fireEvent(new FolderSelectionChangeEvent(currentFolder));
-        getEventBus().fireEvent(new FileSelectionChangeEvent(currentFolder));
-      }
-    }).send();
-  }
-
-  private String getDefaultPath() {
-    return credentials.getUsername() == null ? "/" : "/home/" + credentials.getUsername();
   }
 
   public interface Display extends View, HasBreadcrumbs {

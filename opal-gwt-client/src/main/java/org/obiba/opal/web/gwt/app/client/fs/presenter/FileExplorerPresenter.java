@@ -9,14 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileSystemTreeFolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRefreshedEvent;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -39,7 +38,7 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
 
   private final FilePathPresenter filePathPresenter;
 
-  private final FileSystemTreePresenter fileSystemTreePresenter;
+  private final FilePlacesPresenter filePlacesPresenter;
 
   private final FolderDetailsPresenter folderDetailsPresenter;
 
@@ -52,16 +51,20 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public FileExplorerPresenter(Display display, EventBus eventBus, FilePathPresenter filePathPresenter,
-      FileSystemTreePresenter fileSystemTreePresenter, FolderDetailsPresenter folderDetailsPresenter,
+      FilePlacesPresenter filePlacesPresenter, FolderDetailsPresenter folderDetailsPresenter,
       ModalProvider<FileUploadModalPresenter> fileUploadModalProvider,
       ModalProvider<CreateFolderModalPresenter> createFolderModalProvider) {
     super(eventBus, display);
     this.filePathPresenter = filePathPresenter;
-    this.fileSystemTreePresenter = fileSystemTreePresenter;
+    this.filePlacesPresenter = filePlacesPresenter;
     this.folderDetailsPresenter = folderDetailsPresenter;
     this.fileUploadModalProvider = fileUploadModalProvider.setContainer(this);
     this.createFolderModalProvider = createFolderModalProvider.setContainer(this);
     getView().setUiHandlers(this);
+  }
+
+  public void showProject(String project) {
+    filePlacesPresenter.showProject(project);
   }
 
   @Override
@@ -80,7 +83,7 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
       case CENTER:
         return folderDetailsPresenter;
       case LEFT:
-        return fileSystemTreePresenter;
+        return filePlacesPresenter;
     }
     return null;
   }
@@ -141,16 +144,6 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
               authorizeFile(event.getFile());
             }
           }
-        }));
-
-    registerHandler(getEventBus().addHandler(FileSystemTreeFolderSelectionChangeEvent.getType(),
-        new FileSystemTreeFolderSelectionChangeEvent.Handler() {
-
-          @Override
-          public void onFolderSelectionChange(FileSystemTreeFolderSelectionChangeEvent event) {
-            setEnableFileDeleteButton();
-          }
-
         }));
 
     registerHandler(getEventBus().addHandler(FolderRefreshedEvent.getType(), new FolderRefreshedEvent.Handler() {
