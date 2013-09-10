@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.AddPrincipalHandler;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityModalPresenter;
@@ -67,10 +68,12 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     Provider<IndexPresenter> mockIndexProvider = createMock(Provider.class);
     ModalProvider<EntityModalPresenter> modalEntityModalPresenter = createMock(ModalProvider.class);
     ModalProvider<ValueSequencePopupPresenter> modalProviderValueSequence = createMock(ModalProvider.class);
+    ModalProvider<ConfigureViewStepPresenter> modalConfigureViewStepProvider = createMock(ModalProvider.class);
 
     ValuesTablePresenter values = new ValuesTablePresenter(null, null, modalProviderValueSequence,
         modalEntityModalPresenter);
-    presenter = new TablePresenter(displayMock, new CountingEventBus(), values, mockProvider, mockIndexProvider);
+    presenter = new TablePresenter(displayMock, new CountingEventBus(), values, mockProvider, mockIndexProvider,
+        modalConfigureViewStepProvider);
   }
 
   @SuppressWarnings({ "unchecked", "OverlyLongMethod" })

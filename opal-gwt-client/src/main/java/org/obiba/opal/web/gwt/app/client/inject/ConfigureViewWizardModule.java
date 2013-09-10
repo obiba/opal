@@ -39,7 +39,7 @@ public class ConfigureViewWizardModule extends AbstractPresenterModule {
 
   @Override
   protected void configure() {
-    bindSingletonPresenterWidget(ConfigureViewStepPresenter.class, ConfigureViewStepPresenter.Display.class,
+    bindPresenterWidget(ConfigureViewStepPresenter.class, ConfigureViewStepPresenter.Display.class,
         ConfigureViewStepView.class);
 
     bindPresenterWidget(AddDerivedVariableModalPresenter.class, AddDerivedVariableModalPresenter.Display.class,

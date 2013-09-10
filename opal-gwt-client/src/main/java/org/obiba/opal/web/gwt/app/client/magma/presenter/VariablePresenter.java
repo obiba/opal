@@ -24,6 +24,8 @@ import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEv
 import org.obiba.opal.web.gwt.app.client.magma.event.SummaryRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveVariablePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -58,7 +60,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private final Provider<AuthorizationPresenter> authorizationPresenter;
 
-
+  private final ModalProvider<VariablesToViewPresenter> variablesToViewProvider;
 
   private VariableDto variable;
 
@@ -68,12 +70,15 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   @Inject
   public VariablePresenter(Display display, EventBus eventBus, ValuesTablePresenter valuesTablePresenter,
-      SummaryTabPresenter summaryTabPresenter, ScriptEditorPresenter scriptEditorPresenter, Provider<AuthorizationPresenter> authorizationPresenter) {
+      SummaryTabPresenter summaryTabPresenter, ScriptEditorPresenter scriptEditorPresenter,
+      Provider<AuthorizationPresenter> authorizationPresenter,
+      ModalProvider<VariablesToViewPresenter> variablesToViewProvider) {
     super(eventBus, display);
     this.valuesTablePresenter = valuesTablePresenter;
     this.summaryTabPresenter = summaryTabPresenter;
     this.authorizationPresenter = authorizationPresenter;
     this.scriptEditorPresenter = scriptEditorPresenter;
+    this.variablesToViewProvider = variablesToViewProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -244,9 +249,10 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   @Override
   public void onAddToView() {
-    List<VariableDto> list = new ArrayList<VariableDto>();
-    list.add(variable);
-    getEventBus().fireEvent(new CopyVariablesToViewEvent(table, list));
+    List<VariableDto> variables = new ArrayList<VariableDto>();
+    variables.add(variable);
+    VariablesToViewPresenter variablesToViewPresenter = variablesToViewProvider.get();
+    variablesToViewPresenter.initialize(table, variables);
   }
 
   @Override

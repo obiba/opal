@@ -20,6 +20,7 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
@@ -97,7 +98,7 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
   private final SummaryTabPresenter summaryPresenter;
 
-  private final AddDerivedVariableModalPresenter addDerivedVariableModalPresenter;
+  private final ModalProvider<AddDerivedVariableModalPresenter> addDerivedVariableModalProvider;
 
   /**
    * Widget for entering, and testing, the "select" script.
@@ -124,11 +125,11 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
   @Inject
   @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
   public VariablesListTabPresenter(Display display, EventBus eventBus, SummaryTabPresenter summaryPresenter,
-      AddDerivedVariableModalPresenter addDerivedVariableModalPresenter, ScriptEditorPresenter scriptEditorPresenter,
+      ModalProvider<AddDerivedVariableModalPresenter> addDerivedVariableModalProvider, ScriptEditorPresenter scriptEditorPresenter,
       CategoriesPresenter categoriesPresenter, AttributesPresenter attributesPresenter) {
     super(eventBus, display);
     this.summaryPresenter = summaryPresenter;
-    this.addDerivedVariableModalPresenter = addDerivedVariableModalPresenter;
+    this.addDerivedVariableModalProvider = addDerivedVariableModalProvider.setContainer(this);
     this.scriptEditorPresenter = scriptEditorPresenter;
     this.categoriesPresenter = categoriesPresenter;
     this.attributesPresenter = attributesPresenter;
@@ -151,7 +152,6 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
   @Override
   protected void onUnbind() {
     super.onUnbind();
-    addDerivedVariableModalPresenter.unbind();
     summaryPresenter.unbind();
   }
 
@@ -480,8 +480,10 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
 
     @Override
     public void onClick(ClickEvent event) {
-      addDerivedVariableModalPresenter.getView().getVariableName().setText("");
-      addToPopupSlot(addDerivedVariableModalPresenter);
+      AddDerivedVariableModalPresenter addDerivedVariableModalPresenter = addDerivedVariableModalProvider.get();
+      if (viewDto != null) {
+        addDerivedVariableModalPresenter.refreshVariableNameSuggestions(viewDto);
+      }
     }
   }
 
@@ -799,7 +801,6 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
       getView().navigationEnabled(true);
       updateSelectedVariableName();
       if(getVariableList().size() > 0) getView().removeButtonEnabled(true);
-      addDerivedVariableModalPresenter.refreshVariableNameSuggestions(viewDto);
     }
 
   }

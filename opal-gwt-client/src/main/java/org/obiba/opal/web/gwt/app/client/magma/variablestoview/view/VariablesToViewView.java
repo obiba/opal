@@ -15,32 +15,33 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewUiHandlers;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
+import org.obiba.opal.web.gwt.app.client.ui.Chooser;
+import org.obiba.opal.web.gwt.app.client.ui.EditableListBox;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsVariableCopyColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ConstantActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.EditableColumn;
-import org.obiba.opal.web.gwt.app.client.ui.EditableListBox;
-import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
-import org.obiba.opal.web.gwt.app.client.ui.Chooser;
-import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.CheckBox;
+import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.cell.client.TextInputCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.cellview.client.SimplePager;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Panel;
@@ -48,31 +49,26 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.PopupViewImpl;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 
 /**
  *
  */
-public class VariablesToViewView extends PopupViewImpl implements VariablesToViewPresenter.Display {
+public class VariablesToViewView extends ModalPopupViewWithUiHandlers<VariablesToViewUiHandlers>
+    implements VariablesToViewPresenter.Display {
 
   private static final int SCRIPT_MAX_LENGTH = 150;
 
-  @UiTemplate("VariablesToViewView.ui.xml")
-  interface ViewUiBinder extends UiBinder<DialogBox, VariablesToViewView> {}
+  private final Widget widget;
+
+  interface ViewUiBinder extends UiBinder<Widget, VariablesToViewView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
   private static final Translations translations = GWT.create(Translations.class);
 
   @UiField
-  DialogBox dialog;
-
-  @UiField
-  DockLayoutPanel contentLayout;
-
-  @UiField
-  ResizeHandle resizeHandle;
+  Modal dialog;
 
   @UiField
   Chooser datasourceListBox;
@@ -123,16 +119,19 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
   @Inject
   public VariablesToViewView(EventBus eventBus) {
     super(eventBus);
-    uiBinder.createAndBindUi(this);
+    widget = uiBinder.createAndBindUi(this);
 
     initWidgets();
     addHandlers();
   }
 
-  private void initWidgets() {
-    dialog.setText(translations.addVariablesToViewTitle());
-    resizeHandle.makeResizable(contentLayout);
+  @Override
+  public void hideDialog() {
+    dialog.hide();
+  }
 
+  private void initWidgets() {
+    dialog.setTitle(translations.addVariablesToViewTitle());
     addTableColumns();
   }
 
@@ -271,7 +270,7 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
 
   @Override
   public Widget asWidget() {
-    return dialog;
+    return widget;
   }
 
   @Override
@@ -284,9 +283,19 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
     center();
   }
 
-  @Override
-  public void hideDialog() {
-    dialog.hide();
+  @UiHandler("saveButton")
+  public void onSaveButtonClicked(ClickEvent event) {
+    getUiHandlers().saveVariable();
+  }
+
+  @UiHandler("cancelButton")
+  public void onCacelButtonClicked(ClickEvent event) {
+    hideDialog();
+  }
+
+  @UiHandler("renameWithNumber")
+  public void onRenameButtonClicked(ClickEvent event) {
+    getUiHandlers().rename();
   }
 
   @Override
@@ -298,16 +307,6 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
     datasourceListBox.setSelectedValue(name);
     this.datasources = datasources;
     if(datasources.length() > 0) displayViewsFor(name);
-  }
-
-  @Override
-  public HasClickHandlers getSaveButton() {
-    return saveButton;
-  }
-
-  @Override
-  public HasClickHandlers getCancelButton() {
-    return cancelButton;
   }
 
   @Override
@@ -371,11 +370,6 @@ public class VariablesToViewView extends PopupViewImpl implements VariablesToVie
   @Override
   public boolean isRenameSelected() {
     return renameWithNumber.getValue();
-  }
-
-  @Override
-  public HasClickHandlers getRenameButton() {
-    return renameWithNumber;
   }
 
   @Override
