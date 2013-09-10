@@ -23,7 +23,6 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.UserDto;
 
-import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.logical.shared.SelectionEvent;
@@ -68,13 +67,13 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
     if(dialogMode.equals(Mode.CREATE)) {
       userDto = UserDto.create();
       if(getView().getUserName().isEmpty()) {
-        getView().addAlert(translations.userMessageMap().get("UserNameRequiredError"), AlertType.ERROR);
+        getView().setNameError(translations.userMessageMap().get("UserNameRequiredError"));
         return;
       }
 
       // Password must be set when creating a user
       if(getView().getPassword().isEmpty() || getView().getConfirmPassword().isEmpty()) {
-        getView().addAlert(translations.userMessageMap().get("UserPasswordRequiredError"), AlertType.ERROR);
+        getView().setPasswordError(translations.userMessageMap().get("UserPasswordRequiredError"));
         return;
       }
 
@@ -84,15 +83,13 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
     // Update password only when password is not empty (to allow updating groups only)
     if(!getView().getPassword().isEmpty()) {
       if(getView().getPassword().length() < MIN_PASSWORD_LENGTH) {
-        getView().addAlert(TranslationsUtils
+        getView().setPasswordError(TranslationsUtils
             .replaceArguments(translations.userMessageMap().get("UserPasswordLengthError"),
-                Arrays.asList(String.valueOf(MIN_PASSWORD_LENGTH))), AlertType.ERROR);
-        getView().setPasswordError(true);
+                Arrays.asList(String.valueOf(MIN_PASSWORD_LENGTH))));
         return;
       }
       if(!getView().getPassword().equals(getView().getConfirmPassword())) {
-        getView().addAlert(translations.userMessageMap().get("UserPasswordMatchError"), AlertType.ERROR);
-        getView().setPasswordError(true);
+        getView().setPasswordError(translations.userMessageMap().get("UserPasswordMatchError"));
         return;
       }
 
@@ -116,9 +113,9 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
                 getEventBus().fireEvent(new UsersRefreshEvent());
                 getView().hideDialog();
               } else if(response.getStatusCode() == Response.SC_CONFLICT) {
-                getView().addAlert(TranslationsUtils
+                getView().setNameError(TranslationsUtils
                     .replaceArguments(translations.userMessageMap().get("UserAlreadyExists"),
-                        Arrays.asList(userDto.getName())), AlertType.ERROR);
+                        Arrays.asList(userDto.getName())));
               } else {
                 getView().hideDialog();
                 getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
@@ -136,7 +133,7 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
               if(response.getStatusCode() == Response.SC_OK) {
                 getEventBus().fireEvent(new UsersRefreshEvent());
               } else {
-                getView().addAlert(response.getText(), AlertType.ERROR);
+//                getView().addAlert(response.getText());
               }
             }
           }, Response.SC_OK, Response.SC_PRECONDITION_FAILED, Response.SC_INTERNAL_SERVER_ERROR).put().send();
@@ -184,13 +181,13 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
 
     String getConfirmPassword();
 
-    void setPasswordError(boolean b);
+    void setPasswordError(String message);
 
     void addSearchItem(String text);
 
     HandlerRegistration addSearchSelectionHandler(SelectionHandler<SuggestOracle.Suggestion> handler);
 
-    void addAlert(String message, AlertType type);
+    void setNameError(String message);
 
   }
 

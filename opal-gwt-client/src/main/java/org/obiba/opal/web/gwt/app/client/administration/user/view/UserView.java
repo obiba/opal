@@ -20,9 +20,13 @@ import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.SuggestListBox;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.PasswordTextBox;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
+import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
+import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -67,7 +71,13 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
   SuggestListBox groups;
 
   @UiField
+  ControlGroup usernameGroup;
+
+  @UiField
   TextBox userName;
+
+  @UiField
+  ControlGroup passwordGroup;
 
   @UiField
   PasswordTextBox password;
@@ -123,14 +133,6 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
   }
 
   @Override
-  public void setPasswordError(boolean b) {
-    if(b) {
-      password.addStyleName("error");
-      confirmPassword.addStyleName("error");
-    }
-  }
-
-  @Override
   public JsArrayString getGroups() {
     JsArrayString g = JsArrayString.createArray().cast();
     for(String s : groups.getSelectedItemsTexts()) {
@@ -183,9 +185,37 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
     });
   }
 
-  @Override
-  public void addAlert(String message, AlertType type) {
+  private void clearNameAlert() {
+    usernameGroup.setType(ControlGroupType.NONE);
     dialog.clearAlert();
-    dialog.addAlert(message, type);
+  }
+
+  @Override
+  public void setNameError(String message) {
+    clearNameAlert();
+    usernameGroup.setType(ControlGroupType.ERROR);
+    dialog.addAlert(message, AlertType.ERROR, new ClosedHandler() {
+      @Override
+      public void onClosed(ClosedEvent closedEvent) {
+        clearNameAlert();
+      }
+    });
+  }
+
+  private void clearPasswordAlert() {
+    passwordGroup.setType(ControlGroupType.NONE);
+    dialog.clearAlert();
+  }
+
+  @Override
+  public void setPasswordError(String message) {
+    clearPasswordAlert();
+    passwordGroup.setType(ControlGroupType.ERROR);
+    dialog.addAlert(message, AlertType.ERROR, new ClosedHandler() {
+      @Override
+      public void onClosed(ClosedEvent closedEvent) {
+        clearPasswordAlert();
+      }
+    });
   }
 }
