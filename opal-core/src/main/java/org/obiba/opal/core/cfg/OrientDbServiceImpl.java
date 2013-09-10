@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
+import com.orientechnologies.common.exception.OException;
 import com.orientechnologies.orient.core.db.ODatabase;
 import com.orientechnologies.orient.core.index.OIndexManager;
 import com.orientechnologies.orient.core.index.ONullOutputListener;
@@ -79,16 +80,16 @@ public class OrientDbServiceImpl implements OrientDbService {
   }
 
   @Override
-  public <T> T execute(OrientDbTransactionCallback<T> action) {
+  public <T> T execute(OrientDbTransactionCallback<T> action) throws OException {
     OObjectDatabaseTx db = getDatabaseDocumentTx();
     try {
       db.begin(OTransaction.TXTYPE.OPTIMISTIC);
       T t = action.doInTransaction(db);
       db.commit();
       return t;
-    } catch(Exception e) {
+    } catch(OException e) {
       db.rollback();
-      throw new RuntimeException(e);
+      throw e;
     } finally {
       db.close();
     }
@@ -130,7 +131,8 @@ public class OrientDbServiceImpl implements OrientDbService {
     try {
       return (T) Iterables.getOnlyElement(list(sql, params), null);
     } catch(IllegalArgumentException e) {
-      throw new NonUniqueResultException("Non unique result for query " + sql + " with args: " + Arrays.asList(params));
+      throw new NonUniqueResultException(
+          "Non unique result for query '" + sql + "' with args: " + Arrays.asList(params));
     }
   }
 
