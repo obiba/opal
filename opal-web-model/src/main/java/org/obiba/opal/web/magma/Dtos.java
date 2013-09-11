@@ -557,7 +557,7 @@ public final class Dtos {
     db.setDefaultStorage(dto.getDefaultStorage());
     db.setDescription(dto.getDescription());
     db.setName(dto.getName());
-    db.setType(Database.Type.valueOf(dto.getType()));
+    db.setUsage(Database.Usage.valueOf(dto.getUsage()));
     db.setUsedForIdentifiers(dto.getUsedForIdentifiers());
   }
 
@@ -591,7 +591,7 @@ public final class Dtos {
     builder.setDefaultStorage(db.isDefaultStorage());
     builder.setEditable(db.isEditable());
     builder.setUsedForIdentifiers(db.isUsedForIdentifiers());
-    builder.setType(db.getType().name());
+    builder.setUsage(db.getUsage().name());
     if(db instanceof SqlDatabase) {
       return builder.setExtension(Opal.SqlDatabaseDto.settings, asDto((SqlDatabase) db)).build();
     }

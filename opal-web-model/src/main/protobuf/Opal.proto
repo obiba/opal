@@ -81,7 +81,7 @@ message DatabaseDto {
   optional string description = 2;
   optional bool editable = 3 [default = true];
   required bool defaultStorage = 4 [default = false];
-  required string type = 5; // IMPORT|STORAGE|EXPORT
+  required string usage = 5; // IMPORT|STORAGE|EXPORT
   optional bool usedForIdentifiers = 6;
   extensions 1000 to max;
 }

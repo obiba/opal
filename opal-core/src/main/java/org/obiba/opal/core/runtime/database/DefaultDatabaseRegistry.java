@@ -234,7 +234,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   @Override
   public Datasource createStorageMagmaDatasource(String datasourceName, Database database) {
-    Preconditions.checkArgument(database.getType() == Database.Type.STORAGE,
+    Preconditions.checkArgument(database.getUsage() == Database.Usage.STORAGE,
         "Cannot create datasource for non storage database " + database.getName());
 
     if(database instanceof SqlDatabase) {

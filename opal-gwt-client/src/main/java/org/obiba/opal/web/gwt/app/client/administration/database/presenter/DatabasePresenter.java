@@ -122,7 +122,7 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
   private void displayDatabase(DatabaseDto dto) {
     SqlDatabaseDto sqlDatabaseDto = (SqlDatabaseDto) dto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings);
     getView().getName().setText(dto.getName());
-    getView().getUsage().setText(dto.getType());
+    getView().getUsage().setText(dto.getUsage());
     getView().getDriver().setText(sqlDatabaseDto.getDriverClass());
     getView().getDefaultStorage().setValue(dto.getDefaultStorage());
     getView().getUrl().setText(sqlDatabaseDto.getUrl());
@@ -137,7 +137,7 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
     SqlDatabaseDto sqlDto = SqlDatabaseDto.create();
 
     dto.setName(getView().getName().getText());
-    dto.setType(getView().getUsage().getText());
+    dto.setUsage(getView().getUsage().getText());
     dto.setDefaultStorage(getView().getDefaultStorage().getValue());
 
     sqlDto.setUrl(getView().getUrl().getText());

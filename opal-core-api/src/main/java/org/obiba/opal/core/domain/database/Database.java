@@ -8,7 +8,7 @@ import com.google.common.base.Objects;
 
 public abstract class Database extends AbstractTimestamped {
 
-  public enum Type {
+  public enum Usage {
     IMPORT, STORAGE, EXPORT
   }
 
@@ -16,7 +16,7 @@ public abstract class Database extends AbstractTimestamped {
   private String name;
 
   @Nonnull
-  private Type type;
+  private Usage usage;
 
   private String description;
 
@@ -60,12 +60,12 @@ public abstract class Database extends AbstractTimestamped {
   }
 
   @Nonnull
-  public Type getType() {
-    return type;
+  public Usage getUsage() {
+    return usage;
   }
 
-  public void setType(@Nonnull Type type) {
-    this.type = type;
+  public void setUsage(@Nonnull Usage usage) {
+    this.usage = usage;
   }
 
   public boolean isUsedForIdentifiers() {
@@ -91,7 +91,7 @@ public abstract class Database extends AbstractTimestamped {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).add("defaultStorage", defaultStorage).add("name", name).add("type", type)
+    return Objects.toStringHelper(this).add("defaultStorage", defaultStorage).add("name", name).add("usage", usage)
         .add("description", description).add("editable", editable).add("usedForIdentifiers", usedForIdentifiers)
         .toString();
   }
@@ -132,8 +132,8 @@ public abstract class Database extends AbstractTimestamped {
       return builder;
     }
 
-    public TBuilder type(Type type) {
-      database.setType(type);
+    public TBuilder usage(Usage usage) {
+      database.setUsage(usage);
       return builder;
     }
 
