@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
 import com.google.inject.Inject;
@@ -38,6 +39,15 @@ public class FilePathPresenter extends PresenterWidget<FilePathPresenter.Display
             getView().setFile(event.getFile());
           }
 
+        }));
+
+    registerHandler(
+        getEventBus().addHandler(FolderSelectionChangeEvent.getType(), new FolderSelectionChangeEvent.Handler() {
+
+          @Override
+          public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
+            getView().setFile(event.getFolder());
+          }
         }));
   }
 

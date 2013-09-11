@@ -41,7 +41,7 @@
 
     <b:FluidRow>
       <b:Column size="2">
-        <g:ScrollPanel ui:field="fileSystemTreePanel">
+        <g:ScrollPanel ui:field="filePlacesPanel">
         </g:ScrollPanel>
       </b:Column>
       <b:Column size="10">

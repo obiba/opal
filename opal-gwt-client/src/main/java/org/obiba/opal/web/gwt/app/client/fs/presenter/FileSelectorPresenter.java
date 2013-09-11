@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -34,18 +35,18 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
+import com.gwtplatform.mvp.client.PresenterWidget;
 
 public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPresenter.Display>
     implements FileSelectorUiHandlers {
 
-  public static final Object LEFT = new Object();
-
-  public static final Object CENTER = new Object();
   private final RequestCredentials credentials;
 
-  FilePlacesPresenter fileSystemTreePresenter;
+  private final FilePathPresenter filePathPresenter;
 
-  FolderDetailsPresenter folderDetailsPresenter;
+  private final FilePlacesPresenter filePlacesPresenter;
+
+  private final FolderDetailsPresenter folderDetailsPresenter;
 
   FileUploadModalPresenter fileUploadModalPresenter;
 
@@ -56,11 +57,12 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
   private final List<SelectionResolver> selectionResolverChain;
 
   @Inject
-  public FileSelectorPresenter(Display display, EventBus eventBus, FilePlacesPresenter fileSystemTreePresenter,
-      FolderDetailsPresenter folderDetailsPresenter, FileUploadModalPresenter fileUploadModalPresenter, RequestCredentials credentials) {
+  public FileSelectorPresenter(Display display, EventBus eventBus, FilePathPresenter filePathPresenter,
+      FilePlacesPresenter filePlacesPresenter, FolderDetailsPresenter folderDetailsPresenter,
+      FileUploadModalPresenter fileUploadModalPresenter, RequestCredentials credentials) {
     super(eventBus, display);
-
-    this.fileSystemTreePresenter = fileSystemTreePresenter;
+    this.filePathPresenter = filePathPresenter;
+    this.filePlacesPresenter = filePlacesPresenter;
     this.folderDetailsPresenter = folderDetailsPresenter;
     this.fileUploadModalPresenter = fileUploadModalPresenter;
     this.credentials = credentials;
@@ -80,26 +82,60 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
     setFileSelectionType(event.getFileSelectionType());
   }
 
+  public void showProject(String project) {
+    filePlacesPresenter.showProject(project);
+  }
+
+  public FileDto getCurrentFolder() {
+    return folderDetailsPresenter.getCurrentFolder();
+  }
+
+  public FileDto getSelectedFile() {
+    return folderDetailsPresenter.getSelectedFile();
+  }
+
+  public void clearSelection() {
+    folderDetailsPresenter.getView().clearSelection();
+  }
+
   @Override
   protected void onBind() {
-    setInSlot(LEFT, fileSystemTreePresenter);
-    setInSlot(CENTER, folderDetailsPresenter);
+    super.onBind();
+    for(SplitPaneWorkbenchPresenter.Slot slot : SplitPaneWorkbenchPresenter.Slot.values()) {
+      setInSlot(slot, getDefaultPresenter(slot));
+    }
+  }
+
+  protected PresenterWidget<?> getDefaultPresenter(SplitPaneWorkbenchPresenter.Slot slot) {
+    switch(slot) {
+      case TOP:
+        return filePathPresenter;
+      case CENTER:
+        return folderDetailsPresenter;
+      case LEFT:
+        return filePlacesPresenter;
+    }
+    return null;
+  }
+
+  private void setDisplaysFiles(boolean displaysFiles) {
+    folderDetailsPresenter.getView().setDisplaysFiles(displaysFiles);
   }
 
   @Override
   public void onReveal() {
     // Clear previous state.
-    folderDetailsPresenter.getView().clearSelection(); // clear previous selection (highlighted row)
+    clearSelection(); // clear previous selection (highlighted row)
     getView().clearNewFileName(); // clear previous new file name
     getView().clearNewFolderName(); // clear previous new folder name
 
     // Adjust display based on file selection type.
-    folderDetailsPresenter.getView().setDisplaysFiles(displaysFiles());
+    setDisplaysFiles(displaysFiles());
     getView().setNewFilePanelVisible(allowsFileCreation());
     getView().setNewFolderPanelVisible(allowsFolderCreation());
     getView().setDisplaysUploadFile(displaysFiles());
 
-    fireEvent(new FileSelectionChangeEvent(FileDtos.user(credentials.getUsername())));
+    folderDetailsPresenter.setCurrentFolder(FileDtos.user(credentials.getUsername()));
   }
 
   public void setFileSelectionSource(Object fileSelectionSource) {
@@ -150,17 +186,13 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
         .withCallback(500, callbackHandler).send();
   }
 
-  private FileDto getCurrentFolder() {
-    return folderDetailsPresenter.getCurrentFolder();
-  }
-
   @Nullable
   public FileSelection getSelection() {
     FileSelection selection = null;
 
     for(SelectionResolver resolver : selectionResolverChain) {
-      FileDto currentFolder = folderDetailsPresenter.getCurrentFolder();
-      FileDto currentSelection = folderDetailsPresenter.getSelectedFile();
+      FileDto currentFolder = getCurrentFolder();
+      FileDto currentSelection = getSelectedFile();
 
       resolver.resolveSelection(fileSelectionType, currentFolder.getPath(),
           currentSelection == null ? null : currentSelection.getPath(), getView().getNewFileName());

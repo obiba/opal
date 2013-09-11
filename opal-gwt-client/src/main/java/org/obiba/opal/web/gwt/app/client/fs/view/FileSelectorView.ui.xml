@@ -4,63 +4,30 @@
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <ui:style>
-    .left-margin {
-      padding-left: 5px;
-    }
-
-    .right-margin {
-      padding-right: 5px;
-    }
-
-    .top-margin {
-      padding-top: 0.5em;
-    }
-
-    .bottom-margin {
-      padding-bottom: 5px;
-      border-bottom: #BBBBBB 1px solid;
-    }
-
-    .name-input {
-      width: 90%;
-    }
-  </ui:style>
-  <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false">
+  <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false" minWidth="800">
     <g:FlowPanel ui:field="content">
-      <g:FlowPanel>
-        <g:HTMLPanel ui:field="namePanel"
-            addStyleNames="{style.top-margin} {style.bottom-margin} {style.left-margin} {style.right-margin}">
-          <g:InlineLabel>
-            <ui:msg description="Name label">Name</ui:msg>
-          </g:InlineLabel>
-          :
-          <b:TextBox ui:field="newFileName" addStyleNames="{style.name-input}"/>
-        </g:HTMLPanel>
-
-        <b:FluidRow>
-          <b:Column size="3">
-            <g:ScrollPanel ui:field="fileSystemTreePanel">
-            </g:ScrollPanel>
-          </b:Column>
-          <b:Column size="9">
-            <g:ScrollPanel ui:field="folderDetailsPanel">
-            </g:ScrollPanel>
-          </b:Column>
-        </b:FluidRow>
-      </g:FlowPanel>
+      <b:TextBox ui:field="newFileName" visible="false"/>
+      <g:SimplePanel ui:field="filePathPanel"/>
+      <b:FluidRow>
+        <b:Column size="2">
+          <g:ScrollPanel ui:field="filePlacesPanel">
+          </g:ScrollPanel>
+        </b:Column>
+        <b:Column size="10">
+          <g:ScrollPanel ui:field="folderDetailsPanel">
+          </g:ScrollPanel>
+        </b:Column>
+      </b:FluidRow>
     </g:FlowPanel>
     <b:ModalFooter>
       <g:FlowPanel addStyleNames="pull-left">
-        <g:FlowPanel ui:field="createFolderPanel">
-          <b:Controls>
-            <b:TextBox ui:field="createFolderName" addStyleNames="inline-block"/>
-            <b:Button ui:field="createFolderButton">
-              <ui:msg description="Create Folder button label">Create Folder</ui:msg>
-            </b:Button>
-          </b:Controls>
-        </g:FlowPanel>
-        <b:Button ui:field="uploadButton">
+        <b:Controls ui:field="createFolderPanel" addStyleNames="inline-block">
+          <b:TextBox ui:field="createFolderName" addStyleNames="inline-block"/>
+          <b:Button ui:field="createFolderButton">
+            <ui:msg description="Create Folder button label">Create Folder</ui:msg>
+          </b:Button>
+        </b:Controls>
+        <b:Button ui:field="uploadButton" addStyleNames="indent">
           <ui:msg description="Upload File label">Upload</ui:msg>
         </b:Button>
       </g:FlowPanel>

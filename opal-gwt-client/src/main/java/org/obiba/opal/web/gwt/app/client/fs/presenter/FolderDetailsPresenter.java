@@ -126,6 +126,10 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
     return currentFolder;
   }
 
+  public void setCurrentFolder(FileDto currentFolder) {
+    this.currentFolder = currentFolder;
+  }
+
   public boolean hasSelection() {
     return getView().getTableSelectionModel().getSelectedObject() != null;
   }

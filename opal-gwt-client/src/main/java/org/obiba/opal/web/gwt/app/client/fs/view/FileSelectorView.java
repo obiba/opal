@@ -13,6 +13,7 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 
@@ -61,16 +62,16 @@ public class FileSelectorView extends ModalPopupViewWithUiHandlers<FileSelectorU
   Panel content;
 
   @UiField
-  HTMLPanel namePanel;
-
-  @UiField
   TextBox newFileName;
 
   @UiField
-  ScrollPanel fileSystemTreePanel;
+  Panel filePathPanel;
 
   @UiField
-  ScrollPanel folderDetailsPanel;
+  Panel filePlacesPanel;
+
+  @UiField
+  Panel folderDetailsPanel;
 
   @UiField
   Panel createFolderPanel;
@@ -95,22 +96,32 @@ public class FileSelectorView extends ModalPopupViewWithUiHandlers<FileSelectorU
     super(eventBus);
     uiBinder.createAndBindUi(this);
 
-    content.setHeight(DIALOG_HEIGHT);
-    content.setWidth(DIALOG_WIDTH);
+    //content.setHeight(DIALOG_HEIGHT);
+    //content.setWidth(DIALOG_WIDTH);
 
     dialog.setTitle(translations.fileSelectorTitle());
-    dialog.setHeight(DIALOG_HEIGHT);
-    dialog.setWidth(DIALOG_WIDTH);
+    //dialog.setHeight(DIALOG_HEIGHT);
+    //dialog.setWidth(DIALOG_WIDTH);
   }
 
-  private void updateHeight(String height) {
-    dialog.setHeight(height);
-    content.setHeight(height);
-  }
+//  private void updateHeight(String height) {
+//    dialog.setHeight(height);
+//    content.setHeight(height);
+//  }
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {
-    HasWidgets panel = slot == FileSelectorPresenter.LEFT ? fileSystemTreePanel : folderDetailsPanel;
+    HasWidgets panel;
+    switch((SplitPaneWorkbenchPresenter.Slot) slot) {
+      case TOP:
+        panel = filePathPanel;
+        break;
+      case LEFT:
+        panel = filePlacesPanel;
+        break;
+      default:
+        panel = folderDetailsPanel;
+    }
     panel.clear();
     if(content != null) {
       panel.add(content.asWidget());
@@ -124,8 +135,8 @@ public class FileSelectorView extends ModalPopupViewWithUiHandlers<FileSelectorU
 
   @Override
   public void setNewFilePanelVisible(boolean visible) {
-    namePanel.setVisible(visible);
-    updateHeight(visible ? DIALOG_HEIGHT : DIALOG_SHORT_HEIGHT);
+    //newFileName.setVisible(visible);
+    //updateHeight(visible ? DIALOG_HEIGHT : DIALOG_SHORT_HEIGHT);
   }
 
   @Override

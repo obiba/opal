@@ -125,7 +125,6 @@ public class FolderDetailsView extends ViewImpl implements Display {
 
   private void initTable() {
     addTableColumns();
-    table.addStyleName("folder-details");
     table.setSelectionModel(new SingleSelectionModel<FileDto>());
   }
 

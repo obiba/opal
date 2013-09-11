@@ -36,7 +36,7 @@ public class FileExplorerView extends ViewWithUiHandlers<FileExplorerUiHandlers>
   Panel filePathPanel;
 
   @UiField
-  Panel fileSystemTreePanel;
+  Panel filePlacesPanel;
 
   @UiField
   Panel folderDetailsPanel;
@@ -66,7 +66,7 @@ public class FileExplorerView extends ViewWithUiHandlers<FileExplorerUiHandlers>
         panel = filePathPanel;
         break;
       case LEFT:
-        panel = fileSystemTreePanel;
+        panel = filePlacesPanel;
         break;
       default:
         panel = folderDetailsPanel;
