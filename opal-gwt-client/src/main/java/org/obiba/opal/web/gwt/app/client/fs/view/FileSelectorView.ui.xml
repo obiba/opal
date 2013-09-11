@@ -23,11 +23,11 @@
       <g:FlowPanel addStyleNames="pull-left">
         <b:Controls ui:field="createFolderPanel" addStyleNames="inline-block">
           <b:TextBox ui:field="createFolderName" addStyleNames="inline-block"/>
-          <b:Button ui:field="createFolderButton">
+          <b:Button ui:field="createFolderButton" addStyleNames="bottom-margin">
             <ui:msg description="Create Folder button label">Create Folder</ui:msg>
           </b:Button>
         </b:Controls>
-        <b:Button ui:field="uploadButton" addStyleNames="indent">
+        <b:Button ui:field="uploadButton" addStyleNames="indent bottom-margin">
           <ui:msg description="Upload File label">Upload</ui:msg>
         </b:Button>
       </g:FlowPanel>
