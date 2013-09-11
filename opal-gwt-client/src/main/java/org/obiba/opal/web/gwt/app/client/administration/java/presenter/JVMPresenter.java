@@ -11,20 +11,19 @@ package org.obiba.opal.web.gwt.app.client.administration.java.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
-import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserPresenter;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
-import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.opal.UserDto;
+import org.obiba.opal.web.model.client.opal.OpalEnv;
+import org.obiba.opal.web.model.client.opal.OpalStatus;
 
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.Timer;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.View;
@@ -36,24 +35,29 @@ import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
 public class JVMPresenter extends ItemAdministrationPresenter<JVMPresenter.Display, JVMPresenter.Proxy> {
 
+  private static final int DELAY_MILLIS = 2000;
+
+  private Timer timer;
+
   @ProxyStandard
   @NameToken(Places.JVM)
   public interface Proxy extends ProxyPlace<JVMPresenter> {}
 
-  private final ModalProvider<UserPresenter> userModalProvider;
+  public interface Display extends View, HasBreadcrumbs {
 
-  private Runnable removeConfirmation;
+    void renderProperties(OpalEnv env);
 
-  public interface Display extends View, HasBreadcrumbs {}
+    void renderStatus(OpalStatus status);
+
+    void initCharts();
+  }
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
   @Inject
-  public JVMPresenter(Display display, EventBus eventBus, Proxy proxy, ModalProvider<UserPresenter> userModalProvider,
-      DefaultBreadcrumbsBuilder breadcrumbsHelper) {
+  public JVMPresenter(Display display, EventBus eventBus, Proxy proxy, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     this.breadcrumbsHelper = breadcrumbsHelper;
-    this.userModalProvider = userModalProvider.setContainer(this);
   }
 
   @ProxyEvent
@@ -65,14 +69,28 @@ public class JVMPresenter extends ItemAdministrationPresenter<JVMPresenter.Displ
 
   @Override
   public String getName() {
-    return translations.indicesLabel();
+    return "JVM";
   }
 
   @Override
   protected void onReveal() {
     super.onReveal();
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
-//    getView().getUsersTable().setVisibleRange(0, 10);
+    getView().initCharts();
+
+    timer = new Timer() {
+      @Override
+      public void run() {
+        pollStatus();
+      }
+    };
+    timer.scheduleRepeating(DELAY_MILLIS);
+  }
+
+  @Override
+  protected void onHide() {
+    super.onHide();
+    timer.cancel();
   }
 
   @Override
@@ -101,15 +119,17 @@ public class JVMPresenter extends ItemAdministrationPresenter<JVMPresenter.Displ
     @Override
     public void authorized() {
 
-      // Fetch all users
-      ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder()//
-          .forResource("/system/env").withCallback(new ResourceCallback<JsArray<UserDto>>() {
+      // Fetch all system environment properties
+      ResourceRequestBuilderFactory.<OpalEnv>newBuilder()//
+          .forResource("/system/env").withCallback(new ResourceCallback<OpalEnv>() {
 
         @Override
-        public void onResource(Response response, JsArray<UserDto> resource) {
-//          getView().renderUserRows(resource);
+        public void onResource(Response response, OpalEnv resource) {
+          getView().renderProperties(resource);
         }
       }).get().send();
+
+      pollStatus();
     }
 
     @Override
@@ -117,4 +137,17 @@ public class JVMPresenter extends ItemAdministrationPresenter<JVMPresenter.Displ
     }
   }
 
+  private void pollStatus() {
+    // Fetch system status
+    ResourceRequestBuilderFactory.<OpalStatus>newBuilder()//
+        .forResource("/system/status").withCallback(new ResourceCallback<OpalStatus>() {
+
+      @Override
+      public void onResource(Response response, OpalStatus resource) {
+        if(response.getStatusCode() == Response.SC_OK) {
+          getView().renderStatus(resource);
+        }
+      }
+    }).get().send();
+  }
 }
