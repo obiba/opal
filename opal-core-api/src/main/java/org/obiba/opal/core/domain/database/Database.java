@@ -20,6 +20,10 @@ public abstract class Database extends AbstractTimestamped {
 
   private String description;
 
+  /**
+   * Flag to indicate if this database configuration can be modified:
+   * if it has a Magma Datasource plugged on it, it won't be editable.
+   */
   private boolean editable = true;
 
   private boolean defaultStorage;
