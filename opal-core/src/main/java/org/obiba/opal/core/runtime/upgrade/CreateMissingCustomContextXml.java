@@ -26,7 +26,7 @@ import com.google.common.io.Files;
  */
 public class CreateMissingCustomContextXml extends AbstractUpgradeStep {
 
-  private final Logger log = LoggerFactory.getLogger(getClass());
+  private static final Logger log = LoggerFactory.getLogger(CreateMissingCustomContextXml.class);
 
   @Value("${OPAL_HOME}/conf/custom-context.xml")
   private String filePath;
@@ -36,7 +36,7 @@ public class CreateMissingCustomContextXml extends AbstractUpgradeStep {
     File file = new File(filePath);
     if(file.exists()) return;
 
-    log.info("Create missing config file " + filePath);
+    log.info("Create missing config file {}", filePath);
     try {
       Files.write(
           "<beans xmlns=\"http://www.springframework.org/schema/beans\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +

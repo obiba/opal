@@ -24,8 +24,7 @@ public class OpalServer {
     setProperties();
 
     //TODO remove this static access when restarting embedded server will work
-    OrientDbServiceImpl.start(
-        OrientDbServiceImpl.getUrl(OrientDbServiceImpl.PATH.replace("${OPAL_HOME}", System.getProperty("OPAL_HOME"))));
+    OrientDbServiceImpl.start(OrientDbServiceImpl.URL.replace("${OPAL_HOME}", System.getProperty("OPAL_HOME")));
 
     upgrade();
     start();

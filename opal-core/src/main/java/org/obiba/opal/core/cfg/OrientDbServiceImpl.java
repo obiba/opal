@@ -31,10 +31,10 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   private static final Logger log = LoggerFactory.getLogger(OrientDbServiceImpl.class);
 
-  public static final String PATH = "${OPAL_HOME}/data/orientdb/opal-config";
+  public static final String URL = "local:${OPAL_HOME}/data/orientdb/opal-config";
 
-  @Value(PATH)
-  private String path;
+  @Value(URL)
+  private String url;
 
   //  @Value("${org.obiba.opal.config.username}")
   private String username = "admin";
@@ -44,15 +44,35 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   private static OServer server;
 
+  // test for https://github.com/orientechnologies/orientdb/issues/1667
+  @SuppressWarnings("UseOfSystemOutOrSystemErr")
+  public static void main(String[] args) throws Exception {
+    System.setProperty("ORIENTDB_HOME", "/home/cthiebault/orientdb");
+
+    System.out.println("ORIENTDB_HOME: " + System.getProperty("ORIENTDB_HOME"));
+    for(int i = 0; i < 5; i++) {
+      System.out.println("Iteration " + i);
+      OServer server = OServerMain.create()
+          .startup(OrientDbServiceImpl.class.getResourceAsStream("/orientdb-server-config.xml")).activate();
+      // create database if does not exist
+      ODatabase database = new OObjectDatabaseTx("local:" + System.getProperty("ORIENTDB_HOME") + "/config-db");
+      if(!database.exists()) database.create();
+      database.close();
+
+      server.shutdown();
+    }
+  }
+
   //  @PostConstruct
   public static void start(String url) {
     log.info("Start OrientDB server ({})", url);
+    System.setProperty("ORIENTDB_HOME", URL);
     try {
-      server = OServerMain.create()
-          .startup(OrientDbServiceImpl.class.getResourceAsStream("/orientdb-server-config.xml")).activate();
-      server = new OServer().startup().activate();
+      server = new OServer() //
+          .startup(OrientDbServiceImpl.class.getResourceAsStream("/orientdb-server-config.xml")) //
+          .activate();
 
-      // create database
+      // create database if does not exist
       ODatabase database = new OObjectDatabaseTx(url);
       if(!database.exists()) {
         database.create();
@@ -63,14 +83,6 @@ public class OrientDbServiceImpl implements OrientDbService {
       log.error("Cannot start OrientDB server", e);
       throw new RuntimeException("Cannot start OrientDB server", e);
     }
-  }
-
-  private String getUrl() {
-    return getUrl(path);
-  }
-
-  public static String getUrl(String path) {
-    return "local:" + path;
   }
 
   //  @PreDestroy
@@ -174,7 +186,7 @@ public class OrientDbServiceImpl implements OrientDbService {
   }
 
   private OObjectDatabaseTx getDatabaseDocumentTx() {
-    return OObjectDatabasePool.global().acquire(getUrl(), username, password);
+    return OObjectDatabasePool.global().acquire(url, username, password);
   }
 
 }
