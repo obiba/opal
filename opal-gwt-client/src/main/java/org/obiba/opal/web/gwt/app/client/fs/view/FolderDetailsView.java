@@ -18,10 +18,13 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsPresenter.FileSelectionHandler;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FolderDetailsUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.ValueRenderingHelper;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.DateTimeColumn;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.FileDto.FileType;
@@ -30,40 +33,42 @@ import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SingleSelectionModel;
-import com.gwtplatform.mvp.client.ViewImpl;
+import com.google.gwt.view.client.ListDataProvider;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-public class FolderDetailsView extends ViewImpl implements Display {
+public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandlers> implements Display {
 
-  @UiTemplate("FolderDetailsView.ui.xml")
-  interface FolderDetailsUiBinder extends UiBinder<Widget, FolderDetailsView> {}
-
-  private static final FolderDetailsUiBinder uiBinder = GWT.create(FolderDetailsUiBinder.class);
-
-  private final Widget widget;
+  interface Binder extends UiBinder<Widget, FolderDetailsView> {}
 
   @UiField
-  CellTable<FileDto> table;
+  Table<FileDto> table;
+
+  private CheckboxColumn<FileDto> checkColumn;
 
   private FileNameColumn fileNameColumn;
 
   private final Translations translations = GWT.create(Translations.class);
 
+  private final ListDataProvider<FileDto> dataProvider = new ListDataProvider<FileDto>();
+
   private boolean displaysFiles = true;
 
-  public FolderDetailsView() {
-    widget = uiBinder.createAndBindUi(this);
+  @Inject
+  public FolderDetailsView(Binder uiBinder) {
+    initWidget(uiBinder.createAndBindUi(this));
     initTable();
   }
 
@@ -74,26 +79,23 @@ public class FolderDetailsView extends ViewImpl implements Display {
 
   @Override
   public void clearSelection() {
-    getTableSelectionModel().setSelected(getTableSelectionModel().getSelectedObject(), false);
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public SingleSelectionModel<FileDto> getTableSelectionModel() {
-    return (SingleSelectionModel<FileDto>) table.getSelectionModel();
+    checkColumn.clearSelection();
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public void renderRows(FileDto folder) {
+    clearSelection();
     JsArray<FileDto> children = folder.getChildrenCount() == 0
         ? (JsArray<FileDto>) JsArray.createArray()
         : filterChildren(folder.getChildrenArray());
 
+    dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(children)));
+    dataProvider.refresh();
+
     int fileCount = children.length();
     table.setPageSize(fileCount);
     table.setRowCount(fileCount, true);
-    table.setRowData(0, sortFileList(JsArrays.toList(children, 0, fileCount)));
   }
 
   @SuppressWarnings("unchecked")
@@ -113,23 +115,32 @@ public class FolderDetailsView extends ViewImpl implements Display {
     return foldersOnly;
   }
 
-  @Override
-  public HandlerRegistration addFileSelectionHandler(FileSelectionHandler fileSelectionHandler) {
-    return fileNameColumn.addFileSelectionHandler(fileSelectionHandler);
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
-  }
-
   private void initTable() {
     addTableColumns();
-    table.setSelectionModel(new SingleSelectionModel<FileDto>());
   }
 
   private void addTableColumns() {
+    checkColumn = new CheckboxColumn<FileDto>(new FileDtoDisplay());
+    checkColumn.setActionHandler(new ActionHandler<Integer>() {
+      @Override
+      public void doAction(Integer object, String actionName) {
+        getUiHandlers().onFilesSelected(checkColumn.getSelectedItems());
+      }
+    });
+
+    table.addColumn(checkColumn, checkColumn.getTableListCheckColumnHeader());
+    table.setColumnWidth(checkColumn, 1, Style.Unit.PX);
+
     table.addColumn(fileNameColumn = new FileNameColumn(), translations.nameLabel());
+
+    fileNameColumn.addFileSelectionHandler(new FileSelectionHandler() {
+      @Override
+      public void onFileSelection(FileDto fileDto) {
+        if(!fileDto.getType().isFileType(FileType.FILE)) {
+          getUiHandlers().onFolderSelection(fileDto);
+        }
+      }
+    });
 
     table.addColumn(new TextColumn<FileDto>() {
 
@@ -150,6 +161,7 @@ public class FolderDetailsView extends ViewImpl implements Display {
       }
     }, translations.lastModifiedLabel());
 
+    dataProvider.addDataDisplay(table);
   }
 
   /**
@@ -192,7 +204,7 @@ public class FolderDetailsView extends ViewImpl implements Display {
           if(file.getType().getName().equals(FileType.FOLDER.getName())) {
             icon = "icon-folder-close-alt";
           }
-          if (!file.getReadable()) {
+          if(!file.getReadable()) {
             icon = "icon-lock";
           }
           return new SafeHtmlBuilder().appendHtmlConstant("<i class=\"" + icon + "\"></i> <a>")
@@ -232,6 +244,54 @@ public class FolderDetailsView extends ViewImpl implements Display {
       return FileDto.stringify(dto);
     }
 
+  }
+
+  private class FileDtoDisplay implements CheckboxColumn.Display<FileDto> {
+
+    @Override
+    public Table<FileDto> getTable() {
+      return table;
+    }
+
+    @Override
+    public ListDataProvider<FileDto> getDataProvider() {
+      return dataProvider;
+    }
+
+    @Override
+    public Object getItemKey(FileDto item) {
+      return item.getName();
+    }
+
+    @Override
+    public Anchor getClearSelection() {
+      return null;
+    }
+
+    @Override
+    public Anchor getSelectAll() {
+      return null;
+    }
+
+    @Override
+    public Label getSelectAllStatus() {
+      return null;
+    }
+
+    @Override
+    public String getItemNamePlural() {
+      return "";
+    }
+
+    @Override
+    public String getItemNameSingular() {
+      return "";
+    }
+  }
+
+  public interface FileSelectionHandler {
+
+    void onFileSelection(FileDto fileDto);
   }
 
 }

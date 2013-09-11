@@ -301,7 +301,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @SuppressWarnings("unchecked")
   public void clear(boolean cleanFilter) {
     renderRows((JsArray<VariableDto>) JavaScriptObject.createArray());
-    checkColumn.getSelectionModel().clear();
+    checkColumn.clearSelection();
     if(cleanFilter) filter.setText("");
   }
 

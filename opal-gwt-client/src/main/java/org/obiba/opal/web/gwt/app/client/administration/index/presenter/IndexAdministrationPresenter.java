@@ -50,7 +50,6 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.view.client.HasData;
-import com.google.gwt.view.client.MultiSelectionModel;
 import com.google.gwt.view.client.Range;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -85,6 +84,8 @@ public class IndexAdministrationPresenter
 
     void serviceExecutionPending();
 
+    void unselectIndex(TableIndexStatusDto object);
+
     enum Slots {
       Drivers, Permissions
     }
@@ -101,7 +102,7 @@ public class IndexAdministrationPresenter
 
     void clear();
 
-    MultiSelectionModel<TableIndexStatusDto> getSelectedIndices();
+    List<TableIndexStatusDto> getSelectedIndices();
 
     DropdownButton getActionsDropdown();
 
@@ -208,12 +209,12 @@ public class IndexAdministrationPresenter
       }
 
       private void doClear() {
-        if(getView().getSelectedIndices().getSelectedSet().isEmpty()) {
+        if(getView().getSelectedIndices().isEmpty()) {
           getEventBus()
               .fireEvent(NotificationEvent.Builder.newNotification().error("IndexClearSelectAtLeastOne").build());
         } else {
 
-          for(TableIndexStatusDto object : getView().getSelectedIndices().getSelectedSet()) {
+          for(TableIndexStatusDto object : getView().getSelectedIndices()) {
             ResponseCodeCallback callback = new ResponseCodeCallback() {
 
               @Override
@@ -227,19 +228,19 @@ public class IndexAdministrationPresenter
                 .withCallback(Response.SC_OK, callback)//
                 .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).delete().send();
 
-            getView().getSelectedIndices().setSelected(object, false);
+            getView().unselectIndex(object);
           }
         }
       }
 
       private void doSchedule() {
-        if(getView().getSelectedIndices().getSelectedSet().isEmpty()) {
+        if(getView().getSelectedIndices().isEmpty()) {
           getEventBus()
               .fireEvent(NotificationEvent.Builder.newNotification().error("IndexScheduleSelectAtLeastOne").build());
         } else {
 
           List<TableIndexStatusDto> objects = new ArrayList<TableIndexStatusDto>();
-          for(TableIndexStatusDto object : getView().getSelectedIndices().getSelectedSet()) {
+          for(TableIndexStatusDto object : getView().getSelectedIndices()) {
             objects.add(object);
           }
 

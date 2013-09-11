@@ -13,11 +13,14 @@ package org.obiba.opal.web.gwt.app.client.ui.celltable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 
+import com.google.common.collect.Lists;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.ValueUpdater;
@@ -97,6 +100,13 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
   }
 
   private void addHandlers() {
+    addClearSelectionHandler();
+    addSelectAllHandler();
+  }
+
+  private void addClearSelectionHandler() {
+    if(display.getClearSelection() == null) return;
+
     display.getClearSelection().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
@@ -107,6 +117,10 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
         display.getClearSelection().setVisible(false);
       }
     });
+  }
+
+  private void addSelectAllHandler() {
+    if(display.getSelectAll() == null) return;
 
     // init SelectAll and Clear Selection links
     display.getSelectAll().addClickHandler(new ClickHandler() {
@@ -123,8 +137,16 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     });
   }
 
-  public MultiSelectionModel<T> getSelectionModel() {
+  private MultiSelectionModel<T> getSelectionModel() {
     return selectionModel;
+  }
+
+  public void clearSelection() {
+    getSelectionModel().clear();
+  }
+
+  public void setSelected(T item, boolean selected) {
+    getSelectionModel().setSelected(item, selected);
   }
 
   /**
@@ -161,8 +183,6 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
 
       @Override
       public Boolean getValue() {
-        doAction();
-
         updateStatusAlert();
         if(display.getDataProvider().getList().isEmpty()) {
           return false;
@@ -201,6 +221,8 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
 
   @SuppressWarnings("OverlyLongMethod")
   private void updateStatusAlert() {
+    if(display.getClearSelection() == null || display.getSelectAll() == null || display.getSelectAllStatus() == null)
+      return;
 
     int currentSelected = 0;
     for(int i = 0; i < display.getTable().getVisibleItemCount(); i++) {
@@ -214,57 +236,68 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     boolean allPageSelected = currentSelected == display.getTable().getVisibleItemCount();
 
     if(allSelected) {
-      List<String> args = new ArrayList<String>();
-      args.add(String.valueOf(display.getDataProvider().getList().size()));
-
-      if(currentSelected > 1) {
-        args.add(display.getItemNamePlural());
-        display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.allItemsSelected(), args));
-      } else {
-        args.add(display.getItemNameSingular());
-        display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.NItemSelected(), args));
-      }
-
-      display.getClearSelection().setVisible(true);
-      display.getSelectAll().setVisible(false);
+      updateStatusAlertWhenAllSelected(currentSelected);
     } else if(allPageSelected) {
-      List<String> args = new ArrayList<String>();
-      args.add(String.valueOf(currentSelected));
-
-      if(currentSelected > 1) {
-        args.add(display.getItemNamePlural());
-        display.getSelectAllStatus()
-            .setText(TranslationsUtils.replaceArguments(translations.allNItemsSelected(), args));
-      } else {
-        args.add(display.getItemNameSingular());
-        display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.NItemSelected(), args));
-      }
-      display.getSelectAll().setVisible(true);
-
-      args.clear();
-      args.add(String.valueOf(display.getDataProvider().getList().size()));
-      args.add(display.getItemNamePlural());
-      display.getSelectAll().setText(TranslationsUtils.replaceArguments(translations.selectAllNItems(), args));
-      display.getClearSelection().setVisible(false);
+      updateStatusAlertWhenAllPageSelected(currentSelected);
     } else {
-      List<String> args = new ArrayList<String>();
-      args.add(String.valueOf(currentSelected));
-
-      if(currentSelected > 1) {
-        args.add(display.getItemNamePlural());
-        display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.NItemsSelected(), args));
-      } else {
-        args.add(display.getItemNameSingular());
-        display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.NItemSelected(), args));
-      }
-      display.getSelectAll().setVisible(true);
-
-      args.clear();
-      args.add(String.valueOf(display.getDataProvider().getList().size()));
-      args.add(display.getItemNamePlural());
-      display.getSelectAll().setText(TranslationsUtils.replaceArguments(translations.selectAllNItems(), args));
-      display.getClearSelection().setVisible(false);
+      updateStatusAlertWhenNotAllSelected(currentSelected);
     }
+  }
+
+  private void updateStatusAlertWhenAllSelected(int currentSelected) {
+    List<String> args = Lists.newArrayList();
+    args.add(String.valueOf(display.getDataProvider().getList().size()));
+
+    if(currentSelected > 1) {
+      args.add(display.getItemNamePlural());
+      display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.allItemsSelected(), args));
+    } else {
+      args.add(display.getItemNameSingular());
+      display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.NItemSelected(), args));
+    }
+
+    display.getClearSelection().setVisible(true);
+    display.getSelectAll().setVisible(false);
+  }
+
+  private void updateStatusAlertWhenAllPageSelected(int currentSelected) {
+    List<String> args = Lists.newArrayList();
+    args.add(String.valueOf(currentSelected));
+
+    if(currentSelected > 1) {
+      args.add(display.getItemNamePlural());
+      display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.allNItemsSelected(), args));
+    } else {
+      args.add(display.getItemNameSingular());
+      display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.NItemSelected(), args));
+    }
+    display.getSelectAll().setVisible(true);
+
+    args.clear();
+    args.add(String.valueOf(display.getDataProvider().getList().size()));
+    args.add(display.getItemNamePlural());
+    display.getSelectAll().setText(TranslationsUtils.replaceArguments(translations.selectAllNItems(), args));
+    display.getClearSelection().setVisible(false);
+  }
+
+  private void updateStatusAlertWhenNotAllSelected(int currentSelected) {
+    List<String> args = Lists.newArrayList();
+    args.add(String.valueOf(currentSelected));
+
+    if(currentSelected > 1) {
+      args.add(display.getItemNamePlural());
+      display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.NItemsSelected(), args));
+    } else {
+      args.add(display.getItemNameSingular());
+      display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.NItemSelected(), args));
+    }
+    display.getSelectAll().setVisible(true);
+
+    args.clear();
+    args.add(String.valueOf(display.getDataProvider().getList().size()));
+    args.add(display.getItemNamePlural());
+    display.getSelectAll().setText(TranslationsUtils.replaceArguments(translations.selectAllNItems(), args));
+    display.getClearSelection().setVisible(false);
   }
 
   private void doAction() {

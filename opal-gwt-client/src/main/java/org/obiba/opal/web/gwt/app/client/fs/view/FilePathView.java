@@ -64,7 +64,6 @@ public class FilePathView extends ViewImpl implements FilePathPresenter.Display 
   }
 
   private void addFileLink(final FileDto file) {
-    GWT.log("[" + file.getName() + "] [" + file.getPath() + "]");
     NavLink link = new NavLink(file.getName());
     if(Strings.isNullOrEmpty(file.getName())) {
       link.setIcon(IconType.HDD);

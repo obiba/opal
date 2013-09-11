@@ -9,47 +9,26 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreationEvent;
-import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FileDto;
-import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 
 import com.google.gwt.http.client.Request;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
-public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresenter.Display> {
-
-  public interface Display extends View {
-
-    void setDisplaysFiles(boolean include);
-
-    void clearSelection();
-
-    void renderRows(FileDto rows);
-
-    HandlerRegistration addFileSelectionHandler(FileSelectionHandler fileSelectionHandler);
-
-    SingleSelectionModel<FileDto> getTableSelectionModel();
-
-  }
-
-  public interface FileSelectionHandler {
-
-    void onFileSelection(FileDto fileDto);
-  }
+public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresenter.Display> implements FolderDetailsUiHandlers {
 
   /**
    * The folder currently being displayed. This is null until a request to the server succeeds (see {@code updateTable})
@@ -57,64 +36,55 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
    */
   private FileDto currentFolder;
 
+  private List<FileDto> selectedFiles;
+
   @Inject
   public FolderDetailsPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
+    getView().setUiHandlers(this);
+  }
+
+  @Override
+  public void onFilesSelected(List<FileDto> files) {
+    selectedFiles = files;
+  }
+
+  @Override
+  public void onFolderSelection(FileDto fileDto) {
+    if(fileDto.getReadable()) {
+      getEventBus().fireEvent(new FolderSelectionChangeEvent(fileDto));
+      updateTable(fileDto);
+    }
   }
 
   @Override
   protected void onBind() {
-
-    getView().addFileSelectionHandler(new FileSelectionHandler() {
+    addRegisteredHandler(FileSelectionChangeEvent.getType(), new FileSelectionChangeEvent.Handler() {
 
       @Override
-      public void onFileSelection(FileDto fileDto) {
-        if(!fileDto.getType().isFileType(FileType.FILE) && fileDto.getReadable()) {
-          getEventBus().fireEvent(new FolderSelectionChangeEvent(fileDto));
-          updateTable(fileDto);
-        }
+      public void onFileSelectionChange(FileSelectionChangeEvent event) {
+        updateTable(event.getFile());
       }
+
     });
 
-    registerHandler(getView().getTableSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        FileDto selectedFile = getView().getTableSelectionModel().getSelectedObject();
-        if(selectedFile != null) {
-          getEventBus().fireEvent(new FileSelectionChangeEvent(selectedFile));
-        }
-      }
-
-    }));
-
-    registerHandler(
-        getEventBus().addHandler(FileSelectionChangeEvent.getType(), new FileSelectionChangeEvent.Handler() {
-
-          @Override
-          public void onFileSelectionChange(FileSelectionChangeEvent event) {
-            updateTable(event.getFile());
-          }
-
-        }));
-
-    registerHandler(getEventBus().addHandler(FileUploadedEvent.getType(), new FileUploadedEvent.Handler() {
+    addRegisteredHandler(FileUploadedEvent.getType(), new FileUploadedEvent.Handler() {
 
       @Override
       public void onFileUploaded(FileUploadedEvent event) {
-        // Refresh the current folder since a new file was probably added to it.
+        // Refresh the current folder
         updateTable(currentFolder);
       }
-    }));
+    });
 
-    registerHandler(getEventBus().addHandler(FolderCreationEvent.getType(), new FolderCreationEvent.Handler() {
+    addRegisteredHandler(FolderCreationEvent.getType(), new FolderCreationEvent.Handler() {
 
       @Override
       public void onFolderCreation(FolderCreationEvent event) {
-        getEventBus().fireEvent(new FolderSelectionChangeEvent(event.getFolder()));
-        updateTable(event.getFolder());
+        // Refresh the current folder
+        updateTable(currentFolder);
       }
-    }));
+    });
   }
 
   @Override
@@ -131,15 +101,16 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
   }
 
   public boolean hasSelection() {
-    return getView().getTableSelectionModel().getSelectedObject() != null;
+    return selectedFiles != null && selectedFiles.size() > 0;
   }
 
   public FileDto getSelectedFile() {
-    return getView().getTableSelectionModel().getSelectedObject();
+    return hasSelection() ? selectedFiles.get(0) : null;
   }
 
   private void updateTable(final FileDto file) {
     currentFolder = file;
+    selectedFiles = null;
     if(!isVisible()) return;
     getAndUpdateTable(file);
   }
@@ -165,4 +136,14 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
     }, Response.SC_NOT_FOUND, Response.SC_UNAUTHORIZED, Response.SC_INTERNAL_SERVER_ERROR).send();
 
   }
+
+  public interface Display extends View, HasUiHandlers<FolderDetailsUiHandlers> {
+
+    void setDisplaysFiles(boolean include);
+
+    void clearSelection();
+
+    void renderRows(FileDto rows);
+  }
+
 }

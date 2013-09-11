@@ -9,9 +9,12 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.index.view;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsIndexColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
@@ -19,7 +22,6 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.IndexStatusImageCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueRenderer;
-import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
@@ -44,7 +46,6 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.MultiSelectionModel;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 import static org.obiba.opal.web.model.client.opal.ScheduleType.DAILY;
@@ -159,7 +160,7 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
   @Override
   public void clear() {
     renderRows((JsArray<TableIndexStatusDto>) JavaScriptObject.createArray());
-    checkboxColumn.getSelectionModel().clear();
+    checkboxColumn.clearSelection();
     selectAllAlert.setVisible(false);
   }
 
@@ -216,8 +217,13 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
   }
 
   @Override
-  public MultiSelectionModel<TableIndexStatusDto> getSelectedIndices() {
-    return checkboxColumn.getSelectionModel();
+  public List<TableIndexStatusDto> getSelectedIndices() {
+    return checkboxColumn.getSelectedItems();
+  }
+
+  @Override
+  public void unselectIndex(TableIndexStatusDto object) {
+    checkboxColumn.setSelected(object, false);
   }
 
   @Override
