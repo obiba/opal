@@ -1803,6 +1803,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Projects")
   String pageProjectsTitle();
 
+  @Description("Page Java title")
+  @DefaultStringValue("Java Virtual Machine")
+  String pageJVMTitle();
+
   @Description("User Name label")
   @DefaultStringValue("Name")
   String userNameLabel();
