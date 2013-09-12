@@ -246,6 +246,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   @Override
   public void onFolderUpdated(FolderUpdatedEvent event) {
+    if (fileExplorerPresenter == null || !fileExplorerPresenter.isVisible()) return;
     updateHistory(event.getFolder().getPath());
   }
 
