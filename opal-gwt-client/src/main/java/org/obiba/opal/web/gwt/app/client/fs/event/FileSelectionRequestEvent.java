@@ -17,7 +17,7 @@ import com.google.gwt.event.shared.GwtEvent;
 /**
  *
  */
-public class FileSelectionRequiredEvent extends GwtEvent<FileSelectionRequiredEvent.Handler> {
+public class FileSelectionRequestEvent extends GwtEvent<FileSelectionRequestEvent.Handler> {
   //
   // Static Variables
   //
@@ -36,7 +36,7 @@ public class FileSelectionRequiredEvent extends GwtEvent<FileSelectionRequiredEv
   // Constructors
   //
 
-  public FileSelectionRequiredEvent(Object source, FileSelectionType fileSelectionType) {
+  public FileSelectionRequestEvent(Object source, FileSelectionType fileSelectionType) {
     this.source = source;
     this.fileSelectionType = fileSelectionType;
   }
@@ -78,6 +78,6 @@ public class FileSelectionRequiredEvent extends GwtEvent<FileSelectionRequiredEv
 
   public interface Handler extends EventHandler {
 
-    void onFileSelectionRequired(FileSelectionRequiredEvent event);
+    void onFileSelectionRequired(FileSelectionRequestEvent event);
   }
 }

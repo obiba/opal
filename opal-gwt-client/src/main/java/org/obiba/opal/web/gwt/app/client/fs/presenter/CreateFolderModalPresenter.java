@@ -10,8 +10,8 @@
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -61,7 +61,7 @@ public class CreateFolderModalPresenter extends ModalPresenterWidget<CreateFolde
 
       @Override
       public void onResource(Response response, FileDto resource) {
-        getEventBus().fireEvent(new FolderCreationEvent(resource));
+        getEventBus().fireEvent(new FolderCreatedEvent(resource));
         getView().hideDialog();
       }
     };

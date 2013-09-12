@@ -14,35 +14,62 @@ import org.obiba.opal.web.model.client.opal.FileDto;
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
-public class FileSelectionChangeEvent extends GwtEvent<FileSelectionChangeEvent.Handler> {
-
-  public interface Handler extends EventHandler {
-    void onFileSelectionChange(FileSelectionChangeEvent event);
-  }
+/**
+ *
+ */
+public class FolderCreatedEvent extends GwtEvent<FolderCreatedEvent.Handler> {
+  //
+  // Static Variables
+  //
 
   private static final Type<Handler> TYPE = new Type<Handler>();
 
-  private final FileDto file;
+  //
+  // Instance Variables
+  //
 
-  public FileSelectionChangeEvent(FileDto file) {
-    this.file = file;
+  private final FileDto folder;
+
+  //
+  // Constructors
+  //
+
+  public FolderCreatedEvent(FileDto dto) {
+    folder = dto;
   }
 
-  public FileDto getFile() {
-    return file;
+  //
+  // GwtEvent Methods
+  //
+
+  @Override
+  protected void dispatch(Handler handler) {
+    handler.onFolderCreated(this);
   }
+
+  @Override
+  public Type<Handler> getAssociatedType() {
+    return getType();
+  }
+
+  //
+  // Methods
+  //
 
   public static Type<Handler> getType() {
     return TYPE;
   }
 
-  @Override
-  protected void dispatch(Handler handler) {
-    handler.onFileSelectionChange(this);
+  public FileDto getFolder() {
+    return folder;
   }
 
-  @Override
-  public GwtEvent.Type<Handler> getAssociatedType() {
-    return TYPE;
+  //
+  // Inner Classes / Interfaces
+  //
+
+  public interface Handler extends EventHandler {
+
+    void onFolderCreated(FolderCreatedEvent event);
   }
 }

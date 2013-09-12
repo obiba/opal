@@ -202,7 +202,7 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
           FileDto file = FileDto.parse(object);
           String icon = "icon-file";
           if(file.getType().getName().equals(FileType.FOLDER.getName())) {
-            icon = "icon-folder-close-alt";
+            icon = "icon-folder-close";
           }
           if(!file.getReadable()) {
             icon = "icon-lock";

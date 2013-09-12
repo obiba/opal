@@ -13,7 +13,8 @@ package org.obiba.opal.web.gwt.app.client.project.presenter;
 import java.util.Arrays;
 
 import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
@@ -51,7 +52,7 @@ import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 
 public class ProjectPresenter extends Presenter<ProjectPresenter.Display, ProjectPresenter.Proxy>
     implements ProjectUiHandlers, DatasourceSelectionChangeEvent.Handler, TableSelectionChangeEvent.Handler,
-    VariableSelectionChangeEvent.Handler, FileSelectionChangeEvent.Handler {
+    VariableSelectionChangeEvent.Handler, FolderUpdatedEvent.Handler {
 
   public interface Display extends View, HasUiHandlers<ProjectUiHandlers>, HasTabPanel {
 
@@ -121,7 +122,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     addRegisteredHandler(DatasourceSelectionChangeEvent.getType(), this);
     addRegisteredHandler(TableSelectionChangeEvent.getType(), this);
     addRegisteredHandler(VariableSelectionChangeEvent.getType(), this);
-    addRegisteredHandler(FileSelectionChangeEvent.getType(), this);
+    addRegisteredHandler(FolderUpdatedEvent.getType(), this);
   }
 
   @Override
@@ -210,9 +211,9 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     }
     fileExplorerPresenter.showProject(name);
     if(Strings.isNullOrEmpty(path)) {
-      fireEvent(new FileSelectionChangeEvent(FileDtos.project(name)));
+      fireEvent(new FolderRequestEvent(FileDtos.project(name)));
     } else {
-      fireEvent(new FileSelectionChangeEvent(FileDtos.create(path.split("/"))));
+      fireEvent(new FolderRequestEvent(FileDtos.create(path.split("/"))));
     }
   }
 
@@ -244,8 +245,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   @Override
-  public void onFileSelectionChange(FileSelectionChangeEvent event) {
-    updateHistory(event.getFile().getPath());
+  public void onFolderUpdated(FolderUpdatedEvent event) {
+    updateHistory(event.getFolder().getPath());
   }
 
   private void updateHistory(String queryPathParam) {

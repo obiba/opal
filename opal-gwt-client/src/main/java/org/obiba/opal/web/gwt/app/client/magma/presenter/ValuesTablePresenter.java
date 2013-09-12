@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
@@ -312,7 +312,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       StringBuilder link = new StringBuilder(table.getLink());
       link.append("/valueSet/").append(entityIdentifier).append("/variable/").append(variable.getName())
           .append("/value");
-      getEventBus().fireEvent(new FileDownloadEvent(link.toString()));
+      getEventBus().fireEvent(new FileDownloadRequestEvent(link.toString()));
     }
 
     @Override

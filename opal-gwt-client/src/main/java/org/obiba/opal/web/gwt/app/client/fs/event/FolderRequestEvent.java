@@ -14,22 +14,22 @@ import org.obiba.opal.web.model.client.opal.FileDto;
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
-public class FolderSelectionChangeEvent extends GwtEvent<FolderSelectionChangeEvent.Handler> {
+public class FolderRequestEvent extends GwtEvent<FolderRequestEvent.Handler> {
 
   public interface Handler extends EventHandler {
-    void onFolderSelectionChange(FolderSelectionChangeEvent event);
+    void onFolderRequest(FolderRequestEvent event);
   }
 
   private static final Type<Handler> TYPE = new Type<Handler>();
 
-  private final FileDto folder;
+  private final FileDto file;
 
-  public FolderSelectionChangeEvent(FileDto folder) {
-    this.folder = folder;
+  public FolderRequestEvent(FileDto file) {
+    this.file = file;
   }
 
-  public FileDto getFolder() {
-    return folder;
+  public FileDto getFile() {
+    return file;
   }
 
   public static Type<Handler> getType() {
@@ -38,11 +38,11 @@ public class FolderSelectionChangeEvent extends GwtEvent<FolderSelectionChangeEv
 
   @Override
   protected void dispatch(Handler handler) {
-    handler.onFolderSelectionChange(this);
+    handler.onFolderRequest(this);
   }
 
   @Override
   public GwtEvent.Type<Handler> getAssociatedType() {
-    return getType();
+    return TYPE;
   }
 }

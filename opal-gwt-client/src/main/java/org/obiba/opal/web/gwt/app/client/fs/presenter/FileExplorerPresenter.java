@@ -15,11 +15,9 @@ import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FilesCheckedEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FolderRefreshedEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -111,27 +109,13 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
   }
 
   private void addEventHandlers() {
-    addRegisteredHandler(FolderRefreshedEvent.getType(), new FolderRefreshedEvent.Handler() {
+    addRegisteredHandler(FolderUpdatedEvent.getType(), new FolderUpdatedEvent.Handler() {
 
       @Override
-      public void onFolderRefreshed(FolderRefreshedEvent event) {
+      public void onFolderUpdated(FolderUpdatedEvent event) {
         authorizeFolder(event.getFolder());
-      }
-    });
-
-    addRegisteredHandler(FileSelectionChangeEvent.getType(), new FileSelectionChangeEvent.Handler() {
-      @Override
-      public void onFileSelectionChange(FileSelectionChangeEvent event) {
         checkedFiles = null;
-        resetCheckedFilesAuthorizations();
-      }
-    });
-
-    addRegisteredHandler(FolderSelectionChangeEvent.getType(), new FolderSelectionChangeEvent.Handler() {
-      @Override
-      public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
-        checkedFiles = null;
-        resetCheckedFilesAuthorizations();
+        updateCheckedFilesAuthorizations();
       }
     });
 
@@ -143,12 +127,12 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
         checkedFiles = null;
         if(!isVisible()) return;
         checkedFiles = event.getCheckedFiles();
-        resetCheckedFilesAuthorizations();
+        updateCheckedFilesAuthorizations();
       }
     });
   }
 
-  private void resetCheckedFilesAuthorizations() {
+  private void updateCheckedFilesAuthorizations() {
     if(hasCheckedFiles()) {
       // TODO handle multiple files
       authorizeFile(checkedFiles.get(0));
@@ -229,7 +213,7 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
     if(!hasCheckedFiles()) return;
 
     for(FileDto file : checkedFiles) {
-      getEventBus().fireEvent(new FileDownloadEvent("/files" + file.getPath()));
+      getEventBus().fireEvent(new FileDownloadRequestEvent("/files" + file.getPath()));
     }
   }
 

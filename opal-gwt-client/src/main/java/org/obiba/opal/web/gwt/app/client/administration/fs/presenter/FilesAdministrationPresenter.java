@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.app.client.administration.fs.presenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
@@ -77,7 +77,7 @@ public class FilesAdministrationPresenter
 
   @Override
   public void onReveal() {
-    fireEvent(new FileSelectionChangeEvent(FileDtos.user(credentials.getUsername())));
+    fireEvent(new FolderRequestEvent(FileDtos.user(credentials.getUsername())));
     breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs()).build();
   }
 

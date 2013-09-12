@@ -10,12 +10,12 @@
 package org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.LanguageLocale;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionUpdateEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.CharacterSetDisplay;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
@@ -91,9 +91,9 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     this.fileSelectionPresenter = fileSelectionPresenter;
     setDefaultCharset();
 
-    getEventBus().addHandler(FileSelectionUpdateEvent.getType(), new FileSelectionUpdateEvent.Handler() {
+    getEventBus().addHandler(FileSelectionUpdatedEvent.getType(), new FileSelectionUpdatedEvent.Handler() {
       @Override
-      public void onFileSelectionUpdate(FileSelectionUpdateEvent event) {
+      public void onFileSelectionUpdated(FileSelectionUpdatedEvent event) {
         String selectedFile = ((FileSelectionPresenter) event.getSource()).getSelectedFile();
         getView().showSpssSpecificPanel(DatasourceFileType.isSpssFile(selectedFile));
       }
@@ -265,7 +265,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
     @Override
     public void onClick(ClickEvent event) {
-      getEventBus().fireEvent(new FileDownloadEvent("/templates" + EXCEL_TEMPLATE));
+      getEventBus().fireEvent(new FileDownloadRequestEvent("/templates" + EXCEL_TEMPLATE));
     }
   }
 

@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.app.client.fs.view;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FilePathPresenter;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
@@ -20,7 +20,6 @@ import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Widget;
@@ -72,7 +71,7 @@ public class FilePathView extends ViewImpl implements FilePathPresenter.Display 
     link.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        eventBus.fireEvent(new FileSelectionChangeEvent(file));
+        eventBus.fireEvent(new FolderRequestEvent(file));
       }
     });
   }

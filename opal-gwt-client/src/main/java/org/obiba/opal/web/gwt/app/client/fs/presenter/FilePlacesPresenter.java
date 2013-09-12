@@ -10,9 +10,8 @@
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
 import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
-import org.obiba.opal.web.model.client.opal.FileDto;
 
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -36,39 +35,39 @@ public class FilePlacesPresenter extends PresenterWidget<FilePlacesPresenter.Dis
 
   @Override
   public void onUserHomeSelection() {
-    getEventBus().fireEvent(new FileSelectionChangeEvent(FileDtos.user(credentials.getUsername())));
+    fireEvent(new FolderRequestEvent(FileDtos.user(credentials.getUsername())));
   }
 
   @Override
   public void onProjectHomeSelection() {
     if(project != null) {
-      getEventBus().fireEvent(new FileSelectionChangeEvent(FileDtos.project(project)));
+      fireEvent(new FolderRequestEvent(FileDtos.project(project)));
     }
   }
 
   @Override
   public void onFileSystemSelection() {
-    getEventBus().fireEvent(new FileSelectionChangeEvent(FileDtos.create()));
+    fireEvent(new FolderRequestEvent(FileDtos.create()));
   }
 
   @Override
   public void onUsersSelection() {
-    getEventBus().fireEvent(new FileSelectionChangeEvent(FileDtos.users()));
+    fireEvent(new FolderRequestEvent(FileDtos.users()));
   }
 
   @Override
   public void onProjectsSelection() {
-    getEventBus().fireEvent(new FileSelectionChangeEvent(FileDtos.projects()));
+    fireEvent(new FolderRequestEvent(FileDtos.projects()));
   }
 
   @Override
   public void onOrganizationsSelection() {
-    getEventBus().fireEvent(new FileSelectionChangeEvent(FileDtos.units()));
+    fireEvent(new FolderRequestEvent(FileDtos.units()));
   }
 
   @Override
   public void onReportsSelection() {
-    getEventBus().fireEvent(new FileSelectionChangeEvent(FileDtos.reports()));
+    fireEvent(new FolderRequestEvent(FileDtos.reports()));
   }
 
   public void showProject(String project) {

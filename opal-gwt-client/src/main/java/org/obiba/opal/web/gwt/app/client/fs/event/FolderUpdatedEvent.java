@@ -9,29 +9,27 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.event;
 
+import org.obiba.opal.web.model.client.opal.FileDto;
+
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
-/**
- *
- */
-public class FileDownloadEvent extends GwtEvent<FileDownloadEvent.Handler> {
+public class FolderUpdatedEvent extends GwtEvent<FolderUpdatedEvent.Handler> {
 
   public interface Handler extends EventHandler {
-
-    void onFileDownload(FileDownloadEvent event);
+    void onFolderUpdated(FolderUpdatedEvent event);
   }
 
   private static final Type<Handler> TYPE = new Type<Handler>();
 
-  private final String url;
+  private final FileDto folder;
 
-  public FileDownloadEvent(String url) {
-    this.url = url;
+  public FolderUpdatedEvent(FileDto folder) {
+    this.folder = folder;
   }
 
-  public String getUrl() {
-    return url;
+  public FileDto getFolder() {
+    return folder;
   }
 
   public static Type<Handler> getType() {
@@ -40,11 +38,11 @@ public class FileDownloadEvent extends GwtEvent<FileDownloadEvent.Handler> {
 
   @Override
   protected void dispatch(Handler handler) {
-    handler.onFileDownload(this);
+    handler.onFolderUpdated(this);
   }
 
   @Override
-  public Type<Handler> getAssociatedType() {
+  public GwtEvent.Type<Handler> getAssociatedType() {
     return getType();
   }
 }

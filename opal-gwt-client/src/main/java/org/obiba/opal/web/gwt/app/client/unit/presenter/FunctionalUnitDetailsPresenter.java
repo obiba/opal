@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.app.client.unit.presenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
@@ -173,13 +173,13 @@ public class FunctionalUnitDetailsPresenter
   @Override
   public void exportIdentifiers() {
     String url = "/functional-unit/" + functionalUnit.getName() + "/entities/identifiers";
-    getEventBus().fireEvent(new FileDownloadEvent(url));
+    getEventBus().fireEvent(new FileDownloadRequestEvent(url));
   }
 
   @Override
   public void exportIdentifiersMapping() {
     String url = "/functional-unit/" + functionalUnit.getName() + "/entities/csv";
-    getEventBus().fireEvent(new FileDownloadEvent(url));
+    getEventBus().fireEvent(new FileDownloadRequestEvent(url));
   }
 
   @Override
@@ -394,7 +394,7 @@ public class FunctionalUnitDetailsPresenter
   private void downloadCertificate(KeyDto dto) {
     UriBuilder ub = UriBuilder.create()
         .segment("functional-unit", functionalUnit.getName(), "key", dto.getAlias(), "certificate");
-    getEventBus().fireEvent(new FileDownloadEvent(ub.build()));
+    getEventBus().fireEvent(new FileDownloadRequestEvent(ub.build()));
   }
 
   private void retrieveFunctioanUnit(String unitName) {

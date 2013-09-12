@@ -10,8 +10,8 @@
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionUpdateEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequestEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionUpdatedEvent;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -81,7 +81,7 @@ public class FileSelectionPresenter extends PresenterWidget<FileSelectionPresent
         if(FileSelectionPresenter.this.equals(event.getSource())) {
           fileTypeSelected = event.getSelectedFile().getSelectionType();
           getView().setFile(event.getSelectedFile().getSelectionPath());
-          getEventBus().fireEvent(new FileSelectionUpdateEvent(FileSelectionPresenter.this));
+          getEventBus().fireEvent(new FileSelectionUpdatedEvent(FileSelectionPresenter.this));
         }
       }
 
@@ -91,7 +91,7 @@ public class FileSelectionPresenter extends PresenterWidget<FileSelectionPresent
 
       @Override
       public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new FileSelectionRequiredEvent(FileSelectionPresenter.this, fileSelectionType));
+        getEventBus().fireEvent(new FileSelectionRequestEvent(FileSelectionPresenter.this, fileSelectionType));
       }
     }));
 

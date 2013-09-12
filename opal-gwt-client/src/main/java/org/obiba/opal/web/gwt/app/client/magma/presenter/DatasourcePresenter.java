@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
@@ -139,7 +139,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   private void downloadMetadata(String datasource) {
     String downloadUrl = "/datasource/" + datasource + "/tables/excel";
-    getEventBus().fireEvent(new FileDownloadEvent(downloadUrl));
+    getEventBus().fireEvent(new FileDownloadRequestEvent(downloadUrl));
   }
 
   private void addView(String datasource) {

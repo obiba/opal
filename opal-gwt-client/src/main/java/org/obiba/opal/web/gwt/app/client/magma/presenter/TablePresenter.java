@@ -15,10 +15,9 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.ConfigureViewStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.event.CopyVariablesToViewEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.SiblingTableSelectionEvent;
@@ -390,13 +389,13 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @Override
   public void onDownloadDictionary() {
     String downloadUrl = table.getLink() + "/variables/excel";
-    getEventBus().fireEvent(new FileDownloadEvent(downloadUrl));
+    getEventBus().fireEvent(new FileDownloadRequestEvent(downloadUrl));
   }
 
   @Override
   public void onDownloadView() {
     String downloadUrl = table.getViewLink() + "/xml";
-    getEventBus().fireEvent(new FileDownloadEvent(downloadUrl));
+    getEventBus().fireEvent(new FileDownloadRequestEvent(downloadUrl));
   }
 
   @Override

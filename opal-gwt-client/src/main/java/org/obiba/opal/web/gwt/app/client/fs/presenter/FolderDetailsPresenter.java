@@ -13,11 +13,11 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FilesCheckedEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreationEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FileDto;
@@ -52,17 +52,16 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
   @Override
   public void onFolderSelection(FileDto fileDto) {
     if(fileDto.getReadable()) {
-      getEventBus().fireEvent(new FolderSelectionChangeEvent(fileDto));
       updateTable(fileDto);
     }
   }
 
   @Override
   protected void onBind() {
-    addRegisteredHandler(FileSelectionChangeEvent.getType(), new FileSelectionChangeEvent.Handler() {
+    addRegisteredHandler(FolderRequestEvent.getType(), new FolderRequestEvent.Handler() {
 
       @Override
-      public void onFileSelectionChange(FileSelectionChangeEvent event) {
+      public void onFolderRequest(FolderRequestEvent event) {
         updateTable(event.getFile());
       }
     });
@@ -76,10 +75,10 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
       }
     });
 
-    addRegisteredHandler(FolderCreationEvent.getType(), new FolderCreationEvent.Handler() {
+    addRegisteredHandler(FolderCreatedEvent.getType(), new FolderCreatedEvent.Handler() {
 
       @Override
-      public void onFolderCreation(FolderCreationEvent event) {
+      public void onFolderCreated(FolderCreatedEvent event) {
         // Refresh the current folder
         updateTable(currentFolder);
       }
@@ -121,7 +120,7 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
       public void onResource(Response response, FileDto resource) {
         currentFolder = resource;
         getView().renderRows(resource);
-        fireEvent(new FolderSelectionChangeEvent(currentFolder));
+        fireEvent(new FolderUpdatedEvent(currentFolder));
       }
     }).withCallback(new ResponseCodeCallback() {
       @Override

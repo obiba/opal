@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.app.client.magma.presenter;
 import java.util.Arrays;
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
@@ -32,7 +32,6 @@ import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.PresenterWidget;
 
 /**
  *
@@ -136,7 +135,7 @@ public class ValueSequencePopupPresenter extends ModalPresenterWidget<ValueSeque
       StringBuilder link = new StringBuilder(table.getLink());
       link.append("/valueSet/").append(entityIdentifier).append("/variable/").append(variable.getName())
           .append("/value").append("?pos=").append(index);
-      getEventBus().fireEvent(new FileDownloadEvent(link.toString()));
+      getEventBus().fireEvent(new FileDownloadRequestEvent(link.toString()));
     }
 
     @Override

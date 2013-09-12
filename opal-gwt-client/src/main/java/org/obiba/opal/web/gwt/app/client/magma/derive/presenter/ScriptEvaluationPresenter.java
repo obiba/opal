@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
@@ -83,7 +83,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
         // TODO won't work with long script
         // OPAL-1346 encode script
         link.append("&script=").append(URL.encodePathSegment(VariableDtos.getScript(variable)));
-        getEventBus().fireEvent(new FileDownloadEvent(link.toString()));
+        getEventBus().fireEvent(new FileDownloadRequestEvent(link.toString()));
       }
 
       @Override

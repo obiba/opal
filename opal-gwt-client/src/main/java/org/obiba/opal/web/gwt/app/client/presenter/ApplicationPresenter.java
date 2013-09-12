@@ -12,8 +12,8 @@ package org.obiba.opal.web.gwt.app.client.presenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
@@ -101,10 +101,10 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   @Override
   protected void onBind() {
     registerHandler(
-        getEventBus().addHandler(FileSelectionRequiredEvent.getType(), new FileSelectionRequiredEvent.Handler() {
+        getEventBus().addHandler(FileSelectionRequestEvent.getType(), new FileSelectionRequestEvent.Handler() {
 
           @Override
-          public void onFileSelectionRequired(FileSelectionRequiredEvent event) {
+          public void onFileSelectionRequired(FileSelectionRequestEvent event) {
             FileSelectorPresenter fsp = fileSelectorProvider.get();
             fsp.handle(event);
           }
@@ -118,10 +118,10 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
         addToPopupSlot(vmp);
       }
     }));
-    registerHandler(getEventBus().addHandler(FileDownloadEvent.getType(), new FileDownloadEvent.Handler() {
+    registerHandler(getEventBus().addHandler(FileDownloadRequestEvent.getType(), new FileDownloadRequestEvent.Handler() {
 
       @Override
-      public void onFileDownload(FileDownloadEvent event) {
+      public void onFileDownloadRequest(FileDownloadRequestEvent event) {
         getView().getDownloader().setUrl(urlBuilder.buildAbsoluteUrl(event.getUrl()));
       }
     }));

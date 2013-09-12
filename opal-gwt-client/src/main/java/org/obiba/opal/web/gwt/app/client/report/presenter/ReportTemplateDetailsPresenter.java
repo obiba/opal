@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateListReceivedEvent;
@@ -231,12 +231,12 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
   }
 
   private void downloadReportFile(ReportDto report) {
-    getEventBus().fireEvent(new FileDownloadEvent(report.getLink()));
+    getEventBus().fireEvent(new FileDownloadRequestEvent(report.getLink()));
   }
 
   private void downloadFile(String filePath) {
     String url = "/files" + filePath;
-    getEventBus().fireEvent(new FileDownloadEvent(url));
+    getEventBus().fireEvent(new FileDownloadRequestEvent(url));
   }
 
   private void refreshProducedReports(ReportTemplateDto reportTemplate) {

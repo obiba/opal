@@ -17,9 +17,9 @@ import javax.annotation.Nullable;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FilesCheckedEvent;
-import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreationEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
@@ -79,7 +79,7 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
     getView().setUiHandlers(this);
   }
 
-  public void handle(FileSelectionRequiredEvent event) {
+  public void handle(FileSelectionRequestEvent event) {
     setFileSelectionSource(event.getSource());
     setFileSelectionType(event.getFileSelectionType());
   }
@@ -181,7 +181,7 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
 
       @Override
       public void onResource(Response response, FileDto resource) {
-        getEventBus().fireEvent(new FolderCreationEvent(resource));
+        getEventBus().fireEvent(new FolderCreatedEvent(resource));
         getView().clearNewFolderName();
       }
     };

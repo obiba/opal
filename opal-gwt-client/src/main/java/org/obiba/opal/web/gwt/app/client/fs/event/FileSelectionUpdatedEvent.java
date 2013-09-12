@@ -15,7 +15,7 @@ import com.google.gwt.event.shared.GwtEvent;
 /**
  * Event that will be fired by {@link TableSelectorPresenter}.
  */
-public class FileSelectionUpdateEvent extends GwtEvent<FileSelectionUpdateEvent.Handler> {
+public class FileSelectionUpdatedEvent extends GwtEvent<FileSelectionUpdatedEvent.Handler> {
   //
   // Static Variables
   //
@@ -31,7 +31,7 @@ public class FileSelectionUpdateEvent extends GwtEvent<FileSelectionUpdateEvent.
   //
   // Constructors
   //
-  public FileSelectionUpdateEvent(Object source) {
+  public FileSelectionUpdatedEvent(Object source) {
     this.source = source;
   }
 
@@ -41,7 +41,7 @@ public class FileSelectionUpdateEvent extends GwtEvent<FileSelectionUpdateEvent.
 
   @Override
   protected void dispatch(Handler handler) {
-    handler.onFileSelectionUpdate(this);
+    handler.onFileSelectionUpdated(this);
   }
 
   @Override
@@ -68,6 +68,6 @@ public class FileSelectionUpdateEvent extends GwtEvent<FileSelectionUpdateEvent.
 
   public interface Handler extends EventHandler {
 
-    void onFileSelectionUpdate(FileSelectionUpdateEvent event);
+    void onFileSelectionUpdated(FileSelectionUpdatedEvent event);
   }
 }

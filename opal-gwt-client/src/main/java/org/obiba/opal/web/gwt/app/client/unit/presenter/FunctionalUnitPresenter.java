@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.unit.presenter;
 
-import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.Places;
@@ -97,7 +97,7 @@ public class FunctionalUnitPresenter extends Presenter<FunctionalUnitPresenter.D
 
   @Override
   public void exportIdentifiers() {
-    getEventBus().fireEvent(new FileDownloadEvent("/functional-units/entities/csv"));
+    getEventBus().fireEvent(new FileDownloadRequestEvent("/functional-units/entities/csv"));
   }
 
   @Override
