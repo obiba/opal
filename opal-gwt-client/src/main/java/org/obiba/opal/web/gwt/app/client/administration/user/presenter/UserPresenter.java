@@ -22,9 +22,11 @@ import org.obiba.opal.web.gwt.app.client.ui.GroupSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.UserDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -113,9 +115,8 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
                 getEventBus().fireEvent(new UsersRefreshEvent());
                 getView().hideDialog();
               } else if(response.getStatusCode() == Response.SC_CONFLICT) {
-                getView().setNameError(TranslationsUtils
-                    .replaceArguments(translations.userMessageMap().get("UserAlreadyExists"),
-                        Arrays.asList(userDto.getName())));
+                ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+                getView().setNameError(error.getStatus());
               } else {
                 getView().hideDialog();
                 getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
@@ -132,11 +133,15 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
             public void onResponseCode(Request request, Response response) {
               if(response.getStatusCode() == Response.SC_OK) {
                 getEventBus().fireEvent(new UsersRefreshEvent());
+              } else if(response.getStatusCode() == Response.SC_CONFLICT) {
+                ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+                getView().setNameError(error.getStatus());
               } else {
                 getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
               }
             }
-          }, Response.SC_OK, Response.SC_PRECONDITION_FAILED, Response.SC_INTERNAL_SERVER_ERROR).put().send();
+          }, Response.SC_OK, Response.SC_PRECONDITION_FAILED, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_CONFLICT)
+          .put().send();
       getView().hideDialog();
     }
 

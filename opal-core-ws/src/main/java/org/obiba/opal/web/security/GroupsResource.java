@@ -18,7 +18,6 @@ import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.User;
-import org.obiba.opal.core.service.impl.GroupAlreadyExistsException;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -48,13 +47,10 @@ public class GroupsResource extends AbstractUserGroupResource {
       return Response.status(Response.Status.NOT_MODIFIED).build();
     }
 
-    try {
-      Group group = new Group();
-      group.setName(groupDto.getName());
-      userService.createOrUpdateGroup(group);
-    } catch(GroupAlreadyExistsException e) {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-    }
+    Group group = new Group();
+    group.setName(groupDto.getName());
+    userService.createOrUpdateGroup(group);
+
     return Response.ok().build();
   }
 
