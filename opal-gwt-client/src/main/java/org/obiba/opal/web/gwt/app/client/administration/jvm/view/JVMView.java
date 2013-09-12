@@ -7,9 +7,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.java.view;
+package org.obiba.opal.web.gwt.app.client.administration.jvm.view;
 
-import org.obiba.opal.web.gwt.app.client.administration.java.presenter.JVMPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.jvm.presenter.JVMPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
@@ -117,7 +117,7 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
       systemProperties.setWidget(row++, 1, new Label(entries.get(i).getValue()));
     }
 
-    systemScroll.setHeight(javaProperties.getElement().getClientHeight() + "px");
+    systemScroll.setHeight("145px");
   }
 
   @Override

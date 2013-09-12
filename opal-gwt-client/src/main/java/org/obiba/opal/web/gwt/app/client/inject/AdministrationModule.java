@@ -33,8 +33,8 @@ import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPre
 import org.obiba.opal.web.gwt.app.client.administration.index.view.IndexAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.index.view.IndexConfigurationView;
 import org.obiba.opal.web.gwt.app.client.administration.index.view.IndexView;
-import org.obiba.opal.web.gwt.app.client.administration.java.presenter.JVMPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.java.view.JVMView;
+import org.obiba.opal.web.gwt.app.client.administration.jvm.presenter.JVMPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.jvm.view.JVMView;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.view.RAdministrationView;
