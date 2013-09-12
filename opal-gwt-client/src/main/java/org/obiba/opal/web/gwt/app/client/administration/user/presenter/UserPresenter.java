@@ -114,7 +114,7 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
               if(response.getStatusCode() == Response.SC_OK) {
                 getEventBus().fireEvent(new UsersRefreshEvent());
                 getView().hideDialog();
-              } else if(response.getStatusCode() == Response.SC_CONFLICT) {
+              } else if(response.getStatusCode() == Response.SC_BAD_REQUEST) {
                 ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
                 getView().setNameError(error.getStatus());
               } else {
@@ -122,7 +122,7 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
                 getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
               }
             }
-          }, Response.SC_OK, Response.SC_CONFLICT, Response.SC_PRECONDITION_FAILED).post().send();
+          }, Response.SC_OK, Response.SC_BAD_REQUEST, Response.SC_PRECONDITION_FAILED).post().send();
     } else {
       // Update
       ResourceRequestBuilderFactory.newBuilder()//
@@ -133,15 +133,15 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
             public void onResponseCode(Request request, Response response) {
               if(response.getStatusCode() == Response.SC_OK) {
                 getEventBus().fireEvent(new UsersRefreshEvent());
-              } else if(response.getStatusCode() == Response.SC_CONFLICT) {
+              } else if(response.getStatusCode() == Response.SC_BAD_REQUEST) {
                 ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
                 getView().setNameError(error.getStatus());
               } else {
                 getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
               }
             }
-          }, Response.SC_OK, Response.SC_PRECONDITION_FAILED, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_CONFLICT)
-          .put().send();
+          }, Response.SC_OK, Response.SC_PRECONDITION_FAILED, Response.SC_INTERNAL_SERVER_ERROR,
+              Response.SC_BAD_REQUEST).put().send();
       getView().hideDialog();
     }
 
