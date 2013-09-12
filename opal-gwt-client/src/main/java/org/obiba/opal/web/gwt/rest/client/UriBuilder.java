@@ -96,7 +96,8 @@ public class UriBuilder {
    * @return uriBuilder
    */
   public UriBuilder fromPath(String p) {
-    append(path, p.split("/"));
+    String cleanedPath = p.startsWith("/") ? p.substring(1) : p;
+    append(path, cleanedPath.split("/"));
     return this;
   }
 
@@ -106,16 +107,16 @@ public class UriBuilder {
     }
   }
 
-  public static final UriBuilder URI_PROJECT = UriBuilder.create().segment("project","{}");
+  public static final UriBuilder URI_PROJECT = create().segment("project","{}");
 
-  public static final UriBuilder URI_DATASOURCE = UriBuilder.create().segment("datasource","{}");
+  public static final UriBuilder URI_DATASOURCE = create().segment("datasource","{}");
 
-  public static final UriBuilder URI_DATASOURCE_TABLES = UriBuilder.create().segment("datasource","{}","tables");
+  public static final UriBuilder URI_DATASOURCE_TABLES = create().segment("datasource","{}","tables");
 
-  public static final UriBuilder URI_DATASOURCE_TABLE = UriBuilder.create().segment("datasource", "{}", "table", "{}");
+  public static final UriBuilder URI_DATASOURCE_TABLE = create().segment("datasource", "{}", "table", "{}");
 
-  public static final UriBuilder URI_DATASOURCE_TABLE_INDEX = UriBuilder.create().segment("datasource", "{}", "table", "{}", "index");
+  public static final UriBuilder URI_DATASOURCE_TABLE_INDEX = create().segment("datasource", "{}", "table", "{}", "index");
 
-  public static final UriBuilder URI_DATASOURCE_TABLE_VARIABLES = UriBuilder.create().segment("datasource", "{}", "table", "{}", "variables");
+  public static final UriBuilder URI_DATASOURCE_TABLE_VARIABLES = create().segment("datasource", "{}", "table", "{}", "variables");
 
 }

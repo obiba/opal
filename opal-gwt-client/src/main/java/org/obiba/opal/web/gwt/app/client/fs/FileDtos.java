@@ -24,14 +24,8 @@ public class FileDtos {
 
   private FileDtos() {}
 
-  public static boolean isFolder(FileDto dto) {
-    if(dto == null) throw new IllegalArgumentException("dto cannot be null");
-    return FileDto.FileType.FOLDER.isFileType(dto.getType());
-  }
-
-  public static boolean isFile(FileDto dto) {
-    if(dto == null) throw new IllegalArgumentException("dto cannot be null");
-    return FileDto.FileType.FILE.isFileType(dto.getType());
+  public static String getLink(FileDto file) {
+    return "/files" + file.getPath();
   }
 
   public static FileDto users() {

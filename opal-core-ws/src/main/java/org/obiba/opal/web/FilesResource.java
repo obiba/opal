@@ -39,6 +39,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -116,16 +117,17 @@ public class FilesResource {
   @Path("/")
   @AuthenticatedByCookie
   public Response getFileSystemRoot() throws IOException {
-    return getFile("/");
+    return getFile("/", null);
   }
 
   @GET
   @Path("/{path:.*}")
   @AuthenticatedByCookie
-  public Response getFile(@PathParam("path") String path) throws IOException {
+  public Response getFile(@PathParam("path") String path, @QueryParam("file") List<String> children)
+      throws IOException {
     FileObject file = resolveFileInFileSystem(path);
     if(file.exists()) {
-      return file.getType() == FileType.FILE ? getFile(file) : getFolder(file);
+      return file.getType() == FileType.FILE ? getFile(file) : getFolder(file, children);
     }
     return getPathNotExistResponse(path);
   }
@@ -320,7 +322,7 @@ public class FilesResource {
         .header("Content-Disposition", getContentDispositionOfAttachment(localFile.getName())).build();
   }
 
-  private Response getFolder(FileObject folder) throws IOException {
+  private Response getFolder(FileObject folder, List<String> children) throws IOException {
     SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
     String folderName = folder.getName().getBaseName();
     File compressedFolder = new File(System.getProperty("java.io.tmpdir"),
@@ -329,7 +331,7 @@ public class FilesResource {
     compressedFolder.deleteOnExit();
     String mimeType = mimeTypes.getContentType(compressedFolder);
 
-    compressFolder(compressedFolder, folder);
+    compressFolder(compressedFolder, folder, children);
 
     return Response.ok(compressedFolder, mimeType)
         .header("Content-Disposition", getContentDispositionOfAttachment(compressedFolder.getName())).build();
@@ -471,36 +473,43 @@ public class FilesResource {
 
   }
 
-  private void compressFolder(File compressedFile, FileObject folder) throws IOException {
+  private void compressFolder(File compressedFile, FileObject folder, List<String> children) throws IOException {
     ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(compressedFile));
-    addFolder(folder, outputStream);
+    addFolder(folder, outputStream, children);
     outputStream.close();
   }
 
-  private void addFolder(FileObject folder, ZipOutputStream outputStream) throws IOException {
+  private void addFolder(FileObject folder, ZipOutputStream outputStream, List<String> children) throws IOException {
+    addFolder(folder.getParent().getName().getPath(), folder, outputStream, children);
+  }
 
+  private void addFolder(String basePath, FileObject folder, ZipOutputStream outputStream, List<String> children) throws IOException {
+    int baseLength = basePath.equals("/") ? 1 : basePath.length() + 1;
+    
     // Add the folder.
-    outputStream.putNextEntry(new ZipEntry(folder.getName().getPath().substring(1) + "/"));
+    outputStream.putNextEntry(new ZipEntry(folder.getName().getPath().substring(baseLength) + "/"));
 
     // Add its children files and subfolders.
     FileObject[] files = folder.getChildren();
     for(FileObject file : files) {
-      String path = file.getName().getPath();
+      log.info("child.baseName={}", file.getName().getBaseName());
+      if(children == null || children.isEmpty() || children.contains(file.getName().getBaseName())) {
+        String path = file.getName().getPath();
 
-      // only add files for which download is authorized
-      // TODO formalise file permissions
-      if(SecurityUtils.getSubject().isPermitted("magma:/files" + path + ":GET")) {
-        if(file.getType() == FileType.FOLDER) {
-          addFolder(file, outputStream);
-        } else {
-          outputStream.putNextEntry(new ZipEntry(file.getName().getPath().substring(1)));
-          FileInputStream inputStream = new FileInputStream(opalRuntime.getFileSystem().getLocalFile(file));
-          StreamUtil.copy(inputStream, outputStream);
-          outputStream.closeEntry();
-          StreamUtil.silentSafeClose(inputStream);
+        // only add files for which download is authorized
+        // TODO formalise file permissions
+        if(SecurityUtils.getSubject().isPermitted("magma:/files" + path + ":GET")) {
+          if(file.getType() == FileType.FOLDER) {
+            addFolder(basePath, file, outputStream, null);
+          } else {
+            outputStream.putNextEntry(new ZipEntry(file.getName().getPath().substring(baseLength)));
+            FileInputStream inputStream = new FileInputStream(opalRuntime.getFileSystem().getLocalFile(file));
+            StreamUtil.copy(inputStream, outputStream);
+            outputStream.closeEntry();
+            StreamUtil.silentSafeClose(inputStream);
+          }
         }
       }
-
     }
   }
 

@@ -14,15 +14,18 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FilesCheckedEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FilesDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.FileDto;
@@ -92,15 +95,6 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
     return null;
   }
 
-  private void authorizeFile(FileDto dto) {
-    // download
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).get()
-        .authorize(getView().getFileDownloadAuthorizer()).send();
-    // delete
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).delete()
-        .authorize(getView().getFileDeleteAuthorizer()).send();
-  }
-
   private void authorizeFolder(FileDto dto) {
     // create folder and upload
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).post()//
@@ -134,8 +128,8 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
 
   private void updateCheckedFilesAuthorizations() {
     if(hasCheckedFiles()) {
-      // TODO handle multiple files
-      authorizeFile(checkedFiles.get(0));
+      updateCheckedFilesDownloadAuthorization();
+      updateCheckedFilesDeleteAuthorization();
     } else {
       getView().getFileDownloadAuthorizer().unauthorized();
       getView().getFileDeleteAuthorizer().unauthorized();
@@ -143,6 +137,40 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
       getView().getFileCutAuthorizer().unauthorized();
       getView().getFilePasteAuthorizer().unauthorized();
     }
+  }
+
+  /**
+   * Authorize download if all that is selected can be downloaded.
+   */
+  private void updateCheckedFilesDownloadAuthorization() {
+    if (!hasCheckedFiles()) return;
+
+    CascadingAuthorizer.Builder builder = CascadingAuthorizer.newBuilder();
+    FileDto current = null;
+    for(FileDto file : checkedFiles) {
+      builder.and(ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + file.getPath()).get()
+          .authorize(getView().getFileDownloadAuthorizer()));
+      if(current == null) current = FileDtos.getParent(file);
+    }
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + current.getPath()).get()
+        .authorize(builder.authorize(getView().getFileDownloadAuthorizer()).build()).send();
+  }
+
+  /**
+   * Authorize delete if all that is selected can be deleted.
+   */
+  private void updateCheckedFilesDeleteAuthorization() {
+    if (!hasCheckedFiles()) return;
+
+    CascadingAuthorizer.Builder builder = CascadingAuthorizer.newBuilder();
+    for(FileDto file : checkedFiles) {
+      builder.and(ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + file.getPath()).delete()
+          .authorize(getView().getFileDeleteAuthorizer()));
+    }
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + checkedFiles.get(0).getPath()).delete()
+        .authorize(builder.authorize(getView().getFileDeleteAuthorizer()).build()).send();
   }
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
@@ -212,8 +240,10 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
   public void onDownload() {
     if(!hasCheckedFiles()) return;
 
-    for(FileDto file : checkedFiles) {
-      getEventBus().fireEvent(new FileDownloadRequestEvent("/files" + file.getPath()));
+    if(checkedFiles.size() == 1) {
+      fireEvent(new FileDownloadRequestEvent(FileDtos.getLink(checkedFiles.get(0))));
+    } else {
+      fireEvent(new FilesDownloadRequestEvent(FileDtos.getParent(checkedFiles.get(0)), checkedFiles));
     }
   }
 

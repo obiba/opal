@@ -9,7 +9,7 @@
 
     <g:FlowPanel ui:field="inputFieldPanel">
       <b:ControlGroup>
-        <b:ControlLabel addStyleNames="key">
+        <b:ControlLabel>
           <ui:msg description="Select file to upload label">Select the file to be uploaded in directory:</ui:msg>
         </b:ControlLabel>
         <b:Controls>

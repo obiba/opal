@@ -229,7 +229,7 @@ public class FilesResourceTest {
   }
 
   private void checkCompressedFolder(String folderPath, String[] expectedFolderContentArray) throws IOException {
-    Response response = filesResource.getFile(folderPath);
+    Response response = filesResource.getFile(folderPath, null);
     ZipFile zipfile = new ZipFile(((File) response.getEntity()).getPath());
 
     // Check that all folders and files exist in the compressed archive that represents the folder.
@@ -267,7 +267,7 @@ public class FilesResourceTest {
   }
 
   private void checkGetFileDetailsResponse(String path, String expectedFileContent) throws IOException {
-    Response response = filesResource.getFile(path);
+    Response response = filesResource.getFile(path, null);
 
     // Make sure response is OK
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());

@@ -12,8 +12,10 @@ package org.obiba.opal.web.gwt.app.client.presenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
+import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequestEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FilesDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
@@ -31,7 +33,9 @@ import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.opal.FileDto;
 
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.shared.GwtEvent;
@@ -100,16 +104,15 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   @Override
   protected void onBind() {
-    registerHandler(
-        getEventBus().addHandler(FileSelectionRequestEvent.getType(), new FileSelectionRequestEvent.Handler() {
+    addRegisteredHandler(FileSelectionRequestEvent.getType(), new FileSelectionRequestEvent.Handler() {
 
-          @Override
-          public void onFileSelectionRequired(FileSelectionRequestEvent event) {
-            FileSelectorPresenter fsp = fileSelectorProvider.get();
-            fsp.handle(event);
-          }
-        }));
-    registerHandler(getEventBus().addHandler(GeoValueDisplayEvent.getType(), new GeoValueDisplayEvent.Handler() {
+      @Override
+      public void onFileSelectionRequired(FileSelectionRequestEvent event) {
+        FileSelectorPresenter fsp = fileSelectorProvider.get();
+        fsp.handle(event);
+      }
+    });
+    addRegisteredHandler(GeoValueDisplayEvent.getType(), new GeoValueDisplayEvent.Handler() {
 
       @Override
       public void onGeoValueDisplay(GeoValueDisplayEvent event) {
@@ -117,44 +120,51 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
         vmp.handle(event);
         addToPopupSlot(vmp);
       }
-    }));
-    registerHandler(getEventBus().addHandler(FileDownloadRequestEvent.getType(), new FileDownloadRequestEvent.Handler() {
+    });
+    addRegisteredHandler(FileDownloadRequestEvent.getType(), new FileDownloadRequestEvent.Handler() {
 
       @Override
       public void onFileDownloadRequest(FileDownloadRequestEvent event) {
         getView().getDownloader().setUrl(urlBuilder.buildAbsoluteUrl(event.getUrl()));
       }
-    }));
+    });
+    addRegisteredHandler(FilesDownloadRequestEvent.getType(), new FilesDownloadRequestEvent.Handler() {
+      @Override
+      public void onFilesDownloadRequest(FilesDownloadRequestEvent event) {
+        UriBuilder uriBuilder = UriBuilder.create().fromPath(event.getParentLink());
+        for (FileDto child : event.getChildren()) {
+          uriBuilder.query("file", child.getName());
+        }
+        getView().getDownloader().setUrl(urlBuilder.buildAbsoluteUrl(uriBuilder.build()));
+      }
+    });
 
     // Update search box on event
-    registerHandler(getEventBus()
-        .addHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionChangeEvent.Handler() {
-          @Override
-          public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
-            getView().clearSearch();
-            getView().addSearchItem(event.getSelection(), VariableSearchListItem.ItemType.DATASOURCE);
-          }
-        }));
+    addRegisteredHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionChangeEvent.Handler() {
+      @Override
+      public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
+        getView().clearSearch();
+        getView().addSearchItem(event.getSelection(), VariableSearchListItem.ItemType.DATASOURCE);
+      }
+    });
 
-    registerHandler(
-        getEventBus().addHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
-          @Override
-          public void onTableSelectionChanged(TableSelectionChangeEvent event) {
-            getView().clearSearch();
-            getView().addSearchItem(event.getDatasourceName(), VariableSearchListItem.ItemType.DATASOURCE);
-            getView().addSearchItem(event.getTableName(), VariableSearchListItem.ItemType.TABLE);
-          }
-        }));
+    addRegisteredHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
+      @Override
+      public void onTableSelectionChanged(TableSelectionChangeEvent event) {
+        getView().clearSearch();
+        getView().addSearchItem(event.getDatasourceName(), VariableSearchListItem.ItemType.DATASOURCE);
+        getView().addSearchItem(event.getTableName(), VariableSearchListItem.ItemType.TABLE);
+      }
+    });
 
-    registerHandler(
-        getEventBus().addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionChangeEvent.Handler() {
-          @Override
-          public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-            getView().clearSearch();
-            getView().addSearchItem(event.getTable().getDatasourceName(), VariableSearchListItem.ItemType.DATASOURCE);
-            getView().addSearchItem(event.getTable().getName(), VariableSearchListItem.ItemType.TABLE);
-          }
-        }));
+    addRegisteredHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionChangeEvent.Handler() {
+      @Override
+      public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
+        getView().clearSearch();
+        getView().addSearchItem(event.getTable().getDatasourceName(), VariableSearchListItem.ItemType.DATASOURCE);
+        getView().addSearchItem(event.getTable().getName(), VariableSearchListItem.ItemType.TABLE);
+      }
+    });
 
     registerUserMessageEventHandler();
   }
@@ -189,14 +199,14 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   }
 
   private void registerUserMessageEventHandler() {
-    registerHandler(getEventBus().addHandler(NotificationEvent.getType(), new NotificationEvent.Handler() {
+    addRegisteredHandler(NotificationEvent.getType(), new NotificationEvent.Handler() {
 
       @Override
       public void onUserMessage(NotificationEvent event) {
         messageDialog.setNotification(event);
         setInSlot(NOTIFICATION, messageDialog);
       }
-    }));
+    });
   }
 
   @Override

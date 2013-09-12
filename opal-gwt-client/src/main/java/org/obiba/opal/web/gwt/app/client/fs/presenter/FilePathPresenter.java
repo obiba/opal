@@ -29,6 +29,8 @@ public class FilePathPresenter extends PresenterWidget<FilePathPresenter.Display
     addRegisteredHandler(FolderUpdatedEvent.getType(), new FolderUpdatedEvent.Handler() {
       @Override
       public void onFolderUpdated(FolderUpdatedEvent event) {
+        if (!isVisible()) return;
+
         getView().setFile(event.getFolder());
       }
     });
