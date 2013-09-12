@@ -33,7 +33,7 @@
     <b:NavLink icon="FILE_ALT" ui:field="reports">
       <ui:msg description="Reports label">Reports</ui:msg>
     </b:NavLink>
-    <b:NavHeader>
+    <b:NavHeader visible="false">
       <ui:msg description="Bookmarks label">Bookmarks</ui:msg>
     </b:NavHeader>
   </b:NavList>

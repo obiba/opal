@@ -16,9 +16,9 @@ import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
-import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FilesCheckedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreationEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
@@ -56,6 +56,8 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
 
   private final List<SelectionResolver> selectionResolverChain;
 
+  private List<FileDto> checkedFiles;
+
   @Inject
   public FileSelectorPresenter(Display display, EventBus eventBus, FilePathPresenter filePathPresenter,
       FilePlacesPresenter filePlacesPresenter, FolderDetailsPresenter folderDetailsPresenter,
@@ -90,11 +92,16 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
     return folderDetailsPresenter.getCurrentFolder();
   }
 
+  public List<FileDto> getCheckedFiles() {
+    return checkedFiles;
+  }
+
   public FileDto getSelectedFile() {
-    return folderDetailsPresenter.getSelectedFile();
+    return getCheckedFiles().get(0);
   }
 
   public void clearSelection() {
+    checkedFiles = null;
     folderDetailsPresenter.getView().clearSelection();
   }
 
@@ -104,6 +111,12 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
     for(SplitPaneWorkbenchPresenter.Slot slot : SplitPaneWorkbenchPresenter.Slot.values()) {
       setInSlot(slot, getDefaultPresenter(slot));
     }
+    addRegisteredHandler(FilesCheckedEvent.getType(), new FilesCheckedEvent.Handler() {
+      @Override
+      public void onFilesChecked(FilesCheckedEvent event) {
+        checkedFiles = event.getCheckedFiles();
+      }
+    });
   }
 
   protected PresenterWidget<?> getDefaultPresenter(SplitPaneWorkbenchPresenter.Slot slot) {

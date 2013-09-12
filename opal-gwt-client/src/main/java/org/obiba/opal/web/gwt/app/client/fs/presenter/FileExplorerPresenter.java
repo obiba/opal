@@ -9,13 +9,17 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FilesCheckedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRefreshedEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -47,6 +51,8 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
   private final ModalProvider<CreateFolderModalPresenter> createFolderModalProvider;
 
   private Runnable actionRequiringConfirmation;
+
+  private List<FileDto> checkedFiles;
 
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
@@ -102,60 +108,57 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).post()//
         .authorize(new CompositeAuthorizer(getView().getCreateFolderAuthorizer(), getView().getFileUploadAuthorizer()))
         .send();
-
-    if(!folderDetailsPresenter.hasSelection()) {
-      // download
-      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).get()
-          .authorize(getView().getFileDownloadAuthorizer()).send();
-      // delete
-      setEnableFileDeleteButton();
-    }
-  }
-
-  private void setEnableFileDeleteButton() {
-    FileDto folder = folderDetailsPresenter.getCurrentFolder();
-    if("/".equals(folder.getPath()) || folder.getChildrenCount() > 0) {
-      getView().setEnabledFileDeleteButton(false);
-    } else {
-      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + folder.getPath()).delete()
-          .authorize(getView().getFileDeleteAuthorizer()).send();
-    }
-  }
-
-  /**
-   * Returns the file currently selected or the current folder if no file is selected.
-   *
-   * @return
-   */
-  private FileDto getCurrentSelectionOrFolder() {
-    return folderDetailsPresenter.hasSelection()
-        ? folderDetailsPresenter.getSelectedFile()
-        : folderDetailsPresenter.getCurrentFolder();
   }
 
   private void addEventHandlers() {
-    registerHandler(
-        getEventBus().addHandler(FileSelectionChangeEvent.getType(), new FileSelectionChangeEvent.Handler() {
-
-          @Override
-          public void onFileSelectionChange(FileSelectionChangeEvent event) {
-            getView().setEnabledFileDeleteButton(folderDetailsPresenter.hasSelection());
-            if(folderDetailsPresenter.hasSelection()) {
-              authorizeFile(event.getFile());
-            }
-          }
-        }));
-
-    registerHandler(getEventBus().addHandler(FolderRefreshedEvent.getType(), new FolderRefreshedEvent.Handler() {
+    addRegisteredHandler(FolderRefreshedEvent.getType(), new FolderRefreshedEvent.Handler() {
 
       @Override
       public void onFolderRefreshed(FolderRefreshedEvent event) {
         authorizeFolder(event.getFolder());
       }
-    }));
+    });
 
-    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    addRegisteredHandler(FileSelectionChangeEvent.getType(), new FileSelectionChangeEvent.Handler() {
+      @Override
+      public void onFileSelectionChange(FileSelectionChangeEvent event) {
+        checkedFiles = null;
+        resetCheckedFilesAuthorizations();
+      }
+    });
 
+    addRegisteredHandler(FolderSelectionChangeEvent.getType(), new FolderSelectionChangeEvent.Handler() {
+      @Override
+      public void onFolderSelectionChange(FolderSelectionChangeEvent event) {
+        checkedFiles = null;
+        resetCheckedFilesAuthorizations();
+      }
+    });
+
+    addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler());
+
+    addRegisteredHandler(FilesCheckedEvent.getType(), new FilesCheckedEvent.Handler() {
+      @Override
+      public void onFilesChecked(FilesCheckedEvent event) {
+        checkedFiles = null;
+        if(!isVisible()) return;
+        checkedFiles = event.getCheckedFiles();
+        resetCheckedFilesAuthorizations();
+      }
+    });
+  }
+
+  private void resetCheckedFilesAuthorizations() {
+    if(hasCheckedFiles()) {
+      // TODO handle multiple files
+      authorizeFile(checkedFiles.get(0));
+    } else {
+      getView().getFileDownloadAuthorizer().unauthorized();
+      getView().getFileDeleteAuthorizer().unauthorized();
+      getView().getFileCopyAuthorizer().unauthorized();
+      getView().getFileCutAuthorizer().unauthorized();
+      getView().getFilePasteAuthorizer().unauthorized();
+    }
   }
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
@@ -186,12 +189,15 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
 
   @Override
   public void onDelete() {
+    if(!hasCheckedFiles()) return;
+
     // We are either deleting a file or a folder
-    final FileDto fileToDelete = getCurrentSelectionOrFolder();
     actionRequiringConfirmation = new Runnable() {
       @Override
       public void run() {
-        deleteFile(fileToDelete);
+        for(FileDto fileToDelete : checkedFiles) {
+          deleteFile(fileToDelete);
+        }
       }
 
       private void deleteFile(final FileDto file) {
@@ -220,8 +226,11 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
 
   @Override
   public void onDownload() {
-    FileDto file = getCurrentSelectionOrFolder();
-    getEventBus().fireEvent(new FileDownloadEvent("/files" + file.getPath()));
+    if(!hasCheckedFiles()) return;
+
+    for(FileDto file : checkedFiles) {
+      getEventBus().fireEvent(new FileDownloadEvent("/files" + file.getPath()));
+    }
   }
 
   @Override
@@ -239,6 +248,10 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
     //To change body of implemented methods use File | Settings | File Templates.
   }
 
+  private boolean hasCheckedFiles() {
+    return checkedFiles != null && checkedFiles.size() > 0;
+  }
+
   public interface Display extends View, HasUiHandlers<FileExplorerUiHandlers> {
 
     void setEnabledFileDeleteButton(boolean enabled);
@@ -250,6 +263,12 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
     HasAuthorization getFileDownloadAuthorizer();
 
     HasAuthorization getFileDeleteAuthorizer();
+
+    HasAuthorization getFileCopyAuthorizer();
+
+    HasAuthorization getFileCutAuthorizer();
+
+    HasAuthorization getFilePasteAuthorizer();
 
   }
 }

@@ -12,8 +12,10 @@ package org.obiba.opal.web.gwt.app.client.fs.presenter;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FilesCheckedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderSelectionChangeEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -36,8 +38,6 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
    */
   private FileDto currentFolder;
 
-  private List<FileDto> selectedFiles;
-
   @Inject
   public FolderDetailsPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
@@ -45,8 +45,8 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
   }
 
   @Override
-  public void onFilesSelected(List<FileDto> files) {
-    selectedFiles = files;
+  public void onFilesChecked(List<FileDto> files) {
+    fireEvent(new FilesCheckedEvent(files));
   }
 
   @Override
@@ -65,7 +65,6 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
       public void onFileSelectionChange(FileSelectionChangeEvent event) {
         updateTable(event.getFile());
       }
-
     });
 
     addRegisteredHandler(FileUploadedEvent.getType(), new FileUploadedEvent.Handler() {
@@ -85,6 +84,15 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
         updateTable(currentFolder);
       }
     });
+
+    addRegisteredHandler(FileDeletedEvent.getType(), new FileDeletedEvent.Handler() {
+
+      @Override
+      public void onFileDeleted(FileDeletedEvent event) {
+        // Refresh the current folder
+        updateTable(currentFolder);
+      }
+    });
   }
 
   @Override
@@ -100,17 +108,8 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
     this.currentFolder = currentFolder;
   }
 
-  public boolean hasSelection() {
-    return selectedFiles != null && selectedFiles.size() > 0;
-  }
-
-  public FileDto getSelectedFile() {
-    return hasSelection() ? selectedFiles.get(0) : null;
-  }
-
   private void updateTable(final FileDto file) {
     currentFolder = file;
-    selectedFiles = null;
     if(!isVisible()) return;
     getAndUpdateTable(file);
   }

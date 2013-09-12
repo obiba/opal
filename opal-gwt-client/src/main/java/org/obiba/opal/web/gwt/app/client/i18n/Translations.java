@@ -574,7 +574,7 @@ public interface Translations extends Constants {
       "The file that you are uploading already exist in the file system.<br /><br />Please confirm that you want to replace the existing file.",
       //
       "confirmDeleteFile",
-      "The file will be removed from the file system.<br /><br />Please confirm that you want to delete this file.", //
+      "The file(s) will be removed from the file system. Please confirm.", //
       "confirmDeleteKeyPair",
       "Please confirm that you want to remove the Key Pair. All associated encrypted material will not be accessible anymore",
 //

@@ -51,6 +51,15 @@ public class FileExplorerView extends ViewWithUiHandlers<FileExplorerUiHandlers>
   Button download;
 
   @UiField
+  Button copy;
+
+  @UiField
+  Button cut;
+
+  @UiField
+  Button paste;
+
+  @UiField
   NavLink addFolder;
 
   @Inject
@@ -94,12 +103,27 @@ public class FileExplorerView extends ViewWithUiHandlers<FileExplorerUiHandlers>
 
   @Override
   public HasAuthorization getFileDownloadAuthorizer() {
-    return new WidgetAuthorizer(download);
+    return new WidgetAuthorizer(false, download);
   }
 
   @Override
   public HasAuthorization getFileDeleteAuthorizer() {
-    return new WidgetAuthorizer(remove);
+    return new WidgetAuthorizer(false, remove);
+  }
+
+  @Override
+  public HasAuthorization getFileCopyAuthorizer() {
+    return new WidgetAuthorizer(false, copy);
+  }
+
+  @Override
+  public HasAuthorization getFileCutAuthorizer() {
+    return new WidgetAuthorizer(false, cut);
+  }
+
+  @Override
+  public HasAuthorization getFilePasteAuthorizer() {
+    return new WidgetAuthorizer(false, paste);
   }
 
   @UiHandler("addFolder")

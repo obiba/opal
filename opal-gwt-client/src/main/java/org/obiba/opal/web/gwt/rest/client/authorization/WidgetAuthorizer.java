@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.rest.client.authorization;
 
+import com.google.gwt.user.client.ui.HasEnabled;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -18,26 +19,45 @@ public class WidgetAuthorizer implements HasAuthorization {
 
   private final Widget[] widgets;
 
+  private final boolean visibility;
+
   public WidgetAuthorizer(Widget... widgets) {
+    this(true, widgets);
+  }
+
+  public WidgetAuthorizer(boolean visibility, Widget... widgets) {
     this.widgets = widgets;
+    this.visibility = visibility;
+  }
+
+  private boolean canEnable(Widget w) {
+    return !visibility && w instanceof HasEnabled;
+  }
+
+  private void toggleWidget(Widget w, boolean toggle) {
+    if(canEnable(w)) {
+      ((HasEnabled) w).setEnabled(toggle);
+    } else {
+      w.setVisible(toggle);
+    }
   }
 
   @Override
   public void beforeAuthorization() {
     for(Widget w : widgets)
-      w.setVisible(false);
+      toggleWidget(w, false);
   }
 
   @Override
   public void authorized() {
     for(Widget w : widgets)
-      w.setVisible(true);
+      toggleWidget(w, true);
   }
 
   @Override
   public void unauthorized() {
     for(Widget w : widgets)
-      w.setVisible(false);
+      toggleWidget(w, false);
   }
 
 }

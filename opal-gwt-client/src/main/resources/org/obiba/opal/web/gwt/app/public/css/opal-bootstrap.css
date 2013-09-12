@@ -50,6 +50,6 @@ footer.footer .container > div {
   min-width: 15px;
 }
 
-th > input[type="checkbox"], tr > input[type="checkbox"] {
+th input[type="checkbox"], tr input[type="checkbox"] {
   margin: 0;
 }

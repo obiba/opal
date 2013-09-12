@@ -124,7 +124,7 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
     checkColumn.setActionHandler(new ActionHandler<Integer>() {
       @Override
       public void doAction(Integer object, String actionName) {
-        getUiHandlers().onFilesSelected(checkColumn.getSelectedItems());
+        getUiHandlers().onFilesChecked(checkColumn.getSelectedItems());
       }
     });
 

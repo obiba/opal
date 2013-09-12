@@ -30,11 +30,11 @@
         </b:Button>
       </b:ButtonGroup>
       <b:ButtonGroup>
-        <b:Button icon="BOOKMARK_EMPTY" size="SMALL" title="Bookmark" ui:field="bookmark">
+        <b:Button icon="TRASH" size="SMALL" title="Delete" ui:field="remove">
         </b:Button>
       </b:ButtonGroup>
-      <b:ButtonGroup>
-        <b:Button icon="TRASH" size="SMALL" title="Delete" ui:field="remove">
+      <b:ButtonGroup visible="false">
+        <b:Button icon="BOOKMARK_EMPTY" size="SMALL" title="Bookmark" ui:field="bookmark">
         </b:Button>
       </b:ButtonGroup>
     </g:FlowPanel>

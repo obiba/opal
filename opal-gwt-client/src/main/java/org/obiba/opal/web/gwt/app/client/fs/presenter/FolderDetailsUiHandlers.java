@@ -18,7 +18,7 @@ import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface FolderDetailsUiHandlers extends UiHandlers {
 
-  void onFilesSelected(List<FileDto> files);
+  void onFilesChecked(List<FileDto> files);
 
   void onFolderSelection(FileDto fileDto);
 
