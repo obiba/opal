@@ -262,18 +262,17 @@ public class FilesResource {
       return getPathNotExistResponse(path);
     }
 
-    // The path refers to a folder that contains one or many files or subfolders.
-    if(file.getType() == FileType.FOLDER && file.getChildren().length > 0) {
-      return Response.status(Status.FORBIDDEN).entity("cannotDeleteNotEmptyFolder").build();
-    }
-
     // Read-only file or folder.
     if(!file.isWriteable()) {
       return Response.status(Status.FORBIDDEN).entity("cannotDeleteReadOnlyFile").build();
     }
 
     try {
-      file.delete();
+      if(file.getType() == FileType.FOLDER) {
+        deleteFolder(file);
+      } else {
+        file.delete();
+      }
       return Response.ok("The following file or folder has been deleted : " + path).build();
     } catch(FileSystemException couldNotDeleteFile) {
       return Response.status(Status.INTERNAL_SERVER_ERROR).entity("couldNotDeleteFileError").build();
@@ -483,16 +482,16 @@ public class FilesResource {
     addFolder(folder.getParent().getName().getPath(), folder, outputStream, children);
   }
 
-  private void addFolder(String basePath, FileObject folder, ZipOutputStream outputStream, List<String> children) throws IOException {
+  private void addFolder(String basePath, FileObject folder, ZipOutputStream outputStream, List<String> children)
+      throws IOException {
     int baseLength = basePath.equals("/") ? 1 : basePath.length() + 1;
-    
+
     // Add the folder.
     outputStream.putNextEntry(new ZipEntry(folder.getName().getPath().substring(baseLength) + "/"));
 
     // Add its children files and subfolders.
     FileObject[] files = folder.getChildren();
     for(FileObject file : files) {
-      log.info("child.baseName={}", file.getName().getBaseName());
       if(children == null || children.isEmpty() || children.contains(file.getName().getBaseName())) {
         String path = file.getName().getPath();
 
@@ -510,6 +509,27 @@ public class FilesResource {
           }
         }
       }
+    }
+  }
+
+  /**
+   * Delete writable folder and sub-folders.
+   * @param folder
+   * @throws FileSystemException
+   */
+  private void deleteFolder(FileObject folder) throws FileSystemException {
+    if (!folder.isWriteable()) return;
+
+    FileObject[] files = folder.getChildren();
+    for(FileObject file : files) {
+      if(file.getType() == FileType.FOLDER) {
+        deleteFolder(file);
+      } else if(file.isWriteable()) {
+        file.delete();
+      }
+    }
+    if(folder.getChildren().length == 0) {
+      folder.delete();
     }
   }
 

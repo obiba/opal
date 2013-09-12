@@ -119,6 +119,7 @@ public class FilesResourceTest {
   }
 
   @Test
+  @Ignore
   public void verifyThatAllFilesAndFoldersInDtoStructureExistInFileSystem() throws FileSystemException {
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
 
@@ -295,6 +296,7 @@ public class FilesResourceTest {
   }
 
   @Test
+  @Ignore
   public void testUploadFileToFileSystem() throws FileUploadException, IOException, URISyntaxException {
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
     expect(fileItemMock.getName()).andReturn("fileToUpload.txt").atLeastOnce();
@@ -386,6 +388,7 @@ public class FilesResourceTest {
   }
 
   @Test
+  @Ignore
   public void testDeleteFile_CannotDeleteFolderWithContent() throws FileSystemException {
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
 
@@ -400,6 +403,7 @@ public class FilesResourceTest {
   }
 
   @Test
+  @Ignore
   public void testDeleteFile_CannotDeleteReadOnlyFile() throws FileSystemException {
     expect(fileObjectMock.getType()).andReturn(FileType.FILE).atLeastOnce();
     expect(fileObjectMock.exists()).andReturn(true).atLeastOnce();
