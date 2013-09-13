@@ -19,12 +19,14 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FilesCheckedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FilesDownloadRequestEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -41,6 +43,10 @@ import com.gwtplatform.mvp.client.View;
 public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter.Display>
     implements FileExplorerUiHandlers {
 
+  private enum FileAction {
+    COPY, MOVE
+  }
+
   private final FilePathPresenter filePathPresenter;
 
   private final FilePlacesPresenter filePlacesPresenter;
@@ -54,6 +60,10 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
   private Runnable actionRequiringConfirmation;
 
   private List<FileDto> checkedFiles;
+
+  private List<FileDto> filesClipboard;
+
+  private FileAction currentAction;
 
   @Inject
   @SuppressWarnings("PMD.ExcessiveParameterList")
@@ -98,20 +108,13 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
     return null;
   }
 
-  private void authorizeFolder(FileDto dto) {
-    // create folder and upload
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + dto.getPath()).post()//
-        .authorize(new CompositeAuthorizer(getView().getCreateFolderAuthorizer(), getView().getFileUploadAuthorizer()))
-        .send();
-  }
-
   private void addEventHandlers() {
     addRegisteredHandler(FolderUpdatedEvent.getType(), new FolderUpdatedEvent.Handler() {
 
       @Override
       public void onFolderUpdated(FolderUpdatedEvent event) {
-        authorizeFolder(event.getFolder());
         checkedFiles = null;
+        updateCurrentFoldeAuthorizations();
         updateCheckedFilesAuthorizations();
       }
     });
@@ -129,51 +132,100 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
     });
   }
 
+  private FileDto getCurrentFolder() {
+    return folderDetailsPresenter.getCurrentFolder();
+  }
+
   private void updateCheckedFilesAuthorizations() {
     if(hasCheckedFiles()) {
       updateCheckedFilesDownloadAuthorization();
+      updateCheckedFilesCopyAuthorization();
+      updateCheckedFilesCutAuthorization();
       updateCheckedFilesDeleteAuthorization();
     } else {
       getView().getFileDownloadAuthorizer().unauthorized();
       getView().getFileDeleteAuthorizer().unauthorized();
       getView().getFileCopyAuthorizer().unauthorized();
       getView().getFileCutAuthorizer().unauthorized();
-      getView().getFilePasteAuthorizer().unauthorized();
     }
+  }
+
+  private void updateCurrentFoldeAuthorizations() {
+    // create folder and upload
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + getCurrentFolder().getPath())
+        .post()//
+        .authorize(new CompositeAuthorizer(getView().getCreateFolderAuthorizer(), getView().getFileUploadAuthorizer()))
+        .send();
+
+    updateCurrentFolderPasteAuthorization();
   }
 
   /**
    * Authorize download if all that is selected can be downloaded.
    */
   private void updateCheckedFilesDownloadAuthorization() {
-    if (!hasCheckedFiles()) return;
+    if(!hasCheckedFiles()) return;
 
-    CascadingAuthorizer.Builder builder = CascadingAuthorizer.newBuilder();
-    FileDto current = null;
+    boolean allReadable = true;
     for(FileDto file : checkedFiles) {
-      builder.and(ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + file.getPath()).get()
-          .authorize(getView().getFileDownloadAuthorizer()));
-      if(current == null) current = FileDtos.getParent(file);
+      if(!allReadable) break;
+      allReadable = file.getReadable();
     }
+    if(allReadable) getView().getFileDownloadAuthorizer().authorized();
+    else getView().getFileDownloadAuthorizer().unauthorized();
+  }
 
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + current.getPath()).get()
-        .authorize(builder.authorize(getView().getFileDownloadAuthorizer()).build()).send();
+  /**
+   * Authorize copy if all that is selected can be downloaded.
+   */
+  private void updateCheckedFilesCopyAuthorization() {
+    if(!hasCheckedFiles()) return;
+
+    boolean allReadable = true;
+    for(FileDto file : checkedFiles) {
+      if(!allReadable) break;
+      allReadable = file.getReadable();
+    }
+    if(allReadable) getView().getFileCopyAuthorizer().authorized();
+    else getView().getFileCopyAuthorizer().unauthorized();
+  }
+
+  /**
+   * Authorize cut if all that is selected can be downloaded and deleted.
+   */
+  private void updateCheckedFilesCutAuthorization() {
+    if(!hasCheckedFiles()) return;
+
+    boolean allWritable = true;
+    for(FileDto file : checkedFiles) {
+      if(!allWritable) break;
+      allWritable = file.getReadable() && file.getWritable();
+    }
+    if(allWritable) getView().getFileCutAuthorizer().authorized();
+    else getView().getFileCutAuthorizer().unauthorized();
+  }
+
+  /**
+   * Authorize paste if current folder is writable.
+   */
+  private void updateCurrentFolderPasteAuthorization() {
+    if(hasFilesInClipboard() && getCurrentFolder().getWritable()) getView().getFilePasteAuthorizer().authorized();
+    else getView().getFilePasteAuthorizer().unauthorized();
   }
 
   /**
    * Authorize delete if all that is selected can be deleted.
    */
   private void updateCheckedFilesDeleteAuthorization() {
-    if (!hasCheckedFiles()) return;
+    if(!hasCheckedFiles()) return;
 
-    CascadingAuthorizer.Builder builder = CascadingAuthorizer.newBuilder();
+    boolean allWritable = true;
     for(FileDto file : checkedFiles) {
-      builder.and(ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + file.getPath()).delete()
-          .authorize(getView().getFileDeleteAuthorizer()));
+      if(!allWritable) break;
+      allWritable = file.getWritable();
     }
-
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + checkedFiles.get(0).getPath()).delete()
-        .authorize(builder.authorize(getView().getFileDeleteAuthorizer()).build()).send();
+    if(allWritable) getView().getFileDeleteAuthorizer().authorized();
+    else getView().getFileDeleteAuthorizer().unauthorized();
   }
 
   class ConfirmationEventHandler implements ConfirmationEvent.Handler {
@@ -248,26 +300,57 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
 
   @Override
   public void onCopy() {
-    //To change body of implemented methods use File | Settings | File Templates.
+    filesClipboard = checkedFiles;
+    currentAction = FileAction.COPY;
+    getView().showFilesInClipboard(filesClipboard);
   }
 
   @Override
   public void onCut() {
-    //To change body of implemented methods use File | Settings | File Templates.
+    filesClipboard = checkedFiles;
+    currentAction = FileAction.MOVE;
+    getView().showFilesInClipboard(filesClipboard);
   }
 
   @Override
   public void onPaste() {
-    //To change body of implemented methods use File | Settings | File Templates.
+    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        if(response.getStatusCode() != Response.SC_OK) {
+          fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+        } else {
+          fireEvent(new FolderRequestEvent(getCurrentFolder()));
+        }
+        filesClipboard = null;
+        currentAction = null;
+        updateCurrentFolderPasteAuthorization();
+        getView().showFilesInClipboard(filesClipboard);
+      }
+    };
+
+    UriBuilder uriBuilder = UriBuilder.create().fromPath(FileDtos.getLink(getCurrentFolder()));
+    for (FileDto child : filesClipboard) {
+      uriBuilder.query("file", child.getPath());
+    }
+    uriBuilder.query("action", currentAction.toString().toLowerCase());
+    ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).put()
+        .withCallback(Response.SC_OK, callbackHandler).withCallback(Response.SC_FORBIDDEN, callbackHandler)
+        .withCallback(Response.SC_BAD_REQUEST, callbackHandler)
+        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler)
+        .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
   }
 
   private boolean hasCheckedFiles() {
-    return checkedFiles != null && checkedFiles.size() > 0;
+    return checkedFiles != null && !checkedFiles.isEmpty();
+  }
+
+  private boolean hasFilesInClipboard() {
+    return filesClipboard != null && !filesClipboard.isEmpty();
   }
 
   public interface Display extends View, HasUiHandlers<FileExplorerUiHandlers> {
-
-    void setEnabledFileDeleteButton(boolean enabled);
 
     HasAuthorization getCreateFolderAuthorizer();
 
@@ -283,5 +366,6 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
 
     HasAuthorization getFilePasteAuthorizer();
 
+    void showFilesInClipboard(List<FileDto> filesClipboard);
   }
 }

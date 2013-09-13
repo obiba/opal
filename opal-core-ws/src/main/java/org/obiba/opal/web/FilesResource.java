@@ -34,8 +34,10 @@ import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -50,10 +52,14 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.vfs2.AllFileSelector;
+import org.apache.commons.vfs2.FileFilter;
+import org.apache.commons.vfs2.FileFilterSelector;
 import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSelectInfo;
+import org.apache.commons.vfs2.FileSelector;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
-import org.apache.shiro.SecurityUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.core.util.StreamUtil;
@@ -130,6 +136,67 @@ public class FilesResource {
       return file.getType() == FileType.FILE ? getFile(file) : getFolder(file, children);
     }
     return getPathNotExistResponse(path);
+  }
+
+  /**
+   * Copy or move a file to the current folder.
+   *
+   * @param path
+   * @param action 'copy' (default) or 'move'
+   * @param file
+   * @return
+   * @throws IOException
+   */
+  @PUT
+  @Path("/{path:.*}")
+  @AuthenticatedByCookie
+  public Response addFile(@Context UriInfo uriInfo, @PathParam("path") String destinationPath,
+      @QueryParam("action") @DefaultValue("copy") String action, @QueryParam("file") List<String> sourcesPath)
+      throws IOException {
+    // destination check
+    FileObject destinationFolder = resolveFileInFileSystem(destinationPath);
+    if(!destinationFolder.exists()) getPathNotExistResponse(destinationPath);
+    if(destinationFolder.getType() != FileType.FOLDER)
+      return Response.status(Status.BAD_REQUEST).entity("Destination must be a folder: " + destinationPath).build();
+    if(!destinationFolder.isWriteable())
+      return Response.status(Status.FORBIDDEN).entity("Destination file is not writable: " + destinationPath).build();
+
+    // sources check
+    if(sourcesPath == null || sourcesPath.isEmpty())
+      return Response.status(Status.BAD_REQUEST).entity("Source files are missing").build();
+    for(String sourcePath : sourcesPath) {
+      FileObject sourceFile = resolveFileInFileSystem(sourcePath);
+      if(!sourceFile.exists()) getPathNotExistResponse(sourcePath);
+      if(!sourceFile.isReadable())
+        return Response.status(Status.FORBIDDEN).entity("Source file is not readable: " + sourcePath).build();
+      if(!sourceFile.isWriteable() && "move".equals(action))
+        return Response.status(Status.FORBIDDEN).entity("Source file cannot be moved: " + sourcePath).build();
+    }
+
+    // do action
+    for(String sourcePath : sourcesPath) {
+      final FileObject sourceFile = resolveFileInFileSystem(sourcePath);
+      FileObject destinationFile = resolveFileInFileSystem(destinationPath + "/" + sourceFile.getName().getBaseName());
+      if("move".equals(action.toLowerCase())) {
+        sourceFile.moveTo(destinationFile);
+      } else if(sourceFile.getType() == FileType.FOLDER) {
+        destinationFile.copyFrom(sourceFile, new AllFileSelector());
+      } else {
+        destinationFile.copyFrom(sourceFile.getParent(), new FileSelector() {
+          @Override
+          public boolean includeFile(FileSelectInfo fileInfo) throws Exception {
+            return fileInfo.getFile().getName().getPath().equals(sourceFile.getName().getPath());
+          }
+
+          @Override
+          public boolean traverseDescendents(FileSelectInfo fileInfo) throws Exception {
+            return false;
+          }
+        });
+      }
+    }
+
+    return Response.ok().build();
   }
 
   @POST
@@ -493,11 +560,8 @@ public class FilesResource {
     FileObject[] files = folder.getChildren();
     for(FileObject file : files) {
       if(children == null || children.isEmpty() || children.contains(file.getName().getBaseName())) {
-        String path = file.getName().getPath();
-
         // only add files for which download is authorized
-        // TODO formalise file permissions
-        if(SecurityUtils.getSubject().isPermitted("magma:/files" + path + ":GET")) {
+        if(file.isReadable()) {
           if(file.getType() == FileType.FOLDER) {
             addFolder(basePath, file, outputStream, null);
           } else {
@@ -514,11 +578,12 @@ public class FilesResource {
 
   /**
    * Delete writable folder and sub-folders.
+   *
    * @param folder
    * @throws FileSystemException
    */
   private void deleteFolder(FileObject folder) throws FileSystemException {
-    if (!folder.isWriteable()) return;
+    if(!folder.isWriteable()) return;
 
     FileObject[] files = folder.getChildren();
     for(FileObject file : files) {

@@ -9,11 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.view;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerUiHandlers;
 import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
+import org.obiba.opal.web.model.client.opal.FileDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.NavLink;
@@ -87,11 +90,6 @@ public class FileExplorerView extends ViewWithUiHandlers<FileExplorerUiHandlers>
   }
 
   @Override
-  public void setEnabledFileDeleteButton(boolean enabled) {
-    remove.setEnabled(enabled);
-  }
-
-  @Override
   public HasAuthorization getCreateFolderAuthorizer() {
     return new WidgetAuthorizer(addFolder);
   }
@@ -126,6 +124,12 @@ public class FileExplorerView extends ViewWithUiHandlers<FileExplorerUiHandlers>
     return new WidgetAuthorizer(false, paste);
   }
 
+  @Override
+  public void showFilesInClipboard(List<FileDto> filesClipboard) {
+    // TODO translate
+    paste.setTitle(filesClipboard == null || filesClipboard.isEmpty() ? "Paste" : "Paste " + filesClipboard.size() + " files");
+  }
+
   @UiHandler("addFolder")
   void onAddFolder(ClickEvent event) {
     getUiHandlers().onAddFolder();
@@ -149,6 +153,7 @@ public class FileExplorerView extends ViewWithUiHandlers<FileExplorerUiHandlers>
   @UiHandler("copy")
   void onCopy(ClickEvent event) {
     getUiHandlers().onCopy();
+
   }
 
   @UiHandler("cut")

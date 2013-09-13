@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 class SecuredFileObject extends DecoratedFileObject {
 
@@ -35,13 +36,6 @@ class SecuredFileObject extends DecoratedFileObject {
   SecuredFileObject(Authorizer authorizer, FileObject decoratedFileObject) {
     super(decoratedFileObject);
     this.authorizer = authorizer;
-  }
-
-  @Override
-  public void findFiles(FileSelector selector, boolean depthwise, List<FileObject> selected)
-      throws FileSystemException {
-    super.findFiles(selector, depthwise,
-        Arrays.asList(toSecuredFileObjects(selected.toArray(new FileObject[selected.size()]))));
   }
 
   @Override
@@ -116,12 +110,12 @@ class SecuredFileObject extends DecoratedFileObject {
   private FileObject[] toSecuredFileObjects(FileObject... children) {
     if(children == null) return null;
 
-    return Iterables.toArray(Iterables.transform(Arrays.asList(children), new Function<FileObject, FileObject>() {
-      @Override
-      public FileObject apply(@Nullable FileObject input) {
-        return new SecuredFileObject(authorizer, input);
-      }
-    }), FileObject.class);
+    FileObject[] secured = new FileObject[children.length];
+    for (int i=0; i<children.length;i++) {
+      secured[i] = new SecuredFileObject(authorizer, children[i]);
+    }
+
+    return secured;
   }
 
   private boolean isPermitted(FileObject file, String method) {
