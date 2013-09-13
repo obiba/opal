@@ -13,7 +13,7 @@
           <ui:msg description="Select file to upload label">Select the file to be uploaded in directory:</ui:msg>
         </b:ControlLabel>
         <b:Controls>
-          <b2:InlineLabel ui:field="remoteFolderName"/>
+          <b2:InlineLabel ui:field="remoteFolderName" addStyleNames="help-block"/>
           <g:Image ui:field="uploadingText" visible="false" url="image/in-progress.gif"/>
         </b:Controls>
       </b:ControlGroup>

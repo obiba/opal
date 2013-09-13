@@ -102,8 +102,7 @@ public class FileUploadModalPresenter extends ModalPresenterWidget<FileUploadMod
   @Override
   public void onReveal() {
     if(currentFolder != null) {
-      String folderName = currentFolder.getName();
-      getView().setRemoteFolderName("root".equals(folderName) ? translations.fileSystemLabel() : folderName);
+      getView().setRemoteFolderName(currentFolder.getPath());
     }
   }
 
