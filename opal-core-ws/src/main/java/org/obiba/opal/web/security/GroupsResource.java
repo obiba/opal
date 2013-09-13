@@ -42,19 +42,16 @@ public class GroupsResource extends AbstractUserGroupResource {
   }
 
   @POST
-  public Response createGroup(Opal.GroupDto groupDto) {
+  public Response createGroup(Opal.GroupDto groupDto) throws GroupAlreadyExistsException {
 
     if(userService.getGroupWithName(groupDto.getName()) != null) {
       return Response.status(Response.Status.NOT_MODIFIED).build();
     }
 
-    try {
-      Group group = new Group();
-      group.setName(groupDto.getName());
-      userService.createOrUpdateGroup(group);
-    } catch(GroupAlreadyExistsException e) {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-    }
+    Group group = new Group();
+    group.setName(groupDto.getName());
+    userService.createOrUpdateGroup(group);
+
     return Response.ok().build();
   }
 
