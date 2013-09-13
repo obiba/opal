@@ -36,7 +36,7 @@
       </b:Column>
 
       <b:Column size="3" ui:field="reports">
-        <g:Image url="image/48/units.png" addStyleNames="inline-block"></g:Image>
+        <g:Image url="image/48/report.png" addStyleNames="inline-block"></g:Image>
         <b:NavLink ui:field="reportsLink">
           <ui:msg description="Reports link label">Run Reports</ui:msg>
         </b:NavLink>
