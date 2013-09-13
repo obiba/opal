@@ -14,6 +14,7 @@ import org.hibernate.SessionFactory;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.datasource.hibernate.HibernateDatasource;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasource;
+import org.obiba.magma.datasource.mongodb.MongoDBFactory;
 import org.obiba.opal.core.cfg.OrientDbService;
 import org.obiba.opal.core.cfg.OrientDbTransactionCallbackWithoutResult;
 import org.obiba.opal.core.domain.database.Database;
@@ -187,7 +188,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   @Override
   public void deleteDatabase(@Nonnull final Database database) throws CannotDeleteDatabaseWithDataException {
-    //TODO check if this database has data 
+    //TODO check if this database has data
     orientDbService.execute(new OrientDbTransactionCallbackWithoutResult() {
       @Override
       public void doInTransactionWithoutResult(OObjectDatabaseTx db) {
@@ -244,7 +245,8 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
       }
     }
     if(database instanceof MongoDbDatabase) {
-      return new MongoDBDatasource(datasourceName, ((MongoDbDatabase) database).createMongoClientURI());
+      return new MongoDBDatasource(datasourceName,
+          new MongoDBFactory(((MongoDbDatabase) database).createMongoClientURI().toString()));
     }
     throw new IllegalArgumentException("Unknown datasource config for database " + database);
   }
