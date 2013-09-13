@@ -30,6 +30,10 @@
       <artifactId>magma-hibernate-datasource</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-datasource-mongodb</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-ext-jdk16</artifactId>
     </dependency>
@@ -77,10 +81,7 @@
       <groupId>org.eclipse.jgit</groupId>
       <artifactId>org.eclipse.jgit</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.mongodb</groupId>
-      <artifactId>mongo-java-driver</artifactId>
-    </dependency>
+
     <!--<dependency>-->
     <!--<groupId>org.gitective</groupId>-->
     <!--<artifactId>gitective-core</artifactId>-->

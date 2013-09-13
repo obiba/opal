@@ -1,11 +1,8 @@
 package org.obiba.opal.core.domain.database;
 
-import java.net.UnknownHostException;
-
 import javax.annotation.Nonnull;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
+import org.obiba.magma.datasource.mongodb.MongoDBFactory;
 
 @SuppressWarnings("ParameterHidesMemberVariable")
 public class MongoDbDatabase extends Database {
@@ -22,12 +19,8 @@ public class MongoDbDatabase extends Database {
 
   private String properties;
 
-  public MongoClient createMongoClient() throws UnknownHostException {
-    return new MongoClient(url);
-  }
-
-  public MongoClientURI createMongoClientURI() {
-    return new MongoClientURI(url);
+  public MongoDBFactory createMongoDBFactory() {
+    return new MongoDBFactory(url);
   }
 
   public String getPassword() {

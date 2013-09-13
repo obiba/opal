@@ -245,8 +245,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
       }
     }
     if(database instanceof MongoDbDatabase) {
-      return new MongoDBDatasource(datasourceName,
-          new MongoDBFactory(((MongoDbDatabase) database).createMongoClientURI().toString()));
+      return new MongoDBDatasource(datasourceName, ((MongoDbDatabase) database).createMongoDBFactory());
     }
     throw new IllegalArgumentException("Unknown datasource config for database " + database);
   }
