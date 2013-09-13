@@ -44,7 +44,7 @@ public class UserResource extends AbstractUserGroupResource {
   }
 
   @PUT
-  public Response updateUser(Opal.UserDto userDto) {
+  public Response updateUser(Opal.UserDto userDto) throws UserAlreadyExistsException {
 
     if(!name.equals(userDto.getName())) {
       return Response.status(Response.Status.BAD_REQUEST).build();
@@ -55,11 +55,8 @@ public class UserResource extends AbstractUserGroupResource {
       user.setPassword(User.digest(userDto.getPassword()));
     }
 
-    try {
-      userService.createOrUpdateUser(user);
-    } catch(UserAlreadyExistsException e) {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-    }
+    userService.createOrUpdateUser(user);
+
     return Response.ok().build();
   }
 

@@ -417,10 +417,11 @@ public interface Translations extends Constants {
       "UserPasswordLengthError", "Password must contain at least {0} characters.",//
       "UserPasswordMatchError", "Passwords do not match.",//
       "UserDeletedOk", "User {0} has been successfully deleted.", //
-      "UserAlreadyExists", "User {0} already exists.", //
+      "UserAlreadyExists", "User name already exists.", //
       "UserNameRequiredError", "User name is required.",//
       "UserPasswordRequiredError", "Password is required.",//
       "GroupDeletedOk", "Group {0} has been successfully deleted.", //
+      "GroupAlreadyExists", "Group already exists.", //
       "ProjectNameRequired", "Project name is required.", //
       "ProjectNameMustBeUnique", "A project already exists with this name.",//
       "ProjectCreationFailed", "The datasource creation has failed: {0}", //
@@ -573,8 +574,7 @@ public interface Translations extends Constants {
       "confirmReplaceExistingFile",
       "The file that you are uploading already exist in the file system.<br /><br />Please confirm that you want to replace the existing file.",
       //
-      "confirmDeleteFile",
-      "The file(s) will be removed from the file system. Please confirm.", //
+      "confirmDeleteFile", "The file(s) will be removed from the file system. Please confirm.", //
       "confirmDeleteKeyPair",
       "Please confirm that you want to remove the Key Pair. All associated encrypted material will not be accessible anymore",
 //

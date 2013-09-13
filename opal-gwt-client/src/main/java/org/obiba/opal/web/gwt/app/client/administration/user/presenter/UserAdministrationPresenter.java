@@ -252,17 +252,6 @@ public class UserAdministrationPresenter
           getView().renderUserRows(resource);
         }
       }).get().send();
-
-      // Fetch all groups
-      ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder()//
-          .forResource("/groups").withCallback(new ResourceCallback<JsArray<GroupDto>>() {
-
-        @Override
-        public void onResource(Response response, JsArray<GroupDto> resource) {
-          getView().renderGroupRows(resource);
-        }
-      }).get().send();
-
     }
 
     @Override
