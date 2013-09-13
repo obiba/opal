@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
+import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.PageHeader;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -40,22 +41,16 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   PageHeader pageTitle;
 
   @UiField
-  Label participantCount;
+  NavLink exploreVariablesLink;
 
   @UiField
-  Anchor exploreVariablesLink;
+  NavLink exploreFilesLink;
 
   @UiField
-  Anchor exploreFilesLink;
+  NavLink reportsLink;
 
   @UiField
-  Anchor jobsLink;
-
-  @UiField
-  Anchor reportsLink;
-
-  @UiField
-  Anchor unitsLink;
+  NavLink unitsLink;
 
   @UiField
   Panel datasources;
@@ -69,15 +64,11 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   @UiField
   Panel reports;
 
-  @UiField
-  Panel jobs;
-
   public DashboardView() {
     initWidget(uiBinder.createAndBindUi(this));
-    getDatasourcesLink().setHref("#" + Places.NAVIGATOR);
+    getDatasourcesLink().setHref("#" + Places.PROJECTS);
     getUnitsLink().setHref("#" + Places.UNITS);
     getReportsLink().setHref("#" + Places.REPORT_TEMPLATES);
-    getJobsLink().setHref("#" + Places.JOBS);
     getFilesLink().setHref("#" + Places.FILES);
     pageTitle.setText(translations.pageDashboardTitle());
   }
@@ -99,28 +90,19 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   public void setInSlot(Object slot, IsWidget content) {
   }
 
-  @Override
-  public void setParticipantCount(int count) {
-    participantCount.setText(String.valueOf(count));
-  }
-
-  public Anchor getDatasourcesLink() {
+  public NavLink getDatasourcesLink() {
     return exploreVariablesLink;
   }
 
-  public Anchor getFilesLink() {
+  public NavLink getFilesLink() {
     return exploreFilesLink;
   }
 
-  public Anchor getJobsLink() {
-    return jobsLink;
-  }
-
-  public Anchor getReportsLink() {
+  public NavLink getReportsLink() {
     return reportsLink;
   }
 
-  public Anchor getUnitsLink() {
+  public NavLink getUnitsLink() {
     return unitsLink;
   }
 
@@ -139,10 +121,6 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
     return new WidgetAuthorizer(files);
   }
 
-  @Override
-  public HasAuthorization getJobsAuthorizer() {
-    return new WidgetAuthorizer(jobs);
-  }
 
   @Override
   public HasAuthorization getReportsAuthorizer() {

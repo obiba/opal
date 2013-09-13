@@ -2,6 +2,10 @@
  * Twitter Bootstrap
  */
 
+a:visited {
+  color: #0088CC;
+}
+
 footer.footer {
   margin-top: 40px;
   font-size: 0.8em;

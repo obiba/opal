@@ -50,29 +50,13 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
 
   @Override
   protected void onReveal() {
-    super.onReveal();
-
     authorize();
-
     ResponseCodeCallback noOp = new ResponseCodeCallback() {
 
       @Override
       public void onResponseCode(Request request, Response response) {
       }
     };
-
-    ResourceRequestBuilderFactory.newBuilder().forResource("/participants/count").get()
-        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
-
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            getView().setParticipantCount(Integer.parseInt(response.getText()));
-          }
-        })//
-        .withCallback(Response.SC_FORBIDDEN, noOp)//
-        .withCallback(Response.SC_METHOD_NOT_ALLOWED, noOp)//
-        .send();
-
   }
 
   private void authorize() {
@@ -82,8 +66,6 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
         .authorize(getView().getUnitsAuthorizer()).send();
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").get()
         .authorize(getView().getReportsAuthorizer()).send();
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/commands").get()
-        .authorize(getView().getJobsAuthorizer()).send();
   }
 
   //
@@ -91,7 +73,6 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
   //
 
   public interface Display extends View {
-    void setParticipantCount(int count);
 
     //
     // Authorization
@@ -102,8 +83,6 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
     HasAuthorization getDatasourcesAuthorizer();
 
     HasAuthorization getFilesAuthorizer();
-
-    HasAuthorization getJobsAuthorizer();
 
     HasAuthorization getReportsAuthorizer();
 
