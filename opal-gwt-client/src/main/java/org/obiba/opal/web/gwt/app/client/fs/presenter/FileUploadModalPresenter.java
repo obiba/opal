@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileUploadedEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
@@ -61,8 +62,15 @@ public class FileUploadModalPresenter extends ModalPresenterWidget<FileUploadMod
     getView().setUiHandlers(this);
   }
 
-  public void setCurrentFolder(FileDto currentFolder) {
-    this.currentFolder = currentFolder;
+  @Override
+  protected void onBind() {
+    addRegisteredHandler(FolderUpdatedEvent.getType(), new FolderUpdatedEvent.Handler() {
+      @Override
+      public void onFolderUpdated(FolderUpdatedEvent event) {
+        currentFolder = event.getFolder();
+      }
+    });
+    addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler());
   }
 
   @Override
@@ -76,9 +84,9 @@ public class FileUploadModalPresenter extends ModalPresenterWidget<FileUploadMod
     };
 
     if("".equals(fileName)) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.fileMustBeSelected()).build());
+      fireEvent(NotificationEvent.newBuilder().error(translations.fileMustBeSelected()).build());
     } else if(fileExist(fileName)) {
-      getEventBus().fireEvent(ConfirmationRequiredEvent
+      fireEvent(ConfirmationRequiredEvent
           .createWithKeys(actionRequiringConfirmation, "replaceExistingFile", "confirmReplaceExistingFile"));
     } else {
       submitFile();
@@ -93,11 +101,13 @@ public class FileUploadModalPresenter extends ModalPresenterWidget<FileUploadMod
 
   @Override
   public void onReveal() {
-    String folderName = currentFolder.getName();
-    getView().setRemoteFolderName("root".equals(folderName) ? translations.fileSystemLabel() : folderName);
+    if(currentFolder != null) {
+      String folderName = currentFolder.getName();
+      getView().setRemoteFolderName("root".equals(folderName) ? translations.fileSystemLabel() : folderName);
+    }
   }
 
-  class ConfirmationEventHandler implements ConfirmationEvent.Handler {
+  private class ConfirmationEventHandler implements ConfirmationEvent.Handler {
 
     @Override
     public void onConfirmation(ConfirmationEvent event) {
@@ -110,6 +120,8 @@ public class FileUploadModalPresenter extends ModalPresenterWidget<FileUploadMod
   }
 
   private boolean fileExist(String fileName) {
+    if(currentFolder == null) return false;
+
     // OPAL-1075 Chrome prefixes the file name with C:\fakepath\
     int sep = fileName.lastIndexOf("\\");
     String name = fileName;

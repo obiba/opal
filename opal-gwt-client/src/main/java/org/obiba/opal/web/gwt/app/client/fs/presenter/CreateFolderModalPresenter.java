@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -40,16 +41,25 @@ public class CreateFolderModalPresenter extends ModalPresenterWidget<CreateFolde
   @Inject
   public CreateFolderModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
-   getView().setUiHandlers(this);
+    getView().setUiHandlers(this);
   }
 
+  @Override
+  protected void onBind() {
+    addRegisteredHandler(FolderUpdatedEvent.getType(), new FolderUpdatedEvent.Handler() {
+      @Override
+      public void onFolderUpdated(FolderUpdatedEvent event) {
+        currentFolder = event.getFolder();
+      }
+    });
+  }
 
   @Override
   public void createFolder(String folderName) {
     if("".equals(folderName)) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.folderNameIsRequired()).build());
+      fireEvent(NotificationEvent.newBuilder().error(translations.folderNameIsRequired()).build());
     } else if(".".equals(folderName) || "..".equals(folderName)) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.dotNamesAreInvalid()).build());
+      fireEvent(NotificationEvent.newBuilder().error(translations.dotNamesAreInvalid()).build());
     } else {
       createRemoteFolder(currentFolder.getPath(), folderName);
     }
@@ -61,7 +71,7 @@ public class CreateFolderModalPresenter extends ModalPresenterWidget<CreateFolde
 
       @Override
       public void onResource(Response response, FileDto resource) {
-        getEventBus().fireEvent(new FolderCreatedEvent(resource));
+        fireEvent(new FolderCreatedEvent(resource));
         getView().hideDialog();
       }
     };
@@ -70,16 +80,12 @@ public class CreateFolderModalPresenter extends ModalPresenterWidget<CreateFolde
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+        fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
       }
     };
 
     ResourceRequestBuilderFactory.<FileDto>newBuilder().forResource("/files" + destination).post()
-        .withBody("text/plain", folder).withCallback(createdCallback).withCallback(403, error).withCallback(500, error)
-        .send();
-  }
-
-  public void setCurrentFolder(FileDto currentFolder) {
-    this.currentFolder = currentFolder;
+        .withBody("text/plain", folder).withCallback(createdCallback).withCallback(Response.SC_FORBIDDEN, error)
+        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, error).send();
   }
 }

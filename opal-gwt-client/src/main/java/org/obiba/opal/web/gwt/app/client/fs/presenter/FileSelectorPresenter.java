@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FilesCheckedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -49,7 +50,9 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
 
   private final FolderDetailsPresenter folderDetailsPresenter;
 
-  FileUploadModalPresenter fileUploadModalPresenter;
+  private final ModalProvider<FileUploadModalPresenter> fileUploadModalProvider;
+
+  private FileUploadModalPresenter fileUploadModalPresenter;
 
   private Object fileSelectionSource;
 
@@ -60,12 +63,12 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
   @Inject
   public FileSelectorPresenter(Display display, EventBus eventBus, FilePathPresenter filePathPresenter,
       FilePlacesPresenter filePlacesPresenter, FolderDetailsPresenter folderDetailsPresenter,
-      FileUploadModalPresenter fileUploadModalPresenter, RequestCredentials credentials) {
+      ModalProvider<FileUploadModalPresenter> fileUploadModalProvider, RequestCredentials credentials) {
     super(eventBus, display);
     this.filePathPresenter = filePathPresenter;
     this.filePlacesPresenter = filePlacesPresenter;
     this.folderDetailsPresenter = folderDetailsPresenter;
-    this.fileUploadModalPresenter = fileUploadModalPresenter;
+    this.fileUploadModalProvider = fileUploadModalProvider.setContainer(this);
     this.credentials = credentials;
 
     getView().setUiHandlers(this);
@@ -109,6 +112,7 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
         checkedFiles = event.getCheckedFiles();
       }
     });
+    fileUploadModalPresenter = fileUploadModalProvider.create();
     folderDetailsPresenter.setSingleSelectionModel(true);
   }
 
@@ -196,8 +200,7 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
 
   @Override
   public void onUploadFile() {
-    fileUploadModalPresenter.setCurrentFolder(getCurrentFolder());
-    addToPopupSlot(fileUploadModalPresenter);
+    fileUploadModalProvider.show();
   }
 
   @Override
