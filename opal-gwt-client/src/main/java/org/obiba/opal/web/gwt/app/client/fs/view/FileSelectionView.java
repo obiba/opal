@@ -10,35 +10,25 @@
 package org.obiba.opal.web.gwt.app.client.fs.view;
 
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionUiHandlers;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
-import com.gwtplatform.mvp.client.ViewImpl;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 /**
  *
  */
-public class FileSelectionView extends ViewImpl implements FileSelectionPresenter.Display {
+public class FileSelectionView extends ViewWithUiHandlers<FileSelectionUiHandlers> implements FileSelectionPresenter.Display {
 
-  @UiTemplate("FileSelectionView.ui.xml")
-  interface FileSelectionViewUiBinder extends UiBinder<Panel, FileSelectionView> {}
-
-  //
-  // Constants
-  //
-
-  private static final FileSelectionViewUiBinder uiBinder = GWT.create(FileSelectionViewUiBinder.class);
-
-  private final Widget uiWidget;
+  interface Binder extends UiBinder<Panel, FileSelectionView> {}
 
   //
   // Instance Variables
@@ -54,20 +44,20 @@ public class FileSelectionView extends ViewImpl implements FileSelectionPresente
   // Constructors
   //
 
-  public FileSelectionView() {
-    uiWidget = uiBinder.createAndBindUi(this);
-
+  @Inject
+  public FileSelectionView(Binder uiBinder) {
+    initWidget(uiBinder.createAndBindUi(this));
     fileField.setReadOnly(true);
+  }
+
+  @UiHandler("browseButton")
+  public void onBrowse(ClickEvent event) {
+    getUiHandlers().onBrowse();
   }
 
   //
   // FileSelectionPresenter.Display methods
   //
-
-  @Override
-  public HandlerRegistration addBrowseClickHandler(ClickHandler handler) {
-    return browseButton.addClickHandler(handler);
-  }
 
   @Override
   public String getFile() {
@@ -77,11 +67,6 @@ public class FileSelectionView extends ViewImpl implements FileSelectionPresente
   @Override
   public void setFieldWidth(String width) {
     fileField.setWidth(width);
-  }
-
-  @Override
-  public Widget asWidget() {
-    return uiWidget;
   }
 
   @Override

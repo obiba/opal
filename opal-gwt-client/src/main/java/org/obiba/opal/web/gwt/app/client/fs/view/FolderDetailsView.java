@@ -66,6 +66,8 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
 
   private boolean displaysFiles = true;
 
+  private boolean singleSelectionModel;
+
   @Inject
   public FolderDetailsView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
@@ -98,6 +100,12 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
     table.setRowCount(fileCount, true);
   }
 
+  @Override
+  public void setSingleSelectionModel(boolean single) {
+    singleSelectionModel = single;
+    addCheckColumn();
+  }
+
   @SuppressWarnings("unchecked")
   private JsArray<FileDto> filterChildren(JsArray<FileDto> children) {
     if(displaysFiles) {
@@ -116,20 +124,7 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
   }
 
   private void initTable() {
-    addTableColumns();
-  }
-
-  private void addTableColumns() {
-    checkColumn = new CheckboxColumn<FileDto>(new FileDtoDisplay());
-    checkColumn.setActionHandler(new ActionHandler<Integer>() {
-      @Override
-      public void doAction(Integer object, String actionName) {
-        getUiHandlers().onFilesChecked(checkColumn.getSelectedItems());
-      }
-    });
-
-    table.addColumn(checkColumn, checkColumn.getTableListCheckColumnHeader());
-    table.setColumnWidth(checkColumn, 1, Style.Unit.PX);
+    addCheckColumn();
 
     table.addColumn(fileNameColumn = new FileNameColumn(), translations.nameLabel());
 
@@ -162,6 +157,25 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
     }, translations.lastModifiedLabel());
 
     dataProvider.addDataDisplay(table);
+  }
+
+  private void addCheckColumn() {
+    if(checkColumn != null) table.removeColumn(checkColumn);
+
+    checkColumn = new CheckboxColumn<FileDto>(new FileDtoDisplay(), singleSelectionModel);
+    checkColumn.setActionHandler(new ActionHandler<Integer>() {
+      @Override
+      public void doAction(Integer object, String actionName) {
+        getUiHandlers().onFilesChecked(checkColumn.getSelectedItems());
+      }
+    });
+
+    if(singleSelectionModel) {
+      table.insertColumn(0, checkColumn);
+    } else {
+      table.insertColumn(0, checkColumn, checkColumn.getTableListCheckColumnHeader());
+    }
+    table.setColumnWidth(checkColumn, 1, Style.Unit.PX);
   }
 
   /**

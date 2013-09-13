@@ -194,7 +194,7 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
     setInSlot(Display.Slots.EMAIL, emailSelectorPresenter);
     setInSlot(Display.Slots.REPORT_PARAMS, parametersSelectorPresenter);
 
-    fileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
+    fileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE);
     fileSelectionPresenter.bind();
     getView().setDesignFileWidgetDisplay(fileSelectionPresenter.getView());
 

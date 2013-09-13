@@ -42,7 +42,7 @@ public class SpssFormatStepPresenter extends PresenterWidget<SpssFormatStepPrese
 
   @Override
   protected void onBind() {
-    spssFileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE_OR_FOLDER);
+    spssFileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE_OR_FOLDER);
     spssFileSelectionPresenter.bind();
     getView().setSpssFileSelectorWidgetDisplay(spssFileSelectionPresenter.getView());
     setDefaultCharset();

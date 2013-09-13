@@ -110,7 +110,7 @@ public class IdentifiersMapPresenter extends WizardPresenterWidget<IdentifiersMa
     getDefaultCharset();
     getAvailableCharsets();
 
-    csvOptionsFileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
+    csvOptionsFileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE);
     csvOptionsFileSelectionPresenter.bind();
     getView().setCsvOptionsFileSelectorWidgetDisplay(csvOptionsFileSelectionPresenter.getView());
 

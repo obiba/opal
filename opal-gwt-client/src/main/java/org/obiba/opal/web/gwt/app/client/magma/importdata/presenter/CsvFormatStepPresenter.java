@@ -53,7 +53,7 @@ public class CsvFormatStepPresenter extends PresenterWidget<CsvFormatStepPresent
     getDefaultCharset();
     getAvailableCharsets();
 
-    csvFileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
+    csvFileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE);
     csvFileSelectionPresenter.bind();
     getView().setCsvFileSelectorWidgetDisplay(csvFileSelectionPresenter.getView());
   }

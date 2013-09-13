@@ -10,15 +10,12 @@
 
 package org.obiba.opal.web.gwt.app.client.ui.celltable;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 
 import com.google.common.collect.Lists;
 import com.google.gwt.cell.client.CheckboxCell;
@@ -36,23 +33,35 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.MultiSelectionModel;
 import com.google.gwt.view.client.ProvidesKey;
+import com.google.gwt.view.client.SetSelectionModel;
+import com.google.gwt.view.client.SingleSelectionModel;
 
 public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHandler<Integer> {
 
   private final Translations translations = GWT.create(Translations.class);
 
-  private final MultiSelectionModel<T> selectionModel;
+  private final SetSelectionModel<T> selectionModel;
 
   private final Display<T> display;
+
+  private final boolean singleSelectionModel;
 
   private ActionHandler<Integer> actionHandler;
 
   /**
-   * Construct a new Column with a given {@link com.google.gwt.cell.client.Cell}.
-   *
-   * @param cell the Cell used by this Column
+   * Construct a new column with check boxes and multi selection model.
+   * @param display
    */
   public CheckboxColumn(final Display<T> display) {
+    this(display, false);
+  }
+
+  /**
+   * Construct a new column with check boxes and optional single or multi selection model.
+   * @param display
+   * @param single
+   */
+  public CheckboxColumn(final Display<T> display, boolean single) {
     super(new CheckboxCell(true, true) {
       @Override
       public void render(Context context, Boolean value, SafeHtmlBuilder sb) {
@@ -61,8 +70,15 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
       }
     });
     this.display = display;
+    singleSelectionModel = single;
 
-    selectionModel = new MultiSelectionModel<T>(new ProvidesKey<T>() {
+    selectionModel = single ? new SingleSelectionModel<T>(new ProvidesKey<T>() {
+
+      @Override
+      public Object getKey(T item) {
+        return display.getItemKey(item);
+      }
+    }) : new MultiSelectionModel<T>(new ProvidesKey<T>() {
 
       @Override
       public Object getKey(T item) {
@@ -86,13 +102,12 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
         }
 
         // Redraw table when selecting/deselecting the last/first checkbox
-        if(nbDeselected <= 1) {
+        if(singleSelectionModel || nbDeselected <= 1) {
           display.getTable().redraw();
         }
 
         updateStatusAlert();
         doAction();
-
       }
     });
 
@@ -137,16 +152,12 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     });
   }
 
-  private MultiSelectionModel<T> getSelectionModel() {
-    return selectionModel;
-  }
-
   public void clearSelection() {
-    getSelectionModel().clear();
+    selectionModel.clear();
   }
 
   public void setSelected(T item, boolean selected) {
-    getSelectionModel().setSelected(item, selected);
+    selectionModel.setSelected(item, selected);
   }
 
   /**

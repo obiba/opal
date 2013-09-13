@@ -106,7 +106,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     comparedDatasourcesReportPresenter.bind();
     getView().setComparedDatasourcesReportDisplay(comparedDatasourcesReportPresenter.getView());
 
-    fileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE);
+    fileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE);
     fileSelectionPresenter.bind();
     getView().setFileSelectionDisplay(fileSelectionPresenter.getView());
 

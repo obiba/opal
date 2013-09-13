@@ -19,13 +19,14 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
 /**
  *
  */
-public class FileSelectionPresenter extends PresenterWidget<FileSelectionPresenter.Display> {
+public class FileSelectionPresenter extends PresenterWidget<FileSelectionPresenter.Display> implements FileSelectionUiHandlers {
 
   //
   // Instance Variables
@@ -42,11 +43,17 @@ public class FileSelectionPresenter extends PresenterWidget<FileSelectionPresent
   @Inject
   public FileSelectionPresenter(EventBus eventBus, Display display) {
     super(eventBus, display);
+    getView().setUiHandlers(this);
   }
 
   @Override
   protected void onBind() {
     addEventHandlers();
+  }
+
+  @Override
+  public void onBrowse() {
+    fireEvent(new FileSelectionRequestEvent(this, fileSelectionType));
   }
 
   //
@@ -81,29 +88,18 @@ public class FileSelectionPresenter extends PresenterWidget<FileSelectionPresent
         if(FileSelectionPresenter.this.equals(event.getSource())) {
           fileTypeSelected = event.getSelectedFile().getSelectionType();
           getView().setFile(event.getSelectedFile().getSelectionPath());
-          getEventBus().fireEvent(new FileSelectionUpdatedEvent(FileSelectionPresenter.this));
+          fireEvent(new FileSelectionUpdatedEvent(FileSelectionPresenter.this));
         }
       }
 
     }));
-
-    registerHandler(getView().addBrowseClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        getEventBus().fireEvent(new FileSelectionRequestEvent(FileSelectionPresenter.this, fileSelectionType));
-      }
-    }));
-
   }
 
   //
   // Inner Classes / Interfaces
   //
 
-  public interface Display extends View {
-
-    HandlerRegistration addBrowseClickHandler(ClickHandler handler);
+  public interface Display extends View, HasUiHandlers<FileSelectionUiHandlers> {
 
     String getFile();
 

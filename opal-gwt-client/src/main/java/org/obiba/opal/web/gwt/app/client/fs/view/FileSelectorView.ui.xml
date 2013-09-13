@@ -6,7 +6,6 @@
 
   <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false" minWidth="800">
     <g:FlowPanel ui:field="content">
-      <b:TextBox ui:field="newFileName" visible="false"/>
       <g:SimplePanel ui:field="filePathPanel"/>
       <b:FluidRow>
         <b:Column size="2">

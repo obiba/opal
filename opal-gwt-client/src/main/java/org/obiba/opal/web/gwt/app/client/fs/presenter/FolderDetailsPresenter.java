@@ -99,6 +99,10 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
     if(currentFolder != null) getAndUpdateTable(currentFolder);
   }
 
+  public void setSingleSelectionModel(boolean single) {
+    getView().setSingleSelectionModel(single);
+  }
+
   public FileDto getCurrentFolder() {
     return currentFolder;
   }
@@ -142,6 +146,8 @@ public class FolderDetailsPresenter extends PresenterWidget<FolderDetailsPresent
     void clearSelection();
 
     void renderRows(FileDto rows);
+
+    void setSingleSelectionModel(boolean single);
   }
 
 }

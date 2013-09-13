@@ -35,7 +35,7 @@ public class XmlFormatStepPresenter extends PresenterWidget<XmlFormatStepPresent
 
   @Override
   protected void onBind() {
-    xmlFileSelectionPresenter.setFileSelectionType(FileSelectionType.EXISTING_FILE_OR_FOLDER);
+    xmlFileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE_OR_FOLDER);
     xmlFileSelectionPresenter.bind();
     getView().setXmlFileSelectorWidgetDisplay(xmlFileSelectionPresenter.getView());
   }
