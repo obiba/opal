@@ -61,21 +61,16 @@ public class DatabaseResource {
   }
 
   @PUT
-  public Response update(Opal.DatabaseDto dto) {
+  public Response update(Opal.DatabaseDto dto)
+      throws MultipleIdentifiersDatabaseException, DatabaseAlreadyExistsException {
     //TODO check that name did not change
     Database database = Dtos.fromDto(dto);
     if(!database.isEditable()) {
       return Response.status(BAD_REQUEST).build();
     }
-    try {
-      databaseRegistry.addOrReplaceDatabase(database);
-    } catch(MultipleIdentifiersDatabaseException e) {
-      return Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "MultipleIdentifiersDatabase", e).build()).build();
-    } catch(DatabaseAlreadyExistsException e) {
-      return Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatabaseAlreadyExists", e).build()).build();
-    }
+
+    databaseRegistry.addOrReplaceDatabase(database);
+
     return Response.ok().build();
   }
 

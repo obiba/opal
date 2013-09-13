@@ -11,6 +11,8 @@ package org.obiba.opal.web.gwt.app.client.administration.user.view;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -24,9 +26,6 @@ import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.PasswordTextBox;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
-import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
-import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
-import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -185,13 +184,22 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
   }
 
   @Override
-  public void setNameError(String message) {
-    dialog.addAlert(message, AlertType.ERROR, usernameGroup);
+  public void showError(@Nullable UserPresenter.Display.FormField formField, String message) {
+    ControlGroup group = null;
+    if(formField != null) {
+      switch(formField) {
+        case USERNAME:
+          group = usernameGroup;
+          break;
+        case PASSWORD:
+          group = passwordGroup;
+          break;
+      }
+    }
+    if(group == null) {
+      dialog.addAlert(message, AlertType.ERROR);
+    } else {
+      dialog.addAlert(message, AlertType.ERROR, group);
+    }
   }
-
-  @Override
-  public void setPasswordError(String message) {
-    dialog.addAlert(message, AlertType.ERROR, passwordGroup);
-  }
-
 }

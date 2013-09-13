@@ -17,7 +17,7 @@ public class UserAlreadyExistsExceptionMapper implements ExceptionMapper<UserAlr
   @Override
   public Response toResponse(UserAlreadyExistsException exception) {
     return Response.status(BAD_REQUEST)
-        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, exception.getMessage()).build()).build();
+        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "UserAlreadyExists", exception).build()).build();
   }
 
 }
