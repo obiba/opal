@@ -49,7 +49,8 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
             magmaConvert("/functional-units/entities/table", "GET"),//
             magmaConvert("/project/{0}", "*:GET/*", args),//
             magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "POST:GET/*", args));
+            magmaConvert("/files/projects/{0}", "POST:GET/*", args), //
+            magmaConvert("/files/projects/{0}", "PUT:GET/*", args));
       }
 
     },
@@ -61,7 +62,8 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
             magmaConvert("/datasource/{0}/tables", "POST:GET", args),//
             magmaConvert("/project/{0}", "GET:GET", args),//
             magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "POST:GET/*", args));
+            magmaConvert("/files/projects/{0}", "POST:GET/*", args), //
+            magmaConvert("/files/projects/{0}", "PUT:GET/*", args));
         return perms;
       }
     },
@@ -73,7 +75,8 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
             magmaConvert("/datasource/{0}/views", "POST:GET", args),//
             magmaConvert("/project/{0}", "GET:GET", args),//
             magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "POST:GET/*", args));
+            magmaConvert("/files/projects/{0}", "POST:GET/*", args), //
+            magmaConvert("/files/projects/{0}", "PUT:GET/*", args));
         return perms;
       }
     },
@@ -85,7 +88,8 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
             magmaConvert("/datasource/{0}/commands/_copy", "POST:GET", args),//
             magmaConvert("/project/{0}", "GET:GET", args),//
             magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "POST:GET/*", args));
+            magmaConvert("/files/projects/{0}", "POST:GET/*", args), //
+            magmaConvert("/files/projects/{0}", "PUT:GET/*", args));
       }
 
     },
@@ -129,7 +133,8 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
             magmaConvert("/datasource/{0}/table/{1}/index", "GET:GET", args),//
             magmaConvert("/datasource/{0}/table/{1}/index/schedule", "GET:GET", args),//
             magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "POST:GET/*", args));
+            magmaConvert("/files/projects/{0}", "POST:GET/*", args), //
+            magmaConvert("/files/projects/{0}", "PUT:GET/*", args));
         Iterables.addAll(perms, TABLE_READ.convert(node));
         return perms;
       }
@@ -142,7 +147,8 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
         List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/view/{1}", "*:GET/*", args),//
             magmaConvert("/project/{0}", "GET:GET", args),//
             magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "POST:GET/*", args));
+            magmaConvert("/files/projects/{0}", "POST:GET/*", args), //
+            magmaConvert("/files/projects/{0}", "PUT:GET/*", args));
         Iterables.addAll(perms, TABLE_ALL.convert(node.replace("/view/", "/table/")));
         return perms;
       }
@@ -180,7 +186,8 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
             magmaConvert("/datasource/{0}/view/{1}/from/variable/_transient/_compile", "POST:GET", args),//
             magmaConvert("/project/{0}", "GET:GET", args),//
             magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "POST:GET/*", args));
+            magmaConvert("/files/projects/{0}", "POST:GET/*", args), //
+            magmaConvert("/files/projects/{0}", "PUT:GET/*", args));
         Iterables.addAll(perms, VIEW_READ.convert(node));
         return perms;
       }
@@ -194,7 +201,8 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
             .newArrayList(magmaConvert("/datasource/{0}/view/{1}/from/valueSets/variable/_transient", "POST", args),//
                 magmaConvert("/project/{0}", "GET:GET", args),//
                 magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
-                magmaConvert("/files/projects/{0}", "POST:GET/*", args));
+                magmaConvert("/files/projects/{0}", "POST:GET/*", args), //
+                magmaConvert("/files/projects/{0}", "PUT:GET/*", args));
         Iterables.addAll(perms, VIEW_VALUES.convert(node));
         Iterables.addAll(perms, VIEW_EDIT.convert(node));
         return perms;
