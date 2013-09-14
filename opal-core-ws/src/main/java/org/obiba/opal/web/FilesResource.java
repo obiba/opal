@@ -150,39 +150,80 @@ public class FilesResource {
   @PUT
   @Path("/{path:.*}")
   @AuthenticatedByCookie
-  public Response addFile(@Context UriInfo uriInfo, @PathParam("path") String destinationPath,
+  public Response updateFile(@PathParam("path") String destinationPath,
       @QueryParam("action") @DefaultValue("copy") String action, @QueryParam("file") List<String> sourcesPath)
       throws IOException {
+
     // destination check
-    FileObject destinationFolder = resolveFileInFileSystem(destinationPath);
-    if(!destinationFolder.exists()) getPathNotExistResponse(destinationPath);
-    if(destinationFolder.getType() != FileType.FOLDER)
-      return Response.status(Status.BAD_REQUEST).entity("Destination must be a folder: " + destinationPath).build();
-    if(!destinationFolder.isWriteable())
+    FileObject destinationFile = resolveFileInFileSystem(destinationPath);
+    if(!destinationFile.exists()) getPathNotExistResponse(destinationPath);
+    if(!destinationFile.isWriteable())
       return Response.status(Status.FORBIDDEN).entity("Destination file is not writable: " + destinationPath).build();
 
     // sources check
     if(sourcesPath == null || sourcesPath.isEmpty())
-      return Response.status(Status.BAD_REQUEST).entity("Source files are missing").build();
+      return Response.status(Status.BAD_REQUEST).entity("Source file is missing").build();
+
+    // filter actions: copy, move
+    if("move".equals(action.toLowerCase())) {
+      return moveTo(destinationFile, sourcesPath);
+    }
+
+    if("copy".equals(action.toLowerCase())) {
+      return copyFrom(destinationFile, sourcesPath);
+    }
+
+    return Response.status(Status.BAD_REQUEST).entity("Unexpected file action: " + action).build();
+  }
+
+  private Response moveTo(FileObject destinationFolder, List<String> sourcesPath) throws IOException {
+    // destination check
+    String destinationPath = destinationFolder.getName().getPath();
+    if(destinationFolder.getType() != FileType.FOLDER)
+      return Response.status(Status.BAD_REQUEST).entity("Destination must be a folder: " + destinationPath).build();
+
+    // sources check
     for(String sourcePath : sourcesPath) {
       FileObject sourceFile = resolveFileInFileSystem(sourcePath);
       if(!sourceFile.exists()) getPathNotExistResponse(sourcePath);
       if(!sourceFile.isReadable())
         return Response.status(Status.FORBIDDEN).entity("Source file is not readable: " + sourcePath).build();
-      if(!sourceFile.isWriteable() && "move".equals(action))
+      if(!sourceFile.isWriteable())
         return Response.status(Status.FORBIDDEN).entity("Source file cannot be moved: " + sourcePath).build();
+    }
+
+    // do action
+    for(String sourcePath : sourcesPath) {
+      FileObject sourceFile = resolveFileInFileSystem(sourcePath);
+      FileObject destinationFile = resolveFileInFileSystem(destinationPath + "/" + sourceFile.getName().getBaseName());
+      sourceFile.moveTo(destinationFile);
+    }
+
+    return Response.ok().build();
+  }
+
+  private Response copyFrom(FileObject destinationFolder, List<String> sourcesPath) throws IOException {
+    // destination check
+    String destinationPath = destinationFolder.getName().getPath();
+    if(destinationFolder.getType() != FileType.FOLDER)
+      return Response.status(Status.BAD_REQUEST).entity("Destination must be a folder: " + destinationPath).build();
+
+    // sources check
+    for(String sourcePath : sourcesPath) {
+      FileObject sourceFile = resolveFileInFileSystem(sourcePath);
+      if(!sourceFile.exists()) getPathNotExistResponse(sourcePath);
+      if(!sourceFile.isReadable())
+        return Response.status(Status.FORBIDDEN).entity("Source file is not readable: " + sourcePath).build();
     }
 
     // do action
     for(String sourcePath : sourcesPath) {
       final FileObject sourceFile = resolveFileInFileSystem(sourcePath);
       FileObject destinationFile = resolveFileInFileSystem(destinationPath + "/" + sourceFile.getName().getBaseName());
-      if("move".equals(action.toLowerCase())) {
-        sourceFile.moveTo(destinationFile);
-      } else if(sourceFile.getType() == FileType.FOLDER) {
+      if(sourceFile.getType() == FileType.FOLDER) {
         destinationFile.copyFrom(sourceFile, new AllFileSelector());
       } else {
-        destinationFile.copyFrom(sourceFile.getParent(), new FileSelector() {
+        destinationFile.copyFrom(sourceFile, new FileSelector() {
           @Override
           public boolean includeFile(FileSelectInfo fileInfo) throws Exception {
             return fileInfo.getFile().getName().getPath().equals(sourceFile.getName().getPath());

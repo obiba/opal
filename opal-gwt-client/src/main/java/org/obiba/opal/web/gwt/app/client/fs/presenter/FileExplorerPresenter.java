@@ -114,7 +114,7 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
       @Override
       public void onFolderUpdated(FolderUpdatedEvent event) {
         checkedFiles = null;
-        updateCurrentFoldeAuthorizations();
+        updateCurrentFolderAuthorizations();
         updateCheckedFilesAuthorizations();
       }
     });
@@ -150,7 +150,7 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
     }
   }
 
-  private void updateCurrentFoldeAuthorizations() {
+  private void updateCurrentFolderAuthorizations() {
     // create folder and upload
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/files" + getCurrentFolder().getPath())
         .post()//
@@ -209,7 +209,10 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
    * Authorize paste if current folder is writable.
    */
   private void updateCurrentFolderPasteAuthorization() {
-    if(hasFilesInClipboard() && getCurrentFolder().getWritable()) getView().getFilePasteAuthorizer().authorized();
+    // destination must be writable and cannot be the same as the source
+    if(hasFilesInClipboard() && getCurrentFolder().getWritable() &&
+        !getCurrentFolder().getPath().equals(FileDtos.getParent(filesClipboard.get(0)).getPath()))
+      getView().getFilePasteAuthorizer().authorized();
     else getView().getFilePasteAuthorizer().unauthorized();
   }
 
@@ -331,7 +334,7 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
     };
 
     UriBuilder uriBuilder = UriBuilder.create().fromPath(FileDtos.getLink(getCurrentFolder()));
-    for (FileDto child : filesClipboard) {
+    for(FileDto child : filesClipboard) {
       uriBuilder.query("file", child.getPath());
     }
     uriBuilder.query("action", currentAction.toString().toLowerCase());
