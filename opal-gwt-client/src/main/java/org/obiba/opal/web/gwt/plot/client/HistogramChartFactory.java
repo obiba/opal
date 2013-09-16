@@ -42,8 +42,6 @@ public class HistogramChartFactory {
         .setCredits(new Credits().setEnabled(false))//
         .setColumnPlotOptions(new ColumnPlotOptions().setEnableMouseTracking(false)//
             .setAnimation(false)//
-//            .setLineWidth(0)//
-                //.setMarker(new Marker().setEnabled(true).setHoverState(new Marker().setEnabled(true)))//
             .setShadow(false)//
             .setPointPadding(0)//
             .setGroupPadding(0)//
@@ -57,23 +55,9 @@ public class HistogramChartFactory {
         );
     chart.getYAxis().setAxisTitle(new AxisTitle().setText(yaxisTitle).setAlign(AxisTitle.Align.MIDDLE));
 
-//    chart.setToolTip(new ToolTip().setEnabled(true).setFormatter(new ToolTipFormatter() {
-//      public String format(ToolTipData toolTipData) {
-//        return tooltipsData.get(toolTipData.getPoint().getX());
-//      }
-//    }));
-
     chart.addSeries(chart.createSeries() //
         .setPoints(values.toArray(new Point[values.size()]))//
-//        .set
     );
     return chart;
   }
-
-//  public Chart createFrequencyChart(String title, String yaxisTitle){
-//    Chart chart = createChart(title, yaxisTitle);
-//    chart.getYAxis().setAllowDecimals(false);
-//
-//    return chart;
-//  }
 }
