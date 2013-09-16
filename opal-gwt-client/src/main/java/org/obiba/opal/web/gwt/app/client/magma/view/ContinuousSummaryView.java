@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
 import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
 import org.obiba.opal.web.gwt.plot.client.HistogramChartFactory;
@@ -38,6 +39,8 @@ public class ContinuousSummaryView extends Composite {
 
   private static final ContinuousSummaryViewUiBinder uiBinder = GWT.create(ContinuousSummaryViewUiBinder.class);
 
+  private static final Translations translations = GWT.create(Translations.class);
+
   @UiField
   TabPanel tabPanel;
 
@@ -63,41 +66,39 @@ public class ContinuousSummaryView extends Composite {
   public ContinuousSummaryView(ContinuousSummaryDto continuous) {
     initWidget(uiBinder.createAndBindUi(this));
 
-    // TODO translation
-    TabPanelHelper.setTabTitle(tabPanel, 0, "Plot");
-    TabPanelHelper.setTabTitle(tabPanel, 1, "Statistics");
+    TabPanelHelper.setTabTitle(tabPanel, 0, translations.statsMap().get("PLOT"));
+    TabPanelHelper.setTabTitle(tabPanel, 1, translations.statsMap().get("STATISTICS"));
 
     histogramElement.setId(HTMLPanel.createUniqueId());
     qqPlotElement.setId(HTMLPanel.createUniqueId());
 
     DescriptiveStatsDto descriptiveStats = continuous.getSummary();
 
-    // TODO translation
     grid.clear();
-    grid.setHeader(0, "Descriptive Statistic");
-    grid.setHeader(1, "Value");
+    grid.setHeader(0, translations.statsMap().get("DESC_STATISTICS"));
+    grid.setHeader(1, translations.statsMap().get("VALUE"));
     int row = 0;
-    grid.setWidget(row, 0, new Label("N"));
+    grid.setWidget(row, 0, new Label(translations.statsMap().get("N")));
     grid.setWidget(row++, 1, new Label("" + Math.round(descriptiveStats.getN())));
-    grid.setWidget(row, 0, new Label("Min"));
+    grid.setWidget(row, 0, new Label(translations.statsMap().get("MIN")));
     grid.setWidget(row++, 1, new Label("" + descriptiveStats.getMin()));
-    grid.setWidget(row, 0, new Label("Max"));
+    grid.setWidget(row, 0, new Label(translations.statsMap().get("MAX")));
     grid.setWidget(row++, 1, new Label("" + descriptiveStats.getMax()));
-    grid.setWidget(row, 0, new Label("Mean"));
+    grid.setWidget(row, 0, new Label(translations.statsMap().get("MEAN")));
     grid.setWidget(row++, 1, new Label("" + descriptiveStats.getMean()));
-    grid.setWidget(row, 0, new Label("Median"));
+    grid.setWidget(row, 0, new Label(translations.statsMap().get("MEDIAN")));
     grid.setWidget(row++, 1, new Label("" + descriptiveStats.getMedian()));
-    grid.setWidget(row, 0, new Label("Standard Deviation"));
+    grid.setWidget(row, 0, new Label(translations.statsMap().get("STD_DEVIATION")));
     grid.setWidget(row++, 1, new Label("" + descriptiveStats.getStdDev()));
-    grid.setWidget(row, 0, new Label("Variance"));
+    grid.setWidget(row, 0, new Label(translations.statsMap().get("VARIANCE")));
     grid.setWidget(row++, 1, new Label("" + descriptiveStats.getVariance()));
-    grid.setWidget(row, 0, new Label("Skewness"));
+    grid.setWidget(row, 0, new Label(translations.statsMap().get("SKEWNESS")));
     grid.setWidget(row++, 1, new Label("" + descriptiveStats.getSkewness()));
-    grid.setWidget(row, 0, new Label("Kurtosis"));
+    grid.setWidget(row, 0, new Label(translations.statsMap().get("KURTOSIS")));
     grid.setWidget(row++, 1, new Label("" + descriptiveStats.getKurtosis()));
-    grid.setWidget(row, 0, new Label("Sum"));
+    grid.setWidget(row, 0, new Label(translations.statsMap().get("SUM")));
     grid.setWidget(row++, 1, new Label("" + descriptiveStats.getSum()));
-    grid.setWidget(row, 0, new Label("Sum of squares"));
+    grid.setWidget(row, 0, new Label(translations.statsMap().get("SUM_OF_SQUARES")));
     grid.setWidget(row++, 1, new Label("" + descriptiveStats.getSumsq()));
 
     if(descriptiveStats.getVariance() > 0) {
@@ -121,10 +122,12 @@ public class ContinuousSummaryView extends Composite {
   protected void onLoad() {
     super.onLoad();
     if(histogram != null) {
-      histogramPanel.add(histogram.createChart("Histogram", "Density"));
+      histogramPanel
+          .add(histogram.createChart(translations.statsMap().get("HISTOGRAM"), translations.statsMap().get("DENSITY")));
     }
     if(qqPlot != null) {
-      normalProbability.add(qqPlot.createChart("Normal Probability"));
+      normalProbability.add(qqPlot.createChart(translations.statsMap().get("NORMAL_PROB"),
+          translations.statsMap().get("THEORETHICAL_QUANTILES"), translations.statsMap().get("SAMPLE_QUANTILES")));
     }
   }
 
