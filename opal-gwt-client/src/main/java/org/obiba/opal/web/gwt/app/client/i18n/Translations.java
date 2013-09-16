@@ -1899,8 +1899,11 @@ public interface Translations extends Constants {
       "KURTOSIS", "Kurtosis", //
       "SUM", "Sum", //
       "SUM_OF_SQUARES", "Sum of squares", //
-      "HISTOGRAM", "Histogram", "DENSITY", "Density", "NORMAL_PROB", "Normal Probability", "THEORETHICAL_QUANTILES",
-      "Theroretical Quantiles", "SAMPLE_QUANTILES", "Sample Quantiles", "HISTOGRAM", "Sample Quantiles", })
+      "HISTOGRAM", "Histogram", //
+      "DENSITY", "Density",//
+      "NORMAL_PROB", "Normal Probability",//
+      "THEORETHICAL_QUANTILES", "Theroretical Quantiles",//
+      "SAMPLE_QUANTILES", "Sample Quantiles" })
   Map<String, String> statsMap();
 
   @Description("JVM Labels")
