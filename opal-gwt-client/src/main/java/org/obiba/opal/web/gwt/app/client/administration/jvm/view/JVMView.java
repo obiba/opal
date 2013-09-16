@@ -104,11 +104,11 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
 
   @Override
   public void renderProperties(OpalEnv env) {
-    javaProperties.addProperty("Opal Version", env.getVersion());
-    javaProperties.addProperty("Java Version", env.getJavaVersion());
-    javaProperties.addProperty("VM Name", env.getVmName());
-    javaProperties.addProperty("VM Vendor", env.getVmVendor());
-    javaProperties.addProperty("VM Version", env.getVmVersion());
+    javaProperties.addProperty(translations.jvmMap().get("OPAL_VERSION"), env.getVersion());
+    javaProperties.addProperty(translations.jvmMap().get("JAVA_VERSION"), env.getJavaVersion());
+    javaProperties.addProperty(translations.jvmMap().get("VM_NAME"), env.getVmName());
+    javaProperties.addProperty(translations.jvmMap().get("VM_VENDOR"), env.getVmVendor());
+    javaProperties.addProperty(translations.jvmMap().get("VM_VERSION"), env.getVmVersion());
 
     int row = 0;
     JsArray<EntryDto> entries = JsArrays.toSafeArray(env.getSystemPropertiesArray());
@@ -123,28 +123,31 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
   @Override
   public void initCharts() {
     memHeapChart = new MonitoringChartFactory();
-    memHeapChart.createAreaSplineChart("Memory Heap", "MegaBytes (Mb)", new String[] { "Committed", "Used" }, DURATION);
+    memHeapChart.createAreaSplineChart(translations.jvmMap().get("MEM_HEAP"), translations.jvmMap().get("MEGABYTES"),
+        new String[] { translations.jvmMap().get("COMMITTED"), translations.jvmMap().get("USED") }, DURATION);
     memHeapChartColumn.clear();
     memHeapChart.getChart().setHeight(300);
     memHeapChartColumn.add(memHeapChart.getChart());
 
     memNonHeapChart = new MonitoringChartFactory();
     memNonHeapChart
-        .createAreaSplineChart("Memory Non-Heap", "MegaBytes (Mb)", new String[] { "Commited", "Used" }, DURATION);
+        .createAreaSplineChart(translations.jvmMap().get("MEM_NON_HEAP"), translations.jvmMap().get("MEGABYTES"),
+            new String[] { translations.jvmMap().get("COMMITTED"), translations.jvmMap().get("USED") }, DURATION);
     memNonHeapChartColumn.clear();
     memNonHeapChart.getChart().setHeight(300);
     memNonHeapChartColumn.add(memNonHeapChart.getChart());
 
     threadsChart = new MonitoringChartFactory();
-    threadsChart.createSplineChart("Threads", "Count", new String[] { "Peak", "Current" }, DURATION);
+    threadsChart.createSplineChart(translations.jvmMap().get("THREADS"), translations.jvmMap().get("COUNT"),
+        new String[] { translations.jvmMap().get("PEAK"), translations.jvmMap().get("CURRENT") }, DURATION);
     threadsChartColumn.clear();
     threadsChart.getChart().setHeight(300);
     threadsChartColumn.add(threadsChart.getChart());
 
     gcChart = new MonitoringChartFactory();
-    gcChart
-        .createSplineChart("Garbage Collectors (delta)", "Delta", "Time (ms)", new String[] { "GC Count", "Time (ms)" },
-            DURATION);
+    gcChart.createSplineChart(translations.jvmMap().get("GC_DELTA"), translations.jvmMap().get("DELTA"),
+        translations.jvmMap().get("TIME_MS"),
+        new String[] { translations.jvmMap().get("GC_COUNT"), translations.jvmMap().get("TIME_MS") }, DURATION);
     gcChart.getChart().setHeight(300);
     gcChart.getChart().getYAxis(0).setMin(0);
     gcChartColumn.clear();

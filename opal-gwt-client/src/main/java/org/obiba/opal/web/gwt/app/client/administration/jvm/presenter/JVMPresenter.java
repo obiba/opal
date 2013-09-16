@@ -128,12 +128,11 @@ public class JVMPresenter extends ItemAdministrationPresenter<JVMPresenter.Displ
           getView().renderProperties(resource);
         }
       }).get().send();
-
-      pollStatus();
     }
 
     @Override
     public void unauthorized() {
+      timer.cancel();
     }
   }
 
