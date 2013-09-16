@@ -60,6 +60,7 @@ import org.apache.commons.vfs2.FileSelectInfo;
 import org.apache.commons.vfs2.FileSelector;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.Selectors;
 import org.codehaus.jettison.json.JSONArray;
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.core.util.StreamUtil;
@@ -218,23 +219,10 @@ public class FilesResource {
 
     // do action
     for(String sourcePath : sourcesPath) {
-      final FileObject sourceFile = resolveFileInFileSystem(sourcePath);
+      FileObject sourceFile = resolveFileInFileSystem(sourcePath);
       FileObject destinationFile = resolveFileInFileSystem(destinationPath + "/" + sourceFile.getName().getBaseName());
-      if(sourceFile.getType() == FileType.FOLDER) {
-        destinationFile.copyFrom(sourceFile, new AllFileSelector());
-      } else {
-        destinationFile.copyFrom(sourceFile, new FileSelector() {
-          @Override
-          public boolean includeFile(FileSelectInfo fileInfo) throws Exception {
-            return fileInfo.getFile().getName().getPath().equals(sourceFile.getName().getPath());
-          }
-
-          @Override
-          public boolean traverseDescendents(FileSelectInfo fileInfo) throws Exception {
-            return false;
-          }
-        });
-      }
+      FileSelector selector = sourceFile.getType() == FileType.FOLDER ? Selectors.SELECT_ALL : Selectors.SELECT_SELF;
+      destinationFile.copyFrom(sourceFile, selector);
     }
 
     return Response.ok().build();
