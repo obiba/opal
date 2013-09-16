@@ -18,6 +18,7 @@ import java.util.List;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockftpserver.fake.FakeFtpServer;
@@ -32,10 +33,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.io.CharStreams;
 
-import junit.framework.Assert;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assume.assumeTrue;
 
 public class OpalFileSystemTest {

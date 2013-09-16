@@ -12,6 +12,7 @@ package org.obiba.opal.web.magma;
 import java.util.Locale;
 
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.obiba.magma.Attribute;
@@ -28,8 +29,6 @@ import org.obiba.opal.web.model.Magma.JdbcDatasourceSettingsDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 
 import com.googlecode.protobuf.format.JsonFormat;
-
-import junit.framework.Assert;
 
 public class DtosTest {
 

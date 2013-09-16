@@ -14,11 +14,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
-
-import junit.framework.Assert;
 
 public class DefaultParticipantIdentifierImplTest {
 

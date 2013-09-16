@@ -23,6 +23,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.easymock.EasyMock;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.obiba.magma.Category;
@@ -47,8 +48,6 @@ import org.springframework.context.ApplicationContext;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-
-import junit.framework.Assert;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
@@ -194,7 +193,6 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     expect(valueTableMock.isView()).andReturn(false);
     expect(datasourceMock.createWriter("name", "entityType")).andReturn(valueTableWriterMock);
     expect(valueTableWriterMock.writeVariables()).andReturn(variableWriterMock);
-
 
     variableWriterMock.writeVariable(EasyMock.isA(Variable.class));
     EasyMock.expectLastCall().times(5);

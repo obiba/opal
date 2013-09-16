@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
@@ -29,8 +30,6 @@ import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.FunctionalUnitDto;
 import org.springframework.context.ApplicationContext;
-
-import junit.framework.Assert;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;

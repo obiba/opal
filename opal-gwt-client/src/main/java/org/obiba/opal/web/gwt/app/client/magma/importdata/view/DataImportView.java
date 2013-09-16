@@ -11,19 +11,19 @@ package org.obiba.opal.web.gwt.app.client.magma.importdata.view;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.ui.WizardModalBox;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.Skippable;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepChain;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.StepInHandler;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.WidgetProvider;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter.ImportDataInputsHandler;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.DatasourceParsingErrorPanel;
 import org.obiba.opal.web.gwt.app.client.ui.ModalViewImpl;
+import org.obiba.opal.web.gwt.app.client.ui.WizardModalBox;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.Skippable;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepChain;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.StepInHandler;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.WidgetProvider;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
@@ -32,17 +32,17 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 
 import static org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig.ImportFormat;
 

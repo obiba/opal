@@ -35,8 +35,10 @@ import org.apache.commons.vfs2.FileName;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
+import org.hamcrest.Matchers;
 import org.jboss.resteasy.specimpl.UriBuilderImpl;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -45,13 +47,10 @@ import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.web.model.Opal.FileDto;
 
-import junit.framework.Assert;
-
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
 
 public class FilesResourceTest {
@@ -71,7 +70,7 @@ public class FilesResourceTest {
   /**
    * Delete these files in tearDown().
    */
-  private List<String> filesCreatedByTest = new ArrayList<String>();
+  private final List<String> filesCreatedByTest = new ArrayList<String>();
 
   @Before
   public void setUp() throws URISyntaxException, FileSystemException {
@@ -79,7 +78,7 @@ public class FilesResourceTest {
 
     String rootDir = getClass().getResource("/test-file-system").toURI().toString();
     File emptyDir = new File(rootDir.replace("file:", ""), "folder4/folder41");
-    if(emptyDir.exists() == false) {
+    if(!emptyDir.exists()) {
       Assert.assertEquals(true, emptyDir.mkdirs());
     }
     fileSystem = new DefaultOpalFileSystem(rootDir);
@@ -172,7 +171,7 @@ public class FilesResourceTest {
 
   }
 
-  private void checkGetFileDetailsResponse(String path, String[] expectedFolderContentArray)
+  private void checkGetFileDetailsResponse(String path, String... expectedFolderContentArray)
       throws FileSystemException {
 
     Set<String> expectedFolderContent = new HashSet<String>(Arrays.asList(expectedFolderContentArray));
@@ -190,7 +189,7 @@ public class FilesResourceTest {
     Assert.assertTrue(expectedFolderContent.isEmpty());
   }
 
-  private void checkFolderContent(Set<String> expectedFolderContent, List<FileDto> folderContent, int level) {
+  private void checkFolderContent(Set<String> expectedFolderContent, Iterable<FileDto> folderContent, int level) {
     // Make sure folder content is as expected.
     for(FileDto oneFileOrFolder : folderContent) {
       Assert.assertTrue(expectedFolderContent.contains(oneFileOrFolder.getName()));
@@ -229,14 +228,14 @@ public class FilesResourceTest {
 
   }
 
-  private void checkCompressedFolder(String folderPath, String[] expectedFolderContentArray) throws IOException {
+  private void checkCompressedFolder(String folderPath, String... expectedFolderContentArray) throws IOException {
     Response response = filesResource.getFile(folderPath, null);
     ZipFile zipfile = new ZipFile(((File) response.getEntity()).getPath());
 
     // Check that all folders and files exist in the compressed archive that represents the folder.
     ZipEntry zipEntry;
-    for(int i = 0; i < expectedFolderContentArray.length; i++) {
-      zipEntry = zipfile.getEntry(expectedFolderContentArray[i]);
+    for(String anExpectedFolderContentArray : expectedFolderContentArray) {
+      zipEntry = zipfile.getEntry(anExpectedFolderContentArray);
       Assert.assertNotNull(zipEntry);
     }
 
@@ -352,7 +351,7 @@ public class FilesResourceTest {
 
   @Test
   public void testUploadFile_ReturnsNotFoundResponseWhenUploadDestinationDoesNotExist()
-      throws IOException, FileSystemException, FileUploadException, URISyntaxException {
+      throws IOException, FileUploadException, URISyntaxException {
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
 
     FilesResource fileResource = new FilesResource(opalRuntimeMock) {
@@ -452,13 +451,12 @@ public class FilesResourceTest {
   }
 
   private FilesResource getFileResource() {
-    FilesResource filesResource = new FilesResource(opalRuntimeMock) {
+    return new FilesResource(opalRuntimeMock) {
       @Override
       protected FileObject resolveFileInFileSystem(String path) throws FileSystemException {
         return fileObjectMock;
       }
     };
-    return filesResource;
   }
 
   @Test
@@ -513,7 +511,7 @@ public class FilesResourceTest {
 
     FileContent mockContent = createMock(FileContent.class);
     expect(childFolderMock.getContent()).andReturn(mockContent).atLeastOnce();
-    expect(mockContent.getLastModifiedTime()).andReturn(new Long(1)).atLeastOnce();
+    expect(mockContent.getLastModifiedTime()).andReturn((long) 1).atLeastOnce();
 
     childFolderMock.createFolder();
     FileObject parentFolderMock = createMock(FileObject.class);
@@ -535,6 +533,6 @@ public class FilesResourceTest {
   @Test
   public void testCharsetsAvailable() throws Exception {
     Response charSets = filesResource.getAvailableCharsets();
-    assertThat(charSets.getEntity().toString(), containsString("UTF-8"));
+    assertThat(charSets.getEntity().toString(), Matchers.containsString("UTF-8"));
   }
 }

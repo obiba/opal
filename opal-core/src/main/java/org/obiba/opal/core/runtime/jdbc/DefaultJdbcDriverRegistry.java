@@ -23,7 +23,6 @@ import org.springframework.stereotype.Component;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.ByteStreams;
-import com.google.common.io.Closeables;
 
 @Component
 public class DefaultJdbcDriverRegistry implements JdbcDriverRegistry {
@@ -56,8 +55,14 @@ public class DefaultJdbcDriverRegistry implements JdbcDriverRegistry {
     try {
       ByteStreams.copy(jarFile, fos);
     } finally {
-      Closeables.closeQuietly(jarFile);
-      Closeables.closeQuietly(fos);
+      try {
+        if(jarFile != null) jarFile.close();
+      } catch(IOException ignored) {
+      }
+      try {
+        fos.close();
+      } catch(IOException ignored) {
+      }
     }
   }
 }

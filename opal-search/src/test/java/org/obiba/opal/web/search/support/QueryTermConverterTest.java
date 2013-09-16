@@ -18,6 +18,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.easymock.EasyMock;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.magma.Datasource;
@@ -26,13 +27,9 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.type.DecimalType;
 import org.obiba.magma.type.TextType;
-import org.obiba.opal.search.IndexManager;
-import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.ValueTableValuesIndex;
 import org.obiba.opal.search.ValuesIndexManager;
 import org.obiba.opal.web.model.Search;
-
-import junit.framework.Assert;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;

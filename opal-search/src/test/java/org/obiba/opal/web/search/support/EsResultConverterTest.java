@@ -13,11 +13,10 @@ import java.util.List;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.web.model.Search;
-
-import junit.framework.Assert;
 
 public class EsResultConverterTest {
 

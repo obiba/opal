@@ -70,7 +70,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
-import com.google.common.io.Closeables;
 
 /**
  * A {@link FunctionalUnit}'s keystore.
@@ -503,7 +502,10 @@ public class UnitKeyStore implements KeyProvider {
     } catch(IOException e) {
       throw new RuntimeException(e);
     } finally {
-      Closeables.closeQuietly(pemReader);
+      try {
+        if(pemReader != null) pemReader.close();
+      } catch(IOException ignored) {
+      }
     }
   }
 
@@ -535,7 +537,10 @@ public class UnitKeyStore implements KeyProvider {
     } catch(IOException e) {
       throw new RuntimeException(e);
     } finally {
-      Closeables.closeQuietly(pemReader);
+      try {
+        if(pemReader != null) pemReader.close();
+      } catch(IOException ignored) {
+      }
     }
   }
 
@@ -583,7 +588,10 @@ public class UnitKeyStore implements KeyProvider {
     } catch(IOException e) {
       throw new RuntimeException(e);
     } finally {
-      Closeables.closeQuietly(pemReader);
+      try {
+        if(pemReader != null) pemReader.close();
+      } catch(IOException ignored) {
+      }
     }
   }
 

@@ -24,7 +24,6 @@ import org.springframework.jdbc.core.CallableStatementCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.google.common.io.CharStreams;
-import com.google.common.io.Closeables;
 
 /**
  * Allows creating a store procedure, execute it and then drop it. This is useful for executing upgrade steps that are
@@ -73,7 +72,10 @@ public class StoredProcedureUpgradeStep extends SqlScriptUpgradeStep {
     } catch(IOException e) {
       throw new RuntimeException(e);
     } finally {
-      Closeables.closeQuietly(reader);
+      try {
+        if(reader != null) reader.close();
+      } catch(IOException ignored) {
+      }
     }
   }
 }

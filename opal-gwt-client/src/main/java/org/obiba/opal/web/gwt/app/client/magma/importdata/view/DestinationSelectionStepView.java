@@ -12,10 +12,10 @@ package org.obiba.opal.web.gwt.app.client.magma.importdata.view;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.ui.EditableListBox;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DestinationSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DestinationSelectionStepPresenter.TableSelectionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
+import org.obiba.opal.web.gwt.app.client.ui.EditableListBox;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 
 import com.google.gwt.core.client.GWT;

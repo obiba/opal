@@ -19,6 +19,7 @@ import javax.ws.rs.core.UriInfo;
 import org.easymock.EasyMock;
 import org.jboss.resteasy.specimpl.UriBuilderImpl;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -33,8 +34,6 @@ import org.obiba.opal.shell.service.CommandSchedulerService;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.reporting.Dtos;
-
-import junit.framework.Assert;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;

@@ -9,10 +9,9 @@
  */
 package org.obiba.opal.core.runtime.security.support;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.obiba.opal.core.runtime.security.SubjectPermissionConverter;
-
-import junit.framework.Assert;
 
 /**
  *

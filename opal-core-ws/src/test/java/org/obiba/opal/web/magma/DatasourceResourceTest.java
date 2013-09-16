@@ -25,6 +25,7 @@ import javax.ws.rs.core.UriInfo;
 import org.easymock.EasyMock;
 import org.easymock.IArgumentMatcher;
 import org.jboss.resteasy.specimpl.UriBuilderImpl;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.obiba.core.util.FileUtil;
@@ -71,8 +72,6 @@ import org.springframework.context.ApplicationContext;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-
-import junit.framework.Assert;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;

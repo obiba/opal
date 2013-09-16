@@ -26,7 +26,6 @@ import org.springframework.util.Assert;
 
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
-import com.google.common.io.Closeables;
 
 public class DefaultOpalFileSystem implements OpalFileSystem {
 
@@ -126,8 +125,14 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
     } catch(Exception couldNotConvertFileToLocal) {
       throw new RuntimeException("Failed to convert FileObject (VFS) to a local File", couldNotConvertFileToLocal);
     } finally {
-      Closeables.closeQuietly(virtualFileInputStream);
-      Closeables.closeQuietly(localFileOutputStream);
+      try {
+        if(virtualFileInputStream != null) virtualFileInputStream.close();
+      } catch(IOException ignored) {
+      }
+      try {
+        if(localFileOutputStream != null) localFileOutputStream.close();
+      } catch(IOException ignored) {
+      }
     }
 
   }

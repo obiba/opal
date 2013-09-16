@@ -14,6 +14,7 @@ import java.net.URISyntaxException;
 
 import org.apache.http.NoHttpResponseException;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -28,8 +29,6 @@ import org.obiba.magma.type.BinaryType;
 import org.obiba.opal.rest.client.magma.RestDatasource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import junit.framework.Assert;
 
 /**
  *

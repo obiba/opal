@@ -11,9 +11,9 @@ package org.obiba.opal.shell.commands;
 
 import java.io.File;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.vfs2.FileSystemException;
 import org.junit.Test;
@@ -43,6 +43,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Unit tests for {@link ReportCommand}.
  */
+@SuppressWarnings("MagicNumber")
 public class ReportCommandTest {
 
   private static final String FROM = "opal-mailer@obiba.org";
@@ -95,7 +96,7 @@ public class ReportCommandTest {
   // Helper Methods
   //
 
-  private void testExecute(Set<String> emailNotificationAddresses) throws FileSystemException, ReportException {
+  private void testExecute(Collection<String> emailNotificationAddresses) throws FileSystemException, ReportException {
     // Setup
     ReportTemplate reportTemplate = createReportTemplate("testTemplate", "/testDesign.rptdesign", "pdf",
         emailNotificationAddresses);
@@ -179,14 +180,14 @@ public class ReportCommandTest {
       }
 
       @Override
-      String getMergedVelocityTemplate(Map<String, String> model) {
+      String getMergedVelocityTemplate(Map<String, Object> model) {
         return model.get("report_template") + "," + model.get("report_public_link");
       }
     };
   }
 
   private ReportTemplate createReportTemplate(String name, String design, String format,
-      Set<String> emailNotificationAddresses) {
+      Collection<String> emailNotificationAddresses) {
     ReportTemplate reportTemplate = new ReportTemplate();
 
     reportTemplate.setName(name);

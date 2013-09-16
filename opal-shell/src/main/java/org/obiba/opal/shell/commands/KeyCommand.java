@@ -34,8 +34,6 @@ import org.obiba.opal.shell.commands.options.KeyCommandOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
-import com.google.common.io.Closeables;
-
 /**
  * Provides key management allowing for key creation, deletion, importing and exporting of keys.
  */
@@ -236,7 +234,10 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
     } catch(IOException e) {
       throw new RuntimeException(e);
     } finally {
-      Closeables.closeQuietly(certificateWriter);
+      try {
+        if(certificateWriter != null) certificateWriter.close();
+      } catch(IOException ignored) {
+      }
     }
 
     return errorCode;

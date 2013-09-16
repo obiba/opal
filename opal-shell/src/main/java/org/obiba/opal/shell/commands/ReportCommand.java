@@ -187,18 +187,18 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
   }
 
   private String getEmailNotificationText(String reportTemplateName, FileObject reportOutput) {
-    Map<String, String> model = new HashMap<String, String>();
+    Map<String, Object> model = new HashMap<String, Object>();
     model.put("report_template", reportTemplateName);
     model.put("report_public_link",
         opalPublicUrl + "/ws/report/public/" + getOpalRuntime().getFileSystem().getObfuscatedPath(reportOutput));
-
     return getMergedVelocityTemplate(model);
   }
 
   @VisibleForTesting
-  String getMergedVelocityTemplate(Map<String, String> model) {
+  String getMergedVelocityTemplate(Map<String, Object> model) {
     return VelocityEngineUtils
-        .mergeTemplateIntoString(velocityEngine, "velocity/opal-reporting/report-email-notification.vm", model);
+        .mergeTemplateIntoString(velocityEngine, "velocity/opal-reporting/report-email-notification.vm", "UTF-8",
+            model);
   }
 
   @VisibleForTesting

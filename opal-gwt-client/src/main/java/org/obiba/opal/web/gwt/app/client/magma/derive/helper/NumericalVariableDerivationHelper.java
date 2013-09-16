@@ -27,7 +27,6 @@ import org.obiba.opal.web.model.client.math.CategoricalSummaryDto;
 import org.obiba.opal.web.model.client.math.FrequencyDto;
 
 import com.google.common.collect.Range;
-import com.google.common.collect.Ranges;
 import com.google.gwt.core.client.JsArray;
 
 public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>> extends DerivationHelper {
@@ -163,15 +162,15 @@ public class NumericalVariableDerivationHelper<N extends Number & Comparable<N>>
 
   public static <N extends Number & Comparable<N>> Range<N> buildRange(@Nullable N lower, @Nullable N upper) {
     if(lower == null) {
-      return Ranges.lessThan(upper);
+      return Range.lessThan(upper);
     }
     if(upper == null) {
-      return Ranges.atLeast(lower);
+      return Range.atLeast(lower);
     }
     if(lower.equals(upper)) {
-      return Ranges.closed(lower, upper);
+      return Range.closed(lower, upper);
     }
-    return Ranges.closedOpen(lower, upper);
+    return Range.closedOpen(lower, upper);
   }
 
   private final class NumericValueMapEntryComparator implements Comparator<ValueMapEntry> {
