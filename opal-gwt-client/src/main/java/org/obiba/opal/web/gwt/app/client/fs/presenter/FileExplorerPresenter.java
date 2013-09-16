@@ -209,10 +209,22 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
    * Authorize paste if current folder is writable.
    */
   private void updateCurrentFolderPasteAuthorization() {
+    boolean authorized = hasFilesInClipboard() && getCurrentFolder().getWritable();
     // destination must be writable and cannot be the same as the source
-    if(hasFilesInClipboard() && getCurrentFolder().getWritable() &&
-        !getCurrentFolder().getPath().equals(FileDtos.getParent(filesClipboard.get(0)).getPath()))
-      getView().getFilePasteAuthorizer().authorized();
+    if(authorized && getCurrentFolder().getPath().equals(FileDtos.getParent(filesClipboard.get(0)).getPath()))
+      authorized = false;
+
+    // cannot paste in a children
+    if (authorized) {
+      for (FileDto file : filesClipboard) {
+        if (FileDtos.isFolder(file) && getCurrentFolder().getPath().startsWith(file.getPath())) {
+          authorized = false;
+          break;
+        }
+      }
+    }
+
+    if(authorized) getView().getFilePasteAuthorizer().authorized();
     else getView().getFilePasteAuthorizer().unauthorized();
   }
 
