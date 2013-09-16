@@ -1882,4 +1882,46 @@ public interface Translations extends Constants {
   @Description("History label")
   @DefaultStringValue("History")
   String historyLabel();
+
+  @Description("Statistics Related Labels")
+  @DefaultStringMapValue({ "PLOT", "Plot",//
+      "STATISTICS", "Statistics",//
+      "DESC_STATISTICS", "Descriptive Statistic",//
+      "VALUE", "Value",//
+      "N", "N", //
+      "MIN", "Min", //
+      "MAX", "Max", //
+      "MEAN", "Mean", //
+      "MEDIAN", "Median", //
+      "STD_DEVIATION", "Standard Deviation", //
+      "VARIANCE", "Variance", //
+      "SKEWNESS", "Skewness", //
+      "KURTOSIS", "Kurtosis", //
+      "SUM", "Sum", //
+      "SUM_OF_SQUARES", "Sum of squares", //
+      "HISTOGRAM", "Histogram", "DENSITY", "Density", "NORMAL_PROB", "Normal Probability", "THEORETHICAL_QUANTILES",
+      "Theroretical Quantiles", "SAMPLE_QUANTILES", "Sample Quantiles", "HISTOGRAM", "Sample Quantiles", })
+  Map<String, String> statsMap();
+
+  @Description("JVM Labels")
+  @DefaultStringMapValue({ "OPAL_VERSION", "Opal Version",//
+      "JAVA_VERSION", "Java Version", //
+      "VM_NAME", "VM Name", //
+      "VM_VENDOR", "VM Vendor", //
+      "VM_VERSION", "VM Version", //
+      "MEM_HEAP", "Memory Heap", //
+      "MEGABYTES", "MegaBytes (Mb)", //
+      "COMMITTED", "Committed", //
+      "USED", "Used", //
+      "MEM_NON_HEAP", "Memory Non-Heap", //
+      "THREADS", "Threads", //
+      "COUNT", "Count", //
+      "PEAK", "Peak", //
+      "CURRENT", "Current", //
+      "GC_DELTA", "Garbage Collectors (delta)", //
+      "DELTA", "Delta", //
+      "TIME_MS", "Time (ms)", //
+      "GC_COUNT", "GC Count" //
+  })
+  Map<String, String> jvmMap();
 }

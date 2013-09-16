@@ -52,16 +52,15 @@ public class NormalProbabilityChartFactory {
     normal.add(new Point(max, max));
   }
 
-  public Chart createChart(String title) {
+  public Chart createChart(String title, String xAxis, String yAxis) {
     Chart chart = new Chart().setChartTitleText(title).setLegend(new Legend().setEnabled(false))//
-        .setCredits(new Credits().setEnabled(false)//
-        );
+        .setCredits(new Credits().setEnabled(false));
 
     chart.getXAxis().setType(Axis.Type.LINEAR)//
         .setMin(min)//
         .setMax(max)//
         .setAllowDecimals(true)//
-        .setAxisTitle(new AxisTitle().setAlign(AxisTitle.Align.MIDDLE).setText("Theoretical Quantiles"))//
+        .setAxisTitle(new AxisTitle().setAlign(AxisTitle.Align.MIDDLE).setText(xAxis))//
         .setTickmarkPlacement(XAxis.TickmarkPlacement.ON)//
         .setLabels(new XAxisLabels()).setLabels(new XAxisLabels()//
         .setRotation(-45)//
@@ -71,22 +70,28 @@ public class NormalProbabilityChartFactory {
     chart.getYAxis().setType(Axis.Type.LINEAR)//
         .setMin(min)//
         .setMax(max)//
-        .setAxisTitle(new AxisTitle().setAlign(AxisTitle.Align.MIDDLE).setText("Sample Quantiles"))//
+        .setAxisTitle(new AxisTitle().setAlign(AxisTitle.Align.MIDDLE).setText(yAxis))//
         .setAllowDecimals(true);
 
     // Scatter line
     chart.addSeries(chart.createSeries() //
         .setType(Series.Type.LINE)//
         .setPoints(normal.toArray(new Point[normal.size()]))//
-        .setPlotOptions(new LinePlotOptions().setMarker(new Marker().setEnabled(false))));
+        .setPlotOptions(new LinePlotOptions().setMarker(new Marker().setEnabled(false))//
+            .setAnimation(false)//
+            .setEnableMouseTracking(false)//
+        ));
+
     // Scatter serie
     chart.addSeries(chart.createSeries() //
         .setType(Series.Type.SCATTER)//
-        .setPlotOptions(new ScatterPlotOptions().setMarker(new Marker().setSymbol(Marker.Symbol.CIRCLE)))//
+        .setPlotOptions(new ScatterPlotOptions().setMarker(new Marker().setSymbol(Marker.Symbol.CIRCLE))//
+            .setAnimation(false)//
+            .setEnableMouseTracking(false)//
+        )//
         .setPoints(values.toArray(new Point[values.size()]))//
     );
 
-    chart.setAnimation(false);
     return chart;
   }
 }
