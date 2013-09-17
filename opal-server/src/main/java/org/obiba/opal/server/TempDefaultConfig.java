@@ -24,7 +24,7 @@ public class TempDefaultConfig {
 
   public static final String USERNAME = "root";
 
-  public static final String PASSWORD = "rootadmin";
+  public static final String PASSWORD = "1234";
 
   @Autowired
   private DatabaseRegistry databaseRegistry;
@@ -43,7 +43,7 @@ public class TempDefaultConfig {
 
     SqlDatabase opalData = new SqlDatabase.Builder() //
         .name("opal-data") //
-        .url("jdbc:mysql://localhost:3306/opal_data?characterEncoding=UTF-8") //
+        .url("jdbc:mysql://localhost:3306/opal?characterEncoding=UTF-8") //
         .driverClass("com.mysql.jdbc.Driver") //
         .username(USERNAME) //
         .password(PASSWORD) //
@@ -55,7 +55,7 @@ public class TempDefaultConfig {
 
     SqlDatabase opalKey = new SqlDatabase.Builder() //
         .name("opal-key") //
-        .url("jdbc:mysql://localhost:3306/opal_key?characterEncoding=UTF-8") //
+        .url("jdbc:mysql://localhost:3306/key?characterEncoding=UTF-8") //
         .driverClass("com.mysql.jdbc.Driver") //
         .username(USERNAME) //
         .password(PASSWORD) //
@@ -67,7 +67,7 @@ public class TempDefaultConfig {
     databaseRegistry.addOrReplaceDatabase(opalKey);
 
     createDatasourceAndProject("opal-data", opalData);
-    createDatasourceAndProject("mica_demo", opalData);
+    createDatasourceAndProject("opal-data2", opalData);
 
     MongoDbDatabase opalMongo = new MongoDbDatabase.Builder() //
         .name("mongo-data") //
