@@ -10,32 +10,34 @@
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueMapPopupPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.LineStringValueMap;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.PointValueMap;
 import org.obiba.opal.web.gwt.app.client.ui.PolygonValueMap;
 import org.obiba.opal.web.gwt.app.client.ui.ValueMap;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueMapPopupPresenter;
-import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.web.bindery.event.shared.EventBus;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PopupViewImpl;
+import com.google.web.bindery.event.shared.EventBus;
 
 /**
  *
  */
-public class ValueMapPopupView extends PopupViewImpl implements ValueMapPopupPresenter.Display {
+public class ValueMapPopupView extends ModalPopupViewWithUiHandlers<ModalUiHandlers>
+    implements ValueMapPopupPresenter.Display {
 
-  @UiTemplate("ValueMapPopupView.ui.xml")
+  private static final int MINIMUM_WIDTH = 400;
+  private static final int MINIMUM_HEIGHT = 400;
+
   interface ValueMapPopupViewUiBinder extends UiBinder<Widget, ValueMapPopupView> {}
 
   private static final ValueMapPopupViewUiBinder uiBinder = GWT.create(ValueMapPopupViewUiBinder.class);
@@ -43,25 +45,17 @@ public class ValueMapPopupView extends PopupViewImpl implements ValueMapPopupPre
   private final Widget widget;
 
   @UiField
-  DialogBox dialogBox;
-
-  @UiField
-  Panel content;
+  Modal dialog;
 
   @UiField
   Panel panel;
-
-  @UiField
-  Button closeButton;
-
-  @UiField
-  ResizeHandle resizeHandle;
 
   @Inject
   public ValueMapPopupView(EventBus eventBus) {
     super(eventBus);
     widget = uiBinder.createAndBindUi(this);
-    resizeHandle.makeResizable(content);
+    dialog.setMinWidth(MINIMUM_WIDTH);
+    dialog.setMinHeight(MINIMUM_HEIGHT);
   }
 
   @Override
@@ -69,15 +63,14 @@ public class ValueMapPopupView extends PopupViewImpl implements ValueMapPopupPre
     return widget;
   }
 
-  @Override
-  public HasClickHandlers getButton() {
-    return closeButton;
+  @UiHandler("closeButton")
+  public void onCloseButtonClicked(ClickEvent event) {
+    dialog.hide();
   }
 
   @Override
   public void initialize(GeoValueDisplayEvent event) {
-    dialogBox.setModal(true);
-    dialogBox.setText(event.getVariable().getName() + " - " + event.getEntityIdentifier());
+    dialog.setTitle(event.getVariable().getName() + " - " + event.getEntityIdentifier());
     panel.clear();
     ValueMap map = null;
     
@@ -89,9 +82,9 @@ public class ValueMapPopupView extends PopupViewImpl implements ValueMapPopupPre
       map = new PolygonValueMap(event.getVariable(), event.getValue(), event.getIndex());
 
     if (map != null) {
-      map.setHeight("500px");
+      // TODO needs more refining and also a resize handler on the dialog
+      map.setHeight(String.valueOf(MINIMUM_WIDTH)+"px");
       map.setWidth("100%");
-      resizeHandle.makeResizable(map, 200);
       panel.add(map);
     }
   }

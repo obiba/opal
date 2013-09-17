@@ -10,19 +10,22 @@
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
 /**
  *
  */
-public class ValueMapPopupPresenter extends PresenterWidget<ValueMapPopupPresenter.Display> {
+public class ValueMapPopupPresenter extends ModalPresenterWidget<ValueMapPopupPresenter.Display> {
 
   /**
    * @param eventBus
@@ -32,12 +35,12 @@ public class ValueMapPopupPresenter extends PresenterWidget<ValueMapPopupPresent
   @Inject
   public ValueMapPopupPresenter(EventBus eventBus, Display view) {
     super(eventBus, view);
+    getView().setUiHandlers(this);
   }
 
   @Override
   protected void onBind() {
     super.onBind();
-    addHandler();
   }
 
   public void handle(GeoValueDisplayEvent event) {
@@ -48,26 +51,12 @@ public class ValueMapPopupPresenter extends PresenterWidget<ValueMapPopupPresent
   // Private methods
   //
 
-  private void addHandler() {
-    registerHandler(getView().getButton().addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        getView().hide();
-      }
-    }));
-  }
-
   //
   // Inner classes and Interfaces
   //
 
-  public interface Display extends PopupView {
-
+  public interface Display extends PopupView, HasUiHandlers<ModalUiHandlers> {
     void initialize(GeoValueDisplayEvent event);
-
-    HasClickHandlers getButton();
-
   }
 
 }
