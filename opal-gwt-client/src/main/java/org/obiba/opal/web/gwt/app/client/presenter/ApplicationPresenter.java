@@ -75,7 +75,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   private final ModalProvider<FileSelectorPresenter> fileSelectorProvider;
 
-  private final Provider<ValueMapPopupPresenter> valueMapPopupPresenter;
+  private final ModalProvider<ValueMapPopupPresenter> valueMapPopupProvider;
 
   private final RequestUrlBuilder urlBuilder;
 
@@ -85,13 +85,13 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public ApplicationPresenter(Display display, Proxy proxy, EventBus eventBus, RequestCredentials credentials,
       NotificationPresenter messageDialog, ModalProvider<FileSelectorPresenter> fileSelectorProvider,
-      Provider<ValueMapPopupPresenter> valueMapPopupPresenter, RequestUrlBuilder urlBuilder,
+      ModalProvider<ValueMapPopupPresenter> valueMapPopupProvider, RequestUrlBuilder urlBuilder,
       PlaceManager placeManager) {
     super(eventBus, display, proxy);
     this.credentials = credentials;
     this.messageDialog = messageDialog;
     this.fileSelectorProvider = fileSelectorProvider.setContainer(this);
-    this.valueMapPopupPresenter = valueMapPopupPresenter;
+    this.valueMapPopupProvider = valueMapPopupProvider.setContainer(this);
     this.urlBuilder = urlBuilder;
     this.placeManager = placeManager;
     getView().setUiHandlers(this);
@@ -116,9 +116,8 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
       @Override
       public void onGeoValueDisplay(GeoValueDisplayEvent event) {
-        ValueMapPopupPresenter vmp = valueMapPopupPresenter.get();
+        ValueMapPopupPresenter vmp = valueMapPopupProvider.get();
         vmp.handle(event);
-        addToPopupSlot(vmp);
       }
     });
     addRegisteredHandler(FileDownloadRequestEvent.getType(), new FileDownloadRequestEvent.Handler() {
