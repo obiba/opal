@@ -1927,4 +1927,61 @@ public interface Translations extends Constants {
       "GC_COUNT", "GC Count" //
   })
   Map<String, String> jvmMap();
+
+  @Description("System Configuration page title")
+  @DefaultStringValue("Configuration")
+  String pageServerConfigurationTitle();
+
+  @Description("Select languages label")
+  @DefaultStringValue("Select languages...")
+  String selectLanguages();
+
+  @Description("Locale Labels")
+  @DefaultStringMapValue({//
+      "ar", "Arabic",//
+      "be", "Belarusian", //
+      "bg", "Bulgarian", //
+      "ca", "Catalan", //
+      "cs", "Czech", //
+      "da", "Danish", //
+      "de", "German", //
+      "el", "Greek", //
+      "en", "English", //
+      "es", "Spanish", //
+      "et", "Estonian", //
+      "fi", "Finnish", //
+      "fr", "French", //
+      "ga", "Irish", //
+      "hi", "Hindi", //
+      "hr", "Croatian", //
+      "hu", "Hungarian", //
+      "in", "Indonesian", //
+      "is", "Icelandic", //
+      "it", "Italian", //
+      "iw", "Hebrew", //
+      "ja", "Japanese", //
+      "ko", "Korean", //
+      "lt", "Lithuanian", //
+      "lv", "Latvian", //
+      "mk", "Macedonian", //
+      "ms", "Malay", //
+      "mt", "Maltese", //
+      "nl", "Dutch", //
+      "no", "Norwegian", //
+      "pl", "Polish", //
+      "pt", "Portuguese", //
+      "ro", "Romanian", //
+      "ru", "Russian", //
+      "sk", "Slovak", //
+      "sl", "Slovenian", //
+      "sq", "Albanian", //
+      "sr", "Serbian", //
+      "sv", "Swedish", //
+      "th", "Thai", //
+      "tr", "Turkish", //
+      "uk", "Ukrainian", //
+      "vi", "Vietnamese", //
+      "zh", "Chinese"//
+  })
+  Map<String, String> localeMap();
 }

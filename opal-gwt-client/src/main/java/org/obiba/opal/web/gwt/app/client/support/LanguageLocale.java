@@ -12,6 +12,10 @@ package org.obiba.opal.web.gwt.app.client.support;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+
+import com.google.gwt.core.client.GWT;
+
 public enum LanguageLocale {
   AR("ar"),
   BE("be"),
@@ -58,6 +62,8 @@ public enum LanguageLocale {
   VI("vi"),
   ZH("zh");
 
+  private static final Translations translations = GWT.create(Translations.class);
+
   public static Iterable<String> getAllLocales() {
     return localeNames;
   }
@@ -70,6 +76,9 @@ public enum LanguageLocale {
     return localeNames.contains(localeName);
   }
 
+  public static String getDisplayName(String name) {
+    return translations.localeMap().get(name);
+  }
 
   //
   // Private Members
@@ -84,6 +93,8 @@ public enum LanguageLocale {
   }
 
   private final String name;
+
+//  private final String displayName;
 
   LanguageLocale(String name) {
     this.name = name;
