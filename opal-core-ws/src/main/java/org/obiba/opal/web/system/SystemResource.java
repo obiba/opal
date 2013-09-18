@@ -16,7 +16,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.cfg.TaxonomyService;
+import org.obiba.opal.core.domain.server.OpalGeneralConfig;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
+import org.obiba.opal.core.service.impl.DefaultGeneralConfigService;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.runtime.Version;
@@ -29,11 +31,15 @@ public class SystemResource {
 
   private final Version opalVersion;
 
+  private final DefaultGeneralConfigService serverService;
+
   private final TaxonomyService taxonomyService;
 
   @Autowired
-  public SystemResource(Version opalVersion, TaxonomyService taxonomyService) {
+  public SystemResource(Version opalVersion, DefaultGeneralConfigService serverService,
+      TaxonomyService taxonomyService) {
     this.opalVersion = opalVersion;
+    this.serverService = serverService;
     this.taxonomyService = taxonomyService;
   }
 
@@ -117,22 +123,36 @@ public class SystemResource {
       taxonomies.add(Dtos.asDto(taxonomy));
     }
     return Opal.OpalConf.newBuilder()//
-        .setGeneral(Opal.GeneralConf.getDefaultInstance())//TODO
-        .addAllTaxonomies(taxonomies)//
+        .setGeneral(getOpalGeneralConfiguration()).addAllTaxonomies(taxonomies)//
         .build();
   }
 
-  @GET //TODO
+  @GET
   @Path("/conf/general")
   public Opal.GeneralConf getOpalGeneralConfiguration() {
+    OpalGeneralConfig conf = serverService.getServerConfig();
 
-    return Opal.GeneralConf.getDefaultInstance();
+    return Opal.GeneralConf.newBuilder()//
+        .setName(conf.getName())//
+        .addAllLanguages(conf.getLocales())//
+        .setDefaultCharSet(conf.getDefaultCharacterSet()).build();
   }
 
-  @PUT //TODO
+  @PUT
   @Path("/conf/general")
-  public Response updateGeneralConfigurations() {
+  public Response updateGeneralConfigurations(Opal.GeneralConf confDto) {
+    OpalGeneralConfig conf = serverService.getServerConfig();
+
+    if(conf == null) {
+      conf = new OpalGeneralConfig();
+    }
+
+    conf.setName(confDto.getName());
+    conf.setLocales(confDto.getLanguagesList());
+    conf.setDefaultCharacterSet(confDto.getDefaultCharSet());
+
+    serverService.updateServerConfig(conf);
+
     return Response.ok().build();
   }
-
 }
