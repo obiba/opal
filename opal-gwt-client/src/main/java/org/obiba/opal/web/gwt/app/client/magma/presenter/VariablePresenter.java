@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.CopyVariablesToViewEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.SiblingVariableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
@@ -39,6 +40,7 @@ import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
+import org.obiba.opal.web.model.client.opal.LocaleDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.web.bindery.event.shared.EventBus;
@@ -49,8 +51,8 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
-public class VariablePresenter extends PresenterWidget<VariablePresenter.Display> implements
-    VariableUiHandlers, VariableSelectionChangeEvent.Handler {
+public class VariablePresenter extends PresenterWidget<VariablePresenter.Display>
+    implements VariableUiHandlers, VariableSelectionChangeEvent.Handler {
 
   private final SummaryTabPresenter summaryTabPresenter;
 
@@ -83,13 +85,20 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   }
 
   @Override
-  public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-    if (event.hasTable()) {
+  public void onVariableSelectionChanged(final VariableSelectionChangeEvent event) {
+    if(event.hasTable()) {
       updateDisplay(event.getTable(), event.getSelection(), event.getPrevious(), event.getNext());
-    }
-    else {
+    } else {
       updateDisplay(event.getDatasourceName(), event.getTableName(), event.getVariableName(), null, null);
     }
+    ResourceRequestBuilderFactory.<JsArray<LocaleDto>>newBuilder()
+        .forResource(UriBuilder.URI_DATASOURCE_LOCALES.build(event.getDatasourceName())).get()
+        .withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<LocaleDto> resource) {
+            getView().setLanguages(JsArrays.toSafeArray(resource));
+          }
+        }).send();
   }
 
   @Override
@@ -98,8 +107,14 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     setInSlot(Display.Slots.Values, valuesTablePresenter);
     setInSlot(Display.Slots.ScriptEditor, scriptEditorPresenter);
 
-    registerHandler(getEventBus().addHandler(VariableSelectionChangeEvent.getType(), new VariableSelectionHandler()));
-    registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
+    addRegisteredHandler(VariableSelectionChangeEvent.getType(), this);
+    addRegisteredHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionChangeEvent.Handler() {
+      @Override
+      public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
+
+      }
+    });
+    addRegisteredHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler());
 
     summaryTabPresenter.bind();
     getView().setSummaryTabWidget(summaryTabPresenter.getView());
@@ -116,10 +131,9 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     if(table != null && table.getDatasourceName().equals(datasourceName) && table.getName().equals(tableName) &&
         variable != null && variable.getName().equals(variableName)) return;
 
-
-    if (variableUpdatePending) return;
-    UriBuilder ub = UriBuilder.create().segment("datasource", "{}", "table", "{}", "variable", "{}");
-    ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(ub.build(datasourceName, tableName, variableName)).get()
+    if(variableUpdatePending) return;
+    ResourceRequestBuilderFactory.<VariableDto>newBuilder()
+        .forResource(UriBuilder.URI_DATASOURCE_TABLE_VARIABLE.build(datasourceName, tableName, variableName)).get()
         .withCallback(new ResourceCallback<VariableDto>() {
           @Override
           public void onResource(Response response, VariableDto resource) {
@@ -129,7 +143,6 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
             variableUpdatePending = false;
           }
         }).send();
-
 
   }
 
@@ -332,20 +345,9 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     }
   }
 
-  class VariableSelectionHandler implements VariableSelectionChangeEvent.Handler {
-    @Override
-    public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-      if (event.hasTable()) {
-        updateDisplay(event.getTable(), event.getSelection(), event.getPrevious(), event.getNext());
-      }
-      else {
-        updateDisplay(event.getDatasourceName(), event.getTableName(), event.getVariableName(), null, null);
-      }
-
-    }
-  }
-
   public interface Display extends View, HasUiHandlers<VariableUiHandlers> {
+
+    void setLanguages(JsArray<LocaleDto> languages);
 
     enum Slots {
       Permissions, Values, ScriptEditor

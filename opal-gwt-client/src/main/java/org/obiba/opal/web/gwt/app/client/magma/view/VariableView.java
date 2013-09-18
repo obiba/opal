@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
 import org.obiba.opal.web.gwt.app.client.ui.EditorPanel;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.EditableColumn;
 import org.obiba.opal.web.gwt.prettify.client.PrettyPrintLabel;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -25,6 +26,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.opal.LocaleDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.NavLink;
@@ -32,6 +34,7 @@ import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.google.common.base.Strings;
+import com.google.gwt.cell.client.TextInputCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -95,7 +98,10 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   TabPanel tabPanel;
 
   @UiField(provided = true)
-  Table<CategoryDto> categoryTable;
+  CategoriesTable categoryTable;
+
+  @UiField
+  Table<CategoryDto> editCategoriesTable;
 
   @UiField
   SimplePager categoryTablePager;
@@ -135,10 +141,10 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   Button remove;
 
   @UiField
-  Button editCategories;
+  Button editAttributes;
 
   @UiField
-  Button editAttributes;
+  EditorPanel categoriesEditorPanel;
 
   @UiField
   EditorPanel scriptEditorPanel;
@@ -161,6 +167,8 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @UiField
   NavLink deriveCustom;
 
+  private JsArray<LocaleDto> languages;
+
   @Inject
   public VariableView(Binder uiBinder) {
     categoryTable = new CategoriesTable();
@@ -180,6 +188,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
       }
     });
     scriptEditorPanel.setHandler(new ScriptEditorHandler());
+    categoriesEditorPanel.setHandler(new CategoriesEditorHandler());
   }
 
   @Override
@@ -244,7 +253,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   public void renderCategoryRows(JsArray<CategoryDto> rows) {
     categoryProvider.setArray(rows);
     int size = categoryProvider.getList().size();
-    //TabPanelHelper.setTabText(tabPanel, CATEGORIES_TAB_INDEX, translations.categoriesLabel() + " (" + size + ")");
     categoryTablePager.firstPage();
     categoryTablePager.setVisible(size > Table.DEFAULT_PAGESIZE);
     categoryProvider.refresh();
@@ -254,7 +262,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   public void renderAttributeRows(JsArray<AttributeDto> rows) {
     attributeProvider.setArray(rows);
     int size = attributeProvider.getList().size();
-    //TabPanelHelper.setTabText(tabPanel, ATTRIBUTES_TAB_INDEX, translations.attributesLabel() + " (" + size + ")");
     attributeTablePager.firstPage();
     attributeTablePager.setVisible(size > Table.DEFAULT_PAGESIZE);
     attributeTable.setupSort(attributeProvider);
@@ -301,6 +308,11 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   //
 
   @Override
+  public void setLanguages(JsArray<LocaleDto> languages) {
+    this.languages = languages;
+  }
+
+  @Override
   public void setVariable(VariableDto variable) {
     entityType.setText(variable.getEntityType());
     refEntityType.setText(variable.getReferencedEntityType());
@@ -330,8 +342,8 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   @Override
   public HasAuthorization getEditAuthorizer() {
-    return new CompositeAuthorizer(new WidgetAuthorizer(editCategories, editAttributes, editProperties, remove),
-        scriptEditorPanel.getAuthorizer());
+    return new CompositeAuthorizer(categoriesEditorPanel.getAuthorizer(),
+        new WidgetAuthorizer(editAttributes, editProperties, remove), scriptEditorPanel.getAuthorizer());
   }
 
   private void initCategoryTable() {
@@ -339,6 +351,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     categoryTable.setPageSize(Table.DEFAULT_PAGESIZE);
     categoryTablePager.setDisplay(categoryTable);
     categoryProvider.addDataDisplay(categoryTable);
+    categoryProvider.addDataDisplay(editCategoriesTable);
   }
 
   private void initAttributeTable() {
@@ -372,6 +385,61 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     categorizeToAnother.setDisabled(!available);
     categorizeToThis.setDisabled(!available);
     deriveCustom.setDisabled(!available);
+  }
+
+  private class CategoriesEditorHandler implements EditorPanel.Handler {
+
+    @Override
+    public void onEdit() {
+      initColumns();
+    }
+
+    @Override
+    public void onSave() {
+      //TODO
+    }
+
+    @Override
+    public void onCancel() {
+      //TODO
+    }
+
+    @Override
+    public void onHistory() {
+      //TODO
+    }
+
+    private void initColumns() {
+      while (editCategoriesTable.getColumnCount()>0) {
+        editCategoriesTable.removeColumn(0);
+      }
+      editCategoriesTable.addColumn(new EditableColumn<CategoryDto>(new TextInputCell()) {
+        @Override
+        public String getValue(CategoryDto object) {
+          return object.getName();
+        }
+      }, translations.nameLabel());
+      if (languages != null) {
+        for (final LocaleDto locale : JsArrays.toIterable(languages)) {
+          editCategoriesTable.addColumn(new EditableColumn<CategoryDto>(new TextInputCell()) {
+            @Override
+            public String getValue(CategoryDto object) {
+              if(object.getAttributesArray() != null) {
+                for(AttributeDto attr : JsArrays.toIterable(object.getAttributesArray())) {
+                  if(attr.getName().equals("label") && locale.getName().equals(attr.getLocale())) {
+                    return attr.getValue();
+                  }
+                }
+              }
+              return "";
+            }
+          }, translations.labelLabel() + ":" + locale.getName());
+        }
+      }
+      // TODO find locales from the categories
+      // TODO add missing column
+    }
+
   }
 
   private class ScriptEditorHandler implements EditorPanel.Handler {

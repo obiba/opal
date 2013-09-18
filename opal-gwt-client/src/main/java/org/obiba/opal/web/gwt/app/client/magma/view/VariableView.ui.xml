@@ -29,7 +29,7 @@
         <b:Button icon="TRASH" size="SMALL" ui:field="remove">
         </b:Button>
       </b:ButtonGroup>
-      <b:ButtonGroup addStyleNames="pull-right">
+      <b:ButtonGroup>
         <b:Button icon="CHEVRON_UP" size="SMALL" ui:field="previous">
         </b:Button>
         <b:Button icon="CHEVRON_DOWN" size="SMALL" ui:field="next">
@@ -41,12 +41,15 @@
 
     <b:TabPanel tabPosition="above" ui:field="tabPanel">
       <b:Tab heading="Categories" active="true">
-        <b:Button icon="EDIT" size="SMALL" type="INFO" title="Edit categories..." ui:field="editCategories"
-            addStyleNames="bottom-margin">
-          <ui:msg description="Edit label">Edit</ui:msg>
-        </b:Button>
-        <b:SimplePager ui:field="categoryTablePager" location="RIGHT"/>
-        <o:Table ui:field="categoryTable"/>
+        <o:EditorPanel size="SMALL" ui:field="categoriesEditorPanel">
+          <g:FlowPanel>
+            <b:SimplePager ui:field="categoryTablePager" location="RIGHT"/>
+            <o:Table ui:field="categoryTable"/>
+          </g:FlowPanel>
+          <g:FlowPanel>
+            <o:Table ui:field="editCategoriesTable"/>
+          </g:FlowPanel>
+        </o:EditorPanel>
       </b:Tab>
 
       <b:Tab heading="Attributes">
