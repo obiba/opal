@@ -61,6 +61,8 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @SuppressWarnings("OverlyCoupledClass")
@@ -191,7 +193,8 @@ public class DatasourceResource {
 
   @POST
   @Path("/views")
-  public Response createView(ViewDto viewDto, @Context UriInfo uriInfo) {
+  public Response createView(ViewDto viewDto, @Context UriInfo uriInfo,
+      @Nullable @QueryParam("comment") String comment) {
     if(!viewDto.hasName()) return Response.status(BAD_REQUEST).build();
 
     if(datasourceHasTable(viewDto.getName())) {
@@ -200,7 +203,7 @@ public class DatasourceResource {
     }
     View view = viewDtos.fromDto(viewDto);
 
-    viewManager.addView(getDatasource().getName(), view);
+    viewManager.addView(getDatasource().getName(), view, comment);
 
     URI viewUri = UriBuilder.fromUri(uriInfo.getBaseUri().toString()).path(DatasourceResource.class)
         .path(DatasourceResource.class, "getView").build(name, viewDto.getName());

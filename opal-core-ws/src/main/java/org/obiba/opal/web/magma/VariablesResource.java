@@ -30,7 +30,6 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.jboss.resteasy.annotations.cache.Cache;
-import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
@@ -54,6 +53,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 public class VariablesResource extends AbstractValueTableResource {
 
@@ -128,7 +129,7 @@ public class VariablesResource extends AbstractValueTableResource {
   }
 
   @POST
-  public Response addOrUpdateVariables(List<VariableDto> variables) {
+  public Response addOrUpdateVariables(List<VariableDto> variables, @Nullable @QueryParam("comment") String comment) {
     try {
 
       // @TODO Check if table can be modified and respond with "IllegalTableModification" (it seems like this cannot be

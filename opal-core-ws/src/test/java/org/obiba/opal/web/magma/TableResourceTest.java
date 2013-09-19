@@ -207,7 +207,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
           .setIsRepeatable(false).build());
     }
 
-    new VariablesResource(valueTableMock, Collections.<Locale>emptySet()).addOrUpdateVariables(variablesDto);
+    new VariablesResource(valueTableMock, Collections.<Locale>emptySet()).addOrUpdateVariables(variablesDto, null);
 
     verify(valueTableMock, datasourceMock, valueTableWriterMock, variableWriterMock);
 
@@ -215,7 +215,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
 
   @Test
   public void testAddOrUpdateVariables_InternalServerError() {
-    Response response = new VariablesResource(null, Collections.<Locale>emptySet()).addOrUpdateVariables(null);
+    Response response = new VariablesResource(null, Collections.<Locale>emptySet()).addOrUpdateVariables(null, null);
     Assert.assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
   }
 

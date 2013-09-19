@@ -37,10 +37,10 @@ public class ViewsUpgrade_1_4_0Test {
   @After
   public void tearDown() throws Exception {
     // Delete view files.
-    viewPersistenceStrategy.writeViews("starbucks", ImmutableSet.<View>of());
-    viewPersistenceStrategy.writeViews("two words", ImmutableSet.<View>of());
-    viewPersistenceStrategy.writeViews("robin", ImmutableSet.<View>of());
-    viewPersistenceStrategy.writeViews("dylan", ImmutableSet.<View>of());
+    viewPersistenceStrategy.writeViews("starbucks", ImmutableSet.<View>of(), null);
+    viewPersistenceStrategy.writeViews("two words", ImmutableSet.<View>of(), null);
+    viewPersistenceStrategy.writeViews("robin", ImmutableSet.<View>of(), null);
+    viewPersistenceStrategy.writeViews("dylan", ImmutableSet.<View>of(), null);
     workingOpalConfigFile.delete();
   }
 
@@ -58,7 +58,7 @@ public class ViewsUpgrade_1_4_0Test {
   }
 
   private String getTestFilesRoot() {
-    return this.getClass().getResource("/" + this.getClass().getSimpleName()).getFile();
+    return getClass().getResource("/" + getClass().getSimpleName()).getFile();
   }
 
 }
