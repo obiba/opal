@@ -428,8 +428,8 @@ public interface Translations extends Constants {
       "FileNotFound", "File not found: {0}",//
       "FileNotAccessible", "File not accessible: {0}",//
       "MultipleIdentifiersDatabase", "Database for identifiers already exists: {0}", //
-      "DatabaseAlreadyExists", "Database named {0} already exists" //
-  })
+      "DatabaseAlreadyExists", "Database named {0} already exists", //
+      "GeneralConfigSaved", "Opal general configuration was successfully saved." })
   Map<String, String> userMessageMap();
 
   @Description("You must select a file message")

@@ -15,4 +15,6 @@ import com.gwtplatform.mvp.client.UiHandlers;
 public interface ServerUiHandlers extends UiHandlers {
 
   void save();
+
+  void cancel();
 }

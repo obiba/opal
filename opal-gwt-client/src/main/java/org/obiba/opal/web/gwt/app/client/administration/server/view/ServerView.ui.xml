@@ -19,66 +19,80 @@
       <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
 
-    <g:FlowPanel addStyleNames="panel">
-      <b:Heading size="5" addStyleNames="no-top-margin">
-        <ui:msg description="Server Configuration General header">General</ui:msg>
-      </b:Heading>
-      <g:Label>
-        <ui:msg description="General settings that will affect user interface label">General settings that will affect
-          user interface.
-        </ui:msg>
-      </g:Label>
 
-      <b:Button ui:field="saveButton" type="PRIMARY">
-        <ui:msg description="Save button label">Save</ui:msg>
-      </b:Button>
-      <b:Button>
-        <ui:msg description="Cancel button label">Cancel</ui:msg>
-      </b:Button>
+    <o:NavPillsPanel>
+      <b:NavLink>
+        <ui:msg description="General configuragion label">General</ui:msg>
+      </b:NavLink>
+      <g:FlowPanel addStyleNames="panel">
+        <!--<b:Heading size="5" addStyleNames="no-top-margin">-->
+        <!--<ui:msg description="Server Configuration General header">General</ui:msg>-->
+        <!--</b:Heading>-->
+        <g:Label>
+          <ui:msg description="General settings that will affect user interface label">General settings that will affect
+            user interface.
+          </ui:msg>
+        </g:Label>
 
-      <!-- Name -->
-      <b:ControlGroup>
-        <b:ControlLabel>
-          <ui:msg description="Name label">Name</ui:msg>
-        </b:ControlLabel>
-        <b:Controls>
-          <b:TextBox ui:field="name"></b:TextBox>
-          <b:HelpBlock>
-            <ui:msg description="Name of organization help">Name of your organization
-            </ui:msg>
-          </b:HelpBlock>
-        </b:Controls>
-      </b:ControlGroup>
+        <b:Button ui:field="saveButton" type="PRIMARY">
+          <ui:msg description="Save button label">Save</ui:msg>
+        </b:Button>
+        <b:Button ui:field="cancelButton">
+          <ui:msg description="Cancel button label">Cancel</ui:msg>
+        </b:Button>
 
-      <!-- Languages -->
-      <b:ControlGroup>
-        <b:ControlLabel>
-          <ui:msg description="Languages label">Languages</ui:msg>
-        </b:ControlLabel>
-        <b:Controls>
-          <o:LocaleChooser ui:field="locales"/>
-          <b:HelpBlock>
-            <ui:msg description="languages help">Languages used to describe the dictionnaries
-            </ui:msg>
-          </b:HelpBlock>
-        </b:Controls>
-      </b:ControlGroup>
+        <!-- Name -->
+        <b:ControlGroup>
+          <b:ControlLabel>
+            <ui:msg description="Name label">Name</ui:msg>
+          </b:ControlLabel>
+          <b:Controls>
+            <b:TextBox ui:field="name"></b:TextBox>
+            <b:HelpBlock>
+              <ui:msg description="Name of organization help">Name of your organization
+              </ui:msg>
+            </b:HelpBlock>
+          </b:Controls>
+        </b:ControlGroup>
 
-      <!-- Default Character Set -->
-      <b:ControlGroup>
-        <b:ControlLabel>
-          <ui:msg description="Default character set label">Default Character Set</ui:msg>
-        </b:ControlLabel>
-        <b:Controls>
-          <o:CharacterSetView ui:field="characterSet"></o:CharacterSetView>
-          <b:HelpBlock>
-            <ui:msg description="Default Character set help">Default character set used when prompting dictionnaries
-              data
-            </ui:msg>
-          </b:HelpBlock>
-        </b:Controls>
-      </b:ControlGroup>
+        <!-- Languages -->
+        <b:ControlGroup>
+          <b:ControlLabel>
+            <ui:msg description="Languages label">Languages</ui:msg>
+          </b:ControlLabel>
+          <b:Controls>
+            <o:LocaleChooser ui:field="locales"/>
+            <b:HelpBlock>
+              <ui:msg description="languages help">Languages used to describe the dictionnaries
+              </ui:msg>
+            </b:HelpBlock>
+          </b:Controls>
+        </b:ControlGroup>
 
-    </g:FlowPanel>
+        <!-- Default Character Set -->
+        <b:ControlGroup>
+          <b:ControlLabel>
+            <ui:msg description="Default character set label">Default Character Set</ui:msg>
+          </b:ControlLabel>
+          <b:Controls>
+            <o:CharacterSetView ui:field="characterSet"></o:CharacterSetView>
+            <b:HelpBlock>
+              <ui:msg description="Default Character set help">Default character set used when prompting dictionnaries
+                data
+              </ui:msg>
+            </b:HelpBlock>
+          </b:Controls>
+        </b:ControlGroup>
+
+      </g:FlowPanel>
+
+      <b:NavLink disabled="true">
+        <ui:msg description="Taxonomies label">Taxonomies</ui:msg>
+      </b:NavLink>
+      <g:FlowPanel>
+      </g:FlowPanel>
+    </o:NavPillsPanel>
+
+
   </g:FlowPanel>
 </ui:UiBinder>

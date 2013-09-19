@@ -46,6 +46,9 @@ public class ServerView extends ViewWithUiHandlers<ServerUiHandlers> implements 
   Button saveButton;
 
   @UiField
+  Button cancelButton;
+
+  @UiField
   TextBox name;
 
   @UiField(provided = true)
@@ -81,6 +84,11 @@ public class ServerView extends ViewWithUiHandlers<ServerUiHandlers> implements 
   @UiHandler("saveButton")
   public void onSave(ClickEvent event) {
     getUiHandlers().save();
+  }
+
+  @UiHandler("cancelButton")
+  public void onCancel(ClickEvent event) {
+    getUiHandlers().cancel();
   }
 
   @Override

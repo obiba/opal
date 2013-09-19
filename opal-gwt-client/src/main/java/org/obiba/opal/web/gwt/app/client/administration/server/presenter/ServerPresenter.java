@@ -11,17 +11,20 @@ package org.obiba.opal.web.gwt.app.client.administration.server.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.GeneralConf;
 
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -76,6 +79,7 @@ public class ServerPresenter extends ItemAdministrationPresenter<ServerPresenter
   protected void onReveal() {
     super.onReveal();
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
+    initGeneralConfig();
   }
 
   @Override
@@ -107,15 +111,34 @@ public class ServerPresenter extends ItemAdministrationPresenter<ServerPresenter
     dto.setDefaultCharSet(getView().getDefaultCharSet());
     dto.setLanguagesArray(getView().getLanguages());
 
-//    ResourceRequestBuilderFactory.<GeneralConf>newBuilder().forResource("/system/conf/general")
-//        .withResourceBody(GeneralConf.stringify(dto)).withCallback(new ResponseCodeCallback() {
-//      @Override
-//      public void onResponseCode(Request request, Response response) {
-//        if(response.getStatusCode() != Response.SC_OK) {
-//          getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
-//        }
-//      }
-//    }, Response.SC_OK, Response.).put().send();
+    ResourceRequestBuilderFactory.<GeneralConf>newBuilder().forResource("/system/conf/general")
+        .withResourceBody(GeneralConf.stringify(dto)).withCallback(new ResponseCodeCallback() {
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        if(response.getStatusCode() == Response.SC_OK) {
+          initGeneralConfig();
+          getEventBus().fireEvent(NotificationEvent.Builder.newNotification().info("GeneralConfigSaved").build());
+        } else {
+          getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
+        }
+      }
+    }, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_NOT_FOUND).put().send();
+  }
+
+  @Override
+  public void cancel() {
+    initGeneralConfig();
+  }
+
+  private void initGeneralConfig() {
+    ResourceRequestBuilderFactory.<GeneralConf>newBuilder()//
+        .forResource("/system/conf/general").withCallback(new ResourceCallback<GeneralConf>() {
+
+      @Override
+      public void onResource(Response response, GeneralConf resource) {
+        getView().renderProperties(resource);
+      }
+    }).get().send();
   }
 
   private final class ServerAuthorization implements HasAuthorization {
@@ -126,8 +149,6 @@ public class ServerPresenter extends ItemAdministrationPresenter<ServerPresenter
 
     @Override
     public void authorized() {
-
-      // Fetch all system environment properties
       ResourceRequestBuilderFactory.<GeneralConf>newBuilder()//
           .forResource("/system/conf/general").withCallback(new ResourceCallback<GeneralConf>() {
 

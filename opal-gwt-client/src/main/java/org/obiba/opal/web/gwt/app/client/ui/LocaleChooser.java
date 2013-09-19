@@ -53,6 +53,8 @@ public class LocaleChooser extends Chooser {
       insertItem(LanguageLocale.getDisplayName(locale), locale, i++);
       localeMap.put(locale, locale);
     }
+
+    // TODO: Sort by display name
   }
 
   @Override
