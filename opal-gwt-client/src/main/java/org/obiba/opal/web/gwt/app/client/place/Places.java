@@ -91,6 +91,10 @@ public final class Places {
 
   public static final Place JVM_PLACE = new Place(JVM);
 
+  public static final String SERVER = ADMINISTRATION + ".server";
+
+  public static final Place SERVER_PLACE = new Place(SERVER);
+
   public static final class Place extends com.google.gwt.place.shared.Place {
 
     private final String place;
