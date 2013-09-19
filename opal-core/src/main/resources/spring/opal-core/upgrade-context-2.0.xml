@@ -194,20 +194,20 @@
           <property name="appliesTo" value="2.0.0"/>
         </bean>
 
-        <!-- 2.0.0 / move config tables -->
-        <bean class="org.obiba.opal.core.runtime.upgrade.database.MoveConfigTablesUpgradeStep">
-          <property name="description" value="Move config tables to config database"/>
-          <property name="appliesTo" value="2.0.0"/>
-          <property name="configDataSource" ref="configDataSource"/>
-          <property name="databaseRegistry" ref="databaseRegistry"/>
-        </bean>
-
         <!-- 2.0.0 / import general config to config database -->
         <bean class="org.obiba.opal.core.runtime.upgrade.ExtractOpalGeneralConfigToDatabaseUpgradeStep">
           <property name="description" value="Extract general config from properties file to Opal config database"/>
           <property name="appliesTo" value="2.0.0"/>
           <property name="propertiesFile" value="file:${OPAL_HOME}/conf/opal-config.properties"/>
           <property name="generalConfigService" ref="generalConfigService"/>
+        </bean>
+
+        <!-- 2.0.0 / move config tables -->
+        <bean class="org.obiba.opal.core.runtime.upgrade.database.MoveConfigTablesUpgradeStep">
+          <property name="description" value="Move config tables to config database"/>
+          <property name="appliesTo" value="2.0.0"/>
+          <property name="configDataSource" ref="configDataSource"/>
+          <property name="databaseRegistry" ref="databaseRegistry"/>
         </bean>
 
         <!-- 2.0.0 / update Opal Configuration -->
