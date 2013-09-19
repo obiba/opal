@@ -32,10 +32,10 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Repository;
-import org.obiba.core.util.FileUtil;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewPersistenceStrategy;
@@ -46,9 +46,12 @@ import org.slf4j.LoggerFactory;
 
 import com.gitblit.utils.JGitUtils;
 import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStream;
+
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
  * This implementation of the {@link ViewPersistenceStrategy} serializes and de-serializes {@link View}s to XML files.
@@ -103,20 +106,20 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   }
 
   @Override
-  public void writeViews(@Nonnull String datasourceName, @Nonnull Set<View> views) {
+  public void writeViews(@Nonnull String datasourceName, @Nonnull Set<View> views, @Nullable String comment) {
     w.lock();
     try {
-      doWriteGitViews(datasourceName, views);
+      doWriteGitViews(datasourceName, views, comment);
     } finally {
       w.unlock();
     }
   }
 
   @Override
-  public void writeView(@Nonnull String datasourceName, @Nonnull View view) {
+  public void writeView(@Nonnull String datasourceName, @Nonnull View view, @Nullable String comment) {
     w.lock();
     try {
-      doWriteGitViews(datasourceName, ImmutableSet.of(view));
+      doWriteGitViews(datasourceName, ImmutableSet.of(view), comment);
     } finally {
       w.unlock();
     }
@@ -147,11 +150,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     r.lock();
     try {
       File targetDir = getDatasourceViewsGit(datasourceName);
-      if(targetDir.exists()) {
-        return doReadGitViews(datasourceName);
-      } else {
-        return doReadViews(datasourceName);
-      }
+      return targetDir.exists() ? doReadGitViews(datasourceName) : doReadViews(datasourceName);
     } finally {
       r.unlock();
     }
@@ -163,8 +162,10 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     git.push().setPushAll().setRemote("origin").call();
   }
 
-  private void doWriteGitViews(@Nonnull String datasourceName, @Nonnull Collection<View> views) {
+  private void doWriteGitViews(@Nonnull String datasourceName, @Nonnull Iterable<View> views,
+      @Nullable String comment) {
     File localRepo = null;
+
     try {
       // Fetch or clone a tmp working directory
       localRepo = cloneDatasourceViewsGit(datasourceName);
@@ -186,7 +187,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
         git.rm().addFilepattern(toRemove).call();
       }
       git.add().addFilepattern(".").call();
-      doCommitPush(git, "Update " + message);
+      doCommitPush(git, Strings.isNullOrEmpty(comment) ? "Update " + message : comment);
 
     } catch(Exception e) {
       throw new RuntimeException("Failed writing views in git for datasource: " + datasourceName, e);
@@ -258,7 +259,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     return localRepo;
   }
 
-  private void doWriteGitView(File localRepo, View view, List<String> varFilesToRemove) throws IOException {
+  private void doWriteGitView(File localRepo, ValueTable view, Collection<String> varFilesToRemove) throws IOException {
     File viewRepo = new File(localRepo, view.getName());
     viewRepo.mkdirs();
 
@@ -295,12 +296,12 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
       String script = variable.getAttributeStringValue("script");
       File variableFile = new File(viewRepo, variable.getName() + ".js");
 
-      FileWriter w = new FileWriter(variableFile);
+      FileWriter fileWriter = new FileWriter(variableFile);
       try {
-        w.append(script);
-        w.flush();
+        fileWriter.append(script);
+        fileWriter.flush();
       } finally {
-        StreamUtil.silentSafeClose(w);
+        StreamUtil.silentSafeClose(fileWriter);
       }
     }
   }

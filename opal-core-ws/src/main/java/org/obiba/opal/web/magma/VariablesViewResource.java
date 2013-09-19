@@ -14,6 +14,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import javax.ws.rs.POST;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -24,6 +25,8 @@ import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma.VariableDto;
+
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 public class VariablesViewResource extends VariablesResource {
 
@@ -39,7 +42,7 @@ public class VariablesViewResource extends VariablesResource {
 
   @Override
   @POST
-  public Response addOrUpdateVariables(List<VariableDto> variables) {
+  public Response addOrUpdateVariables(List<VariableDto> variables, @Nullable @QueryParam("comment") String comment) {
     try {
 
       // @TODO Check if table can be modified and respond with "IllegalTableModification" (it seems like this cannot be
@@ -48,7 +51,7 @@ public class VariablesViewResource extends VariablesResource {
       if(!getValueTable().isView()) {
         addOrUpdateTableVariables(variables);
       } else if(viewManager != null || viewDtos == null) {
-        addOrUpdateViewVariables(variables);
+        addOrUpdateViewVariables(variables, comment);
       } else {
         return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "CannotWriteToView"))
             .build();
@@ -61,7 +64,7 @@ public class VariablesViewResource extends VariablesResource {
     }
   }
 
-  private void addOrUpdateViewVariables(Iterable<VariableDto> variables) {
+  private void addOrUpdateViewVariables(Iterable<VariableDto> variables, @Nullable String comment) {
     VariableWriter vw = null;
     try {
       View view = getValueTableAsView();
@@ -69,7 +72,7 @@ public class VariablesViewResource extends VariablesResource {
       for(VariableDto variable : variables) {
         vw.writeVariable(Dtos.fromDto(variable));
       }
-      viewManager.addView(getDatasource().getName(), view);
+      viewManager.addView(getDatasource().getName(), view, comment);
     } finally {
       Closeables.closeQuietly(vw);
     }
