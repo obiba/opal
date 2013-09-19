@@ -94,8 +94,6 @@ public enum LanguageLocale {
 
   private final String name;
 
-//  private final String displayName;
-
   LanguageLocale(String name) {
     this.name = name;
   }
