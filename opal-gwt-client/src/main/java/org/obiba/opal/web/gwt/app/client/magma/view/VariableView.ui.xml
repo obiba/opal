@@ -1,3 +1,13 @@
+<!--
+  ~ Copyright (c) 2013 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
@@ -10,8 +20,18 @@
 
   <g:FlowPanel>
 
-    <g:FlowPanel addStyleNames="bottom-margin">
-      <b:DropdownButton text="Derive" size="SMALL" icon="COG" ui:field="deriveBtn">
+    <g:FlowPanel>
+      <b:ButtonGroup addStyleNames="pull-right">
+        <b:Button icon="CHEVRON_UP" size="SMALL" ui:field="previous">
+        </b:Button>
+        <b:Button icon="CHEVRON_DOWN" size="SMALL" ui:field="next">
+        </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup addStyleNames="pull-right">
+        <b:Button icon="TRASH" size="SMALL" ui:field="remove">
+        </b:Button>
+      </b:ButtonGroup>
+      <b:DropdownButton text="Derive" size="SMALL" icon="COG" ui:field="deriveBtn" addStyleNames="pull-right">
         <b:NavLink icon="PLUS" ui:field="addToView">
           <ui:msg description="Add variable to view label">Add variable to view...</ui:msg>
         </b:NavLink>
@@ -25,40 +45,95 @@
           <ui:msg description="Derive custom label">Custom...</ui:msg>
         </b:NavLink>
       </b:DropdownButton>
-      <b:ButtonGroup>
-        <b:Button icon="TRASH" size="SMALL" ui:field="remove">
-        </b:Button>
-      </b:ButtonGroup>
-      <b:ButtonGroup>
-        <b:Button icon="CHEVRON_UP" size="SMALL" ui:field="previous">
-        </b:Button>
-        <b:Button icon="CHEVRON_DOWN" size="SMALL" ui:field="next">
-        </b:Button>
-      </b:ButtonGroup>
     </g:FlowPanel>
 
-    <g:FlowPanel ui:field="label" addStyleNames="bottom-margin"/>
-
     <b:TabPanel tabPosition="above" ui:field="tabPanel">
-      <b:Tab heading="Categories" active="true">
-        <o:EditorPanel size="SMALL" ui:field="categoriesEditorPanel">
-          <g:FlowPanel>
-            <b:SimplePager ui:field="categoryTablePager" location="RIGHT"/>
-            <o:Table ui:field="categoryTable"/>
-          </g:FlowPanel>
-          <g:FlowPanel>
-            <o:Table ui:field="editCategoriesTable"/>
-          </g:FlowPanel>
-        </o:EditorPanel>
-      </b:Tab>
+      <b:Tab heading="Dictionary" active="true">
+        <b:Heading size="4" addStyleNames="inline-block">
+          <ui:msg description="Properties label">Properties</ui:msg>
+        </b:Heading>
+        <b2:IconAnchor icon="EDIT" addStyleNames="small-indent">
+        </b2:IconAnchor>
+        <b:FluidRow>
+          <b:Column size="6">
+            <o:PropertiesTable keyStyleNames="span2">
+              <o:PropertyPanel>
+                <g:Label>
+                  <ui:msg description="Entity type label">Entity Type</ui:msg>
+                </g:Label>
+                <g:Label ui:field="entityType"/>
+              </o:PropertyPanel>
 
-      <b:Tab heading="Attributes">
-        <b:Button icon="EDIT" size="SMALL" type="INFO" title="Edit attributes..." ui:field="editAttributes"
-            addStyleNames="bottom-margin">
-          <ui:msg description="Edit label">Edit</ui:msg>
-        </b:Button>
-        <b:SimplePager ui:field="attributeTablePager" location="RIGHT"/>
+              <o:PropertyPanel>
+                <g:Label>
+                  <ui:msg description="Value Type label">Value Type</ui:msg>
+                </g:Label>
+                <g:Label ui:field="valueType"/>
+              </o:PropertyPanel>
+
+              <o:PropertyPanel>
+                <g:Label>
+                  <ui:msg description="Repeatable label">Repeatable</ui:msg>
+                </g:Label>
+                <g:Label ui:field="repeatable"/>
+              </o:PropertyPanel>
+
+              <o:PropertyPanel>
+                <g:Label>
+                  <ui:msg description="Unit label">Unit</ui:msg>
+                </g:Label>
+                <g:Label ui:field="unit"/>
+              </o:PropertyPanel>
+            </o:PropertiesTable>
+          </b:Column>
+          <b:Column size="6">
+            <o:PropertiesTable>
+              <o:PropertyPanel>
+                <g:Label>
+                  <ui:msg description="Referenced Entity Type label">Referenced Entity Type</ui:msg>
+                </g:Label>
+                <g:Label ui:field="refEntityType"/>
+              </o:PropertyPanel>
+
+              <o:PropertyPanel>
+                <g:Label>
+                  <ui:msg description="Mime Type label">Mime Type</ui:msg>
+                </g:Label>
+                <g:Label ui:field="mimeType"/>
+              </o:PropertyPanel>
+
+              <o:PropertyPanel>
+                <g:Label>
+                  <ui:msg description="Occurrence Group label">Occurrence Group</ui:msg>
+                </g:Label>
+                <g:Label ui:field="occurrenceGroup"/>
+              </o:PropertyPanel>
+
+            </o:PropertiesTable>
+          </b:Column>
+        </b:FluidRow>
+
+
+        <g:FlowPanel>
+          <b:Heading size="4" addStyleNames="inline-block">
+            <ui:msg description="Categories label">Categories</ui:msg>
+          </b:Heading>
+          <b2:IconAnchor icon="EDIT" addStyleNames="small-indent">
+          </b2:IconAnchor>
+          <b:SimplePager ui:field="categoryTablePager" location="RIGHT" addStyleNames="pull-right"/>
+        </g:FlowPanel>
+        <o:Table ui:field="categoryTable"/>
+
+        <g:FlowPanel>
+          <b:Heading size="4" addStyleNames="inline-block">
+            <ui:msg description="Attributes label">Attributes</ui:msg>
+          </b:Heading>
+          <b2:IconAnchor icon="EDIT" addStyleNames="small-indent">
+          </b2:IconAnchor>
+          <b:SimplePager ui:field="attributeTablePager" location="RIGHT" addStyleNames="pull-right"/>
+        </g:FlowPanel>
         <o:Table ui:field="attributeTable"/>
+
       </b:Tab>
 
       <b:Tab heading="Script">
@@ -131,70 +206,7 @@
         <g:SimplePanel ui:field="values"/>
       </b:Tab>
 
-      <b:Tab heading="Properties">
-        <b:Button icon="EDIT" size="SMALL" type="INFO" title="Edit properties..." ui:field="editProperties"
-            addStyleNames="bottom-margin">
-          <ui:msg description="Edit label">Edit</ui:msg>
-        </b:Button>
-        <b:FluidRow>
-          <b:Column size="6">
-            <o:PropertiesTable keyStyleNames="span2">
-              <o:PropertyPanel>
-                <g:Label>
-                  <ui:msg description="Entity type label">Entity Type</ui:msg>
-                </g:Label>
-                <g:Label ui:field="entityType"/>
-              </o:PropertyPanel>
 
-              <o:PropertyPanel>
-                <g:Label>
-                  <ui:msg description="Value Type label">Value Type</ui:msg>
-                </g:Label>
-                <g:Label ui:field="valueType"/>
-              </o:PropertyPanel>
-
-              <o:PropertyPanel>
-                <g:Label>
-                  <ui:msg description="Repeatable label">Repeatable</ui:msg>
-                </g:Label>
-                <g:Label ui:field="repeatable"/>
-              </o:PropertyPanel>
-
-              <o:PropertyPanel>
-                <g:Label>
-                  <ui:msg description="Unit label">Unit</ui:msg>
-                </g:Label>
-                <g:Label ui:field="unit"/>
-              </o:PropertyPanel>
-            </o:PropertiesTable>
-          </b:Column>
-          <b:Column size="6">
-            <o:PropertiesTable>
-              <o:PropertyPanel>
-                <g:Label>
-                  <ui:msg description="Referenced Entity Type label">Referenced Entity Type</ui:msg>
-                </g:Label>
-                <g:Label ui:field="refEntityType"/>
-              </o:PropertyPanel>
-
-              <o:PropertyPanel>
-                <g:Label>
-                  <ui:msg description="Mime Type label">Mime Type</ui:msg>
-                </g:Label>
-                <g:Label ui:field="mimeType"/>
-              </o:PropertyPanel>
-
-              <o:PropertyPanel>
-                <g:Label>
-                  <ui:msg description="Occurrence Group label">Occurrence Group</ui:msg>
-                </g:Label>
-                <g:Label ui:field="occurrenceGroup"/>
-              </o:PropertyPanel>
-
-            </o:PropertiesTable>
-          </b:Column>
-        </b:FluidRow>
-      </b:Tab>
     </b:TabPanel>
 
   </g:FlowPanel>

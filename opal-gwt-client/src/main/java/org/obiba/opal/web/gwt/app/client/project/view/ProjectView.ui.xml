@@ -40,11 +40,11 @@
         </g:FlowPanel>
       </b:Tab>
       <b:Tab icon="TABLE">
-        <b:Heading size="5" addStyleNames="no-top-margin">Tables</b:Heading>
+        <!--<b:Heading size="4" addStyleNames="no-top-margin">Tables</b:Heading>-->
         <g:SimplePanel ui:field="tablesPanel"/>
       </b:Tab>
       <b:Tab icon="HDD">
-        <b:Heading size="5" addStyleNames="no-top-margin">Files</b:Heading>
+        <!--<b:Heading size="5" addStyleNames="no-top-margin">Files</b:Heading>-->
         <g:SimplePanel ui:field="filesPanel"/>
       </b:Tab>
       <b:Tab icon="BAR_CHART">
@@ -72,7 +72,7 @@
         </b:Paragraph>
       </b:Tab>
       <b:Tab icon="BOOK">
-        <b:Heading size="5" addStyleNames="no-top-margin">Administration</b:Heading>
+        <!--<b:Heading size="5" addStyleNames="no-top-margin">Administration</b:Heading>-->
         <g:SimplePanel ui:field="adminPanel"/>
       </b:Tab>
     </o:OpalTabPanel>

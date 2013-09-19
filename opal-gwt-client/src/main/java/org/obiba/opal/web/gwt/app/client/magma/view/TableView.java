@@ -13,6 +13,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TableUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
@@ -24,6 +25,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
+import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
@@ -35,6 +37,7 @@ import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.ProgressBar;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TabPanel;
+import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.cell.client.FieldUpdater;
@@ -73,7 +76,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   private static final Integer VARIABLES_TAB_INDEX = 0;
 
-  private static final Integer VALUES_TAB_INDEX = 1;
+  private static final Integer VALUES_TAB_INDEX = 2;
 
   private boolean hasLinkAuthorization = true;
 
@@ -81,16 +84,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   Label entityType;
 
   @UiField
-  Label entityCount;
-
-  @UiField
-  FlowPanel fromTable;
-
-  @UiField
-  FlowPanel fromTableLinks;
-
-  @UiField
-  Label fromTableLabel;
+  PropertiesTable propertiesTable;
 
   @UiField
   FlowPanel indexStatus;
@@ -159,7 +153,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   NavLink downloadView;
 
   @UiField
-  Button edit;
+  IconAnchor edit;
 
   @UiField
   Button remove;
@@ -236,9 +230,23 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
       @Override
       public String getValue(VariableDto object) {
-        return object.getUnit();
+        String categories = "";
+        int count = 1;
+        for (CategoryDto category : JsArrays.toIterable(JsArrays.toSafeArray(object.getCategoriesArray()))) {
+          if (count>10) {
+            categories = categories + " ...";
+            break;
+          }
+          if (!categories.isEmpty()) {
+            categories = categories + ", " + category.getName();
+          } else {
+            categories = category.getName();
+          }
+          count++;
+        }
+        return categories;
       }
-    }, translations.unitLabel());
+    }, translations.categoriesLabel());
 
     table.setSelectionModel(new SingleSelectionModel<VariableDto>());
     table.setPageSize(Table.DEFAULT_PAGESIZE);
@@ -308,17 +316,16 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @Override
   public void setTable(TableDto dto) {
     entityType.setText(dto.getEntityType());
-    entityCount.setText(Integer.toString(dto.getValueSetCount()));
     edit.setVisible(dto.hasViewLink());
   }
 
   @Override
   public void setFromTables(JsArrayString tableNames) {
-    if(tableNames == null) {
-      fromTable.setVisible(false);
-    } else {
-      fromTable.setVisible(true);
-      fromTableLinks.clear();
+    if (propertiesTable.getRowCount()>1) {
+      propertiesTable.removeProperty(1);
+    }
+    if(tableNames != null) {
+      FlowPanel fromTableLinks = new FlowPanel();
       for(int i = 0; i < tableNames.length(); i++) {
         final String tableFullName = tableNames.get(i);
         Anchor a = new Anchor();
@@ -335,6 +342,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
           fromTableLinks.add(new InlineLabel(", "));
         }
       }
+      propertiesTable.addProperty(new Label(translations.tableReferencesLabel()), fromTableLinks);
     }
   }
 

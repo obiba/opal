@@ -30,6 +30,7 @@ public class DefaultFlexTable extends FlexTable {
     setStyled(true);
     setCondensed(true);
     setZebra(true);
+    setBordered(true);
   }
 
   public void setStyled(boolean styled) {

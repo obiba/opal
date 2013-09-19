@@ -38,6 +38,7 @@ public class Table<T> extends CellTable<T> {
     super(pageSize);
     setStriped(true);
     setCondensed(true);
+    setBordered(true);
     setEmptyTableWidget(new InlineLabel("No items."));
   }
 
@@ -45,6 +46,7 @@ public class Table<T> extends CellTable<T> {
     super(pageSize, keyProvider);
     setStriped(true);
     setCondensed(true);
+    setBordered(true);
   }
 
   @Override

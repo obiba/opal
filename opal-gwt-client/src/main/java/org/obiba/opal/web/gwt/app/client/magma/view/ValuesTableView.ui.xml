@@ -14,13 +14,13 @@
     <g:PopupPanel ui:field="navigationPopup" autoHideEnabled="true" styleName="gwt-MenuBarPopup"></g:PopupPanel>
 
     <g:FlowPanel ui:field="searchPanel">
-      <b:InputAddOn prependIcon="SEARCH">
+      <b:InputAddOn prependIcon="SEARCH" addStyleNames="inline-block">
         <b:TextBox ui:field="searchBox" placeholder="search for an identifier..."/>
       </b:InputAddOn>
-
+      <b:SimplePager ui:field="pager" location="CENTER" addStyleNames="pull-right"></b:SimplePager>
     </g:FlowPanel>
 
-    <g:DisclosurePanel ui:field="addPanel" addStyleNames="left-aligned">
+    <g:DisclosurePanel ui:field="addPanel">
       <g:customHeader>
         <g:FlowPanel>
           <g:InlineLabel>
@@ -66,8 +66,7 @@
       </g:Grid>
 
     </g:DisclosurePanel>
-    <b:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"></b:SimplePager>
-    <o:Table ui:field="valuesTable" addStyleNames="full-width left-aligned"></o:Table>
+    <o:Table ui:field="valuesTable"></o:Table>
   </g:FlowPanel>
 
 </ui:UiBinder>

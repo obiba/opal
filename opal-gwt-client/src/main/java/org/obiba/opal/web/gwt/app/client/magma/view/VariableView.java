@@ -58,15 +58,17 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   interface Binder extends UiBinder<Widget, VariableView> {}
 
+  private static final int PROPERTIES_TAB_INDEX = 0;
+
   private static final int CATEGORIES_TAB_INDEX = 0;
 
-  private static final int ATTRIBUTES_TAB_INDEX = 1;
+  private static final int ATTRIBUTES_TAB_INDEX = 0;
 
-  private static final int SCRIPT_TAB_INDEX = 2;
+  private static final int SCRIPT_TAB_INDEX = 1;
 
-  private static final int SUMMARY_TAB_INDEX = 3;
+  private static final int SUMMARY_TAB_INDEX = 2;
 
-  private static final int VALUES_TAB_INDEX = 4;
+  private static final int VALUES_TAB_INDEX = 3;
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -91,17 +93,14 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @UiField
   Label occurrenceGroup;
 
-  @UiField
-  FlowPanel label;
+  // @UiField
+  // FlowPanel label;
 
   @UiField
   TabPanel tabPanel;
 
   @UiField(provided = true)
   CategoriesTable categoryTable;
-
-  @UiField
-  Table<CategoryDto> editCategoriesTable;
 
   @UiField
   SimplePager categoryTablePager;
@@ -141,19 +140,10 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   Button remove;
 
   @UiField
-  Button editAttributes;
-
-  @UiField
-  EditorPanel categoriesEditorPanel;
-
-  @UiField
   EditorPanel scriptEditorPanel;
 
   @UiField
   Panel scriptEditor;
-
-  @UiField
-  Button editProperties;
 
   @UiField
   NavLink addToView;
@@ -174,6 +164,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     categoryTable = new CategoriesTable();
     attributeTable = new AttributesTable();
     initWidget(uiBinder.createAndBindUi(this));
+
     initCategoryTable();
     initAttributeTable();
     tabPanel.addShownHandler(new TabPanel.ShownEvent.Handler() {
@@ -188,7 +179,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
       }
     });
     scriptEditorPanel.setHandler(new ScriptEditorHandler());
-    categoriesEditorPanel.setHandler(new CategoriesEditorHandler());
   }
 
   @Override
@@ -240,11 +230,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     getUiHandlers().onPreviousVariable();
   }
 
-  @UiHandler("editProperties")
-  void onEditProperties(ClickEvent event) {
-    getUiHandlers().onEdit();
-  }
-
   //
   // VariablePresenter.Display Methods
   //
@@ -270,28 +255,28 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   }
 
   private void renderVariableLabels(JsArray<AttributeDto> rows) {
-    label.clear();
-    for(AttributeDto attr : JsArrays.toIterable(rows)) {
-      if("label".equals(attr.getName())) {
-        renderVariableLabel(attr);
-      }
-    }
+//    label.clear();
+//    for(AttributeDto attr : JsArrays.toIterable(rows)) {
+//      if("label".equals(attr.getName())) {
+//        renderVariableLabel(attr);
+//      }
+//    }
   }
 
-  private void renderVariableLabel(AttributeDto attr) {
-    if(attr.hasValue() && attr.getValue().trim().length() > 0) {
-      FlowPanel item = new FlowPanel();
-      if(attr.hasLocale() && attr.getLocale().trim().length() > 0) {
-        InlineLabel lang = new InlineLabel(attr.getLocale());
-        lang.setStyleName("label");
-        item.add(lang);
-      }
-      InlineLabel value = new InlineLabel(attr.getValue());
-      value.addStyleName("xsmall-indent");
-      item.add(value);
-      label.add(item);
-    }
-  }
+//  private void renderVariableLabel(AttributeDto attr) {
+//    if(attr.hasValue() && attr.getValue().trim().length() > 0) {
+//      FlowPanel item = new FlowPanel();
+//      if(attr.hasLocale() && attr.getLocale().trim().length() > 0) {
+//        InlineLabel lang = new InlineLabel(attr.getLocale());
+//        lang.setStyleName("label");
+//        item.add(lang);
+//      }
+//      InlineLabel value = new InlineLabel(attr.getValue());
+//      value.addStyleName("xsmall-indent");
+//      item.add(value);
+//      label.add(item);
+//    }
+//  }
 
   @Override
   public boolean isSummaryTabSelected() {
@@ -342,20 +327,16 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   @Override
   public HasAuthorization getEditAuthorizer() {
-    return new CompositeAuthorizer(categoriesEditorPanel.getAuthorizer(),
-        new WidgetAuthorizer(editAttributes, editProperties, remove), scriptEditorPanel.getAuthorizer());
+    return new CompositeAuthorizer(new WidgetAuthorizer(remove), scriptEditorPanel.getAuthorizer());
   }
 
   private void initCategoryTable() {
-    TabPanelHelper.setTabText(tabPanel, CATEGORIES_TAB_INDEX, translations.categoriesLabel());
     categoryTable.setPageSize(Table.DEFAULT_PAGESIZE);
     categoryTablePager.setDisplay(categoryTable);
     categoryProvider.addDataDisplay(categoryTable);
-    categoryProvider.addDataDisplay(editCategoriesTable);
   }
 
   private void initAttributeTable() {
-    TabPanelHelper.setTabText(tabPanel, ATTRIBUTES_TAB_INDEX, translations.attributesLabel());
     attributeTable.setPageSize(Table.DEFAULT_PAGESIZE);
     attributeTablePager.setDisplay(attributeTable);
     attributeProvider.addDataDisplay(attributeTable);
@@ -385,61 +366,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     categorizeToAnother.setDisabled(!available);
     categorizeToThis.setDisabled(!available);
     deriveCustom.setDisabled(!available);
-  }
-
-  private class CategoriesEditorHandler implements EditorPanel.Handler {
-
-    @Override
-    public void onEdit() {
-      initColumns();
-    }
-
-    @Override
-    public void onSave() {
-      //TODO
-    }
-
-    @Override
-    public void onCancel() {
-      //TODO
-    }
-
-    @Override
-    public void onHistory() {
-      //TODO
-    }
-
-    private void initColumns() {
-      while (editCategoriesTable.getColumnCount()>0) {
-        editCategoriesTable.removeColumn(0);
-      }
-      editCategoriesTable.addColumn(new EditableColumn<CategoryDto>(new TextInputCell()) {
-        @Override
-        public String getValue(CategoryDto object) {
-          return object.getName();
-        }
-      }, translations.nameLabel());
-      if (languages != null) {
-        for (final LocaleDto locale : JsArrays.toIterable(languages)) {
-          editCategoriesTable.addColumn(new EditableColumn<CategoryDto>(new TextInputCell()) {
-            @Override
-            public String getValue(CategoryDto object) {
-              if(object.getAttributesArray() != null) {
-                for(AttributeDto attr : JsArrays.toIterable(object.getAttributesArray())) {
-                  if(attr.getName().equals("label") && locale.getName().equals(attr.getLocale())) {
-                    return attr.getValue();
-                  }
-                }
-              }
-              return "";
-            }
-          }, translations.labelLabel() + ":" + locale.getName());
-        }
-      }
-      // TODO find locales from the categories
-      // TODO add missing column
-    }
-
   }
 
   private class ScriptEditorHandler implements EditorPanel.Handler {

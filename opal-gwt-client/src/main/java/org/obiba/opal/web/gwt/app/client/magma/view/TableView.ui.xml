@@ -1,3 +1,13 @@
+<!--
+  ~ Copyright (c) 2013 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
@@ -9,16 +19,12 @@
 
   <g:FlowPanel>
 
-    <g:FlowPanel addStyleNames="bottom-margin">
-      <b:DropdownButton text="Download" size="SMALL" icon="DOWNLOAD" ui:field="downloadBtn">
-        <b:NavLink ui:field="downloadDictionary">
-          <ui:msg description="Download dictionary label">Download dictionary</ui:msg>
-        </b:NavLink>
-        <b:NavLink ui:field="downloadView">
-          <ui:msg description="Download view label">Download view</ui:msg>
-        </b:NavLink>
-      </b:DropdownButton>
-      <b:DropdownButton text="Tasks" size="SMALL" icon="TASKS" ui:field="tasksBtn">
+    <g:FlowPanel>
+      <b:ButtonGroup addStyleNames="pull-right">
+        <b:Button icon="TRASH" size="SMALL" ui:field="remove">
+        </b:Button>
+      </b:ButtonGroup>
+      <b:DropdownButton text="Tasks" size="SMALL" icon="TASKS" ui:field="tasksBtn" addStyleNames="pull-right">
         <b:NavLink icon="SIGNOUT" ui:field="exportData">
           <ui:msg description="Export data label">Export data...</ui:msg>
         </b:NavLink>
@@ -26,31 +32,59 @@
           <ui:msg description="Copy data label">Copy data...</ui:msg>
         </b:NavLink>
       </b:DropdownButton>
-      <b:ButtonGroup>
-        <b:Button icon="TRASH" size="SMALL" ui:field="remove">
-        </b:Button>
-      </b:ButtonGroup>
-      <b:ButtonGroup>
-        <b:Button icon="EDIT" size="SMALL" ui:field="edit">
-          <ui:msg description="Edit label">Edit</ui:msg>
-        </b:Button>
-      </b:ButtonGroup>
+      <b:DropdownButton text="Download" size="SMALL" icon="DOWNLOAD" ui:field="downloadBtn" addStyleNames="pull-right">
+        <b:NavLink ui:field="downloadDictionary">
+          <ui:msg description="Download dictionary label">Download dictionary</ui:msg>
+        </b:NavLink>
+        <b:NavLink ui:field="downloadView">
+          <ui:msg description="Download view label">Download view</ui:msg>
+        </b:NavLink>
+      </b:DropdownButton>
     </g:FlowPanel>
 
     <b:TabPanel tabPosition="above" ui:field="tabPanel">
-      <b:Tab heading="Variables" active="true">
+      <b:Tab heading="Dictionary" active="true">
+
+        <g:FlowPanel>
+          <b:Heading size="4" addStyleNames="inline-block">
+            <ui:msg description="Properties label">Properties</ui:msg>
+          </b:Heading>
+          <b2:IconAnchor ui:field="edit" icon="EDIT" addStyleNames="small-indent">
+          </b2:IconAnchor>
+        </g:FlowPanel>
+
+        <g:FlowPanel>
+          <o:PropertiesTable ui:field="propertiesTable" keyStyleNames="span3">
+            <o:PropertyPanel>
+              <g:Label>
+                <ui:msg description="Entity type label">Entity Type</ui:msg>
+              </g:Label>
+              <g:Label ui:field="entityType"/>
+            </o:PropertyPanel>
+          </o:PropertiesTable>
+        </g:FlowPanel>
+
+        <g:FlowPanel>
+          <b:Heading size="4" addStyleNames="inline-block">
+            <ui:msg description="Variables label">Variables</ui:msg>
+          </b:Heading>
+          <b2:IconAnchor icon="EDIT" addStyleNames="small-indent">
+          </b2:IconAnchor>
+          <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
+
+          <b:Controls addStyleNames="pull-right small-top-margin small-right-indent">
+            <b:InputAddOn prependIcon="FILTER">
+              <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"></o:TextBoxClearable>
+            </b:InputAddOn>
+          </b:Controls>
+        </g:FlowPanel>
+
         <g:FlowPanel>
           <b2:InlineLabel ui:field="noVariables">
             <ui:msg description="No Variables label">No Variables</ui:msg>
           </b2:InlineLabel>
 
-          <b:Controls>
-            <b:InputAddOn prependIcon="FILTER">
-              <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"></o:TextBoxClearable>
-            </b:InputAddOn>
-          </b:Controls>
 
-          <b:SimplePager ui:field="pager" location="RIGHT"/>
           <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false"
               addStyleNames="block clear select-all-variables">
             <g:Grid>
@@ -80,10 +114,8 @@
           <o:Table ui:field="table" width="100%" addStyleNames="left-aligned first-column-checkbox"/>
         </g:FlowPanel>
       </b:Tab>
-      <b:Tab heading="Values">
-        <g:SimplePanel ui:field="valuesPanel"/>
-      </b:Tab>
-      <b:Tab heading="Properties">
+
+      <b:Tab heading="Summary">
         <g:FlowPanel ui:field="indexStatus" addStyleNames="small-top-margin" visible="false">
           <b:Alert ui:field="indexStatusAlert" close="false" visible="true">
 
@@ -116,30 +148,10 @@
             </g:Grid>
           </b:Alert>
         </g:FlowPanel>
+      </b:Tab>
 
-        <o:PropertiesTable keyStyleNames="span3 small-indent">
-          <g:FlowPanel>
-            <g:Label>
-              <ui:msg description="Entity type label">Entity Type</ui:msg>
-            </g:Label>
-            <g:Label ui:field="entityType"/>
-          </g:FlowPanel>
-          <g:FlowPanel>
-            <g:Label>
-              <ui:msg description="Current Entity Count label">Current Number of Entity</ui:msg>
-            </g:Label>
-            <g:Label ui:field="entityCount"/>
-          </g:FlowPanel>
-        </o:PropertiesTable>
-
-        <o:PropertiesTable ui:field="fromTable" keyStyleNames="span3 small-indent">
-          <g:FlowPanel>
-            <g:Label ui:field="fromTableLabel">
-              <ui:msg description="From table label">Tables included in the view</ui:msg>
-            </g:Label>
-            <g:FlowPanel ui:field="fromTableLinks"/>
-          </g:FlowPanel>
-        </o:PropertiesTable>
+      <b:Tab heading="Values">
+        <g:SimplePanel ui:field="valuesPanel"/>
       </b:Tab>
     </b:TabPanel>
 

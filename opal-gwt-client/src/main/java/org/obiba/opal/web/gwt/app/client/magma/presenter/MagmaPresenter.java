@@ -67,7 +67,7 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
   @Override
   public void onTableSelectionChanged(TableSelectionChangeEvent event) {
     if(!equals(event.getSource())) {
-      getView().selectTable(event.getDatasourceName(), event.getTableName());
+      getView().selectTable(event.getDatasourceName(), event.getTableName(), event.isView());
     }
   }
 
@@ -104,7 +104,7 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
   }
 
   private void show(String datasource, String table) {
-    getView().selectTable(datasource, table);
+    getView().selectTable(datasource, table, false);
     onTableSelection(datasource, table);
   }
 
@@ -166,7 +166,7 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
 
     void selectDatasource(String name);
 
-    void selectTable(String datasource, String table);
+    void selectTable(String datasource, String table, boolean isView);
 
     void selectVariable(String datasource, String table, String variable);
   }

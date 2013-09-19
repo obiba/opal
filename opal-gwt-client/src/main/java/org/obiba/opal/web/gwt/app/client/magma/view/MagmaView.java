@@ -46,9 +46,11 @@ public class MagmaView extends ViewWithUiHandlers<MagmaUiHandlers> implements Ma
       public void onSelection(SelectionEvent<Integer> event) {
         if (event.getSelectedItem() == 0) {
           getUiHandlers().onDatasourceSelection(datasource);
+          tabPanel.setHeading(3,"Tables");
         }
         else if (event.getSelectedItem() == 1) {
           getUiHandlers().onTableSelection(datasource, table);
+          tabPanel.setHeading(3,"Table");
         }
       }
     });
@@ -73,16 +75,18 @@ public class MagmaView extends ViewWithUiHandlers<MagmaUiHandlers> implements Ma
   public void selectDatasource(String name) {
     datasource = name;
     tabPanel.clear();
-    tabPanel.addAndSelect(datasourceWidget, translations.allTablesLabel());
+    tabPanel.addAndSelect(datasourceWidget, name);
+    tabPanel.setHeading(3,"Tables");
   }
 
   @Override
-  public void selectTable(String datasource, String table) {
+  public void selectTable(String datasource, String table, boolean isView) {
     this.datasource = datasource;
     this.table = table;
     tabPanel.clear();
-    tabPanel.add(datasourceWidget, getDatasourceLink(datasource));
+    tabPanel.add(datasourceWidget, datasource);
     tabPanel.addAndSelect(tableWidget, table);
+    tabPanel.setHeading(3, isView ? "View" : "Table");
   }
 
   @Override
@@ -91,9 +95,10 @@ public class MagmaView extends ViewWithUiHandlers<MagmaUiHandlers> implements Ma
     this.table = table;
     this.variable = variable;
     tabPanel.clear();
-    tabPanel.add(datasourceWidget, getDatasourceLink(datasource));
+    tabPanel.add(datasourceWidget, datasource);
     tabPanel.add(tableWidget, table);
     tabPanel.addAndSelect(variableWidget, variable);
+    tabPanel.setHeading(3,"Variable");
   }
 
   private NavLink getDatasourceLink(String name) {

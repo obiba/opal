@@ -88,6 +88,10 @@ public class TableSelectionChangeEvent extends GwtEvent<TableSelectionChangeEven
     return table;
   }
 
+  public boolean isView() {
+    return hasTable() && table.hasViewLink();
+  }
+
   public String getPrevious() {
     return previous;
   }

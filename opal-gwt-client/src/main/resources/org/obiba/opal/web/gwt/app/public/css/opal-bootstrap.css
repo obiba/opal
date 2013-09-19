@@ -57,3 +57,17 @@ footer.footer .container > div {
 th input[type="checkbox"], td input[type="checkbox"] {
   margin: 0;
 }
+
+.table thead {
+  background-color: #EEEEEE;
+  border-top: 1px solid #CCCCCC;
+  border-bottom: 1px solid #CCCCCC;
+}
+
+.table thead th {
+  vertical-align: middle;
+}
+
+.table th, .table td {
+  border-bottom-color: #EEEEEE;
+}

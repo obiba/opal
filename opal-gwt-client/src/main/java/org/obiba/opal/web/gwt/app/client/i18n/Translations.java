@@ -1993,4 +1993,8 @@ public interface Translations extends Constants {
       "zh", "Chinese"//
   })
   Map<String, String> localeMap();
+
+  @Description("Table References label")
+  @DefaultStringValue("Table References")
+  String tableReferencesLabel();
 }
