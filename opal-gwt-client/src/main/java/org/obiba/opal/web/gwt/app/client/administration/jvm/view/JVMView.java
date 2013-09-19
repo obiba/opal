@@ -10,7 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.administration.jvm.view;
 
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
+//import java.util.concurrent.TimeUnit;
 
 import org.obiba.opal.web.gwt.app.client.administration.jvm.presenter.JVMPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -118,7 +118,6 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
     for(int i = 0; i < entries.length(); i++) {
       systemProperties.addProperty(entries.get(i).getKey(), entries.get(i).getValue());
     }
-    ;
   }
 
   @Override
@@ -209,13 +208,13 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
   }
 
   private void renderServerUptime(long ms) {
-    Long days = TimeUnit.MILLISECONDS.toDays(ms);
-    Long hours = TimeUnit.MILLISECONDS.toHours(ms) - TimeUnit.DAYS.toHours(days);
-    Long min = TimeUnit.MILLISECONDS.toMinutes(ms) - TimeUnit.HOURS.toMinutes(hours);
-    Long sec = TimeUnit.MILLISECONDS.toSeconds(ms) - TimeUnit.MINUTES.toSeconds(min);
-
-    uptime.setText(TranslationsUtils.replaceArguments(translations.opalRunningSince(),
-        Arrays.asList(days.toString(), hours.toString(), min.toString(), sec.toString())));
+//    Long days = TimeUnit.MILLISECONDS.toDays(ms);
+//    Long hours = TimeUnit.MILLISECONDS.toHours(ms) - TimeUnit.DAYS.toHours(days);
+//    Long min = TimeUnit.MILLISECONDS.toMinutes(ms) - TimeUnit.HOURS.toMinutes(hours);
+//    Long sec = TimeUnit.MILLISECONDS.toSeconds(ms) - TimeUnit.MINUTES.toSeconds(min);
+//
+//    uptime.setText(TranslationsUtils.replaceArguments(translations.opalRunningSince(),
+//        Arrays.asList(days.toString(), hours.toString(), min.toString(), sec.toString())));
   }
 
 }

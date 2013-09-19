@@ -19,45 +19,33 @@
       <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
 
-    <g:FlowPanel addStyleNames="panel">
-      <b:Heading size="5" addStyleNames="no-top-margin">
-        <ui:msg description="Environment Properties header">Environment Properties</ui:msg>
-      </b:Heading>
-      <b:Row>
-        <b:Column size="6">
-          <o:PropertiesTable ui:field="javaProperties"/>
-        </b:Column>
-      </b:Row>
-    </g:FlowPanel>
+    <b:Heading size="4">
+      <ui:msg description="Versions label">Versions</ui:msg>
+    </b:Heading>
+    <b:Row>
+      <b:Column size="6">
+        <o:PropertiesTable ui:field="javaProperties"/>
+      </b:Column>
+    </b:Row>
 
-    <g:FlowPanel addStyleNames="panel">
-      <b:Heading size="5" addStyleNames="no-top-margin">
-        <ui:msg description="JVM Status header">Status</ui:msg>
-      </b:Heading>
-      <b:Row>
-        <b:Column size="6">
-          <g:Label ui:field="uptime"/>
-        </b:Column>
-      </b:Row>
-      <b:Row>
-        <b:Column size="4" offset="1" ui:field="memHeapChartColumn"/>
-        <b:Column size="4" offset="2" ui:field="memNonHeapChartColumn"/>
-      </b:Row>
-      <b:Row>
-        <b:Column size="4" offset="1" ui:field="threadsChartColumn"/>
-        <b:Column size="4" offset="2" ui:field="gcChartColumn"/>
-      </b:Row>
-    </g:FlowPanel>
+    <b:Heading size="4">
+      <ui:msg description="JVM Status header">Status</ui:msg>
+    </b:Heading>
+    <g:Label ui:field="uptime"/>
+    <b:Row>
+      <b:Column size="4" offset="1" ui:field="memHeapChartColumn"/>
+      <b:Column size="4" offset="2" ui:field="memNonHeapChartColumn"/>
+    </b:Row>
+    <b:Row>
+      <b:Column size="4" offset="1" ui:field="threadsChartColumn"/>
+      <b:Column size="4" offset="2" ui:field="gcChartColumn"/>
+    </b:Row>
 
-    <g:FlowPanel addStyleNames="panel">
-      <b:Heading size="5" addStyleNames="no-top-margin">
-        <ui:msg description="System Properties header">System Properties</ui:msg>
-      </b:Heading>
-      <b:Row>
-        <b:Column size="12">
-          <o:PropertiesTable ui:field="systemProperties"/>
-        </b:Column>
-      </b:Row>
-    </g:FlowPanel>
+    <b:Heading size="4">
+      <ui:msg description="System Properties label">System Properties</ui:msg>
+    </b:Heading>
+    <o:PropertiesTable ui:field="systemProperties"/>
+
   </g:FlowPanel>
+
 </ui:UiBinder>
