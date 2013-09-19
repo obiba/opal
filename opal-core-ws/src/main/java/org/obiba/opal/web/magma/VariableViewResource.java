@@ -14,6 +14,7 @@ import java.util.Set;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.PUT;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.magma.NoSuchVariableException;
@@ -27,6 +28,8 @@ import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma.VariableDto;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 public class VariableViewResource extends VariablesViewResource {
 
   private final String name;
@@ -38,7 +41,7 @@ public class VariableViewResource extends VariablesViewResource {
   }
 
   @PUT
-  public Response createOrUpdateVariable(VariableDto variable) {
+  public Response createOrUpdateVariable(VariableDto variable, @Nullable @QueryParam("comment") String comment) {
     ValueTableWriter.VariableWriter vw = null;
     try {
       // The variable must exist
@@ -56,7 +59,7 @@ public class VariableViewResource extends VariablesViewResource {
         vw.removeVariable(v);
       }
       vw.writeVariable(Dtos.fromDto(variable));
-      viewManager.addView(getDatasource().getName(), view);
+      viewManager.addView(getDatasource().getName(), view, comment);
 
     } catch(NoSuchVariableException e) {
       return Response.status(Response.Status.NOT_FOUND).build();

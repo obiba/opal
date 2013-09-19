@@ -21,11 +21,13 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.obiba.magma.ValueTable;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.service.ImportService;
@@ -38,6 +40,8 @@ import org.obiba.opal.web.model.Magma.ViewDto;
 import org.obiba.opal.web.model.Ws;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
+
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 public class ViewResource extends AbstractValueTableResource {
 
@@ -53,7 +57,7 @@ public class ViewResource extends AbstractValueTableResource {
 
   private final ElasticSearchProvider esProvider;
 
-  public ViewResource(ViewManager viewManager, View view, ViewDtos viewDtos, Set<Locale> locales,
+  public ViewResource(ViewManager viewManager, ValueTable view, ViewDtos viewDtos, Set<Locale> locales,
       ImportService importService, OpalSearchService opalSearchService, StatsIndexManager statsIndexManager,
       ElasticSearchProvider esProvider) {
     super(view, locales);
@@ -77,7 +81,7 @@ public class ViewResource extends AbstractValueTableResource {
   }
 
   @PUT
-  public Response updateView(ViewDto viewDto) {
+  public Response updateView(ViewDto viewDto, @Nullable @QueryParam("comment") String comment) {
     if(!viewDto.hasName()) return Response.status(Status.BAD_REQUEST).build();
     if(!viewDto.getName().equals(getValueTable().getName())) return Response.status(Status.BAD_REQUEST).build();
 
@@ -97,7 +101,7 @@ public class ViewResource extends AbstractValueTableResource {
 
       }
     }
-    viewManager.addView(getDatasource().getName(), viewDtos.fromDto(viewDto));
+    viewManager.addView(getDatasource().getName(), viewDtos.fromDto(viewDto), comment);
 
     return Response.ok().build();
   }

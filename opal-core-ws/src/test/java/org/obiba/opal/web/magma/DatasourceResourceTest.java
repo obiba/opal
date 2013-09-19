@@ -511,7 +511,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
         .setExtension(JavaScriptViewDto.view, jsViewDto).build();
 
     ViewManager mockViewManager = createMock(ViewManager.class);
-    mockViewManager.addView(EasyMock.same(mockDatasourceName), eqView(mockView));
+    mockViewManager.addView(EasyMock.same(mockDatasourceName), eqView(mockView), eqComment(null));
     expectLastCall().once();
 
     UriInfo uriInfoMock = createMock(UriInfo.class);
@@ -524,7 +524,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     // Exercise
     MagmaEngine.get().addDatasource(mockDatasource);
-    Response response = sut.createView(viewDto, uriInfoMock);
+    Response response = sut.createView(viewDto, uriInfoMock, null);
     MagmaEngine.get().removeDatasource(mockDatasource);
 
     // Verify state
@@ -560,7 +560,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     ViewManager mockViewManager = createMock(ViewManager.class);
     View view = new View(viewName, mockFromTable);
     expect(mockViewManager.getView(mockDatasourceName, viewName)).andReturn(view).atLeastOnce();
-    mockViewManager.addView(EasyMock.same(mockDatasourceName), eqView(view));
+    mockViewManager.addView(EasyMock.same(mockDatasourceName), eqView(view), eqComment(null));
     expectLastCall().once();
 
     OpalConfigurationService mockOpalRuntime = createMock(OpalConfigurationService.class);
@@ -571,7 +571,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     // Exercise
     MagmaEngine.get().addDatasource(mockDatasource);
-    Response response = sut.getView(viewName).updateView(viewDto);
+    Response response = sut.getView(viewName).updateView(viewDto, null);
     MagmaEngine.get().removeDatasource(mockDatasource);
 
     // Verify state
@@ -775,6 +775,22 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
   @Nullable
   static View eqView(View in) {
     EasyMock.reportMatcher(new ViewMatcher(in));
+    return null;
+  }
+
+  @Nullable
+  static String eqComment(String in) {
+    EasyMock.reportMatcher(new IArgumentMatcher() {
+      @Override
+      public boolean matches(Object o) {
+        return true;
+      }
+
+      @Override
+      public void appendTo(StringBuffer stringBuffer) {
+      }
+    });
+
     return null;
   }
 }
