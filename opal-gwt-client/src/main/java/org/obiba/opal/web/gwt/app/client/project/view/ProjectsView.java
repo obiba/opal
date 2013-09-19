@@ -46,8 +46,10 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
@@ -148,12 +150,18 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
           JsArrayString tableNames = JsArrays.toSafeArray(project.getDatasource().getTableArray());
           if(tableNames.length() > 0) {
-            NavPills pills = new NavPills();
-            pills.addStyleName("inline");
-            Icon icon = new Icon(IconType.TABLE);
-            pills.add(new ListItem(icon));
+            FlowPanel pills = new FlowPanel();
+            int count = 1;
             for(String table : JsArrays.toIterable(tableNames)) {
+              if (count>5) {
+                pills.add(new InlineLabel("..."));
+                break;
+              }
+              if (pills.getWidgetCount() > 0) {
+                pills.add(new InlineLabel(", "));
+              }
               pills.add(newProjectTableLink(handlers, project, table));
+              count++;
             }
             panel.add(pills);
           }
@@ -225,9 +233,9 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
       return head;
     }
 
-    protected NavLink newProjectTableLink(final ProjectsUiHandlers handlers, final ProjectDto project,
+    protected Widget newProjectTableLink(final ProjectsUiHandlers handlers, final ProjectDto project,
         final String table) {
-      NavLink link = new NavLink(table);
+      Anchor link = new Anchor(table);
       link.addClickHandler(new ClickHandler() {
         @Override
         public void onClick(ClickEvent event) {
