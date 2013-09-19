@@ -38,6 +38,8 @@ import org.obiba.opal.web.gwt.app.client.administration.jvm.view.JVMView;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.view.RAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.server.presenter.ServerPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.server.view.ServerView;
 import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.user.view.UserAdministrationView;
@@ -89,6 +91,9 @@ public class AdministrationModule extends AbstractPresenterModule {
 
     // Java virtual machine
     bindPresenter(JVMPresenter.class, JVMPresenter.Display.class, JVMView.class, JVMPresenter.Proxy.class);
+
+    // System config
+    bindPresenter(ServerPresenter.class, ServerPresenter.Display.class, ServerView.class, ServerPresenter.Proxy.class);
 
     bindPresenter(FilesAdministrationPresenter.class, FilesAdministrationPresenter.Display.class,
         FilesAdministrationView.class, FilesAdministrationPresenter.Proxy.class);
