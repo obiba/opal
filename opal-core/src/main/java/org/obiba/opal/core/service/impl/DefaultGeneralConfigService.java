@@ -39,7 +39,10 @@ public class DefaultGeneralConfigService implements SystemService {
   public void stop() {
   }
 
-  public void updateServerConfig(final OpalGeneralConfig config) {
+  public void createServerConfig(final OpalGeneralConfig config) throws OpalGeneralConfigAlreadyExistsException {
+    if(orientDbService.count(OpalGeneralConfig.class) != 0) {
+      throw new OpalGeneralConfigAlreadyExistsException();
+    }
 
     orientDbService.execute(new OrientDbTransactionCallback<Object>() {
       @Override
@@ -49,10 +52,22 @@ public class DefaultGeneralConfigService implements SystemService {
     });
   }
 
-  public OpalGeneralConfig getServerConfig() {
-    // TODO: Once there is a default server config already created, we won't need to check if it exists.
-    if(orientDbService.count(OpalGeneralConfig.class) == 0) {
-      updateServerConfig(new OpalGeneralConfig());
+  public void updateServerConfig(final OpalGeneralConfig config) throws OpalGeneralConfigMissingException {
+    if(orientDbService.count(OpalGeneralConfig.class) != 1) {
+      throw new OpalGeneralConfigMissingException();
+    }
+
+    orientDbService.execute(new OrientDbTransactionCallback<Object>() {
+      @Override
+      public Object doInTransaction(OObjectDatabaseTx db) {
+        return db.save(config);
+      }
+    });
+  }
+
+  public OpalGeneralConfig getServerConfig() throws OpalGeneralConfigMissingException {
+    if(orientDbService.count(OpalGeneralConfig.class) != 1) {
+      throw new OpalGeneralConfigMissingException();
     }
 
     return orientDbService.list(OpalGeneralConfig.class).iterator().next();
