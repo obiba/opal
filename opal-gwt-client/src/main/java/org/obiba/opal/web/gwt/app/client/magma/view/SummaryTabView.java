@@ -91,7 +91,11 @@ public class SummaryTabView extends ViewImpl implements SummaryTabPresenter.Disp
     if(dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous) != null) {
       ContinuousSummaryDto continuous = dto.getExtension(ContinuousSummaryDto.SummaryStatisticsDtoExtensions.continuous)
           .cast();
-      summary.add(new ContinuousSummaryView(continuous));
+      if(continuous.getSummary().getN() > 0) {
+        summary.add(new ContinuousSummaryView(continuous));
+      } else {
+        renderNoSummary();
+      }
     } else if(dto.getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical) != null) {
       CategoricalSummaryDto categorical = dto
           .getExtension(CategoricalSummaryDto.SummaryStatisticsDtoExtensions.categorical).cast();

@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
 import org.obiba.opal.web.gwt.app.client.ui.AbstractTabPanel;
 import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
@@ -36,6 +37,8 @@ public class CategoricalSummaryView extends Composite {
 
   private static final CategoricalSummaryViewUiBinder uiBinder = GWT.create(CategoricalSummaryViewUiBinder.class);
 
+  private static final Translations translations = GWT.create(Translations.class);
+
   @UiField
   TabPanel tabPanel;
 
@@ -59,18 +62,16 @@ public class CategoricalSummaryView extends Composite {
   public CategoricalSummaryView(final String title, CategoricalSummaryDto categorical) {
     initWidget(uiBinder.createAndBindUi(this));
 
-    // TODO translation
-    TabPanelHelper.setTabTitle(tabPanel, 0, "Plot");
-    TabPanelHelper.setTabTitle(tabPanel, 1, "Statistics");
+    TabPanelHelper.setTabTitle(tabPanel, 0, translations.statsMap().get("PLOT"));
+    TabPanelHelper.setTabTitle(tabPanel, 1, translations.statsMap().get("STATISTICS"));
 
-    // TODO translation
     stats.clear();
-    stats.setHeader(0, "Descriptive Statistic");
-    stats.setHeader(1, "Value");
+    stats.setHeader(0, translations.statsMap().get("DESC_STATISTICS"));
+    stats.setHeader(1, translations.statsMap().get("VALUE"));
     int row = 0;
-    stats.setWidget(row, 0, new Label("N"));
+    stats.setWidget(row, 0, new Label(translations.statsMap().get("N")));
     stats.setWidget(row++, 1, new Label("" + Math.round(categorical.getN())));
-    stats.setWidget(row, 0, new Label("Mode"));
+    stats.setWidget(row, 0, new Label(translations.statsMap().get("MODE")));
     stats.setWidget(row++, 1, new Label(categorical.getMode()));
 
     chartsPanel.addSelectionHandler(new SelectionHandler<Integer>() {
@@ -88,9 +89,9 @@ public class CategoricalSummaryView extends Composite {
       int count = categorical.getFrequenciesArray().length();
       chartFactory = new FrequencyChartFactory();
       frequencies.clear();
-      // TODO translation
-      frequencies.setHeader(0, "Category");
-      frequencies.setHeader(1, "Frequency");
+
+      frequencies.setHeader(0, translations.statsMap().get("CATEGORY"));
+      frequencies.setHeader(1, translations.statsMap().get("FREQUENCY"));
       frequencies.setHeader(2, "%");
       for(int i = 0; i < count; i++) {
         FrequencyDto value = categorical.getFrequenciesArray().get(i);
