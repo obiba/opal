@@ -18,12 +18,18 @@ import org.obiba.opal.core.domain.AbstractTimestamped;
 
 public class OpalGeneralConfig extends AbstractTimestamped {
 
+  public static final String DEFAULT_NAME = "OPAL";
+
+  public static final String DEFAULT_LOCALE = "en";
+
+  public static final String DEFAULT_CHARSET = "ISO-8859-1";
+
   @Nonnull
-  private String name = "OPAL";
+  private String name = DEFAULT_NAME;
 
   private List<String> locales = new ArrayList<String>();
 
-  private String defaultCharacterSet = "ISO-8859-1";
+  private String defaultCharacterSet = DEFAULT_CHARSET;
 
   @Nonnull
   public String getName() {
