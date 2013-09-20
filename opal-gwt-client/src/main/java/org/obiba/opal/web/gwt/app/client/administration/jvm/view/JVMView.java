@@ -204,5 +204,5 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
     gcChart.updateChart(1, 1, timestamp, gcCount - gcCountMemento == 0 ? 0 : gcTotalTime - gcTimeMemento);
     gcCountMemento = gcCount;
     gcTimeMemento = gcTotalTime;
-
+  }
 }
