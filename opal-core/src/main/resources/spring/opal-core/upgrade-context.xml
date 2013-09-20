@@ -38,6 +38,8 @@
 
   <bean id="databaseRegistry" class="org.obiba.opal.core.runtime.database.DefaultDatabaseRegistry"/>
 
+  <bean id="generalConfigService" class="org.obiba.opal.core.service.impl.DefaultGeneralConfigService"/>
+
   <bean id="upgradeOpalConfigurationService" class="org.obiba.opal.core.cfg.DefaultOpalConfigurationService">
     <constructor-arg>
       <bean class="org.obiba.opal.core.cfg.OpalConfigurationIo">
@@ -87,6 +89,9 @@
           <property name="upgradeStep" ref="quartzSchema-1.4.0"/>
         </bean>
         <bean class="org.obiba.opal.core.runtime.install.CreateOpalSecretKeyInstallStep"/>
+        <bean class="org.obiba.opal.core.runtime.install.CreateOpalGeneralConfigInstallStep">
+          <property name="generalConfigService" ref="generalConfigService"/>
+        </bean>
       </list>
     </property>
 

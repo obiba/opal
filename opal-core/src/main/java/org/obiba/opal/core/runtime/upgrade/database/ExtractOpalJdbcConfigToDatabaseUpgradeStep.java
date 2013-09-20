@@ -231,7 +231,9 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
       Node node = (Node) xPath
           .compile("//org.obiba.opal.core.runtime.jdbc.DefaultJdbcDataSourceRegistry_-JdbcDataSourcesConfig")
           .evaluate(doc.getDocumentElement(), XPathConstants.NODE);
-      node.getParentNode().removeChild(node);
+      if(node != null) {
+        node.getParentNode().removeChild(node);
+      }
       Transformer transformer = TransformerFactory.newInstance().newTransformer();
       transformer.transform(new DOMSource(doc), new StreamResult(configFile));
     } catch(TransformerConfigurationException e) {

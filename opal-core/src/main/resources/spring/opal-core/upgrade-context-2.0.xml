@@ -136,6 +136,8 @@
 
   <bean id="databaseRegistry" class="org.obiba.opal.core.runtime.database.DefaultDatabaseRegistry"/>
 
+  <bean id="generalConfigService" class="org.obiba.opal.core.service.impl.DefaultGeneralConfigService"/>
+
   <bean id="upgradeManager" class="org.obiba.runtime.upgrade.support.DefaultUpgradeManager">
     <property name="currentVersionProvider">
       <bean class="org.obiba.runtime.upgrade.support.JdbcVersionModifier">
@@ -190,6 +192,14 @@
           <property name="scriptPath" value="classpath:/META-INF/opal/install-scripts/quartz/"/>
           <property name="scriptBasename" value="tables"/>
           <property name="appliesTo" value="2.0.0"/>
+        </bean>
+
+        <!-- 2.0.0 / import general config to config database -->
+        <bean class="org.obiba.opal.core.runtime.upgrade.ExtractOpalGeneralConfigToDatabaseUpgradeStep">
+          <property name="description" value="Extract general config from properties file to Opal config database"/>
+          <property name="appliesTo" value="2.0.0"/>
+          <property name="propertiesFile" value="file:${OPAL_HOME}/conf/opal-config.properties"/>
+          <property name="generalConfigService" ref="generalConfigService"/>
         </bean>
 
         <!-- 2.0.0 / move config tables -->
