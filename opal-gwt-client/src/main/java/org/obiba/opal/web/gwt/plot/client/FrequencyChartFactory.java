@@ -35,49 +35,31 @@ public class FrequencyChartFactory {
   private final List<String> categories = Lists.newArrayList();
 
   public void push(String category, double value, double pct) {
-    categories.add(category);
-    values.add(value);
-    percentages.add(pct);
+    if(value > 0) {
+      categories.add(category);
+      values.add(value);
+      percentages.add(pct);
+    }
   }
 
   private Chart createChart(String title, String yaxisTitle) {
-    Chart chart = new Chart()
-        .setType(Series.Type.BAR)
-        .setChartTitleText(title)
-        .setBarPlotOptions(new BarPlotOptions()
-            .setAnimation(false)
-            .setDataLabels(new DataLabels()
-                .setEnabled(true)
-            )
-        )
-        .setLegend(new Legend()
-            .setEnabled(false)
-        )
-        .setCredits(new Credits()
-            .setEnabled(false)
-        ).setHeight(categories.size()*30 + 100);
+    Chart chart = new Chart().setType(Series.Type.BAR).setChartTitleText(title)
+        .setBarPlotOptions(new BarPlotOptions().setAnimation(false).setDataLabels(new DataLabels().setEnabled(true)))
+        .setLegend(new Legend().setEnabled(false)).setCredits(new Credits().setEnabled(false))
+        .setHeight(categories.size() * 30 + 100);
 
-    chart.getXAxis()
-        .setCategories(categories.toArray(new String[categories.size()]));
+    chart.getXAxis().setCategories(categories.toArray(new String[categories.size()]));
 
-    chart.getYAxis()
-        .setAxisTitle(new AxisTitle()
-            .setText(yaxisTitle)
-            .setAlign(AxisTitle.Align.HIGH)
-        );
+    chart.getYAxis().setAxisTitle(new AxisTitle().setText(yaxisTitle).setAlign(AxisTitle.Align.HIGH));
 
     chart.setAnimation(false);
-
 
     return chart;
   }
 
-
   public Chart createValueChart(String title) {
     Chart chart = createChart(title, "Count");
-    chart.addSeries(chart.createSeries()
-        .setName("Count")
-        .setPoints(values.toArray(new Number[values.size()]))
+    chart.addSeries(chart.createSeries().setName("Count").setPoints(values.toArray(new Number[values.size()]))
 
     );
     return chart;
@@ -85,10 +67,7 @@ public class FrequencyChartFactory {
 
   public Chart createPercentageChart(String title) {
     Chart chart = createChart(title, "%");
-    chart.addSeries(chart.createSeries()
-        .setName("%")
-        .setPoints(percentages.toArray(new Number[percentages.size()]))
-    );
+    chart.addSeries(chart.createSeries().setName("%").setPoints(percentages.toArray(new Number[percentages.size()])));
     return chart;
   }
 }

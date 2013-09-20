@@ -40,9 +40,6 @@ public class CategoricalSummaryView extends Composite {
   private static final Translations translations = GWT.create(Translations.class);
 
   @UiField
-  TabPanel tabPanel;
-
-  @UiField
   AbstractTabPanel chartsPanel;
 
   @UiField
@@ -61,10 +58,6 @@ public class CategoricalSummaryView extends Composite {
 
   public CategoricalSummaryView(final String title, CategoricalSummaryDto categorical) {
     initWidget(uiBinder.createAndBindUi(this));
-
-    TabPanelHelper.setTabTitle(tabPanel, 0, translations.statsMap().get("PLOT"));
-    TabPanelHelper.setTabTitle(tabPanel, 1, translations.statsMap().get("STATISTICS"));
-
     stats.clear();
     stats.setHeader(0, translations.statsMap().get("DESC_STATISTICS"));
     stats.setHeader(1, translations.statsMap().get("VALUE"));

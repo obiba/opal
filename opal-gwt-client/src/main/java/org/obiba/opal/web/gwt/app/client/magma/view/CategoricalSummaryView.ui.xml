@@ -5,49 +5,32 @@
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <ui:style>
-    .title {
-      font-size: small;
-      margin-right: 1em;
-    }
-
-    .title-light {
-      color: gray;
-      font-size: small;
-    }
-
-    .plot {
-      float: left;
-      margin-right: 2em
-    }
-  </ui:style>
-
   <g:FlowPanel>
-    <b:TabPanel tabPosition="left" ui:field="tabPanel">
-      <b:Tab icon="BAR_CHART" active="true">
-        <o:NavPillsPanel ui:field="chartsPanel">
-          <b:NavLink active="true">Frequency</b:NavLink>
-          <b:Row>
-            <b:Row>
-              <b:Column size="6" offset="3" ui:field="freqPanel">
-              </b:Column>
-            </b:Row>
-          </b:Row>
-          
-          <b:NavLink>Percentage</b:NavLink>
-          <b:Row>
-            <b:Row>
-              <b:Column size="6" offset="3" ui:field="pctPanel">
-              </b:Column>
-            </b:Row>
-          </b:Row>
-        </o:NavPillsPanel>
-      </b:Tab>
-      <b:Tab icon="TABLE">
-        <o:DefaultFlexTable ui:field="stats" addStyleNames="span4"/>
-        <o:DefaultFlexTable ui:field="frequencies" addStyleNames="span4"/>
-      </b:Tab>
-    </b:TabPanel>
+    <b:Heading size="4">
+      <ui:msg description="Plots label">Plots</ui:msg>
+    </b:Heading>
+    <o:NavPillsPanel ui:field="chartsPanel">
+      <b:NavLink active="true">Frequency</b:NavLink>
+      <b:Row>
+        <b:Row>
+          <b:Column size="6" offset="2" ui:field="freqPanel">
+          </b:Column>
+        </b:Row>
+      </b:Row>
+      <b:NavLink>Percentage</b:NavLink>
+      <b:Row>
+        <b:Row>
+          <b:Column size="6" offset="2" ui:field="pctPanel">
+          </b:Column>
+        </b:Row>
+      </b:Row>
+    </o:NavPillsPanel>
+
+    <b:Heading size="4">
+      <ui:msg description="Statistics label">Statistics</ui:msg>
+    </b:Heading>
+    <o:DefaultFlexTable ui:field="stats" addStyleNames="span4"/>
+    <o:DefaultFlexTable ui:field="frequencies" addStyleNames="span4"/>
 
   </g:FlowPanel>
 

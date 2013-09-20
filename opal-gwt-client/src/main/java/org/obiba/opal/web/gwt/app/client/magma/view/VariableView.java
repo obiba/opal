@@ -73,6 +73,9 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   private static final Translations translations = GWT.create(Translations.class);
 
   @UiField
+  Label name;
+
+  @UiField
   Label entityType;
 
   @UiField
@@ -299,6 +302,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   @Override
   public void setVariable(VariableDto variable) {
+    name.setText(variable.getName());
     entityType.setText(variable.getEntityType());
     refEntityType.setText(variable.getReferencedEntityType());
     valueType.setText(variable.getValueType());

@@ -57,6 +57,12 @@
           <o:PropertiesTable ui:field="propertiesTable" keyStyleNames="span3">
             <o:PropertyPanel>
               <g:Label>
+                <ui:msg description="Name label">Name</ui:msg>
+              </g:Label>
+              <g:Label ui:field="name"/>
+            </o:PropertyPanel>
+            <o:PropertyPanel>
+              <g:Label>
                 <ui:msg description="Entity type label">Entity Type</ui:msg>
               </g:Label>
               <g:Label ui:field="entityType"/>
@@ -80,11 +86,6 @@
         </g:FlowPanel>
 
         <g:FlowPanel>
-          <b2:InlineLabel ui:field="noVariables">
-            <ui:msg description="No Variables label">No Variables</ui:msg>
-          </b2:InlineLabel>
-
-
           <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false"
               addStyleNames="block clear select-all-variables">
             <g:Grid>
@@ -148,6 +149,16 @@
             </g:Grid>
           </b:Alert>
         </g:FlowPanel>
+
+        <b:Heading size="4">
+          <ui:msg description="Statistics label">Statistics</ui:msg>
+        </b:Heading>
+        <b:Row>
+          <b:Column size="6">
+            <o:PropertiesTable ui:field="summaryTable" keyStyleNames="span3"/>
+          </b:Column>
+        </b:Row>
+
       </b:Tab>
 
       <b:Tab heading="Values">

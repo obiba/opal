@@ -57,6 +57,14 @@
         <b:FluidRow>
           <b:Column size="6">
             <o:PropertiesTable keyStyleNames="span2">
+
+              <o:PropertyPanel>
+                <g:Label>
+                  <ui:msg description="Name label">Name</ui:msg>
+                </g:Label>
+                <g:Label ui:field="name"/>
+              </o:PropertyPanel>
+
               <o:PropertyPanel>
                 <g:Label>
                   <ui:msg description="Entity type label">Entity Type</ui:msg>
@@ -78,16 +86,18 @@
                 <g:Label ui:field="repeatable"/>
               </o:PropertyPanel>
 
+            </o:PropertiesTable>
+          </b:Column>
+          <b:Column size="6">
+            <o:PropertiesTable keyStyleNames="span3">
+
               <o:PropertyPanel>
                 <g:Label>
                   <ui:msg description="Unit label">Unit</ui:msg>
                 </g:Label>
                 <g:Label ui:field="unit"/>
               </o:PropertyPanel>
-            </o:PropertiesTable>
-          </b:Column>
-          <b:Column size="6">
-            <o:PropertiesTable>
+
               <o:PropertyPanel>
                 <g:Label>
                   <ui:msg description="Referenced Entity Type label">Referenced Entity Type</ui:msg>

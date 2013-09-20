@@ -102,6 +102,12 @@ public class PropertiesTable extends FlowPanel {
     }
   }
 
+  public void removeProperties() {
+    while (getRowCount()>0) {
+      removeProperty(0);
+    }
+  }
+
   public void removeProperty(int row) {
     innerTable.removeRow(row);
   }

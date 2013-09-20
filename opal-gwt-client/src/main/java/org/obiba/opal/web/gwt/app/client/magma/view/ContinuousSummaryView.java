@@ -42,16 +42,7 @@ public class ContinuousSummaryView extends Composite {
   private static final Translations translations = GWT.create(Translations.class);
 
   @UiField
-  TabPanel tabPanel;
-
-  @UiField
   DefaultFlexTable grid;
-
-  @UiField
-  DivElement histogramElement;
-
-  @UiField
-  DivElement qqPlotElement;
 
   @UiField
   SimplePanel histogramPanel;
@@ -65,12 +56,6 @@ public class ContinuousSummaryView extends Composite {
 
   public ContinuousSummaryView(ContinuousSummaryDto continuous) {
     initWidget(uiBinder.createAndBindUi(this));
-
-    TabPanelHelper.setTabTitle(tabPanel, 0, translations.statsMap().get("PLOT"));
-    TabPanelHelper.setTabTitle(tabPanel, 1, translations.statsMap().get("STATISTICS"));
-
-    histogramElement.setId(HTMLPanel.createUniqueId());
-    qqPlotElement.setId(HTMLPanel.createUniqueId());
 
     DescriptiveStatsDto descriptiveStats = continuous.getSummary();
 

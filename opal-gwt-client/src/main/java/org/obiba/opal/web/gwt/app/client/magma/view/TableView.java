@@ -81,10 +81,16 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   private boolean hasLinkAuthorization = true;
 
   @UiField
+  Label name;
+
+  @UiField
   Label entityType;
 
   @UiField
   PropertiesTable propertiesTable;
+
+  @UiField
+  PropertiesTable summaryTable;
 
   @UiField
   FlowPanel indexStatus;
@@ -109,9 +115,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @UiField
   ProgressBar progress;
-
-  @UiField
-  InlineLabel noVariables;
 
   @UiField
   Alert selectAllItemsAlert;
@@ -232,12 +235,12 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
       public String getValue(VariableDto object) {
         String categories = "";
         int count = 1;
-        for (CategoryDto category : JsArrays.toIterable(JsArrays.toSafeArray(object.getCategoriesArray()))) {
-          if (count>10) {
+        for(CategoryDto category : JsArrays.toIterable(JsArrays.toSafeArray(object.getCategoriesArray()))) {
+          if(count > 10) {
             categories = categories + " ...";
             break;
           }
-          if (!categories.isEmpty()) {
+          if(!categories.isEmpty()) {
             categories = categories + ", " + category.getName();
           } else {
             categories = category.getName();
@@ -250,7 +253,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
     table.setSelectionModel(new SingleSelectionModel<VariableDto>());
     table.setPageSize(Table.DEFAULT_PAGESIZE);
-    table.setEmptyTableWidget(noVariables);
+    table.setEmptyTableWidget(new InlineLabel(translations.noVariablesLabel()));
     table.getColumnSortList().push(new ColumnSortInfo(variableIndexColumn, true));
     pager.setDisplay(table);
     dataProvider.addDataDisplay(table);
@@ -315,14 +318,18 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @Override
   public void setTable(TableDto dto) {
+    name.setText(dto.getName());
     entityType.setText(dto.getEntityType());
     edit.setVisible(dto.hasViewLink());
+    summaryTable.removeProperties();
+    if(dto.hasValueSetCount()) summaryTable.addProperty(translations.entitiesCountLabel(), "" + dto.getValueSetCount());
+    if(dto.hasVariableCount()) summaryTable.addProperty(translations.variablesCountLabel(), "" + dto.getVariableCount());
   }
 
   @Override
   public void setFromTables(JsArrayString tableNames) {
-    if (propertiesTable.getRowCount()>1) {
-      propertiesTable.removeProperty(1);
+    if(propertiesTable.getRowCount() > 2) {
+      propertiesTable.removeProperty(2);
     }
     if(tableNames != null) {
       FlowPanel fromTableLinks = new FlowPanel();

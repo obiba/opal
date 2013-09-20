@@ -147,7 +147,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
       public String getValue(TableDto object) {
         return Integer.toString(object.getValueSetCount());
       }
-    }, translations.entitiesCountLabel());
+    }, translations.entitiesLabel());
 
     dataProvider.addDataDisplay(table);
     table.setSelectionModel(new SingleSelectionModel<TableDto>());

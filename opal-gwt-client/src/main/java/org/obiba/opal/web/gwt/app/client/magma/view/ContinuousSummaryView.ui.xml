@@ -5,32 +5,23 @@
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <ui:style>
-    .plot {
-    width: 400px;
-    float: left;
-    margin-right: 2em
-    }
-  </ui:style>
-
   <g:FlowPanel>
-    <b:TabPanel tabPosition="left" ui:field="tabPanel">
-      <b:Tab icon="BAR_CHART" active="true">
-        <g:HTMLPanel>
-          <div id="plot-container">
-            <div ui:field="histogramElement" class="{style.plot}" style="width:400px">
-              <g:SimplePanel ui:field="histogramPanel"/>
-            </div>
-            <div ui:field="qqPlotElement" class="{style.plot}" style="width:400px">
-              <g:SimplePanel ui:field="normalProbability"/>
-            </div>
-          </div>
-        </g:HTMLPanel>
-      </b:Tab>
-      <b:Tab icon="TABLE">
-        <o:DefaultFlexTable ui:field="grid" addStyleNames="span4"/>
-      </b:Tab>
-    </b:TabPanel>
+    <b:Heading size="4">
+      <ui:msg description="Plots label">Plots</ui:msg>
+    </b:Heading>
+    <b:Row>
+      <b:Column size="4" offset="1">
+        <g:SimplePanel ui:field="histogramPanel"/>
+      </b:Column>
+      <b:Column size="4" offset="1">
+        <g:SimplePanel ui:field="normalProbability"/>
+      </b:Column>
+    </b:Row>
+
+    <b:Heading size="4">
+      <ui:msg description="Statistics label">Statistics</ui:msg>
+    </b:Heading>
+    <o:DefaultFlexTable ui:field="grid" addStyleNames="span4"/>
 
   </g:FlowPanel>
 

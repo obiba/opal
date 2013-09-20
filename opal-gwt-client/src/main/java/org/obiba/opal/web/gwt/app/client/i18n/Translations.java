@@ -209,13 +209,21 @@ public interface Translations extends Constants {
   @DefaultStringValue("Table")
   String tableLabel();
 
+  @Description("Entities label")
+  @DefaultStringValue("Entities")
+  String entitiesLabel();
+
   @Description("Variables label")
   @DefaultStringValue("Variables")
   String variablesLabel();
 
   @Description("Entities Count label")
-  @DefaultStringValue("#Entities")
+  @DefaultStringValue("Entities Count")
   String entitiesCountLabel();
+
+  @Description("Entities Count label")
+  @DefaultStringValue("Variables Count")
+  String variablesCountLabel();
 
   @Description("Variable label")
   @DefaultStringValue("Variable")
@@ -2001,4 +2009,8 @@ public interface Translations extends Constants {
   @Description("No Tables label")
   @DefaultStringValue("No tables")
   String noTablesLabel();
+
+  @Description("No Variables label")
+  @DefaultStringValue("No variables")
+  String noVariablesLabel();
 }
