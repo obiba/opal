@@ -5,6 +5,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.BreadcrumbsTabPanel;
 
+import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.core.client.GWT;
@@ -22,6 +23,9 @@ public class MagmaView extends ViewWithUiHandlers<MagmaUiHandlers> implements Ma
   private static final Translations translations = GWT.create(Translations.class);
 
   interface Binder extends UiBinder<Widget, MagmaView> {}
+
+  @UiField
+  Heading heading;
 
   @UiField
   BreadcrumbsTabPanel tabPanel;
@@ -44,13 +48,12 @@ public class MagmaView extends ViewWithUiHandlers<MagmaUiHandlers> implements Ma
     tabPanel.addSelectionHandler(new SelectionHandler<Integer>() {
       @Override
       public void onSelection(SelectionEvent<Integer> event) {
-        if (event.getSelectedItem() == 0) {
+        if(event.getSelectedItem() == 0) {
           getUiHandlers().onDatasourceSelection(datasource);
-          tabPanel.setHeading(3,"Tables");
-        }
-        else if (event.getSelectedItem() == 1) {
+          setHeading(datasource, "Tables");
+        } else if(event.getSelectedItem() == 1) {
           getUiHandlers().onTableSelection(datasource, table);
-          tabPanel.setHeading(3,"Table");
+          setHeading(table, "Table");
         }
       }
     });
@@ -76,7 +79,9 @@ public class MagmaView extends ViewWithUiHandlers<MagmaUiHandlers> implements Ma
     datasource = name;
     tabPanel.clear();
     tabPanel.addAndSelect(datasourceWidget, name);
-    tabPanel.setHeading(3,"Tables");
+    tabPanel.setMenuVisible(false);
+    setHeading(name, "Tables");
+
   }
 
   @Override
@@ -84,9 +89,10 @@ public class MagmaView extends ViewWithUiHandlers<MagmaUiHandlers> implements Ma
     this.datasource = datasource;
     this.table = table;
     tabPanel.clear();
-    tabPanel.add(datasourceWidget, datasource);
+    tabPanel.add(datasourceWidget, getDatasourceLink(datasource));
     tabPanel.addAndSelect(tableWidget, table);
-    tabPanel.setHeading(3, isView ? "View" : "Table");
+    tabPanel.setMenuVisible(true);
+    setHeading(table, isView ? "View" : "Table");
   }
 
   @Override
@@ -95,10 +101,16 @@ public class MagmaView extends ViewWithUiHandlers<MagmaUiHandlers> implements Ma
     this.table = table;
     this.variable = variable;
     tabPanel.clear();
-    tabPanel.add(datasourceWidget, datasource);
+    tabPanel.add(datasourceWidget, getDatasourceLink(datasource));
     tabPanel.add(tableWidget, table);
     tabPanel.addAndSelect(variableWidget, variable);
-    tabPanel.setHeading(3,"Variable");
+    tabPanel.setMenuVisible(true);
+    setHeading(variable, "Variable");
+  }
+
+  private void setHeading(String text, String subtext) {
+    heading.setText(text);
+    heading.setSubtext("[" + subtext + "]");
   }
 
   private NavLink getDatasourceLink(String name) {
