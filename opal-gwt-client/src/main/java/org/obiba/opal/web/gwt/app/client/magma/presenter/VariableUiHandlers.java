@@ -25,4 +25,6 @@ public interface VariableUiHandlers extends UiHandlers {
   void onShowSummary();
 
   void onShowValues();
+
+  void onEditCategories();
 }

@@ -32,6 +32,7 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TabPanel;
+import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.google.common.base.Strings;
 import com.google.gwt.cell.client.TextInputCell;
@@ -160,6 +161,9 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @UiField
   NavLink deriveCustom;
 
+  @UiField
+  IconAnchor editCategories;
+
   private JsArray<LocaleDto> languages;
 
   @Inject
@@ -233,6 +237,10 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     getUiHandlers().onPreviousVariable();
   }
 
+  @UiHandler("editCategories")
+  void onEditCategories(ClickEvent event) {
+    getUiHandlers().onEditCategories();
+  }
   //
   // VariablePresenter.Display Methods
   //

@@ -64,6 +64,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private final ModalProvider<VariablesToViewPresenter> variablesToViewProvider;
 
+  private final ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider;
+
   private VariableDto variable;
 
   private TableDto table;
@@ -74,13 +76,15 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   public VariablePresenter(Display display, EventBus eventBus, ValuesTablePresenter valuesTablePresenter,
       SummaryTabPresenter summaryTabPresenter, ScriptEditorPresenter scriptEditorPresenter,
       Provider<AuthorizationPresenter> authorizationPresenter,
-      ModalProvider<VariablesToViewPresenter> variablesToViewProvider) {
+      ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
+      ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider) {
     super(eventBus, display);
     this.valuesTablePresenter = valuesTablePresenter;
     this.summaryTabPresenter = summaryTabPresenter;
     this.authorizationPresenter = authorizationPresenter;
     this.scriptEditorPresenter = scriptEditorPresenter;
     this.variablesToViewProvider = variablesToViewProvider.setContainer(this);
+    this.categoriesEditorModalProvider = categoriesEditorModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -291,6 +295,12 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   @Override
   public void onShowValues() {
     valuesTablePresenter.setTable(table, variable);
+  }
+
+  @Override
+  public void onEditCategories() {
+    CategoriesEditorModalPresenter categoriesEditorPresenter = categoriesEditorModalProvider.get();
+    categoriesEditorPresenter.initialize();
   }
 
   //

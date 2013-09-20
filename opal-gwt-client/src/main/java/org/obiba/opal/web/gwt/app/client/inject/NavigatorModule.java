@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.inject;
 
+import org.obiba.opal.web.gwt.app.client.magma.presenter.CategoriesEditorModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.CodingViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityModalPresenter;
@@ -16,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.view.CategoriesEditorModalView;
 import org.obiba.opal.web.gwt.app.client.magma.view.CodingViewModalView;
 import org.obiba.opal.web.gwt.app.client.magma.view.DatasourceView;
 import org.obiba.opal.web.gwt.app.client.magma.view.EntityModalView;
@@ -76,11 +78,14 @@ public class NavigatorModule extends AbstractOpalModule {
 
   @Override
   protected void configure() {
-    bindPresenter(ProjectsPresenter.class, ProjectsPresenter.Display.class, ProjectsView.class, ProjectsPresenter.Proxy.class);
-    bindPresenter(ProjectPresenter.class, ProjectPresenter.Display.class, ProjectView.class, ProjectPresenter.Proxy.class);
+    bindPresenter(ProjectsPresenter.class, ProjectsPresenter.Display.class, ProjectsView.class,
+        ProjectsPresenter.Proxy.class);
+    bindPresenter(ProjectPresenter.class, ProjectPresenter.Display.class, ProjectView.class,
+        ProjectPresenter.Proxy.class);
     bindPresenterWidget(ProjectAdministrationPresenter.class, ProjectAdministrationPresenter.Display.class,
         ProjectAdministrationView.class);
-    bindPresenterWidget(AddProjectModalPresenter.class, AddProjectModalPresenter.Display.class, AddProjectModalView.class);
+    bindPresenterWidget(AddProjectModalPresenter.class, AddProjectModalPresenter.Display.class,
+        AddProjectModalView.class);
 
     bindPresenterWidget(MagmaPresenter.class, MagmaPresenter.Display.class, MagmaView.class);
     bindPresenterWidget(DatasourcePresenter.class, DatasourcePresenter.Display.class, DatasourceView.class);
@@ -88,6 +93,8 @@ public class NavigatorModule extends AbstractOpalModule {
     bindPresenterWidget(VariablePresenter.class, VariablePresenter.Display.class, VariableView.class);
     bindPresenterWidget(ValuesTablePresenter.class, ValuesTablePresenter.Display.class, ValuesTableView.class);
     bindPresenterWidget(EntityModalPresenter.class, EntityModalPresenter.Display.class, EntityModalView.class);
+    bindPresenterWidget(CategoriesEditorModalPresenter.class, CategoriesEditorModalPresenter.Display.class,
+        CategoriesEditorModalView.class);
 
     bindWizardPresenterWidget(CreateDatasourcePresenter.class, CreateDatasourcePresenter.Display.class,
         CreateDatasourceView.class, CreateDatasourcePresenter.Wizard.class);
