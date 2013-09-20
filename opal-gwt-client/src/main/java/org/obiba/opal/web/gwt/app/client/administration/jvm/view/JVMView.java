@@ -32,8 +32,6 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
 
-//import java.util.concurrent.TimeUnit;
-
 public class JVMView extends ViewImpl implements JVMPresenter.Display {
 
   // 2 minutes in milliseconds
@@ -206,6 +204,5 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
     gcChart.updateChart(1, 1, timestamp, gcCount - gcCountMemento == 0 ? 0 : gcTotalTime - gcTimeMemento);
     gcCountMemento = gcCount;
     gcTimeMemento = gcTotalTime;
-  }
 
 }
