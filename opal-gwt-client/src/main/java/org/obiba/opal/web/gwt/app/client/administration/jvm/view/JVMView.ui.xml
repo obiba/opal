@@ -19,14 +19,8 @@
       <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
 
-    <b:Row>
-      <b:Column size="6">
-        <g:Label ui:field="uptime"/>
-      </b:Column>
-    </b:Row>
-
     <g:FlowPanel addStyleNames="panel">
-      <b:Heading size="5">
+      <b:Heading size="5" addStyleNames="no-top-margin">
         <ui:msg description="Environment Properties header">Environment Properties</ui:msg>
       </b:Heading>
       <b:Row>
@@ -40,6 +34,11 @@
       <b:Heading size="5" addStyleNames="no-top-margin">
         <ui:msg description="JVM Status header">Status</ui:msg>
       </b:Heading>
+      <b:Row>
+        <b:Column size="6">
+          <g:Label ui:field="uptime"/>
+        </b:Column>
+      </b:Row>
       <b:Row>
         <b:Column size="4" offset="1" ui:field="memHeapChartColumn"/>
         <b:Column size="4" offset="2" ui:field="memNonHeapChartColumn"/>
