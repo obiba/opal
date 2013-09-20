@@ -322,8 +322,11 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     entityType.setText(dto.getEntityType());
     edit.setVisible(dto.hasViewLink());
     summaryTable.removeProperties();
+    summaryTable.addProperty(translations.createdLabel(),dto.getTimestamps().getCreated());
+    summaryTable.addProperty(translations.lastUpdateLabel(),dto.getTimestamps().getLastUpdate());
     if(dto.hasValueSetCount()) summaryTable.addProperty(translations.entitiesCountLabel(), "" + dto.getValueSetCount());
     if(dto.hasVariableCount()) summaryTable.addProperty(translations.variablesCountLabel(), "" + dto.getVariableCount());
+
   }
 
   @Override
