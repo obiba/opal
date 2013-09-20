@@ -69,9 +69,6 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   NavLink addView;
 
   @UiField
-  InlineLabel noTables;
-
-  @UiField
   Table<TableDto> table;
 
   @UiField
@@ -155,7 +152,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     dataProvider.addDataDisplay(table);
     table.setSelectionModel(new SingleSelectionModel<TableDto>());
     table.setPageSize(Table.DEFAULT_PAGESIZE);
-    table.setEmptyTableWidget(noTables);
+    table.setEmptyTableWidget(new InlineLabel(translations.noTablesLabel()));
     pager.setDisplay(table);
   }
 

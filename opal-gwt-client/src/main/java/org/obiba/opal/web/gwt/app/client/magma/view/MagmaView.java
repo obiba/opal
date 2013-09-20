@@ -50,7 +50,7 @@ public class MagmaView extends ViewWithUiHandlers<MagmaUiHandlers> implements Ma
       public void onSelection(SelectionEvent<Integer> event) {
         if(event.getSelectedItem() == 0) {
           getUiHandlers().onDatasourceSelection(datasource);
-          setHeading(datasource, "Tables");
+          setHeading(datasource, "Datasource");
         } else if(event.getSelectedItem() == 1) {
           getUiHandlers().onTableSelection(datasource, table);
           setHeading(table, "Table");
@@ -80,7 +80,7 @@ public class MagmaView extends ViewWithUiHandlers<MagmaUiHandlers> implements Ma
     tabPanel.clear();
     tabPanel.addAndSelect(datasourceWidget, name);
     tabPanel.setMenuVisible(false);
-    setHeading(name, "Tables");
+    setHeading(name, "Datasource");
 
   }
 

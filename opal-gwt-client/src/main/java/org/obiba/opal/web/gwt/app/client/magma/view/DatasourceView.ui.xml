@@ -7,10 +7,7 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <g:FlowPanel addStyleNames="bottom-margin">
-
-      <g:FlowPanel addStyleNames="inline-block">
-      </g:FlowPanel>
+    <g:FlowPanel>
       <b:DropdownButton text="Add" size="SMALL" icon="PLUS_SIGN_ALT" ui:field="addBtn" addStyleNames="pull-right">
         <b:NavLink icon="TABLE" ui:field="addTable">
           <ui:msg description="Add table label">Add table...</ui:msg>
@@ -37,13 +34,15 @@
       </b:ButtonGroup>
     </g:FlowPanel>
 
-    <g:FlowPanel>
-      <g:InlineLabel ui:field="noTables">
-        <ui:msg description="No Tables label">No Tables</ui:msg>
-      </g:InlineLabel>
-      <b:SimplePager ui:field="pager" location="RIGHT"/>
-      <o:Table ui:field="table"/>
-    </g:FlowPanel>
+    <b:TabPanel tabPosition="above" ui:field="tabPanel">
+      <b:Tab heading="Dictionary" active="true">
+        <b:Heading size="4" addStyleNames="inline-block">
+          <ui:msg description="Properties label">Tables</ui:msg>
+        </b:Heading>
+        <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
+        <o:Table ui:field="table"/>
+      </b:Tab>
+    </b:TabPanel>
   </g:FlowPanel>
 
 </ui:UiBinder>

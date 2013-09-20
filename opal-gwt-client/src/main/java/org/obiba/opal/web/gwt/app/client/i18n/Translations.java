@@ -1997,4 +1997,8 @@ public interface Translations extends Constants {
   @Description("Table References label")
   @DefaultStringValue("Table References")
   String tableReferencesLabel();
+
+  @Description("No Tables label")
+  @DefaultStringValue("No tables")
+  String noTablesLabel();
 }

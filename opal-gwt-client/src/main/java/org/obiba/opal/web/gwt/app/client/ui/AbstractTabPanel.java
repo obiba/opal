@@ -35,6 +35,8 @@ import com.google.gwt.user.client.ui.Widget;
 public class AbstractTabPanel extends FlowPanel
     implements IndexedPanel, HasSelectionHandlers<Integer>, HasBeforeSelectionHandlers<Integer> {
 
+  private final FlowPanel menuPanel;
+
   private final UnorderedList menu;
 
   private final TabDeckPanel contentContainer;
@@ -44,11 +46,22 @@ public class AbstractTabPanel extends FlowPanel
   private int selectedIndex = -1;
 
   protected AbstractTabPanel(UnorderedList menu) {
+    menuPanel = new FlowPanel();
     this.menu = menu;
-    super.add(menu);
+    menuPanel.add(menu);
+    super.add(menuPanel);
     super.add(contentContainer = new TabDeckPanel());
     contentContainer.addStyleName("content");
     getWidgetCount();
+  }
+
+  public void setHeading(int size, String text, String subtext) {
+    if (heading != null) menuPanel.remove(heading);
+    heading = new Heading(size, text);
+    heading.setSubtext(subtext);
+    heading.addStyleName("inline-block small-right-indent");
+    menuPanel.insert(heading, 0);
+    menu.addStyleName("inline");
   }
 
   @UiChild(tagname = "tab")
