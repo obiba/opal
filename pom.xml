@@ -238,19 +238,7 @@
 
       <dependency>
         <groupId>org.obiba.magma</groupId>
-        <artifactId>magma-hibernate-common</artifactId>
-        <version>${magma.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.obiba.magma</groupId>
-        <artifactId>magma-hibernate-datasource</artifactId>
-        <version>${magma.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.obiba.magma</groupId>
-        <artifactId>magma-hibernate-audit</artifactId>
+        <artifactId>magma-datasource-hibernate</artifactId>
         <version>${magma.version}</version>
       </dependency>
 
@@ -437,14 +425,7 @@
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-core</artifactId>
         <version>${hibernate.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>javax.transaction</groupId>
-            <artifactId>jta</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
-
       <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-ehcache</artifactId>
@@ -458,80 +439,15 @@
       </dependency>
 
       <dependency>
-        <groupId>org.hibernate</groupId>
-        <artifactId>hibernate-annotations</artifactId>
-        <version>${hibernate.version}</version>
-      </dependency>
-
-      <dependency>
         <groupId>cglib</groupId>
         <artifactId>cglib-nodep</artifactId>
         <version>${cglib-nodep.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>javax.transaction</groupId>
-        <artifactId>jta</artifactId>
-        <version>${jta.version}</version>
-      </dependency>
-
-      <dependency>
         <groupId>javax.persistence</groupId>
         <artifactId>persistence-api</artifactId>
         <version>${jpa.version}</version>
-      </dependency>
-
-      <!-- JOTM dependencies -->
-      <dependency>
-        <groupId>org.ow2.jotm</groupId>
-        <artifactId>jotm-core</artifactId>
-        <version>${jotm.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.ow2.carol.irmi</groupId>
-            <artifactId>irmi</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.ow2.cmi</groupId>
-            <artifactId>cmi-admin</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.ow2.cmi</groupId>
-            <artifactId>cmi-jndi</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.jacorb</groupId>
-            <artifactId>jacorb</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.jacorb</groupId>
-            <artifactId>jacorb-idl</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging-api</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <!-- JOTM requires javax.resource and javax.transaction Java APIs; these are missing due to the exclusions declared
-        above for the JOTM dependency. -->
-      <!-- javax.resource -->
-      <dependency>
-        <groupId>org.ow2.spec.ee</groupId>
-        <artifactId>ow2-connector-1.5-spec</artifactId>
-        <version>${ow2-spec.version}</version>
-      </dependency>
-
-      <!-- javax.transaction -->
-      <dependency>
-        <groupId>org.ow2.spec.ee</groupId>
-        <artifactId>ow2-jta-1.1-spec</artifactId>
-        <version>${ow2-spec.version}</version>
       </dependency>
 
       <dependency>
@@ -724,6 +640,10 @@
           <exclusion>
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -1200,30 +1120,6 @@
         <version>${orientdb.version}</version>
       </dependency>
 
-      <!--dependency>
-        <groupId>com.wordnik</groupId>
-        <artifactId>swagger-jaxrs_2.9.1</artifactId>
-        <version>${swagger.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-servlet</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-core</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency-->
-
     </dependencies>
   </dependencyManagement>
 
@@ -1550,7 +1446,7 @@
 
     <birt.version>2.6.2</birt.version>
     <bouncycastle.version>1.46</bouncycastle.version>
-    <cglib-nodep.version>2.2.2</cglib-nodep.version>
+    <cglib-nodep.version>3.0</cglib-nodep.version>
     <commons-codec.version>1.8</commons-codec.version>
     <commons-collections.version>3.2.1</commons-collections.version>
     <commons-configuration.version>1.9</commons-configuration.version>
@@ -1564,7 +1460,7 @@
     <crowd.version>2.8.0-OD-1</crowd.version>
     <dbunit.version>2.4.9</dbunit.version>
     <easymock.version>3.2</easymock.version>
-    <ehcache-core.version>2.4.2</ehcache-core.version>
+    <ehcache-core.version>2.6.6</ehcache-core.version>
     <elasticsearch.version>0.20.6</elasticsearch.version>
     <findbugs-annotation.version>1.3.2</findbugs-annotation.version>
     <gin.version>2.0.0</gin.version>
@@ -1578,7 +1474,7 @@
     <gwtp.version>1.0.1</gwtp.version>
     <gwtquery.version>1.3.2</gwtquery.version>
     <hamcrest.version>1.3</hamcrest.version>
-    <hibernate.version>3.5.6-Final</hibernate.version>
+    <hibernate.version>4.2.5.Final</hibernate.version>
     <hsqldb.version>2.3.0</hsqldb.version>
     <httpclient.version>4.3</httpclient.version>
     <jetty.version>7.6.8.v20121106</jetty.version>
@@ -1587,11 +1483,9 @@
     <jgit.version>3.0.0.201306101825-r</jgit.version>
     <jline.version>0.9.94</jline.version>
     <joda-time.version>2.3</joda-time.version>
-    <jotm.version>2.2.3</jotm.version>
-    <jpa.version>1.0</jpa.version>
+    <jpa.version>1.0.2</jpa.version>
     <json.version>20090211</json.version>
     <jsr305.version>2.0.1</jsr305.version>
-    <jta.version>1.0.1B</jta.version>
     <junit.version>4.11</junit.version>
     <liquibase.version>1.9.4</liquibase.version>
     <magma.version>1.8-SNAPSHOT</magma.version>
@@ -1604,7 +1498,6 @@
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
     <orientdb.version>1.5.1</orientdb.version>
-    <ow2-spec.version>1.0.2</ow2-spec.version>
     <protobuf-java-format.version>1.2.1-obiba</protobuf-java-format.version>
     <protobuf.version>2.3.0</protobuf.version>
     <protostuff.version>1.0.1</protostuff.version>
@@ -1619,7 +1512,6 @@
     <spring.version>3.2.4.RELEASE</spring.version>
     <spring-batch.version>2.0.3.RELEASE</spring-batch.version>
     <sshd.version>0.8.0</sshd.version>
-    <!--swagger.version>1.2.4</swagger.version-->
     <truezip.version>6.6</truezip.version>
     <velocity.version>1.7</velocity.version>
     <xfire.version>1.2.6</xfire.version>

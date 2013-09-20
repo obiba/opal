@@ -16,14 +16,15 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.sql.DataSource;
-import javax.transaction.TransactionManager;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.dialect.resolver.DialectFactory;
-import org.obiba.magma.datasource.hibernate.support.AnnotationConfigurationHelper;
-import org.obiba.magma.hibernate.cfg.MagmaNamingStrategy;
+import org.hibernate.service.classloading.internal.ClassLoaderServiceImpl;
+import org.hibernate.service.jdbc.dialect.internal.DialectFactoryImpl;
+import org.hibernate.service.jdbc.dialect.internal.StandardDialectResolver;
+import org.obiba.magma.datasource.hibernate.cfg.HibernateConfigurationHelper;
+import org.obiba.magma.datasource.hibernate.cfg.MagmaNamingStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,21 +46,25 @@ public class SessionFactoryFactory {
   private ApplicationContext applicationContext;
 
   @Autowired
-  private TransactionManager transactionManager;
-
-  @Autowired
   @Qualifier("hibernate")
   private Properties hibernateProperties;
 
+  private final DialectFactoryImpl dialectFactory = new DialectFactoryImpl();
+
+  public SessionFactoryFactory() {
+    dialectFactory.setClassLoaderService(new ClassLoaderServiceImpl(getClass().getClassLoader()));
+    dialectFactory.setDialectResolver(new StandardDialectResolver());
+  }
+
   public SessionFactory getSessionFactory(DataSource dataSource) {
+
+    Set<Class<?>> annotatedTypes = new HibernateConfigurationHelper().getAnnotatedTypes();
+    Dialect dialect = determineDialect(dataSource);
 
     AnnotationSessionFactoryBean factoryBean = new CustomSessionFactoryBean();
     factoryBean.setDataSource(dataSource);
-    factoryBean.setJtaTransactionManager(transactionManager);
     factoryBean.setHibernateProperties(hibernateProperties);
-    factoryBean.getHibernateProperties()
-        .setProperty(Environment.DIALECT, determineDialect(dataSource).getClass().getName());
-    Set<Class<?>> annotatedTypes = new AnnotationConfigurationHelper().getAnnotatedTypes();
+    factoryBean.getHibernateProperties().setProperty(Environment.DIALECT, dialect.getClass().getName());
     factoryBean.setAnnotatedClasses(annotatedTypes.toArray(new Class[annotatedTypes.size()]));
     factoryBean.setNamingStrategy(new MagmaNamingStrategy());
     factoryBean.setExposeTransactionAwareSessionFactory(false);
@@ -89,12 +94,10 @@ public class SessionFactoryFactory {
   }
 
   private Dialect determineDialect(DataSource dataSource) {
-    JdbcTemplate template = new JdbcTemplate(dataSource);
-    return template.execute(new ConnectionCallback<Dialect>() {
-
+    return new JdbcTemplate(dataSource).execute(new ConnectionCallback<Dialect>() {
       @Override
       public Dialect doInConnection(Connection connection) throws SQLException, DataAccessException {
-        return DialectFactory.buildDialect(new Properties(), connection);
+        return dialectFactory.buildDialect(hibernateProperties, connection);
       }
     });
   }

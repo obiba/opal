@@ -14,7 +14,6 @@ import org.hibernate.SessionFactory;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.datasource.hibernate.HibernateDatasource;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasource;
-import org.obiba.magma.datasource.mongodb.MongoDBFactory;
 import org.obiba.opal.core.cfg.OrientDbService;
 import org.obiba.opal.core.cfg.OrientDbTransactionCallbackWithoutResult;
 import org.obiba.opal.core.domain.database.Database;
@@ -179,9 +178,13 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   private void validUniqueIdentifiersDatabase(Database database) throws MultipleIdentifiersDatabaseException {
     if(database.isUsedForIdentifiers()) {
-      Database identifiersDatabase = getIdentifiersDatabase();
-      if(identifiersDatabase != null && !Objects.equal(identifiersDatabase.getName(), database.getName())) {
-        throw new MultipleIdentifiersDatabaseException(identifiersDatabase.getName(), database.getName());
+      Database identifiersDatabase = null;
+      try {
+        identifiersDatabase = getIdentifiersDatabase();
+        if(!Objects.equal(identifiersDatabase.getName(), database.getName())) {
+          throw new MultipleIdentifiersDatabaseException(identifiersDatabase.getName(), database.getName());
+        }
+      } catch(IdentifiersDatabaseNotFoundException ignored) {
       }
     }
   }
@@ -227,10 +230,12 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     registrations.remove(databaseName, usedByDatasource);
   }
 
-  @Nullable
+  @Nonnull
   @Override
-  public Database getIdentifiersDatabase() {
-    return orientDbService.uniqueResult("select from Database where usedForIdentifiers = ?", true);
+  public Database getIdentifiersDatabase() throws IdentifiersDatabaseNotFoundException {
+    Database database = orientDbService.uniqueResult("select from Database where usedForIdentifiers = ?", true);
+    if(database == null) throw new IdentifiersDatabaseNotFoundException();
+    return database;
   }
 
   @Override

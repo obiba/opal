@@ -22,8 +22,8 @@ import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
-import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
+import org.obiba.opal.core.runtime.database.IdentifiersDatabaseNotFoundException;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -142,9 +142,9 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
 
   private Datasource getDatasource() {
     if(datasource == null) {
-      Database database = databaseRegistry.getIdentifiersDatabase();
-      if(database != null) {
-        datasource = databaseRegistry.createStorageMagmaDatasource(getDatasourceName(), database);
+      try {
+        datasource = databaseRegistry
+            .createStorageMagmaDatasource(getDatasourceName(), databaseRegistry.getIdentifiersDatabase());
         new TransactionTemplate(txManager).execute(new TransactionCallbackWithoutResult() {
 
           @Override
@@ -159,6 +159,7 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
             }
           }
         });
+      } catch(IdentifiersDatabaseNotFoundException ignored) {
       }
     }
     return datasource;

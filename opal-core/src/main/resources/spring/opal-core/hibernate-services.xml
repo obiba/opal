@@ -16,11 +16,6 @@
     <property name="persistenceManager" ref="persistenceManager"/>
   </bean>
 
-  <bean id="auditLogManager" class="org.obiba.magma.audit.hibernate.HibernateVariableEntityAuditLogManager">
-    <property name="sessionFactory" ref="sessionFactory"/>
-    <property name="userProvider" ref="userProvider"/>
-  </bean>
-
   <bean id="userProvider" class="org.obiba.opal.audit.OpalUserProvider"/>
 
 </beans>

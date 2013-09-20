@@ -47,11 +47,7 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.magma</groupId>
-      <artifactId>magma-hibernate-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.obiba.magma</groupId>
-      <artifactId>magma-hibernate-datasource</artifactId>
+      <artifactId>magma-datasource-hibernate</artifactId>
     </dependency>
     <dependency>
       <groupId>org.obiba.magma</groupId>
@@ -68,10 +64,6 @@
     <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-datasource-mongodb</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.obiba.magma</groupId>
-      <artifactId>magma-hibernate-audit</artifactId>
     </dependency>
     <dependency>
       <groupId>org.obiba.magma</groupId>
@@ -104,7 +96,7 @@
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-annotations</artifactId>
+      <artifactId>hibernate-core</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
@@ -139,10 +131,6 @@
     <dependency>
       <groupId>eu.flatwhite.shiro</groupId>
       <artifactId>shiro-extras</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.ow2.spec.ee</groupId>
-      <artifactId>ow2-jta-1.1-spec</artifactId>
     </dependency>
     <dependency>
       <groupId>org.quartz-scheduler</groupId>

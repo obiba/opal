@@ -9,27 +9,17 @@
  ******************************************************************************/
 package org.obiba.opal.core.runtime.jdbc;
 
-import javax.transaction.TransactionManager;
-
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.dbcp.managed.BasicManagedDataSource;
 import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
 
 @Component
 public class DataSourceFactory {
-
-  private final TransactionManager transactionManager;
-
-  @Autowired
-  public DataSourceFactory(TransactionManager transactionManager) {
-    this.transactionManager = transactionManager;
-  }
 
   public BasicDataSource createDataSource(SqlDatabase database) {
     BasicManagedDataSource dataSource = new BasicManagedDataSource();
@@ -41,7 +31,6 @@ public class DataSourceFactory {
     }
 
     // Set other properties
-    dataSource.setTransactionManager(transactionManager);
     dataSource.setUrl(database.getUrl());
     dataSource.setDriverClassName(database.getDriverClass());
     dataSource.setUsername(database.getUsername());
