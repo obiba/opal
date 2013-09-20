@@ -145,6 +145,8 @@ public class JVMPresenter extends ItemAdministrationPresenter<JVMPresenter.Displ
       public void onResource(Response response, OpalStatus resource) {
         if(response.getStatusCode() == Response.SC_OK) {
           getView().renderStatus(resource);
+        } else {
+          timer.cancel();
         }
       }
     }).get().send();
