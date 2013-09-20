@@ -6,6 +6,7 @@ import java.lang.management.MemoryUsage;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -147,9 +148,16 @@ public class SystemResource {
       conf = new OpalGeneralConfig();
     }
 
-    conf.setName(confDto.getName());
-    conf.setLocales(confDto.getLanguagesList());
-    conf.setDefaultCharacterSet(confDto.getDefaultCharSet());
+    conf.setName(confDto.getName().isEmpty()//
+        ? OpalGeneralConfig.DEFAULT_NAME //
+        : confDto.getName());
+
+    conf.setLocales(confDto.getLanguagesList().isEmpty() ? Arrays.asList(OpalGeneralConfig.DEFAULT_LOCALE)//
+        : confDto.getLanguagesList());
+
+    conf.setDefaultCharacterSet(confDto.getDefaultCharSet().isEmpty()//
+        ? OpalGeneralConfig.DEFAULT_CHARSET//
+        : confDto.getDefaultCharSet());
 
     serverService.updateServerConfig(conf);
 
