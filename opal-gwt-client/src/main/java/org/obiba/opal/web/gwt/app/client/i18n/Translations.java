@@ -1907,7 +1907,12 @@ public interface Translations extends Constants {
       "DENSITY", "Density",//
       "NORMAL_PROB", "Normal Probability",//
       "THEORETHICAL_QUANTILES", "Theroretical Quantiles",//
-      "SAMPLE_QUANTILES", "Sample Quantiles" })
+      "SAMPLE_QUANTILES", "Sample Quantiles",//
+      "MODE", "Mode",//
+      "CATEGORY", "Category",//
+      "FREQUENCY", "Frequency"//
+
+  })
   Map<String, String> statsMap();
 
   @Description("JVM Labels")
