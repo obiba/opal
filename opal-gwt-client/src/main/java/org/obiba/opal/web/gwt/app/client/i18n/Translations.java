@@ -1883,6 +1883,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("History")
   String historyLabel();
 
+  @Description("Opal running since title")
+  @DefaultStringValue("Opal is running since {0} days {1} hours {2} min. {3} sec.")
+  String opalRunningSince();
+
   @Description("Statistics Related Labels")
   @DefaultStringMapValue({ "PLOT", "Plot",//
       "STATISTICS", "Statistics",//
