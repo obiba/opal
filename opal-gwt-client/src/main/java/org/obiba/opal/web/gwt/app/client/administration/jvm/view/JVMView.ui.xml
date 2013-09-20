@@ -19,18 +19,19 @@
       <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
 
+    <b:Row>
+      <b:Column size="6">
+        <g:Label ui:field="uptime"/>
+      </b:Column>
+    </b:Row>
+
     <g:FlowPanel addStyleNames="panel">
-      <b:Heading size="5" addStyleNames="no-top-margin">
-        <ui:msg description="JVM Properties header">Properties</ui:msg>
+      <b:Heading size="5">
+        <ui:msg description="Environment Properties header">Environment Properties</ui:msg>
       </b:Heading>
       <b:Row>
-        <b:Column size="4">
+        <b:Column size="6">
           <o:PropertiesTable ui:field="javaProperties"/>
-        </b:Column>
-        <b:Column size="8">
-          <g:ScrollPanel ui:field="systemScroll">
-            <o:DefaultFlexTable ui:field="systemProperties"/>
-          </g:ScrollPanel>
         </b:Column>
       </b:Row>
     </g:FlowPanel>
@@ -46,6 +47,17 @@
       <b:Row>
         <b:Column size="4" offset="1" ui:field="threadsChartColumn"/>
         <b:Column size="4" offset="2" ui:field="gcChartColumn"/>
+      </b:Row>
+    </g:FlowPanel>
+
+    <g:FlowPanel addStyleNames="panel">
+      <b:Heading size="5" addStyleNames="no-top-margin">
+        <ui:msg description="System Properties header">System Properties</ui:msg>
+      </b:Heading>
+      <b:Row>
+        <b:Column size="12">
+          <o:PropertiesTable ui:field="systemProperties"/>
+        </b:Column>
       </b:Row>
     </g:FlowPanel>
   </g:FlowPanel>

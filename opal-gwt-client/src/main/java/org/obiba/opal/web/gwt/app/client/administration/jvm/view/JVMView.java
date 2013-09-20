@@ -9,10 +9,13 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.jvm.view;
 
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+
 import org.obiba.opal.web.gwt.app.client.administration.jvm.presenter.JVMPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.ui.DefaultFlexTable;
 import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
 import org.obiba.opal.web.gwt.plot.client.MonitoringChartFactory;
 import org.obiba.opal.web.model.client.opal.EntryDto;
@@ -28,7 +31,6 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
 
@@ -68,13 +70,13 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
   Panel breadcrumbs;
 
   @UiField
+  Label uptime;
+
+  @UiField
   PropertiesTable javaProperties;
 
   @UiField
-  ScrollPanel systemScroll;
-
-  @UiField
-  DefaultFlexTable systemProperties;
+  PropertiesTable systemProperties;
 
   @UiField
   Column memHeapChartColumn;
@@ -104,20 +106,19 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
 
   @Override
   public void renderProperties(OpalEnv env) {
+    javaProperties.clearProperties();
     javaProperties.addProperty(translations.jvmMap().get("OPAL_VERSION"), env.getVersion());
     javaProperties.addProperty(translations.jvmMap().get("JAVA_VERSION"), env.getJavaVersion());
     javaProperties.addProperty(translations.jvmMap().get("VM_NAME"), env.getVmName());
     javaProperties.addProperty(translations.jvmMap().get("VM_VENDOR"), env.getVmVendor());
     javaProperties.addProperty(translations.jvmMap().get("VM_VERSION"), env.getVmVersion());
 
-    int row = 0;
+    systemProperties.clearProperties();
     JsArray<EntryDto> entries = JsArrays.toSafeArray(env.getSystemPropertiesArray());
     for(int i = 0; i < entries.length(); i++) {
-      systemProperties.setWidget(row, 0, new Label(entries.get(i).getKey()));
-      systemProperties.setWidget(row++, 1, new Label(entries.get(i).getValue()));
+      systemProperties.addProperty(entries.get(i).getKey(), entries.get(i).getValue());
     }
-
-    systemScroll.setHeight("145px");
+    ;
   }
 
   @Override
@@ -156,6 +157,8 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
 
   @Override
   public void renderStatus(OpalStatus status) {
+    renderServerUptime((long) status.getUptime());
+
     if(initialTimestamp == null) {
       initialTimestamp = status.getTimestamp();
     }
@@ -203,6 +206,16 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
     gcChart.updateChart(1, 1, timestamp, gcCount - gcCountMemento == 0 ? 0 : gcTotalTime - gcTimeMemento);
     gcCountMemento = gcCount;
     gcTimeMemento = gcTotalTime;
+  }
+
+  private void renderServerUptime(long ms) {
+    Long days = TimeUnit.MILLISECONDS.toDays(ms);
+    Long hours = TimeUnit.MILLISECONDS.toHours(ms) - TimeUnit.DAYS.toHours(days);
+    Long min = TimeUnit.MILLISECONDS.toMinutes(ms) - TimeUnit.HOURS.toMinutes(hours);
+    Long sec = TimeUnit.MILLISECONDS.toSeconds(ms) - TimeUnit.MINUTES.toSeconds(min);
+
+    uptime.setText(TranslationsUtils.replaceArguments(translations.opalRunningSince(),
+        Arrays.asList(days.toString(), hours.toString(), min.toString(), sec.toString())));
   }
 
 }
