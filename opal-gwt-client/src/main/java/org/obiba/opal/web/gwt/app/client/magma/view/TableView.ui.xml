@@ -53,22 +53,24 @@
           </b2:IconAnchor>
         </g:FlowPanel>
 
-        <g:FlowPanel>
-          <o:PropertiesTable ui:field="propertiesTable" keyStyleNames="span3">
-            <o:PropertyPanel>
-              <g:Label>
-                <ui:msg description="Name label">Name</ui:msg>
-              </g:Label>
-              <g:Label ui:field="name"/>
-            </o:PropertyPanel>
-            <o:PropertyPanel>
-              <g:Label>
-                <ui:msg description="Entity type label">Entity Type</ui:msg>
-              </g:Label>
-              <g:Label ui:field="entityType"/>
-            </o:PropertyPanel>
-          </o:PropertiesTable>
-        </g:FlowPanel>
+        <b:Row>
+          <b:Column size="6">
+            <o:PropertiesTable ui:field="propertiesTable" keyStyleNames="span3">
+              <o:PropertyPanel>
+                <g:Label>
+                  <ui:msg description="Name label">Name</ui:msg>
+                </g:Label>
+                <g:Label ui:field="name"/>
+              </o:PropertyPanel>
+              <o:PropertyPanel>
+                <g:Label>
+                  <ui:msg description="Entity type label">Entity Type</ui:msg>
+                </g:Label>
+                <g:Label ui:field="entityType"/>
+              </o:PropertyPanel>
+            </o:PropertiesTable>
+          </b:Column>
+        </b:Row>
 
         <g:FlowPanel>
           <b:Heading size="4" addStyleNames="inline-block">
