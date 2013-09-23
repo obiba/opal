@@ -11,33 +11,21 @@
 package org.obiba.opal.web.gwt.app.client.project.view;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsUiHandlers;
+import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
-import org.obiba.opal.web.model.client.opal.ProjectFactoryDto;
 
-import com.github.gwtbootstrap.client.ui.AccordionGroup;
-import com.github.gwtbootstrap.client.ui.Alert;
-import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.Heading;
-import com.github.gwtbootstrap.client.ui.Icon;
-import com.github.gwtbootstrap.client.ui.Modal;
 import com.github.gwtbootstrap.client.ui.NavLink;
-import com.github.gwtbootstrap.client.ui.NavPills;
-import com.github.gwtbootstrap.client.ui.base.ListItem;
-import com.github.gwtbootstrap.client.ui.base.UnorderedList;
-import com.github.gwtbootstrap.client.ui.constants.AlertType;
-import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
-import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
-import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -48,8 +36,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
@@ -68,7 +54,13 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   @UiField
   Panel archivedPanel;
 
-  private SortBy sortBy = SortBy.NAME;
+  @UiField
+  NavLink nameNav;
+
+  @UiField
+  NavLink lastUpdateNav;
+
+  private SortBy sortBy = SortBy.LAST_UPDATE;
 
   private JsArray<ProjectDto> projects;
 
@@ -92,14 +84,23 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   void onSortByName(ClickEvent event) {
     if(sortBy != SortBy.NAME) {
       sortBy = SortBy.NAME;
+      nameNav.setIcon(IconType.OK);
+      nameNav.removeStyleName("no-icon");
+      lastUpdateNav.setIcon(null);
+      lastUpdateNav.addStyleName("no-icon");
+
       redraw();
     }
   }
 
-  @UiHandler("tagNav")
-  void onSortByTag(ClickEvent event) {
-    if(sortBy != SortBy.TAG) {
-      sortBy = SortBy.TAG;
+  @UiHandler("lastUpdateNav")
+  void onSortByLastUpdate(ClickEvent event) {
+    if(sortBy != SortBy.LAST_UPDATE) {
+      sortBy = SortBy.LAST_UPDATE;
+      lastUpdateNav.setIcon(IconType.OK);
+      lastUpdateNav.removeStyleName("no-icon");
+      nameNav.setIcon(null);
+      nameNav.addStyleName("no-icon");
       redraw();
     }
   }
@@ -128,83 +129,27 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   private enum SortBy {
     NAME {
       @Override
-      void sort(ProjectsUiHandlers handlers, Panel content, JsArray<ProjectDto> projects) {
-        for(ProjectDto project : JsArrays.toIterable(projects)) {
-          FlowPanel panel = new FlowPanel();
-          panel.addStyleName("item");
-
-          Widget projectLink = newProjectLink(handlers, project);
-          panel.add(projectLink);
-
-          FlowPanel tagsPanel = new FlowPanel();
-          tagsPanel.addStyleName("tags inline-block");
-          for(String tag : JsArrays.toIterable(JsArrays.toSafeArray(project.getTagsArray()))) {
-            tagsPanel.add(new com.github.gwtbootstrap.client.ui.Label(tag));
-          }
-          panel.add(tagsPanel);
-
-          if(project.hasDescription()) {
-            Label descriptionLabel = new Label(project.getDescription());
-            panel.add(descriptionLabel);
-          }
-
-          JsArrayString tableNames = JsArrays.toSafeArray(project.getDatasource().getTableArray());
-          if(tableNames.length() > 0) {
-            FlowPanel pills = new FlowPanel();
-            int count = 1;
-            for(String table : JsArrays.toIterable(tableNames)) {
-              if (count>5) {
-                pills.add(new InlineLabel("..."));
-                break;
-              }
-              if (pills.getWidgetCount() > 0) {
-                pills.add(new InlineLabel(", "));
-              }
-              pills.add(newProjectTableLink(handlers, project, table));
-              count++;
-            }
-            panel.add(pills);
-          }
-
-          content.add(panel);
+      void sort(final ProjectsUiHandlers handlers, Panel content, JsArray<ProjectDto> projects) {
+        for(final ProjectDto project : JsArrays.toIterable(projects)) {
+          content.add(newProjectPanel(handlers, project));
         }
       }
-    }, TAG {
+    }, LAST_UPDATE {
       @Override
       void sort(ProjectsUiHandlers handlers, Panel content, JsArray<ProjectDto> projects) {
-        // get a unique list of tags
-        Map<String, JsArray<ProjectDto>> tagMap = Maps.newHashMap();
-        for(ProjectDto project : JsArrays.toIterable(projects)) {
-          JsArrayString tags = JsArrays.toSafeArray(project.getTagsArray());
-          if(tags.length() == 0) {
-            addToTagMap(tagMap, "N/A", project);
+        List<ProjectDto> projectList = JsArrays.toList(projects);
+        Collections.sort(projectList, new Comparator<ProjectDto>() {
+          @Override
+          public int compare(ProjectDto o1, ProjectDto o2) {
+            Moment m1 = Moment.create(o1.getTimestamps().getLastUpdate());
+            Moment m2 = Moment.create(o2.getTimestamps().getLastUpdate());
+            return m2.unix() - m1.unix();
           }
-          for(String tag : JsArrays.toIterable(tags)) {
-            addToTagMap(tagMap, tag, project);
-          }
+        });
+        for(final ProjectDto project : projectList) {
+          content.add(newProjectPanel(handlers, project));
         }
-        List<String> sortedTags = Lists.newArrayList(tagMap.keySet());
-        Collections.sort(sortedTags, String.CASE_INSENSITIVE_ORDER);
-        for(String tag : sortedTags) {
-          AccordionGroup tagPanel = new AccordionGroup();
-          tagPanel.setHeading(tag + " (" + tagMap.get(tag).length() + ")");
-          tagPanel.addStyleName("item");
-          FlowPanel tagContent = new FlowPanel();
-          tagPanel.add(tagContent);
-          content.add(tagPanel);
-          NAME.sort(handlers, tagContent, tagMap.get(tag));
-        }
-
       }
-
-      private void addToTagMap(Map<String, JsArray<ProjectDto>> tagMap, String tag, ProjectDto project) {
-        if(!tagMap.keySet().contains(tag)) {
-          JsArray<ProjectDto> p = JsArrays.create();
-          tagMap.put(tag, p);
-        }
-        tagMap.get(tag).push(project);
-      }
-
     };
 
     /**
@@ -215,6 +160,58 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
      * @param projects
      */
     abstract void sort(ProjectsUiHandlers handlers, Panel content, JsArray<ProjectDto> projects);
+
+    protected Panel newProjectPanel(final ProjectsUiHandlers handlers, final ProjectDto project) {
+      FlowPanel panel = new FlowPanel();
+      panel.addStyleName("item");
+
+      Widget projectLink = newProjectLink(handlers, project);
+      panel.add(projectLink);
+
+      FlowPanel tagsPanel = new FlowPanel();
+      tagsPanel.addStyleName("tags inline-block");
+      for(String tag : JsArrays.toIterable(JsArrays.toSafeArray(project.getTagsArray()))) {
+        tagsPanel.add(new com.github.gwtbootstrap.client.ui.Label(tag));
+      }
+      panel.add(tagsPanel);
+
+      if(project.hasDescription()) {
+        Label descriptionLabel = new Label(project.getDescription());
+        panel.add(descriptionLabel);
+      }
+
+      JsArrayString tableNames = JsArrays.toSafeArray(project.getDatasource().getTableArray());
+      if(tableNames.length() > 0) {
+        Anchor countLabel = new Anchor(tableNames.length() == 1
+            ? translations.tableCountLabel()
+            : TranslationsUtils.replaceArguments(translations.tablesCountLabel(), "" + tableNames.length()));
+        countLabel.addClickHandler(new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            handlers.onProjectTableSelection(project, null);
+          }
+        });
+
+        for(String table : JsArrays.toIterable(tableNames)) {
+          if(Strings.isNullOrEmpty(countLabel.getTitle())) {
+            countLabel.setTitle(table);
+          } else {
+            countLabel.setTitle(countLabel.getTitle() + ", " + table);
+          }
+        }
+        panel.add(countLabel);
+      }
+
+      if(project.hasTimestamps()) {
+        Moment lastUpdate = Moment.create(project.getTimestamps().getLastUpdate());
+        Label ago = new Label(
+            TranslationsUtils.replaceArguments(translations.lastUpdateAgoLabel(), lastUpdate.fromNow()));
+        ago.addStyleName("help-block");
+        panel.add(ago);
+      }
+
+      return panel;
+    }
 
     protected Widget newProjectLink(final ProjectsUiHandlers handlers, final ProjectDto project) {
       NavLink link = new NavLink(project.getTitle());

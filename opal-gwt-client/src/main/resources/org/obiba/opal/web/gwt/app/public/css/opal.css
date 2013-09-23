@@ -27,7 +27,11 @@ li {
 }
 
 .items .item {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
+}
+
+li.no-icon > a {
+  padding-left: 3em;
 }
 
 .xsmall-indent {

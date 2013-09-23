@@ -12,8 +12,13 @@ package org.obiba.opal.web.project;
 import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.magma.Datasource;
+import org.obiba.magma.Timestamps;
+import org.obiba.magma.Value;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.project.domain.Project;
 import org.obiba.opal.web.magma.DatasourceResource;
+import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Projects;
 
 public class Dtos {
@@ -46,6 +51,8 @@ public class Dtos {
     builder.setDatasource(org.obiba.opal.web.magma.Dtos.asDto(datasource)
         .setLink(UriBuilder.fromPath("/").path(DatasourceResource.class).build(project.getName()).toString()));
 
+    addTimestamps(builder, datasource);
+
     return builder;
   }
 
@@ -62,4 +69,24 @@ public class Dtos {
     return builder.build();
   }
 
+  private static void addTimestamps(Projects.ProjectDto.Builder builder, Datasource datasource) {
+    Value created = DateTimeType.get().now();
+    Value lastUpdate = null;
+    for (ValueTable table : datasource.getValueTables()) {
+      Timestamps ts = table.getTimestamps();
+      if (created.compareTo(ts.getCreated()) > 0) {
+        created = ts.getCreated();
+      }
+      if (lastUpdate == null || lastUpdate.compareTo(ts.getLastUpdate()) < 0) {
+        lastUpdate = ts.getLastUpdate();
+      }
+    }
+    if (lastUpdate == null) {
+      lastUpdate = created;
+    }
+
+    Magma.TimestampsDto.Builder tsBuilder = Magma.TimestampsDto.newBuilder();
+    tsBuilder.setCreated(created.toString()).setLastUpdate(lastUpdate.toString());
+    builder.setTimestamps(tsBuilder);
+  }
 }

@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArrayString;
 
 /**
@@ -34,6 +35,10 @@ public class TranslationsUtils {
 
   public static String replaceArguments(String msg, JsArrayString args) {
     return replaceArguments(msg, JsArrays.toList(args));
+  }
+
+  public static String replaceArguments(String msg, String arg) {
+    return replaceArguments(msg, Lists.newArrayList(arg));
   }
 
 }

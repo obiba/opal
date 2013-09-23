@@ -9,14 +9,12 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.jvm.view;
 
-import java.util.Arrays;
-//import java.util.concurrent.TimeUnit;
-
 import org.obiba.opal.web.gwt.app.client.administration.jvm.presenter.JVMPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
+import org.obiba.opal.web.gwt.datetime.client.Duration;
 import org.obiba.opal.web.gwt.plot.client.MonitoringChartFactory;
 import org.obiba.opal.web.model.client.opal.EntryDto;
 import org.obiba.opal.web.model.client.opal.OpalEnv;
@@ -33,6 +31,8 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
+
+//import java.util.concurrent.TimeUnit;
 
 public class JVMView extends ViewImpl implements JVMPresenter.Display {
 
@@ -156,7 +156,8 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
 
   @Override
   public void renderStatus(OpalStatus status) {
-    renderServerUptime((long) status.getUptime());
+    uptime.setText(TranslationsUtils
+        .replaceArguments(translations.serverRunningFor(), Duration.create((int) status.getUptime()).humanize()));
 
     if(initialTimestamp == null) {
       initialTimestamp = status.getTimestamp();
@@ -205,16 +206,6 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
     gcChart.updateChart(1, 1, timestamp, gcCount - gcCountMemento == 0 ? 0 : gcTotalTime - gcTimeMemento);
     gcCountMemento = gcCount;
     gcTimeMemento = gcTotalTime;
-  }
-
-  private void renderServerUptime(long ms) {
-//    Long days = TimeUnit.MILLISECONDS.toDays(ms);
-//    Long hours = TimeUnit.MILLISECONDS.toHours(ms) - TimeUnit.DAYS.toHours(days);
-//    Long min = TimeUnit.MILLISECONDS.toMinutes(ms) - TimeUnit.HOURS.toMinutes(hours);
-//    Long sec = TimeUnit.MILLISECONDS.toSeconds(ms) - TimeUnit.MINUTES.toSeconds(min);
-//
-//    uptime.setText(TranslationsUtils.replaceArguments(translations.opalRunningSince(),
-//        Arrays.asList(days.toString(), hours.toString(), min.toString(), sec.toString())));
   }
 
 }

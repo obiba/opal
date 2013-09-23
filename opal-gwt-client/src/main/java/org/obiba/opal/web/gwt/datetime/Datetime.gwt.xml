@@ -12,8 +12,5 @@
     'http://google-web-toolkit.googlecode.com/svn/tags/2.5.1/distro-source/core/src/gwt-module.dtd'>
 <module>
   <inherits name="com.google.gwt.core.Core"/>
-  <inherits name="org.moxieapps.gwt.highcharts.Highcharts"/>
-  <inherits name="com.google.common.collect.Collect"/>
-  <script src="js/jquery-1.10.2.min.js"/>
-  <script src="highcharts/highcharts.js"/>
+  <script src="moment/moment+langs.min.js"/>
 </module>

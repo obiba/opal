@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -99,11 +100,15 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
 
   @Override
   public void onProjectTableSelection(ProjectDto project, String table) {
-    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.PROJECT)
+    PlaceRequest.Builder builder = new PlaceRequest.Builder().nameToken(Places.PROJECT)
         .with(ParameterTokens.TOKEN_NAME, project.getName()) //
-        .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString()) //
-        .with(ParameterTokens.TOKEN_PATH, project.getName() + "." + table).build();
-    placeManager.revealPlace(request);
+        .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString());
+
+    if (!Strings.isNullOrEmpty(table)) {
+      builder.with(ParameterTokens.TOKEN_PATH, project.getName() + "." + table).build();
+    }
+
+    placeManager.revealPlace(builder.build());
   }
 
   @Override

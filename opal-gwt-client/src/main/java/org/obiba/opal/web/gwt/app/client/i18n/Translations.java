@@ -1899,9 +1899,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("History")
   String historyLabel();
 
-  @Description("Opal running since title")
-  @DefaultStringValue("Opal is running since {0} days {1} hours {2} min. {3} sec.")
-  String opalRunningSince();
+  @Description("Server running title")
+  @DefaultStringValue("Server has been running for {0}.")
+  String serverRunningFor();
 
   @Description("Statistics Related Labels")
   @DefaultStringMapValue({ "PLOT", "Plot",//
@@ -2021,4 +2021,16 @@ public interface Translations extends Constants {
   @Description("No Variables label")
   @DefaultStringValue("No variables")
   String noVariablesLabel();
+
+  @Description("Table count label")
+  @DefaultStringValue("1 table")
+  String tableCountLabel();
+
+  @Description("Tables count label")
+  @DefaultStringValue("{0} tables")
+  String tablesCountLabel();
+
+  @Description("Last Update Ago label")
+  @DefaultStringValue("Last update {0}")
+  String lastUpdateAgoLabel();
 }

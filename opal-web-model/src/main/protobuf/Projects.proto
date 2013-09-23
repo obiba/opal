@@ -14,6 +14,7 @@ message ProjectDto {
   optional string directory = 7;
   required bool archived = 8 [default = false];
   optional string database = 9;
+  optional Magma.TimestampsDto timestamps = 10;
 }
 
 message ProjectFactoryDto {
