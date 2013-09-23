@@ -32,11 +32,11 @@
         </b:ButtonGroup>
         <b:ButtonGroup addStyleNames="pull-right">
           <b:DropdownButton text="Sort by" size="SMALL">
-            <b:NavLink ui:field="nameNav" addStyleNames="no-icon">
-              <ui:msg description="Name label">Name</ui:msg>
-            </b:NavLink>
             <b:NavLink ui:field="lastUpdateNav" icon="OK">
               <ui:msg description="Last Update label">Last Update</ui:msg>
+            </b:NavLink>
+            <b:NavLink ui:field="nameNav" addStyleNames="no-icon">
+              <ui:msg description="Name label">Name</ui:msg>
             </b:NavLink>
           </b:DropdownButton>
         </b:ButtonGroup>
