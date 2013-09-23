@@ -1,37 +1,30 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:tx="http://www.springframework.org/schema/tx"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <tx:annotation-driven transaction-manager="transactionManager"/>
-
-  <!-- TransactionManager used for Opal internal configuration -->
-  <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
-    <property name="sessionFactory" ref="sessionFactory"/>
-  </bean>
-
-  <!-- TransactionTemplate used for Opal internal configuration -->
-  <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate" scope="prototype">
-    <constructor-arg ref="transactionManager"/>
-  </bean>
+  <!--
+    Hibernate stuff for Opal internal configuration database
+  -->
 
   <!-- Datasource used for Opal internal configuration -->
-  <bean id="dataSource" class="org.apache.commons.dbcp.managed.BasicManagedDataSource" destroy-method="close">
+  <bean id="dataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" destroy-method="close">
     <qualifier value="opal-config"/>
-    <property name="url" value="${org.obiba.opal.datasource.url}"/>
-    <property name="driverClassName" value="${org.obiba.opal.datasource.driver}"/>
-    <property name="username" value="${org.obiba.opal.datasource.username}"/>
-    <property name="password" value="${org.obiba.opal.datasource.password}"/>
-    <property name="maxIdle" value="10"/>
-    <property name="maxActive" value="100"/>
-    <property name="maxWait" value="10000"/>
-    <property name="initialSize" value="2"/>
-    <property name="validationQuery" value="${org.obiba.opal.datasource.validationQuery}"/>
-    <property name="testOnBorrow" value="true"/>
+    <property name="uniqueName" value="opal-config"/>
+    <property name="minPoolSize" value="2"/>
+    <property name="maxPoolSize" value="100"/>
+    <property name="maxIdleTime" value="10"/>
+    <property name="testQuery" value="${org.obiba.opal.datasource.validationQuery}"/>
+    <property name="className" value="${org.obiba.opal.datasource.driver}"/>
+    <property name="driverProperties">
+      <props>
+        <prop key="URL">${org.obiba.opal.datasource.url}</prop>
+        <prop key="user">${org.obiba.opal.datasource.username}</prop>
+        <prop key="password">${org.obiba.opal.datasource.password}</prop>
+      </props>
+    </property>
   </bean>
 
   <!-- Hibernate SessionFactory used for Opal internal configuration -->
-  <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+  <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
     <qualifier value="opal-config"/>
     <property name="dataSource" ref="dataSource"/>
     <property name="namingStrategy">
@@ -40,18 +33,27 @@
     <property name="annotatedClasses">
       <bean class="org.obiba.opal.core.support.OpalAnnotationConfigurationHelper"/>
     </property>
+    <property name="jtaTransactionManager" ref="transactionManager"/>
     <property name="hibernateProperties">
       <bean class="org.obiba.opal.core.runtime.jdbc.HsqlDialectOverride">
         <property name="properties">
           <props>
             <prop key="hibernate.dialect">${org.obiba.opal.datasource.dialect}</prop>
-            <prop key="hibernate.generate_statistics">true</prop>
+            <prop key="hibernate.hbm2ddl.auto">create</prop>
+            <prop key="hibernate.generate_statistics">false</prop>
             <prop key="hibernate.cache.use_structured_entries">true</prop>
             <prop key="hibernate.cache.use_query_cache">true</prop>
             <prop key="hibernate.cache.use_second_level_cache">true</prop>
-            <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop>
+            <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
+            </prop>
             <prop key="hibernate.cache.provider_configuration_file_resource_path">/opal-ehcache.xml</prop>
+            <!-- Set the CurrentSessionContext to JTASessionContext: a Hibernate Session will be available when a transaction is active -->
+            <prop key="hibernate.current_session_context_class">jta</prop>
+            <prop key="hibernate.transaction.jta.platform">
+              org.hibernate.service.jta.platform.internal.BitronixJtaPlatform
+            </prop>
             <prop key="hibernate.transaction.auto_close_session">true</prop>
+            <prop key="hibernate.transaction.flush_before_completion">true</prop>
           </props>
         </property>
       </bean>
@@ -63,16 +65,21 @@
     <qualifier value="hibernate"/>
     <property name="properties">
       <props>
-        <prop key="hibernate.generate_statistics">true</prop>
+        <prop key="hibernate.generate_statistics">false</prop>
         <prop key="hibernate.cache.use_structured_entries">true</prop>
         <prop key="hibernate.cache.use_query_cache">true</prop>
         <prop key="hibernate.cache.use_second_level_cache">true</prop>
-        <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop>
+        <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
+        </prop>
         <prop key="hibernate.cache.provider_configuration_file_resource_path">/opal-ehcache.xml</prop>
+        <!-- Set the CurrentSessionContext to JTASessionContext: a Hibernate Session will be available when a transaction is active -->
+        <prop key="hibernate.current_session_context_class">jta</prop>
+        <prop key="hibernate.transaction.jta.platform">org.hibernate.service.jta.platform.internal.BitronixJtaPlatform
+        </prop>
+        <prop key="hibernate.transaction.auto_close_session">true</prop>
         <prop key="hibernate.transaction.flush_before_completion">true</prop>
       </props>
     </property>
   </bean>
-
 
 </beans>

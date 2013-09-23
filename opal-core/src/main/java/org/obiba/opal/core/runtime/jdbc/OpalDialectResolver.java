@@ -39,6 +39,8 @@ public class OpalDialectResolver extends AbstractDialectResolver {
       return new MySQL5InnoDBDialect();
     }
 
+    //TODO support PostgreSQL & MariaDB
+
     return null;
   }
 

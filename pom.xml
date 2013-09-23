@@ -445,6 +445,17 @@
       </dependency>
 
       <dependency>
+        <groupId>javax.transaction</groupId>
+        <artifactId>jta</artifactId>
+        <version>${jta.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.btm</groupId>
+        <artifactId>btm</artifactId>
+        <version>${btm.version}</version>
+      </dependency>
+
+      <dependency>
         <groupId>javax.persistence</groupId>
         <artifactId>persistence-api</artifactId>
         <version>${jpa.version}</version>
@@ -1120,6 +1131,12 @@
         <version>${orientdb.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.javassist</groupId>
+        <artifactId>javassist</artifactId>
+        <version>${javassist.version}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
@@ -1446,6 +1463,7 @@
 
     <birt.version>2.6.2</birt.version>
     <bouncycastle.version>1.46</bouncycastle.version>
+    <btm.version>2.1.4</btm.version>
     <cglib-nodep.version>3.0</cglib-nodep.version>
     <commons-codec.version>1.8</commons-codec.version>
     <commons-collections.version>3.2.1</commons-collections.version>
@@ -1477,6 +1495,7 @@
     <hibernate.version>4.2.5.Final</hibernate.version>
     <hsqldb.version>2.3.0</hsqldb.version>
     <httpclient.version>4.3</httpclient.version>
+    <javassist.version>3.18.1-GA</javassist.version>
     <jetty.version>7.6.8.v20121106</jetty.version>
     <jetty-util.version>6.1.22</jetty-util.version>
     <jewelcli.version>0.6</jewelcli.version>
@@ -1486,6 +1505,7 @@
     <jpa.version>1.0.2</jpa.version>
     <json.version>20090211</json.version>
     <jsr305.version>2.0.1</jsr305.version>
+    <jta.version>1.1</jta.version>
     <junit.version>4.11</junit.version>
     <liquibase.version>1.9.4</liquibase.version>
     <magma.version>1.8-SNAPSHOT</magma.version>

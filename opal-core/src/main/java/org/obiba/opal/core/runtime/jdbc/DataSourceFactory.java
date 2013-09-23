@@ -9,44 +9,41 @@
  ******************************************************************************/
 package org.obiba.opal.core.runtime.jdbc;
 
-import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.commons.dbcp.managed.BasicManagedDataSource;
+import java.util.Properties;
+
 import org.obiba.opal.core.domain.database.SqlDatabase;
-import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.beans.MutablePropertyValues;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
 
+import bitronix.tm.resource.jdbc.PoolingDataSource;
+
 @Component
 public class DataSourceFactory {
 
-  public BasicDataSource createDataSource(SqlDatabase database) {
-    BasicManagedDataSource dataSource = new BasicManagedDataSource();
+  public PoolingDataSource createDataSource(SqlDatabase database) {
+    PoolingDataSource dataSource = new PoolingDataSource();
+    dataSource.setClassName(database.getDriverClass());
 
     if(!Strings.isNullOrEmpty(database.getProperties())) {
-      BeanWrapperImpl bw = new BeanWrapperImpl(dataSource);
-      // Set values, ignoring unknown/invalid entries
-      bw.setPropertyValues(new MutablePropertyValues(database.readProperties()), true, true);
+      dataSource.setDriverProperties(new Properties(database.readProperties()));
     }
 
-    // Set other properties
-    dataSource.setUrl(database.getUrl());
-    dataSource.setDriverClassName(database.getDriverClass());
-    dataSource.setUsername(database.getUsername());
-    dataSource.setPassword(database.getPassword());
+    dataSource.getDriverProperties().setProperty("URL", database.getUrl());
+    dataSource.getDriverProperties().setProperty("user", database.getUsername());
+    dataSource.getDriverProperties().setProperty("password", database.getPassword());
 
-    if("com.mysql.jdbc.Driver".equals(dataSource.getDriverClassName())) {
-      dataSource.setValidationQuery("select 1");
-    } else if("org.hsqldb.jdbcDriver".equals(dataSource.getDriverClassName())) {
-      dataSource.setValidationQuery("select 1 from INFORMATION_SCHEMA.SYSTEM_USERS");
+    if("com.mysql.jdbc.Driver".equals(database.getDriverClass())) {
+      dataSource.setTestQuery("select 1");
+    } else if("org.hsqldb.jdbcDriver".equals(database.getDriverClass())) {
+      dataSource.setTestQuery("select 1 from INFORMATION_SCHEMA.SYSTEM_USERS");
     }
     //TODO validation query for PostgreSQL
 
-    if(dataSource.getMaxWait() < 0) {
-      // Wait for 10 seconds maximum
-      dataSource.setMaxWait(10 * 1000);
-    }
+    //TODO maxWait
+//    if(dataSource.getMaxWait() < 0) {
+//      dataSource.setMaxWait(10 * 1000); // Wait for 10 seconds maximum
+//    }
     return dataSource;
   }
 

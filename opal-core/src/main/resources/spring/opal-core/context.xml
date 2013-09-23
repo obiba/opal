@@ -5,6 +5,7 @@
 
   <context:annotation-config/>
 
+  <import resource="tx.xml"/>
   <import resource="hibernate-services.xml"/>
   <import resource="version.xml"/>
   <import resource="quartz.xml"/>

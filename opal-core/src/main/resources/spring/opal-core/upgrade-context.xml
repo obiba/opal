@@ -7,15 +7,9 @@
 
   <context:annotation-config/>
 
+  <import resource="tx.xml"/>
   <import resource="version.xml"/>
   <import resource="hibernate-session.xml"/>
-
-  <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-    <property name="driverClassName" value="${org.obiba.opal.datasource.driver}"/>
-    <property name="url" value="${org.obiba.opal.datasource.url}"/>
-    <property name="username" value="${org.obiba.opal.datasource.username}"/>
-    <property name="password" value="${org.obiba.opal.datasource.password}"/>
-  </bean>
 
   <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
     <property name="customEditors">
@@ -27,9 +21,7 @@
     </property>
   </bean>
 
-  <bean id="dataSourceFactory" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactory">
-    <constructor-arg ref="jotm"/>
-  </bean>
+  <bean id="dataSourceFactory" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactory"/>
 
   <bean id="sessionFactoryFactory" class="org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory"/>
 
@@ -65,7 +57,7 @@
     </property>
 
     <property name="newInstallationDetectionStrategy">
-      <bean class="org.obiba.runtime.upgrade.support.EmptyDataSourceDetectionStrategy">
+      <bean class="org.obiba.runtime.upgrade.support.NoVersionTableDetectionStrategy">
         <property name="dataSource" ref="dataSource"/>
       </bean>
     </property>
@@ -74,15 +66,6 @@
       <list>
         <bean class="org.obiba.runtime.upgrade.support.VersionTableInstallStep">
           <property name="dataSource" ref="dataSource"/>
-        </bean>
-        <bean class="org.obiba.runtime.upgrade.InstallStepAdapter">
-          <property name="upgradeStep">
-            <bean class="org.obiba.runtime.upgrade.support.MethodInvokingUpgradeStep">
-              <property name="description" value="Install Opal Schema."/>
-              <property name="methodOwner" ref="&amp;sessionFactory"/>
-              <property name="methodName" value="createDatabaseSchema"/>
-            </bean>
-          </property>
         </bean>
         <bean class="org.obiba.runtime.upgrade.InstallStepAdapter">
           <property name="upgradeStep" ref="quartzSchema-1.4.0"/>
@@ -101,10 +84,21 @@
         <bean id="opal-schemaUpgrade-1.1" parent="updateOpalSchema">
           <property name="appliesTo" value="1.1"/>
         </bean>
-        <ref bean="opal-dataUpgrade-1.1"/>
+        <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
+          <property name="dataSource" ref="dataSource"/>
+          <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/1.1/"/>
+          <property name="scriptBasename" value="opal-dataUpgrade-1.1"/>
+          <property name="description"
+              value="Copy 'DEFAULT_STUDY_ID' keystore from study_key_store to unit_key_store, then drop study_key_store."/>
+          <property name="appliesTo" value="1.1"/>
+        </bean>
 
         <!-- 1.4.0 -->
-        <ref bean="opal-viewsUpgrade-1.4.0"/>
+        <bean class="org.obiba.opal.core.runtime.upgrade.ViewsUpgrade_1_4_0">
+          <property name="description" value="Update action table 'type' field."/>
+          <property name="appliesTo" value="1.4.0"/>
+          <property name="configFile" value="${OPAL_HOME}/conf/opal-config.xml"/>
+        </bean>
         <ref bean="quartzSchema-1.4.0"/>
         <!-- Drop audit log tables -->
         <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
@@ -266,21 +260,6 @@
     <property name="description" value="Update Opal Schema."/>
     <property name="methodOwner" ref="&amp;sessionFactory"/>
     <property name="methodName" value="updateDatabaseSchema"/>
-  </bean>
-
-  <bean id="opal-dataUpgrade-1.1" class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
-    <property name="dataSource" ref="dataSource"/>
-    <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/1.1/"/>
-    <property name="scriptBasename" value="opal-dataUpgrade-1.1"/>
-    <property name="description"
-        value="Copy 'DEFAULT_STUDY_ID' keystore from study_key_store to unit_key_store, then drop study_key_store."/>
-    <property name="appliesTo" value="1.1"/>
-  </bean>
-
-  <bean id="opal-viewsUpgrade-1.4.0" class="org.obiba.opal.core.runtime.upgrade.ViewsUpgrade_1_4_0">
-    <property name="description" value="Update action table 'type' field."/>
-    <property name="appliesTo" value="1.4.0"/>
-    <property name="configFile" value="${OPAL_HOME}/conf/opal-config.xml"/>
   </bean>
 
   <!--  The "1.4.0" here refers to the "appliesTo" Opal version, not the version of Quartz! -->
