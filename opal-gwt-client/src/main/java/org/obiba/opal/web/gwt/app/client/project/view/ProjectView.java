@@ -11,24 +11,30 @@
 package org.obiba.opal.web.gwt.app.client.project.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectUiHandlers;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalTabPanel;
+import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
+import org.obiba.opal.web.gwt.datetime.client.FormatType;
+import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
-import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.Heading;
+import com.github.gwtbootstrap.client.ui.Label;
 import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.Popover;
 import com.github.gwtbootstrap.client.ui.TabPanel;
-import com.github.gwtbootstrap.client.ui.constants.IconType;
-import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
@@ -45,10 +51,19 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   Breadcrumbs titlecrumbs;
 
   @UiField
-  HasText description;
+  Heading projectHeader;
 
   @UiField
-  Button ellipsis;
+  com.google.gwt.user.client.ui.Label description;
+
+  @UiField
+  FlowPanel tagsPanel;
+
+  @UiField
+  Panel timestampsPanel;
+
+  @UiField
+  Popover timestamps;
 
   @UiField
   OpalTabPanel tabPanel;
@@ -82,10 +97,29 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
       titlecrumbs.remove(1);
     }
     titlecrumbs.add(new NavLink(project.getTitle()));
-    String desc = project.getDescription();
-    description.setText(desc.substring(0, desc.indexOf('.') + 1));
-    ellipsis.setIcon(IconType.PLUS_SIGN);
-    ellipsis.setVisible(!Strings.isNullOrEmpty(description.getText()));
+
+    projectHeader.setText(project.getTitle());
+    projectHeader.setSubtext("[" + project.getName() +"]");
+    description.setText(project.getDescription());
+
+    tagsPanel.clear();
+    JsArrayString tagsArray = JsArrays.toSafeArray(project.getTagsArray());
+    if (tagsArray.length()>0) {
+      for (String tag : JsArrays.toIterable(tagsArray)) {
+        tagsPanel.add(new Label(tag));
+      }
+    }
+
+    timestampsPanel.setVisible(project.hasTimestamps());
+    if (project.hasTimestamps()) {
+      Moment created = Moment.create(project.getTimestamps().getCreated());
+      Moment lastUpdate = Moment.create(project.getTimestamps().getLastUpdate());
+      timestamps.setHeading(translations.timestampsLabel());
+      String createdOn = TranslationsUtils.replaceArguments(translations.createdOnLabel(), created.format(FormatType.MONTH_NAME_TIME_SHORT));
+      String lastUpdateOn = TranslationsUtils.replaceArguments(translations.lastUpdateOnLabel(), lastUpdate.fromNow());
+      timestamps.setText(createdOn + "<br/>" + lastUpdateOn);
+      timestamps.reconfigure();
+    }
   }
 
   @Override
@@ -106,18 +140,6 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   @UiHandler("projects")
   void onProjectsSelection(ClickEvent event) {
     getUiHandlers().onProjectsSelection();
-  }
-
-  @UiHandler("ellipsis")
-  void onEllipsis(ClickEvent event) {
-    String desc = project.getDescription();
-    if(desc.equals(description.getText())) {
-      description.setText(desc.substring(0, desc.indexOf('.')));
-      ellipsis.setIcon(IconType.PLUS_SIGN);
-    } else {
-      description.setText(desc);
-      ellipsis.setIcon(IconType.MINUS_SIGN);
-    }
   }
 
   @UiHandler("tabPanel")

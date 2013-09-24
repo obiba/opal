@@ -13,48 +13,6 @@
         <b:Column size="6">
           <b:WellNavList>
             <b:NavHeader>
-              <ui:msg description="Project Identification label">Project identification</ui:msg>
-            </b:NavHeader>
-            <b:Divider/>
-            <b:Form>
-              <b:ControlGroup>
-                <b:ControlLabel for="name">Name</b:ControlLabel>
-                <b:Controls>
-                  <b:TextBox ui:field="name" alternateSize="XLARGE" b:id="name" enabled="false"/>
-                  <b:HelpBlock>The project name is unique.
-                  </b:HelpBlock>
-                </b:Controls>
-              </b:ControlGroup>
-              <b:ControlGroup>
-                <b:ControlLabel for="title">Title</b:ControlLabel>
-                <b:Controls>
-                  <b:TextBox ui:field="title" alternateSize="XLARGE" b:id="title"/>
-                  <b:HelpBlock>The project title (name for human beings).
-                  </b:HelpBlock>
-                </b:Controls>
-              </b:ControlGroup>
-              <b:ControlGroup>
-                <b:ControlLabel for="description">Description</b:ControlLabel>
-                <b:Controls>
-                  <b:TextArea ui:field="description" alternateSize="XLARGE" b:id="description"
-                      visibleLines="3"/>
-                </b:Controls>
-              </b:ControlGroup>
-              <b:ControlGroup>
-                <b:ControlLabel for="tags">Tags</b:ControlLabel>
-                <b:Controls>
-                  <b:TextBox ui:field="tags" alternateSize="XLARGE" b:id="tags"/>
-                  <b:HelpBlock>Tags that describe this project.
-                  </b:HelpBlock>
-                </b:Controls>
-              </b:ControlGroup>
-              <b:Button type="PRIMARY" ui:field="saveIdentification">Save</b:Button>
-            </b:Form>
-          </b:WellNavList>
-        </b:Column>
-        <b:Column size="6">
-          <b:WellNavList>
-            <b:NavHeader>
               <ui:msg description="Data Storage label">Data storage</ui:msg>
             </b:NavHeader>
             <b:Divider/>
@@ -84,6 +42,8 @@
               </b:Form>
             </o:EditorPanel>
           </b:WellNavList>
+        </b:Column>
+        <b:Column size="6">
           <b:WellNavList>
             <b:NavHeader>
               <ui:msg description="Danger Zone label">Danger zone</ui:msg>

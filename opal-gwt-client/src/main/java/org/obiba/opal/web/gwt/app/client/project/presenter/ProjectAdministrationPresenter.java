@@ -11,7 +11,12 @@
 package org.obiba.opal.web.gwt.app.client.project.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseResources;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
+import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectUpdatedEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -29,18 +34,39 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
+
+import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
+import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
+import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
+import static com.google.gwt.http.client.Response.SC_OK;
 
 public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdministrationPresenter.Display>
     implements ProjectEditionUiHandlers {
 
+  private final PlaceManager placeManager;
+
+  private ProjectDto project;
+
+  private Runnable removeConfirmation;
+
   @Inject
-  public ProjectAdministrationPresenter(EventBus eventBus, Display view) {
+  public ProjectAdministrationPresenter(EventBus eventBus, Display view, PlaceManager placeManager) {
     super(eventBus, view);
+    this.placeManager = placeManager;
     getView().setUiHandlers(this);
   }
 
   @Override
   protected void onBind() {
+
+    addRegisteredHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler());
+  }
+
+  public void setProject(ProjectDto project) {
+    this.project = project;
+    getView().setProject(project);
     ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder().forResource(DatabaseResources.databases())
         .withCallback(new ResourceCallback<JsArray<DatabaseDto>>() {
 
@@ -49,10 +75,6 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
             getView().setAvailableDatabases(resource);
           }
         }).get().send();
-  }
-
-  public void setProject(ProjectDto project) {
-    getView().setProject(project);
   }
 
   @Override
@@ -77,6 +99,53 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
   @Override
   public void cancel() {
     //TODO
+  }
+
+  @Override
+  public void delete() {
+    removeConfirmation = new RemoveRunnable(project);
+    fireEvent(ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "removeProject", "confirmRemoveProject"));
+  }
+
+  private class RemoveConfirmationEventHandler implements ConfirmationEvent.Handler {
+
+    @Override
+    public void onConfirmation(ConfirmationEvent event) {
+      if(removeConfirmation != null && event.getSource().equals(removeConfirmation) && event.isConfirmed()) {
+        removeConfirmation.run();
+        removeConfirmation = null;
+      }
+    }
+  }
+
+  private class RemoveRunnable implements Runnable {
+
+    private ProjectDto projectDto;
+
+    private RemoveRunnable(ProjectDto projectDto) {
+      this.projectDto = projectDto;
+    }
+
+    @Override
+    public void run() {
+      ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          if(response.getStatusCode() == SC_OK) {
+            PlaceRequest projectsRequest = new PlaceRequest.Builder().nameToken(Places.PROJECTS).build();
+            placeManager.revealPlace(projectsRequest);
+          } else {
+            String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
+            fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
+          }
+        }
+      };
+
+      ResourceRequestBuilderFactory.newBuilder().forResource(projectDto.getLink()).delete()
+          .withCallback(SC_OK, callbackHandler).withCallback(SC_FORBIDDEN, callbackHandler)
+          .withCallback(SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(SC_NOT_FOUND, callbackHandler).send();
+    }
   }
 
   private class CreateOrUpdateCallBack implements ResponseCodeCallback {

@@ -33,46 +33,42 @@
     </g:FlowPanel>
     <o:OpalTabPanel tabPosition="right" ui:field="tabPanel">
       <b:Tab icon="HOME" active="true">
-        <b:Heading size="5" addStyleNames="no-top-margin">Home</b:Heading>
-        <g:FlowPanel ui:field="homePanel">
-          <g:InlineLabel ui:field="description"></g:InlineLabel>
-          <b:Button type="LINK" icon="PLUS_SIGN" ui:field="ellipsis"/>
-        </g:FlowPanel>
+        <b:Heading size="3" ui:field="projectHeader" addStyleNames="inline-block">Project</b:Heading>
+        <g:FlowPanel ui:field="tagsPanel" addStyleNames="inline-block small-indent"/>
+        <g:SimplePanel ui:field="timestampsPanel" addStyleNames="inline-block small-indent">
+          <b:Popover ui:field="timestamps" trigger="HOVER" placement="BOTTOM" html="true">
+            <b:Icon type="TIME"></b:Icon>
+          </b:Popover>
+        </g:SimplePanel>
+        <g:Label ui:field="description"></g:Label>
       </b:Tab>
       <b:Tab icon="TABLE">
-        <!--<b:Heading size="4" addStyleNames="no-top-margin">Tables</b:Heading>-->
         <g:SimplePanel ui:field="tablesPanel"/>
       </b:Tab>
       <b:Tab icon="HDD">
-        <!--<b:Heading size="5" addStyleNames="no-top-margin">Files</b:Heading>-->
+        <b:Heading size="3">Files</b:Heading>
         <g:SimplePanel ui:field="filesPanel"/>
       </b:Tab>
-      <b:Tab icon="BAR_CHART">
-        <b:Heading size="5" addStyleNames="no-top-margin">Data visualization</b:Heading>
-        <b:Paragraph>
-          huhuhu hahha
-        </b:Paragraph>
-      </b:Tab>
       <b:Tab icon="FILE_ALT">
-        <b:Heading size="5" addStyleNames="no-top-margin">Reports</b:Heading>
+        <b:Heading size="3">Reports</b:Heading>
         <b:Paragraph>
           huhuhu hahha
         </b:Paragraph>
       </b:Tab>
       <b:Tab icon="TASKS">
-        <b:Heading size="5" addStyleNames="no-top-margin">Tasks</b:Heading>
+        <b:Heading size="3">Tasks</b:Heading>
         <b:Paragraph>
           huhuhu hahha
         </b:Paragraph>
       </b:Tab>
       <b:Tab icon="LOCK">
-        <b:Heading size="5" addStyleNames="no-top-margin">Permissions</b:Heading>
+        <b:Heading size="3">Permissions</b:Heading>
         <b:Paragraph>
           huhuhu hahha
         </b:Paragraph>
       </b:Tab>
       <b:Tab icon="BOOK">
-        <!--<b:Heading size="5" addStyleNames="no-top-margin">Administration</b:Heading>-->
+        <b:Heading size="3">Administration</b:Heading>
         <g:SimplePanel ui:field="adminPanel"/>
       </b:Tab>
     </o:OpalTabPanel>

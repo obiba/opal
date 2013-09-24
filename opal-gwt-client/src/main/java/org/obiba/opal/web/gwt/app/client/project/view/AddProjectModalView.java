@@ -10,6 +10,7 @@ import org.obiba.opal.web.model.client.opal.ProjectFactoryDto;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -39,6 +40,9 @@ public class AddProjectModalView extends ModalPopupViewWithUiHandlers<AddProject
   HasText nameTxt;
 
   @UiField
+  HasText titleTxt;
+
+  @UiField
   HasText descriptionTxt;
 
   @Inject
@@ -58,6 +62,7 @@ public class AddProjectModalView extends ModalPopupViewWithUiHandlers<AddProject
     // validate
     ProjectFactoryDto p = ProjectFactoryDto.create();
     p.setName(nameTxt.getText());
+    p.setTitle(Strings.isNullOrEmpty(titleTxt.getText()) ? nameTxt.getText() : titleTxt.getText());
     p.setDescription(descriptionTxt.getText());
     if(getUiHandlers().addProject(p)) {
       modal.hide();

@@ -43,9 +43,6 @@
       </b:Column>
     </b:FluidRow>
 
-    <b:NavPills>
-    </b:NavPills>
-
     <o:NavPillsPanel>
       <b:NavLink active="true">Active</b:NavLink>
       <g:FlowPanel ui:field="activePanel" addStyleNames="items"></g:FlowPanel>

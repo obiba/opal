@@ -36,18 +36,6 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectEdition
   interface Binder extends UiBinder<Widget, ProjectAdministrationView> {}
 
   @UiField
-  HasText name;
-
-  @UiField
-  HasText title;
-
-  @UiField
-  HasText description;
-
-  @UiField
-  HasText tags;
-
-  @UiField
   Paragraph database;
 
   @UiField
@@ -70,19 +58,6 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectEdition
   @Override
   public void setProject(ProjectDto project) {
     this.project = project;
-
-    name.setText(project.getName());
-    title.setText(project.getTitle());
-    description.setText(project.getDescription());
-    StringBuilder tagsStr = new StringBuilder();
-    for(String tag : JsArrays.toIterable(JsArrays.toSafeArray(project.getTagsArray()))) {
-      if(tagsStr.length() != 0) {
-        tagsStr.append(" ");
-      }
-      tagsStr.append(tag);
-    }
-    tags.setText(tagsStr.toString());
-
     database.setText(project.getDatabase());
     storageEditor.showEditor(false);
   }
@@ -99,14 +74,9 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectEdition
     }
   }
 
-  @UiHandler("saveIdentification")
-  void onSaveIdentification(ClickEvent event) {
-
-  }
-
   @UiHandler("deleteProject")
   void onDeleteProject(ClickEvent event) {
-
+    getUiHandlers().delete();
   }
 
   private class StorageEditorHandler implements EditorPanel.Handler {

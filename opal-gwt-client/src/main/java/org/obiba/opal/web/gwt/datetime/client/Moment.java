@@ -95,6 +95,24 @@ public class Moment extends JavaScriptObject {
   }-*/;
 
   /**
+   * Get the localized text representation of the date/time.
+   * @param type
+   * @return
+   */
+  public final String format(FormatType type) {
+    return format(type.get());
+  }
+
+  /**
+   * Get the text representation of the date/time.
+   * @param type
+   * @return
+   */
+  public final native String format(String type) /*-{
+      return this.format(type);
+  }-*/;
+
+  /**
    * Get the Unix EPOCH time in seconds.
    * @return
    */

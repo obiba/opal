@@ -60,7 +60,6 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       HOME,
       TABLES,
       FILES,
-      VISUALISATION,
       REPORTS,
       TASKS,
       PERMISSIONS,

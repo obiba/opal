@@ -44,6 +44,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Name")
   String nameLabel();
 
+  @Description("Tags label")
+  @DefaultStringValue("Tags")
+  String tagsLabel();
+
   @Description("Namespace label")
   @DefaultStringValue("Namespace")
   String namespaceLabel();
@@ -549,6 +553,7 @@ public interface Translations extends Constants {
       "replaceExistingFile", "Replace File", //
       "deleteFile", "Delete File", //
       "deleteKeyPair", "Delete Key Pair", //
+      "removeProject", "Remove Project",//
       "removeDatasource", "Remove Datasource",//
       "removeReportTemplate", "Remove Report Template",//
       "removeFunctionalUnit", "Remove Unit",//
@@ -586,6 +591,8 @@ public interface Translations extends Constants {
       "confirmDeleteKeyPair",
       "Please confirm that you want to remove the Key Pair. All associated encrypted material will not be accessible anymore",
 //
+      "confirmRemoveProject",
+      "Please confirm that you want to remove permanently the current project and all associated data.", //
       "confirmRemoveDatasource",
       "Please confirm that you want to remove the current datasource from Opal configuration.",//
       "confirmDeleteReportTemplate",
@@ -1545,13 +1552,25 @@ public interface Translations extends Constants {
       "Preview the count of identifiers that can be imported and select from which table identifiers will be extracted.")
   String identifiersSyncTableStep();
 
+  @Description("Timestamps label")
+  @DefaultStringValue("Timestamps")
+  String timestampsLabel();
+
   @Description("Created label")
   @DefaultStringValue("Created")
   String createdLabel();
 
+  @Description("Created On label")
+  @DefaultStringValue("Created on {0}")
+  String createdOnLabel();
+
   @Description("Last Update label")
   @DefaultStringValue("Last Update")
   String lastUpdateLabel();
+
+  @Description("Last Update On label")
+  @DefaultStringValue("Last update {0}")
+  String lastUpdateOnLabel();
 
   @Description("Table last update")
   @DefaultStringValue("Table last update")

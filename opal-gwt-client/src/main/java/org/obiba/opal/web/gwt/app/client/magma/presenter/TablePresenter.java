@@ -177,12 +177,10 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @SuppressWarnings({ "OverlyLongMethod" })
   private void addEventHandlers() {
-    registerHandler(getEventBus().addHandler(TableSelectionChangeEvent.getType(), this));
-    registerHandler(
-        getEventBus().addHandler(VariableSelectionChangeEvent.getType(), this));
-    registerHandler(
-        getEventBus().addHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler()));
-    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler()));
+    addRegisteredHandler(TableSelectionChangeEvent.getType(), this);
+    addRegisteredHandler(VariableSelectionChangeEvent.getType(), this);
+    addRegisteredHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler());
+    addRegisteredHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler());
     getView().setValuesTabCommand(new ValuesCommand());
     getView().setVariablesTabCommand(new VariablesCommand());
 
@@ -197,10 +195,9 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     registerHandler(getView().getFilter().getClear().addClickHandler(new FilterClearHandler()));
 
     // OPAL-975
-    registerHandler(getEventBus().addHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler()));
+    addRegisteredHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler());
 
-    registerHandler(
-        getEventBus().addHandler(TableIndexStatusRefreshEvent.getType(), new TableIndexStatusRefreshHandler()));
+    addRegisteredHandler(TableIndexStatusRefreshEvent.getType(), new TableIndexStatusRefreshHandler());
   }
 
   private String getIndexResource(String datasource, String table) {
@@ -368,40 +365,40 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onNextTable() {
-    getEventBus().fireEvent(new SiblingTableSelectionEvent(table, Direction.NEXT));
+    fireEvent(new SiblingTableSelectionEvent(table, Direction.NEXT));
   }
 
   @Override
   public void onPreviousTable() {
-    getEventBus().fireEvent(new SiblingTableSelectionEvent(table, Direction.PREVIOUS));
+    fireEvent(new SiblingTableSelectionEvent(table, Direction.PREVIOUS));
   }
 
   @Override
   public void onExportData() {
-    getEventBus().fireEvent(new WizardRequiredEvent(DataExportPresenter.WizardType, table));
+    fireEvent(new WizardRequiredEvent(DataExportPresenter.WizardType, table));
   }
 
   @Override
   public void onCopyData() {
-    getEventBus().fireEvent(new WizardRequiredEvent(DataCopyPresenter.WizardType, table));
+    fireEvent(new WizardRequiredEvent(DataCopyPresenter.WizardType, table));
   }
 
   @Override
   public void onDownloadDictionary() {
     String downloadUrl = table.getLink() + "/variables/excel";
-    getEventBus().fireEvent(new FileDownloadRequestEvent(downloadUrl));
+    fireEvent(new FileDownloadRequestEvent(downloadUrl));
   }
 
   @Override
   public void onDownloadView() {
     String downloadUrl = table.getViewLink() + "/xml";
-    getEventBus().fireEvent(new FileDownloadRequestEvent(downloadUrl));
+    fireEvent(new FileDownloadRequestEvent(downloadUrl));
   }
 
   @Override
   public void onAddVariablesToView(List<VariableDto> variables) {
     if(variables.isEmpty()) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error("CopyVariableSelectAtLeastOne").build());
+      fireEvent(NotificationEvent.newBuilder().error("CopyVariableSelectAtLeastOne").build());
     } else {
       VariablesToViewPresenter variablesToViewPresenter = variablesToViewProvider.get();
       variablesToViewPresenter.initialize(table, variables);
@@ -420,7 +417,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
             viewDto.setName(table.getName());
             // TODO: this popup is going to die soon and won't need a ModalProvider
             configureViewStepProvider.get();
-            getEventBus().fireEvent(new ViewConfigurationRequiredEvent(viewDto));
+            fireEvent(new ViewConfigurationRequiredEvent(viewDto));
 
           }
         }).send();
@@ -435,7 +432,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         ? ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "removeView", "confirmRemoveView")
         : ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "removeTable", "confirmRemoveTable");
 
-    getEventBus().fireEvent(event);
+    fireEvent(event);
   }
 
   @Override
@@ -447,7 +444,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           updateIndexStatus();
         } else {
           ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-          getEventBus().fireEvent(
+          fireEvent(
               NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
                   .build());
         }
@@ -476,7 +473,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           // Schedule the timer to run once in X seconds.
           t.schedule(DELAY_MILLIS);
         } else {
-          getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
+          fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
         }
       }
 
@@ -497,7 +494,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           updateIndexStatus();
         } else {
           ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-          getEventBus().fireEvent(
+          fireEvent(
               NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
                   .build());
         }
@@ -524,7 +521,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @Override
   public void onFromTable(String tableFullName) {
     String[] s = tableFullName.split("\\.");
-    getEventBus().fireEvent(new TableSelectionChangeEvent(this, s[0], s[1]));
+    fireEvent(new TableSelectionChangeEvent(this, s[0], s[1]));
   }
 
   private final class ValuesCommand implements Command {
@@ -676,7 +673,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   private class VariableNameFieldUpdater implements FieldUpdater<VariableDto, String> {
     @Override
     public void update(int index, VariableDto variableDto, String value) {
-      getEventBus().fireEvent(new VariableSelectionChangeEvent(TablePresenter.this, table, variableDto, getPreviousVariable(index),
+      fireEvent(new VariableSelectionChangeEvent(TablePresenter.this, table, variableDto, getPreviousVariable(index),
           getNextVariable(index)));
     }
   }
@@ -701,7 +698,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       VariableDto variableDto = variables.get(siblingIndex);
 
       getView().setVariableSelection(variableDto, siblingIndex);
-      getEventBus().fireEvent(
+      fireEvent(
           new VariableSelectionChangeEvent(TablePresenter.this, table, variableDto, getPreviousVariable(siblingIndex),
               getNextVariable(siblingIndex)));
     }
@@ -806,11 +803,11 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         @Override
         public void onResponseCode(Request request, Response response) {
           if(response.getStatusCode() == SC_OK) {
-            getEventBus().fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
-            getEventBus().fireEvent(new DatasourceSelectionChangeEvent(TablePresenter.this, table.getDatasourceName()));
+            fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
+            fireEvent(new DatasourceSelectionChangeEvent(TablePresenter.this, table.getDatasourceName()));
           } else {
             String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
-            getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
+            fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
           }
         }
       };
@@ -827,11 +824,11 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         @Override
         public void onResponseCode(Request request, Response response) {
           if(response.getStatusCode() == SC_OK) {
-            getEventBus().fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
-            getEventBus().fireEvent(new DatasourceSelectionChangeEvent(TablePresenter.this, table.getDatasourceName()));
+            fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
+            fireEvent(new DatasourceSelectionChangeEvent(TablePresenter.this, table.getDatasourceName()));
           } else {
             String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
-            getEventBus().fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
+            fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
           }
         }
       };

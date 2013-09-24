@@ -175,11 +175,6 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
       }
       panel.add(tagsPanel);
 
-      if(project.hasDescription()) {
-        Label descriptionLabel = new Label(project.getDescription());
-        panel.add(descriptionLabel);
-      }
-
       JsArrayString tableNames = JsArrays.toSafeArray(project.getDatasource().getTableArray());
       if(tableNames.length() > 0) {
         Anchor countLabel = new Anchor(tableNames.length() == 1
@@ -200,6 +195,15 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
           }
         }
         panel.add(countLabel);
+      }
+
+      if(project.hasDescription()) {
+        // find first phrase
+        String desc = project.getDescription();
+        int idx = desc.indexOf('.');
+        if (idx>0) desc = desc.substring(0,idx) + "...";
+        Label descriptionLabel = new Label(desc);
+        panel.add(descriptionLabel);
       }
 
       if(project.hasTimestamps()) {
@@ -228,18 +232,6 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
       head.add(link);
 
       return head;
-    }
-
-    protected Widget newProjectTableLink(final ProjectsUiHandlers handlers, final ProjectDto project,
-        final String table) {
-      Anchor link = new Anchor(table);
-      link.addClickHandler(new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent event) {
-          handlers.onProjectTableSelection(project, table);
-        }
-      });
-      return link;
     }
   }
 

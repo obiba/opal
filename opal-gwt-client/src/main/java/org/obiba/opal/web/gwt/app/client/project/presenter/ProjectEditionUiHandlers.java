@@ -20,4 +20,6 @@ public interface ProjectEditionUiHandlers extends UiHandlers {
 
   void cancel();
 
+  void delete();
+
 }

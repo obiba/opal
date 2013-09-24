@@ -20,6 +20,8 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.VariableAttributeColumn;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
+import org.obiba.opal.web.gwt.datetime.client.FormatType;
+import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
@@ -322,10 +324,14 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     entityType.setText(dto.getEntityType());
     edit.setVisible(dto.hasViewLink());
     summaryTable.removeProperties();
-    summaryTable.addProperty(translations.createdLabel(),dto.getTimestamps().getCreated());
-    summaryTable.addProperty(translations.lastUpdateLabel(),dto.getTimestamps().getLastUpdate());
+    Moment created = Moment.create(dto.getTimestamps().getCreated());
+    summaryTable.addProperty(translations.createdLabel(), created.format(FormatType.MONTH_NAME_TIME));
+    Moment lastUpdate = Moment.create(dto.getTimestamps().getLastUpdate());
+    summaryTable.addProperty(translations.lastUpdateLabel(),
+        lastUpdate.format(FormatType.MONTH_NAME_TIME) + " (" + lastUpdate.fromNow() + ")");
+    if(dto.hasVariableCount())
+      summaryTable.addProperty(translations.variablesCountLabel(), "" + dto.getVariableCount());
     if(dto.hasValueSetCount()) summaryTable.addProperty(translations.entitiesCountLabel(), "" + dto.getValueSetCount());
-    if(dto.hasVariableCount()) summaryTable.addProperty(translations.variablesCountLabel(), "" + dto.getVariableCount());
 
   }
 

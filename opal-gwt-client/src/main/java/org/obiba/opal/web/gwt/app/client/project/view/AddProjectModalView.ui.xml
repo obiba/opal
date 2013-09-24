@@ -20,10 +20,17 @@
     <o:Modal ui:field="modal" closeVisible="true" keyboard="true" animation="false">
       <b:ControlGroup ui:field="labelGroup">
         <b:ControlLabel>
-          <ui:msg description="Add Project Modal Name label">Name</ui:msg>
+          <ui:msg description="Name label">Name</ui:msg>
         </b:ControlLabel>
         <b:TextBox ui:field="nameTxt"/>
         <b:HelpBlock>A project must have a unique name.</b:HelpBlock>
+      </b:ControlGroup>
+      <b:ControlGroup ui:field="titleGroup">
+        <b:ControlLabel>
+          <ui:msg description="Title label">Title</ui:msg>
+        </b:ControlLabel>
+        <b:TextBox ui:field="titleTxt"/>
+        <b:HelpBlock>A project title for the human beings.</b:HelpBlock>
       </b:ControlGroup>
       <b:ControlLabel>
         <ui:msg description="Description label">Description</ui:msg>
