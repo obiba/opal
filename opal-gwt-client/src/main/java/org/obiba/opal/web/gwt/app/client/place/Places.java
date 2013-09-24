@@ -71,9 +71,9 @@ public final class Places {
 
   public static final Place DATABASES_PLACE = new Place(DATABASES);
 
-  public static final String SQL_DATABASES = "!admin.databases.sql";
+  public static final String DATA_DATABASES = "!admin.databases.data";
 
-  public static final Place SQL_DATABASES_PLACE = new Place(SQL_DATABASES);
+  public static final Place DATA_DATABASES_PLACE = new Place(DATA_DATABASES);
 
   public static final String INDEX = ADMINISTRATION + ".index";
 

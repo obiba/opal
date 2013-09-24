@@ -30,9 +30,6 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   OpalNavLink databasesPlace;
 
   @UiField
-  OpalNavLink mongoDbPlace;
-
-  @UiField
   OpalNavLink esPlace;
 
   @UiField
@@ -88,11 +85,6 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   @Override
   public void setDatabasesHistoryToken(String historyToken) {
     databasesPlace.setHistoryToken(historyToken);
-  }
-
-  @Override
-  public void setMongoDbHistoryToken(String historyToken) {
-    mongoDbPlace.setHistoryToken(historyToken);
   }
 
   @Override

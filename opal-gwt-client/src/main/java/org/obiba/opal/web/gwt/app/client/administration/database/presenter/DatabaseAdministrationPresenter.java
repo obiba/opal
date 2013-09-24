@@ -61,7 +61,7 @@ public class DatabaseAdministrationPresenter extends
     ItemAdministrationPresenter<DatabaseAdministrationPresenter.Display, DatabaseAdministrationPresenter.Proxy> {
 
   @ProxyStandard
-  @NameToken(Places.SQL_DATABASES)
+  @NameToken(Places.DATA_DATABASES)
   public interface Proxy extends ProxyPlace<DatabaseAdministrationPresenter> {}
 
   public interface Display extends View, HasBreadcrumbs {
@@ -112,7 +112,7 @@ public class DatabaseAdministrationPresenter extends
 
   @Override
   public String getName() {
-    return "SQL Databases";
+    return "Data Databases";
   }
 
   @Override
@@ -133,7 +133,7 @@ public class DatabaseAdministrationPresenter extends
   @Override
   @TitleFunction
   public String getTitle() {
-    return translations.pageDatabasesTitle();
+    return translations.pageDataDatabasesTitle();
   }
 
   @Override

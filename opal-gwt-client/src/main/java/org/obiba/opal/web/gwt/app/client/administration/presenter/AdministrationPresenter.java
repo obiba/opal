@@ -32,8 +32,6 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
 
     void setDatabasesHistoryToken(String historyToken);
 
-    void setMongoDbHistoryToken(String historyToken);
-
     void setEsHistoryToken(String historyToken);
 
     void setIndexHistoryToken(String historyToken);
@@ -88,7 +86,7 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
   private void setHistoryTokens() {
 
     getView().setUsersGroupsHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.USERS_GROUPS), 1));
-    getView().setDatabasesHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.SQL_DATABASES), 1));
+    getView().setDatabasesHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.DATA_DATABASES), 1));
     getView().setIndexHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.INDEX), 1));
     getView().setRHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.R), 1));
     getView().setUnitsHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.UNITS), 1));

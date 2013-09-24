@@ -48,25 +48,34 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
   private final Widget uiWidget;
 
   @UiField
-  Button addDatabaseButton;
+  Button addSQL;
 
   @UiField
-  SimplePager databaseTablePager;
+  SimplePager sqlPager;
 
   @UiField
-  Table<DatabaseDto> databaseTable;
+  Table<DatabaseDto> sqlTable;
+
+  @UiField
+  Button addMongo;
+
+  @UiField
+  SimplePager mongoPager;
+
+  @UiField
+  Table<DatabaseDto> mongoTable;
 
   @UiField
   Panel breadcrumbs;
 
   public DatabaseAdministrationView() {
     uiWidget = uiBinder.createAndBindUi(this);
-    databaseTablePager.setDisplay(databaseTable);
-    databaseTable.addColumn(Columns.NAME, translations.nameLabel());
-    databaseTable.addColumn(Columns.URL, translations.urlLabel());
-    databaseTable.addColumn(Columns.DRIVER, translations.driverLabel());
-    databaseTable.addColumn(Columns.USERNAME, translations.usernameLabel());
-    databaseTable.addColumn(Columns.ACTIONS, translations.actionsLabel());
+    sqlPager.setDisplay(sqlTable);
+    sqlTable.addColumn(Columns.NAME, translations.nameLabel());
+    sqlTable.addColumn(Columns.URL, translations.urlLabel());
+    sqlTable.addColumn(Columns.DRIVER, translations.driverLabel());
+    sqlTable.addColumn(Columns.USERNAME, translations.usernameLabel());
+    sqlTable.addColumn(Columns.ACTIONS, translations.actionsLabel());
   }
 
   @Override
@@ -76,7 +85,7 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
 
   @Override
   public HasClickHandlers getAddButton() {
-    return addDatabaseButton;
+    return addSQL;
   }
 
   @Override
@@ -86,7 +95,7 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
 
   @Override
   public HasData<DatabaseDto> getDatabaseTable() {
-    return databaseTable;
+    return sqlTable;
   }
 
   @Override

@@ -6,20 +6,31 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <b:FluidRow addStyleNames="page-header">
-      <b:Column size="9">
-        <b:Breadcrumbs ui:field="breadcrumbs"/>
-      </b:Column>
-      <b:Column size="3">
-        <b:Button ui:field="addDatabaseButton" type="INFO" icon="PLUS" size="SMALL" addStyleNames="pull-right">
-          <ui:msg description="Add SQL database label">Add SQL database</ui:msg>
-        </b:Button>
-      </b:Column>
-    </b:FluidRow>
-    <g:FlowPanel>
-      <b:SimplePager ui:field="databaseTablePager" location="RIGHT"/>
-      <o:Table ui:field="databaseTable" width="100%"/>
+    <g:FlowPanel addStyleNames="page-header">
+      <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
+
+    <g:FlowPanel>
+      <b:Heading size="4">
+        <ui:msg description="SQL Databases label">SQL Databases</ui:msg>
+      </b:Heading>
+      <b:Button ui:field="addSQL" type="INFO" icon="PLUS" size="SMALL">
+        <ui:msg description="Add SQL database label">Add SQL database</ui:msg>
+      </b:Button>
+      <b:SimplePager ui:field="sqlPager" location="RIGHT" addStyleNames="pull-right"/>
+    </g:FlowPanel>
+    <o:Table ui:field="sqlTable" width="100%"/>
+
+    <g:FlowPanel>
+      <b:Heading size="4">
+        <ui:msg description="MongoDB Databases label">MongoDB Databases</ui:msg>
+      </b:Heading>
+      <b:Button ui:field="addMongo" type="INFO" icon="PLUS" size="SMALL">
+        <ui:msg description="Add MongoDB database label">Add MongoDB database</ui:msg>
+      </b:Button>
+      <b:SimplePager ui:field="mongoPager" location="RIGHT" addStyleNames="pull-right"/>
+    </g:FlowPanel>
+    <o:Table ui:field="mongoTable" width="100%"/>
   </g:FlowPanel>
 
 </ui:UiBinder>

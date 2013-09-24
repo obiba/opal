@@ -54,20 +54,11 @@
               </g:FlowPanel>
               <b:Divider/>
               <o:OpalNavLink ui:field="databasesPlace" icon="COG">
-                <ui:msg description="Main Administration SQL Databases title">SQL Databases</ui:msg>
+                <ui:msg description="Main Administration Data Databases title">Data Databases</ui:msg>
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration SQL Databases help">Manage SQL databases</ui:msg>
-                </g:Label>
-              </g:FlowPanel>
-              <b:Divider/>
-              <o:OpalNavLink ui:field="mongoDbPlace" icon="COG">
-                <ui:msg description="Main Administration MongoDB title">MongoDB Databases</ui:msg>
-              </o:OpalNavLink>
-              <g:FlowPanel>
-                <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration MongoDB help">Manage MongoDB databases</ui:msg>
+                  <ui:msg description="Main Administration Data Databases help">Manage data databases for storage, import and export</ui:msg>
                 </g:Label>
               </g:FlowPanel>
             </b:WellNavList>
@@ -182,11 +173,11 @@
               </g:FlowPanel>
               <b:Divider/>
               <o:OpalNavLink ui:field="javaPlace" icon="COG">
-                <ui:msg description="Main Administration Java title">Java</ui:msg>
+                <ui:msg description="Main Administration JVM title">Java Virtual Machine</ui:msg>
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Java help">Monitor Java virtual machine</ui:msg>
+                  <ui:msg description="Main Administration JVM help">Monitor Java virtual machine</ui:msg>
                 </g:Label>
               </g:FlowPanel>
             </b:WellNavList>
