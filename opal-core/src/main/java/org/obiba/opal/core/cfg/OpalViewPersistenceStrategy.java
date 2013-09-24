@@ -32,6 +32,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Repository;
+import org.obiba.core.util.FileUtil;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
@@ -139,7 +140,10 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   public void removeViews(String datasourceName) {
     w.lock();
     try {
-      doRemoveGitViews(datasourceName);
+      File targetDir = getDatasourceViewsGit(datasourceName);
+      FileUtil.delete(targetDir);
+    } catch(IOException e) {
+      throw new RuntimeException("Failed deleting views in git for datasource: " + datasourceName, e);
     } finally {
       w.unlock();
     }
@@ -206,28 +210,6 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     } catch(Exception e) {
       throw new RuntimeException("Failed removing view '" + viewName + "' from git for datasource: " + datasourceName,
           e);
-    } finally {
-      if(localRepo != null) localRepo.delete();
-    }
-  }
-
-  private void doRemoveGitViews(@Nonnull String datasourceName) {
-    File localRepo = null;
-    try {
-      localRepo = cloneDatasourceViewsGit(datasourceName);
-      Git git = new Git(new FileRepository(new File(localRepo, ".git")));
-
-      StringBuilder message = new StringBuilder();
-      for(File f : listViewDirectories(localRepo)) {
-        git.rm().addFilepattern(f.getName());
-        if(message.length() > 0) {
-          message.append(", ");
-        }
-        message.append(f.getName());
-      }
-      doCommitPush(git, "Remove " + message);
-    } catch(Exception e) {
-      throw new RuntimeException("Failed removing views from git for datasource: " + datasourceName, e);
     } finally {
       if(localRepo != null) localRepo.delete();
     }

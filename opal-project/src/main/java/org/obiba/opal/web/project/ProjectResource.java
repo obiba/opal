@@ -16,9 +16,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileType;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.views.ViewManager;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.project.NoSuchProjectException;
 import org.obiba.opal.project.ProjectService;
 import org.obiba.opal.web.model.Projects;
@@ -33,9 +38,15 @@ public class ProjectResource {
 
   private final ProjectService projectService;
 
+  private final ViewManager viewManager;
+
+  private final OpalRuntime opalRuntime;
+
   @Autowired
-  public ProjectResource(ProjectService projectService) {
+  public ProjectResource(OpalRuntime opalRuntime, ProjectService projectService, ViewManager viewManager) {
+    this.opalRuntime = opalRuntime;
     this.projectService = projectService;
+    this.viewManager = viewManager;
   }
 
   @PathParam("name")
@@ -66,22 +77,49 @@ public class ProjectResource {
   }
 
   @DELETE
-  public Response delete() {
+  public Response delete() throws FileSystemException {
     // silently ignore project not found
     if(projectService.hasProject(name)) {
       projectService.removeProject(name);
     }
-    // TODO remove all tables, permissions, folders, index etc.
+    
+    // TODO remove all permissions, index etc.
     if(MagmaEngine.get().hasDatasource(name)) {
       Datasource ds = MagmaEngine.get().getDatasource(name);
+      // disconnect datasource
       MagmaEngine.get().removeDatasource(ds);
+      // remove all views
+      viewManager.removeAllViews(ds.getName());
+      // remove all tables
       for(ValueTable table : ds.getValueTables()) {
-        if(ds.canDropTable(table.getName())) {
+        if(!table.isView() && ds.canDropTable(table.getName())) {
           ds.dropTable(table.getName());
         }
       }
+      // remove datasource
+      if(ds.canDrop()) ds.drop();
+
     }
+    // remove project folder
+    deleteFolder(opalRuntime.getFileSystem().getRoot().resolveFile("/projects/" + name));
+
     return Response.ok().build();
+  }
+
+  private void deleteFolder(FileObject folder) throws FileSystemException {
+    if(!folder.isWriteable()) return;
+
+    FileObject[] files = folder.getChildren();
+    for(FileObject file : files) {
+      if(file.getType() == FileType.FOLDER) {
+        deleteFolder(file);
+      } else if(file.isWriteable()) {
+        file.delete();
+      }
+    }
+    if(folder.getChildren().length == 0) {
+      folder.delete();
+    }
   }
 
 }

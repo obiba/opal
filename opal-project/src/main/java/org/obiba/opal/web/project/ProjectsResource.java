@@ -29,6 +29,7 @@ import org.obiba.magma.support.DatasourceParsingException;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.project.ProjectService;
+import org.obiba.opal.project.domain.Project;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.magma.support.NoSuchDatasourceFactoryException;
@@ -90,7 +91,10 @@ public class ProjectsResource {
         }
       });
       UriBuilder ub = uriInfo.getBaseUriBuilder().path("project").path(ds.getName());
-      projectService.getOrCreateProject(ds);
+      Project project = projectService.getOrCreateProject(ds);
+      if(projectFactoryDto.hasTitle()) project.setTitle(projectFactoryDto.getTitle());
+      if(projectFactoryDto.hasDescription()) project.setDescription(projectFactoryDto.getDescription());
+      projectService.addOrReplaceProject(project);
       response = Response.created(ub.build()).entity(org.obiba.opal.web.magma.Dtos.asDto(ds).build());
     } catch(NoSuchDatasourceFactoryException noSuchDatasourceFactoryEx) {
       response = Response.status(BAD_REQUEST)
