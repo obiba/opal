@@ -330,8 +330,8 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     summaryTable.addProperty(translations.lastUpdateLabel(),
         lastUpdate.format(FormatType.MONTH_NAME_TIME) + " (" + lastUpdate.fromNow() + ")");
     if(dto.hasVariableCount())
-      summaryTable.addProperty(translations.variablesCountLabel(), "" + dto.getVariableCount());
-    if(dto.hasValueSetCount()) summaryTable.addProperty(translations.entitiesCountLabel(), "" + dto.getValueSetCount());
+      summaryTable.addProperty(translations.variablesCountProperty(), "" + dto.getVariableCount());
+    if(dto.hasValueSetCount()) summaryTable.addProperty(translations.entitiesCountProperty(), "" + dto.getValueSetCount());
 
   }
 

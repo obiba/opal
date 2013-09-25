@@ -2065,4 +2065,12 @@ public interface Translations extends Constants {
   @Description("Last Update Ago label")
   @DefaultStringValue("Last update {0}")
   String lastUpdateAgoLabel();
+
+  @Description("Variables count property label")
+  @DefaultStringValue("Variables Count")
+  String variablesCountProperty();
+
+  @Description("Entities count property label")
+  @DefaultStringValue("Entities Count")
+  String entitiesCountProperty();
 }
