@@ -1552,9 +1552,9 @@ public interface Translations extends Constants {
       "Preview the count of identifiers that can be imported and select from which table identifiers will be extracted.")
   String identifiersSyncTableStep();
 
-  @Description("Timestamps label")
-  @DefaultStringValue("Timestamps")
-  String timestampsLabel();
+  @Description("Information label")
+  @DefaultStringValue("Information")
+  String infoLabel();
 
   @Description("Created label")
   @DefaultStringValue("Created")

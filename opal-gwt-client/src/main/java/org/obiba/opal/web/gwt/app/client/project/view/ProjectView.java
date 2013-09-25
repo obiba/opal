@@ -114,7 +114,7 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     if (project.hasTimestamps()) {
       Moment created = Moment.create(project.getTimestamps().getCreated());
       Moment lastUpdate = Moment.create(project.getTimestamps().getLastUpdate());
-      timestamps.setHeading(translations.timestampsLabel());
+      timestamps.setHeading(translations.infoLabel());
       String createdOn = TranslationsUtils.replaceArguments(translations.createdOnLabel(), created.format(FormatType.MONTH_NAME_TIME_SHORT));
       String lastUpdateOn = TranslationsUtils.replaceArguments(translations.lastUpdateOnLabel(), lastUpdate.fromNow());
       timestamps.setText(createdOn + "<br/>" + lastUpdateOn);
