@@ -29,8 +29,7 @@ import com.google.common.collect.Sets;
 
 public class Dtos {
 
-  public static Projects.ProjectDto.Builder asDto(Project project, Datasource datasource, String directory,
-      boolean withCounts) {
+  public static Projects.ProjectDto.Builder asDto(Project project, Datasource datasource, String directory) {
     Projects.ProjectDto.Builder builder = Projects.ProjectDto.newBuilder() //
         .setName(project.getName());
 
@@ -54,10 +53,6 @@ public class Dtos {
     builder.setDatasource(org.obiba.opal.web.magma.Dtos.asDto(datasource)
         .setLink(UriBuilder.fromPath("/").path(DatasourceResource.class).build(project.getName()).toString()));
 
-    if(withCounts) {
-      addCounts(builder, datasource);
-    }
-
     addTimestamps(builder, datasource);
 
     return builder;
@@ -75,7 +70,11 @@ public class Dtos {
 
     return builder.build();
   }
-  private static void addCounts(Projects.ProjectDto.Builder builder, Datasource datasource) {
+
+  public static Projects.ProjectSummaryDto.Builder asDto(Project project, Datasource datasource) {
+    Projects.ProjectSummaryDto.Builder builder = Projects.ProjectSummaryDto.newBuilder();
+    builder.setName(project.getName());
+
     // TODO get counts from elasticsearch
     int tableCount = 0;
     int variablesCount = 0;
@@ -83,13 +82,15 @@ public class Dtos {
     for(ValueTable table : datasource.getValueTables()) {
       tableCount++;
       variablesCount = variablesCount + (Iterables.size(table.getVariables()));
-      for (VariableEntity entity : table.getVariableEntities()) {
+      for(VariableEntity entity : table.getVariableEntities()) {
         ids.add(entity.getType() + ":" + entity.getIdentifier());
       }
     }
     builder.setTableCount(tableCount);
     builder.setVariableCount(variablesCount);
     builder.setEntityCount(ids.size());
+
+    return builder;
   }
 
   private static void addTimestamps(Projects.ProjectDto.Builder builder, Datasource datasource) {

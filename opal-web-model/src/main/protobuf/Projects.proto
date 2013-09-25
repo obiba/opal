@@ -15,9 +15,7 @@ message ProjectDto {
   required bool archived = 8 [default = false];
   optional string database = 9;
   optional Magma.TimestampsDto timestamps = 10;
-  optional int32 tableCount = 11;
-  optional int32 variableCount = 12;
-  optional int32 entityCount = 13;
+
 }
 
 message ProjectFactoryDto {
@@ -26,4 +24,11 @@ message ProjectFactoryDto {
   optional string description = 3;
   optional Magma.DatasourceFactoryDto factory = 4;
   repeated string tags = 5;
+}
+
+message ProjectSummaryDto {
+  required string name = 1;
+  required int32 tableCount = 2;
+  required int32 variableCount = 3;
+  required int32 entityCount = 4;
 }

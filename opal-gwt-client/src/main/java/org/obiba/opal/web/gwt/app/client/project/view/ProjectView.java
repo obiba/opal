@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
 import org.obiba.opal.web.gwt.datetime.client.FormatType;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
+import org.obiba.opal.web.model.client.opal.ProjectSummaryDto;
 
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.Heading;
@@ -115,7 +116,6 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
 
     setTags();
     setTimestamps();
-    setProjectCounts();
   }
 
   private void setTags() {
@@ -142,20 +142,28 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     }
   }
 
-  private void setProjectCounts() {
-    String count = project.hasTableCount() ? "" + project.getTableCount() : "?";
+  @Override
+  public void setProjectSummary(ProjectSummaryDto projectSummary) {
+    if (projectSummary == null) {
+      tableCount.setText(TranslationsUtils.replaceArguments(translations.tablesCountLabel(), "?"));
+      variableCount.setText(TranslationsUtils.replaceArguments(translations.variablesCountLabel(), "?"));
+      entityCount.setText(TranslationsUtils.replaceArguments(translations.entitiesCountLabel(), "?"));
+      return;
+    }
+
+    String count = "" + projectSummary.getTableCount();
     if("0".equals(count)) count = translations.noTablesLabel();
     else if("1".equals(count)) count = translations.tableCountLabel();
     else count = TranslationsUtils.replaceArguments(translations.tablesCountLabel(), count);
     tableCount.setText(count);
 
-    count = project.hasVariableCount() ? "" + project.getVariableCount() : "?";
+    count = "" + projectSummary.getVariableCount();
     if("0".equals(count)) count = translations.noVariablesLabel();
     else if("1".equals(count)) count = translations.variableCountLabel();
     else count = TranslationsUtils.replaceArguments(translations.variablesCountLabel(), count);
     variableCount.setText(count);
 
-    count = project.hasEntityCount() ? "" + project.getEntityCount() : "?";
+    count = "" + projectSummary.getEntityCount();
     if("0".equals(count)) count = translations.noEntitiesLabel();
     else if("1".equals(count)) count = translations.entityCountLabel();
     else count = TranslationsUtils.replaceArguments(translations.entitiesCountLabel(), count);

@@ -32,6 +32,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
+import org.obiba.opal.web.model.client.opal.ProjectSummaryDto;
 
 import com.google.common.base.Strings;
 import com.google.gwt.event.shared.GwtEvent;
@@ -67,6 +68,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     }
 
     void setProject(ProjectDto project);
+
+    void setProjectSummary(ProjectSummaryDto projectSummary);
   }
 
   @ProxyStandard
@@ -144,6 +147,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   public void refresh() {
     // TODO handle wrong or missing project name
     if(name == null) return;
+    // reset
+    getView().setProjectSummary(null);
     ResourceRequestBuilderFactory.<ProjectDto>newBuilder().forResource(UriBuilder.URI_PROJECT.build(name)).get()
         .withCallback(new ResourceCallback<ProjectDto>() {
           @Override
@@ -153,6 +158,13 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
             getView().setProject(project);
             onTabSelected(tab.ordinal());
             getView().selectTab(tab.ordinal());
+          }
+        }).send();
+    ResourceRequestBuilderFactory.<ProjectSummaryDto>newBuilder().forResource(UriBuilder.URI_PROJECT_SUMMARY.build(name)).get()
+        .withCallback(new ResourceCallback<ProjectSummaryDto>() {
+          @Override
+          public void onResource(Response response, ProjectSummaryDto resource) {
+            getView().setProjectSummary(resource);
           }
         }).send();
   }
@@ -245,7 +257,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   @Override
   public void onFolderUpdated(FolderUpdatedEvent event) {
-    if (fileExplorerPresenter == null || !fileExplorerPresenter.isVisible()) return;
+    if(fileExplorerPresenter == null || !fileExplorerPresenter.isVisible()) return;
     updateHistory(event.getFolder().getPath());
   }
 

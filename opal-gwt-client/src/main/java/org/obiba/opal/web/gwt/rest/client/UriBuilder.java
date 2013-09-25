@@ -109,6 +109,8 @@ public class UriBuilder {
 
   public static final UriBuilder URI_PROJECT = create().segment("project","{}");
 
+  public static final UriBuilder URI_PROJECT_SUMMARY = create().segment("project","{}","summary");
+
   public static final UriBuilder URI_DATASOURCE = create().segment("datasource","{}");
 
   public static final UriBuilder URI_DATASOURCE_LOCALES = create().segment("datasource","{}","locales");

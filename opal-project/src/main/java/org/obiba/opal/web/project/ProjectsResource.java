@@ -62,13 +62,13 @@ public class ProjectsResource {
   }
 
   @GET
-  public List<Projects.ProjectDto> getProjects(@QueryParam("counts") @DefaultValue("false") Boolean counts) {
+  public List<Projects.ProjectDto> getProjects() {
     List<Projects.ProjectDto> projects = Lists.newArrayList();
 
     // one project per datasource
     for(Datasource ds : MagmaEngine.get().getDatasources()) {
       projects.add(
-          Dtos.asDto(projectService.getOrCreateProject(ds), ds, projectService.getProjectDirectoryPath(ds.getName()), counts)
+          Dtos.asDto(projectService.getOrCreateProject(ds), ds, projectService.getProjectDirectoryPath(ds.getName()))
               .build());
     }
 

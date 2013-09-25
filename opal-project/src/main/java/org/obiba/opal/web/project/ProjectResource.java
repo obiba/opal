@@ -57,10 +57,21 @@ public class ProjectResource {
   private String name;
 
   @GET
-  public Projects.ProjectDto get(@QueryParam("counts") @DefaultValue("true") Boolean counts) {
+  public Projects.ProjectDto get() {
     if(MagmaEngine.get().hasDatasource(name)) {
       Datasource ds = MagmaEngine.get().getDatasource(name);
-      return Dtos.asDto(projectService.getOrCreateProject(ds), ds, projectService.getProjectDirectoryPath(name), counts)
+      return Dtos.asDto(projectService.getOrCreateProject(ds), ds, projectService.getProjectDirectoryPath(name))
+          .build();
+    }
+    throw new NoSuchProjectException(name);
+  }
+
+  @GET
+  @Path("/summary")
+  public Projects.ProjectSummaryDto getSummary() {
+    if(MagmaEngine.get().hasDatasource(name)) {
+      Datasource ds = MagmaEngine.get().getDatasource(name);
+      return Dtos.asDto(projectService.getOrCreateProject(ds), ds)
           .build();
     }
     throw new NoSuchProjectException(name);
