@@ -5,23 +5,18 @@
     Hibernate stuff for Opal internal configuration database
   -->
 
-  <!-- Datasource used for opal internal configuration -->
-  <bean id="dataSource" class="org.apache.commons.dbcp.managed.BasicManagedDataSource" destroy-method="close">
-    <qualifier value="opal-config"/>
-    <property name="transactionManager" ref="jbossTransactionManager"/>
-    <property name="driverClassName" value="com.arjuna.ats.jdbc.TransactionalDriver"/>
-    <property name="XADataSource" value="${org.obiba.opal.datasource.driver}"/>
+  <!-- configure a JTA-aware datasource -->
+  <bean id="dataSource" class="com.atomikos.jdbc.nonxa.AtomikosNonXADataSourceBean" init-method="init"
+      destroy-method="close">
+    <property name="uniqueResourceName" value="opal-config"/>
+    <property name="driverClassName" value="${org.obiba.opal.datasource.driver}"/>
     <property name="url" value="${org.obiba.opal.datasource.url}"/>
-    <property name="username" value="${org.obiba.opal.datasource.username}"/>
+    <property name="user" value="${org.obiba.opal.datasource.username}"/>
     <property name="password" value="${org.obiba.opal.datasource.password}"/>
-    <property name="maxIdle" value="10"/>
-    <!-- Maximum number of borrowed connections. -1: unlimited -->
-    <property name="maxActive" value="100"/>
-    <!-- Wait no more than 10 seconds to a connection -->
-    <property name="maxWait" value="10000"/>
-    <property name="initialSize" value="2"/>
-    <property name="validationQuery" value="${org.obiba.opal.datasource.validationQuery}"/>
-    <property name="testOnBorrow" value="true"/>
+    <property name="minPoolSize" value="3"/>
+    <property name="poolSize" value="50"/>
+    <!--<property name="maxIdleTime" value="10"/>-->
+    <property name="testQuery" value="${org.obiba.opal.datasource.validationQuery}"/>
   </bean>
 
   <!-- Hibernate SessionFactory used for Opal internal configuration -->
@@ -37,26 +32,14 @@
     <property name="jtaTransactionManager" ref="transactionManager"/>
     <property name="hibernateProperties">
       <bean class="org.obiba.opal.core.runtime.jdbc.HsqlDialectOverride">
-        <property name="properties">
-          <props>
-            <prop key="hibernate.dialect">${org.obiba.opal.datasource.dialect}</prop>
-            <prop key="hibernate.hbm2ddl.auto">create</prop>
-            <prop key="hibernate.generate_statistics">false</prop>
-            <prop key="hibernate.cache.use_structured_entries">true</prop>
-            <prop key="hibernate.cache.use_query_cache">true</prop>
-            <prop key="hibernate.cache.use_second_level_cache">true</prop>
-            <prop key="hibernate.cache.region.factory_class">
-              org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
-            </prop>
-            <prop key="hibernate.cache.provider_configuration_file_resource_path">/opal-ehcache.xml</prop>
-            <!-- Set the CurrentSessionContext to JTASessionContext: a Hibernate Session will be available when a transaction is active -->
-            <prop key="hibernate.current_session_context_class">jta</prop>
-            <prop key="hibernate.transaction.jta.platform">
-              org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform
-            </prop>
-            <prop key="hibernate.transaction.auto_close_session">true</prop>
-            <prop key="hibernate.transaction.flush_before_completion">true</prop>
-          </props>
+        <property name="propertiesArray">
+          <list>
+            <ref bean="hibernateProperties"/>
+            <props>
+              <prop key="hibernate.dialect">${org.obiba.opal.datasource.dialect}</prop>
+              <prop key="hibernate.hbm2ddl.auto">create</prop>
+            </props>
+          </list>
         </property>
       </bean>
     </property>
@@ -77,8 +60,11 @@
         <prop key="hibernate.cache.provider_configuration_file_resource_path">/opal-ehcache.xml</prop>
         <!-- Set the CurrentSessionContext to JTASessionContext: a Hibernate Session will be available when a transaction is active -->
         <prop key="hibernate.current_session_context_class">jta</prop>
-        <prop key="hibernate.transaction.jta.platform">
-          org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform
+        <!--<prop key="hibernate.transaction.factory_class">-->
+        <!--org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory-->
+        <!--</prop>-->
+        <prop key="hibernate.transaction.manager_lookup_class">
+          com.atomikos.icatch.jta.hibernate3.TransactionManagerLookup
         </prop>
         <prop key="hibernate.transaction.auto_close_session">true</prop>
         <prop key="hibernate.transaction.flush_before_completion">true</prop>
