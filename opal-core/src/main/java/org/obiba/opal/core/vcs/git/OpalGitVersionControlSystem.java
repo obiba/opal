@@ -22,11 +22,16 @@ import org.obiba.opal.core.vcs.OpalGitException;
 import org.obiba.opal.core.vcs.OpalVersionControlSystem;
 import org.obiba.opal.core.vcs.git.commands.OpalGitCommitLogCommand;
 import org.obiba.opal.core.vcs.git.commands.OpalGitCommitsLogCommand;
+import org.obiba.opal.core.vcs.git.commands.OpalGitDiffCommand;
 import org.obiba.opal.core.vcs.git.commands.OpalGitFetchBlobCommand;
 import org.obiba.opal.core.vcs.support.OpalGitUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import com.google.common.base.Strings;
+
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 @Component
 public class OpalGitVersionControlSystem implements OpalVersionControlSystem {
@@ -47,6 +52,13 @@ public class OpalGitVersionControlSystem implements OpalVersionControlSystem {
   public String getBlob(@Nonnull String datasource, @Nonnull String path, @Nonnull String commitId) {
     OpalGitFetchBlobCommand command = new OpalGitFetchBlobCommand(getRepository(datasource)).addPath(path)
         .addCommitId(commitId);
+    return command.execute();
+  }
+
+  public List<String> getDiffEntries(@Nonnull String datasource, @Nonnull String commitId, @Nullable String path) {
+    OpalGitDiffCommand command = new OpalGitDiffCommand(getRepository(datasource)).addCommitId(commitId);
+    if (Strings.isNullOrEmpty(path)) command.addPath(path);
+
     return command.execute();
   }
 
