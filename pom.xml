@@ -450,9 +450,9 @@
         <version>${jta.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.codehaus.btm</groupId>
-        <artifactId>btm</artifactId>
-        <version>${btm.version}</version>
+        <groupId>org.jboss.jbossts</groupId>
+        <artifactId>jbossjta</artifactId>
+        <version>${jbossjta.version}</version>
       </dependency>
 
       <dependency>
@@ -1463,7 +1463,6 @@
 
     <birt.version>2.6.2</birt.version>
     <bouncycastle.version>1.46</bouncycastle.version>
-    <btm.version>2.1.4</btm.version>
     <cglib-nodep.version>3.0</cglib-nodep.version>
     <commons-codec.version>1.8</commons-codec.version>
     <commons-collections.version>3.2.1</commons-collections.version>
@@ -1496,6 +1495,7 @@
     <hsqldb.version>2.3.0</hsqldb.version>
     <httpclient.version>4.3</httpclient.version>
     <javassist.version>3.18.1-GA</javassist.version>
+    <jbossjta.version>4.16.6.Final</jbossjta.version>
     <jetty.version>7.6.8.v20121106</jetty.version>
     <jetty-util.version>6.1.22</jetty-util.version>
     <jewelcli.version>0.6</jewelcli.version>

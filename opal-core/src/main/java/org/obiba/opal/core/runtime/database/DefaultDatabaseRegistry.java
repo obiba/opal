@@ -1,11 +1,14 @@
 package org.obiba.opal.core.runtime.database;
 
+import java.sql.SQLException;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.obiba.magma.Datasource;
@@ -39,8 +42,6 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
-import bitronix.tm.resource.jdbc.PoolingDataSource;
-
 @Component
 public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
@@ -55,20 +56,24 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Autowired
   private OrientDbService orientDbService;
 
-  private final LoadingCache<String, PoolingDataSource> dataSourceCache = CacheBuilder.newBuilder()
-      .removalListener(new RemovalListener<String, PoolingDataSource>() {
+  private final LoadingCache<String, BasicDataSource> dataSourceCache = CacheBuilder.newBuilder()
+      .removalListener(new RemovalListener<String, BasicDataSource>() {
 
         @Override
-        public void onRemoval(RemovalNotification<String, PoolingDataSource> notification) {
-          log.info("Destroying DataSource {}", notification.getKey());
-          PoolingDataSource dataSource = notification.getValue();
-          if(dataSource != null) dataSource.close();
+        public void onRemoval(RemovalNotification<String, BasicDataSource> notification) {
+          try {
+            log.info("Destroying DataSource {}", notification.getKey());
+            BasicDataSource dataSource = notification.getValue();
+            if(dataSource != null) dataSource.close();
+          } catch(SQLException e) {
+            log.warn("Ignoring exception during shutdown: ", e);
+          }
         }
       }) //
-      .build(new CacheLoader<String, PoolingDataSource>() {
+      .build(new CacheLoader<String, BasicDataSource>() {
 
         @Override
-        public PoolingDataSource load(String databaseName) throws Exception {
+        public BasicDataSource load(String databaseName) throws Exception {
           log.info("Building DataSource {}", databaseName);
           return dataSourceFactory.createDataSource((SqlDatabase) getDatabase(databaseName));
         }
