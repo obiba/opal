@@ -10,10 +10,12 @@
 package org.obiba.opal.web.project;
 
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.vfs2.FileObject;
@@ -30,6 +32,8 @@ import org.obiba.opal.web.model.Projects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import com.google.common.collect.Iterables;
 
 @Component
 @Scope("request")
@@ -53,10 +57,10 @@ public class ProjectResource {
   private String name;
 
   @GET
-  public Projects.ProjectDto get() {
+  public Projects.ProjectDto get(@QueryParam("counts") @DefaultValue("true") Boolean counts) {
     if(MagmaEngine.get().hasDatasource(name)) {
       Datasource ds = MagmaEngine.get().getDatasource(name);
-      return Dtos.asDto(projectService.getOrCreateProject(ds), ds, projectService.getProjectDirectoryPath(name))
+      return Dtos.asDto(projectService.getOrCreateProject(ds), ds, projectService.getProjectDirectoryPath(name), counts)
           .build();
     }
     throw new NoSuchProjectException(name);
@@ -82,7 +86,7 @@ public class ProjectResource {
     if(projectService.hasProject(name)) {
       projectService.removeProject(name);
     }
-    
+
     // TODO remove all permissions, index etc.
     if(MagmaEngine.get().hasDatasource(name)) {
       Datasource ds = MagmaEngine.get().getDatasource(name);

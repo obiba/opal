@@ -21,13 +21,12 @@ import org.obiba.opal.web.magma.DatasourceResource;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Projects;
 
+import com.google.common.collect.Iterables;
+
 public class Dtos {
 
-  public static Projects.ProjectDto.Builder asDto(Project project, Datasource datasource) {
-    return asDto(project, datasource, null);
-  }
-
-  public static Projects.ProjectDto.Builder asDto(Project project, Datasource datasource, String directory) {
+  public static Projects.ProjectDto.Builder asDto(Project project, Datasource datasource, String directory,
+      boolean withCounts) {
     Projects.ProjectDto.Builder builder = Projects.ProjectDto.newBuilder() //
         .setName(project.getName());
 
@@ -51,6 +50,10 @@ public class Dtos {
     builder.setDatasource(org.obiba.opal.web.magma.Dtos.asDto(datasource)
         .setLink(UriBuilder.fromPath("/").path(DatasourceResource.class).build(project.getName()).toString()));
 
+    if(withCounts) {
+      addCounts(builder, datasource);
+    }
+
     addTimestamps(builder, datasource);
 
     return builder;
@@ -68,20 +71,31 @@ public class Dtos {
 
     return builder.build();
   }
+  private static void addCounts(Projects.ProjectDto.Builder builder, Datasource datasource) {
+    // TODO get counts from elasticsearch
+    int tableCount = 0;
+    int variablesCount = 0;
+    for(ValueTable table : datasource.getValueTables()) {
+      tableCount++;
+      variablesCount = variablesCount + (Iterables.size(table.getVariables()));
+    }
+    builder.setTableCount(tableCount);
+    builder.setVariableCount(variablesCount);
+  }
 
   private static void addTimestamps(Projects.ProjectDto.Builder builder, Datasource datasource) {
     Value created = DateTimeType.get().now();
     Value lastUpdate = null;
-    for (ValueTable table : datasource.getValueTables()) {
+    for(ValueTable table : datasource.getValueTables()) {
       Timestamps ts = table.getTimestamps();
-      if (created.compareTo(ts.getCreated()) > 0) {
+      if(created.compareTo(ts.getCreated()) > 0) {
         created = ts.getCreated();
       }
-      if (lastUpdate == null || lastUpdate.compareTo(ts.getLastUpdate()) < 0) {
+      if(lastUpdate == null || lastUpdate.compareTo(ts.getLastUpdate()) < 0) {
         lastUpdate = ts.getLastUpdate();
       }
     }
-    if (lastUpdate == null) {
+    if(lastUpdate == null) {
       lastUpdate = created;
     }
 

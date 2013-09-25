@@ -11,9 +11,11 @@ package org.obiba.opal.web.project;
 
 import java.util.List;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -60,13 +62,13 @@ public class ProjectsResource {
   }
 
   @GET
-  public List<Projects.ProjectDto> getProjects() {
+  public List<Projects.ProjectDto> getProjects(@QueryParam("counts") @DefaultValue("false") Boolean counts) {
     List<Projects.ProjectDto> projects = Lists.newArrayList();
 
     // one project per datasource
     for(Datasource ds : MagmaEngine.get().getDatasources()) {
       projects.add(
-          Dtos.asDto(projectService.getOrCreateProject(ds), ds, projectService.getProjectDirectoryPath(ds.getName()))
+          Dtos.asDto(projectService.getOrCreateProject(ds), ds, projectService.getProjectDirectoryPath(ds.getName()), counts)
               .build());
     }
 
