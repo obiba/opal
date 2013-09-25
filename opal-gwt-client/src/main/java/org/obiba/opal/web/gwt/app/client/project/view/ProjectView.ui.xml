@@ -40,7 +40,24 @@
             <b:Icon type="INFO_SIGN"></b:Icon>
           </b:Popover>
         </g:SimplePanel>
-        <g:Label ui:field="description"></g:Label>
+        <b:Paragraph ui:field="description"></b:Paragraph>
+        <b:FluidRow addStyleNames="text-align-center">
+          <b:Column size="4">
+            <b:WellNavList>
+              <b:NavLink icon="TABLE" ui:field="tableCount">? tables</b:NavLink>
+            </b:WellNavList>
+          </b:Column>
+          <b:Column size="4">
+            <b:WellNavList>
+              <b:NavLink icon="COLUMNS" ui:field="variableCount">? variables</b:NavLink>
+            </b:WellNavList>
+          </b:Column>
+          <b:Column size="4">
+            <b:WellNavList>
+              <b:NavLink icon="USER" ui:field="entityCount">? entities</b:NavLink>
+            </b:WellNavList>
+          </b:Column>
+        </b:FluidRow>
       </b:Tab>
       <b:Tab icon="TABLE">
         <g:SimplePanel ui:field="tablesPanel"/>

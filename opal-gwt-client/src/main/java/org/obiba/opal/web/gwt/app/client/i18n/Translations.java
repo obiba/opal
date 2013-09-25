@@ -221,13 +221,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Variables")
   String variablesLabel();
 
-  @Description("Entities Count label")
-  @DefaultStringValue("Entities Count")
-  String entitiesCountLabel();
-
-  @Description("Entities Count label")
-  @DefaultStringValue("Variables Count")
-  String variablesCountLabel();
 
   @Description("Variable label")
   @DefaultStringValue("Variable")
@@ -2041,13 +2034,33 @@ public interface Translations extends Constants {
   @DefaultStringValue("No variables")
   String noVariablesLabel();
 
+  @Description("No Entities label")
+  @DefaultStringValue("No entities")
+  String noEntitiesLabel();
+
   @Description("Table count label")
   @DefaultStringValue("1 table")
   String tableCountLabel();
 
+  @Description("Variable count label")
+  @DefaultStringValue("1 variable")
+  String variableCountLabel();
+
+  @Description("Entity count label")
+  @DefaultStringValue("1 entity")
+  String entityCountLabel();
+
   @Description("Tables count label")
   @DefaultStringValue("{0} tables")
   String tablesCountLabel();
+
+  @Description("Variables count label")
+  @DefaultStringValue("{0} variables")
+  String variablesCountLabel();
+
+  @Description("Entities count label")
+  @DefaultStringValue("{0} entities")
+  String entitiesCountLabel();
 
   @Description("Last Update Ago label")
   @DefaultStringValue("Last update {0}")

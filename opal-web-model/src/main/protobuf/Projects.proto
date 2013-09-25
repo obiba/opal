@@ -17,6 +17,7 @@ message ProjectDto {
   optional Magma.TimestampsDto timestamps = 10;
   optional int32 tableCount = 11;
   optional int32 variableCount = 12;
+  optional int32 entityCount = 13;
 }
 
 message ProjectFactoryDto {

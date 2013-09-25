@@ -9,12 +9,15 @@
  */
 package org.obiba.opal.web.project;
 
+import java.util.Set;
+
 import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.VariableEntity;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.project.domain.Project;
 import org.obiba.opal.web.magma.DatasourceResource;
@@ -22,6 +25,7 @@ import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Projects;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 
 public class Dtos {
 
@@ -75,12 +79,17 @@ public class Dtos {
     // TODO get counts from elasticsearch
     int tableCount = 0;
     int variablesCount = 0;
+    Set<String> ids = Sets.newHashSet();
     for(ValueTable table : datasource.getValueTables()) {
       tableCount++;
       variablesCount = variablesCount + (Iterables.size(table.getVariables()));
+      for (VariableEntity entity : table.getVariableEntities()) {
+        ids.add(entity.getType() + ":" + entity.getIdentifier());
+      }
     }
     builder.setTableCount(tableCount);
     builder.setVariableCount(variablesCount);
+    builder.setEntityCount(ids.size());
   }
 
   private static void addTimestamps(Projects.ProjectDto.Builder builder, Datasource datasource) {

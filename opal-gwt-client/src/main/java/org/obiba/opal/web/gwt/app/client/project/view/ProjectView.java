@@ -26,6 +26,7 @@ import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.Label;
 import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.github.gwtbootstrap.client.ui.Popover;
 import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.google.gwt.core.client.GWT;
@@ -35,6 +36,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
@@ -54,7 +56,7 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   Heading projectHeader;
 
   @UiField
-  com.google.gwt.user.client.ui.Label description;
+  Paragraph description;
 
   @UiField
   FlowPanel tagsPanel;
@@ -64,6 +66,15 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
 
   @UiField
   Popover timestamps;
+
+  @UiField
+  NavLink tableCount;
+
+  @UiField
+  NavLink variableCount;
+
+  @UiField
+  NavLink entityCount;
 
   @UiField
   OpalTabPanel tabPanel;
@@ -99,27 +110,56 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     titlecrumbs.add(new NavLink(project.getTitle()));
 
     projectHeader.setText(project.getTitle());
-    projectHeader.setSubtext("[" + project.getName() +"]");
+    projectHeader.setSubtext("[" + project.getName() + "]");
     description.setText(project.getDescription());
 
+    setTags();
+    setTimestamps();
+    setProjectCounts();
+  }
+
+  private void setTags() {
     tagsPanel.clear();
     JsArrayString tagsArray = JsArrays.toSafeArray(project.getTagsArray());
-    if (tagsArray.length()>0) {
-      for (String tag : JsArrays.toIterable(tagsArray)) {
+    if(tagsArray.length() > 0) {
+      for(String tag : JsArrays.toIterable(tagsArray)) {
         tagsPanel.add(new Label(tag));
       }
     }
+  }
 
+  private void setTimestamps() {
     timestampsPanel.setVisible(project.hasTimestamps());
-    if (project.hasTimestamps()) {
+    if(project.hasTimestamps()) {
       Moment created = Moment.create(project.getTimestamps().getCreated());
       Moment lastUpdate = Moment.create(project.getTimestamps().getLastUpdate());
       timestamps.setHeading(translations.infoLabel());
-      String createdOn = TranslationsUtils.replaceArguments(translations.createdOnLabel(), created.format(FormatType.MONTH_NAME_TIME_SHORT));
+      String createdOn = TranslationsUtils
+          .replaceArguments(translations.createdOnLabel(), created.format(FormatType.MONTH_NAME_TIME_SHORT));
       String lastUpdateOn = TranslationsUtils.replaceArguments(translations.lastUpdateOnLabel(), lastUpdate.fromNow());
       timestamps.setText(createdOn + "<br/>" + lastUpdateOn);
       timestamps.reconfigure();
     }
+  }
+
+  private void setProjectCounts() {
+    String count = project.hasTableCount() ? "" + project.getTableCount() : "?";
+    if("0".equals(count)) count = translations.noTablesLabel();
+    else if("1".equals(count)) count = translations.tableCountLabel();
+    else count = TranslationsUtils.replaceArguments(translations.tablesCountLabel(), count);
+    tableCount.setText(count);
+
+    count = project.hasVariableCount() ? "" + project.getVariableCount() : "?";
+    if("0".equals(count)) count = translations.noVariablesLabel();
+    else if("1".equals(count)) count = translations.variableCountLabel();
+    else count = TranslationsUtils.replaceArguments(translations.variablesCountLabel(), count);
+    variableCount.setText(count);
+
+    count = project.hasEntityCount() ? "" + project.getEntityCount() : "?";
+    if("0".equals(count)) count = translations.noEntitiesLabel();
+    else if("1".equals(count)) count = translations.entityCountLabel();
+    else count = TranslationsUtils.replaceArguments(translations.entitiesCountLabel(), count);
+    entityCount.setText(count);
   }
 
   @Override
@@ -140,6 +180,21 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   @UiHandler("projects")
   void onProjectsSelection(ClickEvent event) {
     getUiHandlers().onProjectsSelection();
+  }
+
+  @UiHandler("tableCount")
+  void onTableCount(ClickEvent event) {
+    tabPanel.selectTab(ProjectTab.TABLES.ordinal());
+  }
+
+  @UiHandler("variableCount")
+  void onVariableCount(ClickEvent event) {
+    tabPanel.selectTab(ProjectTab.TABLES.ordinal());
+  }
+
+  @UiHandler("entityCount")
+  void onEntityCount(ClickEvent event) {
+    tabPanel.selectTab(ProjectTab.TABLES.ordinal());
   }
 
   @UiHandler("tabPanel")

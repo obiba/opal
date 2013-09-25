@@ -34,6 +34,10 @@ li.no-icon > a {
   padding-left: 3em;
 }
 
+.text-align-center {
+  text-align: center;
+}
+
 .xsmall-indent {
   margin-left: 0.4em;
 }
