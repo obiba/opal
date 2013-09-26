@@ -23,6 +23,8 @@ public class ReportTemplate {
 
   private String name;
 
+  private String project;
+
   private String design;
 
   private String format;
@@ -52,6 +54,18 @@ public class ReportTemplate {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public String getProject() {
+    return project;
+  }
+
+  public void setProject(String project) {
+    this.project = project;
+  }
+
+  public boolean hasProject() {
+    return project != null;
   }
 
   public String getDesign() {
@@ -87,6 +101,10 @@ public class ReportTemplate {
 
   public void setSchedule(String schedule) {
     this.schedule = schedule;
+  }
+
+  public boolean hasSchedule() {
+    return schedule != null;
   }
 
   public Set<String> getEmailNotificationAddresses() {

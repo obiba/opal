@@ -9,12 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.web.shell.reporting;
 
+import java.security.Principal;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.Response;
 
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
@@ -81,11 +84,20 @@ public class ReportTemplatesResourceTest {
 
   @Test
   public void testGetReportTemplates_RetrieveSetOfTemplates() {
-    replay(opalConfigurationServiceMock);
+    Subject mockSubject = createMock(Subject.class);
+    ThreadContext.bind(mockSubject);
+    expect(mockSubject.getPrincipal()).andReturn(createMock(Principal.class)).anyTimes();
+    expect(mockSubject.isPermitted("magma:/report-template/template1:GET")).andReturn(true).anyTimes();
+    expect(mockSubject.isPermitted("magma:/report-template/template2:GET")).andReturn(true).anyTimes();
+    expect(mockSubject.isPermitted("magma:/report-template/template3:GET")).andReturn(true).anyTimes();
+    expect(mockSubject.isPermitted("magma:/report-template/template4:GET")).andReturn(true).anyTimes();
+
+    replay(opalConfigurationServiceMock, mockSubject);
 
     ReportTemplatesResource reportTemplateResource = new ReportTemplatesResource(opalConfigurationServiceMock,
         commandSchedulerServiceMock, commandRegistry);
     Set<ReportTemplateDto> reportTemplatesDtos = reportTemplateResource.getReportTemplates();
+    ThreadContext.unbindSubject();
 
     Assert.assertEquals(4, reportTemplates.size());
     Assert.assertEquals(4, reportTemplatesDtos.size());
@@ -97,7 +109,7 @@ public class ReportTemplatesResourceTest {
     Assert.assertEquals("schedule", reportTemplateDto.getCron());
     Assert.assertEquals(2, reportTemplateDto.getParametersList().size());
 
-    verify(opalConfigurationServiceMock);
+    verify(opalConfigurationServiceMock, mockSubject);
   }
 
   @Test

@@ -21,6 +21,7 @@ import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.easymock.IArgumentMatcher;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.shell.CommandJob;
@@ -110,6 +111,11 @@ public class DefaultCommandJobServiceTest {
     sut.setExecutor(mockExecutor);
 
     replay(cmd, mockExecutor);
+  }
+
+  @After
+  public void tearDown() {
+    ThreadContext.unbindSubject();
   }
 
   //

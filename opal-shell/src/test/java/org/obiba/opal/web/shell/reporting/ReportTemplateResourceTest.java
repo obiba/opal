@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.shell.reporting;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -16,6 +17,9 @@ import java.util.Set;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.easymock.EasyMock;
 import org.jboss.resteasy.specimpl.UriBuilderImpl;
 import org.junit.After;
@@ -77,19 +81,25 @@ public class ReportTemplateResourceTest {
 
   @Test
   public void testGetReportTemplate_ReportTemplateFoundAndReturned() {
+    Subject mockSubject = createMock(Subject.class);
+    ThreadContext.bind(mockSubject);
+    expect(mockSubject.getPrincipal()).andReturn(createMock(Principal.class)).anyTimes();
+    expect(mockSubject.isPermitted("magma:/report-template/template3:GET")).andReturn(true).anyTimes();
 
-    replay(opalRuntimeMock, opalConfigurationServiceMock);
+    replay(opalRuntimeMock, opalConfigurationServiceMock, mockSubject);
 
     ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template3",
         opalConfigurationServiceMock);
 
     Response response = reportTemplateResource.getReportTemplate();
+    ThreadContext.unbindSubject();
+
     Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
     ReportTemplateDto reportTemplateDto = (ReportTemplateDto) response.getEntity();
     Assert.assertEquals("template3", reportTemplateDto.getName());
 
-    verify(opalRuntimeMock, opalConfigurationServiceMock);
+    verify(opalRuntimeMock, opalConfigurationServiceMock, mockSubject);
 
   }
 
@@ -109,6 +119,10 @@ public class ReportTemplateResourceTest {
 
   @Test
   public void testDeleteReportTemplate_ReportTemplateDeleted() {
+    Subject mockSubject = createMock(Subject.class);
+    ThreadContext.bind(mockSubject);
+    expect(mockSubject.getPrincipal()).andReturn(createMock(Principal.class)).anyTimes();
+    expect(mockSubject.isPermitted("magma:/report-template/template2:GET")).andReturn(true).anyTimes();
 
     CommandSchedulerService commandSchedulerServiceMock = createMock(CommandSchedulerService.class);
     commandSchedulerServiceMock.deleteCommand("template2", "reports");
@@ -116,17 +130,18 @@ public class ReportTemplateResourceTest {
     opalConfigurationServiceMock.modifyConfiguration((ConfigModificationTask) EasyMock.anyObject());
     expectLastCall().once();
 
-    replay(opalRuntimeMock, opalConfigurationServiceMock, commandSchedulerServiceMock);
+    replay(opalRuntimeMock, opalConfigurationServiceMock, commandSchedulerServiceMock, mockSubject);
 
     ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template2",
         opalConfigurationServiceMock, commandSchedulerServiceMock);
     Response response = reportTemplateResource.deleteReportTemplate();
+    ThreadContext.unbindSubject();
 
     Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
     // Assert.assertTrue(opalConfiguration.getReportTemplate("template2") == null);
 
-    verify(opalRuntimeMock, opalConfigurationServiceMock, commandSchedulerServiceMock);
+    verify(opalRuntimeMock, opalConfigurationServiceMock, commandSchedulerServiceMock, mockSubject);
 
   }
 

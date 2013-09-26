@@ -84,10 +84,14 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
     this.opalRuntime = opalRuntime;
   }
 
+  protected void setName(String name) {
+    this.name = name;
+  }
+
   @GET
   public Response getReportTemplate() {
     ReportTemplate reportTemplate = getOpalConfigurationService().getOpalConfiguration().getReportTemplate(name);
-    return reportTemplate == null || !authzReadReportTemplate(name)
+    return reportTemplate == null || !authzReadReportTemplate(reportTemplate)
         ? Response.status(Status.NOT_FOUND).build()
         : Response.ok(Dtos.asDto(reportTemplate)).build();
   }
@@ -96,7 +100,7 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   public Response deleteReportTemplate() {
     ReportTemplate reportTemplateToRemove = getOpalConfigurationService().getOpalConfiguration()
         .getReportTemplate(name);
-    if(reportTemplateToRemove == null || !authzReadReportTemplate(name)) {
+    if(reportTemplateToRemove == null || !authzReadReportTemplate(reportTemplateToRemove)) {
       return Response.status(Status.NOT_FOUND).build();
     } else {
       getOpalConfigurationService().modifyConfiguration(new ConfigModificationTask() {

@@ -31,16 +31,14 @@ public class Dtos {
     reportTemplate.setDesign(reportTemplateDto.getDesign());
     reportTemplate.setFormat(reportTemplateDto.getFormat());
 
+    if(reportTemplateDto.hasProject()) reportTemplate.setProject(reportTemplateDto.getProject());
+    if(reportTemplateDto.hasCron()) reportTemplate.setSchedule(reportTemplateDto.getCron());
+
     Map<String, String> params = Maps.newLinkedHashMap();
     for(ParameterDto param : reportTemplateDto.getParametersList()) {
       params.put(param.getKey(), param.getValue());
     }
     reportTemplate.setParameters(params);
-
-    String schedule = reportTemplateDto.getCron();
-    if(schedule != null) {
-      reportTemplate.setSchedule(reportTemplateDto.getCron());
-    }
 
     reportTemplate.setEmailNotificationAddresses(Sets.newHashSet(reportTemplateDto.getEmailNotificationList()));
 
@@ -48,20 +46,18 @@ public class Dtos {
   }
 
   public static ReportTemplateDto asDto(ReportTemplate reportTemplate) {
-    ReportTemplateDto.Builder dtoBuilder = ReportTemplateDto.newBuilder().setName(reportTemplate.getName())
+    ReportTemplateDto.Builder builder = ReportTemplateDto.newBuilder().setName(reportTemplate.getName())
         .setDesign(reportTemplate.getDesign()).setFormat(reportTemplate.getFormat());
     for(Map.Entry<String, String> param : reportTemplate.getParameters().entrySet()) {
-      dtoBuilder.addParameters(ParameterDto.newBuilder().setKey(param.getKey()).setValue(param.getValue()));
+      builder.addParameters(ParameterDto.newBuilder().setKey(param.getKey()).setValue(param.getValue()));
     }
 
-    String schedule = reportTemplate.getSchedule();
-    if(schedule != null) {
-      dtoBuilder.setCron(schedule);
-    }
+    if(reportTemplate.hasProject()) builder.setProject(reportTemplate.getProject());
+    if(reportTemplate.hasSchedule()) builder.setCron(reportTemplate.getSchedule());
 
-    dtoBuilder.addAllEmailNotification(reportTemplate.getEmailNotificationAddresses());
+    builder.addAllEmailNotification(reportTemplate.getEmailNotificationAddresses());
 
-    return dtoBuilder.build();
+    return builder.build();
   }
 
   public static Set<ReportTemplateDto> asDto(Iterable<ReportTemplate> reportTemplates) {

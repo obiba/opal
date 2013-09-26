@@ -12,6 +12,7 @@ package org.obiba.opal.web.shell.reporting;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.MagmaSecurityExtension;
+import org.obiba.magma.security.shiro.ShiroAuthorizer;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
@@ -24,19 +25,14 @@ import org.obiba.opal.web.reporting.Dtos;
  *
  */
 public abstract class AbstractReportTemplateResource {
+
   protected static final String REPORT_SCHEDULING_GROUP = "reports";
 
   protected abstract OpalConfigurationService getOpalConfigurationService();
 
   protected abstract CommandSchedulerService getCommandSchedulerService();
 
-  private final Authorizer authorizer;
-
-  protected AbstractReportTemplateResource() {
-    authorizer = MagmaEngine.get().hasExtension(MagmaSecurityExtension.class) //
-        ? MagmaEngine.get().getExtension(MagmaSecurityExtension.class).getAuthorizer() //
-        : null;
-  }
+  private final Authorizer authorizer = new ShiroAuthorizer();
 
   protected boolean reportTemplateExists(String name) {
     return name != null && getOpalConfigurationService().getOpalConfiguration().hasReportTemplate(name);
@@ -49,13 +45,9 @@ public abstract class AbstractReportTemplateResource {
       public void doWithConfig(OpalConfiguration config) {
         OpalConfiguration opalConfig = getOpalConfigurationService().getOpalConfiguration();
 
-        ReportTemplate reportTemplate = opalConfig.getReportTemplate(dto.getName());
-        if(reportTemplate != null) {
-          opalConfig.removeReportTemplate(dto.getName());
-        }
+        if(opalConfig.hasReportTemplate(dto.getName())) opalConfig.removeReportTemplate(dto.getName());
 
-        reportTemplate = Dtos.fromDto(dto);
-        opalConfig.addReportTemplate(reportTemplate);
+        opalConfig.addReportTemplate(Dtos.fromDto(dto));
       }
     });
 
@@ -69,8 +61,12 @@ public abstract class AbstractReportTemplateResource {
     }
   }
 
-  protected boolean authzReadReportTemplate(String name) {
-    return authorizer == null || authorizer.isPermitted("magma:/report-template/" + name + ":GET");
+  protected Authorizer getAuthorizer() {
+    return authorizer;
+  }
+
+  protected boolean authzReadReportTemplate(ReportTemplate template) {
+    return authorizer.isPermitted("magma:/report-template/" + template.getName() + ":GET");
   }
 
 }

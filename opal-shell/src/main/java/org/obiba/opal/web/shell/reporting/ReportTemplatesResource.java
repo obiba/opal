@@ -65,7 +65,7 @@ public class ReportTemplatesResource extends AbstractReportTemplateResource {
 
       @Override
       public boolean apply(ReportTemplate template) {
-        return authzReadReportTemplate(template.getName());
+        return authzReadReportTemplate(template);
       }
     }));
     return Dtos.asDto(builder.build());

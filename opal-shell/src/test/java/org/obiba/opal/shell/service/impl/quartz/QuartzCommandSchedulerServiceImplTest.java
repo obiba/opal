@@ -57,6 +57,7 @@ public class QuartzCommandSchedulerServiceImplTest {
     // Exercise
     QuartzCommandSchedulerServiceImpl sut = new QuartzCommandSchedulerServiceImpl(schedulerMock);
     sut.addCommand("commandName", "reporting", new CommandStub("commandName", "commandLine"));
+    ThreadContext.unbindSubject();
 
     // Verify behaviour
     verify(schedulerMock);
