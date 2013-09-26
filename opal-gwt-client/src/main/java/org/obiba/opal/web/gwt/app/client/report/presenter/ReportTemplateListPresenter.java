@@ -16,32 +16,41 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateDeletedEvent;
-import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateListReceivedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
-public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateListPresenter.Display> {
+public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateListPresenter.Display> implements ReportTemplateListUiHandlers{
 
   @Inject
   public ReportTemplateListPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
+    getView().setUiHandlers(this);
   }
 
   @Override
   protected void onBind() {
-    refreshReportTemplates(null);
+
     addHandlers();
+  }
+
+  @Override
+  protected void onReveal() {
+    refreshReportTemplates(null);
+  }
+
+  @Override
+  public void onSelection(ReportTemplateDto template) {
+    fireEvent(new ReportTemplateSelectedEvent(template));
   }
 
   private void refreshReportTemplates(ReportTemplateDto templateToSelect) {
@@ -50,9 +59,8 @@ public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateL
   }
 
   private void addHandlers() {
-    registerHandler(getEventBus().addHandler(ReportTemplateCreatedEvent.getType(), new ReportTemplateCreatedHandler()));
-    registerHandler(getEventBus().addHandler(ReportTemplateDeletedEvent.getType(), new ReportTemplateDeletedHandler()));
-    registerHandler(getView().addSelectReportTemplateHandler(new ReportTemplateSelectionChangeHandler()));
+    addRegisteredHandler(ReportTemplateCreatedEvent.getType(), new ReportTemplateCreatedHandler());
+    addRegisteredHandler(ReportTemplateDeletedEvent.getType(), new ReportTemplateDeletedHandler());
   }
 
   private JsArray<ReportTemplateDto> sortReportTemplates(JsArray<ReportTemplateDto> templates) {
@@ -75,15 +83,10 @@ public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateL
     return sortedTemplates;
   }
 
-  public interface Display extends View {
+  public interface Display extends View, HasUiHandlers<ReportTemplateListUiHandlers> {
 
     void setReportTemplates(JsArray<ReportTemplateDto> templates);
 
-    void select(ReportTemplateDto reportTemplateDto);
-
-    ReportTemplateDto getSelectedReportTemplate();
-
-    HandlerRegistration addSelectReportTemplateHandler(SelectionChangeEvent.Handler handler);
   }
 
   class ReportTemplateCreatedHandler implements ReportTemplateCreatedEvent.Handler {
@@ -102,14 +105,6 @@ public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateL
     }
   }
 
-  class ReportTemplateSelectionChangeHandler implements SelectionChangeEvent.Handler {
-
-    @Override
-    public void onSelectionChange(SelectionChangeEvent event) {
-      getEventBus().fireEvent(new ReportTemplateSelectedEvent(getView().getSelectedReportTemplate()));
-    }
-  }
-
   class ReportTemplatesResourceCallback implements ResourceCallback<JsArray<ReportTemplateDto>> {
 
     private final ReportTemplateDto templateToSelect;
@@ -120,15 +115,16 @@ public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateL
 
     @Override
     public void onResource(Response response, JsArray<ReportTemplateDto> templates) {
-      JsArray<ReportTemplateDto> nonNullTemplates = JsArrays.toSafeArray(templates);
+      JsArray<ReportTemplateDto> sortedTemplates = sortReportTemplates(JsArrays.toSafeArray(templates));
 
-      getView().setReportTemplates(sortReportTemplates(nonNullTemplates));
+      getView().setReportTemplates(sortedTemplates);
 
-      if(templateToSelect != null) {
-        getView().select(templateToSelect);
+      if (templateToSelect != null) {
+        onSelection(templateToSelect);
       }
-
-      getEventBus().fireEvent(new ReportTemplateListReceivedEvent(nonNullTemplates));
+      else if (sortedTemplates.length()>0) {
+        onSelection(sortedTemplates.get(0));
+      }
     }
   }
 }

@@ -11,15 +11,12 @@ import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
 
-public class FilesAdministrationView extends ViewImpl implements FilesAdministrationPresenter.Display{
+public class FilesAdministrationView extends ViewImpl implements FilesAdministrationPresenter.Display {
 
-  interface ViewUiBinder extends UiBinder<Widget, FilesAdministrationView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  private final Widget widget;
+  interface Binder extends UiBinder<Widget, FilesAdministrationView> {}
 
   @UiField
   Panel body;
@@ -27,14 +24,9 @@ public class FilesAdministrationView extends ViewImpl implements FilesAdministra
   @UiField
   Breadcrumbs breadcrumbs;
 
-
-  public FilesAdministrationView() {
-    widget = uiBinder.createAndBindUi(this);
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
+  @Inject
+  public FilesAdministrationView(Binder uiBinder) {
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
   @Override

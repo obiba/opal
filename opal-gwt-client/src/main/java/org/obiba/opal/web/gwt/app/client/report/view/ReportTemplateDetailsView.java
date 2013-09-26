@@ -18,17 +18,17 @@ import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsP
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.DateTimeColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.app.client.ui.NavTabsPanel;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
-import org.obiba.opal.web.gwt.rest.client.authorization.TabAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.ParameterDto;
 import org.obiba.opal.web.model.client.opal.ReportDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
+import com.github.gwtbootstrap.client.ui.Heading;
+import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -37,7 +37,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
@@ -50,6 +49,7 @@ import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewImpl;
 
@@ -58,23 +58,21 @@ import static org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateD
 
 public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplateDetailsPresenter.Display {
 
-  @UiTemplate("ReportTemplateDetailsView.ui.xml")
-  interface ReportTemplateDetailsViewUiBinder extends UiBinder<Widget, ReportTemplateDetailsView> {}
-
-  private static final ReportTemplateDetailsViewUiBinder uiBinder = GWT.create(ReportTemplateDetailsViewUiBinder.class);
+  interface Binder extends UiBinder<Widget, ReportTemplateDetailsView> {}
 
   private static final Translations translations = GWT.create(Translations.class);
 
-  private final Widget widget;
-
   @UiField
-  Label noReportTemplatesLabel;
+  Heading reportTemplateName;
 
   @UiField
   Panel reportTemplatePanel;
 
   @UiField
-  NavTabsPanel tabs;
+  Panel reportsPanel;
+
+  @UiField
+  Panel permissionsPanel;
 
   @UiField
   CellTable<ReportDto> producedReportsTable;
@@ -87,9 +85,6 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
 
   @UiField
   InlineLabel noReports;
-
-  @UiField
-  FlowPanel reportTemplateDetails;
 
   @UiField
   Anchor design;
@@ -106,37 +101,16 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
   @UiField
   Label emails;
 
-  @UiField
-  FlowPanel toolbarPanel;
-
-  private MenuBar toolbar;
-
-  private MenuBar actionsMenu;
-
-  private MenuItem remove;
-
-  private MenuItem run;
-
-  private MenuItem downloadReportDesign;
-
-  private MenuItem update;
-
   JsArrayDataProvider<ReportDto> dataProvider = new JsArrayDataProvider<ReportDto>();
 
   private HasActionHandler<ReportDto> actionsColumn;
 
   private ReportTemplateDto reportTemplate;
 
-  private Label reportTemplateName;
-
-  private MenuItem toolsItem;
-
-  private MenuItemSeparator removeSeparator;
-
-  public ReportTemplateDetailsView() {
-    widget = uiBinder.createAndBindUi(this);
+  @Inject
+  public ReportTemplateDetailsView(Binder uiBinder) {
+    initWidget(uiBinder.createAndBindUi(this));
     initProducedReportsTable();
-    initActionToolbar();
   }
 
   @Override
@@ -145,16 +119,6 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
     if(content != null) {
       permissions.add(content.asWidget());
     }
-  }
-
-  private void initActionToolbar() {
-    toolbarPanel.add(reportTemplateName = new Label());
-    reportTemplateName.addStyleName("title");
-    toolbarPanel.add(toolbar = new MenuBar());
-    toolbar.setAutoOpen(true);
-    toolsItem = toolbar.addItem("", actionsMenu = new MenuBar(true));
-    toolsItem.addStyleName("tools");
-    actionsMenu.addStyleName("tools");
   }
 
   private void initProducedReportsTable() {
@@ -186,19 +150,6 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
   }
 
   @Override
-  public Widget asWidget() {
-    return widget;
-  }
-
-  @Override
-  public void setReportTemplatesAvailable(boolean available) {
-    toolbarPanel.setVisible(available);
-    reportTemplatePanel.setVisible(available);
-    tabs.setVisible(available);
-    noReportTemplatesLabel.setVisible(!available);
-  }
-
-  @Override
   public void setProducedReports(JsArray<ReportDto> reports) {
     pager.setVisible(reports.length() > 10); // OPAL-901
     renderProducedReports(reports);
@@ -218,7 +169,6 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
   }
 
   private void renderReportTemplateDetails(ReportTemplateDto reportTemplate) {
-    reportTemplateDetails.setVisible(true);
     this.reportTemplate = reportTemplate;
     design.setText(reportTemplate.getDesign());
     schedule.setText(reportTemplate.getCron());
@@ -260,83 +210,13 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
   }
 
   @Override
-  public void setRemoveReportTemplateCommand(Command command) {
-    if(remove == null) {
-      removeSeparator = actionsMenu.addSeparator(new MenuItemSeparator());
-      actionsMenu.addItem(remove = new MenuItem(translations.removeLabel(), command));
-    } else {
-      remove.setCommand(command);
-    }
-  }
-
-  @Override
-  public void setRunReportCommand(Command command) {
-    if(run == null) {
-      actionsMenu.addItem(run = new MenuItem(translations.runLabel(), command));
-    } else {
-      run.setCommand(command);
-    }
-  }
-
-  @Override
-  public void setDownloadReportDesignCommand(Command command) {
-    if(downloadReportDesign == null) {
-      actionsMenu.addItem(downloadReportDesign = new MenuItem(translations.downloadReportDesignLabel(), command));
-    } else {
-      downloadReportDesign.setCommand(command);
-    }
-  }
-
-  @Override
-  public void setUpdateReportTemplateCommand(Command command) {
-    if(update == null) {
-      toolbar.addItem(update = new MenuItem("", command)).addStyleName("edit");
-    } else {
-      update.setCommand(command);
-    }
-  }
-
-  @Override
-  public HasAuthorization getRemoveReportTemplateAuthorizer() {
-    return new CompositeAuthorizer(new MenuItemAuthorizer(toolsItem), new MenuItemAuthorizer(remove),
-        new UIObjectAuthorizer(removeSeparator)) {
-      @Override
-      public void unauthorized() {
-      }
-    };
-  }
-
-  @Override
-  public HasAuthorization getRunReportAuthorizer() {
-    return new CompositeAuthorizer(new MenuItemAuthorizer(toolsItem), new MenuItemAuthorizer(run)) {
-      @Override
-      public void unauthorized() {
-      }
-    };
-  }
-
-  @Override
-  public HasAuthorization getDownloadReportDesignAuthorizer() {
-    return new CompositeAuthorizer(new MenuItemAuthorizer(toolsItem), new MenuItemAuthorizer(downloadReportDesign)) {
-      @Override
-      public void unauthorized() {
-      }
-    };
-  }
-
-  @Override
-  public HasAuthorization getUpdateReportTemplateAuthorizer() {
-    return new MenuItemAuthorizer(update);
-  }
-
-  @Override
   public HasAuthorization getListReportsAuthorizer() {
-    return new WidgetAuthorizer(tabs);
+    return new WidgetAuthorizer(reportsPanel);
   }
 
   @Override
   public HasAuthorization getPermissionsAuthorizer() {
-    return new TabAuthorizer(tabs, 1);
+    return new WidgetAuthorizer(permissionsPanel);
   }
 
 }

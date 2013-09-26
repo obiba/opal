@@ -1,21 +1,21 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
-    xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <g:FlowPanel ui:field="reportTemplateDetails" addStyleNames="item-details">
+  <g:FlowPanel>
 
-    <g:Label ui:field="noReportTemplatesLabel" addStyleNames="small-top-margin small-indent">
-      <ui:msg description="No report templates">No report templates</ui:msg>
-    </g:Label>
+    <b:Heading size="3" ui:field="reportTemplateName"/>
 
-    <g:FlowPanel ui:field="toolbarPanel" addStyleNames="toolbar toolbar-left"/>
+    <b:Heading size="4" addStyleNames="inline-block">
+      <ui:msg description="Properties label">Properties</ui:msg>
+    </b:Heading>
 
-    <o:PropertiesTable ui:field="reportTemplatePanel" addStyleNames="small-dual-indent top-margin"
-        keyStyleNames="span2 small-indent">
+    <o:PropertiesTable ui:field="reportTemplatePanel" keyStyleNames="span3">
       <g:FlowPanel>
         <g:Label>
           <ui:msg description="BIRT Report Design label">BIRT Report Design:</ui:msg>
@@ -48,24 +48,25 @@
       </g:FlowPanel>
     </o:PropertiesTable>
 
-    <o:NavTabsPanel ui:field="tabs" addStyleNames="small-indent top-margin not-so-full-width">
-      <g:Anchor>
-        <ui:msg description="Reports title">Reports</ui:msg>
-      </g:Anchor>
-      <g:VerticalPanel width="100%">
+    <g:FlowPanel ui:field="reportsPanel">
+      <b:Heading size="4">
+        <ui:msg description="Reports label">Reports</ui:msg>
+      </b:Heading>
+      <g:FlowPanel>
         <g:InlineLabel ui:field="noReports">
           <ui:msg description="No Reports label">No Reports</ui:msg>
         </g:InlineLabel>
-        <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"/>
-        <o:Table ui:field="producedReportsTable" width="100%" addStyleNames="left-aligned gwt-CellTable"/>
-      </g:VerticalPanel>
+        <b:SimplePager ui:field="pager" location="CENTER" addStyleNames="pull-right"/>
+        <o:Table ui:field="producedReportsTable"/>
+      </g:FlowPanel>
+    </g:FlowPanel>
 
-      <g:Anchor>
+    <g:FlowPanel ui:field="permissionsPanel">
+      <b:Heading size="4">
         <ui:msg description="Permissions label">Permissions</ui:msg>
-      </g:Anchor>
+      </b:Heading>
       <g:SimplePanel ui:field="permissions"></g:SimplePanel>
-
-    </o:NavTabsPanel>
+    </g:FlowPanel>
 
   </g:FlowPanel>
 

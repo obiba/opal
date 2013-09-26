@@ -1,0 +1,45 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+
+
+  <g:FlowPanel>
+    <g:FlowPanel>
+      <b:ButtonGroup>
+        <b:Button icon="PLUS_SIGN_ALT" size="SMALL" ui:field="add">
+          <ui:msg description="Add Report Template label">Add report template</ui:msg>
+        </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:Button icon="DOWNLOAD" size="SMALL" ui:field="download">
+          <ui:msg description="Download report design label">Download report design</ui:msg>
+        </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:Button icon="COG" size="SMALL" ui:field="execute">
+          <ui:msg description="Execute label">Execute</ui:msg>
+        </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:Button icon="EDIT" size="SMALL" ui:field="edit">
+        </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:Button icon="TRASH" size="SMALL" ui:field="remove">
+        </b:Button>
+      </b:ButtonGroup>
+    </g:FlowPanel>
+    <b:FluidRow>
+      <b:Column size="2">
+        <g:ScrollPanel ui:field="reportTemplateListPanel" addStyleNames="top-margin"/>
+      </b:Column>
+      <b:Column size="10">
+        <g:ScrollPanel ui:field="reportTemplateDetailsPanel"/>
+      </b:Column>
+    </b:FluidRow>
+  </g:FlowPanel>
+
+</ui:UiBinder>

@@ -2073,4 +2073,8 @@ public interface Translations extends Constants {
   @Description("Entities count property label")
   @DefaultStringValue("Entities Count")
   String entitiesCountProperty();
+
+  @Description("Report templates header")
+  @DefaultStringValue("{0} Reports")
+  String reportTemplatesHeader();
 }

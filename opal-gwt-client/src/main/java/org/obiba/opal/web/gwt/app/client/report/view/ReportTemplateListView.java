@@ -9,106 +9,67 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.report.view;
 
-import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateListPresenter;
+import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateListUiHandlers;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
-import com.google.gwt.core.client.GWT;
+import com.github.gwtbootstrap.client.ui.NavHeader;
+import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.NavList;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.google.gwt.core.client.JsArray;
-import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SingleSelectionModel;
-import com.gwtplatform.mvp.client.ViewImpl;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-public class ReportTemplateListView extends ViewImpl implements ReportTemplateListPresenter.Display {
+public class ReportTemplateListView extends ViewWithUiHandlers<ReportTemplateListUiHandlers>
+    implements ReportTemplateListPresenter.Display {
 
-  @UiTemplate("ReportTemplateListView.ui.xml")
-  interface ReportTemplateListViewUiBinder extends UiBinder<Widget, ReportTemplateListView> {}
+  interface Binder extends UiBinder<Widget, ReportTemplateListView> {}
 
-  private static final ReportTemplateListViewUiBinder uiBinder = GWT.create(ReportTemplateListViewUiBinder.class);
+  private final Translations translations;
 
-    private final Widget widget;
- @UiField
-  CellTable<ReportTemplateDto> reportTemplateTable;
+  @UiField
+  NavList reportList;
 
-  SingleSelectionModel<ReportTemplateDto> selectionModel;
-
-  JsArrayDataProvider<ReportTemplateDto> dataProvider = new JsArrayDataProvider<ReportTemplateDto>();
-
-  public ReportTemplateListView() {
-    selectionModel = new SingleSelectionModel<ReportTemplateDto>();
-    widget = uiBinder.createAndBindUi(this);
-    initTable();
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
+  @Inject
+  public ReportTemplateListView(Binder uiBinder, Translations translations) {
+    initWidget(uiBinder.createAndBindUi(this));
+    this.translations = translations;
   }
 
   @Override
   public void setReportTemplates(JsArray<ReportTemplateDto> templates) {
-    clearSelection();
-    int templateCount = templates.length();
-    dataProvider.setArray(templates);
-    reportTemplateTable.setPageSize(templateCount);
+    reportList.clear();
 
-    // Select the first element in the list.
-    if(templates.length() > 0) {
-      selectionModel.setSelected(templates.get(0), true);
-    }
-  }
-
-  @Override
-  public void select(ReportTemplateDto reportTemplateDto) {
-    // Clear current selection.
-    ReportTemplateDto currentSelection = selectionModel.getSelectedObject();
-    if(currentSelection != null) {
-      selectionModel.setSelected(currentSelection, false);
+    // group templates by project
+    Multimap<String, ReportTemplateDto> templateMap = ArrayListMultimap.create();
+    for(final ReportTemplateDto template : JsArrays.toIterable(JsArrays.toSafeArray(templates))) {
+      templateMap.get(template.getProject()).add(template);
     }
 
-    // Find and select specified template.
-    for(ReportTemplateDto r : reportTemplateTable.getVisibleItems()) {
-      if(r.getName().equals(reportTemplateDto.getName())) {
-        selectionModel.setSelected(r, true);
-        break;
+    for(String project : templateMap.keySet()) {
+      reportList.add(new NavHeader(TranslationsUtils.replaceArguments(translations.reportTemplatesHeader(), project)));
+
+      for(final ReportTemplateDto template : templateMap.get(project)) {
+        NavLink link = new NavLink(template.getName());
+        link.addClickHandler(new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            getUiHandlers().onSelection(template);
+          }
+        });
+        reportList.add(link);
       }
     }
   }
 
-  private void clearSelection() {
-    if(getSelectedReportTemplate() != null) {
-      selectionModel.setSelected(getSelectedReportTemplate(), false);
-      reportTemplateTable.redraw();
-    }
-  }
-
-  @Override
-  public ReportTemplateDto getSelectedReportTemplate() {
-    return selectionModel.getSelectedObject();
-  }
-
-  private void initTable() {
-
-    reportTemplateTable.setStyleName("selection-list");
-    reportTemplateTable.addColumn(new TextColumn<ReportTemplateDto>() {
-      @Override
-      public String getValue(ReportTemplateDto dto) {
-        return dto.getName();
-      }
-    });
-    reportTemplateTable.setSelectionModel(selectionModel);
-    dataProvider.addDataDisplay(reportTemplateTable);
-  }
-
-  @Override
-  public HandlerRegistration addSelectReportTemplateHandler(SelectionChangeEvent.Handler handler) {
-    return selectionModel.addSelectionChangeHandler(handler);
-  }
 }
