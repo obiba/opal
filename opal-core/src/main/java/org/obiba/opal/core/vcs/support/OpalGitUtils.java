@@ -41,5 +41,9 @@ public final class OpalGitUtils {
     return commitId +"~" + String.valueOf(nth);
   }
 
+  public static boolean isFilePath(String path) {
+    // TODO find a safe check
+    return path.matches("\\w+\\/+\\w+\\.\\w+$");
+  }
 
 }

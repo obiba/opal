@@ -1,7 +1,10 @@
 package org.obiba.opal.core.vcs;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 public class CommitInfo {
   private String author;
@@ -16,6 +19,13 @@ public class CommitInfo {
 
   public Date getDate() {
     return date;
+  }
+
+  public String getDateAsIso8601() {
+    TimeZone tz = TimeZone.getTimeZone("UTC");
+    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+    df.setTimeZone(tz);
+    return df.format(new Date());
   }
 
   public String getComment() {

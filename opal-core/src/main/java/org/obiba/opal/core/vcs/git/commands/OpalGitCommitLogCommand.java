@@ -2,6 +2,8 @@ package org.obiba.opal.core.vcs.git.commands;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Repository;
@@ -17,7 +19,10 @@ public class OpalGitCommitLogCommand extends OpalGitCommand<CommitInfo> {
   private String commitId;
 
 
-  public OpalGitCommitLogCommand(Repository repository) {
+  public OpalGitCommitLogCommand(@Nonnull Repository repository, String datasourceName) {
+    super(repository, datasourceName);
+  }
+ public OpalGitCommitLogCommand(@Nonnull Repository repository) {
     super(repository);
   }
 
@@ -34,7 +39,6 @@ public class OpalGitCommitLogCommand extends OpalGitCommand<CommitInfo> {
   @Override
   public CommitInfo execute() {
     RevWalk walk = new RevWalk(repository);
-    CommitInfo commitInfo = new CommitInfo();
 
     try {
       RevCommit commit = walk.parseCommit(ObjectId.fromString(commitId));
