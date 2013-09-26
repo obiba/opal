@@ -3,21 +3,22 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
-  <tx:annotation-driven transaction-manager="transactionManager"/>
+  <tx:annotation-driven/>
 
-  <bean id="jotm" class="org.springframework.transaction.jta.JotmFactoryBean"/>
+  <bean id="userTransactionManagerManager" class="com.atomikos.icatch.jta.UserTransactionManager" init-method="init"
+      destroy-method="close">
+    <property name="forceShutdown" value="false"/>
+  </bean>
+
+  <bean id="userTransactionImp" class="com.atomikos.icatch.jta.UserTransactionImp">
+    <!-- Set a very high timeout (10 days) -->
+    <property name="transactionTimeout" value="864000"/>
+  </bean>
 
   <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
-    <!-- Set a very high timeout (10 days) -->
-    <property name="defaultTimeout" value="864000"/>
+    <property name="transactionManager" ref="userTransactionManagerManager"/>
+    <property name="userTransaction" ref="userTransactionImp"/>
     <property name="allowCustomIsolationLevels" value="true"/>
-    <property name="userTransaction">
-      <ref local="jotm"/>
-    </property>
-    <!--
-      No need to set "transactionManager" property since the jotm bean implements both interfaces and Spring's
-      JtaTransactionManager will detect this.
-    -->
   </bean>
 
   <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate" scope="prototype">

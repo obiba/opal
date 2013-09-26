@@ -83,24 +83,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.ow2.spec.ee</groupId>
-      <artifactId>ow2-jta-1.1-spec</artifactId>
-      <scope>compile</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.ow2.jotm</groupId>
-      <artifactId>jotm-core</artifactId>
-      <scope>compile</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.ow2.spec.ee</groupId>
-      <artifactId>ow2-connector-1.5-spec</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <scope>runtime</scope>

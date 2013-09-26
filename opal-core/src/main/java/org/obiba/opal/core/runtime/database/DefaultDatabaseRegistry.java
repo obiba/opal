@@ -1,20 +1,16 @@
 package org.obiba.opal.core.runtime.database;
 
-import java.sql.SQLException;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.datasource.hibernate.HibernateDatasource;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasource;
-import org.obiba.magma.datasource.mongodb.MongoDBFactory;
 import org.obiba.opal.core.cfg.OrientDbService;
 import org.obiba.opal.core.cfg.OrientDbTransactionCallbackWithoutResult;
 import org.obiba.opal.core.domain.database.Database;
@@ -27,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.atomikos.jdbc.AbstractDataSourceBean;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -57,24 +54,20 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Autowired
   private OrientDbService orientDbService;
 
-  private final LoadingCache<String, BasicDataSource> dataSourceCache = CacheBuilder.newBuilder()
-      .removalListener(new RemovalListener<String, BasicDataSource>() {
+  private final LoadingCache<String, DataSource> dataSourceCache = CacheBuilder.newBuilder()
+      .removalListener(new RemovalListener<String, DataSource>() {
 
         @Override
-        public void onRemoval(RemovalNotification<String, BasicDataSource> notification) {
-          try {
-            log.info("Destroying DataSource {}", notification.getKey());
-            BasicDataSource dataSource = notification.getValue();
-            if(dataSource != null) dataSource.close();
-          } catch(SQLException e) {
-            log.warn("Ignoring exception during shutdown: ", e);
-          }
+        public void onRemoval(RemovalNotification<String, DataSource> notification) {
+          log.info("Destroying DataSource {}", notification.getKey());
+          DataSource dataSource = notification.getValue();
+          if(dataSource != null) ((AbstractDataSourceBean) dataSource).close();
         }
       }) //
-      .build(new CacheLoader<String, BasicDataSource>() {
+      .build(new CacheLoader<String, DataSource>() {
 
         @Override
-        public BasicDataSource load(String databaseName) throws Exception {
+        public DataSource load(String databaseName) throws Exception {
           log.info("Building DataSource {}", databaseName);
           return dataSourceFactory.createDataSource((SqlDatabase) getDatabase(databaseName));
         }
@@ -179,9 +172,13 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   private void validUniqueIdentifiersDatabase(Database database) throws MultipleIdentifiersDatabaseException {
     if(database.isUsedForIdentifiers()) {
-      Database identifiersDatabase = getIdentifiersDatabase();
-      if(identifiersDatabase != null && !Objects.equal(identifiersDatabase.getName(), database.getName())) {
-        throw new MultipleIdentifiersDatabaseException(identifiersDatabase.getName(), database.getName());
+      Database identifiersDatabase = null;
+      try {
+        identifiersDatabase = getIdentifiersDatabase();
+        if(!Objects.equal(identifiersDatabase.getName(), database.getName())) {
+          throw new MultipleIdentifiersDatabaseException(identifiersDatabase.getName(), database.getName());
+        }
+      } catch(IdentifiersDatabaseNotFoundException ignored) {
       }
     }
   }
@@ -227,16 +224,18 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     registrations.remove(databaseName, usedByDatasource);
   }
 
-  @Nullable
+  @Nonnull
   @Override
-  public Database getIdentifiersDatabase() {
-    return orientDbService.uniqueResult("select from Database where usedForIdentifiers = ?", true);
+  public Database getIdentifiersDatabase() throws IdentifiersDatabaseNotFoundException {
+    Database database = orientDbService.uniqueResult("select from Database where usedForIdentifiers = ?", true);
+    if(database == null) throw new IdentifiersDatabaseNotFoundException();
+    return database;
   }
 
   @Override
   public Datasource createStorageMagmaDatasource(String datasourceName, Database database) {
     Preconditions.checkArgument(database.getUsage() == Database.Usage.STORAGE,
-        "Cannot create datasource for non storage database " + database.getName());
+        "Cannot create datasource for non storage database " + database.getName() + " (" + database.getUsage() + ")");
 
     if(database instanceof SqlDatabase) {
       SqlDatabase sqlDatabase = (SqlDatabase) database;

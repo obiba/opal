@@ -14,7 +14,7 @@ import java.sql.SQLException;
 
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.MySQL5InnoDBDialect;
-import org.hibernate.dialect.resolver.AbstractDialectResolver;
+import org.hibernate.service.jdbc.dialect.internal.AbstractDialectResolver;
 
 /**
  * Ensures usage of InnoDB for MySQL databases and uses custom dialect for HSQLDB, otherwise, fallback to default
@@ -23,6 +23,8 @@ import org.hibernate.dialect.resolver.AbstractDialectResolver;
  * This class is instantiated by Hibernate itself through the {@code hibernate.properties} file.
  */
 public class OpalDialectResolver extends AbstractDialectResolver {
+
+  private static final long serialVersionUID = 6167226108895659666L;
 
   @Override
   protected Dialect resolveDialectInternal(DatabaseMetaData metaData) throws SQLException {
@@ -36,6 +38,8 @@ public class OpalDialectResolver extends AbstractDialectResolver {
     if("MySQL".equals(databaseName) && databaseMajorVersion > 4) {
       return new MySQL5InnoDBDialect();
     }
+
+    //TODO support PostgreSQL & MariaDB
 
     return null;
   }

@@ -30,10 +30,7 @@ public class OpalServer {
     start();
   }
 
-  private void setProperties() {// Tell Carol not to initialize its CMI component. This helps us minimize dependencies brought in by JOTM.
-    // See http://wiki.obiba.org/confluence/display/CAG/Technical+Requirements for details.
-    System.setProperty("cmi.disabled", "true");
-
+  private void setProperties() {
     // Disable EHCache and Quartz usage tracker
     // http://martijndashorst.com/blog/2011/02/21/ehcache-and-quartz-phone-home-during-startup
     System.setProperty("net.sf.ehcache.skipUpdateCheck", "true");

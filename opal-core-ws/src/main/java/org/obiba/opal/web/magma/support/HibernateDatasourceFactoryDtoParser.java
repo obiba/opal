@@ -13,7 +13,6 @@ import javax.annotation.Nonnull;
 
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory;
-import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.core.runtime.jdbc.DatabaseSessionFactoryProvider;
 import org.obiba.opal.core.service.IdentifiersTableService;
@@ -45,12 +44,8 @@ public class HibernateDatasourceFactoryDtoParser extends AbstractDatasourceFacto
     DatabaseSessionFactoryProvider sessionFactoryProvider = null;
     HibernateDatasourceFactoryDto factoryDto = dto.getExtension(HibernateDatasourceFactoryDto.params);
     if(factoryDto.getKey()) {
-      Database identifiersDatabase = databaseRegistry.getIdentifiersDatabase();
-      if(identifiersDatabase == null) {
-        throw new RuntimeException("There is no identifiers database configured!");
-      }
       sessionFactoryProvider = new DatabaseSessionFactoryProvider(identifiersTableService.getDatasourceName(),
-          databaseRegistry, identifiersDatabase.getName());
+          databaseRegistry, databaseRegistry.getIdentifiersDatabase().getName());
     } else {
       // fallback to default settings
       String database = factoryDto.hasDatabase() ? factoryDto.getDatabase() : "opal-data";
