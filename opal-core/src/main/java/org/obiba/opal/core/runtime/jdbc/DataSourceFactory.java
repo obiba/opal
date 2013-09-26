@@ -26,6 +26,8 @@ public class DataSourceFactory {
     dataSource.setUrl(database.getUrl());
     dataSource.setUser(database.getUsername());
     dataSource.setPassword(database.getPassword());
+    dataSource.setMinPoolSize(3);
+    dataSource.setMaxPoolSize(50);
 
     if("com.mysql.jdbc.Driver".equals(database.getDriverClass())) {
       dataSource.setTestQuery("select 1");

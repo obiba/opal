@@ -14,10 +14,12 @@ import org.obiba.opal.core.runtime.jdbc.DatabaseSessionFactoryProvider;
 import org.obiba.opal.project.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 //TODO to be deleted once UI is fully working
 @Component
 @Deprecated
+@Transactional
 @SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class TempDefaultConfig {
 

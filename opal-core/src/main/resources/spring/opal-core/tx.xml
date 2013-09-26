@@ -11,12 +11,14 @@
   </bean>
 
   <bean id="userTransactionImp" class="com.atomikos.icatch.jta.UserTransactionImp">
-    <property name="transactionTimeout" value="300"/>
+    <!-- Set a very high timeout (10 days) -->
+    <property name="transactionTimeout" value="864000"/>
   </bean>
 
   <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
     <property name="transactionManager" ref="userTransactionManagerManager"/>
     <property name="userTransaction" ref="userTransactionImp"/>
+    <property name="allowCustomIsolationLevels" value="true"/>
   </bean>
 
   <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate" scope="prototype">
