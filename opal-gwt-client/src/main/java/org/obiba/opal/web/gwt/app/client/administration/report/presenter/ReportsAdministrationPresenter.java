@@ -42,8 +42,7 @@ public class ReportsAdministrationPresenter
 
   @Inject
   public ReportsAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
-      ReportsPresenter reportsPresenter,
-      DefaultBreadcrumbsBuilder breadcrumbsBuilder) {
+      ReportsPresenter reportsPresenter, DefaultBreadcrumbsBuilder breadcrumbsBuilder) {
     super(eventBus, display, proxy);
     this.reportsPresenter = reportsPresenter;
     this.breadcrumbsBuilder = breadcrumbsBuilder;

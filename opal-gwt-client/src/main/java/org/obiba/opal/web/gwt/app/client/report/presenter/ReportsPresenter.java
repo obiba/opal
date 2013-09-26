@@ -46,6 +46,8 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
 
   private Runnable actionRequiringConfirmation;
 
+  private String project;
+
   @Inject
   public ReportsPresenter(Display display, EventBus eventBus,
       ReportTemplateDetailsPresenter reportTemplateDetailsPresenter,
@@ -61,12 +63,14 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
   @Override
   public void onAdd() {
     ReportTemplateUpdateModalPresenter presenter = reportTemplateUpdateModalPresenterProvider.show();
+    presenter.setProject(project);
     presenter.setDialogMode(Mode.CREATE);
   }
 
   @Override
   public void onEdit() {
     ReportTemplateUpdateModalPresenter presenter = reportTemplateUpdateModalPresenterProvider.show();
+    presenter.setProject(project);
     presenter.setReportTemplate(reportTemplate);
     presenter.setDialogMode(Mode.UPDATE);
   }
@@ -124,6 +128,12 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
         }
       }
     });
+  }
+
+  public void showProject(String project) {
+    this.project = project;
+    reportTemplateListPresenter.showProject(project);
+
   }
 
   private class RemoveReportTemplateResponseCallBack implements ResponseCodeCallback {

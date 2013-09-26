@@ -87,6 +87,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   Panel filesPanel;
 
   @UiField
+  Panel reportsPanel;
+
+  @UiField
   Panel adminPanel;
 
   private ProjectDto project;
@@ -144,7 +147,7 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
 
   @Override
   public void setProjectSummary(ProjectSummaryDto projectSummary) {
-    if (projectSummary == null) {
+    if(projectSummary == null) {
       tableCount.setText(TranslationsUtils.replaceArguments(translations.tablesCountLabel(), "?"));
       variableCount.setText(TranslationsUtils.replaceArguments(translations.variablesCountLabel(), "?"));
       entityCount.setText(TranslationsUtils.replaceArguments(translations.entitiesCountLabel(), "?"));
@@ -229,6 +232,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     } else if(slot == ProjectPresenter.FILES_PANE) {
       filesPanel.clear();
       filesPanel.add(content);
+    } else if(slot == ProjectPresenter.REPORTS_PANE) {
+      reportsPanel.clear();
+      reportsPanel.add(content);
     } else if(slot == ProjectPresenter.ADMIN_PANE) {
       adminPanel.clear();
       adminPanel.add(content);

@@ -107,9 +107,13 @@ public class UriBuilder {
     }
   }
 
+  public static final UriBuilder URI_REPORT_TEMPLATES = create().segment("report-templates");
+
   public static final UriBuilder URI_PROJECT = create().segment("project","{}");
 
   public static final UriBuilder URI_PROJECT_SUMMARY = create().segment("project","{}","summary");
+
+  public static final UriBuilder URI_PROJECT_REPORT_TEMPLATES = create().segment("project","{}","report-templates");
 
   public static final UriBuilder URI_DATASOURCE = create().segment("datasource","{}");
 

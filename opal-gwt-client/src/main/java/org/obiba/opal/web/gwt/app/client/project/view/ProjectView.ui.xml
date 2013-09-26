@@ -68,20 +68,18 @@
       </b:Tab>
       <b:Tab icon="FILE_ALT">
         <b:Heading size="3">Reports</b:Heading>
-        <b:Paragraph>
-          huhuhu hahha
-        </b:Paragraph>
+        <g:SimplePanel ui:field="reportsPanel"/>
       </b:Tab>
       <b:Tab icon="TASKS">
         <b:Heading size="3">Tasks</b:Heading>
         <b:Paragraph>
-          huhuhu hahha
+          TODO
         </b:Paragraph>
       </b:Tab>
       <b:Tab icon="LOCK">
         <b:Heading size="3">Permissions</b:Heading>
         <b:Paragraph>
-          huhuhu hahha
+          TODO
         </b:Paragraph>
       </b:Tab>
       <b:Tab icon="BOOK">

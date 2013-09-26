@@ -66,6 +66,8 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
 
   private final Collection<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
+  private String project;
+
   private Mode dialogMode;
 
   public enum Mode {
@@ -127,6 +129,10 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
     emailSelectorPresenter.getView().setItemInputDisplay(new TextBoxItemInputView());
     errorNotificationPresenter = errorNotificationPresenterProvider.get();
     getView().setUiHandlers(this);
+  }
+
+  public void setProject(String project) {
+    this.project = project;
   }
 
   @Override
@@ -323,6 +329,9 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
 
   private void doCreateReportTemplate() {
     ReportTemplateDto reportTemplate = getReportTemplateDto();
+    if(project != null) {
+      reportTemplate.setProject(project);
+    }
     ResponseCodeCallback callbackHandler = new CreateOrUpdateReportTemplateCallBack(reportTemplate);
     ResourceRequestBuilderFactory.newBuilder().forResource("/report-templates").post()
         .withResourceBody(ReportTemplateDto.stringify(reportTemplate)).withCallback(Response.SC_OK, callbackHandler)

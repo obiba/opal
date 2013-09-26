@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateDeletedEvent
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -29,7 +30,10 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
-public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateListPresenter.Display> implements ReportTemplateListUiHandlers{
+public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateListPresenter.Display>
+    implements ReportTemplateListUiHandlers {
+
+  private String project;
 
   @Inject
   public ReportTemplateListPresenter(Display display, EventBus eventBus) {
@@ -39,7 +43,6 @@ public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateL
 
   @Override
   protected void onBind() {
-
     addHandlers();
   }
 
@@ -54,7 +57,13 @@ public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateL
   }
 
   private void refreshReportTemplates(ReportTemplateDto templateToSelect) {
-    ResourceRequestBuilderFactory.<JsArray<ReportTemplateDto>>newBuilder().forResource("/report-templates").get()
+    String uri;
+    if(project == null) {
+      uri = UriBuilder.URI_REPORT_TEMPLATES.build();
+    } else {
+      uri = UriBuilder.URI_PROJECT_REPORT_TEMPLATES.build(project);
+    }
+    ResourceRequestBuilderFactory.<JsArray<ReportTemplateDto>>newBuilder().forResource(uri).get()
         .withCallback(new ReportTemplatesResourceCallback(templateToSelect)).send();
   }
 
@@ -77,10 +86,14 @@ public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateL
     @SuppressWarnings("unchecked")
     JsArray<ReportTemplateDto> sortedTemplates = (JsArray<ReportTemplateDto>) JsArray.createArray();
     for(ReportTemplateDto template : templateList) {
-      sortedTemplates.push(template);
+      if(project == null || project.equals(template.getProject())) sortedTemplates.push(template);
     }
 
     return sortedTemplates;
+  }
+
+  public void showProject(String project) {
+    this.project = project;
   }
 
   public interface Display extends View, HasUiHandlers<ReportTemplateListUiHandlers> {
@@ -119,10 +132,9 @@ public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateL
 
       getView().setReportTemplates(sortedTemplates);
 
-      if (templateToSelect != null) {
+      if(templateToSelect != null) {
         onSelection(templateToSelect);
-      }
-      else if (sortedTemplates.length()>0) {
+      } else if(sortedTemplates.length() > 0) {
         onSelection(sortedTemplates.get(0));
       }
     }
