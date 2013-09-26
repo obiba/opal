@@ -17,9 +17,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 //TODO to be deleted once UI is fully working
-@Transactional
 @Component
 @Deprecated
+@Transactional
+@SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class TempDefaultConfig {
 
   public static final String USERNAME = "root";
@@ -43,7 +44,7 @@ public class TempDefaultConfig {
 
     SqlDatabase opalData = new SqlDatabase.Builder() //
         .name("opal-data") //
-        .url("jdbc:mysql://localhost:3306/opal?characterEncoding=UTF-8") //
+        .url("jdbc:mysql://localhost:3306/opal_clean?characterEncoding=UTF-8") //
         .driverClass("com.mysql.jdbc.Driver") //
         .username(USERNAME) //
         .password(PASSWORD) //
@@ -55,7 +56,7 @@ public class TempDefaultConfig {
 
     SqlDatabase opalKey = new SqlDatabase.Builder() //
         .name("opal-key") //
-        .url("jdbc:mysql://localhost:3306/key?characterEncoding=UTF-8") //
+        .url("jdbc:mysql://localhost:3306/key_clean?characterEncoding=UTF-8") //
         .driverClass("com.mysql.jdbc.Driver") //
         .username(USERNAME) //
         .password(PASSWORD) //

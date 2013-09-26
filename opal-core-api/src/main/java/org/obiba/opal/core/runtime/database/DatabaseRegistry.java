@@ -31,8 +31,8 @@ public interface DatabaseRegistry extends SystemService {
 
   void unregister(@Nonnull String databaseName, @Nullable String usedByDatasource);
 
-  @Nullable
-  Database getIdentifiersDatabase();
+  @Nonnull
+  Database getIdentifiersDatabase() throws IdentifiersDatabaseNotFoundException;
 
   Datasource createStorageMagmaDatasource(String datasourceName, Database database);
 }

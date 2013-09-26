@@ -1,15 +1,13 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:context="http://www.springframework.org/schema/context"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
   <context:annotation-config/>
 
-  <import resource="tx.xml"/>
   <import resource="version.xml"/>
 
-  <bean id="dataSource" class="org.apache.commons.dbcp.managed.BasicManagedDataSource" destroy-method="close">
-    <property name="transactionManager" ref="jotm"/>
+  <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
     <property name="url" value="${org.obiba.opal.datasource.opal.url}"/>
     <property name="driverClassName" value="${org.obiba.opal.datasource.opal.driver}"/>
     <property name="username" value="${org.obiba.opal.datasource.opal.username}"/>
@@ -21,8 +19,7 @@
     <property name="testOnBorrow" value="true"/>
   </bean>
 
-  <bean id="configDataSource" class="org.apache.commons.dbcp.managed.BasicManagedDataSource" destroy-method="close">
-    <property name="transactionManager" ref="jotm"/>
+  <bean id="configDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
     <property name="url" value="${org.obiba.opal.datasource.url}"/>
     <property name="driverClassName" value="${org.obiba.opal.datasource.driver}"/>
     <property name="username" value="${org.obiba.opal.datasource.username}"/>
@@ -34,47 +31,40 @@
     <property name="testOnBorrow" value="true"/>
   </bean>
 
-  <bean id="configSessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+  <bean id="configSessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
     <property name="dataSource" ref="configDataSource"/>
     <property name="namingStrategy">
-      <bean class="org.obiba.magma.hibernate.cfg.MagmaNamingStrategy"/>
+      <bean class="org.obiba.magma.datasource.hibernate.cfg.MagmaNamingStrategy"/>
     </property>
     <property name="annotatedClasses">
       <bean class="org.obiba.opal.core.support.OpalAnnotationConfigurationHelper"/>
     </property>
-    <property name="jtaTransactionManager" ref="jotm"/>
-    <property name="exposeTransactionAwareSessionFactory" value="false"/>
-    <property name="configurationClass" value="org.hibernate.cfg.AnnotationConfiguration"/>
     <property name="hibernateProperties">
       <bean class="org.obiba.opal.core.runtime.jdbc.HsqlDialectOverride">
         <property name="properties">
           <props>
+            <prop key="hibernate.dialect">${org.obiba.opal.datasource.dialect}</prop>
             <prop key="hibernate.generate_statistics">true</prop>
             <prop key="hibernate.cache.use_structured_entries">true</prop>
             <prop key="hibernate.cache.use_query_cache">true</prop>
             <prop key="hibernate.cache.use_second_level_cache">true</prop>
-            <prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.EhCacheRegionFactory</prop>
-            <prop key="net.sf.ehcache.configurationResourceName">/opal-ehcache.xml</prop>
-            <prop key="hibernate.dialect">${org.obiba.opal.datasource.dialect}</prop>
-            <prop key="hibernate.current_session_context_class">jta</prop>
-            <prop key="hibernate.transaction.factory_class">org.obiba.opal.core.tx.JOTMTransactionFactory</prop>
+            <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop>
+            <prop key="hibernate.cache.provider_configuration_file_resource_path">/opal-ehcache.xml</prop>
             <prop key="hibernate.transaction.auto_close_session">true</prop>
-            <prop key="hibernate.transaction.flush_before_completion">true</prop>
           </props>
         </property>
       </bean>
     </property>
   </bean>
 
-  <bean id="datasourceClasses" class="org.obiba.magma.datasource.hibernate.support.AnnotationConfigurationHelper"/>
+  <bean id="datasourceClasses" class="org.obiba.magma.datasource.hibernate.cfg.HibernateConfigurationHelper"/>
 
-  <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+  <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
     <qualifier value="opal-config"/>
     <property name="dataSource" ref="dataSource"/>
     <property name="namingStrategy">
-      <bean class="org.obiba.magma.hibernate.cfg.MagmaNamingStrategy"/>
+      <bean class="org.obiba.magma.datasource.hibernate.cfg.MagmaNamingStrategy"/>
     </property>
-    <!--<property name="annotatedClasses" value="#{datasourceClasses.annotatedTypes}" />-->
     <property name="annotatedClasses">
       <bean class="org.obiba.opal.core.support.OpalAnnotationConfigurationHelper">
         <property name="additionalClasses">
@@ -84,9 +74,6 @@
         </property>
       </bean>
     </property>
-    <property name="jtaTransactionManager" ref="jotm"/>
-    <property name="exposeTransactionAwareSessionFactory" value="false"/>
-    <property name="configurationClass" value="org.hibernate.cfg.AnnotationConfiguration"/>
     <property name="hibernateProperties">
       <bean class="org.obiba.opal.core.runtime.jdbc.HsqlDialectOverride">
         <property name="properties">
@@ -118,17 +105,20 @@
         <prop key="hibernate.cache.use_second_level_cache">true</prop>
         <prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.EhCacheRegionFactory</prop>
         <prop key="net.sf.ehcache.configurationResourceName">/opal-ehcache.xml</prop>
-        <prop key="hibernate.current_session_context_class">jta</prop>
-        <prop key="hibernate.transaction.factory_class">org.obiba.opal.core.tx.JOTMTransactionFactory</prop>
         <prop key="hibernate.transaction.auto_close_session">true</prop>
-        <prop key="hibernate.transaction.flush_before_completion">true</prop>
       </props>
     </property>
   </bean>
 
-  <bean id="dataSourceFactory" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactory">
-    <constructor-arg ref="jotm"/>
+  <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+    <property name="sessionFactory" ref="sessionFactory"/>
   </bean>
+
+  <bean id="configTransactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+    <property name="sessionFactory" ref="configSessionFactory"/>
+  </bean>
+
+  <bean id="dataSourceFactory" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactory"/>
 
   <bean id="sessionFactoryFactory" class="org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory"/>
 
@@ -175,14 +165,6 @@
           <property name="configFile" value="file:${OPAL_HOME}/conf/opal-config.xml"/>
           <property name="propertiesFile" value="file:${OPAL_HOME}/conf/opal-config.properties"/>
           <property name="databaseRegistry" ref="databaseRegistry"/>
-        </bean>
-
-        <!-- 2.0.0 / create config schema -->
-        <bean class="org.obiba.runtime.upgrade.support.MethodInvokingUpgradeStep">
-          <property name="description" value="Install Opal Schema."/>
-          <property name="methodOwner" ref="&amp;configSessionFactory"/>
-          <property name="methodName" value="createDatabaseSchema"/>
-          <property name="appliesTo" value="2.0.0"/>
         </bean>
 
         <!-- 2.0.0 / create quartz config schema -->

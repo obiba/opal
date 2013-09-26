@@ -47,11 +47,7 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.magma</groupId>
-      <artifactId>magma-hibernate-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.obiba.magma</groupId>
-      <artifactId>magma-hibernate-datasource</artifactId>
+      <artifactId>magma-datasource-hibernate</artifactId>
     </dependency>
     <dependency>
       <groupId>org.obiba.magma</groupId>
@@ -71,10 +67,6 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.magma</groupId>
-      <artifactId>magma-hibernate-audit</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.obiba.magma</groupId>
       <artifactId>magma-crypt</artifactId>
     </dependency>
     <dependency>
@@ -91,6 +83,10 @@
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
+      <artifactId>spring-context-support</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
       <artifactId>spring-tx</artifactId>
     </dependency>
     <!-- @Transactional annotations require spring-aop -->
@@ -104,7 +100,23 @@
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-annotations</artifactId>
+      <artifactId>hibernate-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-ehcache</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.atomikos</groupId>
+      <artifactId>transactions-jta</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.atomikos</groupId>
+      <artifactId>transactions-jdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.atomikos</groupId>
+      <artifactId>transactions-hibernate3</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
@@ -141,10 +153,6 @@
       <artifactId>shiro-extras</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.ow2.spec.ee</groupId>
-      <artifactId>ow2-jta-1.1-spec</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.quartz-scheduler</groupId>
       <artifactId>quartz</artifactId>
     </dependency>
@@ -161,10 +169,6 @@
       <groupId>xmlunit</groupId>
       <artifactId>xmlunit</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>commons-dbcp</groupId>
-      <artifactId>commons-dbcp</artifactId>
     </dependency>
     <dependency>
       <groupId>de.schlichtherle.io</groupId>
@@ -202,6 +206,11 @@
     <dependency>
       <groupId>com.orientechnologies</groupId>
       <artifactId>orientdb-object</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.javassist</groupId>
+      <artifactId>javassist</artifactId>
     </dependency>
 
   </dependencies>

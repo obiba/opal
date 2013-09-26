@@ -9,55 +9,33 @@
  ******************************************************************************/
 package org.obiba.opal.core.runtime.jdbc;
 
-import javax.transaction.TransactionManager;
+import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.commons.dbcp.managed.BasicManagedDataSource;
 import org.obiba.opal.core.domain.database.SqlDatabase;
-import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Strings;
+import com.atomikos.jdbc.nonxa.AtomikosNonXADataSourceBean;
 
 @Component
 public class DataSourceFactory {
 
-  private final TransactionManager transactionManager;
-
-  @Autowired
-  public DataSourceFactory(TransactionManager transactionManager) {
-    this.transactionManager = transactionManager;
-  }
-
-  public BasicDataSource createDataSource(SqlDatabase database) {
-    BasicManagedDataSource dataSource = new BasicManagedDataSource();
-
-    if(!Strings.isNullOrEmpty(database.getProperties())) {
-      BeanWrapperImpl bw = new BeanWrapperImpl(dataSource);
-      // Set values, ignoring unknown/invalid entries
-      bw.setPropertyValues(new MutablePropertyValues(database.readProperties()), true, true);
-    }
-
-    // Set other properties
-    dataSource.setTransactionManager(transactionManager);
-    dataSource.setUrl(database.getUrl());
+  public DataSource createDataSource(SqlDatabase database) {
+    AtomikosNonXADataSourceBean dataSource = new AtomikosNonXADataSourceBean();
+    dataSource.setUniqueResourceName(database.getName());
     dataSource.setDriverClassName(database.getDriverClass());
-    dataSource.setUsername(database.getUsername());
+    dataSource.setUrl(database.getUrl());
+    dataSource.setUser(database.getUsername());
     dataSource.setPassword(database.getPassword());
+    dataSource.setMinPoolSize(3);
+    dataSource.setMaxPoolSize(50);
 
-    if("com.mysql.jdbc.Driver".equals(dataSource.getDriverClassName())) {
-      dataSource.setValidationQuery("select 1");
-    } else if("org.hsqldb.jdbcDriver".equals(dataSource.getDriverClassName())) {
-      dataSource.setValidationQuery("select 1 from INFORMATION_SCHEMA.SYSTEM_USERS");
+    if("com.mysql.jdbc.Driver".equals(database.getDriverClass())) {
+      dataSource.setTestQuery("select 1");
+    } else if("org.hsqldb.jdbcDriver".equals(database.getDriverClass())) {
+      dataSource.setTestQuery("select 1 from INFORMATION_SCHEMA.SYSTEM_USERS");
     }
     //TODO validation query for PostgreSQL
 
-    if(dataSource.getMaxWait() < 0) {
-      // Wait for 10 seconds maximum
-      dataSource.setMaxWait(10 * 1000);
-    }
     return dataSource;
   }
 

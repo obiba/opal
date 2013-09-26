@@ -27,7 +27,7 @@
     </dependency>
     <dependency>
       <groupId>org.obiba.magma</groupId>
-      <artifactId>magma-hibernate-datasource</artifactId>
+      <artifactId>magma-datasource-hibernate</artifactId>
     </dependency>
     <dependency>
       <groupId>org.obiba.magma</groupId>
@@ -68,10 +68,6 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-annotations</artifactId>
     </dependency>
     <dependency>
       <groupId>org.obiba</groupId>

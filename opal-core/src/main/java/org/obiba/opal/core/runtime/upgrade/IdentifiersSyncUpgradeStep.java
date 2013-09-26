@@ -87,9 +87,9 @@ public class IdentifiersSyncUpgradeStep extends AbstractUpgradeStep {
 
     if(parameters.size() > 0) {
       log.info("Inserting {} entities in opal-key database...", parameters.size());
-      String sql
-          = "insert into variable_entity (type,identifier,created,updated) values (:type,:identifier,:created,:updated)";
-      keyTemplate.batchUpdate(sql, parameters.toArray(new SqlParameterSource[parameters.size()]));
+      keyTemplate.batchUpdate("insert into variable_entity (type,identifier,created,updated) " +
+          "values (:type,:identifier,:created,:updated)",
+          parameters.toArray(new SqlParameterSource[parameters.size()]));
 
       insertMissingEntitiesValueSets(keyTemplate);
     }
@@ -100,15 +100,15 @@ public class IdentifiersSyncUpgradeStep extends AbstractUpgradeStep {
     MagmaEngineTableResolver tableResolver = MagmaEngineTableResolver.valueOf(tableReference);
 
     // get the keys value table id
-    String sql = "select id from value_table where name=?";
-    Long tableId = keyTemplate.queryForObject(sql, Long.class, tableResolver.getTableName());
+    Long tableId = keyTemplate
+        .queryForObject("select id from value_table where name=?", Long.class, tableResolver.getTableName());
 
     if(tableId != null) {
       // join the missing entities to keys value table value sets
       log.info("Looking for missing value sets in opal-key database...");
-      sql
-          = "select * from variable_entity where id not in (select vs.variable_entity_id from value_set vs where vs.value_table_id=?)";
-      List<VariableEntityStateDao> missingEntities = keyTemplate.query(sql, new VariableEntityMapper(), tableId);
+      List<VariableEntityStateDao> missingEntities = keyTemplate.query("select * from variable_entity " +
+          "where id not in (select vs.variable_entity_id from value_set vs where vs.value_table_id=?)",
+          new VariableEntityMapper(), tableId);
 
       if(missingEntities.size() > 0) {
         List<SqlParameterSource> parameters = ImmutableList.<SqlParameterSource>builder()
@@ -122,9 +122,9 @@ public class IdentifiersSyncUpgradeStep extends AbstractUpgradeStep {
             })).build();
 
         log.info("Inserting {} value sets for missing entities in opal-key database...", parameters.size());
-        sql = "insert into value_set (created,updated,value_table_id,variable_entity_id) values (:created,:updated," +
-            tableId + ",:id)";
-        keyTemplate.batchUpdate(sql, parameters.toArray(new SqlParameterSource[parameters.size()]));
+        keyTemplate.batchUpdate("insert into value_set (created,updated,value_table_id,variable_entity_id) " +
+            "values (:created, :updated, " + tableId + ", :id)",
+            parameters.toArray(new SqlParameterSource[parameters.size()]));
       }
     }
   }
@@ -147,6 +147,7 @@ public class IdentifiersSyncUpgradeStep extends AbstractUpgradeStep {
 
   }
 
+  @SuppressWarnings("AssignmentToDateFieldFromParameter")
   public static final class VariableEntityStateDao extends VariableEntityBean {
 
     private final long id;

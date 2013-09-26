@@ -1,85 +1,71 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <!-- Datasource used for opal internal configuration -->
-  <bean id="dataSource" class="org.apache.commons.dbcp.managed.BasicManagedDataSource" destroy-method="close">
-    <qualifier value="opal-config"/>
-    <property name="transactionManager" ref="jotm"/>
-    <property name="url" value="${org.obiba.opal.datasource.url}"/>
-    <property name="driverClassName" value="${org.obiba.opal.datasource.driver}"/>
-    <property name="username" value="${org.obiba.opal.datasource.username}"/>
-    <property name="password" value="${org.obiba.opal.datasource.password}"/>
+  <!--
+    Hibernate stuff for Opal internal configuration database
+  -->
 
-    <property name="maxIdle" value="10"/>
-    <!-- Maximum number of borrowed connections. -1: unlimited -->
-    <property name="maxActive" value="100"/>
-    <!-- Wait no more than 10 seconds to a connection -->
-    <property name="maxWait" value="10000"/>
-    <property name="initialSize" value="2"/>
-    <property name="validationQuery" value="${org.obiba.opal.datasource.validationQuery}"/>
-    <property name="testOnBorrow" value="true"/>
+  <!-- configure a JTA-aware datasource -->
+  <bean id="dataSource" class="com.atomikos.jdbc.nonxa.AtomikosNonXADataSourceBean" init-method="init"
+      destroy-method="close">
+    <property name="uniqueResourceName" value="opal-config"/>
+    <property name="driverClassName" value="${org.obiba.opal.datasource.driver}"/>
+    <property name="url" value="${org.obiba.opal.datasource.url}"/>
+    <property name="user" value="${org.obiba.opal.datasource.username}"/>
+    <property name="password" value="${org.obiba.opal.datasource.password}"/>
+    <property name="minPoolSize" value="3"/>
+    <property name="poolSize" value="50"/>
+    <!--<property name="maxIdleTime" value="10"/>-->
+    <property name="testQuery" value="${org.obiba.opal.datasource.validationQuery}"/>
   </bean>
 
-  <!-- The Hibernate SessionFactory -->
-  <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+  <!-- Hibernate SessionFactory used for Opal internal configuration -->
+  <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
     <qualifier value="opal-config"/>
     <property name="dataSource" ref="dataSource"/>
     <property name="namingStrategy">
-      <bean class="org.obiba.magma.hibernate.cfg.MagmaNamingStrategy"/>
+      <bean class="org.obiba.magma.datasource.hibernate.cfg.MagmaNamingStrategy"/>
     </property>
     <property name="annotatedClasses">
       <bean class="org.obiba.opal.core.support.OpalAnnotationConfigurationHelper"/>
     </property>
-
-    <!-- This is required to allow Hibernate to register transaction synchronisations. -->
-    <property name="jtaTransactionManager" ref="jotm"/>
-    <!-- By setting this to false, the CurrentSessionContext implementation must be specified through hibernate.current_session_context_class -->
-    <property name="exposeTransactionAwareSessionFactory" value="false"/>
-
-    <property name="configurationClass" value="org.hibernate.cfg.AnnotationConfiguration"/>
+    <property name="jtaTransactionManager" ref="transactionManager"/>
     <property name="hibernateProperties">
       <bean class="org.obiba.opal.core.runtime.jdbc.HsqlDialectOverride">
-        <property name="properties">
-          <props>
-            <prop key="hibernate.generate_statistics">true</prop>
-            <prop key="hibernate.cache.use_structured_entries">true</prop>
-            <prop key="hibernate.cache.use_query_cache">true</prop>
-            <prop key="hibernate.cache.use_second_level_cache">true</prop>
-            <prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.EhCacheRegionFactory</prop>
-            <prop key="net.sf.ehcache.configurationResourceName">/opal-ehcache.xml</prop>
-            <prop key="hibernate.dialect">${org.obiba.opal.datasource.dialect}</prop>
-
-            <!-- Set the CurrentSessionContext to JTASessionContext: 
-                a Hibernate Session will be available when a transaction is active -->
-            <prop key="hibernate.current_session_context_class">jta</prop>
-
-            <!-- Overridden to lookup the JOTM UserTransaction directly instead of a JNDI lookup -->
-            <prop key="hibernate.transaction.factory_class">org.obiba.opal.core.tx.JOTMTransactionFactory</prop>
-            <prop key="hibernate.transaction.auto_close_session">true</prop>
-            <prop key="hibernate.transaction.flush_before_completion">true</prop>
-          </props>
+        <property name="propertiesArray">
+          <list>
+            <ref bean="hibernateProperties"/>
+            <props>
+              <prop key="hibernate.dialect">${org.obiba.opal.datasource.dialect}</prop>
+              <prop key="hibernate.hbm2ddl.auto">create</prop>
+            </props>
+          </list>
         </property>
       </bean>
     </property>
   </bean>
 
+  <!-- Default Hibernate properties used when creating SessionFactory for Magma Hibernate Datasources -->
   <bean id="hibernateProperties" class="org.obiba.opal.core.runtime.jdbc.HsqlDialectOverride">
     <qualifier value="hibernate"/>
     <property name="properties">
       <props>
-        <prop key="hibernate.generate_statistics">true</prop>
+        <prop key="hibernate.generate_statistics">false</prop>
         <prop key="hibernate.cache.use_structured_entries">true</prop>
         <prop key="hibernate.cache.use_query_cache">true</prop>
         <prop key="hibernate.cache.use_second_level_cache">true</prop>
-        <prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.EhCacheRegionFactory</prop>
-        <prop key="net.sf.ehcache.configurationResourceName">/opal-ehcache.xml</prop>
-
-        <!-- Set the CurrentSessionContext to JTASessionContext:
-            a Hibernate Session will be available when a transaction is active -->
+        <prop key="hibernate.cache.region.factory_class">
+          org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
+        </prop>
+        <prop key="hibernate.cache.provider_configuration_file_resource_path">/opal-ehcache.xml</prop>
+        <!-- Set the CurrentSessionContext to JTASessionContext: a Hibernate Session will be available when a transaction is active -->
         <prop key="hibernate.current_session_context_class">jta</prop>
-
-        <!-- Overridden to lookup the JOTM UserTransaction directly instead of a JNDI lookup -->
-        <prop key="hibernate.transaction.factory_class">org.obiba.opal.core.tx.JOTMTransactionFactory</prop>
+        <prop key="hibernate.transaction.factory_class">
+          org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory
+        </prop>
+        <prop key="hibernate.transaction.manager_lookup_class">
+          com.atomikos.icatch.jta.hibernate3.TransactionManagerLookup
+        </prop>
         <prop key="hibernate.transaction.auto_close_session">true</prop>
         <prop key="hibernate.transaction.flush_before_completion">true</prop>
       </props>
