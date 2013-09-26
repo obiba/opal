@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.report.event;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.google.gwt.event.shared.EventHandler;
@@ -24,8 +26,12 @@ public class ReportTemplateSelectedEvent extends GwtEvent<ReportTemplateSelected
 
   private final ReportTemplateDto reportTemplate;
 
-  public ReportTemplateSelectedEvent(ReportTemplateDto reportTemplate) {
+  public ReportTemplateSelectedEvent(@Nullable ReportTemplateDto reportTemplate) {
     this.reportTemplate = reportTemplate;
+  }
+
+  public boolean hasReportTemplate() {
+    return reportTemplate != null;
   }
 
   public ReportTemplateDto getReportTemplate() {

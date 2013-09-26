@@ -64,7 +64,7 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
   public void onAdd() {
     ReportTemplateUpdateModalPresenter presenter = reportTemplateUpdateModalPresenterProvider.show();
     presenter.setProject(project);
-    presenter.setDialogMode(Mode.CREATE);
+    presenter.setReportTemplate(null);
   }
 
   @Override
@@ -72,7 +72,6 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
     ReportTemplateUpdateModalPresenter presenter = reportTemplateUpdateModalPresenterProvider.show();
     presenter.setProject(project);
     presenter.setReportTemplate(reportTemplate);
-    presenter.setDialogMode(Mode.UPDATE);
   }
 
   @Override
@@ -117,6 +116,7 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
       @Override
       public void onReportTemplateSelected(ReportTemplateSelectedEvent event) {
         reportTemplate = event.getReportTemplate();
+        getView().setCurrentReportTemplateVisible(reportTemplate != null);
       }
     });
     addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEvent.Handler() {
@@ -217,5 +217,7 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
     HasAuthorization getRemoveReportTemplateAuthorizer();
 
     HasAuthorization getUpdateReportTemplateAuthorizer();
+
+    void setCurrentReportTemplateVisible(boolean visible);
   }
 }

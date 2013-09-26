@@ -126,4 +126,12 @@ public class ReportsView extends ViewWithUiHandlers<ReportsUiHandlers> implement
   public HasAuthorization getUpdateReportTemplateAuthorizer() {
     return new WidgetAuthorizer(edit);
   }
+
+  @Override
+  public void setCurrentReportTemplateVisible(boolean visible) {
+    execute.setVisible(visible);
+    download.setVisible(visible);
+    remove.setVisible(visible);
+    edit.setVisible(visible);
+  }
 }

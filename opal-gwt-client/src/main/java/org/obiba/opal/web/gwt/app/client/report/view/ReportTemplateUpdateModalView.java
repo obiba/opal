@@ -17,27 +17,24 @@ import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateMo
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateUpdateModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.github.gwtbootstrap.client.ui.event.HiddenEvent;
 import com.github.gwtbootstrap.client.ui.event.HiddenHandler;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -46,11 +43,7 @@ import com.google.web.bindery.event.shared.EventBus;
 public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<ReportTemplateUpdateModalUiHandlers>
     implements Display {
 
-
-  interface ReportTemplateUpdateModalUiBinder extends UiBinder<Widget, ReportTemplateUpdateModalView> {}
-
-  private static final ReportTemplateUpdateModalUiBinder uiBinder = GWT
-      .create(ReportTemplateUpdateModalUiBinder.class);
+  interface Binder extends UiBinder<Widget, ReportTemplateUpdateModalView> {}
 
   @UiField
   Modal dialog;
@@ -94,31 +87,15 @@ public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<
   @UiField
   RadioButton scheduleRadio;
 
-  @UiField
-  Anchor cronLink;
-
-
-  @UiField
-  Panel alertPlace;
-
-
   private FileSelectionPresenter.Display fileSelection;
 
-  private static final Translations translations = GWT.create(Translations.class);
+  private final Translations translations;
 
   @Inject
-  public ReportTemplateUpdateModalView(EventBus eventBus) {
+  public ReportTemplateUpdateModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
     super(eventBus);
-    uiBinder.createAndBindUi(this);
-    cronLink.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent arg0) {
-        Window.open("http://www.quartz-scheduler.org/docs/tutorials/crontrigger.html", "_blank", null);
-      }
-    });
-
-    dialog.setTitle(translations.reportTemplateDialogTitle());
+    initWidget(uiBinder.createAndBindUi(this));
+    this.translations = translations;
     dialog.addHiddenHandler(new DialogHiddenHandler());
   }
 
@@ -126,9 +103,6 @@ public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<
   public void setInSlot(Object slot, IsWidget content) {
     Display.Slots s = (Display.Slots) slot;
     switch(s) {
-      case ERROR:
-        alertPlace.add(content);
-        break;
       case EMAIL:
         notificationEmailsPanel.add(content);
         break;
@@ -142,9 +116,6 @@ public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<
   public void removeFromSlot(Object slot, IsWidget content) {
     Display.Slots s = (Display.Slots) slot;
     switch(s) {
-      case ERROR:
-        alertPlace.remove(content);
-        break;
       case EMAIL:
         notificationEmailsPanel.remove(content);
         break;
@@ -155,14 +126,16 @@ public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<
   }
 
   @Override
-  public Widget asWidget() {
-    return dialog;
-  }
-
-  @Override
   public void show() {
     reportTemplateName.setFocus(true);
     super.show();
+  }
+
+  @Override
+  public void showErrors(List<String> messages) {
+    for(String msg : messages) {
+      dialog.addAlert(translations.userMessageMap().get(msg), AlertType.ERROR);
+    }
   }
 
   @Override
@@ -211,6 +184,22 @@ public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<
   }
 
   @Override
+  public void clear() {
+    setDesignFile("");
+    setFormat("");
+    setName("");
+    setSchedule("");
+  }
+
+  @Override
+  public void setReportTemplate(ReportTemplateDto reportTemplate) {
+    setDesignFile(reportTemplate.getDesign());
+    setFormat(reportTemplate.getFormat());
+    setName(reportTemplate.getName());
+    setSchedule(reportTemplate.getCron());
+  }
+
+  @Override
   public void setDesignFileWidgetDisplay(FileSelectionPresenter.Display display) {
     designFilePanel.setWidget(display.asWidget());
     fileSelection = display;
@@ -218,18 +207,15 @@ public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<
     fileSelection.setFieldWidth("20em");
   }
 
-  @Override
-  public void setName(String name) {
+  private void setName(String name) {
     reportTemplateName.setText(name != null ? name : "");
   }
 
-  @Override
-  public void setDesignFile(String designFile) {
+  private void setDesignFile(String designFile) {
     fileSelection.setFile(designFile != null ? designFile : "");
   }
 
-  @Override
-  public void setFormat(String format) {
+  private void setFormat(String format) {
     int itemCount = this.format.getItemCount();
     String item;
     for(int i = 0; i < itemCount; i++) {
@@ -241,8 +227,7 @@ public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<
     }
   }
 
-  @Override
-  public void setSchedule(String schedule) {
+  private void setSchedule(String schedule) {
     this.schedule.setText(schedule);
     if("".equals(schedule)) {
       scheduleRadio.setValue(false);
@@ -256,7 +241,8 @@ public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<
   @Override
   public void setEnabledReportTemplateName(boolean enabled) {
     reportTemplateName.setEnabled(enabled);
-
+    dialog
+        .setTitle(enabled ? translations.addReportTemplateDialogTitle() : translations.editReportTemplateDialogTitle());
   }
 
   @Override
@@ -267,23 +253,23 @@ public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<
   @Override
   public void setErrors(List<String> message, List<FormField> ids) {
 
-    for (FormField id : ids) {
-    switch(id) {
-      case NAME:
-        labelName.setType(ControlGroupType.ERROR);
-        break;
+    for(FormField id : ids) {
+      switch(id) {
+        case NAME:
+          labelName.setType(ControlGroupType.ERROR);
+          break;
 
-      case TEMPLE_FILE:
-        labelTempleFile.setType(ControlGroupType.ERROR);
-        break;
+        case TEMPLE_FILE:
+          labelTempleFile.setType(ControlGroupType.ERROR);
+          break;
 
-      case CRON_EXPRESSION:
-        labelSchedule.setType(ControlGroupType.ERROR);
-        break;
+        case CRON_EXPRESSION:
+          labelSchedule.setType(ControlGroupType.ERROR);
+          break;
 
-      default:
-        break;
-    }
+        default:
+          break;
+      }
     }
   }
 

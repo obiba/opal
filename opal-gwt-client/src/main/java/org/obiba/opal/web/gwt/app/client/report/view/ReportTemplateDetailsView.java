@@ -18,10 +18,7 @@ import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsP
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.DateTimeColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.gwt.rest.client.authorization.MenuItemAuthorizer;
-import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.ParameterDto;
 import org.obiba.opal.web.model.client.opal.ReportDto;
@@ -35,18 +32,12 @@ import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.MenuBar;
-import com.google.gwt.user.client.ui.MenuItem;
-import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -61,6 +52,9 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
   interface Binder extends UiBinder<Widget, ReportTemplateDetailsView> {}
 
   private static final Translations translations = GWT.create(Translations.class);
+
+  @UiField
+  Panel detailsPanel;
 
   @UiField
   Heading reportTemplateName;
@@ -166,6 +160,7 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
     if(reportTemplate != null) {
       renderReportTemplateDetails(reportTemplate);
     }
+    detailsPanel.setVisible(reportTemplate != null);
   }
 
   private void renderReportTemplateDetails(ReportTemplateDto reportTemplate) {

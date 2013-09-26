@@ -62,8 +62,6 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
 
   private final ItemSelectorPresenter parametersSelectorPresenter;
 
-  private final NotificationPresenter errorNotificationPresenter;
-
   private final Collection<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
   private String project;
@@ -76,6 +74,10 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
 
   public interface Display extends PopupView, HasUiHandlers<ReportTemplateUpdateModalUiHandlers> {
 
+    void setReportTemplate(ReportTemplateDto reportTemplate);
+
+    void clear();
+
     enum FormField {
       NAME,
       TEMPLE_FILE,
@@ -84,18 +86,12 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
     }
 
     enum Slots {
-      ERROR, EMAIL, REPORT_PARAMS
+      EMAIL, REPORT_PARAMS
     }
 
+    void showErrors(List<String> messages);
+
     void hideDialog();
-
-    void setName(String name);
-
-    void setDesignFile(String designFile);
-
-    void setFormat(String format);
-
-    void setSchedule(String schedule);
 
     HasText getName();
 
@@ -119,15 +115,13 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
   @Inject
   public ReportTemplateUpdateModalPresenter(Display display, EventBus eventBus,
       Provider<FileSelectionPresenter> fileSelectionPresenterProvider,
-      Provider<ItemSelectorPresenter> itemSelectorPresenterProvider,
-      Provider<NotificationPresenter> errorNotificationPresenterProvider) {
+      Provider<ItemSelectorPresenter> itemSelectorPresenterProvider) {
     super(eventBus, display);
     fileSelectionPresenter = fileSelectionPresenterProvider.get();
     emailSelectorPresenter = itemSelectorPresenterProvider.get();
     parametersSelectorPresenter = itemSelectorPresenterProvider.get();
     parametersSelectorPresenter.getView().setItemInputDisplay(new KeyValueItemInputView());
     emailSelectorPresenter.getView().setItemInputDisplay(new TextBoxItemInputView());
-    errorNotificationPresenter = errorNotificationPresenterProvider.get();
     getView().setUiHandlers(this);
   }
 
@@ -196,7 +190,6 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
   }
 
   protected void initDisplayComponents() {
-    setInSlot(Display.Slots.ERROR, errorNotificationPresenter);
     setInSlot(Display.Slots.EMAIL, emailSelectorPresenter);
     setInSlot(Display.Slots.REPORT_PARAMS, parametersSelectorPresenter);
 
@@ -213,7 +206,6 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
 
   @Override
   public void onDialogHidden() {
-    errorNotificationPresenter.close();
     getView().clearErrors();
   }
 
@@ -260,7 +252,6 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
   }
 
   private boolean validReportTemplate() {
-    errorNotificationPresenter.close();
     getView().clearErrors();
 
     List<Display.FormField> validatorIds = new ArrayList<Display.FormField>();
@@ -275,9 +266,7 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
     }
 
     if(messages.size() > 0) {
-      errorNotificationPresenter
-          .setNotification(NotificationPresenter.NotificationType.ERROR, messages, null, null, true,
-              new ErrorNotificationErrorCloseHandler());
+      getView().showErrors(messages);
 
       getView().setErrors(messages, validatorIds);
       return false;
@@ -387,23 +376,27 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
     }
   }
 
-  /**
-   * @param reportTemplateDetails
-   */
   public void setReportTemplate(ReportTemplateDto reportTemplate) {
-    getView().setDesignFile(reportTemplate.getDesign());
-    getView().setFormat(reportTemplate.getFormat());
-    getView().setName(reportTemplate.getName());
-    emailSelectorPresenter.getView().setItems(JsArrays.toIterable(reportTemplate.getEmailNotificationArray()));
-    parametersSelectorPresenter.getView().setItems(Iterables
-        .transform(JsArrays.toIterable(reportTemplate.getParametersArray()), new Function<ParameterDto, String>() {
+    getView().clear();
+    emailSelectorPresenter.getView().clear();
+    parametersSelectorPresenter.getView().clear();
+    if(reportTemplate == null) {
+      setDialogMode(Mode.CREATE);
+    } else {
+      setDialogMode(Mode.UPDATE);
+      getView().setReportTemplate(reportTemplate);
+      emailSelectorPresenter.getView().setItems(JsArrays.toIterable(reportTemplate.getEmailNotificationArray()));
+      parametersSelectorPresenter.getView().setItems(Iterables
+          .transform(JsArrays.toIterable(reportTemplate.getParametersArray()), new Function<ParameterDto, String>() {
 
-          @Override
-          public String apply(ParameterDto input) {
-            return input.getKey() + "=" + input.getValue();
-          }
-        }));
-    getView().setSchedule(reportTemplate.getCron());
+            @Override
+            public String apply(ParameterDto input) {
+              return input.getKey() + "=" + input.getValue();
+            }
+          }));
+    }
+
+
   }
 
   private class ErrorNotificationErrorCloseHandler implements ClosedHandler {

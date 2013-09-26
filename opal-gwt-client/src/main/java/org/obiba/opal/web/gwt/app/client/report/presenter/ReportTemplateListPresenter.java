@@ -132,7 +132,9 @@ public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateL
 
       getView().setReportTemplates(sortedTemplates);
 
-      if(templateToSelect != null) {
+      if(sortedTemplates.length() == 0) {
+        onSelection(null);
+      } else if(templateToSelect != null) {
         onSelection(templateToSelect);
       } else if(sortedTemplates.length() > 0) {
         onSelection(sortedTemplates.get(0));
