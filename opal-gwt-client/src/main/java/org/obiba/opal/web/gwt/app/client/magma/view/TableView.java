@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TableUiHandlers;
@@ -92,7 +93,13 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   PropertiesTable propertiesTable;
 
   @UiField
-  PropertiesTable summaryTable;
+  NavLink timestamps;
+
+  @UiField
+  NavLink variableCount;
+
+  @UiField
+  NavLink entityCount;
 
   @UiField
   FlowPanel indexStatus;
@@ -323,16 +330,13 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     name.setText(dto.getName());
     entityType.setText(dto.getEntityType());
     edit.setVisible(dto.hasViewLink());
-    summaryTable.removeProperties();
-    Moment created = Moment.create(dto.getTimestamps().getCreated());
-    summaryTable.addProperty(translations.createdLabel(), created.format(FormatType.MONTH_NAME_TIME));
-    Moment lastUpdate = Moment.create(dto.getTimestamps().getLastUpdate());
-    summaryTable.addProperty(translations.lastUpdateLabel(),
-        lastUpdate.format(FormatType.MONTH_NAME_TIME) + " (" + lastUpdate.fromNow() + ")");
-    if(dto.hasVariableCount())
-      summaryTable.addProperty(translations.variablesCountProperty(), "" + dto.getVariableCount());
-    if(dto.hasValueSetCount()) summaryTable.addProperty(translations.entitiesCountProperty(), "" + dto.getValueSetCount());
 
+    timestamps.setText(TranslationsUtils.replaceArguments(translations.lastUpdateOnLabel(),
+        Moment.create(dto.getTimestamps().getLastUpdate()).fromNow()));
+    variableCount.setText(TranslationsUtils.replaceArguments(translations.variablesCountLabel(),
+        dto.hasVariableCount() ? "" + dto.getVariableCount() : "?"));
+    entityCount.setText(TranslationsUtils.replaceArguments(translations.entitiesCountLabel(),
+        dto.hasValueSetCount() ? "" + dto.getValueSetCount() : "?"));
   }
 
   @Override

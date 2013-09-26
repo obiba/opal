@@ -152,14 +152,23 @@
           </b:Alert>
         </g:FlowPanel>
 
-        <b:Heading size="4">
-          <ui:msg description="Statistics label">Statistics</ui:msg>
-        </b:Heading>
-        <b:Row>
-          <b:Column size="6">
-            <o:PropertiesTable ui:field="summaryTable" keyStyleNames="span3"/>
+        <b:FluidRow addStyleNames="text-align-center">
+          <b:Column size="4">
+            <b:WellNavList>
+              <b:NavLink icon="TIME" ui:field="timestamps">?</b:NavLink>
+            </b:WellNavList>
           </b:Column>
-        </b:Row>
+          <b:Column size="4">
+            <b:WellNavList>
+              <b:NavLink icon="COLUMNS" ui:field="variableCount">? variables</b:NavLink>
+            </b:WellNavList>
+          </b:Column>
+          <b:Column size="4">
+            <b:WellNavList>
+              <b:NavLink icon="USER" ui:field="entityCount">? entities</b:NavLink>
+            </b:WellNavList>
+          </b:Column>
+        </b:FluidRow>
 
       </b:Tab>
 

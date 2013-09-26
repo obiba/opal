@@ -35,24 +35,24 @@
       <b:Tab icon="HOME" active="true">
         <b:Heading size="3" ui:field="projectHeader" addStyleNames="inline-block">Project</b:Heading>
         <g:FlowPanel ui:field="tagsPanel" addStyleNames="inline-block small-indent"/>
-        <g:SimplePanel ui:field="timestampsPanel" addStyleNames="inline-block small-indent">
-          <b:Popover ui:field="timestamps" trigger="HOVER" placement="BOTTOM" html="true">
-            <b:Icon type="INFO_SIGN"></b:Icon>
-          </b:Popover>
-        </g:SimplePanel>
         <b:Paragraph ui:field="description"></b:Paragraph>
         <b:FluidRow addStyleNames="text-align-center">
-          <b:Column size="4">
+          <b:Column size="3">
+            <b:WellNavList>
+              <b:NavLink icon="TIME" ui:field="timestamps">?</b:NavLink>
+            </b:WellNavList>
+          </b:Column>
+          <b:Column size="3">
             <b:WellNavList>
               <b:NavLink icon="TABLE" ui:field="tableCount">? tables</b:NavLink>
             </b:WellNavList>
           </b:Column>
-          <b:Column size="4">
+          <b:Column size="3">
             <b:WellNavList>
               <b:NavLink icon="COLUMNS" ui:field="variableCount">? variables</b:NavLink>
             </b:WellNavList>
           </b:Column>
-          <b:Column size="4">
+          <b:Column size="3">
             <b:WellNavList>
               <b:NavLink icon="USER" ui:field="entityCount">? entities</b:NavLink>
             </b:WellNavList>

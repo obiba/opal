@@ -17,7 +17,6 @@ import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectUiHandlers;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalTabPanel;
-import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
 import org.obiba.opal.web.gwt.datetime.client.FormatType;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
@@ -28,7 +27,6 @@ import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.Label;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.Paragraph;
-import com.github.gwtbootstrap.client.ui.Popover;
 import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
@@ -37,7 +35,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
@@ -63,10 +60,7 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   FlowPanel tagsPanel;
 
   @UiField
-  Panel timestampsPanel;
-
-  @UiField
-  Popover timestamps;
+  NavLink timestamps;
 
   @UiField
   NavLink tableCount;
@@ -132,17 +126,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   }
 
   private void setTimestamps() {
-    timestampsPanel.setVisible(project.hasTimestamps());
-    if(project.hasTimestamps()) {
-      Moment created = Moment.create(project.getTimestamps().getCreated());
-      Moment lastUpdate = Moment.create(project.getTimestamps().getLastUpdate());
-      timestamps.setHeading(translations.infoLabel());
-      String createdOn = TranslationsUtils
-          .replaceArguments(translations.createdOnLabel(), created.format(FormatType.MONTH_NAME_TIME_SHORT));
-      String lastUpdateOn = TranslationsUtils.replaceArguments(translations.lastUpdateOnLabel(), lastUpdate.fromNow());
-      timestamps.setText(createdOn + "<br/>" + lastUpdateOn);
-      timestamps.reconfigure();
-    }
+    String lastUpdateOn = "?";
+    if(project.hasTimestamps()) lastUpdateOn = Moment.create(project.getTimestamps().getLastUpdate()).fromNow();
+    timestamps.setText(TranslationsUtils.replaceArguments(translations.lastUpdateOnLabel(), lastUpdateOn));
   }
 
   @Override
@@ -191,6 +177,11 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   @UiHandler("projects")
   void onProjectsSelection(ClickEvent event) {
     getUiHandlers().onProjectsSelection();
+  }
+
+  @UiHandler("timestamps")
+  void onTimestamps(ClickEvent event) {
+    tabPanel.selectTab(ProjectTab.TABLES.ordinal());
   }
 
   @UiHandler("tableCount")
