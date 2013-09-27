@@ -10,6 +10,7 @@
 package org.obiba.opal.web;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.obiba.opal.core.vcs.CommitInfo;
@@ -17,8 +18,10 @@ import org.obiba.opal.web.model.Opal;
 
 public final class Dtos {
 
-  public static Opal.VcsCommitInfosDto asDto(List<CommitInfo> commitInfos) {
-    List<Opal.VcsCommitInfoDto> commitInfoDtos = new ArrayList<Opal.VcsCommitInfoDto>();
+  private Dtos() {}
+
+  public static Opal.VcsCommitInfosDto asDto(Iterable<CommitInfo> commitInfos) {
+    Collection<Opal.VcsCommitInfoDto> commitInfoDtos = new ArrayList<Opal.VcsCommitInfoDto>();
 
     for(CommitInfo commitInfo : commitInfos) {
       commitInfoDtos.add(asDto(commitInfo));

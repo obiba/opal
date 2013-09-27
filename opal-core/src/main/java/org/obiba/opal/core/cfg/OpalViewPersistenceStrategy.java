@@ -27,6 +27,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -51,8 +52,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStream;
-
-import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
  * This implementation of the {@link ViewPersistenceStrategy} serializes and de-serializes {@link View}s to XML files.

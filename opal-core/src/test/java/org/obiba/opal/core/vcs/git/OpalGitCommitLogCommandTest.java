@@ -9,15 +9,11 @@
  */
 package org.obiba.opal.core.vcs.git;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.vcs.CommitInfo;
 import org.obiba.opal.core.vcs.OpalGitException;
 import org.obiba.opal.core.vcs.git.commands.OpalGitCommitLogCommand;
-import org.obiba.opal.core.vcs.git.commands.OpalGitCommitsLogCommand;
 import org.obiba.opal.core.vcs.git.support.TestOpalGitVersionControlSystem;
 
 import static org.hamcrest.Matchers.is;
@@ -33,25 +29,19 @@ public class OpalGitCommitLogCommandTest {
 
   private static final String DATASOURCE_NAME = "opal-data2";
 
-  private AtomicReference<TestOpalGitVersionControlSystem> vcs = new AtomicReference<TestOpalGitVersionControlSystem>();
-
-  private AtomicReference<OpalGitCommitLogCommand> command = new AtomicReference<OpalGitCommitLogCommand>();
-
-  @Before
-  public void setup() {
-    vcs.set(new TestOpalGitVersionControlSystem());
-    command.set(new OpalGitCommitLogCommand(vcs.get().getRepository(DATASOURCE_NAME), DATASOURCE_NAME));
-  }
+  private static final TestOpalGitVersionControlSystem vcs = new TestOpalGitVersionControlSystem();
 
   @Test(expected = OpalGitException.class)
   public void testCreateCommandWithNullRepository() {
-    new OpalGitCommitsLogCommand(null);
+    new OpalGitCommitLogCommand.Builder(null, "", COMMIT_ID).build();
   }
 
   @Test
-  public void testCommitsInfoRetrievalWithValidCommitId() {
+  public void testCommitInfoRetrievalWithValidCommitId() {
     try {
-      CommitInfo commitInfo = command.get().addPath("TestView").addCommitId(COMMIT_ID).execute();
+      OpalGitCommitLogCommand command = new OpalGitCommitLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME),
+          "TestView", COMMIT_ID).build();
+      CommitInfo commitInfo = command.execute();
       assertThat(commitInfo, not(is(nullValue())));
       assertThat(commitInfo.getCommitId(), is(COMMIT_ID));
       assertThat(commitInfo.getAuthor(), is("administrator"));
@@ -62,14 +52,18 @@ public class OpalGitCommitLogCommandTest {
   }
 
   @Test(expected = OpalGitException.class)
-  public void testCommitsInfoRetrievalWithInvalidCommitId() {
-    command.get().addPath("TestView").addCommitId(BAD_COMMIT_ID).execute();
+  public void testCommitInfoRetrievalWithInvalidCommitId() {
+    OpalGitCommitLogCommand command = new OpalGitCommitLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME),
+        "TestView", BAD_COMMIT_ID).build();
+    command.execute();
   }
 
   @Test
-  public void testCommitsInfoRetrievalWithValidVariable() {
+  public void testCommitInfoRetrievalWithValidVariable() {
     try {
-      CommitInfo commitInfo = command.get().addPath("TestView/TOTO_VAR.js").addCommitId(COMMIT_ID).execute();
+      OpalGitCommitLogCommand command = new OpalGitCommitLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME),
+          "TestView/TOTO_VAR.js", COMMIT_ID).build();
+      CommitInfo commitInfo = command.execute();
       assertThat(commitInfo, not(is(nullValue())));
       assertThat(commitInfo.getCommitId(), is(COMMIT_ID));
       assertThat(commitInfo.getAuthor(), is("administrator"));
@@ -80,9 +74,18 @@ public class OpalGitCommitLogCommandTest {
   }
 
   @Test(expected = OpalGitException.class)
-  public void testCommitsInfoRetrievalWithInvalidVariable() {
-    command.get().addPath("TestView").addPath("TestView/BAD_VAR.js").addCommitId(COMMIT_ID).execute();
+  public void testCommitInfoRetrievalWithInvalidVariable() {
+    OpalGitCommitLogCommand command = new OpalGitCommitLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME),
+        "TestView/BAD_VAR.js", COMMIT_ID).build();
+    command.execute();
   }
+
+  @Test(expected = OpalGitException.class)
+  public void testCommitInfoRetrievalWithNoPath() {
+    new OpalGitCommitLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME),
+        null, COMMIT_ID).build().execute();
+  }
+
 
 }
 

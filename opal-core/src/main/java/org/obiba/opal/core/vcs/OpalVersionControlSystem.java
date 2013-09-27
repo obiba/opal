@@ -3,8 +3,7 @@ package org.obiba.opal.core.vcs;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 
 public interface OpalVersionControlSystem {
   List<CommitInfo> getCommitsInfo(@Nonnull String datasource, @Nonnull String path);

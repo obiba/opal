@@ -13,27 +13,21 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 import org.obiba.opal.core.vcs.CommitInfo;
 import org.obiba.opal.core.vcs.OpalGitException;
 
+import com.google.common.base.Strings;
+
+/**
+ * Opal GIT command used to extract the log of a repository path for a specific commit.
+ */
 public class OpalGitCommitLogCommand extends OpalGitCommand<CommitInfo> {
 
   private String path;
+
   private String commitId;
 
-
-  public OpalGitCommitLogCommand(@Nonnull Repository repository, String datasourceName) {
-    super(repository, datasourceName);
-  }
- public OpalGitCommitLogCommand(@Nonnull Repository repository) {
-    super(repository);
-  }
-
-  public OpalGitCommitLogCommand addPath(String value) {
-    path = value;
-    return this;
-  }
-
-  public OpalGitCommitLogCommand addCommitId(String value) {
-    commitId = value;
-    return this;
+  private OpalGitCommitLogCommand(Builder builder) {
+    super(builder.repository, builder.datasourceName);
+    commitId = builder.commitId;
+    path = builder.path;
   }
 
   @Override
@@ -54,6 +48,26 @@ public class OpalGitCommitLogCommand extends OpalGitCommand<CommitInfo> {
     }
 
     throw new OpalGitException(String.format("Path '%s' was not found in commit '%s'", path, commitId));
+  }
+
+  /**
+   * Builder class for OpalGitCommitLogCommand
+   */
+  public static class Builder extends OpalGitCommand.Builder<Builder> {
+
+    private final String commitId;
+
+    public Builder(@Nonnull Repository repository, @Nonnull String path, @Nonnull String commitId) {
+      super(repository);
+      addPath(path);
+      this.commitId = commitId;
+    }
+
+    public OpalGitCommitLogCommand build() {
+      if (Strings.isNullOrEmpty(path)) throw new OpalGitException("Commit path cannot empty nor null.");
+      if (Strings.isNullOrEmpty(commitId)) throw new OpalGitException("Commit id can not be empty nor null.");
+      return new OpalGitCommitLogCommand(this);
+    }
   }
 
 }

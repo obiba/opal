@@ -1,5 +1,7 @@
 package org.obiba.opal.web.vcs;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -13,7 +15,6 @@ import org.obiba.opal.core.vcs.OpalGitException;
 import org.obiba.opal.core.vcs.OpalVersionControlSystem;
 import org.obiba.opal.core.vcs.support.OpalGitUtils;
 import org.obiba.opal.web.Dtos;
-import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -64,7 +65,7 @@ public class ViewVcsLogResource {
       String path = OpalGitUtils.getVariableFilePath(view, variabeName);
       CommitInfo commitInfo = vcs.getCommitInfo(datasource, path, commitId);
       List<String> diffEntries = vcs.getDiffEntries(datasource, commitId, path);
-      CommitInfo.Builder.createFromObject(commitInfo).setDiffEntries(diffEntries).build();
+      commitInfo = CommitInfo.Builder.createFromObject(commitInfo).setDiffEntries(diffEntries).build();
 
       return Response.ok().entity(Dtos.asDto(commitInfo)).build();
     } catch(OpalGitException e) {
@@ -74,15 +75,20 @@ public class ViewVcsLogResource {
 
   @GET
   @Path("/variable/{variableName}/blob/{commitId}")
-  public Response getVariableContent(@Nonnull @PathParam("variableName") String variabeName,
+  public Response getVariableContent(@Nonnull @PathParam("variableName") String variableName,
       @Nonnull @PathParam("commitId") String commitId) {
     try {
+      String blob = vcs.getBlob(datasource, OpalGitUtils.getVariableFilePath(view, variableName), commitId);
+      InputStream is = new ByteArrayInputStream(blob.getBytes());
+
       return Response.ok()
-          .entity(vcs.getBlob(datasource, OpalGitUtils.getVariableFilePath(view, variabeName), commitId)).build();
+          .entity(is).header("Content-Disposition",getHeader(variableName)).build();
     } catch(OpalGitException e) {
       return Response.status(Response.Status.BAD_REQUEST).entity("FailedToRetrieveVariableCommitInfo").build();
     }
-
   }
 
+  public String getHeader(String variableName) {
+    return String.format("attachment; filename=%s", variableName);
+  }
 }

@@ -1,6 +1,9 @@
 package org.obiba.opal.core.vcs.git.commands;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
+
+import javax.annotation.Nonnull;
 
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
@@ -14,47 +17,27 @@ import org.obiba.opal.core.vcs.support.OpalGitUtils;
 
 import com.google.common.base.Strings;
 
+/**
+ * Opal GIT command used to extract the content of a file. Folders are not supported.
+ */
 public class OpalGitFetchBlobCommand extends OpalGitCommand<String> {
 
   private String path;
   private String commitId;
   private String encoding;
 
-
-  public OpalGitFetchBlobCommand(Repository repository, String datasourceName) {
-    super(repository, datasourceName);
-  }
-
-  public OpalGitFetchBlobCommand(Repository repository) {
-    super(repository);
-  }
-
-  public OpalGitFetchBlobCommand addPath(String value) {
-    path = value;
-    return this;
-  }
-
-  public OpalGitFetchBlobCommand addCommitId(String value) {
-    commitId = value;
-    return this;
-  }
-
-  public OpalGitFetchBlobCommand addEncoding(String value) {
-    encoding = value;
-    return this;
+  private OpalGitFetchBlobCommand(Builder builder) {
+    super(builder.repository, builder.datasourceName);
+    path = builder.path;
+    encoding = builder.encoding;
+    commitId = builder.commitId;
   }
 
   @Override
   public String execute() {
     try {
-      validate();
-
-      final ObjectId id = repository.resolve(commitId);
       ObjectReader reader = repository.newObjectReader();
-      RevWalk walk = new RevWalk(reader);
-      RevCommit commit = walk.parseCommit(id);
-      RevTree tree = commit.getTree();
-      TreeWalk treewalk = TreeWalk.forPath(reader, path, tree);
+      TreeWalk treewalk = getPathTreeWalk(reader);
 
       if(treewalk != null) {
         return new String(reader.open(treewalk.getObjectId(0)).getBytes(),
@@ -68,16 +51,39 @@ public class OpalGitFetchBlobCommand extends OpalGitCommand<String> {
     throw new OpalGitException(String.format("Path '%s' was not found in commit '%s'", path, commitId));
   }
 
-  protected void validate() {
-    if (Strings.isNullOrEmpty(commitId)) {
-      throw new OpalGitException("Commit id cannot be null");
+  private TreeWalk getPathTreeWalk(ObjectReader reader) throws IOException {
+    ObjectId id = repository.resolve(commitId);
+    RevWalk walk = new RevWalk(reader);
+    RevCommit commit = walk.parseCommit(id);
+    RevTree tree = commit.getTree();
+    return TreeWalk.forPath(reader, path, tree);
+  }
+
+  /**
+   * Builder class for OpalGitFetchBlobCommand
+   */
+  public static class Builder extends OpalGitCommand.Builder<Builder> {
+
+    private final String commitId;
+    private String encoding;
+
+    public Builder(@Nonnull Repository repository, @Nonnull String path, @Nonnull String commitId) {
+      super(repository);
+      addPath(path);
+      this.commitId = commitId;
     }
 
-    if (Strings.isNullOrEmpty(path)) {
-      throw new OpalGitException("Path cannot be null");
+    public Builder addEncoding(String value) {
+      encoding = value;
+      return this;
     }
-    else if (!OpalGitUtils.isFilePath(path)) {
-      throw new OpalGitException("Path must point to a file and not a folder");
+
+    public OpalGitFetchBlobCommand build() {
+      if (Strings.isNullOrEmpty(commitId)) throw new OpalGitException("Commit id cannot be empty nor null");
+      if (Strings.isNullOrEmpty(path)) throw new OpalGitException("Commit path cannot be empty nor null");
+      if (!OpalGitUtils.isFilePath(path)) throw new OpalGitException("Commit path must point to a file and not a folder");
+      return new OpalGitFetchBlobCommand(this);
     }
+
   }
 }

@@ -10,10 +10,8 @@
 package org.obiba.opal.core.vcs.git;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.vcs.CommitInfo;
 import org.obiba.opal.core.vcs.OpalGitException;
@@ -30,25 +28,19 @@ public class OpalGitCommitsLogCommandTest {
 
   private static final String DATASOURCE_NAME = "opal-data2";
 
-  private AtomicReference<TestOpalGitVersionControlSystem> vcs = new AtomicReference<TestOpalGitVersionControlSystem>();
-
-  private AtomicReference<OpalGitCommitsLogCommand> command = new AtomicReference<OpalGitCommitsLogCommand>();
-
-  @Before
-  public void setup() {
-    vcs.set(new TestOpalGitVersionControlSystem());
-    command.set(new OpalGitCommitsLogCommand(vcs.get().getRepository(DATASOURCE_NAME), DATASOURCE_NAME));
-  }
+  private static final TestOpalGitVersionControlSystem vcs = new TestOpalGitVersionControlSystem();
 
   @Test(expected = OpalGitException.class)
   public void testCreateCommandWithNullRepository() {
-    new OpalGitCommitsLogCommand(null);
+    new OpalGitCommitsLogCommand.Builder(null).build();
   }
 
   @Test
   public void testCommitsInfoRetrievalWitValidViewPath() {
     try {
-      List<CommitInfo> commitInfos = command.get().addPath("TestView").execute();
+      OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
+          .addDatasourceName(DATASOURCE_NAME).addPath("TestView").build();
+      List<CommitInfo> commitInfos = command.execute();
       assertThat(commitInfos, not(is(nullValue())));
       assertTrue(commitInfos.size() > 0);
       assertThat(commitInfos.get(0).getCommitId(), not(is(nullValue())));
@@ -59,13 +51,18 @@ public class OpalGitCommitsLogCommandTest {
 
   @Test(expected = OpalGitException.class)
   public void testCommitsInfoRetrievalWitInvalidViewPath() {
-    command.get().addPath("DUMMY").execute();
+    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
+        .addDatasourceName(DATASOURCE_NAME).addPath("DEADBEAF").build();
+    command.execute();
   }
 
   @Test
   public void testCommitsInfoRetrievalWitValidVariablePath() {
     try {
-      List<CommitInfo> commitInfos = command.get().addPath("TestView/TOTO_VAR.js").execute();
+      OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
+          .addDatasourceName(DATASOURCE_NAME).addPath("TestView/TOTO_VAR.js").build();
+
+      List<CommitInfo> commitInfos = command.execute();
       assertThat(commitInfos, not(is(nullValue())));
       assertThat(commitInfos.size(), not(is(0)));
       assertThat(commitInfos.get(0).getCommitId(), not(is(nullValue())));
@@ -76,13 +73,17 @@ public class OpalGitCommitsLogCommandTest {
 
   @Test(expected = OpalGitException.class)
   public void testCommitsInfoRetrievalWitInvalidVariablePath() {
-    command.get().addPath("TestView/BAD_VAR.js").execute();
+    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
+        .addDatasourceName(DATASOURCE_NAME).addPath("TestView/BAD_VAR.js").build();
+    command.execute();
   }
 
   @Test
   public void testCommitsInfoRetrievalForWholeRepository() {
     try {
-      List<CommitInfo> commitInfos = command.get().execute();
+      OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
+          .addDatasourceName(DATASOURCE_NAME).build();
+      List<CommitInfo> commitInfos = command.execute();
       assertThat(commitInfos, not(is(nullValue())));
       assertTrue(commitInfos.size() > 0);
     } catch(Exception e) {
@@ -96,7 +97,9 @@ public class OpalGitCommitsLogCommandTest {
   @Test
   public void testCommitsInfoRetrievalWithEmptyPath() {
     try {
-      List<CommitInfo> commitInfos = command.get().addPath("").execute();
+      OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
+          .addDatasourceName(DATASOURCE_NAME).addPath("").build();
+      List<CommitInfo> commitInfos = command.execute();
       assertThat(commitInfos, not(is(nullValue())));
       assertTrue(commitInfos.size() > 0);
     } catch(Exception e) {

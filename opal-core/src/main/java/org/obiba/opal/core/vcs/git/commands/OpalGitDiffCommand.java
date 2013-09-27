@@ -22,38 +22,22 @@ import org.obiba.opal.core.vcs.support.OpalGitUtils;
 
 import com.google.common.base.Strings;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
-
+/**
+ * Opal GIT command used to extract the diff between two commits. By default, the diff is between the given commit and
+ * its parent. By providing a valid 'nthCommit' value, the command will extract the appropriate diff from the repo.
+ */
 public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
 
   private String path;
-
   private String commitId;
-
   private int nthCommit = 1;
 
 
-  public OpalGitDiffCommand(@Nonnull Repository repository, @Nullable String datasourceName) {
-    super(repository, datasourceName);
-  }
-
-  public OpalGitDiffCommand(@Nonnull Repository repository) {
-    super(repository);
-  }
-
-  public OpalGitDiffCommand addPath(String value) {
-    path = value;
-    return this;
-  }
-
-  public OpalGitDiffCommand addCommitId(String value) {
-    commitId = value;
-    return this;
-  }
-
-  public OpalGitDiffCommand addNthCommit(int value) {
-    nthCommit = value;
-    return this;
+  private  OpalGitDiffCommand(Builder builder) {
+    super(builder.repository);
+    commitId = builder.commitId;
+    path = builder.path;
+    nthCommit = builder.nthCommit;
   }
 
   @Override
@@ -61,7 +45,6 @@ public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
     ObjectReader reader = repository.newObjectReader();
 
     try {
-      validate();
       DiffCurrentPreviousTreeParsersFactory test = new DiffCurrentPreviousTreeParsersFactory(reader).create();
       CanonicalTreeParser currentCommitParser = test.getCurrentCommitParser();
       AbstractTreeIterator previousCommitParser = test.getPreviousCommitParser();
@@ -100,6 +83,31 @@ public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
     return diffEntries;
   }
 
+  /**
+   * Builder class for OpalGitDiffCommand
+   */
+  public static class Builder extends OpalGitCommand.Builder<Builder> {
+
+    private final String commitId;
+    private int nthCommit = 1;
+
+    public Builder(@Nonnull Repository repository, @Nonnull String commitId) {
+      super(repository);
+      this.commitId = commitId;
+    }
+
+    public Builder addNthCommit(int value) {
+      nthCommit = value;
+      return this;
+    }
+
+    public OpalGitDiffCommand build() {
+      if (Strings.isNullOrEmpty(commitId)) throw new OpalGitException("Commit id cannot be null");
+      return new OpalGitDiffCommand(this);
+    }
+
+  }
+
   private class DiffCurrentPreviousTreeParsersFactory {
     private ObjectReader reader;
 
@@ -107,7 +115,7 @@ public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
 
     private AbstractTreeIterator previousCommitParser;
 
-    public DiffCurrentPreviousTreeParsersFactory(ObjectReader reader) {this.reader = reader;}
+    private DiffCurrentPreviousTreeParsersFactory(ObjectReader reader) {this.reader = reader;}
 
     public CanonicalTreeParser getCurrentCommitParser() {
       return currentCommitParser;
@@ -140,13 +148,6 @@ public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
       }
 
       return this;
-    }
-
-
-    protected void validate() {
-      if (Strings.isNullOrEmpty(commitId)) {
-        throw new OpalGitException("Commit id cannot be null");
-      }
     }
   }
 }

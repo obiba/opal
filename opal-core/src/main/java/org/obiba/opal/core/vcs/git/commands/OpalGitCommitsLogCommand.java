@@ -16,24 +16,17 @@ import org.obiba.opal.core.vcs.OpalGitException;
 
 import com.google.common.base.Strings;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
-
+/**
+ * Opal GIT command used to extract a list of logs of a repository path.
+ */
 public class OpalGitCommitsLogCommand extends OpalGitCommand<List<CommitInfo>> {
 
   private String path;
 
 
-  public OpalGitCommitsLogCommand(@Nonnull Repository repository, @Nullable String datasourceName) {
-    super(repository, datasourceName);
-  }
-
-  public OpalGitCommitsLogCommand(@Nonnull Repository repository) {
-    super(repository);
-  }
-
-  public OpalGitCommitsLogCommand addPath(String value) {
-    path = value;
-    return this;
+  private OpalGitCommitsLogCommand(Builder builder) {
+    super(builder.repository, builder.datasourceName);
+    path = builder.path;
   }
 
   @Override
@@ -55,7 +48,7 @@ public class OpalGitCommitsLogCommand extends OpalGitCommand<List<CommitInfo>> {
             .setComment(commit.getFullMessage()).setCommitId(commit.getName()).build());
       }
 
-      if(commits.size() == 0) {
+      if(commits.isEmpty()) {
         throw new OpalGitException(getNoCommitsErrorMessage());
       }
 
@@ -75,4 +68,19 @@ public class OpalGitCommitsLogCommand extends OpalGitCommand<List<CommitInfo>> {
 
     return errorMessage;
   }
+
+  /**
+   * Builder class for OpalGitCommitsLogCommand
+   */
+  public static class Builder extends OpalGitCommand.Builder<Builder> {
+
+    public Builder(@Nonnull Repository repository) {
+      super(repository);
+    }
+
+    public OpalGitCommitsLogCommand build() {
+      return new OpalGitCommitsLogCommand(this);
+    }
+  }
+
 }
