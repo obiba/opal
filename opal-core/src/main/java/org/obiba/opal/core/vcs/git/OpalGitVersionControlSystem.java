@@ -2,55 +2,55 @@ package org.obiba.opal.core.vcs.git;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.LogCommand;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.NoHeadException;
-import org.eclipse.jgit.errors.IncorrectObjectTypeException;
-import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.obiba.opal.core.vcs.CommitInfo;
 import org.obiba.opal.core.vcs.OpalGitException;
 import org.obiba.opal.core.vcs.OpalVersionControlSystem;
 import org.obiba.opal.core.vcs.git.commands.OpalGitCommitLogCommand;
 import org.obiba.opal.core.vcs.git.commands.OpalGitCommitsLogCommand;
+import org.obiba.opal.core.vcs.git.commands.OpalGitDiffCommand;
 import org.obiba.opal.core.vcs.git.commands.OpalGitFetchBlobCommand;
 import org.obiba.opal.core.vcs.support.OpalGitUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class OpalGitVersionControlSystem implements OpalVersionControlSystem {
 
-  private static final Logger log = LoggerFactory.getLogger(OpalGitVersionControlSystem.class);
-
+  @Override
   public List<CommitInfo> getCommitsInfo(@Nonnull String datasource, @Nonnull String path) {
-    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand(getRepository(datasource)).addPath(path);
+    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(getRepository(datasource)).addPath(path)
+        .addDatasourceName(datasource).build();
     return command.execute();
   }
 
+  @Override
   public CommitInfo getCommitInfo(@Nonnull String datasource, @Nonnull String path, @Nonnull String commitId) {
-    OpalGitCommitLogCommand command = new OpalGitCommitLogCommand(getRepository(datasource)).addPath(path)
-        .addCommitId(commitId);
+    OpalGitCommitLogCommand command = new OpalGitCommitLogCommand.Builder(getRepository(datasource), path, commitId)
+        .addDatasourceName(datasource).build();
     return command.execute();
   }
 
+  @Override
   public String getBlob(@Nonnull String datasource, @Nonnull String path, @Nonnull String commitId) {
-    OpalGitFetchBlobCommand command = new OpalGitFetchBlobCommand(getRepository(datasource)).addPath(path)
-        .addCommitId(commitId);
+    OpalGitFetchBlobCommand command = new OpalGitFetchBlobCommand.Builder(getRepository(datasource), path, commitId)
+        .addDatasourceName(datasource).build();
     return command.execute();
   }
 
-  private Repository getRepository(String name) {
+  @Override
+  public List<String> getDiffEntries(@Nonnull String datasource, @Nonnull String commitId, String path) {
+    OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(getRepository(datasource), commitId).addPath(path)
+        .addDatasourceName(datasource).build();
+
+    return command.execute();
+  }
+
+  protected Repository getRepository(String name) {
     File repo = OpalGitUtils.getGitDirectoryName(OpalGitUtils.buildOpalGitRootPath(), name);
     FileRepositoryBuilder builder = new FileRepositoryBuilder();
 

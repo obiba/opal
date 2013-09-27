@@ -37,5 +37,13 @@ public final class OpalGitUtils {
         .append(VARIABLE_FILE_EXTENSION).toString();
   }
 
+  public static String getNthCommitId(String commitId, int nth) {
+    return commitId +"~" + String.valueOf(nth);
+  }
+
+  public static boolean isFilePath(String path) {
+    // TODO find a safe check
+    return path.matches("\\w+\\/+\\w+\\.\\w+$");
+  }
 
 }

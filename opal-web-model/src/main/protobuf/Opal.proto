@@ -357,3 +357,16 @@ message OpalConf {
   required GeneralConf general = 1;
   repeated TaxonomyDto taxonomies = 2;
 }
+
+
+message VcsCommitInfosDto {
+  repeated VcsCommitInfoDto commitInfos = 1;
+}
+
+message VcsCommitInfoDto {
+  required string author = 1;
+  required string date = 2;
+  required string comment = 3;
+  required string commitId = 4;
+  repeated string diffEntries = 5;
+}
