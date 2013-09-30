@@ -70,14 +70,14 @@ public class TempDefaultConfig {
     createDatasourceAndProject("opal-data", opalData);
     createDatasourceAndProject("mica_demo", opalData);
 
-//    MongoDbDatabase opalMongo = new MongoDbDatabase.Builder() //
-//        .name("mongo-data") //
-//        .url("mongodb://localhost:27017/opal_data") //
-//        .editable(false) //
-//        .usage(Database.Usage.STORAGE) //
-//        .build();
-//
-//    createDatasourceAndProject("mongo", opalMongo);
+    MongoDbDatabase opalMongo = new MongoDbDatabase.Builder() //
+        .name("mongo-data") //
+        .url("mongodb://localhost:27017/opal_data") //
+        .editable(false) //
+        .usage(Database.Usage.STORAGE) //
+        .build();
+
+    createDatasourceAndProject("mongo", opalMongo);
   }
 
   private void createDatasourceAndProject(String datasourceName, final SqlDatabase opalData) {
