@@ -189,6 +189,25 @@ public class VariableDtos {
   }
 
   /**
+   * Get first attribute with the given name and locale from the provided category.
+   *
+   * @param variable
+   * @param name
+   * @return
+   */
+  @Nullable
+  public static AttributeDto getAttribute(CategoryDto category, String name, String locale) {
+    // make sure attributes array is defined
+    category.setAttributesArray(JsArrays.toSafeArray(category.getAttributesArray()));
+    for(AttributeDto attr : JsArrays.toIterable(category.getAttributesArray())) {
+      if(attr.getName().equals(name) && attr.getLocale().equals(locale)) {
+        return attr;
+      }
+    }
+    return null;
+  }
+
+  /**
    * Get all attributes with the given name from the provided variable.
    *
    * @param variable
@@ -230,6 +249,19 @@ public class VariableDtos {
     JsArray<AttributeDto> attributes = JsArrays.toSafeArray(variable.getAttributesArray());
     attributes.push(attribute);
     variable.setAttributesArray(attributes);
+
+    return attribute;
+  }
+
+  public static AttributeDto createAttribute(CategoryDto category, String name, String locale, String value) {
+    AttributeDto attribute = AttributeDto.create();
+    attribute.setName(name);
+    attribute.setValue(value);
+    attribute.setLocale(locale);
+
+    JsArray<AttributeDto> attributes = JsArrays.toSafeArray(category.getAttributesArray());
+    attributes.push(attribute);
+    category.setAttributesArray(attributes);
 
     return attribute;
   }
