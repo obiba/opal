@@ -50,6 +50,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
 
   /**
    * Construct a new column with check boxes and multi selection model.
+   *
    * @param display
    */
   public CheckboxColumn(final Display<T> display) {
@@ -58,6 +59,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
 
   /**
    * Construct a new column with check boxes and optional single or multi selection model.
+   *
    * @param display
    * @param single
    */
@@ -112,6 +114,10 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     });
 
     addHandlers();
+  }
+
+  public SetSelectionModel<T> getSelectionModel() {
+    return selectionModel;
   }
 
   private void addHandlers() {
@@ -250,7 +256,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
       updateStatusAlertWhenAllSelected(currentSelected);
     } else if(allPageSelected) {
       updateStatusAlertWhenAllPageSelected(currentSelected);
-    } else {
+    } else if(currentSelected > 0) {
       updateStatusAlertWhenNotAllSelected(currentSelected);
     }
   }

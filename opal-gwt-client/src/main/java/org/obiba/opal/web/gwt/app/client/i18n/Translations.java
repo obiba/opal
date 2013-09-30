@@ -2042,6 +2042,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("No entities")
   String noEntitiesLabel();
 
+  @Description("Edit categories label")
+  @DefaultStringValue("Edit categories")
+  String editCategories();
+
   @Description("Table count label")
   @DefaultStringValue("1 table")
   String tableCountLabel();
