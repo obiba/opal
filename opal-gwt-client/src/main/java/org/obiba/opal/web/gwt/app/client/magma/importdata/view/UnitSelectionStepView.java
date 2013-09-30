@@ -10,12 +10,12 @@
 package org.obiba.opal.web.gwt.app.client.magma.importdata.view;
 
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.UnitSelectionStepPresenter;
+import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -26,6 +26,7 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public class UnitSelectionStepView extends ViewImpl implements UnitSelectionStepPresenter.Display {
@@ -54,6 +55,9 @@ public class UnitSelectionStepView extends ViewImpl implements UnitSelectionStep
 
   @UiField
   CheckBox incremental;
+
+  @UiField
+  NumericTextBox limit;
 
   @UiField
   FlowPanel unitSection;
@@ -121,6 +125,12 @@ public class UnitSelectionStepView extends ViewImpl implements UnitSelectionStep
   @Override
   public boolean isIncremental() {
     return incremental.getValue();
+  }
+
+  @Override
+  public Integer getLimit() {
+    Long value = limit.getNumberValue();
+    return value == null ? null : value.intValue();
   }
 
 }

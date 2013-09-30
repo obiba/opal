@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.support;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
 import org.obiba.opal.web.model.client.magma.CsvDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.CsvDatasourceTableBundleDto;
+import org.obiba.opal.web.model.client.magma.DatasourceBatchConfigDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceIncrementalConfigDto;
 import org.obiba.opal.web.model.client.magma.DatasourceUnitConfigDto;
@@ -113,6 +114,7 @@ public class DatasourceDtos {
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
     configureUnit(importConfig, dto);
     configureIncremental(importConfig, dto);
+    configureBatch(importConfig, dto);
     dto.setExtension(extensionName, extension);
     return dto;
   }
@@ -123,6 +125,14 @@ public class DatasourceDtos {
       configDto.setIncremental(true);
       configDto.setIncrementalDestinationName(importConfig.getDestinationDatasourceName());
       dto.setIncrementalConfig(configDto);
+    }
+  }
+
+  private static void configureBatch(ImportConfig importConfig, DatasourceFactoryDto dto) {
+    if(importConfig.getLimit() != null) {
+      DatasourceBatchConfigDto configDto = DatasourceBatchConfigDto.create();
+      configDto.setLimit(importConfig.getLimit());
+      dto.setBatchConfig(configDto);
     }
   }
 
@@ -145,6 +155,7 @@ public class DatasourceDtos {
 
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
     configureIncremental(importConfig, dto);
+    configureBatch(importConfig, dto);
     dto.setExtension(SpssDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
 
     return dto;
@@ -155,6 +166,7 @@ public class DatasourceDtos {
 
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
     configureIncremental(importConfig, dto);
+    configureBatch(importConfig, dto);
     dto.setExtension(HCDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
 
     return dto;
@@ -166,6 +178,7 @@ public class DatasourceDtos {
 
     DatasourceFactoryDto dto = DatasourceFactoryDto.create();
     configureIncremental(importConfig, dto);
+    configureBatch(importConfig, dto);
     dto.setExtension(GNPostalCodesDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
 
     return dto;

@@ -28,6 +28,8 @@ public class ImportConfig {
 
   private boolean incremental;
 
+  private Integer limit;
+
   private String xmlFile;
 
   private String destinationDatasourceName;
@@ -264,6 +266,14 @@ public class ImportConfig {
 
   public void setIncremental(boolean incremental) {
     this.incremental = incremental;
+  }
+
+  public void setLimit(Integer limit) {
+    this.limit = limit;
+  }
+
+  public Integer getLimit() {
+    return limit;
   }
 
   private Map<String, Object> getProperties() {

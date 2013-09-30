@@ -16,6 +16,7 @@ import javax.annotation.Nonnull;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.support.BatchDatasourceFactory;
 import org.obiba.magma.support.IncrementalDatasourceFactory;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
@@ -62,6 +63,10 @@ public abstract class AbstractDatasourceFactoryDtoParser implements DatasourceFa
       if(incrementalConfig.getIncremental() && incrementalConfig.hasIncrementalDestinationName()) {
         factory = new IncrementalDatasourceFactory(factory, incrementalConfig.getIncrementalDestinationName());
       }
+    }
+
+    if (dto.hasBatchConfig()) {
+      factory = new BatchDatasourceFactory(factory, dto.getBatchConfig().getLimit());
     }
 
     Initialisables.initialise(factory);

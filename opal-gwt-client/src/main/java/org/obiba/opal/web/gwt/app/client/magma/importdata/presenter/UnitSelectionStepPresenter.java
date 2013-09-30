@@ -74,6 +74,7 @@ public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionSte
     importConfig.setIdentifierAsIs(!withUnit);
     importConfig.setUnit(withUnit ? getView().getSelectedUnit() : null);
     importConfig.setIncremental(getView().isIncremental());
+    importConfig.setLimit(getView().getLimit());
   }
 
   public interface Display extends View {
@@ -91,6 +92,8 @@ public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionSte
     void setUnitEnabled(boolean enabled);
 
     boolean isIncremental();
+
+    Integer getLimit();
 
     void setUnitRadiosEnabled(boolean enabled);
   }

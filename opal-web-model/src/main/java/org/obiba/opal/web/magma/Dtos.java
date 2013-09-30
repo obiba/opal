@@ -353,7 +353,8 @@ public final class Dtos {
    * @return
    */
   public static ValueSetsDto.ValueSetDto.Builder asDto(ValueSet valueSet) {
-    return ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(valueSet.getVariableEntity().getIdentifier());
+    VariableEntity entity = valueSet.getVariableEntity();
+    return ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(entity.getIdentifier());
   }
 
   public static LocaleDto asDto(Locale locale, @Nullable Locale displayLocale) {
