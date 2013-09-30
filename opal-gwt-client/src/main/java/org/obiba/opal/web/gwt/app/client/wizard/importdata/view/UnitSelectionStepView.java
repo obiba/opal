@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.wizard.importdata.view;
 
 import org.obiba.opal.web.gwt.app.client.wizard.importdata.presenter.UnitSelectionStepPresenter;
+import org.obiba.opal.web.gwt.app.client.workbench.view.NumericTextBox;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
 import com.google.gwt.core.client.GWT;
@@ -25,6 +26,7 @@ import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RadioButton;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
 
@@ -54,6 +56,9 @@ public class UnitSelectionStepView extends ViewImpl implements UnitSelectionStep
 
   @UiField
   CheckBox incremental;
+
+  @UiField
+  NumericTextBox limit;
 
   @UiField
   FlowPanel unitSection;
@@ -121,6 +126,12 @@ public class UnitSelectionStepView extends ViewImpl implements UnitSelectionStep
   @Override
   public boolean isIncremental() {
     return incremental.getValue();
+  }
+
+  @Override
+  public Integer getLimit() {
+    Long value = limit.getNumberValue();
+    return value == null ? null : value.intValue();
   }
 
 }

@@ -15,10 +15,15 @@ message DatasourceIncrementalConfigDto {
   optional string incrementalDestinationName = 2;
 }
 
+message DatasourceBatchConfigDto {
+  required int32 limit = 1;
+}
+
 message DatasourceFactoryDto {
   optional string name = 1;
   optional DatasourceIncrementalConfigDto incrementalConfig = 2;
   optional DatasourceUnitConfigDto unitConfig = 3;
+  optional DatasourceBatchConfigDto batchConfig = 4;
   extensions 1000 to max;
 }
 

@@ -29,8 +29,18 @@
         </g:Label>
       </g:FlowPanel>
 
+      <g:FlowPanel styleName="input" addStyleNames="small-indent">
+        <g:Label addStyleNames="key">
+          <ui:msg description="Batch import label">Limit</ui:msg>
+        </g:Label>
+        <o:NumericTextBox ui:field="limit" min="0" maxConstrained="false"/>
+        <g:Label styleName="help-block">
+          <ui:msg description="Batch import limit help">A maximum number of value sets that can be imported</ui:msg>
+        </g:Label>
+      </g:FlowPanel>
 
-      <g:FlowPanel ui:field="unitSection" addStyleNames="blabla">
+
+      <g:FlowPanel ui:field="unitSection">
         <g:Label styleName="section-title">
           <ui:msg description="Specify how the participant are identified">
             Specify how the participant are identified
