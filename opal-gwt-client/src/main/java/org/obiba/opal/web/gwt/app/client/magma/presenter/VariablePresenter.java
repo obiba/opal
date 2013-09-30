@@ -10,21 +10,22 @@
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.event.CopyVariablesToViewEvent;
+import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
+import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveVariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.SiblingVariableSelectionEvent.Direction;
+import org.obiba.opal.web.gwt.app.client.magma.event.SummaryRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.magma.event.SummaryRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveVariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
@@ -43,10 +44,10 @@ import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
@@ -64,6 +65,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private final ModalProvider<VariablesToViewPresenter> variablesToViewProvider;
 
+  private final ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider;
+
   private VariableDto variable;
 
   private TableDto table;
@@ -74,13 +77,15 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   public VariablePresenter(Display display, EventBus eventBus, ValuesTablePresenter valuesTablePresenter,
       SummaryTabPresenter summaryTabPresenter, ScriptEditorPresenter scriptEditorPresenter,
       Provider<AuthorizationPresenter> authorizationPresenter,
-      ModalProvider<VariablesToViewPresenter> variablesToViewProvider) {
+      ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
+      ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider) {
     super(eventBus, display);
     this.valuesTablePresenter = valuesTablePresenter;
     this.summaryTabPresenter = summaryTabPresenter;
     this.authorizationPresenter = authorizationPresenter;
     this.scriptEditorPresenter = scriptEditorPresenter;
     this.variablesToViewProvider = variablesToViewProvider.setContainer(this);
+    this.categoriesEditorModalProvider = categoriesEditorModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -115,6 +120,20 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
       }
     });
     addRegisteredHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler());
+    addRegisteredHandler(VariableRefreshEvent.getType(), new VariableRefreshEvent.Handler() {
+      @Override
+      public void onVariableRefresh(VariableRefreshEvent event) {
+        if(variableUpdatePending) return;
+        ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(variable.getLink()).get()
+            .withCallback(new ResourceCallback<VariableDto>() {
+              @Override
+              public void onResource(Response response, VariableDto resource) {
+                updateVariableDisplay();
+                variableUpdatePending = false;
+              }
+            }).send();
+      }
+    });
 
     summaryTabPresenter.bind();
     getView().setSummaryTabWidget(summaryTabPresenter.getView());
@@ -291,6 +310,13 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   @Override
   public void onShowValues() {
     valuesTablePresenter.setTable(table, variable);
+  }
+
+  @Override
+  public void onEditCategories() {
+    CategoriesEditorModalPresenter categoriesEditorPresenter = categoriesEditorModalProvider.get();
+    // TODO: Get locales from project config
+    categoriesEditorPresenter.initialize(variable, Arrays.asList("en", "fr"));
   }
 
   //

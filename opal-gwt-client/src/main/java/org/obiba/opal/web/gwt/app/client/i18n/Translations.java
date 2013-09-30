@@ -251,6 +251,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("The specified category name already exists.")
   String categoryNameAlreadyExists();
 
+  @Description("Provide a name for this category label")
+  @DefaultStringValue("Provide a name for this category.")
+  String categoryNameRequired();
+
   @Description("Category label required label")
   @DefaultStringValue("Provide a label for the this category.")
   String categoryLabelRequired();
@@ -258,6 +262,10 @@ public interface Translations extends Constants {
   @Description("Category dialog name required label")
   @DefaultStringValue("A category name is required.")
   String categoryDialogNameRequired();
+
+  @Description("Category name duplicated")
+  @DefaultStringValue("Duplicated category name {0}.")
+  String categoryNameDuplicated();
 
   @Description("User message map")
   @DefaultStringMapValue({ //
@@ -2041,6 +2049,10 @@ public interface Translations extends Constants {
   @Description("No Entities label")
   @DefaultStringValue("No entities")
   String noEntitiesLabel();
+
+  @Description("Edit categories label")
+  @DefaultStringValue("Edit categories")
+  String editCategories();
 
   @Description("Table count label")
   @DefaultStringValue("1 table")

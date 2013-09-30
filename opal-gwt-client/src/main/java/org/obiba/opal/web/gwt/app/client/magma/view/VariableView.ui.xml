@@ -128,7 +128,7 @@
           <b:Heading size="4" addStyleNames="inline-block">
             <ui:msg description="Categories label">Categories</ui:msg>
           </b:Heading>
-          <b2:IconAnchor icon="EDIT" addStyleNames="small-indent">
+          <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="editCategories">
           </b2:IconAnchor>
           <b:SimplePager ui:field="categoryTablePager" location="RIGHT" addStyleNames="pull-right"/>
         </g:FlowPanel>

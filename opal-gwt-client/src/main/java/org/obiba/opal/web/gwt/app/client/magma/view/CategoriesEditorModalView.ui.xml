@@ -1,0 +1,78 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+    xmlns:c="urn:import:org.obiba.opal.web.gwt.app.client.magma.view"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+
+  <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false">
+    <g:FlowPanel addStyleNames="main">
+
+      <b:Form type="INLINE">
+        <b:ControlGroup ui:field="nameGroup">
+          <b:ControlLabel>Name(s)</b:ControlLabel>
+          <b:Controls>
+            <b:InputAddOn>
+              <b:TextBox ui:field="newCategoryName"/>
+              <b:Button icon="PLUS" type="SUCCESS" ui:field="addButton">Add</b:Button>
+            </b:InputAddOn>
+            <b:HelpBlock>
+              <ui:msg description="Add categories help block">Add categories by pressing Enter or the "Add" button.
+              </ui:msg>
+            </b:HelpBlock>
+          </b:Controls>
+        </b:ControlGroup>
+      </b:Form>
+
+      <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false"
+          addStyleNames="block clear select-all-variables">
+        <g:Grid>
+          <g:row>
+            <g:customCell styleName="top-aligned">
+              <g:Label ui:field="selectAllStatus" addStyleNames="inline"></g:Label>
+            </g:customCell>
+            <g:customCell styleName="top-aligned">
+              <g:Anchor ui:field="selectAllAnchor" addStyleNames="inline xsmall-indent action"></g:Anchor>
+            </g:customCell>
+            <g:customCell styleName="top-aligned">
+              <g:Anchor ui:field="clearSelectionAnchor" visible="false" addStyleNames="inline xsmall-indent action">
+                <ui:msg description="Clear selection label">Clear selection</ui:msg>
+              </g:Anchor>
+            </g:customCell>
+            <g:customCell styleName="top-aligned">
+              <g:FlowPanel addStyleNames="indent">
+                <b:Icon type="TRASH"/>
+                <g:Anchor addStyleNames="inline xsmall-indent action" ui:field="deleteLink">
+                  <ui:msg description="Delete category label">Delete</ui:msg>
+                </g:Anchor>
+                <b:Icon type="ARROW_DOWN" addStyleNames="xsmall-indent"/>
+                <g:Anchor addStyleNames="inline xsmall-indent action" ui:field="moveDownLink">
+                  <ui:msg description="Move down label">Move down</ui:msg>
+                </g:Anchor>
+                <b:Icon type="ARROW_UP" addStyleNames="xsmall-indent"/>
+                <g:Anchor addStyleNames="inline xsmall-indent action" ui:field="moveUpLink">
+                  <ui:msg description="Move up label">Move up</ui:msg>
+                </g:Anchor>
+              </g:FlowPanel>
+            </g:customCell>
+          </g:row>
+        </g:Grid>
+      </b:Alert>
+      <c:CategoryEditableTable ui:field="table" width="100%" addStyleNames="left-aligned first-column-checkbox"/>
+
+    </g:FlowPanel>
+
+    <b:ModalFooter>
+      <b:Button ui:field="saveButton" type="PRIMARY">
+        <ui:msg description="Save label">Save</ui:msg>
+      </b:Button>
+      <b:Button ui:field="closeButton">
+        <ui:msg description="Close label">Close</ui:msg>
+      </b:Button>
+    </b:ModalFooter>
+
+  </o:Modal>
+
+</ui:UiBinder>

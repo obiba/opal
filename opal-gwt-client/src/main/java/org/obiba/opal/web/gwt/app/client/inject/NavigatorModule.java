@@ -9,28 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.inject;
 
-import org.obiba.opal.web.gwt.app.client.magma.presenter.CodingViewModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.view.CodingViewModalView;
-import org.obiba.opal.web.gwt.app.client.magma.view.DatasourceView;
-import org.obiba.opal.web.gwt.app.client.magma.view.EntityModalView;
-import org.obiba.opal.web.gwt.app.client.magma.view.MagmaView;
-import org.obiba.opal.web.gwt.app.client.magma.view.TableView;
-import org.obiba.opal.web.gwt.app.client.magma.view.ValuesTableView;
-import org.obiba.opal.web.gwt.app.client.magma.view.VariableView;
-import org.obiba.opal.web.gwt.app.client.project.presenter.AddProjectModalPresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsPresenter;
-import org.obiba.opal.web.gwt.app.client.project.view.AddProjectModalView;
-import org.obiba.opal.web.gwt.app.client.project.view.ProjectAdministrationView;
-import org.obiba.opal.web.gwt.app.client.project.view.ProjectView;
-import org.obiba.opal.web.gwt.app.client.project.view.ProjectsView;
+import org.obiba.opal.web.gwt.app.client.magma.createdatasource.presenter.CreateDatasourcePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.createdatasource.view.CreateDatasourceView;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.CsvDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.DatasourceFormPresenterSubscriber;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.ExcelDatasourceFormPresenter;
@@ -44,8 +24,6 @@ import org.obiba.opal.web.gwt.app.client.magma.datasource.view.FsDatasourceFormV
 import org.obiba.opal.web.gwt.app.client.magma.datasource.view.HibernateDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.view.JdbcDatasourceFormView;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.view.NullDatasourceFormView;
-import org.obiba.opal.web.gwt.app.client.magma.createdatasource.presenter.CreateDatasourcePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.createdatasource.view.CreateDatasourceView;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveBooleanVariableStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveCategoricalVariableStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveConclusionPresenter;
@@ -64,6 +42,30 @@ import org.obiba.opal.web.gwt.app.client.magma.derive.view.DeriveNumericalVariab
 import org.obiba.opal.web.gwt.app.client.magma.derive.view.DeriveOpenTextualVariableStepView;
 import org.obiba.opal.web.gwt.app.client.magma.derive.view.DeriveTemporalVariableStepView;
 import org.obiba.opal.web.gwt.app.client.magma.derive.view.DeriveVariableView;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.CategoriesEditorModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.CodingViewModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.view.CategoriesEditorModalView;
+import org.obiba.opal.web.gwt.app.client.magma.view.CodingViewModalView;
+import org.obiba.opal.web.gwt.app.client.magma.view.DatasourceView;
+import org.obiba.opal.web.gwt.app.client.magma.view.EntityModalView;
+import org.obiba.opal.web.gwt.app.client.magma.view.MagmaView;
+import org.obiba.opal.web.gwt.app.client.magma.view.TableView;
+import org.obiba.opal.web.gwt.app.client.magma.view.ValuesTableView;
+import org.obiba.opal.web.gwt.app.client.magma.view.VariableView;
+import org.obiba.opal.web.gwt.app.client.project.presenter.AddProjectModalPresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsPresenter;
+import org.obiba.opal.web.gwt.app.client.project.view.AddProjectModalView;
+import org.obiba.opal.web.gwt.app.client.project.view.ProjectAdministrationView;
+import org.obiba.opal.web.gwt.app.client.project.view.ProjectView;
+import org.obiba.opal.web.gwt.app.client.project.view.ProjectsView;
 
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
@@ -76,11 +78,14 @@ public class NavigatorModule extends AbstractOpalModule {
 
   @Override
   protected void configure() {
-    bindPresenter(ProjectsPresenter.class, ProjectsPresenter.Display.class, ProjectsView.class, ProjectsPresenter.Proxy.class);
-    bindPresenter(ProjectPresenter.class, ProjectPresenter.Display.class, ProjectView.class, ProjectPresenter.Proxy.class);
+    bindPresenter(ProjectsPresenter.class, ProjectsPresenter.Display.class, ProjectsView.class,
+        ProjectsPresenter.Proxy.class);
+    bindPresenter(ProjectPresenter.class, ProjectPresenter.Display.class, ProjectView.class,
+        ProjectPresenter.Proxy.class);
     bindPresenterWidget(ProjectAdministrationPresenter.class, ProjectAdministrationPresenter.Display.class,
         ProjectAdministrationView.class);
-    bindPresenterWidget(AddProjectModalPresenter.class, AddProjectModalPresenter.Display.class, AddProjectModalView.class);
+    bindPresenterWidget(AddProjectModalPresenter.class, AddProjectModalPresenter.Display.class,
+        AddProjectModalView.class);
 
     bindPresenterWidget(MagmaPresenter.class, MagmaPresenter.Display.class, MagmaView.class);
     bindPresenterWidget(DatasourcePresenter.class, DatasourcePresenter.Display.class, DatasourceView.class);
@@ -88,6 +93,8 @@ public class NavigatorModule extends AbstractOpalModule {
     bindPresenterWidget(VariablePresenter.class, VariablePresenter.Display.class, VariableView.class);
     bindPresenterWidget(ValuesTablePresenter.class, ValuesTablePresenter.Display.class, ValuesTableView.class);
     bindPresenterWidget(EntityModalPresenter.class, EntityModalPresenter.Display.class, EntityModalView.class);
+    bindPresenterWidget(CategoriesEditorModalPresenter.class, CategoriesEditorModalPresenter.Display.class,
+        CategoriesEditorModalView.class);
 
     bindWizardPresenterWidget(CreateDatasourcePresenter.class, CreateDatasourcePresenter.Display.class,
         CreateDatasourceView.class, CreateDatasourcePresenter.Wizard.class);
