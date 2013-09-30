@@ -150,13 +150,20 @@
         <b2:InlineLabel ui:field="notDerived">
           <ui:msg description="Not Derived Variable label">Not a Derived Variable</ui:msg>
         </b2:InlineLabel>
-        <o:EditorPanel size="SMALL" ui:field="scriptEditorPanel">
+        <o:NavPillsPanel ui:field="scriptNavPanel">
+          <b:NavLink active="true">View</b:NavLink>
+
           <g:FlowPanel>
-            <b2:InlineLabel ui:field="noScript">
-              <ui:msg description="No Script label">No Script</ui:msg>
-            </b2:InlineLabel>
-            <pretty:PrettyPrintLabel ui:field="script"/>
+            <g:FlowPanel>
+              <b2:InlineLabel ui:field="noScript">
+                <ui:msg description="No Script label">No Script</ui:msg>
+              </b2:InlineLabel>
+              <pretty:PrettyPrintLabel ui:field="script"/>
+            </g:FlowPanel>
           </g:FlowPanel>
+
+          <b:NavLink active="true">Edit</b:NavLink>
+
           <g:FlowPanel>
             <g:HorizontalPanel>
               <o:Chooser ui:field="valueTypes" addStyleNames="inline">
@@ -200,12 +207,15 @@
             </g:HorizontalPanel>
             <g:SimplePanel ui:field="scriptEditor"/>
           </g:FlowPanel>
-          <g:FlowPanel>
-            <b:Paragraph>
-              Git history...
-            </b:Paragraph>
+
+          <b:NavLink active="true">History</b:NavLink>
+          <g:FlowPanel ui:field="historyPanel">
           </g:FlowPanel>
+        </o:NavPillsPanel>
+
+        <o:EditorPanel size="SMALL" ui:field="scriptEditorPanel">
         </o:EditorPanel>
+
       </b:Tab>
 
       <b:Tab heading="Summary">
