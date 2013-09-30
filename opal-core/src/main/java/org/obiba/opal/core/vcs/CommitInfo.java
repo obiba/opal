@@ -25,7 +25,7 @@ public class CommitInfo {
     TimeZone tz = TimeZone.getTimeZone("UTC");
     DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
     df.setTimeZone(tz);
-    return df.format(new Date());
+    return df.format(date);
   }
 
   public String getComment() {

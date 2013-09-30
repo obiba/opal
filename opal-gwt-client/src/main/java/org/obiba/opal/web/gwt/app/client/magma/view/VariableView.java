@@ -11,13 +11,12 @@ package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
 import org.obiba.opal.web.gwt.app.client.ui.EditorPanel;
+import org.obiba.opal.web.gwt.app.client.ui.NavPillsPanel;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.EditableColumn;
 import org.obiba.opal.web.gwt.prettify.client.PrettyPrintLabel;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -35,14 +34,13 @@ import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.google.common.base.Strings;
-import com.google.gwt.cell.client.TextInputCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
@@ -96,6 +94,12 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   @UiField
   Label occurrenceGroup;
+
+  @UiField
+  Panel historyPanel;
+
+  @UiField
+  NavPillsPanel scriptNavPanel;
 
   // @UiField
   // FlowPanel label;
@@ -198,12 +202,32 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
       case ScriptEditor:
         panel = scriptEditor;
         break;
+      case History:
+        panel = historyPanel;
+        break;
     }
     if(panel != null) {
       panel.clear();
       if(content != null) {
         panel.add(content.asWidget());
       }
+    }
+  }
+
+  @UiHandler("scriptNavPanel")
+  public void onScriptNavPanelSelected(SelectionEvent<Integer> event) {
+    updateScriptNavPanel(event.getSelectedItem());
+  }
+
+  private void updateScriptNavPanel(int selectedIndex) {
+    switch(ScriptNavPanels.values()[selectedIndex]) {
+      case VIEW:
+        break;
+      case EDIT:
+        break;
+      case HISTORY:
+        getUiHandlers().onHistory();
+        break;
     }
   }
 
@@ -318,6 +342,8 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     unit.setText(variable.hasUnit() ? variable.getUnit() : "");
     repeatable.setText(variable.getIsRepeatable() ? translations.yesLabel() : translations.noLabel());
     occurrenceGroup.setText(variable.getIsRepeatable() ? variable.getOccurrenceGroup() : "");
+
+    updateScriptNavPanel(scriptNavPanel.getSelectedIndex());
   }
 
   @Override
@@ -401,5 +427,11 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     public void onHistory() {
       // TODO
     }
+  }
+
+  private enum ScriptNavPanels {
+    VIEW,
+    EDIT,
+    HISTORY
   }
 }
