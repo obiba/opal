@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.CategoriesEditorModalUiHandlers;
@@ -28,7 +30,9 @@ import org.obiba.opal.web.model.client.magma.CategoryDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.TextInputCell;
@@ -84,6 +88,9 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   @UiField
   Modal dialog;
+
+  @UiField
+  ControlGroup nameGroup;
 
   @UiField
   CategoryEditableTable table;
@@ -143,9 +150,25 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   @UiHandler("addButton")
   void onAddButton(ClickEvent event) {
+    dialog.clearAlert();
     List<CategoryDto> current = new ArrayList<CategoryDto>(dataProvider.getList());
+
+    // Validate that the new name does not conflicts with an existing one
+    if(newCategoryName.getText().isEmpty()) {
+      showError(translations.categoryNameRequired(), nameGroup);
+      return;
+    }
+
+    for(CategoryDto c : current) {
+      if(c.getName().equalsIgnoreCase(newCategoryName.getText())) {
+        showError(translations.categoryNameAlreadyExists(), nameGroup);
+        return;
+      }
+    }
+
     CategoryDto newCategory = CategoryDto.create();
     newCategory.setName(newCategoryName.getText());
+    newCategory.setIsMissing(false);
     current.add(newCategory);
 
     dataProvider.setList(current);
@@ -160,7 +183,14 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   @UiHandler("saveButton")
   void onSave(ClickEvent event) {
+    dialog.clearAlert();
+
     getUiHandlers().onSave();
+  }
+
+  @UiHandler("clearSelectionAnchor")
+  void onClearSelection(ClickEvent event) {
+    selectAllItemsAlert.setVisible(false);
   }
 
   @UiHandler("deleteLink")
@@ -314,6 +344,15 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
       selected.push(v);
     }
     return selected;
+  }
+
+  @Override
+  public void showError(String message, @Nullable ControlGroup group) {
+    if(group == null) {
+      dialog.addAlert(message, AlertType.ERROR);
+    } else {
+      dialog.addAlert(message, AlertType.ERROR, group);
+    }
   }
 
   private class CategoryDtoDisplay implements CheckboxColumn.Display<CategoryDto> {

@@ -11,7 +11,7 @@
     <g:FlowPanel addStyleNames="main">
 
       <b:Form type="INLINE">
-        <b:ControlGroup>
+        <b:ControlGroup ui:field="nameGroup">
           <b:ControlLabel>Name(s)</b:ControlLabel>
           <b:Controls>
             <b:InputAddOn>
