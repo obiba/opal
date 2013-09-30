@@ -256,7 +256,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
       updateStatusAlertWhenAllSelected(currentSelected);
     } else if(allPageSelected) {
       updateStatusAlertWhenAllPageSelected(currentSelected);
-    } else if(currentSelected > 0) {
+    } else {
       updateStatusAlertWhenNotAllSelected(currentSelected);
     }
   }
