@@ -65,6 +65,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private final ModalProvider<VariablesToViewPresenter> variablesToViewProvider;
 
+  private final VariableVcsCommitHistoryPresenter variableVcsCommitHistoryPresenter;
+
   private final ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider;
 
   private VariableDto variable;
@@ -77,12 +79,14 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   public VariablePresenter(Display display, EventBus eventBus, ValuesTablePresenter valuesTablePresenter,
       SummaryTabPresenter summaryTabPresenter, ScriptEditorPresenter scriptEditorPresenter,
       Provider<AuthorizationPresenter> authorizationPresenter,
+      VariableVcsCommitHistoryPresenter variableVcsCommitHistoryPresenter,
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
       ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider) {
     super(eventBus, display);
     this.valuesTablePresenter = valuesTablePresenter;
     this.summaryTabPresenter = summaryTabPresenter;
     this.authorizationPresenter = authorizationPresenter;
+    this.variableVcsCommitHistoryPresenter = variableVcsCommitHistoryPresenter;
     this.scriptEditorPresenter = scriptEditorPresenter;
     this.variablesToViewProvider = variablesToViewProvider.setContainer(this);
     this.categoriesEditorModalProvider = categoriesEditorModalProvider.setContainer(this);
@@ -111,6 +115,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     super.onBind();
     setInSlot(Display.Slots.Values, valuesTablePresenter);
     setInSlot(Display.Slots.ScriptEditor, scriptEditorPresenter);
+    setInSlot(Display.Slots.History, variableVcsCommitHistoryPresenter);
 
     addRegisteredHandler(VariableSelectionChangeEvent.getType(), this);
     addRegisteredHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionChangeEvent.Handler() {
@@ -275,6 +280,11 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   }
 
   @Override
+  public void onHistory() {
+    variableVcsCommitHistoryPresenter.retrieveCommitInfos(table, variable);
+  }
+
+  @Override
   public void onRemove() {
     //To change body of implemented methods use File | Settings | File Templates.
   }
@@ -376,7 +386,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     void setLanguages(JsArray<LocaleDto> languages);
 
     enum Slots {
-      Permissions, Values, ScriptEditor
+      Permissions, Values, ScriptEditor, History
     }
 
     void setVariable(VariableDto variable);

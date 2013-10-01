@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.i18n;
 import java.util.Map;
 
 import com.google.gwt.i18n.client.Constants;
+import com.google.gwt.i18n.client.LocalizableResource;
 import com.google.gwt.i18n.client.LocalizableResource.Generate;
 import com.google.gwt.i18n.client.LocalizableResource.GenerateKeys;
 
@@ -1910,6 +1911,29 @@ public interface Translations extends Constants {
   @Description("Add derived variable Modal title")
   @DefaultStringValue("Add Derived Variable")
   String addDerivedVariableModalTitle();
+
+
+  @Description("Vcs Commit History Modal title")
+  @DefaultStringValue("Commit History")
+  String vcsCommitHistoryModalTitle();
+
+  @Description("Vcs Commit History Empty")
+  @DefaultStringValue("No comment history available")
+  String noVcsCommitHistoryAvailable();
+
+  @Description("VCS Commit Info Labels")
+  @DefaultStringMapValue({ "id", "ID",//
+      "author", "Author",//
+      "date", "Date",//
+      "comment", "Comment",//
+  })
+  Map<String, String> commitInfoMap();
+
+  @Description("User message map")
+  @DefaultStringMapValue({ //
+      "FailedToRetrieveVariableCommitInfos", "Failed to retrieve all variable commit information.", //
+      "FailedToRetrieveVariableCommitInfo", "Failed to retrieve variable commit information for the given id."})
+  Map<String, String> vcsResourceErrorMap();
 
   @Description("Edit label")
   @DefaultStringValue("Edit")
