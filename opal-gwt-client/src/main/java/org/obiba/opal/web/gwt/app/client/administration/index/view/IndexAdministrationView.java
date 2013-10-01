@@ -15,7 +15,6 @@ import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdm
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsIndexColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
@@ -128,12 +127,7 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
     indexTablePager.setDisplay(indexTable);
 
     checkboxColumn = new CheckboxColumn<TableIndexStatusDto>(new TableIndexStatusDtoDisplay());
-    checkboxColumn.setActionHandler(new ActionHandler<Integer>() {
-      @Override
-      public void doAction(Integer object, String actionName) {
-        selectAllAlert.setVisible(object > 0);
-      }
-    });
+
     indexTable.addColumn(checkboxColumn, checkboxColumn.getTableListCheckColumnHeader());
     indexTable.addColumn(Columns.datasource, translations.datasourceLabel());
     indexTable.addColumn(Columns.table, translations.tableLabel());
@@ -240,7 +234,6 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
   public HasWidgets getBreadcrumbs() {
     return breadcrumbs;
   }
-
 
   private static final class Columns {
 
@@ -362,6 +355,11 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
     @Override
     public String getItemNameSingular() {
       return translations.indiceLabel().toLowerCase();
+    }
+
+    @Override
+    public Alert getAlert() {
+      return selectAllAlert;
     }
   }
 }

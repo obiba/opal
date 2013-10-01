@@ -15,7 +15,7 @@
           <b:ControlLabel>Name(s)</b:ControlLabel>
           <b:Controls>
             <b:InputAddOn>
-              <b:TextBox ui:field="newCategoryName"/>
+              <b:TextBox ui:field="addCategoryName"/>
               <b:Button icon="PLUS" type="SUCCESS" ui:field="addButton">Add</b:Button>
             </b:InputAddOn>
             <b:HelpBlock>

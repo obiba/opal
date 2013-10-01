@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 
+import com.github.gwtbootstrap.client.ui.Alert;
 import com.google.common.collect.Lists;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
@@ -256,8 +257,10 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
       updateStatusAlertWhenAllSelected(currentSelected);
     } else if(allPageSelected) {
       updateStatusAlertWhenAllPageSelected(currentSelected);
-    } else {
+    } else if(currentSelected > 0) {
       updateStatusAlertWhenNotAllSelected(currentSelected);
+    } else if(display.getAlert() != null) {
+      display.getAlert().setVisible(false);
     }
   }
 
@@ -326,6 +329,10 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
       }
     }
 
+    if(display.getAlert() != null) {
+      display.getAlert().setVisible(nbSelected > 0);
+    }
+
     if(actionHandler != null) {
       actionHandler.doAction(nbSelected, "SELECT");
     }
@@ -378,6 +385,6 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
      */
     String getItemNameSingular();
 
-//    ClickHandler getSelectClickHandler();
+    Alert getAlert();
   }
 }

@@ -22,7 +22,6 @@ import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.EditableColumn;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
@@ -40,6 +39,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.safehtml.client.SafeHtmlTemplates;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -96,7 +97,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   CategoryEditableTable table;
 
   @UiField
-  TextBox newCategoryName;
+  TextBox addCategoryName;
 
   @UiField
   Button addButton;
@@ -150,30 +151,16 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   @UiHandler("addButton")
   void onAddButton(ClickEvent event) {
-    dialog.clearAlert();
-    List<CategoryDto> current = new ArrayList<CategoryDto>(dataProvider.getList());
+    addCategory();
+  }
 
-    // Validate that the new name does not conflicts with an existing one
-    if(newCategoryName.getText().isEmpty()) {
-      showError(translations.categoryNameRequired(), nameGroup);
-      return;
+  @UiHandler("addCategoryName")
+  void onKeyDown(KeyDownEvent event) {
+    if(event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+      addCategory();
+      // Prevent the window from reloading
+      event.preventDefault();
     }
-
-    for(CategoryDto c : current) {
-      if(c.getName().equalsIgnoreCase(newCategoryName.getText())) {
-        showError(translations.categoryNameAlreadyExists(), nameGroup);
-        return;
-      }
-    }
-
-    CategoryDto newCategory = CategoryDto.create();
-    newCategory.setName(newCategoryName.getText());
-    newCategory.setIsMissing(false);
-    current.add(newCategory);
-
-    dataProvider.setList(current);
-    dataProvider.refresh();
-    newCategoryName.setText("");
   }
 
   @UiHandler("closeButton")
@@ -188,14 +175,23 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     getUiHandlers().onSave();
   }
 
-  @UiHandler("clearSelectionAnchor")
-  void onClearSelection(ClickEvent event) {
-    selectAllItemsAlert.setVisible(false);
-  }
+//  @UiHandler("clearSelectionAnchor")
+//  void onClearSelection(ClickEvent event) {
+//    selectAllItemsAlert.setVisible(false);
+//  }
 
   @UiHandler("deleteLink")
   void onDelete(ClickEvent event) {
-    getUiHandlers().onDelete();
+    // Remove selected items from table
+    List<CategoryDto> categories = new ArrayList<CategoryDto>();
+    for(CategoryDto c : dataProvider.getList()) {
+      if(!checkActionCol.getSelectionModel().isSelected(c)) {
+        categories.add(c);
+      }
+    }
+
+    dataProvider.setList(categories);
+    dataProvider.refresh();
   }
 
   @UiHandler("moveUpLink")
@@ -250,7 +246,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   public void renderCategoryRows(JsArray<CategoryDto> rows, List<String> locales) {
     addEditableColumns(locales);
 
-    selectAllItemsAlert.setVisible(!checkActionCol.getSelectedItems().isEmpty());
+    //selectAllItemsAlert.setVisible(!checkActionCol.getSelectedItems().isEmpty());
     dataProvider.setList(JsArrays.toList(rows));
     dataProvider.refresh();
   }
@@ -316,12 +312,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   @SuppressWarnings({ "unchecked" })
   private void addCheckColumn() {
     checkActionCol = new CheckboxColumn<CategoryDto>(new CategoryDtoDisplay());
-    checkActionCol.setActionHandler(new ActionHandler<Integer>() {
-      @Override
-      public void doAction(Integer object, String actionName) {
-        selectAllItemsAlert.setVisible(object > 0);
-      }
-    });
+
     table.addColumn(checkActionCol, checkActionCol.getTableListCheckColumnHeader());
     table.setColumnWidth(checkActionCol, 1, Style.Unit.PX);
   }
@@ -337,22 +328,39 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   }
 
   @Override
-  public JsArray<CategoryDto> getSelectedCategories() {
-    JsArray<CategoryDto> selected = JsArrays.create();
-
-    for(CategoryDto v : checkActionCol.getSelectedItems()) {
-      selected.push(v);
-    }
-    return selected;
-  }
-
-  @Override
   public void showError(String message, @Nullable ControlGroup group) {
     if(group == null) {
       dialog.addAlert(message, AlertType.ERROR);
     } else {
       dialog.addAlert(message, AlertType.ERROR, group);
     }
+  }
+
+  private void addCategory() {
+    dialog.clearAlert();
+    List<CategoryDto> current = new ArrayList<CategoryDto>(dataProvider.getList());
+
+    // Validate that the new name does not conflicts with an existing one
+    if(addCategoryName.getText().isEmpty()) {
+      showError(translations.categoryNameRequired(), nameGroup);
+      return;
+    }
+
+    for(CategoryDto c : current) {
+      if(c.getName().equalsIgnoreCase(addCategoryName.getText())) {
+        showError(translations.categoryNameAlreadyExists(), nameGroup);
+        return;
+      }
+    }
+
+    CategoryDto newCategory = CategoryDto.create();
+    newCategory.setName(addCategoryName.getText());
+    newCategory.setIsMissing(false);
+    current.add(newCategory);
+
+    dataProvider.setList(current);
+    dataProvider.refresh();
+    addCategoryName.setText("");
   }
 
   private class CategoryDtoDisplay implements CheckboxColumn.Display<CategoryDto> {
@@ -389,12 +397,17 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
     @Override
     public String getItemNamePlural() {
-      return "Categories";
+      return translations.categoriesLabel();
     }
 
     @Override
     public String getItemNameSingular() {
-      return "Category";
+      return translations.categoryLabel();
+    }
+
+    @Override
+    public Alert getAlert() {
+      return selectAllItemsAlert;
     }
   }
 
