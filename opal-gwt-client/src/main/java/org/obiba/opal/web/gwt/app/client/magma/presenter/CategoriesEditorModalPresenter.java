@@ -85,42 +85,8 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
             if(response.getStatusCode() != Response.SC_OK) {
               getView().showError(response.getText(), null);
             } else {
-//              getView().hide();
+              getView().hide();
             }
-            fireEvent(new VariableRefreshEvent());
-          }
-        }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
-
-  }
-
-  @Override
-  public void onDelete() {
-    JsArray<CategoryDto> categories = JsArrays.toSafeArray(getView().getSelectedCategories());
-    JsArray<CategoryDto> newCategories = JsArrays.create();
-
-    for(int i = 0; i < variable.getCategoriesArray().length(); i++) {
-      boolean removed = false;
-      for(int j = 0; j < categories.length(); j++) {
-        if(categories.get(j).getName().equals(variable.getCategoriesArray().get(i).getName())) {
-          removed = true;
-          break;
-        }
-      }
-
-      if(!removed) {
-        newCategories.push(variable.getCategoriesArray().get(i));
-      }
-    }
-
-    variable.clearCategoriesArray();
-    variable.setCategoriesArray(newCategories);
-    ResourceRequestBuilderFactory.newBuilder().forResource(variable.getLink()) //
-        .put() //
-        .withResourceBody(VariableDto.stringify(variable)) //
-        .withCallback(new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            getView().renderCategoryRows(variable.getCategoriesArray(), locales);
             fireEvent(new VariableRefreshEvent());
           }
         }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
@@ -131,8 +97,6 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
     void renderCategoryRows(JsArray<CategoryDto> rows, List<String> locales);
 
     JsArray<CategoryDto> getCategories();
-
-    JsArray<CategoryDto> getSelectedCategories();
 
     void showError(String message, @Nullable ControlGroup group);
   }

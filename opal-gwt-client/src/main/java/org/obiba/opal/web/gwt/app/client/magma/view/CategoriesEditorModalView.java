@@ -123,6 +123,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   @UiField
   Anchor deleteLink;
 
+  // TODO: Support Move Up/Move Down... With ProvidesKey...
   @UiField
   Anchor moveUpLink;
 
@@ -163,23 +164,6 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     }
   }
 
-  @UiHandler("closeButton")
-  void onClose(ClickEvent event) {
-    dialog.hide();
-  }
-
-  @UiHandler("saveButton")
-  void onSave(ClickEvent event) {
-    dialog.clearAlert();
-
-    getUiHandlers().onSave();
-  }
-
-//  @UiHandler("clearSelectionAnchor")
-//  void onClearSelection(ClickEvent event) {
-//    selectAllItemsAlert.setVisible(false);
-//  }
-
   @UiHandler("deleteLink")
   void onDelete(ClickEvent event) {
     // Remove selected items from table
@@ -192,6 +176,17 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
     dataProvider.setList(categories);
     dataProvider.refresh();
+  }
+
+  @UiHandler("closeButton")
+  void onClose(ClickEvent event) {
+    dialog.hide();
+  }
+
+  @UiHandler("saveButton")
+  void onSave(ClickEvent event) {
+    dialog.clearAlert(nameGroup);
+    getUiHandlers().onSave();
   }
 
   @UiHandler("moveUpLink")
@@ -221,7 +216,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   @UiHandler("moveDownLink")
   void onMoveDown(ClickEvent event) {
     List<CategoryDto> categories = new ArrayList<CategoryDto>();
-    Collection<CategoryDto> reordered = new ArrayList<CategoryDto>();
+    List<CategoryDto> reordered = new ArrayList<CategoryDto>();
 
     int i = 0;
     int pos = 0;
@@ -246,7 +241,6 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   public void renderCategoryRows(JsArray<CategoryDto> rows, List<String> locales) {
     addEditableColumns(locales);
 
-    //selectAllItemsAlert.setVisible(!checkActionCol.getSelectedItems().isEmpty());
     dataProvider.setList(JsArrays.toList(rows));
     dataProvider.refresh();
   }
@@ -269,8 +263,8 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
     // prepare cells for each translations
     for(final String locale : locales) {
-      TabAbleTextInputCell cellLabel = new TabAbleTextInputCell();
-      Column<CategoryDto, String> labelCol = new EditableColumn<CategoryDto>(cellLabel) {
+      TabAbleTextInputCell labelCell = new TabAbleTextInputCell();
+      Column<CategoryDto, String> labelCol = new EditableColumn<CategoryDto>(labelCell) {
         @Override
         public String getValue(CategoryDto object) {
           AttributeDto label = VariableDtos.getAttribute(object, LABEL, locale);
@@ -337,7 +331,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   }
 
   private void addCategory() {
-    dialog.clearAlert();
+    dialog.clearAlert(nameGroup);
     List<CategoryDto> current = new ArrayList<CategoryDto>(dataProvider.getList());
 
     // Validate that the new name does not conflicts with an existing one
@@ -437,6 +431,5 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
         sb.appendHtmlConstant("<input type=\"text\"></input>");
       }
     }
-
   }
 }

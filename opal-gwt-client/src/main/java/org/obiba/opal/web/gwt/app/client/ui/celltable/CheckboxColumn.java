@@ -95,7 +95,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
       public void update(int index, T object, Boolean value) {
         selectionModel.setSelected(object, value);
 
-        //hide status message when deselecting an element
+        // hide status message when deselecting an element
         // only redraw when the first checkbox is deselected
         int nbDeselected = 0;
         for(T v : display.getTable().getVisibleItems()) {
