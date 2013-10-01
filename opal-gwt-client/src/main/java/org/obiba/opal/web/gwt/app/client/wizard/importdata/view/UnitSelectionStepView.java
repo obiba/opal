@@ -16,9 +16,12 @@ import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -130,8 +133,15 @@ public class UnitSelectionStepView extends ViewImpl implements UnitSelectionStep
 
   @Override
   public Integer getLimit() {
+    if (!limit.isEnabled()) return null;
+
     Long value = limit.getNumberValue();
     return value == null ? null : value.intValue();
+  }
+
+  @UiHandler("limitCheck")
+  public void onLimitCheck(ValueChangeEvent<Boolean> event) {
+    limit.setEnabled(event.getValue());
   }
 
 }

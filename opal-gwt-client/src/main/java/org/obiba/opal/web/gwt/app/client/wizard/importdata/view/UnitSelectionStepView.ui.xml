@@ -30,15 +30,14 @@
       </g:FlowPanel>
 
       <g:FlowPanel styleName="input" addStyleNames="small-indent">
-        <g:Label addStyleNames="key">
-          <ui:msg description="Batch import label">Limit</ui:msg>
-        </g:Label>
-        <o:NumericTextBox ui:field="limit" min="0" maxConstrained="false"/>
+        <g:CheckBox ui:field="limitCheck">
+          <ui:msg description="Limit label">Limit</ui:msg>
+        </g:CheckBox>
+        <o:NumericTextBox ui:field="limit" min="0" maxConstrained="false" enabled="false" addStyleNames="span1"/>
         <g:Label styleName="help-block">
-          <ui:msg description="Batch import limit help">A maximum number of value sets that can be imported</ui:msg>
+          <ui:msg description="Batch import limit help">A maximum number of data that can be imported</ui:msg>
         </g:Label>
       </g:FlowPanel>
-
 
       <g:FlowPanel ui:field="unitSection">
         <g:Label styleName="section-title">
