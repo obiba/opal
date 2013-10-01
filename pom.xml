@@ -1562,53 +1562,5 @@
 
   </properties>
 
-  <profiles>
-    <!-- Comment this profile because Jenkins crashes while performing the release -->
-    <!-- <profile>
-      <id>release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>html-aggregate-javadocs</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>aggregate</goal>
-                </goals>
-                <configuration>
-                  <reportOutputDirectory>${obiba.docs.url}/${project.artifactId}</reportOutputDirectory>
-                  <destDir>${project.version}</destDir>
-                </configuration>
-              </execution>
-              <execution>
-                <id>jar-javadocs</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>jar</goal>
-                  <goal>aggregate-jar</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            &lt;!&ndash; Deploy javadoc and sources: explicitly define maven-deploy-plugin after other to force exec order &ndash;&gt;
-            <artifactId>maven-deploy-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>deploy</id>
-                <phase>deploy</phase>
-                <goals>
-                  <goal>deploy</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>-->
-  </profiles>
 
 </project>
