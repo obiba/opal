@@ -13,7 +13,6 @@ import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.User;
 import org.obiba.opal.core.service.SystemService;
 
-@SuppressWarnings("UnusedDeclaration")
 public interface UserService extends SystemService {
 
   /**

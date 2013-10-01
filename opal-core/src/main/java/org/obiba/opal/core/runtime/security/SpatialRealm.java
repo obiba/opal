@@ -95,7 +95,7 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
   }
 
   /**
-   * Overriden because the OpalSecurityManager sets {@code this} as the {@code RolePermissionResolver} on all configured
+   * Overridden because the OpalSecurityManager sets {@code this} as the {@code RolePermissionResolver} on all configured
    * realms. This results the following object graph:
    * <p/>
    * <pre>

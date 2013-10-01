@@ -10,7 +10,7 @@
 package org.obiba.opal.shell.commands;
 
 import org.obiba.opal.shell.commands.options.VersionCommandOptions;
-import org.obiba.runtime.Version;
+import org.obiba.runtime.upgrade.VersionProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -23,7 +23,7 @@ public class VersionCommand extends AbstractCommand<VersionCommandOptions> {
   //
 
   @Autowired
-  private Version opalVersion;
+  private VersionProvider opalVersionProvider;
 
   //
   // AbstractContextLoadingCommand Methods
@@ -31,7 +31,7 @@ public class VersionCommand extends AbstractCommand<VersionCommandOptions> {
 
   @Override
   public int execute() {
-    getShell().printf("Opal %s\n", opalVersion);
+    getShell().printf("Opal %s\n", opalVersionProvider.getVersion());
     return 0; // success!
   }
 }

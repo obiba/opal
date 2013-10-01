@@ -12,7 +12,9 @@ package org.obiba.opal.audit;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.obiba.magma.audit.UserProvider;
+import org.springframework.stereotype.Component;
 
+@Component
 public class OpalUserProvider implements UserProvider {
 
   public static final String UNKNOWN_USERNAME = "Unknown";

@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -33,12 +35,10 @@ public class BackgroundJobService implements Service {
 
   private final Map<String, Thread> jobThreads = new HashMap<String, Thread>();
 
-  private final Set<BackgroundJob> jobs;
-
-  @Autowired
-  public BackgroundJobService(Set<BackgroundJob> jobs) {
-    this.jobs = jobs;
-  }
+  @Nullable
+  @Autowired(required = false)
+  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+  private Set<BackgroundJob> jobs;
 
   @Override
   public boolean isRunning() {
@@ -49,8 +49,10 @@ public class BackgroundJobService implements Service {
   public void start() {
     if(!isRunning) {
       jobThreads.clear();
-      for(BackgroundJob job : jobs) {
-        jobThreads.put(job.getName(), startJob(job));
+      if(jobs != null) {
+        for(BackgroundJob job : jobs) {
+          jobThreads.put(job.getName(), startJob(job));
+        }
       }
       isRunning = true;
     }

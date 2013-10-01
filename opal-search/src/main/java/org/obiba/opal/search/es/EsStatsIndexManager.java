@@ -25,21 +25,17 @@ import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.magma.math.CategoricalVariableSummary;
 import org.obiba.opal.core.magma.math.ContinuousVariableSummary;
 import org.obiba.opal.core.magma.math.ContinuousVariableSummary.Distribution;
-import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.StatsIndexManager;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.ValueTableStatsIndex;
 import org.obiba.opal.search.es.mapping.StatsMapping;
-import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Search.EsCategoricalSummaryDto;
 import org.obiba.opal.web.model.Search.EsContinuousSummaryDto;
 import org.obiba.opal.web.model.Search.EsStatsDto;
-import org.obiba.runtime.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Maps;
@@ -50,13 +46,6 @@ import com.googlecode.protobuf.format.JsonFormat;
 public class EsStatsIndexManager extends EsIndexManager implements StatsIndexManager {
 
   private static final Logger log = LoggerFactory.getLogger(EsStatsIndexManager.class);
-
-  @SuppressWarnings("SpringJavaAutowiringInspection")
-  @Autowired
-  public EsStatsIndexManager(OpalSearchService esProvider, ElasticSearchConfigurationService esConfig,
-      IndexManagerConfigurationService indexConfig, Version version) {
-    super(esProvider, esConfig, indexConfig, version);
-  }
 
   @Nonnull
   @Override
@@ -116,7 +105,7 @@ public class EsStatsIndexManager extends EsIndexManager implements StatsIndexMan
 
     @Override
     protected XContentBuilder getMapping() {
-      return new StatsMapping().createMapping(runtimeVersion, getIndexName(), resolveTable());
+      return new StatsMapping().createMapping(runtimeVersionProvider.getVersion(), getIndexName(), resolveTable());
     }
 
     @Override

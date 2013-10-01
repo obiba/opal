@@ -24,16 +24,12 @@ import org.obiba.magma.AttributeAware;
 import org.obiba.magma.Category;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.ValueTableVariablesIndex;
 import org.obiba.opal.search.VariablesIndexManager;
 import org.obiba.opal.search.es.mapping.AttributeMapping;
 import org.obiba.opal.search.es.mapping.ValueTableVariablesMapping;
-import org.obiba.opal.search.service.OpalSearchService;
-import org.obiba.runtime.Version;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
@@ -43,13 +39,6 @@ import com.google.common.collect.Maps;
 public class EsVariablesIndexManager extends EsIndexManager implements VariablesIndexManager {
 
 //  private static final Logger log = LoggerFactory.getLogger(EsVariablesIndexManager.class);
-
-  @SuppressWarnings("SpringJavaAutowiringInspection")
-  @Autowired
-  public EsVariablesIndexManager(OpalSearchService esProvider, ElasticSearchConfigurationService esConfig,
-      IndexManagerConfigurationService indexConfig, Version version) {
-    super(esProvider, esConfig, indexConfig, version);
-  }
 
   @Nonnull
   @Override
@@ -179,7 +168,8 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
 
     @Override
     protected XContentBuilder getMapping() {
-      return new ValueTableVariablesMapping().createMapping(runtimeVersion, getIndexName(), resolveTable());
+      return new ValueTableVariablesMapping()
+          .createMapping(runtimeVersionProvider.getVersion(), getIndexName(), resolveTable());
     }
 
     @Nonnull

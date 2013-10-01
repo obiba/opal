@@ -48,6 +48,7 @@ import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
@@ -61,6 +62,7 @@ import com.google.common.collect.Iterables;
  * Default implementation of {@link ImportService}.
  */
 @SuppressWarnings("OverlyCoupledClass")
+@Component
 public class DefaultImportService implements ImportService {
 
   @SuppressWarnings("unused")

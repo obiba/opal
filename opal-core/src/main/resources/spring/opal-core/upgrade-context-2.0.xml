@@ -128,23 +128,18 @@
 
   <bean id="generalConfigService" class="org.obiba.opal.core.service.impl.DefaultGeneralConfigService"/>
 
-  <bean id="upgradeManager" class="org.obiba.runtime.upgrade.support.DefaultUpgradeManager">
-    <property name="currentVersionProvider">
-      <bean class="org.obiba.runtime.upgrade.support.JdbcVersionModifier">
-        <property name="datasource" ref="dataSource"/>
-      </bean>
-    </property>
+  <bean id="versionProvider" class="org.obiba.runtime.upgrade.support.JdbcVersionModifier">
+    <property name="datasource" ref="dataSource"/>
+  </bean>
 
-    <property name="runtimeVersionProvider">
-      <bean class="org.obiba.runtime.upgrade.VersionBeanVersionProvider">
-        <property name="version" ref="version"/>
-      </bean>
-    </property>
+  <bean id="upgradeManager" class="org.obiba.runtime.upgrade.support.DefaultUpgradeManager">
+    <property name="currentVersionProvider" ref="versionProvider"/>
+
+    <property name="runtimeVersionProvider" ref="runtimeVersionProvider"/>
 
     <property name="newInstallationDetectionStrategy">
-      <bean class="org.obiba.runtime.upgrade.support.EmptyDataSourceDetectionStrategy">
-        <property name="dataSource" ref="dataSource"/>
-      </bean>
+      <!-- we never want a new installation here as we are upgrading to 2.0 -->
+      <bean class="org.obiba.opal.core.runtime.upgrade.support.AlwaysUpgradeDetectionStrategy"/>
     </property>
 
     <property name="upgradeSteps">
@@ -177,11 +172,24 @@
         </bean>
 
         <!-- 2.0.0 / import general config to config database -->
-        <bean class="org.obiba.opal.core.runtime.upgrade.ExtractOpalGeneralConfigToDatabaseUpgradeStep">
+        <bean class="org.obiba.opal.core.runtime.upgrade.database.ExtractOpalGeneralConfigToDatabaseUpgradeStep">
           <property name="description" value="Extract general config from properties file to Opal config database"/>
           <property name="appliesTo" value="2.0.0"/>
           <property name="propertiesFile" value="file:${OPAL_HOME}/conf/opal-config.properties"/>
           <property name="generalConfigService" ref="generalConfigService"/>
+        </bean>
+
+        <!-- 2.0.0 / move version from table to opal-config.xml -->
+        <bean class="org.obiba.opal.core.runtime.upgrade.database.MoveVersionToOpalConfigurationUpgradeStep">
+          <property name="description"
+              value="Drop version table from previous opal-data database because it's now moved to opal-config database"/>
+          <property name="appliesTo" value="2.0.0"/>
+        </bean>
+
+        <!-- 2.0.0 / move config tables to OrientDB -->
+        <bean class="org.obiba.opal.core.runtime.upgrade.database.MoveConfigTablesToOrientDbUpgradeStep">
+          <property name="description" value="Move config tables to config database"/>
+          <property name="appliesTo" value="2.0.0"/>
         </bean>
 
         <!-- 2.0.0 / move config tables -->

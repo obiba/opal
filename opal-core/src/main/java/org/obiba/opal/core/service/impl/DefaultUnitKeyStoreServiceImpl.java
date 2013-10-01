@@ -18,63 +18,70 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.UnrecoverableKeyException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.PostConstruct;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.commons.vfs2.FileObject;
-import org.obiba.core.service.impl.PersistenceManagerAwareService;
+import org.obiba.opal.core.cfg.OrientDbService;
+import org.obiba.opal.core.cfg.OrientDbTransactionCallback;
 import org.obiba.opal.core.crypt.CacheablePasswordCallback;
 import org.obiba.opal.core.crypt.CachingCallbackHandler;
 import org.obiba.opal.core.crypt.KeyProviderSecurityException;
 import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.service.UnitKeyStoreAlreadyExistsException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.UnitKeyStore;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
+import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
+
+@Component
 @Transactional
-public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareService implements UnitKeyStoreService {
-  //
-  // Constants
-  //
+public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
 
-  private static final String PASSWORD_FOR = "Password for";
+  @Nonnull
+  private final CallbackHandler callbackHandler;
 
-  //
-  // Instance Variables
-  //
-
-  protected final CallbackHandler callbackHandler;
+  @Nonnull
+  private final OrientDbService orientDbService;
 
   @Autowired
-  public DefaultUnitKeyStoreServiceImpl(CallbackHandler callbackHandler) {
-    if(callbackHandler == null) throw new IllegalArgumentException("callbackHandler cannot be null");
+  public DefaultUnitKeyStoreServiceImpl(@Nonnull CallbackHandler callbackHandler,
+      @Nonnull OrientDbService orientDbService) {
     this.callbackHandler = callbackHandler;
+    this.orientDbService = orientDbService;
   }
 
-  //
-  // UnitKeyStore Methods
-  //
+  @Override
+  @PostConstruct
+  public void start() {
+    orientDbService.registerEntityClass(UnitKeyStoreState.class);
+    orientDbService.createUniqueIndex(UnitKeyStoreState.class, "unit", OType.STRING);
+  }
 
   @Override
-  public UnitKeyStore getUnitKeyStore(String unitName) {
+  public void stop() {
+  }
+
+  @Nullable
+  @Override
+  public UnitKeyStore getUnitKeyStore(@Nonnull String unitName) {
     Assert.hasText(unitName, "unitName must not be null or empty");
-
-    UnitKeyStoreState template = new UnitKeyStoreState();
-    template.setUnit(unitName);
-
-    UnitKeyStoreState unitKeyStoreState = getPersistenceManager().matchOne(template);
-    if(unitKeyStoreState != null) {
-      return loadUnitKeyStore(unitName, unitKeyStoreState);
-    }
-
-    return null;
+    UnitKeyStoreState state = orientDbService.uniqueResult("select from UnitKeyStoreState where unit = ?", unitName);
+    return state == null ? null : loadUnitKeyStore(unitName, state);
   }
 
   @Override
-  public UnitKeyStore getOrCreateUnitKeyStore(String unitName) {
+  public UnitKeyStore getOrCreateUnitKeyStore(@Nonnull String unitName) {
     Assert.hasText(unitName, "unitName must not be null or empty");
 
     UnitKeyStore unitKeyStore = getUnitKeyStore(unitName);
@@ -86,23 +93,35 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
   }
 
   @Override
-  public void saveUnitKeyStore(UnitKeyStore unitKeyStore) {
+  public void saveUnitKeyStore(@Nonnull UnitKeyStore unitKeyStore) {
     Assert.notNull(unitKeyStore, "unitKeyStore must not be null");
 
-    UnitKeyStoreState template = new UnitKeyStoreState();
-    template.setUnit(unitKeyStore.getUnitName());
-
-    UnitKeyStoreState unitKeyStoreState = getPersistenceManager().matchOne(template);
-    if(unitKeyStoreState == null) {
-      unitKeyStoreState = template;
+    final UnitKeyStoreState state;
+    String unitName = unitKeyStore.getUnitName();
+    UnitKeyStoreState existing = orientDbService.uniqueResult("select from UnitKeyStoreState where unit = ?", unitName);
+    if(existing == null) {
+      state = new UnitKeyStoreState();
+      state.setUnit(unitName);
+    } else {
+      state = existing;
     }
-    unitKeyStoreState.setKeyStore(getKeyStoreByteArray(unitKeyStore));
+    state.setKeyStore(getKeyStoreByteArray(unitKeyStore));
 
-    getPersistenceManager().save(unitKeyStoreState);
+    try {
+      orientDbService.execute(new OrientDbTransactionCallback<Object>() {
+        @Override
+        public Object doInTransaction(OObjectDatabaseTx db) {
+          return db.save(state);
+        }
+      });
+    } catch(ORecordDuplicatedException e) {
+      throw new UnitKeyStoreAlreadyExistsException(unitName);
+    }
   }
 
   @Override
-  public void createOrUpdateKey(String unitName, String alias, String algorithm, int size, String certificateInfo) {
+  public void createOrUpdateKey(@Nonnull String unitName, @Nonnull String alias, @Nonnull String algorithm, int size,
+      @Nonnull String certificateInfo) {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.hasText(algorithm, "algorithm must not be null or empty");
@@ -123,15 +142,14 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
   }
 
   @Override
-  public boolean aliasExists(String unitName, String alias) {
+  public boolean aliasExists(@Nonnull String unitName, @Nonnull String alias) {
     Assert.hasText(alias, "alias must not be null or empty");
-
     UnitKeyStore unitKeyStore = getUnitKeyStore(unitName);
     return unitKeyStore != null && unitKeyStore.aliasExists(alias);
   }
 
   @Override
-  public void deleteKey(String unitName, String alias) {
+  public void deleteKey(@Nonnull String unitName, @Nonnull String alias) {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
 
@@ -145,7 +163,8 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
   }
 
   @Override
-  public void importKey(String unitName, String alias, FileObject privateKey, FileObject certificate) {
+  public void importKey(@Nonnull String unitName, @Nonnull String alias, @Nonnull FileObject privateKey,
+      @Nonnull FileObject certificate) {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(privateKey, "privateKey must not be null");
@@ -158,8 +177,8 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
   }
 
   @Override
-  public void importKey(String unitName, String alias, InputStream privateKey, InputStream certificate)
-      throws NoSuchFunctionalUnitException {
+  public void importKey(@Nonnull String unitName, @Nonnull String alias, @Nonnull InputStream privateKey,
+      @Nonnull InputStream certificate) throws NoSuchFunctionalUnitException {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(privateKey, "privateKey must not be null");
@@ -172,7 +191,8 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
   }
 
   @Override
-  public void importKey(String unitName, String alias, FileObject privateKey, String certificateInfo) {
+  public void importKey(@Nonnull String unitName, @Nonnull String alias, @Nonnull FileObject privateKey,
+      @Nonnull String certificateInfo) {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(privateKey, "privateKey must not be null");
@@ -185,8 +205,8 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
   }
 
   @Override
-  public void importKey(String unitName, String alias, InputStream privateKey, String certificateInfo)
-      throws NoSuchFunctionalUnitException {
+  public void importKey(@Nonnull String unitName, @Nonnull String alias, @Nonnull InputStream privateKey,
+      @Nonnull String certificateInfo) throws NoSuchFunctionalUnitException {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(privateKey, "privateKey must not be null");
@@ -199,7 +219,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
   }
 
   @Override
-  public void importCertificate(String unitName, String alias, InputStream certStream) {
+  public void importCertificate(@Nonnull String unitName, @Nonnull String alias, @Nonnull InputStream certStream) {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(certStream, "certStream must not be null");
@@ -210,13 +230,13 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
     saveUnitKeyStore(unitKeyStore);
   }
 
-  private UnitKeyStore loadUnitKeyStore(String unitName, UnitKeyStoreState unitKeyStoreState) {
+  private UnitKeyStore loadUnitKeyStore(@Nonnull String unitName, @Nonnull UnitKeyStoreState state) {
     CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName)
         .prompt(getPasswordFor(unitName)).build();
 
     UnitKeyStore unitKeyStore = null;
     try {
-      unitKeyStore = new UnitKeyStore(unitName, loadKeyStore(unitKeyStoreState.getKeyStore(), passwordCallback));
+      unitKeyStore = new UnitKeyStore(unitName, loadKeyStore(state.getKeyStore(), passwordCallback));
       unitKeyStore.setCallbackHandler(callbackHandler);
       UnitKeyStore.loadBouncyCastle();
     } catch(GeneralSecurityException ex) {
@@ -271,7 +291,7 @@ public class DefaultUnitKeyStoreServiceImpl extends PersistenceManagerAwareServi
    * Returns "Password for 'name':  ".
    */
   private String getPasswordFor(String name) {
-    return PASSWORD_FOR + " '" + name + "':  ";
+    return UnitKeyStore.PASSWORD_FOR + " '" + name + "':  ";
   }
 
   private static void clearPasswordCache(CallbackHandler callbackHandler, String passwordKey) {

@@ -7,6 +7,7 @@
   <import resource="classpath:spring/opal-core/context.xml"/>
   <import resource="file:${OPAL_HOME}/conf/custom-context.xml"/>
 
-  <context:component-scan base-package="org.obiba.opal.server,org.obiba.opal.core,org.obiba.opal.service"/>
+  <context:component-scan
+      base-package="org.obiba.opal.server,org.obiba.opal.core,org.obiba.opal.service,org.obiba.opal.audit"/>
 
 </beans>

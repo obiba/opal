@@ -9,69 +9,39 @@
  ******************************************************************************/
 package org.obiba.opal.core.domain.security;
 
-import javax.annotation.Nullable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.annotation.Nonnull;
 
-import org.hibernate.annotations.Index;
-import org.obiba.core.domain.AbstractEntity;
+import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.service.SubjectAclService;
 
-@Entity
-@Table(name = "subject_acl")
-public class SubjectAcl extends AbstractEntity {
+public class SubjectAcl extends AbstractTimestamped {
 
-  private static final long serialVersionUID = 1L;
-
-  @Column(nullable = false)
-  @Index(name = "domain_idx")
+  @Nonnull
   private String domain;
 
-  @Column(nullable = false)
-  @Index(name = "node_idx")
+  @Nonnull
   private String node;
 
-  @Column(nullable = false)
-  @Index(name = "principal_idx")
+  @Nonnull
   private String principal;
 
-  @Column(nullable = false)
-  @Index(name = "type_idx")
+  @Nonnull
   private String type;
 
-  @Column(nullable = false)
+  @Nonnull
   private String permission;
 
   public SubjectAcl() {
 
   }
 
-  public SubjectAcl(String domain) {
-    this(domain, null);
-  }
-
-  public SubjectAcl(SubjectAclService.Subject subject) {
-    this(null, null, subject);
-  }
-
-  public SubjectAcl(String domain, String node) {
-    this(domain, node, null, null, null);
-  }
-
-  public SubjectAcl(String domain, @Nullable String node, SubjectAclService.SubjectType type) {
-    this(domain, node, null, type.toString(), null);
-  }
-
-  public SubjectAcl(String domain, String node, SubjectAclService.Subject subject) {
-    this(domain, node, subject.getPrincipal(), subject.getType().toString(), null);
-  }
-
-  public SubjectAcl(String domain, String node, SubjectAclService.Subject subject, String permission) {
+  public SubjectAcl(@Nonnull String domain, @Nonnull String node, @Nonnull SubjectAclService.Subject subject,
+      @Nonnull String permission) {
     this(domain, node, subject.getPrincipal(), subject.getType().toString(), permission);
   }
 
-  private SubjectAcl(String domain, String node, String principal, String type, String permission) {
+  private SubjectAcl(@Nonnull String domain, @Nonnull String node, @Nonnull String principal, @Nonnull String type,
+      @Nonnull String permission) {
     this.domain = domain;
     this.node = node;
     this.principal = principal;
@@ -79,24 +49,49 @@ public class SubjectAcl extends AbstractEntity {
     this.permission = permission;
   }
 
+  @Nonnull
   public String getDomain() {
     return domain;
   }
 
+  public void setDomain(@Nonnull String domain) {
+    this.domain = domain;
+  }
+
+  @Nonnull
   public String getNode() {
     return node;
   }
 
-  public String getPrincipal() {
-    return principal;
+  public void setNode(@Nonnull String node) {
+    this.node = node;
   }
 
+  @Nonnull
   public String getPermission() {
     return permission;
   }
 
+  public void setPermission(@Nonnull String permission) {
+    this.permission = permission;
+  }
+
+  @Nonnull
+  public String getPrincipal() {
+    return principal;
+  }
+
+  public void setPrincipal(@Nonnull String principal) {
+    this.principal = principal;
+  }
+
+  @Nonnull
   public String getType() {
     return type;
+  }
+
+  public void setType(@Nonnull String type) {
+    this.type = type;
   }
 
   public SubjectAclService.Subject getSubject() {

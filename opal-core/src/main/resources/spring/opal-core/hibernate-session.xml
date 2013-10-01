@@ -19,32 +19,6 @@
     <property name="testQuery" value="${org.obiba.opal.datasource.validationQuery}"/>
   </bean>
 
-  <!-- Hibernate SessionFactory used for Opal internal configuration -->
-  <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
-    <qualifier value="opal-config"/>
-    <property name="dataSource" ref="dataSource"/>
-    <property name="namingStrategy">
-      <bean class="org.obiba.magma.datasource.hibernate.cfg.MagmaNamingStrategy"/>
-    </property>
-    <property name="annotatedClasses">
-      <bean class="org.obiba.opal.core.support.OpalAnnotationConfigurationHelper"/>
-    </property>
-    <property name="jtaTransactionManager" ref="transactionManager"/>
-    <property name="hibernateProperties">
-      <bean class="org.obiba.opal.core.runtime.jdbc.HsqlDialectOverride">
-        <property name="propertiesArray">
-          <list>
-            <ref bean="hibernateProperties"/>
-            <props>
-              <prop key="hibernate.dialect">${org.obiba.opal.datasource.dialect}</prop>
-              <prop key="hibernate.hbm2ddl.auto">create</prop>
-            </props>
-          </list>
-        </property>
-      </bean>
-    </property>
-  </bean>
-
   <!-- Default Hibernate properties used when creating SessionFactory for Magma Hibernate Datasources -->
   <bean id="hibernateProperties" class="org.obiba.opal.core.runtime.jdbc.HsqlDialectOverride">
     <qualifier value="hibernate"/>

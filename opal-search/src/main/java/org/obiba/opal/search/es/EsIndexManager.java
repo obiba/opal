@@ -42,8 +42,10 @@ import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.runtime.Version;
+import org.obiba.runtime.upgrade.VersionProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
 import com.google.common.collect.Maps;
@@ -58,34 +60,23 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
 
   protected static final int ES_BATCH_SIZE = 100;
 
+  @Autowired
   @Nonnull
-  protected final OpalSearchService opalSearchService;
+  protected OpalSearchService opalSearchService;
 
+  @Autowired
   @Nonnull
-  private final ElasticSearchConfigurationService esConfig;
+  private ElasticSearchConfigurationService esConfig;
 
+  @Autowired
   @Nonnull
-  private final IndexManagerConfigurationService indexConfig;
+  private IndexManagerConfigurationService indexConfig;
 
+  @Autowired
   @Nonnull
-  protected final Version runtimeVersion;
+  protected VersionProvider runtimeVersionProvider;
 
   private final Map<String, ValueTableIndex> indices = Maps.newHashMap();
-
-  protected EsIndexManager(@Nonnull OpalSearchService opalSearchService,
-      @Nonnull ElasticSearchConfigurationService esConfig, @Nonnull IndexManagerConfigurationService indexConfig,
-      @Nonnull Version version) {
-
-    Assert.notNull(opalSearchService);
-    Assert.notNull(esConfig);
-    Assert.notNull(esConfig);
-    Assert.notNull(version);
-
-    this.opalSearchService = opalSearchService;
-    this.esConfig = esConfig;
-    this.indexConfig = indexConfig;
-    runtimeVersion = version;
-  }
 
   @Nonnull
   @Override
@@ -271,7 +262,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
       if(v == null) return true;
       try {
         Version indexOpalVersion = new Version(v);
-        return runtimeVersion.compareTo(indexOpalVersion) > 0;
+        return runtimeVersionProvider.getVersion().compareTo(indexOpalVersion) > 0;
       } catch(Exception e) {
         return true;
       }

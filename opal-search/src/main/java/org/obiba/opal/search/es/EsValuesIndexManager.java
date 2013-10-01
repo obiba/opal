@@ -20,7 +20,6 @@ import javax.annotation.Nullable;
 
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.index.IndexRequestBuilder;
-import org.elasticsearch.common.base.Preconditions;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.obiba.magma.Value;
@@ -32,15 +31,12 @@ import org.obiba.magma.concurrent.ConcurrentValueTableReader.ConcurrentReaderCal
 import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.DateType;
 import org.obiba.opal.core.domain.VariableNature;
-import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.StatsIndexManager;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.ValueTableValuesIndex;
 import org.obiba.opal.search.ValuesIndexManager;
 import org.obiba.opal.search.es.mapping.ValueTableMapping;
-import org.obiba.opal.search.service.OpalSearchService;
-import org.obiba.runtime.Version;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -53,23 +49,13 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
 
 //  private static final Logger log = LoggerFactory.getLogger(EsValuesIndexManager.class);
 
-  @Nonnull
-  private final ThreadFactory threadFactory;
-
-  @Nonnull
-  private final StatsIndexManager statsIndexManager;
-
-  @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
-  public EsValuesIndexManager(OpalSearchService esProvider, ElasticSearchConfigurationService esConfig,
-      IndexManagerConfigurationService indexConfig, @Nonnull ThreadFactory threadFactory, Version version,
-      @Nonnull StatsIndexManager statsIndexManager) {
-    super(esProvider, esConfig, indexConfig, version);
-    Preconditions.checkNotNull(threadFactory);
-    Preconditions.checkNotNull(statsIndexManager);
-    this.threadFactory = threadFactory;
-    this.statsIndexManager = statsIndexManager;
-  }
+  @Nonnull
+  private ThreadFactory threadFactory;
+
+  @Autowired
+  @Nonnull
+  private StatsIndexManager statsIndexManager;
 
   @Nonnull
   @Override
@@ -220,7 +206,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
 
     @Override
     protected XContentBuilder getMapping() {
-      return new ValueTableMapping().createMapping(runtimeVersion, getIndexName(), resolveTable());
+      return new ValueTableMapping().createMapping(runtimeVersionProvider.getVersion(), getIndexName(), resolveTable());
     }
 
     @Override

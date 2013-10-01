@@ -6,16 +6,11 @@
   <context:annotation-config/>
 
   <import resource="tx.xml"/>
-  <import resource="hibernate-services.xml"/>
+  <import resource="hibernate-session.xml"/>
   <import resource="version.xml"/>
   <import resource="quartz.xml"/>
   <import resource="email.xml"/>
   <import resource="classpath*:/META-INF/opal/context.xml"/>
-
-  <bean id="participantIdentifier"
-      class="org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl"/>
-
-  <bean id="identifiersTableService" class="org.obiba.opal.core.service.impl.DefaultIdentifiersTableService"/>
 
   <bean class="org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor"/>
 

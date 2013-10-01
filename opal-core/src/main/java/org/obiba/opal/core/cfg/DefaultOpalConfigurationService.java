@@ -9,10 +9,21 @@
  ******************************************************************************/
 package org.obiba.opal.core.cfg;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.js.GlobalMethodProvider;
+import org.obiba.magma.js.MagmaContextFactory;
+import org.obiba.magma.js.MagmaJsExtension;
+import org.obiba.magma.xstream.MagmaXStreamExtension;
+import org.obiba.opal.core.magma.js.OpalGlobalMethodProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,6 +41,30 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
   @Autowired
   public DefaultOpalConfigurationService(OpalConfigurationIo opalConfigIo) {
     this.opalConfigIo = opalConfigIo;
+  }
+
+  @Override
+  @PostConstruct
+  public void start() {
+    // Add opal specific javascript methods
+    Set<GlobalMethodProvider> providers = new HashSet<GlobalMethodProvider>();
+    providers.add(new OpalGlobalMethodProvider());
+    MagmaContextFactory ctxFactory = new MagmaContextFactory();
+    ctxFactory.setGlobalMethodProviders(providers);
+
+    MagmaJsExtension jsExtension = new MagmaJsExtension();
+    jsExtension.setMagmaContextFactory(ctxFactory);
+
+    // We need these two extensions to read the opal config file
+    new MagmaEngine().extend(new MagmaXStreamExtension()).extend(jsExtension);
+
+    readOpalConfiguration();
+  }
+
+  @Override
+  @PreDestroy
+  public void stop() {
+    MagmaEngine.get().shutdown();
   }
 
   @Override
@@ -63,15 +98,6 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
     opalConfigurationLock.lock();
     try {
       task.doWithConfig(getOpalConfiguration());
-      writeOpalConfiguration();
-    } finally {
-      opalConfigurationLock.unlock();
-    }
-  }
-
-  private void writeOpalConfiguration() {
-    opalConfigurationLock.lock();
-    try {
       opalConfigIo.writeConfiguration(opalConfiguration);
     } finally {
       opalConfigurationLock.unlock();

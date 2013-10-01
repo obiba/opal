@@ -15,6 +15,8 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import javax.annotation.Nullable;
+import javax.annotation.PostConstruct;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -41,6 +43,7 @@ import org.obiba.opal.core.service.SubjectAclService;
 import org.obiba.opal.server.httpd.security.AuthenticationFilter;
 import org.obiba.opal.server.ssl.SslContextFactory;
 import org.obiba.runtime.Version;
+import org.obiba.runtime.upgrade.VersionProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,72 +75,59 @@ public class OpalJettyServer implements Service {
 
   private static final int REQUEST_HEADER_SIZE = 8192;
 
-  private final Server jettyServer;
+  @Nullable
+  @Value("${org.obiba.opal.http.port}")
+  private Integer httpPort;
 
-  private final ServletContextHandler contextHandler;
+  @Nullable
+  @Value("${org.obiba.opal.https.port}")
+  private Integer httpsPort;
 
-  private final OpalRuntime opalRuntime;
+  @Nullable
+  @Value("${org.obiba.opal.ajp.port}")
+  private Integer ajpPort;
 
-  private final SubjectAclService subjectAclService;
+  @Nullable
+  @Value("${org.obiba.opal.maxIdleTime}")
+  private Integer maxIdleTime;
 
   @Autowired
-  private Version opalVersion;
+  private ApplicationContext applicationContext;
+
+  @Autowired
+  private PlatformTransactionManager transactionManager;
+
+  @Autowired
+  private OpalRuntime opalRuntime;
+
+  @Autowired
+  private SubjectAclService subjectAclService;
+
+  @Autowired
+  private VersionProvider opalVersionProvider;
+
+  @Autowired
+  private SecurityManager securityMgr;
+
+  @Autowired
+  private SslContextFactory sslContextFactory;
+
+  private Server jettyServer;
+
+  private ServletContextHandler contextHandler;
 
   private ConfigurableApplicationContext webApplicationContext;
 
-  @Autowired
-  @SuppressWarnings({ "unchecked", "PMD.ExcessiveParameterList" })
-  public OpalJettyServer(ApplicationContext ctx, SecurityManager securityMgr, final SslContextFactory sslContextFactory,
-      PlatformTransactionManager txmgr, OpalRuntime opalRuntime, SubjectAclService subjectAclService,
-      @Value("${org.obiba.opal.http.port}") Integer httpPort, @Value("${org.obiba.opal.https.port}") Integer httpsPort,
-      @Value("${org.obiba.opal.ajp.port}") Integer ajpPort, @Value("${org.obiba.opal.maxIdleTime}") Integer maxIdleTime
-
-  ) {
-    this.opalRuntime = opalRuntime;
-    this.subjectAclService = subjectAclService;
-    Server server = new Server();
-    server.setSendServerVersion(false);
+  @PostConstruct
+  public void init() {
+    jettyServer = new Server();
+    jettyServer.setSendServerVersion(false);
     // OPAL-342: We will manually stop the Jetty server instead of relying its shutdown hook
-    server.setStopAtShutdown(false);
+    jettyServer.setStopAtShutdown(false);
 
-    if(httpPort != null && httpPort > 0) {
-      SelectChannelConnector httpConnector = new SelectChannelConnector();
-      httpConnector.setPort(httpPort);
-      httpConnector.setMaxIdleTime(maxIdleTime == null ? MAX_IDLE_TIME : maxIdleTime);
-      httpConnector.setRequestHeaderSize(REQUEST_HEADER_SIZE);
-      server.addConnector(httpConnector);
-    }
-
-    if(httpsPort != null && httpsPort > 0) {
-
-      org.eclipse.jetty.util.ssl.SslContextFactory jettySsl = new org.eclipse.jetty.util.ssl.SslContextFactory() {
-
-        @Override
-        protected void doStart() throws Exception {
-          setSslContext(sslContextFactory.createSslContext());
-        }
-
-        @Override
-        public void checkKeyStore() {
-        }
-      };
-
-      jettySsl.setWantClientAuth(true);
-      jettySsl.setNeedClientAuth(false);
-
-      SslSelectChannelConnector sslConnector = new SslSelectChannelConnector(jettySsl);
-      sslConnector.setPort(httpsPort);
-      sslConnector.setMaxIdleTime(maxIdleTime == null ? MAX_IDLE_TIME : maxIdleTime);
-      sslConnector.setRequestHeaderSize(REQUEST_HEADER_SIZE);
-
-      server.addConnector(sslConnector);
-    }
-
-    if(ajpPort != null && ajpPort > 0) {
-      Connector ajp = new Ajp13SocketConnector();
-      ajp.setPort(ajpPort);
-      server.addConnector(ajp);
-    }
+    configureHttpConnector();
+    configureSslConnector();
+    configureAjpConnector();
 
     HandlerList handlers = new HandlerList();
 
@@ -147,11 +137,51 @@ public class OpalJettyServer implements Service {
     handlers.addHandler(createExtensionFileHandler(OpalRuntime.WEBAPP_EXTENSION));
     // Add a file handler that points to the Opal BIRT extension update-site
     handlers.addHandler(createDistFileHandler("/update-site"));
+    handlers.addHandler(contextHandler = createServletHandler());
+    jettyServer.setHandler(handlers);
+  }
 
-    handlers.addHandler(contextHandler = createServletHandler(ctx, txmgr, securityMgr));
-    server.setHandler(handlers);
+  private void configureAjpConnector() {
+    if(ajpPort == null || ajpPort <= 0) return;
+    Connector ajp = new Ajp13SocketConnector();
+    ajp.setPort(ajpPort);
+    jettyServer.addConnector(ajp);
+  }
 
-    jettyServer = server;
+  private void configureHttpConnector() {
+    if(httpPort == null || httpPort <= 0) return;
+
+    Connector httpConnector = new SelectChannelConnector();
+    httpConnector.setPort(httpPort);
+    httpConnector.setMaxIdleTime(maxIdleTime == null ? MAX_IDLE_TIME : maxIdleTime);
+    httpConnector.setRequestHeaderSize(REQUEST_HEADER_SIZE);
+    jettyServer.addConnector(httpConnector);
+  }
+
+  private void configureSslConnector() {
+    if(httpsPort == null || httpsPort <= 0) return;
+
+    org.eclipse.jetty.util.ssl.SslContextFactory jettySsl = new org.eclipse.jetty.util.ssl.SslContextFactory() {
+
+      @Override
+      protected void doStart() throws Exception {
+        setSslContext(sslContextFactory.createSslContext());
+      }
+
+      @Override
+      public void checkKeyStore() {
+      }
+    };
+
+    jettySsl.setWantClientAuth(true);
+    jettySsl.setNeedClientAuth(false);
+
+    Connector sslConnector = new SslSelectChannelConnector(jettySsl);
+    sslConnector.setPort(httpsPort);
+    sslConnector.setMaxIdleTime(maxIdleTime == null ? MAX_IDLE_TIME : maxIdleTime);
+    sslConnector.setRequestHeaderSize(REQUEST_HEADER_SIZE);
+
+    jettyServer.addConnector(sslConnector);
   }
 
   @Bean
@@ -206,29 +236,27 @@ public class OpalJettyServer implements Service {
     throw new NoSuchServiceConfigurationException(getName());
   }
 
-  private ServletContextHandler createServletHandler(ApplicationContext ctx, PlatformTransactionManager txmgr,
-      SecurityManager securityMgr) {
-    ServletContextHandler contextHandler = new ServletContextHandler(
+  private ServletContextHandler createServletHandler() {
+    ServletContextHandler handler = new ServletContextHandler(
         ServletContextHandler.NO_SESSIONS | ServletContextHandler.NO_SECURITY);
-    contextHandler.setContextPath("/");
-    contextHandler.addFilter(new FilterHolder(new OpalVersionFilter()), "/*", FilterMapping.DEFAULT);
-    contextHandler
-        .addFilter(new FilterHolder(new AuthenticationFilter(securityMgr, opalRuntime, subjectAclService)), "/ws/*",
-            FilterMapping.DEFAULT);
-    // contextHandler.addFilter(new FilterHolder(new X509CertificateAuthenticationFilter()), "/ws/*", FilterMapping.DEFAULT);
-    // contextHandler.addFilter(new FilterHolder(new CrossOriginFilter()), "/*", FilterMapping.DEFAULT);
-    contextHandler.addFilter(new FilterHolder(new RequestContextFilter()), "/*", FilterMapping.DEFAULT);
-    contextHandler.addFilter(new FilterHolder(new TransactionFilter(txmgr)), "/*", FilterMapping.DEFAULT);
+    handler.setContextPath("/");
+    handler.addFilter(new FilterHolder(new OpalVersionFilter()), "/*", FilterMapping.DEFAULT);
+    handler.addFilter(new FilterHolder(new AuthenticationFilter(securityMgr, opalRuntime, subjectAclService)), "/ws/*",
+        FilterMapping.DEFAULT);
+    // handler.addFilter(new FilterHolder(new X509CertificateAuthenticationFilter()), "/ws/*", FilterMapping.DEFAULT);
+    // handler.addFilter(new FilterHolder(new CrossOriginFilter()), "/*", FilterMapping.DEFAULT);
+    handler.addFilter(new FilterHolder(new RequestContextFilter()), "/*", FilterMapping.DEFAULT);
+    handler.addFilter(new FilterHolder(new TransactionFilter(transactionManager)), "/*", FilterMapping.DEFAULT);
 
     webApplicationContext = new XmlWebApplicationContext();
-    webApplicationContext.setParent(ctx);
-    ((ConfigurableWebApplicationContext) webApplicationContext).setServletContext(contextHandler.getServletContext());
+    webApplicationContext.setParent(applicationContext);
+    ((ConfigurableWebApplicationContext) webApplicationContext).setServletContext(handler.getServletContext());
     ((AbstractRefreshableConfigApplicationContext) webApplicationContext)
         .setConfigLocation("classpath:/META-INF/spring/opal-httpd/context.xml");
-    contextHandler.getServletContext()
+    handler.getServletContext()
         .setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, webApplicationContext);
 
-    return contextHandler;
+    return handler;
   }
 
   private Handler createDistFileHandler(String directory) {
@@ -267,8 +295,9 @@ public class OpalJettyServer implements Service {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
       try {
-        if(opalVersion != null) {
-          response.addHeader("X-Opal-Version", opalVersion.toString());
+        Version version = opalVersionProvider.getVersion();
+        if(version != null) {
+          response.addHeader("X-Opal-Version", version.toString());
         }
       } catch(RuntimeException ignored) {
       }

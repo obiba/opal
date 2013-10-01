@@ -13,7 +13,7 @@ import javax.annotation.PostConstruct;
 
 import org.obiba.opal.core.cfg.OrientDbService;
 import org.obiba.opal.core.cfg.OrientDbTransactionCallback;
-import org.obiba.opal.core.domain.server.OpalGeneralConfig;
+import org.obiba.opal.core.domain.OpalGeneralConfig;
 import org.obiba.opal.core.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -43,7 +43,6 @@ public class DefaultGeneralConfigService implements SystemService {
     if(orientDbService.count(OpalGeneralConfig.class) != 0) {
       throw new OpalGeneralConfigAlreadyExistsException();
     }
-
     orientDbService.execute(new OrientDbTransactionCallback<Object>() {
       @Override
       public Object doInTransaction(OObjectDatabaseTx db) {
@@ -53,10 +52,7 @@ public class DefaultGeneralConfigService implements SystemService {
   }
 
   public void updateServerConfig(final OpalGeneralConfig config) throws OpalGeneralConfigMissingException {
-    if(orientDbService.count(OpalGeneralConfig.class) != 1) {
-      throw new OpalGeneralConfigMissingException();
-    }
-
+    checkUniqueConfig();
     orientDbService.execute(new OrientDbTransactionCallback<Object>() {
       @Override
       public Object doInTransaction(OObjectDatabaseTx db) {
@@ -66,11 +62,12 @@ public class DefaultGeneralConfigService implements SystemService {
   }
 
   public OpalGeneralConfig getServerConfig() throws OpalGeneralConfigMissingException {
-    if(orientDbService.count(OpalGeneralConfig.class) != 1) {
-      throw new OpalGeneralConfigMissingException();
-    }
-
+    checkUniqueConfig();
     return orientDbService.list(OpalGeneralConfig.class).iterator().next();
+  }
+
+  private void checkUniqueConfig() throws OpalGeneralConfigMissingException {
+    if(orientDbService.count(OpalGeneralConfig.class) != 1) throw new OpalGeneralConfigMissingException();
   }
 
 }

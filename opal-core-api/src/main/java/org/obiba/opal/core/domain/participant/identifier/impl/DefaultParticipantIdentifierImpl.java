@@ -13,11 +13,13 @@ import java.security.SecureRandom;
 import java.util.Random;
 
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
+import org.springframework.stereotype.Component;
 
 /**
  * Provides a method to generate a random 10 digit {@link Participant} id. Clients are responsible to ensure that the id
  * is unique prior to use. Example ids: 7515827901, 4398790660, 0042480736.
  */
+@Component
 public final class DefaultParticipantIdentifierImpl implements IParticipantIdentifier {
 
   private final Random generator = new SecureRandom();

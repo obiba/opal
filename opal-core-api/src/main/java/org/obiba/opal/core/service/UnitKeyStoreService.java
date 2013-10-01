@@ -11,6 +11,9 @@ package org.obiba.opal.core.service;
 
 import java.io.InputStream;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.apache.commons.vfs2.FileObject;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.UnitKeyStore;
@@ -18,7 +21,7 @@ import org.obiba.opal.core.unit.UnitKeyStore;
 /**
  * Manage KeyStores.
  */
-public interface UnitKeyStoreService {
+public interface UnitKeyStoreService extends SystemService {
 
   /**
    * Gets the {@link UnitKeyStore} for the specified {@link FunctionalUnit}.
@@ -26,7 +29,8 @@ public interface UnitKeyStoreService {
    * @param unitName functional unit name
    * @return the unit's keystore (or <code>null</code> if no keystore exists for that unit)
    */
-  UnitKeyStore getUnitKeyStore(String unitName);
+  @Nullable
+  UnitKeyStore getUnitKeyStore(@Nonnull String unitName);
 
   /**
    * Gets the {@link UnitKeyStore} for the specified {@link FunctionalUnit} or if it doesn't exist, create, persist and
@@ -36,14 +40,14 @@ public interface UnitKeyStoreService {
    * @return the unit's keystore
    * @throws NoSuchFunctionalUnitException if no unit exists with the specified name
    */
-  UnitKeyStore getOrCreateUnitKeyStore(String unitName) throws NoSuchFunctionalUnitException;
+  UnitKeyStore getOrCreateUnitKeyStore(@Nonnull String unitName) throws NoSuchFunctionalUnitException;
 
   /**
    * Save a {@link FunctionalUnit}'s keystore. This will persist any keystore updates.
    *
    * @param unitKeyStore functional unit keystore
    */
-  void saveUnitKeyStore(UnitKeyStore unitKeyStore);
+  void saveUnitKeyStore(@Nonnull UnitKeyStore unitKeyStore) throws UnitKeyStoreAlreadyExistsException;
 
   /**
    * Creates a new key or updates an existing key. It is the responsibility of the client to ensure that the caller
@@ -57,8 +61,8 @@ public interface UnitKeyStoreService {
    * L=Montreal, ST=Quebec, C=CA)
    * @throws NoSuchFunctionalUnitException if no unit exists with the specified name
    */
-  void createOrUpdateKey(String unitName, String alias, String algorithm, int size, String certificateInfo)
-      throws NoSuchFunctionalUnitException;
+  void createOrUpdateKey(@Nonnull String unitName, @Nonnull String alias, @Nonnull String algorithm, int size,
+      @Nonnull String certificateInfo) throws NoSuchFunctionalUnitException;
 
   /**
    * Returns true if the supplied alias exists in the specified functional unit's keystore.
@@ -68,7 +72,7 @@ public interface UnitKeyStoreService {
    * @return true is the alias exists.
    * @throws NoSuchFunctionalUnitException if no unit exists with the specified name
    */
-  boolean aliasExists(String unitName, String alias) throws NoSuchFunctionalUnitException;
+  boolean aliasExists(@Nonnull String unitName, @Nonnull String alias) throws NoSuchFunctionalUnitException;
 
   /**
    * Deletes the specified public/private key pair from the specified functional unit's keystore.
@@ -77,7 +81,7 @@ public interface UnitKeyStoreService {
    * @param alias name of the public/private key pair to be deleted
    * @throws NoSuchFunctionalUnitException if no unit exists with the specified name
    */
-  void deleteKey(String unitName, String alias) throws NoSuchFunctionalUnitException;
+  void deleteKey(@Nonnull String unitName, @Nonnull String alias) throws NoSuchFunctionalUnitException;
 
   /**
    * Import a private key and its associated certificate into the specified keystore at the given alias.
@@ -88,8 +92,8 @@ public interface UnitKeyStoreService {
    * @param certificate certificate in the PEM format
    * @throws NoSuchFunctionalUnitException if no unit exists with the specified name
    */
-  void importKey(String unitName, String alias, FileObject privateKey, FileObject certificate)
-      throws NoSuchFunctionalUnitException;
+  void importKey(@Nonnull String unitName, @Nonnull String alias, @Nonnull FileObject privateKey,
+      @Nonnull FileObject certificate) throws NoSuchFunctionalUnitException;
 
   /**
    * Import a private key and its associated certificate into the specified keystore at the given alias.
@@ -100,8 +104,8 @@ public interface UnitKeyStoreService {
    * @param certificate
    * @throws NoSuchFunctionalUnitException
    */
-  void importKey(String unitName, String alias, InputStream privateKey, InputStream certificate)
-      throws NoSuchFunctionalUnitException;
+  void importKey(@Nonnull String unitName, @Nonnull String alias, @Nonnull InputStream privateKey,
+      @Nonnull InputStream certificate) throws NoSuchFunctionalUnitException;
 
   /**
    * Import a private key into the specified keystore and generate an associated certificate at the given alias.
@@ -113,8 +117,8 @@ public interface UnitKeyStoreService {
    * L=Montreal, ST=Quebec, C=CA)
    * @throws NoSuchFunctionalUnitException if no unit exists with the specified name
    */
-  void importKey(String unitName, String alias, FileObject privateKey, String certificateInfo)
-      throws NoSuchFunctionalUnitException;
+  void importKey(@Nonnull String unitName, @Nonnull String alias, @Nonnull FileObject privateKey,
+      @Nonnull String certificateInfo) throws NoSuchFunctionalUnitException;
 
   /**
    * Import a private key into the specified keystore and generate an associated certificate at the given alias.
@@ -125,14 +129,14 @@ public interface UnitKeyStoreService {
    * @param certificateInfo
    * @throws NoSuchFunctionalUnitException
    */
-  void importKey(String unitName, String alias, InputStream privateKey, String certificateInfo)
-      throws NoSuchFunctionalUnitException;
+  void importKey(@Nonnull String unitName, @Nonnull String alias, @Nonnull InputStream privateKey,
+      @Nonnull String certificateInfo) throws NoSuchFunctionalUnitException;
 
   /**
    * @param unit
    * @param alias
    * @param byteArrayInputStream
    */
-  void importCertificate(String unit, String alias, InputStream byteArrayInputStream);
+  void importCertificate(@Nonnull String unit, @Nonnull String alias, @Nonnull InputStream byteArrayInputStream);
 
 }

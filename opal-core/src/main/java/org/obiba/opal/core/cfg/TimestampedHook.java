@@ -28,4 +28,9 @@ public class TimestampedHook extends ORecordHookAbstract {
     }
     return RESULT.RECORD_NOT_CHANGED;
   }
+
+//  @Override
+//  public DISTRIBUTED_EXECUTION_MODE getDistributedExecutionMode() {
+//    return null;
+//  }
 }

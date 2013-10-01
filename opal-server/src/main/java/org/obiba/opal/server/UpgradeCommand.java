@@ -49,9 +49,8 @@ public class UpgradeCommand {
   private void standardUpgrade() {
     ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(CONTEXT_PATHS);
     try {
-      UpgradeManager upgradeManager = (UpgradeManager) ctx.getBean("upgradeManager");
       try {
-        upgradeManager.executeUpgrade();
+        ctx.getBean("upgradeManager", UpgradeManager.class).executeUpgrade();
       } catch(UpgradeException upgradeFailed) {
         throw new RuntimeException("An error occurred while running the upgrade manager", upgradeFailed);
       }
@@ -88,9 +87,8 @@ public class UpgradeCommand {
 
     ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(OPAL2_CONTEXT_PATHS);
     try {
-      UpgradeManager upgradeManager = (UpgradeManager) ctx.getBean("upgradeManager");
       try {
-        upgradeManager.executeUpgrade();
+        ctx.getBean("upgradeManager", UpgradeManager.class).executeUpgrade();
       } catch(UpgradeException upgradeFailed) {
         throw new RuntimeException("An error occurred while running the opal2 upgrade manager", upgradeFailed);
       }

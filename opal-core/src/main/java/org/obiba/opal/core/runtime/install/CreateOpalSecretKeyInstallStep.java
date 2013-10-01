@@ -42,7 +42,7 @@ public class CreateOpalSecretKeyInstallStep extends AbstractConfigurationInstall
     try {
       keyGenerator = KeyGenerator.getInstance("AES");
     } catch(NoSuchAlgorithmException e) {
-      throw new RuntimeException("Cannot generate AES key. Your JVM is non-standard.");
+      throw new RuntimeException("Cannot generate AES key. Your JVM is non-standard.", e);
     }
     keyGenerator.init(128);
     SecretKey key = keyGenerator.generateKey();

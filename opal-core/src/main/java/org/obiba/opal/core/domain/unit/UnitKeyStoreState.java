@@ -11,59 +11,36 @@ package org.obiba.opal.core.domain.unit;
 
 import java.util.Arrays;
 
-import javax.annotation.Nullable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.annotation.Nonnull;
 
-import org.obiba.core.domain.AbstractEntity;
+import org.obiba.opal.core.domain.AbstractTimestamped;
 
 /**
  * Persisted keystore.
  */
-@Entity
-@Table(name = "unit_key_store", uniqueConstraints = { @UniqueConstraint(columnNames = { "unit" }) })
-public class UnitKeyStoreState extends AbstractEntity {
-  //
-  // Constants
-  //
+public class UnitKeyStoreState extends AbstractTimestamped {
 
-  private static final long serialVersionUID = 1L;
-
-  //
-  // Instance Variables
-  //
-
-  @Column(nullable = false)
+  @Nonnull
   private String unit;
 
-  @Column(nullable = false, length = 1048576)
+  @Nonnull
   private byte[] keyStore;
 
-  //
-  // Methods
-  //
-
+  @Nonnull
   public String getUnit() {
     return unit;
   }
 
-  public void setUnit(String unit) {
+  public void setUnit(@Nonnull String unit) {
     this.unit = unit;
   }
 
-  @Nullable
+  @Nonnull
   public byte[] getKeyStore() {
-    if(keyStore != null) {
-      return Arrays.copyOf(keyStore, keyStore.length);
-    }
-    return null;
+    return Arrays.copyOf(keyStore, keyStore.length);
   }
 
-  public void setKeyStore(byte... keyStore) {
-    if(keyStore != null) {
-      this.keyStore = Arrays.copyOf(keyStore, keyStore.length);
-    }
+  public void setKeyStore(@Nonnull byte... keyStore) {
+    this.keyStore = Arrays.copyOf(keyStore, keyStore.length);
   }
 }

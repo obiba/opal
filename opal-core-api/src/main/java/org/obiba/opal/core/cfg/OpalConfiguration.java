@@ -19,13 +19,15 @@ import javax.annotation.Nullable;
 
 import org.obiba.magma.support.MagmaEngineFactory;
 import org.obiba.opal.core.unit.FunctionalUnit;
+import org.obiba.runtime.Version;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-@SuppressWarnings("UnusedDeclaration")
 public class OpalConfiguration {
+
+  private Version version;
 
   private String secretKey;
 
@@ -39,14 +41,20 @@ public class OpalConfiguration {
 
   private final List<OpalConfigurationExtension> extensions;
 
-  private boolean binariesMigrated;
-
   private boolean migratedToOpal2;
 
   public OpalConfiguration() {
     functionalUnits = Sets.newLinkedHashSet();
     reportTemplates = Sets.newLinkedHashSet();
     extensions = Lists.newArrayList();
+  }
+
+  public Version getVersion() {
+    return version;
+  }
+
+  public void setVersion(Version version) {
+    this.version = version;
   }
 
   public void setSecretKey(String secretKey) {
@@ -133,14 +141,6 @@ public class OpalConfiguration {
 
   public boolean hasReportTemplates() {
     return reportTemplates.size() > 0;
-  }
-
-  public boolean isBinariesMigrated() {
-    return binariesMigrated;
-  }
-
-  public void setBinariesMigrated(boolean binariesMigrated) {
-    this.binariesMigrated = binariesMigrated;
   }
 
   public boolean isMigratedToOpal2() {

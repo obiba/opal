@@ -9,7 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.core.service;
 
-public interface SubjectAclService {
+import javax.annotation.Nonnull;
+
+public interface SubjectAclService extends SystemService {
 
   void addListener(SubjectAclChangeCallback callback);
 
@@ -34,11 +36,11 @@ public interface SubjectAclService {
 
   void addSubjectPermissions(String domain, String node, Subject subject, Iterable<String> permissions);
 
-  void addSubjectPermission(String domain, String node, Subject subject, String permission);
+  void addSubjectPermission(String domain, String node, @Nonnull Subject subject, @Nonnull String permission);
 
   Iterable<Permissions> getSubjectPermissions(Subject subject);
 
-  Permissions getSubjectPermissions(String domain, String node, Subject subject);
+  Permissions getSubjectPermissions(@Nonnull String domain, @Nonnull String node, @Nonnull Subject subject);
 
   Iterable<Permissions> getNodePermissions(String domain, String node, SubjectType type);
 

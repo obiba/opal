@@ -200,7 +200,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     dataSourceCache.invalidate(name);
   }
 
-  private void register(String databaseName, String usedByDatasource) {
+  private void register(String databaseName, @Nullable String usedByDatasource) {
     if(Strings.isNullOrEmpty(usedByDatasource)) return;
     Database database = getDatabase(databaseName);
     if(database == null) {

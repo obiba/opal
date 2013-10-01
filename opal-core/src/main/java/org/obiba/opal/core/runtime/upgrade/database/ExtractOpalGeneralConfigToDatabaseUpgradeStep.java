@@ -1,4 +1,4 @@
-package org.obiba.opal.core.runtime.upgrade;
+package org.obiba.opal.core.runtime.upgrade.database;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,7 +11,7 @@ import java.util.Properties;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.obiba.opal.core.domain.server.OpalGeneralConfig;
+import org.obiba.opal.core.domain.OpalGeneralConfig;
 import org.obiba.opal.core.service.impl.DefaultGeneralConfigService;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
@@ -53,16 +53,16 @@ public class ExtractOpalGeneralConfigToDatabaseUpgradeStep extends AbstractUpgra
       prop.load(new FileInputStream(propertiesFile));
 
       OpalGeneralConfig conf = new OpalGeneralConfig();
-      conf.setName("Opal");
-      conf.setDefaultCharacterSet(prop.getProperty(OPAL_CHARSET, "ISO-8859-1"));
+      conf.setName(OpalGeneralConfig.DEFAULT_NAME);
+      conf.setDefaultCharacterSet(prop.getProperty(OPAL_CHARSET, OpalGeneralConfig.DEFAULT_CHARSET));
 
-      String[] languages = prop.getProperty(OPAL_LANGUAGES, "en").split(",");
+      String[] languages = prop.getProperty(OPAL_LANGUAGES, OpalGeneralConfig.DEFAULT_LOCALE).split(",");
       conf.setLocales(Arrays.asList(languages));
 
       generalConfigService.createServerConfig(conf);
 
-      log.debug("Import general configuration: name:Opal, characterSet:{}, languages:{}", conf.getDefaultCharacterSet(),
-          StringUtils.arrayToDelimitedString(languages, ","));
+      log.debug("Import general configuration. name: {}, characterSet: {}, languages: {}", conf.getName(),
+          conf.getDefaultCharacterSet(), StringUtils.arrayToDelimitedString(languages, ","));
 
     } catch(IOException e) {
       throw new RuntimeException(e);

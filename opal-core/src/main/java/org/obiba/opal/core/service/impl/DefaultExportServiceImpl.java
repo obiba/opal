@@ -43,6 +43,7 @@ import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
@@ -51,6 +52,7 @@ import com.google.common.base.Function;
 /**
  * Default implementation of {@link ExportService}.
  */
+@Component
 public class DefaultExportServiceImpl implements ExportService {
 
   @Nonnull
@@ -65,6 +67,7 @@ public class DefaultExportServiceImpl implements ExportService {
   @Nonnull
   private final IdentifiersTableService identifiersTableService;
 
+  @SuppressWarnings("ConstantConditions")
   @Autowired
   public DefaultExportServiceImpl(@Nonnull ThreadFactory threadFactory, @Nonnull TransactionTemplate txTemplate,
       @Nonnull FunctionalUnitService functionalUnitService, @Nonnull IdentifiersTableService identifiersTableService) {

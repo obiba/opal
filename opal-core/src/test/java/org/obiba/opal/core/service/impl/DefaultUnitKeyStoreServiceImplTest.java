@@ -20,50 +20,39 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.easymock.EasyMock;
-import org.easymock.IArgumentMatcher;
+import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
-import org.obiba.core.service.PersistenceManager;
 import org.obiba.core.util.FileUtil;
+import org.obiba.opal.core.cfg.OrientDbService;
+import org.obiba.opal.core.cfg.OrientDbTransactionCallback;
 import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
 import org.obiba.opal.core.unit.UnitKeyStore;
 
-import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 /**
  * Unit tests for {@link DefaultUnitKeyStoreServiceImpl}.
  */
 public class DefaultUnitKeyStoreServiceImplTest {
-  //
-  // Instance Variables
-  //
 
   private DefaultUnitKeyStoreServiceImpl unitKeyStoreService;
 
-  private PersistenceManager mockPersistenceManager;
-
-  //
-  // Fixture Methods (setUp / tearDown)
-  //
+  private OrientDbService mockOrientDbService;
 
   @Before
   public void setUp() {
-    mockPersistenceManager = createMock(PersistenceManager.class);
-
-    unitKeyStoreService = new DefaultUnitKeyStoreServiceImpl(createPasswordCallbackHandler());
-    unitKeyStoreService.setPersistenceManager(mockPersistenceManager);
+    mockOrientDbService = createMock(OrientDbService.class);
+    unitKeyStoreService = new DefaultUnitKeyStoreServiceImpl(createPasswordCallbackHandler(), mockOrientDbService);
   }
 
-  //
-  // Test Methods
-  //
-
+  @SuppressWarnings("ConstantConditions")
   @Test(expected = IllegalArgumentException.class)
   public void testGetUnitKeyStoreThrowsExceptionOnNullUnitName() {
     unitKeyStoreService.getUnitKeyStore(null);
@@ -83,36 +72,39 @@ public class DefaultUnitKeyStoreServiceImplTest {
   public void testGetUnitKeyStore() throws IOException {
     UnitKeyStoreState expectedUnitKeyStoreStateTemplate = new UnitKeyStoreState();
     expectedUnitKeyStoreStateTemplate.setUnit("my-unit");
-    UnitKeyStoreState matchedUnitKeyStoreState = new UnitKeyStoreState();
-    matchedUnitKeyStoreState.setUnit("my-unit");
-    matchedUnitKeyStoreState.setKeyStore(getTestKeyStoreByteArray());
-    expect(mockPersistenceManager.matchOne(eqUnitKeyStoreState(expectedUnitKeyStoreStateTemplate)))
-        .andReturn(matchedUnitKeyStoreState);
+    UnitKeyStoreState state = new UnitKeyStoreState();
+    state.setUnit("my-unit");
+    state.setKeyStore(getTestKeyStoreByteArray());
+    expect(mockOrientDbService.uniqueResult("select from UnitKeyStoreState where unit = ?", state.getUnit()))
+        .andReturn(state);
 
-    replay(mockPersistenceManager);
+    replay(mockOrientDbService);
 
     UnitKeyStore unitKeyStore = unitKeyStoreService.getUnitKeyStore("my-unit");
+    verify(mockOrientDbService);
 
-    verify(mockPersistenceManager);
-
-    UnitKeyStore expectedUnitKeyStore = new UnitKeyStore("my-unit", null);
-    assertEquals(expectedUnitKeyStore.getUnitName(), unitKeyStore.getUnitName());
+    assertThat(unitKeyStore, IsNull.notNullValue());
+    //noinspection ConstantConditions
+    assertThat(unitKeyStore.getUnitName(), is(state.getUnit()));
   }
 
   @Test
   public void testGetOrCreateUnitKeyStoreCreatesTheKeyStoreIfItDoesNotExist()
       throws IOException, UnsupportedCallbackException {
-    UnitKeyStoreState expectedUnitKeyStoreStateTemplate = new UnitKeyStoreState();
-    expectedUnitKeyStoreStateTemplate.setUnit("my-unit");
-    expect(mockPersistenceManager.matchOne(eqUnitKeyStoreState(expectedUnitKeyStoreStateTemplate))).andReturn(null)
-        .atLeastOnce();
-    expect(mockPersistenceManager.save((UnitKeyStoreState) anyObject())).andReturn(new UnitKeyStoreState());
+    UnitKeyStoreState state = new UnitKeyStoreState();
+    state.setUnit("my-unit");
 
-    replay(mockPersistenceManager);
+    expect(mockOrientDbService.uniqueResult("select from UnitKeyStoreState where unit = ?", state.getUnit()))
+        .andReturn(null).times(2);
+
+    expect(mockOrientDbService.execute(EasyMock.<OrientDbTransactionCallback<Object>>anyObject()))
+        .andReturn(new UnitKeyStoreState());
+
+    replay(mockOrientDbService);
 
     UnitKeyStore unitKeyStore = unitKeyStoreService.getOrCreateUnitKeyStore("my-unit");
 
-    verify(mockPersistenceManager);
+    verify(mockOrientDbService);
 
     assertNotNull(unitKeyStore);
   }
@@ -123,6 +115,7 @@ public class DefaultUnitKeyStoreServiceImplTest {
 
   private CallbackHandler createPasswordCallbackHandler() {
     return new CallbackHandler() {
+      @Override
       public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         for(Callback callback : callbacks) {
           if(callback instanceof PasswordCallback) {
@@ -156,43 +149,6 @@ public class DefaultUnitKeyStoreServiceImplTest {
     }
     return barray;
 
-  }
-
-  //
-  // Inner Classes
-  //
-
-  static class UnitKeyStoreStateMatcher implements IArgumentMatcher {
-
-    private UnitKeyStoreState expected;
-
-    public UnitKeyStoreStateMatcher(UnitKeyStoreState expected) {
-      this.expected = expected;
-    }
-
-    @Override
-    public boolean matches(Object actual) {
-      if(actual instanceof UnitKeyStoreState) {
-        return ((UnitKeyStoreState) actual).getUnit().equals(expected.getUnit());
-      } else {
-        return false;
-      }
-    }
-
-    @Override
-    public void appendTo(StringBuffer buffer) {
-      buffer.append("eqUnitKeyStoreState(");
-      buffer.append(expected.getClass().getName());
-      buffer.append(" with unit \"");
-      buffer.append(expected.getUnit());
-      buffer.append("\")");
-    }
-
-  }
-
-  static UnitKeyStoreState eqUnitKeyStoreState(UnitKeyStoreState in) {
-    EasyMock.reportMatcher(new UnitKeyStoreStateMatcher(in));
-    return null;
   }
 
 }

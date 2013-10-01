@@ -6,6 +6,7 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
+
     <g:FlowPanel addStyleNames="page-header">
       <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
@@ -31,6 +32,7 @@
       <b:SimplePager ui:field="mongoPager" location="RIGHT" addStyleNames="pull-right"/>
     </g:FlowPanel>
     <o:Table ui:field="mongoTable" width="100%"/>
+
   </g:FlowPanel>
 
 </ui:UiBinder>

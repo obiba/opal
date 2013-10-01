@@ -10,7 +10,6 @@
 package org.obiba.opal.core.runtime;
 
 import java.io.File;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -21,14 +20,9 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaEngineExtension;
-import org.obiba.magma.js.GlobalMethodProvider;
-import org.obiba.magma.js.MagmaContextFactory;
-import org.obiba.magma.js.MagmaJsExtension;
 import org.obiba.magma.support.MagmaEngineFactory;
 import org.obiba.magma.views.ViewManager;
-import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
-import org.obiba.opal.core.magma.js.OpalGlobalMethodProvider;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.fs.security.SecuredOpalFileSystem;
@@ -70,7 +64,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
   @Override
   public void start() {
     initExtensions();
-    initOpalConfiguration();
     initMagmaEngine();
     initServices();
     initFileSystem();
@@ -78,7 +71,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
   @Override
   public void stop() {
-
     for(Service service : services) {
       try {
         if(service.isRunning()) service.stop();
@@ -100,9 +92,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
             log.warn("Ignoring exception during shutdown sequence.", e);
           }
         }
-
-        // opalConfigIo.writeConfiguration(opalConfiguration);
-        MagmaEngine.get().shutdown();
       }
     });
   }
@@ -159,21 +148,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
     }
   }
 
-  private void initOpalConfiguration() {
-    // Add opal specific javascript methods
-    MagmaJsExtension jsExtension = new MagmaJsExtension();
-    MagmaContextFactory ctxFactory = new MagmaContextFactory();
-    Set<GlobalMethodProvider> providers = new HashSet<GlobalMethodProvider>();
-    providers.add(new OpalGlobalMethodProvider());
-    ctxFactory.setGlobalMethodProviders(providers);
-    jsExtension.setMagmaContextFactory(ctxFactory);
-
-    // We need these two extensions to read the opal config file
-    new MagmaEngine().extend(new MagmaXStreamExtension()).extend(jsExtension);
-
-    opalConfigurationService.readOpalConfiguration();
-  }
-
   private void initMagmaEngine() {
     try {
       Runnable magmaEngineInit = new Runnable() {
@@ -181,7 +155,21 @@ public class DefaultOpalRuntime implements OpalRuntime {
         public void run() {
           // This needs to be added BEFORE otherwise bad things happen. That really sucks.
           MagmaEngine.get().addDecorator(viewManager);
-          initialise(MagmaEngine.get(), opalConfigurationService.getOpalConfiguration().getMagmaEngineFactory());
+          MagmaEngineFactory magmaEngineFactory = opalConfigurationService.getOpalConfiguration()
+              .getMagmaEngineFactory();
+
+          for(MagmaEngineExtension extension : magmaEngineFactory.extensions()) {
+            MagmaEngine.get().extend(extension);
+          }
+
+          for(DatasourceFactory factory : magmaEngineFactory.factories()) {
+            try {
+              MagmaEngine.get().addDatasource(factory);
+            } catch(RuntimeException e) {
+              log.warn("Cannot initialise datasource '{}' : {}", factory.getName(), e.getMessage());
+              log.debug("Datasource exception:", e);
+            }
+          }
         }
       };
       new TransactionalThread(txManager, magmaEngineInit).start();
@@ -217,21 +205,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
         log.error("Error creating functional unit's directory in the Opal File System.", e);
       }
       syncFs.notifyAll();
-    }
-  }
-
-  private void initialise(MagmaEngine engine, MagmaEngineFactory magmaEngineFactory) {
-    for(MagmaEngineExtension extension : magmaEngineFactory.extensions()) {
-      engine.extend(extension);
-    }
-
-    for(DatasourceFactory factory : magmaEngineFactory.factories()) {
-      try {
-        engine.addDatasource(factory);
-      } catch(RuntimeException e) {
-        log.warn("Cannot initialise datasource '{}' : {}", factory.getName(), e.getMessage());
-        log.debug("Datasource exception:", e);
-      }
     }
   }
 

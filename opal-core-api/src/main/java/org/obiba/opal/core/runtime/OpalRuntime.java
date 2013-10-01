@@ -13,9 +13,10 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
+import org.obiba.opal.core.service.SystemService;
 import org.obiba.opal.fs.OpalFileSystem;
 
-public interface OpalRuntime {
+public interface OpalRuntime extends SystemService {
 
   String EXTENSIONS = System.getProperty("OPAL_HOME") + "/extensions";
 
@@ -26,10 +27,6 @@ public interface OpalRuntime {
   Set<Service> getServices();
 
   OpalFileSystem getFileSystem();
-
-  void start();
-
-  void stop();
 
   /**
    * True if service with given name is available in Opal Runtime.

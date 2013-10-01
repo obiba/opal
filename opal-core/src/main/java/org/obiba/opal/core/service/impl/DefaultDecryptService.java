@@ -31,6 +31,7 @@ import org.obiba.opal.core.unit.UnitKeyStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -38,6 +39,7 @@ import org.springframework.util.Assert;
  * Default implementation of {@link DecryptService}.
  */
 @Transactional
+@Component
 public class DefaultDecryptService implements DecryptService {
   //
   // Constants

@@ -39,21 +39,16 @@ import com.google.common.collect.ImmutableList;
 @Component
 public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> {
 
-  private final Set<Realm> realms;
-
-  private final Set<SessionListener> sessionListeners;
-
-  private final RolePermissionResolver rolePermissionResolver;
-
-  private SecurityManager securityManager;
+  @Autowired
+  private Set<Realm> realms;
 
   @Autowired
-  public OpalSecurityManagerFactory(Set<Realm> securityRealms, Set<SessionListener> sessionListeners,
-      RolePermissionResolver rolePermissionResolver) {
-    realms = securityRealms;
-    this.sessionListeners = sessionListeners;
-    this.rolePermissionResolver = rolePermissionResolver;
-  }
+  private Set<SessionListener> sessionListeners;
+
+  @Autowired
+  private RolePermissionResolver rolePermissionResolver;
+
+  private SecurityManager securityManager;
 
   @Override
   public SecurityManager getObject() throws Exception {

@@ -9,7 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.core.cfg;
 
-public interface OpalConfigurationService {
+import org.obiba.opal.core.service.SystemService;
+
+public interface OpalConfigurationService extends SystemService {
 
   void readOpalConfiguration();
 

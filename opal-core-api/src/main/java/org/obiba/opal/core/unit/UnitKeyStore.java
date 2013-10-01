@@ -76,9 +76,7 @@ import com.google.common.collect.Lists;
  */
 public class UnitKeyStore implements KeyProvider {
 
-  private static final long serialVersionUID = 1L;
-
-  private static final String PASSWORD_FOR = "Password for";
+  public static final String PASSWORD_FOR = "Password for";
 
   public enum UnitKeyType {
     KEY_PAIR, CERTIFICATE
@@ -352,7 +350,6 @@ public class UnitKeyStore implements KeyProvider {
     } catch(KeyStoreException e) {
       throw new KeyProviderException(e);
     }
-
   }
 
   /**
@@ -449,17 +446,15 @@ public class UnitKeyStore implements KeyProvider {
 
   private X509Certificate makeCertificate(String algorithm, String certificateInfo, KeyPair keyPair)
       throws SignatureException, InvalidKeyException, CertificateEncodingException, NoSuchAlgorithmException {
-    X509Certificate cert = makeCertificate(keyPair.getPrivate(), keyPair.getPublic(), certificateInfo,
+    return makeCertificate(keyPair.getPrivate(), keyPair.getPublic(), certificateInfo,
         chooseSignatureAlgorithm(algorithm));
-    return cert;
   }
 
   private KeyPair generateKeyPair(String algorithm, int size) throws NoSuchAlgorithmException {
     KeyPairGenerator keyPairGenerator;
     keyPairGenerator = KeyPairGenerator.getInstance(algorithm);
     keyPairGenerator.initialize(size);
-    KeyPair keyPair = keyPairGenerator.generateKeyPair();
-    return keyPair;
+    return keyPairGenerator.generateKeyPair();
   }
 
   private String chooseSignatureAlgorithm(String keyAlgorithm) {

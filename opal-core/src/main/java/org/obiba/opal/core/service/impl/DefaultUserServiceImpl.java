@@ -70,9 +70,7 @@ public class DefaultUserServiceImpl implements UserService {
 
   @Override
   public void createOrUpdateUser(final User user) throws UserAlreadyExistsException {
-
     //TODO bean validation
-
     try {
       orientDbService.execute(new OrientDbTransactionCallback<Object>() {
         @Override

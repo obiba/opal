@@ -24,7 +24,6 @@ import com.orientechnologies.orient.core.tx.OTransaction;
 import com.orientechnologies.orient.object.db.OObjectDatabasePool;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 import com.orientechnologies.orient.server.OServer;
-import com.orientechnologies.orient.server.OServerMain;
 
 @Component
 public class OrientDbServiceImpl implements OrientDbService {
@@ -45,9 +44,10 @@ public class OrientDbServiceImpl implements OrientDbService {
   private static OServer server;
 
   //  @PostConstruct
-  public static void start(String url) {
+  public static void start() {
+    String url = URL.replace("${OPAL_HOME}", System.getProperty("OPAL_HOME"));
     log.info("Start OrientDB server ({})", url);
-    System.setProperty("ORIENTDB_HOME", URL);
+    System.setProperty("ORIENTDB_HOME", url);
     try {
       server = new OServer() //
           .startup(OrientDbServiceImpl.class.getResourceAsStream("/orientdb-server-config.xml")) //
@@ -68,7 +68,7 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   //  @PreDestroy
   public static void stop() {
-//    log.info("Stop OrientDB server ({})", getUrl());
+//    log.info("Stop OrientDB server ({})", url);
     if(server != null) server.shutdown();
   }
 
@@ -170,22 +170,4 @@ public class OrientDbServiceImpl implements OrientDbService {
     return OObjectDatabasePool.global().acquire(url, username, password);
   }
 
-  // test for https://github.com/orientechnologies/orientdb/issues/1667
-  @SuppressWarnings("UseOfSystemOutOrSystemErr")
-  public static void main(String[] args) throws Exception {
-    System.setProperty("ORIENTDB_HOME", "/home/cthiebault/orientdb");
-
-    System.out.println("ORIENTDB_HOME: " + System.getProperty("ORIENTDB_HOME"));
-    for(int i = 0; i < 5; i++) {
-      System.out.println("Iteration " + i);
-      OServer server = OServerMain.create()
-          .startup(OrientDbServiceImpl.class.getResourceAsStream("/orientdb-server-config.xml")).activate();
-      // create database if does not exist
-      ODatabase database = new OObjectDatabaseTx("local:" + System.getProperty("ORIENTDB_HOME") + "/config-db");
-      if(!database.exists()) database.create();
-      database.close();
-
-      server.shutdown();
-    }
-  }
 }

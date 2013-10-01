@@ -9,29 +9,30 @@
  ******************************************************************************/
 package org.obiba.opal.core.runtime.install;
 
-import java.util.Arrays;
-
-import org.obiba.opal.core.domain.OpalGeneralConfig;
-import org.obiba.opal.core.service.impl.DefaultGeneralConfigService;
+import org.obiba.opal.core.cfg.OpalConfiguration;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.InstallStep;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class CreateOpalGeneralConfigInstallStep implements InstallStep {
+public class SetOpalVersionInstallStep implements InstallStep {
 
   @Autowired
-  private DefaultGeneralConfigService generalConfigService;
+  private OpalConfigurationService configurationService;
 
   @Override
-  public String getDescription() {
-    return "Generate and store default configuration.";
+  public void execute(final Version currentVersion) {
+    configurationService.modifyConfiguration(new OpalConfigurationService.ConfigModificationTask() {
+      @Override
+      public void doWithConfig(OpalConfiguration config) {
+        config.setVersion(currentVersion);
+      }
+    });
   }
 
   @Override
-  public void execute(Version currentVersion) {
-    OpalGeneralConfig conf = new OpalGeneralConfig();
-    conf.setLocales(Arrays.asList(OpalGeneralConfig.DEFAULT_LOCALE));
-    generalConfigService.createServerConfig(conf);
+  public String getDescription() {
+    return "Set current version to Opal Configuration";
   }
 
 }

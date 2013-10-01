@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.core.runtime.jdbc;
 
+import javax.annotation.Nonnull;
 import javax.sql.DataSource;
 
 import org.obiba.opal.core.domain.database.SqlDatabase;
@@ -19,7 +20,7 @@ import com.atomikos.jdbc.nonxa.AtomikosNonXADataSourceBean;
 @Component
 public class DataSourceFactory {
 
-  public DataSource createDataSource(SqlDatabase database) {
+  public DataSource createDataSource(@Nonnull SqlDatabase database) {
     AtomikosNonXADataSourceBean dataSource = new AtomikosNonXADataSourceBean();
     dataSource.setUniqueResourceName(database.getName());
     dataSource.setDriverClassName(database.getDriverClass());

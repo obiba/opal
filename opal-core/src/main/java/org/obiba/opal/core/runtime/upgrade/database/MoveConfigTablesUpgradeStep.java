@@ -11,7 +11,6 @@ import javax.sql.DataSource;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
-import org.obiba.runtime.upgrade.support.VersionTableInstallStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -25,15 +24,13 @@ public class MoveConfigTablesUpgradeStep extends AbstractUpgradeStep {
 
   private static final Logger log = LoggerFactory.getLogger(MoveConfigTablesUpgradeStep.class);
 
-  private static final String[] TABLES = { "unit_key_store", "subject_acl", "version", "QRTZ_BLOB_TRIGGERS",
-      "QRTZ_CALENDARS", "QRTZ_CRON_TRIGGERS", "QRTZ_FIRED_TRIGGERS", "QRTZ_JOB_DETAILS", "QRTZ_JOB_LISTENERS",
-      "QRTZ_PAUSED_TRIGGER_GRPS", "QRTZ_SCHEDULER_STATE", "QRTZ_SIMPLE_TRIGGERS", "QRTZ_TRIGGER_LISTENERS",
-      "QRTZ_TRIGGERS" };
+  private static final String[] TABLES = { "QRTZ_BLOB_TRIGGERS", "QRTZ_CALENDARS", "QRTZ_CRON_TRIGGERS",
+      "QRTZ_FIRED_TRIGGERS", "QRTZ_JOB_DETAILS", "QRTZ_JOB_LISTENERS", "QRTZ_PAUSED_TRIGGER_GRPS",
+      "QRTZ_SCHEDULER_STATE", "QRTZ_SIMPLE_TRIGGERS", "QRTZ_TRIGGER_LISTENERS", "QRTZ_TRIGGERS" };
 
-  private static final String[] DELETE_TABLES = { "unit_key_store", "subject_acl", "QRTZ_BLOB_TRIGGERS",
-      "QRTZ_CALENDARS", "QRTZ_CRON_TRIGGERS", "QRTZ_FIRED_TRIGGERS", "QRTZ_JOB_LISTENERS", "QRTZ_PAUSED_TRIGGER_GRPS",
-      "QRTZ_SCHEDULER_STATE", "QRTZ_SIMPLE_TRIGGERS", "QRTZ_TRIGGER_LISTENERS", "QRTZ_TRIGGERS", "QRTZ_JOB_DETAILS",
-      "QRTZ_LOCKS" };
+  private static final String[] DELETE_TABLES = { "QRTZ_BLOB_TRIGGERS", "QRTZ_CALENDARS", "QRTZ_CRON_TRIGGERS",
+      "QRTZ_FIRED_TRIGGERS", "QRTZ_JOB_LISTENERS", "QRTZ_PAUSED_TRIGGER_GRPS", "QRTZ_SCHEDULER_STATE",
+      "QRTZ_SIMPLE_TRIGGERS", "QRTZ_TRIGGER_LISTENERS", "QRTZ_TRIGGERS", "QRTZ_JOB_DETAILS", "QRTZ_LOCKS" };
 
   private DatabaseRegistry databaseRegistry;
 
@@ -44,15 +41,9 @@ public class MoveConfigTablesUpgradeStep extends AbstractUpgradeStep {
     JdbcTemplate dataJdbcTemplate = new JdbcTemplate(databaseRegistry.getDataSource("opal-data", null));
     JdbcTemplate configJdbcTemplate = new JdbcTemplate(configDataSource);
 
-    // create version table
-    VersionTableInstallStep versionTableStep = new VersionTableInstallStep();
-    versionTableStep.setDataSource(configDataSource);
-    versionTableStep.execute(null);
-
     for(String table : TABLES) {
       copyTable(table, dataJdbcTemplate, configJdbcTemplate);
     }
-    // do not delete version table here
     for(String table : DELETE_TABLES) {
       dataJdbcTemplate.execute("drop table " + table);
     }

@@ -17,12 +17,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.cfg.TaxonomyService;
-import org.obiba.opal.core.domain.server.OpalGeneralConfig;
+import org.obiba.opal.core.domain.OpalGeneralConfig;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.service.impl.DefaultGeneralConfigService;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Opal;
-import org.obiba.runtime.Version;
+import org.obiba.runtime.upgrade.VersionProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,24 +30,19 @@ import org.springframework.stereotype.Component;
 @Path("/system")
 public class SystemResource {
 
-  private final Version opalVersion;
-
-  private final DefaultGeneralConfigService serverService;
-
-  private final TaxonomyService taxonomyService;
+  @Autowired
+  private VersionProvider opalVersionProvider;
 
   @Autowired
-  public SystemResource(Version opalVersion, DefaultGeneralConfigService serverService,
-      TaxonomyService taxonomyService) {
-    this.opalVersion = opalVersion;
-    this.serverService = serverService;
-    this.taxonomyService = taxonomyService;
-  }
+  private DefaultGeneralConfigService serverService;
+
+  @Autowired
+  private TaxonomyService taxonomyService;
 
   @GET
   @Path("/version")
   public String getVersion() {
-    return opalVersion.toString();
+    return opalVersionProvider.getVersion().toString();
   }
 
   @GET
@@ -64,7 +59,7 @@ public class SystemResource {
 
     RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
     return Opal.OpalEnv.newBuilder() //
-        .setVersion(opalVersion.toString()) //
+        .setVersion(opalVersionProvider.getVersion().toString()) //
         .setVmName(runtimeMXBean.getVmName()) //
         .setVmVendor(runtimeMXBean.getVmVendor()) //
         .setVmVersion(runtimeMXBean.getVmVersion())//
@@ -148,15 +143,15 @@ public class SystemResource {
       conf = new OpalGeneralConfig();
     }
 
-    conf.setName(confDto.getName().isEmpty()//
+    conf.setName(confDto.getName().isEmpty() //
         ? OpalGeneralConfig.DEFAULT_NAME //
         : confDto.getName());
 
     conf.setLocales(confDto.getLanguagesList().isEmpty() ? Arrays.asList(OpalGeneralConfig.DEFAULT_LOCALE)//
         : confDto.getLanguagesList());
 
-    conf.setDefaultCharacterSet(confDto.getDefaultCharSet().isEmpty()//
-        ? OpalGeneralConfig.DEFAULT_CHARSET//
+    conf.setDefaultCharacterSet(confDto.getDefaultCharSet().isEmpty() //
+        ? OpalGeneralConfig.DEFAULT_CHARSET //
         : confDto.getDefaultCharSet());
 
     serverService.updateServerConfig(conf);

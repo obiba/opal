@@ -2,7 +2,6 @@ package org.obiba.opal.web.system.database;
 
 import java.io.IOException;
 import java.sql.Driver;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -37,14 +36,13 @@ public class JdbcDriversResource {
   @GET
   public Iterable<Opal.JdbcDriverDto> getJdbcDrivers() {
     return Iterables.transform(jdbcDriverRegistry.listDrivers(), new Function<Driver, Opal.JdbcDriverDto>() {
-
       @Override
-      public Opal.JdbcDriverDto apply(Driver input) {
-        return Opal.JdbcDriverDto.newBuilder()//
-            .setDriverName(jdbcDriverRegistry.getDriverName(input))//
-            .setDriverClass(input.getClass().getName())//
-            .setJdbcUrlTemplate(jdbcDriverRegistry.getJdbcUrlTemplate(input))//
-            .setVersion(input.getMajorVersion() + "." + input.getMinorVersion()).build();
+      public Opal.JdbcDriverDto apply(Driver driver) {
+        return Opal.JdbcDriverDto.newBuilder() //
+            .setDriverName(jdbcDriverRegistry.getDriverName(driver)) //
+            .setDriverClass(driver.getClass().getName()) //
+            .setJdbcUrlTemplate(jdbcDriverRegistry.getJdbcUrlTemplate(driver)) //
+            .setVersion(driver.getMajorVersion() + "." + driver.getMinorVersion()).build();
       }
     });
   }
@@ -53,11 +51,10 @@ public class JdbcDriversResource {
   @Consumes("multipart/form-data")
   @Produces("text/html")
   @AuthenticatedByCookie
-  @SuppressWarnings("unchecked")
   public Response addDriver(@Context UriInfo uriInfo, @Context HttpServletRequest request)
       throws FileUploadException, IOException {
     ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory());
-    for(FileItem fileItem : (List<FileItem>) upload.parseRequest(request)) {
+    for(FileItem fileItem : upload.parseRequest(request)) {
       if(!fileItem.isFormField()) {
         jdbcDriverRegistry.addDriver(fileItem.getName(), fileItem.getInputStream());
       }

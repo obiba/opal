@@ -7,18 +7,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.core.domain.server;
+package org.obiba.opal.core.domain;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import org.obiba.opal.core.domain.AbstractTimestamped;
-
 public class OpalGeneralConfig extends AbstractTimestamped {
 
-  public static final String DEFAULT_NAME = "OPAL";
+  public static final String DEFAULT_NAME = "Opal";
 
   public static final String DEFAULT_LOCALE = "en";
 

@@ -21,32 +21,41 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.google.common.io.ByteStreams;
 
 @Component
 public class DefaultJdbcDriverRegistry implements JdbcDriverRegistry {
 
-  private final Map<String, String> driverClassToName = ImmutableMap
-      .of("com.mysql.jdbc.Driver", "MySQL", "org.hsqldb.jdbc.JDBCDriver", "HSQLDB");
+  private static final Map<String, String> SUPPORTED_DRIVER_CLASS_TO_NAME = ImmutableMap
+      .of("com.mysql.jdbc.Driver", "MySQL", //
+          "org.hsqldb.jdbc.JDBCDriver", "HSQLDB");
 
-  private final Map<String, String> driverClassToUrlTemplate = ImmutableMap
-      .of("com.mysql.jdbc.Driver", "jdbc:mysql://{hostname}:{port}/{databaseName}", "org.hsqldb.jdbc.JDBCDriver",
-          "jdbc:hsqldb:file:{databaseName};shutdown=true;hsqldb.tx=mvcc");
+  private static final Map<String, String> DRIVER_CLASS_TO_URL_TEMPLATE = ImmutableMap
+      .of("com.mysql.jdbc.Driver", "jdbc:mysql://{hostname}:{port}/{databaseName}", //
+          "org.hsqldb.jdbc.JDBCDriver", "jdbc:hsqldb:file:{databaseName};shutdown=true;hsqldb.tx=mvcc");
 
   @Override
   public Iterable<Driver> listDrivers() {
-    return Collections.list(DriverManager.getDrivers());
+    return Iterables.filter(Collections.list(DriverManager.getDrivers()), new Predicate<Driver>() {
+      @Override
+      public boolean apply(Driver driver) {
+        return SUPPORTED_DRIVER_CLASS_TO_NAME.containsKey(driver.getClass().getName());
+      }
+    });
   }
 
   @Override
   public String getDriverName(Driver driver) {
-    return Objects.firstNonNull(driverClassToName.get(driver.getClass().getName()), driver.getClass().getName());
+    String className = driver.getClass().getName();
+    return Objects.firstNonNull(SUPPORTED_DRIVER_CLASS_TO_NAME.get(className), className);
   }
 
   @Override
   public String getJdbcUrlTemplate(Driver driver) {
-    return Objects.firstNonNull(driverClassToUrlTemplate.get(driver.getClass().getName()), "");
+    return Objects.firstNonNull(DRIVER_CLASS_TO_URL_TEMPLATE.get(driver.getClass().getName()), "");
   }
 
   @Override
