@@ -367,6 +367,7 @@ public class FunctionalUnitDetailsPresenter extends PresenterWidget<FunctionalUn
         getEventBus().fireEvent(NotificationEvent.newBuilder().error("IdentifiersGenerationPending").build());
       } else {
         UriBuilder uriBuilder = UriBuilder.create().segment("functional-units", "entities", "table");
+        uriBuilder.query("counts","true");
         ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(uriBuilder.build()).get()
             .withCallback(new ResourceCallback<TableDto>() {
               @Override
