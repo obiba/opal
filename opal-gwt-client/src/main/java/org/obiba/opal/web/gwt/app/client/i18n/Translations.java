@@ -1925,7 +1925,7 @@ public interface Translations extends Constants {
   @DefaultStringMapValue({ "id", "ID",//
       "author", "Author",//
       "date", "Date",//
-      "comment", "Comment",//
+      "comment", "Comment"//
   })
   Map<String, String> commitInfoMap();
 
