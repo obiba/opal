@@ -11,15 +11,15 @@
   <import resource="version.xml"/>
   <import resource="hibernate-session.xml"/>
 
-  <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
-    <property name="customEditors">
-      <map>
-        <entry key="org.obiba.runtime.Version">
-          <bean id="versionEditor" class="org.obiba.runtime.upgrade.support.VersionPropertyEditor"/>
-        </entry>
-      </map>
-    </property>
-  </bean>
+  <!--<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">-->
+  <!--<property name="customEditors">-->
+  <!--<map>-->
+  <!--<entry key="org.obiba.runtime.Version">-->
+  <!--<bean id="versionEditor" class="org.obiba.runtime.upgrade.support.VersionPropertyEditor"/>-->
+  <!--</entry>-->
+  <!--</map>-->
+  <!--</property>-->
+  <!--</bean>-->
 
   <bean id="dataSourceFactory" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactory"/>
 
@@ -33,9 +33,7 @@
 
   <bean id="upgradeOpalConfigurationService" class="org.obiba.opal.core.cfg.DefaultOpalConfigurationService">
     <constructor-arg>
-      <bean class="org.obiba.opal.core.cfg.OpalConfigurationIo">
-        <constructor-arg value="${OPAL_HOME}/conf/opal-config.xml"/>
-      </bean>
+      <bean class="org.obiba.opal.core.cfg.OpalConfigurationIo"/>
     </constructor-arg>
   </bean>
 
@@ -43,200 +41,57 @@
     <constructor-arg index="0" ref="databaseRegistry"/>
   </bean>
 
-  <bean id="upgradeManager" class="org.obiba.runtime.upgrade.support.DefaultUpgradeManager">
-    <property name="currentVersionProvider">
-      <bean class="org.obiba.runtime.upgrade.support.JdbcVersionModifier">
-        <property name="datasource" ref="dataSource"/>
-      </bean>
-    </property>
+  <bean id="opalVersionModifier" class="org.obiba.opal.core.runtime.upgrade.support.OpalVersionModifier"/>
 
-    <property name="runtimeVersionProvider">
-      <bean class="org.obiba.runtime.upgrade.VersionBeanVersionProvider">
-        <property name="version" ref="version"/>
-      </bean>
-    </property>
+  <bean id="upgradeManager" class="org.obiba.runtime.upgrade.support.DefaultUpgradeManager">
+    <property name="currentVersionProvider" ref="opalVersionModifier"/>
+
+    <property name="runtimeVersionProvider" ref="runtimeVersionProvider"/>
 
     <property name="newInstallationDetectionStrategy">
-      <bean class="org.obiba.runtime.upgrade.support.NoVersionTableDetectionStrategy">
-        <property name="dataSource" ref="dataSource"/>
+      <bean class="org.obiba.runtime.upgrade.support.NullVersionNewInstallationDetectionStrategy">
+        <property name="versionProvider" ref="opalVersionModifier"/>
       </bean>
     </property>
 
     <property name="installSteps">
       <list>
-        <bean class="org.obiba.runtime.upgrade.support.VersionTableInstallStep">
-          <property name="dataSource" ref="dataSource"/>
-        </bean>
+        <bean class="org.obiba.opal.core.runtime.install.SetOpalVersionInstallStep"/>
         <bean class="org.obiba.runtime.upgrade.InstallStepAdapter">
-          <property name="upgradeStep" ref="quartzSchema-1.4.0"/>
+          <property name="upgradeStep">
+            <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
+              <property name="description" value="Install Quartz Schema."/>
+              <property name="dataSource" ref="dataSource"/>
+              <property name="scriptPath" value="classpath:/META-INF/opal/install-scripts/quartz/"/>
+              <property name="scriptBasename" value="tables"/>
+            </bean>
+          </property>
         </bean>
         <bean class="org.obiba.opal.core.runtime.install.CreateOpalSecretKeyInstallStep"/>
-        <bean class="org.obiba.opal.core.runtime.install.CreateOpalGeneralConfigInstallStep">
-          <property name="generalConfigService" ref="generalConfigService"/>
-        </bean>
+        <bean class="org.obiba.opal.core.runtime.install.CreateOpalGeneralConfigInstallStep"/>
       </list>
     </property>
 
     <property name="upgradeSteps">
       <list>
-
-        <!-- 1.1.0 -->
-        <bean id="opal-schemaUpgrade-1.1" parent="updateOpalSchema">
-          <property name="appliesTo" value="1.1"/>
-        </bean>
-        <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
-          <property name="dataSource" ref="dataSource"/>
-          <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/1.1/"/>
-          <property name="scriptBasename" value="opal-dataUpgrade-1.1"/>
-          <property name="description"
-              value="Copy 'DEFAULT_STUDY_ID' keystore from study_key_store to unit_key_store, then drop study_key_store."/>
-          <property name="appliesTo" value="1.1"/>
-        </bean>
-
-        <!-- 1.4.0 -->
-        <bean class="org.obiba.opal.core.runtime.upgrade.ViewsUpgrade_1_4_0">
-          <property name="description" value="Update action table 'type' field."/>
-          <property name="appliesTo" value="1.4.0"/>
-          <property name="configFile" value="${OPAL_HOME}/conf/opal-config.xml"/>
-        </bean>
-        <ref bean="quartzSchema-1.4.0"/>
-        <!-- Drop audit log tables -->
-        <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
-          <property name="description" value="Drop Audit log tables"/>
-          <property name="dataSource" ref="dataSource"/>
-          <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/1.4.0/"/>
-          <property name="scriptBasename" value="drop-audit-tables"/>
-          <property name="appliesTo" value="1.4.0"/>
-        </bean>
-        <!-- Upgrade hibernate-datasource schema -->
-        <bean class="org.obiba.opal.core.runtime.upgrade.AllSqlDatabasesScriptUpgradeStep">
-          <property name="description" value="Alter Opal's Datasource schema."/>
-          <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/1.4.0/"/>
-          <property name="scriptBasename" value="hibernate-datasource"/>
-          <property name="appliesTo" value="1.4.0"/>
-          <property name="databaseRegistry" ref="databaseRegistry"/>
-        </bean>
-
-        <!-- 1.5.0 -->
-        <bean class="org.obiba.opal.core.runtime.upgrade.UpdateAllHibernateSchemasStep">
-          <property name="description" value="Upgrade Opal Schema."/>
-          <property name="databaseRegistry" ref="databaseRegistry"/>
-          <property name="appliesTo" value="1.5.0"/>
-        </bean>
-        <bean class="org.obiba.opal.core.runtime.upgrade.IdentifiersTableUpgradeStep"/>
-
-        <!-- 1.6.0 -->
-        <bean class="org.obiba.opal.core.runtime.upgrade.AllSqlDatabasesScriptUpgradeStep">
-          <property name="description" value="Alter Opal's Datasource schema."/>
-          <property name="databaseRegistry" ref="databaseRegistry"/>
-          <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/1.6.0/"/>
-          <property name="scriptBasename" value="hibernate-datasource"/>
-          <property name="appliesTo" value="1.6.0"/>
-        </bean>
-        <bean class="org.obiba.opal.core.runtime.upgrade.AllSqlDatabasesStoredProcedureUpgradeStep">
-          <property name="description" value="Update the variable_index column in variable table."/>
-          <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/1.6.0/"/>
-          <property name="scriptBasename" value="update-var-index"/>
-          <property name="appliesTo" value="1.6.0"/>
-          <property name="procedureName" value="update_var_index"/>
-          <property name="databaseRegistry" ref="databaseRegistry"/>
-        </bean>
-
-        <!-- 1.7.0 -->
-        <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
-          <property name="description" value="Alter some Quartz's column definitions."/>
-          <property name="dataSource" ref="dataSource"/>
-          <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/1.7.0/"/>
-          <property name="scriptBasename" value="quartz-blobs"/>
-          <property name="appliesTo" value="1.7.0"/>
-        </bean>
-        <bean class="org.obiba.opal.core.runtime.upgrade.CreateDataShieldEnvironmentsUpgradeStep"/>
-
-        <!-- 1.10.0 -->
-        <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
-          <property name="description" value="Redefinition of Subject ACLs."/>
-          <property name="dataSource" ref="dataSource"/>
-          <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/1.10.0/"/>
-          <property name="scriptBasename" value="subject-acl"/>
-          <property name="appliesTo" value="1.10.0"/>
-        </bean>
-        <bean class="org.obiba.opal.core.runtime.upgrade.UpdateAllHibernateSchemasStep">
-          <property name="description" value="Upgrade Opal Schema."/>
-          <property name="appliesTo" value="1.10.0"/>
-          <property name="databaseRegistry" ref="databaseRegistry"/>
-        </bean>
-
-        <!-- 1.10.1 -->
-        <bean class="org.obiba.opal.core.runtime.upgrade.IdentifiersSyncUpgradeStep">
-          <property name="description" value="Sync the variable entities between opal-data and opal-key databases."/>
-          <property name="tableReference" value="${org.obiba.opal.keys.tableReference}"/>
-          <property name="appliesTo" value="1.10.1"/>
-          <property name="databaseRegistry" ref="databaseRegistry"/>
-        </bean>
-
-        <!-- 1.11.0 / alter schema binaries storage -->
-        <bean class="org.obiba.opal.core.runtime.upgrade.AllSqlDatabasesScriptUpgradeStep">
-          <property name="description" value="Update schema for Magma hibernate datasource binaries storage."/>
-          <property name="scriptPath" value="classpath:/META-INF/opal/upgrade-scripts/1.11.x/"/>
-          <property name="scriptBasename" value="binaries"/>
-          <property name="databaseRegistry" ref="databaseRegistry"/>
-          <property name="appliesTo" value="1.11.0"/>
-        </bean>
-
-        <!-- 1.11.0 / clear ES indexes -->
-        <bean class="org.obiba.opal.core.runtime.upgrade.ClearElasticSearchIndexes">
-          <property name="description" value="Clear Elastic Search indexes."/>
-          <property name="indexPath" value="${OPAL_HOME}/data"/>
-          <property name="appliesTo" value="1.11.0"/>
-        </bean>
-
-        <!-- 1.11.0 / creates custom-context.xml -->
-        <bean class="org.obiba.opal.core.runtime.upgrade.CreateMissingCustomContextXml">
-          <property name="description" value="Create missing ${OPAL_HOME}/conf/custom-context.xml"/>
-          <property name="filePath" value="${OPAL_HOME}/conf/custom-context.xml"/>
-          <property name="appliesTo" value="1.11.0"/>
-        </bean>
-
-        <!-- 1.11.2 / alter binaries table engine -->
-        <bean class="org.obiba.opal.core.runtime.upgrade.binary.SqlBinariesTableEngineUpgradeStep">
-          <property name="description" value="Change binary value table engine to InnoDB."/>
-          <property name="upgradeUtils" ref="upgradeUtils"/>
-          <property name="appliesTo" value="1.11.2"/>
-        </bean>
-
         <!-- 1.14.0 / clear ES indexes -->
-        <bean class="org.obiba.opal.core.runtime.upgrade.ClearElasticSearchIndexes">
-          <property name="description" value="Clear Elastic Search indexes."/>
-          <property name="indexPath" value="${OPAL_HOME}/data"/>
+        <bean parent="clearElasticSearchIndexes">
           <property name="appliesTo" value="1.14.0"/>
         </bean>
 
         <!-- 1.14.4 / clear ES indexes -->
-        <bean class="org.obiba.opal.core.runtime.upgrade.ClearElasticSearchIndexes">
-          <property name="description" value="Clear Elastic Search indexes."/>
-          <property name="indexPath" value="${OPAL_HOME}/data"/>
+        <bean parent="clearElasticSearchIndexes">
           <property name="appliesTo" value="1.14.4"/>
         </bean>
 
         <!-- 1.14.5 / clear ES indexes -->
-        <bean class="org.obiba.opal.core.runtime.upgrade.ClearElasticSearchIndexes">
-          <property name="description" value="Clear Elastic Search indexes."/>
-          <property name="indexPath" value="${OPAL_HOME}/data"/>
+        <bean parent="clearElasticSearchIndexes">
           <property name="appliesTo" value="1.14.5"/>
         </bean>
 
         <!-- 1.14.6 / clear ES indexes -->
-        <bean class="org.obiba.opal.core.runtime.upgrade.ClearElasticSearchIndexes">
-          <property name="description" value="Clear Elastic Search indexes."/>
-          <property name="indexPath" value="${OPAL_HOME}/data"/>
+        <bean parent="clearElasticSearchIndexes">
           <property name="appliesTo" value="1.14.6"/>
-        </bean>
-
-        <!-- 2.0.0 / drop version table from opal-data database -->
-        <bean class="org.obiba.opal.core.runtime.upgrade.database.DeleteVersionTableUpgradeStep">
-          <property name="description"
-              value="Drop version table from previous opal-data database because it's now moved to opal-config database"/>
-          <property name="appliesTo" value="2.0.0"/>
         </bean>
 
         <!-- 2.0.0 / extract opal_config schema -->
@@ -244,7 +99,6 @@
           <property name="description" value="Extract database config from properties file to Opal config database"/>
           <property name="appliesTo" value="2.0.0"/>
         </bean>
-
 
       </list>
     </property>
@@ -256,19 +110,10 @@
     </property>
   </bean>
 
-  <bean id="updateOpalSchema" class="org.obiba.runtime.upgrade.support.MethodInvokingUpgradeStep" abstract="true">
-    <property name="description" value="Update Opal Schema."/>
-    <property name="methodOwner" ref="&amp;sessionFactory"/>
-    <property name="methodName" value="updateDatabaseSchema"/>
-  </bean>
-
-  <!--  The "1.4.0" here refers to the "appliesTo" Opal version, not the version of Quartz! -->
-  <bean id="quartzSchema-1.4.0" class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
-    <property name="description" value="Install Quartz Schema."/>
-    <property name="dataSource" ref="dataSource"/>
-    <property name="scriptPath" value="classpath:/META-INF/opal/install-scripts/quartz/"/>
-    <property name="scriptBasename" value="tables"/>
-    <property name="appliesTo" value="1.4.0"/>
+  <bean id="clearElasticSearchIndexes" class="org.obiba.opal.core.runtime.upgrade.ClearElasticSearchIndexes"
+      abstract="true">
+    <property name="description" value="Clear Elastic Search indexes."/>
+    <property name="indexPath" value="${OPAL_HOME}/data"/>
   </bean>
 
 </beans>
