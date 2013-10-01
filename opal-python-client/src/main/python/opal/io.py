@@ -7,6 +7,16 @@ import opal.core
 import opal.protobuf.Magma_pb2
 import opal.protobuf.Commands_pb2
 
+def add_import_arguments(parser):
+    """
+    Add Default Import arguments
+    """
+    parser.add_argument('--destination', '-d', required=True, help='Destination datasource name')
+    parser.add_argument('--tables', '-t', nargs='+', required=False, help='The list of tables to be imported (defaults to all)')
+    parser.add_argument('--incremental', '-i', action='store_true', help='Incremental import (new and updated value sets)')
+    parser.add_argument('--limit', '-li', required=False, type=int, help='Import limit (maximum number of value sets)')
+    parser.add_argument('--unit', '-un', required=False, help='Unit name for Participant ID mapping')
+    parser.add_argument('--json', '-j', action='store_true', help='Pretty JSON formatting of the response')
 
 class OpalImporter:
     """
@@ -18,11 +28,12 @@ class OpalImporter:
             raise Exception("ExtensionFactoryInterface.add() method must be implemented by a concrete class.")
 
     @classmethod
-    def build(cls, client, destination, tables=None, incremental=None, unit=None, verbose=None):
+    def build(cls, client, destination, tables=None, incremental=None, limit=None, unit=None, verbose=None):
         setattr(cls, 'client', client)
         setattr(cls, 'destination', destination)
         setattr(cls, 'tables', tables)
         setattr(cls, 'incremental', incremental)
+        setattr(cls, 'limit', limit)
         setattr(cls, 'unit', unit)
         setattr(cls, 'verbose', verbose)
         return cls()
@@ -83,6 +94,8 @@ class OpalImporter:
         if self.incremental:
             factory.incrementalConfig.incremental = True
             factory.incrementalConfig.incrementalDestinationName = self.destination
+        if self.limit:
+            factory.batchConfig.limit = self.limit
         if self.unit:
             factory.unitConfig.unit = self.unit
             factory.unitConfig.allowIdentifierGeneration = False

@@ -19,12 +19,7 @@ def add_arguments(parser):
     parser.add_argument('--type', '-ty', required=False, help='Entity type (e.g. Participant)')
 
     # non specific import arguments
-    parser.add_argument('--destination', '-d', required=True, help='Destination datasource name')
-    parser.add_argument('--tables', '-t', nargs='+', required=False, help='Name of the table.')
-    parser.add_argument('--incremental', '-i', action='store_true', help='Incremental import')
-    parser.add_argument('--unit', '-un', required=False, help='Unit name for Participant ID mapping')
-
-    parser.add_argument('--json', '-j', action='store_true', help='Pretty JSON formatting of the response')
+    opal.io.add_import_arguments(parser)
 
 
 def do_command(args):
@@ -35,7 +30,7 @@ def do_command(args):
     try:
         client = opal.core.OpalClient.build(opal.core.OpalClient.LoginInfo.parse(args))
         importer = opal.io.OpalImporter.build(client=client, destination=args.destination, tables=args.tables,
-                                              incremental=args.incremental, unit=args.unit,
+                                              incremental=args.incremental, limit=args.limit, unit=args.unit,
                                               verbose=args.verbose)
         # print result
         extension_factory = OpalExtensionFactory(characterSet=args.characterSet, path=args.path,
