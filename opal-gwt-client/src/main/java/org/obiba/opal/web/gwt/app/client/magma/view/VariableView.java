@@ -14,12 +14,11 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
-import org.obiba.opal.web.gwt.app.client.ui.EditorPanel;
 import org.obiba.opal.web.gwt.app.client.ui.NavPillsPanel;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.gwt.prettify.client.PrettyPrintLabel;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.TabAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
@@ -28,6 +27,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.CodeBlock;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TabPanel;
@@ -56,12 +56,6 @@ import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> implements VariablePresenter.Display {
 
   interface Binder extends UiBinder<Widget, VariableView> {}
-
-  private static final int PROPERTIES_TAB_INDEX = 0;
-
-  private static final int CATEGORIES_TAB_INDEX = 0;
-
-  private static final int ATTRIBUTES_TAB_INDEX = 0;
 
   private static final int SCRIPT_TAB_INDEX = 1;
 
@@ -101,9 +95,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @UiField
   NavPillsPanel scriptNavPanel;
 
-  // @UiField
-  // FlowPanel label;
-
   @UiField
   TabPanel tabPanel;
 
@@ -130,7 +121,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   Panel values;
 
   @UiField
-  PrettyPrintLabel script;
+  CodeBlock script;
 
   @UiField
   InlineLabel noScript;
@@ -146,9 +137,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   @UiField
   Button remove;
-
-  @UiField
-  EditorPanel scriptEditorPanel;
 
   @UiField
   Panel scriptEditor;
@@ -189,7 +177,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
         }
       }
     });
-    scriptEditorPanel.setHandler(new ScriptEditorHandler());
   }
 
   @Override
@@ -224,6 +211,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
       case VIEW:
         break;
       case EDIT:
+        getUiHandlers().onEditScript();
         break;
       case HISTORY:
         getUiHandlers().onHistory();
@@ -365,7 +353,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   @Override
   public HasAuthorization getEditAuthorizer() {
-    return new CompositeAuthorizer(new WidgetAuthorizer(remove), scriptEditorPanel.getAuthorizer());
+    return new CompositeAuthorizer(new WidgetAuthorizer(remove), new TabAuthorizer(scriptNavPanel, 1));
   }
 
   private void initCategoryTable() {
@@ -404,29 +392,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     categorizeToAnother.setDisabled(!available);
     categorizeToThis.setDisabled(!available);
     deriveCustom.setDisabled(!available);
-  }
-
-  private class ScriptEditorHandler implements EditorPanel.Handler {
-    @Override
-    public void onEdit() {
-      // TODO
-      getUiHandlers().onEditScript();
-    }
-
-    @Override
-    public void onSave() {
-      // TODO
-    }
-
-    @Override
-    public void onCancel() {
-      // TODO
-    }
-
-    @Override
-    public void onHistory() {
-      // TODO
-    }
   }
 
   private enum ScriptNavPanels {

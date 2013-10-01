@@ -9,6 +9,8 @@
       <o:PropertiesTable ui:field="commitProperties"/>
     </g:FlowPanel>
 
+    <b:CodeBlock ui:field="diffCode"/>
+
     <b:ModalFooter>
       <b:Button ui:field="closeButton">
         <ui:msg description="Close button label">Close</ui:msg>

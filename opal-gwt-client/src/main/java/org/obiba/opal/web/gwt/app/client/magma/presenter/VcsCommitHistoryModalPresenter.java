@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
@@ -22,6 +23,8 @@ public class VcsCommitHistoryModalPresenter extends ModalPresenterWidget<VcsComm
 
   public interface Display extends PopupView, HasUiHandlers<ModalUiHandlers> {
     void setCommitInfo(VcsCommitInfoDto commitInfo);
+
+    void setDiff(String diff);
   }
 
   @Inject
@@ -32,6 +35,16 @@ public class VcsCommitHistoryModalPresenter extends ModalPresenterWidget<VcsComm
 
   public void setCommitInfo(VcsCommitInfoDto commitInfo) {
     getView().setCommitInfo(commitInfo);
+
+    if(commitInfo.getDiffEntriesArray() != null) {
+      StringBuilder diffBuidler = new StringBuilder();
+      for(String entry : JsArrays.toIterable(commitInfo.getDiffEntriesArray())) {
+        diffBuidler.append(entry);
+      }
+      getView().setDiff(diffBuidler.toString());
+    } else {
+      getView().setDiff(null);
+    }
   }
 
 }

@@ -13,7 +13,6 @@
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
-    xmlns:pretty="urn:import:org.obiba.opal.web.gwt.prettify.client"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -158,11 +157,11 @@
               <b2:InlineLabel ui:field="noScript">
                 <ui:msg description="No Script label">No Script</ui:msg>
               </b2:InlineLabel>
-              <pretty:PrettyPrintLabel ui:field="script"/>
+              <b:CodeBlock ui:field="script"></b:CodeBlock>
             </g:FlowPanel>
           </g:FlowPanel>
 
-          <b:NavLink active="true">Edit</b:NavLink>
+          <b:NavLink>Edit</b:NavLink>
 
           <g:FlowPanel>
             <g:HorizontalPanel>
@@ -208,13 +207,10 @@
             <g:SimplePanel ui:field="scriptEditor"/>
           </g:FlowPanel>
 
-          <b:NavLink active="true">History</b:NavLink>
+          <b:NavLink>History</b:NavLink>
           <g:FlowPanel ui:field="historyPanel">
           </g:FlowPanel>
         </o:NavPillsPanel>
-
-        <o:EditorPanel size="SMALL" ui:field="scriptEditorPanel">
-        </o:EditorPanel>
 
       </b:Tab>
 

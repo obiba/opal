@@ -15,9 +15,11 @@ import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
+import org.obiba.opal.web.gwt.datetime.client.FormatType;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
 
+import com.github.gwtbootstrap.client.ui.CodeBlock;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -27,7 +29,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-public class VcsCommitHistoryModalView extends ModalPopupViewWithUiHandlers<ModalUiHandlers> implements VcsCommitHistoryModalPresenter.Display{
+public class VcsCommitHistoryModalView extends ModalPopupViewWithUiHandlers<ModalUiHandlers>
+    implements VcsCommitHistoryModalPresenter.Display {
 
   interface DataShieldPackageViewUiBinder extends UiBinder<Widget, VcsCommitHistoryModalView> {}
 
@@ -38,11 +41,14 @@ public class VcsCommitHistoryModalView extends ModalPopupViewWithUiHandlers<Moda
   @UiField
   PropertiesTable commitProperties;
 
-  private final Widget widget;
+  @UiField
+  CodeBlock diffCode;
 
+  private final Widget widget;
 
   @UiField
   Modal dialog;
+
   @Inject
   public VcsCommitHistoryModalView(EventBus eventBus) {
     super(eventBus);
@@ -60,8 +66,15 @@ public class VcsCommitHistoryModalView extends ModalPopupViewWithUiHandlers<Moda
     commitProperties.clearProperties();
     commitProperties.addProperty(translations.commitInfoMap().get("id"), commitInfo.getCommitId());
     commitProperties.addProperty(translations.commitInfoMap().get("author"), commitInfo.getAuthor());
-    commitProperties.addProperty(translations.commitInfoMap().get("date"), Moment.create(commitInfo.getDate()).fromNow());
+    commitProperties.addProperty(translations.commitInfoMap().get("date"),
+        Moment.create(commitInfo.getDate()).format(FormatType.MONTH_NAME_TIME_SHORT));
     commitProperties.addProperty(translations.commitInfoMap().get("comment"), commitInfo.getComment());
+  }
+
+  @Override
+  public void setDiff(String diff) {
+    diffCode.setText(diff == null ? "" : diff);
+    diffCode.setVisible(diff != null);
   }
 
   @UiHandler("closeButton")

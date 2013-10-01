@@ -11,34 +11,33 @@ package org.obiba.opal.web.gwt.app.client.magma.derive.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueColumn.ValueSelectionHandler;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.ScriptEvaluationPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.ScriptEvaluationPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.ScriptEvaluationPresenter.ValueSetFetcher;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.ScriptEvaluationPresenter.ValueSetsProvider;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabPresenter;
+import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.ui.NavTabsPanel;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.gwt.prettify.client.PrettyPrintLabel;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueColumn.ValueSelectionHandler;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.github.gwtbootstrap.client.ui.CodeBlock;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.InlineLabel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextArea;
@@ -47,6 +46,7 @@ import com.google.gwt.view.client.AbstractDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
@@ -84,7 +84,7 @@ public class ScriptEvaluationView extends ViewImpl implements ScriptEvaluationPr
   Label valueType;
 
   @UiField
-  PrettyPrintLabel script;
+  CodeBlock script;
 
   @UiField
   TextArea commentBox;

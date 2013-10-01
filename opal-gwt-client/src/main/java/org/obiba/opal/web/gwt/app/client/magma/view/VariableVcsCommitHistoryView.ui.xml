@@ -17,15 +17,8 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-
-    <g:FlowPanel>
-      <b:Heading size="4" addStyleNames="inline-block">
-        <ui:msg description="VCS Commit Info title label">Commit History</ui:msg>
-      </b:Heading>
       <b:SimplePager ui:field="commitInfoTablePager" location="CENTER" addStyleNames="pull-right"/>
       <o:Table ui:field="commitInfoTable" addStyleNames="small-top-margin"/>
-    </g:FlowPanel>
-
   </g:FlowPanel>
 
 </ui:UiBinder>

@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -19,6 +20,7 @@ import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
 import org.obiba.opal.web.model.client.opal.VcsCommitInfosDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -35,6 +37,10 @@ public class VariableVcsCommitHistoryPresenter extends PresenterWidget<VariableV
 
   private final ModalProvider<VcsCommitHistoryModalPresenter> vcsHistoryModalProvider;
 
+  private TableDto table;
+
+  private VariableDto variable;
+
   /**
    * @param display
    * @param eventBus
@@ -49,14 +55,25 @@ public class VariableVcsCommitHistoryPresenter extends PresenterWidget<VariableV
 
   @Override
   public void showCommitInfo(VcsCommitInfoDto dto) {
-    VcsCommitHistoryModalPresenter vcsHistoryModalPresenter = vcsHistoryModalProvider.get();
-    vcsHistoryModalPresenter.setCommitInfo(dto);
+    String requestUri = UriBuilder.create()
+        .segment("datasource", table.getDatasourceName(), "view", table.getName(), "vcs", "variable",
+            variable.getName(), "commit", dto.getCommitId()).build();
+
+    ResourceRequestBuilderFactory.<VcsCommitInfoDto>newBuilder()//
+        .forResource(requestUri).withCallback(new ResourceCallback<VcsCommitInfoDto>() {
+      @Override
+      public void onResource(Response response, VcsCommitInfoDto resource) {
+        VcsCommitHistoryModalPresenter vcsHistoryModalPresenter = vcsHistoryModalProvider.show();
+        vcsHistoryModalPresenter.setCommitInfo(resource);
+      }
+    }).get().send();
   }
 
   public void retrieveCommitInfos(TableDto table, VariableDto variable) {
-    if (table == null || variable == null) {
-      throw new NullPointerException("Table and variable cannot be null");
-    }
+    if(table == null || variable == null) return;
+
+    this.table = table;
+    this.variable = variable;
 
     String requestUri = UriBuilder.create()
         .segment("datasource", table.getDatasourceName(), "view", table.getName(), "vcs", "variable",

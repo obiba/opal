@@ -66,9 +66,6 @@
   <!-- Opal Datetime Module -->
   <inherits name='org.obiba.opal.web.gwt.datetime.Datetime'/>
 
-  <!-- Syntax Highlighting -->
-  <inherits name='org.obiba.opal.web.gwt.prettify.Prettify'/>
-
   <!-- Ace editor -->
   <inherits name='org.obiba.opal.web.gwt.ace.Ace'/>
 

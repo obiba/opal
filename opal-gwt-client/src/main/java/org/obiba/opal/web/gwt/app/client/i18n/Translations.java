@@ -1914,7 +1914,7 @@ public interface Translations extends Constants {
 
 
   @Description("Vcs Commit History Modal title")
-  @DefaultStringValue("Commit History")
+  @DefaultStringValue("Commit Details")
   String vcsCommitHistoryModalTitle();
 
   @Description("Vcs Commit History Empty")
