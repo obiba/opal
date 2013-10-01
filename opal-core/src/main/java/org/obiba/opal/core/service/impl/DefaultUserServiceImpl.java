@@ -19,7 +19,6 @@ import org.obiba.opal.core.service.SubjectAclService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
@@ -39,8 +38,8 @@ public class DefaultUserServiceImpl implements UserService {
   @PostConstruct
   public void start() {
     orientDbService.registerEntityClass(User.class, Group.class);
-    orientDbService.createUniqueIndex(User.class, "name", OType.STRING);
-    orientDbService.createUniqueIndex(Group.class, "name", OType.STRING);
+    orientDbService.createUniqueStringIndex(User.class, "name");
+    orientDbService.createUniqueStringIndex(Group.class, "name");
   }
 
   @Override

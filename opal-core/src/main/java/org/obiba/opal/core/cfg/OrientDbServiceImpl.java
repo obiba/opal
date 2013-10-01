@@ -152,18 +152,28 @@ public class OrientDbServiceImpl implements OrientDbService {
   }
 
   @Override
-  public void createUniqueIndex(Class<?> clazz, String property, OType type) {
+  public void createIndex(Class<?> clazz, String property, OClass.INDEX_TYPE indexType, OType type) {
     OObjectDatabaseTx db = getDatabaseDocumentTx();
     try {
       String className = clazz.getSimpleName();
       int clusterId = db.getClusterIdByName(className.toLowerCase());
       OIndexManager indexManager = db.getMetadata().getIndexManager();
-      indexManager.createIndex(className + "." + property, OClass.INDEX_TYPE.UNIQUE.name(),
+      indexManager.createIndex(className + "." + property, indexType.name(),
           new OPropertyIndexDefinition(className, property, type), new int[] { clusterId },
           ONullOutputListener.INSTANCE);
     } finally {
       db.close();
     }
+  }
+
+  @Override
+  public void createUniqueIndex(Class<?> clazz, String property, OType type) {
+    createIndex(clazz, property, OClass.INDEX_TYPE.UNIQUE, type);
+  }
+
+  @Override
+  public void createUniqueStringIndex(Class<?> clazz, String property) {
+    createUniqueIndex(clazz, property, OType.STRING);
   }
 
   private OObjectDatabaseTx getDatabaseDocumentTx() {

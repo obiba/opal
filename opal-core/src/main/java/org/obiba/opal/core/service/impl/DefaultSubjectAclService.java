@@ -31,7 +31,10 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
+
+import static com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
 
 @Component
 public class DefaultSubjectAclService implements SubjectAclService {
@@ -47,7 +50,10 @@ public class DefaultSubjectAclService implements SubjectAclService {
   @PostConstruct
   public void start() {
     orientDbService.registerEntityClass(SubjectAcl.class);
-    // TODO create indexes for domain, node, principal, type
+    orientDbService.createIndex(SubjectAcl.class, "domain", INDEX_TYPE.NOTUNIQUE, OType.STRING);
+    orientDbService.createIndex(SubjectAcl.class, "node", INDEX_TYPE.NOTUNIQUE, OType.STRING);
+    orientDbService.createIndex(SubjectAcl.class, "principal", INDEX_TYPE.NOTUNIQUE, OType.STRING);
+    orientDbService.createIndex(SubjectAcl.class, "type", INDEX_TYPE.NOTUNIQUE, OType.STRING);
   }
 
   @Override

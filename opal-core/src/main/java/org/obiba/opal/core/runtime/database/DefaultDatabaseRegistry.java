@@ -36,7 +36,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
 import com.orientechnologies.orient.core.index.OIndexException;
-import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
@@ -103,8 +102,8 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   public void start() {
     orientDbService.registerEntityClass(Database.class, SqlDatabase.class, MongoDbDatabase.class);
     // don't create index on abstract base class or it will fail
-    orientDbService.createUniqueIndex(SqlDatabase.class, "name", OType.STRING);
-    orientDbService.createUniqueIndex(MongoDbDatabase.class, "name", OType.STRING);
+    orientDbService.createUniqueStringIndex(SqlDatabase.class, "name");
+    orientDbService.createUniqueStringIndex(MongoDbDatabase.class, "name");
   }
 
   @Override

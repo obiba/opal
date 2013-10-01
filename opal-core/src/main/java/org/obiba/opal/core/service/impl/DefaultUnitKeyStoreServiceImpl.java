@@ -40,7 +40,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
@@ -65,7 +64,7 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
   @PostConstruct
   public void start() {
     orientDbService.registerEntityClass(UnitKeyStoreState.class);
-    orientDbService.createUniqueIndex(UnitKeyStoreState.class, "unit", OType.STRING);
+    orientDbService.createUniqueStringIndex(UnitKeyStoreState.class, "unit");
   }
 
   @Override
