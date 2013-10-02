@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.validation.ConstrainedModal;
 import org.obiba.opal.web.model.client.opal.JdbcDriverDto;
 
 import com.github.gwtbootstrap.client.ui.CheckBox;
@@ -121,6 +122,12 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
         }
       }
     });
+
+    ConstrainedModal constrainedModal = new ConstrainedModal(modal);
+    constrainedModal.registerWidget("name", translations.nameLabel(), name, nameGroup);
+    constrainedModal.registerWidget("url", translations.urlLabel(), url, urlGroup);
+    constrainedModal.registerWidget("username", translations.usernameLabel(), username, usernameGroup);
+    constrainedModal.registerWidget("password", translations.passwordLabel(), password, passwordGroup);
   }
 
   @Override

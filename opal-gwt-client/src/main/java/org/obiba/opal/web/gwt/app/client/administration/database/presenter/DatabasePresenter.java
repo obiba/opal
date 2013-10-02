@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.database.presenter;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -20,6 +21,8 @@ import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.validation.ConstraintViolationErrorsEvent;
+import org.obiba.opal.web.gwt.app.client.validation.ConstraintViolationUtils;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
@@ -31,6 +34,7 @@ import org.obiba.opal.web.model.client.opal.DatabaseDto;
 import org.obiba.opal.web.model.client.opal.JdbcDriverDto;
 import org.obiba.opal.web.model.client.opal.SqlDatabaseDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
+import org.obiba.opal.web.model.client.ws.ConstraintViolationErrorDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -224,11 +228,16 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
           break;
         default:
           ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-          String errorMessage = translations.userMessageMap().get(error.getStatus());
-          getView().showError(null, errorMessage == null
-              ? translationMessages
-              .unknownResponse(error.getStatus(), String.valueOf(JsArrays.toList(error.getArgumentsArray())))
-              : errorMessage);
+          Collection<ConstraintViolationErrorDto> violationDtos = ConstraintViolationUtils.parseErrors(error);
+          if(violationDtos.isEmpty()) {
+            String errorMessage = translations.userMessageMap().get(error.getStatus());
+            getView().showError(null, errorMessage == null
+                ? translationMessages
+                .unknownResponse(error.getStatus(), String.valueOf(JsArrays.toList(error.getArgumentsArray())))
+                : errorMessage);
+          } else {
+            ConstraintViolationErrorsEvent.fire(getView().asWidget(), violationDtos);
+          }
       }
     }
   }

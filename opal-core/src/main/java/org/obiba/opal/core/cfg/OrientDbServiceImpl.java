@@ -4,7 +4,9 @@ import java.util.Arrays;
 
 import javax.annotation.Nullable;
 import javax.persistence.NonUniqueResultException;
+import javax.validation.ConstraintViolationException;
 
+import org.obiba.opal.core.service.impl.DefaultBeanValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -86,6 +88,27 @@ public class OrientDbServiceImpl implements OrientDbService {
     } finally {
       db.close();
     }
+  }
+
+  @Override
+  public <T> T save(final T t) throws ConstraintViolationException, OException {
+    DefaultBeanValidator.validate(t);
+    return execute(new OrientDbTransactionCallback<T>() {
+      @Override
+      public T doInTransaction(OObjectDatabaseTx db) {
+        return db.save(t);
+      }
+    });
+  }
+
+  @Override
+  public void delete(final Object obj) throws OException {
+    execute(new OrientDbTransactionCallbackWithoutResult() {
+      @Override
+      protected void doInTransactionWithoutResult(OObjectDatabaseTx db) {
+        db.delete(obj);
+      }
+    });
   }
 
   @Override

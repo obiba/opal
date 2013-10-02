@@ -16,8 +16,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
 
 import org.obiba.opal.core.cfg.OrientDbService;
-import org.obiba.opal.core.cfg.OrientDbTransactionCallback;
-import org.obiba.opal.core.cfg.OrientDbTransactionCallbackWithoutResult;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.SubjectAclService;
 import org.slf4j.Logger;
@@ -32,7 +30,6 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.orientechnologies.orient.core.metadata.schema.OType;
-import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
 import static com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
 
@@ -68,30 +65,19 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
   @Override
   public void deleteNodePermissions(String node) {
-    // delete exact match for any domains
     Set<SubjectAclService.Subject> subjects = Sets.newTreeSet();
-    Iterable<SubjectAcl> list = orientDbService.list("select from SubjectAcl where node = ?", node);
-    for(SubjectAcl acl : list) {
-      subjects.add(acl.getSubject());
-      delete(acl);
-    }
-
-    // delete starts with nodes
-    list = orientDbService.list("select from SubjectAcl where node like = ?", node + "/%");
-    for(SubjectAcl acl : list) {
+    Iterable<SubjectAcl> subjectAcls = Sets.newHashSet(Iterables
+        .concat(orientDbService.<SubjectAcl>list("select from SubjectAcl where node = ?", node),
+            orientDbService.<SubjectAcl>list("select from SubjectAcl where node like = ?", node + "/%")));
+    for(SubjectAcl acl : subjectAcls) {
       subjects.add(acl.getSubject());
       delete(acl);
     }
     notifyListeners(subjects);
   }
 
-  private void delete(final SubjectAcl acl) {
-    orientDbService.execute(new OrientDbTransactionCallbackWithoutResult() {
-      @Override
-      protected void doInTransactionWithoutResult(OObjectDatabaseTx db) {
-        db.delete(acl);
-      }
-    });
+  private void delete(SubjectAcl acl) {
+    orientDbService.delete(acl);
   }
 
   @Override
@@ -109,9 +95,9 @@ public class DefaultSubjectAclService implements SubjectAclService {
   @Override
   public void deleteSubjectPermissions(String domain, String node, SubjectAclService.Subject subject) {
 
-    Iterable<SubjectAcl> list = orientDbService
-        .list("select from SubjectAcl where domain = ? and node = ? and subject = ?", domain, node, subject);
-    for(SubjectAcl acl : list) {
+    for(SubjectAcl acl : orientDbService
+        .<SubjectAcl>list("select from SubjectAcl where domain = ? and node = ? and subject = ?", domain, node,
+            subject)) {
       delete(acl);
     }
     notifyListeners(subject);
@@ -121,10 +107,9 @@ public class DefaultSubjectAclService implements SubjectAclService {
   public void deleteSubjectPermissions(String domain, String node, SubjectAclService.Subject subject,
       String permission) {
 
-    Iterable<SubjectAcl> list = orientDbService
-        .list("select from SubjectAcl where domain = ? and node = ? and subject = ? and permission = ?", domain, node,
-            subject, permission);
-    for(SubjectAcl acl : list) {
+    for(SubjectAcl acl : orientDbService
+        .<SubjectAcl>list("select from SubjectAcl where domain = ? and node = ? and subject = ? and permission = ?",
+            domain, node, subject, permission)) {
       delete(acl);
     }
     notifyListeners(subject);
@@ -139,18 +124,11 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public void addSubjectPermission(final String domain, final String node,
-      @Nonnull final SubjectAclService.Subject subject, @Nonnull
-  final String permission) {
+  public void addSubjectPermission(String domain, String node, @Nonnull SubjectAclService.Subject subject,
+      @Nonnull String permission) {
     Assert.notNull(subject, "subject cannot be null");
     Assert.notNull(permission, "permission cannot be null");
-    //TODO bean validation
-    orientDbService.execute(new OrientDbTransactionCallback<Object>() {
-      @Override
-      public Object doInTransaction(OObjectDatabaseTx db) {
-        return db.save(new SubjectAcl(domain, node, subject, permission));
-      }
-    });
+    orientDbService.save(new SubjectAcl(domain, node, subject, permission));
     notifyListeners(subject);
   }
 

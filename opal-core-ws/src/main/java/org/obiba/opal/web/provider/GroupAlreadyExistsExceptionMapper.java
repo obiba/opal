@@ -17,7 +17,7 @@ public class GroupAlreadyExistsExceptionMapper implements ExceptionMapper<GroupA
   @Override
   public Response toResponse(GroupAlreadyExistsException exception) {
     return Response.status(BAD_REQUEST)
-        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "GroupAlreadyExists", exception).build()).build();
+        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "GroupAlreadyExists", exception)).build();
   }
 
 }

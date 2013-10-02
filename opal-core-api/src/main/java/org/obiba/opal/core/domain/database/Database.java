@@ -2,6 +2,7 @@ package org.obiba.opal.core.domain.database;
 
 import javax.annotation.Nonnull;
 
+import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
 
 import com.google.common.base.Objects;
@@ -13,6 +14,7 @@ public abstract class Database extends AbstractTimestamped {
   }
 
   @Nonnull
+  @NotBlank
   private String name;
 
   @Nonnull

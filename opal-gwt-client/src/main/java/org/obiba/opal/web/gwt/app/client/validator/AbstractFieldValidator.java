@@ -12,6 +12,8 @@ package org.obiba.opal.web.gwt.app.client.validator;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 /**
  *
  */
@@ -38,6 +40,7 @@ public abstract class AbstractFieldValidator implements FieldValidator {
   // FieldValidator Methods
   //
 
+  @Nullable
   @Override
   public final String validate() {
     return hasError() ? errorMessageKey : null;

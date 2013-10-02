@@ -18,7 +18,7 @@ public class MultipleIdentifiersDatabaseExceptionMapper
   @Override
   public Response toResponse(MultipleIdentifiersDatabaseException exception) {
     return Response.status(BAD_REQUEST)
-        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "MultipleIdentifiersDatabase", exception).build()).build();
+        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "MultipleIdentifiersDatabase", exception)).build();
   }
 
 }

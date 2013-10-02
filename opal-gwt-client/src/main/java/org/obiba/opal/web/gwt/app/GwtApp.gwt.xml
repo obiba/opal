@@ -27,23 +27,40 @@
   <!-- Specify the app entry point class. -->
   <inherits name='com.gwtplatform.mvp.MvpWithEntryPoint'/>
   <inherits name='com.gwtplatform.mvp.Mvp'/>
-  <!--<entry-point class='org.obiba.opal.web.gwt.app.client.GwtApp'/>-->
 
-  <extend-configuration-property name="gin.ginjector.modules" value="org.obiba.opal.web.gwt.app.client.inject.OpalGinModule"/>
-  <extend-configuration-property name="gin.ginjector.modules" value="org.obiba.opal.web.gwt.app.client.inject.AdministrationModule"/>
-  <extend-configuration-property name="gin.ginjector.modules" value="org.obiba.opal.web.gwt.app.client.inject.AuthorizationModule"/>
-  <extend-configuration-property name="gin.ginjector.modules" value="org.obiba.opal.web.gwt.app.client.inject.ConfigureViewWizardModule"/>
-  <extend-configuration-property name="gin.ginjector.modules" value="org.obiba.opal.web.gwt.app.client.inject.DashboardModule"/>
-  <extend-configuration-property name="gin.ginjector.modules" value="org.obiba.opal.web.gwt.app.client.inject.ExportModule"/>
-  <extend-configuration-property name="gin.ginjector.modules" value="org.obiba.opal.web.gwt.app.client.inject.FileSystemModule"/>
-  <extend-configuration-property name="gin.ginjector.modules" value="org.obiba.opal.web.gwt.app.client.inject.ImportIdentifiersWizardModule"/>
-  <extend-configuration-property name="gin.ginjector.modules" value="org.obiba.opal.web.gwt.app.client.inject.ImportModule"/>
-  <extend-configuration-property name="gin.ginjector.modules" value="org.obiba.opal.web.gwt.app.client.inject.ImportVariablesWizardModule"/>
-  <extend-configuration-property name="gin.ginjector.modules" value="org.obiba.opal.web.gwt.app.client.inject.JobModule"/>
-  <extend-configuration-property name="gin.ginjector.modules" value="org.obiba.opal.web.gwt.app.client.inject.NavigatorModule"/>
-  <extend-configuration-property name="gin.ginjector.modules" value="org.obiba.opal.web.gwt.app.client.inject.ReportsModule"/>
-  <extend-configuration-property name="gin.ginjector.modules" value="org.obiba.opal.web.gwt.app.client.inject.UnitsModule"/>
-  <extend-configuration-property name="gin.ginjector.modules" value="org.obiba.opal.web.gwt.app.client.inject.CreateViewWizardModule"/>
+  <!-- Hibernate Validator-->
+  <inherits name='org.hibernate.validator.HibernateValidator'/>
+
+  <extend-configuration-property name="gin.ginjector.modules"
+      value="org.obiba.opal.web.gwt.app.client.inject.OpalGinModule"/>
+  <extend-configuration-property name="gin.ginjector.modules"
+      value="org.obiba.opal.web.gwt.app.client.inject.AdministrationModule"/>
+  <extend-configuration-property name="gin.ginjector.modules"
+      value="org.obiba.opal.web.gwt.app.client.inject.AuthorizationModule"/>
+  <extend-configuration-property name="gin.ginjector.modules"
+      value="org.obiba.opal.web.gwt.app.client.inject.ConfigureViewWizardModule"/>
+  <extend-configuration-property name="gin.ginjector.modules"
+      value="org.obiba.opal.web.gwt.app.client.inject.DashboardModule"/>
+  <extend-configuration-property name="gin.ginjector.modules"
+      value="org.obiba.opal.web.gwt.app.client.inject.ExportModule"/>
+  <extend-configuration-property name="gin.ginjector.modules"
+      value="org.obiba.opal.web.gwt.app.client.inject.FileSystemModule"/>
+  <extend-configuration-property name="gin.ginjector.modules"
+      value="org.obiba.opal.web.gwt.app.client.inject.ImportIdentifiersWizardModule"/>
+  <extend-configuration-property name="gin.ginjector.modules"
+      value="org.obiba.opal.web.gwt.app.client.inject.ImportModule"/>
+  <extend-configuration-property name="gin.ginjector.modules"
+      value="org.obiba.opal.web.gwt.app.client.inject.ImportVariablesWizardModule"/>
+  <extend-configuration-property name="gin.ginjector.modules"
+      value="org.obiba.opal.web.gwt.app.client.inject.JobModule"/>
+  <extend-configuration-property name="gin.ginjector.modules"
+      value="org.obiba.opal.web.gwt.app.client.inject.NavigatorModule"/>
+  <extend-configuration-property name="gin.ginjector.modules"
+      value="org.obiba.opal.web.gwt.app.client.inject.ReportsModule"/>
+  <extend-configuration-property name="gin.ginjector.modules"
+      value="org.obiba.opal.web.gwt.app.client.inject.UnitsModule"/>
+  <extend-configuration-property name="gin.ginjector.modules"
+      value="org.obiba.opal.web.gwt.app.client.inject.CreateViewWizardModule"/>
 
   <!-- Client-side REST framework -->
   <inherits name='org.obiba.opal.web.gwt.rest.Rest'/>
@@ -80,8 +97,7 @@
   <extend-property name='locale' values='en'/>
   <set-property-fallback name='locale' value='en'/>
 
-   <set-configuration-property name="gwtp.bootstrapper" value="org.obiba.opal.web.gwt.app.client.OpalBootstrapperImpl"/>
-
+  <set-configuration-property name="gwtp.bootstrapper" value="org.obiba.opal.web.gwt.app.client.OpalBootstrapperImpl"/>
 
   <!-- Specific impl for IE -->
   <replace-with class='org.obiba.opal.web.gwt.app.client.view.IELoginView'>

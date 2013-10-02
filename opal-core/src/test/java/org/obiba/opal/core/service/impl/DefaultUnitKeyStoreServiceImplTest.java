@@ -25,7 +25,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.core.cfg.OrientDbService;
-import org.obiba.opal.core.cfg.OrientDbTransactionCallback;
 import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
 import org.obiba.opal.core.unit.UnitKeyStore;
 
@@ -97,8 +96,7 @@ public class DefaultUnitKeyStoreServiceImplTest {
     expect(mockOrientDbService.uniqueResult("select from UnitKeyStoreState where unit = ?", state.getUnit()))
         .andReturn(null).times(2);
 
-    expect(mockOrientDbService.execute(EasyMock.<OrientDbTransactionCallback<Object>>anyObject()))
-        .andReturn(new UnitKeyStoreState());
+    expect(mockOrientDbService.save(EasyMock.anyObject())).andReturn(new UnitKeyStoreState());
 
     replay(mockOrientDbService);
 

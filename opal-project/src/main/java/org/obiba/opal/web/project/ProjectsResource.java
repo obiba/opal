@@ -11,11 +11,9 @@ package org.obiba.opal.web.project;
 
 import java.util.List;
 
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -106,10 +104,10 @@ public class ProjectsResource {
           .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DuplicateDatasourceName").build());
     } catch(DatasourceParsingException dsParsingEx) {
       response = Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", dsParsingEx).build());
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", dsParsingEx));
     } catch(MagmaRuntimeException dsCreationFailedEx) {
       response = Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", dsCreationFailedEx).build());
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", dsCreationFailedEx));
     }
     return response.build();
   }

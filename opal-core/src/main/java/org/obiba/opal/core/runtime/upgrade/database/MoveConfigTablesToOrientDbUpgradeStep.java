@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.obiba.opal.core.cfg.OrientDbService;
-import org.obiba.opal.core.cfg.OrientDbTransactionCallbackWithoutResult;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
@@ -14,8 +13,6 @@ import org.obiba.runtime.upgrade.AbstractUpgradeStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-
-import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
 public class MoveConfigTablesToOrientDbUpgradeStep extends AbstractUpgradeStep {
 
@@ -45,13 +42,8 @@ public class MoveConfigTablesToOrientDbUpgradeStep extends AbstractUpgradeStep {
             return state;
           }
         });
-    for(final UnitKeyStoreState state : states) {
-      orientDbService.execute(new OrientDbTransactionCallbackWithoutResult() {
-        @Override
-        protected void doInTransactionWithoutResult(OObjectDatabaseTx db) {
-          db.save(state);
-        }
-      });
+    for(UnitKeyStoreState state : states) {
+      orientDbService.save(state);
     }
     dataJdbcTemplate.execute("drop table unit_key_store");
   }
@@ -69,13 +61,8 @@ public class MoveConfigTablesToOrientDbUpgradeStep extends AbstractUpgradeStep {
         return acl;
       }
     });
-    for(final SubjectAcl acl : list) {
-      orientDbService.execute(new OrientDbTransactionCallbackWithoutResult() {
-        @Override
-        protected void doInTransactionWithoutResult(OObjectDatabaseTx db) {
-          db.save(acl);
-        }
-      });
+    for(SubjectAcl acl : list) {
+      orientDbService.save(acl);
     }
     dataJdbcTemplate.execute("drop table subject_acl");
   }

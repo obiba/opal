@@ -12,12 +12,15 @@ package org.obiba.opal.web.magma;
 import java.util.Arrays;
 import java.util.Collections;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import javax.ws.rs.core.Response;
 
 import org.mozilla.javascript.RhinoException;
 import org.obiba.magma.support.DatasourceParsingException;
 import org.obiba.opal.web.model.Magma.DatasourceParsingErrorDto;
 import org.obiba.opal.web.model.Magma.JavaScriptErrorDto;
+import org.obiba.opal.web.model.Ws;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,21 +43,20 @@ public class ClientErrorDtos {
   }
 
   @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
-  public static ClientErrorDto.Builder getErrorMessage(Response.StatusType responseStatus, String errorStatus,
-      Exception e) {
+  public static ClientErrorDto getErrorMessage(Response.StatusType responseStatus, String errorStatus, Exception e) {
     ClientErrorDto.Builder builder = getErrorMessage(responseStatus, errorStatus);
     Throwable cause = getRootCause(e);
     builder.addArguments(cause.getMessage() == null ? cause.getClass().getName() : cause.getMessage());
-    return builder;
+    return builder.build();
   }
 
   @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
-  public static ClientErrorDto.Builder getErrorMessage(Response.StatusType responseStatus, String errorStatus,
+  public static ClientErrorDto getErrorMessage(Response.StatusType responseStatus, String errorStatus,
       RuntimeException e) {
     log.warn(errorStatus, e);
     Throwable cause = getRootCause(e);
     return getErrorMessage(responseStatus, errorStatus)
-        .addArguments(cause.getMessage() == null ? cause.getClass().getName() : cause.getMessage());
+        .addArguments(cause.getMessage() == null ? cause.getClass().getName() : cause.getMessage()).build();
   }
 
   private static Throwable getRootCause(Exception e) {
@@ -65,29 +67,44 @@ public class ClientErrorDtos {
     return cause;
   }
 
-  public static ClientErrorDto.Builder getErrorMessage(Response.StatusType responseStatus, String errorStatus,
+  public static ClientErrorDto getErrorMessage(Response.StatusType responseStatus, String errorStatus,
       DatasourceParsingException pe) {
     ClientErrorDto.Builder builder = getErrorMessage(responseStatus, errorStatus);
     builder.addArguments(pe.getMessage());
     // build a parsing error dto list
     if(pe.getChildren().isEmpty()) {
-      builder.addExtension(DatasourceParsingErrorDto.errors, newDatasourceParsingErrorDto(pe).build());
+      builder.addExtension(DatasourceParsingErrorDto.errors, newErrorDto(pe).build());
     } else {
       for(DatasourceParsingException child : pe.getChildrenAsList()) {
-        builder.addExtension(DatasourceParsingErrorDto.errors, newDatasourceParsingErrorDto(child).build());
+        builder.addExtension(DatasourceParsingErrorDto.errors, newErrorDto(child).build());
       }
     }
-    return builder;
+    return builder.build();
   }
 
-  public static ClientErrorDto.Builder getErrorMessage(Response.StatusType responseStatus, String errorStatus,
+  public static ClientErrorDto getErrorMessage(Response.StatusType responseStatus, String errorStatus,
       RhinoException exception) {
     return getErrorMessage(responseStatus, errorStatus) //
         .addArguments(exception.getMessage()) //
-        .addExtension(JavaScriptErrorDto.errors, newJavaScriptErrorDto(exception).build());
+        .addExtension(JavaScriptErrorDto.errors, newErrorDto(exception).build()).build();
   }
 
-  private static DatasourceParsingErrorDto.Builder newDatasourceParsingErrorDto(DatasourceParsingException pe) {
+  public static ClientErrorDto getErrorMessage(Response.StatusType responseStatus, String errorStatus,
+      ConstraintViolationException exception) {
+
+    ClientErrorDto.Builder builder = getErrorMessage(responseStatus, errorStatus);
+    for(ConstraintViolation<?> violation : exception.getConstraintViolations()) {
+      String trimmedMessageTemplate = violation.getMessageTemplate()
+          .substring(1, violation.getMessageTemplate().length() - 1);
+      builder.addExtension(Ws.ConstraintViolationErrorDto.errors, Ws.ConstraintViolationErrorDto.newBuilder() //
+          .setMessage(violation.getMessage()) //
+          .setMessageTemplate(trimmedMessageTemplate) //
+          .setPropertyPath(violation.getPropertyPath().toString()).build());
+    }
+    return builder.build();
+  }
+
+  private static DatasourceParsingErrorDto.Builder newErrorDto(DatasourceParsingException pe) {
     DatasourceParsingErrorDto.Builder builder = DatasourceParsingErrorDto.newBuilder() //
         .setDefaultMessage(pe.getMessage()) //
         .setKey(pe.getKey());
@@ -97,7 +114,7 @@ public class ClientErrorDtos {
     return builder;
   }
 
-  private static JavaScriptErrorDto.Builder newJavaScriptErrorDto(RhinoException exception) {
+  private static JavaScriptErrorDto.Builder newErrorDto(RhinoException exception) {
     JavaScriptErrorDto.Builder builder = JavaScriptErrorDto.newBuilder() //
         .setMessage(exception.details()) //
         .setSourceName(exception.sourceName()) //
@@ -110,4 +127,5 @@ public class ClientErrorDtos {
     }
     return builder;
   }
+
 }

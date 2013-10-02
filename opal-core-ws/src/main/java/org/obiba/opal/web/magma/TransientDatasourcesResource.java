@@ -67,11 +67,11 @@ public class TransientDatasourcesResource {
     } catch(DatasourceParsingException pe) {
       MagmaEngine.get().removeTransientDatasource(uid);
       response = Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", pe).build());
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", pe));
     } catch(MagmaRuntimeException e) {
       MagmaEngine.get().removeTransientDatasource(uid);
       response = Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", e).build());
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", e));
     }
 
     return response.build();

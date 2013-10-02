@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
+import javax.validation.ConstraintViolationException;
 
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
@@ -12,7 +13,6 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.datasource.hibernate.HibernateDatasource;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasource;
 import org.obiba.opal.core.cfg.OrientDbService;
-import org.obiba.opal.core.cfg.OrientDbTransactionCallbackWithoutResult;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbDatabase;
 import org.obiba.opal.core.domain.database.SqlDatabase;
@@ -37,7 +37,6 @@ import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
 import com.orientechnologies.orient.core.index.OIndexException;
 import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
-import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
 @Component
 public class DefaultDatabaseRegistry implements DatabaseRegistry {
@@ -151,17 +150,12 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   }
 
   @Override
-  public void addOrReplaceDatabase(@Nonnull final Database database)
-      throws MultipleIdentifiersDatabaseException, DatabaseAlreadyExistsException {
-    //TODO bean validation
+  public void addOrReplaceDatabase(@Nonnull Database database)
+      throws ConstraintViolationException, MultipleIdentifiersDatabaseException, DatabaseAlreadyExistsException {
+
     validUniqueIdentifiersDatabase(database);
     try {
-      orientDbService.execute(new OrientDbTransactionCallbackWithoutResult() {
-        @Override
-        protected void doInTransactionWithoutResult(OObjectDatabaseTx db) {
-          db.save(database);
-        }
-      });
+      orientDbService.save(database);
     } catch(OIndexException e) {
       throw new DatabaseAlreadyExistsException(database.getName());
     } catch(ORecordDuplicatedException e) {
@@ -183,14 +177,9 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   }
 
   @Override
-  public void deleteDatabase(@Nonnull final Database database) throws CannotDeleteDatabaseWithDataException {
+  public void deleteDatabase(@Nonnull Database database) throws CannotDeleteDatabaseWithDataException {
     //TODO check if this database has data
-    orientDbService.execute(new OrientDbTransactionCallbackWithoutResult() {
-      @Override
-      public void doInTransactionWithoutResult(OObjectDatabaseTx db) {
-        db.delete(database);
-      }
-    });
+    orientDbService.delete(database);
     destroyDataSource(database.getName());
   }
 

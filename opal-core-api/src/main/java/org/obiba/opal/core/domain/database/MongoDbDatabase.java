@@ -2,6 +2,7 @@ package org.obiba.opal.core.domain.database;
 
 import javax.annotation.Nonnull;
 
+import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.magma.datasource.mongodb.MongoDBFactory;
 
 @SuppressWarnings("ParameterHidesMemberVariable")
@@ -11,6 +12,7 @@ public class MongoDbDatabase extends Database {
    * mongodb://{hostname}:{port}/{databaseName}
    */
   @Nonnull
+  @NotBlank
   private String url;
 
   private String username;

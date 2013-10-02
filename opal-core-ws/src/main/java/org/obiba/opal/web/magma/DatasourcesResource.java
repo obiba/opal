@@ -106,10 +106,10 @@ public class DatasourcesResource {
           .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DuplicateDatasourceName").build());
     } catch(DatasourceParsingException dsParsingEx) {
       response = Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", dsParsingEx).build());
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", dsParsingEx));
     } catch(MagmaRuntimeException dsCreationFailedEx) {
       response = Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", dsCreationFailedEx).build());
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", dsCreationFailedEx));
     }
     return response.build();
   }

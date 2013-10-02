@@ -16,7 +16,6 @@ import javax.ws.rs.ext.Provider;
 
 import org.mozilla.javascript.RhinoException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
-import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -28,9 +27,7 @@ public class JavaScriptExceptionMapper implements ExceptionMapper<RhinoException
 
   @Override
   public Response toResponse(RhinoException exception) {
-    ClientErrorDto.Builder errorDtoBuilder = ClientErrorDtos
-        .getErrorMessage(Status.BAD_REQUEST, "JavaScriptException", exception);
-    return Response.status(Status.BAD_REQUEST).type("application/x-protobuf+json").entity(errorDtoBuilder.build())
-        .build();
+    return Response.status(Status.BAD_REQUEST).type("application/x-protobuf+json")
+        .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "JavaScriptException", exception)).build();
   }
 }

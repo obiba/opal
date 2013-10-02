@@ -6,6 +6,8 @@ import java.util.Properties;
 
 import javax.annotation.Nonnull;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 
@@ -22,12 +24,15 @@ public class SqlDatabase extends Database {
    * jdbc:{mysql|mariadb|postgresql}://{hostname}:{port}/{databaseName}
    */
   @Nonnull
+  @NotBlank
   private String url;
 
   @Nonnull
+  @NotBlank
   private String driverClass;
 
   @Nonnull
+  @NotBlank
   private String username;
 
   private String password;
@@ -38,6 +43,7 @@ public class SqlDatabase extends Database {
    * datasource name that can be built on this database: hibernate, jdbc or limesurvey
    */
   @Nonnull
+  @NotBlank
   private String magmaDatasourceType;
 
   @Nonnull

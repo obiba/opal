@@ -26,7 +26,6 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.commons.vfs2.FileObject;
 import org.obiba.opal.core.cfg.OrientDbService;
-import org.obiba.opal.core.cfg.OrientDbTransactionCallback;
 import org.obiba.opal.core.crypt.CacheablePasswordCallback;
 import org.obiba.opal.core.crypt.CachingCallbackHandler;
 import org.obiba.opal.core.crypt.KeyProviderSecurityException;
@@ -41,7 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
-import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
 @Component
 @Transactional
@@ -95,7 +93,7 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
   public void saveUnitKeyStore(@Nonnull UnitKeyStore unitKeyStore) {
     Assert.notNull(unitKeyStore, "unitKeyStore must not be null");
 
-    final UnitKeyStoreState state;
+    UnitKeyStoreState state;
     String unitName = unitKeyStore.getUnitName();
     UnitKeyStoreState existing = orientDbService.uniqueResult("select from UnitKeyStoreState where unit = ?", unitName);
     if(existing == null) {
@@ -107,12 +105,7 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
     state.setKeyStore(getKeyStoreByteArray(unitKeyStore));
 
     try {
-      orientDbService.execute(new OrientDbTransactionCallback<Object>() {
-        @Override
-        public Object doInTransaction(OObjectDatabaseTx db) {
-          return db.save(state);
-        }
-      });
+      orientDbService.save(state);
     } catch(ORecordDuplicatedException e) {
       throw new UnitKeyStoreAlreadyExistsException(unitName);
     }

@@ -794,11 +794,13 @@
         <groupId>com.google.gwt</groupId>
         <artifactId>gwt-servlet</artifactId>
         <version>${gwt.version}</version>
+        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>com.google.gwt</groupId>
         <artifactId>gwt-user</artifactId>
         <version>${gwt.version}</version>
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>com.google.gwt</groupId>
@@ -820,6 +822,12 @@
       <dependency>
         <groupId>com.gwtplatform</groupId>
         <artifactId>gwtp-mvp-client</artifactId>
+        <version>${gwtp.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.gwtplatform</groupId>
+        <artifactId>gwtp-processors</artifactId>
         <version>${gwtp.version}</version>
         <scope>provided</scope>
       </dependency>
@@ -846,11 +854,13 @@
         <groupId>com.googlecode.gwtquery</groupId>
         <artifactId>gwtquery</artifactId>
         <version>${gwtquery.version}</version>
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>com.github.jdramaix</groupId>
         <artifactId>gwtchosen</artifactId>
         <version>${gwt-chosen.version}</version>
+        <scope>provided</scope>
       </dependency>
 
       <!-- GWT HighCharts -->
@@ -1140,6 +1150,22 @@
         <version>${javassist.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-validator</artifactId>
+        <version>${hibernate-validator.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.el</groupId>
+        <artifactId>javax.el-api</artifactId>
+        <version>${javax-el.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.web</groupId>
+        <artifactId>javax.el</artifactId>
+        <version>${javax-el.version}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
@@ -1305,6 +1331,12 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>gwt-maven-plugin</artifactId>
           <version>${gwt.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>apt-maven-plugin</artifactId>
+          <version>${maven-apt-plugin.version}</version>
         </plugin>
 
       </plugins>
@@ -1495,9 +1527,11 @@
     <gwtquery.version>1.3.2</gwtquery.version>
     <hamcrest.version>1.3</hamcrest.version>
     <hibernate.version>4.2.5.Final</hibernate.version>
+    <hibernate-validator.version>5.0.1.Final</hibernate-validator.version>
     <hsqldb.version>2.3.0</hsqldb.version>
     <httpclient.version>4.3</httpclient.version>
     <javassist.version>3.18.1-GA</javassist.version>
+    <javax-el.version>2.2.4</javax-el.version>
     <jetty.version>7.6.8.v20121106</jetty.version>
     <jetty-util.version>6.1.22</jetty-util.version>
     <jewelcli.version>0.6</jewelcli.version>
@@ -1542,6 +1576,7 @@
 
     <!-- maven plugins -->
     <maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>
+    <maven-apt-plugin.version>1.0-alpha-5</maven-apt-plugin.version>
     <maven-assembly-plugin.version>2.3</maven-assembly-plugin.version>
     <maven-build-helper-plugin.version>1.7</maven-build-helper-plugin.version>
     <maven-buildnumber-plugin.version>1.2</maven-buildnumber-plugin.version>
@@ -1561,6 +1596,5 @@
     <maven-war-plugin.version>2.3</maven-war-plugin.version>
 
   </properties>
-
 
 </project>

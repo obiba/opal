@@ -177,12 +177,12 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
       } catch(IOException e) {
         getFunctionalUnitService().removeFunctionalUnit(unit.getName());
         response = Response.status(BAD_REQUEST)
-            .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "FunctionalUnitCreationFailed", e).build());
+            .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "FunctionalUnitCreationFailed", e));
       }
 
     } catch(RuntimeException e) {
       response = Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "FunctionalUnitCreationFailed", e).build());
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "FunctionalUnitCreationFailed", e));
     }
 
     return response.build();
@@ -308,13 +308,13 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
       return Response.ok().build();
     } catch(NoSuchDatasourceException ex) {
       return Response.status(Status.NOT_FOUND)
-          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
+          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex)).build();
     } catch(NoSuchValueTableException ex) {
       return Response.status(Status.NOT_FOUND)
-          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
+          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex)).build();
     } catch(IOException ex) {
-      return Response.status(Status.INTERNAL_SERVER_ERROR).entity(
-          ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex).build())
+      return Response.status(Status.INTERNAL_SERVER_ERROR)
+          .entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex))
           .build();
     }
   }
@@ -347,13 +347,13 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
       return Response.ok().build();
     } catch(NoSuchDatasourceException ex) {
       return Response.status(Status.NOT_FOUND)
-          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
+          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex)).build();
     } catch(NoSuchValueTableException ex) {
       return Response.status(Status.NOT_FOUND)
-          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
+          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex)).build();
     } catch(IOException ex) {
-      return Response.status(Status.INTERNAL_SERVER_ERROR).entity(
-          ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex).build())
+      return Response.status(Status.INTERNAL_SERVER_ERROR)
+          .entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex))
           .build();
     }
   }

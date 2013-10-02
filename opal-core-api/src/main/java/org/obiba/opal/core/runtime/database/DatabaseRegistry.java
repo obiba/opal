@@ -3,6 +3,7 @@ package org.obiba.opal.core.runtime.database;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.sql.DataSource;
+import javax.validation.ConstraintViolationException;
 
 import org.hibernate.SessionFactory;
 import org.obiba.magma.Datasource;
@@ -21,7 +22,7 @@ public interface DatabaseRegistry extends SystemService {
   Database getDatabase(@Nonnull String name);
 
   void addOrReplaceDatabase(@Nonnull Database database)
-      throws MultipleIdentifiersDatabaseException, DatabaseAlreadyExistsException;
+      throws ConstraintViolationException, MultipleIdentifiersDatabaseException, DatabaseAlreadyExistsException;
 
   void deleteDatabase(@Nonnull Database database) throws CannotDeleteDatabaseWithDataException;
 

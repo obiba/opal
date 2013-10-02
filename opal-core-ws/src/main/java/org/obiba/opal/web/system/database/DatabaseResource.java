@@ -97,9 +97,9 @@ public class DatabaseResource {
       });
       if(result != null && result) return Response.ok().build();
     } catch(DataAccessException e) {
-      error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed", e).build();
+      error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed", e);
     } catch(RuntimeException e) {
-      error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed", e).build();
+      error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed", e);
     }
     return Response.status(SERVICE_UNAVAILABLE).entity(error).build();
   }

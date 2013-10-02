@@ -15,14 +15,12 @@ import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Math;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.OpalR;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  * http://groups.google.com/group/protobuf/browse_thread/thread/c6b8280d4b9de976
  */
 @Component
-@Scope("singleton")
 public class ProtobufClassloaderDeadlockPreventer {
 
   public ProtobufClassloaderDeadlockPreventer() {

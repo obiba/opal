@@ -12,7 +12,6 @@ package org.obiba.opal.core.service.impl;
 import javax.annotation.PostConstruct;
 
 import org.obiba.opal.core.cfg.OrientDbService;
-import org.obiba.opal.core.cfg.OrientDbTransactionCallback;
 import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.User;
 import org.obiba.opal.core.service.SubjectAclService;
@@ -20,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
-import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
 /**
  * Default implementation of User Service
@@ -68,46 +66,29 @@ public class DefaultUserServiceImpl implements UserService {
   }
 
   @Override
-  public void createOrUpdateUser(final User user) throws UserAlreadyExistsException {
-    //TODO bean validation
+  public void createOrUpdateUser(User user) throws UserAlreadyExistsException {
     try {
-      orientDbService.execute(new OrientDbTransactionCallback<Object>() {
-        @Override
-        public Object doInTransaction(OObjectDatabaseTx db) {
-          return db.save(user);
-        }
-      });
+      orientDbService.save(user);
     } catch(ORecordDuplicatedException e) {
       throw new UserAlreadyExistsException(user.getName());
     }
   }
 
   @Override
-  public void deleteUser(final User user) {
+  public void deleteUser(User user) {
     SubjectAclService.Subject aclSubject = SubjectAclService.SubjectType
         .valueOf(SubjectAclService.SubjectType.USER.name()).subjectFor(user.getName());
 
-    orientDbService.execute(new OrientDbTransactionCallback<Object>() {
-      @Override
-      public Object doInTransaction(OObjectDatabaseTx db) {
-        return db.delete(user);
-      }
-    });
+    orientDbService.delete(user);
 
     // Delete user's permissions
     aclService.deleteSubjectPermissions("opal", null, aclSubject);
   }
 
   @Override
-  public void createOrUpdateGroup(final Group group) throws GroupAlreadyExistsException {
-    //TODO bean validation
+  public void createOrUpdateGroup(Group group) throws GroupAlreadyExistsException {
     try {
-      orientDbService.execute(new OrientDbTransactionCallback<Object>() {
-        @Override
-        public Object doInTransaction(OObjectDatabaseTx db) {
-          return db.save(group);
-        }
-      });
+      orientDbService.save(group);
     } catch(Exception e) {
       throw new GroupAlreadyExistsException(group.getName());
     }
@@ -124,16 +105,11 @@ public class DefaultUserServiceImpl implements UserService {
   }
 
   @Override
-  public void deleteGroup(final Group group) {
+  public void deleteGroup(Group group) {
     SubjectAclService.Subject aclSubject = SubjectAclService.SubjectType
         .valueOf(SubjectAclService.SubjectType.GROUP.name()).subjectFor(group.getName());
 
-    orientDbService.execute(new OrientDbTransactionCallback<Object>() {
-      @Override
-      public Object doInTransaction(OObjectDatabaseTx db) {
-        return db.delete(group);
-      }
-    });
+    orientDbService.delete(group);
 
     // Delete group's permissions
     aclService.deleteSubjectPermissions("opal", null, aclSubject);

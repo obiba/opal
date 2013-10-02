@@ -100,7 +100,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   @Override
   public void show() {
 
-    if(!modalStack.isEmty() && !modalStack.has(this)) {
+    if(!modalStack.isEmpty() && !modalStack.has(this)) {
       modalStack.hideCurrent();
     }
 
@@ -133,6 +133,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     minHeight = height;
   }
 
+  @Override
   protected void onHide(Event e) {
     if(!hiddenOnStack) super.onHide(e);
   }
@@ -140,6 +141,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   /**
    * This method is called once the widget is completely hidden.
    */
+  @Override
   protected void onHidden(Event e) {
     if(!hiddenOnStack) {
       super.onHidden(e);
@@ -292,16 +294,15 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
 
   private void resizeBodyVertically(int height) {
     Widget body = getBodyWidget();
-    int newHeight = (Math.max(minHeight - bodyVerticalMargin, height - bodyVerticalMargin));
+    int newHeight = Math.max(minHeight - bodyVerticalMargin, height - bodyVerticalMargin);
     body.setHeight(newHeight + "px");
   }
 
   private Widget getWidgetAt(int index) {
     try {
       return getWidget(index);
-    } catch(IndexOutOfBoundsException e) {
+    } catch(IndexOutOfBoundsException ignored) {
     }
-
     return null;
   }
 
@@ -321,7 +322,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     int newX = originalX + deltaX;
     int newY = originalY + deltaY;
 
-    RootPanel.get().setWidgetPosition(this, (newX >= 0 ? newX : originalX), (newY >= 0 ? newY : originalY));
+    RootPanel.get().setWidgetPosition(this, newX >= 0 ? newX : originalX, newY >= 0 ? newY : originalY);
     // override modal bootstrap rules
     DOM.setStyleAttribute(getElement(), "marginLeft", "0px");
     DOM.setStyleAttribute(getElement(), "marginTop", "0px");
@@ -353,8 +354,8 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     int xBound = getAbsoluteLeft() + getOffsetWidth();
     int yBound = getAbsoluteTop() + getOffsetHeight();
 
-    return ((xBound - RESIZE_CURSOR_MARGIN < cursorX && cursorX <= xBound + RESIZE_CURSOR_MARGIN) &&
-        (yBound - RESIZE_CURSOR_MARGIN < cursorY && cursorY <= yBound + RESIZE_CURSOR_MARGIN));
+    return xBound - RESIZE_CURSOR_MARGIN < cursorX && cursorX <= xBound + RESIZE_CURSOR_MARGIN &&
+        yBound - RESIZE_CURSOR_MARGIN < cursorY && cursorY <= yBound + RESIZE_CURSOR_MARGIN;
   }
 
   /**
@@ -381,9 +382,10 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
       int initialX = movePanel.getAbsoluteLeft();
       int width = movePanel.getOffsetWidth();
 
-      return (initialY <= cursorY && initialY + height >= cursorY && initialX <= cursorX &&
-          initialX + width >= cursorX);
-    } else return false;
+      return initialY <= cursorY && initialY + height >= cursorY && initialX <= cursorX &&
+          initialX + width >= cursorX;
+    }
+    return false;
   }
 
   public void clearAlert() {
@@ -444,8 +446,8 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
 
     private Stack<Modal> currentlyShown = new Stack<Modal>();
 
-    public boolean isEmty() {
-      return currentlyShown.size() == 0;
+    public boolean isEmpty() {
+      return currentlyShown.isEmpty();
     }
 
     public boolean has(Modal modal) {

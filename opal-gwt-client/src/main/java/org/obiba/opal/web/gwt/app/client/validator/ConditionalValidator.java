@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.validator;
 
+import javax.annotation.Nullable;
+
 import com.google.gwt.user.client.ui.HasValue;
 
 /**
@@ -38,6 +40,7 @@ public class ConditionalValidator implements FieldValidator {
   // FieldValidator Methods
   //
 
+  @Nullable
   @Override
   public String validate() {
     if(condition.getValue()) {

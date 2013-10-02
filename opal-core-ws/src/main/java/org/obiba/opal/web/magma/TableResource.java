@@ -203,7 +203,7 @@ public class TableResource extends AbstractValueTableResource {
           .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "NoSuchFunctionalUnit", unitName).build()).build();
     } catch(RuntimeException ex) {
       return Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCopierIOException", ex).build()).build();
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCopierIOException", ex)).build();
     }
     return Response.ok().build();
   }

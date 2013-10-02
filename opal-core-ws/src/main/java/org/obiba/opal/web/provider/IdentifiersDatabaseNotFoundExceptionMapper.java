@@ -18,7 +18,7 @@ public class IdentifiersDatabaseNotFoundExceptionMapper
   @Override
   public Response toResponse(IdentifiersDatabaseNotFoundException exception) {
     return Response.status(BAD_REQUEST)
-        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "IdentifiersDatabaseNotFound", exception).build()).build();
+        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "IdentifiersDatabaseNotFound", exception)).build();
   }
 
 }

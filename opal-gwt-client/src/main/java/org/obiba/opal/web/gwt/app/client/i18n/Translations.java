@@ -1535,6 +1535,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Username")
   String usernameLabel();
 
+  @Description("Password label")
+  @DefaultStringValue("Password")
+  String passwordLabel();
+
   @Description("Driver label")
   @DefaultStringValue("Driver")
   String driverLabel();

@@ -167,7 +167,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
     } catch(RuntimeException e) {
       response = Response.status(Status.BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "FunctionalUnitCreationFailed", e).build());
+          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "FunctionalUnitCreationFailed", e));
     }
 
     return response.build();
@@ -261,13 +261,13 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
       response = Response.ok().build();
     } catch(NoSuchDatasourceException ex) {
       response = Response.status(Status.NOT_FOUND)
-          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
+          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex)).build();
     } catch(NoSuchValueTableException ex) {
       response = Response.status(Status.NOT_FOUND)
-          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
+          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex)).build();
     } catch(IOException ex) {
-      response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(
-          ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex).build())
+      response = Response.status(Status.INTERNAL_SERVER_ERROR)
+          .entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex))
           .build();
     } finally {
       Disposables.silentlyDispose(sourceDatasource);
@@ -289,14 +289,13 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
       return Response.ok().entity(Integer.toString(count)).build();
     } catch(NoSuchDatasourceException ex) {
       return Response.status(Status.NOT_FOUND)
-          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex).build()).build();
+          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound", ex)).build();
     } catch(NoSuchValueTableException ex) {
       return Response.status(Status.NOT_FOUND)
-          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex).build()).build();
+          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "ValueTableNotFound", ex)).build();
     } catch(MagmaRuntimeException ex) {
       return Response.status(Status.INTERNAL_SERVER_ERROR)
-          .entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "ImportIdentifiersError", ex).build())
-          .build();
+          .entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "ImportIdentifiersError", ex)).build();
     }
   }
 
@@ -322,7 +321,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
     } catch(Exception e) {
       log.error("Mapping failed", e);
       return Response.status(Status.BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "mappingFailed", e).build()).build();
+          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "mappingFailed", e)).build();
     }
   }
 
@@ -368,7 +367,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
     } catch(Exception e) {
       log.error("Mapping failed", e);
       return Response.status(Status.BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "mappingFailed", e).build()).build();
+          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "mappingFailed", e)).build();
     }
   }
 
@@ -437,7 +436,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
       }
     } catch(Exception e) {
       response = Response.status(Status.INTERNAL_SERVER_ERROR)
-          .entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "KeyPairCreationFailed", e).build());
+          .entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "KeyPairCreationFailed", e));
     }
 
     return response.build();
@@ -456,7 +455,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
       response = Response.ok();
     } catch(RuntimeException e) {
       response = Response.status(Status.INTERNAL_SERVER_ERROR)
-          .entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DeleteKeyPairFailed", e).build());
+          .entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DeleteKeyPairFailed", e));
     }
 
     return response.build();

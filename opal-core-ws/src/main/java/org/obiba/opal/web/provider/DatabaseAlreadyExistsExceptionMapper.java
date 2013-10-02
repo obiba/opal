@@ -17,7 +17,7 @@ public class DatabaseAlreadyExistsExceptionMapper implements ExceptionMapper<Dat
   @Override
   public Response toResponse(DatabaseAlreadyExistsException exception) {
     return Response.status(BAD_REQUEST)
-        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatabaseAlreadyExists", exception).build()).build();
+        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatabaseAlreadyExists", exception)).build();
   }
 
 }
