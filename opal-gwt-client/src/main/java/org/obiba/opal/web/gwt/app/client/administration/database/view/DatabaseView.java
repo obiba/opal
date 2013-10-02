@@ -124,10 +124,10 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
     });
 
     ConstrainedModal constrainedModal = new ConstrainedModal(modal);
-    constrainedModal.registerWidget("name", translations.nameLabel(), name, nameGroup);
-    constrainedModal.registerWidget("url", translations.urlLabel(), url, urlGroup);
-    constrainedModal.registerWidget("username", translations.usernameLabel(), username, usernameGroup);
-    constrainedModal.registerWidget("password", translations.passwordLabel(), password, passwordGroup);
+    constrainedModal.registerWidget("name", translations.nameLabel(), nameGroup);
+    constrainedModal.registerWidget("url", translations.urlLabel(), urlGroup);
+    constrainedModal.registerWidget("username", translations.usernameLabel(), usernameGroup);
+    constrainedModal.registerWidget("password", translations.passwordLabel(), passwordGroup);
   }
 
   @Override
