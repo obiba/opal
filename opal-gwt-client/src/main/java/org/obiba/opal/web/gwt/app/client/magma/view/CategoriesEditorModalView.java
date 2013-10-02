@@ -23,9 +23,10 @@ import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.EditableColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.EditableTabableColumn;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
+import org.obiba.opal.web.model.client.opal.LocaleDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
@@ -34,16 +35,12 @@ import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.cell.client.TextInputCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.safehtml.client.SafeHtmlTemplates;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -54,6 +51,7 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
@@ -62,17 +60,11 @@ import static org.obiba.opal.web.gwt.app.client.magma.presenter.CategoriesEditor
 public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<CategoriesEditorModalUiHandlers>
     implements Display {
 
-  private static final int PAGE_SIZE = 20;
-
   private static final int MIN_WIDTH = 780;
 
   private static final int MIN_HEIGHT = 700;
 
-  private static final String CATEGORY_NAME = "NAME";
-
   private static final String LABEL = "label";
-
-//  private static final String LABEL_PREFIX = "LABEL_";
 
   private final Widget widget;
 
@@ -85,7 +77,6 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   private final ListDataProvider<CategoryDto> dataProvider = new ListDataProvider<CategoryDto>();
 
   private CheckboxColumn<CategoryDto> checkActionCol;
-//  private Map<String, TabAbleTextInputCell> cellMap = new HashMap<String, TabAbleTextInputCell>();
 
   @UiField
   Modal dialog;
@@ -123,7 +114,6 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   @UiField
   Anchor deleteLink;
 
-  // TODO: Support Move Up/Move Down... With ProvidesKey...
   @UiField
   Anchor moveUpLink;
 
@@ -140,6 +130,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     dialog.setMinHeight(MIN_HEIGHT);
 
     table.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.DISABLED);
+    table.setSelectionModel(new SingleSelectionModel<CategoryDto>());
     addCheckColumn();
 
     dataProvider.addDataDisplay(table);
@@ -238,16 +229,15 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   }
 
   @Override
-  public void renderCategoryRows(JsArray<CategoryDto> rows, List<String> locales) {
+  public void renderCategoryRows(JsArray<CategoryDto> rows, List<LocaleDto> locales) {
     addEditableColumns(locales);
 
-    dataProvider.setList(JsArrays.toList(rows));
+    dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
     dataProvider.refresh();
   }
 
-  private void addEditableColumns(List<String> locales) {
-    TabAbleTextInputCell cell = new TabAbleTextInputCell();
-    Column<CategoryDto, String> nameCol = new EditableColumn<CategoryDto>(cell) {
+  private void addEditableColumns(List<LocaleDto> locales) {
+    Column<CategoryDto, String> nameCol = new EditableTabableColumn<CategoryDto>() {
       @Override
       public String getValue(CategoryDto object) {
         return object.getName();
@@ -262,28 +252,28 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     table.addColumn(nameCol, translations.nameLabel());
 
     // prepare cells for each translations
-    for(final String locale : locales) {
-      TabAbleTextInputCell labelCell = new TabAbleTextInputCell();
-      Column<CategoryDto, String> labelCol = new EditableColumn<CategoryDto>(labelCell) {
+    for(final LocaleDto locale : locales) {
+      Column<CategoryDto, String> labelCol = new EditableTabableColumn<CategoryDto>() {
         @Override
         public String getValue(CategoryDto object) {
-          AttributeDto label = VariableDtos.getAttribute(object, LABEL, locale);
+          AttributeDto label = VariableDtos.getAttribute(object, LABEL, locale.getName());
           return label == null ? "" : label.getValue();
         }
       };
       labelCol.setFieldUpdater(new FieldUpdater<CategoryDto, String>() {
         @Override
         public void update(int index, CategoryDto object, String value) {
-          AttributeDto label = VariableDtos.getAttribute(object, LABEL, locale);
+          AttributeDto label = VariableDtos.getAttribute(object, LABEL, locale.getName());
           if(label == null) {
             // Create new attribute
-            VariableDtos.createAttribute(object, LABEL, locale, value);
+            VariableDtos.createAttribute(object, LABEL, locale.getName(), value);
           } else {
             label.setValue(value);
           }
         }
       });
-      table.addColumn(labelCol, translations.labelLabel() + " (" + translations.localeMap().get(locale) + ")");
+      table
+          .addColumn(labelCol, translations.labelLabel() + " (" + translations.localeMap().get(locale.getName()) + ")");
 
     }
 
@@ -303,7 +293,6 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     table.addColumn(missingCol, translations.missingLabel());
   }
 
-  @SuppressWarnings({ "unchecked" })
   private void addCheckColumn() {
     checkActionCol = new CheckboxColumn<CategoryDto>(new CategoryDtoDisplay());
 
@@ -402,34 +391,6 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     @Override
     public Alert getAlert() {
       return selectAllItemsAlert;
-    }
-  }
-
-  static class TabAbleTextInputCell extends TextInputCell {
-
-    interface Template extends SafeHtmlTemplates {
-      @Template("<input type=\"text\" value=\"{0}\"></input>")
-      SafeHtml input(String value);
-    }
-
-    private Template template = GWT.create(Template.class);
-
-    @Override
-    public void render(Context context, String value, SafeHtmlBuilder sb) {
-      // Get the view data.
-      Object key = context.getKey();
-      ViewData viewData = getViewData(key);
-      if(viewData != null && viewData.getCurrentValue().equals(value)) {
-        clearViewData(key);
-        viewData = null;
-      }
-
-      String s = (viewData != null) ? viewData.getCurrentValue() : value;
-      if(s != null) {
-        sb.append(template.input(s));
-      } else {
-        sb.appendHtmlConstant("<input type=\"text\"></input>");
-      }
     }
   }
 }

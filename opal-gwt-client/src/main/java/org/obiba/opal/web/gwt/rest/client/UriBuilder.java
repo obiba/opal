@@ -109,24 +109,30 @@ public class UriBuilder {
 
   public static final UriBuilder URI_REPORT_TEMPLATES = create().segment("report-templates");
 
-  public static final UriBuilder URI_PROJECT = create().segment("project","{}");
+  public static final UriBuilder URI_PROJECT = create().segment("project", "{}");
 
-  public static final UriBuilder URI_PROJECT_SUMMARY = create().segment("project","{}","summary");
+  public static final UriBuilder URI_PROJECT_SUMMARY = create().segment("project", "{}", "summary");
 
-  public static final UriBuilder URI_PROJECT_REPORT_TEMPLATES = create().segment("project","{}","report-templates");
+  public static final UriBuilder URI_PROJECT_REPORT_TEMPLATES = create().segment("project", "{}", "report-templates");
 
-  public static final UriBuilder URI_DATASOURCE = create().segment("datasource","{}");
+  public static final UriBuilder URI_DATASOURCE = create().segment("datasource", "{}");
 
-  public static final UriBuilder URI_DATASOURCE_LOCALES = create().segment("datasource","{}","locales");
+  public static final UriBuilder URI_DATASOURCE_LOCALES = create().segment("datasource", "{}", "locales");
 
-  public static final UriBuilder URI_DATASOURCE_TABLES = create().segment("datasource","{}","tables");
+  public static final UriBuilder URI_DATASOURCE_TABLES = create().segment("datasource", "{}", "tables");
 
   public static final UriBuilder URI_DATASOURCE_TABLE = create().segment("datasource", "{}", "table", "{}");
 
-  public static final UriBuilder URI_DATASOURCE_TABLE_INDEX = create().segment("datasource", "{}", "table", "{}", "index");
+  public static final UriBuilder URI_DATASOURCE_TABLE_INDEX = create()
+      .segment("datasource", "{}", "table", "{}", "index");
 
-  public static final UriBuilder URI_DATASOURCE_TABLE_VARIABLES = create().segment("datasource", "{}", "table", "{}", "variables");
+  public static final UriBuilder URI_DATASOURCE_TABLE_VARIABLES = create()
+      .segment("datasource", "{}", "table", "{}", "variables");
 
-  public static final UriBuilder URI_DATASOURCE_TABLE_VARIABLE = create().segment("datasource", "{}", "table", "{}", "variable", "{}");
+  public static final UriBuilder URI_DATASOURCE_TABLE_VARIABLE = create()
+      .segment("datasource", "{}", "table", "{}", "variable", "{}");
+
+  public static final UriBuilder URI_DATASOURCE_TABLE_LOCALES = create()
+      .segment("datasource", "{}", "table", "{}", "locales");
 
 }

@@ -249,7 +249,15 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
       }
     }
 
-    int selectedSize = selectionModel.getSelectedSet().size();
+    // Count selected items this way instead of selectionModel.getSelectedSet().size(); because it was modifying the
+    // list of items by adding a $H entry...
+    int selectedSize = 0;
+    for(int i = 0; i < display.getDataProvider().getList().size(); i++) {
+      if(selectionModel.isSelected(display.getDataProvider().getList().get(i))) {
+        selectedSize++;
+      }
+    }
+
     boolean allSelected = selectedSize == display.getDataProvider().getList().size();
     boolean allPageSelected = currentSelected == display.getTable().getVisibleItemCount();
 

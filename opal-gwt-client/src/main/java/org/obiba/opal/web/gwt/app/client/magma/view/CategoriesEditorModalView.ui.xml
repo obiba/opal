@@ -47,14 +47,14 @@
                 <g:Anchor addStyleNames="inline xsmall-indent action" ui:field="deleteLink">
                   <ui:msg description="Delete category label">Delete</ui:msg>
                 </g:Anchor>
-                <!--<b:Icon type="ARROW_UP" addStyleNames="xsmall-indent"/>-->
-                <!--<g:Anchor addStyleNames="inline xsmall-indent action" ui:field="moveUpLink">-->
-                <!--<ui:msg description="Move up label">Move up</ui:msg>-->
-                <!--</g:Anchor>-->
-                <!--<b:Icon type="ARROW_DOWN" addStyleNames="xsmall-indent"/>-->
-                <!--<g:Anchor addStyleNames="inline xsmall-indent action" ui:field="moveDownLink">-->
-                <!--<ui:msg description="Move down label">Move down</ui:msg>-->
-                <!--</g:Anchor>-->
+                <b:Icon type="ARROW_UP" addStyleNames="xsmall-indent"/>
+                <g:Anchor addStyleNames="inline xsmall-indent action" ui:field="moveUpLink">
+                  <ui:msg description="Move up label">Move up</ui:msg>
+                </g:Anchor>
+                <b:Icon type="ARROW_DOWN" addStyleNames="xsmall-indent"/>
+                <g:Anchor addStyleNames="inline xsmall-indent action" ui:field="moveDownLink">
+                  <ui:msg description="Move down label">Move down</ui:msg>
+                </g:Anchor>
               </g:FlowPanel>
             </g:customCell>
           </g:row>
