@@ -4,6 +4,9 @@ import org.obiba.opal.web.model.client.opal.DatabaseDto;
 
 import com.gwtplatform.dispatch.annotation.GenEvent;
 
+/**
+ * Will generate {@link DatabaseUpdatedEvent} and {@link DatabaseUpdatedEvent.DatabaseUpdatedHandler}
+ */
 @GenEvent
 public class DatabaseUpdated {
 
