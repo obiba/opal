@@ -68,6 +68,10 @@ li.no-icon > a {
   margin-right: 0.8em;
 }
 
+.right-indent {
+  margin-right: 1.6em;
+}
+
 .small-dual-indent {
   margin-left: 0.8em;
   margin-right: 0.8em;
@@ -297,4 +301,27 @@ div.obiba-SuggestListBox {
  */
 .magma {
   min-height: 200px;
+}
+
+/*
+ * Diff widget
+ */
+.table td.diff-rm {
+  background-color: #FDD;
+}
+
+.table td.diff-add {
+  background-color: #DFD;
+}
+
+.table td.diff-hunk {
+  color: #999;
+  background-color: #f8f8ff;
+}
+
+.table td.diff-line-num {
+  color: #999;
+}
+.table td.diff-line-code {
+  font-family: Consolas, "Liberation Mono", Courier, monospace;
 }

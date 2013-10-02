@@ -9,7 +9,7 @@
       <o:PropertiesTable ui:field="commitProperties"/>
     </g:FlowPanel>
 
-    <b:CodeBlock ui:field="diffCode"/>
+    <o:DiffTable ui:field="diffTable" zebra="false"/>
 
     <b:ModalFooter>
       <b:Button ui:field="closeButton">
