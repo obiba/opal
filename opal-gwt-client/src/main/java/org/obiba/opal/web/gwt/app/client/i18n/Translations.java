@@ -226,7 +226,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Variables")
   String variablesLabel();
 
-
   @Description("Variable label")
   @DefaultStringValue("Variable")
   String variableLabel();
@@ -469,6 +468,10 @@ public interface Translations extends Constants {
   @Description("Categories label")
   @DefaultStringValue("Categories")
   String categoriesLabel();
+
+  @Description("Category label")
+  @DefaultStringValue("Category")
+  String categoryLabel();
 
   @Description("No Categories label")
   @DefaultStringValue("No Categories")

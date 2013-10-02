@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -325,8 +324,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   @Override
   public void onEditCategories() {
     CategoriesEditorModalPresenter categoriesEditorPresenter = categoriesEditorModalProvider.get();
-    // TODO: Get locales from project config
-    categoriesEditorPresenter.initialize(variable, Arrays.asList("en", "fr"));
+    categoriesEditorPresenter.initialize(variable, table);
   }
 
   //
