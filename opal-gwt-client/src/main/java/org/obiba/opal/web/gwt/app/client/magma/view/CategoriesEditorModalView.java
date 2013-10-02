@@ -131,7 +131,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
     table.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.DISABLED);
     table.setSelectionModel(new SingleSelectionModel<CategoryDto>());
-    addCheckColumn();
+    table.setEmptyTableWidget(new Label(translations.noCategoriesLabel()));
 
     dataProvider.addDataDisplay(table);
   }
@@ -237,6 +237,10 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   }
 
   private void addEditableColumns(List<LocaleDto> locales) {
+    checkActionCol = new CheckboxColumn<CategoryDto>(new CategoryDtoDisplay());
+    table.addColumn(checkActionCol, checkActionCol.getTableListCheckColumnHeader());
+    table.setColumnWidth(checkActionCol, 1, Style.Unit.PX);
+
     Column<CategoryDto, String> nameCol = new EditableTabableColumn<CategoryDto>() {
       @Override
       public String getValue(CategoryDto object) {
@@ -291,13 +295,6 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
       }
     });
     table.addColumn(missingCol, translations.missingLabel());
-  }
-
-  private void addCheckColumn() {
-    checkActionCol = new CheckboxColumn<CategoryDto>(new CategoryDtoDisplay());
-
-    table.addColumn(checkActionCol, checkActionCol.getTableListCheckColumnHeader());
-    table.setColumnWidth(checkActionCol, 1, Style.Unit.PX);
   }
 
   @Override

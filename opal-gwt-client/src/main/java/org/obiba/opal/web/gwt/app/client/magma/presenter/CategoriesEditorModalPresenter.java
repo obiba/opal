@@ -31,6 +31,7 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
@@ -65,7 +66,7 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
     locales = new ArrayList<LocaleDto>();
     getView().setUiHandlers(this);
 
-//    // Fetch locales and render categories
+    // Fetch locales and render categories
     ResourceRequestBuilderFactory.<JsArray<LocaleDto>>newBuilder()
         .forResource(UriBuilder.URI_DATASOURCE_TABLE_LOCALES.build(table.getDatasourceName(), table.getName())).get()
         .withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
@@ -93,22 +94,46 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
     }
 
     variable.clearCategoriesArray();
-    variable.setCategoriesArray(categories);
+    variable.setCategoriesArray(getView().getCategories());
 
-    ResourceRequestBuilderFactory.newBuilder().forResource(variable.getLink()) //
-        .put() //
-        .withResourceBody(VariableDto.stringify(variable)) //
-        .withCallback(new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            if(response.getStatusCode() != Response.SC_OK) {
-              getView().showError(response.getText(), null);
-            } else {
-              getView().hide();
+    // If variable from a view
+    if(!Strings.isNullOrEmpty(tableDto.getViewLink())) {
+      UriBuilder uriBuilder = UriBuilder.create().segment("datasource", "{}", "view", "{}", "variable", "{}")
+          .query("comment",
+              TranslationsUtils.replaceArguments(translations.updateVariableCategories(), variable.getName()));
+
+      ResourceRequestBuilderFactory.newBuilder()
+          .forResource(uriBuilder.build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())) //
+          .put() //
+          .withResourceBody(VariableDto.stringify(variable)) //
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              if(response.getStatusCode() != Response.SC_OK) {
+                getView().showError(response.getText(), null);
+              } else {
+                getView().hide();
+              }
+              fireEvent(new VariableRefreshEvent());
             }
-            fireEvent(new VariableRefreshEvent());
-          }
-        }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
+          }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
+    } else {
+      ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilder.URI_DATASOURCE_TABLE_VARIABLE
+          .build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())) //
+          .put() //
+          .withResourceBody(VariableDto.stringify(variable)) //
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              if(response.getStatusCode() != Response.SC_OK) {
+                getView().showError(response.getText(), null);
+              } else {
+                getView().hide();
+              }
+              fireEvent(new VariableRefreshEvent());
+            }
+          }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
+    }
 
   }
 
