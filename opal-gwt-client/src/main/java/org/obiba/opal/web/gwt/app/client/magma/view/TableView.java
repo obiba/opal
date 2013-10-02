@@ -15,13 +15,11 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.VariableAttributeColumn;
-import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
-import org.obiba.opal.web.gwt.datetime.client.FormatType;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -274,12 +272,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @SuppressWarnings({ "unchecked" })
   private void addCheckColumn() {
     checkColumn = new CheckboxColumn<VariableDto>(new VariableDtoDisplay());
-    checkColumn.setActionHandler(new ActionHandler<Integer>() {
-      @Override
-      public void doAction(Integer object, String actionName) {
-        selectAllItemsAlert.setVisible(object > 0);
-      }
-    });
 
     table.addColumn(checkColumn, checkColumn.getTableListCheckColumnHeader());
     table.setColumnWidth(checkColumn, 1, Unit.PX);
@@ -640,6 +632,11 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     @Override
     public String getItemNameSingular() {
       return translations.variableLabel().toLowerCase();
+    }
+
+    @Override
+    public Alert getAlert() {
+      return selectAllItemsAlert;
     }
   }
 

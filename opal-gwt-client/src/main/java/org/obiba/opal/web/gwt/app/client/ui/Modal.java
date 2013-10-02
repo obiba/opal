@@ -390,6 +390,11 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     alertPlace.clear();
   }
 
+  public void clearAlert(ControlGroup group) {
+    clearAlert();
+    group.removeStyle(ControlGroupType.ERROR);
+  }
+
   public void addAlert(Alert alert) {
     alertPlace.add(alert);
   }

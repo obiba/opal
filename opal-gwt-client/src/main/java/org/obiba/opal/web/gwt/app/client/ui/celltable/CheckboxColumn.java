@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 
+import com.github.gwtbootstrap.client.ui.Alert;
 import com.google.common.collect.Lists;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
@@ -94,7 +95,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
       public void update(int index, T object, Boolean value) {
         selectionModel.setSelected(object, value);
 
-        //hide status message when deselecting an element
+        // hide status message when deselecting an element
         // only redraw when the first checkbox is deselected
         int nbDeselected = 0;
         for(T v : display.getTable().getVisibleItems()) {
@@ -248,7 +249,15 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
       }
     }
 
-    int selectedSize = selectionModel.getSelectedSet().size();
+    // Count selected items this way instead of selectionModel.getSelectedSet().size(); because it was modifying the
+    // list of items by adding a $H entry...
+    int selectedSize = 0;
+    for(int i = 0; i < display.getDataProvider().getList().size(); i++) {
+      if(selectionModel.isSelected(display.getDataProvider().getList().get(i))) {
+        selectedSize++;
+      }
+    }
+
     boolean allSelected = selectedSize == display.getDataProvider().getList().size();
     boolean allPageSelected = currentSelected == display.getTable().getVisibleItemCount();
 
@@ -256,8 +265,10 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
       updateStatusAlertWhenAllSelected(currentSelected);
     } else if(allPageSelected) {
       updateStatusAlertWhenAllPageSelected(currentSelected);
-    } else {
+    } else if(currentSelected > 0) {
       updateStatusAlertWhenNotAllSelected(currentSelected);
+    } else if(display.getAlert() != null) {
+      display.getAlert().setVisible(false);
     }
   }
 
@@ -326,6 +337,10 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
       }
     }
 
+    if(display.getAlert() != null) {
+      display.getAlert().setVisible(nbSelected > 0);
+    }
+
     if(actionHandler != null) {
       actionHandler.doAction(nbSelected, "SELECT");
     }
@@ -378,6 +393,6 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
      */
     String getItemNameSingular();
 
-//    ClickHandler getSelectClickHandler();
+    Alert getAlert();
   }
 }

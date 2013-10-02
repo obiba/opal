@@ -29,6 +29,7 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.DateTimeColumn;
 import org.obiba.opal.web.model.client.opal.FileDto;
 import org.obiba.opal.web.model.client.opal.FileDto.FileType;
 
+import com.github.gwtbootstrap.client.ui.Alert;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
@@ -300,6 +301,11 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
     @Override
     public String getItemNameSingular() {
       return "";
+    }
+
+    @Override
+    public Alert getAlert() {
+      return null;
     }
   }
 
