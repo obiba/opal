@@ -140,20 +140,20 @@ public class DatabaseAdministrationPresenter extends
   protected void onBind() {
     super.onBind();
 
-    registerHandler(getEventBus().addHandler(DatabaseCreatedEvent.getType(), new DatabaseCreatedEvent.Handler() {
-
-      @Override
-      public void onCreated(DatabaseCreatedEvent event) {
-        refresh();
-      }
-    }));
-    registerHandler(getEventBus().addHandler(DatabaseUpdatedEvent.getType(), new DatabaseUpdatedEvent.Handler() {
-
-      @Override
-      public void onUpdated(DatabaseUpdatedEvent event) {
-        refresh();
-      }
-    }));
+    registerHandler(
+        getEventBus().addHandler(DatabaseCreatedEvent.getType(), new DatabaseCreatedEvent.DatabaseCreatedHandler() {
+          @Override
+          public void onDatabaseCreated(DatabaseCreatedEvent event) {
+            refresh();
+          }
+        }));
+    registerHandler(
+        getEventBus().addHandler(DatabaseUpdatedEvent.getType(), new DatabaseUpdatedEvent.DatabaseUpdatedHandler() {
+          @Override
+          public void onDatabaseUpdated(DatabaseUpdatedEvent event) {
+            refresh();
+          }
+        }));
     registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEvent.Handler() {
 
       @Override
