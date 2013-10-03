@@ -156,6 +156,9 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @UiField
   IconAnchor editCategories;
 
+  @UiField
+  IconAnchor editProperties;
+
   private JsArray<LocaleDto> languages;
 
   @Inject
@@ -252,6 +255,11 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @UiHandler("editCategories")
   void onEditCategories(ClickEvent event) {
     getUiHandlers().onEditCategories();
+  }
+
+  @UiHandler("editProperties")
+  void onEditProperties(ClickEvent event) {
+    getUiHandlers().onEditProperties();
   }
   //
   // VariablePresenter.Display Methods

@@ -25,6 +25,8 @@ import org.obiba.opal.web.gwt.app.client.magma.event.SummaryRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CategoriesEditorModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.PropertiesEditorModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
@@ -68,6 +70,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private final ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider;
 
+  private final ModalProvider<PropertiesEditorModalPresenter> propertiesEditorModalProvider;
+
   private VariableDto variable;
 
   private TableDto table;
@@ -80,7 +84,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
       Provider<AuthorizationPresenter> authorizationPresenter,
       VariableVcsCommitHistoryPresenter variableVcsCommitHistoryPresenter,
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
-      ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider) {
+      ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider,
+      ModalProvider<PropertiesEditorModalPresenter> propertiesEditorModalProvider) {
     super(eventBus, display);
     this.valuesTablePresenter = valuesTablePresenter;
     this.summaryTabPresenter = summaryTabPresenter;
@@ -89,6 +94,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     this.scriptEditorPresenter = scriptEditorPresenter;
     this.variablesToViewProvider = variablesToViewProvider.setContainer(this);
     this.categoriesEditorModalProvider = categoriesEditorModalProvider.setContainer(this);
+    this.propertiesEditorModalProvider = propertiesEditorModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -132,7 +138,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
             .withCallback(new ResourceCallback<VariableDto>() {
               @Override
               public void onResource(Response response, VariableDto resource) {
-                updateVariableDisplay();
+                updateVariableDisplay(resource);
                 variableUpdatePending = false;
               }
             }).send();
@@ -177,15 +183,20 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     if(variable.getLink().isEmpty()) {
       variable.setLink(variable.getParentLink().getLink() + "/variable/" + variable.getName());
     }
-    updateVariableDisplay();
+    updateVariableDisplay(variableDto);
     updateMenuDisplay(previous, next);
     updateDerivedVariableDisplay();
 
     authorize();
   }
 
-  private void updateVariableDisplay() {
+  private void updateVariableDisplay(VariableDto variableDto) {
+    variable = variableDto;
     getView().setVariable(variable);
+    if(variable.getLink().isEmpty()) {
+      variable.setLink(variable.getParentLink().getLink() + "/variable/" + variable.getName());
+    }
+
     getView().renderCategoryRows(variable.getCategoriesArray());
     getView().renderAttributeRows(variable.getAttributesArray());
   }
@@ -327,7 +338,12 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     categoriesEditorPresenter.initialize(variable, table);
   }
 
-  //
+  @Override
+  public void onEditProperties() {
+    PropertiesEditorModalPresenter propertiesEditorPresenter = propertiesEditorModalProvider.get();
+    propertiesEditorPresenter.initialize(variable, table);
+  }
+//
   // Interfaces and classes
   //
 
