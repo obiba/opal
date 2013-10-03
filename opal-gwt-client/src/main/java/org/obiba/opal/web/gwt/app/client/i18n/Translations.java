@@ -2119,14 +2119,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Last update {0}")
   String lastUpdateAgoLabel();
 
-  @Description("Variables count property label")
-  @DefaultStringValue("Variables Count")
-  String variablesCountProperty();
-
-  @Description("Entities count property label")
-  @DefaultStringValue("Entities Count")
-  String entitiesCountProperty();
-
   @Description("Report templates header")
   @DefaultStringValue("{0} Reports")
   String reportTemplatesHeader();
@@ -2134,4 +2126,8 @@ public interface Translations extends Constants {
   @Description("Update {0} categories label")
   @DefaultStringValue("Update {0} categories")
   String updateVariableCategories();
+
+  @Description("Update {0} properties label")
+  @DefaultStringValue("Update {0} properties")
+  String updateVariableProperties();
 }

@@ -12,22 +12,20 @@ package org.obiba.opal.web.gwt.app.client.magma.variable.view;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.PropertiesEditorModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.PropertiesEditorModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
-import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -53,6 +51,9 @@ public class PropertiesEditorModalView extends ModalPopupViewWithUiHandlers<Prop
 
   @UiField
   Modal dialog;
+
+  @UiField
+  Heading variableName;
 
   @UiField
   Button closeButton;
@@ -109,6 +110,8 @@ public class PropertiesEditorModalView extends ModalPopupViewWithUiHandlers<Prop
 
   @Override
   public void renderProperties(VariableDto variable) {
+    variableName.setText(variable.getName());
+
     valueType.setSelectedValue(variable.getValueType());
     repeatable.setValue(variable.getIsRepeatable());
     unit.setText(variable.getUnit());
@@ -116,22 +119,10 @@ public class PropertiesEditorModalView extends ModalPopupViewWithUiHandlers<Prop
     mimeType.setText(variable.getMimeType());
     occurenceGroup.setText(variable.getOccurrenceGroup());
 
-//    mimeType.setText(variable.hasMimeType() ? variable.getMimeType() : "");
-//    unit.setText(variable.hasUnit() ? variable.getUnit() : "");
-//    repeatable.setText(variable.getIsRepeatable() ? translations.yesLabel() : translations.noLabel());
-//    occurrenceGroup.setText(variable.getIsRepeatable() ? variable.getOccurrenceGroup() : "");
-
     // if has data do not allow to change value
     valueType.setEnabled(false);
     repeatable.setEnabled(false);
     occurenceGroup.setEnabled(variable.getIsRepeatable());
-  }
-
-  @Override
-  public JsArray<CategoryDto> getCategories() {
-    JsArray<CategoryDto> list = JsArrays.create();
-
-    return list;
   }
 
   @Override
@@ -141,11 +132,6 @@ public class PropertiesEditorModalView extends ModalPopupViewWithUiHandlers<Prop
     } else {
       dialog.addAlert(message, AlertType.ERROR, group);
     }
-  }
-
-  @Override
-  public void setDialogTitle(String title) {
-    dialog.setTitle(title);
   }
 
   @Override

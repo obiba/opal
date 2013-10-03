@@ -18,13 +18,12 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -54,12 +53,54 @@ public class PropertiesEditorModalPresenter extends ModalPresenterWidget<Propert
     tableDto = table;
 
     getView().setUiHandlers(this);
-    getView().setDialogTitle(TranslationsUtils.replaceArguments(translations.editVariableProperties(), dto.getName()));
     getView().renderProperties(dto);
   }
 
   @Override
   public void onSave() {
+    VariableDto v = getVariableDto();
+
+    // If variable from a view
+    if(Strings.isNullOrEmpty(tableDto.getViewLink())) {
+      ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilder.URI_DATASOURCE_TABLE_VARIABLE
+          .build(tableDto.getDatasourceName(), tableDto.getName(), v.getName())) //
+          .put() //
+          .withResourceBody(VariableDto.stringify(v)).accept("application/json") //
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              if(response.getStatusCode() != Response.SC_OK) {
+                getView().showError(response.getText(), null);
+              } else {
+                getView().hide();
+              }
+              fireEvent(new VariableRefreshEvent());
+            }
+          }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
+    } else {
+      UriBuilder uriBuilder = UriBuilder.create().segment("datasource", "{}", "view", "{}", "variable", "{}")
+          .query("comment",
+              TranslationsUtils.replaceArguments(translations.updateVariableProperties(), variable.getName()));
+
+      ResourceRequestBuilderFactory.newBuilder()
+          .forResource(uriBuilder.build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())) //
+          .put() //
+          .withResourceBody(VariableDto.stringify(v)).accept("application/json") //
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              if(response.getStatusCode() == Response.SC_OK) {
+                getView().hide();
+              } else {
+                getView().showError(response.getText(), null);
+              }
+              fireEvent(new VariableRefreshEvent());
+            }
+          }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
+    }
+  }
+
+  private VariableDto getVariableDto() {
     VariableDto v = VariableDto.create();
     v.setLink(variable.getLink());
     v.setIndex(variable.getIndex());
@@ -76,38 +117,20 @@ public class PropertiesEditorModalPresenter extends ModalPresenterWidget<Propert
     if(variable.getCategoriesArray().length() > 0) {
       v.setCategoriesArray(variable.getCategoriesArray());
     }
+
+    // Update info from view
     v.setUnit(getView().getUnit());
     v.setIsRepeatable(getView().getRepeatable());
     v.setReferencedEntityType(getView().getReferencedEntityType());
     v.setMimeType(getView().getMimeType());
     v.setOccurrenceGroup(getView().getOccurenceGroup());
-
-    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilder.URI_DATASOURCE_TABLE_VARIABLE
-        .build(tableDto.getDatasourceName(), tableDto.getName(), v.getName())) //
-        .put() //
-        .withResourceBody(VariableDto.stringify(v)).accept("application/json") //
-        .withCallback(new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            if(response.getStatusCode() != Response.SC_OK) {
-              getView().showError(response.getText(), null);
-            } else {
-              getView().hide();
-            }
-            fireEvent(new VariableRefreshEvent());
-          }
-        }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
-
+    return v;
   }
 
   public interface Display extends PopupView, HasUiHandlers<PropertiesEditorModalUiHandlers> {
     void renderProperties(VariableDto variable);
 
-    JsArray<CategoryDto> getCategories();
-
     void showError(String message, @Nullable ControlGroup group);
-
-    void setDialogTitle(String title);
 
     boolean getRepeatable();
 

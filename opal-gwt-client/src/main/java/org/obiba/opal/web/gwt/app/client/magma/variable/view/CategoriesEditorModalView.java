@@ -32,6 +32,7 @@ import org.obiba.opal.web.model.client.opal.LocaleDto;
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.cell.client.CheckboxCell;
@@ -81,6 +82,9 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   @UiField
   Modal dialog;
+
+  @UiField
+  Heading variableName;
 
   @UiField
   ControlGroup nameGroup;
@@ -345,8 +349,8 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   }
 
   @Override
-  public void setDialogTitle(String title) {
-    dialog.setTitle(title);
+  public void setVariableName(String name) {
+    variableName.setText(name);
   }
 
   private class CategoryDtoDisplay implements CheckboxColumn.Display<CategoryDto> {

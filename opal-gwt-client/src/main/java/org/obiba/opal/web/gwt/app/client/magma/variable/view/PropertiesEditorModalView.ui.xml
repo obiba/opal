@@ -9,6 +9,7 @@
   <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false">
     <g:FlowPanel addStyleNames="main">
 
+      <b:Heading size="4" ui:field="variableName"/>
       <b:Form type="INLINE">
         <!--Value Type-->
         <b:ControlGroup ui:field="valueTypeGroup">

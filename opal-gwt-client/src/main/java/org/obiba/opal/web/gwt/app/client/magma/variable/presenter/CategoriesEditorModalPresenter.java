@@ -65,8 +65,7 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
     tableDto = table;
     locales = new ArrayList<LocaleDto>();
     getView().setUiHandlers(this);
-    getView()
-        .setDialogTitle(TranslationsUtils.replaceArguments(translations.editVariableCategories(), variable.getName()));
+    getView().setVariableName(variable.getName());
 
     // Fetch locales and render categories
     ResourceRequestBuilderFactory.<JsArray<LocaleDto>>newBuilder()
@@ -96,6 +95,50 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
       }
     }
 
+    VariableDto v = getVariableDto(categories);
+
+    // If variable from a view
+    if(Strings.isNullOrEmpty(tableDto.getViewLink())) {
+      ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilder.URI_DATASOURCE_TABLE_VARIABLE
+          .build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())) //
+          .put() //
+          .withResourceBody(VariableDto.stringify(v)).accept("application/json") //
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              if(response.getStatusCode() == Response.SC_OK) {
+                getView().hide();
+              } else {
+                getView().showError(response.getText(), null);
+              }
+              fireEvent(new VariableRefreshEvent());
+            }
+          }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
+    } else {
+      UriBuilder uriBuilder = UriBuilder.create().segment("datasource", "{}", "view", "{}", "variable", "{}")
+          .query("comment",
+              TranslationsUtils.replaceArguments(translations.updateVariableCategories(), variable.getName()));
+
+      ResourceRequestBuilderFactory.newBuilder()
+          .forResource(uriBuilder.build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())) //
+          .put() //
+          .withResourceBody(VariableDto.stringify(v)).accept("application/json") //
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              if(response.getStatusCode() == Response.SC_OK) {
+                getView().hide();
+              } else {
+                getView().showError(response.getText(), null);
+              }
+              fireEvent(new VariableRefreshEvent());
+            }
+          }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
+    }
+
+  }
+
+  private VariableDto getVariableDto(JsArray<CategoryDto> categories) {
     VariableDto v = VariableDto.create();
     v.setLink(variable.getLink());
     v.setIndex(variable.getIndex());
@@ -111,46 +154,7 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
     v.setOccurrenceGroup(variable.getOccurrenceGroup());
     v.setAttributesArray(variable.getAttributesArray());
     v.setCategoriesArray(categories);
-
-    // If variable from a view
-    if(!Strings.isNullOrEmpty(tableDto.getViewLink())) {
-      UriBuilder uriBuilder = UriBuilder.create().segment("datasource", "{}", "view", "{}", "variable", "{}")
-          .query("comment",
-              TranslationsUtils.replaceArguments(translations.updateVariableCategories(), variable.getName()));
-
-      ResourceRequestBuilderFactory.newBuilder()
-          .forResource(uriBuilder.build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())) //
-          .put() //
-          .withResourceBody(VariableDto.stringify(v)).accept("application/json") //
-          .withCallback(new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              if(response.getStatusCode() != Response.SC_OK) {
-                getView().showError(response.getText(), null);
-              } else {
-                getView().hide();
-              }
-              fireEvent(new VariableRefreshEvent());
-            }
-          }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
-    } else {
-      ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilder.URI_DATASOURCE_TABLE_VARIABLE
-          .build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())) //
-          .put() //
-          .withResourceBody(VariableDto.stringify(v)).accept("application/json") //
-          .withCallback(new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              if(response.getStatusCode() != Response.SC_OK) {
-                getView().showError(response.getText(), null);
-              } else {
-                getView().hide();
-              }
-              fireEvent(new VariableRefreshEvent());
-            }
-          }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
-    }
-
+    return v;
   }
 
   public interface Display extends PopupView, HasUiHandlers<CategoriesEditorModalUiHandlers> {
@@ -160,6 +164,6 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
 
     void showError(String message, @Nullable ControlGroup group);
 
-    void setDialogTitle(String title);
+    void setVariableName(String name);
   }
 }
