@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.magma.view;
+package org.obiba.opal.web.gwt.app.client.magma.variable.view;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,7 +17,8 @@ import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.CategoriesEditorModalUiHandlers;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CategoriesEditorModalUiHandlers;
+import org.obiba.opal.web.gwt.app.client.magma.view.CategoryEditableTable;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
@@ -31,6 +32,7 @@ import org.obiba.opal.web.model.client.opal.LocaleDto;
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.cell.client.CheckboxCell;
@@ -55,7 +57,7 @@ import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-import static org.obiba.opal.web.gwt.app.client.magma.presenter.CategoriesEditorModalPresenter.Display;
+import static org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CategoriesEditorModalPresenter.Display;
 
 public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<CategoriesEditorModalUiHandlers>
     implements Display {
@@ -80,6 +82,9 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   @UiField
   Modal dialog;
+
+  @UiField
+  Heading variableName;
 
   @UiField
   ControlGroup nameGroup;
@@ -131,7 +136,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
     table.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.DISABLED);
     table.setSelectionModel(new SingleSelectionModel<CategoryDto>());
-    addCheckColumn();
+    table.setEmptyTableWidget(new Label(translations.noCategoriesLabel()));
 
     dataProvider.addDataDisplay(table);
   }
@@ -237,6 +242,10 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   }
 
   private void addEditableColumns(List<LocaleDto> locales) {
+    checkActionCol = new CheckboxColumn<CategoryDto>(new CategoryDtoDisplay());
+    table.addColumn(checkActionCol, checkActionCol.getTableListCheckColumnHeader());
+    table.setColumnWidth(checkActionCol, 1, Style.Unit.PX);
+
     Column<CategoryDto, String> nameCol = new EditableTabableColumn<CategoryDto>() {
       @Override
       public String getValue(CategoryDto object) {
@@ -293,13 +302,6 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     table.addColumn(missingCol, translations.missingLabel());
   }
 
-  private void addCheckColumn() {
-    checkActionCol = new CheckboxColumn<CategoryDto>(new CategoryDtoDisplay());
-
-    table.addColumn(checkActionCol, checkActionCol.getTableListCheckColumnHeader());
-    table.setColumnWidth(checkActionCol, 1, Style.Unit.PX);
-  }
-
   @Override
   public JsArray<CategoryDto> getCategories() {
     JsArray<CategoryDto> list = JsArrays.create();
@@ -346,6 +348,11 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     addCategoryName.setText("");
   }
 
+  @Override
+  public void setVariableName(String name) {
+    variableName.setText(name);
+  }
+
   private class CategoryDtoDisplay implements CheckboxColumn.Display<CategoryDto> {
 
     @Override
@@ -380,12 +387,12 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
     @Override
     public String getItemNamePlural() {
-      return translations.categoriesLabel();
+      return translations.categoriesLabel().toLowerCase();
     }
 
     @Override
     public String getItemNameSingular() {
-      return translations.categoryLabel();
+      return translations.categoryLabel().toLowerCase();
     }
 
     @Override

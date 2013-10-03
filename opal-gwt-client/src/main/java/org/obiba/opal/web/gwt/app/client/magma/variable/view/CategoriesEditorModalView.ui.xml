@@ -10,6 +10,7 @@
   <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false">
     <g:FlowPanel addStyleNames="main">
 
+      <b:Heading size="4" ui:field="variableName"/>
       <b:Form type="INLINE">
         <b:ControlGroup ui:field="nameGroup">
           <b:ControlLabel>Name(s)</b:ControlLabel>

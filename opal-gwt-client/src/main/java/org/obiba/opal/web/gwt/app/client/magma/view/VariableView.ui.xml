@@ -51,7 +51,7 @@
         <b:Heading size="4" addStyleNames="inline-block">
           <ui:msg description="Properties label">Properties</ui:msg>
         </b:Heading>
-        <b2:IconAnchor icon="EDIT" addStyleNames="small-indent">
+        <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="editProperties">
         </b2:IconAnchor>
         <b:FluidRow>
           <b:Column size="6">
