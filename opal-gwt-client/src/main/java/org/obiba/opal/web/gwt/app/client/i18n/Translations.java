@@ -2079,6 +2079,18 @@ public interface Translations extends Constants {
   @DefaultStringValue("Edit categories")
   String editCategories();
 
+  @Description("Edit <Variable> categories label")
+  @DefaultStringValue("Edit {0} categories")
+  String editVariableCategories();
+
+  @Description("Edit properties label")
+  @DefaultStringValue("Edit properties")
+  String editProperties();
+
+  @Description("Edit <Variable> properties label")
+  @DefaultStringValue("Edit {0} properties")
+  String editVariableProperties();
+
   @Description("Table count label")
   @DefaultStringValue("1 table")
   String tableCountLabel();

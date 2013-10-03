@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.magma.view;
+package org.obiba.opal.web.gwt.app.client.magma.variable.view;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,7 +17,8 @@ import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.CategoriesEditorModalUiHandlers;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CategoriesEditorModalUiHandlers;
+import org.obiba.opal.web.gwt.app.client.magma.view.CategoryEditableTable;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
@@ -55,7 +56,7 @@ import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-import static org.obiba.opal.web.gwt.app.client.magma.presenter.CategoriesEditorModalPresenter.Display;
+import static org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CategoriesEditorModalPresenter.Display;
 
 public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<CategoriesEditorModalUiHandlers>
     implements Display {
@@ -343,6 +344,11 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     addCategoryName.setText("");
   }
 
+  @Override
+  public void setDialogTitle(String title) {
+    dialog.setTitle(title);
+  }
+
   private class CategoryDtoDisplay implements CheckboxColumn.Display<CategoryDto> {
 
     @Override
@@ -377,12 +383,12 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
     @Override
     public String getItemNamePlural() {
-      return translations.categoriesLabel();
+      return translations.categoriesLabel().toLowerCase();
     }
 
     @Override
     public String getItemNameSingular() {
-      return translations.categoryLabel();
+      return translations.categoryLabel().toLowerCase();
     }
 
     @Override
