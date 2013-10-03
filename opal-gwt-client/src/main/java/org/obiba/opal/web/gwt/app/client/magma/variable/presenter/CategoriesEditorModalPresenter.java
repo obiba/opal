@@ -86,7 +86,6 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
     Set<String> names = new HashSet<String>();
     JsArray<CategoryDto> categories = JsArrays.toSafeArray(getView().getCategories());
     for(int i = 0; i < categories.length(); i++) {
-      GWT.log("" + categories.get(i).getName() + " " + categories.get(i).getIsMissing());
       if(!names.add(categories.get(i).getName())) {
         getView().showError(
             TranslationsUtils.replaceArguments(translations.categoryNameDuplicated(), categories.get(i).getName()),

@@ -330,8 +330,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   @Override
   public void setVariable(VariableDto variable) {
-    GWT.log("" + variable.getName());
-    GWT.log("" + variable.getMimeType());
     name.setText(variable.getName());
     entityType.setText(variable.getEntityType());
     refEntityType.setText(variable.getReferencedEntityType());
