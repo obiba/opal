@@ -29,7 +29,7 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
   public static final GwtEvent.Type<RevealContentHandler<?>> CONTENT = new GwtEvent.Type<RevealContentHandler<?>>();
 
   @ProxyStandard
-  @NameToken(Places.configuration)
+  @NameToken(Places.SERVER)
   public interface Proxy extends ProxyPlace<ConfigurationPresenter> {}
 
   public interface Display extends View, HasUiHandlers<ConfigurationUiHandlers>, HasBreadcrumbs {
@@ -70,6 +70,6 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
 
   private void setHistoryTokens() {
     getView().setTaxonomiesHistoryToken(
-        placeManager.buildRelativeHistoryToken(new PlaceRequest.Builder().nameToken(Places.taxonomies).build(), 2));
+        placeManager.buildRelativeHistoryToken(new PlaceRequest.Builder().nameToken(Places.TAXONOMIES).build(), 2));
   }
 }

@@ -27,7 +27,7 @@ public class VocabularyPresenter extends Presenter<VocabularyPresenter.Display, 
     implements VocabularyUiHandlers {
 
   @ProxyStandard
-  @NameToken(Places.vocabulary)
+  @NameToken(Places.VOCABULARY)
   public interface Proxy extends ProxyPlace<VocabularyPresenter> {}
 
   public interface Display extends View, HasUiHandlers<VocabularyUiHandlers> {

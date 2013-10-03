@@ -95,6 +95,18 @@ public final class Places {
 
   public static final Place SERVER_PLACE = new Place(SERVER);
 
+  public static final String VOCABULARY = ADMINISTRATION + ".vocabulary";
+
+  public static final Place VOCABULARY_PLACE = new Place(VOCABULARY);
+
+  public static final String TAXONOMIES = ADMINISTRATION + ".taxonomies";
+
+  public static final Place TAXONOMIES_PLACE = new Place(TAXONOMIES);
+
+  public static final String TAXONOMY = ADMINISTRATION + ".taxonomy";
+
+  public static final Place TAXONOMY_PLACE = new Place(TAXONOMY);
+
   public static final class Place extends com.google.gwt.place.shared.Place {
 
     private final String place;

@@ -31,7 +31,7 @@ public class TaxonomiesPresenter extends Presenter<TaxonomiesPresenter.Display, 
     implements TaxonomiesUiHandlers {
 
   @ProxyStandard
-  @NameToken(Places.taxonomies)
+  @NameToken(Places.TAXONOMIES)
   public interface Proxy extends ProxyPlace<TaxonomiesPresenter> {}
 
   public interface Display extends View, HasUiHandlers<TaxonomiesUiHandlers> {
@@ -98,14 +98,14 @@ public class TaxonomiesPresenter extends Presenter<TaxonomiesPresenter.Display, 
 
   @Override
   public void onTaxonomySelection(TaxonomyDto taxonomy) {
-    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.taxonomy)
+    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.TAXONOMIES)
         .with(ParameterTokens.TOKEN_NAME, taxonomy.getName()).build();
     placeManager.revealPlace(request);
   }
 
   @Override
   public void onVocabularySelection(TaxonomyDto taxonomyDto, TaxonomyDto.VocabularyDto vocabularyDto) {
-    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.vocabulary)
+    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.VOCABULARY)
         .with(ParameterTokens.TOKEN_NAME, taxonomyDto.getName() + "/" + vocabularyDto.getName()).build();
     placeManager.revealPlace(request);
   }
