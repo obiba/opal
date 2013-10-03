@@ -18,19 +18,20 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPre
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.AddPrincipalHandler;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.CategoriesEditorModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableVcsCommitHistoryPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CategoriesEditorModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.PropertiesEditorModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent.Type;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.testing.CountingEventBus;
 import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
@@ -64,10 +65,12 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
     Provider<AuthorizationPresenter> mockProvider = createMock(Provider.class);
     ModalProvider<VariablesToViewPresenter> variablesToViewProvider = createMock(ModalProvider.class);
     ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider = createMock(ModalProvider.class);
+    ModalProvider<PropertiesEditorModalPresenter> propertiesEditorModalProvider = createMock(ModalProvider.class);
 
     variablePresenter = new VariablePresenter(displayMock, new CountingEventBus(), null,
         new SummaryTabPresenter(eventBusMock, summaryTabMock), null, mockProvider,
-        variableVcsCommitHistoryPresenterMock, variablesToViewProvider, categoriesEditorModalProvider);
+        variableVcsCommitHistoryPresenterMock, variablesToViewProvider, categoriesEditorModalProvider,
+        propertiesEditorModalProvider);
   }
 
   @SuppressWarnings("unchecked")

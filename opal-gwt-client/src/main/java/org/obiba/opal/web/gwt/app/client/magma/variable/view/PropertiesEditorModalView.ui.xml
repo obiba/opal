@@ -1,0 +1,109 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+
+  <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false">
+    <g:FlowPanel addStyleNames="main">
+
+      <b:Form type="INLINE">
+        <!--Value Type-->
+        <b:ControlGroup ui:field="valueTypeGroup">
+          <b:ControlLabel>Value Type</b:ControlLabel>
+          <b:Controls>
+            <o:Chooser ui:field="valueType">
+              <g:item value="text">
+                <ui:msg description="Text label">text</ui:msg>
+              </g:item>
+              <g:item value="decimal">
+                <ui:msg description="Decimal label">decimal</ui:msg>
+              </g:item>
+              <g:item value="integer">
+                <ui:msg description="Integer label">integer</ui:msg>
+              </g:item>
+              <g:item value="binary">
+                <ui:msg description="Binary label">binary</ui:msg>
+              </g:item>
+              <g:item value="boolean">
+                <ui:msg description="Boolean label">boolean</ui:msg>
+              </g:item>
+              <g:item value="datetime">
+                <ui:msg description="Datetime label">datetime</ui:msg>
+              </g:item>
+              <g:item value="date">
+                <ui:msg description="Date label">date</ui:msg>
+              </g:item>
+              <g:item value="point">
+                <ui:msg description="Point label">point</ui:msg>
+              </g:item>
+              <g:item value="linestring">
+                <ui:msg description="LineString label">line</ui:msg>
+              </g:item>
+              <g:item value="polygon">
+                <ui:msg description="Polygon label">polygon</ui:msg>
+              </g:item>
+              <g:item value="locale">
+                <ui:msg description="Locale label">locale</ui:msg>
+              </g:item>
+            </o:Chooser>
+          </b:Controls>
+        </b:ControlGroup>
+
+        <!--Repeatable-->
+        <b:ControlGroup>
+          <b:Controls>
+            <b:CheckBox ui:field="repeatable">
+              <ui:msg description="Repeatable label">Repeatable</ui:msg>
+            </b:CheckBox>
+          </b:Controls>
+        </b:ControlGroup>
+
+        <!--Unit-->
+        <b:ControlGroup>
+          <b:ControlLabel>Unit</b:ControlLabel>
+          <b:Controls>
+            <b:TextBox ui:field="unit"/>
+          </b:Controls>
+        </b:ControlGroup>
+
+        <!--Referenced entity type-->
+        <b:ControlGroup>
+          <b:ControlLabel>Referenced Entity Type</b:ControlLabel>
+          <b:Controls>
+            <b:TextBox ui:field="refEntityType"/>
+          </b:Controls>
+        </b:ControlGroup>
+
+        <!--Mime type-->
+        <b:ControlGroup>
+          <b:ControlLabel>Mime Type</b:ControlLabel>
+          <b:Controls>
+            <b:TextBox ui:field="mimeType"/>
+          </b:Controls>
+        </b:ControlGroup>
+
+        <!--Occurence group-->
+        <b:ControlGroup>
+          <b:ControlLabel>Occurrence Group</b:ControlLabel>
+          <b:Controls>
+            <b:TextBox ui:field="occurenceGroup"/>
+          </b:Controls>
+        </b:ControlGroup>
+      </b:Form>
+    </g:FlowPanel>
+
+    <b:ModalFooter>
+      <b:Button ui:field="saveButton" type="PRIMARY">
+        <ui:msg description="Save label">Save</ui:msg>
+      </b:Button>
+      <b:Button ui:field="closeButton">
+        <ui:msg description="Close label">Close</ui:msg>
+      </b:Button>
+    </b:ModalFooter>
+
+  </o:Modal>
+
+</ui:UiBinder>

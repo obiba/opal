@@ -156,6 +156,9 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @UiField
   IconAnchor editCategories;
 
+  @UiField
+  IconAnchor editProperties;
+
   private JsArray<LocaleDto> languages;
 
   @Inject
@@ -253,6 +256,11 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   void onEditCategories(ClickEvent event) {
     getUiHandlers().onEditCategories();
   }
+
+  @UiHandler("editProperties")
+  void onEditProperties(ClickEvent event) {
+    getUiHandlers().onEditProperties();
+  }
   //
   // VariablePresenter.Display Methods
   //
@@ -322,6 +330,8 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   @Override
   public void setVariable(VariableDto variable) {
+    GWT.log("" + variable.getName());
+    GWT.log("" + variable.getMimeType());
     name.setText(variable.getName());
     entityType.setText(variable.getEntityType());
     refEntityType.setText(variable.getReferencedEntityType());
