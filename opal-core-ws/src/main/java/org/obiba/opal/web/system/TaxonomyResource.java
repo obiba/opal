@@ -21,9 +21,11 @@ import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component
+@Scope("request")
 @Path("/system/conf/taxonomy/{name}")
 public class TaxonomyResource {
 

@@ -24,6 +24,7 @@ import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.runtime.upgrade.VersionProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -35,6 +36,12 @@ public class SystemResource {
 
   @Autowired
   private DefaultGeneralConfigService serverService;
+
+  @Value("${org.obiba.opal.languages}")
+  private String localesProperty;
+
+  @Value("${org.obiba.opal.public.url}")
+  private String publicURL;
 
   @Autowired
   private TaxonomyService taxonomyService;

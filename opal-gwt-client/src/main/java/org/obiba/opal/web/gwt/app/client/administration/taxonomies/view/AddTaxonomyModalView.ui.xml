@@ -1,0 +1,31 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+
+  <g:FlowPanel>
+    <o:Modal ui:field="modal" closeVisible="true" keyboard="true" animation="false">
+      <g:SimplePanel ui:field="alertPlace"/>
+      <b:ControlGroup ui:field="labelGroup">
+        <b:ControlLabel>
+          <ui:msg description="Add Taxonomy Modal Name label">Name</ui:msg>
+        </b:ControlLabel>
+        <b:TextBox ui:field="nameTxt"/>
+        <b:HelpBlock>Taxonomy name</b:HelpBlock>
+      </b:ControlGroup>
+      <b:TabPanel tabPosition="up" ui:field="localesTabs"/>
+      <b:ModalFooter>
+        <b:Button type="PRIMARY" ui:field="save">
+          <ui:msg description="Add Taxonomy Modal Save label">Save</ui:msg>
+        </b:Button>
+        <b:Button ui:field="cancel">
+          <ui:msg description="Add Taxonomy Modal Cancel label">Cancel</ui:msg>
+        </b:Button>
+      </b:ModalFooter>
+    </o:Modal>
+  </g:FlowPanel>
+
+</ui:UiBinder>
