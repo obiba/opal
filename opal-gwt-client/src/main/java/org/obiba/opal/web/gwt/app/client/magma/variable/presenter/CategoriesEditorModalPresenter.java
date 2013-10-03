@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.magma.presenter;
+package org.obiba.opal.web.gwt.app.client.magma.variable.presenter;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -65,6 +65,8 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
     tableDto = table;
     locales = new ArrayList<LocaleDto>();
     getView().setUiHandlers(this);
+    getView()
+        .setDialogTitle(TranslationsUtils.replaceArguments(translations.editVariableCategories(), variable.getName()));
 
     // Fetch locales and render categories
     ResourceRequestBuilderFactory.<JsArray<LocaleDto>>newBuilder()
@@ -85,6 +87,7 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
     Set<String> names = new HashSet<String>();
     JsArray<CategoryDto> categories = JsArrays.toSafeArray(getView().getCategories());
     for(int i = 0; i < categories.length(); i++) {
+      GWT.log("" + categories.get(i).getName() + " " + categories.get(i).getIsMissing());
       if(!names.add(categories.get(i).getName())) {
         getView().showError(
             TranslationsUtils.replaceArguments(translations.categoryNameDuplicated(), categories.get(i).getName()),
@@ -93,8 +96,21 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
       }
     }
 
-    variable.clearCategoriesArray();
-    variable.setCategoriesArray(getView().getCategories());
+    VariableDto v = VariableDto.create();
+    v.setLink(variable.getLink());
+    v.setIndex(variable.getIndex());
+    v.setIsNewVariable(variable.getIsNewVariable());
+    v.setParentLink(variable.getParentLink());
+    v.setName(variable.getName());
+    v.setEntityType(variable.getEntityType());
+    v.setValueType(variable.getValueType());
+    v.setIsRepeatable(variable.getIsRepeatable());
+    v.setUnit(variable.getUnit());
+    v.setReferencedEntityType(variable.getReferencedEntityType());
+    v.setMimeType(variable.getMimeType());
+    v.setOccurrenceGroup(variable.getOccurrenceGroup());
+    v.setAttributesArray(variable.getAttributesArray());
+    v.setCategoriesArray(categories);
 
     // If variable from a view
     if(!Strings.isNullOrEmpty(tableDto.getViewLink())) {
@@ -105,7 +121,7 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
       ResourceRequestBuilderFactory.newBuilder()
           .forResource(uriBuilder.build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())) //
           .put() //
-          .withResourceBody(VariableDto.stringify(variable)) //
+          .withResourceBody(VariableDto.stringify(v)).accept("application/json") //
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
@@ -121,7 +137,7 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
       ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilder.URI_DATASOURCE_TABLE_VARIABLE
           .build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())) //
           .put() //
-          .withResourceBody(VariableDto.stringify(variable)) //
+          .withResourceBody(VariableDto.stringify(v)).accept("application/json") //
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
@@ -143,5 +159,7 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
     JsArray<CategoryDto> getCategories();
 
     void showError(String message, @Nullable ControlGroup group);
+
+    void setDialogTitle(String title);
   }
 }
