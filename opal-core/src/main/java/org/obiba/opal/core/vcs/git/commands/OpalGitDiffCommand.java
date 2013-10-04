@@ -82,7 +82,7 @@ public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
       df.setPathFilter(PathFilter.create(path));
     }
 
-    List<DiffEntry> diffs = df.scan(currentCommitParser, previousCommitParser);
+    List<DiffEntry> diffs = df.scan(previousCommitParser, currentCommitParser);
 
     for(DiffEntry diffEntry : diffs) {
       df.format(diffEntry);

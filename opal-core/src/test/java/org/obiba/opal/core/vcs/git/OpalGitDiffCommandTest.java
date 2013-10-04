@@ -31,53 +31,53 @@ public class OpalGitDiffCommandTest {
   private static final String DATASOURCE_NAME = "opal-data2";
 
   private static final String DIFF_VARIABLE = "diff --git a/TestView/TOTO_VAR.js b/TestView/TOTO_VAR.js\n" +
-      "deleted file mode 100644\n" +
-      "index ec747fa..0000000\n" +
-      "--- a/TestView/TOTO_VAR.js\n" +
-      "+++ /dev/null\n" +
-      "@@ -1 +0,0 @@\n" +
-      "-null\n" +
+      "new file mode 100644\n" +
+      "index 0000000..ec747fa\n" +
+      "--- /dev/null\n" +
+      "+++ b/TestView/TOTO_VAR.js\n" +
+      "@@ -0,0 +1 @@\n" +
+      "+null\n" +
       "\\ No newline at end of file\n";
 
   private static final String DIFF_VIEW = "diff --git a/TestView/View.xml b/TestView/View.xml\n" +
-      "index 9ba271d..59826e4 100644\n" +
+      "index 59826e4..9ba271d 100644\n" +
       "--- a/TestView/View.xml\n" +
       "+++ b/TestView/View.xml\n" +
-      "@@ -87,13 +87,8 @@\n" +
+      "@@ -87,8 +87,13 @@\n" +
       "           <attribute name=\"script\" valueType=\"text\">$(&apos;COORDINATE&apos;)</attribute>\n" +
       "         </attributes>\n" +
       "       </variable>\n" +
-      "-      <variable name=\"TOTO_VAR\" valueType=\"integer\" entityType=\"PostalCode\" unit=\"\" mimeType=\"\">\n" +
-      "-        <attributes>\n" +
-      "-          <attribute name=\"script\" valueType=\"text\">null</attribute>\n" +
-      "-        </attributes>\n" +
-      "-      </variable>\n" +
+      "+      <variable name=\"TOTO_VAR\" valueType=\"integer\" entityType=\"PostalCode\" unit=\"\" mimeType=\"\">\n" +
+      "+        <attributes>\n" +
+      "+          <attribute name=\"script\" valueType=\"text\">null</attribute>\n" +
+      "+        </attributes>\n" +
+      "+      </variable>\n" +
       "     </variables>\n" +
       "   </variables>\n" +
       "   <created valueType=\"datetime\">2013-09-17T16:09:00.773-0400</created>\n" +
-      "-  <updated valueType=\"datetime\">2013-09-19T11:48:01.742-0400</updated>\n" +
-      "+  <updated valueType=\"datetime\">2013-09-19T11:20:52.956-0400</updated>\n" +
+      "-  <updated valueType=\"datetime\">2013-09-19T11:20:52.956-0400</updated>\n" +
+      "+  <updated valueType=\"datetime\">2013-09-19T11:48:01.742-0400</updated>\n" +
       " </org.obiba.magma.views.View>\n" +
       "\\ No newline at end of file\n";
 
   private static final String DIFF_VIEW_TWO_VERSIONS_BACK = "diff --git a/TestView/View.xml b/TestView/View.xml\n" +
-      "index 9ba271d..ba4eb49 100644\n" +
+      "index ba4eb49..9ba271d 100644\n" +
       "--- a/TestView/View.xml\n" +
       "+++ b/TestView/View.xml\n" +
-      "@@ -87,13 +87,8 @@\n" +
+      "@@ -87,8 +87,13 @@\n" +
       "           <attribute name=\"script\" valueType=\"text\">$(&apos;COORDINATE&apos;)</attribute>\n" +
       "         </attributes>\n" +
       "       </variable>\n" +
-      "-      <variable name=\"TOTO_VAR\" valueType=\"integer\" entityType=\"PostalCode\" unit=\"\" mimeType=\"\">\n" +
-      "-        <attributes>\n" +
-      "-          <attribute name=\"script\" valueType=\"text\">null</attribute>\n" +
-      "-        </attributes>\n" +
-      "-      </variable>\n" +
+      "+      <variable name=\"TOTO_VAR\" valueType=\"integer\" entityType=\"PostalCode\" unit=\"\" mimeType=\"\">\n" +
+      "+        <attributes>\n" +
+      "+          <attribute name=\"script\" valueType=\"text\">null</attribute>\n" +
+      "+        </attributes>\n" +
+      "+      </variable>\n" +
       "     </variables>\n" +
       "   </variables>\n" +
       "   <created valueType=\"datetime\">2013-09-17T16:09:00.773-0400</created>\n" +
-      "-  <updated valueType=\"datetime\">2013-09-19T11:48:01.742-0400</updated>\n" +
-      "+  <updated valueType=\"datetime\">2013-09-19T11:18:57.428-0400</updated>\n" +
+      "-  <updated valueType=\"datetime\">2013-09-19T11:18:57.428-0400</updated>\n" +
+      "+  <updated valueType=\"datetime\">2013-09-19T11:48:01.742-0400</updated>\n" +
       " </org.obiba.magma.views.View>\n" +
       "\\ No newline at end of file\n";
 
