@@ -12,10 +12,12 @@ package org.obiba.opal.web.gwt.app.client.magma.view;
 import javax.inject.Inject;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableVcsCommitHistoryPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableVcsCommitHistoryUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
+import org.obiba.opal.web.gwt.datetime.client.FormatType;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
 
@@ -33,8 +35,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<VariableVcsCommitHistoryUiHandlers> implements
-    VariableVcsCommitHistoryPresenter.Display {
+public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<VariableVcsCommitHistoryUiHandlers>
+    implements VariableVcsCommitHistoryPresenter.Display {
 
   interface Binder extends UiBinder<Widget, VariableVcsCommitHistoryView> {}
 
@@ -49,7 +51,6 @@ public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<VariableVcs
 
   @UiField
   SimplePager commitInfoTablePager;
-
 
   private final ListDataProvider<VcsCommitInfoDto> commitInfoDataProvider = new ListDataProvider<VcsCommitInfoDto>();
 
@@ -69,9 +70,10 @@ public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<VariableVcs
   }
 
   private void createTableColumns() {
-    commitInfoTable.addColumn(createDateColumn(), translations.commitInfoMap().get("date"));
-    commitInfoTable.addColumn(createAuthorColumn(), translations.commitInfoMap().get("author"));
-    commitInfoTable.addColumn(createCommentColumn(), translations.commitInfoMap().get("comment"));
+    commitInfoTable.addColumn(createDateColumn(), translations.commitInfoMap().get("Date"));
+    commitInfoTable.addColumn(createAuthorColumn(), translations.commitInfoMap().get("Author"));
+    commitInfoTable.addColumn(createCommentColumn(), translations.commitInfoMap().get("Comment"));
+    commitInfoTable.addColumn(createDiffColumn(), translations.commitInfoMap().get("Diff"));
     commitInfoDataProvider.addDataDisplay(commitInfoTable);
     commitInfoTable.setEmptyTableWidget(new Label(translations.noVcsCommitHistoryAvailable()));
   }
@@ -81,7 +83,9 @@ public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<VariableVcs
 
       @Override
       public String getValue(VcsCommitInfoDto commitInfo) {
-        return Moment.create(commitInfo.getDate()).fromNow();
+        Moment m = Moment.create(commitInfo.getDate());
+        return TranslationsUtils
+            .replaceArguments(translations.momentWithAgo(), m.format(FormatType.MONTH_NAME_TIME_SHORT), m.fromNow());
       }
     };
   }
@@ -99,11 +103,24 @@ public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<VariableVcs
 
   private Column<VcsCommitInfoDto, String> createCommentColumn() {
 
-    ClickableColumn<VcsCommitInfoDto> column = new ClickableColumn<VcsCommitInfoDto>() {
+    return new TextColumn<VcsCommitInfoDto>() {
 
       @Override
       public String getValue(VcsCommitInfoDto commitInfo) {
         return commitInfo.getComment();
+      }
+    };
+  }
+
+
+
+  private Column<VcsCommitInfoDto, String> createDiffColumn() {
+
+    ClickableColumn<VcsCommitInfoDto> column = new ClickableColumn<VcsCommitInfoDto>() {
+
+      @Override
+      public String getValue(VcsCommitInfoDto commitInfo) {
+        return translations.commitInfoMap().get("ComparePrevious");
       }
     };
 
@@ -116,5 +133,4 @@ public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<VariableVcs
 
     return column;
   }
-
 }

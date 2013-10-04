@@ -1944,9 +1944,11 @@ public interface Translations extends Constants {
 
   @Description("VCS Commit Info Labels")
   @DefaultStringMapValue({ "id", "ID",//
-      "author", "Author",//
-      "date", "Date",//
-      "comment", "Comment"//
+      "Author", "Author",//
+      "Date", "Date",//
+      "Comment", "Comment",//
+      "Diff", "Differences",//
+      "ComparePrevious", "Compare with previous"//
   })
   Map<String, String> commitInfoMap();
 
@@ -2150,4 +2152,8 @@ public interface Translations extends Constants {
   @Description("Update {0} properties label")
   @DefaultStringValue("Update {0} properties")
   String updateVariableProperties();
+
+  @Description("Moment with ago label")
+  @DefaultStringValue("{0} ({1})")
+  String momentWithAgo();
 }

@@ -78,10 +78,10 @@ public class VcsCommitHistoryModalView extends ModalPopupViewWithUiHandlers<Moda
   public void setCommitInfo(VcsCommitInfoDto commitInfo) {
     commitProperties.clearProperties();
     commitProperties.addProperty(translations.commitInfoMap().get("id"), commitInfo.getCommitId());
-    commitProperties.addProperty(translations.commitInfoMap().get("author"), commitInfo.getAuthor());
-    commitProperties.addProperty(translations.commitInfoMap().get("date"),
+    commitProperties.addProperty(translations.commitInfoMap().get("Author"), commitInfo.getAuthor());
+    commitProperties.addProperty(translations.commitInfoMap().get("Date"),
         Moment.create(commitInfo.getDate()).format(FormatType.MONTH_NAME_TIME_SHORT));
-    commitProperties.addProperty(translations.commitInfoMap().get("comment"), commitInfo.getComment());
+    commitProperties.addProperty(translations.commitInfoMap().get("Comment"), commitInfo.getComment());
   }
 
   @Override

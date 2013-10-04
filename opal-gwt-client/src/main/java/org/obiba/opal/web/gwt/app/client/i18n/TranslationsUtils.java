@@ -37,7 +37,7 @@ public class TranslationsUtils {
     return replaceArguments(msg, JsArrays.toList(args));
   }
 
-  public static String replaceArguments(String msg, String arg) {
+  public static String replaceArguments(String msg, String... arg) {
     return replaceArguments(msg, Lists.newArrayList(arg));
   }
 
