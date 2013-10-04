@@ -101,7 +101,7 @@
         <ui:msg description="Save label">Save</ui:msg>
       </b:Button>
       <b:Button ui:field="closeButton">
-        <ui:msg description="Close label">Close</ui:msg>
+        <ui:msg description="Cancel label">Cancel</ui:msg>
       </b:Button>
     </b:ModalFooter>
 

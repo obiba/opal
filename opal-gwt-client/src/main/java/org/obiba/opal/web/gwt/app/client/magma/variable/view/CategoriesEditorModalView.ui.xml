@@ -13,11 +13,15 @@
       <b:Heading size="4" ui:field="variableName"/>
       <b:Form type="INLINE">
         <b:ControlGroup ui:field="nameGroup">
-          <b:ControlLabel>Name(s)</b:ControlLabel>
+          <b:ControlLabel>
+            <ui:msg description="Name label">Name</ui:msg>
+          </b:ControlLabel>
           <b:Controls>
             <b:InputAddOn>
               <b:TextBox ui:field="addCategoryName"/>
-              <b:Button icon="PLUS" type="SUCCESS" ui:field="addButton">Add</b:Button>
+              <b:Button icon="PLUS" type="SUCCESS" ui:field="addButton" addStyleNames="small-indent">
+                <ui:msg description="Add label">Add</ui:msg>
+              </b:Button>
             </b:InputAddOn>
             <b:HelpBlock>
               <ui:msg description="Add categories help block">Add categories by pressing Enter or the "Add" button.
@@ -70,7 +74,7 @@
         <ui:msg description="Save label">Save</ui:msg>
       </b:Button>
       <b:Button ui:field="closeButton">
-        <ui:msg description="Close label">Close</ui:msg>
+        <ui:msg description="Cancel label">Cancel</ui:msg>
       </b:Button>
     </b:ModalFooter>
 
