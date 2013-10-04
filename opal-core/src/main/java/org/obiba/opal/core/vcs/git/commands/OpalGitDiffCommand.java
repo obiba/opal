@@ -39,11 +39,12 @@ import com.google.common.base.Strings;
 public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
 
   private String path;
+
   private String commitId;
+
   private int nthCommit = 1;
 
-
-  private  OpalGitDiffCommand(Builder builder) {
+  private OpalGitDiffCommand(Builder builder) {
     super(builder.repository);
     commitId = builder.commitId;
     path = builder.path;
@@ -99,6 +100,7 @@ public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
   public static class Builder extends OpalGitCommand.Builder<Builder> {
 
     private final String commitId;
+
     private int nthCommit = 1;
 
     public Builder(@Nonnull Repository repository, @Nonnull String commitId) {
@@ -112,7 +114,7 @@ public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
     }
 
     public OpalGitDiffCommand build() {
-      if (Strings.isNullOrEmpty(commitId)) throw new OpalGitException("Commit id cannot be null");
+      if(Strings.isNullOrEmpty(commitId)) throw new OpalGitException("Commit id cannot be null");
       return new OpalGitDiffCommand(this);
     }
 

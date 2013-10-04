@@ -33,7 +33,6 @@ public class OpalGitCommitsLogCommand extends OpalGitCommand<List<CommitInfo>> {
 
   private String path;
 
-
   private OpalGitCommitsLogCommand(Builder builder) {
     super(builder.repository, builder.datasourceName);
     path = builder.path;

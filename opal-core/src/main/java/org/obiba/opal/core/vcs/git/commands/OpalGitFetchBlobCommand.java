@@ -33,7 +33,9 @@ import com.google.common.base.Strings;
 public class OpalGitFetchBlobCommand extends OpalGitCommand<String> {
 
   private String path;
+
   private String commitId;
+
   private String encoding;
 
   private OpalGitFetchBlobCommand(Builder builder) {
@@ -75,6 +77,7 @@ public class OpalGitFetchBlobCommand extends OpalGitCommand<String> {
   public static class Builder extends OpalGitCommand.Builder<Builder> {
 
     private final String commitId;
+
     private String encoding;
 
     public Builder(@Nonnull Repository repository, @Nonnull String path, @Nonnull String commitId) {
@@ -89,9 +92,10 @@ public class OpalGitFetchBlobCommand extends OpalGitCommand<String> {
     }
 
     public OpalGitFetchBlobCommand build() {
-      if (Strings.isNullOrEmpty(commitId)) throw new OpalGitException("Commit id cannot be empty nor null");
-      if (Strings.isNullOrEmpty(path)) throw new OpalGitException("Commit path cannot be empty nor null");
-      if (!OpalGitUtils.isFilePath(path)) throw new OpalGitException("Commit path must point to a file and not a folder");
+      if(Strings.isNullOrEmpty(commitId)) throw new OpalGitException("Commit id cannot be empty nor null");
+      if(Strings.isNullOrEmpty(path)) throw new OpalGitException("Commit path cannot be empty nor null");
+      if(!OpalGitUtils.isFilePath(path))
+        throw new OpalGitException("Commit path must point to a file and not a folder");
       return new OpalGitFetchBlobCommand(this);
     }
 

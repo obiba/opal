@@ -74,8 +74,8 @@ public class OpalGitCommitLogCommand extends OpalGitCommand<CommitInfo> {
     }
 
     public OpalGitCommitLogCommand build() {
-      if (Strings.isNullOrEmpty(path)) throw new OpalGitException("Commit path cannot empty nor null.");
-      if (Strings.isNullOrEmpty(commitId)) throw new OpalGitException("Commit id can not be empty nor null.");
+      if(Strings.isNullOrEmpty(path)) throw new OpalGitException("Commit path cannot empty nor null.");
+      if(Strings.isNullOrEmpty(commitId)) throw new OpalGitException("Commit id can not be empty nor null.");
       return new OpalGitCommitLogCommand(this);
     }
   }

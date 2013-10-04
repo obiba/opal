@@ -18,9 +18,13 @@ import java.util.TimeZone;
 
 public class CommitInfo {
   private String author;
+
   private Date date;
+
   private String comment;
+
   private String commitId;
+
   private List<String> diffEntries;
 
   public String getAuthor() {
@@ -56,14 +60,18 @@ public class CommitInfo {
 
   public static class Builder {
     private String author;
+
     private Date date;
+
     private String comment;
+
     private String commitId;
+
     private List<String> diffEntries;
 
     public static Builder createFromObject(CommitInfo commitInfo) {
-        return new Builder().setAuthor(commitInfo.author).setComment(commitInfo.comment).setCommitId(commitInfo.commitId).setDate(commitInfo.date)
-            .setDiffEntries(commitInfo.diffEntries);
+      return new Builder().setAuthor(commitInfo.author).setComment(commitInfo.comment).setCommitId(commitInfo.commitId)
+          .setDate(commitInfo.date).setDiffEntries(commitInfo.diffEntries);
     }
 
     public Builder setAuthor(String value) {

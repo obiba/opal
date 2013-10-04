@@ -29,6 +29,7 @@ import org.obiba.opal.core.vcs.OpalGitException;
 public abstract class OpalGitCommand<T> implements Command<T> {
 
   protected final Repository repository;
+
   protected final String datasourceName;
 
   protected OpalGitCommand(Repository repository) {
@@ -43,7 +44,7 @@ public abstract class OpalGitCommand<T> implements Command<T> {
   protected RevCommit getCommitById(String commitId) throws IOException {
     ObjectId id = repository.resolve(commitId);
 
-    if (id != null) {
+    if(id != null) {
       return new RevWalk(repository).parseCommit(id);
     }
 
@@ -52,27 +53,30 @@ public abstract class OpalGitCommand<T> implements Command<T> {
 
   /**
    * Base class for all command builder.
+   *
    * @param <T> subclass type
    */
   @SuppressWarnings("RawUseOfParameterizedType")
   protected static class Builder<T extends Builder> {
     protected final Repository repository;
+
     protected String path;
+
     protected String datasourceName; // used mainly for debug and meaningful error messages
 
     protected Builder(@Nonnull Repository repository) {
-      if (repository == null) throw new OpalGitException("Repository cannot be null.");
+      if(repository == null) throw new OpalGitException("Repository cannot be null.");
       this.repository = repository;
     }
 
     public T addPath(@Nonnull String value) {
       path = value;
-      return (T)this;
+      return (T) this;
     }
 
     public T addDatasourceName(@Nonnull String value) {
       datasourceName = value;
-      return (T)this;
+      return (T) this;
     }
   }
 
