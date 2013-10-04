@@ -38,9 +38,9 @@ import com.google.common.base.Strings;
  */
 public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
 
-  private String path;
+  private final String path;
 
-  private String commitId;
+  private final String commitId;
 
   private int nthCommit = 1;
 
