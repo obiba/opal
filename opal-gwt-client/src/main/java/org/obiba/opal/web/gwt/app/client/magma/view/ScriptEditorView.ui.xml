@@ -10,21 +10,66 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     xmlns:ace="urn:import:org.obiba.opal.web.gwt.ace.client"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <ace:AceEditor ui:field="scriptArea" addStyleNames="ace-editor"/>
-    <g:Label styleName="help-block inline">
-      <ui:msg description="Script Help label">
-        Edit the script and test it. Or select a portion of the script and test it.
-      </ui:msg>
-    </g:Label>
-    <b:Button ui:field="testScript" size="SMALL" type="INFO" addStyleNames="small-indent">
-      <ui:msg description="Test label">Test</ui:msg>
-    </b:Button>
+      <g:FlowPanel addStyleNames="clearfix well no-bottom-margin">
+        <g:FlowPanel addStyleNames="form-inline pull-left">
+          <o:Chooser ui:field="valueTypes">
+            <g:item value="text">
+              <ui:msg description="Text label">text</ui:msg>
+            </g:item>
+            <g:item value="decimal">
+              <ui:msg description="Decimal label">decimal</ui:msg>
+            </g:item>
+            <g:item value="integer">
+              <ui:msg description="Integer label">integer</ui:msg>
+            </g:item>
+            <g:item value="binary">
+              <ui:msg description="Binary label">binary</ui:msg>
+            </g:item>
+            <g:item value="boolean">
+              <ui:msg description="Boolean label">boolean</ui:msg>
+            </g:item>
+            <g:item value="datetime">
+              <ui:msg description="Datetime label">datetime</ui:msg>
+            </g:item>
+            <g:item value="date">
+              <ui:msg description="Date label">date</ui:msg>
+            </g:item>
+            <g:item value="point">
+              <ui:msg description="Point label">point</ui:msg>
+            </g:item>
+            <g:item value="linestring">
+              <ui:msg description="LineString label">line</ui:msg>
+            </g:item>
+            <g:item value="polygon">
+              <ui:msg description="Polygon label">polygon</ui:msg>
+            </g:item>
+            <g:item value="locale">
+              <ui:msg description="Locale label">locale</ui:msg>
+            </g:item>
+          </o:Chooser>
+          <b:CheckBox addStyleNames="small-indent bottom-margin">
+            <ui:msg description="Repeatable label">Repeatable</ui:msg>
+          </b:CheckBox>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="pull-right">
+          <g:Label styleName="help-block inline">
+            <ui:msg description="Script Help label">
+              Edit the script and test it. Or select a portion of the script and test it.
+            </ui:msg>
+          </g:Label>
+          <b:Button ui:field="testScript" size="SMALL" type="INFO" addStyleNames="small-indent">
+            <ui:msg description="Test label">Test</ui:msg>
+          </b:Button>
+        </g:FlowPanel>
+      </g:FlowPanel>
+      <ace:AceEditor ui:field="scriptArea" addStyleNames="ace-editor"/>
   </g:FlowPanel>
 
 </ui:UiBinder>

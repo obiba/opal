@@ -290,6 +290,11 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   }
 
   @Override
+  public void onSaveScript() {
+    
+  }
+
+  @Override
   public void onHistory() {
     variableVcsCommitHistoryPresenter.retrieveCommitInfos(table, variable);
   }

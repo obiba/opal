@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
 import org.obiba.opal.web.gwt.app.client.ui.NavPillsPanel;
+import org.obiba.opal.web.gwt.app.client.ui.TabDeckPanel;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -41,6 +42,7 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.DeckPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
@@ -93,7 +95,13 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   Panel historyPanel;
 
   @UiField
-  NavPillsPanel scriptNavPanel;
+  TabDeckPanel scriptNavPanel;
+
+  @UiField
+  NavLink backToScript;
+
+  @UiField
+  Panel scriptControls;
 
   @UiField
   TabPanel tabPanel;
@@ -139,6 +147,9 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   Button remove;
 
   @UiField
+  Button editScript;
+
+  @UiField
   Panel scriptEditor;
 
   @UiField
@@ -180,6 +191,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
         }
       }
     });
+    scriptNavPanel.showWidget(0);
   }
 
   @Override
@@ -204,22 +216,33 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     }
   }
 
-  @UiHandler("scriptNavPanel")
-  public void onScriptNavPanelSelected(SelectionEvent<Integer> event) {
-    updateScriptNavPanel(event.getSelectedItem());
+  @UiHandler("backToScript")
+  public void onBackToScript(ClickEvent event) {
+    scriptNavPanel.showWidget(0);
+    updateScriptNavPanel(0);
   }
 
-  private void updateScriptNavPanel(int selectedIndex) {
-    switch(ScriptNavPanels.values()[selectedIndex]) {
-      case VIEW:
-        break;
-      case EDIT:
-        getUiHandlers().onEditScript();
-        break;
-      case HISTORY:
-        getUiHandlers().onHistory();
-        break;
-    }
+  @UiHandler("editScript")
+  public void onEditScript(ClickEvent event) {
+    scriptNavPanel.showWidget(1);
+    updateScriptNavPanel(1);
+  }
+
+  @UiHandler("saveScript")
+  public void onSaveScript(ClickEvent event) {
+    getUiHandlers().onSaveScript();
+  }
+
+  @UiHandler("cancelEditScript")
+  public void onCancelEditScript(ClickEvent event) {
+    scriptNavPanel.showWidget(0);
+    updateScriptNavPanel(0);
+  }
+
+  @UiHandler("historyScript")
+  public void onHistoryScript(ClickEvent event) {
+    scriptNavPanel.showWidget(2);
+    updateScriptNavPanel(2);
   }
 
   @UiHandler("addToView")
@@ -339,7 +362,26 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     repeatable.setText(variable.getIsRepeatable() ? translations.yesLabel() : translations.noLabel());
     occurrenceGroup.setText(variable.getIsRepeatable() ? variable.getOccurrenceGroup() : "");
 
-    updateScriptNavPanel(scriptNavPanel.getSelectedIndex());
+    updateScriptNavPanel(scriptNavPanel.getVisibleWidget());
+  }
+
+  private void updateScriptNavPanel(int selectedIndex) {
+    switch(ScriptNavPanels.values()[selectedIndex]) {
+      case VIEW:
+        backToScript.setVisible(false);
+        scriptControls.setVisible(true);
+        break;
+      case EDIT:
+        backToScript.setVisible(true);
+        scriptControls.setVisible(false);
+        getUiHandlers().onEditScript();
+        break;
+      case HISTORY:
+        backToScript.setVisible(true);
+        scriptControls.setVisible(false);
+        getUiHandlers().onHistory();
+        break;
+    }
   }
 
   @Override
@@ -361,7 +403,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   @Override
   public HasAuthorization getEditAuthorizer() {
-    return new CompositeAuthorizer(new WidgetAuthorizer(remove), new TabAuthorizer(scriptNavPanel, 1));
+    return new CompositeAuthorizer(new WidgetAuthorizer(remove), new WidgetAuthorizer(editScript));
   }
 
   private void initCategoryTable() {

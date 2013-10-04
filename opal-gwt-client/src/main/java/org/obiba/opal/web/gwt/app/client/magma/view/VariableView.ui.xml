@@ -149,9 +149,25 @@
         <b2:InlineLabel ui:field="notDerived">
           <ui:msg description="Not Derived Variable label">Not a Derived Variable</ui:msg>
         </b2:InlineLabel>
-        <o:NavPillsPanel ui:field="scriptNavPanel">
-          <b:NavLink active="true">View</b:NavLink>
+        <g:FlowPanel addStyleNames="clearfix">
+          <b:NavLink icon="CHEVRON_LEFT" addStyleNames="pull-left" ui:field="backToScript">
+            <ui:msg description="Script label">Script</ui:msg>
+          </b:NavLink>
+          <g:FlowPanel ui:field="scriptControls" addStyleNames="pull-right">
+            <b:ButtonGroup>
+              <b:Button icon="EDIT" size="SMALL" ui:field="editScript">
+                <ui:msg description="Edit label">Edit</ui:msg>
+              </b:Button>
+            </b:ButtonGroup>
+            <b:ButtonGroup>
+              <b:Button icon="LIST_OL" size="SMALL" ui:field="historyScript">
+                <ui:msg description="History label">History</ui:msg>
+              </b:Button>
+            </b:ButtonGroup>
+          </g:FlowPanel>
+        </g:FlowPanel>
 
+        <o:TabDeckPanel ui:field="scriptNavPanel" animationEnabled="false" addStyleNames="top-margin">
           <g:FlowPanel>
             <g:FlowPanel>
               <b2:InlineLabel ui:field="noScript">
@@ -161,56 +177,33 @@
             </g:FlowPanel>
           </g:FlowPanel>
 
-          <b:NavLink>Edit</b:NavLink>
-
           <g:FlowPanel>
-            <g:HorizontalPanel>
-              <o:Chooser ui:field="valueTypes" addStyleNames="inline">
-                <g:item value="text">
-                  <ui:msg description="Text label">text</ui:msg>
-                </g:item>
-                <g:item value="decimal">
-                  <ui:msg description="Decimal label">decimal</ui:msg>
-                </g:item>
-                <g:item value="integer">
-                  <ui:msg description="Integer label">integer</ui:msg>
-                </g:item>
-                <g:item value="binary">
-                  <ui:msg description="Binary label">binary</ui:msg>
-                </g:item>
-                <g:item value="boolean">
-                  <ui:msg description="Boolean label">boolean</ui:msg>
-                </g:item>
-                <g:item value="datetime">
-                  <ui:msg description="Datetime label">datetime</ui:msg>
-                </g:item>
-                <g:item value="date">
-                  <ui:msg description="Date label">date</ui:msg>
-                </g:item>
-                <g:item value="point">
-                  <ui:msg description="Point label">point</ui:msg>
-                </g:item>
-                <g:item value="linestring">
-                  <ui:msg description="LineString label">line</ui:msg>
-                </g:item>
-                <g:item value="polygon">
-                  <ui:msg description="Polygon label">polygon</ui:msg>
-                </g:item>
-                <g:item value="locale">
-                  <ui:msg description="Locale label">locale</ui:msg>
-                </g:item>
-              </o:Chooser>
-              <b:CheckBox addStyleNames="small-indent">
-                <ui:msg description="Repeatable label">Repeatable</ui:msg>
-              </b:CheckBox>
-            </g:HorizontalPanel>
+            <g:FlowPanel addStyleNames="clearfix">
+              <b:Heading size="4" addStyleNames="pull-left">
+                <ui:msg description="Script Edition label">Script Edition</ui:msg>
+              </b:Heading>
+              <g:FlowPanel addStyleNames="pull-right form-inline">
+                <b:TextBox placeholder="Update…" addStyleNames="span3"/>
+                <b:Button type="PRIMARY" addStyleNames="small-dual-indent" ui:field="saveScript">
+                  <ui:msg description="Save label">Save</ui:msg>
+                </b:Button>
+                <b:Button ui:field="cancelEditScript">
+                  <ui:msg description="Cancel label">Cancel</ui:msg>
+                </b:Button>
+              </g:FlowPanel>
+            </g:FlowPanel>
             <g:SimplePanel ui:field="scriptEditor"/>
           </g:FlowPanel>
 
-          <b:NavLink>History</b:NavLink>
-          <g:FlowPanel ui:field="historyPanel">
+          <g:FlowPanel>
+            <b:Heading size="4">
+              <ui:msg description="History of Changes label">History of Changes</ui:msg>
+            </b:Heading>
+            <g:FlowPanel ui:field="historyPanel">
+            </g:FlowPanel>
           </g:FlowPanel>
-        </o:NavPillsPanel>
+
+        </o:TabDeckPanel>
 
       </b:Tab>
 

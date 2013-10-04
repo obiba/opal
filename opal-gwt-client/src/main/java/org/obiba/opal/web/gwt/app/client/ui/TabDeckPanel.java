@@ -34,7 +34,7 @@ import com.google.gwt.user.client.ui.Widget;
  * the widget is removed from the DeckPanel, it will be visible, and its width and height attributes will be cleared.
  * </p>
  */
-class TabDeckPanel extends ComplexPanel implements HasAnimation, InsertPanel.ForIsWidget {
+public class TabDeckPanel extends ComplexPanel implements HasAnimation, InsertPanel.ForIsWidget {
   /**
    * An {@link Animation} used to slide in the new content.
    */

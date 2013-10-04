@@ -41,6 +41,8 @@ public class VariableVcsCommitHistoryPresenter extends PresenterWidget<VariableV
 
   private VariableDto variable;
 
+  private VcsCommitHistoryModalPresenter vcsHistoryModalPresenter;
+
   /**
    * @param display
    * @param eventBus
@@ -63,8 +65,11 @@ public class VariableVcsCommitHistoryPresenter extends PresenterWidget<VariableV
         .forResource(requestUri).withCallback(new ResourceCallback<VcsCommitInfoDto>() {
       @Override
       public void onResource(Response response, VcsCommitInfoDto resource) {
-        VcsCommitHistoryModalPresenter vcsHistoryModalPresenter = vcsHistoryModalProvider.show();
+        if (vcsHistoryModalPresenter == null) {
+          vcsHistoryModalPresenter = vcsHistoryModalProvider.create();
+        }
         vcsHistoryModalPresenter.setCommitInfo(resource);
+        vcsHistoryModalProvider.show();
       }
     }).get().send();
   }
