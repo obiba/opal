@@ -22,17 +22,14 @@ import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.EntryDto;
 import org.obiba.opal.web.model.client.opal.r.RPackageDto;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
@@ -48,14 +45,9 @@ public class DataShieldPackageAdministrationView extends ViewImpl
 
   private static final int PAGE_SIZE = 10;
 
-  @UiTemplate("DataShieldPackageAdministrationView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, DataShieldPackageAdministrationView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  interface Binder extends UiBinder<Widget, DataShieldPackageAdministrationView> {}
 
   private final Translations translations;
-
-  private final Widget widget;
 
   private PackageClickableColumn packageNameColumn;
 
@@ -68,23 +60,15 @@ public class DataShieldPackageAdministrationView extends ViewImpl
   @UiField
   CellTable<RPackageDto> packagesTable;
 
-  @UiField
-  SimplePager packagesTablePager;
-
   private final JsArrayDataProvider<RPackageDto> packagesDataProvider = new JsArrayDataProvider<RPackageDto>();
 
   private ActionsPackageRColumn<RPackageDto> actionsColumn;
 
   @Inject
-  public DataShieldPackageAdministrationView(Translations translations) {
+  public DataShieldPackageAdministrationView(Binder uiBinder, Translations translations) {
     this.translations = translations;
-    widget = uiBinder.createAndBindUi(this);
+    initWidget(uiBinder.createAndBindUi(this));
     initPackagesTable();
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
   }
 
   @Override
@@ -95,10 +79,6 @@ public class DataShieldPackageAdministrationView extends ViewImpl
   @Override
   public void renderDataShieldPackagesRows(JsArray<RPackageDto> rows) {
     packagesDataProvider.setArray(rows);
-
-    int size = packagesDataProvider.getList().size();
-    packagesTablePager.firstPage();
-    packagesTablePager.setVisible(size > 0);
     packagesTable.setVisible(true);
     packagesDataProvider.refresh();
   }
@@ -112,7 +92,6 @@ public class DataShieldPackageAdministrationView extends ViewImpl
     addPackageTableColumns();
 
     packagesTable.setPageSize(PAGE_SIZE);
-    packagesTablePager.setDisplay(packagesTable);
     packagesDataProvider.addDataDisplay(packagesTable);
   }
 

@@ -21,16 +21,18 @@ import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
 import org.obiba.opal.web.model.client.datashield.RScriptDataShieldMethodDto;
 
-import com.google.gwt.core.client.GWT;
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.SimplePager;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
@@ -48,14 +50,9 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
 
   private static final int PAGE_SIZE = 50;
 
-  @UiTemplate("DataShieldAdministrationView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, DataShieldAdministrationView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  interface Binder extends UiBinder<Widget, DataShieldAdministrationView> {}
 
   private final Translations translations;
-
-  private final Widget widget;
 
   @UiField
   Panel methodsPanel;
@@ -81,15 +78,10 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
   private ActionsColumn<DataShieldMethodDto> actionsColumn;
 
   @Inject
-  public DataShieldAdministrationView(Translations translations) {
+  public DataShieldAdministrationView(Binder uiBinder, Translations translations) {
     this.translations = translations;
-    widget = uiBinder.createAndBindUi(this);
+    initWidget(uiBinder.createAndBindUi(this));
     initMethodsTable();
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
   }
 
   @Override

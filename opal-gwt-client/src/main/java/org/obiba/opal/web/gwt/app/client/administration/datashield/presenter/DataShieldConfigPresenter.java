@@ -48,8 +48,6 @@ public class DataShieldConfigPresenter
 
   public interface Display extends View, HasBreadcrumbs {
 
-    HasValue<DataShieldConfigDto.Level> levelSelector();
-
     HasAuthorization getPermissionsAuthorizer();
 
   }
@@ -104,14 +102,6 @@ public class DataShieldConfigPresenter
   protected void onReveal() {
     super.onReveal();
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
-    ResourceRequestBuilderFactory.<DataShieldConfigDto>newBuilder().forResource("/datashield/cfg")
-        .withCallback(new ResourceCallback<DataShieldConfigDto>() {
-
-          @Override
-          public void onResource(Response response, DataShieldConfigDto resource) {
-            getView().levelSelector().setValue(resource.getLevel(), true);
-          }
-        }).get().send();
 
     // set permissions
     AclRequest.newResourceAuthorizationRequestBuilder()
@@ -140,19 +130,6 @@ public class DataShieldConfigPresenter
     addToSlot(PackageSlot, packagePresenter);
     addToSlot(AggregateEnvironmentSlot, aggregatePresenter);
     addToSlot(AssignEnvironmentSlot, assignPresenter);
-
-    getView().levelSelector().addValueChangeHandler(new ValueChangeHandler<DataShieldConfigDto.Level>() {
-      @Override
-      public void onValueChange(ValueChangeEvent<Level> event) {
-        DataShieldConfigDto dto = DataShieldConfigDto.create();
-        dto.setLevel(event.getValue());
-        ResourceRequestBuilderFactory.<DataShieldConfigDto>newBuilder().forResource("/datashield/cfg")
-            .withResourceBody(DataShieldConfigDto.stringify(dto))
-            .withCallback(ResourceCallbacks.<DataShieldConfigDto>noOp()).put().send();
-      }
-    });
-
-    getView().levelSelector().setValue(DataShieldConfigDto.Level.RESTRICTED, false);
   }
 
   private final class PermissionsUpdate implements HasAuthorization {

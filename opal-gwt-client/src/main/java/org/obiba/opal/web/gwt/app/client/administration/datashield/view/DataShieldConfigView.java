@@ -13,49 +13,38 @@ import java.util.Comparator;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.ui.RadioGroup;
 import org.obiba.opal.web.gwt.app.client.ui.NavTabsPanel;
+import org.obiba.opal.web.gwt.app.client.ui.RadioGroup;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.datashield.DataShieldConfigDto;
 import org.obiba.opal.web.model.client.datashield.DataShieldConfigDto.Level;
 
+import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public class DataShieldConfigView extends ViewImpl implements DataShieldConfigPresenter.Display {
 
-  @UiTemplate("DataShieldConfigView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, DataShieldConfigView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  interface Binder extends UiBinder<Widget, DataShieldConfigView> {}
 
   private static final Translations translations = GWT.create(Translations.class);
-
-  private final Widget uiWidget;
 
   @UiField
   Panel packagesPanel;
 
   @UiField
   Panel packages;
-
-  @UiField
-  RadioButton restricted;
-
-  @UiField
-  RadioButton unrestricted;
 
   @UiField
   NavTabsPanel environments;
@@ -69,36 +58,9 @@ public class DataShieldConfigView extends ViewImpl implements DataShieldConfigPr
   @UiField
   Panel breadcrumbs;
 
-  RadioGroup<DataShieldConfigDto.Level> radioGroup;
-
-  public DataShieldConfigView() {
-    uiWidget = uiBinder.createAndBindUi(this);
-    radioGroup = new RadioGroup<DataShieldConfigDto.Level>(new Comparator<Level>() {
-
-      @Override
-      public int compare(Level o1, Level o2) {
-        return o1.getName().compareTo(o2.getName());
-      }
-
-    });
-
-    // TODO: determine if we're leaking handlers here.
-    radioGroup.addButton(restricted, DataShieldConfigDto.Level.RESTRICTED);
-    radioGroup.addButton(unrestricted, DataShieldConfigDto.Level.UNRESTRICTED);
-    radioGroup.addValueChangeHandler(new ValueChangeHandler<DataShieldConfigDto.Level>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<Level> event) {
-        boolean isRestricted = event.getValue() == DataShieldConfigDto.Level.RESTRICTED;
-        environments.setVisible(isRestricted);
-
-      }
-    });
-  }
-
-  @Override
-  public Widget asWidget() {
-    return uiWidget;
+  @Inject
+  public DataShieldConfigView(Binder uiBinder) {
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
   @Override
@@ -121,11 +83,6 @@ public class DataShieldConfigView extends ViewImpl implements DataShieldConfigPr
       permissions.clear();
       permissions.add(content);
     }
-  }
-
-  @Override
-  public HasValue<Level> levelSelector() {
-    return radioGroup;
   }
 
   @Override
