@@ -26,12 +26,12 @@
       </b:Column>
       <b:Column size="3">
         <b:ButtonGroup addStyleNames="pull-right">
-          <b:Button type="INFO" icon="PLUS" size="SMALL" ui:field="add">
+          <b:Button type="INFO" icon="PLUS" ui:field="add">
             <ui:msg description="Add Project label">Add Project</ui:msg>
           </b:Button>
         </b:ButtonGroup>
         <b:ButtonGroup addStyleNames="pull-right">
-          <b:DropdownButton text="Sort by" size="SMALL">
+          <b:DropdownButton text="Sort by">
             <b:NavLink ui:field="lastUpdateNav" icon="OK">
               <ui:msg description="Last Update label">Last Update</ui:msg>
             </b:NavLink>

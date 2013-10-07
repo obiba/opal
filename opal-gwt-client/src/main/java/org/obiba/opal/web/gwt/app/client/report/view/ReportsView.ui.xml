@@ -9,26 +9,26 @@
   <g:FlowPanel>
     <g:FlowPanel>
       <b:ButtonGroup>
-        <b:Button icon="PLUS_SIGN_ALT" size="SMALL" ui:field="add">
+        <b:Button icon="PLUS_SIGN_ALT" ui:field="add">
           <ui:msg description="Add Report Template label">Add report template</ui:msg>
         </b:Button>
       </b:ButtonGroup>
       <b:ButtonGroup>
-        <b:Button icon="DOWNLOAD" size="SMALL" ui:field="download">
+        <b:Button icon="DOWNLOAD" ui:field="download">
           <ui:msg description="Download report design label">Download report design</ui:msg>
         </b:Button>
       </b:ButtonGroup>
       <b:ButtonGroup>
-        <b:Button icon="COG" size="SMALL" ui:field="execute">
+        <b:Button icon="COG" ui:field="execute">
           <ui:msg description="Execute label">Execute</ui:msg>
         </b:Button>
       </b:ButtonGroup>
       <b:ButtonGroup>
-        <b:Button icon="EDIT" size="SMALL" ui:field="edit">
+        <b:Button icon="EDIT" ui:field="edit">
         </b:Button>
       </b:ButtonGroup>
       <b:ButtonGroup>
-        <b:Button icon="TRASH" size="SMALL" ui:field="remove">
+        <b:Button icon="TRASH" ui:field="remove">
         </b:Button>
       </b:ButtonGroup>
     </g:FlowPanel>

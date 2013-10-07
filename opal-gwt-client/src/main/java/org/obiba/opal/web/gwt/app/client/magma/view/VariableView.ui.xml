@@ -21,16 +21,16 @@
 
     <g:FlowPanel>
       <b:ButtonGroup addStyleNames="pull-right">
-        <b:Button icon="CHEVRON_UP" size="SMALL" ui:field="previous">
+        <b:Button icon="CHEVRON_UP" ui:field="previous">
         </b:Button>
-        <b:Button icon="CHEVRON_DOWN" size="SMALL" ui:field="next">
+        <b:Button icon="CHEVRON_DOWN" ui:field="next">
         </b:Button>
       </b:ButtonGroup>
       <b:ButtonGroup addStyleNames="pull-right">
-        <b:Button icon="TRASH" size="SMALL" ui:field="remove">
+        <b:Button icon="TRASH" ui:field="remove">
         </b:Button>
       </b:ButtonGroup>
-      <b:DropdownButton text="Derive" size="SMALL" icon="COG" ui:field="deriveBtn" addStyleNames="pull-right">
+      <b:DropdownButton text="Derive" icon="COG" ui:field="deriveBtn" addStyleNames="pull-right">
         <b:NavLink icon="PLUS" ui:field="addToView">
           <ui:msg description="Add variable to view label">Add variable to view...</ui:msg>
         </b:NavLink>
@@ -155,12 +155,12 @@
           </b:NavLink>
           <g:FlowPanel ui:field="scriptControls" addStyleNames="pull-right">
             <b:ButtonGroup>
-              <b:Button icon="EDIT" size="SMALL" ui:field="editScript">
+              <b:Button icon="EDIT" ui:field="editScript">
                 <ui:msg description="Edit label">Edit</ui:msg>
               </b:Button>
             </b:ButtonGroup>
             <b:ButtonGroup>
-              <b:Button icon="LIST_OL" size="SMALL" ui:field="historyScript">
+              <b:Button icon="LIST_OL" ui:field="historyScript">
                 <ui:msg description="History label">History</ui:msg>
               </b:Button>
             </b:ButtonGroup>

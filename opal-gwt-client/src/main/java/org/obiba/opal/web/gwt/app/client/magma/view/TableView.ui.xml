@@ -21,10 +21,10 @@
 
     <g:FlowPanel>
       <b:ButtonGroup addStyleNames="pull-right">
-        <b:Button icon="TRASH" size="SMALL" ui:field="remove">
+        <b:Button icon="TRASH" ui:field="remove">
         </b:Button>
       </b:ButtonGroup>
-      <b:DropdownButton text="Tasks" size="SMALL" icon="TASKS" ui:field="tasksBtn" addStyleNames="pull-right">
+      <b:DropdownButton text="Tasks" icon="TASKS" ui:field="tasksBtn" addStyleNames="pull-right">
         <b:NavLink icon="SIGNOUT" ui:field="exportData">
           <ui:msg description="Export data label">Export data...</ui:msg>
         </b:NavLink>
@@ -32,7 +32,7 @@
           <ui:msg description="Copy data label">Copy data...</ui:msg>
         </b:NavLink>
       </b:DropdownButton>
-      <b:DropdownButton text="Download" size="SMALL" icon="DOWNLOAD" ui:field="downloadBtn" addStyleNames="pull-right">
+      <b:DropdownButton text="Download" icon="DOWNLOAD" ui:field="downloadBtn" addStyleNames="pull-right">
         <b:NavLink ui:field="downloadDictionary">
           <ui:msg description="Download dictionary label">Download dictionary</ui:msg>
         </b:NavLink>
