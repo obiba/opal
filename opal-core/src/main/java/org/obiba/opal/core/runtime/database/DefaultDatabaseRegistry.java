@@ -227,7 +227,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
     if(database instanceof SqlDatabase) {
       SqlDatabase sqlDatabase = (SqlDatabase) database;
-      if(sqlDatabase.isHibernateDatasourceType()) {
+      if(sqlDatabase.getSqlSchema() == SqlDatabase.SqlSchema.HIBERNATE) {
         return new HibernateDatasource(datasourceName, getSessionFactory(database.getName(), datasourceName));
       }
     }

@@ -14,11 +14,9 @@ import com.google.common.base.Strings;
 @SuppressWarnings("ParameterHidesMemberVariable")
 public class SqlDatabase extends Database {
 
-  public static final String MAGMA_HIBERNATE_DATASOURCE = "hibernate";
-
-  public static final String MAGMA_JDBC_DATASOURCE = "jdbc";
-
-  public static final String MAGMA_LIMESURVEY_DATASOURCE = "limesurvey";
+  public enum SqlSchema {
+    HIBERNATE, JDBC, LIMESURVEY
+  }
 
   /**
    * jdbc:{mysql|mariadb|postgresql}://{hostname}:{port}/{databaseName}
@@ -43,8 +41,7 @@ public class SqlDatabase extends Database {
    * datasource name that can be built on this database: hibernate, jdbc or limesurvey
    */
   @Nonnull
-  @NotBlank
-  private String magmaDatasourceType;
+  private SqlSchema sqlSchema;
 
   @Nonnull
   public String getDriverClass() {
@@ -102,31 +99,19 @@ public class SqlDatabase extends Database {
   }
 
   @Nonnull
-  public String getMagmaDatasourceType() {
-    return magmaDatasourceType;
+  public SqlSchema getSqlSchema() {
+    return sqlSchema;
   }
 
-  public void setMagmaDatasourceType(@Nonnull String magmaDatasourceType) {
-    this.magmaDatasourceType = magmaDatasourceType;
-  }
-
-  public boolean isHibernateDatasourceType() {
-    return MAGMA_HIBERNATE_DATASOURCE.equals(magmaDatasourceType);
-  }
-
-  public boolean isJdbcDatasourceType() {
-    return MAGMA_JDBC_DATASOURCE.equals(magmaDatasourceType);
-  }
-
-  public boolean isLimesurveyDatasourceType() {
-    return MAGMA_LIMESURVEY_DATASOURCE.equals(magmaDatasourceType);
+  public void setSqlSchema(@Nonnull SqlSchema sqlSchema) {
+    this.sqlSchema = sqlSchema;
   }
 
   @Override
   public String toString() {
     return Objects.toStringHelper(this).omitNullValues().add("driverClass", driverClass).add("url", url)
         .add("username", username).add("password", password).add("properties", properties)
-        .add("magmaDatasourceType", magmaDatasourceType).toString();
+        .add("magmaDatasourceType", sqlSchema).toString();
   }
 
   public static class Builder extends Database.Builder<SqlDatabase, Builder> {
@@ -166,8 +151,8 @@ public class SqlDatabase extends Database {
       return this;
     }
 
-    public Builder magmaDatasourceType(String magmaDatasourceType) {
-      database.magmaDatasourceType = magmaDatasourceType;
+    public Builder sqlSchema(SqlSchema sqlSchema) {
+      database.sqlSchema = sqlSchema;
       return this;
     }
 

@@ -54,8 +54,9 @@ public abstract class AbstractFieldValidator implements FieldValidator {
     return args;
   }
 
-  public AbstractFieldValidator setId(String value) {
-    id = value;
+  @SuppressWarnings("ParameterHidesMemberVariable")
+  public AbstractFieldValidator setId(String id) {
+    this.id = id;
     return this;
   }
 

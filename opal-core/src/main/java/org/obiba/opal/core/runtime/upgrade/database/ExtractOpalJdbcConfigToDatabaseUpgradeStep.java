@@ -97,7 +97,7 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
           .password(prop.getProperty(OPAL_PASSWORD)) //
           .editable(false) //
           .usage(Database.Usage.STORAGE) //
-          .magmaDatasourceType(SqlDatabase.MAGMA_HIBERNATE_DATASOURCE) //
+          .sqlSchema(SqlDatabase.SqlSchema.HIBERNATE) //
           .build();
       log.debug("Import opalData: {}", opalData);
       databaseRegistry.addOrReplaceDatabase(opalData);
@@ -111,7 +111,7 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
           .editable(false) //
           .usedForIdentifiers(true) //
           .usage(Database.Usage.STORAGE) //
-          .magmaDatasourceType(SqlDatabase.MAGMA_HIBERNATE_DATASOURCE) //
+          .sqlSchema(SqlDatabase.SqlSchema.HIBERNATE) //
           .build();
       log.debug("Import opalKey: {}", opalKey);
 
@@ -169,7 +169,7 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
             .properties(dataSource.properties) //
             .editable(dataSource.editable) //
             .usage(Database.Usage.STORAGE) //
-            .magmaDatasourceType(SqlDatabase.MAGMA_HIBERNATE_DATASOURCE) //
+            .sqlSchema(SqlDatabase.SqlSchema.HIBERNATE) //
             .build();
         log.debug("Import sqlDatabase: {}", sqlDatabase);
         databaseRegistry.addOrReplaceDatabase(sqlDatabase);

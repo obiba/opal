@@ -39,6 +39,9 @@ import org.obiba.opal.web.model.client.ws.ConstraintViolationErrorDto;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.HasChangeHandlers;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -52,6 +55,46 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
 
   public enum Mode {
     CREATE, UPDATE
+  }
+
+  public enum Usage {
+    IMPORT(translations.importLabel(), SqlSchema.values()),
+    STORAGE(translations.storageLabel(), SqlSchema.HIBERNATE),
+    EXPORT(translations.exportLabel(), SqlSchema.HIBERNATE, SqlSchema.JDBC);
+
+    private final String label;
+
+    private final SqlSchema[] supportedSqlSchemas;
+
+    Usage(String label, SqlSchema... supportedSqlSchemas) {
+      this.label = label;
+      this.supportedSqlSchemas = supportedSqlSchemas;
+    }
+
+    public String getLabel() {
+      return label;
+    }
+
+    public SqlSchema[] getSupportedSqlSchemas() {
+      return supportedSqlSchemas;
+    }
+  }
+
+  public enum SqlSchema {
+    HIBERNATE(translations.hibernateDatasourceLabel()), //
+    JDBC(translations.jdbcDatasourceLabel()), //
+    LIMESURVEY("Limesurvey");
+
+    private final String label;
+
+    SqlSchema(String label) {
+      this.label = label;
+    }
+
+    public String getLabel() {
+      return label;
+    }
+
   }
 
   private static final Translations translations = GWT.create(Translations.class);
@@ -89,7 +132,8 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
   protected void onBind() {
     setDialogMode(Mode.CREATE);
 
-    ResourceRequestBuilderFactory.<JsArray<JdbcDriverDto>>newBuilder().forResource(DatabaseResources.drivers())
+    ResourceRequestBuilderFactory.<JsArray<JdbcDriverDto>>newBuilder() //
+        .forResource(DatabaseResources.drivers()) //
         .withCallback(new ResourceCallback<JsArray<JdbcDriverDto>>() {
 
           @Override
@@ -99,6 +143,15 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
         }).get().send();
 
     methodValidationHandler = new MethodValidationHandler();
+
+    getView().getUsageChangeHandlers().addChangeHandler(new ChangeHandler() {
+      @Override
+      public void onChange(ChangeEvent event) {
+        Usage usage = Usage.valueOf(getView().getUsageText().getText());
+        getView().toggleDefaultStorage(usage == Usage.STORAGE);
+        getView().setAvailableSqlSchemas(usage.getSupportedSqlSchemas());
+      }
+    });
   }
 
   private void setDialogMode(Mode dialogMode) {
@@ -125,15 +178,18 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
 
   private void displayDatabase(DatabaseDto dto) {
     SqlDatabaseDto sqlDatabaseDto = (SqlDatabaseDto) dto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings);
+    GWT.log("DatabaseDto: " + dto);
+    GWT.log("SqlDatabaseDto: " + sqlDatabaseDto);
     getView().getName().setText(dto.getName());
-    getView().getUsage().setText(dto.getUsage());
+    getView().getUsageText().setText(dto.getUsage() == null ? null : dto.getUsage().getName());
     getView().getDriver().setText(sqlDatabaseDto.getDriverClass());
     getView().getDefaultStorage().setValue(dto.getDefaultStorage());
     getView().getUrl().setText(sqlDatabaseDto.getUrl());
     getView().getUsername().setText(sqlDatabaseDto.getUsername());
     getView().getPassword().setText(sqlDatabaseDto.getPassword());
     getView().getProperties().setText(sqlDatabaseDto.getProperties());
-    getView().getSQLSchema().setText(sqlDatabaseDto.getMagmaDatasourceType());
+    getView().getSqlSchema()
+        .setText(sqlDatabaseDto.getSqlSchema() == null ? null : sqlDatabaseDto.getSqlSchema().getName());
   }
 
   private DatabaseDto getDto() {
@@ -141,7 +197,7 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
     SqlDatabaseDto sqlDto = SqlDatabaseDto.create();
 
     dto.setName(getView().getName().getText());
-    dto.setUsage(getView().getUsage().getText());
+    dto.setUsage(parseUsage(getView().getUsageText().getText()));
     dto.setDefaultStorage(getView().getDefaultStorage().getValue());
 
     sqlDto.setUrl(getView().getUrl().getText());
@@ -149,17 +205,44 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
     sqlDto.setUsername(getView().getUsername().getText());
     sqlDto.setPassword(getView().getPassword().getText());
     sqlDto.setProperties(getView().getProperties().getText());
-    sqlDto.setMagmaDatasourceType(getView().getSQLSchema().getText());
+    sqlDto.setSqlSchema(parseSqlSchema(getView().getSqlSchema().getText()));
 
     dto.setExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings, sqlDto);
     return dto;
+  }
+
+  private DatabaseDto.Usage parseUsage(String usageTxt) {
+    if(DatabaseDto.Usage.EXPORT.getName().equals(usageTxt)) {
+      return DatabaseDto.Usage.EXPORT;
+    }
+    if(DatabaseDto.Usage.IMPORT.getName().equals(usageTxt)) {
+      return DatabaseDto.Usage.IMPORT;
+    }
+    if(DatabaseDto.Usage.STORAGE.getName().equals(usageTxt)) {
+      return DatabaseDto.Usage.STORAGE;
+    }
+    throw new IllegalArgumentException("Unknown database usage: " + usageTxt);
+  }
+
+  private SqlDatabaseDto.SqlSchema parseSqlSchema(String sqlSchemaTxt) {
+    if(SqlDatabaseDto.SqlSchema.HIBERNATE.getName().equals(sqlSchemaTxt)) {
+      return SqlDatabaseDto.SqlSchema.HIBERNATE;
+    }
+    if(SqlDatabaseDto.SqlSchema.JDBC.getName().equals(sqlSchemaTxt)) {
+      return SqlDatabaseDto.SqlSchema.JDBC;
+    }
+    if(SqlDatabaseDto.SqlSchema.LIMESURVEY.getName().equals(sqlSchemaTxt)) {
+      return SqlDatabaseDto.SqlSchema.LIMESURVEY;
+    }
+    throw new IllegalArgumentException("Unknown Sql Schema: " + sqlSchemaTxt);
   }
 
   private void updateDatabase() {
     if(methodValidationHandler.validate()) {
       DatabaseDto dto = getDto();
       ResponseCodeCallback callbackHandler = new CreateOrUpdateCallBack(dto);
-      ResourceRequestBuilderFactory.newBuilder().forResource(DatabaseResources.database(dto.getName())) //
+      ResourceRequestBuilderFactory.newBuilder() //
+          .forResource(DatabaseResources.database(dto.getName())) //
           .put() //
           .withResourceBody(DatabaseDto.stringify(dto)) //
           .withCallback(Response.SC_OK, callbackHandler) //
@@ -172,7 +255,8 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
     if(methodValidationHandler.validate()) {
       DatabaseDto dto = getDto();
       ResponseCodeCallback callbackHandler = new CreateOrUpdateCallBack(dto);
-      ResourceRequestBuilderFactory.newBuilder().forResource(DatabaseResources.databases()) //
+      ResourceRequestBuilderFactory.newBuilder() //
+          .forResource(DatabaseResources.databases()) //
           .post() //
           .withResourceBody(DatabaseDto.stringify(dto)) //
           .withCallback(Response.SC_OK, callbackHandler) //
@@ -189,14 +273,20 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
     protected Set<FieldValidator> getValidators() {
       if(validators == null) {
         validators = new LinkedHashSet<FieldValidator>();
-        validators
-            .add(new RequiredTextValidator(getView().getName(), "NameIsRequired").setId(Display.FormField.NAME.name()));
-        validators
-            .add(new RequiredTextValidator(getView().getUrl(), "UrlIsRequired").setId(Display.FormField.URL.name()));
-        validators.add(new RequiredTextValidator(getView().getUsername(), "UsernameIsRequired")
+        validators.add(new RequiredTextValidator(getView().getName(), "NameIsRequired") //
+            .setId(Display.FormField.NAME.name()));
+        validators.add(new RequiredTextValidator(getView().getUrl(), "UrlIsRequired") //
+            .setId(Display.FormField.URL.name()));
+        validators.add(new RequiredTextValidator(getView().getUsername(), "UsernameIsRequired") //
             .setId(Display.FormField.USERNAME.name()));
-        validators.add(new RequiredTextValidator(getView().getPassword(), "PasswordIsRequired")
+        validators.add(new RequiredTextValidator(getView().getPassword(), "PasswordIsRequired") //
             .setId(Display.FormField.PASSWORD.name()));
+        validators.add(new RequiredTextValidator(getView().getUsageText(), "UsageIsRequired") //
+            .setId(Display.FormField.USAGE.name()));
+        validators.add(new RequiredTextValidator(getView().getSqlSchema(), "SqlSchemaIsRequired") //
+            .setId(Display.FormField.SQL_SCHEMA.name()));
+        validators.add(new RequiredTextValidator(getView().getDriver(), "DriverIsRequired") //
+            .setId(Display.FormField.DRIVER.name()));
       }
       return validators;
     }
@@ -231,7 +321,7 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
           Collection<ConstraintViolationErrorDto> violationDtos = ConstraintViolationUtils.parseErrors(error);
           if(violationDtos.isEmpty()) {
             String errorMessage = translations.userMessageMap().get(error.getStatus());
-            getView().showError(null, errorMessage == null
+            getView().showError(errorMessage == null
                 ? translationMessages
                 .unknownResponse(error.getStatus(), String.valueOf(JsArrays.toList(error.getArgumentsArray())))
                 : errorMessage);
@@ -246,24 +336,31 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
 
     enum FormField {
       NAME,
+      DRIVER,
       URL,
       USERNAME,
-      PASSWORD
+      PASSWORD,
+      USAGE,
+      SQL_SCHEMA
     }
 
     void hideDialog();
 
     void setAvailableDrivers(JsArray<JdbcDriverDto> resource);
 
+    void setAvailableSqlSchemas(SqlSchema... sqlSchemas);
+
     void setDialogMode(Mode dialogMode);
+
+    void showError(String message);
 
     void showError(@Nullable FormField formField, String message);
 
     HasText getName();
 
-    HasText getUsage();
+    HasText getUsageText();
 
-    HasText getSQLSchema();
+    HasText getSqlSchema();
 
     HasText getUrl();
 
@@ -276,6 +373,10 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
     HasText getProperties();
 
     HasValue<Boolean> getDefaultStorage();
+
+    HasChangeHandlers getUsageChangeHandlers();
+
+    void toggleDefaultStorage(boolean show);
 
   }
 

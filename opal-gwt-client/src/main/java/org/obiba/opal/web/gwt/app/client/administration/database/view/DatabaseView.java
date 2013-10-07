@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.administration.database.view;
 
 import javax.annotation.Nullable;
 
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabasePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabasePresenter.Display;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabasePresenter.Mode;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseUiHandlers;
@@ -33,6 +34,7 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.HasChangeHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -72,6 +74,15 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   ControlGroup passwordGroup;
 
   @UiField
+  ControlGroup usageGroup;
+
+  @UiField
+  ControlGroup sqlSchemaGroup;
+
+  @UiField
+  ControlGroup driverGroup;
+
+  @UiField
   TextBox name;
 
   @UiField
@@ -84,7 +95,7 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   ListBox usage;
 
   @UiField
-  ListBox magmaDatasourceType;
+  ListBox sqlSchema;
 
   @UiField
   TextBox username;
@@ -115,19 +126,24 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
 
       @Override
       public void onChange(ChangeEvent event) {
-        int index = driver.getSelectedIndex();
-        JdbcDriverDto jdbcDriver = getDriver(driver.getValue(index));
+        JdbcDriverDto jdbcDriver = getDriver(getDriver().getText());
         if(jdbcDriver != null) {
           url.setText(jdbcDriver.getJdbcUrlTemplate());
         }
       }
     });
 
+    setAvailableUsages();
+
+    // used to support ConstraintViolation exceptions
     ConstrainedModal constrainedModal = new ConstrainedModal(modal);
     constrainedModal.registerWidget("name", translations.nameLabel(), nameGroup);
     constrainedModal.registerWidget("url", translations.urlLabel(), urlGroup);
+    constrainedModal.registerWidget("driver", translations.driverLabel(), driverGroup);
     constrainedModal.registerWidget("username", translations.usernameLabel(), usernameGroup);
     constrainedModal.registerWidget("password", translations.passwordLabel(), passwordGroup);
+    constrainedModal.registerWidget("usage", translations.usageLabel(), usageGroup);
+    constrainedModal.registerWidget("sqlSchema", translations.sqlSchemaLabel(), sqlSchemaGroup);
   }
 
   @Override
@@ -153,6 +169,12 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   }
 
   @Override
+  public void showError(String message) {
+    showError(null, message);
+  }
+
+  @Override
+  @SuppressWarnings("OverlyLongMethod")
   public void showError(@Nullable FormField formField, String message) {
     ControlGroup group = null;
     if(formField != null) {
@@ -163,11 +185,20 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
         case URL:
           group = urlGroup;
           break;
+        case DRIVER:
+          group = driverGroup;
+          break;
         case USERNAME:
           group = usernameGroup;
           break;
         case PASSWORD:
           group = passwordGroup;
+          break;
+        case USAGE:
+          group = usageGroup;
+          break;
+        case SQL_SCHEMA:
+          group = sqlSchemaGroup;
           break;
       }
     }
@@ -194,19 +225,65 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   }
 
   @Override
-  public HasText getSQLSchema() {
+  public HasText getSqlSchema() {
     return new HasText() {
 
       @Override
       public String getText() {
-        return magmaDatasourceType.getValue(magmaDatasourceType.getSelectedIndex());
+        int selectedIndex = sqlSchema.getSelectedIndex();
+        return selectedIndex < 0 ? null : sqlSchema.getValue(selectedIndex);
       }
 
       @Override
       public void setText(String text) {
-        for(int i = 0; i < magmaDatasourceType.getItemCount(); i++) {
-          if(magmaDatasourceType.getValue(i).equals(text)) {
-            magmaDatasourceType.setSelectedIndex(i);
+        if(Strings.isNullOrEmpty(text)) return;
+        int count = sqlSchema.getItemCount();
+        for(int i = 0; i < count; i++) {
+          if(sqlSchema.getValue(i).equals(text)) {
+            sqlSchema.setSelectedIndex(i);
+            break;
+          }
+        }
+      }
+    };
+  }
+
+  private void setAvailableUsages() {
+    for(DatabasePresenter.Usage usageType : DatabasePresenter.Usage.values()) {
+      usage.addItem(usageType.getLabel(), usageType.name());
+    }
+    getUsageText().setText(DatabasePresenter.Usage.STORAGE.name());
+  }
+
+  @Override
+  public void setAvailableSqlSchemas(DatabasePresenter.SqlSchema... sqlSchemas) {
+    sqlSchema.clear();
+    if(sqlSchemas != null) {
+      for(DatabasePresenter.SqlSchema datasourceType : sqlSchemas) {
+        sqlSchema.addItem(datasourceType.getLabel(), datasourceType.name());
+      }
+      getSqlSchema().setText(sqlSchemas[0].name());
+    }
+  }
+
+  @Override
+  public HasText getUsageText() {
+    return new HasText() {
+
+      @Override
+      public String getText() {
+        int selectedIndex = usage.getSelectedIndex();
+        return selectedIndex < 0 ? null : usage.getValue(selectedIndex);
+      }
+
+      @Override
+      public void setText(String text) {
+        if(Strings.isNullOrEmpty(text)) return;
+        int count = usage.getItemCount();
+        for(int i = 0; i < count; i++) {
+          if(usage.getValue(i).equals(text)) {
+            usage.setSelectedIndex(i);
+            setAvailableSqlSchemas(DatabasePresenter.Usage.valueOf(text).getSupportedSqlSchemas());
             break;
           }
         }
@@ -215,24 +292,8 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   }
 
   @Override
-  public HasText getUsage() {
-    return new HasText() {
-
-      @Override
-      public String getText() {
-        return usage.getValue(usage.getSelectedIndex());
-      }
-
-      @Override
-      public void setText(String text) {
-        for(int i = 0; i < usage.getItemCount(); i++) {
-          if(usage.getValue(i).equals(text)) {
-            usage.setSelectedIndex(i);
-            break;
-          }
-        }
-      }
-    };
+  public HasChangeHandlers getUsageChangeHandlers() {
+    return usage;
   }
 
   @Override
@@ -246,12 +307,26 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
 
       @Override
       public String getText() {
-        return driver.getValue(driver.getSelectedIndex());
+        int selectedIndex = driver.getSelectedIndex();
+        return selectedIndex < 0 ? null : driver.getValue(selectedIndex);
       }
 
       @Override
-      public void setText(String text) {
-        updateDriverSelection(text);
+      public void setText(@Nullable String text) {
+        if(Strings.isNullOrEmpty(text)) return;
+        int count = driver.getItemCount();
+        for(int i = 0; i < count; i++) {
+          if(driver.getValue(i).equals(text)) {
+            driver.setSelectedIndex(i);
+            break;
+          }
+        }
+        if(Strings.isNullOrEmpty(url.getText())) {
+          JdbcDriverDto dto = getDriver(getDriver().getText());
+          if(dto != null) {
+            url.setText(dto.getJdbcUrlTemplate());
+          }
+        }
       }
     };
   }
@@ -282,32 +357,24 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
     for(JdbcDriverDto driverDto : JsArrays.toIterable(resource)) {
       driver.addItem(driverDto.getDriverName(), driverDto.getDriverClass());
     }
-    updateDriverSelection(null);
+    getDriver().setText(null);
   }
 
   @Nullable
-  private JdbcDriverDto getDriver(@SuppressWarnings("ParameterHidesMemberVariable") String driverClass) {
+  private JdbcDriverDto getDriver(@SuppressWarnings("ParameterHidesMemberVariable") @Nullable String driverClass) {
+    if(Strings.isNullOrEmpty(driverClass)) return null;
     for(JdbcDriverDto driverDto : JsArrays.toIterable(availableDrivers)) {
-      if(driverDto.getDriverClass().equals(driverClass)) {
+      if(driverDto.getDriverClass().equalsIgnoreCase(driverClass)) {
         return driverDto;
       }
     }
     return null;
   }
 
-  private void updateDriverSelection(String driverClass) {
-    for(int i = 0; i < driver.getItemCount(); i++) {
-      if(driver.getValue(i).equals(driverClass)) {
-        driver.setSelectedIndex(i);
-        break;
-      }
-    }
-    if(Strings.isNullOrEmpty(getUrl().getText())) {
-      JdbcDriverDto dto = getDriver(getDriver().getText());
-      if(dto != null) {
-        getUrl().setText(dto.getJdbcUrlTemplate());
-      }
-    }
+  @Override
+  public void toggleDefaultStorage(boolean show) {
+    if(!show) defaultStorage.setValue(false);
+    defaultStorage.setEnabled(show);
   }
 
 }

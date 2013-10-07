@@ -10,46 +10,37 @@
         <ui:msg description="Name label">Name</ui:msg>
       </b:ControlLabel>
       <b:TextBox ui:field="name" b:id="name"/>
-      <b:HelpBlock>A SQL database must have a unique name.</b:HelpBlock>
+      <b:HelpBlock>
+        <ui:msg description="Database name help label">A SQL database must have a unique name.</ui:msg>
+      </b:HelpBlock>
     </b:ControlGroup>
 
-    <b:ControlGroup>
-      <b:CheckBox ui:field="defaultStorage">
-        <ui:msg description="Default storage label">Default storage</ui:msg>
-      </b:CheckBox>
-    </b:ControlGroup>
-
-    <b:ControlGroup>
+    <b:ControlGroup ui:field="usageGroup">
       <b:ControlLabel for="usage">
         <ui:msg description="Usage label">Usage</ui:msg>
       </b:ControlLabel>
-      <o:Chooser ui:field="usage" name="usage">
-        <g:item value="IMPORT">
-          <ui:msg description="Import label">Import</ui:msg>
-        </g:item>
-        <g:item value="STORAGE">
-          <ui:msg description="Storage label">Storage</ui:msg>
-        </g:item>
-        <g:item value="EXPORT">
-          <ui:msg description="Export label">Export</ui:msg>
-        </g:item>
-      </o:Chooser>
-      <b:HelpBlock>Determine if this database will be proposed at import/export time or as a project's data storage.
+      <o:Chooser ui:field="usage" name="usage"/>
+      <b:HelpBlock>
+        <ui:msg description="Database usage help label">
+          Determine if this database will be proposed at import/export time or as a project's data storage.
+        </ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 
     <b:ControlGroup>
+      <b:CheckBox ui:field="defaultStorage" b:id="defaultStorage" inline="true">
+        <ui:msg description="Default storage label">Default storage</ui:msg>
+      </b:CheckBox>
+    </b:ControlGroup>
+
+    <b:ControlGroup ui:field="sqlSchemaGroup">
       <b:ControlLabel for="magmaDatasourceType">
         <ui:msg description="SQL Schema label">SQL Schema</ui:msg>
       </b:ControlLabel>
-      <o:Chooser ui:field="magmaDatasourceType" name="magmaDatasourceType">
-        <g:item value="hibernate">Opal SQL</g:item>
-        <g:item value="jdbc">Custom SQL</g:item>
-        <g:item value="limesurvey">Limesurvey</g:item>
-      </o:Chooser>
+      <o:Chooser ui:field="sqlSchema" name="magmaDatasourceType"/>
     </b:ControlGroup>
 
-    <b:ControlGroup>
+    <b:ControlGroup ui:field="driverGroup">
       <b:ControlLabel for="driver">
         <ui:msg description="Driver label">Driver</ui:msg>
       </b:ControlLabel>
@@ -60,7 +51,7 @@
       <b:ControlLabel for="url">
         <ui:msg description="Url label">Url</ui:msg>
       </b:ControlLabel>
-      <b:TextBox ui:field="url" b:id="url" alternateSize="XLARGE"/>
+      <b:TextBox ui:field="url" b:id="url" addStyleNames="database-url"/>
     </b:ControlGroup>
 
     <b:ControlGroup ui:field="usernameGroup">
