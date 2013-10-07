@@ -31,6 +31,11 @@ public class RequiredTextValidator extends AbstractFieldValidator {
     this.textField = textField;
   }
 
+  public RequiredTextValidator(HasText textField, String errorMessageKey, String id) {
+    super(errorMessageKey, id);
+    this.textField = textField;
+  }
+
   public RequiredTextValidator(final HasValue<String> hasValue, String errorMessageKey) {
     this(new HasText() {
 

@@ -18,7 +18,6 @@ import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.core.runtime.database.MultipleIdentifiersDatabaseException;
 import org.obiba.opal.web.database.Dtos;
 import org.obiba.opal.web.magma.ClientErrorDtos;
-import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Ws;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -29,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
+import static org.obiba.opal.web.model.Database.DatabaseDto;
 
 @Component
 @Scope("request")
@@ -42,7 +42,7 @@ public class DatabaseResource {
   private String name;
 
   @GET
-  public Opal.DatabaseDto get() {
+  public DatabaseDto get() {
     return Dtos.asDto(getDatabase());
   }
 
@@ -62,8 +62,7 @@ public class DatabaseResource {
   }
 
   @PUT
-  public Response update(Opal.DatabaseDto dto)
-      throws MultipleIdentifiersDatabaseException, DatabaseAlreadyExistsException {
+  public Response update(DatabaseDto dto) throws MultipleIdentifiersDatabaseException, DatabaseAlreadyExistsException {
 
     Database database = databaseRegistry.getDatabase(dto.getName());
     if(database == null) {

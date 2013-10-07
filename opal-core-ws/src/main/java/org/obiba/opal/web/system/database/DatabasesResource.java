@@ -16,9 +16,10 @@ import org.obiba.opal.core.runtime.database.DatabaseAlreadyExistsException;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.core.runtime.database.MultipleIdentifiersDatabaseException;
 import org.obiba.opal.web.database.Dtos;
-import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import static org.obiba.opal.web.model.Database.DatabaseDto;
 
 @Component
 @Path("/system/databases")
@@ -28,30 +29,30 @@ public class DatabasesResource {
   private DatabaseRegistry databaseRegistry;
 
   @GET
-  public List<Opal.DatabaseDto> getDatabases(@QueryParam("type") String type) {
+  public List<DatabaseDto> getDatabases(@QueryParam("type") String type) {
     return asDto(databaseRegistry.list(type));
   }
 
   @GET
   @Path("/sql")
-  public List<Opal.DatabaseDto> getSqlDatabases() {
+  public List<DatabaseDto> getSqlDatabases() {
     return asDto(databaseRegistry.list(SqlDatabase.class));
   }
 
   @GET
   @Path("/mongodb")
-  public List<Opal.DatabaseDto> getMongoDbDatabases() {
+  public List<DatabaseDto> getMongoDbDatabases() {
     return asDto(databaseRegistry.list(MongoDbDatabase.class));
   }
 
   @GET
   @Path("/identifiers")
-  public Opal.DatabaseDto getIdentifiersDatabase() {
+  public DatabaseDto getIdentifiersDatabase() {
     return Dtos.asDto(databaseRegistry.getIdentifiersDatabase());
   }
 
-  private List<Opal.DatabaseDto> asDto(Iterable<? extends Database> databases) {
-    List<Opal.DatabaseDto> dtos = new ArrayList<Opal.DatabaseDto>();
+  private List<DatabaseDto> asDto(Iterable<? extends Database> databases) {
+    List<DatabaseDto> dtos = new ArrayList<DatabaseDto>();
     for(Database database : databases) {
       dtos.add(Dtos.asDto(database));
     }
@@ -59,7 +60,7 @@ public class DatabasesResource {
   }
 
   @POST
-  public Response addDatabase(Opal.DatabaseDto database)
+  public Response addDatabase(DatabaseDto database)
       throws MultipleIdentifiersDatabaseException, DatabaseAlreadyExistsException {
     databaseRegistry.addOrReplaceDatabase(Dtos.fromDto(database));
 

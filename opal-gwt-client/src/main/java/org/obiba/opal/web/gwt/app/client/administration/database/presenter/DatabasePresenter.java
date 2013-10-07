@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.validation.ConstraintViolationErrorsEvent;
 import org.obiba.opal.web.gwt.app.client.validation.ConstraintViolationUtils;
+import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
@@ -30,12 +31,14 @@ import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.opal.DatabaseDto;
-import org.obiba.opal.web.model.client.opal.JdbcDriverDto;
-import org.obiba.opal.web.model.client.opal.SqlDatabaseDto;
+import org.obiba.opal.web.model.client.database.DatabaseDto;
+import org.obiba.opal.web.model.client.database.JdbcDriverDto;
+import org.obiba.opal.web.model.client.database.SqlDatabaseDto;
+import org.obiba.opal.web.model.client.magma.JdbcDatasourceSettingsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 import org.obiba.opal.web.model.client.ws.ConstraintViolationErrorDto;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
@@ -50,6 +53,11 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
+
+import static org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabasePresenter.Display.FormField;
+import static org.obiba.opal.web.model.client.database.SqlDatabaseDto.SqlSchema.HIBERNATE;
+import static org.obiba.opal.web.model.client.database.SqlDatabaseDto.SqlSchema.JDBC;
+import static org.obiba.opal.web.model.client.database.SqlDatabaseDto.SqlSchema.LIMESURVEY;
 
 public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Display> implements DatabaseUiHandlers {
 
@@ -152,6 +160,15 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
         getView().setAvailableSqlSchemas(usage.getSupportedSqlSchemas());
       }
     });
+
+    getView().getSqlSchemaChangeHandlers().addChangeHandler(new ChangeHandler() {
+      @Override
+      public void onChange(ChangeEvent event) {
+        SqlSchema sqlSchema = SqlSchema.valueOf(getView().getSqlSchema().getText());
+        getView().toggleJdbcOptions(sqlSchema == SqlSchema.JDBC);
+        getView().toggleLimesurveyOptions(sqlSchema == SqlSchema.LIMESURVEY);
+      }
+    });
   }
 
   private void setDialogMode(Mode dialogMode) {
@@ -178,8 +195,6 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
 
   private void displayDatabase(DatabaseDto dto) {
     SqlDatabaseDto sqlDatabaseDto = (SqlDatabaseDto) dto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings);
-    GWT.log("DatabaseDto: " + dto);
-    GWT.log("SqlDatabaseDto: " + sqlDatabaseDto);
     getView().getName().setText(dto.getName());
     getView().getUsageText().setText(dto.getUsage() == null ? null : dto.getUsage().getName());
     getView().getDriver().setText(sqlDatabaseDto.getDriverClass());
@@ -188,8 +203,19 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
     getView().getUsername().setText(sqlDatabaseDto.getUsername());
     getView().getPassword().setText(sqlDatabaseDto.getPassword());
     getView().getProperties().setText(sqlDatabaseDto.getProperties());
-    getView().getSqlSchema()
-        .setText(sqlDatabaseDto.getSqlSchema() == null ? null : sqlDatabaseDto.getSqlSchema().getName());
+    getView().getSqlSchema().setText(sqlDatabaseDto.getSqlSchema().getName());
+    JdbcDatasourceSettingsDto jdbcDatasourceSettings = sqlDatabaseDto.getJdbcDatasourceSettings();
+    if(JDBC.getName().equals(sqlDatabaseDto.getSqlSchema().getName()) && jdbcDatasourceSettings != null) {
+      getView().getDefaultEntityType().setText(jdbcDatasourceSettings.getDefaultEntityType());
+      getView().getDefaultCreatedTimestampColumn()
+          .setText(jdbcDatasourceSettings.getDefaultCreatedTimestampColumnName());
+      getView().getDefaultUpdatedTimestampColumn()
+          .setText(jdbcDatasourceSettings.getDefaultUpdatedTimestampColumnName());
+      getView().getUseMetadataTables().setValue(jdbcDatasourceSettings.getUseMetadataTables());
+    } else if(LIMESURVEY.getName().equals(sqlDatabaseDto.getSqlSchema().getName()) &&
+        sqlDatabaseDto.getLimesurveyDatasourceSettings() != null) {
+      getView().getTablePrefix().setText(sqlDatabaseDto.getLimesurveyDatasourceSettings().getTablePrefix());
+    }
   }
 
   private DatabaseDto getDto() {
@@ -205,7 +231,22 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
     sqlDto.setUsername(getView().getUsername().getText());
     sqlDto.setPassword(getView().getPassword().getText());
     sqlDto.setProperties(getView().getProperties().getText());
-    sqlDto.setSqlSchema(parseSqlSchema(getView().getSqlSchema().getText()));
+    SqlDatabaseDto.SqlSchema sqlSchema = parseSqlSchema(getView().getSqlSchema().getText());
+    sqlDto.setSqlSchema(sqlSchema);
+
+    if(JDBC.getName().equals(sqlSchema.getName())) {
+      JdbcDatasourceSettingsDto jdbcSettings = JdbcDatasourceSettingsDto.create();
+      jdbcSettings.setDefaultEntityType(getView().getDefaultEntityType().getText());
+      jdbcSettings.setDefaultCreatedTimestampColumnName(getView().getDefaultCreatedTimestampColumn().getText());
+      jdbcSettings.setDefaultUpdatedTimestampColumnName(getView().getDefaultUpdatedTimestampColumn().getText());
+      jdbcSettings.setUseMetadataTables(getView().getUseMetadataTables().getValue());
+      sqlDto.setJdbcDatasourceSettings(jdbcSettings);
+    } else if(LIMESURVEY.getName().equals(sqlSchema.getName())) {
+      SqlDatabaseDto.LimesurveyDatasourceSettingsDto limesurveySettings = SqlDatabaseDto.LimesurveyDatasourceSettingsDto
+          .create();
+      limesurveySettings.setTablePrefix(getView().getTablePrefix().getText());
+      sqlDto.setLimesurveyDatasourceSettings(limesurveySettings);
+    }
 
     dto.setExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings, sqlDto);
     return dto;
@@ -225,15 +266,9 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
   }
 
   private SqlDatabaseDto.SqlSchema parseSqlSchema(String sqlSchemaTxt) {
-    if(SqlDatabaseDto.SqlSchema.HIBERNATE.getName().equals(sqlSchemaTxt)) {
-      return SqlDatabaseDto.SqlSchema.HIBERNATE;
-    }
-    if(SqlDatabaseDto.SqlSchema.JDBC.getName().equals(sqlSchemaTxt)) {
-      return SqlDatabaseDto.SqlSchema.JDBC;
-    }
-    if(SqlDatabaseDto.SqlSchema.LIMESURVEY.getName().equals(sqlSchemaTxt)) {
-      return SqlDatabaseDto.SqlSchema.LIMESURVEY;
-    }
+    if(HIBERNATE.getName().equals(sqlSchemaTxt)) return HIBERNATE;
+    if(JDBC.getName().equals(sqlSchemaTxt)) return JDBC;
+    if(LIMESURVEY.getName().equals(sqlSchemaTxt)) return LIMESURVEY;
     throw new IllegalArgumentException("Unknown Sql Schema: " + sqlSchemaTxt);
   }
 
@@ -273,28 +308,39 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
     protected Set<FieldValidator> getValidators() {
       if(validators == null) {
         validators = new LinkedHashSet<FieldValidator>();
-        validators.add(new RequiredTextValidator(getView().getName(), "NameIsRequired") //
-            .setId(Display.FormField.NAME.name()));
-        validators.add(new RequiredTextValidator(getView().getUrl(), "UrlIsRequired") //
-            .setId(Display.FormField.URL.name()));
-        validators.add(new RequiredTextValidator(getView().getUsername(), "UsernameIsRequired") //
-            .setId(Display.FormField.USERNAME.name()));
-        validators.add(new RequiredTextValidator(getView().getPassword(), "PasswordIsRequired") //
-            .setId(Display.FormField.PASSWORD.name()));
-        validators.add(new RequiredTextValidator(getView().getUsageText(), "UsageIsRequired") //
-            .setId(Display.FormField.USAGE.name()));
-        validators.add(new RequiredTextValidator(getView().getSqlSchema(), "SqlSchemaIsRequired") //
-            .setId(Display.FormField.SQL_SCHEMA.name()));
-        validators.add(new RequiredTextValidator(getView().getDriver(), "DriverIsRequired") //
-            .setId(Display.FormField.DRIVER.name()));
+        validators.add(new RequiredTextValidator(getView().getName(), "NameIsRequired", FormField.NAME.name()));
+        validators.add(new RequiredTextValidator(getView().getUrl(), "UrlIsRequired", FormField.URL.name()));
+        validators
+            .add(new RequiredTextValidator(getView().getUsername(), "UsernameIsRequired", FormField.USERNAME.name()));
+        validators
+            .add(new RequiredTextValidator(getView().getPassword(), "PasswordIsRequired", FormField.PASSWORD.name()));
+        validators.add(new RequiredTextValidator(getView().getUsageText(), "UsageIsRequired", FormField.USAGE.name()));
+        validators.add(
+            new RequiredTextValidator(getView().getSqlSchema(), "SqlSchemaIsRequired", FormField.SQL_SCHEMA.name()));
+        validators.add(new RequiredTextValidator(getView().getDriver(), "DriverIsRequired", FormField.DRIVER.name()));
+        validators.add(new DefaultEntityTypeValidator());
       }
       return validators;
     }
 
     @Override
     protected void showMessage(String id, String message) {
-      getView().showError(Display.FormField.valueOf(id), message);
+      getView().showError(FormField.valueOf(id), message);
     }
+
+    private class DefaultEntityTypeValidator extends AbstractFieldValidator {
+
+      private DefaultEntityTypeValidator() {
+        super("DefaultEntityTypeIsRequired", FormField.DEFAULT_ENTITY_TYPE.name());
+      }
+
+      @Override
+      protected boolean hasError() {
+        return SqlDatabaseDto.SqlSchema.JDBC.getName().equals(getView().getSqlSchema().getText()) &&
+            Strings.nullToEmpty(getView().getDefaultEntityType().getText()).trim().isEmpty();
+      }
+    }
+
   }
 
   private class CreateOrUpdateCallBack implements ResponseCodeCallback {
@@ -334,6 +380,8 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
 
   public interface Display extends PopupView, HasUiHandlers<DatabaseUiHandlers> {
 
+    void toggleJdbcOptions(boolean show);
+
     enum FormField {
       NAME,
       DRIVER,
@@ -341,7 +389,8 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
       USERNAME,
       PASSWORD,
       USAGE,
-      SQL_SCHEMA
+      SQL_SCHEMA,
+      DEFAULT_ENTITY_TYPE
     }
 
     void hideDialog();
@@ -372,11 +421,25 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
 
     HasText getProperties();
 
+    HasText getTablePrefix();
+
+    HasText getDefaultEntityType();
+
+    HasText getDefaultCreatedTimestampColumn();
+
+    HasText getDefaultUpdatedTimestampColumn();
+
     HasValue<Boolean> getDefaultStorage();
+
+    HasValue<Boolean> getUseMetadataTables();
 
     HasChangeHandlers getUsageChangeHandlers();
 
+    HasChangeHandlers getSqlSchemaChangeHandlers();
+
     void toggleDefaultStorage(boolean show);
+
+    void toggleLimesurveyOptions(boolean show);
 
   }
 

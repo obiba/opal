@@ -20,7 +20,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.validation.ConstrainedModal;
-import org.obiba.opal.web.model.client.opal.JdbcDriverDto;
+import org.obiba.opal.web.model.client.database.JdbcDriverDto;
 
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
@@ -38,6 +38,7 @@ import com.google.gwt.event.dom.client.HasChangeHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.ListBox;
@@ -109,6 +110,30 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   @UiField
   CheckBox defaultStorage;
 
+  @UiField
+  DisclosurePanel limesurveyOptions;
+
+  @UiField
+  TextBox tablePrefix;
+
+  @UiField
+  DisclosurePanel jdbcOptions;
+
+  @UiField
+  TextBox defaultEntityType;
+
+  @UiField
+  TextBox defaultCreatedTimestampColumn;
+
+  @UiField
+  TextBox defaultUpdatedTimestampColumn;
+
+  @UiField
+  CheckBox useMetadataTables;
+
+  @UiField
+  ControlGroup defaultEntityTypeGroup;
+
   private JsArray<JdbcDriverDto> availableDrivers;
 
   @Inject
@@ -144,6 +169,9 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
     constrainedModal.registerWidget("password", translations.passwordLabel(), passwordGroup);
     constrainedModal.registerWidget("usage", translations.usageLabel(), usageGroup);
     constrainedModal.registerWidget("sqlSchema", translations.sqlSchemaLabel(), sqlSchemaGroup);
+    constrainedModal
+        .registerWidget("sqlSchema.jdbcDatasourceSettings.defaultEntityType", translations.defaultEntityTypeLabel(),
+            defaultEntityTypeGroup);
   }
 
   @Override
@@ -200,6 +228,9 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
         case SQL_SCHEMA:
           group = sqlSchemaGroup;
           break;
+        case DEFAULT_ENTITY_TYPE:
+          group = defaultEntityTypeGroup;
+          break;
       }
     }
     if(group == null) {
@@ -241,6 +272,9 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
         for(int i = 0; i < count; i++) {
           if(sqlSchema.getValue(i).equals(text)) {
             sqlSchema.setSelectedIndex(i);
+            DatabasePresenter.SqlSchema selectedSqlSchema = DatabasePresenter.SqlSchema.valueOf(text);
+            toggleLimesurveyOptions(selectedSqlSchema == DatabasePresenter.SqlSchema.LIMESURVEY);
+            toggleJdbcOptions(selectedSqlSchema == DatabasePresenter.SqlSchema.JDBC);
             break;
           }
         }
@@ -283,7 +317,9 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
         for(int i = 0; i < count; i++) {
           if(usage.getValue(i).equals(text)) {
             usage.setSelectedIndex(i);
-            setAvailableSqlSchemas(DatabasePresenter.Usage.valueOf(text).getSupportedSqlSchemas());
+            DatabasePresenter.Usage selectedUsage = DatabasePresenter.Usage.valueOf(text);
+            setAvailableSqlSchemas(selectedUsage.getSupportedSqlSchemas());
+            toggleDefaultStorage(selectedUsage == DatabasePresenter.Usage.STORAGE);
             break;
           }
         }
@@ -294,6 +330,11 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   @Override
   public HasChangeHandlers getUsageChangeHandlers() {
     return usage;
+  }
+
+  @Override
+  public HasChangeHandlers getSqlSchemaChangeHandlers() {
+    return sqlSchema;
   }
 
   @Override
@@ -347,8 +388,33 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   }
 
   @Override
+  public HasText getTablePrefix() {
+    return tablePrefix;
+  }
+
+  @Override
+  public HasText getDefaultEntityType() {
+    return defaultEntityType;
+  }
+
+  @Override
+  public HasText getDefaultCreatedTimestampColumn() {
+    return defaultCreatedTimestampColumn;
+  }
+
+  @Override
+  public HasText getDefaultUpdatedTimestampColumn() {
+    return defaultUpdatedTimestampColumn;
+  }
+
+  @Override
   public HasValue<Boolean> getDefaultStorage() {
     return defaultStorage;
+  }
+
+  @Override
+  public HasValue<Boolean> getUseMetadataTables() {
+    return useMetadataTables;
   }
 
   @Override
@@ -375,6 +441,22 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   public void toggleDefaultStorage(boolean show) {
     if(!show) defaultStorage.setValue(false);
     defaultStorage.setEnabled(show);
+  }
+
+  @Override
+  public void toggleLimesurveyOptions(boolean show) {
+    if(!show) tablePrefix.setValue(null);
+    limesurveyOptions.setVisible(show);
+  }
+
+  @Override
+  public void toggleJdbcOptions(boolean show) {
+    if(!show) {
+      defaultCreatedTimestampColumn.setValue(null);
+      defaultUpdatedTimestampColumn.setValue(null);
+      useMetadataTables.setValue(false);
+    }
+    jdbcOptions.setVisible(show);
   }
 
 }

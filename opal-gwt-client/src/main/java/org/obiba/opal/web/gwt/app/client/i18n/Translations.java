@@ -395,6 +395,7 @@ public interface Translations extends Constants {
       "CannotFindDatabase", "Cannot find database named {0}",//
       "NameIsRequired", "A name is required.",//
       "DriverIsRequired", "A driver is required.",//
+      "DefaultEntityTypeIsRequired", "Default Entity Type is required for Custom SQL schema.",//
       "DatabaseUsageIsRequired", "Database usage is required.",//
       "SQLSchemaIsRequired", "SQL schema is required.",//
       "LimeSurveyDatabaseIsRequired", "LimeSurvey database is required.",//
@@ -1557,6 +1558,10 @@ public interface Translations extends Constants {
   @Description("SQL Schema label")
   @DefaultStringValue("SQL Schema")
   String sqlSchemaLabel();
+
+  @Description("Default Entity Type label")
+  @DefaultStringValue("Default Entity Type")
+  String defaultEntityTypeLabel();
 
   @Description("Key/Value label")
   @DefaultStringValue("key=value")

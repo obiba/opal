@@ -99,7 +99,10 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Override
   @PostConstruct
   public void start() {
-    orientDbService.registerEntityClass(Database.class, SqlDatabase.class, MongoDbDatabase.class);
+    orientDbService
+        .registerEntityClass(Database.class, SqlDatabase.class, SqlDatabase.LimesurveyDatasourceSettings.class,
+            SqlDatabase.JdbcDatasourceSettings.class, SqlDatabase.JdbcDatasourceSettings.JdbcValueTableSettings.class,
+            MongoDbDatabase.class);
     // don't create index on abstract base class or it will fail
     orientDbService.createUniqueStringIndex(SqlDatabase.class, "name");
     orientDbService.createUniqueStringIndex(MongoDbDatabase.class, "name");

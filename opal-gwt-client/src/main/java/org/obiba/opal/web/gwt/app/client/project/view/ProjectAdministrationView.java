@@ -15,7 +15,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectEditionUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.EditorPanel;
-import org.obiba.opal.web.model.client.opal.DatabaseDto;
+import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.github.gwtbootstrap.client.ui.Paragraph;
@@ -24,7 +24,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;

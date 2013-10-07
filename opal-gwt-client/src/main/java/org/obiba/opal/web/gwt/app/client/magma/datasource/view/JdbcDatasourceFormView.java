@@ -11,7 +11,7 @@ package org.obiba.opal.web.gwt.app.client.magma.datasource.view;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.JdbcDatasourceFormPresenter;
-import org.obiba.opal.web.model.client.opal.DatabaseDto;
+import org.obiba.opal.web.model.client.database.DatabaseDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;

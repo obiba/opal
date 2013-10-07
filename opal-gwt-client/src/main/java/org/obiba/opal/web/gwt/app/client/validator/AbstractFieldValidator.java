@@ -36,6 +36,11 @@ public abstract class AbstractFieldValidator implements FieldValidator {
     this.errorMessageKey = errorMessageKey;
   }
 
+  public AbstractFieldValidator(String errorMessageKey, String id) {
+    this.errorMessageKey = errorMessageKey;
+    this.id = id;
+  }
+
   //
   // FieldValidator Methods
   //

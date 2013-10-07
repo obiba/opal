@@ -26,6 +26,15 @@ public interface OrientDbService {
 
   <T> Iterable<T> list(Class<T> clazz);
 
+  /**
+   * Create index.
+   * Be careful to not create index on Abstract class or it will fail
+   *
+   * @param clazz
+   * @param property
+   * @param indexType
+   * @param type
+   */
   void createIndex(Class<?> clazz, String property, OClass.INDEX_TYPE indexType, OType type);
 
   void createUniqueIndex(Class<?> clazz, String property, OType type);
