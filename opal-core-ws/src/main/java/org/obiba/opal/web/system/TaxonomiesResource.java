@@ -20,8 +20,8 @@ import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.cfg.TaxonomyService;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
-import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.model.Opal.TaxonomyDto;
+import org.obiba.opal.web.taxonomy.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

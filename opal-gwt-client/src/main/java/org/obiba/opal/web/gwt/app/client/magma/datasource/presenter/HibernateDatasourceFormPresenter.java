@@ -11,9 +11,9 @@ package org.obiba.opal.web.gwt.app.client.magma.datasource.presenter;
 
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.HibernateDatasourceFactoryDto;
-import org.obiba.opal.web.model.client.opal.DatabaseDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;

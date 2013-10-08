@@ -13,10 +13,10 @@ import org.obiba.opal.web.gwt.app.client.validator.RequiredOptionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidatablePresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.JdbcDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.JdbcDatasourceSettingsDto;
-import org.obiba.opal.web.model.client.opal.DatabaseDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;

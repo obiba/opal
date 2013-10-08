@@ -18,7 +18,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.obiba.opal.core.runtime.jdbc.JdbcDriverRegistry;
-import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.model.Database;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,11 +34,11 @@ public class JdbcDriversResource {
   private JdbcDriverRegistry jdbcDriverRegistry;
 
   @GET
-  public Iterable<Opal.JdbcDriverDto> getJdbcDrivers() {
-    return Iterables.transform(jdbcDriverRegistry.listDrivers(), new Function<Driver, Opal.JdbcDriverDto>() {
+  public Iterable<Database.JdbcDriverDto> getJdbcDrivers() {
+    return Iterables.transform(jdbcDriverRegistry.listDrivers(), new Function<Driver, Database.JdbcDriverDto>() {
       @Override
-      public Opal.JdbcDriverDto apply(Driver driver) {
-        return Opal.JdbcDriverDto.newBuilder() //
+      public Database.JdbcDriverDto apply(Driver driver) {
+        return Database.JdbcDriverDto.newBuilder() //
             .setDriverName(jdbcDriverRegistry.getDriverName(driver)) //
             .setDriverClass(driver.getClass().getName()) //
             .setJdbcUrlTemplate(jdbcDriverRegistry.getJdbcUrlTemplate(driver)) //

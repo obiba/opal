@@ -1,6 +1,6 @@
-package Math;
-
 import "Ws.proto";
+
+package Math;
 
 option java_package = "org.obiba.opal.web.model";
 

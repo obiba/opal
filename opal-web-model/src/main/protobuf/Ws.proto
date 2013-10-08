@@ -20,7 +20,7 @@ message ConstraintViolationErrorDto {
   required string message = 1; // the interpolated error message for this constraint violation
   required string messageTemplate = 2; // the non-interpolated error message for this constraint violation
   required string propertyPath = 3;
-  extend Ws.ClientErrorDto {
+  extend ClientErrorDto {
     repeated ConstraintViolationErrorDto errors = 1002;
   }
 }

@@ -15,7 +15,7 @@ import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.opal.DatabaseDto;
+import org.obiba.opal.web.model.client.database.DatabaseDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;

@@ -31,10 +31,9 @@ public class LimesurveyDatasourceFactoryDtoParser extends AbstractDatasourceFact
   @Nonnull
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
-    LimesurveyDatasourceFactoryDto hDto = dto.getExtension(LimesurveyDatasourceFactoryDto.params);
+    LimesurveyDatasourceFactoryDto limesurveyDto = dto.getExtension(LimesurveyDatasourceFactoryDto.params);
     return new DatabaseLimesurveyDatasourceFactory(dto.getName(), //
-        hDto.getDatabase(), //
-        hDto.hasTablePrefix() ? hDto.getTablePrefix() : null, //
+        limesurveyDto.getDatabase(), //
         databaseRegistry);
   }
 

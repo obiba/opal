@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -32,14 +30,6 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.math.stat.IntervalFrequency;
 import org.obiba.magma.type.BinaryType;
-import org.obiba.opal.core.domain.database.Database;
-import org.obiba.opal.core.domain.database.MongoDbDatabase;
-import org.obiba.opal.core.domain.database.SqlDatabase;
-import org.obiba.opal.core.domain.taxonomy.HasTerms;
-import org.obiba.opal.core.domain.taxonomy.Taxonomy;
-import org.obiba.opal.core.domain.taxonomy.Term;
-import org.obiba.opal.core.domain.taxonomy.Text;
-import org.obiba.opal.core.domain.taxonomy.Vocabulary;
 import org.obiba.opal.core.magma.math.CategoricalVariableSummary;
 import org.obiba.opal.core.magma.math.ContinuousVariableSummary;
 import org.obiba.opal.web.model.Magma;
@@ -52,13 +42,10 @@ import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.VariableEntityDto;
 import org.obiba.opal.web.model.Math;
-import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.LocaleDto;
-import org.obiba.opal.web.model.Opal.TaxonomyDto;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -439,186 +426,4 @@ public final class Dtos {
 
   }
 
-  public static TaxonomyDto asDto(Taxonomy taxonomy) {
-    Opal.TaxonomyDto.Builder builder = Opal.TaxonomyDto.newBuilder();
-    builder.setName(taxonomy.getName());
-    builder.addAllTitles(toTextDtoList(taxonomy.getTitles()));
-    builder.addAllDescriptions(toTextDtoList(taxonomy.getDescriptions()));
-
-    Collection<TaxonomyDto.VocabularyDto> vocabularyDtos = new ArrayList<TaxonomyDto.VocabularyDto>();
-    for(Vocabulary v : taxonomy.getVocabularies()) {
-      vocabularyDtos.add(asDto(v));
-    }
-    builder.addAllVocabularies(vocabularyDtos);
-    return builder.build();
-  }
-
-  public static Taxonomy fromDto(TaxonomyDto dto) {
-    Taxonomy taxonomy = new Taxonomy(dto.getName());
-    taxonomy.setTitles(fromTextDtoList(dto.getTitlesList()));
-    taxonomy.setDescriptions(fromTextDtoList(dto.getDescriptionsList()));
-
-    List<Vocabulary> vocabularies = new ArrayList<Vocabulary>();
-    for(TaxonomyDto.VocabularyDto v : dto.getVocabulariesList()) {
-      vocabularies.add(fromDto(v));
-    }
-    taxonomy.setVocabularies(vocabularies);
-    return taxonomy;
-  }
-
-  public static TaxonomyDto.TextDto asDto(Text text) {
-    TaxonomyDto.TextDto.Builder builder = TaxonomyDto.TextDto.newBuilder()//
-        .setText(text.getText())//
-        .setLocale(text.getLocale());
-    return builder.build();
-  }
-
-  public static Text fromDto(TaxonomyDto.TextDto from) {
-    return new Text(from.getText(), from.getLocale());
-  }
-
-  public static TaxonomyDto.TermDto asDto(Term term) {
-    TaxonomyDto.TermDto.Builder builder = TaxonomyDto.TermDto.newBuilder();
-    builder.setName(term.getName());
-    builder.addAllTitles(toTextDtoList(term.getTitles()));
-    builder.addAllDescriptions(toTextDtoList(term.getDescriptions()));
-    builder.addAllTerms(asDto(term.getTerms()));
-    return builder.build();
-  }
-
-  private static Iterable<TaxonomyDto.TextDto> toTextDtoList(Iterable<Text> texts) {
-    Collection<TaxonomyDto.TextDto> textsDto = new ArrayList<TaxonomyDto.TextDto>();
-    for(Text t : texts) {
-      textsDto.add(asDto(t));
-    }
-    return textsDto;
-  }
-
-  private static List<Text> fromTextDtoList(Iterable<TaxonomyDto.TextDto> textDtos) {
-    List<Text> texts = new ArrayList<Text>();
-    for(TaxonomyDto.TextDto t : textDtos) {
-      texts.add(fromDto(t));
-    }
-    return texts;
-  }
-
-  private static Iterable<TaxonomyDto.TermDto> asDto(Iterable<HasTerms> terms) {
-    Collection<TaxonomyDto.TermDto> termDto = new ArrayList<TaxonomyDto.TermDto>();
-    for(HasTerms t : terms) {
-      termDto.add(asDto((Term) t));
-    }
-    return termDto;
-  }
-
-  private static List<HasTerms> fromDto(Iterable<TaxonomyDto.TermDto> termDtos) {
-    List<HasTerms> termDto = new ArrayList<HasTerms>();
-    for(TaxonomyDto.TermDto t : termDtos) {
-      termDto.add(fromDto(t));
-    }
-    return termDto;
-  }
-
-  public static Term fromDto(TaxonomyDto.TermDto from) {
-    Term term = new Term(from.getName());
-    term.setTitles(fromTextDtoList(from.getTitlesList()));
-    term.setDescriptions(fromTextDtoList(from.getDescriptionsList()));
-    term.setTerms(fromDto(from.getTermsList()));
-    return term;
-  }
-
-  public static TaxonomyDto.VocabularyDto asDto(Vocabulary vocabulary) {
-    TaxonomyDto.VocabularyDto.Builder builder = TaxonomyDto.VocabularyDto.newBuilder();
-    builder.setName(vocabulary.getName());
-    builder.addAllTitles(toTextDtoList(vocabulary.getTitles()));
-    builder.addAllDescriptions(toTextDtoList(vocabulary.getDescriptions()));
-    builder.addAllTerms(asDto(vocabulary.getTerms()));
-    builder.setRepeatable(vocabulary.isRepeatable());
-    return builder.build();
-  }
-
-  public static Vocabulary fromDto(TaxonomyDto.VocabularyDto dto) {
-    Vocabulary vocabulary = new Vocabulary(dto.getName());
-    vocabulary.setTitles(fromTextDtoList(dto.getTitlesList()));
-    vocabulary.setDescriptions(fromTextDtoList(dto.getDescriptionsList()));
-    vocabulary.setTerms(fromDto(dto.getTermsList()));
-    vocabulary.setRepeatable(dto.getRepeatable());
-    return vocabulary;
-  }
-
-  public static Database fromDto(Opal.DatabaseDto dto) {
-    Opal.SqlDatabaseDto sqlDto = dto.getExtension(Opal.SqlDatabaseDto.settings);
-    if(sqlDto != null) return fromDto(dto, sqlDto);
-    Opal.MongoDbDatabaseDto mongoDto = dto.getExtension(Opal.MongoDbDatabaseDto.settings);
-    if(mongoDto != null) return fromDto(dto, mongoDto);
-    throw new IllegalArgumentException("Unsupported DatabaseDto extension");
-  }
-
-  private static void fromDto(Database db, Opal.DatabaseDto dto) {
-    db.setEditable(dto.getEditable());
-    db.setDefaultStorage(dto.getDefaultStorage());
-    db.setDescription(dto.getDescription());
-    db.setName(dto.getName());
-    db.setUsage(Database.Usage.valueOf(dto.getUsage()));
-    db.setUsedForIdentifiers(dto.getUsedForIdentifiers());
-  }
-
-  private static SqlDatabase fromDto(Opal.DatabaseDto dto, Opal.SqlDatabaseDto sqlDto) {
-    SqlDatabase db = new SqlDatabase();
-    fromDto(db, dto);
-    db.setDriverClass(sqlDto.getDriverClass());
-    db.setMagmaDatasourceType(sqlDto.getMagmaDatasourceType());
-    db.setUrl(sqlDto.getUrl());
-    db.setUsername(sqlDto.getUsername());
-    db.setPassword(sqlDto.getPassword());
-    db.setProperties(sqlDto.getProperties());
-
-    return db;
-  }
-
-  private static MongoDbDatabase fromDto(Opal.DatabaseDto dto, Opal.MongoDbDatabaseDto mongoDto) {
-    MongoDbDatabase db = new MongoDbDatabase();
-    fromDto(db, dto);
-    db.setUrl(mongoDto.getUrl());
-    db.setUsername(mongoDto.getUsername());
-    db.setPassword(mongoDto.getPassword());
-    db.setProperties(mongoDto.getProperties());
-    return db;
-  }
-
-  public static Opal.DatabaseDto asDto(Database db) {
-    Opal.DatabaseDto.Builder builder = Opal.DatabaseDto.newBuilder();
-    builder.setName(db.getName());
-    if(!Strings.isNullOrEmpty(db.getDescription())) builder.setDescription(db.getDescription());
-    builder.setDefaultStorage(db.isDefaultStorage());
-    builder.setEditable(db.isEditable());
-    builder.setUsedForIdentifiers(db.isUsedForIdentifiers());
-    builder.setUsage(db.getUsage().name());
-    if(db instanceof SqlDatabase) {
-      return builder.setExtension(Opal.SqlDatabaseDto.settings, asDto((SqlDatabase) db)).build();
-    }
-    if(db instanceof MongoDbDatabase) {
-      return builder.setExtension(Opal.MongoDbDatabaseDto.settings, asDto((MongoDbDatabase) db)).build();
-    }
-    throw new IllegalArgumentException("Unsupported database class " + db.getClass());
-  }
-
-  private static Opal.SqlDatabaseDto asDto(SqlDatabase db) {
-    Opal.SqlDatabaseDto.Builder builder = Opal.SqlDatabaseDto.newBuilder() //
-        .setDriverClass(db.getDriverClass()) //
-        .setMagmaDatasourceType(db.getMagmaDatasourceType()) //
-        .setUrl(db.getUrl()) //
-        .setUsername(db.getUsername());
-    if(!Strings.isNullOrEmpty(db.getPassword())) builder.setPassword(db.getPassword());
-    if(!Strings.isNullOrEmpty(db.getProperties())) builder.setProperties(db.getProperties());
-    return builder.build();
-  }
-
-  private static Opal.MongoDbDatabaseDto asDto(MongoDbDatabase db) {
-    Opal.MongoDbDatabaseDto.Builder builder = Opal.MongoDbDatabaseDto.newBuilder() //
-        .setUrl(db.getUrl());
-    if(!Strings.isNullOrEmpty(db.getUsername())) builder.setUsername(db.getUsername());
-    if(!Strings.isNullOrEmpty(db.getPassword())) builder.setPassword(db.getPassword());
-    if(!Strings.isNullOrEmpty(db.getProperties())) builder.setProperties(db.getProperties());
-    return builder.build();
-  }
 }

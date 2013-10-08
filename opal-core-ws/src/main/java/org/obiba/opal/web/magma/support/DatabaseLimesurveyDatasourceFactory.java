@@ -10,21 +10,20 @@
 package org.obiba.opal.web.magma.support;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.obiba.magma.AbstractDatasourceFactory;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.Disposable;
 import org.obiba.magma.datasource.limesurvey.LimesurveyDatasource;
+import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.google.common.base.Preconditions;
+import org.springframework.util.Assert;
 
 public class DatabaseLimesurveyDatasourceFactory extends AbstractDatasourceFactory implements Disposable {
 
   private String databaseName;
-
-  private String tablePrefix;
 
   // transient because of XML serialization
   @SuppressWarnings("TransientFieldInNonSerializableClass")
@@ -42,22 +41,31 @@ public class DatabaseLimesurveyDatasourceFactory extends AbstractDatasourceFacto
    * @param tablePrefix
    * @param dataSourceRegistry
    */
-  public DatabaseLimesurveyDatasourceFactory(String name, String databaseName, String tablePrefix,
+  public DatabaseLimesurveyDatasourceFactory(@Nonnull String name, @Nonnull String databaseName,
       DatabaseRegistry databaseRegistry) {
+    Assert.notNull(name);
+    Assert.notNull(databaseName);
+    Assert.notNull(databaseRegistry);
     setName(name);
-    Preconditions.checkArgument(name != null);
-    Preconditions.checkArgument(databaseName != null);
-    Preconditions.checkArgument(databaseRegistry != null);
-
     this.databaseName = databaseName;
-    this.tablePrefix = tablePrefix;
     this.databaseRegistry = databaseRegistry;
   }
 
   @Nonnull
   @Override
   protected Datasource internalCreate() {
-    return new LimesurveyDatasource(getName(), databaseRegistry.getDataSource(databaseName, getName()), tablePrefix);
+    SqlDatabase.LimesurveyDatasourceSettings settings = getSettings();
+    return new LimesurveyDatasource(getName(), databaseRegistry.getDataSource(databaseName, getName()),
+        settings == null ? null : settings.getTablePrefix());
+  }
+
+  @Nullable
+  private SqlDatabase.LimesurveyDatasourceSettings getSettings() {
+    SqlDatabase database = (SqlDatabase) databaseRegistry.getDatabase(databaseName);
+    if(database == null) {
+      throw new IllegalArgumentException("Cannot find database " + databaseName);
+    }
+    return database.getLimesurveyDatasourceSettings();
   }
 
   @Override

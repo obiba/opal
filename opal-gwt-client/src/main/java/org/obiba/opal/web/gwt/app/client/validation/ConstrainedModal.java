@@ -15,7 +15,6 @@ import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
 import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
 import com.google.common.collect.Maps;
-import com.google.gwt.user.client.ui.Widget;
 
 public class ConstrainedModal {
 
@@ -31,13 +30,13 @@ public class ConstrainedModal {
     modal.addHandler(new ModalConstraintViolationErrorHandler(), ConstraintViolationErrorsEvent.getType());
   }
 
-  public void registerWidget(@Nonnull String propertyPath, @Nonnull String propertyLabel, @Nonnull Widget widget) {
-    registerWidget(propertyPath, propertyLabel, widget, null);
+  public void registerWidget(@Nonnull String propertyPath, @Nonnull String propertyLabel) {
+    registerWidget(propertyPath, propertyLabel, null);
   }
 
-  public void registerWidget(@Nonnull String propertyPath, @Nonnull String propertyLabel, @Nonnull Widget widget,
+  public void registerWidget(@Nonnull String propertyPath, @Nonnull String propertyLabel,
       @Nullable ControlGroup group) {
-    constrainedWidgets.put(propertyPath, new ConstrainedWidget(propertyPath, propertyLabel, widget, group));
+    constrainedWidgets.put(propertyPath, new ConstrainedWidget(propertyPath, propertyLabel, group));
   }
 
   private static class ConstrainedWidget {
@@ -48,17 +47,13 @@ public class ConstrainedModal {
     @Nonnull
     private final String propertyLabel;
 
-    @Nonnull
-    private final Widget widget;
-
     @Nullable
     private final ControlGroup group;
 
-    private ConstrainedWidget(@Nonnull String propertyPath, @Nonnull String propertyLabel, @Nonnull Widget widget,
+    private ConstrainedWidget(@Nonnull String propertyPath, @Nonnull String propertyLabel,
         @Nullable ControlGroup group) {
       this.propertyPath = propertyPath;
       this.propertyLabel = propertyLabel;
-      this.widget = widget;
       this.group = group;
     }
 
@@ -73,11 +68,6 @@ public class ConstrainedModal {
     }
 
     @Nonnull
-    private Widget getWidget() {
-      return widget;
-    }
-
-    @Nonnull
     private String getPropertyLabel() {
       return propertyLabel;
     }
@@ -89,15 +79,17 @@ public class ConstrainedModal {
     @Override
     public void onConstraintViolationErrors(ConstraintViolationErrorsEvent event) {
       for(ConstraintViolationErrorDto violation : event.getViolations()) {
-        ConstrainedWidget constrainedWidget = constrainedWidgets.get(violation.getPropertyPath());
+        String propertyPath = violation.getPropertyPath();
+        String messageTemplate = violation.getMessageTemplate();
+        ConstrainedWidget constrainedWidget = constrainedWidgets.get(propertyPath);
         if(constrainedWidget == null) {
-          // this error is not attached to a widget, default
-          modal.addAlert(validationMessageResolver.get(violation.getMessageTemplate()), AlertType.ERROR);
+          // this error is not attached to a widget
+          modal.addAlert(propertyPath + " " + validationMessageResolver.get(messageTemplate), AlertType.ERROR);
         } else {
           final ControlGroup group = constrainedWidget.getGroup();
           if(group != null) group.setType(ControlGroupType.ERROR);
           modal.addAlert(constrainedWidget.getPropertyLabel() + " " +
-              validationMessageResolver.get(violation.getMessageTemplate()), AlertType.ERROR, new ClosedHandler() {
+              validationMessageResolver.get(messageTemplate), AlertType.ERROR, new ClosedHandler() {
             @Override
             public void onClosed(ClosedEvent closedEvent) {
               if(group != null) group.setType(ControlGroupType.NONE);
