@@ -177,10 +177,31 @@
         </configuration>
       </plugin>
 
+      <!-- Disable annotation processors during normal compilation -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <proc>none</proc>
+        </configuration>
+      </plugin>
+
       <!-- Boilerplate Generation -->
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>apt-maven-plugin</artifactId>
+        <groupId>org.bsc.maven</groupId>
+        <artifactId>maven-processor-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>process</id>
+            <goals>
+              <goal>process</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <defaultOutputDirectory>${project.build.directory}/generated-sources/annotations</defaultOutputDirectory>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
       <!-- Add generated sources to the build path -->

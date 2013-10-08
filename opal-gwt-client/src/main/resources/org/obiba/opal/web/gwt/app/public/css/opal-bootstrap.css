@@ -1,7 +1,3 @@
-/*
- * Twitter Bootstrap
- */
-
 a:visited {
   color: #0088CC;
 }
@@ -70,4 +66,9 @@ th input[type="checkbox"], td input[type="checkbox"] {
 
 .table th, .table td {
   border-bottom-color: #EEEEEE;
+}
+
+.icon-small {
+  font-size: 70%; /* 10px */
+  vertical-align: text-top;
 }

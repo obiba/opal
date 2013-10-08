@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.administration.database.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabasePresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
@@ -73,7 +74,8 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
     sqlPager.setDisplay(sqlTable);
     sqlTable.addColumn(Columns.NAME, translations.nameLabel());
     sqlTable.addColumn(Columns.URL, translations.urlLabel());
-    sqlTable.addColumn(Columns.DRIVER, translations.driverLabel());
+    sqlTable.addColumn(Columns.USAGE, translations.usageLabel());
+    sqlTable.addColumn(Columns.SQL_SCHEMA, translations.sqlSchemaLabel());
     sqlTable.addColumn(Columns.USERNAME, translations.usernameLabel());
     sqlTable.addColumn(Columns.ACTIONS, translations.actionsLabel());
   }
@@ -121,11 +123,19 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
       }
     };
 
-    static final Column<DatabaseDto, String> DRIVER = new TextColumn<DatabaseDto>() {
-
+    static final Column<DatabaseDto, String> USAGE = new TextColumn<DatabaseDto>() {
       @Override
       public String getValue(DatabaseDto dto) {
-        return ((SqlDatabaseDto) dto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings)).getDriverClass();
+        return DatabasePresenter.Usage.valueOf(dto.getUsage().getName()).getLabel();
+      }
+    };
+
+    static final Column<DatabaseDto, String> SQL_SCHEMA = new TextColumn<DatabaseDto>() {
+      @Override
+      public String getValue(DatabaseDto dto) {
+        return DatabasePresenter.SqlSchema.valueOf(
+            ((SqlDatabaseDto) dto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings)).getSqlSchema().getName())
+            .getLabel();
       }
     };
 

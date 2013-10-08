@@ -196,7 +196,7 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
   private void displayDatabase(DatabaseDto dto) {
     SqlDatabaseDto sqlDatabaseDto = (SqlDatabaseDto) dto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings);
     getView().getName().setText(dto.getName());
-    getView().getUsageText().setText(dto.getUsage() == null ? null : dto.getUsage().getName());
+    getView().getUsageText().setText(dto.getUsage().getName());
     getView().getDriver().setText(sqlDatabaseDto.getDriverClass());
     getView().getDefaultStorage().setValue(dto.getDefaultStorage());
     getView().getUrl().setText(sqlDatabaseDto.getUrl());
@@ -235,21 +235,29 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
     sqlDto.setSqlSchema(sqlSchema);
 
     if(JDBC.getName().equals(sqlSchema.getName())) {
-      JdbcDatasourceSettingsDto jdbcSettings = JdbcDatasourceSettingsDto.create();
-      jdbcSettings.setDefaultEntityType(getView().getDefaultEntityType().getText());
-      jdbcSettings.setDefaultCreatedTimestampColumnName(getView().getDefaultCreatedTimestampColumn().getText());
-      jdbcSettings.setDefaultUpdatedTimestampColumnName(getView().getDefaultUpdatedTimestampColumn().getText());
-      jdbcSettings.setUseMetadataTables(getView().getUseMetadataTables().getValue());
-      sqlDto.setJdbcDatasourceSettings(jdbcSettings);
+      sqlDto.setJdbcDatasourceSettings(getJdbcDatasourceSettingsDto());
     } else if(LIMESURVEY.getName().equals(sqlSchema.getName())) {
-      SqlDatabaseDto.LimesurveyDatasourceSettingsDto limesurveySettings = SqlDatabaseDto.LimesurveyDatasourceSettingsDto
-          .create();
-      limesurveySettings.setTablePrefix(getView().getTablePrefix().getText());
-      sqlDto.setLimesurveyDatasourceSettings(limesurveySettings);
+      sqlDto.setLimesurveyDatasourceSettings(getLimesurveyDatasourceSettingsDto());
     }
 
     dto.setExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings, sqlDto);
     return dto;
+  }
+
+  private SqlDatabaseDto.LimesurveyDatasourceSettingsDto getLimesurveyDatasourceSettingsDto() {
+    SqlDatabaseDto.LimesurveyDatasourceSettingsDto limesurveySettings = SqlDatabaseDto.LimesurveyDatasourceSettingsDto
+        .create();
+    limesurveySettings.setTablePrefix(getView().getTablePrefix().getText());
+    return limesurveySettings;
+  }
+
+  private JdbcDatasourceSettingsDto getJdbcDatasourceSettingsDto() {
+    JdbcDatasourceSettingsDto jdbcSettings = JdbcDatasourceSettingsDto.create();
+    jdbcSettings.setDefaultEntityType(getView().getDefaultEntityType().getText());
+    jdbcSettings.setDefaultCreatedTimestampColumnName(getView().getDefaultCreatedTimestampColumn().getText());
+    jdbcSettings.setDefaultUpdatedTimestampColumnName(getView().getDefaultUpdatedTimestampColumn().getText());
+    jdbcSettings.setUseMetadataTables(getView().getUseMetadataTables().getValue());
+    return jdbcSettings;
   }
 
   private DatabaseDto.Usage parseUsage(String usageTxt) {
@@ -380,8 +388,6 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
 
   public interface Display extends PopupView, HasUiHandlers<DatabaseUiHandlers> {
 
-    void toggleJdbcOptions(boolean show);
-
     enum FormField {
       NAME,
       DRIVER,
@@ -440,6 +446,8 @@ public class DatabasePresenter extends ModalPresenterWidget<DatabasePresenter.Di
     void toggleDefaultStorage(boolean show);
 
     void toggleLimesurveyOptions(boolean show);
+
+    void toggleJdbcOptions(boolean show);
 
   }
 

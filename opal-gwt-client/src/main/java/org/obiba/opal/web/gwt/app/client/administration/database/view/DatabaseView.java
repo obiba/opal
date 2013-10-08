@@ -120,6 +120,9 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   DisclosurePanel jdbcOptions;
 
   @UiField
+  DisclosurePanel advancedOptions;
+
+  @UiField
   TextBox defaultEntityType;
 
   @UiField
@@ -384,7 +387,20 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
 
   @Override
   public HasText getProperties() {
-    return properties;
+    return new HasText() {
+      @Override
+      public String getText() {
+        return properties.getText();
+      }
+
+      @Override
+      public void setText(String text) {
+        properties.setText(text);
+        if(!Strings.isNullOrEmpty(text)) {
+          advancedOptions.setOpen(true);
+        }
+      }
+    };
   }
 
   @Override
@@ -447,6 +463,7 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   public void toggleLimesurveyOptions(boolean show) {
     if(!show) tablePrefix.setValue(null);
     limesurveyOptions.setVisible(show);
+    limesurveyOptions.setOpen(show);
   }
 
   @Override
@@ -457,6 +474,7 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
       useMetadataTables.setValue(false);
     }
     jdbcOptions.setVisible(show);
+    jdbcOptions.setOpen(show);
   }
 
 }
