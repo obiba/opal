@@ -9,19 +9,19 @@ li {
   list-style-type: none;
 }
 
-/*
- * Pretty print
+  /*
+   * Pretty print
 
-.container pre.prettyprint {
-  border: 1px dashed #CCCCCC;
-  padding: 10px;
-  margin-bottom: 0;
-}
- */
+  .container pre.prettyprint {
+    border: 1px dashed #CCCCCC;
+    padding: 10px;
+    margin-bottom: 0;
+  }
+   */
 
-/*
- * Opal
- */
+  /*
+   * Opal
+   */
 
 .tags .label {
   margin-right: 10px;
@@ -281,16 +281,16 @@ div.obiba-SuggestListBox {
   padding-top: 2px;
 }
 
-/*
- * Properties Table
- */
+  /*
+   * Properties Table
+   */
 .property-key {
   font-weight: bold;
 }
 
-/*
- * Ace editor
- */
+  /*
+   * Ace editor
+   */
 .ace-editor {
   height: 600px;
   border: 1px solid #DDD;
@@ -300,16 +300,16 @@ div.obiba-SuggestListBox {
   font-size: 1em;
 }
 
-/*
- * Magma widget
- */
+  /*
+   * Magma widget
+   */
 .magma {
   min-height: 200px;
 }
 
-/*
- * Diff widget
- */
+  /*
+   * Diff widget
+   */
 .table td.diff-rm {
   background-color: #FDD;
 }
@@ -326,6 +326,17 @@ div.obiba-SuggestListBox {
 .table td.diff-line-num {
   color: #999;
 }
+
 .table td.diff-line-code {
   font-family: Consolas, "Liberation Mono", Courier, monospace;
+}
+
+input.database-url {
+  width: 450px;
+}
+
+.icon-required {
+  font-size: 50%;
+  vertical-align: text-top;
+  color: #888;
 }

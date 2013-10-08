@@ -2,6 +2,8 @@ package org.obiba.opal.web.gwt.app.client.ui;
 
 import java.util.Stack;
 
+import javax.annotation.Nullable;
+
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.ModalFooter;
@@ -415,7 +417,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     });
   }
 
-  public void addAlert(String message, AlertType type, ClosedHandler handler) {
+  public void addAlert(String message, AlertType type, @Nullable ClosedHandler handler) {
     final Alert alert = new Alert(message);
     alert.setType(type);
     alert.setAnimation(true);

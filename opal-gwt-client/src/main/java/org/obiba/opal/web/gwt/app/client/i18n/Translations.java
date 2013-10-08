@@ -391,8 +391,11 @@ public interface Translations extends Constants {
       "DatabaseAlreadyExists", "A database with this name already exists.",//
       "DatabaseConnectionOk", "Connection successful.",//
       "DatabaseConnectionFailed", "Failed to connect: {0}.",//
+      "DatabaseIsNotEditable", "Database is used by a Datasource and is not editable",//
+      "CannotFindDatabase", "Cannot find database named {0}",//
       "NameIsRequired", "A name is required.",//
       "DriverIsRequired", "A driver is required.",//
+      "DefaultEntityTypeIsRequired", "Default Entity Type is required for Custom SQL schema.",//
       "DatabaseUsageIsRequired", "Database usage is required.",//
       "SQLSchemaIsRequired", "SQL schema is required.",//
       "LimeSurveyDatabaseIsRequired", "LimeSurvey database is required.",//
@@ -404,6 +407,8 @@ public interface Translations extends Constants {
       "IndexClearSelectAtLeastOne", "Select at least one index to clear.",//
       "IndexScheduleSelectAtLeastOne", "Select at least one index to schedule.",//
       "PasswordIsRequired", "A password is required.",//
+      "UsageIsRequired", "Database usage is required.",//
+      "SqlSchemaIsRequired", "Database SQL schema is required.",//
       "OpalURLIsRequired", "Opal address is required.",//
       "RemoteDatasourceIsRequired", "Remote datasource name is required.",//
       "TableSelectionIsRequired", "At least one table must be selected.",//
@@ -1546,6 +1551,18 @@ public interface Translations extends Constants {
   @DefaultStringValue("URL")
   String urlLabel();
 
+  @Description("Usage label")
+  @DefaultStringValue("Usage")
+  String usageLabel();
+
+  @Description("SQL Schema label")
+  @DefaultStringValue("SQL Schema")
+  String sqlSchemaLabel();
+
+  @Description("Default Entity Type label")
+  @DefaultStringValue("Default Entity Type")
+  String defaultEntityTypeLabel();
+
   @Description("Key/Value label")
   @DefaultStringValue("key=value")
   String keyValueLabel();
@@ -2141,9 +2158,37 @@ public interface Translations extends Constants {
   @DefaultStringValue("Last update {0}")
   String lastUpdateAgoLabel();
 
+  @Description("Variables count property label")
+  @DefaultStringValue("Variables Count")
+  String variablesCountProperty();
+
+  @Description("Entities count property label")
+  @DefaultStringValue("Entities Count")
+  String entitiesCountProperty();
+
   @Description("Report templates header")
   @DefaultStringValue("{0} Reports")
   String reportTemplatesHeader();
+
+  @Description("Import label")
+  @DefaultStringValue("Import")
+  String importLabel();
+
+  @Description("Storage label")
+  @DefaultStringValue("Storage")
+  String storageLabel();
+
+  @Description("Export label")
+  @DefaultStringValue("Export")
+  String exportLabel();
+
+  @Description("Opal SQL label")
+  @DefaultStringValue("Opal SQL")
+  String hibernateDatasourceLabel();
+
+  @Description("Custom SQL label")
+  @DefaultStringValue("Custom SQL")
+  String jdbcDatasourceLabel();
 
   @Description("Update {0} categories label")
   @DefaultStringValue("Update {0} categories")
@@ -2156,4 +2201,9 @@ public interface Translations extends Constants {
   @Description("Moment with ago label")
   @DefaultStringValue("{0} ({1})")
   String momentWithAgo();
+
+  @Description("Required label")
+  @DefaultStringValue("Required")
+  String required();
+
 }

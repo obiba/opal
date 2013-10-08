@@ -43,8 +43,7 @@ public class JdbcDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDto
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
     JdbcDatasourceFactoryDto jdbcDto = dto.getExtension(JdbcDatasourceFactoryDto.params);
-    return new DatabaseJdbcDatasourceFactory(dto.getName(), jdbcDto.getDatabase(), parseSettings(jdbcDto.getSettings()),
-        databaseRegistry);
+    return new DatabaseJdbcDatasourceFactory(dto.getName(), jdbcDto.getDatabase(), databaseRegistry);
   }
 
   private JdbcDatasourceSettings parseSettings(JdbcDatasourceSettingsDto dto) {

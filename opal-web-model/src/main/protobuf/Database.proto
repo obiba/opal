@@ -1,0 +1,60 @@
+import "Magma.proto";
+
+package Database;
+
+option java_package = "org.obiba.opal.web.model";
+
+
+message JdbcDriverDto {
+  required string driverName = 1; // e.g., "MySQL 5.1"
+  required string driverClass = 2; // e.g., "com.mysql.jdbc.Driver"
+  required string jdbcUrlTemplate = 3; // e.g., "jdbc:mysql://{hostname}:{port}/{databaseName}"
+  optional string version = 4;
+}
+
+message DatabaseDto {
+  enum Usage {
+    IMPORT = 0;
+    STORAGE = 1;
+    EXPORT = 2;
+  }
+  required string name = 1;
+  optional string description = 2;
+  optional bool editable = 3 [default = true];
+  required bool defaultStorage = 4 [default = false];
+  required Usage usage = 5;
+  optional bool usedForIdentifiers = 6;
+  extensions 1000 to max;
+}
+
+message SqlDatabaseDto {
+  enum SqlSchema {
+    HIBERNATE = 0;
+    JDBC = 1;
+    LIMESURVEY = 2;
+  }
+  message LimesurveyDatasourceSettingsDto {
+    optional string tablePrefix = 1;
+  }
+  required string url = 1; // jdbc:{mysql|hsqldb|postgresql}://{hostname}:{port}/{databaseName}
+  required string driverClass = 2;
+  required string username = 3;
+  optional string password = 4;
+  optional string properties = 5;
+  required SqlSchema sqlSchema = 6;
+  optional Magma.JdbcDatasourceSettingsDto jdbcDatasourceSettings = 7;
+  optional LimesurveyDatasourceSettingsDto limesurveyDatasourceSettings = 8;
+  extend DatabaseDto {
+    optional SqlDatabaseDto settings = 1000;
+  }
+}
+
+message MongoDbDatabaseDto {
+  required string url = 1; // mongodb://{hostname}:{port}/{databaseName}
+  optional string username = 2;
+  optional string password = 3;
+  optional string properties = 4;
+  extend DatabaseDto {
+    optional MongoDbDatabaseDto settings = 1001;
+  }
+}

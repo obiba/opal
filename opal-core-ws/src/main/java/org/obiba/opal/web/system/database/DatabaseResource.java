@@ -16,9 +16,8 @@ import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.obiba.opal.core.runtime.database.DatabaseAlreadyExistsException;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.core.runtime.database.MultipleIdentifiersDatabaseException;
+import org.obiba.opal.web.database.Dtos;
 import org.obiba.opal.web.magma.ClientErrorDtos;
-import org.obiba.opal.web.magma.Dtos;
-import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Ws;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -29,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
+import static org.obiba.opal.web.model.Database.DatabaseDto;
 
 @Component
 @Scope("request")
@@ -42,7 +42,7 @@ public class DatabaseResource {
   private String name;
 
   @GET
-  public Opal.DatabaseDto get() {
+  public DatabaseDto get() {
     return Dtos.asDto(getDatabase());
   }
 
@@ -54,19 +54,26 @@ public class DatabaseResource {
   public Response delete() {
     Database database = getDatabase();
     if(!database.isEditable()) {
-      return Response.status(BAD_REQUEST).build();
+      return Response.status(BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatabaseIsNotEditable").build()).build();
     }
     databaseRegistry.deleteDatabase(database);
     return Response.ok().build();
   }
 
   @PUT
-  public Response update(Opal.DatabaseDto dto)
-      throws MultipleIdentifiersDatabaseException, DatabaseAlreadyExistsException {
-    //TODO check that name did not change
-    Database database = Dtos.fromDto(dto);
+  public Response update(DatabaseDto dto) throws MultipleIdentifiersDatabaseException, DatabaseAlreadyExistsException {
+
+    Database database = databaseRegistry.getDatabase(dto.getName());
+    if(database == null) {
+      return Response.status(BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "CannotFindDatabase", dto.getName()).build()).build();
+    }
+
+    Dtos.fromDto(dto, database);
     if(!database.isEditable()) {
-      return Response.status(BAD_REQUEST).build();
+      return Response.status(BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatabaseIsNotEditable").build()).build();
     }
 
     databaseRegistry.addOrReplaceDatabase(database);

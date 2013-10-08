@@ -16,14 +16,15 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.Disposable;
 import org.obiba.magma.datasource.jdbc.JdbcDatasource;
 import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
+import org.obiba.magma.datasource.jdbc.JdbcValueTableSettings;
+import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class DatabaseJdbcDatasourceFactory extends AbstractDatasourceFactory implements Disposable {
 
   private String databaseName;
-
-  private JdbcDatasourceSettings settings;
 
   // transient because of XML serialization
   @SuppressWarnings("TransientFieldInNonSerializableClass")
@@ -35,23 +36,36 @@ public class DatabaseJdbcDatasourceFactory extends AbstractDatasourceFactory imp
   public DatabaseJdbcDatasourceFactory() {
   }
 
-  /**
-   * @param name
-   * @param jdbcDataSourceRegistry
-   * @param parseSettings
-   */
-  public DatabaseJdbcDatasourceFactory(String name, String databaseName, JdbcDatasourceSettings settings,
-      DatabaseRegistry databaseRegistry) {
+  public DatabaseJdbcDatasourceFactory(String name, String databaseName, DatabaseRegistry databaseRegistry) {
     setName(name);
     this.databaseName = databaseName;
-    this.settings = settings;
     this.databaseRegistry = databaseRegistry;
   }
 
   @Nonnull
   @Override
   protected Datasource internalCreate() {
-    return new JdbcDatasource(getName(), databaseRegistry.getDataSource(databaseName, getName()), settings);
+    return new JdbcDatasource(getName(), databaseRegistry.getDataSource(databaseName, getName()), getSettings());
+  }
+
+  private JdbcDatasourceSettings getSettings() {
+    SqlDatabase database = (SqlDatabase) databaseRegistry.getDatabase(databaseName);
+    if(database == null) {
+      throw new IllegalArgumentException("Cannot find database " + databaseName);
+    }
+    JdbcDatasourceSettings settings = new JdbcDatasourceSettings();
+    SqlDatabase.JdbcDatasourceSettings dbSettings = database.getJdbcDatasourceSettings();
+    if(dbSettings != null) {
+      BeanUtils.copyProperties(dbSettings, settings, new String[] { "tableSettings" });
+      if(dbSettings.getTableSettings() != null) {
+        for(SqlDatabase.JdbcDatasourceSettings.JdbcValueTableSettings dbTableSettings : dbSettings.getTableSettings()) {
+          JdbcValueTableSettings tableSettings = new JdbcValueTableSettings();
+          BeanUtils.copyProperties(dbTableSettings, tableSettings);
+          settings.addTableSettings(tableSettings);
+        }
+      }
+    }
+    return settings;
   }
 
   @Override
