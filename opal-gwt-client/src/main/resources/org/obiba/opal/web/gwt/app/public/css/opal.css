@@ -334,3 +334,9 @@ div.obiba-SuggestListBox {
 input.database-url {
   width: 450px;
 }
+
+.icon-required {
+  font-size: 50%;
+  vertical-align: text-top;
+  color: #888;
+}

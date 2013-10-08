@@ -2201,4 +2201,9 @@ public interface Translations extends Constants {
   @Description("Moment with ago label")
   @DefaultStringValue("{0} ({1})")
   String momentWithAgo();
+
+  @Description("Required label")
+  @DefaultStringValue("Required")
+  String required();
+
 }

@@ -8,7 +8,7 @@
     <b:ControlGroup ui:field="nameGroup">
       <b:ControlLabel for="name">
         <ui:msg description="Name label">Name</ui:msg>
-        <i class="icon-asterisk icon-small"> </i>
+        <o:RequiredIcon/>
       </b:ControlLabel>
       <b:TextBox ui:field="name" b:id="name"/>
       <b:HelpBlock>
@@ -19,7 +19,7 @@
     <b:ControlGroup ui:field="usageGroup">
       <b:ControlLabel for="usage">
         <ui:msg description="Usage label">Usage</ui:msg>
-        <i class="icon-asterisk icon-small"> </i>
+        <o:RequiredIcon/>
       </b:ControlLabel>
       <o:Chooser ui:field="usage" name="usage"/>
       <b:HelpBlock>
@@ -38,7 +38,7 @@
     <b:ControlGroup ui:field="sqlSchemaGroup">
       <b:ControlLabel for="magmaDatasourceType">
         <ui:msg description="SQL Schema label">SQL Schema</ui:msg>
-        <i class="icon-asterisk icon-small"> </i>
+        <o:RequiredIcon/>
       </b:ControlLabel>
       <o:Chooser ui:field="sqlSchema" name="magmaDatasourceType"/>
     </b:ControlGroup>
@@ -46,7 +46,7 @@
     <b:ControlGroup ui:field="driverGroup">
       <b:ControlLabel for="driver">
         <ui:msg description="Driver label">Driver</ui:msg>
-        <i class="icon-asterisk icon-small"> </i>
+        <o:RequiredIcon/>
       </b:ControlLabel>
       <o:Chooser ui:field="driver" name="driver"/>
     </b:ControlGroup>
@@ -54,7 +54,7 @@
     <b:ControlGroup ui:field="urlGroup">
       <b:ControlLabel for="url">
         <ui:msg description="Url label">Url</ui:msg>
-        <i class="icon-asterisk icon-small"> </i>
+        <o:RequiredIcon/>
       </b:ControlLabel>
       <b:TextBox ui:field="url" b:id="url" addStyleNames="database-url"/>
     </b:ControlGroup>
@@ -62,7 +62,7 @@
     <b:ControlGroup ui:field="usernameGroup">
       <b:ControlLabel for="username">
         <ui:msg description="Username label">Username</ui:msg>
-        <i class="icon-asterisk icon-small"> </i>
+        <o:RequiredIcon/>
       </b:ControlLabel>
       <b:TextBox ui:field="username" b:id="username"/>
     </b:ControlGroup>
@@ -70,7 +70,7 @@
     <b:ControlGroup ui:field="passwordGroup">
       <b:ControlLabel for="password">
         <ui:msg description="Password label">Password</ui:msg>
-        <i class="icon-asterisk icon-small"> </i>
+        <o:RequiredIcon/>
       </b:ControlLabel>
       <b:PasswordTextBox ui:field="password" b:id="password"/>
     </b:ControlGroup>
@@ -84,7 +84,7 @@
       <g:FlowPanel>
         <b:ControlLabel for="tablePrefix">
           <ui:msg description="tablePrefix label">Table prefix</ui:msg>
-          <i class="icon-asterisk icon-small"> </i>
+          <o:RequiredIcon/>
         </b:ControlLabel>
         <b:TextBox ui:field="tablePrefix" b:id="tablePrefix"/>
       </g:FlowPanel>
