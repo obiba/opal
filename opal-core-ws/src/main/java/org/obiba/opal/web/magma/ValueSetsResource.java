@@ -13,18 +13,21 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 
 import javax.annotation.Nullable;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.jboss.resteasy.annotations.cache.Cache;
+import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
@@ -40,6 +43,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 /**
  *
@@ -94,6 +98,33 @@ public class ValueSetsResource extends AbstractValueTableResource {
         : getValueSetsDto(uriInfo, variableEntities, filterBinary);
 
     return TimestampedResponses.ok(getValueTable(), vs).build();
+  }
+
+  /**
+   * Get the value set timestamps without the values.
+   * @param offset
+   * @param limit
+   * @return
+   */
+  @GET
+  @Path("/timestamps")
+  public Response getValueSetsTimestamps(@QueryParam("offset") @DefaultValue("0") int offset, //
+      @QueryParam("limit") @DefaultValue("100") int limit) {
+
+    // filter entities
+    Iterable<VariableEntity> variableEntities = entities == null ? filterEntities(null, offset, limit) : entities;
+
+    ValueSetsDto.Builder builder = ValueSetsDto.newBuilder().setEntityType(getValueTable().getEntityType());
+    builder.addAllValueSets(Iterables.transform(variableEntities, new Function<VariableEntity, ValueSetDto>() {
+      @Override
+      public ValueSetDto apply(VariableEntity fromEntity) {
+        Timestamps timestamps = getValueTable().getValueSetTimestamps(fromEntity);
+        return ValueSetsDto.ValueSetDto.newBuilder().setIdentifier(fromEntity.getIdentifier())
+            .setTimestamps(Dtos.asDto(timestamps)).build();
+      }
+    }));
+
+    return TimestampedResponses.ok(getValueTable(), builder.build()).build();
   }
 
   private ValueSetsDto getValueSetsDto(UriInfo uriInfo, String select, Iterable<VariableEntity> variableEntities,

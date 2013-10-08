@@ -9,10 +9,10 @@
  */
 package org.obiba.opal.rest.client.magma;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -51,6 +51,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 
 @SuppressWarnings("OverlyCoupledClass")
@@ -63,6 +64,10 @@ class RestValueTable extends AbstractValueTable {
   private final URI tableReference;
 
   private Timestamps tableTimestamps;
+
+  private Map<String, Timestamps> valueSetsTimestamps = Maps.newHashMap();
+
+  private boolean valueSetsTimestampsSupported = true;
 
   RestValueTable(Datasource datasource, TableDto dto) {
     super(datasource, dto.getName());
@@ -123,6 +128,32 @@ class RestValueTable extends AbstractValueTable {
       throw new NoSuchValueSetException(this, entity);
     }
     return new LazyValueSet(this, entity);
+  }
+
+  @Override
+  public Timestamps getValueSetTimestamps(VariableEntity entity) throws NoSuchValueSetException {
+    if(valueSetsTimestampsSupported && valueSetsTimestamps.isEmpty()) {
+      initialiseValueSetsTimestamps();
+    }
+
+    return valueSetsTimestampsSupported
+        ? valueSetsTimestamps.get(entity.getIdentifier())
+        : super.getValueSetTimestamps(entity);
+  }
+
+  private void initialiseValueSetsTimestamps() {
+    try {
+      ValueSetsDto vss = getOpalClient()
+          .getResource(ValueSetsDto.class, newUri("valueSets", "timestamps").query("limit", "-1").build(),
+              ValueSetsDto.newBuilder());
+      if(vss.getValueSetsCount() > 0) {
+        for(ValueSetsDto.ValueSetDto vs : vss.getValueSetsList()) {
+          valueSetsTimestamps.put(vs.getIdentifier(), new ValueSetTimestamps(vs.getTimestamps()));
+        }
+      }
+    } catch(Exception e) {
+      valueSetsTimestampsSupported = false;
+    }
   }
 
   void refresh() {
@@ -220,6 +251,7 @@ class RestValueTable extends AbstractValueTable {
 
     /**
      * Get the binary value directly from the link provided in the value dto.
+     *
      * @param valueDto
      * @return
      */
@@ -274,34 +306,33 @@ class RestValueTable extends AbstractValueTable {
       }
       return valueSet;
     }
+  }
 
-    private class ValueSetTimestamps implements Timestamps {
+  private class ValueSetTimestamps implements Timestamps {
 
-      private final Magma.TimestampsDto tsDto;
+    private final Magma.TimestampsDto tsDto;
 
-      private ValueSetTimestamps(Magma.TimestampsDto tsDto) {
-        this.tsDto = tsDto;
-      }
-
-      @Nonnull
-      @Override
-      public Value getLastUpdate() {
-        if(tsDto != null && tsDto.hasLastUpdate()) {
-          return DateTimeType.get().valueOf(tsDto.getLastUpdate());
-        }
-        return RestValueTable.this.getTimestamps().getLastUpdate();
-      }
-
-      @Nonnull
-      @Override
-      public Value getCreated() {
-        if(tsDto != null && tsDto.hasCreated()) {
-          return DateTimeType.get().valueOf(tsDto.getCreated());
-        }
-        return RestValueTable.this.getTimestamps().getCreated();
-      }
+    private ValueSetTimestamps(Magma.TimestampsDto tsDto) {
+      this.tsDto = tsDto;
     }
 
+    @Nonnull
+    @Override
+    public Value getLastUpdate() {
+      if(tsDto != null && tsDto.hasLastUpdate()) {
+        return DateTimeType.get().valueOf(tsDto.getLastUpdate());
+      }
+      return getTimestamps().getLastUpdate();
+    }
+
+    @Nonnull
+    @Override
+    public Value getCreated() {
+      if(tsDto != null && tsDto.hasCreated()) {
+        return DateTimeType.get().valueOf(tsDto.getCreated());
+      }
+      return getTimestamps().getCreated();
+    }
   }
 
   @Override
