@@ -43,24 +43,21 @@
       <b:TextBox ui:field="url" b:id="url" addStyleNames="database-url"/>
       <b:HelpBlock>
         <ui:msg description="Url help label">
-          For example:
-          <i>mongodb://localhost:27017/opal_data</i>
+          For example: mongodb://localhost:27017/opal_data
         </ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 
-    <b:ControlGroup ui:field="usernameGroup">
+    <b:ControlGroup>
       <b:ControlLabel for="username">
         <ui:msg description="Username label">Username</ui:msg>
-        <o:RequiredIcon/>
       </b:ControlLabel>
       <b:TextBox ui:field="username" b:id="username"/>
     </b:ControlGroup>
 
-    <b:ControlGroup ui:field="passwordGroup">
+    <b:ControlGroup>
       <b:ControlLabel for="password">
         <ui:msg description="Password label">Password</ui:msg>
-        <o:RequiredIcon/>
       </b:ControlLabel>
       <b:PasswordTextBox ui:field="password" b:id="password"/>
     </b:ControlGroup>

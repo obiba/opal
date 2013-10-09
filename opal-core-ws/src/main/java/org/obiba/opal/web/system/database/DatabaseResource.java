@@ -2,6 +2,7 @@ package org.obiba.opal.web.system.database;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -12,6 +13,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.database.Database;
+import org.obiba.opal.core.domain.database.MongoDbDatabase;
 import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.obiba.opal.core.runtime.database.DatabaseAlreadyExistsException;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
@@ -88,6 +90,9 @@ public class DatabaseResource {
     if(database instanceof SqlDatabase) {
       return testSqlConnection();
     }
+    if(database instanceof MongoDbDatabase) {
+      return testMongoConnection();
+    }
     throw new RuntimeException("Connection test not yet implemented for database " + database.getClass());
   }
 
@@ -102,9 +107,23 @@ public class DatabaseResource {
           return con.isValid(1);
         }
       });
-      if(result != null && result) return Response.ok().build();
-    } catch(DataAccessException e) {
+      if(result != null && result) {
+        return Response.ok().build();
+      }
+    } catch(RuntimeException e) {
       error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed", e);
+    }
+    return Response.status(SERVICE_UNAVAILABLE).entity(error).build();
+  }
+
+  private Response testMongoConnection() {
+    Ws.ClientErrorDto error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed").build();
+    try {
+      MongoDbDatabase database = (MongoDbDatabase) getDatabase();
+      List<String> dbs = database.createMongoDBFactory().getMongoClient().getDatabaseNames();
+      if(dbs.contains(database.getMongoDbDatabaseName())) {
+        return Response.ok().build();
+      }
     } catch(RuntimeException e) {
       error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed", e);
     }

@@ -94,10 +94,6 @@ public class MongoDatabasePresenter extends AbstractDatabasePresenter<MongoDatab
         validators = new LinkedHashSet<FieldValidator>();
         validators.add(new RequiredTextValidator(getView().getName(), "NameIsRequired", FormField.NAME.name()));
         validators.add(new RequiredTextValidator(getView().getUrl(), "UrlIsRequired", FormField.URL.name()));
-        validators
-            .add(new RequiredTextValidator(getView().getUsername(), "UsernameIsRequired", FormField.USERNAME.name()));
-        validators
-            .add(new RequiredTextValidator(getView().getPassword(), "PasswordIsRequired", FormField.PASSWORD.name()));
         validators.add(new RequiredValueValidator(getView().getUsage(), "UsageIsRequired", FormField.USAGE.name()));
       }
       return validators;
@@ -115,8 +111,6 @@ public class MongoDatabasePresenter extends AbstractDatabasePresenter<MongoDatab
     enum FormField {
       NAME,
       URL,
-      USERNAME,
-      PASSWORD,
       USAGE,
     }
 
