@@ -89,6 +89,7 @@ public class AdministrationModule extends AbstractPresenterModule {
   private void configureSystemConfig() {
     bindPresenter(JVMPresenter.class, JVMPresenter.Display.class, JVMView.class, JVMPresenter.Proxy.class);
     bindPresenter(ServerPresenter.class, ServerPresenter.Display.class, ServerView.class, ServerPresenter.Proxy.class);
+
     bindPresenter(FilesAdministrationPresenter.class, FilesAdministrationPresenter.Display.class,
         FilesAdministrationView.class, FilesAdministrationPresenter.Proxy.class);
     bindPresenter(ConfigurationPresenter.class, ConfigurationPresenter.Display.class, ConfigurationView.class,

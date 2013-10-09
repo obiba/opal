@@ -86,10 +86,12 @@
 
       </g:FlowPanel>
 
-      <b:NavLink disabled="true">
+      <b:NavLink>
         <ui:msg description="Taxonomies label">Taxonomies</ui:msg>
       </b:NavLink>
-      <g:FlowPanel>
+      <!--<g:FlowPanel ui:field='taxonomiesPanel'>-->
+      <!--</g:FlowPanel>-->
+      <g:FlowPanel addStyleNames="panel" ui:field='taxonomiesPanel'>
       </g:FlowPanel>
     </o:NavPillsPanel>
 

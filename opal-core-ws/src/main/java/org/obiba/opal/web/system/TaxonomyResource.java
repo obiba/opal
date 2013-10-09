@@ -46,4 +46,5 @@ public class TaxonomyResource {
     taxonomyService.saveTaxonomy(Dtos.fromDto(dto));
     return Response.ok().build();
   }
+
 }

@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.administration.server.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomiesPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
@@ -22,11 +23,14 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.GeneralConf;
+import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.View;
@@ -43,22 +47,30 @@ public class ServerPresenter extends ItemAdministrationPresenter<ServerPresenter
   @NameToken(Places.SERVER)
   public interface Proxy extends ProxyPlace<ServerPresenter> {}
 
+  private final TaxonomiesPresenter taxonomiesPresenter;
+
+  public static final Object TaxonomiesSlot = new Object();
+
   public interface Display extends View, HasBreadcrumbs, HasUiHandlers<ServerUiHandlers> {
 
-    void renderProperties(GeneralConf resource);
+    void renderGeneralProperties(GeneralConf resource);
 
     String getName();
 
     String getDefaultCharSet();
 
     JsArrayString getLanguages();
+
+//    void renderTaxonomies(JsArray<TaxonomyDto> taxonomiesDto);
   }
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
   @Inject
-  public ServerPresenter(Display display, EventBus eventBus, Proxy proxy, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
+  public ServerPresenter(Display display, EventBus eventBus, Proxy proxy,
+      Provider<TaxonomiesPresenter> serverPresenterProvider, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
+    taxonomiesPresenter = serverPresenterProvider.get();
     this.breadcrumbsHelper = breadcrumbsHelper;
     getView().setUiHandlers(this);
   }
@@ -80,6 +92,9 @@ public class ServerPresenter extends ItemAdministrationPresenter<ServerPresenter
     super.onReveal();
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
     initGeneralConfig();
+
+    addToSlot(TaxonomiesSlot, taxonomiesPresenter);
+    initTaxonomiesConfig();
   }
 
   @Override
@@ -136,7 +151,20 @@ public class ServerPresenter extends ItemAdministrationPresenter<ServerPresenter
 
       @Override
       public void onResource(Response response, GeneralConf resource) {
-        getView().renderProperties(resource);
+        getView().renderGeneralProperties(resource);
+      }
+    }).get().send();
+  }
+
+  private void initTaxonomiesConfig() {
+    ResourceRequestBuilderFactory.<JsArray<TaxonomyDto>>newBuilder()//
+        .forResource("/system/conf/taxonomies").withCallback(new ResourceCallback<JsArray<TaxonomyDto>>() {
+
+      @Override
+      public void onResource(Response response, JsArray<TaxonomyDto> resource) {
+
+//        getView().renderTaxonomies(resource);
+        taxonomiesPresenter.getView().setTaxonomies(resource);
       }
     }).get().send();
   }
@@ -154,7 +182,7 @@ public class ServerPresenter extends ItemAdministrationPresenter<ServerPresenter
 
         @Override
         public void onResource(Response response, GeneralConf resource) {
-          getView().renderProperties(resource);
+          getView().renderGeneralProperties(resource);
         }
       }).get().send();
     }

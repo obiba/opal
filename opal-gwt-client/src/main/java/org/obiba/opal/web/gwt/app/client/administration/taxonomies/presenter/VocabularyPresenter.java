@@ -10,7 +10,6 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto.VocabularyDto;
 
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
@@ -34,6 +33,8 @@ public class VocabularyPresenter extends Presenter<VocabularyPresenter.Display, 
     void setTaxonomyAndVocabulary(TaxonomyDto taxonomyDto, VocabularyDto vocabularyDto);
 
     HasWidgets getBreadcrumbs();
+
+    void displayTerm(TaxonomyDto.TermDto termDto);
   }
 
   private final BreadcrumbsBuilder breadcrumbsBuilder;
@@ -42,7 +43,7 @@ public class VocabularyPresenter extends Presenter<VocabularyPresenter.Display, 
 
   private TaxonomyDto taxonomy;
 
-  private JsArray<TaxonomyDto> taxonomies;
+//  private JsArray<TaxonomyDto> taxonomies;
 
   private VocabularyDto vocabulary;
 
@@ -105,7 +106,7 @@ public class VocabularyPresenter extends Presenter<VocabularyPresenter.Display, 
 
   @Override
   public void onTermSelection(TaxonomyDto taxonomyDto, VocabularyDto vocabularyDto, TaxonomyDto.TermDto termDto) {
-    //To change body of implemented methods use File | Settings | File Templates.
+    getView().displayTerm(termDto);
   }
 
 }

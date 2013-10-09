@@ -18,50 +18,34 @@
       </Column>
       <Column size="3">
         <ButtonGroup addStyleNames="pull-right">
-          <Button type="INFO" size="SMALL" ui:field="edit">
-            <ui:msg description="Edit Vocabulary">Edit Vocabulary</ui:msg>
+          <Button type="INFO" size="SMALL" icon="PENCIL" ui:field="editButton">
+            <ui:msg description="Edit Vocabulary">Edit</ui:msg>
           </Button>
         </ButtonGroup>
         <ButtonGroup addStyleNames="pull-right">
-          <Button type="INFO" icon="PLUS" size="SMALL" ui:field="add">
-            <ui:msg description="Add Term">Add Term</ui:msg>
+          <Button type="INFO" size="SMALL" ui:field="saveButton">
+            <ui:msg description="Add Term">Save</ui:msg>
           </Button>
         </ButtonGroup>
       </Column>
     </FluidRow>
     <b:Heading size="4" ui:field="vocabularyName"/>
-    <g:FlowPanel>
-      <FluidRow>
-        <Column size="1">
-          <b:Heading size="5">Title</b:Heading>
-        </Column>
-        <b:Column size="11">
-          <g:FlowPanel ui:field="titlePanel"/>
-        </b:Column>
-      </FluidRow>
-    </g:FlowPanel>
-    <g:FlowPanel>
-      <FluidRow>
-        <Column size="1">
-          <b:Heading size="5">Description</b:Heading>
-        </Column>
-        <b:Column size="11">
-          <g:FlowPanel ui:field="descriptionPanel"/>
-        </b:Column>
-      </FluidRow>
-    </g:FlowPanel>
-    <g:FlowPanel>
-      <FluidRow>
-        <Column size="1">
-          <b:Heading size="5">Taxonomy:</b:Heading>
-        </Column>
-        <b:Column size="11">
-          <g:InlineLabel ui:field="taxonomyName"/>
-        </b:Column>
-      </FluidRow>
-    </g:FlowPanel>
+    <b:Row>
+      <b:Column size="6">
+        <g:FlowPanel ui:field="vocabularyPanel"/>
+      </b:Column>
+    </b:Row>
+
     <b:Heading size="5">Terms</b:Heading>
-    <g:FlowPanel ui:field="termsPanel" addStyleNames="items"></g:FlowPanel>
-    <b:CheckBox ui:field="isRepeatable">Repeatable</b:CheckBox>
+    <b:FluidRow>
+      <b:Column size="6">
+        <g:FlowPanel ui:field="termsPanel" addStyleNames="items"></g:FlowPanel>
+      </b:Column>
+      <b:Column size="6">
+        <g:FlowPanel ui:field="termPanel"></g:FlowPanel>
+      </b:Column>
+    </b:FluidRow>
+
+    <!--<t:TermsTable ui:field="termsTable" width="100%" addStyleNames="left-aligned first-column-checkbox"/>-->
   </g:FlowPanel>
 </ui:UiBinder>

@@ -14,7 +14,6 @@ import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -36,8 +35,6 @@ public class TaxonomiesPresenter extends Presenter<TaxonomiesPresenter.Display, 
 
   public interface Display extends View, HasUiHandlers<TaxonomiesUiHandlers> {
     void setTaxonomies(JsArray<TaxonomyDto> taxonomies);
-
-    HasWidgets getBreadcrumbs();
   }
 
   private final PlaceManager placeManager;
@@ -81,7 +78,7 @@ public class TaxonomiesPresenter extends Presenter<TaxonomiesPresenter.Display, 
   @Override
   protected void onReveal() {
     super.onReveal();
-    breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs()).build();
+//    breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs()).build();
     refresh();
   }
 
