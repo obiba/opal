@@ -11,10 +11,9 @@ package org.obiba.opal.web.gwt.app.client.administration.database.view;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabasePresenter;
-import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabasePresenter.Display;
-import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabasePresenter.Mode;
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.AbstractDatabasePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseUiHandlers;
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.SqlDatabasePresenter.Display;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
@@ -29,7 +28,6 @@ import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -38,6 +36,7 @@ import com.google.gwt.event.dom.client.HasChangeHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
@@ -46,18 +45,16 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
+import static org.obiba.opal.web.gwt.app.client.administration.database.presenter.AbstractDatabasePresenter.Mode.CREATE;
+import static org.obiba.opal.web.gwt.app.client.administration.database.presenter.AbstractDatabasePresenter.SqlSchema;
+import static org.obiba.opal.web.gwt.app.client.administration.database.presenter.AbstractDatabasePresenter.Usage;
+
 /**
  *
  */
-public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandlers> implements Display {
+public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandlers> implements Display {
 
-  interface ViewUiBinder extends UiBinder<Widget, DatabaseView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  private static final Translations translations = GWT.create(Translations.class);
-
-  private final Widget widget;
+  interface Binder extends UiBinder<Widget, SqlDatabaseView> {}
 
   @UiField
   Modal modal;
@@ -139,14 +136,17 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
 
   private JsArray<JdbcDriverDto> availableDrivers;
 
+  private final Translations translations;
+
   @Inject
-  public DatabaseView(EventBus eventBus) {
+  public SqlDatabaseView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
-    widget = uiBinder.createAndBindUi(this);
-    initWidgets();
+    this.translations = translations;
+    initWidget(uiBinder.createAndBindUi(this));
+    init();
   }
 
-  private void initWidgets() {
+  private void init() {
     modal.hide();
     properties.getElement().setAttribute("placeholder", translations.keyValueLabel());
 
@@ -156,7 +156,7 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
       public void onChange(ChangeEvent event) {
         JdbcDriverDto jdbcDriver = getDriver(getDriver().getText());
         if(jdbcDriver != null) {
-          url.setText(jdbcDriver.getJdbcUrlTemplate());
+          url.getElement().setAttribute("placeholder", jdbcDriver.getJdbcUrlTemplate());
         }
       }
     });
@@ -178,11 +178,6 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   }
 
   @Override
-  public Widget asWidget() {
-    return widget;
-  }
-
-  @Override
   public void show() {
     name.setFocus(true);
     super.show();
@@ -194,9 +189,9 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   }
 
   @Override
-  public void setDialogMode(Mode dialogMode) {
-    name.setEnabled(Mode.CREATE == dialogMode);
-    modal.setTitle(Mode.CREATE == dialogMode ? translations.addDatabase() : translations.editDatabase());
+  public void setDialogMode(AbstractDatabasePresenter.Mode dialogMode) {
+    name.setEnabled(dialogMode == CREATE);
+    modal.setTitle(dialogMode == CREATE ? translations.addDatabase() : translations.editDatabase());
   }
 
   @Override
@@ -259,70 +254,67 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   }
 
   @Override
-  public HasText getSqlSchema() {
-    return new HasText() {
+  public TakesValue<SqlSchema> getSqlSchema() {
+    return new TakesValue<SqlSchema>() {
 
       @Override
-      public String getText() {
-        int selectedIndex = sqlSchema.getSelectedIndex();
-        return selectedIndex < 0 ? null : sqlSchema.getValue(selectedIndex);
-      }
-
-      @Override
-      public void setText(String text) {
-        if(Strings.isNullOrEmpty(text)) return;
+      public void setValue(SqlSchema selectedSqlSchema) {
+        if(selectedSqlSchema == null) return;
         int count = sqlSchema.getItemCount();
         for(int i = 0; i < count; i++) {
-          if(sqlSchema.getValue(i).equals(text)) {
+          if(sqlSchema.getValue(i).equals(selectedSqlSchema.name())) {
             sqlSchema.setSelectedIndex(i);
-            DatabasePresenter.SqlSchema selectedSqlSchema = DatabasePresenter.SqlSchema.valueOf(text);
-            toggleLimesurveyOptions(selectedSqlSchema == DatabasePresenter.SqlSchema.LIMESURVEY);
-            toggleJdbcOptions(selectedSqlSchema == DatabasePresenter.SqlSchema.JDBC);
+            toggleLimesurveyOptions(selectedSqlSchema == SqlSchema.LIMESURVEY);
+            toggleJdbcOptions(selectedSqlSchema == SqlSchema.JDBC);
             break;
           }
         }
+      }
+
+      @Override
+      public SqlSchema getValue() {
+        int selectedIndex = sqlSchema.getSelectedIndex();
+        return selectedIndex < 0 ? null : SqlSchema.valueOf(sqlSchema.getValue(selectedIndex));
       }
     };
   }
 
   private void setAvailableUsages() {
-    for(DatabasePresenter.Usage usageType : DatabasePresenter.Usage.values()) {
+    for(Usage usageType : Usage.values()) {
       usage.addItem(usageType.getLabel(), usageType.name());
     }
-    getUsageText().setText(DatabasePresenter.Usage.STORAGE.name());
+    getUsage().setValue(Usage.STORAGE);
   }
 
   @Override
-  public void setAvailableSqlSchemas(DatabasePresenter.SqlSchema... sqlSchemas) {
+  public void setAvailableSqlSchemas(SqlSchema... sqlSchemas) {
     sqlSchema.clear();
     if(sqlSchemas != null) {
-      for(DatabasePresenter.SqlSchema datasourceType : sqlSchemas) {
+      for(SqlSchema datasourceType : sqlSchemas) {
         sqlSchema.addItem(datasourceType.getLabel(), datasourceType.name());
       }
-      getSqlSchema().setText(sqlSchemas[0].name());
+      getSqlSchema().setValue(sqlSchemas[0]);
     }
   }
 
   @Override
-  public HasText getUsageText() {
-    return new HasText() {
-
+  public TakesValue<Usage> getUsage() {
+    return new TakesValue<Usage>() {
       @Override
-      public String getText() {
+      public Usage getValue() {
         int selectedIndex = usage.getSelectedIndex();
-        return selectedIndex < 0 ? null : usage.getValue(selectedIndex);
+        return selectedIndex < 0 ? null : Usage.valueOf(usage.getValue(selectedIndex));
       }
 
       @Override
-      public void setText(String text) {
-        if(Strings.isNullOrEmpty(text)) return;
+      public void setValue(Usage selectedUsage) {
+        if(selectedUsage == null) return;
         int count = usage.getItemCount();
         for(int i = 0; i < count; i++) {
-          if(usage.getValue(i).equals(text)) {
+          if(usage.getValue(i).equals(selectedUsage.name())) {
             usage.setSelectedIndex(i);
-            DatabasePresenter.Usage selectedUsage = DatabasePresenter.Usage.valueOf(text);
             setAvailableSqlSchemas(selectedUsage.getSupportedSqlSchemas());
-            toggleDefaultStorage(selectedUsage == DatabasePresenter.Usage.STORAGE);
+            toggleDefaultStorage(selectedUsage == Usage.STORAGE);
             break;
           }
         }
@@ -366,9 +358,9 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
           }
         }
         if(Strings.isNullOrEmpty(url.getText())) {
-          JdbcDriverDto dto = getDriver(getDriver().getText());
+          JdbcDriverDto dto = getDriver(text);
           if(dto != null) {
-            url.setText(dto.getJdbcUrlTemplate());
+            url.getElement().setAttribute("placeholder", dto.getJdbcUrlTemplate());
           }
         }
       }
@@ -434,16 +426,16 @@ public class DatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandler
   }
 
   @Override
-  public void setAvailableDrivers(JsArray<JdbcDriverDto> resource) {
-    availableDrivers = resource;
-    for(JdbcDriverDto driverDto : JsArrays.toIterable(resource)) {
+  public void setAvailableDrivers(JsArray<JdbcDriverDto> availableDrivers) {
+    this.availableDrivers = availableDrivers;
+    for(JdbcDriverDto driverDto : JsArrays.toIterable(availableDrivers)) {
       driver.addItem(driverDto.getDriverName(), driverDto.getDriverClass());
     }
     getDriver().setText(null);
   }
 
   @Nullable
-  private JdbcDriverDto getDriver(@SuppressWarnings("ParameterHidesMemberVariable") @Nullable String driverClass) {
+  private JdbcDriverDto getDriver(@Nullable String driverClass) {
     if(Strings.isNullOrEmpty(driverClass)) return null;
     for(JdbcDriverDto driverDto : JsArrays.toIterable(availableDrivers)) {
       if(driverDto.getDriverClass().equalsIgnoreCase(driverClass)) {

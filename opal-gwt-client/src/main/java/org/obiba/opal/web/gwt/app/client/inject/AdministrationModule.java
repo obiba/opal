@@ -11,11 +11,12 @@ package org.obiba.opal.web.gwt.app.client.inject;
 
 import org.obiba.opal.web.gwt.app.client.administration.configuration.presenter.ConfigurationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.configuration.view.ConfigurationView;
-import org.obiba.opal.web.gwt.app.client.administration.configuration.presenter.ConfigurationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabasePresenter;
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.MongoDatabasePresenter;
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.SqlDatabasePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.view.DatabaseAdministrationView;
-import org.obiba.opal.web.gwt.app.client.administration.database.view.DatabaseView;
+import org.obiba.opal.web.gwt.app.client.administration.database.view.MongoDatabaseView;
+import org.obiba.opal.web.gwt.app.client.administration.database.view.SqlDatabaseView;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodPresenter;
@@ -71,21 +72,47 @@ public class AdministrationModule extends AbstractPresenterModule {
   protected void configure() {
     bindPresenter(AdministrationPresenter.class, AdministrationPresenter.Display.class, AdministrationView.class,
         AdministrationPresenter.Proxy.class);
-    bindPresenter(DataShieldConfigPresenter.class, DataShieldConfigPresenter.Display.class, DataShieldConfigView.class,
-        DataShieldConfigPresenter.Proxy.class);
     bindPresenter(RAdministrationPresenter.class, RAdministrationPresenter.Display.class, RAdministrationView.class,
         RAdministrationPresenter.Proxy.class);
+    configureDatabases();
+    configureIndexes();
+    configureDatashield();
+    configureUserGroups();
+    configureSystemConfig();
+    configureTaxonomies();
+  }
 
-    bindPresenter(DatabaseAdministrationPresenter.class, DatabaseAdministrationPresenter.Display.class,
-        DatabaseAdministrationView.class, DatabaseAdministrationPresenter.Proxy.class);
-    bindPresenterWidget(DatabasePresenter.class, DatabasePresenter.Display.class, DatabaseView.class);
+  private void configureSystemConfig() {
+    bindPresenter(JVMPresenter.class, JVMPresenter.Display.class, JVMView.class, JVMPresenter.Proxy.class);
+    bindPresenter(ServerPresenter.class, ServerPresenter.Display.class, ServerView.class, ServerPresenter.Proxy.class);
+    bindPresenter(FilesAdministrationPresenter.class, FilesAdministrationPresenter.Display.class,
+        FilesAdministrationView.class, FilesAdministrationPresenter.Proxy.class);
+    bindPresenter(ConfigurationPresenter.class, ConfigurationPresenter.Display.class, ConfigurationView.class,
+        ConfigurationPresenter.Proxy.class);
+  }
 
-    bindPresenter(IndexAdministrationPresenter.class, IndexAdministrationPresenter.Display.class,
-        IndexAdministrationView.class, IndexAdministrationPresenter.Proxy.class);
-    bindPresenterWidget(IndexPresenter.class, IndexPresenter.Display.class, IndexView.class);
-    bindPresenterWidget(IndexConfigurationPresenter.class, IndexConfigurationPresenter.Display.class,
-        IndexConfigurationView.class);
+  private void configureTaxonomies() {
+    bindPresenter(TaxonomiesPresenter.class, TaxonomiesPresenter.Display.class, TaxonomiesView.class,
+        TaxonomiesPresenter.Proxy.class);
+    bindPresenterWidget(AddTaxonomyModalPresenter.class, AddTaxonomyModalPresenter.Display.class,
+        AddTaxonomyModalView.class);
+    bindPresenter(TaxonomyPresenter.class, TaxonomyPresenter.Display.class, TaxonomyView.class,
+        TaxonomyPresenter.Proxy.class);
+    bindPresenter(VocabularyPresenter.class, VocabularyPresenter.Display.class, VocabularyView.class,
+        VocabularyPresenter.Proxy.class);
+    bindPresenterWidget(AddVocabularyModalPresenter.class, AddVocabularyModalPresenter.Display.class,
+        AddVocabularyModalView.class);
+  }
 
+  private void configureUserGroups() {
+    bindPresenter(UserAdministrationPresenter.class, UserAdministrationPresenter.Display.class,
+        UserAdministrationView.class, UserAdministrationPresenter.Proxy.class);
+    bindPresenterWidget(UserPresenter.class, UserPresenter.Display.class, UserView.class);
+  }
+
+  private void configureDatashield() {
+    bindPresenter(DataShieldConfigPresenter.class, DataShieldConfigPresenter.Display.class, DataShieldConfigView.class,
+        DataShieldConfigPresenter.Proxy.class);
     bindPresenterWidget(DataShieldPackageAdministrationPresenter.class,
         DataShieldPackageAdministrationPresenter.Display.class, DataShieldPackageAdministrationView.class);
     bindPresenterWidget(DataShieldAdministrationPresenter.class, DataShieldAdministrationPresenter.Display.class,
@@ -96,39 +123,21 @@ public class AdministrationModule extends AbstractPresenterModule {
         DataShieldPackageView.class);
     bindPresenterWidget(DataShieldMethodPresenter.class, DataShieldMethodPresenter.Display.class,
         DataShieldMethodView.class);
+  }
 
-    // User and Groups
-    bindPresenter(UserAdministrationPresenter.class, UserAdministrationPresenter.Display.class,
-        UserAdministrationView.class, UserAdministrationPresenter.Proxy.class);
-    bindPresenterWidget(UserPresenter.class, UserPresenter.Display.class, UserView.class);
+  private void configureIndexes() {
+    bindPresenter(IndexAdministrationPresenter.class, IndexAdministrationPresenter.Display.class,
+        IndexAdministrationView.class, IndexAdministrationPresenter.Proxy.class);
+    bindPresenterWidget(IndexPresenter.class, IndexPresenter.Display.class, IndexView.class);
+    bindPresenterWidget(IndexConfigurationPresenter.class, IndexConfigurationPresenter.Display.class,
+        IndexConfigurationView.class);
+  }
 
-    // Java virtual machine
-    bindPresenter(JVMPresenter.class, JVMPresenter.Display.class, JVMView.class, JVMPresenter.Proxy.class);
-
-    // System config
-    bindPresenter(ServerPresenter.class, ServerPresenter.Display.class, ServerView.class, ServerPresenter.Proxy.class);
-
-    bindPresenter(FilesAdministrationPresenter.class, FilesAdministrationPresenter.Display.class,
-        FilesAdministrationView.class, FilesAdministrationPresenter.Proxy.class);
-    
-    bindPresenter(ConfigurationPresenter.class, ConfigurationPresenter.Display.class, ConfigurationView.class,
-        ConfigurationPresenter.Proxy.class);
-
-    // Taxonomies
-    bindPresenter(TaxonomiesPresenter.class, TaxonomiesPresenter.Display.class, TaxonomiesView.class,
-        TaxonomiesPresenter.Proxy.class);
-    bindPresenterWidget(AddTaxonomyModalPresenter.class, AddTaxonomyModalPresenter.Display.class,
-        AddTaxonomyModalView.class);
-
-    //Taxonomy
-    bindPresenter(TaxonomyPresenter.class, TaxonomyPresenter.Display.class, TaxonomyView.class,
-        TaxonomyPresenter.Proxy.class);
-    //Vocabulary
-    bindPresenter(VocabularyPresenter.class, VocabularyPresenter.Display.class, VocabularyView.class,
-        VocabularyPresenter.Proxy.class);
-    bindPresenterWidget(AddVocabularyModalPresenter.class, AddVocabularyModalPresenter.Display.class,
-        AddVocabularyModalView.class);
-
+  private void configureDatabases() {
+    bindPresenter(DatabaseAdministrationPresenter.class, DatabaseAdministrationPresenter.Display.class,
+        DatabaseAdministrationView.class, DatabaseAdministrationPresenter.Proxy.class);
+    bindPresenterWidget(SqlDatabasePresenter.class, SqlDatabasePresenter.Display.class, SqlDatabaseView.class);
+    bindPresenterWidget(MongoDatabasePresenter.class, MongoDatabasePresenter.Display.class, MongoDatabaseView.class);
   }
 
 }

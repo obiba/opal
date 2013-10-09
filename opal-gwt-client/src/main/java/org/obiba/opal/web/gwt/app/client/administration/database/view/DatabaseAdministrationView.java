@@ -10,28 +10,28 @@
 package org.obiba.opal.web.gwt.app.client.administration.database.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabasePresenter;
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.SqlDatabasePresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
+import org.obiba.opal.web.model.client.database.MongoDbDatabaseDto;
 import org.obiba.opal.web.model.client.database.SqlDatabaseDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.SimplePager;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.HasData;
+import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
@@ -39,14 +39,7 @@ import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_
 
 public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdministrationPresenter.Display {
 
-  @UiTemplate("DatabaseAdministrationView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, DatabaseAdministrationView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  private static final Translations translations = GWT.create(Translations.class);
-
-  private final Widget uiWidget;
+  interface Binder extends UiBinder<Widget, DatabaseAdministrationView> {}
 
   @UiField
   Button addSQL;
@@ -69,25 +62,43 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
   @UiField
   Panel breadcrumbs;
 
-  public DatabaseAdministrationView() {
-    uiWidget = uiBinder.createAndBindUi(this);
+  private final Translations translations;
+
+  @Inject
+  public DatabaseAdministrationView(Binder uiBinder, Translations translations) {
+    this.translations = translations;
+    initWidget(uiBinder.createAndBindUi(this));
+    initSqlTable();
+    initMongoTable();
+  }
+
+  private void initSqlTable() {
     sqlPager.setDisplay(sqlTable);
     sqlTable.addColumn(Columns.NAME, translations.nameLabel());
-    sqlTable.addColumn(Columns.URL, translations.urlLabel());
+    sqlTable.addColumn(Columns.SQL_URL, translations.urlLabel());
     sqlTable.addColumn(Columns.USAGE, translations.usageLabel());
     sqlTable.addColumn(Columns.SQL_SCHEMA, translations.sqlSchemaLabel());
-    sqlTable.addColumn(Columns.USERNAME, translations.usernameLabel());
+    sqlTable.addColumn(Columns.SQL_USERNAME, translations.usernameLabel());
     sqlTable.addColumn(Columns.ACTIONS, translations.actionsLabel());
   }
 
-  @Override
-  public Widget asWidget() {
-    return uiWidget;
+  private void initMongoTable() {
+    mongoPager.setDisplay(mongoTable);
+    mongoTable.addColumn(Columns.NAME, translations.nameLabel());
+    mongoTable.addColumn(Columns.MONGO_URL, translations.urlLabel());
+    mongoTable.addColumn(Columns.USAGE, translations.usageLabel());
+    mongoTable.addColumn(Columns.MONGO_USERNAME, translations.usernameLabel());
+    mongoTable.addColumn(Columns.ACTIONS, translations.actionsLabel());
   }
 
   @Override
-  public HasClickHandlers getAddButton() {
+  public HasClickHandlers getAddSqlButton() {
     return addSQL;
+  }
+
+  @Override
+  public HasClickHandlers getAddMongoButton() {
+    return addMongo;
   }
 
   @Override
@@ -96,8 +107,13 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
   }
 
   @Override
-  public HasData<DatabaseDto> getDatabaseTable() {
+  public HasData<DatabaseDto> getSqlTable() {
     return sqlTable;
+  }
+
+  @Override
+  public HasData<DatabaseDto> getMongoTable() {
+    return mongoTable;
   }
 
   @Override
@@ -115,7 +131,7 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
       }
     };
 
-    static final Column<DatabaseDto, String> URL = new TextColumn<DatabaseDto>() {
+    static final Column<DatabaseDto, String> SQL_URL = new TextColumn<DatabaseDto>() {
 
       @Override
       public String getValue(DatabaseDto dto) {
@@ -123,27 +139,41 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
       }
     };
 
+    static final Column<DatabaseDto, String> MONGO_URL = new TextColumn<DatabaseDto>() {
+
+      @Override
+      public String getValue(DatabaseDto dto) {
+        return ((MongoDbDatabaseDto) dto.getExtension(MongoDbDatabaseDto.DatabaseDtoExtensions.settings)).getUrl();
+      }
+    };
+
     static final Column<DatabaseDto, String> USAGE = new TextColumn<DatabaseDto>() {
       @Override
       public String getValue(DatabaseDto dto) {
-        return DatabasePresenter.Usage.valueOf(dto.getUsage().getName()).getLabel();
+        return SqlDatabasePresenter.Usage.valueOf(dto.getUsage().getName()).getLabel();
       }
     };
 
     static final Column<DatabaseDto, String> SQL_SCHEMA = new TextColumn<DatabaseDto>() {
       @Override
       public String getValue(DatabaseDto dto) {
-        return DatabasePresenter.SqlSchema.valueOf(
+        return SqlDatabasePresenter.SqlSchema.valueOf(
             ((SqlDatabaseDto) dto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings)).getSqlSchema().getName())
             .getLabel();
       }
     };
 
-    static final Column<DatabaseDto, String> USERNAME = new TextColumn<DatabaseDto>() {
-
+    static final Column<DatabaseDto, String> SQL_USERNAME = new TextColumn<DatabaseDto>() {
       @Override
       public String getValue(DatabaseDto dto) {
         return ((SqlDatabaseDto) dto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings)).getUsername();
+      }
+    };
+
+    static final Column<DatabaseDto, String> MONGO_USERNAME = new TextColumn<DatabaseDto>() {
+      @Override
+      public String getValue(DatabaseDto dto) {
+        return ((MongoDbDatabaseDto) dto.getExtension(MongoDbDatabaseDto.DatabaseDtoExtensions.settings)).getUsername();
       }
     };
 

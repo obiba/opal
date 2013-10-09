@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.administration.database.presenter;
 
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 
+@SuppressWarnings("StaticMethodOnlyUsedInOneClass")
 public final class DatabaseResources {
 
   private DatabaseResources() {}
@@ -21,6 +22,10 @@ public final class DatabaseResources {
 
   public static String sqlDatabases() {
     return databases() + "/sql";
+  }
+
+  public static String mongoDatabases() {
+    return databases() + "/mongodb";
   }
 
   public static String database(String name) {
