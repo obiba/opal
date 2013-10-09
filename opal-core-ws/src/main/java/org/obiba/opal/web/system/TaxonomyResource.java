@@ -47,4 +47,13 @@ public class TaxonomyResource {
     return Response.ok().build();
   }
 
+  @Path("vocabularies")
+  public VocabulariesResource getVocabularies() {
+    return new VocabulariesResource(taxonomyService, name);
+  }
+
+  @Path("vocabulary/{vocabularyName}")
+  public VocabularyResource getVocabulary(@PathParam("vocabularyName") String vocabularyName) {
+    return new VocabularyResource(taxonomyService, name, vocabularyName);
+  }
 }

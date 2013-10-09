@@ -12,8 +12,6 @@ package org.obiba.opal.web.system;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.cfg.TaxonomyService;
@@ -21,31 +19,26 @@ import org.obiba.opal.core.domain.taxonomy.HasTerms;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.domain.taxonomy.Term;
 import org.obiba.opal.core.domain.taxonomy.Vocabulary;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
-@Path("/system/conf/taxonomy/{name}/vocabulary/{vocabulary}")
 public class VocabularyResource {
 
-  @PathParam("name")
-  private String name;
+  private final String taxonomyName;
 
-  @PathParam("vocabulary")
-  private String vocabularyName;
+  private final String vocabularyName;
 
   private final TaxonomyService taxonomyService;
 
-  @Autowired
-  public VocabularyResource(TaxonomyService taxonomyService) {
+  public VocabularyResource(TaxonomyService taxonomyService, String taxonomyName, String vocabularyName) {
     this.taxonomyService = taxonomyService;
+    this.taxonomyName = taxonomyName;
+    this.vocabularyName = vocabularyName;
   }
 
   @SuppressWarnings("ConstantConditions")
   @POST
   @Consumes(value = "text/plain")
   public Response addVocabularyTerms(String input) {
-    Taxonomy tax = taxonomyService.getTaxonomy(name);
+    Taxonomy tax = taxonomyService.getTaxonomy(taxonomyName);
 
     if(tax == null) {
       return Response.status(Response.Status.NOT_FOUND).build();
@@ -85,6 +78,7 @@ public class VocabularyResource {
     }
 
     tax.add(voc);
+    taxonomyService.addOrReplaceTaxonomy(tax);
 
     return Response.ok().build();
   }

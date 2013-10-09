@@ -15,46 +15,41 @@ import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.cfg.TaxonomyService;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.domain.taxonomy.Vocabulary;
-import org.obiba.opal.web.magma.Dtos;
-import org.obiba.opal.web.model.Opal.TaxonomyDto;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.obiba.opal.web.taxonomy.Dtos;
 
 import static org.obiba.opal.web.model.Opal.TaxonomyDto.VocabularyDto;
 
-@Component
-@Path("/system/conf/taxonomy/{name}/vocabularies")
 public class VocabulariesResource {
-
-  @PathParam("name")
-  private String name;
 
   private final TaxonomyService taxonomyService;
 
-  @Autowired
-  public VocabulariesResource(TaxonomyService taxonomyService) {
+  private final String taxonomyName;
+
+  public VocabulariesResource(TaxonomyService taxonomyService, String taxonomyName) {
     this.taxonomyService = taxonomyService;
+    this.taxonomyName = taxonomyName;
   }
 
   @GET
-  public List<TaxonomyDto> getTaxonomies() {
-    List<TaxonomyDto> taxonomies = new ArrayList<TaxonomyDto>();
-    for(Taxonomy taxonomy : taxonomyService.getTaxonomies()) {
-      taxonomies.add(Dtos.asDto(taxonomy));
+  public List<VocabularyDto> getVocabularies() {
+    List<VocabularyDto> vocabularies = new ArrayList<VocabularyDto>();
+    Taxonomy t = taxonomyService.getTaxonomy(taxonomyName);
+    if(t != null) {
+      for(Vocabulary v : t.getVocabularies()) {
+        vocabularies.add(Dtos.asDto(v));
+      }
     }
-    return taxonomies;
+    return vocabularies;
   }
 
   @POST
   public Response createVocabulary(VocabularyDto vocabulary) {
-    Taxonomy tax = taxonomyService.getTaxonomy(name);
+    Taxonomy tax = taxonomyService.getTaxonomy(taxonomyName);
 
     if(tax == null) {
       return Response.status(Response.Status.NOT_FOUND).build();
