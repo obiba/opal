@@ -37,9 +37,9 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
 
   private static final int DEFAULT_MINIMUM_WIDTH = 200;
 
-  private static ModalStack modalStack = new ModalStack();
+  private static final ModalStack MODAL_STACK = new ModalStack();
 
-  private Panel alertPlace;
+  private final Panel alertPlace;
 
   private boolean resizable = false;
 
@@ -102,11 +102,11 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   @Override
   public void show() {
 
-    if(!modalStack.isEmpty() && !modalStack.has(this)) {
-      modalStack.hideCurrent();
+    if(!MODAL_STACK.isEmpty() && !MODAL_STACK.has(this)) {
+      MODAL_STACK.hideCurrent();
     }
 
-    modalStack.push(this);
+    MODAL_STACK.push(this);
 
     super.show();
   }
@@ -148,8 +148,8 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     if(!hiddenOnStack) {
       super.onHidden(e);
 
-      modalStack.pop(this);
-      modalStack.showCurrent();
+      MODAL_STACK.pop(this);
+      MODAL_STACK.showCurrent();
     }
 
   }
@@ -446,7 +446,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
 
   private static class ModalStack {
 
-    private Stack<Modal> currentlyShown = new Stack<Modal>();
+    private final Stack<Modal> currentlyShown = new Stack<Modal>();
 
     public boolean isEmpty() {
       return currentlyShown.isEmpty();

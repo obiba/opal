@@ -31,6 +31,8 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
+import org.obiba.opal.web.model.client.database.MongoDbDatabaseDto;
+import org.obiba.opal.web.model.client.database.SqlDatabaseDto;
 import org.obiba.opal.web.model.client.opal.AclAction;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
@@ -46,6 +48,7 @@ import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.Event;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
@@ -68,23 +71,29 @@ public class DatabaseAdministrationPresenter extends
 
     String TEST_ACTION = "Test";
 
-    enum Slots {
-      DRIVERS, HEADER
-    }
-
     HasActionHandler<DatabaseDto> getActions();
 
-    HasClickHandlers getAddButton();
+    HasClickHandlers getAddSqlButton();
 
-    HasData<DatabaseDto> getDatabaseTable();
+    HasData<DatabaseDto> getSqlTable();
+
+    HasData<DatabaseDto> getMongoTable();
+
+    HasClickHandlers getAddMongoButton();
+
   }
 
-  private final ModalProvider<DatabasePresenter> databaseModalProvider;
+  private final ModalProvider<SqlDatabasePresenter> sqlDatabaseModalProvider;
+
+  private final ModalProvider<MongoDatabasePresenter> mongoDatabaseModalProvider;
 
   private final AuthorizationPresenter authorizationPresenter;
 
-  private final ResourceDataProvider<DatabaseDto> resourceDataProvider = new ResourceDataProvider<DatabaseDto>(
+  private final ResourceDataProvider<DatabaseDto> resourceSqlDatabasesProvider = new ResourceDataProvider<DatabaseDto>(
       DatabaseResources.sqlDatabases());
+
+  private final ResourceDataProvider<DatabaseDto> resourceMongoDbProvider = new ResourceDataProvider<DatabaseDto>(
+      DatabaseResources.mongoDatabases());
 
   private final BreadcrumbsBuilder breadcrumbsBuilder;
 
@@ -92,10 +101,12 @@ public class DatabaseAdministrationPresenter extends
 
   @Inject
   public DatabaseAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
-      ModalProvider<DatabasePresenter> databaseModalProvider, Provider<AuthorizationPresenter> authorizationPresenter,
-      BreadcrumbsBuilder breadcrumbsBuilder) {
+      ModalProvider<SqlDatabasePresenter> sqlDatabaseModalProvider,
+      ModalProvider<MongoDatabasePresenter> mongoDatabaseModalProvider,
+      Provider<AuthorizationPresenter> authorizationPresenter, BreadcrumbsBuilder breadcrumbsBuilder) {
     super(eventBus, display, proxy);
-    this.databaseModalProvider = databaseModalProvider.setContainer(this);
+    this.sqlDatabaseModalProvider = sqlDatabaseModalProvider.setContainer(this);
+    this.mongoDatabaseModalProvider = mongoDatabaseModalProvider.setContainer(this);
     this.authorizationPresenter = authorizationPresenter.get();
     this.breadcrumbsBuilder = breadcrumbsBuilder;
   }
@@ -106,7 +117,13 @@ public class DatabaseAdministrationPresenter extends
     ResourceAuthorizationRequestBuilderFactory.newBuilder() //
         .forResource(DatabaseResources.sqlDatabases()) //
         .get() //
-        .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListDatabasesAuthorization())) //
+        .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListSqlDatabasesAuthorization())) //
+        .send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(DatabaseResources.mongoDatabases()) //
+        .get() //
+        .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListMongoDbAuthorization())) //
         .send();
   }
 
@@ -125,6 +142,12 @@ public class DatabaseAdministrationPresenter extends
   public void authorize(HasAuthorization authorizer) {
     ResourceAuthorizationRequestBuilderFactory.newBuilder() //
         .forResource(DatabaseResources.sqlDatabases()) //
+        .get() //
+        .authorize(authorizer) //
+        .send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(DatabaseResources.mongoDatabases()) //
         .get() //
         .authorize(authorizer) //
         .send();
@@ -169,75 +192,112 @@ public class DatabaseAdministrationPresenter extends
     getView().getActions().setActionHandler(new ActionHandler<DatabaseDto>() {
 
       @Override
-      public void doAction(final DatabaseDto dto, String actionName) {
+      public void doAction(DatabaseDto dto, String actionName) {
         if(dto.getEditable() && actionName.equalsIgnoreCase(DELETE_ACTION)) {
-          getEventBus().fireEvent(ConfirmationRequiredEvent.createWithKeys(confirmedCommand = new Command() {
-            @Override
-            public void execute() {
-              deleteDatabase(dto);
-            }
 
-            private void deleteDatabase(DatabaseDto database) {
-              ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder()
-                  .forResource(DatabaseResources.database(database.getName()))
-                  .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+          getEventBus().fireEvent(ConfirmationRequiredEvent
+              .createWithKeys(confirmedCommand = new DeleteDatabaseCommand(dto), "deleteDatabase",
+                  "confirmDeleteDatabase"));
 
-                    @Override
-                    public void onResponseCode(Request request, Response response) {
-                      refresh();
-                    }
-
-                  }).delete().send();
-            }
-
-          }, "deleteDatabase", "confirmDeleteDatabase"));
         } else if(dto.getEditable() && actionName.equalsIgnoreCase(EDIT_ACTION)) {
-          databaseModalProvider.get().updateDatabase(dto);
+
+          SqlDatabaseDto sqlDatabaseDto = (SqlDatabaseDto) dto
+              .getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings);
+          MongoDbDatabaseDto mongoDbDatabaseDto = (MongoDbDatabaseDto) dto
+              .getExtension(MongoDbDatabaseDto.DatabaseDtoExtensions.settings);
+          if(sqlDatabaseDto != null) {
+            sqlDatabaseModalProvider.get().editDatabase(dto);
+          } else if(mongoDbDatabaseDto != null) {
+            mongoDatabaseModalProvider.get().editDatabase(dto);
+          }
+
         } else if(actionName.equalsIgnoreCase(Display.TEST_ACTION)) {
-          ResponseCodeCallback callback = new ResponseCodeCallback() {
 
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              if(response.getStatusCode() == Response.SC_OK) {
-                getEventBus()
-                    .fireEvent(NotificationEvent.Builder.newNotification().info("DatabaseConnectionOk").build());
-              } else {
-                ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-                getEventBus().fireEvent(
-                    NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
-                        .build());
-              }
-            }
-
-          };
-          ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder()//
-              .forResource(DatabaseResources.database(dto.getName(), "connections")).accept("application/json")//
-              .withCallback(Response.SC_OK, callback).withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).post()
+          ResponseCodeCallback testConnectionCallback = new TestConnectionCallback();
+          ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
+              .forResource(DatabaseResources.database(dto.getName(), "connections")) //
+              .accept("application/json") //
+              .withCallback(Response.SC_OK, testConnectionCallback) //
+              .withCallback(Response.SC_SERVICE_UNAVAILABLE, testConnectionCallback) //
+              .post() //
               .send();
         }
       }
 
     });
 
-    registerHandler(getView().getAddButton().addClickHandler(new ClickHandler() {
+    registerHandler(getView().getAddSqlButton().addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
-        DatabasePresenter dialog = databaseModalProvider.get();
-        dialog.createNewDatabase();
+        sqlDatabaseModalProvider.get().createNewDatabase();
+      }
+
+    }));
+    registerHandler(getView().getAddMongoButton().addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        mongoDatabaseModalProvider.get().createNewDatabase();
       }
 
     }));
 
     authorizationPresenter
-        .setAclRequest("databases", new AclRequest(AclAction.DATABASES_ALL, DatabaseResources.sqlDatabases()));
+        .setAclRequest("databases", new AclRequest(AclAction.DATABASES_ALL, DatabaseResources.databases()));
   }
 
   private void refresh() {
-    getView().getDatabaseTable().setVisibleRangeAndClearData(new Range(0, 10), true);
+    getView().getSqlTable().setVisibleRangeAndClearData(new Range(0, 10), true);
+    getView().getMongoTable().setVisibleRangeAndClearData(new Range(0, 10), true);
   }
 
-  private final class ListDatabasesAuthorization implements HasAuthorization {
+  private class DeleteDatabaseCommand implements Command {
+
+    private final DatabaseDto dto;
+
+    private DeleteDatabaseCommand(DatabaseDto dto) {
+      this.dto = dto;
+    }
+
+    @Override
+    public void execute() {
+      deleteDatabase(dto);
+    }
+
+    private void deleteDatabase(DatabaseDto database) {
+      ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
+          .forResource(DatabaseResources.database(database.getName())) //
+          .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              refresh();
+            }
+
+          }) //
+          .delete() //
+          .send();
+    }
+  }
+
+  private class TestConnectionCallback implements ResponseCodeCallback {
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      Event<?> event = null;
+      if(response.getStatusCode() == Response.SC_OK) {
+        event = NotificationEvent.Builder.newNotification().info("DatabaseConnectionOk").build();
+      } else {
+        ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+        event = NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+            .build();
+      }
+      getEventBus().fireEvent(event);
+    }
+  }
+
+  private final class ListSqlDatabasesAuthorization implements HasAuthorization {
 
     @Override
     public void beforeAuthorization() {
@@ -246,8 +306,28 @@ public class DatabaseAdministrationPresenter extends
     @Override
     public void authorized() {
       // Only bind the table to its data provider if we're authorized
-      if(resourceDataProvider.getDataDisplays().isEmpty()) {
-        resourceDataProvider.addDataDisplay(getView().getDatabaseTable());
+      if(resourceSqlDatabasesProvider.getDataDisplays().isEmpty()) {
+        resourceSqlDatabasesProvider.addDataDisplay(getView().getSqlTable());
+      }
+    }
+
+    @Override
+    public void unauthorized() {
+    }
+
+  }
+
+  private final class ListMongoDbAuthorization implements HasAuthorization {
+
+    @Override
+    public void beforeAuthorization() {
+    }
+
+    @Override
+    public void authorized() {
+      // Only bind the table to its data provider if we're authorized
+      if(resourceMongoDbProvider.getDataDisplays().isEmpty()) {
+        resourceMongoDbProvider.addDataDisplay(getView().getMongoTable());
       }
     }
 

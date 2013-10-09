@@ -17,47 +17,51 @@ import com.gwtplatform.mvp.client.PresenterWidget;
  * Client code must set the modal container needed to manage modal slot.
  * <p/>
  * Usage:
- *
- * @Inject MyPresenter(ModalProvider<MyModal> modalProvider, ...) {
- * this.modalProvider = modalProvider.setContainer(this);
- * }
- * <p/>
- * public void showModal() {
- * MyModal modal = modalProvider.get();
- * }
- * <p/>
+ * <pre>
+ * {@code
+ *  &#064;Inject
+ *  MyPresenter(ModalProvider<MyModal> modalProvider, ...) {
+ *    this.modalProvider = modalProvider.setContainer(this);
+ *  }
+ *  public void showModal() {
+ *    MyModal modal = modalProvider.get();
+ *  }
+ * }</pre>
  * The get() method adds the modal to its container triggering a show() on the modal. Once the modal is closed
  * the provider ModalCloseHandler does the cleanup and removes it from its container slot triggering a hide() on the
  * modal.
  */
-public class ModalProvider<M extends ModalPresenterWidget> implements Provider<M> {
+public class ModalProvider<TPresenter extends ModalPresenterWidget<?>> implements Provider<TPresenter> {
 
-  private final Provider<M> modalProvider;
+  private final Provider<TPresenter> modalProvider;
 
   private final EventBus eventBus;
 
-  private PresenterWidget container;
+  private PresenterWidget<?> container;
 
-  private M modal;
+  private TPresenter modal;
 
-  private final Map<M, ModalListData<M>> modals = new HashMap<M, ModalListData<M>>();
+  private final Map<TPresenter, ModalListData<TPresenter>> modals
+      = new HashMap<TPresenter, ModalListData<TPresenter>>();
 
   @Inject
-  public ModalProvider(EventBus eventBus, Provider<M> modalProvider) {
+  public ModalProvider(EventBus eventBus, Provider<TPresenter> modalProvider) {
     this.eventBus = eventBus;
     this.modalProvider = modalProvider;
   }
 
-  public ModalProvider<M> setContainer(PresenterWidget container) {
+  public ModalProvider<TPresenter> setContainer(
+      @SuppressWarnings("ParameterHidesMemberVariable") PresenterWidget<?> container) {
     this.container = container;
     return this;
   }
 
   /**
    * Create a new instance of modal without showing it.
+   *
    * @return
    */
-  public M create() {
+  public TPresenter create() {
     if(container == null) {
       throw new NullPointerException("Modal container is not set. Call ModalProvider.setContainer(PresenterWidget)");
     }
@@ -66,22 +70,25 @@ public class ModalProvider<M extends ModalPresenterWidget> implements Provider<M
 
   /**
    * Create a new instance of modal and show it.
+   *
    * @return
    */
-  public M get() {
+  @Override
+  public TPresenter get() {
     create();
     return show();
   }
 
   /**
-   * Ceate a instance of modal if it does not exist and show it.
+   * Create a instance of modal if it does not exist and show it.
+   *
    * @return
    */
-  public M show() {
-    if (modal == null) create();
+  public TPresenter show() {
+    if(modal == null) create();
     HandlerRegistration closeHandler = eventBus.addHandler(ModalClosedEvent.getType(), new ModalClosedHandler());
     container.addToPopupSlot(modal);
-    modals.put(modal, new ModalListData<M>(modal, closeHandler));
+    modals.put(modal, new ModalListData<TPresenter>(modal, closeHandler));
     return modal;
   }
 
@@ -89,28 +96,29 @@ public class ModalProvider<M extends ModalPresenterWidget> implements Provider<M
 
     @Override
     public void onModalClosed(ModalClosedEvent event) {
-      ModalListData<M> modalListData = modals.get(event.getSource());
+      Object source = event.getSource();
+      ModalListData<TPresenter> modalListData = modals.get(source);
 
       if(modalListData != null) {
-        M modal = modalListData.getModal();
+        TPresenter modalToClose = modalListData.getModal();
         modalListData.getCloseHandler().removeHandler();
-        container.removeFromPopupSlot(modal);
-        modals.remove(modal);
+        container.removeFromPopupSlot(modalToClose);
+        modals.remove(modalToClose);
       }
     }
   }
 
-  private class ModalListData<M> {
-    private final M modal;
+  private class ModalListData<TModal> {
+    private final TModal modal;
 
     private final HandlerRegistration closeHandler;
 
-    public ModalListData(M modal, HandlerRegistration closeHandler) {
+    private ModalListData(TModal modal, HandlerRegistration closeHandler) {
       this.modal = modal;
       this.closeHandler = closeHandler;
     }
 
-    public M getModal() {
+    public TModal getModal() {
       return modal;
     }
 

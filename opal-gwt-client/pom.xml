@@ -90,14 +90,6 @@
 
   <build>
     <outputDirectory>war/WEB-INF/classes</outputDirectory>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-      </resource>
-      <resource>
-        <directory>${project.build.directory}/generated-sources/annotations</directory>
-      </resource>
-    </resources>
     <plugins>
 
       <plugin>
@@ -186,7 +178,7 @@
         </configuration>
       </plugin>
 
-      <!-- Boilerplate Generation -->
+      <!-- Generate Boilerplate to target/generated-sources/annotations and add this folder to source path -->
       <plugin>
         <groupId>org.bsc.maven</groupId>
         <artifactId>maven-processor-plugin</artifactId>
@@ -199,26 +191,6 @@
             <phase>generate-sources</phase>
             <configuration>
               <defaultOutputDirectory>${project.build.directory}/generated-sources/annotations</defaultOutputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!-- Add generated sources to the build path -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>add-source</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>add-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>${project.build.directory}/generated-sources/annotations</source>
-              </sources>
             </configuration>
           </execution>
         </executions>

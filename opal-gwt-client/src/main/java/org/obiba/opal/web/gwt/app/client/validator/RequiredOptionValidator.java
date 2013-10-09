@@ -10,10 +10,11 @@
 package org.obiba.opal.web.gwt.app.client.validator;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.TakesValue;
 
 /**
  *
@@ -23,13 +24,13 @@ public class RequiredOptionValidator extends AbstractFieldValidator {
   // Instance Variables
   //
 
-  private final Set<HasValue<Boolean>> options;
+  private final Set<TakesValue<Boolean>> options;
 
   //
   // Constructors
   //
 
-  public RequiredOptionValidator(Set<HasValue<Boolean>> options, String errorMessageKey) {
+  public RequiredOptionValidator(Collection<TakesValue<Boolean>> options, String errorMessageKey) {
     super(errorMessageKey);
 
     if(options == null) {
@@ -39,7 +40,7 @@ public class RequiredOptionValidator extends AbstractFieldValidator {
       throw new IllegalArgumentException("empty options");
     }
 
-    this.options = new HashSet<HasValue<Boolean>>();
+    this.options = new HashSet<TakesValue<Boolean>>();
     this.options.addAll(options);
   }
 
@@ -49,7 +50,7 @@ public class RequiredOptionValidator extends AbstractFieldValidator {
 
   @Override
   protected boolean hasError() {
-    for(HasValue<Boolean> option : options) {
+    for(TakesValue<Boolean> option : options) {
       if(option.getValue()) {
         return false;
       }
@@ -61,8 +62,8 @@ public class RequiredOptionValidator extends AbstractFieldValidator {
   // Static Methods
   //
 
-  public static Set<HasValue<Boolean>> asSet(HasValue<Boolean>... options) {
-    Set<HasValue<Boolean>> optionSet = new HashSet<HasValue<Boolean>>();
+  public static Set<TakesValue<Boolean>> asSet(TakesValue<Boolean>... options) {
+    Set<TakesValue<Boolean>> optionSet = new HashSet<TakesValue<Boolean>>();
     optionSet.addAll(Arrays.asList(options));
     return optionSet;
   }

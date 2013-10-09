@@ -3,14 +3,15 @@ package org.obiba.opal.web.gwt.app.client.event;
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
-public class ModalClosedEvent<S> extends GwtEvent<ModalClosedEvent.Handler> {
+public class ModalClosedEvent extends GwtEvent<ModalClosedEvent.Handler> {
+
   public interface Handler extends EventHandler {
     void onModalClosed(ModalClosedEvent event);
   }
 
   private static final Type<Handler> TYPE = new Type<Handler>();
 
-  private Object source;
+  private final Object source;
 
   public ModalClosedEvent(Object source) {
     this.source = source;

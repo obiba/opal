@@ -19,22 +19,22 @@ public class Dtos {
   private Dtos() {}
 
   public static void fromDto(@Nonnull DatabaseDto dto, @Nonnull Database database) {
-    SqlDatabaseDto sqlDto = dto.getExtension(SqlDatabaseDto.settings);
-    MongoDbDatabaseDto mongoDto = dto.getExtension(MongoDbDatabaseDto.settings);
-    if(sqlDto != null) {
-      fromDto(dto, sqlDto, (SqlDatabase) database);
-    } else if(mongoDto != null) {
-      fromDto(dto, mongoDto, (MongoDbDatabase) database);
+    if(dto.hasExtension(SqlDatabaseDto.settings)) {
+      fromDto(dto, dto.getExtension(SqlDatabaseDto.settings), (SqlDatabase) database);
+    } else if(dto.hasExtension(MongoDbDatabaseDto.settings)) {
+      fromDto(dto, dto.getExtension(MongoDbDatabaseDto.settings), (MongoDbDatabase) database);
     } else {
       throw new IllegalArgumentException("Unsupported DatabaseDto extension");
     }
   }
 
   public static Database fromDto(DatabaseDto dto) {
-    SqlDatabaseDto sqlDto = dto.getExtension(SqlDatabaseDto.settings);
-    if(sqlDto != null) return fromDto(dto, sqlDto);
-    MongoDbDatabaseDto mongoDto = dto.getExtension(MongoDbDatabaseDto.settings);
-    if(mongoDto != null) return fromDto(dto, mongoDto);
+    if(dto.hasExtension(SqlDatabaseDto.settings)) {
+      return fromDto(dto, dto.getExtension(SqlDatabaseDto.settings));
+    }
+    if(dto.hasExtension(MongoDbDatabaseDto.settings)) {
+      return fromDto(dto, dto.getExtension(MongoDbDatabaseDto.settings));
+    }
     throw new IllegalArgumentException("Unsupported DatabaseDto extension");
   }
 
