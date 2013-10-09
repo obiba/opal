@@ -67,7 +67,9 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
         @Override
         public DataSource load(String databaseName) throws Exception {
           log.info("Building DataSource {}", databaseName);
-          return dataSourceFactory.createDataSource((SqlDatabase) getDatabase(databaseName));
+          SqlDatabase database = (SqlDatabase) getDatabase(databaseName);
+          if(database == null) throw new IllegalArgumentException("Cannot find database " + databaseName);
+          return dataSourceFactory.createDataSource(database);
         }
       });
 
@@ -76,11 +78,11 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
         @Override
         public void onRemoval(RemovalNotification<String, SessionFactory> notification) {
           try {
-            log.info("Destroying session factory {}", notification.getKey());
+            log.info("Destroying SessionFactory {}", notification.getKey());
             SessionFactory sf = notification.getValue();
             if(sf != null) sf.close();
           } catch(HibernateException e) {
-            log.warn("Ignoring exception during shutdown: ", e);
+            log.warn("Ignoring exception during SessionFactory shutdown: ", e);
           }
         }
       }) //

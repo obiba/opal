@@ -61,12 +61,6 @@ public class MongoDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHa
   ControlGroup urlGroup;
 
   @UiField
-  ControlGroup usernameGroup;
-
-  @UiField
-  ControlGroup passwordGroup;
-
-  @UiField
   ControlGroup usageGroup;
 
   @UiField
@@ -114,8 +108,6 @@ public class MongoDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHa
     ConstrainedModal constrainedModal = new ConstrainedModal(modal);
     constrainedModal.registerWidget("name", translations.nameLabel(), nameGroup);
     constrainedModal.registerWidget("url", translations.urlLabel(), urlGroup);
-    constrainedModal.registerWidget("username", translations.usernameLabel(), usernameGroup);
-    constrainedModal.registerWidget("password", translations.passwordLabel(), passwordGroup);
     constrainedModal.registerWidget("usage", translations.usageLabel(), usageGroup);
   }
 
@@ -152,12 +144,6 @@ public class MongoDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHa
           break;
         case URL:
           group = urlGroup;
-          break;
-        case USERNAME:
-          group = usernameGroup;
-          break;
-        case PASSWORD:
-          group = passwordGroup;
           break;
         case USAGE:
           group = usageGroup;
