@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 OBiBa. All rights reserved.
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
@@ -9,6 +9,10 @@
  */
 package org.obiba.opal.web.shell;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -19,13 +23,17 @@ import org.apache.shiro.SecurityUtils;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.CommandRegistry;
+import org.obiba.opal.shell.Dtos;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
+import org.obiba.opal.shell.commands.options.ReportCommandOptions;
 import org.obiba.opal.shell.service.CommandJobService;
 import org.obiba.opal.shell.web.CopyCommandOptionsDtoImpl;
 import org.obiba.opal.shell.web.ImportCommandOptionsDtoImpl;
+import org.obiba.opal.shell.web.ReportCommandOptionsDtoImpl;
 import org.obiba.opal.web.model.Commands;
 import org.obiba.opal.web.support.InvalidRequestException;
 import org.slf4j.Logger;
@@ -37,11 +45,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Scope("request")
-@Path("/datasource/{name}/commands")
-public class DatasourceCommandsResource extends AbstractCommandsResource {
+@Path("/project/{name}/commands")
+public class ProjectCommandsResource extends AbstractCommandsResource {
 
   @SuppressWarnings("UnusedDeclaration")
-  private static final Logger log = LoggerFactory.getLogger(DatasourceCommandsResource.class);
+  private static final Logger log = LoggerFactory.getLogger(ProjectCommandsResource.class);
 
   @PathParam("name")
   private String name;
@@ -49,10 +57,24 @@ public class DatasourceCommandsResource extends AbstractCommandsResource {
   private final CommandRegistry commandRegistry;
 
   @Autowired
-  public DatasourceCommandsResource(OpalRuntime opalRuntime, CommandJobService commandJobService,
+  public ProjectCommandsResource(OpalRuntime opalRuntime, CommandJobService commandJobService,
       @Qualifier("web") CommandRegistry commandRegistry) {
     super(opalRuntime, commandJobService);
     this.commandRegistry = commandRegistry;
+  }
+
+  @GET
+  public List<Commands.CommandStateDto> getCommands() {
+    List<Commands.CommandStateDto> commandDtoList = new ArrayList<Commands.CommandStateDto>();
+
+    List<CommandJob> history = commandJobService.getHistory();
+    for(CommandJob commandJob : history) {
+      if(commandJob.hasProject() && commandJob.getProject().equals(name)) {
+        commandDtoList.add(Dtos.asDto(commandJob));
+      }
+    }
+
+    return commandDtoList;
   }
 
   @POST
@@ -89,6 +111,25 @@ public class DatasourceCommandsResource extends AbstractCommandsResource {
     copyCommand.setOptions(copyOptions);
 
     return launchCommand(copyCommand);
+  }
+
+  @POST
+  @Path("/_report")
+  public Response createReport(Commands.ReportCommandOptionsDto options) {
+    // TODO ensure file access (report template file and report repo)
+
+    ReportCommandOptions reportOptions = new ReportCommandOptionsDtoImpl(options);
+    Command<ReportCommandOptions> reportCommand = commandRegistry.newCommand("report");
+    reportCommand.setOptions(reportOptions);
+
+    return launchCommand(reportCommand);
+  }
+
+  @Override
+  protected CommandJob newCommandJob(Command<?> command) {
+    CommandJob job = super.newCommandJob(command);
+    job.setProject(name);
+    return job;
   }
 
   private void ensureTableValuesAccess(String table) {

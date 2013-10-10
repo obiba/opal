@@ -80,6 +80,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("User")
   String userLabel();
 
+  @Description("Project label")
+  @DefaultStringValue("Project")
+  String projectLabel();
+
   @Description("Start label")
   @DefaultStringValue("Start")
   String startLabel();
@@ -312,7 +316,7 @@ public interface Translations extends Constants {
       "ZipFileSuffixInvalid", "Invalid Zip file suffix: .zip is expected.",//
       "InvalidFileType", "Invalid file type. Supported file types are: xls, xlsx, and sav.",//
       "ReportTemplateWasNotFound", "The specified report template could not be found.",//
-      "ReportJobStarted", "Report job has been launched.  You can follow its progress in the job list.",//
+      "ReportJobStarted", "Report task has been launched.  You can follow its progress in the task list.",//
       "ReportTemplateAlreadyExistForTheSpecifiedName", "A report template already exist with the specified name.",//
       "BirtReportDesignFileIsRequired", "A BIRT Design File must be selected.",//
       "CronExpressionIsRequired", "A schedule expression must be specified.",//
@@ -595,7 +599,7 @@ public interface Translations extends Constants {
       "All the completed jobs (succeeded, failed or cancelled) will be removed from the jobs list. Currently running jobs will be unaffected.<br /><br />Please confirm that you want to clear the jobs list.",
       //
       "confirmCancelJob",
-      "The job will be cancelled. Changes will be rolled back as much as possible: although cancelled, a job might be partially completed.<br /><br />Please confirm that you want cancel this job.",
+      "The task will be cancelled. Changes will be rolled back as much as possible: although cancelled, a task might be partially completed.<br /><br />Please confirm that you want cancel this task.",
       //
       "confirmReplaceExistingFile",
       "The file that you are uploading already exist in the file system.<br /><br />Please confirm that you want to replace the existing file.",
@@ -646,15 +650,15 @@ public interface Translations extends Constants {
   String dataCopyInstructions();
 
   @Description("Data copy pending conclusion")
-  @DefaultStringValue("Data copy job is being launched.")
+  @DefaultStringValue("Data copy task is being launched.")
   String dataCopyPendingConclusion();
 
   @Description("Data copy completed conclusion")
-  @DefaultStringValue("Data copy job was successfully launched.")
+  @DefaultStringValue("Data copy task was successfully launched.")
   String dataCopyCompletedConclusion();
 
   @Description("Data copy failed conclusion")
-  @DefaultStringValue("Data copy job launch failed.")
+  @DefaultStringValue("Data copy task launch failed.")
   String dataCopyFailedConclusion();
 
   @Description("Data copy destination")
@@ -666,15 +670,15 @@ public interface Translations extends Constants {
   String dataExportInstructions();
 
   @Description("Data export pending conclusion")
-  @DefaultStringValue("Data export job is being launched.")
+  @DefaultStringValue("Data export task is being launched.")
   String dataExportPendingConclusion();
 
   @Description("Data export completed conclusion")
-  @DefaultStringValue("Data export job was successfully launched.")
+  @DefaultStringValue("Data export task was successfully launched.")
   String dataExportCompletedConclusion();
 
   @Description("Data export failed conclusion")
-  @DefaultStringValue("Data export job launch failed.")
+  @DefaultStringValue("Data export task launch failed.")
   String dataExportFailedConclusion();
 
   @Description("Data export options")
@@ -704,7 +708,7 @@ public interface Translations extends Constants {
   String dataImportValuesStep();
 
   @Description("Data import instructions conclusion")
-  @DefaultStringValue("Data import job is launched.")
+  @DefaultStringValue("Data import task is launched.")
   String dataImportInstructionsConclusion();
 
   @Description("Identifiers Map File Step")
@@ -717,12 +721,12 @@ public interface Translations extends Constants {
   String identifiersMapUnitStep();
 
   @Description("Identifier map pending conclusion")
-  @DefaultStringValue("Identifier mapping job is being launched.")
+  @DefaultStringValue("Identifier mapping task is being launched.")
   String identifierMapPendingConclusion();
 
   @Description("Identifier map completed conclusion")
   @DefaultStringValue(
-      "Identifier mapping job completed successfully.")
+      "Identifier mapping task completed successfully.")
   String identifierMapCompletedConclusion();
 
   @Description("Identifier map update count")
@@ -730,7 +734,7 @@ public interface Translations extends Constants {
   String identifierMapUpdateCount();
 
   @Description("Identifier map failed conclusion")
-  @DefaultStringValue("Identifier mapping job failed.")
+  @DefaultStringValue("Identifier mapping task failed.")
   String identifierMapFailedConclusion();
 
   @Description("Identifiers Import File Step")
@@ -738,16 +742,16 @@ public interface Translations extends Constants {
   String identifiersImportFileStep();
 
   @Description("Identifier import pending conclusion")
-  @DefaultStringValue("Identifier import job is being launched.")
+  @DefaultStringValue("Identifier import task is being launched.")
   String identifierImportPendingConclusion();
 
   @Description("Identifier import completed conclusion")
   @DefaultStringValue(
-      "Identifier import job completed successfully.")
+      "Identifier import task completed successfully.")
   String identifierImportCompletedConclusion();
 
   @Description("Identifier import failed conclusion")
-  @DefaultStringValue("Identifier import job failed.")
+  @DefaultStringValue("Identifier import task failed.")
   String identifierImportFailedConclusion();
 
   @Description("Export to Excel icon title")

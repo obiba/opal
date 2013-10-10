@@ -27,6 +27,7 @@ message CommandStateDto {
   optional int64 startTime = 6;
   optional int64 endTime = 7;
   repeated Message messages = 8;
+  optional string project = 9;
 }
 
 message ImportCommandOptionsDto {

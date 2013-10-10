@@ -93,6 +93,8 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     // export variables in excel
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/tables/excel").get()
         .authorize(getView().getExcelDownloadAuthorizer()).send();
+
+    ub = UriBuilder.create().segment("project", datasourceName);
     // export data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/commands/_copy").post()//
         .authorize(CascadingAuthorizer.newBuilder()//

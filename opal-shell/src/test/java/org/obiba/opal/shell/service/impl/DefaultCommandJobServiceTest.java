@@ -219,9 +219,9 @@ public class DefaultCommandJobServiceTest {
     // Verify
     assertNotNull(history);
     assertEquals(3, history.size());
-    assertEquals((Integer) 3, history.get(0).getId()); // job 3 first, since it was submitted last
-    assertEquals((Integer) 2, history.get(1).getId()); // then job 2
-    assertEquals((Integer) 1, history.get(2).getId()); // then job 1
+    assertEquals((Integer) 3, history.get(0).getId()); // task 3 first, since it was submitted last
+    assertEquals((Integer) 2, history.get(1).getId()); // then task 2
+    assertEquals((Integer) 1, history.get(2).getId()); // then task 1
   }
 
   @Test

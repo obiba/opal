@@ -63,7 +63,7 @@ public class BackgroundJobService implements Service {
     if(isRunning) {
       for(Map.Entry<String, Thread> background : jobThreads.entrySet()) {
         if(background.getValue().isAlive()) {
-          log.info("Interrupting job [{}]", background.getKey());
+          log.info("Interrupting task [{}]", background.getKey());
           background.getValue().interrupt();
         }
       }
@@ -83,14 +83,14 @@ public class BackgroundJobService implements Service {
 
   private Thread startJob(BackgroundJob job) {
     Thread background = new Thread(getSubject().associateWith(job));
-    log.info("Starting job [{}]: {}", job.getName(), job.getDescription());
+    log.info("Starting task [{}]: {}", job.getName(), job.getDescription());
     background.setPriority(job.getPriority());
     background.start();
     return background;
   }
 
   private Subject getSubject() {
-    // Login as background job user
+    // Login as background task user
     try {
       PrincipalCollection principals = SecurityUtils.getSecurityManager()
           .authenticate(new BackgroundJobServiceAuthToken()).getPrincipals();

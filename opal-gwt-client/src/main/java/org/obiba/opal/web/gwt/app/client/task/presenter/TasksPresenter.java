@@ -7,19 +7,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.job.presenter;
+package org.obiba.opal.web.gwt.app.client.task.presenter;
 
-import javax.annotation.Nullable;
-
-import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -28,7 +21,6 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
-import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.CommandStateDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -36,39 +28,32 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.view.client.SelectionModel;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.annotations.NameToken;
-import com.gwtplatform.mvp.client.annotations.ProxyStandard;
-import com.gwtplatform.mvp.client.annotations.TitleFunction;
-import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
 /**
  *
  */
-public class JobListPresenter extends ItemAdministrationPresenter<JobListPresenter.Display, JobListPresenter.Proxy> {
+public class TasksPresenter extends PresenterWidget<TasksPresenter.Display> {
 
   public static final String LOG_ACTION = "Log";
 
   public static final String CANCEL_ACTION = "Cancel";
 
-  private final ModalProvider<JobDetailsPresenter> jobDetailsModalProvider;
+  private String project;
 
-  private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
+  private final ModalProvider<TaskDetailsPresenter> jobDetailsModalProvider;
 
   private Runnable actionRequiringConfirmation;
 
   @Inject
-  public JobListPresenter(Display display, EventBus eventBus, Proxy proxy,
-      ModalProvider<JobDetailsPresenter> jobDetailsModalProvider, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
-    super(eventBus, display, proxy);
-
+  public TasksPresenter(Display display, EventBus eventBus,
+      ModalProvider<TaskDetailsPresenter> jobDetailsModalProvider) {
+    super(eventBus, display);
     this.jobDetailsModalProvider = jobDetailsModalProvider.setContainer(this);
-    this.breadcrumbsHelper = breadcrumbsHelper;
-
     getView().getActionsColumn().setActionHandler(new ActionHandler<CommandStateDto>() {
       @Override
       public void doAction(CommandStateDto dto, String actionName) {
@@ -80,20 +65,11 @@ public class JobListPresenter extends ItemAdministrationPresenter<JobListPresent
   }
 
   @Override
-  public String getName() {
-    return getTitle();
-  }
-
-  @Override
-  public void authorize(HasAuthorization authorizer) {
-  }
-
-  @Override
   protected void onBind() {
     super.onBind();
     registerHandler(getView().addClearButtonHandler(new ClearButtonHandler()));
     registerHandler(getView().addRefreshButtonHandler(new RefreshButtonHandler()));
-    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
+    addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler());
   }
 
   @Override
@@ -104,7 +80,6 @@ public class JobListPresenter extends ItemAdministrationPresenter<JobListPresent
   @Override
   public void onReveal() {
     super.onReveal();
-    breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
     updateTable();
   }
 
@@ -120,7 +95,13 @@ public class JobListPresenter extends ItemAdministrationPresenter<JobListPresent
   }
 
   private void updateTable() {
-    ResourceRequestBuilderFactory.<JsArray<CommandStateDto>>newBuilder().forResource("/shell/commands").get()
+    UriBuilder uriBuilder = UriBuilder.create();
+    if (project != null && !project.isEmpty()) {
+      uriBuilder.segment("project", project,"commands");
+    } else {
+      uriBuilder.segment("shell","commands");
+    }
+    ResourceRequestBuilderFactory.<JsArray<CommandStateDto>>newBuilder().forResource(uriBuilder.build()).get()
         .withCallback(new ResourceCallback<JsArray<CommandStateDto>>() {
           @Override
           public void onResource(Response response, JsArray<CommandStateDto> resource) {
@@ -138,8 +119,8 @@ public class JobListPresenter extends ItemAdministrationPresenter<JobListPresent
 
   private void doActionImpl(final CommandStateDto dto, String actionName) {
     if(LOG_ACTION.equals(actionName)) {
-      JobDetailsPresenter jobDetailsPresenter = jobDetailsModalProvider.get();
-      jobDetailsPresenter.setJob(dto);
+      TaskDetailsPresenter taskDetailsPresenter = jobDetailsModalProvider.get();
+      taskDetailsPresenter.setJob(dto);
     } else if(CANCEL_ACTION.equals(actionName)) {
       authorizeCancelJob(dto, new Authorizer(getEventBus()) {
 
@@ -200,24 +181,16 @@ public class JobListPresenter extends ItemAdministrationPresenter<JobListPresent
         ConfirmationRequiredEvent.createWithKeys(actionRequiringConfirmation, "clearJobsList", "confirmClearJobsList"));
   }
 
-  @Override
-  public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
-  }
-
-  @Override
-  @TitleFunction
-  public String getTitle() {
-    return translations.pageJobsTitle();
+  public void showProject(String project) {
+    this.project = project;
+    updateTable();
   }
 
   //
   // Inner Classes / Interfaces
   //
 
-  public interface Display extends View, HasBreadcrumbs {
-
-    @Nullable
-    SelectionModel<CommandStateDto> getTableSelection();
+  public interface Display extends View {
 
     void renderRows(JsArray<CommandStateDto> rows);
 
@@ -229,10 +202,6 @@ public class JobListPresenter extends ItemAdministrationPresenter<JobListPresent
 
     HandlerRegistration addRefreshButtonHandler(ClickHandler handler);
   }
-
-  @ProxyStandard
-  @NameToken(Places.JOBS)
-  public interface Proxy extends ProxyPlace<JobListPresenter> {}
 
   class ClearButtonHandler implements ClickHandler {
 

@@ -72,9 +72,7 @@
       </b:Tab>
       <b:Tab icon="TASKS">
         <b:Heading size="3">Tasks</b:Heading>
-        <b:Paragraph>
-          TODO
-        </b:Paragraph>
+        <g:SimplePanel ui:field="tasksPanel"/>
       </b:Tab>
       <b:Tab icon="LOCK">
         <b:Heading size="3">Permissions</b:Heading>

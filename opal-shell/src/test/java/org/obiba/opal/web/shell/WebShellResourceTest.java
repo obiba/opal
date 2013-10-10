@@ -82,7 +82,7 @@ public class WebShellResourceTest {
     verify(mockCommandJobService);
 
     // Verify that the HTTP response code was OK (200) and that the body contains
-    // the CommandStateDto of the specified job.
+    // the CommandStateDto of the specified task.
     assertNotNull(response);
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     assertNotNull(response.getEntity());
@@ -129,7 +129,7 @@ public class WebShellResourceTest {
     verify(mockCommandJobService);
 
     // Verify that the HTTP response code was OK (200) and that the body contains
-    // the status of the specified job.
+    // the status of the specified task.
     assertNotNull(response);
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     assertNotNull(response.getEntity());

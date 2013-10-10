@@ -21,7 +21,7 @@ import com.google.common.collect.Lists;
  * Converts datasources related resources permissions from opal domain to magma domain.
  */
 @Component
-public class DatasourcesPermissionConverter extends OpalPermissionConverter {
+public class ProjectsPermissionConverter extends OpalPermissionConverter {
 
   @Override
   protected boolean hasPermission(AclAction action) {
@@ -44,7 +44,7 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)");
         return Lists.newArrayList(magmaConvert("/datasource/{0}", "*:GET/*", args), //
-            magmaConvert("/datasource/{0}/commands", "*:GET/*", args), //
+            magmaConvert("/project/{0}/commands", "*:GET/*", args), //
             magmaConvert("/functional-units/unit", "GET:GET/GET"), //
             magmaConvert("/functional-units/entities/table", "GET"),//
             magmaConvert("/project/{0}", "*:GET/*", args),//
@@ -85,7 +85,7 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)/table/(.+)");
         return Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}", "*:GET/*", args),//
-            magmaConvert("/datasource/{0}/commands/_copy", "POST:GET", args),//
+            magmaConvert("/project/{0}/commands/_copy", "POST:GET", args),//
             magmaConvert("/project/{0}", "GET:GET", args),//
             magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
             magmaConvert("/files/projects/{0}", "POST:GET/*", args), //
@@ -118,7 +118,7 @@ public class DatasourcesPermissionConverter extends OpalPermissionConverter {
                 magmaConvert("/datasource/{0}/table/{1}/index/_search", "GET", args),//
                 magmaConvert("/datasource/{0}/table/{1}/index/_search", "POST", args),//
                 magmaConvert("/datasource/{0}/table/{1}/index/_schema", "GET", args),//
-                magmaConvert("/datasource/{0}/commands/_copy", "POST:GET", args),//
+                magmaConvert("/project/{0}/commands/_copy", "POST:GET", args),//
                 magmaConvert("/project/{0}", "GET:GET", args));
         Iterables.addAll(perms, TABLE_READ.convert(node));
         return perms;

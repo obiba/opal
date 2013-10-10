@@ -52,7 +52,7 @@
   <extend-configuration-property name="gin.ginjector.modules"
       value="org.obiba.opal.web.gwt.app.client.inject.ImportVariablesWizardModule"/>
   <extend-configuration-property name="gin.ginjector.modules"
-      value="org.obiba.opal.web.gwt.app.client.inject.JobModule"/>
+      value="org.obiba.opal.web.gwt.app.client.inject.TasksModule"/>
   <extend-configuration-property name="gin.ginjector.modules"
       value="org.obiba.opal.web.gwt.app.client.inject.NavigatorModule"/>
   <extend-configuration-property name="gin.ginjector.modules"

@@ -78,7 +78,7 @@ public class QuartzCommandJob implements Job {
   private Subject getSubject(JobExecutionContext context) {
     PrincipalCollection principals = (PrincipalCollection) context.getJobDetail().getJobDataMap().get("subject");
     if(principals == null) {
-      // Login as background job user
+      // Login as background task user
       principals = SecurityUtils.getSecurityManager().authenticate(new BackgroundJobServiceAuthToken()).getPrincipals();
     }
     return new Subject.Builder().principals(principals).authenticated(true).buildSubject();
@@ -92,7 +92,7 @@ public class QuartzCommandJob implements Job {
     try {
       command = toCommand(commandLine);
     } catch(ArgumentValidationException ex) {
-      throw new JobExecutionException("Invalid job parameter 'command': " + commandLine, ex);
+      throw new JobExecutionException("Invalid task parameter 'command': " + commandLine, ex);
     }
     return command;
   }

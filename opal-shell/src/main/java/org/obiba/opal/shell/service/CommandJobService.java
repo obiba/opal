@@ -21,29 +21,29 @@ import org.obiba.opal.shell.CommandJob;
 public interface CommandJobService extends Service {
 
   /**
-   * Assigns an id to a command job and submits it for asynchronous execution.
+   * Assigns an id to a command task and submits it for asynchronous execution.
    *
-   * @param commandJob the submitted command job
-   * @param owner the command job's owner
-   * @return the command job's id
+   * @param commandJob the submitted command task
+   * @param owner the command task's owner
+   * @return the command task's id
    */
   Integer launchCommand(CommandJob commandJob, Subject owner);
 
   /**
-   * Assigns an id to a command job and submits it for asynchronous execution.
+   * Assigns an id to a command task and submits it for asynchronous execution.
    * <p/>
-   * The command job's owner is set to the current user.
+   * The command task's owner is set to the current user.
    *
-   * @param commandJob the submitted command job
-   * @return the command job's id
+   * @param commandJob the submitted command task
+   * @return the command task's id
    */
   Integer launchCommand(CommandJob commandJob);
 
   /**
-   * Returns the specified command job.
+   * Returns the specified command task.
    *
-   * @param id command job id
-   * @return the command job (<code>null</code> if none)
+   * @param id command task id
+   * @return the command task (<code>null</code> if none)
    */
   CommandJob getCommand(Integer id);
 
@@ -55,21 +55,21 @@ public interface CommandJobService extends Service {
   List<CommandJob> getHistory();
 
   /**
-   * Cancels the specified command job.
+   * Cancels the specified command task.
    *
-   * @param id command job id
-   * @throws NoSuchCommandJobException if the specified command job does not exist
-   * @throws IllegalStateException if the command job is not in a "cancellable" state (either NOT_STARTED or
+   * @param id command task id
+   * @throws NoSuchCommandJobException if the specified command task does not exist
+   * @throws IllegalStateException if the command task is not in a "cancellable" state (either NOT_STARTED or
    * IN_PROGRESS) and therefore cannot be cancelled
    */
   void cancelCommand(Integer id) throws NoSuchCommandJobException, IllegalStateException;
 
   /**
-   * Deletes the specified command job.
+   * Deletes the specified command task.
    *
-   * @param id command job id
-   * @throws NoSuchCommandJobException if the specified command job does not exist
-   * @throws IllegalStateException if the command job is in a "running" state (IN_PROGRESS or CANCEL_PENDING) and
+   * @param id command task id
+   * @throws NoSuchCommandJobException if the specified command task does not exist
+   * @throws IllegalStateException if the command task is in a "running" state (IN_PROGRESS or CANCEL_PENDING) and
    * therefore cannot be deleted
    */
   void deleteCommand(Integer id) throws NoSuchCommandJobException, IllegalStateException;

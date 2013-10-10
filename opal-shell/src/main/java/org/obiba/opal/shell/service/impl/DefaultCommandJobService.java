@@ -112,7 +112,7 @@ public class DefaultCommandJobService implements CommandJobService {
 
   @Override
   public String getName() {
-    return "job";
+    return "task";
   }
 
   @Override
@@ -217,7 +217,7 @@ public class DefaultCommandJobService implements CommandJobService {
     return new ThreadPoolExecutor(10, 10, 0, TimeUnit.MILLISECONDS, jobsNotStarted) {
       @Override
       protected void beforeExecute(Thread t, Runnable r) {
-        log.info("Starting job {}", ((FutureCommandJob) r).commandJob.getId());
+        log.info("Starting task {}", ((FutureCommandJob) r).commandJob.getId());
         getStartedJobs().add((FutureCommandJob) r);
       }
 

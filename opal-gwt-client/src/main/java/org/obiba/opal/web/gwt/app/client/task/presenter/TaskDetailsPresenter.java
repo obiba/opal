@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.job.presenter;
+package org.obiba.opal.web.gwt.app.client.task.presenter;
 
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
@@ -18,14 +18,14 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
-public class JobDetailsPresenter extends ModalPresenterWidget<JobDetailsPresenter.Display> {
+public class TaskDetailsPresenter extends ModalPresenterWidget<TaskDetailsPresenter.Display> {
 
   public interface Display extends PopupView, HasUiHandlers<ModalUiHandlers> {
     void setJob(CommandStateDto commandStateDto);
   }
 
   @Inject
-  public JobDetailsPresenter(Display display, EventBus eventBus) {
+  public TaskDetailsPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
     getView().setUiHandlers(this);
   }

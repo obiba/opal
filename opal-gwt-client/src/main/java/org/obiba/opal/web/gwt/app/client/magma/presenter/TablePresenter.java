@@ -207,10 +207,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   private void authorize() {
     if(table == null) return;
 
-    UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName());
-    // export variables in excel
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/variables/excel").get()
-        .authorize(getView().getExcelDownloadAuthorizer()).send();
+    UriBuilder ub = UriBuilder.create().segment("project", table.getDatasourceName());
     // export data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/commands/_copy").post()//
         .authorize(getView().getExportDataAuthorizer())//
@@ -218,6 +215,12 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     // copy data
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/commands/_copy").post()
         .authorize(getView().getCopyDataAuthorizer()).send();
+
+    ub = UriBuilder.create().segment("datasource", table.getDatasourceName());
+    // export variables in excel
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/variables/excel").get()
+        .authorize(getView().getExcelDownloadAuthorizer()).send();
+
     if(table.hasViewLink()) {
       // download view
       ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getViewLink() + "/xml").get()

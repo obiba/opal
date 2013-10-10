@@ -267,7 +267,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   private void submitJob(ImportCommandOptionsDto dto) {
     ResourceRequestBuilderFactory.newBuilder() //
-        .forResource(UriBuilder.create().segment("datasource", dto.getDestination(), "commands", "_import").build()) //
+        .forResource(UriBuilder.create().segment("project", dto.getDestination(), "commands", "_import").build()) //
         .post() //
         .withResourceBody(ImportCommandOptionsDto.stringify(dto)) //
         .withCallback(new SubmitJobResponseCodeCallBack(), SC_CREATED, SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR) //

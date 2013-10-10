@@ -104,7 +104,7 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
     super.onFinish();
     getView().renderPendingConclusion();
     UriBuilder uriBuilder = UriBuilder.create();
-    uriBuilder.segment("datasource", datasourceName, "commands", "_copy");
+    uriBuilder.segment("project", datasourceName, "commands", "_copy");
     ResourceRequestBuilderFactory.newBuilder() //
         .forResource(uriBuilder.build()) //
         .post() //
@@ -307,7 +307,7 @@ public class DataCopyPresenter extends WizardPresenterWidget<DataCopyPresenter.D
     void renderPendingConclusion();
 
     /**
-     * Add a handler to the job list
+     * Add a handler to the task list
      */
     HandlerRegistration addJobLinkClickHandler(ClickHandler handler);
 

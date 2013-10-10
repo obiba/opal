@@ -28,8 +28,12 @@ public abstract class AbstractCommandsResource {
   }
 
   protected Response launchCommand(Command<?> command) {
-    CommandJob commandJob = new CommandJob(command);
+    CommandJob commandJob = newCommandJob(command);
     return buildLaunchCommandResponse(commandJobService.launchCommand(commandJob));
+  }
+
+  protected CommandJob newCommandJob(Command<?> command) {
+    return new CommandJob(command);
   }
 
   protected abstract Response buildLaunchCommandResponse(Integer jobId);

@@ -98,7 +98,7 @@ public class IndexSynchronizationManager {
   }
 
   private Subject getSubject() {
-    // Login as background job user
+    // Login as background task user
     try {
       PrincipalCollection principals = SecurityUtils.getSecurityManager()
           .authenticate(new BackgroundJobServiceAuthToken()).getPrincipals();

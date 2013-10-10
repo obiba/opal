@@ -16,8 +16,8 @@ import org.obiba.opal.core.runtime.security.SubjectPermissionConverter;
 /**
  *
  */
-public class DatasourcesPermissionConverterTest
-    extends OpalPermissionConverterTest<DatasourcesPermissionConverter.Permission> {
+public class ProjectsPermissionConverterTest
+    extends OpalPermissionConverterTest<ProjectsPermissionConverter.Permission> {
 
   @Test
   public void testArgs() {
@@ -30,9 +30,9 @@ public class DatasourcesPermissionConverterTest
 
   @Test
   public void testDatasourceAll() {
-    testConversion("/datasource/patate", DatasourcesPermissionConverter.Permission.DATASOURCE_ALL, //
+    testConversion("/datasource/patate", ProjectsPermissionConverter.Permission.DATASOURCE_ALL, //
         "magma:/datasource/patate:*:GET/*", //
-        "magma:/datasource/patate/commands:*:GET/*", //
+        "magma:/project/patate/commands:*:GET/*", //
         "magma:/functional-units/unit:GET:GET/GET", //
         "magma:/functional-units/entities/table:GET",//
         "magma:/project/patate:*:GET/*",//
@@ -43,7 +43,7 @@ public class DatasourcesPermissionConverterTest
 
   @Test
   public void testCreateTable() {
-    testConversion("/datasource/patate", DatasourcesPermissionConverter.Permission.CREATE_TABLE, //
+    testConversion("/datasource/patate", ProjectsPermissionConverter.Permission.CREATE_TABLE, //
         "magma:/datasource/patate/tables:GET:GET", //
         "magma:/datasource/patate/tables:POST:GET", //
         "magma:/project/patate:GET:GET", //
@@ -54,7 +54,7 @@ public class DatasourcesPermissionConverterTest
 
   @Test
   public void testCreateView() {
-    testConversion("/datasource/patate", DatasourcesPermissionConverter.Permission.CREATE_VIEW, //
+    testConversion("/datasource/patate", ProjectsPermissionConverter.Permission.CREATE_VIEW, //
         "magma:/datasource/patate/tables:GET:GET", //
         "magma:/datasource/patate/views:POST:GET", //
         "magma:/project/patate:GET:GET",//
@@ -65,7 +65,7 @@ public class DatasourcesPermissionConverterTest
 
   @Test
   public void testTableEdit() {
-    testConversion("/datasource/patate/table/pwel", DatasourcesPermissionConverter.Permission.TABLE_EDIT, //
+    testConversion("/datasource/patate/table/pwel", ProjectsPermissionConverter.Permission.TABLE_EDIT, //
         "magma:/datasource/patate/table/pwel/variables:POST:GET", //
         "magma:/datasource/patate/table/pwel/index:GET:GET", //
         "magma:/datasource/patate/table/pwel/index/schedule:GET:GET", //
@@ -83,7 +83,7 @@ public class DatasourcesPermissionConverterTest
 
   @Test
   public void testViewRead() {
-    testConversion("/datasource/patate/view/pwel", DatasourcesPermissionConverter.Permission.VIEW_READ, //
+    testConversion("/datasource/patate/view/pwel", ProjectsPermissionConverter.Permission.VIEW_READ, //
         "magma:/datasource/patate/view/pwel/xml:GET:GET", //
         "magma:/datasource/patate/table/pwel:GET:GET", //
         "magma:/datasource/patate/table/pwel/variable:GET:GET/GET", //
@@ -96,7 +96,7 @@ public class DatasourcesPermissionConverterTest
 
   @Test
   public void testViewValues() {
-    testConversion("/datasource/patate/view/pwel", DatasourcesPermissionConverter.Permission.VIEW_VALUES, //
+    testConversion("/datasource/patate/view/pwel", ProjectsPermissionConverter.Permission.VIEW_VALUES, //
         "magma:/datasource/patate/view/pwel/xml:GET:GET", //
         "magma:/project/patate:GET:GET", //
         "magma:/datasource/patate/table/pwel/valueSet:GET:GET/GET", //
@@ -105,7 +105,7 @@ public class DatasourcesPermissionConverterTest
         "magma:/datasource/patate/table/pwel/index/_search:GET", //
         "magma:/datasource/patate/table/pwel/index/_search:POST", //
         "magma:/datasource/patate/table/pwel/index/_schema:GET", //
-        "magma:/datasource/patate/commands/_copy:POST:GET", //
+        "magma:/project/patate/commands/_copy:POST:GET", //
         "magma:/project/patate:GET:GET", //
         "magma:/datasource/patate/table/pwel:GET:GET", //
         "magma:/datasource/patate/table/pwel/variable:GET:GET/GET", //
@@ -119,7 +119,7 @@ public class DatasourcesPermissionConverterTest
   @Test
   public void testVariableRead() {
     testConversion("/datasource/patate/table/pwel/variable/pouet",
-        DatasourcesPermissionConverter.Permission.VARIABLE_READ, //
+        ProjectsPermissionConverter.Permission.VARIABLE_READ, //
         "magma:/datasource/patate/table/pwel/variable/pouet:GET:GET/GET", //
         "magma:/datasource/patate/table/pwel/variable/_transient/summary:POST:GET", //
         "magma:/project/patate:GET:GET");
@@ -127,7 +127,7 @@ public class DatasourcesPermissionConverterTest
 
   @Override
   protected SubjectPermissionConverter newConverter() {
-    return new DatasourcesPermissionConverter();
+    return new ProjectsPermissionConverter();
   }
 
 }

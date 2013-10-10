@@ -84,6 +84,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   Panel reportsPanel;
 
   @UiField
+  Panel tasksPanel;
+
+  @UiField
   Panel adminPanel;
 
   private ProjectDto project;
@@ -226,6 +229,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     } else if(slot == ProjectPresenter.REPORTS_PANE) {
       reportsPanel.clear();
       reportsPanel.add(content);
+    } else if(slot == ProjectPresenter.TASKS_PANE) {
+      tasksPanel.clear();
+      tasksPanel.add(content);
     } else if(slot == ProjectPresenter.ADMIN_PANE) {
       adminPanel.clear();
       adminPanel.add(content);

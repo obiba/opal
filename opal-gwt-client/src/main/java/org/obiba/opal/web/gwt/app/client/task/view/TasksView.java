@@ -7,54 +7,44 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.job.view;
+package org.obiba.opal.web.gwt.app.client.task.view;
 
 import java.util.Date;
 
-import javax.annotation.Nullable;
-
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.DateTimeColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.app.client.ui.WorkbenchLayout;
 import org.obiba.opal.web.model.client.opal.CommandStateDto;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.InlineLabel;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.SelectionModel;
+import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.gwtplatform.mvp.client.ViewImpl;
 
-import static org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter.CANCEL_ACTION;
-import static org.obiba.opal.web.gwt.app.client.job.presenter.JobListPresenter.LOG_ACTION;
+import static org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter.CANCEL_ACTION;
+import static org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter.LOG_ACTION;
 
 /**
  *
  */
-public class JobListView extends Composite implements Display {
+public class TasksView extends ViewImpl implements Display {
 
-  @UiTemplate("JobListView.ui.xml")
-  interface JobListViewUiBinder extends UiBinder<WorkbenchLayout, JobListView> {}
-
-  private static final JobListViewUiBinder uiBinder = GWT.create(JobListViewUiBinder.class);
+  interface Binder extends UiBinder<Widget, TasksView> {}
 
   @UiField
   InlineLabel noJobs;
@@ -71,9 +61,6 @@ public class JobListView extends Composite implements Display {
   @UiField
   SimplePager pager;
 
-  @UiField
-  Panel breadcrumbs;
-
   ListDataProvider<CommandStateDto> dataProvider;
 
   private static final Translations translations = GWT.create(Translations.class);
@@ -84,37 +71,15 @@ public class JobListView extends Composite implements Display {
   // Constructors
   //
 
-  public JobListView() {
+  @Inject
+  public TasksView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
     initTable();
   }
 
-  @Override
-  public Widget asWidget() {
-    return this;
-  }
-
-  @Override
-  public void addToSlot(Object slot, IsWidget content) {
-  }
-
-  @Override
-  public void removeFromSlot(Object slot, IsWidget content) {
-  }
-
-  @Override
-  public void setInSlot(Object slot, IsWidget content) {
-  }
-
   //
-  // JobListPresenter.Display Methods
+  // TasksPresenter.Display Methods
   //
-
-  @Nullable
-  @Override
-  public SelectionModel<CommandStateDto> getTableSelection() {
-    return null;
-  }
 
   @Override
   public void renderRows(JsArray<CommandStateDto> rows) {
@@ -174,6 +139,13 @@ public class JobListView extends Composite implements Display {
     table.addColumn(new TextColumn<CommandStateDto>() {
       @Override
       public String getValue(CommandStateDto object) {
+        return object.getProject();
+      }
+    }, translations.projectLabel());
+
+    table.addColumn(new TextColumn<CommandStateDto>() {
+      @Override
+      public String getValue(CommandStateDto object) {
         return object.getOwner();
       }
     }, translations.userLabel());
@@ -225,11 +197,6 @@ public class JobListView extends Composite implements Display {
   private void addTablePager() {
     table.setPageSize(50);
     pager.setDisplay(table);
-  }
-
-  @Override
-  public HasWidgets getBreadcrumbs() {
-    return breadcrumbs;
   }
 
 }

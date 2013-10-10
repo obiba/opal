@@ -10,40 +10,40 @@
 package org.obiba.opal.core.runtime;
 
 /**
- * A generic background job that will be run at opal startup.
+ * A generic background task that will be run at opal startup.
  */
 public interface BackgroundJob extends Runnable {
 
   /**
-   * Name identifying the job.
+   * Name identifying the task.
    *
    * @return
    */
   String getName();
 
   /**
-   * description of the job.
+   * description of the task.
    *
    * @return
    */
   String getDescription();
 
   /**
-   * Get the thread priority for this job.
+   * Get the thread priority for this task.
    *
    * @return
    */
   int getPriority();
 
   /**
-   * Percentage of the progress of the job.
+   * Percentage of the progress of the task.
    *
    * @return
    */
   int getProgress();
 
   /**
-   * Description of the current state of the job.
+   * Description of the current state of the task.
    *
    * @return
    */

@@ -25,6 +25,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.CommandRegistry;
+import org.obiba.opal.shell.Dtos;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
@@ -82,7 +83,7 @@ public class WebShellResource extends AbstractCommandsResource {
 
     List<CommandJob> history = commandJobService.getHistory();
     for(CommandJob commandJob : history) {
-      commandDtoList.add(toCommandStateDto(commandJob));
+      commandDtoList.add(Dtos.asDto(commandJob));
     }
 
     return commandDtoList;
@@ -95,7 +96,7 @@ public class WebShellResource extends AbstractCommandsResource {
 
     return commandJob == null
         ? Response.status(Status.NOT_FOUND).build()
-        : Response.ok(toCommandStateDto(commandJob)).build();
+        : Response.ok(Dtos.asDto(commandJob)).build();
   }
 
   @DELETE
@@ -125,7 +126,7 @@ public class WebShellResource extends AbstractCommandsResource {
 
     return commandJob == null
         ? Response.status(Status.NOT_FOUND).build()
-        : Response.ok(toCommandStateDto(commandJob).getStatus()).build();
+        : Response.ok(Dtos.asDto(commandJob).getStatus()).build();
   }
 
   @PUT
@@ -189,22 +190,5 @@ public class WebShellResource extends AbstractCommandsResource {
         .build();
   }
 
-  private CommandStateDto toCommandStateDto(CommandJob commandJob) {
-    CommandStateDto.Builder dtoBuilder = CommandStateDto.newBuilder() //
-        .setId(commandJob.getId()) //
-        .setCommand(commandJob.getCommand().getName()) //
-        .setCommandArgs(commandJob.getCommand().toString()) //
-        .setOwner(commandJob.getOwner()) //
-        .setStatus(commandJob.getStatus().toString()) //
-        .addAllMessages(commandJob.getMessages());
 
-    if(commandJob.getStartTime() != null) {
-      dtoBuilder.setStartTime(commandJob.getStartTime().getTime());
-    }
-    if(commandJob.getEndTime() != null) {
-      dtoBuilder.setEndTime(commandJob.getEndTime().getTime());
-    }
-
-    return dtoBuilder.build();
-  }
 }

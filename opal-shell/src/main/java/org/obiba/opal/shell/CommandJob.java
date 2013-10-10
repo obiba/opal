@@ -54,6 +54,8 @@ public class CommandJob implements OpalShell, Runnable {
 
   private Long endTime;
 
+  private String project;
+
   //
   // CommandJob
   //
@@ -114,7 +116,7 @@ public class CommandJob implements OpalShell, Runnable {
 
       int errorCode = 0;
 
-      // Don't execute the command if the job has been cancelled.
+      // Don't execute the command if the task has been cancelled.
       if(status != Status.CANCEL_PENDING) {
         status = Status.IN_PROGRESS;
         startTime = getCurrentTime();
@@ -154,6 +156,18 @@ public class CommandJob implements OpalShell, Runnable {
 
   public void setOwner(String owner) {
     this.owner = owner;
+  }
+
+  public boolean hasProject() {
+    return project != null;
+  }
+
+  public String getProject() {
+    return project;
+  }
+
+  public void setProject(String project) {
+    this.project = project;
   }
 
   public Status getStatus() {
@@ -208,7 +222,7 @@ public class CommandJob implements OpalShell, Runnable {
 
   private void updateJobStatus(int errorCode) {
     // Update the status. Set to SUCCEEDED/FAILED, based on the error code, unless the status was changed to
-    // CANCEL_PENDING (i.e., job was interrupted); in that case set it to CANCELED.
+    // CANCEL_PENDING (i.e., task was interrupted); in that case set it to CANCELED.
     if(status == Status.IN_PROGRESS) {
       status = errorCode == 0 ? Status.SUCCEEDED : Status.FAILED;
     } else if(status == Status.CANCEL_PENDING) {

@@ -7,12 +7,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.job.view;
+package org.obiba.opal.web.gwt.app.client.task.view;
 
 import java.util.Date;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.job.presenter.JobDetailsPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.task.presenter.TaskDetailsPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
@@ -33,13 +33,13 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-public class JobDetailsView extends ModalPopupViewWithUiHandlers<ModalUiHandlers> implements Display {
+public class TaskDetailsView extends ModalPopupViewWithUiHandlers<ModalUiHandlers> implements Display {
 
   private static int DIALOG_HEIGHT = 400;
 
   private static final int DIALOG_WIDTH = 480;
 
-  interface ViewUiBinder extends UiBinder<Widget, JobDetailsView> {}
+  interface ViewUiBinder extends UiBinder<Widget, TaskDetailsView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -54,7 +54,7 @@ public class JobDetailsView extends ModalPopupViewWithUiHandlers<ModalUiHandlers
   CellTable<Message> table;
 
   @Inject
-  public JobDetailsView(EventBus eventBus) {
+  public TaskDetailsView(EventBus eventBus) {
     super(eventBus);
     widget = uiBinder.createAndBindUi(this);
     dialogBox.setMinHeight(DIALOG_HEIGHT);

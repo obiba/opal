@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.MagmaPathSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
@@ -87,6 +88,9 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   public static final GwtEvent.Type<RevealContentHandler<?>> REPORTS_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
 
   @ContentSlot
+  public static final GwtEvent.Type<RevealContentHandler<?>> TASKS_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
+
+  @ContentSlot
   public static final GwtEvent.Type<RevealContentHandler<?>> ADMIN_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
 
   private final Provider<MagmaPresenter> magmaPresenterProvider;
@@ -94,6 +98,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   private final Provider<FileExplorerPresenter> fileExplorerPresenterProvider;
 
   private final Provider<ReportsPresenter> reportsPresenterProvider;
+
+  private final Provider<TasksPresenter> tasksPresenterProvider;
 
   private final Provider<ProjectAdministrationPresenter> projectAdministrationPresenterProvider;
 
@@ -111,6 +117,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private ReportsPresenter reportsPresenter;
 
+  private TasksPresenter tasksPresenter;
+
   private ProjectAdministrationPresenter projectAdministrationPresenter;
 
   @Inject
@@ -118,6 +126,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       PlaceManager placeManager, Provider<MagmaPresenter> magmaPresenterProvider,
       Provider<FileExplorerPresenter> fileExplorerPresenterProvider,
       Provider<ReportsPresenter> reportsPresenterProvider,
+      Provider<TasksPresenter> tasksPresenterProvider,
       Provider<ProjectAdministrationPresenter> projectAdministrationPresenterProvider) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
@@ -125,6 +134,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     this.magmaPresenterProvider = magmaPresenterProvider;
     this.fileExplorerPresenterProvider = fileExplorerPresenterProvider;
     this.reportsPresenterProvider = reportsPresenterProvider;
+    this.tasksPresenterProvider = tasksPresenterProvider;
     this.projectAdministrationPresenterProvider = projectAdministrationPresenterProvider;
   }
 
@@ -204,6 +214,9 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       case REPORTS:
         onReportsTabSelected(queryPathParam);
         break;
+      case TASKS:
+        onTasksTabSelected(queryPathParam);
+        break;
       case ADMINISTRATION:
         onAdminTabSelected();
         break;
@@ -247,6 +260,14 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       setInSlot(REPORTS_PANE, reportsPresenter);
     }
     reportsPresenter.showProject(name);
+  }
+
+  private void onTasksTabSelected(String path) {
+    if (tasksPresenter == null) {
+      tasksPresenter = tasksPresenterProvider.get();
+      setInSlot(TASKS_PANE, tasksPresenter);
+    }
+    tasksPresenter.showProject(name);
   }
 
   private void onAdminTabSelected() {
