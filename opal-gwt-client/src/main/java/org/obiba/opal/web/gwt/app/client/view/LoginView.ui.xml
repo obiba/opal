@@ -9,31 +9,28 @@
       <b:Brand href="#">Opal</b:Brand>
     </b:ResponsiveNavbar>
     <g:FlowPanel addStyleNames="container">
-      <g:FlowPanel>
-        <b:FluidRow addStyleNames="top-margin">
-          <b:Column size="3" offset="4">
-            <g:SimplePanel ui:field="alertPanel"/>
-            <b:Well>
-              <b:ControlGroup>
-                <b:ControlLabel>
-                  <ui:msg description="User name field label">User Name</ui:msg>
-                </b:ControlLabel>
-                <b:TextBox ui:field="userName"/>
-              </b:ControlGroup>
-              <b:ControlGroup>
-                <b:ControlLabel>
-                  <ui:msg description="Password field label">Password</ui:msg>
-                </b:ControlLabel>
-                <b:PasswordTextBox ui:field="password"/>
-              </b:ControlGroup>
-              <b:Button ui:field="login" type="INFO">
-                <ui:msg description="Sign in button label">Sign In</ui:msg>
-              </b:Button>
-            </b:Well>
-          </b:Column>
-        </b:FluidRow>
-
-      </g:FlowPanel>
+      <b:Row addStyleNames="top-margin">
+        <b:Column size="4" offset="4">
+          <g:SimplePanel ui:field="alertPanel"/>
+          <b:Well>
+            <b:ControlGroup>
+              <b:ControlLabel>
+                <ui:msg description="User name field label">User Name</ui:msg>
+              </b:ControlLabel>
+              <b:TextBox ui:field="userName"/>
+            </b:ControlGroup>
+            <b:ControlGroup>
+              <b:ControlLabel>
+                <ui:msg description="Password field label">Password</ui:msg>
+              </b:ControlLabel>
+              <b:PasswordTextBox ui:field="password"/>
+            </b:ControlGroup>
+            <b:Button ui:field="login" type="INFO">
+              <ui:msg description="Sign in button label">Sign In</ui:msg>
+            </b:Button>
+          </b:Well>
+        </b:Column>
+      </b:Row>
     </g:FlowPanel>
   </g:FlowPanel>
 
