@@ -1,32 +1,32 @@
 package org.obiba.opal.web.gwt.app.client.view;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 
+import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
-import com.google.gwt.animation.client.Animation;
-import com.google.gwt.core.client.GWT;
+import com.github.gwtbootstrap.client.ui.PasswordTextBox;
+import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
+import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.dom.client.HasKeyUpHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.PasswordTextBox;
-import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public class LoginView extends ViewImpl implements LoginPresenter.Display {
-  @UiTemplate("LoginView.ui.xml")
-  interface LoginViewUiBinder extends UiBinder<Widget, LoginView> {}
 
-  private static final LoginViewUiBinder uiBinder = GWT.create(LoginViewUiBinder.class);
-
-  private final Widget panel;
+  interface Binder extends UiBinder<Widget, LoginView> {}
 
   @UiField
-  Label errorMessage;
+  Panel alertPanel;
 
   @UiField
   TextBox userName;
@@ -37,20 +37,18 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
   @UiField
   Button login;
 
-  public LoginView() {
-    panel = uiBinder.createAndBindUi(this);
-    errorMessage.setVisible(false);
+  private final Translations translations;
+
+  @Inject
+  public LoginView(Binder uiBinder, Translations translations) {
+    initWidget(uiBinder.createAndBindUi(this));
+    this.translations = translations;
     userName.setFocus(true);
   }
 
   @Override
   public HasClickHandlers getSignIn() {
     return login;
-  }
-
-  @Override
-  public Widget asWidget() {
-    return panel;
   }
 
   @Override
@@ -70,21 +68,28 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
 
   @Override
   public void showErrorMessageAndClearPassword() {
-    errorMessage.setVisible(true);
-    new Animation() {
-
+    clear();
+    final Alert alert = new Alert(translations.authFailed(), AlertType.ERROR);
+    alert.addClosedHandler(new ClosedHandler() {
       @Override
-      protected void onUpdate(double progress) {
-        errorMessage.getElement().setAttribute("style", "opacity:" + progress);
+      public void onClosed(ClosedEvent closedEvent) {
+        alert.removeFromParent();
       }
+    });
+    alertPanel.add(alert);
 
-    }.run(200);
-    clearPassword();
+    Timer nonStickyTimer = new Timer() {
+      @Override
+      public void run() {
+        alert.close();
+      }
+    };
+    nonStickyTimer.schedule(3000);
   }
 
   @Override
   public void clear() {
-    errorMessage.setVisible(false);
+    alertPanel.clear();
     clearPassword();
   }
 

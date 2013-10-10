@@ -2210,4 +2210,7 @@ public interface Translations extends Constants {
   @DefaultStringValue("Required")
   String required();
 
+  @Description("Authentication Failed message")
+  @DefaultStringValue("Authentication failed")
+  String authFailed();
 }

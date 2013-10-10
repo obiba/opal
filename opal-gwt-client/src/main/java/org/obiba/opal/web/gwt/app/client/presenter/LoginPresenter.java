@@ -114,7 +114,8 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
   public void onReset() {
     // TODO: Temporarily commenting out the "focus on user name" behaviour.
     // This seems to lead to layout issues!
-    // getView().focusOnUserName();
+    getView().focusOnUserName();
+    getView().clear();
     authorizationCache.clear();
   }
 
