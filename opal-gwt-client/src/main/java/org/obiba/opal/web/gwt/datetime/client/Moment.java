@@ -124,7 +124,7 @@ public class Moment extends JavaScriptObject {
    * Get the Unix EPOCH time in milliseconds.
    * @return
    */
-  public final native int valueOf() /*-{
+  public final native double valueOf() /*-{
       return this.valueOf();
   }-*/;
 

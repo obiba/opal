@@ -9,15 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.task.view;
 
-import java.util.Date;
-
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.DateTimeColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.datetime.client.Duration;
+import org.obiba.opal.web.gwt.datetime.client.FormatType;
+import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.model.client.opal.CommandStateDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
@@ -108,6 +108,11 @@ public class TasksView extends ViewImpl implements Display {
     return refreshButton.addClickHandler(handler);
   }
 
+  @Override
+  public void inProject(boolean b) {
+    if (b && table.getColumnCount() == 8) table.removeColumn(2);
+  }
+
   //
   // Methods
   //
@@ -150,17 +155,21 @@ public class TasksView extends ViewImpl implements Display {
       }
     }, translations.userLabel());
 
-    table.addColumn(new DateTimeColumn<CommandStateDto>() {
+    table.addColumn(new TextColumn<CommandStateDto>() {
       @Override
-      public Date getValue(CommandStateDto object) {
-        return object.getStartTime() > 0 ? new Date((long) object.getStartTime()) : null;
+      public String getValue(CommandStateDto object) {
+        if (!object.hasStartTime()) return "-";
+        return Moment.create(object.getStartTime()).format(FormatType.MONTH_NAME_TIME_SHORT);
       }
     }, translations.startLabel());
 
-    table.addColumn(new DateTimeColumn<CommandStateDto>() {
+    table.addColumn(new TextColumn<CommandStateDto>() {
       @Override
-      public Date getValue(CommandStateDto object) {
-        return object.getEndTime() > 0 ? new Date((long) object.getEndTime()) : null;
+      public String getValue(CommandStateDto object) {
+        if (!object.hasEndTime()) return "-";
+        Moment end = Moment.create(object.getEndTime());
+        Moment start = Moment.create(object.getStartTime());
+        return end.format(FormatType.MONTH_NAME_TIME_SHORT) + " [" + Duration.create(start,end).humanize() + "]";
       }
     }, translations.endLabel());
 

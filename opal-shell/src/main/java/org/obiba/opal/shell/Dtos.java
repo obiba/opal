@@ -10,6 +10,7 @@
 
 package org.obiba.opal.shell;
 
+import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.web.model.Commands;
 
 public final class Dtos {
@@ -30,10 +31,10 @@ public final class Dtos {
     }
 
     if(commandJob.getStartTime() != null) {
-      dtoBuilder.setStartTime(commandJob.getStartTime().getTime());
+      dtoBuilder.setStartTime(DateTimeType.get().valueOf(commandJob.getStartTime()).toString());
     }
     if(commandJob.getEndTime() != null) {
-      dtoBuilder.setEndTime(commandJob.getEndTime().getTime());
+      dtoBuilder.setEndTime(DateTimeType.get().valueOf(commandJob.getEndTime()).toString());
     }
 
     return dtoBuilder.build();

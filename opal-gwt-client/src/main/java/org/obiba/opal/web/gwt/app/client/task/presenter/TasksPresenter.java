@@ -183,6 +183,7 @@ public class TasksPresenter extends PresenterWidget<TasksPresenter.Display> {
 
   public void showProject(String project) {
     this.project = project;
+    getView().inProject(project != null);
     updateTable();
   }
 
@@ -201,6 +202,8 @@ public class TasksPresenter extends PresenterWidget<TasksPresenter.Display> {
     HandlerRegistration addClearButtonHandler(ClickHandler handler);
 
     HandlerRegistration addRefreshButtonHandler(ClickHandler handler);
+
+    void inProject(boolean b);
   }
 
   class ClearButtonHandler implements ClickHandler {

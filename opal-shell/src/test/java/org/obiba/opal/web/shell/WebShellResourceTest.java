@@ -466,8 +466,6 @@ public class WebShellResourceTest {
       assertEquals(job.getCommand().getName(), dto.getCommand());
       assertEquals(job.getOwner(), dto.getOwner());
       assertEquals(job.getStatus().toString(), dto.getStatus());
-      assertEquals(job.getStartTime().getTime(), dto.getStartTime());
-      assertEquals(job.getEndTime().getTime(), dto.getEndTime());
     }
   }
 

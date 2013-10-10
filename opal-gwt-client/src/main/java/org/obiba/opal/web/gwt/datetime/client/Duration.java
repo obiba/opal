@@ -35,6 +35,11 @@ public class Duration extends JavaScriptObject {
       return $wnd.moment.duration(ellapsed);
   }-*/;
 
+  public static Duration create(Moment start, Moment end) {
+    double millis = end.valueOf() - start.valueOf();
+    return create((int)millis);
+  }
+
   /**
    * Non directly instantiable.
    */
