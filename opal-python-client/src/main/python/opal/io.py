@@ -70,7 +70,7 @@ class OpalImporter:
             print options
             print "**"
 
-        uri = opal.core.UriBuilder(['datasource', self.destination, 'commands', '_import']).build()
+        uri = opal.core.UriBuilder(['project', self.destination, 'commands', '_import']).build()
         response = request.post().resource(uri).content(options.SerializeToString()).send()
 
         # get job status
@@ -188,7 +188,7 @@ class OpalExporter:
         if self.verbose:
             request.verbose()
 
-        uri = opal.core.UriBuilder(['datasource', self.datasource, 'commands', '_copy']).build()
+        uri = opal.core.UriBuilder(['project', self.datasource, 'commands', '_copy']).build()
         response = request.post().resource(uri).content(options.SerializeToString()).send()
 
         # get job status
