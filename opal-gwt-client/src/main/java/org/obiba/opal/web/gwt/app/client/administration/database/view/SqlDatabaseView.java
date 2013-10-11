@@ -149,9 +149,9 @@ public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHand
   private void init() {
     modal.hide();
     properties.getElement().setAttribute("placeholder", translations.keyValueLabel());
+    setAvailableUsages();
 
     driver.addChangeHandler(new ChangeHandler() {
-
       @Override
       public void onChange(ChangeEvent event) {
         JdbcDriverDto jdbcDriver = getDriver(getDriver().getText());
@@ -160,8 +160,6 @@ public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHand
         }
       }
     });
-
-    setAvailableUsages();
 
     // used to support ConstraintViolation exceptions
     ConstrainedModal constrainedModal = new ConstrainedModal(modal);
@@ -192,6 +190,11 @@ public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHand
   public void setDialogMode(AbstractDatabasePresenter.Mode dialogMode) {
     name.setEnabled(dialogMode == CREATE);
     modal.setTitle(dialogMode == CREATE ? translations.addDatabase() : translations.editDatabase());
+  }
+
+  @Override
+  public void clearErrors() {
+    modal.clearAlert();
   }
 
   @Override

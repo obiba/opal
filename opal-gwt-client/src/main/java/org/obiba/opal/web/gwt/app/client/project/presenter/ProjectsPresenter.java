@@ -45,11 +45,11 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
 
   private final Translations translations;
 
-  private final ModalProvider<AddProjectModalPresenter> addProjectModalProvider;
+  private final ModalProvider<AddProjectPresenter> addProjectModalProvider;
 
   @Inject
   public ProjectsPresenter(EventBus eventBus, Display display, Proxy proxy, Translations translations,
-      PlaceManager placeManager, ModalProvider<AddProjectModalPresenter> addProjectModalProvider) {
+      PlaceManager placeManager, ModalProvider<AddProjectPresenter> addProjectModalProvider) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
     this.translations = translations;
@@ -104,7 +104,7 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
         .with(ParameterTokens.TOKEN_NAME, project.getName()) //
         .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString());
 
-    if (!Strings.isNullOrEmpty(table)) {
+    if(!Strings.isNullOrEmpty(table)) {
       builder.with(ParameterTokens.TOKEN_PATH, project.getName() + "." + table).build();
     }
 
@@ -113,7 +113,7 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
 
   @Override
   public void showAddProject() {
-    AddProjectModalPresenter presenter = addProjectModalProvider.get();
+    AddProjectPresenter presenter = addProjectModalProvider.get();
     presenter.setProjects(projects);
   }
 

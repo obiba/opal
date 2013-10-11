@@ -9,28 +9,36 @@
  */
 package org.obiba.opal.project.domain;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.persistence.Transient;
+
+import org.hibernate.validator.constraints.NotBlank;
+import org.obiba.magma.Datasource;
+import org.obiba.magma.MagmaEngine;
+import org.obiba.opal.core.domain.AbstractOrientDbTimestampedEntity;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 
 /**
  * Description of a project in Opal.
  */
-public class Project {
+public class Project extends AbstractOrientDbTimestampedEntity {
 
   @Nonnull
+  @NotBlank
   private String name;
 
   @Nonnull
+  @NotBlank
   private String title;
 
   private String description;
 
-  private List<String> tags;
+  private Set<String> tags;
 
   private boolean archived;
 
@@ -43,10 +51,6 @@ public class Project {
 
   public void setName(@Nonnull String name) {
     this.name = name;
-  }
-
-  public boolean hasTitle() {
-    return !Strings.isNullOrEmpty(title);
   }
 
   @Nonnull
@@ -71,17 +75,16 @@ public class Project {
   }
 
   public boolean hasTags() {
-    return getTags().size() > 0;
+    return tags != null && !tags.isEmpty();
   }
 
-  public List<String> getTags() {
-    return tags == null ? tags = Lists.newArrayList() : tags;
+  public Set<String> getTags() {
+    return tags;
   }
 
   public void addTag(String tag) {
-    if(!getTags().contains(tag)) {
-      getTags().add(tag);
-    }
+    if(tags == null) tags = new HashSet<String>();
+    tags.add(tag);
   }
 
   public boolean isArchived() {
@@ -100,16 +103,28 @@ public class Project {
     this.database = database;
   }
 
+  public boolean hasDatabase() {
+    return !Strings.isNullOrEmpty(database);
+  }
+
+  @Transient
+  public Datasource getDatasource() {
+    return MagmaEngine.get().getDatasource(name);
+  }
+
   @SuppressWarnings("ParameterHidesMemberVariable")
   public static class Builder {
 
     private Project project;
 
-    public static Builder create(String name) {
+    public static Builder create(@Nullable Project project) {
       Builder builder = new Builder();
-      builder.project = new Project();
-      builder.project.setName(name);
+      builder.project = project == null ? new Project() : project;
       return builder;
+    }
+
+    public static Builder create() {
+      return create(null);
     }
 
     public Builder name(String name) {

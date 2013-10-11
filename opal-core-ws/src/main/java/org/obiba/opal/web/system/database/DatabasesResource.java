@@ -12,7 +12,6 @@ import javax.ws.rs.core.Response;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbDatabase;
 import org.obiba.opal.core.domain.database.SqlDatabase;
-import org.obiba.opal.core.runtime.database.DatabaseAlreadyExistsException;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.core.runtime.database.MultipleIdentifiersDatabaseException;
 import org.obiba.opal.web.database.Dtos;
@@ -60,10 +59,8 @@ public class DatabasesResource {
   }
 
   @POST
-  public Response addDatabase(DatabaseDto database)
-      throws MultipleIdentifiersDatabaseException, DatabaseAlreadyExistsException {
+  public Response addDatabase(DatabaseDto database) throws MultipleIdentifiersDatabaseException {
     databaseRegistry.addOrReplaceDatabase(Dtos.fromDto(database));
-
     return Response.ok().build();
   }
 

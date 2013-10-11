@@ -14,10 +14,10 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
-import org.obiba.opal.core.domain.AbstractTimestamped;
+import org.obiba.opal.core.domain.AbstractOrientDbTimestampedEntity;
 
 @SuppressWarnings("ComparableImplementedButEqualsNotOverridden")
-public class Group extends AbstractTimestamped implements Comparable<Group> {
+public class Group extends AbstractOrientDbTimestampedEntity implements Comparable<Group> {
 
   @Nonnull
   private String name;

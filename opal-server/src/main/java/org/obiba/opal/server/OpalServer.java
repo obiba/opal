@@ -1,7 +1,7 @@
 package org.obiba.opal.server;
 
-import org.obiba.opal.core.cfg.OrientDbServiceImpl;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.impl.LocalOrientDbServerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
@@ -24,7 +24,7 @@ public class OpalServer {
     setProperties();
 
     //TODO remove this static access when restarting embedded server will work
-    OrientDbServiceImpl.start();
+    LocalOrientDbServerFactory.start();
 
     upgrade();
     start();
@@ -66,9 +66,6 @@ public class OpalServer {
     if(ctx.isActive()) {
       ctx.getBean(OpalRuntime.class).start();
       System.out.println("Opal Server successfully started.");
-
-      //TODO remove these default config data
-      ctx.getBean(TempDefaultConfig.class).createDefaultConfig();
     }
   }
 
@@ -80,7 +77,7 @@ public class OpalServer {
       ctx.close();
     }
     //TODO remove this static access when restarting embedded server will work
-    OrientDbServiceImpl.stop();
+    LocalOrientDbServerFactory.stop();
   }
 
   private static void checkSystemProperty(String... properties) {

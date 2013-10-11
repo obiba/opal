@@ -1,4 +1,4 @@
-package org.obiba.opal.core.cfg;
+package org.obiba.opal.core.service;
 
 import javax.annotation.Nullable;
 import javax.validation.ConstraintViolationException;

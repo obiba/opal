@@ -11,6 +11,8 @@ package org.obiba.opal.web.project;
 
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.magma.Datasource;
@@ -27,29 +29,27 @@ import org.obiba.opal.web.model.Projects;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
+import static org.obiba.opal.web.model.Projects.ProjectDto;
+
 public class Dtos {
 
-  public static Projects.ProjectDto.Builder asDto(Project project, Datasource datasource, String directory) {
-    Projects.ProjectDto.Builder builder = Projects.ProjectDto.newBuilder() //
-        .setName(project.getName());
+  private Dtos() {}
 
-    builder.setTitle(project.hasTitle() ? project.getTitle() : project.getName());
-
+  public static ProjectDto.Builder asDto(Project project, @Nonnull String directory) {
+    ProjectDto.Builder builder = ProjectDto.newBuilder() //
+        .setName(project.getName()) //
+        .setTitle(project.getTitle()) //
+        .setDirectory(directory) //
+        .setLink(UriBuilder.fromPath("/").path(ProjectResource.class).build(project.getName()).toString())
+        .setArchived(project.isArchived());
     if(project.hasDescription()) {
       builder.setDescription(project.getDescription());
     }
-
     if(project.hasTags()) {
       builder.addAllTags(project.getTags());
     }
 
-    builder.setArchived(project.isArchived());
-
-    if(directory != null) {
-      builder.setDirectory(directory);
-    }
-
-    builder.setLink(UriBuilder.fromPath("/").path(ProjectResource.class).build(project.getName()).toString());
+    Datasource datasource = project.getDatasource();
     builder.setDatasource(org.obiba.opal.web.magma.Dtos.asDto(datasource)
         .setLink(UriBuilder.fromPath("/").path(DatasourceResource.class).build(project.getName()).toString()));
 
@@ -58,20 +58,22 @@ public class Dtos {
     return builder;
   }
 
-  public static Project fromDto(Projects.ProjectDto projectDto) {
-    Project.Builder builder = Project.Builder.create(projectDto.getName()) //
+  public static Project fromDto(ProjectDto projectDto, @Nullable Project project) {
+    return Project.Builder.create(project) //
+        .name(projectDto.getName()) //
         .title(projectDto.getTitle()) //
+        .description(projectDto.getDescription()) //
+        .database(projectDto.getDatabase()) //
         .archived(projectDto.getArchived()) //
-        .tags(projectDto.getTagsList());
-
-    if(projectDto.hasDescription()) {
-      builder.description(projectDto.getDescription());
-    }
-
-    return builder.build();
+        .tags(projectDto.getTagsList()) //
+        .build();
   }
 
-  public static Projects.ProjectSummaryDto.Builder asDto(Project project, Datasource datasource) {
+  public static Project fromDto(ProjectDto projectDto) {
+    return fromDto(projectDto, null);
+  }
+
+  public static Projects.ProjectSummaryDto.Builder asDto(Project project) {
     Projects.ProjectSummaryDto.Builder builder = Projects.ProjectSummaryDto.newBuilder();
     builder.setName(project.getName());
 
@@ -79,9 +81,9 @@ public class Dtos {
     int tableCount = 0;
     int variablesCount = 0;
     Set<String> ids = Sets.newHashSet();
-    for(ValueTable table : datasource.getValueTables()) {
+    for(ValueTable table : project.getDatasource().getValueTables()) {
       tableCount++;
-      variablesCount = variablesCount + (Iterables.size(table.getVariables()));
+      variablesCount = variablesCount + Iterables.size(table.getVariables());
       for(VariableEntity entity : table.getVariableEntities()) {
         ids.add(entity.getType() + ":" + entity.getIdentifier());
       }
@@ -93,7 +95,7 @@ public class Dtos {
     return builder;
   }
 
-  private static void addTimestamps(Projects.ProjectDto.Builder builder, Datasource datasource) {
+  private static void addTimestamps(ProjectDto.Builder builder, Datasource datasource) {
     Value created = DateTimeType.get().now();
     Value lastUpdate = null;
     for(ValueTable table : datasource.getValueTables()) {

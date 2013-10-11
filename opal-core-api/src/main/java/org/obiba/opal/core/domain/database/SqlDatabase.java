@@ -11,7 +11,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import org.hibernate.validator.constraints.NotBlank;
-import org.obiba.opal.core.domain.AbstractTimestamped;
+import org.obiba.opal.core.domain.AbstractOrientDbTimestampedEntity;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
@@ -138,7 +138,7 @@ public class SqlDatabase extends Database {
         .add("magmaDatasourceType", sqlSchema).toString();
   }
 
-  public static class LimesurveyDatasourceSettings extends AbstractTimestamped {
+  public static class LimesurveyDatasourceSettings extends AbstractOrientDbTimestampedEntity {
 
     private String tablePrefix;
 
@@ -158,7 +158,7 @@ public class SqlDatabase extends Database {
     }
   }
 
-  public static class JdbcDatasourceSettings extends AbstractTimestamped {
+  public static class JdbcDatasourceSettings extends AbstractOrientDbTimestampedEntity {
 
     private String defaultEntityType;
 
@@ -221,7 +221,7 @@ public class SqlDatabase extends Database {
       this.useMetadataTables = useMetadataTables;
     }
 
-    public static class JdbcValueTableSettings extends AbstractTimestamped {
+    public static class JdbcValueTableSettings extends AbstractOrientDbTimestampedEntity {
 
       private String sqlTableName;
 

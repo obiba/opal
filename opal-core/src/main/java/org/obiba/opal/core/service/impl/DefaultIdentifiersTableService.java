@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 import javax.annotation.PreDestroy;
 
 import org.obiba.magma.Datasource;
+import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.support.Disposables;
@@ -145,14 +146,17 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   private Datasource getDatasource() {
     if(datasource == null) {
       try {
-        datasource = databaseRegistry
-            .createStorageMagmaDatasource(getDatasourceName(), databaseRegistry.getIdentifiersDatabase());
+
+        final DatasourceFactory dataSourceFactory = databaseRegistry
+            .createDataSourceFactory(getDatasourceName(), databaseRegistry.getIdentifiersDatabase());
+
         new TransactionTemplate(txManager).execute(new TransactionCallbackWithoutResult() {
 
           @Override
           protected void doInTransactionWithoutResult(TransactionStatus status) {
             try {
-              Initialisables.initialise(datasource);
+              Initialisables.initialise(dataSourceFactory);
+              datasource = dataSourceFactory.create();
               if(!datasource.hasValueTable(getTableName())) {
                 datasource.createWriter(getTableName(), getEntityType()).close();
               }

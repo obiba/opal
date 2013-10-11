@@ -129,6 +129,11 @@ public class MongoDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHa
   }
 
   @Override
+  public void clearErrors() {
+    modal.clearAlert();
+  }
+
+  @Override
   public void showError(String message) {
     showError(null, message);
   }

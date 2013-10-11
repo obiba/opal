@@ -11,9 +11,9 @@ package org.obiba.opal.core.service.impl;
 
 import javax.annotation.PostConstruct;
 
-import org.obiba.opal.core.cfg.OrientDbService;
 import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.User;
+import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SubjectAclService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

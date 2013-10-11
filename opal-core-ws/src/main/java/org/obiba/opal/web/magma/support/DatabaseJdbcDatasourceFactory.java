@@ -50,9 +50,6 @@ public class DatabaseJdbcDatasourceFactory extends AbstractDatasourceFactory imp
 
   private JdbcDatasourceSettings getSettings() {
     SqlDatabase database = (SqlDatabase) databaseRegistry.getDatabase(databaseName);
-    if(database == null) {
-      throw new IllegalArgumentException("Cannot find database " + databaseName);
-    }
     JdbcDatasourceSettings settings = new JdbcDatasourceSettings();
     SqlDatabase.JdbcDatasourceSettings dbSettings = database.getJdbcDatasourceSettings();
     if(dbSettings != null) {

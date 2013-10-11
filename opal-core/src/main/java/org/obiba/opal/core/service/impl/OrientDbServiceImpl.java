@@ -1,4 +1,4 @@
-package org.obiba.opal.core.cfg;
+package org.obiba.opal.core.service.impl;
 
 import java.util.Arrays;
 
@@ -6,16 +6,17 @@ import javax.annotation.Nullable;
 import javax.persistence.NonUniqueResultException;
 import javax.validation.ConstraintViolationException;
 
-import org.obiba.opal.core.service.impl.DefaultBeanValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.obiba.opal.core.service.OrientDbServerFactory;
+import org.obiba.opal.core.service.OrientDbService;
+import org.obiba.opal.core.service.OrientDbTransactionCallback;
+import org.obiba.opal.core.service.OrientDbTransactionCallbackWithoutResult;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.orientechnologies.common.exception.OException;
-import com.orientechnologies.orient.core.db.ODatabase;
 import com.orientechnologies.orient.core.index.OIndexManager;
 import com.orientechnologies.orient.core.index.ONullOutputListener;
 import com.orientechnologies.orient.core.index.OPropertyIndexDefinition;
@@ -23,60 +24,22 @@ import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import com.orientechnologies.orient.core.tx.OTransaction;
-import com.orientechnologies.orient.object.db.OObjectDatabasePool;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
-import com.orientechnologies.orient.server.OServer;
 
 @Component
 public class OrientDbServiceImpl implements OrientDbService {
 
-  private static final Logger log = LoggerFactory.getLogger(OrientDbServiceImpl.class);
+//  private static final Logger log = LoggerFactory.getLogger(OrientDbServiceImpl.class);
 
-  public static final String URL = "local:${OPAL_HOME}/data/orientdb/opal-config";
+  @Autowired
+  private DefaultBeanValidator defaultBeanValidator;
 
-  @Value(URL)
-  private String url;
-
-  //  @Value("${org.obiba.opal.config.username}")
-  private String username = "admin";
-
-  //  @Value("${org.obiba.opal.config.password}")
-  private String password = "admin";
-
-  private static OServer server;
-
-  //  @PostConstruct
-  public static void start() {
-    String url = URL.replace("${OPAL_HOME}", System.getProperty("OPAL_HOME"));
-    log.info("Start OrientDB server ({})", url);
-    System.setProperty("ORIENTDB_HOME", url);
-    try {
-      server = new OServer() //
-          .startup(OrientDbServiceImpl.class.getResourceAsStream("/orientdb-server-config.xml")) //
-          .activate();
-
-      // create database if does not exist
-      ODatabase database = new OObjectDatabaseTx(url);
-      if(!database.exists()) {
-        database.create();
-      }
-      database.close();
-
-    } catch(Exception e) {
-      log.error("Cannot start OrientDB server", e);
-      throw new RuntimeException("Cannot start OrientDB server", e);
-    }
-  }
-
-  //  @PreDestroy
-  public static void stop() {
-//    log.info("Stop OrientDB server ({})", url);
-    if(server != null) server.shutdown();
-  }
+  @Autowired
+  private OrientDbServerFactory serverFactory;
 
   @Override
   public <T> T execute(OrientDbTransactionCallback<T> action) throws OException {
-    OObjectDatabaseTx db = getDatabaseDocumentTx();
+    OObjectDatabaseTx db = serverFactory.getDatabaseDocumentTx();
     try {
       db.begin(OTransaction.TXTYPE.OPTIMISTIC);
       T t = action.doInTransaction(db);
@@ -92,7 +55,7 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   @Override
   public <T> T save(final T t) throws ConstraintViolationException, OException {
-    DefaultBeanValidator.validate(t);
+    defaultBeanValidator.validate(t);
     return execute(new OrientDbTransactionCallback<T>() {
       @Override
       public T doInTransaction(OObjectDatabaseTx db) {
@@ -113,7 +76,7 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   @Override
   public <T> Iterable<T> list(Class<T> clazz) {
-    OObjectDatabaseTx db = getDatabaseDocumentTx();
+    OObjectDatabaseTx db = serverFactory.getDatabaseDocumentTx();
     try {
       return detachAll(db.browseClass(clazz), db);
     } finally {
@@ -123,7 +86,7 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   @Override
   public <T> Iterable<T> list(String sql, Object... params) {
-    OObjectDatabaseTx db = getDatabaseDocumentTx();
+    OObjectDatabaseTx db = serverFactory.getDatabaseDocumentTx();
     try {
       return detachAll(db.command(new OSQLSynchQuery(sql)).<Iterable<T>>execute(params), db);
     } finally {
@@ -154,7 +117,7 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   @Override
   public long count(Class<?> clazz) {
-    OObjectDatabaseTx db = getDatabaseDocumentTx();
+    OObjectDatabaseTx db = serverFactory.getDatabaseDocumentTx();
     try {
       return db.countClass(clazz);
     } finally {
@@ -164,7 +127,7 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   @Override
   public void registerEntityClass(Class<?>... classes) {
-    OObjectDatabaseTx db = getDatabaseDocumentTx();
+    OObjectDatabaseTx db = serverFactory.getDatabaseDocumentTx();
     try {
       for(Class<?> clazz : classes) {
         db.getEntityManager().registerEntityClass(clazz);
@@ -176,7 +139,7 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   @Override
   public void createIndex(Class<?> clazz, String property, OClass.INDEX_TYPE indexType, OType type) {
-    OObjectDatabaseTx db = getDatabaseDocumentTx();
+    OObjectDatabaseTx db = serverFactory.getDatabaseDocumentTx();
     try {
       String className = clazz.getSimpleName();
       int clusterId = db.getClusterIdByName(className.toLowerCase());
@@ -199,8 +162,8 @@ public class OrientDbServiceImpl implements OrientDbService {
     createUniqueIndex(clazz, property, OType.STRING);
   }
 
-  private OObjectDatabaseTx getDatabaseDocumentTx() {
-    return OObjectDatabasePool.global().acquire(url, username, password);
+  @VisibleForTesting
+  public void setServerFactory(OrientDbServerFactory serverFactory) {
+    this.serverFactory = serverFactory;
   }
-
 }

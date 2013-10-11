@@ -11,10 +11,10 @@ package org.obiba.opal.core.domain.security;
 
 import javax.annotation.Nonnull;
 
-import org.obiba.opal.core.domain.AbstractTimestamped;
+import org.obiba.opal.core.domain.AbstractOrientDbTimestampedEntity;
 import org.obiba.opal.core.service.SubjectAclService;
 
-public class SubjectAcl extends AbstractTimestamped {
+public class SubjectAcl extends AbstractOrientDbTimestampedEntity {
 
   @Nonnull
   private String domain;

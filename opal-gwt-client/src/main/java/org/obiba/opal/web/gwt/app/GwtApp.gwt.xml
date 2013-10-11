@@ -108,6 +108,10 @@
     </any>
   </replace-with>
 
+  <replace-with class="org.obiba.opal.web.gwt.app.client.validator.ValidationMessageResolver">
+    <when-type-is class="com.google.gwt.validation.client.ProviderValidationMessageResolver"/>
+  </replace-with>
+
   <!-- This will limit the compile to a single browser: Firefox 3.x -->
   <!--<set-property name='user.agent' value='gecko1_8'/>-->
 

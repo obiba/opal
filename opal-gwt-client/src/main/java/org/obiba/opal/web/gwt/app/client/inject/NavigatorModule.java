@@ -64,11 +64,11 @@ import org.obiba.opal.web.gwt.app.client.magma.view.ValuesTableView;
 import org.obiba.opal.web.gwt.app.client.magma.view.VariableVcsCommitHistoryView;
 import org.obiba.opal.web.gwt.app.client.magma.view.VariableView;
 import org.obiba.opal.web.gwt.app.client.magma.view.VcsCommitHistoryModalView;
-import org.obiba.opal.web.gwt.app.client.project.presenter.AddProjectModalPresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.AddProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsPresenter;
-import org.obiba.opal.web.gwt.app.client.project.view.AddProjectModalView;
+import org.obiba.opal.web.gwt.app.client.project.view.AddProjectView;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectAdministrationView;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectView;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectsView;
@@ -93,8 +93,7 @@ public class NavigatorModule extends AbstractOpalModule {
         ProjectPresenter.Proxy.class);
     bindPresenterWidget(ProjectAdministrationPresenter.class, ProjectAdministrationPresenter.Display.class,
         ProjectAdministrationView.class);
-    bindPresenterWidget(AddProjectModalPresenter.class, AddProjectModalPresenter.Display.class,
-        AddProjectModalView.class);
+    bindPresenterWidget(AddProjectPresenter.class, AddProjectPresenter.Display.class, AddProjectView.class);
 
     bindPresenterWidget(MagmaPresenter.class, MagmaPresenter.Display.class, MagmaView.class);
     bindPresenterWidget(DatasourcePresenter.class, DatasourcePresenter.Display.class, DatasourceView.class);

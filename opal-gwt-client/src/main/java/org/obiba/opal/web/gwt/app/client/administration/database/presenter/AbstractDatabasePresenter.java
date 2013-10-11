@@ -33,6 +33,10 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
+import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
+import static com.google.gwt.http.client.Response.SC_CREATED;
+import static com.google.gwt.http.client.Response.SC_OK;
+
 public abstract class AbstractDatabasePresenter<TView extends AbstractDatabasePresenter.Display>
     extends ModalPresenterWidget<TView> implements DatabaseUiHandlers {
 
@@ -108,6 +112,7 @@ public abstract class AbstractDatabasePresenter<TView extends AbstractDatabasePr
 
   @Override
   public void save() {
+    getView().clearErrors();
     switch(dialogMode) {
       case CREATE:
         createDatabase();
@@ -161,28 +166,22 @@ public abstract class AbstractDatabasePresenter<TView extends AbstractDatabasePr
   private void updateDatabase() {
     if(validationHandler.validate()) {
       DatabaseDto dto = getDto();
-      ResponseCodeCallback callbackHandler = new CreateOrUpdateCallBack(dto);
       ResourceRequestBuilderFactory.newBuilder() //
           .forResource(DatabaseResources.database(dto.getName())) //
-          .put() //
           .withResourceBody(DatabaseDto.stringify(dto)) //
-          .withCallback(Response.SC_OK, callbackHandler) //
-          .withCallback(Response.SC_CREATED, callbackHandler) //
-          .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+          .withCallback(new CreateOrUpdateCallBack(dto), SC_OK, SC_CREATED, SC_BAD_REQUEST) //
+          .put().send();
     }
   }
 
   private void createDatabase() {
     if(validationHandler.validate()) {
       DatabaseDto dto = getDto();
-      ResponseCodeCallback callbackHandler = new CreateOrUpdateCallBack(dto);
       ResourceRequestBuilderFactory.newBuilder() //
           .forResource(DatabaseResources.databases()) //
-          .post() //
           .withResourceBody(DatabaseDto.stringify(dto)) //
-          .withCallback(Response.SC_OK, callbackHandler) //
-          .withCallback(Response.SC_CREATED, callbackHandler) //
-          .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+          .withCallback(new CreateOrUpdateCallBack(dto), SC_OK, SC_CREATED, SC_BAD_REQUEST) //
+          .post().send();
     }
   }
 
@@ -197,11 +196,11 @@ public abstract class AbstractDatabasePresenter<TView extends AbstractDatabasePr
     @Override
     public void onResponseCode(Request request, Response response) {
       switch(response.getStatusCode()) {
-        case Response.SC_OK:
+        case SC_OK:
           getView().hideDialog();
           getEventBus().fireEvent(new DatabaseUpdatedEvent(dto));
           break;
-        case Response.SC_CREATED:
+        case SC_CREATED:
           getView().hideDialog();
           getEventBus().fireEvent(new DatabaseCreatedEvent(dto));
           break;
@@ -222,6 +221,8 @@ public abstract class AbstractDatabasePresenter<TView extends AbstractDatabasePr
   }
 
   public interface Display extends PopupView, HasUiHandlers<DatabaseUiHandlers> {
+
+    void clearErrors();
 
     void hideDialog();
 

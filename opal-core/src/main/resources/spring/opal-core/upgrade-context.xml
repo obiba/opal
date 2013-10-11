@@ -25,7 +25,9 @@
 
   <bean id="sessionFactoryFactory" class="org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory"/>
 
-  <bean id="orientDbService" class="org.obiba.opal.core.cfg.OrientDbServiceImpl"/>
+  <bean id="defaultBeanValidator" class="org.obiba.opal.core.service.impl.DefaultBeanValidator"/>
+  <bean id="orientDbService" class="org.obiba.opal.core.service.impl.OrientDbServiceImpl"/>
+  <bean id="localOrientDbServerFactory" class="org.obiba.opal.core.service.impl.LocalOrientDbServerFactory"/>
 
   <bean id="databaseRegistry" class="org.obiba.opal.core.runtime.database.DefaultDatabaseRegistry"/>
 

@@ -15,15 +15,6 @@ message ProjectDto {
   required bool archived = 8 [default = false];
   optional string database = 9;
   optional Magma.TimestampsDto timestamps = 10;
-
-}
-
-message ProjectFactoryDto {
-  required string name = 1;
-  optional string title = 2;
-  optional string description = 3;
-  optional Magma.DatasourceFactoryDto factory = 4;
-  repeated string tags = 5;
 }
 
 message ProjectSummaryDto {

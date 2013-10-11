@@ -11,7 +11,7 @@ import org.obiba.magma.datasource.hibernate.domain.Timestamped;
 import com.google.common.base.Objects;
 
 @SuppressWarnings("AssignmentToDateFieldFromParameter")
-public abstract class AbstractTimestamped implements Timestamped {
+public abstract class AbstractOrientDbTimestampedEntity implements OrientDbEntity, Timestamped {
 
   @Id
   private String id;
@@ -35,21 +35,25 @@ public abstract class AbstractTimestamped implements Timestamped {
   public boolean equals(Object obj) {
     if(this == obj) return true;
     if(obj == null || getClass() != obj.getClass()) return false;
-    return Objects.equal(id, ((AbstractTimestamped) obj).id);
+    return Objects.equal(id, ((AbstractOrientDbTimestampedEntity) obj).id);
   }
 
+  @Override
   public String getId() {
     return id;
   }
 
+  @Override
   public void setId(String id) {
     this.id = id;
   }
 
+  @Override
   public Integer getVersion() {
     return version;
   }
 
+  @Override
   public void setVersion(Integer version) {
     this.version = version;
   }
