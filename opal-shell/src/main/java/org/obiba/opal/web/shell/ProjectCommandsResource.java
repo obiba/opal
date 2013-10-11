@@ -52,7 +52,7 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   private static final Logger log = LoggerFactory.getLogger(ProjectCommandsResource.class);
 
   @PathParam("name")
-  private String name;
+  protected String name;
 
   private final CommandRegistry commandRegistry;
 
