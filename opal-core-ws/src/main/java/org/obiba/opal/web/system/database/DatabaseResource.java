@@ -12,10 +12,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import org.obiba.magma.datasource.mongodb.MongoDBDatasourceFactory;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbDatabase;
 import org.obiba.opal.core.domain.database.SqlDatabase;
-import org.obiba.opal.core.runtime.database.DatabaseAlreadyExistsException;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.core.runtime.database.MultipleIdentifiersDatabaseException;
 import org.obiba.opal.web.database.Dtos;
@@ -64,14 +64,9 @@ public class DatabaseResource {
   }
 
   @PUT
-  public Response update(DatabaseDto dto) throws MultipleIdentifiersDatabaseException, DatabaseAlreadyExistsException {
+  public Response update(DatabaseDto dto) throws MultipleIdentifiersDatabaseException {
 
     Database database = databaseRegistry.getDatabase(dto.getName());
-    if(database == null) {
-      return Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "CannotFindDatabase", dto.getName()).build()).build();
-    }
-
     Dtos.fromDto(dto, database);
     if(!database.isEditable()) {
       return Response.status(BAD_REQUEST)
@@ -120,8 +115,9 @@ public class DatabaseResource {
     Ws.ClientErrorDto error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed").build();
     try {
       MongoDbDatabase database = (MongoDbDatabase) getDatabase();
-      List<String> dbs = database.createMongoDBFactory().getMongoClient().getDatabaseNames();
-      if(dbs.contains(database.getMongoDbDatabaseName())) {
+      MongoDBDatasourceFactory datasourceFactory = database.createMongoDBDatasourceFactory();
+      List<String> dbs = datasourceFactory.getMongoDBFactory().getMongoClient().getDatabaseNames();
+      if(dbs.contains(datasourceFactory.getMongoDbDatabaseName())) {
         return Response.ok().build();
       }
     } catch(RuntimeException e) {

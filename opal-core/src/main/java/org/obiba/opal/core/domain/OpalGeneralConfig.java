@@ -14,7 +14,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-public class OpalGeneralConfig extends AbstractTimestamped {
+public class OpalGeneralConfig extends AbstractOrientDbTimestampedEntity {
 
   public static final String DEFAULT_NAME = "Opal";
 

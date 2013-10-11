@@ -13,12 +13,12 @@ import java.util.Arrays;
 
 import javax.annotation.Nonnull;
 
-import org.obiba.opal.core.domain.AbstractTimestamped;
+import org.obiba.opal.core.domain.AbstractOrientDbTimestampedEntity;
 
 /**
  * Persisted keystore.
  */
-public class UnitKeyStoreState extends AbstractTimestamped {
+public class UnitKeyStoreState extends AbstractOrientDbTimestampedEntity {
 
   @Nonnull
   private String unit;

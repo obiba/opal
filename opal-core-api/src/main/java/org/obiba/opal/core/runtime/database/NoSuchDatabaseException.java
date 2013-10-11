@@ -7,20 +7,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.project;
+package org.obiba.opal.core.runtime.database;
 
-public class NoSuchProjectException extends RuntimeException {
+public class NoSuchDatabaseException extends RuntimeException {
 
   private static final long serialVersionUID = -6357540199499515674L;
 
-  private final String projectName;
+  private final String databaseName;
 
-  public NoSuchProjectException(String projectName) {
-    super("No project exists with the specified name '" + projectName + "'");
-    this.projectName = projectName;
+  public NoSuchDatabaseException(String databaseName) {
+    super("No database exists with the specified name '" + databaseName + "'");
+    this.databaseName = databaseName;
   }
 
-  public String getProjectName() {
-    return projectName;
+  public String getDatabaseName() {
+    return databaseName;
   }
 }

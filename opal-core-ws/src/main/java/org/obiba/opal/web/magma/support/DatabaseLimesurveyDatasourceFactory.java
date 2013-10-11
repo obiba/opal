@@ -62,9 +62,6 @@ public class DatabaseLimesurveyDatasourceFactory extends AbstractDatasourceFacto
   @Nullable
   private SqlDatabase.LimesurveyDatasourceSettings getSettings() {
     SqlDatabase database = (SqlDatabase) databaseRegistry.getDatabase(databaseName);
-    if(database == null) {
-      throw new IllegalArgumentException("Cannot find database " + databaseName);
-    }
     return database.getLimesurveyDatasourceSettings();
   }
 

@@ -15,8 +15,8 @@ import java.util.TreeSet;
 import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
 
-import org.obiba.opal.core.cfg.OrientDbService;
 import org.obiba.opal.core.domain.security.SubjectAcl;
+import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SubjectAclService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

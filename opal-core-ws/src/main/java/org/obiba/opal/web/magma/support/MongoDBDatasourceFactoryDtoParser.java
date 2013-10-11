@@ -12,7 +12,6 @@ package org.obiba.opal.web.magma.support;
 import javax.annotation.Nonnull;
 
 import org.obiba.magma.DatasourceFactory;
-import org.obiba.magma.datasource.mongodb.MongoDBDatasourceFactory;
 import org.obiba.opal.core.domain.database.MongoDbDatabase;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.web.model.Magma;
@@ -36,12 +35,9 @@ public class MongoDBDatasourceFactoryDtoParser extends AbstractDatasourceFactory
   @Nonnull
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
-    MongoDBDatasourceFactory factory = new MongoDBDatasourceFactory();
     Magma.MongoDBDatasourceFactoryDto mongoDto = dto.getExtension(Magma.MongoDBDatasourceFactoryDto.params);
     MongoDbDatabase database = (MongoDbDatabase) databaseRegistry.getDatabase(mongoDto.getDatabase());
-    factory.setConnectionURI(database.getUrl());
-    // TODO get registered host port for the database
-    return factory;
+    return database.createMongoDBDatasourceFactory();
   }
 
   @Override

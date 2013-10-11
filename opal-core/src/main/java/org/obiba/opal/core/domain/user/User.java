@@ -17,10 +17,10 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 
 import org.obiba.core.util.HexUtil;
-import org.obiba.opal.core.domain.AbstractTimestamped;
+import org.obiba.opal.core.domain.AbstractOrientDbTimestampedEntity;
 
 @SuppressWarnings("ComparableImplementedButEqualsNotOverridden")
-public class User extends AbstractTimestamped implements Comparable<User> {
+public class User extends AbstractOrientDbTimestampedEntity implements Comparable<User> {
 
   public enum Status {
     ACTIVE, INACTIVE

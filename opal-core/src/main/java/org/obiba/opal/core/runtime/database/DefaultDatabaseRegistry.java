@@ -9,15 +9,15 @@ import javax.validation.ConstraintViolationException;
 
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
-import org.obiba.magma.Datasource;
-import org.obiba.magma.datasource.hibernate.HibernateDatasource;
-import org.obiba.magma.datasource.mongodb.MongoDBDatasource;
-import org.obiba.opal.core.cfg.OrientDbService;
+import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbDatabase;
 import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
+import org.obiba.opal.core.runtime.jdbc.DatabaseSessionFactoryProvider;
 import org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory;
+import org.obiba.opal.core.service.OrientDbService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +35,8 @@ import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
-import com.orientechnologies.orient.core.index.OIndexException;
-import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 
+@SuppressWarnings("OverlyCoupledClass")
 @Component
 public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
@@ -68,7 +67,6 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
         public DataSource load(String databaseName) throws Exception {
           log.info("Building DataSource {}", databaseName);
           SqlDatabase database = (SqlDatabase) getDatabase(databaseName);
-          if(database == null) throw new IllegalArgumentException("Cannot find database " + databaseName);
           return dataSourceFactory.createDataSource(database);
         }
       });
@@ -136,10 +134,12 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     return orientDbService.list("select from Database where usedForIdentifiers = ? and type = ?", false, type);
   }
 
-  @Nullable
+  @Nonnull
   @Override
-  public Database getDatabase(@Nonnull String name) {
-    return orientDbService.uniqueResult("select from Database where name = ?", name);
+  public Database getDatabase(@Nonnull String name) throws NoSuchDatabaseException {
+    Database database = orientDbService.uniqueResult("select from Database where name = ?", name);
+    if(database == null) throw new NoSuchDatabaseException(name);
+    return database;
   }
 
   @Override
@@ -156,16 +156,9 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   @Override
   public void addOrReplaceDatabase(@Nonnull Database database)
-      throws ConstraintViolationException, MultipleIdentifiersDatabaseException, DatabaseAlreadyExistsException {
-
+      throws ConstraintViolationException, MultipleIdentifiersDatabaseException {
     validUniqueIdentifiersDatabase(database);
-    try {
-      orientDbService.save(database);
-    } catch(OIndexException e) {
-      throw new DatabaseAlreadyExistsException(database.getName());
-    } catch(ORecordDuplicatedException e) {
-      throw new DatabaseAlreadyExistsException(database.getName());
-    }
+    orientDbService.save(database);
   }
 
   private void validUniqueIdentifiersDatabase(Database database) throws MultipleIdentifiersDatabaseException {
@@ -196,9 +189,6 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   private void register(String databaseName, @Nullable String usedByDatasource) {
     if(Strings.isNullOrEmpty(usedByDatasource)) return;
     Database database = getDatabase(databaseName);
-    if(database == null) {
-      throw new IllegalArgumentException("Cannot find database " + databaseName);
-    }
     if(database.isEditable()) {
       database.setEditable(false);
       addOrReplaceDatabase(database);
@@ -209,9 +199,6 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Override
   public void unregister(@Nonnull String databaseName, String usedByDatasource) {
     Database database = getDatabase(databaseName);
-    if(database == null) {
-      throw new IllegalArgumentException("Cannot find database " + databaseName);
-    }
     database.setEditable(true);
     addOrReplaceDatabase(database);
     registrations.remove(databaseName, usedByDatasource);
@@ -225,21 +212,27 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     return database;
   }
 
+  @Nonnull
   @Override
-  public Datasource createStorageMagmaDatasource(String datasourceName, Database database) {
+  public DatasourceFactory createDataSourceFactory(@Nonnull String datasourceName, @Nonnull Database database) {
+    String databaseName = database.getName();
     Preconditions.checkArgument(database.getUsage() == Database.Usage.STORAGE,
-        "Cannot create datasource for non storage database " + database.getName() + " (" + database.getUsage() + ")");
+        "Cannot create DatasourceFactory for non storage database " + databaseName + ": " + database.getUsage());
 
     if(database instanceof SqlDatabase) {
       SqlDatabase sqlDatabase = (SqlDatabase) database;
-      if(sqlDatabase.getSqlSchema() == SqlDatabase.SqlSchema.HIBERNATE) {
-        return new HibernateDatasource(datasourceName, getSessionFactory(database.getName(), datasourceName));
+      if(sqlDatabase.getSqlSchema() != SqlDatabase.SqlSchema.HIBERNATE) {
+        throw new IllegalArgumentException(
+            "Cannot create datasource for non Hibernate storage database " + databaseName + ": " +
+                sqlDatabase.getSqlSchema());
       }
+      return new HibernateDatasourceFactory(datasourceName,
+          new DatabaseSessionFactoryProvider(datasourceName, this, database.getName()));
     }
     if(database instanceof MongoDbDatabase) {
-      return new MongoDBDatasource(datasourceName, ((MongoDbDatabase) database).createMongoDBFactory());
+      return ((MongoDbDatabase) database).createMongoDBDatasourceFactory();
     }
-    throw new IllegalArgumentException("Unknown datasource config for database " + database);
+    throw new IllegalArgumentException("Unknown datasource config for database " + database.getClass());
   }
 
 }

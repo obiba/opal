@@ -98,8 +98,16 @@
       <artifactId>javax.el</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
+      <groupId>com.orientechnologies</groupId>
+      <artifactId>orient-commons</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.orientechnologies</groupId>
+      <artifactId>orientdb-object</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.orientechnologies</groupId>
+      <artifactId>orientdb-server</artifactId>
     </dependency>
   </dependencies>
 

@@ -24,8 +24,8 @@ import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.core.util.FileUtil;
-import org.obiba.opal.core.cfg.OrientDbService;
 import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
+import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.unit.UnitKeyStore;
 
 import static org.easymock.EasyMock.createMock;

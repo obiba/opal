@@ -3,11 +3,13 @@ package org.obiba.opal.core.domain.database;
 import javax.annotation.Nonnull;
 
 import org.hibernate.validator.constraints.NotBlank;
-import org.obiba.opal.core.domain.AbstractTimestamped;
+import org.obiba.opal.core.domain.AbstractOrientDbTimestampedEntity;
+import org.obiba.opal.core.validator.Unique;
 
 import com.google.common.base.Objects;
 
-public abstract class Database extends AbstractTimestamped {
+@Unique(properties = "name")
+public abstract class Database extends AbstractOrientDbTimestampedEntity {
 
   public enum Usage {
     IMPORT, STORAGE, EXPORT
