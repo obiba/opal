@@ -23,7 +23,6 @@ import org.obiba.opal.web.model.client.opal.UserDto;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CellTable;
 import com.github.gwtbootstrap.client.ui.SimplePager;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -40,21 +39,18 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 import static com.github.gwtbootstrap.client.ui.constants.IconType.OK;
 import static org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserAdministrationPresenter.Display;
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 
 public class UserAdministrationView extends ViewWithUiHandlers<UserAdministrationUiHandlers> implements Display {
 
   @UiTemplate("UserAdministrationView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, UserAdministrationView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  private static final Translations translations = GWT.create(Translations.class);
-
-  private final Widget uiWidget;
+  interface Binder extends UiBinder<Widget, UserAdministrationView> {}
 
   @UiField
   Button addUser;
@@ -75,89 +71,27 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
 
   private final ListDataProvider<GroupDto> groupDataProvider = new ListDataProvider<GroupDto>();
 
-  Column<UserDto, UserDto> status;
+  @Inject
+  public UserAdministrationView(Binder uiBinder, Translations translations) {
+    initWidget(uiBinder.createAndBindUi(this));
+    configUserTable(translations);
+    configGroupTable(translations);
+  }
 
-  ActionsColumn<UserDto> userActions;
-
-  ActionsColumn<GroupDto> groupActions;
-
-  public UserAdministrationView() {
-    uiWidget = uiBinder.createAndBindUi(this);
+  private void configUserTable(Translations translations) {
     indexTablePager.setDisplay(usersTable);
-
-    Column<UserDto, String> name = new TextColumn<UserDto>() {
-
-      @Override
-      public String getValue(UserDto object) {
-        return object.getName();
-      }
-    };
-
-    Column<UserDto, String> groups = new TextColumn<UserDto>() {
-
-      @Override
-      public String getValue(UserDto object) {
-        return object.getGroupsCount() > 0 ? object.getGroupsArray().join(", ") : "";
-      }
-    };
-
-    status = new Column<UserDto, UserDto>(new UserStatusIconActionCell(OK, null)) {
-
-      @Override
-      public UserDto getValue(UserDto object) {
-        return object;
-      }
-    };
-    userActions = new ActionsColumn<UserDto>(new ActionsProvider<UserDto>() {
-
-      private final String[] all = new String[] { ActionsColumn.EDIT_ACTION, ActionsColumn.DELETE_ACTION,
-          PERMISSIONS_ACTION };
-
-      @Override
-      public String[] allActions() {
-        return all;
-      }
-
-      @Override
-      public String[] getActions(UserDto value) {
-        return allActions();
-      }
-    });
-
-    groupActions = new ActionsColumn<GroupDto>(new ActionsProvider<GroupDto>() {
-
-      private final String[] all = new String[] { ActionsColumn.DELETE_ACTION, PERMISSIONS_ACTION };
-
-      private final String[] permissions = new String[] { PERMISSIONS_ACTION };
-
-      @Override
-      public String[] allActions() {
-        return all;
-      }
-
-      public String[] permissionsActions() {
-        return permissions;
-      }
-
-      @Override
-      public String[] getActions(GroupDto value) {
-        return value.getUsersCount() > 0 ? permissionsActions() : allActions();
-      }
-    });
-
-    usersTable.addColumn(name, translations.userNameLabel());
-    usersTable.addColumn(groups, translations.userGroupsLabel());
-    usersTable.addColumn(status, translations.userStatusLabel());
-    usersTable.addColumn(userActions, translations.actionsLabel());
+    usersTable.addColumn(UserColumns.NAME, translations.userNameLabel());
+    usersTable.addColumn(UserColumns.GROUPS, translations.userGroupsLabel());
+    usersTable.addColumn(UserColumns.STATUS, translations.userStatusLabel());
+    usersTable.addColumn(UserColumns.ACTIONS, translations.actionsLabel());
     usersTable.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
-
     userDataProvider.addDataDisplay(usersTable);
+  }
 
-    /*Groups*/
-    groupsTable.addColumn(GroupColumns.name, translations.groupNameLabel());
-    groupsTable.addColumn(GroupColumns.users, translations.groupUsersLabel());
-    groupsTable.addColumn(groupActions, translations.actionsLabel());
-
+  private void configGroupTable(Translations translations) {
+    groupsTable.addColumn(GroupColumns.NAME, translations.groupNameLabel());
+    groupsTable.addColumn(GroupColumns.USERS, translations.groupUsersLabel());
+    groupsTable.addColumn(GroupColumns.ACTIONS, translations.actionsLabel());
     groupDataProvider.addDataDisplay(groupsTable);
   }
 
@@ -172,7 +106,7 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
 
   @Override
   public void setDelegate(IconActionCell.Delegate<UserDto> delegate) {
-    ((IconActionCell<UserDto>) status.getCell()).setDelegate(delegate);
+    ((IconActionCell<UserDto>) UserColumns.STATUS.getCell()).setDelegate(delegate);
   }
 
   @Override
@@ -185,11 +119,6 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
   public void clear() {
     renderUserRows((JsArray<UserDto>) JavaScriptObject.createArray());
     renderGroupRows((JsArray<GroupDto>) JavaScriptObject.createArray());
-  }
-
-  @Override
-  public Widget asWidget() {
-    return uiWidget;
   }
 
   @Override
@@ -220,17 +149,59 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
 
   @Override
   public HasActionHandler<UserDto> getUsersActions() {
-    return userActions;
+    return UserColumns.ACTIONS;
   }
 
   @Override
   public HasActionHandler<GroupDto> getGroupsActions() {
-    return groupActions;
+    return GroupColumns.ACTIONS;
+  }
+
+  private static final class UserColumns {
+
+    static final Column<UserDto, String> NAME = new TextColumn<UserDto>() {
+
+      @Override
+      public String getValue(UserDto object) {
+        return object.getName();
+      }
+    };
+
+    static final Column<UserDto, String> GROUPS = new TextColumn<UserDto>() {
+
+      @Override
+      public String getValue(UserDto object) {
+        return object.getGroupsCount() > 0 ? object.getGroupsArray().join(", ") : "";
+      }
+    };
+
+    static final Column<UserDto, UserDto> STATUS = new Column<UserDto, UserDto>(
+        new UserStatusIconActionCell(OK, null)) {
+
+      @Override
+      public UserDto getValue(UserDto object) {
+        return object;
+      }
+    };
+
+    static final ActionsColumn<UserDto> ACTIONS = new ActionsColumn<UserDto>(new ActionsProvider<UserDto>() {
+
+      @Override
+      public String[] allActions() {
+        return new String[] { EDIT_ACTION, DELETE_ACTION, PERMISSIONS_ACTION };
+      }
+
+      @Override
+      public String[] getActions(UserDto value) {
+        return allActions();
+      }
+    });
+
   }
 
   private static final class GroupColumns {
 
-    static final Column<GroupDto, String> name = new TextColumn<GroupDto>() {
+    static final Column<GroupDto, String> NAME = new TextColumn<GroupDto>() {
 
       @Override
       public String getValue(GroupDto object) {
@@ -238,12 +209,29 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
       }
     };
 
-    static final Column<GroupDto, String> users = new TextColumn<GroupDto>() {
+    static final Column<GroupDto, String> USERS = new TextColumn<GroupDto>() {
 
       @Override
       public String getValue(GroupDto object) {
         return object.getUsersCount() > 0 ? object.getUsersArray().join(", ") : "";
       }
     };
+
+    static final ActionsColumn<GroupDto> ACTIONS = new ActionsColumn<GroupDto>(new ActionsProvider<GroupDto>() {
+
+      @Override
+      public String[] allActions() {
+        return new String[] { DELETE_ACTION, PERMISSIONS_ACTION };
+      }
+
+      public String[] permissionsActions() {
+        return new String[] { PERMISSIONS_ACTION };
+      }
+
+      @Override
+      public String[] getActions(GroupDto value) {
+        return value.getUsersCount() > 0 ? permissionsActions() : allActions();
+      }
+    });
   }
 }
