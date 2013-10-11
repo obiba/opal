@@ -66,27 +66,6 @@ public class UserAdministrationPresenter
 
   private Runnable removeConfirmation;
 
-  public interface Display extends View, HasBreadcrumbs, HasUiHandlers<UserAdministrationUiHandlers> {
-
-    String PERMISSIONS_ACTION = "Permissions";
-
-    void renderUserRows(JsArray<UserDto> rows);
-
-    void renderGroupRows(JsArray<GroupDto> rows);
-
-    void clear();
-
-    HasClickHandlers getAddUserButton();
-
-    void setDelegate(IconActionCell.Delegate<UserDto> delegate);
-
-    HasData<UserDto> getUsersTable();
-
-    HasActionHandler<UserDto> getUsersActions();
-
-    HasActionHandler<GroupDto> getGroupsActions();
-  }
-
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
   @Inject
@@ -130,27 +109,31 @@ public class UserAdministrationPresenter
 
   @Override
   public void onUsersSelected() {
-    ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder()//
-        .forResource("/users").withCallback(new ResourceCallback<JsArray<UserDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder() //
+        .forResource("/users") //
+        .withCallback(new ResourceCallback<JsArray<UserDto>>() {
 
-      @Override
-      public void onResource(Response response, JsArray<UserDto> resource) {
-        getView().renderUserRows(resource);
-      }
-    }).get().send();
+          @Override
+          public void onResource(Response response, JsArray<UserDto> resource) {
+            getView().renderUserRows(resource);
+          }
+        }) //
+        .get().send();
   }
 
   @Override
   public void onGroupsSelected() {
     // Fetch all groups
-    ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder()//
-        .forResource("/groups").withCallback(new ResourceCallback<JsArray<GroupDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder() //
+        .forResource("/groups") //
+        .withCallback(new ResourceCallback<JsArray<GroupDto>>() {
 
-      @Override
-      public void onResource(Response response, JsArray<GroupDto> resource) {
-        getView().renderGroupRows(resource);
-      }
-    }).get().send();
+          @Override
+          public void onResource(Response response, JsArray<GroupDto> resource) {
+            getView().renderGroupRows(resource);
+          }
+        }) //
+        .get().send();
   }
 
   @Override
@@ -166,14 +149,16 @@ public class UserAdministrationPresenter
     registerHandler(getEventBus().addHandler(UsersRefreshEvent.getType(), new UsersRefreshEvent.Handler() {
       @Override
       public void onRefresh(UsersRefreshEvent event) {
-        ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder()//
-            .forResource("/users").withCallback(new ResourceCallback<JsArray<UserDto>>() {
+        ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder() //
+            .forResource("/users") //
+            .withCallback(new ResourceCallback<JsArray<UserDto>>() {
 
-          @Override
-          public void onResource(Response response, JsArray<UserDto> resource) {
-            getView().renderUserRows(resource);
-          }
-        }).get().send();
+              @Override
+              public void onResource(Response response, JsArray<UserDto> resource) {
+                getView().renderUserRows(resource);
+              }
+            }) //
+            .get().send();
       }
     }));
 
@@ -181,14 +166,16 @@ public class UserAdministrationPresenter
     registerHandler(getEventBus().addHandler(GroupsRefreshEvent.getType(), new GroupsRefreshEvent.Handler() {
       @Override
       public void onRefresh(GroupsRefreshEvent event) {
-        ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder()//
-            .forResource("/groups").withCallback(new ResourceCallback<JsArray<GroupDto>>() {
+        ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder() //
+            .forResource("/groups") //
+            .withCallback(new ResourceCallback<JsArray<GroupDto>>() {
 
-          @Override
-          public void onResource(Response response, JsArray<GroupDto> resource) {
-            getView().renderGroupRows(resource);
-          }
-        }).get().send();
+              @Override
+              public void onResource(Response response, JsArray<GroupDto> resource) {
+                getView().renderGroupRows(resource);
+              }
+            }) //
+            .get().send();
       }
     }));
 
@@ -196,8 +183,7 @@ public class UserAdministrationPresenter
     getView().getAddUserButton().addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        UserPresenter dialog = userModalProvider.get();
-        dialog.setDialogMode(UserPresenter.Mode.CREATE);
+        userModalProvider.get().setDialogMode(UserPresenter.Mode.CREATE);
       }
     });
 
@@ -206,11 +192,11 @@ public class UserAdministrationPresenter
 
       @Override
       public void doAction(UserDto object, String actionName) {
-        if(actionName.trim().equalsIgnoreCase(ActionsColumn.EDIT_ACTION)) {
+        if(ActionsColumn.EDIT_ACTION.equals(actionName)) {
           UserPresenter dialog = userModalProvider.get();
           dialog.setDialogMode(UserPresenter.Mode.UPDATE);
           dialog.setUser(object);
-        } else if(actionName.trim().equalsIgnoreCase(ActionsColumn.DELETE_ACTION)) {
+        } else if(ActionsColumn.DELETE_ACTION.equals(actionName)) {
           removeConfirmation = new RemoveRunnable(object.getName(), true);
           fireEvent(ConfirmationRequiredEvent
               .createWithMessages(removeConfirmation, translations.confirmationTitleMap().get("removeUser"),
@@ -224,7 +210,7 @@ public class UserAdministrationPresenter
 
       @Override
       public void doAction(GroupDto object, String actionName) {
-        if(actionName.trim().equalsIgnoreCase(ActionsColumn.DELETE_ACTION)) {
+        if(ActionsColumn.DELETE_ACTION.equals(actionName)) {
           removeConfirmation = new RemoveRunnable(object.getName(), false);
           fireEvent(ConfirmationRequiredEvent
               .createWithMessages(removeConfirmation, translations.confirmationTitleMap().get("removeGroup"),
@@ -242,16 +228,17 @@ public class UserAdministrationPresenter
 
     @Override
     public void authorized() {
-
       // Fetch all users
-      ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder()//
-          .forResource("/users").withCallback(new ResourceCallback<JsArray<UserDto>>() {
+      ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder() //
+          .forResource("/users") //
+          .withCallback(new ResourceCallback<JsArray<UserDto>>() {
 
-        @Override
-        public void onResource(Response response, JsArray<UserDto> resource) {
-          getView().renderUserRows(resource);
-        }
-      }).get().send();
+            @Override
+            public void onResource(Response response, JsArray<UserDto> resource) {
+              getView().renderUserRows(resource);
+            }
+          }) //
+          .get().send();
     }
 
     @Override
@@ -264,24 +251,24 @@ public class UserAdministrationPresenter
     public void executeClick(NativeEvent event, UserDto value) {
       // Enable/Disable user all groups
       value.setEnabled(!value.getEnabled());
-      ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder()//
-          .forResource("/user/" + value.getName()).withResourceBody(UserDto.stringify(value))
-          .accept("application/json")//
-          .withCallback(Response.SC_OK, new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              // Fetch all users
-              ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder()//
-                  .forResource("/users").withCallback(new ResourceCallback<JsArray<UserDto>>() {
+      ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder() //
+          .forResource("/user/" + value.getName()) //
+          .withResourceBody(UserDto.stringify(value)).withCallback(Response.SC_OK, new ResponseCodeCallback() {
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          // Fetch all users
+          ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder() //
+              .forResource("/users") //
+              .withCallback(new ResourceCallback<JsArray<UserDto>>() {
 
                 @Override
                 public void onResource(Response response, JsArray<UserDto> resource) {
                   getView().renderUserRows(resource);
-
                 }
-              }).get().send();
-            }
-          })//
+              }) //
+              .get().send();
+        }
+      })//
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
@@ -292,7 +279,8 @@ public class UserAdministrationPresenter
                         .build());
               }
             }
-          }).put().send();
+          }) //
+          .put().send();
 
     }
 
@@ -316,14 +304,15 @@ public class UserAdministrationPresenter
 
     @Override
     public void run() {
-      ResourceRequestBuilderFactory.newBuilder()//
-          .forResource(UriBuilder.create().segment(isUser ? "user" : "group", name).build())
-          .withCallback(new ResponseCodeCallback() {
+      ResourceRequestBuilderFactory.newBuilder() //
+          .forResource(UriBuilder.create().segment(isUser ? "user" : "group", name).build()) //
+          .withCallback(Response.SC_OK, new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
               getEventBus().fireEvent(isUser ? new UsersRefreshEvent() : new GroupsRefreshEvent());
             }
-          }, Response.SC_OK).delete().send();
+          }) //
+          .delete().send();
     }
   }
 
@@ -336,5 +325,26 @@ public class UserAdministrationPresenter
         removeConfirmation = null;
       }
     }
+  }
+
+  public interface Display extends View, HasBreadcrumbs, HasUiHandlers<UserAdministrationUiHandlers> {
+
+    String PERMISSIONS_ACTION = "Permissions";
+
+    void renderUserRows(JsArray<UserDto> rows);
+
+    void renderGroupRows(JsArray<GroupDto> rows);
+
+    void clear();
+
+    HasClickHandlers getAddUserButton();
+
+    void setDelegate(IconActionCell.Delegate<UserDto> delegate);
+
+    HasData<UserDto> getUsersTable();
+
+    HasActionHandler<UserDto> getUsersActions();
+
+    HasActionHandler<GroupDto> getGroupsActions();
   }
 }
