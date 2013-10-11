@@ -16,6 +16,7 @@ public class ConstraintViolationExceptionMapper implements ExceptionMapper<Const
 
   @Override
   public Response toResponse(ConstraintViolationException exception) {
+    // should we use PRECONDITION_FAILED (412)?
     return Response.status(BAD_REQUEST)
         .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "ConstraintViolation", exception)).build();
   }

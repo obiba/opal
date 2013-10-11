@@ -1,27 +1,19 @@
 package org.obiba.opal.web.gwt.app.client.administration.database.presenter;
 
-import java.util.Collection;
-
 import javax.annotation.Nonnull;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.validation.ConstraintViolationErrorsEvent;
-import org.obiba.opal.web.gwt.app.client.validation.ConstraintViolationUtils;
+import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
-import org.obiba.opal.web.model.client.ws.ConstraintViolationErrorDto;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.HasChangeHandlers;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -34,7 +26,6 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
 import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
-import static com.google.gwt.http.client.Response.SC_CREATED;
 import static com.google.gwt.http.client.Response.SC_OK;
 
 public abstract class AbstractDatabasePresenter<TView extends AbstractDatabasePresenter.Display>
@@ -85,8 +76,6 @@ public abstract class AbstractDatabasePresenter<TView extends AbstractDatabasePr
   }
 
   protected static final Translations translations = GWT.create(Translations.class);
-
-  protected static final TranslationMessages translationMessages = GWT.create(TranslationMessages.class);
 
   protected Mode dialogMode;
 
@@ -165,58 +154,37 @@ public abstract class AbstractDatabasePresenter<TView extends AbstractDatabasePr
 
   private void updateDatabase() {
     if(validationHandler.validate()) {
-      DatabaseDto dto = getDto();
+      final DatabaseDto dto = getDto();
       ResourceRequestBuilderFactory.newBuilder() //
           .forResource(DatabaseResources.database(dto.getName())) //
           .withResourceBody(DatabaseDto.stringify(dto)) //
-          .withCallback(new CreateOrUpdateCallBack(dto), SC_OK, SC_CREATED, SC_BAD_REQUEST) //
+          .withCallback(SC_OK, new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              getView().hideDialog();
+              getEventBus().fireEvent(new DatabaseUpdatedEvent(dto));
+            }
+          }) //
+          .withCallback(SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
           .put().send();
     }
   }
 
   private void createDatabase() {
     if(validationHandler.validate()) {
-      DatabaseDto dto = getDto();
+      final DatabaseDto dto = getDto();
       ResourceRequestBuilderFactory.newBuilder() //
           .forResource(DatabaseResources.databases()) //
           .withResourceBody(DatabaseDto.stringify(dto)) //
-          .withCallback(new CreateOrUpdateCallBack(dto), SC_OK, SC_CREATED, SC_BAD_REQUEST) //
+          .withCallback(SC_OK, new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              getView().hideDialog();
+              getEventBus().fireEvent(new DatabaseCreatedEvent(dto));
+            }
+          }) //
+          .withCallback(SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
           .post().send();
-    }
-  }
-
-  private class CreateOrUpdateCallBack implements ResponseCodeCallback {
-
-    private final DatabaseDto dto;
-
-    private CreateOrUpdateCallBack(DatabaseDto dto) {
-      this.dto = dto;
-    }
-
-    @Override
-    public void onResponseCode(Request request, Response response) {
-      switch(response.getStatusCode()) {
-        case SC_OK:
-          getView().hideDialog();
-          getEventBus().fireEvent(new DatabaseUpdatedEvent(dto));
-          break;
-        case SC_CREATED:
-          getView().hideDialog();
-          getEventBus().fireEvent(new DatabaseCreatedEvent(dto));
-          break;
-        default:
-          ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-          Collection<ConstraintViolationErrorDto> violationDtos = ConstraintViolationUtils.parseErrors(error);
-          if(violationDtos.isEmpty()) {
-            String errorMessage = translations.userMessageMap().get(error.getStatus());
-            getView().showError(errorMessage == null
-                ? translationMessages
-                .unknownResponse(error.getStatus(), String.valueOf(JsArrays.toList(error.getArgumentsArray())))
-                : errorMessage);
-          } else {
-            ConstraintViolationErrorsEvent.fire(getView().asWidget(), violationDtos);
-          }
-      }
     }
   }
 

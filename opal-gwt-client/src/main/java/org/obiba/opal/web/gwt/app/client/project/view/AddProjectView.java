@@ -52,6 +52,11 @@ public class AddProjectView extends ModalPopupViewWithUiHandlers<AddProjectUiHan
   }
 
   @Override
+  public void clearErrors() {
+    modal.clearAlert();
+  }
+
+  @Override
   public HasText getName() {
     return name;
   }

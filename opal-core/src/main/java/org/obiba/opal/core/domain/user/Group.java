@@ -14,12 +14,16 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
+import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractOrientDbTimestampedEntity;
+import org.obiba.opal.core.validator.Unique;
 
+@Unique(properties = "name")
 @SuppressWarnings("ComparableImplementedButEqualsNotOverridden")
 public class Group extends AbstractOrientDbTimestampedEntity implements Comparable<Group> {
 
   @Nonnull
+  @NotBlank
   private String name;
 
   private Set<User> users;

@@ -19,7 +19,6 @@ import org.obiba.opal.core.domain.user.Group;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-@SuppressWarnings("UnusedDeclaration")
 @Component
 @Scope("request")
 @Path("/group/{name}")
@@ -42,6 +41,7 @@ public class GroupResource extends AbstractUserGroupResource {
     Group group = userService.getGroupWithName(name);
     if(group != null && !group.getUsers().isEmpty()) {
       // cannot delete a group with users
+      //TODO add message to explain what failed
       return Response.status(Response.Status.PRECONDITION_FAILED).build();
     }
 

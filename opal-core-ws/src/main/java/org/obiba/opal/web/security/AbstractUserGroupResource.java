@@ -17,12 +17,11 @@ abstract class AbstractUserGroupResource {
   protected UserService userService;
 
   protected User fromDto(Opal.UserDto dto) {
-    User user = userService.getUserWithName(dto.getName());
-    if(user == null) {
-      user = new User(dto.getName());
-    }
-    user.setEnabled(dto.getEnabled());
+    return fromDto(dto, new User(dto.getName()));
+  }
 
+  protected User fromDto(Opal.UserDto dto, User user) {
+    user.setEnabled(dto.getEnabled());
     // Remove groups that are not in userDto
     for(Group group : ImmutableList.copyOf(user.getGroups())) {
       if(!dto.getGroupsList().contains(group.getName())) {

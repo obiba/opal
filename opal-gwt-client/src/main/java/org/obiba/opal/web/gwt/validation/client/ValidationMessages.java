@@ -1,4 +1,4 @@
-package org.obiba.opal.web.gwt.app.client.validator;
+package org.obiba.opal.web.gwt.validation.client;
 
 /**
  * Interface to represent the constants contained in resource bundle:

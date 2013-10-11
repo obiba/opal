@@ -213,7 +213,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
     try {
       return build().send();
     } catch(RequestException e) {
-      eventBus.fireEvent(new RequestErrorEvent(e));
+      eventBus.fireEvent(new RequestErrorEvent.Builder().exception(e).build());
       return null;
     }
   }
@@ -247,7 +247,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
 
     @Override
     public void onError(Request request, Throwable exception) {
-      eventBus.fireEvent(new RequestErrorEvent(exception));
+      eventBus.fireEvent(new RequestErrorEvent.Builder().exception(exception).build());
     }
 
     @Override

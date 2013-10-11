@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.user.view;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -20,24 +21,24 @@ import org.obiba.opal.web.gwt.app.client.ui.GroupSuggestOracle;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.SuggestListBox;
+import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.PasswordTextBox;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.TakesValue;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -48,17 +49,13 @@ import com.google.web.bindery.event.shared.EventBus;
  */
 public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> implements UserPresenter.Display {
 
+  public static final int COMMA_KEY = 188;
+
   @UiTemplate("UserView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, UserView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  private static final Translations translations = GWT.create(Translations.class);
-
-  private final Widget widget;
+  interface Binder extends UiBinder<Widget, UserView> {}
 
   @UiField
-  Modal dialog;
+  Modal modal;
 
   @UiField
   Button saveButton;
@@ -70,10 +67,10 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
   SuggestListBox groups;
 
   @UiField
-  ControlGroup usernameGroup;
+  ControlGroup nameGroup;
 
   @UiField
-  TextBox userName;
+  TextBox name;
 
   @UiField
   ControlGroup passwordGroup;
@@ -84,41 +81,56 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
   @UiField
   PasswordTextBox confirmPassword;
 
+  private final Translations translations;
+
   @Inject
-  public UserView(EventBus eventBus) {
+  public UserView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
+    this.translations = translations;
+
     groups = new SuggestListBox(new GroupSuggestOracle(eventBus));
 
-    widget = uiBinder.createAndBindUi(this);
-    dialog.setTitle(translations.addUserLabel());
+    initWidget(uiBinder.createAndBindUi(this));
+
+    groups.getSuggestBox().addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
+      @Override
+      public void onSelection(SelectionEvent<SuggestOracle.Suggestion> event) {
+        addGroup(((GroupSuggestOracle.GroupSuggestion) event.getSelectedItem()).getGroup());
+        groups.getSuggestBox().setText("");
+      }
+    });
+
+    modal.setTitle(translations.addUserLabel());
 
     groups.getSuggestBox().getValueBox().addKeyUpHandler(new KeyUpHandler() {
 
       @Override
       public void onKeyUp(KeyUpEvent event) {
         // Keycode for comma
-        if(event.getNativeEvent().getKeyCode() == 188) {
-          addSearchItem(groups.getSuggestBox().getText().replace(",", "").trim());
+        if(event.getNativeEvent().getKeyCode() == COMMA_KEY) {
+          addGroup(groups.getSuggestBox().getText().replace(",", "").trim());
           groups.getSuggestBox().setText("");
         }
       }
     });
+
+    // used to support ConstraintViolation exceptions
+    ConstrainedModal constrainedModal = new ConstrainedModal(modal);
+    constrainedModal.registerWidget("name", translations.nameLabel(), nameGroup);
+    constrainedModal.registerWidget("password", translations.urlLabel(), passwordGroup);
+
+  }
+
+  //
+  @Override
+  public void setNamedEnabled(boolean enabled) {
+    name.setEnabled(enabled);
+    modal.setTitle(enabled ? translations.addUserLabel() : translations.editUserLabel());
   }
 
   @Override
-  public void setUser(String originalUserName, List<String> originalGroups) {
-    userName.setText(originalUserName);
-  }
-
-  @Override
-  public void usernameSetEnabled(boolean b) {
-    userName.setEnabled(b);
-    dialog.setTitle(b ? translations.addUserLabel() : translations.editUserLabel());
-  }
-
-  @Override
-  public String getUserName() {
-    return userName.getText();
+  public HasText getName() {
+    return name;
   }
 
   @Override
@@ -132,28 +144,38 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
   }
 
   @Override
-  public JsArrayString getGroups() {
-    JsArrayString g = JsArrayString.createArray().cast();
-    for(String s : groups.getSelectedItemsTexts()) {
-      g.push(s);
-    }
+  public TakesValue<List<String>> getGroups() {
+    return new TakesValue<List<String>>() {
+      @Override
+      public void setValue(List<String> value) {
+        if(value != null) {
+          for(String group : value) {
+            addGroup(group);
+          }
+        }
+      }
 
-    // add the group from the textbox (if the user has not entered ',')
-    if(!groups.getSuggestBox().getText().isEmpty()) {
-      g.push(groups.getSuggestBox().getText());
-    }
+      @Override
+      public List<String> getValue() {
+        List<String> selected = new ArrayList<String>();
+        for(String group : groups.getSelectedItemsTexts()) {
+          selected.add(group);
+        }
 
-    return g;
-  }
+        // add the group from the textbox (if the user has not entered ',')
+        if(!groups.getSuggestBox().getText().isEmpty()) {
+          selected.add(groups.getSuggestBox().getText());
+        }
 
-  @Override
-  public Widget asWidget() {
-    return widget;
+        return selected;
+      }
+    };
+
   }
 
   @Override
   public void hideDialog() {
-    dialog.hide();
+    modal.hide();
   }
 
   @UiHandler("saveButton")
@@ -166,21 +188,8 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
     getUiHandlers().cancel();
   }
 
-  @Override
-  public void addSearchItem(String text) {
-    groups.addItem(text);
-  }
-
-  @Override
-  public HandlerRegistration addSearchSelectionHandler(final SelectionHandler<SuggestOracle.Suggestion> handler) {
-    return groups.getSuggestBox().addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
-      @Override
-      public void onSelection(SelectionEvent<SuggestOracle.Suggestion> event) {
-        addSearchItem(((GroupSuggestOracle.GroupSuggestion) event.getSelectedItem()).getGroup());
-        groups.getSuggestBox().setText("");
-        handler.onSelection(event);
-      }
-    });
+  private void addGroup(String group) {
+    groups.addItem(group);
   }
 
   @Override
@@ -189,7 +198,7 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
     if(formField != null) {
       switch(formField) {
         case USERNAME:
-          group = usernameGroup;
+          group = nameGroup;
           break;
         case PASSWORD:
           group = passwordGroup;
@@ -197,9 +206,14 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
       }
     }
     if(group == null) {
-      dialog.addAlert(message, AlertType.ERROR);
+      modal.addAlert(message, AlertType.ERROR);
     } else {
-      dialog.addAlert(message, AlertType.ERROR, group);
+      modal.addAlert(message, AlertType.ERROR, group);
     }
+  }
+
+  @Override
+  public void clearErrors() {
+    modal.clearAlert();
   }
 }

@@ -105,7 +105,7 @@ public class OpalBootstrapperImpl implements Bootstrapper {
       }
     });
 
-    eventBus.addHandler(RequestErrorEvent.getType(), new RequestErrorEvent.Handler() {
+    eventBus.addHandler(RequestErrorEvent.getType(), new RequestErrorEvent.RequestErrorHandler() {
       @Override
       public void onRequestError(RequestErrorEvent e) {
         GWT.log("Request error: ", e.getException());

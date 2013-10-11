@@ -17,7 +17,7 @@ import org.obiba.opal.web.gwt.app.client.administration.database.presenter.Mongo
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
-import org.obiba.opal.web.gwt.app.client.validation.ConstrainedModal;
+import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
 
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;

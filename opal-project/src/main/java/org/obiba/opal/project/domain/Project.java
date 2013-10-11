@@ -20,12 +20,14 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.opal.core.domain.AbstractOrientDbTimestampedEntity;
+import org.obiba.opal.core.validator.Unique;
 
 import com.google.common.base.Strings;
 
 /**
  * Description of a project in Opal.
  */
+@Unique(properties = "name")
 public class Project extends AbstractOrientDbTimestampedEntity {
 
   @Nonnull
