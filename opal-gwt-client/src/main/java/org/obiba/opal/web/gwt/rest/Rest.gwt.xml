@@ -2,10 +2,12 @@
 <!DOCTYPE module PUBLIC '//gwt-module/'
     'http://google-web-toolkit.googlecode.com/svn/tags/2.5.1/distro-source/core/src/gwt-module.dtd'>
 <module>
+
   <!-- Inherit the core Web Toolkit stuff. -->
   <inherits name='com.google.gwt.user.User'/>
   <inherits name='com.github.gwtbootstrap.Bootstrap'/>
-  <!--<inherits name="org.obiba.opal.web.gwt.app.GwtApp"/>-->
+  <inherits name="org.obiba.opal.web.gwt.validation.Validation"/>
+  <inherits name="com.google.common.collect.Collect"/>
 
   <!--
     This tells GWT to use this concrete implementation whenever a call to GWT.create() is made for the interface type.
@@ -29,4 +31,5 @@
       <when-property-is name="user.agent" value="ie8"/>
     </any>
   </replace-with>
+
 </module>

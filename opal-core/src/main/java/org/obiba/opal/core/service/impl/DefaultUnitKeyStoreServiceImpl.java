@@ -31,15 +31,12 @@ import org.obiba.opal.core.crypt.KeyProviderSecurityException;
 import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.OrientDbService;
-import org.obiba.opal.core.service.UnitKeyStoreAlreadyExistsException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.UnitKeyStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-
-import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 
 @Component
 @Transactional
@@ -104,11 +101,7 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
     }
     state.setKeyStore(getKeyStoreByteArray(unitKeyStore));
 
-    try {
-      orientDbService.save(state);
-    } catch(ORecordDuplicatedException e) {
-      throw new UnitKeyStoreAlreadyExistsException(unitName);
-    }
+    orientDbService.save(state);
   }
 
   @Override

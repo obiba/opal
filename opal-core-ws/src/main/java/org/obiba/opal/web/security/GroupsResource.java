@@ -18,14 +18,12 @@ import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.User;
-import org.obiba.opal.core.service.impl.GroupAlreadyExistsException;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
 
-@SuppressWarnings("UnusedDeclaration")
 @Component
 @Scope("request")
 @Path("/groups")
@@ -42,7 +40,7 @@ public class GroupsResource extends AbstractUserGroupResource {
   }
 
   @POST
-  public Response createGroup(Opal.GroupDto groupDto) throws GroupAlreadyExistsException {
+  public Response createGroup(Opal.GroupDto groupDto) {
 
     if(userService.getGroupWithName(groupDto.getName()) != null) {
       return Response.status(Response.Status.NOT_MODIFIED).build();

@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.core.service.impl;
 
+import javax.validation.ConstraintViolationException;
+
 import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.User;
 import org.obiba.opal.core.service.SystemService;
@@ -42,7 +44,7 @@ public interface UserService extends SystemService {
    *
    * @param user
    */
-  void createOrUpdateUser(User user) throws UserAlreadyExistsException;
+  void createOrUpdateUser(User user) throws ConstraintViolationException;
 
   /**
    * Deletes a user from user table and from subject_acl
@@ -56,7 +58,7 @@ public interface UserService extends SystemService {
    *
    * @return
    */
-  void createOrUpdateGroup(Group group) throws GroupAlreadyExistsException;
+  void createOrUpdateGroup(Group group) throws ConstraintViolationException;
 
   /**
    * Returns the list of groups

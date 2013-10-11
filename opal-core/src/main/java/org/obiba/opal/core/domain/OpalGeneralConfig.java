@@ -14,6 +14,8 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 public class OpalGeneralConfig extends AbstractOrientDbTimestampedEntity {
 
   public static final String DEFAULT_NAME = "Opal";
@@ -23,6 +25,7 @@ public class OpalGeneralConfig extends AbstractOrientDbTimestampedEntity {
   public static final String DEFAULT_CHARSET = "ISO-8859-1";
 
   @Nonnull
+  @NotBlank
   private String name = DEFAULT_NAME;
 
   private List<String> locales = new ArrayList<String>();

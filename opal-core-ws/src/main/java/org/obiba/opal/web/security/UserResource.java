@@ -17,7 +17,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.user.User;
-import org.obiba.opal.core.service.impl.UserAlreadyExistsException;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -40,23 +39,19 @@ public class UserResource extends AbstractUserGroupResource {
     }
 
     return Response.ok().entity(asDto(user)).build();
-
   }
 
   @PUT
-  public Response updateUser(Opal.UserDto userDto) throws UserAlreadyExistsException {
-
-    if(!name.equals(userDto.getName())) {
+  public Response updateUser(Opal.UserDto dto) {
+    if(!name.equals(dto.getName())) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
-
-    User user = fromDto(userDto);
-    if(userDto.hasPassword()) {
-      user.setPassword(User.digest(userDto.getPassword()));
+    User user = userService.getUserWithName(dto.getName());
+    fromDto(dto, user);
+    if(dto.hasPassword()) {
+      user.setPassword(User.digest(dto.getPassword()));
     }
-
     userService.createOrUpdateUser(user);
-
     return Response.ok().build();
   }
 

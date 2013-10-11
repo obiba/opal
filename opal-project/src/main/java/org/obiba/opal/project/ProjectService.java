@@ -10,6 +10,7 @@
 package org.obiba.opal.project;
 
 import javax.annotation.Nonnull;
+import javax.validation.ConstraintViolationException;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -29,9 +30,9 @@ public interface ProjectService extends SystemService {
 
   boolean hasProject(@Nonnull String name);
 
-  void createProject(@Nonnull Project project) throws ProjectAlreadyExistsException;
+  void createProject(@Nonnull Project project) throws ConstraintViolationException;
 
-  void updateProject(@Nonnull Project project) throws ProjectAlreadyExistsException;
+  void updateProject(@Nonnull Project project) throws ConstraintViolationException;
 
   void deleteProject(@Nonnull String name) throws NoSuchProjectException, FileSystemException;
 

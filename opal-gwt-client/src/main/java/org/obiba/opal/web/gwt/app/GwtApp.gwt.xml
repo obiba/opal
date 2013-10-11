@@ -28,9 +28,6 @@
   <inherits name='com.gwtplatform.mvp.MvpWithEntryPoint'/>
   <inherits name='com.gwtplatform.mvp.Mvp'/>
 
-  <!-- Hibernate Validator-->
-  <inherits name='org.hibernate.validator.HibernateValidator'/>
-
   <extend-configuration-property name="gin.ginjector.modules"
       value="org.obiba.opal.web.gwt.app.client.inject.OpalGinModule"/>
   <extend-configuration-property name="gin.ginjector.modules"
@@ -93,6 +90,8 @@
   <!-- Open Layers Mapping -->
   <inherits name='org.gwtopenmaps.openlayers.OpenLayers'/>
 
+  <inherits name="org.obiba.opal.web.gwt.validation.Validation"/>
+
   <extend-property name='locale' values='fr'/>
   <extend-property name='locale' values='en'/>
   <set-property-fallback name='locale' value='en'/>
@@ -106,10 +105,6 @@
       <when-property-is name='user.agent' value='ie6'/>
       <when-property-is name='user.agent' value='ie7'/>
     </any>
-  </replace-with>
-
-  <replace-with class="org.obiba.opal.web.gwt.app.client.validator.ValidationMessageResolver">
-    <when-type-is class="com.google.gwt.validation.client.ProviderValidationMessageResolver"/>
   </replace-with>
 
   <!-- This will limit the compile to a single browser: Firefox 3.x -->

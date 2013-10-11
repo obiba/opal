@@ -1,4 +1,4 @@
-package org.obiba.opal.web.gwt.app.client.validation;
+package org.obiba.opal.web.gwt.app.client.validator;
 
 import java.util.Map;
 
@@ -6,7 +6,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationMessageResolver;
+import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
+import org.obiba.opal.web.gwt.validation.client.ValidationMessageResolver;
 import org.obiba.opal.web.model.client.ws.ConstraintViolationErrorDto;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
@@ -14,12 +15,10 @@ import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
 import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
 public class ConstrainedModal {
-
-//  private static final HibernateValidationMessageResolver hibernateValidationMessageResolver
-//      = new HibernateValidationMessageResolver();
 
   private static final ValidationMessageResolver validationMessageResolver = new ValidationMessageResolver();
 
@@ -29,7 +28,7 @@ public class ConstrainedModal {
 
   public ConstrainedModal(@Nonnull Modal modal) {
     this.modal = modal;
-    modal.addHandler(new ModalConstraintViolationErrorHandler(), ConstraintViolationErrorsEvent.getType());
+    modal.addHandler(new ModalRequestErrorHandler(), RequestErrorEvent.getType());
   }
 
   public void registerWidget(@Nonnull String propertyPath, @Nonnull String propertyLabel) {
@@ -75,12 +74,22 @@ public class ConstrainedModal {
     }
   }
 
-  private class ModalConstraintViolationErrorHandler
-      implements ConstraintViolationErrorsEvent.ConstraintViolationErrorsHandler {
+  private class ModalRequestErrorHandler implements RequestErrorEvent.RequestErrorHandler {
 
     @Override
-    public void onConstraintViolationErrors(ConstraintViolationErrorsEvent event) {
-      for(ConstraintViolationErrorDto violation : event.getViolations()) {
+    public void onRequestError(RequestErrorEvent event) {
+      if(event.getViolations() != null) {
+        showConstraintViolations(event.getViolations());
+      } else if(!Strings.isNullOrEmpty(event.getMessage())) {
+        modal.addAlert(event.getMessage(), AlertType.ERROR);
+      } else {
+        //noinspection ThrowableResultOfMethodCallIgnored
+        modal.addAlert(event.getException().getMessage(), AlertType.ERROR);
+      }
+    }
+
+    private void showConstraintViolations(Iterable<ConstraintViolationErrorDto> violations) {
+      for(ConstraintViolationErrorDto violation : violations) {
         String propertyPath = violation.getPropertyPath();
         String messageTemplate = violation.getMessageTemplate();
         ConstrainedWidget constrainedWidget = constrainedWidgets.get(propertyPath);

@@ -12,6 +12,7 @@ package org.obiba.opal.project;
 import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.validation.ConstraintViolationException;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -29,8 +30,6 @@ import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.project.domain.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 
 @Component
 public class ProjectsConfigurationService implements ProjectService {
@@ -101,22 +100,14 @@ public class ProjectsConfigurationService implements ProjectService {
   }
 
   @Override
-  public void createProject(@Nonnull Project project) throws ProjectAlreadyExistsException {
-    try {
-      orientDbService.save(project);
-    } catch(ORecordDuplicatedException e) {
-      throw new ProjectAlreadyExistsException(project.getName());
-    }
+  public void createProject(@Nonnull Project project) throws ConstraintViolationException {
+    orientDbService.save(project);
     registerDatasource(project);
   }
 
   @Override
-  public void updateProject(@Nonnull Project project) throws ProjectAlreadyExistsException {
-    try {
-      orientDbService.save(project);
-    } catch(ORecordDuplicatedException e) {
-      throw new ProjectAlreadyExistsException(project.getName());
-    }
+  public void updateProject(@Nonnull Project project) throws ConstraintViolationException {
+    orientDbService.save(project);
   }
 
   @Nonnull

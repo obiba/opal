@@ -47,7 +47,7 @@ public interface UnitKeyStoreService extends SystemService {
    *
    * @param unitKeyStore functional unit keystore
    */
-  void saveUnitKeyStore(@Nonnull UnitKeyStore unitKeyStore) throws UnitKeyStoreAlreadyExistsException;
+  void saveUnitKeyStore(@Nonnull UnitKeyStore unitKeyStore);
 
   /**
    * Creates a new key or updates an existing key. It is the responsibility of the client to ensure that the caller

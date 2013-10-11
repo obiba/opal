@@ -18,7 +18,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
-import org.obiba.opal.web.gwt.app.client.validation.ConstrainedModal;
+import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
 import org.obiba.opal.web.model.client.database.JdbcDriverDto;
 
 import com.github.gwtbootstrap.client.ui.CheckBox;

@@ -15,41 +15,33 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.administration.user.event.UsersRefreshEvent;
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.ui.GroupSuggestOracle;
+import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.UserDto;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.common.base.Strings;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.SuggestOracle;
+import com.google.gwt.user.client.TakesValue;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
+import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
+import static com.google.gwt.http.client.Response.SC_OK;
+
 public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> implements UserUiHandlers {
 
   private static final int MIN_PASSWORD_LENGTH = 6;
 
-  private static final TranslationMessages translationMessages = GWT.create(TranslationMessages.class);
-
-  private static final Translations translations = GWT.create(Translations.class);
-
-  private UserDto userDto;
+  private final Translations translations;
 
   private Mode dialogMode;
 
@@ -58,8 +50,9 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
   }
 
   @Inject
-  public UserPresenter(Display display, EventBus eventBus) {
+  public UserPresenter(Display display, EventBus eventBus, Translations translations) {
     super(eventBus, display);
+    this.translations = translations;
     getView().setUiHandlers(this);
   }
 
@@ -71,9 +64,11 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
   @Override
   public void save() {
 
+    getView().clearErrors();
+
     if(dialogMode == Mode.CREATE) {
-      userDto = UserDto.create();
-      if(getView().getUserName().isEmpty()) {
+
+      if(Strings.isNullOrEmpty(getView().getName().getText())) {
         getView().showError(Display.FormField.USERNAME, translations.userMessageMap().get("UserNameRequiredError"));
         return;
       }
@@ -84,7 +79,6 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
         return;
       }
 
-      userDto.setName(getView().getUserName());
     }
 
     // Update password only when password is not empty (to allow updating groups only)
@@ -100,83 +94,51 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
         return;
       }
 
-      if(getView().getPassword().equals(getView().getConfirmPassword())) {
-        userDto.setPassword(getView().getPassword());
-      }
     }
 
-    // update groups
-    userDto.clearGroupsArray();
-    userDto.setGroupsArray(getView().getGroups());
+    ResponseCodeCallback callback = new ResponseCodeCallback() {
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        getEventBus().fireEvent(new UsersRefreshEvent());
+        getView().hideDialog();
+      }
+    };
 
-    if(dialogMode == Mode.CREATE) {
-      // Create
-      ResourceRequestBuilderFactory.newBuilder()//
-          .forResource("/users").withResourceBody(UserDto.stringify(userDto)).accept("application/json")//
-          .withCallback(new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              if(response.getStatusCode() == Response.SC_OK) {
-                getEventBus().fireEvent(new UsersRefreshEvent());
-                getView().hideDialog();
-              } else if(response.getStatusCode() == Response.SC_BAD_REQUEST) {
-                ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-                String errorMessage = translations.userMessageMap().get(error.getStatus());
-                getView().showError(null, errorMessage == null
-                    ? translationMessages
-                    .unknownResponse(error.getStatus(), String.valueOf(JsArrays.toList(error.getArgumentsArray())))
-                    : errorMessage);
-              } else {
-                getView().hideDialog();
-                getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
-              }
-            }
-          }, Response.SC_OK, Response.SC_BAD_REQUEST, Response.SC_PRECONDITION_FAILED).post().send();
-    } else {
-      // Update
-      ResourceRequestBuilderFactory.newBuilder()//
-          .forResource("/user/" + userDto.getName()).withResourceBody(UserDto.stringify(userDto))
-          .accept("application/json")//
-          .withCallback(new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              if(response.getStatusCode() == Response.SC_OK) {
-                getEventBus().fireEvent(new UsersRefreshEvent());
-              } else if(response.getStatusCode() == Response.SC_BAD_REQUEST) {
-                ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-                String errorMessage = translations.userMessageMap().get(error.getStatus());
-                getView().showError(null, errorMessage == null
-                    ? translationMessages
-                    .unknownResponse(error.getStatus(), String.valueOf(JsArrays.toList(error.getArgumentsArray())))
-                    : errorMessage);
-              } else {
-                getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-              }
-            }
-          }, Response.SC_OK, Response.SC_PRECONDITION_FAILED, Response.SC_INTERNAL_SERVER_ERROR,
-              Response.SC_BAD_REQUEST).put().send();
-      getView().hideDialog();
+    UserDto userDto = getDto();
+
+    switch(dialogMode) {
+      case CREATE:
+        ResourceRequestBuilderFactory.newBuilder() //
+            .forResource("/users") //
+            .withResourceBody(UserDto.stringify(userDto)) //
+            .withCallback(SC_OK, callback) //
+            .withCallback(SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
+            .post().send();
+        break;
+      case UPDATE:
+        ResourceRequestBuilderFactory.newBuilder() //
+            .forResource("/user/" + userDto.getName()) //
+            .withResourceBody(UserDto.stringify(userDto)) //
+            .withCallback(SC_OK, callback) //
+            .withCallback(SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
+            .put().send();
+        break;
     }
 
   }
 
-  @Override
-  protected void onBind() {
-
-    // Groups selection handler
-    registerHandler(getView().addSearchSelectionHandler(new GroupSuggestionSelectionHandler()));
+  private UserDto getDto() {
+    UserDto dto = UserDto.create();
+    dto.setName(getView().getName().getText());
+    dto.setPassword(getView().getPassword());
+    dto.setGroupsArray(JsArrays.fromIterable(getView().getGroups().getValue()));
+    return dto;
   }
 
   public void setUser(UserDto userDto) {
-    this.userDto = userDto;
-    if(userDto.getGroupsArray() != null) {
-      for(int i = 0; i < userDto.getGroupsArray().length(); i++) {
-        getView().addSearchItem(userDto.getGroups(i));
-      }
-    }
-
-    getView().setUser(userDto.getName(), JsArrays.toList(userDto.getGroupsArray()));
-    getView().usernameSetEnabled(false);
+    getView().getName().setText(userDto.getName());
+    getView().getGroups().setValue(JsArrays.toList(userDto.getGroupsArray()));
+    getView().setNamedEnabled(false);
   }
 
   public void setDialogMode(Mode mode) {
@@ -192,35 +154,20 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
 
     void hideDialog();
 
-    void setUser(String originalUserName, List<String> originalGroups);
+    HasText getName();
 
-    void usernameSetEnabled(boolean b);
+    TakesValue<List<String>> getGroups();
 
-    String getUserName();
-
-    JsArrayString getGroups();
+    void setNamedEnabled(boolean enabled);
 
     String getPassword();
 
     String getConfirmPassword();
 
-    void addSearchItem(String text);
-
-    HandlerRegistration addSearchSelectionHandler(SelectionHandler<SuggestOracle.Suggestion> handler);
-
     void showError(@Nullable FormField formField, String message);
-  }
 
-  private class GroupSuggestionSelectionHandler implements SelectionHandler<SuggestOracle.Suggestion> {
+    void clearErrors();
 
-    @Override
-    public void onSelection(SelectionEvent<SuggestOracle.Suggestion> event) {
-      // Get the table dto to fire the event to select the variable
-      String group = ((GroupSuggestOracle.GroupSuggestion) event.getSelectedItem()).getGroup();
-      userDto.addGroups(group);
-      getView().setUser(getView().getUserName().isEmpty() ? userDto.getName() : getView().getUserName(),
-          JsArrays.toList(userDto.getGroupsArray()));
-    }
   }
 
 }

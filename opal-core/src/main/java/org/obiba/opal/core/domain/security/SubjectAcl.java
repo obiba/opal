@@ -11,24 +11,30 @@ package org.obiba.opal.core.domain.security;
 
 import javax.annotation.Nonnull;
 
+import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractOrientDbTimestampedEntity;
 import org.obiba.opal.core.service.SubjectAclService;
 
 public class SubjectAcl extends AbstractOrientDbTimestampedEntity {
 
   @Nonnull
+  @NotBlank
   private String domain;
 
   @Nonnull
+  @NotBlank
   private String node;
 
   @Nonnull
+  @NotBlank
   private String principal;
 
   @Nonnull
+  @NotBlank
   private String type;
 
   @Nonnull
+  @NotBlank
   private String permission;
 
   public SubjectAcl() {

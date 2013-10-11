@@ -51,6 +51,8 @@ public class AddProjectPresenter extends ModalPresenterWidget<AddProjectPresente
 
   @Override
   public void save() {
+    getView().clearErrors();
+
     if(validationHandler.validate()) {
       ResponseCodeCallback callback = new ResponseCodeCallback() {
         @Override
@@ -138,6 +140,8 @@ public class AddProjectPresenter extends ModalPresenterWidget<AddProjectPresente
   }
 
   public interface Display extends PopupView, HasUiHandlers<AddProjectUiHandlers> {
+
+    void clearErrors();
 
     enum FormField {
       NAME,

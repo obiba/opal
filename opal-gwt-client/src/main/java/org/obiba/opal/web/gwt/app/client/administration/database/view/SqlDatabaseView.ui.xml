@@ -12,7 +12,7 @@
       </b:ControlLabel>
       <b:TextBox ui:field="name" b:id="name"/>
       <b:HelpBlock>
-        <ui:msg description="Database name help label">A SQL database must have a unique name.</ui:msg>
+        <ui:msg description="Database name help label">A database must have a unique name</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 
@@ -24,7 +24,7 @@
       <o:Chooser ui:field="usage" name="usage"/>
       <b:HelpBlock>
         <ui:msg description="Database usage help label">
-          Determine if this database will be proposed at import/export time or as a project's data storage.
+          Determine if this database will be proposed at import/export time or as a project's data storage
         </ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>

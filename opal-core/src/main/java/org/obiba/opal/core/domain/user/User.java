@@ -16,9 +16,12 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
+import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.core.util.HexUtil;
 import org.obiba.opal.core.domain.AbstractOrientDbTimestampedEntity;
+import org.obiba.opal.core.validator.Unique;
 
+@Unique(properties = "name")
 @SuppressWarnings("ComparableImplementedButEqualsNotOverridden")
 public class User extends AbstractOrientDbTimestampedEntity implements Comparable<User> {
 
@@ -27,9 +30,11 @@ public class User extends AbstractOrientDbTimestampedEntity implements Comparabl
   }
 
   @Nonnull
+  @NotBlank
   private String name;
 
   @Nonnull
+  @NotBlank
   private String password;
 
   private boolean enabled;

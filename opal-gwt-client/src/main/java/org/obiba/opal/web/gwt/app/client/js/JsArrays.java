@@ -107,7 +107,7 @@ public class JsArrays {
     int length = values.length();
     @SuppressWarnings("unchecked")
     T[] ret = (T[]) new JavaScriptObject[length];
-    for(int i = 0, l = length; i < l; i++) {
+    for(int i = 0; i < length; i++) {
       ret[i] = values.get(i);
     }
     return ret;
@@ -119,8 +119,18 @@ public class JsArrays {
   }
 
   public static List<String> toList(JsArrayString jsArray) {
-    final JsArrayString array = jsArray == null ? (JsArrayString) JsArrayString.createArray() : jsArray;
+    JsArrayString array = jsArray == null ? (JsArrayString) JsArrayString.createArray() : jsArray;
     return new JsArrayStringList(array);
+  }
+
+  public static JsArrayString fromIterable(Iterable<String> iterable) {
+    JsArrayString array = (JsArrayString) JsArrayString.createArray();
+    if(iterable != null) {
+      for(String s : iterable) {
+        array.push(s);
+      }
+    }
+    return array;
   }
 
   /**
@@ -133,13 +143,18 @@ public class JsArrays {
    * @param start the index within the array that will become the 0th element in the returned list
    * @param length the size of the returned list
    * @return a view of the array as a {@code List} that contains elements array[start] to array[start + length] (or
-   *         array[array.length] if start + lenght > array.length)
+   *         array[array.length] if start + length > array.length)
    */
-  public static <T extends JavaScriptObject> List<T> toList(final JsArray<T> array, final int start, final int length) {
-    if(array == null) throw new IllegalArgumentException("array cannot be null");
-    if(start < 0 || start > array.length())
+  public static <T extends JavaScriptObject> List<T> toList(JsArray<T> array, int start, int length) {
+    if(array == null) {
+      throw new IllegalArgumentException("array cannot be null");
+    }
+    if(start < 0 || start > array.length()) {
       throw new IndexOutOfBoundsException("start index '" + start + "'is invalid");
-    if(length < 0) throw new IndexOutOfBoundsException("length '" + length + "'is invalid");
+    }
+    if(length < 0) {
+      throw new IndexOutOfBoundsException("length '" + length + "'is invalid");
+    }
     return new JavaScriptObjectRangeList<T>(array, start, length);
   }
 
@@ -153,19 +168,19 @@ public class JsArrays {
     return array == null ? (JsArray<T>) create() : array;
   }
 
-  public static <T extends JavaScriptObject> JsArrayString toSafeArray(JsArrayString array) {
+  public static JsArrayString toSafeArray(JsArrayString array) {
     return array == null ? (JsArrayString) JavaScriptObject.createArray() : array;
   }
 
   private static native <T extends JavaScriptObject> T[] reinterpretCast(JsArray<T> value) /*-{
-      return value;
+    return value;
   }-*/;
 
   private static class JavaScriptObjectList<T extends JavaScriptObject> extends AbstractList<T> {
 
     private JsArray<T> array;
 
-    public JavaScriptObjectList(JsArray<T> array) {
+    private JavaScriptObjectList(JsArray<T> array) {
       this.array = array;
     }
 
@@ -195,7 +210,9 @@ public class JsArrays {
 
     private JsArrayString array;
 
-    public JsArrayStringList(JsArrayString array) {this.array = array;}
+    private JsArrayStringList(JsArrayString array) {
+      this.array = array;
+    }
 
     @Override
     public String get(int index) {
@@ -229,7 +246,7 @@ public class JsArrays {
 
     transient int size;
 
-    public JavaScriptObjectRangeList(JsArray<T> array, int start, int length) {
+    private JavaScriptObjectRangeList(JsArray<T> array, int start, int length) {
       this.array = array;
       this.start = start;
       this.length = length;
@@ -245,7 +262,7 @@ public class JsArrays {
     public int size() {
       if(size == -1) {
         // size is either "length" or the number of elements that exist between "start" and the array's last item
-        // "array.lenght()" (array.length() - start)
+        // "array.length()" (array.length() - start)
         size = start + length > array.length() ? array.length() - start : length;
       }
       return size;

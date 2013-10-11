@@ -10,6 +10,7 @@
 package org.obiba.opal.core.service.impl;
 
 import javax.annotation.PostConstruct;
+import javax.validation.ConstraintViolationException;
 
 import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.User;
@@ -17,8 +18,6 @@ import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SubjectAclService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 
 /**
  * Default implementation of User Service
@@ -66,12 +65,8 @@ public class DefaultUserServiceImpl implements UserService {
   }
 
   @Override
-  public void createOrUpdateUser(User user) throws UserAlreadyExistsException {
-    try {
-      orientDbService.save(user);
-    } catch(ORecordDuplicatedException e) {
-      throw new UserAlreadyExistsException(user.getName());
-    }
+  public void createOrUpdateUser(User user) throws ConstraintViolationException {
+    orientDbService.save(user);
   }
 
   @Override
@@ -86,12 +81,8 @@ public class DefaultUserServiceImpl implements UserService {
   }
 
   @Override
-  public void createOrUpdateGroup(Group group) throws GroupAlreadyExistsException {
-    try {
-      orientDbService.save(group);
-    } catch(Exception e) {
-      throw new GroupAlreadyExistsException(group.getName());
-    }
+  public void createOrUpdateGroup(Group group) throws ConstraintViolationException {
+    orientDbService.save(group);
   }
 
   @Override
@@ -113,7 +104,6 @@ public class DefaultUserServiceImpl implements UserService {
 
     // Delete group's permissions
     aclService.deleteSubjectPermissions("opal", null, aclSubject);
-
   }
 
 }
