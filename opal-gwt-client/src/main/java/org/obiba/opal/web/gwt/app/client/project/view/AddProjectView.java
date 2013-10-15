@@ -28,6 +28,8 @@ import com.google.web.bindery.event.shared.EventBus;
 public class AddProjectView extends ModalPopupViewWithUiHandlers<AddProjectUiHandlers>
     implements AddProjectPresenter.Display {
 
+  private static final String DATABASE_NONE = "_none";
+
   interface Binder extends UiBinder<Widget, AddProjectView> {}
 
   @UiField
@@ -89,7 +91,8 @@ public class AddProjectView extends ModalPopupViewWithUiHandlers<AddProjectUiHan
       @Override
       public String getText() {
         int selectedIndex = database.getSelectedIndex();
-        return selectedIndex < 0 ? null : database.getValue(selectedIndex);
+        String selectedDatabase = selectedIndex < 0 ? null : database.getValue(selectedIndex);
+        return selectedDatabase == null || DATABASE_NONE.equals(selectedDatabase) ? null : selectedDatabase;
       }
 
       @Override
@@ -109,9 +112,9 @@ public class AddProjectView extends ModalPopupViewWithUiHandlers<AddProjectUiHan
   @Override
   public void setAvailableDatabases(JsArray<DatabaseDto> availableDatabases) {
     database.clear();
-    database.addItem(translations.none(), (String) null);
+    database.addItem(translations.none(), DATABASE_NONE);
 
-    String defaultStorageDatabase = null;
+    String defaultStorageDatabase = DATABASE_NONE;
     for(DatabaseDto databaseDto : JsArrays.toIterable(availableDatabases)) {
       StringBuilder label = new StringBuilder(databaseDto.getName());
       if(databaseDto.getDefaultStorage()) {

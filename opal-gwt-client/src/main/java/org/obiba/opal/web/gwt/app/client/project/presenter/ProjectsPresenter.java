@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.project.event.ProjectUpdatedEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
@@ -69,12 +70,9 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
   @Override
   public void onBind() {
     super.onBind();
-    registerHandler(getEventBus().addHandler(ProjectCreatedEvent.getType(), new ProjectCreatedEvent.Handler() {
-      @Override
-      public void onProjectCreated(ProjectCreatedEvent event) {
-        refresh();
-      }
-    }));
+    ProjectUpdatedHandler projectUpdatedHandler = new ProjectUpdatedHandler();
+    registerHandler(getEventBus().addHandler(ProjectCreatedEvent.getType(), projectUpdatedHandler));
+    registerHandler(getEventBus().addHandler(ProjectUpdatedEvent.getType(), projectUpdatedHandler));
   }
 
   @Override
@@ -83,7 +81,7 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
     refresh();
   }
 
-  public void refresh() {
+  private void refresh() {
     ResourceRequestBuilderFactory.<JsArray<ProjectDto>>newBuilder() //
         .forResource("/projects") //
         .withCallback(new ResourceCallback<JsArray<ProjectDto>>() {
@@ -125,6 +123,20 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
 
   public interface Display extends View, HasUiHandlers<ProjectsUiHandlers> {
     void setProjects(JsArray<ProjectDto> projects);
+  }
+
+  private class ProjectUpdatedHandler
+      implements ProjectCreatedEvent.ProjectCreatedHandler, ProjectUpdatedEvent.ProjectUpdatedHandler {
+
+    @Override
+    public void onProjectCreated(ProjectCreatedEvent event) {
+      refresh();
+    }
+
+    @Override
+    public void onProjectUpdated(ProjectUpdatedEvent event) {
+      refresh();
+    }
   }
 
 }

@@ -35,6 +35,8 @@ import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
+import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
+import static com.google.gwt.http.client.Response.SC_CREATED;
 import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
 import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
@@ -77,16 +79,13 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
 
   @Override
   public void saveStorage(String database) {
-    ProjectDto project = getView().getProject();
-    project.setDatabase(database);
-
-    ResponseCodeCallback callbackHandler = new CreateOrUpdateCallBack(project);
-    ResourceRequestBuilderFactory.newBuilder().forResource("database/" + project.getName()) //
-        .put() //
-        .withResourceBody(ProjectDto.stringify(project)) //
-        .withCallback(Response.SC_OK, callbackHandler) //
-        .withCallback(Response.SC_CREATED, callbackHandler) //
-        .withCallback(Response.SC_BAD_REQUEST, callbackHandler).send();
+    ProjectDto projectDto = getView().getProject();
+    projectDto.setDatabase(database);
+    ResourceRequestBuilderFactory.newBuilder() //
+        .forResource("database/" + projectDto.getName()) //
+        .withResourceBody(ProjectDto.stringify(projectDto)) //
+        .withCallback(new CreateOrUpdateCallBack(projectDto), SC_OK, SC_CREATED, SC_BAD_REQUEST) //
+        .put().send();
   }
 
   @Override
@@ -118,7 +117,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
 
   private class RemoveRunnable implements Runnable {
 
-    private ProjectDto projectDto;
+    private final ProjectDto projectDto;
 
     private RemoveRunnable(ProjectDto projectDto) {
       this.projectDto = projectDto;
@@ -140,9 +139,10 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
         }
       };
 
-      ResourceRequestBuilderFactory.newBuilder().forResource(projectDto.getLink()).delete()
-          .withCallback(SC_OK, callbackHandler).withCallback(SC_FORBIDDEN, callbackHandler)
-          .withCallback(SC_INTERNAL_SERVER_ERROR, callbackHandler).withCallback(SC_NOT_FOUND, callbackHandler).send();
+      ResourceRequestBuilderFactory.newBuilder() //
+          .forResource(projectDto.getLink()) //
+          .withCallback(callbackHandler, SC_OK, SC_FORBIDDEN, SC_INTERNAL_SERVER_ERROR, SC_NOT_FOUND) //
+          .delete().send();
     }
   }
 
@@ -158,10 +158,10 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     public void onResponseCode(Request request, Response response) {
       Event<?> event = null;
       switch(response.getStatusCode()) {
-        case Response.SC_OK:
+        case SC_OK:
           event = new ProjectUpdatedEvent(dto);
           break;
-        case Response.SC_CREATED:
+        case SC_CREATED:
           event = new ProjectCreatedEvent(dto);
           break;
         default:

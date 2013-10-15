@@ -38,7 +38,7 @@ public class AddProjectPresenter extends ModalPresenterWidget<AddProjectPresente
 
   private JsArray<ProjectDto> projects;
 
-  protected ValidationHandler validationHandler;
+  private ValidationHandler validationHandler;
 
   @Inject
   public AddProjectPresenter(EventBus eventBus, Display display) {
@@ -72,9 +72,9 @@ public class AddProjectPresenter extends ModalPresenterWidget<AddProjectPresente
           .withCallback(Response.SC_CREATED, new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
+              getView().hideDialog();
               ProjectDto projectDto = JsonUtils.unsafeEval(response.getText());
               getEventBus().fireEvent(new ProjectCreatedEvent(projectDto));
-              getView().hideDialog();
             }
           }) //
           .withCallback(Response.SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
