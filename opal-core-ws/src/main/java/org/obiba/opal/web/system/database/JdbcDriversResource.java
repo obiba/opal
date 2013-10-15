@@ -42,6 +42,7 @@ public class JdbcDriversResource {
             .setDriverName(jdbcDriverRegistry.getDriverName(driver)) //
             .setDriverClass(driver.getClass().getName()) //
             .setJdbcUrlTemplate(jdbcDriverRegistry.getJdbcUrlTemplate(driver)) //
+            .setJdbcUrlExample(jdbcDriverRegistry.getJdbcUrlExample(driver)) //
             .setVersion(driver.getMajorVersion() + "." + driver.getMinorVersion()).build();
       }
     });

@@ -40,6 +40,7 @@ import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -85,6 +86,9 @@ public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHand
 
   @UiField
   TextBox url;
+
+  @UiField
+  Label urlExample;
 
   @UiField
   ListBox driver;
@@ -154,10 +158,7 @@ public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHand
     driver.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {
-        JdbcDriverDto jdbcDriver = getDriver(getDriver().getText());
-        if(jdbcDriver != null) {
-          url.getElement().setAttribute("placeholder", jdbcDriver.getJdbcUrlTemplate());
-        }
+        setDriverContextualInfo();
       }
     });
 
@@ -173,6 +174,12 @@ public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHand
     constrainedModal
         .registerWidget("sqlSchema.jdbcDatasourceSettings.defaultEntityType", translations.defaultEntityTypeLabel(),
             defaultEntityTypeGroup);
+  }
+
+  private void setDriverContextualInfo() {
+    JdbcDriverDto jdbcDriver = getDriver(getDriver().getText());
+    url.getElement().setAttribute("placeholder", jdbcDriver == null ? "" : jdbcDriver.getJdbcUrlTemplate());
+    urlExample.setText(jdbcDriver == null ? "" : jdbcDriver.getJdbcUrlExample());
   }
 
   @Override
@@ -352,7 +359,6 @@ public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHand
 
       @Override
       public void setText(@Nullable String text) {
-        if(Strings.isNullOrEmpty(text)) return;
         int count = driver.getItemCount();
         for(int i = 0; i < count; i++) {
           if(driver.getValue(i).equals(text)) {
@@ -360,12 +366,7 @@ public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHand
             break;
           }
         }
-        if(Strings.isNullOrEmpty(url.getText())) {
-          JdbcDriverDto dto = getDriver(text);
-          if(dto != null) {
-            url.getElement().setAttribute("placeholder", dto.getJdbcUrlTemplate());
-          }
-        }
+        setDriverContextualInfo();
       }
     };
   }
@@ -441,7 +442,7 @@ public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHand
   private JdbcDriverDto getDriver(@Nullable String driverClass) {
     if(Strings.isNullOrEmpty(driverClass)) return null;
     for(JdbcDriverDto driverDto : JsArrays.toIterable(availableDrivers)) {
-      if(driverDto.getDriverClass().equalsIgnoreCase(driverClass)) {
+      if(driverDto.getDriverClass().equals(driverClass)) {
         return driverDto;
       }
     }

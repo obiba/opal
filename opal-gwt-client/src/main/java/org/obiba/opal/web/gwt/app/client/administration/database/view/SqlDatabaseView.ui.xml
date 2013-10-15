@@ -57,6 +57,12 @@
         <o:RequiredIcon/>
       </b:ControlLabel>
       <b:TextBox ui:field="url" b:id="url" addStyleNames="database-url"/>
+      <b:HelpBlock>
+        <ui:msg description="Url help label">For example:</ui:msg>
+        <i>
+          <g:Label ui:field="urlExample" styleName="inline"/>
+        </i>
+      </b:HelpBlock>
     </b:ControlGroup>
 
     <b:ControlGroup ui:field="usernameGroup">

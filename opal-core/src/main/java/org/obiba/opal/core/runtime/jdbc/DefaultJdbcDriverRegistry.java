@@ -37,6 +37,10 @@ public class DefaultJdbcDriverRegistry implements JdbcDriverRegistry {
       .of("com.mysql.jdbc.Driver", "jdbc:mysql://{hostname}:{port}/{databaseName}", //
           "org.hsqldb.jdbc.JDBCDriver", "jdbc:hsqldb:file:{databaseName};shutdown=true;hsqldb.tx=mvcc");
 
+  private static final Map<String, String> DRIVER_CLASS_TO_URL_EXAMPLE = ImmutableMap
+      .of("com.mysql.jdbc.Driver", "jdbc:mysql://localhost:3306/opal", //
+          "org.hsqldb.jdbc.JDBCDriver", "jdbc:hsqldb:file:opal;shutdown=true;hsqldb.tx=mvcc");
+
   @Override
   public Iterable<Driver> listDrivers() {
     return Iterables.filter(Collections.list(DriverManager.getDrivers()), new Predicate<Driver>() {
@@ -56,6 +60,11 @@ public class DefaultJdbcDriverRegistry implements JdbcDriverRegistry {
   @Override
   public String getJdbcUrlTemplate(Driver driver) {
     return Objects.firstNonNull(DRIVER_CLASS_TO_URL_TEMPLATE.get(driver.getClass().getName()), "");
+  }
+
+  @Override
+  public String getJdbcUrlExample(Driver driver) {
+    return Objects.firstNonNull(DRIVER_CLASS_TO_URL_EXAMPLE.get(driver.getClass().getName()), "");
   }
 
   @Override
