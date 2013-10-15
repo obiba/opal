@@ -48,7 +48,9 @@ public class Dtos {
     if(project.hasTags()) {
       builder.addAllTags(project.getTags());
     }
-
+    if(project.hasDatabase()) {
+      builder.setDatabase(project.getDatabase());
+    }
     Datasource datasource = project.getDatasource();
     builder.setDatasource(org.obiba.opal.web.magma.Dtos.asDto(datasource)
         .setLink(UriBuilder.fromPath("/").path(DatasourceResource.class).build(project.getName()).toString()));
@@ -69,11 +71,17 @@ public class Dtos {
         .build();
   }
 
-  public static Project fromDto(ProjectDto projectDto) {
-    return fromDto(projectDto, null);
+  public static Project fromDto(Projects.ProjectFactoryDto projectFactoryDto) {
+    return Project.Builder.create() //
+        .name(projectFactoryDto.getName()) //
+        .title(projectFactoryDto.getTitle()) //
+        .description(projectFactoryDto.getDescription()) //
+        .database(projectFactoryDto.getDatabase()) //
+        .tags(projectFactoryDto.getTagsList()) //
+        .build();
   }
 
-  public static Projects.ProjectSummaryDto.Builder asDto(Project project) {
+  public static Projects.ProjectSummaryDto.Builder asSummaryDto(Project project) {
     Projects.ProjectSummaryDto.Builder builder = Projects.ProjectSummaryDto.newBuilder();
     builder.setName(project.getName());
 

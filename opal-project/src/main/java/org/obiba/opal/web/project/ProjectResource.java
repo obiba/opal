@@ -44,7 +44,7 @@ public class ProjectResource {
   @GET
   @Path("/summary")
   public Projects.ProjectSummaryDto getSummary() {
-    return Dtos.asDto(getProject()).build();
+    return Dtos.asSummaryDto(getProject()).build();
   }
 
   @PUT

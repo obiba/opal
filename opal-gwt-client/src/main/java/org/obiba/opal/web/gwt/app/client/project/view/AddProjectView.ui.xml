@@ -19,8 +19,8 @@
     <b:ControlGroup ui:field="nameGroup">
       <b:ControlLabel for="name">
         <ui:msg description="Name label">Name</ui:msg>
+        <o:RequiredIcon/>
       </b:ControlLabel>
-      <o:RequiredIcon/>
       <b:TextBox ui:field="name" b:id="name"/>
       <b:HelpBlock>
         <ui:msg description="Project Name help">A project must have a unique name</ui:msg>
@@ -43,7 +43,7 @@
       </b:ControlLabel>
       <o:Chooser ui:field="database" name="database"/>
       <b:HelpBlock>
-        <ui:msg description="Database Title help">Optional database containing data</ui:msg>
+        <ui:msg description="Database Title help">Optional database used to store data</ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
 

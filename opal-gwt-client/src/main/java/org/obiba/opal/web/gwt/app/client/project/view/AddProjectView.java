@@ -3,10 +3,10 @@ package org.obiba.opal.web.gwt.app.client.project.view;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.Console;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.project.presenter.AddProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.AddProjectUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
@@ -21,7 +21,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -44,7 +43,7 @@ public class AddProjectView extends ModalPopupViewWithUiHandlers<AddProjectUiHan
   HasText title;
 
   @UiField
-  ListBox database;
+  Chooser database;
 
   @UiField
   HasText description;
@@ -54,9 +53,11 @@ public class AddProjectView extends ModalPopupViewWithUiHandlers<AddProjectUiHan
   @Inject
   public AddProjectView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
+    initWidget(uiBinder.createAndBindUi(this));
+
     this.translations = translations;
-    uiBinder.createAndBindUi(this);
     modal.setTitle(translations.addProject());
+    database.setPlaceholderText(translations.selectDatabase());
 
     ConstrainedModal constrainedModal = new ConstrainedModal(modal);
     constrainedModal.registerWidget("name", translations.nameLabel(), nameGroup);
@@ -107,8 +108,9 @@ public class AddProjectView extends ModalPopupViewWithUiHandlers<AddProjectUiHan
 
   @Override
   public void setAvailableDatabases(JsArray<DatabaseDto> availableDatabases) {
-    Console.log(availableDatabases);
     database.clear();
+    database.addItem(translations.none(), (String) null);
+
     String defaultStorageDatabase = null;
     for(DatabaseDto databaseDto : JsArrays.toIterable(availableDatabases)) {
       StringBuilder label = new StringBuilder(databaseDto.getName());

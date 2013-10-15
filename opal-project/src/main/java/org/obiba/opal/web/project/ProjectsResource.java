@@ -51,14 +51,15 @@ public class ProjectsResource {
   }
 
   @POST
-  public Response createProject(@Context UriInfo uriInfo, Projects.ProjectDto projectDto) {
+  public Response createProject(@Context UriInfo uriInfo, Projects.ProjectFactoryDto projectFactoryDto) {
     Response.ResponseBuilder response;
     try {
 
-      Project project = Dtos.fromDto(projectDto);
+      Project project = Dtos.fromDto(projectFactoryDto);
       projectService.createProject(project);
       URI projectUri = uriInfo.getBaseUriBuilder().path("project").path(project.getName()).build();
-      response = Response.created(projectUri).entity(projectDto);
+      response = Response.created(projectUri)
+          .entity(Dtos.asDto(project, projectService.getProjectDirectoryPath(project.getName())));
 
     } catch(NoSuchDatasourceFactoryException e) {
       response = Response.status(BAD_REQUEST)
