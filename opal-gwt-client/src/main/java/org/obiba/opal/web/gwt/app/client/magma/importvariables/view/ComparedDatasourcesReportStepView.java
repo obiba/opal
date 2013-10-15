@@ -35,27 +35,16 @@ import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.MultiSelectionModel;
 import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.SelectionModel;
+import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public class ComparedDatasourcesReportStepView extends ViewImpl
     implements ComparedDatasourcesReportStepPresenter.Display {
-  //
-  // Static Variables
-  //
 
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  private static final Translations translations = GWT.create(Translations.class);
-
-  //
-  // Instance Variables
-  //
+  private final Translations translations;
 
   @UiField
   CheckBox ignoreAllModifications;
-
-  @UiField
-  HTMLPanel help;
 
   @UiField
   BreadcrumbsTabPanel tableTabs;
@@ -70,7 +59,9 @@ public class ComparedDatasourcesReportStepView extends ViewImpl
   // Constructors
   //
 
-  public ComparedDatasourcesReportStepView() {
+  @Inject
+  public ComparedDatasourcesReportStepView(Binder uiBinder, Translations translations) {
+    this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
     initTableList();
     ignoreAllModifications.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
@@ -192,12 +183,7 @@ public class ComparedDatasourcesReportStepView extends ViewImpl
 
   }
 
-  interface ViewUiBinder extends UiBinder<Widget, ComparedDatasourcesReportStepView> {}
-
-  @Override
-  public Widget getStepHelp() {
-    return help;
-  }
+  interface Binder extends UiBinder<Widget, ComparedDatasourcesReportStepView> {}
 
   class TableComparison {
     private final TableCompareDto dto;

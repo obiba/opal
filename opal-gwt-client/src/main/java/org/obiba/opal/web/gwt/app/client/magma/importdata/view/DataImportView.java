@@ -49,13 +49,9 @@ import static org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig.Im
 @SuppressWarnings("OverlyCoupledClass")
 public class DataImportView extends ModalViewImpl implements DataImportPresenter.Display {
 
-  interface ViewUiBinder extends UiBinder<Widget, DataImportView> {}
+  interface Binder extends UiBinder<Widget, DataImportView> {}
 
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  private static final Translations translations = GWT.create(Translations.class);
-
-  private final Widget widget;
+  private final Translations translations;
 
   @UiField
   WizardModalBox dialog;
@@ -112,23 +108,9 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
   FlowPanel helpGeonamesPostalCodes;
 
   @UiField
-  HTMLPanel formatSelectionHelp;
-
-  @UiField
-  HTMLPanel destinationSelectionHelp;
-
-  @UiField
-  HTMLPanel unitSelectionHelp;
-
-  @UiField
-  HTMLPanel archiveHelp;
-
-  @UiField
   Chooser formatChooser;
 
   private final EventBus eventBus;
-
-  private WizardStepDisplay formatStepDisplay;
 
   private WizardStepChain stepChain;
 
@@ -138,25 +120,24 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
 
   private StepInHandler datasourceValuesStepInHandler;
 
-  private Widget comparedDatasourcesReportHelp;
-
   private ImportDataInputsHandler importDataInputsHandler;
 
   @Inject
-  public DataImportView(EventBus eventBus) {
+  public DataImportView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
     this.eventBus = eventBus;
-    widget = uiBinder.createAndBindUi(this);
+    initWidget(uiBinder.createAndBindUi(this));
+    this.translations = translations;
     initWidgets();
     initWizardDialog();
   }
 
   private void initWizardDialog() {
     stepChain = WizardStepChain.Builder.create(dialog)//
-        .append(formatSelectionStep, formatSelectionHelp)//
+        .append(formatSelectionStep)//
         .title(translations.dataImportFormatStep())//
 
-        .append(formatStep, null, new Skippable() {
+        .append(formatStep, new Skippable() {
           @Override
           public boolean skip() {
             String selection = formatChooser.getSelectedValue();
@@ -164,13 +145,6 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
                 ImportFormat.HEALTH_CANADA.name().equals(selection);
           }
         })//
-        .help(new WidgetProvider() {
-
-          @Override
-          public Widget getWidget() {
-            return formatStepDisplay.getStepHelp();
-          }
-        }) //
         .onValidate(new ValidationHandler() {
 
           @Override
@@ -179,7 +153,7 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
           }
         }).title(translations.dataImportFileStep())//
 
-        .append(destinationSelectionStep, destinationSelectionHelp, new Skippable() {
+        .append(destinationSelectionStep, new Skippable() {
           @Override
           public boolean skip() {
             return !ImportFormat.CSV.name().equals(formatChooser.getSelectedValue());
@@ -194,7 +168,7 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
           }
         })//
 
-        .append(unitSelectionStep, unitSelectionHelp)//
+        .append(unitSelectionStep)//
         .title(translations.configureDataImport())//
         .onStepIn(new StepInHandler() {
           @Override
@@ -205,13 +179,6 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
 
         .append(comparedDatasourcesReportStep)//
         .title(translations.dataImportComparedDatasourcesReportStep())//
-        .help(new WidgetProvider() {
-
-          @Override
-          public Widget getWidget() {
-            return comparedDatasourcesReportHelp;
-          }
-        })//
         .onStepIn(new StepInHandler() {
 
           @Override
@@ -235,7 +202,7 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
           }
         }).title(translations.dataImportValuesStep())//
 
-        .append(archiveStep, archiveHelp, new Skippable() {
+        .append(archiveStep, new Skippable() {
           @Override
           public boolean skip() {
             String selection = formatChooser.getSelectedValue();
@@ -263,16 +230,10 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
 
   @Override
   public Widget asWidget() {
-    return widget;
-  }
-
-  @Override
-  protected Modal asModal() {
     return dialog;
   }
 
   @Override
-  @SuppressWarnings("PMD.NcssMethodCount")
   public void setInSlot(Object slot, IsWidget content) {
     if(!(slot instanceof Slots)) return;
     Widget wContent = content.asWidget();
@@ -325,7 +286,6 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
 
   @Override
   public void setFormatStepDisplay(WizardStepDisplay display) {
-    formatStepDisplay = display;
     formatStep.removeStepContent();
     formatStep.add(display.asWidget());
   }
@@ -352,7 +312,6 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
     comparedDatasourcesReportPanel.setVisible(true);
     datasourceErrors.setVisible(false);
     parsingErrors.setVisible(false);
-    comparedDatasourcesReportHelp = display.getStepHelp();
   }
 
   @Override

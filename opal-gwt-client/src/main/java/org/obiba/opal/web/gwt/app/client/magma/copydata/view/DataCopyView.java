@@ -44,13 +44,9 @@ import com.google.inject.Inject;
  */
 public class DataCopyView extends ModalViewImpl implements DataCopyPresenter.Display {
 
-  private static final Translations translations = GWT.create(Translations.class);
+  private final Translations translations;
 
-  interface DataCopyUiBinder extends UiBinder<Widget, DataCopyView> {}
-
-  private static final DataCopyUiBinder uiBinder = GWT.create(DataCopyUiBinder.class);
-
-  private final Widget widget;
+  interface Binder extends UiBinder<Widget, DataCopyView> {}
 
   @UiField
   WizardModalBox dialog;
@@ -80,9 +76,6 @@ public class DataCopyView extends ModalViewImpl implements DataCopyPresenter.Dis
   CheckBox copyNullValues;
 
   @UiField
-  HTMLPanel destinationHelpPanel;
-
-  @UiField
   CheckBox useAlias;
 
   private ValidationHandler tablesValidator;
@@ -92,10 +85,11 @@ public class DataCopyView extends ModalViewImpl implements DataCopyPresenter.Dis
   private WizardStepChain stepChain;
 
   @Inject
-  public DataCopyView(EventBus eventBus) {
+  public DataCopyView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
+    this.translations = translations;
     tableChooser = new TableChooser(true);
-    widget = uiBinder.createAndBindUi(this);
+    initWidget(uiBinder.createAndBindUi(this));
     initWizardDialog();
   }
 
@@ -119,12 +113,11 @@ public class DataCopyView extends ModalViewImpl implements DataCopyPresenter.Dis
 
           private void clearTablesStep() {
             tablesStep.setVisible(true);
-            dialog.setHelpEnabled(false);
             tableChooser.clear();
           }
 
         })//
-        .append(destinationStep, destinationHelpPanel)//
+        .append(destinationStep)//
         .title(translations.dataCopyDestination())//
         .onValidate(new ValidationHandler() {
 
@@ -151,16 +144,6 @@ public class DataCopyView extends ModalViewImpl implements DataCopyPresenter.Dis
         .conclusion()//
 
         .onNext().onPrevious().build();
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
-  }
-
-  @Override
-  protected Modal asModal() {
-    return dialog;
   }
 
   @Override

@@ -19,15 +19,9 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 
 public class CsvFormatStepView extends AbstractCsvOptionsView implements CsvFormatStepPresenter.Display {
-  //
-  // Static Variables
-  //
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  private final Widget widget;
 
   //
   // Instance Variables
@@ -36,20 +30,13 @@ public class CsvFormatStepView extends AbstractCsvOptionsView implements CsvForm
   @UiField
   CsvOptionsView csvOptions;
 
-  @UiField
-  HTMLPanel help;
-
   //
   // Constructors
   //
 
-  public CsvFormatStepView() {
-    widget = uiBinder.createAndBindUi(this);
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
+  @Inject
+  public CsvFormatStepView(Binder uiBinder) {
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
   //
@@ -62,20 +49,9 @@ public class CsvFormatStepView extends AbstractCsvOptionsView implements CsvForm
   }
 
   //
-  // Methods
-  //
-
-  @Override
-  public Widget getStepHelp() {
-    help.removeFromParent();
-    return help;
-  }
-
-  //
   // Inner Classes / Interfaces
   //
 
-  @UiTemplate("CsvFormatStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, CsvFormatStepView> {}
+  interface Binder extends UiBinder<Widget, CsvFormatStepView> {}
 
 }

@@ -24,8 +24,6 @@ import com.gwtplatform.mvp.client.ViewImpl;
 
 public class RestStepView extends ViewImpl implements RestStepPresenter.Display {
 
-  private final Widget widget;
-
   @UiField
   TextBox url;
 
@@ -38,28 +36,11 @@ public class RestStepView extends ViewImpl implements RestStepPresenter.Display 
   @UiField
   TextBox remoteDatasource;
 
-  @UiField
-  HTMLPanel help;
-
-  @UiTemplate("RestStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, RestStepView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  interface Binder extends UiBinder<Widget, RestStepView> {}
 
   @Inject
-  public RestStepView() {
-    widget = uiBinder.createAndBindUi(this);
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
-  }
-
-  @Override
-  public Widget getStepHelp() {
-    help.removeFromParent();
-    return help;
+  public RestStepView(Binder uiBinder) {
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
   @Override

@@ -20,27 +20,21 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public class XmlFormatStepView extends ViewImpl implements XmlFormatStepPresenter.Display {
 
-  @UiTemplate("XmlFormatStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, XmlFormatStepView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  private final Widget uiWidget;
+  interface Binder extends UiBinder<Widget, XmlFormatStepView> {}
 
   private FileSelectionPresenter.Display fileSelection;
 
   @UiField
   SimplePanel selectXmlFilePanel;
 
-  @UiField
-  HTMLPanel help;
-
-  public XmlFormatStepView() {
-    uiWidget = uiBinder.createAndBindUi(this);
+  @Inject
+  public XmlFormatStepView(Binder uiBinder) {
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
   @Override
@@ -53,17 +47,6 @@ public class XmlFormatStepView extends ViewImpl implements XmlFormatStepPresente
   @Override
   public String getSelectedFile() {
     return fileSelection.getFile();
-  }
-
-  @Override
-  public Widget asWidget() {
-    return uiWidget;
-  }
-
-  @Override
-  public Widget getStepHelp() {
-    help.removeFromParent();
-    return help;
   }
 
 }

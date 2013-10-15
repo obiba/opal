@@ -24,9 +24,7 @@ import com.google.web.bindery.event.shared.EventBus;
 public class AddProjectModalView extends ModalPopupViewWithUiHandlers<AddProjectModalUiHandlers>
     implements AddProjectModalPresenter.Display {
 
-  interface AddProjectModalViewUiBinder extends UiBinder<Widget, AddProjectModalView> {}
-
-  private static final AddProjectModalViewUiBinder uiBinder = GWT.create(AddProjectModalViewUiBinder.class);
+  interface Binder extends UiBinder<Widget, AddProjectModalView> {}
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -46,15 +44,10 @@ public class AddProjectModalView extends ModalPopupViewWithUiHandlers<AddProject
   HasText descriptionTxt;
 
   @Inject
-  public AddProjectModalView(EventBus eventBus) {
+  public AddProjectModalView(EventBus eventBus, Binder uiBinder) {
     super(eventBus);
-    uiBinder.createAndBindUi(this);
+    initWidget(uiBinder.createAndBindUi(this));
     modal.setTitle(translations.addProject());
-  }
-
-  @Override
-  public Widget asWidget() {
-    return modal;
   }
 
   @UiHandler("save")

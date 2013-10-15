@@ -13,11 +13,9 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.LimesurveyStepPresenter;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
@@ -27,19 +25,13 @@ import com.gwtplatform.mvp.client.ViewImpl;
 
 public class LimesurveyStepView extends ViewImpl implements LimesurveyStepPresenter.Display {
 
-  private final Widget widget;
-
   @UiField
   ListBox database;
 
   @UiField
   TextBox tablePrefix;
 
-  @UiField
-  HTMLPanel help;
-
-  @UiTemplate("LimesurveyStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, LimesurveyStepView> {}
+  interface Binder extends UiBinder<Widget, LimesurveyStepView> {}
 
   @Override
   public void setDatabases(JsArray<DatabaseDto> resource) {
@@ -59,21 +51,9 @@ public class LimesurveyStepView extends ViewImpl implements LimesurveyStepPresen
     return tablePrefix.getValue();
   }
 
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
   @Inject
-  public LimesurveyStepView() {
-    widget = uiBinder.createAndBindUi(this);
+  public LimesurveyStepView(Binder uiBinder) {
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
-  @Override
-  public Widget asWidget() {
-    return widget;
-  }
-
-  @Override
-  public Widget getStepHelp() {
-    help.removeFromParent();
-    return help;
-  }
 }
