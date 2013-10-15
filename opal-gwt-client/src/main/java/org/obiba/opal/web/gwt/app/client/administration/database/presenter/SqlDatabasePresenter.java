@@ -63,7 +63,8 @@ public class SqlDatabasePresenter extends AbstractDatabasePresenter<SqlDatabaseP
           public void onResource(Response response, JsArray<JdbcDriverDto> drivers) {
             getView().setAvailableDrivers(drivers);
           }
-        }).get().send();
+        }) //
+        .get().send();
 
     getView().getUsageChangeHandlers().addChangeHandler(new ChangeHandler() {
       @Override

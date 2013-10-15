@@ -88,7 +88,7 @@ public class JsArrays {
     };
   }
 
-  public static <T extends JavaScriptObject> Iterable<T> toIterable(JsArray<T> values) {
+  public static <T extends JavaScriptObject> Iterable<T> toIterable(@Nullable JsArray<T> values) {
     final JsArray<T> array = toSafeArray(values);
     return new Iterable<T>() {
 

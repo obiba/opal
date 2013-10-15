@@ -6,7 +6,6 @@ import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.database.Database;
@@ -28,11 +27,6 @@ public class DatabasesResource {
   private DatabaseRegistry databaseRegistry;
 
   @GET
-  public List<DatabaseDto> getDatabases(@QueryParam("type") String type) {
-    return asDto(databaseRegistry.list(type));
-  }
-
-  @GET
   @Path("/sql")
   public List<DatabaseDto> getSqlDatabases() {
     return asDto(databaseRegistry.list(SqlDatabase.class));
@@ -42,6 +36,12 @@ public class DatabasesResource {
   @Path("/mongodb")
   public List<DatabaseDto> getMongoDbDatabases() {
     return asDto(databaseRegistry.list(MongoDbDatabase.class));
+  }
+
+  @GET
+  @Path("/storage")
+  public List<DatabaseDto> getStorageDatabases() {
+    return asDto(databaseRegistry.list(Database.Usage.STORAGE));
   }
 
   @GET

@@ -28,6 +28,10 @@ public final class DatabaseResources {
     return databases() + "/mongodb";
   }
 
+  public static String storageDatabases() {
+    return databases() + "/storage";
+  }
+
   public static String database(String name) {
     return UriBuilder.create().segment("system", "database", name).build();
   }
@@ -37,6 +41,6 @@ public final class DatabaseResources {
   }
 
   public static String drivers() {
-    return "/system/databases/jdbc-drivers";
+    return databases() + "/jdbc-drivers";
   }
 }

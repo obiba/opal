@@ -16,7 +16,7 @@ public interface DatabaseRegistry extends SystemService {
 
   <T extends Database> Iterable<T> list(@Nonnull Class<T> databaseClass);
 
-  Iterable<Database> list(@Nullable String type);
+  Iterable<Database> list(@Nullable Database.Usage usage);
 
   @Nonnull
   Database getDatabase(@Nonnull String name) throws NoSuchDatabaseException;
