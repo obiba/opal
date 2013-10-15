@@ -5,24 +5,24 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseResources;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -36,48 +36,46 @@ public class AddProjectPresenter extends ModalPresenterWidget<AddProjectPresente
 
   private JsArray<ProjectDto> projects;
 
-  private final Translations translations;
-
   protected ValidationHandler validationHandler;
 
   @Inject
-  public AddProjectPresenter(EventBus eventBus, Display display, Translations translations) {
+  public AddProjectPresenter(EventBus eventBus, Display display) {
     super(eventBus, display);
-    this.translations = translations;
     getView().setUiHandlers(this);
-
     validationHandler = new ProjectValidationHandler();
+  }
+
+  @Override
+  protected void onBind() {
+    super.onBind();
+    ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
+        .forResource(DatabaseResources.storageDatabases()) //
+        .withCallback(new ResourceCallback<JsArray<DatabaseDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<DatabaseDto> databases) {
+            getView().setAvailableDatabases(databases);
+          }
+        }) //
+        .get().send();
   }
 
   @Override
   public void save() {
     getView().clearErrors();
-
     if(validationHandler.validate()) {
-      ResponseCodeCallback callback = new ResponseCodeCallback() {
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          if(response.getStatusCode() == Response.SC_CREATED) {
-            getEventBus().fireEvent(new ProjectCreatedEvent(null));
-            getView().hideDialog();
-          } else if(!Strings.isNullOrEmpty(response.getText())) {
-            ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
-            getEventBus().fireEvent(
-                NotificationEvent.newBuilder().error("ProjectCreationFailed").args(errorDto.getArgumentsArray())
-                    .build());
-          } else {
-            getEventBus()
-                .fireEvent(NotificationEvent.newBuilder().error(translations.datasourceCreationFailed()).build());
-          }
-        }
-      };
-
+      final ProjectDto projectDto = getDto();
       ResourceRequestBuilderFactory.<ProjectDto>newBuilder() //
           .forResource("/projects")  //
-          .withResourceBody(ProjectDto.stringify(getDto())) //
-          .withCallback(callback, Response.SC_CREATED, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR) //
+          .withResourceBody(ProjectDto.stringify(projectDto)) //
+          .withCallback(Response.SC_CREATED, new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              getEventBus().fireEvent(new ProjectCreatedEvent(projectDto));
+              getView().hideDialog();
+            }
+          }) //
+          .withCallback(Response.SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
           .post().send();
-
     }
   }
 
@@ -141,8 +139,6 @@ public class AddProjectPresenter extends ModalPresenterWidget<AddProjectPresente
 
   public interface Display extends PopupView, HasUiHandlers<AddProjectUiHandlers> {
 
-    void clearErrors();
-
     enum FormField {
       NAME,
     }
@@ -158,5 +154,9 @@ public class AddProjectPresenter extends ModalPresenterWidget<AddProjectPresente
     void showError(@Nullable FormField formField, String message);
 
     void hideDialog();
+
+    void clearErrors();
+
+    void setAvailableDatabases(JsArray<DatabaseDto> availableDatabases);
   }
 }

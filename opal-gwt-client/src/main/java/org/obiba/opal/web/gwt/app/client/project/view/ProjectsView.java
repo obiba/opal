@@ -65,7 +65,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   private JsArray<ProjectDto> projects;
 
   @Inject
-  ProjectsView(Binder uiBinder) {
+  public ProjectsView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
   }
 
@@ -129,8 +129,8 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   private enum SortBy {
     NAME {
       @Override
-      void sort(final ProjectsUiHandlers handlers, Panel content, JsArray<ProjectDto> projects) {
-        for(final ProjectDto project : JsArrays.toIterable(projects)) {
+      void sort(ProjectsUiHandlers handlers, Panel content, JsArray<ProjectDto> projects) {
+        for(ProjectDto project : JsArrays.toIterable(projects)) {
           content.add(newProjectPanel(handlers, project));
         }
       }
@@ -146,7 +146,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
             return m2.unix() - m1.unix();
           }
         });
-        for(final ProjectDto project : projectList) {
+        for(ProjectDto project : projectList) {
           content.add(newProjectPanel(handlers, project));
         }
       }
@@ -201,7 +201,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
         // find first phrase
         String desc = project.getDescription();
         int idx = desc.indexOf('.');
-        if (idx>0) desc = desc.substring(0,idx) + "...";
+        if(idx > 0) desc = desc.substring(0, idx) + "...";
         Label descriptionLabel = new Label(desc);
         panel.add(descriptionLabel);
       }

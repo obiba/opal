@@ -39,6 +39,10 @@ import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, ProjectsPresenter.Proxy>
     implements ProjectsUiHandlers {
 
+  @ProxyStandard
+  @NameToken(Places.PROJECTS)
+  public interface Proxy extends ProxyPlace<ProjectsPresenter> {}
+
   private final PlaceManager placeManager;
 
   private JsArray<ProjectDto> projects;
@@ -51,10 +55,10 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
   public ProjectsPresenter(EventBus eventBus, Display display, Proxy proxy, Translations translations,
       PlaceManager placeManager, ModalProvider<AddProjectPresenter> addProjectModalProvider) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
-    getView().setUiHandlers(this);
     this.translations = translations;
     this.placeManager = placeManager;
     this.addProjectModalProvider = addProjectModalProvider.setContainer(this);
+    getView().setUiHandlers(this);
   }
 
   @TitleFunction
@@ -80,14 +84,16 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
   }
 
   public void refresh() {
-    ResourceRequestBuilderFactory.<JsArray<ProjectDto>>newBuilder().forResource("/projects").get()
+    ResourceRequestBuilderFactory.<JsArray<ProjectDto>>newBuilder() //
+        .forResource("/projects") //
         .withCallback(new ResourceCallback<JsArray<ProjectDto>>() {
           @Override
           public void onResource(Response response, JsArray<ProjectDto> resource) {
             projects = JsArrays.toSafeArray(resource);
             getView().setProjects(projects);
           }
-        }).send();
+        }) //
+        .get().send();
   }
 
   @Override
@@ -120,9 +126,5 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
   public interface Display extends View, HasUiHandlers<ProjectsUiHandlers> {
     void setProjects(JsArray<ProjectDto> projects);
   }
-
-  @ProxyStandard
-  @NameToken(Places.PROJECTS)
-  public interface Proxy extends ProxyPlace<ProjectsPresenter> {}
 
 }
