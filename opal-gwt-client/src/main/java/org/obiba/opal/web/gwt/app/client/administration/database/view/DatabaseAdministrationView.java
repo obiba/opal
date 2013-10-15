@@ -64,6 +64,8 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
 
   private final Translations translations;
 
+  private final Columns columns = new Columns();
+
   @Inject
   public DatabaseAdministrationView(Binder uiBinder, Translations translations) {
     this.translations = translations;
@@ -74,21 +76,21 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
 
   private void initSqlTable() {
     sqlPager.setDisplay(sqlTable);
-    sqlTable.addColumn(Columns.NAME, translations.nameLabel());
-    sqlTable.addColumn(Columns.SQL_URL, translations.urlLabel());
-    sqlTable.addColumn(Columns.USAGE, translations.usageLabel());
-    sqlTable.addColumn(Columns.SQL_SCHEMA, translations.sqlSchemaLabel());
-    sqlTable.addColumn(Columns.SQL_USERNAME, translations.usernameLabel());
-    sqlTable.addColumn(Columns.ACTIONS, translations.actionsLabel());
+    sqlTable.addColumn(columns.name, translations.nameLabel());
+    sqlTable.addColumn(columns.sqlUrl, translations.urlLabel());
+    sqlTable.addColumn(columns.usage, translations.usageLabel());
+    sqlTable.addColumn(columns.sqlSchema, translations.sqlSchemaLabel());
+    sqlTable.addColumn(columns.sqlUsername, translations.usernameLabel());
+    sqlTable.addColumn(columns.actions, translations.actionsLabel());
   }
 
   private void initMongoTable() {
     mongoPager.setDisplay(mongoTable);
-    mongoTable.addColumn(Columns.NAME, translations.nameLabel());
-    mongoTable.addColumn(Columns.MONGO_URL, translations.urlLabel());
-    mongoTable.addColumn(Columns.USAGE, translations.usageLabel());
-    mongoTable.addColumn(Columns.MONGO_USERNAME, translations.usernameLabel());
-    mongoTable.addColumn(Columns.ACTIONS, translations.actionsLabel());
+    mongoTable.addColumn(columns.name, translations.nameLabel());
+    mongoTable.addColumn(columns.mongoUrl, translations.urlLabel());
+    mongoTable.addColumn(columns.usage, translations.usageLabel());
+    mongoTable.addColumn(columns.mongoUsername, translations.usernameLabel());
+    mongoTable.addColumn(columns.actions, translations.actionsLabel());
   }
 
   @Override
@@ -103,7 +105,7 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
 
   @Override
   public HasActionHandler<DatabaseDto> getActions() {
-    return Columns.ACTIONS;
+    return columns.actions;
   }
 
   @Override
@@ -121,17 +123,18 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
     return breadcrumbs;
   }
 
-  private static final class Columns {
+  private final class Columns {
 
-    static final Column<DatabaseDto, String> NAME = new TextColumn<DatabaseDto>() {
-
+    final Column<DatabaseDto, String> name = new TextColumn<DatabaseDto>() {
       @Override
       public String getValue(DatabaseDto dto) {
-        return dto.getName();
+        String value = dto.getName();
+        if(dto.getDefaultStorage()) value += " (" + translations.defaultStorage().toLowerCase() + ")";
+        return value;
       }
     };
 
-    static final Column<DatabaseDto, String> SQL_URL = new TextColumn<DatabaseDto>() {
+    final Column<DatabaseDto, String> sqlUrl = new TextColumn<DatabaseDto>() {
 
       @Override
       public String getValue(DatabaseDto dto) {
@@ -139,7 +142,7 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
       }
     };
 
-    static final Column<DatabaseDto, String> MONGO_URL = new TextColumn<DatabaseDto>() {
+    final Column<DatabaseDto, String> mongoUrl = new TextColumn<DatabaseDto>() {
 
       @Override
       public String getValue(DatabaseDto dto) {
@@ -147,14 +150,14 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
       }
     };
 
-    static final Column<DatabaseDto, String> USAGE = new TextColumn<DatabaseDto>() {
+    final Column<DatabaseDto, String> usage = new TextColumn<DatabaseDto>() {
       @Override
       public String getValue(DatabaseDto dto) {
         return SqlDatabasePresenter.Usage.valueOf(dto.getUsage().getName()).getLabel();
       }
     };
 
-    static final Column<DatabaseDto, String> SQL_SCHEMA = new TextColumn<DatabaseDto>() {
+    final Column<DatabaseDto, String> sqlSchema = new TextColumn<DatabaseDto>() {
       @Override
       public String getValue(DatabaseDto dto) {
         return SqlDatabasePresenter.SqlSchema.valueOf(
@@ -163,33 +166,32 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
       }
     };
 
-    static final Column<DatabaseDto, String> SQL_USERNAME = new TextColumn<DatabaseDto>() {
+    final Column<DatabaseDto, String> sqlUsername = new TextColumn<DatabaseDto>() {
       @Override
       public String getValue(DatabaseDto dto) {
         return ((SqlDatabaseDto) dto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings)).getUsername();
       }
     };
 
-    static final Column<DatabaseDto, String> MONGO_USERNAME = new TextColumn<DatabaseDto>() {
+    final Column<DatabaseDto, String> mongoUsername = new TextColumn<DatabaseDto>() {
       @Override
       public String getValue(DatabaseDto dto) {
         return ((MongoDbDatabaseDto) dto.getExtension(MongoDbDatabaseDto.DatabaseDtoExtensions.settings)).getUsername();
       }
     };
 
-    static final ActionsColumn<DatabaseDto> ACTIONS = new ActionsColumn<DatabaseDto>(
-        new ActionsProvider<DatabaseDto>() {
+    final ActionsColumn<DatabaseDto> actions = new ActionsColumn<DatabaseDto>(new ActionsProvider<DatabaseDto>() {
 
-          @Override
-          public String[] allActions() {
-            return new String[] { TEST_ACTION, EDIT_ACTION, DELETE_ACTION };
-          }
+      @Override
+      public String[] allActions() {
+        return new String[] { TEST_ACTION, EDIT_ACTION, DELETE_ACTION };
+      }
 
-          @Override
-          public String[] getActions(DatabaseDto dto) {
-            return dto.getEditable() ? allActions() : new String[] { TEST_ACTION };
-          }
-        });
+      @Override
+      public String[] getActions(DatabaseDto dto) {
+        return dto.getEditable() ? allActions() : new String[] { TEST_ACTION };
+      }
+    });
   }
 
 }

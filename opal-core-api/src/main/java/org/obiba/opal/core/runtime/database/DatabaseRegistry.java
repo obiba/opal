@@ -37,4 +37,7 @@ public interface DatabaseRegistry extends SystemService {
 
   @Nonnull
   DatasourceFactory createDataSourceFactory(@Nonnull String datasourceName, @Nonnull Database database);
+
+  @Nullable
+  Database getDefaultStorageDatabase();
 }

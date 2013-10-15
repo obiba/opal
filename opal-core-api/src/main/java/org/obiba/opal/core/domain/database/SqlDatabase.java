@@ -12,11 +12,13 @@ import javax.persistence.OneToOne;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractOrientDbTimestampedEntity;
+import org.obiba.opal.core.validator.Unique;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 
 @SuppressWarnings("ParameterHidesMemberVariable")
+@Unique(properties = "url")
 public class SqlDatabase extends Database {
 
   public enum SqlSchema {

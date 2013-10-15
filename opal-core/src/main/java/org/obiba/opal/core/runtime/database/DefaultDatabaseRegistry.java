@@ -18,6 +18,8 @@ import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
 import org.obiba.opal.core.runtime.jdbc.DatabaseSessionFactoryProvider;
 import org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory;
 import org.obiba.opal.core.service.OrientDbService;
+import org.obiba.opal.core.service.OrientDbTransactionCallbackWithoutResult;
+import org.obiba.opal.core.service.impl.DefaultBeanValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,7 @@ import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
+import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
 @SuppressWarnings("OverlyCoupledClass")
 @Component
@@ -50,6 +53,9 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   @Autowired
   private OrientDbService orientDbService;
+
+  @Autowired
+  private DefaultBeanValidator defaultBeanValidator;
 
   private final LoadingCache<String, DataSource> dataSourceCache = CacheBuilder.newBuilder()
       .removalListener(new RemovalListener<String, DataSource>() {
@@ -155,10 +161,29 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   }
 
   @Override
-  public void addOrReplaceDatabase(@Nonnull Database database)
+  public void addOrReplaceDatabase(@Nonnull final Database database)
       throws ConstraintViolationException, MultipleIdentifiersDatabaseException {
+
     validUniqueIdentifiersDatabase(database);
-    orientDbService.save(database);
+
+    if(database.isDefaultStorage()) {
+      final Database previousDefaultStorageDatabase = getDefaultStorageDatabase();
+      if(previousDefaultStorageDatabase == null) {
+        orientDbService.save(database);
+      } else {
+        defaultBeanValidator.validate(database);
+        previousDefaultStorageDatabase.setDefaultStorage(false);
+        orientDbService.execute(new OrientDbTransactionCallbackWithoutResult() {
+          @Override
+          protected void doInTransactionWithoutResult(OObjectDatabaseTx db) {
+            db.save(database);
+            db.save(previousDefaultStorageDatabase);
+          }
+        });
+      }
+    } else {
+      orientDbService.save(database);
+    }
   }
 
   private void validUniqueIdentifiersDatabase(Database database) throws MultipleIdentifiersDatabaseException {
@@ -172,6 +197,12 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
       } catch(IdentifiersDatabaseNotFoundException ignored) {
       }
     }
+  }
+
+  @Nullable
+  @Override
+  public Database getDefaultStorageDatabase() {
+    return orientDbService.uniqueResult("select from Database where defaultStorage = true");
   }
 
   @Override

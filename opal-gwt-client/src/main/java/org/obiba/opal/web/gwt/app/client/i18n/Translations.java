@@ -2206,4 +2206,7 @@ public interface Translations extends Constants {
   @DefaultStringValue("Required")
   String required();
 
+  @Description("Default storage label")
+  @DefaultStringValue("Default storage")
+  String defaultStorage();
 }
