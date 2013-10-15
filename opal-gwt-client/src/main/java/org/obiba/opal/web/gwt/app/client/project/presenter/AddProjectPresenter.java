@@ -20,9 +20,11 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
+import org.obiba.opal.web.model.client.opal.ProjectFactoryDto;
 
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -42,12 +44,13 @@ public class AddProjectPresenter extends ModalPresenterWidget<AddProjectPresente
   public AddProjectPresenter(EventBus eventBus, Display display) {
     super(eventBus, display);
     getView().setUiHandlers(this);
-    validationHandler = new ProjectValidationHandler();
   }
 
   @Override
   protected void onBind() {
     super.onBind();
+    validationHandler = new ProjectValidationHandler();
+
     ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
         .forResource(DatabaseResources.storageDatabases()) //
         .withCallback(new ResourceCallback<JsArray<DatabaseDto>>() {
@@ -63,13 +66,13 @@ public class AddProjectPresenter extends ModalPresenterWidget<AddProjectPresente
   public void save() {
     getView().clearErrors();
     if(validationHandler.validate()) {
-      final ProjectDto projectDto = getDto();
-      ResourceRequestBuilderFactory.<ProjectDto>newBuilder() //
+      ResourceRequestBuilderFactory.<ProjectFactoryDto>newBuilder() //
           .forResource("/projects")  //
-          .withResourceBody(ProjectDto.stringify(projectDto)) //
+          .withResourceBody(ProjectFactoryDto.stringify(getDto())) //
           .withCallback(Response.SC_CREATED, new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
+              ProjectDto projectDto = JsonUtils.unsafeEval(response.getText());
               getEventBus().fireEvent(new ProjectCreatedEvent(projectDto));
               getView().hideDialog();
             }
@@ -79,8 +82,8 @@ public class AddProjectPresenter extends ModalPresenterWidget<AddProjectPresente
     }
   }
 
-  private ProjectDto getDto() {
-    ProjectDto dto = ProjectDto.create();
+  private ProjectFactoryDto getDto() {
+    ProjectFactoryDto dto = ProjectFactoryDto.create();
     dto.setName(getView().getName().getText());
     String title = getView().getTitle().getText();
     dto.setTitle(Strings.isNullOrEmpty(title) ? dto.getName() : title);

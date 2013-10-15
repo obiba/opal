@@ -17,6 +17,14 @@ message ProjectDto {
   optional Magma.TimestampsDto timestamps = 10;
 }
 
+message ProjectFactoryDto {
+  required string name = 1;
+  optional string title = 2;
+  optional string description = 3;
+  optional string database = 4;
+  repeated string tags = 5;
+}
+
 message ProjectSummaryDto {
   required string name = 1;
   required int32 tableCount = 2;

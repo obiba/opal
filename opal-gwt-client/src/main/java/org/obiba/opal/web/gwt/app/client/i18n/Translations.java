@@ -2216,4 +2216,12 @@ public interface Translations extends Constants {
   @Description("Default storage label")
   @DefaultStringValue("Default storage")
   String defaultStorage();
+
+  @Description("Select database label")
+  @DefaultStringValue("Select database...")
+  String selectDatabase();
+
+  @Description("None label")
+  @DefaultStringValue("None")
+  String none();
 }
