@@ -3,14 +3,19 @@ package org.obiba.opal.web.gwt.app.client.project.view;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.Console;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.project.presenter.AddProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.AddProjectUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
+import org.obiba.opal.web.model.client.database.DatabaseDto;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -44,11 +49,17 @@ public class AddProjectView extends ModalPopupViewWithUiHandlers<AddProjectUiHan
   @UiField
   HasText description;
 
+  private final Translations translations;
+
   @Inject
   public AddProjectView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
+    this.translations = translations;
     uiBinder.createAndBindUi(this);
     modal.setTitle(translations.addProject());
+
+    ConstrainedModal constrainedModal = new ConstrainedModal(modal);
+    constrainedModal.registerWidget("name", translations.nameLabel(), nameGroup);
   }
 
   @Override
@@ -95,15 +106,24 @@ public class AddProjectView extends ModalPopupViewWithUiHandlers<AddProjectUiHan
   }
 
   @Override
-  public void showError(@Nullable FormField formField, String message) {
-    ControlGroup group = null;
-    if(formField != null) {
-      switch(formField) {
-        case NAME:
-          group = nameGroup;
-          break;
+  public void setAvailableDatabases(JsArray<DatabaseDto> availableDatabases) {
+    Console.log(availableDatabases);
+    database.clear();
+    String defaultStorageDatabase = null;
+    for(DatabaseDto databaseDto : JsArrays.toIterable(availableDatabases)) {
+      StringBuilder label = new StringBuilder(databaseDto.getName());
+      if(databaseDto.getDefaultStorage()) {
+        defaultStorageDatabase = databaseDto.getName();
+        label.append(" (").append(translations.defaultStorage().toLowerCase()).append(")");
       }
+      database.addItem(label.toString(), databaseDto.getName());
     }
+    getDatabase().setText(defaultStorageDatabase);
+  }
+
+  @Override
+  public void showError(@Nullable FormField formField, String message) {
+    ControlGroup group = formField == FormField.NAME ? nameGroup : null;
     if(group == null) {
       modal.addAlert(message, AlertType.ERROR);
     } else {
