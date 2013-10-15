@@ -133,11 +133,11 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   }
 
   @Override
-  public Iterable<Database> list(@Nullable String type) {
-    if(Strings.isNullOrEmpty(type)) {
+  public Iterable<Database> list(@Nullable Database.Usage usage) {
+    if(usage == null) {
       return list();
     }
-    return orientDbService.list("select from Database where usedForIdentifiers = ? and type = ?", false, type);
+    return orientDbService.list("select from Database where usedForIdentifiers = ? and usage = ?", false, usage);
   }
 
   @Nonnull
@@ -202,7 +202,8 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Nullable
   @Override
   public Database getDefaultStorageDatabase() {
-    return orientDbService.uniqueResult("select from Database where defaultStorage = true");
+    return orientDbService
+        .uniqueResult("select from Database where usedForIdentifiers = ? and defaultStorage = ?", false, true);
   }
 
   @Override

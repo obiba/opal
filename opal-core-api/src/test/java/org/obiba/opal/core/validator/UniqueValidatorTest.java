@@ -26,8 +26,9 @@ public class UniqueValidatorTest {
   @Test
   public void testFindAnnotatedClass() {
     assertEquals(null, UniqueValidator.findAnnotatedClass(OrientDbEntity.class));
-    assertEquals(Database.class, UniqueValidator.findAnnotatedClass(Database.class));
-    assertEquals(Database.class, UniqueValidator.findAnnotatedClass(SqlDatabase.class));
+    assertEquals(Database.class, UniqueValidator.findAnnotatedClass(Database.class, "name"));
+    assertEquals(Database.class, UniqueValidator.findAnnotatedClass(SqlDatabase.class, "name"));
+    assertEquals(SqlDatabase.class, UniqueValidator.findAnnotatedClass(SqlDatabase.class, "url"));
   }
 
   @Test
@@ -37,6 +38,7 @@ public class UniqueValidatorTest {
     existing.setId("1");
 
     OrientDbService mockOrientDbService = createMock(OrientDbService.class);
+    expect(mockOrientDbService.uniqueResult("select from SqlDatabase where url = ?", "url")).andReturn(null).once();
     expect(mockOrientDbService.uniqueResult("select from Database where name = ?", "db")).andReturn(existing).once();
     replay(mockOrientDbService);
 
@@ -52,7 +54,6 @@ public class UniqueValidatorTest {
     assertEquals("must be unique", constraintViolation.getMessage());
     assertEquals("{org.obiba.opal.core.validator.Unique.message}", constraintViolation.getMessageTemplate());
     assertEquals("name", constraintViolation.getPropertyPath().toString());
-
   }
 
   private Validator getValidator(final OrientDbService orientDbService) {

@@ -67,22 +67,6 @@ public class DatabaseAdministrationPresenter extends
   @NameToken(Places.DATA_DATABASES)
   public interface Proxy extends ProxyPlace<DatabaseAdministrationPresenter> {}
 
-  public interface Display extends View, HasBreadcrumbs {
-
-    String TEST_ACTION = "Test";
-
-    HasActionHandler<DatabaseDto> getActions();
-
-    HasClickHandlers getAddSqlButton();
-
-    HasData<DatabaseDto> getSqlTable();
-
-    HasData<DatabaseDto> getMongoTable();
-
-    HasClickHandlers getAddMongoButton();
-
-  }
-
   private final ModalProvider<SqlDatabasePresenter> sqlDatabaseModalProvider;
 
   private final ModalProvider<MongoDatabasePresenter> mongoDatabaseModalProvider;
@@ -116,15 +100,13 @@ public class DatabaseAdministrationPresenter extends
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
     ResourceAuthorizationRequestBuilderFactory.newBuilder() //
         .forResource(DatabaseResources.sqlDatabases()) //
-        .get() //
         .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListSqlDatabasesAuthorization())) //
-        .send();
+        .get().send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder() //
         .forResource(DatabaseResources.mongoDatabases()) //
-        .get() //
         .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListMongoDbAuthorization())) //
-        .send();
+        .get().send();
   }
 
   @Override
@@ -142,15 +124,13 @@ public class DatabaseAdministrationPresenter extends
   public void authorize(HasAuthorization authorizer) {
     ResourceAuthorizationRequestBuilderFactory.newBuilder() //
         .forResource(DatabaseResources.sqlDatabases()) //
-        .get() //
         .authorize(authorizer) //
-        .send();
+        .get().send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder() //
         .forResource(DatabaseResources.mongoDatabases()) //
-        .get() //
         .authorize(authorizer) //
-        .send();
+        .get().send();
   }
 
   @Override
@@ -219,8 +199,7 @@ public class DatabaseAdministrationPresenter extends
               .accept("application/json") //
               .withCallback(Response.SC_OK, testConnectionCallback) //
               .withCallback(Response.SC_SERVICE_UNAVAILABLE, testConnectionCallback) //
-              .post() //
-              .send();
+              .post().send();
         }
       }
 
@@ -252,6 +231,22 @@ public class DatabaseAdministrationPresenter extends
     getView().getMongoTable().setVisibleRangeAndClearData(new Range(0, 10), true);
   }
 
+  public interface Display extends View, HasBreadcrumbs {
+
+    String TEST_ACTION = "Test";
+
+    HasActionHandler<DatabaseDto> getActions();
+
+    HasClickHandlers getAddSqlButton();
+
+    HasData<DatabaseDto> getSqlTable();
+
+    HasData<DatabaseDto> getMongoTable();
+
+    HasClickHandlers getAddMongoButton();
+
+  }
+
   private class DeleteDatabaseCommand implements Command {
 
     private final DatabaseDto dto;
@@ -276,8 +271,7 @@ public class DatabaseAdministrationPresenter extends
             }
 
           }) //
-          .delete() //
-          .send();
+          .delete().send();
     }
   }
 
