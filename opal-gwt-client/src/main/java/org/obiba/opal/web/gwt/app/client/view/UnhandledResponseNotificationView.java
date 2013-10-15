@@ -2,26 +2,21 @@ package org.obiba.opal.web.gwt.app.client.view;
 
 import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PopupViewImpl;
 
 public class UnhandledResponseNotificationView extends PopupViewImpl
     implements UnhandledResponseNotificationPresenter.Display {
-  @UiTemplate("UnhandledResponseNotificationView.ui.xml")
-  interface UnhandledResponseNotificationViewUiBinder extends UiBinder<Widget, UnhandledResponseNotificationView> {}
 
-  private static final UnhandledResponseNotificationViewUiBinder uiBinder = GWT
-      .create(UnhandledResponseNotificationViewUiBinder.class);
+  interface Binder extends UiBinder<Widget, UnhandledResponseNotificationView> {}
 
   private final PopupPanel popup = new PopupPanel(false, true);
 
@@ -38,11 +33,11 @@ public class UnhandledResponseNotificationView extends PopupViewImpl
   Button okay;
 
   @Inject
-  public UnhandledResponseNotificationView(EventBus eventBus) {
+  public UnhandledResponseNotificationView(EventBus eventBus, Binder uiBinder) {
     super(eventBus);
     popup.add(uiBinder.createAndBindUi(this));
     popup.setGlassEnabled(true);
-    popup.addStyleName("alert alert-error");
+    popup.addStyleName("alert alert-error error-popup");
   }
 
   @Override

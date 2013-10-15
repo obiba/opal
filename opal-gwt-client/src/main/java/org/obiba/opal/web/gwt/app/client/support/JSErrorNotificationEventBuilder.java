@@ -17,6 +17,7 @@ import com.google.gwt.core.client.JsArray;
 
 public class JSErrorNotificationEventBuilder {
 
+  @SuppressWarnings("unchecked")
   public NotificationEvent build(ClientErrorDto error) {
 
     if(error.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors) != null) {

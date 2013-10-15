@@ -72,12 +72,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   @Override
   public void setProjects(JsArray<ProjectDto> projects) {
     this.projects = projects;
-    if(projects.length() == 0) {
-      activePanel.clear();
-      archivedPanel.clear();
-    } else {
-      redraw();
-    }
+    redraw();
   }
 
   @UiHandler("nameNav")
@@ -217,7 +212,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
       return panel;
     }
 
-    protected Widget newProjectLink(final ProjectsUiHandlers handlers, final ProjectDto project) {
+    Widget newProjectLink(final ProjectsUiHandlers handlers, final ProjectDto project) {
       NavLink link = new NavLink(project.getTitle());
       link.setTitle(project.getName());
       link.addClickHandler(new ClickHandler() {

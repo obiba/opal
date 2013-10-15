@@ -58,8 +58,9 @@ public class ProjectsResource {
       Project project = Dtos.fromDto(projectFactoryDto);
       projectService.createProject(project);
       URI projectUri = uriInfo.getBaseUriBuilder().path("project").path(project.getName()).build();
-      response = Response.created(projectUri)
-          .entity(Dtos.asDto(project, projectService.getProjectDirectoryPath(project.getName())));
+      Projects.ProjectDto projectDto = Dtos.asDto(project, projectService.getProjectDirectoryPath(project.getName()))
+          .build();
+      response = Response.created(projectUri).entity(projectDto);
 
     } catch(NoSuchDatasourceFactoryException e) {
       response = Response.status(BAD_REQUEST)

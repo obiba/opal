@@ -340,3 +340,7 @@ input.database-url {
   vertical-align: text-top;
   color: #888;
 }
+
+.error-popup {
+  z-index: 1500;
+}

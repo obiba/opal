@@ -30,12 +30,11 @@
               </g:Label>
             </g:customHeader>
             <g:ScrollPanel>
-              <g:Label ui:field="errorMessage" addStyleNames="message detailedErrorMessage"></g:Label>
+              <g:Label ui:field="errorMessage" addStyleNames="message detailedErrorMessage"/>
             </g:ScrollPanel>
           </g:DisclosurePanel>
         </td>
       </tr>
-
       <tr>
         <td/>
         <td>
