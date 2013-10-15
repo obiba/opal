@@ -4,8 +4,10 @@ import javax.annotation.Nonnull;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasourceFactory;
+import org.obiba.opal.core.validator.Unique;
 
 @SuppressWarnings("ParameterHidesMemberVariable")
+@Unique(properties = "url")
 public class MongoDbDatabase extends Database {
 
   /**

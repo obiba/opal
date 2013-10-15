@@ -2213,4 +2213,7 @@ public interface Translations extends Constants {
   @Description("Authentication Failed message")
   @DefaultStringValue("Authentication failed")
   String authFailed();
+  @Description("Default storage label")
+  @DefaultStringValue("Default storage")
+  String defaultStorage();
 }
