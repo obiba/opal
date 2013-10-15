@@ -23,4 +23,5 @@ public interface JdbcDriverRegistry {
 
   void addDriver(String filename, InputStream jarFile) throws IOException;
 
+  String getJdbcUrlExample(Driver driver);
 }

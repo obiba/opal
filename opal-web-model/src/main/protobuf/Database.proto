@@ -10,6 +10,7 @@ message JdbcDriverDto {
   required string driverClass = 2; // e.g., "com.mysql.jdbc.Driver"
   required string jdbcUrlTemplate = 3; // e.g., "jdbc:mysql://{hostname}:{port}/{databaseName}"
   optional string version = 4;
+  required string jdbcUrlExample = 5; // e.g., "jdbc:mysql://localhost:3306/opal"
 }
 
 message DatabaseDto {
