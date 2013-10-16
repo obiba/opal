@@ -17,25 +17,17 @@ import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.PageHeader;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 
 public class DashboardView extends Composite implements DashboardPresenter.Display {
 
-  @UiTemplate("DashboardView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, DashboardView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  private static final Translations translations = GWT.create(Translations.class);
+  interface Binder extends UiBinder<Widget, DashboardView> {}
 
   @UiField
   PageHeader pageTitle;
@@ -64,18 +56,14 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   @UiField
   Panel reports;
 
-  public DashboardView() {
+  @Inject
+  public DashboardView(Binder uiBinder, Translations translations) {
     initWidget(uiBinder.createAndBindUi(this));
     getDatasourcesLink().setHref("#" + Places.PROJECTS);
     getUnitsLink().setHref("#" + Places.UNITS);
     getReportsLink().setHref("#" + Places.REPORT_TEMPLATES);
     getFilesLink().setHref("#" + Places.FILES);
     pageTitle.setText(translations.pageDashboardTitle());
-  }
-
-  @Override
-  public Widget asWidget() {
-    return this;
   }
 
   @Override
@@ -120,7 +108,6 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   public HasAuthorization getFilesAuthorizer() {
     return new WidgetAuthorizer(files);
   }
-
 
   @Override
   public HasAuthorization getReportsAuthorizer() {

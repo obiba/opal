@@ -11,18 +11,16 @@ package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.createview.presenter.CreateViewStepPresenter;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportPresenter;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -32,15 +30,12 @@ import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.opal.AclAction;
 
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
@@ -54,13 +49,9 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   private DatasourceDto datasource;
 
-  private final Provider<AuthorizationPresenter> authorizationPresenter;
-
   @Inject
-  public DatasourcePresenter(Display display, EventBus eventBus,
-      Provider<AuthorizationPresenter> authorizationPresenter) {
+  public DatasourcePresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
-    this.authorizationPresenter = authorizationPresenter;
     getView().setUiHandlers(this);
   }
 
@@ -82,50 +73,6 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     return tableIndex;
   }
 
-  private void authorize() {
-    UriBuilder ub = UriBuilder.create().segment("datasource", datasourceName);
-    // create tables
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/tables").post()
-        .authorize(getView().getAddUpdateTablesAuthorizer()).send();
-    // create views
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/views").post()
-        .authorize(getView().getAddViewAuthorizer()).send();
-    // export variables in excel
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/tables/excel").get()
-        .authorize(getView().getExcelDownloadAuthorizer()).send();
-
-    ub = UriBuilder.create().segment("project", datasourceName);
-    // export data
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/commands/_copy").post()//
-        .authorize(CascadingAuthorizer.newBuilder()//
-            .and("/functional-units", HttpMethod.GET)//
-            .and("/functional-units/entities/table", HttpMethod.GET)//
-            .authorize(getView().getExportDataAuthorizer()).build())//
-        .send();
-    // copy data
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/commands/_copy").post()
-        .authorize(getView().getCopyDataAuthorizer()).send();
-    // import data
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/commands/_import").post()//
-        .authorize(CascadingAuthorizer.newBuilder()//
-            .and("/functional-units", HttpMethod.GET)//
-            .and("/functional-units/entities/table", HttpMethod.GET)//
-            .authorize(getView().getImportDataAuthorizer()).build())//
-        .send();
-  }
-
-  private void displayDatasource(final DatasourceDto datasourceDto, @Nullable String table) {
-    getView().setDatasource(datasourceDto);
-    updateTable(table);
-    authorize();
-
-    if(table != null) {
-      selectTable(table);
-    } else {
-      getView().afterRenderRows();
-    }
-  }
-
   private void selectTable(String tableName) {
     if(tableName != null) {
       int index = getTableIndex(tableName);
@@ -133,55 +80,25 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     }
   }
 
-  private void updateTable(@Nullable String tableName) {
-    UriBuilder ub = UriBuilder.URI_DATASOURCE_TABLES.query("counts", "true");
-    ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(ub.build(datasourceName)).get()
-        .withCallback(new TablesResourceCallback(datasourceName, tableName)).send();
+  private void downloadMetadata() {
+    getEventBus().fireEvent(new FileDownloadRequestEvent("/datasource/" + datasourceName + "/tables/excel"));
   }
 
-  private void downloadMetadata(String datasource) {
-    String downloadUrl = "/datasource/" + datasource + "/tables/excel";
-    getEventBus().fireEvent(new FileDownloadRequestEvent(downloadUrl));
-  }
-
-  private void addView(String datasource) {
-    getEventBus().fireEvent(new WizardRequiredEvent(CreateViewStepPresenter.WizardType, datasource));
-  }
-
-  private String getPreviousTableName(int index) {
-    TableDto previous = null;
-    if(index > 0) {
-      previous = tables.get(index - 1);
-    }
-    return previous == null ? null : previous.getName();
-  }
-
-  private String getNextTableName(int index) {
-    TableDto next = null;
-    if(index < tables.length() - 1) {
-      next = tables.get(index + 1);
-    }
-    return next == null ? null : next.getName();
+  private void addView() {
+    getEventBus().fireEvent(new WizardRequiredEvent(CreateViewStepPresenter.WizardType, datasourceName));
   }
 
   private void initDatasource() {
     if(datasource == null || !datasource.getName().equals(datasourceName)) {
-      ResourceRequestBuilderFactory.<DatasourceDto>newBuilder()
-          .forResource(UriBuilder.URI_DATASOURCE.build(datasourceName)).get()
-          .withCallback(new ResourceCallback<DatasourceDto>() {
-            @Override
-            public void onResource(Response response, DatasourceDto resource) {
-              datasource = resource;
-              displayDatasource(datasource, null);
-            }
-
-          }).send();
+      ResourceRequestBuilderFactory.<DatasourceDto>newBuilder() //
+          .forResource(UriBuilder.URI_DATASOURCE.build(datasourceName)) //
+          .withCallback(new InitResourceCallback()) //
+          .get().send();
     }
   }
 
   @Override
   public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
-    GWT.log("onDatasourceSelectionChanged=" + event.getSelection());
     datasourceName = event.getSelection();
     initDatasource();
   }
@@ -208,41 +125,90 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   @Override
   public void onAddView() {
-    addView(datasourceName);
+    addView();
   }
 
   @Override
   public void onDownloadDictionary() {
-    downloadMetadata(datasourceName);
+    downloadMetadata();
   }
-
 
   //
   // Interfaces and classes
   //
 
-  /**
-   * Update permissions on authorization.
-   */
-  private final class PermissionsUpdate implements HasAuthorization {
+  private class InitResourceCallback implements ResourceCallback<DatasourceDto> {
     @Override
-    public void unauthorized() {
-
+    public void onResource(Response response, DatasourceDto resource) {
+      datasource = resource;
+      displayDatasource(datasource, null);
     }
 
-    @Override
-    public void beforeAuthorization() {
-      clearSlot(null);
+    private void displayDatasource(DatasourceDto datasourceDto, @Nullable String table) {
+      getView().setDatasource(datasourceDto);
+      updateTable(table);
+      authorize();
+
+      if(table == null) {
+        getView().afterRenderRows();
+      } else {
+        selectTable(table);
+      }
     }
 
-    @Override
-    public void authorized() {
-      AuthorizationPresenter authz = authorizationPresenter.get();
-      String node = UriBuilder.create().segment("datasource", datasourceName).build();
-      authz.setAclRequest("datasource", new AclRequest(AclAction.CREATE_TABLE, node), //
-          new AclRequest(AclAction.CREATE_VIEW, node), //
-          new AclRequest(AclAction.DATASOURCE_ALL, node));
-      setInSlot(null, authz);
+    private void updateTable(@Nullable String tableName) {
+      UriBuilder ub = UriBuilder.URI_DATASOURCE_TABLES.query("counts", "true");
+      ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(ub.build(datasourceName)).get()
+          .withCallback(new TablesResourceCallback(datasourceName, tableName)).send();
+    }
+
+    private void authorize() {
+      authorizeDatasource();
+      authorizeProject();
+    }
+
+    private void authorizeDatasource() {
+      String datasourceUri = UriBuilder.create().segment("datasource", datasourceName).build();
+      // create tables
+      ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+          .forResource(datasourceUri + "/tables") //
+          .authorize(getView().getAddUpdateTablesAuthorizer()) //
+          .post().send();
+      // create views
+      ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+          .forResource(datasourceUri + "/views") //
+          .authorize(getView().getAddViewAuthorizer()) //
+          .post().send();
+      // export variables in excel
+      ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+          .forResource(datasourceUri + "/tables/excel") //
+          .authorize(getView().getExcelDownloadAuthorizer()) //
+          .get().send();
+    }
+
+    private void authorizeProject() {
+      String projectUri = UriBuilder.create().segment("project", datasourceName).build();
+      // export data
+      ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+          .forResource(projectUri + "/commands/_copy") //
+          .authorize(CascadingAuthorizer.newBuilder() //
+              .and("/functional-units", HttpMethod.GET) //
+              .and("/functional-units/entities/table", HttpMethod.GET) //
+              .authorize(getView().getExportDataAuthorizer()).build()) //
+          .post().send();
+      // copy data
+      ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+          .forResource(projectUri + "/commands/_copy") //
+          .authorize(getView().getCopyDataAuthorizer()) //
+          .post().send();
+      // import data
+      ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+          .forResource(projectUri + "/commands/_import") //
+          .authorize(CascadingAuthorizer.newBuilder() //
+              .and("/functional-units", HttpMethod.GET) //
+              .and("/functional-units/entities/table", HttpMethod.GET) //
+              .authorize(getView().getImportDataAuthorizer()).build()) //
+          .post().send();
     }
   }
 
@@ -275,6 +241,22 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       getEventBus().fireEvent(
           new TableSelectionChangeEvent(DatasourcePresenter.this, tableDto, getPreviousTableName(index),
               getNextTableName(index)));
+    }
+
+    private String getPreviousTableName(int index) {
+      TableDto previous = null;
+      if(index > 0) {
+        previous = tables.get(index - 1);
+      }
+      return previous == null ? null : previous.getName();
+    }
+
+    private String getNextTableName(int index) {
+      TableDto next = null;
+      if(index < tables.length() - 1) {
+        next = tables.get(index + 1);
+      }
+      return next == null ? null : next.getName();
     }
   }
 

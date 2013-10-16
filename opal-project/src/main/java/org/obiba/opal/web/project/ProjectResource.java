@@ -38,13 +38,13 @@ public class ProjectResource {
 
   @GET
   public Projects.ProjectDto get() {
-    return Dtos.asDto(getProject(), projectService.getProjectDirectoryPath(name)).build();
+    return Dtos.asDto(getProject(), projectService.getProjectDirectoryPath(name));
   }
 
   @GET
   @Path("/summary")
   public Projects.ProjectSummaryDto getSummary() {
-    return Dtos.asSummaryDto(getProject()).build();
+    return Dtos.asSummaryDto(getProject());
   }
 
   @PUT

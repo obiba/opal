@@ -45,7 +45,8 @@ public class ProjectsResource {
   public List<Projects.ProjectDto> getProjects() {
     List<Projects.ProjectDto> projects = Lists.newArrayList();
     for(Project project : projectService.getProjects()) {
-      projects.add(Dtos.asDto(project, projectService.getProjectDirectoryPath(project.getName())).build());
+      String path = projectService.getProjectDirectoryPath(project.getName());
+      projects.add(Dtos.asDto(project, path));
     }
     return projects;
   }
@@ -58,8 +59,7 @@ public class ProjectsResource {
       Project project = Dtos.fromDto(projectFactoryDto);
       projectService.createProject(project);
       URI projectUri = uriInfo.getBaseUriBuilder().path("project").path(project.getName()).build();
-      Projects.ProjectDto projectDto = Dtos.asDto(project, projectService.getProjectDirectoryPath(project.getName()))
-          .build();
+      Projects.ProjectDto projectDto = Dtos.asDto(project, projectService.getProjectDirectoryPath(project.getName()));
       response = Response.created(projectUri).entity(projectDto);
 
     } catch(NoSuchDatasourceFactoryException e) {

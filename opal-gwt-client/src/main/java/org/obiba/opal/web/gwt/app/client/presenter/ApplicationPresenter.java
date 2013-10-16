@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.app.client.presenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
-import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FilesDownloadRequestEvent;
@@ -41,7 +40,6 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.Presenter;
@@ -56,6 +54,7 @@ import com.gwtplatform.mvp.client.proxy.RevealRootContentEvent;
 /**
  *
  */
+@SuppressWarnings("OverlyCoupledClass")
 public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display, ApplicationPresenter.Proxy>
     implements ApplicationUiHandlers {
 
@@ -82,7 +81,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   private final PlaceManager placeManager;
 
   @Inject
-  @SuppressWarnings("PMD.ExcessiveParameterList")
+  @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
   public ApplicationPresenter(Display display, Proxy proxy, EventBus eventBus, RequestCredentials credentials,
       NotificationPresenter messageDialog, ModalProvider<FileSelectorPresenter> fileSelectorProvider,
       ModalProvider<ValueMapPopupPresenter> valueMapPopupProvider, RequestUrlBuilder urlBuilder,
@@ -131,7 +130,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       @Override
       public void onFilesDownloadRequest(FilesDownloadRequestEvent event) {
         UriBuilder uriBuilder = UriBuilder.create().fromPath(event.getParentLink());
-        for (FileDto child : event.getChildren()) {
+        for(FileDto child : event.getChildren()) {
           uriBuilder.query("file", child.getName());
         }
         getView().getDownloader().setUrl(urlBuilder.buildAbsoluteUrl(uriBuilder.build()));

@@ -13,8 +13,8 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourceUiHandlers;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -25,7 +25,6 @@ import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -36,13 +35,12 @@ import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
+import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> implements DatasourcePresenter.Display {
 
-  interface DatasourceViewUiBinder extends UiBinder<Widget, DatasourceView> {}
-
-  private static final DatasourceViewUiBinder uiBinder = GWT.create(DatasourceViewUiBinder.class);
+  interface Binder extends UiBinder<Widget, DatasourceView> {}
 
   @UiField
   Button downloadDictionary;
@@ -78,10 +76,12 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
 
   private ClickableColumn<TableDto> tableNameColumn;
 
-  private final Translations translations = GWT.create(Translations.class);
+  private final Translations translations;
 
-  public DatasourceView() {
+  @Inject
+  public DatasourceView(Binder uiBinder, Translations translations) {
     initWidget(uiBinder.createAndBindUi(this));
+    this.translations = translations;
     addTableColumns();
   }
 

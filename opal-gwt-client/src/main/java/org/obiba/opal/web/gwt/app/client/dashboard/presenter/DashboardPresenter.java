@@ -14,13 +14,8 @@ import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
@@ -32,15 +27,16 @@ import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 public class DashboardPresenter extends Presenter<DashboardPresenter.Display, DashboardPresenter.Proxy>
     implements HasPageTitle {
 
-  private static final Translations translations = GWT.create(Translations.class);
-
   @ProxyStandard
   @NameToken(Places.DASHBOARD)
   public interface Proxy extends ProxyPlace<DashboardPresenter> {}
 
+  private final Translations translations;
+
   @Inject
-  public DashboardPresenter(Display display, EventBus eventBus, Proxy proxy) {
+  public DashboardPresenter(Display display, EventBus eventBus, Proxy proxy, Translations translations) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
+    this.translations = translations;
   }
 
   @Override
@@ -51,12 +47,6 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
   @Override
   protected void onReveal() {
     authorize();
-    ResponseCodeCallback noOp = new ResponseCodeCallback() {
-
-      @Override
-      public void onResponseCode(Request request, Response response) {
-      }
-    };
   }
 
   private void authorize() {

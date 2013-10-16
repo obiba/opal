@@ -15,6 +15,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -83,6 +84,7 @@ import au.com.bytecode.opencsv.CSVReader;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
+@SuppressWarnings("OverlyCoupledClass")
 @Component
 @Path("/functional-units")
 public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
@@ -107,6 +109,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   private final ElasticSearchProvider esProvider;
 
+  @SuppressWarnings("ConstructorWithTooManyParameters")
   @Autowired
   public FunctionalUnitsResource(FunctionalUnitService functionalUnitService, OpalRuntime opalRuntime,
       UnitKeyStoreService unitKeyStoreService, ImportService importService,
@@ -122,10 +125,6 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
     this.statsIndexManager = statsIndexManager;
     this.esProvider = esProvider;
   }
-
-  //
-  // Functional Units
-  //
 
   @GET
   public List<Opal.FunctionalUnitDto> getFunctionalUnits() {
@@ -330,7 +329,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
   @POST
   @Path("/entities/sync")
   public Response importIdentifiers(@QueryParam("datasource") String datasource,
-      @QueryParam("table") List<String> tableList) {
+      @SuppressWarnings("TypeMayBeWeakened") @QueryParam("table") List<String> tableList) {
     try {
       if(datasource != null) {
         Datasource ds = MagmaEngine.get().getDatasource(datasource);
@@ -361,7 +360,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
   @GET
   @Path("/entities/sync")
   public List<TableIdentifiersSync> getIdentifiersToBeImported(@QueryParam("datasource") String datasource,
-      @QueryParam("table") List<String> tableList) {
+      @SuppressWarnings("TypeMayBeWeakened") @QueryParam("table") List<String> tableList) {
     final Datasource ds = MagmaEngine.get().getDatasource(datasource);
 
     ImmutableList.Builder<TableIdentifiersSync> builder = ImmutableList.builder();
@@ -390,7 +389,8 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
     return builder.build();
   }
 
-  private TableIdentifiersSync getTableIdentifiersSync(Set<VariableEntity> entities, Datasource ds, ValueTable vt) {
+  private TableIdentifiersSync getTableIdentifiersSync(Collection<VariableEntity> entities, Datasource ds,
+      ValueTable vt) {
     int count = 0;
     Set<VariableEntity> tableEntities = vt.getVariableEntities();
     TableIdentifiersSync.Builder builder = TableIdentifiersSync.newBuilder()//

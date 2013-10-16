@@ -23,7 +23,6 @@ import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.base.UnorderedList;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Timer;
@@ -40,9 +39,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
  */
 public class NotificationView extends ViewImpl implements NotificationPresenter.Display {
 
-  interface ViewUiBinder extends UiBinder<Widget, NotificationView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  interface Binder extends UiBinder<Widget, NotificationView> {}
 
   @UiField
   Panel alertPanel;
@@ -50,7 +47,7 @@ public class NotificationView extends ViewImpl implements NotificationPresenter.
   private final Translations translations;
 
   @Inject
-  public NotificationView(Translations translations) {
+  public NotificationView(Binder uiBinder, Translations translations) {
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
   }
@@ -63,11 +60,19 @@ public class NotificationView extends ViewImpl implements NotificationPresenter.
 
   @Override
   public void setNotification(NotificationType type, List<String> messages, @Nullable List<String> messageArgs,
-      @Nullable String title, boolean isSticky, ClosedHandler handler) {
+      @Nullable String title, boolean isSticky, @Nullable ClosedHandler handler) {
+    Alert alert = createAlert(type, title, handler);
+    addMessages(alert, messages, messageArgs == null ? new ArrayList<String>() : messageArgs);
+    alertPanel.add(alert);
+    if(!isSticky) runSticky(alert);
+  }
+
+  private Alert createAlert(NotificationType type, @Nullable String title, @Nullable ClosedHandler handler) {
     Alert alert = new Alert();
     alert.setAnimation(true);
     alert.setClose(true);
     if(handler != null) alert.addClosedHandler(handler);
+    if(title != null) alert.setHeading(title);
 
     switch(type) {
       case ERROR:
@@ -80,14 +85,7 @@ public class NotificationView extends ViewImpl implements NotificationPresenter.
         alert.setType(AlertType.INFO);
         break;
     }
-    if(title != null) {
-      alert.setHeading(title);
-    }
-
-    addMessages(alert, messages, messageArgs == null ? new ArrayList<String>() : messageArgs);
-    alertPanel.add(alert);
-    if(!isSticky) runSticky(alert);
-
+    return alert;
   }
 
   @Override

@@ -50,12 +50,13 @@ import com.gwtplatform.mvp.client.gin.DefaultModule;
 /**
  *
  */
+@SuppressWarnings("OverlyCoupledClass")
 public class OpalGinModule extends AbstractPresenterModule {
 
   @Override
   protected void configure() {
     bind(BreadcrumbsBuilder.class).to(DefaultBreadcrumbsBuilder.class).in(Singleton.class);
-    ;
+
     bind(RequestUrlBuilder.class).to(DefaultRequestUrlBuilder.class).in(Singleton.class);
     bind(UnhandledResponseNotificationPresenter.Display.class).to(UnhandledResponseNotificationView.class)
         .in(Singleton.class);

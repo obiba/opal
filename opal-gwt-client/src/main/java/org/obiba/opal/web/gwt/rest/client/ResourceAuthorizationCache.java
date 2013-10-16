@@ -41,11 +41,7 @@ public class ResourceAuthorizationCache {
   }
 
   private String normalize(String resource) {
-    String str = resource;
-    if(resource.startsWith("/ws")) {
-      str = resource.substring(3);
-    }
-    return str;
+    return resource.startsWith("/ws") ? resource.substring(3) : resource;
   }
 
   @Override

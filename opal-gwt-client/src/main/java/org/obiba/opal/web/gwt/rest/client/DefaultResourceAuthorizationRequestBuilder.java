@@ -33,6 +33,7 @@ public class DefaultResourceAuthorizationRequestBuilder implements ResourceAutho
   @Nonnull
   private HasAuthorization toAuthorize;
 
+  @SuppressWarnings("StaticNonFinalField")
   private static ResourceAuthorizationCache authorizationCache;
 
   public static void setup(ResourceAuthorizationCache authorizationCache) {
@@ -41,6 +42,7 @@ public class DefaultResourceAuthorizationRequestBuilder implements ResourceAutho
 
   @Override
   public DefaultResourceAuthorizationRequestBuilder authorize(@Nonnull HasAuthorization toAuthorize) {
+    //noinspection ConstantConditions
     if(toAuthorize == null) throw new IllegalArgumentException("UI object to authorize cannot be null");
     this.toAuthorize = toAuthorize;
     return this;
@@ -54,6 +56,7 @@ public class DefaultResourceAuthorizationRequestBuilder implements ResourceAutho
 
   @Override
   public ResourceAuthorizationRequestBuilder forResource(@Nonnull String resource) {
+    //noinspection ConstantConditions
     if(resource == null) throw new IllegalArgumentException("path cannot be null");
     this.resource = resource;
     return this;

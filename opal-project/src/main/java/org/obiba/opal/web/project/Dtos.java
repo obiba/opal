@@ -35,7 +35,7 @@ public class Dtos {
 
   private Dtos() {}
 
-  public static ProjectDto.Builder asDto(Project project, @Nonnull String directory) {
+  public static ProjectDto asDto(Project project, @Nonnull String directory) {
     ProjectDto.Builder builder = ProjectDto.newBuilder() //
         .setName(project.getName()) //
         .setTitle(project.getTitle()) //
@@ -57,7 +57,7 @@ public class Dtos {
 
     addTimestamps(builder, datasource);
 
-    return builder;
+    return builder.build();
   }
 
   public static Project fromDto(ProjectDto projectDto, @Nullable Project project) {
@@ -81,7 +81,7 @@ public class Dtos {
         .build();
   }
 
-  public static Projects.ProjectSummaryDto.Builder asSummaryDto(Project project) {
+  public static Projects.ProjectSummaryDto asSummaryDto(Project project) {
     Projects.ProjectSummaryDto.Builder builder = Projects.ProjectSummaryDto.newBuilder();
     builder.setName(project.getName());
 
@@ -100,7 +100,7 @@ public class Dtos {
     builder.setVariableCount(variablesCount);
     builder.setEntityCount(ids.size());
 
-    return builder;
+    return builder.build();
   }
 
   private static void addTimestamps(ProjectDto.Builder builder, Datasource datasource) {
