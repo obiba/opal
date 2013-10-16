@@ -1563,6 +1563,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("SQL Schema")
   String sqlSchemaLabel();
 
+  @Description("SQL label")
+  @DefaultStringValue("SQL")
+  String sqlLabel();
+
+  @Description("MongoDB label")
+  @DefaultStringValue("MongoDB")
+  String mongoDbLabel();
+
   @Description("Default Entity Type label")
   @DefaultStringValue("Default Entity Type")
   String defaultEntityTypeLabel();
@@ -1830,6 +1838,10 @@ public interface Translations extends Constants {
   @Description("Page Datasources title")
   @DefaultStringValue("Datasources")
   String pageDatasourcesTitle();
+
+  @Description("Page Identifiers Database title")
+  @DefaultStringValue("Identifiers Database")
+  String pageIdentifiersDatabaseTitle();
 
   @Description("Page Data Databases title")
   @DefaultStringValue("Data Databases")
@@ -2213,6 +2225,7 @@ public interface Translations extends Constants {
   @Description("Authentication Failed message")
   @DefaultStringValue("Authentication failed")
   String authFailed();
+
   @Description("Default storage label")
   @DefaultStringValue("Default storage")
   String defaultStorage();

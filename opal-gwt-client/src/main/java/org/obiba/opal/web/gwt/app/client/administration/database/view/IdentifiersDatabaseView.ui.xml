@@ -1,0 +1,36 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+
+  <g:FlowPanel>
+
+    <g:FlowPanel addStyleNames="page-header">
+      <b:Breadcrumbs ui:field="breadcrumbs"/>
+    </g:FlowPanel>
+
+    <g:FlowPanel>
+      <g:HorizontalPanel>
+        <b:Button ui:field="createSql" type="INFO" icon="PLUS" size="SMALL">
+          <ui:msg description="Create SQL database label">Create SQL database</ui:msg>
+        </b:Button>
+        <b:Button ui:field="createMongo" type="INFO" icon="PLUS" size="SMALL">
+          <ui:msg description="Create MongoDB database label">Create MongoDB database</ui:msg>
+        </b:Button>
+      </g:HorizontalPanel>
+    </g:FlowPanel>
+
+    <g:FlowPanel ui:field="propertiesWrapper">
+      <b:Heading size="4" addStyleNames="inline">
+        <ui:msg description="Identifiers Database label">Identifiers Database</ui:msg>
+      </b:Heading>
+      <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="edit"/>
+      <o:PropertiesTable ui:field="properties"/>
+    </g:FlowPanel>
+
+  </g:FlowPanel>
+
+</ui:UiBinder>

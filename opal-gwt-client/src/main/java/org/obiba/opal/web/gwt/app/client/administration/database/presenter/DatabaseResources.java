@@ -32,6 +32,10 @@ public final class DatabaseResources {
     return databases() + "/storage";
   }
 
+  public static String identifiersDatabase() {
+    return databases() + "/identifiers";
+  }
+
   public static String database(String name) {
     return UriBuilder.create().segment("system", "database", name).build();
   }

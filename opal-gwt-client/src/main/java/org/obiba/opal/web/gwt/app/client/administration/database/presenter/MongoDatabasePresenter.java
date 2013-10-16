@@ -23,6 +23,7 @@ import org.obiba.opal.web.model.client.database.MongoDbDatabaseDto;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.user.client.ui.HasVisibility;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
@@ -62,10 +63,18 @@ public class MongoDatabasePresenter extends AbstractDatabasePresenter<MongoDatab
   }
 
   @Override
+  protected void hideNonEditableIdentifiersDatabaseFields() {
+    getView().getNameGroupVisibility().setVisible(false);
+    getView().getUsageGroupVisibility().setVisible(false);
+    getView().getDefaultStorageGroupVisibility().setVisible(false);
+  }
+
+  @Override
   protected DatabaseDto getDto() {
     DatabaseDto dto = DatabaseDto.create();
     MongoDbDatabaseDto mongoDto = MongoDbDatabaseDto.create();
 
+    dto.setUsedForIdentifiers(usedForIdentifiers);
     dto.setName(getView().getName().getText());
     dto.setUsage(parseUsage(getView().getUsage().getValue()));
     dto.setDefaultStorage(getView().getDefaultStorage().getValue());
@@ -115,6 +124,12 @@ public class MongoDatabasePresenter extends AbstractDatabasePresenter<MongoDatab
     }
 
     void showError(@Nullable FormField formField, String message);
+
+    HasVisibility getNameGroupVisibility();
+
+    HasVisibility getDefaultStorageGroupVisibility();
+
+    HasVisibility getUsageGroupVisibility();
 
   }
 

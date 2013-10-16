@@ -12,6 +12,7 @@ import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbDatabase;
 import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
+import org.obiba.opal.core.runtime.database.IdentifiersDatabaseNotFoundException;
 import org.obiba.opal.core.runtime.database.MultipleIdentifiersDatabaseException;
 import org.obiba.opal.web.database.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,11 @@ public class DatabasesResource {
   @GET
   @Path("/identifiers")
   public DatabaseDto getIdentifiersDatabase() {
-    return Dtos.asDto(databaseRegistry.getIdentifiersDatabase());
+    try {
+      return Dtos.asDto(databaseRegistry.getIdentifiersDatabase());
+    } catch(IdentifiersDatabaseNotFoundException e) {
+      return null;
+    }
   }
 
   private List<DatabaseDto> asDto(Iterable<? extends Database> databases) {

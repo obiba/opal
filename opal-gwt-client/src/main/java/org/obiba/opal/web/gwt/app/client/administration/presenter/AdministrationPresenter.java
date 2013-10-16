@@ -5,7 +5,6 @@ import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
 import org.obiba.opal.web.gwt.app.client.presenter.PageContainerPresenter;
 
-import com.google.gwt.core.client.GWT;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
@@ -30,7 +29,9 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
 
     void setUnitsHistoryToken(String historyToken);
 
-    void setDatabasesHistoryToken(String historyToken);
+    void setIdentifiersDatabasePlaceHistoryToken(String historyToken);
+
+    void setDataDatabasesHistoryToken(String historyToken);
 
     void setEsHistoryToken(String historyToken);
 
@@ -51,21 +52,24 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
     void setJavaHistoryToken(String historyToken);
 
     void setServerHistoryToken(String historyToken);
+
   }
 
   //
   // Data members
   //
-  private static final Translations translations = GWT.create(Translations.class);
 
   private final PlaceManager placeManager;
 
+  private final Translations translations;
+
   @Inject
-  public AdministrationPresenter(Display display, EventBus eventBus, Proxy proxy, PlaceManager placeManager) {
+  public AdministrationPresenter(Display display, EventBus eventBus, Proxy proxy, PlaceManager placeManager,
+      Translations translations) {
     super(eventBus, display, proxy);
     this.placeManager = placeManager;
+    this.translations = translations;
     setHistoryTokens();
-
   }
 
   @Override
@@ -84,18 +88,22 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
   //
 
   private void setHistoryTokens() {
+    getView().setUsersGroupsHistoryToken(getHistoryToken(Places.USERS_GROUPS));
+    getView().setIdentifiersDatabasePlaceHistoryToken(getHistoryToken(Places.IDENTIFIERS_DATABASES));
+    getView().setDataDatabasesHistoryToken(getHistoryToken(Places.DATA_DATABASES));
+    getView().setIndexHistoryToken(getHistoryToken(Places.INDEX));
+    getView().setRHistoryToken(getHistoryToken(Places.R));
+    getView().setUnitsHistoryToken(getHistoryToken(Places.UNITS));
+    getView().setFilesHistoryToken(getHistoryToken(Places.FILES));
+    getView().setTasksHistoryToken(getHistoryToken(Places.JOBS));
+    getView().setDataShieldHistoryToken(getHistoryToken(Places.DATASHIELD));
+    getView().setReportsHistoryToken(getHistoryToken(Places.REPORT_TEMPLATES));
+    getView().setJavaHistoryToken(getHistoryToken(Places.JVM));
+    getView().setServerHistoryToken(getHistoryToken(Places.SERVER));
+  }
 
-    getView().setUsersGroupsHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.USERS_GROUPS), 1));
-    getView().setDatabasesHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.DATA_DATABASES), 1));
-    getView().setIndexHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.INDEX), 1));
-    getView().setRHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.R), 1));
-    getView().setUnitsHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.UNITS), 1));
-    getView().setFilesHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.FILES), 1));
-    getView().setTasksHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.JOBS), 1));
-    getView().setDataShieldHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.DATASHIELD), 1));
-    getView().setReportsHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.REPORT_TEMPLATES), 1));
-    getView().setJavaHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.JVM), 1));
-    getView().setServerHistoryToken(placeManager.buildRelativeHistoryToken(createRequest(Places.SERVER), 1));
+  private String getHistoryToken(String place) {
+    return placeManager.buildRelativeHistoryToken(createRequest(place), 1);
   }
 
   private PlaceRequest createRequest(String nameToken) {

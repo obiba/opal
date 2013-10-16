@@ -36,6 +36,7 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.HasVisibility;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
@@ -112,10 +113,19 @@ public class SqlDatabasePresenter extends AbstractDatabasePresenter<SqlDatabaseP
   }
 
   @Override
+  protected void hideNonEditableIdentifiersDatabaseFields() {
+    getView().getNameGroupVisibility().setVisible(false);
+    getView().getUsageGroupVisibility().setVisible(false);
+    getView().getDefaultStorageGroupVisibility().setVisible(false);
+    getView().getSqlSchemaGroupVisibility().setVisible(false);
+  }
+
+  @Override
   protected DatabaseDto getDto() {
     DatabaseDto dto = DatabaseDto.create();
     SqlDatabaseDto sqlDto = SqlDatabaseDto.create();
 
+    dto.setUsedForIdentifiers(usedForIdentifiers);
     dto.setName(getView().getName().getText());
     dto.setUsage(parseUsage(getView().getUsage().getValue()));
     dto.setDefaultStorage(getView().getDefaultStorage().getValue());
@@ -253,6 +263,14 @@ public class SqlDatabasePresenter extends AbstractDatabasePresenter<SqlDatabaseP
     void toggleLimesurveyOptions(boolean show);
 
     void toggleJdbcOptions(boolean show);
+
+    HasVisibility getNameGroupVisibility();
+
+    HasVisibility getUsageGroupVisibility();
+
+    HasVisibility getDefaultStorageGroupVisibility();
+
+    HasVisibility getSqlSchemaGroupVisibility();
 
   }
 

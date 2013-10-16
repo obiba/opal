@@ -15,97 +15,53 @@ import java.util.Set;
 
 public final class Places {
 
-  private Places() {}
-
   public static final String LOGIN = "!login";
-
-  public static final Place LOGIN_PLACE = new Place(LOGIN);
 
   public static final String DASHBOARD = "!dashboard";
 
-  public static final Place DASHBOARD_PLACE = new Place(DASHBOARD);
-
   public static final String PROJECTS = "!projects";
-
-  public static final Place PROJECTS_PLACE = new Place(PROJECTS);
 
   public static final String PROJECT = "!project";
 
   public static final String NAVIGATOR = "!navigator";
 
-  public static final Place NAVIGATOR_PLACE = new Place(NAVIGATOR);
-
   public static final String UNITS = "!units";
-
-  public static final Place unitsPlace = new Place(UNITS);
 
   public static final String UNIT = "!unit";
 
-  public static final Place UNIT_PLACE = new Place(UNIT);
-
   public static final String FILES = "!files";
-
-  public static final Place FILES_PLACE = new Place(FILES);
 
   public static final String REPORT_TEMPLATES = "!reports";
 
-  public static final Place REPORT_TEMPLATES_PLACE = new Place(REPORT_TEMPLATES);
-
   public static final String JOBS = "!jobs";
-
-  public static final Place JOBS_PLACE = new Place(JOBS);
-
-  public static final String ADMINISTRATION = "!admin";
-
-  public static final Place ADMINISTRATION_PLACE = new Place(ADMINISTRATION);
 
   public static final String ADMIN = "!adminpage";
 
-  public static final Place ADMIN_PLACE = new Place(ADMIN);
+  public static final String ADMINISTRATION = "!admin";
 
   public static final String USERS_GROUPS = ADMINISTRATION + ".users";
 
-  public static final Place USERS_GROUPS_PLACE = new Place(USERS_GROUPS);
+  public static final String IDENTIFIERS_DATABASES = "!databases.identifiers";
 
-  public static final String DATABASES = "!admin.databases";
-
-  public static final Place DATABASES_PLACE = new Place(DATABASES);
-
-  public static final String DATA_DATABASES = "!admin.databases.data";
-
-  public static final Place DATA_DATABASES_PLACE = new Place(DATA_DATABASES);
+  public static final String DATA_DATABASES = "!databases.data";
 
   public static final String INDEX = ADMINISTRATION + ".index";
 
-  public static final Place INDEX_PLACE = new Place(INDEX);
-
   public static final String DATASHIELD = ADMINISTRATION + ".datashield";
-
-  public static final Place DATASHIELD_PLACE = new Place(DATASHIELD);
 
   public static final String R = ADMINISTRATION + ".r";
 
-  public static final Place R_PLACE = new Place(R);
-
   public static final String JVM = ADMINISTRATION + ".jvm";
-
-  public static final Place JVM_PLACE = new Place(JVM);
 
   public static final String SERVER = ADMINISTRATION + ".server";
 
-  public static final Place SERVER_PLACE = new Place(SERVER);
-
   public static final String VOCABULARY = ADMINISTRATION + ".vocabulary";
-
-  public static final Place VOCABULARY_PLACE = new Place(VOCABULARY);
 
   public static final String TAXONOMIES = ADMINISTRATION + ".taxonomies";
 
-  public static final Place TAXONOMIES_PLACE = new Place(TAXONOMIES);
-
   public static final String TAXONOMY = ADMINISTRATION + ".taxonomy";
 
-  public static final Place TAXONOMY_PLACE = new Place(TAXONOMY);
+  private Places() {}
 
   public static final class Place extends com.google.gwt.place.shared.Place {
 

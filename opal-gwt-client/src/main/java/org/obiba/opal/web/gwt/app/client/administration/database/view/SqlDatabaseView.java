@@ -40,6 +40,7 @@ import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.HasVisibility;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -80,6 +81,9 @@ public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHand
 
   @UiField
   ControlGroup driverGroup;
+
+  @UiField
+  ControlGroup defaultStorageGroup;
 
   @UiField
   TextBox name;
@@ -264,6 +268,11 @@ public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHand
   }
 
   @Override
+  public HasVisibility getNameGroupVisibility() {
+    return nameGroup;
+  }
+
+  @Override
   public TakesValue<SqlSchema> getSqlSchema() {
     return new TakesValue<SqlSchema>() {
 
@@ -289,6 +298,11 @@ public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHand
     };
   }
 
+  @Override
+  public HasVisibility getSqlSchemaGroupVisibility() {
+    return sqlSchemaGroup;
+  }
+
   private void setAvailableUsages() {
     for(Usage usageType : Usage.values()) {
       usage.addItem(usageType.getLabel(), usageType.name());
@@ -300,8 +314,8 @@ public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHand
   public void setAvailableSqlSchemas(SqlSchema... sqlSchemas) {
     sqlSchema.clear();
     if(sqlSchemas != null) {
-      for(SqlSchema datasourceType : sqlSchemas) {
-        sqlSchema.addItem(datasourceType.getLabel(), datasourceType.name());
+      for(SqlSchema schema : sqlSchemas) {
+        sqlSchema.addItem(schema.getLabel(), schema.name());
       }
       getSqlSchema().setValue(sqlSchemas[0]);
     }
@@ -335,6 +349,11 @@ public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHand
   @Override
   public HasChangeHandlers getUsageChangeHandlers() {
     return usage;
+  }
+
+  @Override
+  public HasVisibility getUsageGroupVisibility() {
+    return usageGroup;
   }
 
   @Override
@@ -422,6 +441,11 @@ public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHand
   @Override
   public HasValue<Boolean> getDefaultStorage() {
     return defaultStorage;
+  }
+
+  @Override
+  public HasVisibility getDefaultStorageGroupVisibility() {
+    return defaultStorageGroup;
   }
 
   @Override

@@ -81,6 +81,8 @@ public abstract class AbstractDatabasePresenter<TView extends AbstractDatabasePr
 
   protected ValidationHandler validationHandler;
 
+  protected boolean usedForIdentifiers;
+
   @Inject
   public AbstractDatabasePresenter(EventBus eventBus, TView view) {
     super(eventBus, view);
@@ -90,6 +92,8 @@ public abstract class AbstractDatabasePresenter<TView extends AbstractDatabasePr
   protected abstract DatabaseDto getDto();
 
   protected abstract void displayDatabase(DatabaseDto dto);
+
+  protected abstract void hideNonEditableIdentifiersDatabaseFields();
 
   protected abstract ViewValidationHandler createValidationHandler();
 
@@ -124,6 +128,13 @@ public abstract class AbstractDatabasePresenter<TView extends AbstractDatabasePr
     setDialogMode(Mode.CREATE);
   }
 
+  void createNewIdentifierDatabase(DatabaseDto dto) {
+    setDialogMode(Mode.CREATE);
+    displayDatabase(dto);
+    hideNonEditableIdentifiersDatabaseFields();
+    usedForIdentifiers = true;
+  }
+
   /**
    * Setup the dialog for updating an existing method
    *
@@ -131,7 +142,10 @@ public abstract class AbstractDatabasePresenter<TView extends AbstractDatabasePr
    */
   void editDatabase(DatabaseDto dto) {
     setDialogMode(Mode.UPDATE);
+    usedForIdentifiers = dto.getUsedForIdentifiers();
     displayDatabase(dto);
+    if(usedForIdentifiers) hideNonEditableIdentifiersDatabaseFields();
+
   }
 
   void setDialogMode(Mode dialogMode) {

@@ -28,7 +28,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.HasWidgets;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.HasData;
 import com.google.inject.Inject;
@@ -60,7 +59,7 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
   Table<DatabaseDto> mongoTable;
 
   @UiField
-  Panel breadcrumbs;
+  HasWidgets breadcrumbs;
 
   private final Translations translations;
 

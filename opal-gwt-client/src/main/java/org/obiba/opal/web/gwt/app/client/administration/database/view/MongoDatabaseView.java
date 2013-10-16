@@ -35,6 +35,7 @@ import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.HasVisibility;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -86,6 +87,9 @@ public class MongoDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHa
 
   @UiField
   CheckBox defaultStorage;
+
+  @UiField
+  ControlGroup defaultStorageGroup;
 
   private final Translations translations;
 
@@ -177,6 +181,11 @@ public class MongoDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHa
     return name;
   }
 
+  @Override
+  public HasVisibility getNameGroupVisibility() {
+    return nameGroup;
+  }
+
   private void setAvailableUsages() {
     for(Usage usageType : Usage.values()) {
       usage.addItem(usageType.getLabel(), usageType.name());
@@ -211,6 +220,11 @@ public class MongoDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHa
   @Override
   public HasChangeHandlers getUsageChangeHandlers() {
     return usage;
+  }
+
+  @Override
+  public HasVisibility getUsageGroupVisibility() {
+    return usageGroup;
   }
 
   @Override
@@ -252,9 +266,14 @@ public class MongoDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHa
   }
 
   @Override
-  public void toggleDefaultStorage(boolean show) {
-    if(!show) defaultStorage.setValue(false);
-    defaultStorage.setEnabled(show);
+  public HasVisibility getDefaultStorageGroupVisibility() {
+    return defaultStorageGroup;
+  }
+
+  @Override
+  public void toggleDefaultStorage(boolean enabled) {
+    if(!enabled) defaultStorage.setValue(false);
+    defaultStorage.setEnabled(enabled);
   }
 
 }

@@ -10,7 +10,7 @@
     <g:FlowPanel addStyleNames="main">
       <b:FluidRow>
         <b:Column size="6">
-          <g:FlowPanel addStyleNames="extra-large-bottom-margin panel">
+          <g:FlowPanel addStyleNames="extra-large-bottom-margin">
             <b:WellNavList>
               <b:NavHeader>
                 <ui:msg description="Main Administration Data Access">Data Access</ui:msg>
@@ -42,23 +42,25 @@
                 <ui:msg description="Main Administration Databases">Databases</ui:msg>
               </b:NavHeader>
               <b:Divider/>
-              <o:OpalNavLink ui:field="identifiersPlace" icon="COG">
+              <o:OpalNavLink ui:field="identifiersDatabasePlace" icon="COG">
                 <ui:msg description="Main Administration Identifiers Database title">Identifiers Database</ui:msg>
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Identifiers Databases help">Configure the identifiers
-                    database
+                  <ui:msg description="Main Administration Identifiers Databases help">
+                    Configure the identifiers database
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>
               <b:Divider/>
-              <o:OpalNavLink ui:field="databasesPlace" icon="COG">
+              <o:OpalNavLink ui:field="dataDatabasesPlace" icon="COG">
                 <ui:msg description="Main Administration Data Databases title">Data Databases</ui:msg>
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Data Databases help">Manage data databases for storage, import and export</ui:msg>
+                  <ui:msg description="Main Administration Data Databases help">
+                    Manage data databases for storage, import and export
+                  </ui:msg>
                 </g:Label>
               </g:FlowPanel>
             </b:WellNavList>
@@ -90,7 +92,7 @@
         </b:Column>
 
         <b:Column size="6">
-          <g:FlowPanel addStyleNames="extra-large-bottom-margin panel">
+          <g:FlowPanel addStyleNames="extra-large-bottom-margin">
 
             <b:WellNavList>
               <b:NavHeader>

@@ -3,22 +3,16 @@ package org.obiba.opal.web.gwt.app.client.administration.view;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.OpalNavLink;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public class AdministrationView extends ViewImpl implements AdministrationPresenter.Display {
 
-  @UiTemplate("AdministrationView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, AdministrationView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  private final Widget widget;
+  interface Binder extends UiBinder<Widget, AdministrationView> {}
 
   @UiField
   OpalNavLink usersGroupsPlace;
@@ -27,7 +21,10 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   OpalNavLink unitsPlace;
 
   @UiField
-  OpalNavLink databasesPlace;
+  OpalNavLink identifiersDatabasePlace;
+
+  @UiField
+  OpalNavLink dataDatabasesPlace;
 
   @UiField
   OpalNavLink esPlace;
@@ -59,17 +56,13 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   @UiField
   OpalNavLink serverPlace;
 
-  public AdministrationView() {
-    widget = uiBinder.createAndBindUi(this);
+  @Inject
+  public AdministrationView(Binder uiBinder) {
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
   }
 
   @Override
@@ -83,8 +76,13 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   }
 
   @Override
-  public void setDatabasesHistoryToken(String historyToken) {
-    databasesPlace.setHistoryToken(historyToken);
+  public void setIdentifiersDatabasePlaceHistoryToken(String historyToken) {
+    identifiersDatabasePlace.setHistoryToken(historyToken);
+  }
+
+  @Override
+  public void setDataDatabasesHistoryToken(String historyToken) {
+    dataDatabasesPlace.setHistoryToken(historyToken);
   }
 
   @Override
