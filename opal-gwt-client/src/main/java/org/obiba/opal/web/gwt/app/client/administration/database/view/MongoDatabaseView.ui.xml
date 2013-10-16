@@ -29,7 +29,7 @@
       </b:HelpBlock>
     </b:ControlGroup>
 
-    <b:ControlGroup ui:field="defaultStorageGroup">>
+    <b:ControlGroup ui:field="defaultStorageGroup">
       <b:CheckBox ui:field="defaultStorage" b:id="defaultStorage" inline="true">
         <ui:msg description="Default storage label">Default storage</ui:msg>
       </b:CheckBox>

@@ -225,7 +225,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     Database database = getDatabase(databaseName);
     if(database.isEditable()) {
       database.setEditable(false);
-      addOrReplaceDatabase(database);
+      orientDbService.save(database);
     }
     registrations.put(databaseName, usedByDatasource);
   }
@@ -234,7 +234,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   public void unregister(@Nonnull String databaseName, String usedByDatasource) {
     Database database = getDatabase(databaseName);
     database.setEditable(true);
-    addOrReplaceDatabase(database);
+    orientDbService.save(database);
     registrations.remove(databaseName, usedByDatasource);
   }
 

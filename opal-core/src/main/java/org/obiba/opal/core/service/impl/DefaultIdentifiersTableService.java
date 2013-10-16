@@ -31,11 +31,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.util.Assert;
 
 /**
  *
@@ -45,57 +40,34 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultIdentifiersTableService.class);
 
-  @Nonnull
-  private final PlatformTransactionManager txManager;
+  @Autowired
+  private DatabaseRegistry databaseRegistry;
 
   @Nonnull
-  private final String tableReference;
+  @Value("${org.obiba.opal.keys.tableReference}")
+  private String tableReference;
 
   @Nonnull
-  private final String entityType;
+  @Value("${org.obiba.opal.keys.entityType}")
+  private String entityType;
 
   private MagmaEngineReferenceResolver tableResolver;
 
   @Nullable
   private Datasource datasource;
 
-  private final DatabaseRegistry databaseRegistry;
-
-  @Autowired
-  public DefaultIdentifiersTableService(@Nonnull PlatformTransactionManager txManager,
-      @Nonnull @Value("${org.obiba.opal.keys.tableReference}") String tableReference,
-      @Nonnull @Value("${org.obiba.opal.keys.entityType}") String entityType, DatabaseRegistry databaseRegistry) {
-    Assert.notNull(txManager, "txManager cannot be null");
-    Assert.notNull(tableReference, "tableReference cannot be null");
-    Assert.notNull(entityType, "entityType cannot be null");
-    Assert.notNull(databaseRegistry, "databaseRegistry cannot be null");
-    this.txManager = txManager;
-    this.tableReference = tableReference;
-    this.entityType = entityType;
-    this.databaseRegistry = databaseRegistry;
-  }
-
   @Override
-  public ValueTable getValueTable() {
-    if(getDatasource() == null) {
-      throw new RuntimeException("IdentifiersTableService has no datasource configured");
-    }
+  public ValueTable getValueTable() throws IdentifiersDatabaseNotFoundException {
     return getDatasource().getValueTable(getTableName());
   }
 
   @Override
-  public ValueTableWriter createValueTableWriter() {
-    if(getDatasource() == null) {
-      throw new RuntimeException("IdentifiersTableService has no datasource configured");
-    }
+  public ValueTableWriter createValueTableWriter() throws IdentifiersDatabaseNotFoundException {
     return getDatasource().createWriter(getTableName(), entityType);
   }
 
   @Override
-  public boolean hasValueTable() {
-    if(getDatasource() == null) {
-      throw new RuntimeException("IdentifiersTableService has no datasource configured");
-    }
+  public boolean hasValueTable() throws IdentifiersDatabaseNotFoundException {
     return getDatasource().hasValueTable(getTableName());
   }
 
@@ -131,41 +103,27 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   @PreDestroy
   public void destroy() {
     if(datasource == null) return;
-    new TransactionTemplate(txManager).execute(new TransactionCallbackWithoutResult() {
-      @Override
-      protected void doInTransactionWithoutResult(TransactionStatus status) {
-        try {
-          Disposables.dispose(getDatasource());
-        } catch(RuntimeException e) {
-          log.warn("Ignoring exception during shutdown sequence.", e);
-        }
-      }
-    });
+    try {
+      Disposables.dispose(datasource);
+    } catch(RuntimeException e) {
+      log.warn("Ignoring exception during shutdown sequence.", e);
+    }
   }
 
-  private Datasource getDatasource() {
+  @Nonnull
+  private Datasource getDatasource() throws IdentifiersDatabaseNotFoundException {
     if(datasource == null) {
-      try {
-
-        final DatasourceFactory dataSourceFactory = databaseRegistry
-            .createDataSourceFactory(getDatasourceName(), databaseRegistry.getIdentifiersDatabase());
-
-        new TransactionTemplate(txManager).execute(new TransactionCallbackWithoutResult() {
-
-          @Override
-          protected void doInTransactionWithoutResult(TransactionStatus status) {
-            try {
-              Initialisables.initialise(dataSourceFactory);
-              datasource = dataSourceFactory.create();
-              if(!datasource.hasValueTable(getTableName())) {
-                datasource.createWriter(getTableName(), getEntityType()).close();
-              }
-            } catch(IOException e) {
-              throw new RuntimeException(e);
-            }
-          }
-        });
-      } catch(IdentifiersDatabaseNotFoundException ignored) {
+      DatasourceFactory datasourceFactory = databaseRegistry
+          .createDataSourceFactory(getDatasourceName(), databaseRegistry.getIdentifiersDatabase());
+      Initialisables.initialise(datasourceFactory);
+      datasource = datasourceFactory.create();
+      Initialisables.initialise(datasource);
+      if(!datasource.hasValueTable(getTableName())) {
+        try {
+          datasource.createWriter(getTableName(), getEntityType()).close();
+        } catch(IOException e) {
+          throw new RuntimeException(e);
+        }
       }
     }
     return datasource;

@@ -13,6 +13,7 @@ import javax.annotation.Nonnull;
 
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
+import org.obiba.opal.core.runtime.database.IdentifiersDatabaseNotFoundException;
 
 /**
  *
@@ -24,21 +25,21 @@ public interface IdentifiersTableService {
    *
    * @return
    */
-  ValueTable getValueTable();
+  ValueTable getValueTable() throws IdentifiersDatabaseNotFoundException;
 
   /**
    * Create a writer on the identifiers value table.
    *
    * @return
    */
-  ValueTableWriter createValueTableWriter();
+  ValueTableWriter createValueTableWriter() throws IdentifiersDatabaseNotFoundException;
 
   /**
    * Check if identifiers value table exists.
    *
    * @return
    */
-  boolean hasValueTable();
+  boolean hasValueTable() throws IdentifiersDatabaseNotFoundException;
 
   /**
    * Get the table reference as specified by property <code>org.obiba.opal.keys.tableReference</code>.
