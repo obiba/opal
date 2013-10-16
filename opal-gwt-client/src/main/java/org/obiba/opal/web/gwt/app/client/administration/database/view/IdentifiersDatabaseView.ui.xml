@@ -13,14 +13,18 @@
     </g:FlowPanel>
 
     <g:FlowPanel>
-      <g:HorizontalPanel>
-        <b:Button ui:field="createSql" type="INFO" icon="PLUS" size="SMALL">
-          <ui:msg description="Create SQL database label">Create SQL database</ui:msg>
-        </b:Button>
-        <b:Button ui:field="createMongo" type="INFO" icon="PLUS" size="SMALL">
-          <ui:msg description="Create MongoDB database label">Create MongoDB database</ui:msg>
-        </b:Button>
-      </g:HorizontalPanel>
+      <b:FluidRow>
+        <b:Column size="2">
+          <b:Button ui:field="createSql" type="INFO" icon="PLUS" size="SMALL">
+            <ui:msg description="Create SQL database label">Create SQL database</ui:msg>
+          </b:Button>
+        </b:Column>
+        <b:Column size="10">
+          <b:Button ui:field="createMongo" type="INFO" icon="PLUS" size="SMALL">
+            <ui:msg description="Create MongoDB database label">Create MongoDB database</ui:msg>
+          </b:Button>
+        </b:Column>
+      </b:FluidRow>
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="propertiesWrapper">

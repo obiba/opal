@@ -63,6 +63,7 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
     edit.setTitle(translations.editLabel());
+    propertiesWrapper.setVisible(false);
   }
 
   @Override
