@@ -30,6 +30,9 @@ import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.project.domain.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Component
 public class ProjectsConfigurationService implements ProjectService {
@@ -48,13 +51,29 @@ public class ProjectsConfigurationService implements ProjectService {
   @Autowired
   private ViewManager viewManager;
 
+  @Autowired
+  private TransactionTemplate transactionTemplate;
+
   @Override
   @PostConstruct
   public void start() {
     orientDbService.registerEntityClass(Project.class);
     orientDbService.createUniqueStringIndex(Project.class, "name");
 
-    // add all project datasources to MagmaEngine
+    // In the @PostConstruct there is no way to ensure that all the post processing is already done,
+    // so (indeed) there can be no Transactions.
+    // The only way to ensure that that is working is by using a TransactionTemplate.
+    transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+      @Override
+      protected void doInTransactionWithoutResult(TransactionStatus status) {
+        // add all project datasources to MagmaEngine
+        registerAllProjects();
+      }
+    });
+  }
+
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
+  private void registerAllProjects() {
     for(Project project : getProjects()) {
       registerDatasource(project);
     }
