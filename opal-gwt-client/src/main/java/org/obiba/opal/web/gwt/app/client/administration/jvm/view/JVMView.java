@@ -21,15 +21,13 @@ import org.obiba.opal.web.model.client.opal.OpalEnv;
 import org.obiba.opal.web.model.client.opal.OpalStatus;
 
 import com.github.gwtbootstrap.client.ui.Column;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public class JVMView extends ViewImpl implements JVMPresenter.Display {
@@ -40,14 +38,9 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
   // Bytes to megabytes factor
   private static final double B_TO_MB_FACTOR = 0.000000954;
 
-  @UiTemplate("JVMView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, JVMView> {}
+  public static final int HEIGHT = 300;
 
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  private static final Translations translations = GWT.create(Translations.class);
-
-  private final Widget uiWidget;
+  interface Binder extends UiBinder<Widget, JVMView> {}
 
   private MonitoringChartFactory memHeapChart;
 
@@ -65,7 +58,7 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
   private Double initialTimestamp;
 
   @UiField
-  Panel breadcrumbs;
+  HasWidgets breadcrumbs;
 
   @UiField
   Label uptime;
@@ -88,13 +81,12 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
   @UiField
   Column gcChartColumn;
 
-  public JVMView() {
-    uiWidget = uiBinder.createAndBindUi(this);
-  }
+  private final Translations translations;
 
-  @Override
-  public Widget asWidget() {
-    return uiWidget;
+  @Inject
+  public JVMView(Binder uiBinder, Translations translations) {
+    this.translations = translations;
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
   @Override
@@ -124,7 +116,7 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
     memHeapChart.createAreaSplineChart(translations.jvmMap().get("MEM_HEAP"), translations.jvmMap().get("MEGABYTES"),
         new String[] { translations.jvmMap().get("COMMITTED"), translations.jvmMap().get("USED") }, DURATION);
     memHeapChartColumn.clear();
-    memHeapChart.getChart().setHeight(300);
+    memHeapChart.getChart().setHeight(HEIGHT);
     memHeapChartColumn.add(memHeapChart.getChart());
 
     memNonHeapChart = new MonitoringChartFactory();
@@ -132,21 +124,21 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
         .createAreaSplineChart(translations.jvmMap().get("MEM_NON_HEAP"), translations.jvmMap().get("MEGABYTES"),
             new String[] { translations.jvmMap().get("COMMITTED"), translations.jvmMap().get("USED") }, DURATION);
     memNonHeapChartColumn.clear();
-    memNonHeapChart.getChart().setHeight(300);
+    memNonHeapChart.getChart().setHeight(HEIGHT);
     memNonHeapChartColumn.add(memNonHeapChart.getChart());
 
     threadsChart = new MonitoringChartFactory();
     threadsChart.createSplineChart(translations.jvmMap().get("THREADS"), translations.jvmMap().get("COUNT"),
         new String[] { translations.jvmMap().get("PEAK"), translations.jvmMap().get("CURRENT") }, DURATION);
     threadsChartColumn.clear();
-    threadsChart.getChart().setHeight(300);
+    threadsChart.getChart().setHeight(HEIGHT);
     threadsChartColumn.add(threadsChart.getChart());
 
     gcChart = new MonitoringChartFactory();
     gcChart.createSplineChart(translations.jvmMap().get("GC_DELTA"), translations.jvmMap().get("DELTA"),
         translations.jvmMap().get("TIME_MS"),
         new String[] { translations.jvmMap().get("GC_COUNT"), translations.jvmMap().get("TIME_MS") }, DURATION);
-    gcChart.getChart().setHeight(300);
+    gcChart.getChart().setHeight(HEIGHT);
     gcChart.getChart().getYAxis(0).setMin(0);
     gcChartColumn.clear();
     gcChartColumn.add(gcChart.getChart());

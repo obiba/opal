@@ -14,12 +14,10 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
-import org.obiba.opal.web.gwt.app.client.ui.NavPillsPanel;
 import org.obiba.opal.web.gwt.app.client.ui.TabDeckPanel;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.gwt.rest.client.authorization.TabAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
@@ -35,18 +33,17 @@ import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.DeckPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.View;
@@ -64,8 +61,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   private static final int SUMMARY_TAB_INDEX = 2;
 
   private static final int VALUES_TAB_INDEX = 3;
-
-  private static final Translations translations = GWT.create(Translations.class);
 
   @UiField
   Label name;
@@ -92,7 +87,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   Label occurrenceGroup;
 
   @UiField
-  Panel historyPanel;
+  FlowPanel historyPanel;
 
   @UiField
   TabDeckPanel scriptNavPanel;
@@ -126,7 +121,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   Panel summary;
 
   @UiField
-  Panel values;
+  SimplePanel values;
 
   @UiField
   CodeBlock script;
@@ -150,7 +145,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   Button editScript;
 
   @UiField
-  Panel scriptEditor;
+  SimplePanel scriptEditor;
 
   @UiField
   NavLink addToView;
@@ -172,8 +167,11 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   private JsArray<LocaleDto> languages;
 
+  private final Translations translations;
+
   @Inject
-  public VariableView(Binder uiBinder) {
+  public VariableView(Binder uiBinder, Translations translations) {
+    this.translations = translations;
     categoryTable = new CategoriesTable();
     attributeTable = new AttributesTable();
     initWidget(uiBinder.createAndBindUi(this));
@@ -291,9 +289,8 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @Override
   public void renderCategoryRows(JsArray<CategoryDto> rows) {
     categoryProvider.setArray(rows);
-    int size = categoryProvider.getList().size();
     categoryTablePager.firstPage();
-    categoryTablePager.setVisible(size > Table.DEFAULT_PAGESIZE);
+    categoryTablePager.setVisible(categoryProvider.getList().size() > Table.DEFAULT_PAGESIZE);
     categoryProvider.refresh();
   }
 

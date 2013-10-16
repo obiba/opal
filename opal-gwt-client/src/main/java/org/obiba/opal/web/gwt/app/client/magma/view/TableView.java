@@ -42,7 +42,6 @@ import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -63,7 +62,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -75,11 +74,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   interface Binder extends UiBinder<Widget, TableView> {}
 
-  private static final Integer VARIABLES_TAB_INDEX = 0;
+  private static final int VARIABLES_TAB_INDEX = 0;
 
-  private static final Integer VALUES_TAB_INDEX = 2;
-
-  private boolean hasLinkAuthorization = true;
+  private static final int VALUES_TAB_INDEX = 2;
 
   @UiField
   Label name;
@@ -139,7 +136,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   Table<VariableDto> table;
 
   @UiField
-  Panel valuesPanel;
+  SimplePanel valuesPanel;
 
   @UiField
   SimplePager pager;
@@ -174,12 +171,15 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   private VariableClickableColumn variableIndexColumn;
 
-  private final Translations translations = GWT.create(Translations.class);
+  private final Translations translations;
 
   private CheckboxColumn<VariableDto> checkColumn;
 
+  private boolean hasLinkAuthorization = true;
+
   @Inject
-  public TableView(Binder uiBinder) {
+  public TableView(Binder uiBinder, Translations translations) {
+    this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
     addTableColumns();
     initializeAnchorTexts();
@@ -240,21 +240,21 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
       @Override
       public String getValue(VariableDto object) {
-        String categories = "";
+        StringBuilder categories = new StringBuilder();
         int count = 1;
         for(CategoryDto category : JsArrays.toIterable(JsArrays.toSafeArray(object.getCategoriesArray()))) {
           if(count > 10) {
-            categories = categories + " ...";
+            categories.append(" ...");
             break;
           }
-          if(!categories.isEmpty()) {
-            categories = categories + ", " + category.getName();
+          if(categories.length() == 0) {
+            categories.append(category.getName());
           } else {
-            categories = category.getName();
+            categories.append(", ").append(category.getName());
           }
           count++;
         }
-        return categories;
+        return categories.toString();
       }
     }, translations.categoriesLabel());
 

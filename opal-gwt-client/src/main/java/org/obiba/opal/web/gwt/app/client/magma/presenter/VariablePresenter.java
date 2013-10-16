@@ -99,7 +99,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   }
 
   @Override
-  public void onVariableSelectionChanged(final VariableSelectionChangeEvent event) {
+  public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
     if(event.hasTable()) {
       updateDisplay(event.getTable(), event.getSelection(), event.getPrevious(), event.getNext());
     } else {
@@ -291,7 +291,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   @Override
   public void onSaveScript() {
-    
+
   }
 
   @Override

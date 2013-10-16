@@ -30,12 +30,10 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.ListDataProvider;
@@ -49,7 +47,6 @@ import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_
 
 public class UserAdministrationView extends ViewWithUiHandlers<UserAdministrationUiHandlers> implements Display {
 
-  @UiTemplate("UserAdministrationView.ui.xml")
   interface Binder extends UiBinder<Widget, UserAdministrationView> {}
 
   @UiField
@@ -65,7 +62,7 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
   CellTable<GroupDto> groupsTable;
 
   @UiField
-  Panel breadcrumbs;
+  HasWidgets breadcrumbs;
 
   private final ListDataProvider<UserDto> userDataProvider = new ListDataProvider<UserDto>();
 

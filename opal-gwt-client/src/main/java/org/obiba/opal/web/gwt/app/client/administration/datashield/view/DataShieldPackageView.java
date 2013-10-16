@@ -17,12 +17,10 @@ import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
 import org.obiba.opal.web.model.client.opal.EntryDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -32,19 +30,14 @@ import com.google.web.bindery.event.shared.EventBus;
 /**
  *
  */
-public class DataShieldPackageView extends ModalPopupViewWithUiHandlers<ModalUiHandlers> implements DataShieldPackagePresenter.Display {
+public class DataShieldPackageView extends ModalPopupViewWithUiHandlers<ModalUiHandlers>
+    implements DataShieldPackagePresenter.Display {
 
-  interface DataShieldPackageViewUiBinder extends UiBinder<Widget, DataShieldPackageView> {}
+  interface Binder extends UiBinder<Widget, DataShieldPackageView> {}
 
-  private static final DataShieldPackageViewUiBinder uiBinder = GWT.create(DataShieldPackageViewUiBinder.class);
-
-  private static final Translations translations = GWT.create(Translations.class);
-
-  private static int DIALOG_HEIGHT = 400;
+  private static final int DIALOG_HEIGHT = 400;
 
   private static final int DIALOG_WIDTH = 480;
-
-  private final Widget widget;
 
   @UiField
   Modal dialog;
@@ -52,21 +45,15 @@ public class DataShieldPackageView extends ModalPopupViewWithUiHandlers<ModalUiH
   @UiField
   PropertiesTable properties;
 
-  //
-  // Constructors
-  //
+  private final Translations translations;
 
   @Inject
-  public DataShieldPackageView(EventBus eventBus) {
+  public DataShieldPackageView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
-    widget = uiBinder.createAndBindUi(this);
-    dialog.setMinHeight(DIALOG_WIDTH);
-    dialog.setMinWidth(DIALOG_HEIGHT);
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
+    initWidget(uiBinder.createAndBindUi(this));
+    this.translations = translations;
+    dialog.setMinHeight(DIALOG_HEIGHT);
+    dialog.setMinWidth(DIALOG_WIDTH);
   }
 
   @Override
