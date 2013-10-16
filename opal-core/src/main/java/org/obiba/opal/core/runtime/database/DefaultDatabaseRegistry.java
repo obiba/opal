@@ -111,7 +111,9 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
             MongoDbDatabase.class);
     // don't create index on abstract base class or it will fail
     orientDbService.createUniqueStringIndex(SqlDatabase.class, "name");
+    orientDbService.createUniqueStringIndex(SqlDatabase.class, "url");
     orientDbService.createUniqueStringIndex(MongoDbDatabase.class, "name");
+    orientDbService.createUniqueStringIndex(MongoDbDatabase.class, "url");
   }
 
   @Override
