@@ -404,7 +404,13 @@ public interface Translations extends Constants {
       "CopyVariableNameColon", "Variable name '{0}' cannot contain ':'.",//
       "CopyVariableNameAlreadyExists", "Duplicate variable name: {0}.",//
       "CopyVariableIncompatibleEntityType", "Incompatible entity types: {0} / {1}",//
-      "SearchServiceUnavailable", "Search operation failed. Please make sure the service is started."//
+      "SearchServiceUnavailable", "Search operation failed. Please make sure the service is started.",  //
+      "SpssFailedToLoadMetadata", "Failed to load metadata from file '{0}'. Please make sure you have chosen the correct character set. ",//
+      "SpssEmptyIdentifier", "Identifier '{0}' has an invalid value. This may be due to a value overflow.",
+      "SpssDuplicateEntity", "Duplicate entity identifier '{0}' at row '{1}'. Please make sure that the variable '{2}' representing entities has unique values.", //
+      "SpssFailedToLoadData", "Failed to load data from file '{0}'. Please make sure you have chosen the correct character set.",//
+      "InvalidCategoryCharsetCharacter", "File contains invalid characters at row '{0}' for variable category '{1}' in string '{2}'. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.",//
+      "InvalidCharsetCharacter", "File contains invalid characters at row '{0}' in string '{1}'. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.",//
   })
   Map<String, String> userMessageMap();
 
@@ -784,24 +790,18 @@ public interface Translations extends Constants {
       "CsvVariablesHeaderMustContainName", "The variables.csv header must contain 'name'", //
       "CsvVariablesHeaderMustContainValueType", "The variables.csv header must contain 'valueType'.", //
       "CsvVariablesHeaderMustContainEntityType", "The variables.csv header must contain 'entityType'.", //
-      "CsvCannotCreateWriter", "Cannot create writer", //
-      "CsvCannotSetVariableHeader", "Cannot set variables header", //
+      "CsvCannotCreateWriter", "Cannot create writer. A table with the name '{0}' does not exist.", //
+      "CsvCannotSetVariableHeader", "Cannot set variables header. A table with the name '{0}' does not exist.", //
       "CsvCannotObtainWriter", "Cannot get csv writer", //
       "CsvCannotObtainReader", "Cannot get csv reader", //
+      "CsvUnableToGetVariableValueForEntity", "Unable to get value for entity '{0}' and variable {1}: {2}", //
       "LimeDuplicateVariableName", "[{0}] Survey contains duplicated variable name: {1}",//
-      "InvalidCharsetCharacter",
-      "File contains invalid characters at row '{0}'. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.",
-//
-      "InvalidCategoryCharsetCharacter",
-      "File contains invalid characters at row '{0}' for variable category {1}. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.",
-//
-      "SpssFailedToLoadMetadata",
-      "Failed to load metadata from file '{0}'. Please make sure you have chosen the correct character set. ",//
-      "SpssFailedToLoadData",
-      "Failed to load data from file '{0}'. Please make sure you have chosen the correct character set.",//
-      "SpssDuplicateEntity",
-      "Duplicate entity identifier '{0}' at row '{1}'. Please make sure that the variable '{2}' representing entities has unique values.",
-//
+      "SpssFailedToLoadMetadata", "Failed to load metadata from file '{0}'. Please make sure you have chosen the correct character set. ",//
+      "SpssEmptyIdentifier", "Identifier '{0}' has an invalid value. This may be due to a value overflow.",
+      "SpssDuplicateEntity", "Duplicate entity identifier '{0}' at row '{1}'. Please make sure that the variable '{2}' representing entities has unique values.", //
+      "SpssFailedToLoadData", "Failed to load data from file '{0}'. Please make sure you have chosen the correct character set.",//
+      "InvalidCategoryCharsetCharacter", "File contains invalid characters at row '{0}' for variable category '{1}' in string '{2}'. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.",//
+      "InvalidCharsetCharacter", "File contains invalid characters at row '{0}' in string '{1}'. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.",//
       "FailedToOpenFile", "Failed to open file '{0}'. Please make sure you have chosen the correct character set." })
   Map<String, String> datasourceParsingErrorMap();
 
