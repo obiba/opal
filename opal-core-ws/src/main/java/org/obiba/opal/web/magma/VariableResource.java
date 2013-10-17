@@ -25,9 +25,7 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.opal.core.domain.VariableNature;
-import org.obiba.opal.search.StatsIndexManager;
-import org.obiba.opal.search.es.ElasticSearchProvider;
-import org.obiba.opal.search.service.OpalSearchService;
+import org.obiba.opal.core.service.VariableStatsService;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.math.AbstractSummaryResource;
 import org.obiba.opal.web.magma.math.CategoricalSummaryResource;
@@ -42,19 +40,12 @@ public class VariableResource {
 
   private final VariableValueSource vvs;
 
-  private final OpalSearchService opalSearchService;
+  private final VariableStatsService variableStatsService;
 
-  private final StatsIndexManager statsIndexManager;
-
-  private final ElasticSearchProvider esProvider;
-
-  public VariableResource(ValueTable valueTable, VariableValueSource vvs, OpalSearchService opalSearchService,
-      StatsIndexManager statsIndexManager, ElasticSearchProvider esProvider) {
+  public VariableResource(ValueTable valueTable, VariableValueSource vvs, VariableStatsService variableStatsService) {
     this.valueTable = valueTable;
     this.vvs = vvs;
-    this.opalSearchService = opalSearchService;
-    this.statsIndexManager = statsIndexManager;
-    this.esProvider = esProvider;
+    this.variableStatsService = variableStatsService;
   }
 
   @GET
@@ -82,16 +73,13 @@ public class VariableResource {
 
     switch(nature) {
       case CATEGORICAL:
-        return new CategoricalSummaryResource(opalSearchService, statsIndexManager, esProvider, getValueTable(),
-            variable, vvs);
+        return new CategoricalSummaryResource(variableStatsService, getValueTable(), variable, vvs);
       case CONTINUOUS:
-        return new ContinuousSummaryResource(opalSearchService, statsIndexManager, esProvider, getValueTable(),
-            variable, vvs);
+        return new ContinuousSummaryResource(variableStatsService, getValueTable(), variable, vvs);
       case TEMPORAL:
       case UNDETERMINED:
       default:
-        return new DefaultSummaryResource(opalSearchService, statsIndexManager, esProvider, getValueTable(), variable,
-            vvs);
+        return new DefaultSummaryResource(variableStatsService, getValueTable(), variable, vvs);
     }
   }
 

@@ -12,7 +12,6 @@ package org.obiba.opal.core.magma.math;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.SortedSet;
 
 import javax.annotation.Nonnull;
 
@@ -21,7 +20,6 @@ import org.obiba.magma.Value;
 import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VectorSource;
 import org.obiba.magma.type.BooleanType;
 import org.springframework.util.Assert;
@@ -30,7 +28,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Sets;
 
 /**
  *

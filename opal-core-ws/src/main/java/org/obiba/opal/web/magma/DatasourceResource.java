@@ -41,11 +41,9 @@ import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.runtime.security.support.OpalPermissions;
 import org.obiba.opal.core.service.ImportService;
+import org.obiba.opal.core.service.VariableStatsService;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.Schedule;
-import org.obiba.opal.search.StatsIndexManager;
-import org.obiba.opal.search.es.ElasticSearchProvider;
-import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.ViewDto;
@@ -78,13 +76,9 @@ public class DatasourceResource {
 
   private final ImportService importService;
 
-  private final OpalSearchService opalSearchService;
-
-  private final StatsIndexManager statsIndexManager;
-
-  private final ElasticSearchProvider esProvider;
-
   private final IndexManagerConfigurationService indexManagerConfigService;
+
+  private final VariableStatsService variableStatsService;
 
   private final ViewDtos viewDtos;
 
@@ -98,26 +92,21 @@ public class DatasourceResource {
   @SuppressWarnings("NullableProblems")
   @Autowired
   public DatasourceResource(OpalConfigurationService configService, ImportService importService,
-      ViewManager viewManager, OpalSearchService opalSearchService, StatsIndexManager statsIndexManager,
-      ElasticSearchProvider esProvider, IndexManagerConfigurationService indexManagerConfigService, ViewDtos viewDtos,
-      Set<ValueTableUpdateListener> tableListeners) {
+      ViewManager viewManager, IndexManagerConfigurationService indexManagerConfigService,
+      VariableStatsService variableStatsService, ViewDtos viewDtos, Set<ValueTableUpdateListener> tableListeners) {
 
     if(configService == null) throw new IllegalArgumentException("configService cannot be null");
     if(viewManager == null) throw new IllegalArgumentException("viewManager cannot be null");
     if(importService == null) throw new IllegalArgumentException("importService cannot be null");
-    if(opalSearchService == null) throw new IllegalArgumentException("opalSearchService cannot be null");
-    if(statsIndexManager == null) throw new IllegalArgumentException("statsIndexManager cannot be null");
-    if(esProvider == null) throw new IllegalArgumentException("opalSearchService cannot be null");
+    if(variableStatsService == null) throw new IllegalArgumentException("variableStatsService cannot be null");
     if(viewDtos == null) throw new IllegalArgumentException("viewDtos cannot be null");
 
     this.configService = configService;
     this.importService = importService;
     this.viewManager = viewManager;
-    this.opalSearchService = opalSearchService;
     this.indexManagerConfigService = indexManagerConfigService;
-    this.statsIndexManager = statsIndexManager;
-    this.esProvider = esProvider;
     this.viewDtos = viewDtos;
+    this.variableStatsService = variableStatsService;
     this.tableListeners = tableListeners;
   }
 
@@ -175,14 +164,12 @@ public class DatasourceResource {
 
   public TableResource getTableResource(ValueTable table) {
     return getDatasource().canDropTable(table.getName()) //
-        ? new DroppableTableResource(table, getLocales(), importService, opalSearchService, statsIndexManager,
-        esProvider, tableListeners) //
-        : new TableResource(table, getLocales(), importService, opalSearchService, statsIndexManager, esProvider);
+        ? new DroppableTableResource(table, getLocales(), importService, variableStatsService, tableListeners) //
+        : new TableResource(table, getLocales(), importService, variableStatsService);
   }
 
   public ViewResource getViewResource(View view) {
-    return new ViewResource(viewManager, view, viewDtos, getLocales(), importService, opalSearchService,
-        statsIndexManager, esProvider);
+    return new ViewResource(viewManager, view, viewDtos, getLocales(), importService, variableStatsService);
   }
 
   @Path("/compare")

@@ -45,12 +45,9 @@ import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.service.ImportService;
+import org.obiba.opal.core.service.VariableStatsService;
 import org.obiba.opal.search.IndexManagerConfiguration;
 import org.obiba.opal.search.IndexManagerConfigurationService;
-import org.obiba.opal.search.StatsIndexManager;
-import org.obiba.opal.search.es.ElasticSearchConfigurationService;
-import org.obiba.opal.search.es.ElasticSearchProvider;
-import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.magma.support.DatasourceFactoryDtoParser;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.magma.support.ExcelDatasourceFactoryDtoParser;
@@ -67,7 +64,6 @@ import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.obiba.opal.web.model.Opal.LocaleDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
-import org.springframework.context.ApplicationContext;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -218,16 +214,12 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
   private DatasourceResource createDatasource(String name, OpalConfigurationService opalConfigurationService) {
     ViewManager viewManagerMock = createMock(ViewManager.class);
     ImportService importService = createMock(ImportService.class);
-    OpalSearchService opalSearchService = new OpalSearchService(
-        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)),
-        createMock(ApplicationContext.class));
-    StatsIndexManager statsIndexManager = createMock(StatsIndexManager.class);
-    ElasticSearchProvider esProvider = createMock(ElasticSearchProvider.class);
+    VariableStatsService variableStatsService = createMock(VariableStatsService.class);
     IndexManagerConfigurationService indexManagerConfigService = new IndexManagerConfigurationService(
         opalConfigurationService);
 
     DatasourceResource resource = new DatasourceResource(opalConfigurationService, importService, viewManagerMock,
-        opalSearchService, statsIndexManager, esProvider, indexManagerConfigService, newViewDtos(),
+        indexManagerConfigService, variableStatsService, newViewDtos(),
         Collections.<ValueTableUpdateListener>emptySet());
     resource.setName(name);
     return resource;
@@ -236,14 +228,9 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
   private DatasourceResource createDatasource(String mockDatasourceName, final Datasource mockDatasource,
       OpalConfigurationService mockOpalRuntime, ViewManager mockViewManager) {
     ImportService importService = createMock(ImportService.class);
-    OpalSearchService opalSearchService = new OpalSearchService(
-        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)),
-        createMock(ApplicationContext.class));
-    StatsIndexManager statsIndexManager = createMock(StatsIndexManager.class);
-    ElasticSearchProvider esProvider = createMock(ElasticSearchProvider.class);
 
     IndexManagerConfigurationService indexManagerConfigService = new IndexManagerConfigurationService(mockOpalRuntime);
-
+    VariableStatsService variableStatsService = createMock(VariableStatsService.class);
     OpalConfiguration opalConfig = new OpalConfiguration();
     opalConfig.addExtension(new IndexManagerConfiguration());
 
@@ -253,8 +240,8 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     //mockOpalRuntime.getOpalConfiguration()
     replay(mockOpalRuntime);
 
-    DatasourceResource sut = new DatasourceResource(mockOpalRuntime, importService, mockViewManager, opalSearchService,
-        statsIndexManager, esProvider, indexManagerConfigService, newViewDtos(),
+    DatasourceResource sut = new DatasourceResource(mockOpalRuntime, importService, mockViewManager,
+        indexManagerConfigService, variableStatsService, newViewDtos(),
         Collections.<ValueTableUpdateListener>emptySet()) {
 
       @Override
@@ -272,15 +259,11 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     OpalConfigurationService opalRuntimeMock = createMock(OpalConfigurationService.class);
     ViewManager viewManagerMock = createMock(ViewManager.class);
     ImportService importService = createMock(ImportService.class);
-    OpalSearchService opalSearchService = new OpalSearchService(
-        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)),
-        createMock(ApplicationContext.class));
-    StatsIndexManager statsIndexManager = createMock(StatsIndexManager.class);
-    ElasticSearchProvider esProvider = createMock(ElasticSearchProvider.class);
+    VariableStatsService variableStatsService = createMock(VariableStatsService.class);
     IndexManagerConfigurationService indexManagerConfigService = new IndexManagerConfigurationService(opalRuntimeMock);
 
     DatasourceResource resource = new DatasourceResource(opalRuntimeMock, importService, viewManagerMock,
-        opalSearchService, statsIndexManager, esProvider, indexManagerConfigService, newViewDtos(),
+        indexManagerConfigService, variableStatsService, newViewDtos(),
         Collections.<ValueTableUpdateListener>emptySet());
     resource.setName("datasourceNotExist");
     Response response = resource.removeDatasource();

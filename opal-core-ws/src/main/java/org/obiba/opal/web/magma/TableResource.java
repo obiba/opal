@@ -43,9 +43,7 @@ import org.obiba.magma.support.StaticDatasource;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
-import org.obiba.opal.search.StatsIndexManager;
-import org.obiba.opal.search.es.ElasticSearchProvider;
-import org.obiba.opal.search.service.OpalSearchService;
+import org.obiba.opal.core.service.VariableStatsService;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
@@ -66,24 +64,17 @@ public class TableResource extends AbstractValueTableResource {
 
   private final ImportService importService;
 
-  private final OpalSearchService opalSearchService;
+  private final VariableStatsService variableStatsService;
 
-  private final StatsIndexManager statsIndexManager;
-
-  private final ElasticSearchProvider esProvider;
-
-  public TableResource(ValueTable valueTable, ImportService importService, OpalSearchService opalSearchService,
-      StatsIndexManager statsIndexManager, ElasticSearchProvider esProvider) {
-    this(valueTable, Collections.<Locale>emptySet(), importService, opalSearchService, statsIndexManager, esProvider);
+  public TableResource(ValueTable valueTable, ImportService importService, VariableStatsService variableStatsService) {
+    this(valueTable, Collections.<Locale>emptySet(), importService, variableStatsService);
   }
 
   public TableResource(ValueTable valueTable, Set<Locale> locales, ImportService importService,
-      OpalSearchService opalSearchService, StatsIndexManager statsIndexManager, ElasticSearchProvider esProvider) {
+      VariableStatsService variableStatsService) {
     super(valueTable, locales);
     this.importService = importService;
-    this.opalSearchService = opalSearchService;
-    this.statsIndexManager = statsIndexManager;
-    this.esProvider = esProvider;
+    this.variableStatsService = variableStatsService;
   }
 
   @GET
@@ -388,7 +379,7 @@ public class TableResource extends AbstractValueTableResource {
   }
 
   private VariableResource getVariableResource(VariableValueSource source) {
-    return new VariableResource(getValueTable(), source, opalSearchService, statsIndexManager, esProvider);
+    return new VariableResource(getValueTable(), source, variableStatsService);
   }
 
   private JavascriptVariableValueSource getJavascriptVariableValueSource(String valueTypeName, Boolean repeatable,
