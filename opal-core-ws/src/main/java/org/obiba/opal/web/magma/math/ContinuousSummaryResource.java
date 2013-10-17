@@ -22,6 +22,7 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
 import org.obiba.opal.core.magma.math.ContinuousVariableSummary;
 import org.obiba.opal.core.magma.math.ContinuousVariableSummary.Distribution;
+import org.obiba.opal.core.magma.math.ContinuousVariableSummaryFactory;
 import org.obiba.opal.core.service.VariableStatsService;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.Dtos;
@@ -41,9 +42,11 @@ public class ContinuousSummaryResource extends AbstractSummaryResource {
       @QueryParam("p") List<Double> percentiles, @QueryParam("intervals") @DefaultValue("10") int intervals,
       @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
 
-    ContinuousVariableSummary summary = variableStatsService
-        .getContinuousSummary(getVariable(), getValueTable(), getVariableValueSource(), distribution, percentiles,
-            intervals, offset, limit);
+    ContinuousVariableSummaryFactory summaryFactory = new ContinuousVariableSummaryFactory.Builder()
+        .variable(getVariable()).table(getValueTable()).valueSource(getVariableValueSource()).distribution(distribution)
+        .percentiles(percentiles).intervals(intervals).offset(offset).limit(limit).build();
+
+    ContinuousVariableSummary summary = variableStatsService.getContinuousSummary(summaryFactory);
 
     SummaryStatisticsDto dto = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //

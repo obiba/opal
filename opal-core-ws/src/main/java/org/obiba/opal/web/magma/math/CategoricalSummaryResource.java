@@ -18,6 +18,7 @@ import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.magma.math.CategoricalVariableSummary;
+import org.obiba.opal.core.magma.math.CategoricalVariableSummaryFactory;
 import org.obiba.opal.core.service.VariableStatsService;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.Dtos;
@@ -39,8 +40,11 @@ public class CategoricalSummaryResource extends AbstractSummaryResource {
   public Response get(@QueryParam("distinct") boolean distinct, @QueryParam("offset") Integer offset,
       @QueryParam("limit") Integer limit) {
 
-    CategoricalVariableSummary summary = variableStatsService
-        .getCategoricalSummary(getVariable(), getValueTable(), getVariableValueSource(), distinct, offset, limit);
+    CategoricalVariableSummaryFactory summaryFactory = new CategoricalVariableSummaryFactory.Builder()
+        .variable(getVariable()).table(getValueTable()).valueSource(getVariableValueSource()).distinct(distinct)
+        .offset(offset).limit(limit).build();
+
+    CategoricalVariableSummary summary = variableStatsService.getCategoricalSummary(summaryFactory);
 
     SummaryStatisticsDto dto = SummaryStatisticsDto.newBuilder() //
         .setResource(getVariable().getName()) //

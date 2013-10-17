@@ -17,7 +17,7 @@ public abstract class AbstractVariableSummary {
   private Integer limit;
 
   protected SortedSet<VariableEntity> getVariableEntities(@Nonnull ValueTable table) {
-    if (offset == null && limit == null) return Sets.newTreeSet(table.getVariableEntities());
+    if(offset == null && limit == null) return Sets.newTreeSet(table.getVariableEntities());
 
     Iterable<VariableEntity> entities;
     entities = Sets.newTreeSet(table.getVariableEntities());
@@ -42,4 +42,13 @@ public abstract class AbstractVariableSummary {
   public boolean isFiltered() {
     return offset != null || limit != null;
   }
+
+  public Integer getOffset() {
+    return offset;
+  }
+
+  public Integer getLimit() {
+    return limit;
+  }
+
 }

@@ -221,12 +221,12 @@ public class CategoricalVariableSummary extends AbstractVariableSummary {
       return this;
     }
 
-    public Builder addTable(@Nonnull ValueTable table, @Nonnull ValueSource variableValueSource) {
+    public Builder addTable(@Nonnull ValueTable table, @Nonnull ValueSource valueSource) {
       if(addedValue) {
         throw new IllegalStateException("Cannot add table for variable " + summary.getVariable().getName() +
             " because values where previously added with addValue().");
       }
-      summary.add(table, variableValueSource);
+      summary.add(table, valueSource);
       addedTable = true;
 
       return this;

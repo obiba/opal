@@ -162,7 +162,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
         } else {
           xcb.field(fieldName, esValue(variable, value));
         }
-        variableStatsService.computeVariable(getValueTable(), variable, value);
+        variableStatsService.stackVariable(getValueTable(), variable, value);
       }
 
       @Override

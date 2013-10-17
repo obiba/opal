@@ -9,35 +9,31 @@
  */
 package org.obiba.opal.core.service;
 
-import java.util.List;
-
 import javax.annotation.Nonnull;
 
 import org.obiba.magma.Value;
-import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.magma.math.CategoricalVariableSummary;
+import org.obiba.opal.core.magma.math.CategoricalVariableSummaryFactory;
 import org.obiba.opal.core.magma.math.ContinuousVariableSummary;
+import org.obiba.opal.core.magma.math.ContinuousVariableSummaryFactory;
 
 /**
  *
  */
 public interface VariableStatsService {
 
-  void computeVariable(@Nonnull ValueTable valueTable, @Nonnull Variable variable, @Nonnull Value value);
+  void stackVariable(@Nonnull ValueTable valueTable, @Nonnull Variable variable, @Nonnull Value value);
 
   void computeSummaries(@Nonnull ValueTable valueTable);
 
   void clearComputingSummaries(@Nonnull ValueTable valueTable);
 
   @Nonnull
-  ContinuousVariableSummary getContinuousSummary(@Nonnull Variable variable, @Nonnull ValueTable table,
-      @Nonnull ValueSource valueSource, @Nonnull ContinuousVariableSummary.Distribution distribution,
-      List<Double> percentiles, int intervals, Integer offset, Integer limit);
+  ContinuousVariableSummary getContinuousSummary(@Nonnull ContinuousVariableSummaryFactory summaryFactory);
 
   @Nonnull
-  CategoricalVariableSummary getCategoricalSummary(@Nonnull Variable variable, @Nonnull ValueTable table,
-      @Nonnull ValueSource valueSource, boolean distinct, Integer offset, Integer limit);
+  CategoricalVariableSummary getCategoricalSummary(@Nonnull CategoricalVariableSummaryFactory summaryFactory);
 
 }

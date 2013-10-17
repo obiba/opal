@@ -1,20 +1,27 @@
 package org.obiba.opal.core.service.impl;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+
 import org.obiba.core.util.TimedExecution;
+import org.obiba.magma.Timestamped;
 import org.obiba.magma.Value;
-import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.magma.math.CategoricalVariableSummary;
+import org.obiba.opal.core.magma.math.CategoricalVariableSummaryFactory;
 import org.obiba.opal.core.magma.math.ContinuousVariableSummary;
+import org.obiba.opal.core.magma.math.ContinuousVariableSummaryFactory;
 import org.obiba.opal.core.service.VariableStatsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,22 +29,33 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+import com.google.common.io.Resources;
 
 @Component
 public class CachedVariableStatsService implements VariableStatsService {
 
   private static final Logger log = LoggerFactory.getLogger(CachedVariableStatsService.class);
 
+  private static final String CONTINUOUS_CACHE = "continuousSummaries";
+
+  private static final String CATEGORICAL_CACHE = "categoricalSummaries";
+
   // Map<TableReference, Map<VariableName, CategoricalVariableSummary.Builder>>
-  private final Map<String, Map<String, CategoricalVariableSummary.Builder>> categoricalSummaryBuilders = Maps
-      .newHashMap();
+  private final Map<String, Map<String, CategoricalVariableSummary.Builder>> categoricalSummaryBuilders = Collections
+      .synchronizedMap(new HashMap<String, Map<String, CategoricalVariableSummary.Builder>>());
 
   // Map<TableReference, Map<VariableName, ContinuousVariableSummary.Builder>>
-  private final Map<String, Map<String, ContinuousVariableSummary.Builder>> continuousSummaryBuilders = Maps
-      .newHashMap();
+  private final Map<String, Map<String, ContinuousVariableSummary.Builder>> continuousSummaryBuilders = Collections
+      .synchronizedMap(new HashMap<String, Map<String, ContinuousVariableSummary.Builder>>());
+
+  private final CacheManager cacheManager;
+
+  public CachedVariableStatsService() {
+    cacheManager = CacheManager.create(Resources.getResource("/opal-stats-ehcache.xml"));
+  }
 
   @Override
-  public void computeVariable(@Nonnull ValueTable valueTable, @Nonnull Variable variable, @Nonnull Value value) {
+  public void stackVariable(@Nonnull ValueTable valueTable, @Nonnull Variable variable, @Nonnull Value value) {
     // skip binary variable
     Preconditions.checkArgument(!BinaryType.get().equals(variable.getValueType()),
         "Cannot compute summary for binary variable " + variable.getName());
@@ -94,7 +112,6 @@ public class CachedVariableStatsService implements VariableStatsService {
   @Override
   public void computeSummaries(@Nonnull ValueTable valueTable) {
 
-    //TODO lock maps
     TimedExecution timedExecution = new TimedExecution().start();
 
     // categorical summaries
@@ -137,34 +154,83 @@ public class CachedVariableStatsService implements VariableStatsService {
     continuousSummaryBuilders.remove(valueTable.getTableReference());
   }
 
-  // TODO cache if !"_transient".equals(getVariable().getName()) && !summary.isFiltered()
   @Nonnull
   @Override
-  public CategoricalVariableSummary getCategoricalSummary(@Nonnull Variable variable, @Nonnull ValueTable table,
-      @Nonnull ValueSource valueSource, boolean distinct, Integer offset, Integer limit) {
-    log.debug("Compute categorical summary for {}", variable.getName());
+  public CategoricalVariableSummary getCategoricalSummary(@Nonnull CategoricalVariableSummaryFactory summaryFactory) {
+    Variable variable = summaryFactory.getVariable();
+    log.debug("Get categorical summary for {}", variable.getName());
 
-    return new CategoricalVariableSummary.Builder(variable) //
-        .distinct(distinct) //
-        .filter(offset, limit) //
-        .addTable(table, valueSource) //
-        .build();
+    // don't cache transient variable summary
+    if("_transient".equals(variable.getName())) {
+      return summaryFactory.getSummary();
+    }
+
+    return getCached(summaryFactory);
   }
 
-  // TODO cache if !"_transient".equals(getVariable().getName()) && !summary.isFiltered()
+  private CategoricalVariableSummary getCached(CategoricalVariableSummaryFactory summaryFactory) {
+    Cache cache = cacheManager.getCache(CATEGORICAL_CACHE);
+    String key = summaryFactory.getCacheKey();
+    Element element = cache.get(key);
+    if(element == null) {
+      return cacheCategoricalSummary(summaryFactory, cache, key);
+    }
+
+    // check timestamps
+    if(isCacheObsolete(element, summaryFactory.getTable())) {
+      return cacheCategoricalSummary(summaryFactory, cache, key);
+    }
+    return (CategoricalVariableSummary) element.getValue();
+  }
+
+  private CategoricalVariableSummary cacheCategoricalSummary(CategoricalVariableSummaryFactory summaryFactory,
+      Cache cache, String key) {
+    CategoricalVariableSummary summary = summaryFactory.getSummary();
+    cache.put(new Element(key, summary));
+    return summary;
+  }
+
   @Nonnull
   @Override
-  public ContinuousVariableSummary getContinuousSummary(@Nonnull Variable variable, @Nonnull ValueTable table,
-      @Nonnull ValueSource valueSource, @Nonnull ContinuousVariableSummary.Distribution distribution,
-      List<Double> percentiles, int intervals, Integer offset, Integer limit) {
-    log.debug("Compute continuous summary for {}", variable.getName());
+  public ContinuousVariableSummary getContinuousSummary(@Nonnull ContinuousVariableSummaryFactory summaryFactory) {
+    Variable variable = summaryFactory.getVariable();
 
-    return new ContinuousVariableSummary.Builder(variable, distribution) //
-        .defaultPercentiles(percentiles) //
-        .intervals(intervals) //
-        .filter(offset, limit) //
-        .addTable(table, valueSource) //
-        .build();
+    log.debug("Get continuous summary for {}", variable.getName());
+
+    // don't cache transient variable summary
+    if("_transient".equals(variable.getName())) {
+      return summaryFactory.getSummary();
+    }
+
+    return getCached(summaryFactory);
+  }
+
+  private ContinuousVariableSummary getCached(ContinuousVariableSummaryFactory summaryFactory) {
+    Cache cache = cacheManager.getCache(CONTINUOUS_CACHE);
+    String key = summaryFactory.getCacheKey();
+    Element element = cache.get(key);
+    if(element == null) {
+      return cacheContinuousSummary(summaryFactory, cache, key);
+    }
+
+    // check timestamps
+    if(isCacheObsolete(element, summaryFactory.getTable())) {
+      return cacheContinuousSummary(summaryFactory, cache, key);
+    }
+    return (ContinuousVariableSummary) element.getValue();
+  }
+
+  private ContinuousVariableSummary cacheContinuousSummary(ContinuousVariableSummaryFactory summaryFactory, Cache cache,
+      String key) {
+    ContinuousVariableSummary summary = summaryFactory.getSummary();
+    cache.put(new Element(key, summary));
+    return summary;
+  }
+
+  private boolean isCacheObsolete(Element element, Timestamped table) {
+    Date creationTime = new Date(element.getCreationTime());
+    Date tableLastUpdate = (Date) table.getTimestamps().getLastUpdate().getValue();
+    return tableLastUpdate != null && tableLastUpdate.after(creationTime);
   }
 
 }

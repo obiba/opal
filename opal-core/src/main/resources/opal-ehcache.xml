@@ -1,8 +1,9 @@
 <ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="ehcache.xsd"
+    xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
     updateCheck="false">
 
   <diskStore path="${OPAL_HOME}/work"/>
+
   <defaultCache
       maxElementsInMemory="10000"
       eternal="false"
@@ -11,7 +12,26 @@
       overflowToDisk="true"
       maxElementsOnDisk="10000000"
       diskPersistent="false"
+      diskExpiryThreadIntervalSeconds="120"/>
+
+  <cache name="categoricalSummaries"
+      maxElementsInMemory="10000"
+      eternal="false"
+      timeToIdleSeconds="3600"
+      timeToLiveSeconds="120"
+      overflowToDisk="true"
+      diskPersistent="true"
       diskExpiryThreadIntervalSeconds="120"
-      memoryStoreEvictionPolicy="LRU"
-      />
+      maxEntriesLocalDisk="10000"/>
+
+  <cache name="continuousSummaries"
+      maxElementsInMemory="10000"
+      eternal="false"
+      timeToIdleSeconds="3600"
+      timeToLiveSeconds="120"
+      overflowToDisk="true"
+      diskPersistent="true"
+      diskExpiryThreadIntervalSeconds="120"
+      maxEntriesLocalDisk="10000"/>
+
 </ehcache>
