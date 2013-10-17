@@ -192,14 +192,7 @@ public class DatabaseAdministrationPresenter extends
           }
 
         } else if(actionName.equalsIgnoreCase(Display.TEST_ACTION)) {
-
-          ResponseCodeCallback testConnectionCallback = new TestConnectionCallback();
-          ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
-              .forResource(DatabaseResources.database(dto.getName(), "connections")) //
-              .accept("application/json") //
-              .withCallback(Response.SC_OK, testConnectionCallback) //
-              .withCallback(Response.SC_SERVICE_UNAVAILABLE, testConnectionCallback) //
-              .post().send();
+          testConnection(getEventBus(), dto.getName());
         }
       }
 
@@ -229,6 +222,15 @@ public class DatabaseAdministrationPresenter extends
   private void refresh() {
     getView().getSqlTable().setVisibleRangeAndClearData(new Range(0, 10), true);
     getView().getMongoTable().setVisibleRangeAndClearData(new Range(0, 10), true);
+  }
+
+  static void testConnection(EventBus eventBus, String database) {
+    ResponseCodeCallback testConnectionCallback = new TestConnectionCallback(eventBus);
+    ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
+        .forResource(DatabaseResources.database(database, "connections")) //
+        .withCallback(Response.SC_OK, testConnectionCallback) //
+        .withCallback(Response.SC_SERVICE_UNAVAILABLE, testConnectionCallback) //
+        .post().send();
   }
 
   public interface Display extends View, HasBreadcrumbs {
@@ -275,7 +277,13 @@ public class DatabaseAdministrationPresenter extends
     }
   }
 
-  private class TestConnectionCallback implements ResponseCodeCallback {
+  static class TestConnectionCallback implements ResponseCodeCallback {
+
+    private final EventBus eventBus;
+
+    TestConnectionCallback(EventBus eventBus) {
+      this.eventBus = eventBus;
+    }
 
     @Override
     public void onResponseCode(Request request, Response response) {
@@ -287,7 +295,7 @@ public class DatabaseAdministrationPresenter extends
         event = NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
             .build();
       }
-      getEventBus().fireEvent(event);
+      eventBus.fireEvent(event);
     }
   }
 

@@ -32,6 +32,9 @@
         <ui:msg description="Identifiers Database label">Identifiers Database</ui:msg>
       </b:Heading>
       <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="edit"/>
+      <b:Button ui:field="testConnection" type="LINK" size="SMALL" addStyleNames="pull-right">
+        <ui:msg description="Test connection label">Test connection</ui:msg>
+      </b:Button>
       <o:PropertiesTable ui:field="properties"/>
     </g:FlowPanel>
 

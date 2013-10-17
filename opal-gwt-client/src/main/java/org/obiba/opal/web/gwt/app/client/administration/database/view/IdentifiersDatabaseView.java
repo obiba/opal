@@ -23,7 +23,6 @@ import org.obiba.opal.web.model.client.database.SqlDatabaseDto;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -56,6 +55,9 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
   @UiField
   HasVisibility propertiesWrapper;
 
+  @UiField
+  Button testConnection;
+
   private final Translations translations;
 
   @Inject
@@ -71,19 +73,24 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
     return breadcrumbs;
   }
 
-  @Override
-  public HasClickHandlers getCreateSqlButton() {
-    return createSql;
+  @UiHandler("createSql")
+  void createSql(ClickEvent event) {
+    getUiHandlers().createSql();
   }
 
-  @Override
-  public HasClickHandlers getCreateMongoButton() {
-    return createMongo;
+  @UiHandler("createMongo")
+  void createMongo(ClickEvent event) {
+    getUiHandlers().createMongo();
   }
 
   @UiHandler("edit")
   void edit(ClickEvent event) {
     getUiHandlers().edit();
+  }
+
+  @UiHandler("testConnection")
+  void testConnection(ClickEvent event) {
+    getUiHandlers().testConnection();
   }
 
   @Override

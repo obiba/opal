@@ -4,6 +4,12 @@ import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface IdentifiersDatabaseUiHandlers extends UiHandlers {
 
+  void createSql();
+
+  void createMongo();
+
   void edit();
+
+  void testConnection();
 
 }

@@ -26,9 +26,6 @@ import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.database.MongoDbDatabaseDto;
 import org.obiba.opal.web.model.client.database.SqlDatabaseDto;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -119,25 +116,22 @@ public class IdentifiersDatabasePresenter
         }));
 
     breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs());
+  }
 
-    registerHandler(getView().getCreateSqlButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        DatabaseDto dto = createDefaultIdentifiersDatabaseDto();
-        SqlDatabaseDto sqlDatabaseDto = SqlDatabaseDto.create();
-        sqlDatabaseDto.setSqlSchema(SqlDatabaseDto.SqlSchema.HIBERNATE);
-        dto.setExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings, sqlDatabaseDto);
-        sqlDatabaseModalProvider.get().createNewIdentifierDatabase(dto);
-      }
-    }));
-    registerHandler(getView().getCreateMongoButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        DatabaseDto dto = createDefaultIdentifiersDatabaseDto();
-        dto.setExtension(MongoDbDatabaseDto.DatabaseDtoExtensions.settings, MongoDbDatabaseDto.create());
-        mongoDatabaseModalProvider.get().createNewIdentifierDatabase(dto);
-      }
-    }));
+  @Override
+  public void createSql() {
+    DatabaseDto dto = createDefaultIdentifiersDatabaseDto();
+    SqlDatabaseDto sqlDatabaseDto = SqlDatabaseDto.create();
+    sqlDatabaseDto.setSqlSchema(SqlDatabaseDto.SqlSchema.HIBERNATE);
+    dto.setExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings, sqlDatabaseDto);
+    sqlDatabaseModalProvider.get().createNewIdentifierDatabase(dto);
+  }
+
+  @Override
+  public void createMongo() {
+    DatabaseDto dto = createDefaultIdentifiersDatabaseDto();
+    dto.setExtension(MongoDbDatabaseDto.DatabaseDtoExtensions.settings, MongoDbDatabaseDto.create());
+    mongoDatabaseModalProvider.get().createNewIdentifierDatabase(dto);
   }
 
   @Override
@@ -147,6 +141,11 @@ public class IdentifiersDatabasePresenter
     } else if(databaseDto.getExtension(MongoDbDatabaseDto.DatabaseDtoExtensions.settings) != null) {
       mongoDatabaseModalProvider.get().editDatabase(databaseDto);
     }
+  }
+
+  @Override
+  public void testConnection() {
+    DatabaseAdministrationPresenter.testConnection(getEventBus(), IDENTIFIERS_DATABASE_NAME);
   }
 
   private DatabaseDto createDefaultIdentifiersDatabaseDto() {
@@ -172,10 +171,6 @@ public class IdentifiersDatabasePresenter
   }
 
   public interface Display extends View, HasBreadcrumbs, HasUiHandlers<IdentifiersDatabaseUiHandlers> {
-
-    HasClickHandlers getCreateSqlButton();
-
-    HasClickHandlers getCreateMongoButton();
 
     void setDatabase(@Nullable DatabaseDto database);
   }
