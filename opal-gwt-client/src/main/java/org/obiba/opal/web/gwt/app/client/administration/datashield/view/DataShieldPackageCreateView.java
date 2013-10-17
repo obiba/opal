@@ -18,16 +18,13 @@ import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.TextBox;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
@@ -37,15 +34,7 @@ import com.google.web.bindery.event.shared.EventBus;
 public class DataShieldPackageCreateView extends ModalPopupViewWithUiHandlers<DataShieldPackageCreateUiHandlers>
     implements Display {
 
-  @UiTemplate("DataShieldPackageCreateView.ui.xml")
-  interface DataShieldPackageCreateViewUiBinder extends UiBinder<Modal, DataShieldPackageCreateView> {}
-
-  private static final DataShieldPackageCreateViewUiBinder uiBinder = GWT
-      .create(DataShieldPackageCreateViewUiBinder.class);
-
-  private static final Translations translations = GWT.create(Translations.class);
-
-  private final Widget widget;
+  interface Binder extends UiBinder<Modal, DataShieldPackageCreateView> {}
 
   @UiField
   Modal dialog;
@@ -68,14 +57,17 @@ public class DataShieldPackageCreateView extends ModalPopupViewWithUiHandlers<Da
   @UiField
   TextBox reference;
 
+  private final Translations translations;
+
   //
   // Constructors
   //
 
   @Inject
-  public DataShieldPackageCreateView(EventBus eventBus) {
+  public DataShieldPackageCreateView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
-    widget = uiBinder.createAndBindUi(this);
+    this.translations = translations;
+    initWidget(uiBinder.createAndBindUi(this));
     initWidgets();
   }
 
@@ -93,11 +85,6 @@ public class DataShieldPackageCreateView extends ModalPopupViewWithUiHandlers<Da
       }
     });
     allPkg.setValue(true, true);
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
   }
 
   @Override
@@ -159,7 +146,7 @@ public class DataShieldPackageCreateView extends ModalPopupViewWithUiHandlers<Da
   @Override
   public void setInstallButtonEnabled(boolean b) {
     installButton.setEnabled(b);
-    if (b) {
+    if(b) {
       dialog.removeStyleName("progress");
     } else {
       dialog.addStyleName("progress");

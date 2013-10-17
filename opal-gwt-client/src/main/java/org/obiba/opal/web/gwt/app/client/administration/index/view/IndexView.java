@@ -20,7 +20,6 @@ import org.obiba.opal.web.model.client.opal.ScheduleDto;
 import org.obiba.opal.web.model.client.opal.ScheduleType;
 
 import com.github.gwtbootstrap.client.ui.ControlLabel;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -39,13 +38,7 @@ public class IndexView extends ModalPopupViewWithUiHandlers<IndexUiHandlers> imp
 
   private static final int DIALOG_MIN_HEIGHT = 400;
 
-  interface ViewUiBinder extends UiBinder<Widget, IndexView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  private static final Translations translations = GWT.create(Translations.class);
-
-  private final Widget widget;
+  interface Binder extends UiBinder<Widget, IndexView> {}
 
   @UiField
   Modal dialog;
@@ -67,6 +60,16 @@ public class IndexView extends ModalPopupViewWithUiHandlers<IndexUiHandlers> imp
 
   @UiField
   ControlLabel at;
+
+  private final Translations translations;
+
+  @Inject
+  public IndexView(EventBus eventBus, Binder uiBinder, Translations translations) {
+    super(eventBus);
+    this.translations = translations;
+    initWidget(uiBinder.createAndBindUi(this));
+    initWidgets();
+  }
 
   @Override
   public String getSelectedType() {
@@ -103,13 +106,6 @@ public class IndexView extends ModalPopupViewWithUiHandlers<IndexUiHandlers> imp
     if(dto.hasMinutes()) {
       minutes.setSelectedValue(String.valueOf(dto.getMinutes()));
     }
-  }
-
-  @Inject
-  public IndexView(EventBus eventBus) {
-    super(eventBus);
-    widget = uiBinder.createAndBindUi(this);
-    initWidgets();
   }
 
   private void initWidgets() {
@@ -193,11 +189,6 @@ public class IndexView extends ModalPopupViewWithUiHandlers<IndexUiHandlers> imp
     hour.setVisible(at.isVisible() &&
         (typeValue.equals(ScheduleType.DAILY.getName()) || typeValue.equals(ScheduleType.WEEKLY.getName())));
     minutes.setVisible(at.isVisible() && typeValue.equals(ScheduleType.HOURLY.getName()));
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
   }
 
   @Override

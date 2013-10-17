@@ -82,16 +82,16 @@ public class DataShieldPackageAdministrationPresenter
         dataShieldPackageCreatePresenter.addNewPackage();
       }
     }));
-    registerHandler(
-        getEventBus().addHandler(DataShieldMethodCreatedEvent.getType(), new DataShieldMethodCreatedEvent.Handler() {
+    registerHandler(getEventBus().addHandler(DataShieldMethodCreatedEvent.getType(),
+        new DataShieldMethodCreatedEvent.DataShieldMethodCreatedHandler() {
 
           @Override
           public void onDataShieldMethodCreated(DataShieldMethodCreatedEvent event) {
             updateDataShieldPackages();
           }
         }));
-    registerHandler(
-        getEventBus().addHandler(DataShieldPackageCreatedEvent.getType(), new DataShieldPackageCreatedEvent.Handler() {
+    registerHandler(getEventBus().addHandler(DataShieldPackageCreatedEvent.getType(),
+        new DataShieldPackageCreatedEvent.DataShieldPackageCreatedHandler() {
 
           @Override
           public void onDataShieldPackageCreated(DataShieldPackageCreatedEvent event) {

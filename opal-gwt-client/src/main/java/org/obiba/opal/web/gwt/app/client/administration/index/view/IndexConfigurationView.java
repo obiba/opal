@@ -17,7 +17,6 @@ import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
 
 import com.github.gwtbootstrap.client.ui.TextBox;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -33,13 +32,7 @@ import com.google.web.bindery.event.shared.EventBus;
 public class IndexConfigurationView extends ModalPopupViewWithUiHandlers<IndexConfigurationUiHandlers>
     implements IndexConfigurationPresenter.Display {
 
-  interface ViewUiBinder extends UiBinder<Widget, IndexConfigurationView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  private static final Translations translations = GWT.create(Translations.class);
-
-  private final Widget widget;
+  interface Binder extends UiBinder<Widget, IndexConfigurationView> {}
 
   @UiField
   Modal dialog;
@@ -59,20 +52,18 @@ public class IndexConfigurationView extends ModalPopupViewWithUiHandlers<IndexCo
   @UiField
   HasText settings;
 
+  private final Translations translations;
+
   @Inject
-  public IndexConfigurationView(EventBus eventBus) {
+  public IndexConfigurationView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
-    widget = uiBinder.createAndBindUi(this);
+    this.translations = translations;
+    initWidget(uiBinder.createAndBindUi(this));
     initWidgets();
   }
 
   private void initWidgets() {
     dialog.hide();
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
   }
 
   @Override

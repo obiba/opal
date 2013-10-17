@@ -5,21 +5,19 @@ import org.obiba.opal.web.gwt.app.client.administration.configuration.presenter.
 import org.obiba.opal.web.gwt.app.client.ui.OpalNavLink;
 
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 public class ConfigurationView extends ViewWithUiHandlers<ConfigurationUiHandlers>
     implements ConfigurationPresenter.Display {
 
-  interface ViewUiBinder extends UiBinder<Widget, ConfigurationView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  interface Binder extends UiBinder<Widget, ConfigurationView> {}
 
   @UiField
   Breadcrumbs breadcrumbs;
@@ -30,15 +28,9 @@ public class ConfigurationView extends ViewWithUiHandlers<ConfigurationUiHandler
   @UiField
   Panel content;
 
-  private final Widget widget;
-
-  public ConfigurationView() {
-    widget = uiBinder.createAndBindUi(this);
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
+  @Inject
+  public ConfigurationView(Binder uiBinder) {
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
   @Override

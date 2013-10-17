@@ -20,17 +20,14 @@ import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlLabel;
-import com.github.gwtbootstrap.client.ui.Dropdown;
 import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.TextBox;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.ListBox;
@@ -43,14 +40,7 @@ import com.google.web.bindery.event.shared.EventBus;
  */
 public class DataShieldMethodView extends ModalPopupViewWithUiHandlers<DataShieldMethodUiHandlers> implements Display {
 
-  @UiTemplate("DataShieldMethodView.ui.xml")
-  interface DataShieldMethodViewUiBinder extends UiBinder<Widget, DataShieldMethodView> {}
-
-  private static final DataShieldMethodViewUiBinder uiBinder = GWT.create(DataShieldMethodViewUiBinder.class);
-
-  private static final Translations translations = GWT.create(Translations.class);
-
-  private final Widget widget;
+  interface Binder extends UiBinder<Widget, DataShieldMethodView> {}
 
   @UiField
   Modal dialog;
@@ -63,8 +53,6 @@ public class DataShieldMethodView extends ModalPopupViewWithUiHandlers<DataShiel
 
   @UiField
   TextBox name;
-
-  Dropdown types;
 
   @UiField
   ListBox typeList;
@@ -81,14 +69,17 @@ public class DataShieldMethodView extends ModalPopupViewWithUiHandlers<DataShiel
   @UiField
   TextBox function;
 
+  private final Translations translations;
+
   //
   // Constructors
   //
 
   @Inject
-  public DataShieldMethodView(EventBus eventBus) {
+  public DataShieldMethodView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
-    widget = uiBinder.createAndBindUi(this);
+    this.translations = translations;
+    initWidget(uiBinder.createAndBindUi(this));
     initWidgets();
   }
 
@@ -112,11 +103,6 @@ public class DataShieldMethodView extends ModalPopupViewWithUiHandlers<DataShiel
     scriptLabel.setVisible(type == MethodType.RSCRIPT);
     function.setVisible(type == MethodType.RFUNCTION);
     functionLabel.setVisible(type == MethodType.RFUNCTION);
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
   }
 
   @Override

@@ -15,8 +15,6 @@ import java.util.List;
 import org.obiba.opal.web.gwt.app.client.administration.index.event.TableIndicesRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexStatusRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
@@ -47,12 +45,10 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
@@ -118,20 +114,13 @@ public class IndexAdministrationPresenter
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
-  @SuppressWarnings("FieldCanBeLocal")
-  private final AuthorizationPresenter authorizationPresenter;
-
-  @SuppressWarnings("UnusedDeclaration")
-  private Command confirmedCommand;
-
   @Inject
   public IndexAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
-      Provider<AuthorizationPresenter> authorizationPresenter, ModalProvider<IndexPresenter> indexModalProvider,
+      ModalProvider<IndexPresenter> indexModalProvider,
       ModalProvider<IndexConfigurationPresenter> indexConfigurationProvider,
       DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     this.indexModalProvider = indexModalProvider.setContainer(this);
-    this.authorizationPresenter = authorizationPresenter.get();
     this.indexConfigurationProvider = indexConfigurationProvider.setContainer(this);
     this.breadcrumbsHelper = breadcrumbsHelper;
   }
@@ -186,15 +175,6 @@ public class IndexAdministrationPresenter
   @Override
   protected void onBind() {
     super.onBind();
-    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEvent.Handler() {
-
-      @Override
-      public void onConfirmation(ConfirmationEvent event) {
-        if(event.getSource() == confirmedCommand && event.isConfirmed()) {
-          confirmedCommand.execute();
-        }
-      }
-    }));
 
     // Dropdown Actions
     getView().getActionsDropdown().addChangeHandler(new ChangeHandler() {
@@ -317,10 +297,10 @@ public class IndexAdministrationPresenter
       }
     }));
 
-    registerHandler(
-        getEventBus().addHandler(TableIndicesRefreshEvent.getType(), new TableIndicesRefreshEvent.Handler() {
+    registerHandler(getEventBus()
+        .addHandler(TableIndicesRefreshEvent.getType(), new TableIndicesRefreshEvent.TableIndicesRefreshHandler() {
           @Override
-          public void onRefresh(TableIndicesRefreshEvent event) {
+          public void onTableIndicesRefresh(TableIndicesRefreshEvent event) {
             refresh();
           }
         }));
@@ -418,7 +398,7 @@ public class IndexAdministrationPresenter
   private class TableIndexStatusResourceCallback implements ResourceCallback<JsArray<TableIndexStatusDto>> {
     private final Range r;
 
-    private boolean clearIndices;
+    private final boolean clearIndices;
 
     private TableIndexStatusResourceCallback(Range r, boolean clearIndices) {
       this.r = r;

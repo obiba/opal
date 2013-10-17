@@ -83,6 +83,22 @@ public class JVMPresenter extends ItemAdministrationPresenter<JVMPresenter.Displ
       public void run() {
         pollStatus();
       }
+
+      private void pollStatus() {
+        // Fetch system status
+        ResourceRequestBuilderFactory.<OpalStatus>newBuilder()//
+            .forResource("/system/status").withCallback(new ResourceCallback<OpalStatus>() {
+
+          @Override
+          public void onResource(Response response, OpalStatus resource) {
+            if(response.getStatusCode() == Response.SC_OK) {
+              getView().renderStatus(resource);
+            } else {
+              timer.cancel();
+            }
+          }
+        }).get().send();
+      }
     };
     timer.scheduleRepeating(DELAY_MILLIS);
   }
@@ -136,19 +152,4 @@ public class JVMPresenter extends ItemAdministrationPresenter<JVMPresenter.Displ
     }
   }
 
-  private void pollStatus() {
-    // Fetch system status
-    ResourceRequestBuilderFactory.<OpalStatus>newBuilder()//
-        .forResource("/system/status").withCallback(new ResourceCallback<OpalStatus>() {
-
-      @Override
-      public void onResource(Response response, OpalStatus resource) {
-        if(response.getStatusCode() == Response.SC_OK) {
-          getView().renderStatus(resource);
-        } else {
-          timer.cancel();
-        }
-      }
-    }).get().send();
-  }
 }

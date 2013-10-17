@@ -14,6 +14,6 @@
       <b:NavLink>General</b:NavLink>
       <o:OpalNavLink ui:field="taxonomies">Taxonomies</o:OpalNavLink>
     </b:NavPills>
-    <g:FlowPanel ui:field="content"></g:FlowPanel>
+    <g:FlowPanel ui:field="content"/>
   </g:FlowPanel>
 </ui:UiBinder>

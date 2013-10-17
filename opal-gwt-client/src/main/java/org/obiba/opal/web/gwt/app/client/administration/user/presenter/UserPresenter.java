@@ -14,7 +14,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.administration.user.event.UsersRefreshEvent;
+import org.obiba.opal.web.gwt.app.client.administration.user.event.UsersRefreshedEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -99,7 +99,7 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
     ResponseCodeCallback callback = new ResponseCodeCallback() {
       @Override
       public void onResponseCode(Request request, Response response) {
-        getEventBus().fireEvent(new UsersRefreshEvent());
+        getEventBus().fireEvent(new UsersRefreshedEvent());
         getView().hideDialog();
       }
     };

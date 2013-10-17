@@ -11,8 +11,8 @@ package org.obiba.opal.web.gwt.app.client.administration.user.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
-import org.obiba.opal.web.gwt.app.client.administration.user.event.GroupsRefreshEvent;
-import org.obiba.opal.web.gwt.app.client.administration.user.event.UsersRefreshEvent;
+import org.obiba.opal.web.gwt.app.client.administration.user.event.GroupsRefreshedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.user.event.UsersRefreshedEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -146,38 +146,41 @@ public class UserAdministrationPresenter
     registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler()));
 
     // Refresh user list
-    registerHandler(getEventBus().addHandler(UsersRefreshEvent.getType(), new UsersRefreshEvent.Handler() {
-      @Override
-      public void onRefresh(UsersRefreshEvent event) {
-        ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder() //
-            .forResource("/users") //
-            .withCallback(new ResourceCallback<JsArray<UserDto>>() {
+    registerHandler(
+        getEventBus().addHandler(UsersRefreshedEvent.getType(), new UsersRefreshedEvent.UsersRefreshedHandler() {
 
-              @Override
-              public void onResource(Response response, JsArray<UserDto> resource) {
-                getView().renderUserRows(resource);
-              }
-            }) //
-            .get().send();
-      }
-    }));
+          @Override
+          public void onUsersRefreshed(UsersRefreshedEvent event) {
+            ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder() //
+                .forResource("/users") //
+                .withCallback(new ResourceCallback<JsArray<UserDto>>() {
+
+                  @Override
+                  public void onResource(Response response, JsArray<UserDto> resource) {
+                    getView().renderUserRows(resource);
+                  }
+                }) //
+                .get().send();
+          }
+        }));
 
     // Refresh group list
-    registerHandler(getEventBus().addHandler(GroupsRefreshEvent.getType(), new GroupsRefreshEvent.Handler() {
-      @Override
-      public void onRefresh(GroupsRefreshEvent event) {
-        ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder() //
-            .forResource("/groups") //
-            .withCallback(new ResourceCallback<JsArray<GroupDto>>() {
+    registerHandler(
+        getEventBus().addHandler(GroupsRefreshedEvent.getType(), new GroupsRefreshedEvent.GroupsRefreshedHandler() {
+          @Override
+          public void onGroupsRefreshed(GroupsRefreshedEvent event) {
+            ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder() //
+                .forResource("/groups") //
+                .withCallback(new ResourceCallback<JsArray<GroupDto>>() {
 
-              @Override
-              public void onResource(Response response, JsArray<GroupDto> resource) {
-                getView().renderGroupRows(resource);
-              }
-            }) //
-            .get().send();
-      }
-    }));
+                  @Override
+                  public void onResource(Response response, JsArray<GroupDto> resource) {
+                    getView().renderGroupRows(resource);
+                  }
+                }) //
+                .get().send();
+          }
+        }));
 
     // Add user
     getView().getAddUserButton().addClickHandler(new ClickHandler() {
@@ -309,7 +312,7 @@ public class UserAdministrationPresenter
           .withCallback(Response.SC_OK, new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
-              getEventBus().fireEvent(isUser ? new UsersRefreshEvent() : new GroupsRefreshEvent());
+              getEventBus().fireEvent(isUser ? new UsersRefreshedEvent() : new GroupsRefreshedEvent());
             }
           }) //
           .delete().send();

@@ -33,7 +33,6 @@ import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
@@ -45,6 +44,7 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 import static org.obiba.opal.web.model.client.opal.ScheduleType.DAILY;
@@ -57,14 +57,9 @@ import static org.obiba.opal.web.model.client.opal.ScheduleType.WEEKLY;
 
 public class IndexAdministrationView extends ViewImpl implements IndexAdministrationPresenter.Display {
 
-  @UiTemplate("IndexAdministrationView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, IndexAdministrationView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  interface Binder extends UiBinder<Widget, IndexAdministrationView> {}
 
   private static final Translations translations = GWT.create(Translations.class);
-
-  private final Widget uiWidget;
 
   @UiField
   Button startButton;
@@ -106,24 +101,25 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
 
   private final CheckboxColumn<TableIndexStatusDto> checkboxColumn;
 
-  ActionsIndexColumn<TableIndexStatusDto> actionsColumn = new ActionsIndexColumn<TableIndexStatusDto>(
-      new ActionsProvider<TableIndexStatusDto>() {
+  private static final ActionsIndexColumn<TableIndexStatusDto> ACTIONS_COLUMNS
+      = new ActionsIndexColumn<TableIndexStatusDto>(new ActionsProvider<TableIndexStatusDto>() {
 
-        private final String[] all = new String[] { CLEAR_ACTION, INDEX_ACTION };
+    private final String[] all = new String[] { CLEAR_ACTION, INDEX_ACTION };
 
-        @Override
-        public String[] allActions() {
-          return all;
-        }
+    @Override
+    public String[] allActions() {
+      return all;
+    }
 
-        @Override
-        public String[] getActions(TableIndexStatusDto value) {
-          return allActions();
-        }
-      });
+    @Override
+    public String[] getActions(TableIndexStatusDto value) {
+      return allActions();
+    }
+  });
 
-  public IndexAdministrationView() {
-    uiWidget = uiBinder.createAndBindUi(this);
+  @Inject
+  public IndexAdministrationView(Binder uiBinder) {
+    initWidget(uiBinder.createAndBindUi(this));
     indexTablePager.setDisplay(indexTable);
 
     checkboxColumn = new CheckboxColumn<TableIndexStatusDto>(new TableIndexStatusDtoDisplay());
@@ -135,7 +131,7 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
     indexTable.addColumn(Columns.indexLastUpdate, translations.indexLastUpdateLabel());
     indexTable.addColumn(Columns.scheduleType, translations.scheduleLabel());
     indexTable.addColumn(Columns.status, translations.statusLabel());
-    indexTable.addColumn(actionsColumn, translations.actionsLabel());
+    indexTable.addColumn(ACTIONS_COLUMNS, translations.actionsLabel());
     indexTable.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
     indexTable.setColumnWidth(checkboxColumn, 1, Style.Unit.PX);
 
@@ -156,11 +152,6 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
     renderRows((JsArray<TableIndexStatusDto>) JavaScriptObject.createArray());
     checkboxColumn.clearSelection();
     selectAllAlert.setVisible(false);
-  }
-
-  @Override
-  public Widget asWidget() {
-    return uiWidget;
   }
 
   @Override
@@ -222,7 +213,7 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
 
   @Override
   public HasActionHandler<TableIndexStatusDto> getActions() {
-    return actionsColumn;
+    return ACTIONS_COLUMNS;
   }
 
   @Override

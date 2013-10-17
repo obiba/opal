@@ -78,20 +78,20 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
       @Override
       public void onClick(ClickEvent event) {
         DataShieldMethodPresenter presenter = datashieldModalProvider.get();
-        if (!Strings.isNullOrEmpty(env)) presenter.setEnvironement(env);
+        if(!Strings.isNullOrEmpty(env)) presenter.setEnvironement(env);
         presenter.createNewMethod();
       }
     }));
-    registerHandler(
-        getEventBus().addHandler(DataShieldMethodCreatedEvent.getType(), new DataShieldMethodCreatedEvent.Handler() {
+    registerHandler(getEventBus().addHandler(DataShieldMethodCreatedEvent.getType(),
+        new DataShieldMethodCreatedEvent.DataShieldMethodCreatedHandler() {
 
           @Override
           public void onDataShieldMethodCreated(DataShieldMethodCreatedEvent event) {
             updateDataShieldMethods();
           }
         }));
-    registerHandler(
-        getEventBus().addHandler(DataShieldMethodUpdatedEvent.getType(), new DataShieldMethodUpdatedEvent.Handler() {
+    registerHandler(getEventBus().addHandler(DataShieldMethodUpdatedEvent.getType(),
+        new DataShieldMethodUpdatedEvent.DataShieldMethodUpdatedHandler() {
 
           @Override
           public void onDataShieldMethodUpdated(DataShieldMethodUpdatedEvent event) {
@@ -99,8 +99,8 @@ public class DataShieldAdministrationPresenter extends PresenterWidget<DataShiel
           }
 
         }));
-    registerHandler(
-        getEventBus().addHandler(DataShieldPackageRemovedEvent.getType(), new DataShieldPackageRemovedEvent.Handler() {
+    registerHandler(getEventBus().addHandler(DataShieldPackageRemovedEvent.getType(),
+        new DataShieldPackageRemovedEvent.DataShieldPackageRemovedHandler() {
           @Override
           public void onDataShieldPackageRemoved(DataShieldPackageRemovedEvent event) {
             updateDataShieldMethods();
