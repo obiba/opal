@@ -61,9 +61,6 @@ public class CreateDatasourceView extends ModalViewImpl implements CreateDatasou
   @UiField
   ListBox datasourceType;
 
-  @UiField
-  HTMLPanel helpPanel;
-
   private ValidationHandler selectTypeValidator;
 
   private WizardStepChain stepChain;
@@ -89,7 +86,7 @@ public class CreateDatasourceView extends ModalViewImpl implements CreateDatasou
   private void initWizardDialog() {
     stepChain = WizardStepChain.Builder.create(dialog)//
 
-        .append(selectTypeStep, helpPanel)//
+        .append(selectTypeStep)//
         .title(translations.createDatasourceStepSummary())//
         .onValidate(new ValidationHandler() {
 

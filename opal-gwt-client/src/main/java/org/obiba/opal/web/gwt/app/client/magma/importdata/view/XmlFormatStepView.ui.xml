@@ -4,7 +4,6 @@
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <g:FlowPanel>
     <g:FlowPanel styleName="input">
       <g:Label addStyleNames="key">
         <ui:msg description="Data File label">Data File</ui:msg>
@@ -16,18 +15,5 @@
         </ui:msg>
       </g:Label>
     </g:FlowPanel>
-
-    <g:HTMLPanel ui:field="help">
-      <g:Label addStyleNames="title">
-        <ui:msg description="Data File label">Data File</ui:msg>
-      </g:Label>
-      <p>
-        <ui:msg description="Xml data file information">The Opal XML file to use must be on the server. Use the file
-          explorer to upload it if it's not already there.
-        </ui:msg>
-      </p>
-    </g:HTMLPanel>
-
-  </g:FlowPanel>
 
 </ui:UiBinder>

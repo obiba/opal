@@ -48,11 +48,7 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
 
 public class CreateViewStepView extends ModalViewImpl implements CreateViewStepPresenter.Display {
 
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  private static final Translations translations = GWT.create(Translations.class);
-
-  private final Widget widget;
+  private final Translations translations;
 
   @UiField
   WizardModalBox dialog;
@@ -105,10 +101,11 @@ public class CreateViewStepView extends ModalViewImpl implements CreateViewStepP
   private ValidationHandler tablesValidator;
 
   @Inject
-  public CreateViewStepView(EventBus eventBus) {
+  public CreateViewStepView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
+    this.translations = translations;
     tableChooser = new TableChooser(true);
-    widget = uiBinder.createAndBindUi(this);
+    initWidget(uiBinder.createAndBindUi(this));
     initWizardDialog();
 
     ValueChangeHandler<Boolean> handler = new ValueChangeHandler<Boolean>() {
@@ -138,7 +135,7 @@ public class CreateViewStepView extends ModalViewImpl implements CreateViewStepP
   private void initWizardDialog() {
     stepChain = WizardStepChain.Builder.create(dialog)//
 
-        .append(selectTypeStep, selectTypeHelp)//
+        .append(selectTypeStep)//
         .title(translations.editViewTypeStep())//
         .onValidate(new ValidationHandler() {
 
@@ -156,7 +153,7 @@ public class CreateViewStepView extends ModalViewImpl implements CreateViewStepP
           }
         })//
 
-        .append(tablesStep, tablesHelp)//
+        .append(tablesStep)//
         .title(translations.editViewTablesStep())//
         .onReset(new ResetHandler() {
 
@@ -284,13 +281,7 @@ public class CreateViewStepView extends ModalViewImpl implements CreateViewStepP
     super.show();
   }
 
-  @Override
-  public Widget asWidget() {
-    return widget;
-  }
-
-  @UiTemplate("CreateViewStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, CreateViewStepView> {}
+  interface Binder extends UiBinder<Widget, CreateViewStepView> {}
 
   @Override
   public void renderPendingConclusion() {

@@ -9,39 +9,30 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.importdata.view;
 
-import org.obiba.opal.web.gwt.app.client.support.LanguageLocale;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.ui.CharacterSetView;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.SpssFormatStepPresenter;
+import org.obiba.opal.web.gwt.app.client.support.LanguageLocale;
+import org.obiba.opal.web.gwt.app.client.ui.CharacterSetView;
 import org.obiba.opal.web.gwt.app.client.ui.DropdownSuggestBox;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public class SpssFormatStepView extends ViewImpl implements SpssFormatStepPresenter.Display {
 
-  @UiTemplate("SpssFormatStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, SpssFormatStepView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  private final Widget widget;
+  interface Binder extends UiBinder<Widget, SpssFormatStepView> {}
 
   private Display fileSelection;
 
   @UiField
   SimplePanel selectSpssFilePanel;
-
-  @UiField
-  HTMLPanel help;
 
   @UiField
   CharacterSetView charsetView;
@@ -52,8 +43,9 @@ public class SpssFormatStepView extends ViewImpl implements SpssFormatStepPresen
   @UiField
   DropdownSuggestBox localeNameBox;
 
-  public SpssFormatStepView() {
-    widget = uiBinder.createAndBindUi(this);
+  @Inject
+  public SpssFormatStepView(Binder uiBinder) {
+    initWidget(uiBinder.createAndBindUi(this));
     initializeLocales();
   }
 
@@ -77,17 +69,6 @@ public class SpssFormatStepView extends ViewImpl implements SpssFormatStepPresen
   @Override
   public String getSelectedFile() {
     return fileSelection.getFile();
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
-  }
-
-  @Override
-  public Widget getStepHelp() {
-    help.removeFromParent();
-    return help;
   }
 
   @Override

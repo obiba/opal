@@ -28,6 +28,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
@@ -35,14 +36,9 @@ import com.gwtplatform.mvp.client.ViewImpl;
  */
 public class DeriveFromVariableView extends ViewImpl implements DeriveFromVariablePresenter.Display {
 
-  @UiTemplate("DeriveFromVariableView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, DeriveFromVariableView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  interface Binder extends UiBinder<Widget, DeriveFromVariableView> {}
 
   private static final Translations translations = GWT.create(Translations.class);
-
-  private final Widget widget;
 
   @UiField
   WizardStep deriveFromVariableStep;
@@ -53,15 +49,16 @@ public class DeriveFromVariableView extends ViewImpl implements DeriveFromVariab
   @UiField
   Chooser variableBox;
 
-  public DeriveFromVariableView() {
+@Inject
+  public DeriveFromVariableView(Binder uiBinder) {
     tableChooser = new TableChooser(false); // Single-select
-    widget = uiBinder.createAndBindUi(this);
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
   @Override
   public BranchingWizardStepController.Builder getDeriveFromVariableStepController(final boolean skip) {
     return (BranchingWizardStepController.Builder) BranchingWizardStepController.Builder
-        .create(deriveFromVariableStep, null, new Skippable() {
+        .create(deriveFromVariableStep, new Skippable() {
           @Override
           public boolean skip() {
             return skip;
@@ -100,11 +97,6 @@ public class DeriveFromVariableView extends ViewImpl implements DeriveFromVariab
       }
       if(variableBox.getSelectedIndex() == -1) variableBox.setSelectedIndex(0);
     }
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
   }
 
   @Override

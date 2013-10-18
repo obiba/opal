@@ -4,16 +4,6 @@
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
   <g:FlowPanel>
-
-    <g:HTMLPanel ui:field="help">
-      <g:Label addStyleNames="title">
-        <ui:msg description="Opal URL label">Opal URL</ui:msg>
-      </g:Label>
-      <p>
-        <ui:msg description="Opal URL information">The Opal url (starts with http or https)</ui:msg>
-      </p>
-    </g:HTMLPanel>
-
     <g:FlowPanel styleName="input">
       <g:Label addStyleNames="key">
         <ui:msg description="Opal URL label">Opal address</ui:msg>

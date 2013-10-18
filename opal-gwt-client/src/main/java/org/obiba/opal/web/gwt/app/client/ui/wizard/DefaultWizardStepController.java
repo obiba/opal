@@ -33,16 +33,12 @@ public class DefaultWizardStepController implements WizardStepController {
       currentStepCtrl = ctrl;
     }
 
-    public static Builder create(WizardStep step, Widget help, Skippable skippable) {
-      return new Builder(new DefaultWizardStepController(step, help, skippable));
-    }
-
-    public static Builder create(WizardStep step, @Nullable Widget help) {
-      return new Builder(new DefaultWizardStepController(step, help));
+    public static Builder create(WizardStep step, Skippable skippable) {
+      return new Builder(new DefaultWizardStepController(step, skippable));
     }
 
     public static Builder create(WizardStep step) {
-      return create(step, null);
+      return new Builder(new DefaultWizardStepController(step));
     }
 
     /**
@@ -53,17 +49,6 @@ public class DefaultWizardStepController implements WizardStepController {
      */
     public Builder title(String text) {
       currentStepCtrl.getStep().setStepTitle(text);
-      return this;
-    }
-
-    /**
-     * Set a provider of help for the last appended step.
-     *
-     * @param provider
-     * @return
-     */
-    public Builder help(WidgetProvider provider) {
-      currentStepCtrl.setHelpProvider(provider);
       return this;
     }
 
@@ -153,8 +138,6 @@ public class DefaultWizardStepController implements WizardStepController {
 
   private WizardStep step;
 
-  private WidgetProvider help;
-
   private WizardStepController next;
 
   private WizardStepController previous;
@@ -169,16 +152,13 @@ public class DefaultWizardStepController implements WizardStepController {
 
   private boolean conclusion = false;
 
-  DefaultWizardStepController(WizardStep step, Widget help, Skippable skippable) {
-    this(step, help);
+  DefaultWizardStepController(WizardStep step, Skippable skippable) {
+    this(step);
     setSkippable(skippable);
   }
 
-  DefaultWizardStepController(WizardStep step, @Nullable Widget help) {
+  DefaultWizardStepController(WizardStep step) {
     this.step = step;
-    if(help != null) {
-      this.help = new WidgetProviderImpl(help);
-    }
   }
 
   void setNext(WizardStepController next) {
@@ -201,9 +181,6 @@ public class DefaultWizardStepController implements WizardStepController {
     this.reset = reset;
   }
 
-  public void setHelpProvider(WidgetProvider provider) {
-    help = provider;
-  }
 
   public void setSkippable(Skippable skippable) {
     this.skippable = skippable;
@@ -225,12 +202,6 @@ public class DefaultWizardStepController implements WizardStepController {
     if(next != null) {
       next.addSteps(widgetsContainer, visible);
     }
-  }
-
-  @Nullable
-  @Override
-  public Widget getHelp() {
-    return help == null ? null : help.getWidget();
   }
 
   @Override

@@ -16,6 +16,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
@@ -23,28 +24,14 @@ import com.gwtplatform.mvp.client.ViewImpl;
  */
 public class NoFormatStepView extends ViewImpl implements NoFormatStepPresenter.Display {
 
-  @UiTemplate("NoFormatStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, NoFormatStepView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  private final Widget widget;
+  interface Binder extends UiBinder<Widget, NoFormatStepView> {}
 
   @UiField
   Widget label;
 
-  public NoFormatStepView() {
-    widget = uiBinder.createAndBindUi(this);
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
-  }
-
-  @Override
-  public Widget getStepHelp() {
-    return label;
+  @Inject
+  public NoFormatStepView(Binder uiBinder) {
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
 }

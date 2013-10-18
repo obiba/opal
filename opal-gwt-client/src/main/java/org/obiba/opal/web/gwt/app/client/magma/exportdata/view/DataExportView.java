@@ -49,15 +49,12 @@ import com.google.inject.Inject;
  * View of the dialog used to export data from Opal.
  */
 public class DataExportView extends ModalViewImpl implements DataExportPresenter.Display {
-  private static final Translations translations = GWT.create(Translations.class);
+
+  private final Translations translations;
 
   private String username;
 
-  interface DataExportUiBinder extends UiBinder<Widget, DataExportView> {}
-
-  private static final DataExportUiBinder uiBinder = GWT.create(DataExportUiBinder.class);
-
-  private final Widget widget;
+  interface Binder extends UiBinder<Widget, DataExportView> {}
 
   @UiField
   WizardModalBox dialog;
@@ -90,12 +87,6 @@ public class DataExportView extends ModalViewImpl implements DataExportPresenter
   RadioButton unitId;
 
   @UiField
-  HTMLPanel destinationHelpPanel;
-
-  @UiField
-  HTMLPanel unitHelpPanel;
-
-  @UiField
   CheckBox useAlias;
 
   @UiField
@@ -116,10 +107,11 @@ public class DataExportView extends ModalViewImpl implements DataExportPresenter
   private WizardStepChain stepChain;
 
   @Inject
-  public DataExportView(EventBus eventBus) {
+  public DataExportView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
+    this.translations = translations;
     tableChooser = new TableChooser(true);
-    widget = uiBinder.createAndBindUi(this);
+    initWidget(uiBinder.createAndBindUi(this));
     initWidgets();
     initWizardDialog();
   }
@@ -142,7 +134,7 @@ public class DataExportView extends ModalViewImpl implements DataExportPresenter
             clearTablesStep();
           }
         })//
-        .append(destinationStep, destinationHelpPanel)//
+        .append(destinationStep)//
         .title(translations.dataExportDestination())//
         .onValidate(new ValidationHandler() {
 
@@ -158,7 +150,7 @@ public class DataExportView extends ModalViewImpl implements DataExportPresenter
             clearDestinationStep();
           }
         })//
-        .append(unitStep, unitHelpPanel)//
+        .append(unitStep)//
         .title(translations.dataExportUnit())//
         .onReset(new ResetHandler() {
 
@@ -186,16 +178,6 @@ public class DataExportView extends ModalViewImpl implements DataExportPresenter
         units.setEnabled(true);
       }
     });
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
-  }
-
-  @Override
-  protected Modal asModal() {
-    return dialog;
   }
 
   @Override
@@ -306,7 +288,6 @@ public class DataExportView extends ModalViewImpl implements DataExportPresenter
   @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void clearTablesStep() {
     tablesStep.setVisible(true);
-    dialog.setHelpEnabled(false);
     tableChooser.clear();
   }
 

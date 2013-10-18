@@ -35,6 +35,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
@@ -42,12 +43,9 @@ import com.gwtplatform.mvp.client.ViewImpl;
  */
 public class DeriveConclusionView extends ViewImpl implements DeriveConclusionPresenter.Display {
 
-  @UiTemplate("DeriveConclusionView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, DeriveConclusionView> {}
+  interface Binder extends UiBinder<Widget, DeriveConclusionView> {}
 
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  private static final Translations translations = GWT.create(Translations.class);
+  private final Translations translations;
 
   @UiField
   WizardStep conclusionStep;
@@ -72,10 +70,10 @@ public class DeriveConclusionView extends ViewImpl implements DeriveConclusionPr
 
   private Map<String, List<String>> viewSuggestions;
 
-  private final Widget widget;
-
-  public DeriveConclusionView() {
-    widget = uiBinder.createAndBindUi(this);
+  @Inject
+  public DeriveConclusionView(Binder uiBinder, Translations translations) {
+    this.translations = translations;
+    initWidget(uiBinder.createAndBindUi(this));
     datasourceNameBox.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {
@@ -91,7 +89,7 @@ public class DeriveConclusionView extends ViewImpl implements DeriveConclusionPr
 
   @Override
   public DefaultWizardStepController.Builder getConclusionStepBuilder(final boolean shouldSkip) {
-    return DefaultWizardStepController.Builder.create(conclusionStep, null, new Skippable() {
+    return DefaultWizardStepController.Builder.create(conclusionStep, new Skippable() {
       @Override
       public boolean skip() {
         return shouldSkip;
@@ -163,11 +161,6 @@ public class DeriveConclusionView extends ViewImpl implements DeriveConclusionPr
     } else {
       viewNameInput.removeStyleName("error");
     }
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
   }
 
 }
