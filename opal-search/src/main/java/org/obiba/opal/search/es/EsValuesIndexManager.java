@@ -20,6 +20,7 @@ import javax.annotation.Nullable;
 
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.index.IndexRequestBuilder;
+import org.elasticsearch.common.base.Preconditions;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.obiba.magma.Value;
@@ -31,12 +32,15 @@ import org.obiba.magma.concurrent.ConcurrentValueTableReader.ConcurrentReaderCal
 import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.DateType;
 import org.obiba.opal.core.domain.VariableNature;
+import org.obiba.opal.core.service.VariableStatsService;
+import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronization;
-import org.obiba.opal.search.StatsIndexManager;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.ValueTableValuesIndex;
 import org.obiba.opal.search.ValuesIndexManager;
 import org.obiba.opal.search.es.mapping.ValueTableMapping;
+import org.obiba.opal.search.service.OpalSearchService;
+import org.obiba.runtime.Version;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -55,7 +59,8 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
 
   @Autowired
   @Nonnull
-  private StatsIndexManager statsIndexManager;
+  private VariableStatsService variableStatsService;
+
 
   @Nonnull
   @Override
@@ -148,17 +153,17 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
         } else {
           xcb.field(fieldName, esValue(variable, value));
         }
-        //statsIndexManager.getIndex(getValueTable()).indexVariable(variable, value);
+        variableStatsService.stackVariable(getValueTable(), variable, value);
       }
 
       @Override
       public void onComplete() {
         if(stop) {
           index.delete();
-          //statsIndexManager.getIndex(getValueTable()).delete();
+          variableStatsService.clearComputingSummaries(getValueTable());
         } else {
           sendAndCheck(bulkRequest);
-          //statsIndexManager.getIndex(getValueTable()).computeAndIndexSummaries();
+          variableStatsService.computeSummaries(getValueTable());
           index.updateTimestamps();
         }
       }

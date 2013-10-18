@@ -34,16 +34,11 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.type.TextType;
-import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.service.ImportService;
-import org.obiba.opal.search.StatsIndexManager;
-import org.obiba.opal.search.es.ElasticSearchConfigurationService;
-import org.obiba.opal.search.es.ElasticSearchProvider;
-import org.obiba.opal.search.service.OpalSearchService;
+import org.obiba.opal.core.service.VariableStatsService;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Opal.LocaleDto;
-import org.springframework.context.ApplicationContext;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -91,12 +86,8 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
 
   private TableResource createResource(ValueTable table, Set<Locale> locales) {
     ImportService importService = createMock(ImportService.class);
-    OpalSearchService opalSearchService = new OpalSearchService(
-        new ElasticSearchConfigurationService(createMock(OpalConfigurationService.class)),
-        createMock(ApplicationContext.class));
-    StatsIndexManager statsIndexManager = createMock(StatsIndexManager.class);
-    ElasticSearchProvider esProvider = createMock(ElasticSearchProvider.class);
-    return new TableResource(table, locales, importService, opalSearchService, statsIndexManager, esProvider);
+    VariableStatsService variableStatsService = createMock(VariableStatsService.class);
+    return new TableResource(table, locales, importService, variableStatsService);
   }
 
   @Test
@@ -137,6 +128,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
 
     Response r = new VariablesResource(datasource.getValueTable("Weight"), Collections.<Locale>emptySet())
         .getVariables(uriInfoMock, null, 0, null);
+    @SuppressWarnings("unchecked")
     List<VariableDto> dtos = ImmutableList.copyOf(((GenericEntity<Iterable<VariableDto>>) r.getEntity()).getEntity());
 
     verify(uriInfoMock);

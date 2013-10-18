@@ -9,15 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.math;
 
+import javax.annotation.Nonnull;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
-import org.obiba.opal.search.StatsIndexManager;
-import org.obiba.opal.search.es.ElasticSearchProvider;
-import org.obiba.opal.search.service.OpalSearchService;
+import org.obiba.opal.core.service.VariableStatsService;
 import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
 
 /**
@@ -25,10 +24,9 @@ import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
  */
 public class DefaultSummaryResource extends AbstractSummaryResource {
 
-  public DefaultSummaryResource(OpalSearchService opalSearchService, StatsIndexManager statsIndexManager,
-      ElasticSearchProvider esProvider, ValueTable valueTable, Variable variable,
-      VariableValueSource variableValueSource) {
-    super(opalSearchService, statsIndexManager, esProvider, valueTable, variable, variableValueSource);
+  public DefaultSummaryResource(@Nonnull VariableStatsService variableStatsService, ValueTable valueTable,
+      Variable variable, VariableValueSource variableValueSource) {
+    super(variableStatsService, valueTable, variable, variableValueSource);
   }
 
   @GET

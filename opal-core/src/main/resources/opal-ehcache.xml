@@ -2,6 +2,7 @@
     xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd" updateCheck="false">
 
   <diskStore path="${OPAL_HOME}/work/ehcache"/>
+  
   <defaultCache
       maxElementsInMemory="10000"
       eternal="false"
@@ -9,8 +10,18 @@
       timeToLiveSeconds="120"
       overflowToDisk="true"
       maxElementsOnDisk="10000000"
-      diskPersistent="false"
-      diskExpiryThreadIntervalSeconds="120"
-      memoryStoreEvictionPolicy="LRU"/>
+      diskPersistent="false"/>
+
+  <cache name="opal.variable.summary.categorical"
+      maxElementsInMemory="100"
+      eternal="true"
+      overflowToDisk="true"
+      diskPersistent="true"/>
+
+  <cache name="opal.variable.summary.continuous"
+      maxElementsInMemory="100"
+      eternal="true"
+      overflowToDisk="true"
+      diskPersistent="true"/>
 
 </ehcache>

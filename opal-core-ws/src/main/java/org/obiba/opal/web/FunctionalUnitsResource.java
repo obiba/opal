@@ -55,13 +55,11 @@ import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
+import org.obiba.opal.core.service.VariableStatsService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers.UnitIdentifier;
 import org.obiba.opal.core.unit.FunctionalUnitService;
-import org.obiba.opal.search.StatsIndexManager;
-import org.obiba.opal.search.es.ElasticSearchProvider;
-import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.TableResource;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
@@ -103,27 +101,21 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   private final IdentifiersTableService identifiersTableService;
 
-  private final OpalSearchService opalSearchService;
-
-  private final StatsIndexManager statsIndexManager;
-
-  private final ElasticSearchProvider esProvider;
+  private final VariableStatsService variableStatsService;
 
   @SuppressWarnings("ConstructorWithTooManyParameters")
   @Autowired
   public FunctionalUnitsResource(FunctionalUnitService functionalUnitService, OpalRuntime opalRuntime,
       UnitKeyStoreService unitKeyStoreService, ImportService importService,
       DatasourceFactoryRegistry datasourceFactoryRegistry, IdentifiersTableService identifiersTableResolver,
-      OpalSearchService opalSearchService, StatsIndexManager statsIndexManager, ElasticSearchProvider esProvider) {
+      VariableStatsService variableStatsService) {
     this.functionalUnitService = functionalUnitService;
     this.opalRuntime = opalRuntime;
     this.unitKeyStoreService = unitKeyStoreService;
     this.importService = importService;
     this.datasourceFactoryRegistry = datasourceFactoryRegistry;
     identifiersTableService = identifiersTableResolver;
-    this.opalSearchService = opalSearchService;
-    this.statsIndexManager = statsIndexManager;
-    this.esProvider = esProvider;
+    this.variableStatsService = variableStatsService;
   }
 
   @GET
@@ -220,15 +212,14 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   @Path("/entities/table")
   public TableResource getEntitiesTable() {
-    return new TableResource(identifiersTableService.getValueTable(), importService, opalSearchService,
-        statsIndexManager, esProvider);
+    return new TableResource(identifiersTableService.getValueTable(), importService, variableStatsService);
   }
 
   @GET
   @Path("/entities/csv")
   @Produces("text/csv")
   @AuthenticatedByCookie
-  public Response getCSVIdentifiers() throws MagmaRuntimeException, IOException {
+  public Response getCSVIdentifiers() throws MagmaRuntimeException {
     try {
       String destinationName = identifiersTableService.getValueTable().getDatasource().getName();
 

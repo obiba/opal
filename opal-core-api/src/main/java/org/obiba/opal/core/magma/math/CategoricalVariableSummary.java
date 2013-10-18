@@ -9,10 +9,10 @@
  */
 package org.obiba.opal.core.magma.math;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.SortedSet;
 
 import javax.annotation.Nonnull;
 
@@ -21,7 +21,6 @@ import org.obiba.magma.Value;
 import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VectorSource;
 import org.obiba.magma.type.BooleanType;
 import org.springframework.util.Assert;
@@ -30,12 +29,13 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Sets;
 
 /**
  *
  */
-public class CategoricalVariableSummary extends AbstractVariableSummary {
+public class CategoricalVariableSummary extends AbstractVariableSummary implements Serializable {
+
+  private static final long serialVersionUID = 203198842420473154L;
 
   public static final String NULL_NAME = "N/A";
 
@@ -62,6 +62,12 @@ public class CategoricalVariableSummary extends AbstractVariableSummary {
     Assert.notNull(variable, "Variable cannot be null");
   }
 
+  @Override
+  public String getCacheKey(ValueTable table) {
+    return CategoricalVariableSummaryFactory.getCacheKey(variable, table, distinct, getOffset(), getLimit());
+  }
+
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void add(@Nonnull ValueTable table, @Nonnull ValueSource variableValueSource) {
     Assert.notNull(variable, "ValueTable cannot be null");
     Assert.notNull(variableValueSource, "variableValueSource cannot be null");
@@ -174,7 +180,9 @@ public class CategoricalVariableSummary extends AbstractVariableSummary {
     return empty;
   }
 
-  public static class Frequency {
+  public static class Frequency implements Serializable {
+
+    private static final long serialVersionUID = -2876592652764310324L;
 
     private final String value;
 
@@ -224,12 +232,12 @@ public class CategoricalVariableSummary extends AbstractVariableSummary {
       return this;
     }
 
-    public Builder addTable(@Nonnull ValueTable table, @Nonnull ValueSource variableValueSource) {
+    public Builder addTable(@Nonnull ValueTable table, @Nonnull ValueSource valueSource) {
       if(addedValue) {
         throw new IllegalStateException("Cannot add table for variable " + summary.getVariable().getName() +
             " because values where previously added with addValue().");
       }
-      summary.add(table, variableValueSource);
+      summary.add(table, valueSource);
       addedTable = true;
 
       return this;

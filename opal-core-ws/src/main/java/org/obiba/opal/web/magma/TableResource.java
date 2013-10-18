@@ -43,9 +43,7 @@ import org.obiba.magma.support.StaticDatasource;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
-import org.obiba.opal.search.StatsIndexManager;
-import org.obiba.opal.search.es.ElasticSearchProvider;
-import org.obiba.opal.search.service.OpalSearchService;
+import org.obiba.opal.core.service.VariableStatsService;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
@@ -66,24 +64,17 @@ public class TableResource extends AbstractValueTableResource {
 
   private final ImportService importService;
 
-  private final OpalSearchService opalSearchService;
+  private final VariableStatsService variableStatsService;
 
-  private final StatsIndexManager statsIndexManager;
-
-  private final ElasticSearchProvider esProvider;
-
-  public TableResource(ValueTable valueTable, ImportService importService, OpalSearchService opalSearchService,
-      StatsIndexManager statsIndexManager, ElasticSearchProvider esProvider) {
-    this(valueTable, Collections.<Locale>emptySet(), importService, opalSearchService, statsIndexManager, esProvider);
+  public TableResource(ValueTable valueTable, ImportService importService, VariableStatsService variableStatsService) {
+    this(valueTable, Collections.<Locale>emptySet(), importService, variableStatsService);
   }
 
   public TableResource(ValueTable valueTable, Set<Locale> locales, ImportService importService,
-      OpalSearchService opalSearchService, StatsIndexManager statsIndexManager, ElasticSearchProvider esProvider) {
+      VariableStatsService variableStatsService) {
     super(valueTable, locales);
     this.importService = importService;
-    this.opalSearchService = opalSearchService;
-    this.statsIndexManager = statsIndexManager;
-    this.esProvider = esProvider;
+    this.variableStatsService = variableStatsService;
   }
 
   @GET
@@ -203,7 +194,7 @@ public class TableResource extends AbstractValueTableResource {
           .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "NoSuchFunctionalUnit", unitName).build()).build();
     } catch(RuntimeException ex) {
       return Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCopierIOException", ex)).build();
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCopierIOException", ex).build()).build();
     }
     return Response.ok().build();
   }
@@ -243,7 +234,7 @@ public class TableResource extends AbstractValueTableResource {
   @Path("/variable/{variable}")
   public VariableResource getVariable(@Context Request request, @PathParam("variable") String name) {
     TimestampedResponses.evaluate(request, getValueTable());
-    return getVariableResource(getValueTable().getVariableValueSource(name), name);
+    return getVariableResource(getValueTable().getVariableValueSource(name));
   }
 
   /**
@@ -264,7 +255,7 @@ public class TableResource extends AbstractValueTableResource {
       @FormParam("category") List<String> categoriesFP) {
     JavascriptVariableValueSource jvvs = getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP,
         categoriesQP, scriptFP, categoriesFP);
-    return getVariableResource(jvvs, null);
+    return getVariableResource(jvvs);
   }
 
   /**
@@ -387,8 +378,8 @@ public class TableResource extends AbstractValueTableResource {
     }
   }
 
-  private VariableResource getVariableResource(VariableValueSource source, String name) {
-    return new VariableResource(getValueTable(), source, opalSearchService, statsIndexManager, esProvider, name);
+  private VariableResource getVariableResource(VariableValueSource source) {
+    return new VariableResource(getValueTable(), source, variableStatsService);
   }
 
   private JavascriptVariableValueSource getJavascriptVariableValueSource(String valueTypeName, Boolean repeatable,

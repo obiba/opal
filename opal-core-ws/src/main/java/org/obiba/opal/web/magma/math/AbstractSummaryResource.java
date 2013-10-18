@@ -9,37 +9,17 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.math;
 
-import java.util.Iterator;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
-import org.obiba.magma.Value;
+import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.magma.VariableEntity;
-import org.obiba.magma.VariableValueSource;
-import org.obiba.magma.js.JavascriptValueSource;
-import org.obiba.magma.type.BooleanType;
-import org.obiba.opal.search.StatsIndexManager;
-import org.obiba.opal.search.es.ElasticSearchProvider;
-import org.obiba.opal.search.service.OpalSearchService;
+import org.obiba.opal.core.service.VariableStatsService;
 import org.springframework.util.Assert;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 
 public class AbstractSummaryResource {
 
-  protected final OpalSearchService opalSearchService;
-
-  protected final StatsIndexManager statsIndexManager;
-
-  protected final ElasticSearchProvider esProvider;
+  protected final VariableStatsService variableStatsService;
 
   @Nonnull
   private final ValueTable valueTable;
@@ -48,19 +28,17 @@ public class AbstractSummaryResource {
   private final Variable variable;
 
   @Nonnull
-  private final VariableValueSource variableValueSource;
+  private final ValueSource variableValueSource;
 
-  protected AbstractSummaryResource(OpalSearchService opalSearchService, StatsIndexManager statsIndexManager,
-      ElasticSearchProvider esProvider, @Nonnull ValueTable valueTable, @Nonnull Variable variable,
-      @Nonnull VariableValueSource variableValueSource) {
-    this.variableValueSource = variableValueSource;
+  protected AbstractSummaryResource(@Nonnull VariableStatsService variableStatsService, @Nonnull ValueTable valueTable,
+      @Nonnull Variable variable, @Nonnull ValueSource variableValueSource) {
+    Assert.notNull(variableStatsService);
     Assert.notNull(valueTable);
     Assert.notNull(variable);
     Assert.notNull(variableValueSource);
 
-    this.opalSearchService = opalSearchService;
-    this.statsIndexManager = statsIndexManager;
-    this.esProvider = esProvider;
+    this.variableValueSource = variableValueSource;
+    this.variableStatsService = variableStatsService;
     this.valueTable = valueTable;
     this.variable = variable;
   }
@@ -76,16 +54,8 @@ public class AbstractSummaryResource {
   }
 
   @Nonnull
-  public VariableValueSource getVariableValueSource() {
+  public ValueSource getVariableValueSource() {
     return variableValueSource;
-  }
-
-  protected boolean isEsAvailable() {
-    return opalSearchService.isEnabled() && opalSearchService.isRunning() && statsIndexManager.isReady();
-  }
-
-  protected boolean canQueryEsIndex() {
-    return isEsAvailable() && statsIndexManager.isIndexUpToDate(valueTable);
   }
 
 }

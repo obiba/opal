@@ -979,7 +979,6 @@
         <groupId>net.sf.ehcache</groupId>
         <artifactId>ehcache-core</artifactId>
         <version>${ehcache-core.version}</version>
-        <scope>runtime</scope>
       </dependency>
 
       <dependency>
