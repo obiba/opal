@@ -11,6 +11,7 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
+import org.obiba.core.util.TimedExecution;
 import org.obiba.magma.Timestamped;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
@@ -55,12 +56,12 @@ public class CachedVariableStatsService implements VariableStatsService {
 
   @Override
   public void stackVariable(@Nonnull ValueTable valueTable, @Nonnull Variable variable, @Nonnull Value value) {
-//    // skip binary variable
-//    Preconditions.checkArgument(!BinaryType.get().equals(variable.getValueType()),
-//        "Cannot compute summary for binary variable " + variable.getName());
-//
-//    addValueToCategoricalSummaryBuilder(valueTable, variable, value);
-//    addValueToContinuousSummaryBuilder(valueTable, variable, value);
+    // skip binary variable
+    Preconditions.checkArgument(!BinaryType.get().equals(variable.getValueType()),
+        "Cannot compute summary for binary variable " + variable.getName());
+
+    addValueToCategoricalSummaryBuilder(valueTable, variable, value);
+    addValueToContinuousSummaryBuilder(valueTable, variable, value);
   }
 
   private void addValueToCategoricalSummaryBuilder(ValueTable valueTable, Variable variable, Value value) {
@@ -110,19 +111,21 @@ public class CachedVariableStatsService implements VariableStatsService {
 
   @Override
   public void computeSummaries(@Nonnull ValueTable table) {
-//    TimedExecution timedExecution = new TimedExecution().start();
-//    computeAndCacheCategoricalSummaries(table);
-//    computeAndCacheContinuousSummaries(table);
-//    clearComputingSummaries(table);
-//    log.info("Variables summaries for {} computed in {}", table.getTableReference(),
-//        timedExecution.end().formatExecutionTime());
+    TimedExecution timedExecution = new TimedExecution().start();
+    computeAndCacheCategoricalSummaries(table);
+    computeAndCacheContinuousSummaries(table);
+    clearComputingSummaries(table);
+    log.info("Variables summaries for {} computed in {}", table.getTableReference(),
+        timedExecution.end().formatExecutionTime());
   }
 
   private void computeAndCacheCategoricalSummaries(ValueTable table) {
     Cache cache = cacheManager.getCache(CATEGORICAL_CACHE);
     for(CategoricalVariableSummary.Builder summaryBuilder : getCategoricalSummaryBuilders(table)) {
       CategoricalVariableSummary summary = summaryBuilder.build();
-      cache.put(new Element(summary.getCacheKey(table), summary));
+      String key = summary.getCacheKey(table);
+      log.debug("Add to cache {}", key);
+      cache.put(new Element(key, summary));
     }
   }
 
@@ -130,7 +133,9 @@ public class CachedVariableStatsService implements VariableStatsService {
     Cache cache = cacheManager.getCache(CONTINUOUS_CACHE);
     for(ContinuousVariableSummary.Builder summaryBuilder : getContinuousSummaryBuilders(table)) {
       ContinuousVariableSummary summary = summaryBuilder.build();
-      cache.put(new Element(summary.getCacheKey(table), summary));
+      String key = summary.getCacheKey(table);
+      log.debug("Add to cache {}", key);
+      cache.put(new Element(key, summary));
     }
   }
 
@@ -165,20 +170,20 @@ public class CachedVariableStatsService implements VariableStatsService {
 
     log.debug("Get categorical summary for {}", variable.getName());
 
-    return summaryFactory.getSummary();
+    // don't cache transient variable summary
+    if("_transient".equals(variable.getName())) {
+      return summaryFactory.getSummary();
+    }
 
-//    // don't cache transient variable summary
-//    if("_transient".equals(variable.getName())) {
-//      return summaryFactory.getSummary();
-//    }
-//
-//    return getCached(summaryFactory);
+    return getCached(summaryFactory);
   }
 
   private CategoricalVariableSummary getCached(CategoricalVariableSummaryFactory summaryFactory) {
     Cache cache = cacheManager.getCache(CATEGORICAL_CACHE);
     String key = summaryFactory.getCacheKey();
     Element element = cache.get(key);
+    log.debug("Cache for {}: {}", key, element);
+
     if(element == null) {
       return cacheCategoricalSummary(summaryFactory, cache, key);
     }
@@ -206,20 +211,20 @@ public class CachedVariableStatsService implements VariableStatsService {
 
     log.debug("Get continuous summary for {}", variable.getName());
 
-    return summaryFactory.getSummary();
+    // don't cache transient variable summary
+    if("_transient".equals(variable.getName())) {
+      return summaryFactory.getSummary();
+    }
 
-//    // don't cache transient variable summary
-//    if("_transient".equals(variable.getName())) {
-//      return summaryFactory.getSummary();
-//    }
-//
-//    return getCached(summaryFactory);
+    return getCached(summaryFactory);
   }
 
   private ContinuousVariableSummary getCached(ContinuousVariableSummaryFactory summaryFactory) {
     Cache cache = cacheManager.getCache(CONTINUOUS_CACHE);
     String key = summaryFactory.getCacheKey();
     Element element = cache.get(key);
+    log.debug("Cache for {}: {}", key, element);
+
     if(element == null) {
       return cacheContinuousSummary(summaryFactory, cache, key);
     }
