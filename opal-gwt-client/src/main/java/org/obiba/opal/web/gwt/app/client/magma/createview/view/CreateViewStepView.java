@@ -66,12 +66,6 @@ public class CreateViewStepView extends ModalViewImpl implements CreateViewStepP
   WizardStep conclusionStep;
 
   @UiField
-  HTMLPanel selectTypeHelp;
-
-  @UiField
-  HTMLPanel tablesHelp;
-
-  @UiField
   TextBox viewNameTextBox;
 
   @UiField
