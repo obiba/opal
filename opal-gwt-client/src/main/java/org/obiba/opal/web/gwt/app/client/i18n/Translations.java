@@ -410,7 +410,7 @@ public interface Translations extends Constants {
       "SpssDuplicateEntity", "Duplicate entity identifier '{0}' at row '{1}'. Please make sure that the variable '{2}' representing entities has unique values.", //
       "SpssFailedToLoadData", "Failed to load data from file '{0}'. Please make sure you have chosen the correct character set.",//
       "InvalidCategoryCharsetCharacter", "File contains invalid characters at row '{0}' for variable category '{1}' in string '{2}'. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.",//
-      "InvalidCharsetCharacter", "File contains invalid characters at row '{0}' in string '{1}'. Please make sure the file is a valid SPSS file and that you have chosen the correct character set.",//
+      "InvalidCharsetCharacter", "File contains invalid characters at row '{0}' in string '{1}'. Please make sure the file is a valid SPSS file and that you have chosen the correct character set."
   })
   Map<String, String> userMessageMap();
 
