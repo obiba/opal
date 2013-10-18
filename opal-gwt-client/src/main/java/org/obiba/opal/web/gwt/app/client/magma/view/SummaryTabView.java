@@ -112,7 +112,7 @@ public class SummaryTabView extends ViewImpl implements SummaryTabPresenter.Disp
   }
 
   @Override
-  public void requestingSummary(int limit, int max) {
+  public void requestingSummary(int limit, int entitiesCount) {
     summary.clear();
     summary.add(new Image("image/loading.gif"));
 
@@ -120,13 +120,14 @@ public class SummaryTabView extends ViewImpl implements SummaryTabPresenter.Disp
     limitTextBox.setMaxConstrained(false);
     limitTextBox.setMin(1);
     limitTextBox.setValue(String.valueOf(limit));
-    if(limit < max) {
+    if(limit < entitiesCount) {
       limitTextBox.setVisible(true);
       previewSummaryTextSuffix.setVisible(true);
       fullPanel.setVisible(false);
       refreshPanel.setVisible(false);
       previewSummaryText.setText(translations.summaryPreviewPendingLabel());
-      previewSummaryTextSuffix.setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(max)));
+      previewSummaryTextSuffix
+          .setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(entitiesCount)));
     } else {
       limitTextBox.setVisible(false);
       previewSummaryTextSuffix.setVisible(false);
@@ -139,8 +140,8 @@ public class SummaryTabView extends ViewImpl implements SummaryTabPresenter.Disp
   }
 
   @Override
-  public void renderSummaryLimit(int limit, int max) {
-    if(limit < max) {
+  public void renderSummaryLimit(int limit, int entitiesCount) {
+    if(limit < entitiesCount) {
       limitTextBox.setValue(String.valueOf(limit));
 
       previewSummary.setVisible(true);
@@ -148,14 +149,15 @@ public class SummaryTabView extends ViewImpl implements SummaryTabPresenter.Disp
       refreshPanel.setVisible(true);
       fullPanel.setVisible(true);
       previewSummaryText.setText(translations.summaryPreviewOnLabel());
-      previewSummaryTextSuffix.setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(max)));
+      previewSummaryTextSuffix
+          .setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(entitiesCount)));
     } else {
       previewSummary.setVisible(false);
     }
   }
 
   @Override
-  public void renderCancelSummaryLimit(int limit, int max) {
+  public void renderCancelSummaryLimit(int limit, int entitiesCount) {
     summary.clear();
     limitTextBox.setValue(String.valueOf(limit));
     limitTextBox.setVisible(true);
@@ -166,7 +168,8 @@ public class SummaryTabView extends ViewImpl implements SummaryTabPresenter.Disp
     fullPanel.setVisible(true);
     refreshPanel.setVisible(true);
     previewSummaryText.setText(translations.summaryFetchSummaryLabel());
-    previewSummaryTextSuffix.setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(max)));
+    previewSummaryTextSuffix
+        .setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(entitiesCount)));
   }
 
   @Override

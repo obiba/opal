@@ -254,7 +254,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
    */
   @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void requestSummary(VariableDto selection) {
-    getEventBus().fireEvent(new SummaryRequiredEvent(selection.getLink() + "/summary", table.getValueSetCount()));
+    getEventBus().fireEvent(new SummaryRequiredEvent(selection.getLink() + "/summary"));
   }
 
   @SuppressWarnings("MethodOnlyUsedFromInnerClass")

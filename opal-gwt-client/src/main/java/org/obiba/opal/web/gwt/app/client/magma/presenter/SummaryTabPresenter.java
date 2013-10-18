@@ -10,9 +10,9 @@
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
 import org.obiba.opal.web.gwt.app.client.magma.event.SummaryReceivedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.SummaryRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -25,10 +25,10 @@ import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
@@ -37,26 +37,9 @@ import com.gwtplatform.mvp.client.View;
  */
 public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Display> {
 
-  public interface Display extends View {
+  private final static int DEFAULT_LIMIT = 500;
 
-    void requestingSummary(int limit, int max);
-
-    void renderSummary(SummaryStatisticsDto summary);
-
-    void renderNoSummary();
-
-    void renderSummaryLimit(int limit, int max);
-
-    void renderCancelSummaryLimit(int limit, int max);
-
-    HasClickHandlers getFullSummary();
-
-    HasClickHandlers getCancelSummary();
-
-    HasClickHandlers getRefreshSummary();
-
-    Number getLimit();
-  }
+  private final static int MIN_LIMIT = 10;
 
   private SummaryStatisticsDto summary;
 
@@ -64,13 +47,9 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
 
   private ResourceRequestBuilder<SummaryStatisticsDto> resourceRequestBuilder;
 
-  private final static int DEFAULT_LIMIT = 500;
-
-  private final static int MIN_LIMIT = 10;
-
   private int limit = DEFAULT_LIMIT;
 
-  private int max = 0;
+  private int entitiesCount;
 
   @Inject
   public SummaryTabPresenter(EventBus eventBus, Display display) {
@@ -106,10 +85,15 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
   public void setResourceUri(String resourceUri, int entitiesCount) {
     cancelPendingSummaryRequest();
 
-    max = entitiesCount;
-    limit = Math.min(max, limit);
+    this.entitiesCount = entitiesCount;
+    UriBuilder uriBuilder = UriBuilder.create().fromPath(resourceUri);
+    if(limit < entitiesCount) {
+      uriBuilder.query("limit", String.valueOf(limit));
+    }
     resourceRequestBuilder = ResourceRequestBuilderFactory.<SummaryStatisticsDto>newBuilder()
-        .forResource(UriBuilder.create().fromPath(resourceUri).query("limit", String.valueOf(limit)).build()).get();
+        .forResource(uriBuilder.build()).get();
+
+    limit = Math.min(entitiesCount, limit);
   }
 
   public void setRequestBuilder(ResourceRequestBuilder<SummaryStatisticsDto> resourceRequestBuilder) {
@@ -117,14 +101,14 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
   }
 
   private void requestSummary() {
-    getView().requestingSummary(limit, max);
+    getView().requestingSummary(limit, entitiesCount);
     summaryRequest = resourceRequestBuilder //
         .withCallback(new ResourceCallback<SummaryStatisticsDto>() {
           @Override
           public void onResource(Response response, SummaryStatisticsDto resource) {
             summary = resource;
             getView().renderSummary(resource);
-            getView().renderSummaryLimit(limit, max);
+            getView().renderSummaryLimit(limit, entitiesCount);
             getEventBus().fireEvent(new SummaryReceivedEvent(resourceRequestBuilder.getResource(), resource));
           }
         }) //
@@ -157,16 +141,34 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     return summary != null || summaryRequest != null && summaryRequest.isPending();
   }
 
+  @SuppressWarnings("ParameterHidesMemberVariable")
+  public interface Display extends View {
+
+    void requestingSummary(int limit, int entitiesCount);
+
+    void renderSummary(SummaryStatisticsDto summary);
+
+    void renderNoSummary();
+
+    void renderSummaryLimit(int limit, int entitiesCount);
+
+    void renderCancelSummaryLimit(int limit, int entitiesCount);
+
+    HasClickHandlers getFullSummary();
+
+    HasClickHandlers getCancelSummary();
+
+    HasClickHandlers getRefreshSummary();
+
+    Number getLimit();
+  }
+
   class DeferredSummaryRequestHandler implements SummaryRequiredEvent.Handler {
 
     @Override
     public void onSummaryRequest(SummaryRequiredEvent event) {
       cancelPendingSummaryRequest();
-      int max = DEFAULT_LIMIT;
-      if (event.getMax() != null) {
-        max = event.getMax();
-      }
-      setResourceUri(event.getResourceUri(), max);
+      setResourceUri(event.getResourceUri(), event.getMax() == null ? DEFAULT_LIMIT : event.getMax());
     }
 
   }
@@ -181,7 +183,7 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
         uri = uri.substring(0, uri.indexOf("?"));
       }
       resourceRequestBuilder.forResource(uri).get();
-      limit = max;
+      limit = entitiesCount;
       onReset();
     }
   }
@@ -190,7 +192,8 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     @Override
     public void onClick(ClickEvent event) {
       cancelPendingSummaryRequest();
-      getView().renderCancelSummaryLimit(limit < max ? limit : Math.min(DEFAULT_LIMIT, max), max);
+      getView().renderCancelSummaryLimit(limit < entitiesCount ? limit : Math.min(DEFAULT_LIMIT, entitiesCount),
+          entitiesCount);
 
       // If canceling from a full summary, automatically fetch for limit, else, do nothing
       if(!resourceRequestBuilder.getResource().contains("limit")) {
@@ -209,12 +212,12 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
 
   private void refreshSummary() {
     limit = getView().getLimit().intValue();
-    if(limit < Math.min(MIN_LIMIT, max)) {
-      limit = Math.min(MIN_LIMIT, max);
+    if(limit < Math.min(MIN_LIMIT, entitiesCount)) {
+      limit = Math.min(MIN_LIMIT, entitiesCount);
     }
     String uri = resourceRequestBuilder.getResource();
     uri = uri.substring(0, uri.indexOf("?") > 0 ? uri.indexOf("?") : uri.length());
-    resourceRequestBuilder.forResource(limit >= max ? uri : uri + "?limit=" + limit).get();
+    resourceRequestBuilder.forResource(limit >= entitiesCount ? uri : uri + "?limit=" + limit).get();
 
     onReset();
   }
