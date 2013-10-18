@@ -26,6 +26,7 @@ import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.core.runtime.security.BackgroundJobServiceAuthToken;
+import org.obiba.opal.search.service.OpalSearchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,9 @@ public class IndexSynchronizationManager {
   @Autowired
   private Set<IndexManager> indexManagers;
 
+  @Autowired
+  private OpalSearchService opalSearchService;
+
   private final SyncProducer syncProducer = new SyncProducer();
 
   private SyncConsumer syncConsumer;
@@ -63,6 +67,9 @@ public class IndexSynchronizationManager {
   // Every minute
   @Scheduled(fixedDelay = 60 * 1000)
   public void synchronizeIndices() {
+
+    if(!opalSearchService.isRunning()) return;
+
     if(syncConsumer == null) {
       // start one IndexSynchronization consumer thread per index manager
       syncConsumer = new SyncConsumer();
@@ -215,9 +222,9 @@ public class IndexSynchronizationManager {
         if(sync.getIndexManager().isReady()) {
           getSubject().execute(sync);
         }
-      } catch (NoSuchDatasourceException e) {
+      } catch(NoSuchDatasourceException e) {
         log.trace("Cannot index: ", e.getMessage());
-      } catch (NoSuchValueTableException e) {
+      } catch(NoSuchValueTableException e) {
         log.trace("Cannot index: ", e.getMessage());
       } finally {
         currentTask = null;
