@@ -32,9 +32,9 @@ import org.obiba.magma.concurrent.ConcurrentValueTableReader.ConcurrentReaderCal
 import org.obiba.magma.type.BinaryType;
 import org.obiba.magma.type.DateType;
 import org.obiba.opal.core.domain.VariableNature;
+import org.obiba.opal.core.service.VariableStatsService;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronization;
-import org.obiba.opal.search.StatsIndexManager;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.ValueTableValuesIndex;
 import org.obiba.opal.search.ValuesIndexManager;
@@ -57,18 +57,18 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
   private final ThreadFactory threadFactory;
 
   @Nonnull
-  private final StatsIndexManager statsIndexManager;
+  private final VariableStatsService variableStatsService;
 
   @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
   public EsValuesIndexManager(OpalSearchService esProvider, ElasticSearchConfigurationService esConfig,
       IndexManagerConfigurationService indexConfig, @Nonnull ThreadFactory threadFactory, Version version,
-      @Nonnull StatsIndexManager statsIndexManager) {
+      @Nonnull VariableStatsService variableStatsService) {
     super(esProvider, esConfig, indexConfig, version);
     Preconditions.checkNotNull(threadFactory);
-    Preconditions.checkNotNull(statsIndexManager);
+    Preconditions.checkNotNull(variableStatsService);
+    this.variableStatsService = variableStatsService;
     this.threadFactory = threadFactory;
-    this.statsIndexManager = statsIndexManager;
   }
 
   @Nonnull
@@ -162,17 +162,17 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
         } else {
           xcb.field(fieldName, esValue(variable, value));
         }
-        //statsIndexManager.getIndex(getValueTable()).indexVariable(variable, value);
+        variableStatsService.stackVariable(getValueTable(), variable, value);
       }
 
       @Override
       public void onComplete() {
         if(stop) {
           index.delete();
-          //statsIndexManager.getIndex(getValueTable()).delete();
+          variableStatsService.clearComputingSummaries(getValueTable());
         } else {
           sendAndCheck(bulkRequest);
-          //statsIndexManager.getIndex(getValueTable()).computeAndIndexSummaries();
+          variableStatsService.computeSummaries(getValueTable());
           index.updateTimestamps();
         }
       }

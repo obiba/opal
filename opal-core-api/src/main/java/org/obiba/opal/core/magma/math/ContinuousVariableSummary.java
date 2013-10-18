@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.core.magma.math;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -38,7 +39,9 @@ import com.google.common.collect.Sets;
 /**
  *
  */
-public class ContinuousVariableSummary extends AbstractVariableSummary {
+public class ContinuousVariableSummary extends AbstractVariableSummary implements Serializable {
+
+  private static final long serialVersionUID = -8679001175321206239L;
 
   public static final int DEFAULT_INTERVALS = 10;
 
@@ -74,6 +77,12 @@ public class ContinuousVariableSummary extends AbstractVariableSummary {
   @Nonnull
   private final Collection<IntervalFrequency.Interval> intervalFrequencies = Lists.newArrayList();
 
+  @Override
+  public String getCacheKey(ValueTable table) {
+    return ContinuousVariableSummaryFactory
+        .getCacheKey(variable, table, distribution, percentiles, intervals, getOffset(), getLimit());
+  }
+
   private ContinuousVariableSummary(@Nonnull Variable variable, @Nonnull Distribution distribution) {
 
     Assert.notNull(variable, "Variable cannot be null");
@@ -92,6 +101,7 @@ public class ContinuousVariableSummary extends AbstractVariableSummary {
     }
   }
 
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void add(@Nonnull ValueTable table, @Nonnull ValueSource variableValueSource) {
     Assert.notNull(variable, "ValueTable cannot be null");
     Assert.notNull(variableValueSource, "VariableValueSource cannot be null");

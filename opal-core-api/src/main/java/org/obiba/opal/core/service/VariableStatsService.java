@@ -9,7 +9,31 @@
  */
 package org.obiba.opal.core.service;
 
+import javax.annotation.Nonnull;
+
+import org.obiba.magma.Value;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
+import org.obiba.opal.core.magma.math.CategoricalVariableSummary;
+import org.obiba.opal.core.magma.math.CategoricalVariableSummaryFactory;
+import org.obiba.opal.core.magma.math.ContinuousVariableSummary;
+import org.obiba.opal.core.magma.math.ContinuousVariableSummaryFactory;
+
 /**
  *
  */
-public interface VariableStatsService {}
+public interface VariableStatsService {
+
+  void stackVariable(@Nonnull ValueTable valueTable, @Nonnull Variable variable, @Nonnull Value value);
+
+  void computeSummaries(@Nonnull ValueTable valueTable);
+
+  void clearComputingSummaries(@Nonnull ValueTable valueTable);
+
+  @Nonnull
+  ContinuousVariableSummary getContinuousSummary(@Nonnull ContinuousVariableSummaryFactory summaryFactory);
+
+  @Nonnull
+  CategoricalVariableSummary getCategoricalSummary(@Nonnull CategoricalVariableSummaryFactory summaryFactory);
+
+}
