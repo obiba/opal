@@ -37,7 +37,7 @@ public class MongoDBDatasourceFactoryDtoParser extends AbstractDatasourceFactory
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
     Magma.MongoDBDatasourceFactoryDto mongoDto = dto.getExtension(Magma.MongoDBDatasourceFactoryDto.params);
     MongoDbDatabase database = (MongoDbDatabase) databaseRegistry.getDatabase(mongoDto.getDatabase());
-    return database.createMongoDBDatasourceFactory();
+    return database.createMongoDBDatasourceFactory(dto.getName());
   }
 
   @Override

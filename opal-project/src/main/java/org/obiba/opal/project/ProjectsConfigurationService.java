@@ -120,8 +120,8 @@ public class ProjectsConfigurationService implements ProjectService {
 
   @Override
   public void createProject(@Nonnull Project project) throws ConstraintViolationException {
-    orientDbService.save(project);
     registerDatasource(project);
+    orientDbService.save(project);
   }
 
   @Override

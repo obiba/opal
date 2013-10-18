@@ -252,6 +252,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     String databaseName = database.getName();
     Preconditions.checkArgument(database.getUsage() == Database.Usage.STORAGE,
         "Cannot create DatasourceFactory for non storage database " + databaseName + ": " + database.getUsage());
+    register(database.getName(), datasourceName);
 
     if(database instanceof SqlDatabase) {
       SqlDatabase sqlDatabase = (SqlDatabase) database;
@@ -264,7 +265,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
           new DatabaseSessionFactoryProvider(datasourceName, this, database.getName()));
     }
     if(database instanceof MongoDbDatabase) {
-      return ((MongoDbDatabase) database).createMongoDBDatasourceFactory();
+      return ((MongoDbDatabase) database).createMongoDBDatasourceFactory(datasourceName);
     }
     throw new IllegalArgumentException("Unknown datasource config for database " + database.getClass());
   }

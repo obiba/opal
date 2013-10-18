@@ -115,7 +115,7 @@ public class DatabaseResource {
     Ws.ClientErrorDto error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed").build();
     try {
       MongoDbDatabase database = (MongoDbDatabase) getDatabase();
-      MongoDBDatasourceFactory datasourceFactory = database.createMongoDBDatasourceFactory();
+      MongoDBDatasourceFactory datasourceFactory = database.createMongoDBDatasourceFactory("_test");
       List<String> dbs = datasourceFactory.getMongoDBFactory().getMongoClient().getDatabaseNames();
       if(dbs.contains(datasourceFactory.getMongoDbDatabaseName())) {
         return Response.ok().build();

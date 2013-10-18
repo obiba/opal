@@ -50,9 +50,6 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
           99.5d, 99.95d);
 
   @Nonnull
-  private final Variable variable;
-
-  @Nonnull
   private final Distribution distribution;
 
   @Nonnull
@@ -84,12 +81,11 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
   }
 
   private ContinuousVariableSummary(@Nonnull Variable variable, @Nonnull Distribution distribution) {
+    super(variable);
 
-    Assert.notNull(variable, "Variable cannot be null");
     Assert.notNull(distribution, "Distribution cannot be null");
     Assert.isTrue(variable.getValueType().isNumeric(), "Continuous variables must be numeric");
 
-    this.variable = variable;
     this.distribution = distribution;
 
     if(variable.hasCategories()) {

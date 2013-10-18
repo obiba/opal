@@ -6,7 +6,9 @@ import java.util.SortedSet;
 import javax.annotation.Nonnull;
 
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
+import org.springframework.util.Assert;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -15,9 +17,21 @@ public abstract class AbstractVariableSummary implements Serializable {
 
   private static final long serialVersionUID = 3105572632716973506L;
 
-  private Integer offset;
+  @Nonnull
+  protected transient final Variable variable;
 
-  private Integer limit;
+  @Nonnull
+  protected final String variableName;
+
+  protected Integer offset;
+
+  protected Integer limit;
+
+  protected AbstractVariableSummary(@Nonnull Variable variable) {
+    Assert.notNull(variable, "Variable cannot be null");
+    this.variable = variable;
+    variableName = variable.getName();
+  }
 
   public abstract String getCacheKey(ValueTable table);
 
@@ -34,6 +48,11 @@ public abstract class AbstractVariableSummary implements Serializable {
       entities = Iterables.limit(entities, limit);
     }
     return Sets.newTreeSet(entities);
+  }
+
+  @Nonnull
+  public String getVariableName() {
+    return variableName;
   }
 
   void setOffset(Integer offset) {

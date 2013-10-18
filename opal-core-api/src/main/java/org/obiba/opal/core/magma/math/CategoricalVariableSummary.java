@@ -41,9 +41,6 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
 
   private final org.apache.commons.math.stat.Frequency frequencyDist = new org.apache.commons.math.stat.Frequency();
 
-  @Nonnull
-  private final Variable variable;
-
   /**
    * Mode is the most frequent value
    */
@@ -58,8 +55,7 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
   private final Collection<Frequency> frequencies = new ArrayList<Frequency>();
 
   private CategoricalVariableSummary(@Nonnull Variable variable) {
-    this.variable = variable;
-    Assert.notNull(variable, "Variable cannot be null");
+    super(variable);
   }
 
   @Override
@@ -69,7 +65,7 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
 
   @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void add(@Nonnull ValueTable table, @Nonnull ValueSource variableValueSource) {
-    Assert.notNull(variable, "ValueTable cannot be null");
+    Assert.notNull(table, "ValueTable cannot be null");
     Assert.notNull(variableValueSource, "variableValueSource cannot be null");
 
     VectorSource vectorSource = variableValueSource.asVectorSource();
@@ -80,7 +76,7 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
   }
 
   private void add(@Nonnull Value value) {
-    Assert.notNull(variable, "Value cannot be null");
+    Assert.notNull(value, "Value cannot be null");
     if(empty) empty = false;
     if(value.isSequence()) {
       if(value.isNull()) {
@@ -134,13 +130,13 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
    * Returns an iterator of category names
    */
   private Iterator<String> categoryNames() {
-    if(getVariable().getValueType().equals(BooleanType.get())) {
+    if(variable.getValueType().equals(BooleanType.get())) {
       return ImmutableList.<String>builder() //
           .add(BooleanType.get().trueValue().toString()) //
           .add(BooleanType.get().falseValue().toString()).build().iterator();
     }
 
-    return Iterables.transform(getVariable().getCategories(), new Function<Category, String>() {
+    return Iterables.transform(variable.getCategories(), new Function<Category, String>() {
 
       @Override
       public String apply(Category from) {
@@ -148,11 +144,6 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
       }
 
     }).iterator();
-  }
-
-  @Nonnull
-  public Variable getVariable() {
-    return variable;
   }
 
   @Nonnull
@@ -224,7 +215,7 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
 
     public Builder addValue(@Nonnull Value value) {
       if(addedTable) {
-        throw new IllegalStateException("Cannot add value for variable " + summary.getVariable().getName() +
+        throw new IllegalStateException("Cannot add value for variable " + summary.variable.getName() +
             " because values where previously added from the whole table with addTable().");
       }
       summary.add(value);
@@ -234,7 +225,7 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
 
     public Builder addTable(@Nonnull ValueTable table, @Nonnull ValueSource valueSource) {
       if(addedValue) {
-        throw new IllegalStateException("Cannot add table for variable " + summary.getVariable().getName() +
+        throw new IllegalStateException("Cannot add table for variable " + summary.variable.getName() +
             " because values where previously added with addValue().");
       }
       summary.add(table, valueSource);

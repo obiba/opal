@@ -23,8 +23,8 @@ public class MongoDbDatabase extends Database {
 
   private String properties;
 
-  public MongoDBDatasourceFactory createMongoDBDatasourceFactory() {
-    return new MongoDBDatasourceFactory(getName(), url, username, password, properties);
+  public MongoDBDatasourceFactory createMongoDBDatasourceFactory(String datasourceName) {
+    return new MongoDBDatasourceFactory(datasourceName, url, username, password, properties);
   }
 
   public String getPassword() {
