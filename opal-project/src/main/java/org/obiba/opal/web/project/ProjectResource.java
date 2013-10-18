@@ -38,7 +38,8 @@ public class ProjectResource {
 
   @GET
   public Projects.ProjectDto get() {
-    return Dtos.asDto(getProject(), projectService.getProjectDirectoryPath(name));
+    Project project = getProject();
+    return Dtos.asDto(project, projectService.getProjectDirectoryPath(project));
   }
 
   @GET

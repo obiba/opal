@@ -115,7 +115,7 @@ public class ProjectsConfigurationService implements ProjectService {
     if(datasource.canDrop()) datasource.drop();
 
     // remove project folder
-    deleteFolder(getProjectDirectory(name));
+    deleteFolder(getProjectDirectory(project));
   }
 
   @Override
@@ -139,10 +139,8 @@ public class ProjectsConfigurationService implements ProjectService {
 
   @Nonnull
   @Override
-  public FileObject getProjectDirectory(@Nonnull String name)
-      throws NoSuchProjectException, NoSuchFunctionalUnitException, FileSystemException {
-    // check project exists
-    Project project = getProject(name);
+  public FileObject getProjectDirectory(@Nonnull Project project)
+      throws NoSuchFunctionalUnitException, FileSystemException {
     FileObject projectDir = opalRuntime.getFileSystem().getRoot().resolveFile(PROJECTS_DIR)
         .resolveFile(project.getName());
     projectDir.createFolder();
@@ -151,9 +149,9 @@ public class ProjectsConfigurationService implements ProjectService {
 
   @Nonnull
   @Override
-  public String getProjectDirectoryPath(@Nonnull String name) throws NoSuchProjectException {
+  public String getProjectDirectoryPath(@Nonnull Project project) {
     try {
-      FileObject fo = getProjectDirectory(name);
+      FileObject fo = getProjectDirectory(project);
       return fo.getURL().getPath().substring(2);
     } catch(FileSystemException e) {
       throw new RuntimeException(e);

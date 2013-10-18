@@ -45,10 +45,9 @@ public interface ProjectService extends SystemService {
    * @throws FileSystemException
    */
   @Nonnull
-  FileObject getProjectDirectory(@Nonnull String name)
-      throws NoSuchProjectException, NoSuchFunctionalUnitException, FileSystemException;
+  FileObject getProjectDirectory(@Nonnull Project project) throws NoSuchFunctionalUnitException, FileSystemException;
 
   @Nonnull
-  String getProjectDirectoryPath(@Nonnull String name) throws NoSuchProjectException;
+  String getProjectDirectoryPath(@Nonnull Project project);
 
 }
