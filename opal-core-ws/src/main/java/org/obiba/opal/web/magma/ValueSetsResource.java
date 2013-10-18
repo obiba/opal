@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Locale;
 
 import javax.annotation.Nullable;
@@ -43,7 +42,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
 /**
  *
@@ -102,6 +100,7 @@ public class ValueSetsResource extends AbstractValueTableResource {
 
   /**
    * Get the value set timestamps without the values.
+   *
    * @param offset
    * @param limit
    * @return

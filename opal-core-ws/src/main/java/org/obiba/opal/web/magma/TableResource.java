@@ -194,7 +194,7 @@ public class TableResource extends AbstractValueTableResource {
           .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "NoSuchFunctionalUnit", unitName).build()).build();
     } catch(RuntimeException ex) {
       return Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCopierIOException", ex).build()).build();
+          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCopierIOException", ex)).build();
     }
     return Response.ok().build();
   }
@@ -234,7 +234,7 @@ public class TableResource extends AbstractValueTableResource {
   @Path("/variable/{variable}")
   public VariableResource getVariable(@Context Request request, @PathParam("variable") String name) {
     TimestampedResponses.evaluate(request, getValueTable());
-    return getVariableResource(getValueTable().getVariableValueSource(name));
+    return getVariableResource(getValueTable().getVariableValueSource(name), name);
   }
 
   /**
@@ -255,7 +255,7 @@ public class TableResource extends AbstractValueTableResource {
       @FormParam("category") List<String> categoriesFP) {
     JavascriptVariableValueSource jvvs = getJavascriptVariableValueSource(valueTypeName, repeatable, scriptQP,
         categoriesQP, scriptFP, categoriesFP);
-    return getVariableResource(jvvs);
+    return getVariableResource(jvvs, null);
   }
 
   /**
@@ -378,8 +378,8 @@ public class TableResource extends AbstractValueTableResource {
     }
   }
 
-  private VariableResource getVariableResource(VariableValueSource source) {
-    return new VariableResource(getValueTable(), source, variableStatsService);
+  private VariableResource getVariableResource(VariableValueSource source, String name) {
+    return new VariableResource(getValueTable(), source, name, variableStatsService);
   }
 
   private JavascriptVariableValueSource getJavascriptVariableValueSource(String valueTypeName, Boolean repeatable,

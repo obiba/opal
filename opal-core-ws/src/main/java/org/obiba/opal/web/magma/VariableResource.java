@@ -46,11 +46,12 @@ public class VariableResource {
 
   private final VariableValueSource vvs;
 
-  private final VariableStatsService variableStatsService;
-
   private final String name;
 
-  public VariableResource(ValueTable valueTable, VariableValueSource vvs, VariableStatsService variableStatsService, String name) {
+  private final VariableStatsService variableStatsService;
+
+  public VariableResource(ValueTable valueTable, VariableValueSource vvs, String name,
+      VariableStatsService variableStatsService) {
     this.valueTable = valueTable;
     this.vvs = vvs;
     this.name = name;

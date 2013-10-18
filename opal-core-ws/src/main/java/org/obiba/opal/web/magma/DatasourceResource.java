@@ -57,8 +57,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.google.common.annotations.VisibleForTesting;
-
 import edu.umd.cs.findbugs.annotations.Nullable;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;

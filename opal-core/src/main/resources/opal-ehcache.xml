@@ -2,7 +2,7 @@
     xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd" updateCheck="false">
 
   <diskStore path="${OPAL_HOME}/work/ehcache"/>
-  
+
   <defaultCache
       maxElementsInMemory="10000"
       eternal="false"

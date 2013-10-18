@@ -27,7 +27,6 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.obiba.magma.ValueTable;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.service.ImportService;
