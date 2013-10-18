@@ -110,26 +110,29 @@ public class CachedVariableStatsService implements VariableStatsService {
   }
 
   @Override
-  public void computeSummaries(@Nonnull ValueTable valueTable) {
-
+  public void computeSummaries(@Nonnull ValueTable table) {
     TimedExecution timedExecution = new TimedExecution().start();
-
-    // categorical summaries
-    for(CategoricalVariableSummary.Builder summaryBuilder : getCategoricalSummaryBuilders(valueTable)) {
-      CategoricalVariableSummary summary = summaryBuilder.build();
-      //TODO cache summary
-    }
-
-    // continuous summaries
-    for(ContinuousVariableSummary.Builder summaryBuilder : getContinuousSummaryBuilders(valueTable)) {
-      ContinuousVariableSummary summary = summaryBuilder.build();
-      //TODO cache summary
-    }
-
-    clearComputingSummaries(valueTable);
-
-    log.info("Variables summaries for {} computed in {}", valueTable.getTableReference(),
+    computeAndCacheCategoricalSummaries(table);
+    computeAndCacheContinuousSummaries(table);
+    clearComputingSummaries(table);
+    log.info("Variables summaries for {} computed in {}", table.getTableReference(),
         timedExecution.end().formatExecutionTime());
+  }
+
+  private void computeAndCacheCategoricalSummaries(ValueTable table) {
+    Cache cache = cacheManager.getCache(CATEGORICAL_CACHE);
+    for(CategoricalVariableSummary.Builder summaryBuilder : getCategoricalSummaryBuilders(table)) {
+      CategoricalVariableSummary summary = summaryBuilder.build();
+      cache.put(new Element(summary.getCacheKey(table), summary));
+    }
+  }
+
+  private void computeAndCacheContinuousSummaries(ValueTable table) {
+    Cache cache = cacheManager.getCache(CONTINUOUS_CACHE);
+    for(ContinuousVariableSummary.Builder summaryBuilder : getContinuousSummaryBuilders(table)) {
+      ContinuousVariableSummary summary = summaryBuilder.build();
+      cache.put(new Element(summary.getCacheKey(table), summary));
+    }
   }
 
   private Iterable<CategoricalVariableSummary.Builder> getCategoricalSummaryBuilders(@Nonnull ValueTable valueTable) {
@@ -158,6 +161,9 @@ public class CachedVariableStatsService implements VariableStatsService {
   @Override
   public CategoricalVariableSummary getCategoricalSummary(@Nonnull CategoricalVariableSummaryFactory summaryFactory) {
     Variable variable = summaryFactory.getVariable();
+    Preconditions.checkArgument(!BinaryType.get().equals(variable.getValueType()),
+        "Cannot compute summary for binary variable " + variable.getName());
+
     log.debug("Get categorical summary for {}", variable.getName());
 
     // don't cache transient variable summary
@@ -194,6 +200,8 @@ public class CachedVariableStatsService implements VariableStatsService {
   @Override
   public ContinuousVariableSummary getContinuousSummary(@Nonnull ContinuousVariableSummaryFactory summaryFactory) {
     Variable variable = summaryFactory.getVariable();
+    Preconditions.checkArgument(!BinaryType.get().equals(variable.getValueType()),
+        "Cannot compute summary for binary variable " + variable.getName());
 
     log.debug("Get continuous summary for {}", variable.getName());
 

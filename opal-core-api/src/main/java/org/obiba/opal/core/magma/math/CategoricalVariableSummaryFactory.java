@@ -1,5 +1,8 @@
 package org.obiba.opal.core.magma.math;
 
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
+
 public class CategoricalVariableSummaryFactory extends AbstractVariableSummaryFactory {
 
   private boolean distinct;
@@ -10,7 +13,12 @@ public class CategoricalVariableSummaryFactory extends AbstractVariableSummaryFa
 
   @Override
   public String getCacheKey() {
-    String key = getVariable().getVariableReference(getTable()) + "." + distinct;
+    return getCacheKey(getVariable(), getTable(), distinct, offset, limit);
+  }
+
+  public static String getCacheKey(Variable variable, ValueTable table, boolean distinct, Integer offset,
+      Integer limit) {
+    String key = variable.getVariableReference(table) + "." + distinct;
     if(offset != null) key += "." + offset;
     if(limit != null) key += "." + limit;
     return key;

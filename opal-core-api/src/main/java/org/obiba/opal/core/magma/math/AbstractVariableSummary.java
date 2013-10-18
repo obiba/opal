@@ -16,6 +16,8 @@ public abstract class AbstractVariableSummary {
 
   private Integer limit;
 
+  public abstract String getCacheKey(ValueTable table);
+
   protected SortedSet<VariableEntity> getVariableEntities(@Nonnull ValueTable table) {
     if(offset == null && limit == null) return Sets.newTreeSet(table.getVariableEntities());
 

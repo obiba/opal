@@ -74,6 +74,12 @@ public class ContinuousVariableSummary extends AbstractVariableSummary {
   @Nonnull
   private final Collection<IntervalFrequency.Interval> intervalFrequencies = Lists.newArrayList();
 
+  @Override
+  public String getCacheKey(ValueTable table) {
+    return ContinuousVariableSummaryFactory
+        .getCacheKey(variable, table, distribution, percentiles, intervals, getOffset(), getLimit());
+  }
+
   private ContinuousVariableSummary(@Nonnull Variable variable, @Nonnull Distribution distribution) {
 
     Assert.notNull(variable, "Variable cannot be null");
@@ -92,6 +98,7 @@ public class ContinuousVariableSummary extends AbstractVariableSummary {
     }
   }
 
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void add(@Nonnull ValueTable table, @Nonnull ValueSource variableValueSource) {
     Assert.notNull(variable, "ValueTable cannot be null");
     Assert.notNull(variableValueSource, "VariableValueSource cannot be null");

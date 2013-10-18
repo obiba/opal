@@ -59,6 +59,12 @@ public class CategoricalVariableSummary extends AbstractVariableSummary {
     Assert.notNull(variable, "Variable cannot be null");
   }
 
+  @Override
+  public String getCacheKey(ValueTable table) {
+    return CategoricalVariableSummaryFactory.getCacheKey(variable, table, distinct, getOffset(), getLimit());
+  }
+
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void add(@Nonnull ValueTable table, @Nonnull ValueSource variableValueSource) {
     Assert.notNull(variable, "ValueTable cannot be null");
     Assert.notNull(variableValueSource, "variableValueSource cannot be null");

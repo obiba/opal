@@ -2,9 +2,14 @@ package org.obiba.opal.core.magma.math;
 
 import java.util.List;
 
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.Variable;
+
+import static org.obiba.opal.core.magma.math.ContinuousVariableSummary.Distribution;
+
 public class ContinuousVariableSummaryFactory extends AbstractVariableSummaryFactory {
 
-  private ContinuousVariableSummary.Distribution distribution;
+  private Distribution distribution;
 
   private List<Double> percentiles;
 
@@ -16,7 +21,12 @@ public class ContinuousVariableSummaryFactory extends AbstractVariableSummaryFac
 
   @Override
   public String getCacheKey() {
-    String key = getVariable().getVariableReference(getTable()) + "." + distribution + "." + intervals;
+    return getCacheKey(getVariable(), getTable(), distribution, percentiles, intervals, offset, limit);
+  }
+
+  public static String getCacheKey(Variable variable, ValueTable table, Distribution distribution,
+      List<Double> percentiles, int intervals, Integer offset, Integer limit) {
+    String key = variable.getVariableReference(table) + "." + distribution + "." + intervals;
     if(percentiles != null) key += "." + percentiles.hashCode();
     if(offset != null) key += "." + offset;
     if(limit != null) key += "." + limit;
@@ -32,11 +42,11 @@ public class ContinuousVariableSummaryFactory extends AbstractVariableSummaryFac
         .build();
   }
 
-  public ContinuousVariableSummary.Distribution getDistribution() {
+  public Distribution getDistribution() {
     return distribution;
   }
 
-  public void setDistribution(ContinuousVariableSummary.Distribution distribution) {
+  public void setDistribution(Distribution distribution) {
     this.distribution = distribution;
   }
 
@@ -86,7 +96,7 @@ public class ContinuousVariableSummaryFactory extends AbstractVariableSummaryFac
       return this;
     }
 
-    public Builder distribution(ContinuousVariableSummary.Distribution distribution) {
+    public Builder distribution(Distribution distribution) {
       factory.distribution = distribution;
       return this;
     }
