@@ -1,5 +1,6 @@
 package org.obiba.opal.core.magma.math;
 
+import java.io.Serializable;
 import java.util.SortedSet;
 
 import javax.annotation.Nonnull;
@@ -10,7 +11,9 @@ import org.obiba.magma.VariableEntity;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
-public abstract class AbstractVariableSummary {
+public abstract class AbstractVariableSummary implements Serializable {
+
+  private static final long serialVersionUID = 3105572632716973506L;
 
   private Integer offset;
 

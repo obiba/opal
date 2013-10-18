@@ -36,9 +36,9 @@ public class CachedVariableStatsService implements VariableStatsService {
 
   private static final Logger log = LoggerFactory.getLogger(CachedVariableStatsService.class);
 
-  private static final String CONTINUOUS_CACHE = "continuousSummaries";
+  private static final String CONTINUOUS_CACHE = "opal.variable.summary.continuous";
 
-  private static final String CATEGORICAL_CACHE = "categoricalSummaries";
+  private static final String CATEGORICAL_CACHE = "opal.variable.summary.categorical";
 
   // Map<TableReference, Map<VariableName, CategoricalVariableSummary.Builder>>
   private final Map<String, Map<String, CategoricalVariableSummary.Builder>> categoricalSummaryBuilders = Collections
@@ -51,7 +51,7 @@ public class CachedVariableStatsService implements VariableStatsService {
   private final CacheManager cacheManager;
 
   public CachedVariableStatsService() {
-    cacheManager = CacheManager.create(Resources.getResource("/opal-stats-ehcache.xml"));
+    cacheManager = CacheManager.create(Resources.getResource("opal-ehcache.xml"));
   }
 
   @Override

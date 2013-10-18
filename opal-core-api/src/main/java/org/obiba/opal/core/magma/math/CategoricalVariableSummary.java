@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.core.magma.math;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -32,7 +33,9 @@ import com.google.common.collect.Iterators;
 /**
  *
  */
-public class CategoricalVariableSummary extends AbstractVariableSummary {
+public class CategoricalVariableSummary extends AbstractVariableSummary implements Serializable {
+
+  private static final long serialVersionUID = 203198842420473154L;
 
   public static final String NULL_NAME = "N/A";
 
@@ -177,7 +180,9 @@ public class CategoricalVariableSummary extends AbstractVariableSummary {
     return empty;
   }
 
-  public static class Frequency {
+  public static class Frequency implements Serializable {
+
+    private static final long serialVersionUID = -2876592652764310324L;
 
     private final String value;
 

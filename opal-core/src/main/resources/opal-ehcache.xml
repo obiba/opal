@@ -14,24 +14,16 @@
       diskPersistent="false"
       diskExpiryThreadIntervalSeconds="120"/>
 
-  <cache name="categoricalSummaries"
-      maxElementsInMemory="10000"
-      eternal="false"
-      timeToIdleSeconds="3600"
-      timeToLiveSeconds="120"
+  <cache name="opal.variable.summary.categorical"
+      maxElementsInMemory="100"
+      eternal="true"
       overflowToDisk="true"
-      diskPersistent="true"
-      diskExpiryThreadIntervalSeconds="120"
-      maxEntriesLocalDisk="10000"/>
+      diskPersistent="true"/>
 
-  <cache name="continuousSummaries"
-      maxElementsInMemory="10000"
-      eternal="false"
-      timeToIdleSeconds="3600"
-      timeToLiveSeconds="120"
+  <cache name="opal.variable.summary.continuous"
+      maxElementsInMemory="100"
+      eternal="true"
       overflowToDisk="true"
-      diskPersistent="true"
-      diskExpiryThreadIntervalSeconds="120"
-      maxEntriesLocalDisk="10000"/>
+      diskPersistent="true"/>
 
 </ehcache>

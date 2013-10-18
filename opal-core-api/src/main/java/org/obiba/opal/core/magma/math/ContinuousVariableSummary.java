@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.core.magma.math;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -38,7 +39,9 @@ import com.google.common.collect.Sets;
 /**
  *
  */
-public class ContinuousVariableSummary extends AbstractVariableSummary {
+public class ContinuousVariableSummary extends AbstractVariableSummary implements Serializable {
+
+  private static final long serialVersionUID = -8679001175321206239L;
 
   public static final int DEFAULT_INTERVALS = 10;
 
