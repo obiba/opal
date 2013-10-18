@@ -72,11 +72,6 @@ public class WizardStepChain {
     wizard.setPreviousEnabled(current.hasPrevious());
     wizard.setFinishEnabled(current.isFinish());
     wizard.setCloseVisible(current.isConclusion());
-    Widget help = current.getHelp();
-    wizard.setHelpEnabled(help != null);
-    if(help != null) {
-      wizard.setHelpTooltip(help);
-    }
   }
 
   public boolean isValid() {
@@ -147,19 +142,8 @@ public class WizardStepChain {
       return append(step, null);
     }
 
-    /**
-     * Append a step with its help widget.
-     *
-     * @param step
-     * @param help
-     * @return
-     */
-    public Builder append(WizardStep step, Widget help) {
-      return append(new DefaultWizardStepController(step, help));
-    }
-
-    public Builder append(WizardStep step, Widget help, Skippable skippable) {
-      return append(new DefaultWizardStepController(step, help, skippable));
+    public Builder append(WizardStep step, Skippable skippable) {
+      return append(new DefaultWizardStepController(step, skippable));
     }
 
     public Builder append(DefaultWizardStepController stepCtrl) {
@@ -182,17 +166,6 @@ public class WizardStepChain {
      */
     public Builder title(String text) {
       currentStepCtrl.getStep().setStepTitle(text);
-      return this;
-    }
-
-    /**
-     * Set a provider of help for the last appended step.
-     *
-     * @param provider
-     * @return
-     */
-    public Builder help(WidgetProvider provider) {
-      currentStepCtrl.setHelpProvider(provider);
       return this;
     }
 

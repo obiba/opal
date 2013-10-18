@@ -39,15 +39,7 @@ public class WizardModalBox extends Modal {
 
   private Button cancel;
 
-  private Button help;
-
   private Button close;
-
-  private Tooltip helpTooltip;
-
-  private String helpTooltipWidth;
-
-  private String helpTooltipHeight;
 
   public WizardModalBox() {
     initWidget();
@@ -66,7 +58,6 @@ public class WizardModalBox extends Modal {
     ModalFooter footer = new ModalFooter();
     super.add(footer);
     initNavigationControls(footer);
-    initHelpControl(footer);
   }
 
   private void initNavigationControls(ModalFooter footer) {
@@ -85,16 +76,6 @@ public class WizardModalBox extends Modal {
     footer.add(group);
 
     setPreviousEnabled(false);
-  }
-
-  private void initHelpControl(ModalFooter footer) {
-    footer.add(help = new Button(translations.helpLabel()));
-    help.addStyleName("pull-left");
-    help.setEnabled(false);
-  }
-
-  public void setHelpEnabled(boolean enabled) {
-    help.setEnabled(enabled);
   }
 
   public void setFinishEnabled(boolean enabled) {
@@ -158,32 +139,6 @@ public class WizardModalBox extends Modal {
 
   public HandlerRegistration addCloseClickHandler(ClickHandler handler) {
     return close.addClickHandler(handler);
-  }
-
-  public void setHelpTooltip(Widget w) {
-    setHelpTooltip(w, "400px", "400px");
-  }
-
-  public void setHelpTooltip(Widget w, String width, String height) {
-    if(helpTooltip == null) {
-      helpTooltip = new Tooltip();
-      help.addClickHandler(new ClickHandler() {
-
-        @Override
-        public void onClick(ClickEvent evt) {
-          helpTooltip.setPopupPosition(evt.getNativeEvent().getClientX() + 20, evt.getNativeEvent().getClientY() - 400);
-          helpTooltip.setSize(helpTooltipWidth, helpTooltipHeight);
-          helpTooltip.show();
-        }
-      });
-    }
-    help.setEnabled(w != null);
-    helpTooltip.clear();
-    if(w != null) {
-      helpTooltip.add(w);
-      helpTooltipWidth = width;
-      helpTooltipHeight = height;
-    }
   }
 
   public void setProgress(boolean progress) {

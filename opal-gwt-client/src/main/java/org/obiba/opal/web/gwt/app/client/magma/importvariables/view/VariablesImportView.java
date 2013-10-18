@@ -9,24 +9,23 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.importvariables.view;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.support.LanguageLocale;
-import org.obiba.opal.web.gwt.app.client.ui.WizardModalBox;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.ui.CharacterSetView;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepChain;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.ResetHandler;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.WidgetProvider;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.createdatasource.presenter.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.ConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportPresenter;
+import org.obiba.opal.web.gwt.app.client.support.LanguageLocale;
+import org.obiba.opal.web.gwt.app.client.ui.CharacterSetView;
 import org.obiba.opal.web.gwt.app.client.ui.DatasourceParsingErrorPanel;
 import org.obiba.opal.web.gwt.app.client.ui.DropdownSuggestBox;
 import org.obiba.opal.web.gwt.app.client.ui.ModalViewImpl;
+import org.obiba.opal.web.gwt.app.client.ui.WizardModalBox;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepChain;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.ResetHandler;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
@@ -37,8 +36,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
@@ -52,6 +49,8 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 
 public class VariablesImportView extends ModalViewImpl implements VariablesImportPresenter.Display {
 
@@ -75,9 +74,6 @@ public class VariablesImportView extends ModalViewImpl implements VariablesImpor
 
   @UiField
   SimplePanel fileSelectionPanel;
-
-  @UiField
-  HTMLPanel fileSelectionHelp;
 
   @UiField
   Button downloadExcelTemplateButton;
@@ -132,7 +128,7 @@ public class VariablesImportView extends ModalViewImpl implements VariablesImpor
     spssPanel.setVisible(false);
 
     stepChain = WizardStepChain.Builder.create(dialog)//
-        .append(fileSelectionStep, fileSelectionHelp)//
+        .append(fileSelectionStep)//
         .title(translations.variablesImportFileSelectionStep())//
         .onReset(new ResetHandler() {
 
@@ -146,14 +142,6 @@ public class VariablesImportView extends ModalViewImpl implements VariablesImpor
 
         .append(compareStep)//
         .title(translations.variablesImportCompareStep())//
-        .help(new WidgetProvider() {
-
-          @Override
-          public Widget getWidget() {
-            return compareDisplay.getStepHelp();
-          }
-        })//
-
         .append(conclusionStep)//
         .title(translations.variablesImportPending())//
         .conclusion()//

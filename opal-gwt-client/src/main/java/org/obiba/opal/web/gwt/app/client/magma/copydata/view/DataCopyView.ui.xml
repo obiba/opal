@@ -1,5 +1,6 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
@@ -42,22 +43,11 @@
       </o:WizardStep>
 
       <o:WizardStep ui:field="conclusionStep">
-        <g:Label addStyleNames="p">
+        <b:Paragraph>
           <ui:msg description="Data copy job">The data copy process can be followed using the Job ID:</ui:msg>
-        </g:Label>
+        </b:Paragraph>
         <g:Anchor ui:field="jobLink" addStyleNames="large-indent">Job ID</g:Anchor>
       </o:WizardStep>
-
-      <g:HTMLPanel ui:field="destinationHelpPanel">
-        <g:Label addStyleNames="title">
-          <ui:msg description="Datasource destination label">Datasource Destination</ui:msg>
-        </g:Label>
-
-        <p>
-          <ui:msg description="Datasource destination information">The data can be copied to another datasource.
-          </ui:msg>
-        </p>
-      </g:HTMLPanel>
 
     </g:FlowPanel>
 

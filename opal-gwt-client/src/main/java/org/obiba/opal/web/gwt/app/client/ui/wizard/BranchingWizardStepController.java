@@ -28,12 +28,8 @@ public class BranchingWizardStepController extends DefaultWizardStepController {
       this.ctrl = ctrl;
     }
 
-    public static Builder create(WizardStep step, Widget help, Skippable skippable) {
-      return new Builder(new BranchingWizardStepController(step, help, skippable));
-    }
-
-    public static Builder create(WizardStep step, Widget help) {
-      return new Builder(new BranchingWizardStepController(step, help));
+    public static Builder create(WizardStep step, Skippable skippable) {
+      return new Builder(new BranchingWizardStepController(step, skippable));
     }
 
     public static Builder create(WizardStep step) {
@@ -58,16 +54,8 @@ public class BranchingWizardStepController extends DefaultWizardStepController {
 
   private final List<Candidate> nextCandidates = new ArrayList<Candidate>();
 
-  public BranchingWizardStepController(WizardStep step, Widget help, Skippable skippable) {
-    super(step, help, skippable);
-  }
-
-  /**
-   * @param step
-   * @param help
-   */
-  public BranchingWizardStepController(WizardStep step, Widget help) {
-    super(step, help);
+  public BranchingWizardStepController(WizardStep step, Skippable skippable) {
+    super(step, skippable);
   }
 
   @Override

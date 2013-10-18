@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.importdata.presenter;
 
-import javax.annotation.Nullable;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
@@ -21,9 +19,9 @@ import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
@@ -44,12 +42,11 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
 
   @Override
   protected void onBind() {
-    super.onBind();
     getView().setTableSelectionHandler(new TableSelectionHandler() {
 
       @Override
       public void onTableSelected(String datasource, String table) {
-        UriBuilder ub = UriBuilder.create().segment("datasource", datasource, "table", table).query("counts","false");
+        UriBuilder ub = UriBuilder.create().segment("datasource", datasource, "table", table).query("counts", "false");
         ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build()).get()//
             .withCallback(new ResourceCallback<TableDto>() {
 
@@ -64,39 +61,17 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
     });
   }
 
-  private void refreshDatasources() {
-    if(destination == null) {
-      ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
-          .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-            @Override
-            public void onResource(Response response, JsArray<DatasourceDto> resource) {
-              datasources = JsArrays.toSafeArray(resource);
-              refreshDatasources(datasources);
-            }
-          }).send();
-    } else {
-      UriBuilder ub = UriBuilder.create().segment("datasource", destination);
-      ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(ub.build()).get()
-          .withCallback(new ResourceCallback<DatasourceDto>() {
-            @Override
-            public void onResource(Response response, DatasourceDto resource) {
-              datasources = JsArrays.create();
-              datasources.push(resource);
-              refreshDatasources(datasources);
-            }
-          }).send();
-    }
-  }
-
-  private void refreshDatasources(
-      @SuppressWarnings("ParameterHidesMemberVariable") JsArray<DatasourceDto> datasources) {
-    for(int i = 0; i < datasources.length(); i++) {
-      DatasourceDto d = datasources.get(i);
-      d.setTableArray(JsArrays.toSafeArray(d.getTableArray()));
-      d.setViewArray(JsArrays.toSafeArray(d.getViewArray()));
-    }
-
-    getView().setDatasources(datasources);
+  private void refreshDatasource() {
+    UriBuilder ub = UriBuilder.create().segment("datasource", destination);
+    ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(ub.build()).get()
+        .withCallback(new ResourceCallback<DatasourceDto>() {
+          @Override
+          public void onResource(Response response, DatasourceDto resource) {
+            resource.setTableArray(JsArrays.toSafeArray(resource.getTableArray()));
+            resource.setViewArray(JsArrays.toSafeArray(resource.getViewArray()));
+            getView().setDatasource(resource);
+          }
+        }).send();
   }
 
   public boolean validate() {
@@ -142,7 +117,7 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
 
   public void refreshDisplay() {
     getView().showTables(ImportFormat.CSV == importFormat || ImportFormat.EXCEL == importFormat);
-    refreshDatasources();
+    refreshDatasource();
   }
 
   public void updateImportConfig(ImportConfig importConfig) {
@@ -160,7 +135,7 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
     refreshDisplay();
   }
 
-  public void setDestination(@Nullable String destination) {
+  public void setDestination(String destination) {
     this.destination = destination;
   }
 
@@ -170,7 +145,7 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
 
   public interface Display extends View {
 
-    void setDatasources(JsArray<DatasourceDto> datasources);
+    void setDatasource(DatasourceDto datasource);
 
     void setTable(String name);
 

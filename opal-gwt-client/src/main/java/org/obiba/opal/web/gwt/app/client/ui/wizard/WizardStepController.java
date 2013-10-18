@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.ui.wizard;
 
-import javax.annotation.Nullable;
-
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 
 import com.google.gwt.user.client.ui.HasWidgets;
@@ -22,9 +20,6 @@ import com.google.gwt.user.client.ui.Widget;
 public interface WizardStepController {
 
   WizardStep getStep();
-
-  @Nullable
-  Widget getHelp();
 
   boolean hasNext();
 
