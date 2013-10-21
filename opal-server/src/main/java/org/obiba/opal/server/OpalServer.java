@@ -4,6 +4,7 @@ import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.impl.LocalOrientDbServerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 
@@ -23,11 +24,24 @@ public class OpalServer {
   OpalServer(OpalServerOptions options) {
     setProperties();
 
+    configureSLF4JBridgeHandler();
+
     //TODO remove this static access when restarting embedded server will work
     LocalOrientDbServerFactory.start();
 
     upgrade();
     start();
+  }
+
+  /**
+   * Bridge/route all java.util.logging log records to the SLF4J API.
+   */
+  private void configureSLF4JBridgeHandler() {
+    //  remove existing handlers attached to java.util.logging root logger
+    SLF4JBridgeHandler.removeHandlersForRootLogger();
+
+    // add SLF4JBridgeHandler to java.util.logging's root logger
+    SLF4JBridgeHandler.install();
   }
 
   private void setProperties() {
