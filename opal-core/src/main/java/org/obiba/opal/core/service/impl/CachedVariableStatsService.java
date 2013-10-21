@@ -28,13 +28,17 @@ public class CachedVariableStatsService implements VariableStatsService {
 
   private static final Logger log = LoggerFactory.getLogger(CachedVariableStatsService.class);
 
-  private final CacheManager cacheManager = CacheManager.create(Resources.getResource("opal-ehcache.xml"));
+  private final CacheManager cacheManager;
 
-  private final ContinuousVariableSummaryCachedService continuousSummaryService
-      = new ContinuousVariableSummaryCachedService();
+  private final ContinuousVariableSummaryCachedService continuousSummaryService;
 
-  private final CategoricalVariableSummaryCachedService categoricalSummaryService
-      = new CategoricalVariableSummaryCachedService();
+  private final CategoricalVariableSummaryCachedService categoricalSummaryService;
+
+  public CachedVariableStatsService() {
+    cacheManager = CacheManager.create(Resources.getResource("opal-ehcache.xml"));
+    continuousSummaryService = new ContinuousVariableSummaryCachedService();
+    categoricalSummaryService = new CategoricalVariableSummaryCachedService();
+  }
 
   @Override
   public void stackVariable(@Nonnull ValueTable valueTable, @Nonnull Variable variable, @Nonnull Value value) {
