@@ -1,6 +1,5 @@
 package org.obiba.opal.core.magma.math;
 
-import java.io.Serializable;
 import java.util.SortedSet;
 
 import javax.annotation.Nonnull;
@@ -13,7 +12,7 @@ import org.springframework.util.Assert;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
-public abstract class AbstractVariableSummary implements Serializable {
+public abstract class AbstractVariableSummary implements VariableSummary {
 
   private static final long serialVersionUID = 3105572632716973506L;
 
@@ -33,8 +32,6 @@ public abstract class AbstractVariableSummary implements Serializable {
     variableName = variable.getName();
   }
 
-  public abstract String getCacheKey(ValueTable table);
-
   protected SortedSet<VariableEntity> getVariableEntities(@Nonnull ValueTable table) {
     if(offset == null && limit == null) return Sets.newTreeSet(table.getVariableEntities());
 
@@ -51,8 +48,15 @@ public abstract class AbstractVariableSummary implements Serializable {
   }
 
   @Nonnull
+  @Override
   public String getVariableName() {
     return variableName;
+  }
+
+  @Nonnull
+  @Override
+  public Variable getVariable() {
+    return variable;
   }
 
   void setOffset(Integer offset) {
@@ -73,6 +77,11 @@ public abstract class AbstractVariableSummary implements Serializable {
 
   public Integer getLimit() {
     return limit;
+  }
+
+  public interface VariableSummaryBuilder<TVariableSummary extends VariableSummary> {
+
+    TVariableSummary build();
   }
 
 }

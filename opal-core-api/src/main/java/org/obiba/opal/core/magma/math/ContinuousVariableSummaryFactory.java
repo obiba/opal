@@ -2,12 +2,15 @@ package org.obiba.opal.core.magma.math;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
+import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 
 import static org.obiba.opal.core.magma.math.ContinuousVariableSummary.Distribution;
 
-public class ContinuousVariableSummaryFactory extends AbstractVariableSummaryFactory {
+public class ContinuousVariableSummaryFactory extends AbstractVariableSummaryFactory<ContinuousVariableSummary> {
 
   private Distribution distribution;
 
@@ -19,6 +22,7 @@ public class ContinuousVariableSummaryFactory extends AbstractVariableSummaryFac
 
   private Integer limit;
 
+  @Nonnull
   @Override
   public String getCacheKey() {
     return getCacheKey(getVariable(), getTable(), distribution, percentiles, intervals, offset, limit);
@@ -33,6 +37,8 @@ public class ContinuousVariableSummaryFactory extends AbstractVariableSummaryFac
     return key;
   }
 
+  @Nonnull
+  @Override
   public ContinuousVariableSummary getSummary() {
     return new ContinuousVariableSummary.Builder(getVariable(), distribution) //
         .defaultPercentiles(percentiles) //
@@ -83,16 +89,22 @@ public class ContinuousVariableSummaryFactory extends AbstractVariableSummaryFac
   }
 
   @SuppressWarnings("ParameterHidesMemberVariable")
-  public static class Builder
-      extends AbstractVariableSummaryFactory.Builder<ContinuousVariableSummaryFactory, Builder> {
+  public static class Builder {
 
-    @Override
-    protected ContinuousVariableSummaryFactory createFactory() {
-      return new ContinuousVariableSummaryFactory();
+    private final ContinuousVariableSummaryFactory factory = new ContinuousVariableSummaryFactory();
+
+    public Builder variable(Variable variable) {
+      factory.setVariable(variable);
+      return this;
     }
 
-    @Override
-    protected Builder createBuilder() {
+    public Builder table(ValueTable table) {
+      factory.setTable(table);
+      return this;
+    }
+
+    public Builder valueSource(ValueSource valueSource) {
+      factory.setValueSource(valueSource);
       return this;
     }
 

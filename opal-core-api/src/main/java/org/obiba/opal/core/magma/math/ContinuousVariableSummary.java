@@ -97,62 +97,6 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
     }
   }
 
-  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
-  private void add(@Nonnull ValueTable table, @Nonnull ValueSource variableValueSource) {
-    Assert.notNull(variable, "ValueTable cannot be null");
-    Assert.notNull(variableValueSource, "VariableValueSource cannot be null");
-
-    VectorSource vectorSource = variableValueSource.asVectorSource();
-    if(vectorSource == null) return;
-    for(Value value : vectorSource.getValues(getVariableEntities(table))) {
-      add(value);
-    }
-  }
-
-  @SuppressWarnings("ConstantConditions")
-  private void add(@Nonnull Value value) {
-    Assert.notNull(variable, "Value cannot be null");
-    if(!value.isNull() && !missing.contains(value)) {
-      if(value.isSequence()) {
-        for(Value v : value.asSequence().getValue()) {
-          add(v);
-        }
-      } else {
-        descriptiveStats.addValue(((Number) value.getValue()).doubleValue());
-      }
-    }
-  }
-
-  @SuppressWarnings({ "MethodOnlyUsedFromInnerClass", "MagicNumber" })
-  private void compute() {
-    double variance = descriptiveStats.getVariance();
-    if(Double.isNaN(variance) || Double.isInfinite(variance) || variance <= 0) return;
-
-    IntervalFrequency intervalFrequency = new IntervalFrequency(descriptiveStats.getMin(), descriptiveStats.getMax(),
-        intervals, getVariable().getValueType() == IntegerType.get());
-    for(double d : descriptiveStats.getSortedValues()) {
-      intervalFrequency.add(d);
-    }
-
-    for(IntervalFrequency.Interval interval : intervalFrequency.intervals()) {
-      intervalFrequencies.add(interval);
-    }
-
-    ContinuousDistribution cd = distribution.getDistribution(descriptiveStats);
-    for(Double p : defaultPercentiles) {
-      percentiles.add(descriptiveStats.getPercentile(p));
-      try {
-        if(cd != null) distributionPercentiles.add(cd.inverseCumulativeProbability(p / 100d));
-      } catch(MathException ignored) {
-      }
-    }
-  }
-
-  @Nonnull
-  public Variable getVariable() {
-    return variable;
-  }
-
   @Nonnull
   public Distribution getDistribution() {
     return distribution;
@@ -211,15 +155,19 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
   }
 
   @SuppressWarnings("ParameterHidesMemberVariable")
-  public static class Builder {
+  public static class Builder implements VariableSummaryBuilder<ContinuousVariableSummary> {
 
     private final ContinuousVariableSummary summary;
+
+    @Nonnull
+    private final Variable variable;
 
     private boolean addedTable;
 
     private boolean addedValue;
 
     public Builder(@Nonnull Variable variable, @Nonnull Distribution distribution) {
+      this.variable = variable;
       summary = new ContinuousVariableSummary(variable, distribution);
     }
 
@@ -246,7 +194,7 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
         throw new IllegalStateException("Cannot add value for variable " + summary.getVariable().getName() +
             " because values where previously added from the whole table with addTable().");
       }
-      summary.add(value);
+      add(value);
       addedValue = true;
       return this;
     }
@@ -256,15 +204,67 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
         throw new IllegalStateException("Cannot add table for variable " + summary.getVariable().getName() +
             " because values where previously added with addValue().");
       }
-      summary.add(table, variableValueSource);
+      add(table, variableValueSource);
       addedTable = true;
 
       return this;
     }
 
+    private void add(@Nonnull ValueTable table, @Nonnull ValueSource variableValueSource) {
+      Assert.notNull(variable, "ValueTable cannot be null");
+      Assert.notNull(variableValueSource, "VariableValueSource cannot be null");
+
+      VectorSource vectorSource = variableValueSource.asVectorSource();
+      if(vectorSource == null) return;
+      for(Value value : vectorSource.getValues(summary.getVariableEntities(table))) {
+        add(value);
+      }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    private void add(@Nonnull Value value) {
+      Assert.notNull(variable, "Value cannot be null");
+      if(!value.isNull() && !summary.missing.contains(value)) {
+        if(value.isSequence()) {
+          for(Value v : value.asSequence().getValue()) {
+            add(v);
+          }
+        } else {
+          summary.descriptiveStats.addValue(((Number) value.getValue()).doubleValue());
+        }
+      }
+    }
+
+    @SuppressWarnings("MagicNumber")
+    private void compute() {
+      double variance = summary.descriptiveStats.getVariance();
+      if(Double.isNaN(variance) || Double.isInfinite(variance) || variance <= 0) return;
+
+      IntervalFrequency intervalFrequency = new IntervalFrequency(summary.descriptiveStats.getMin(),
+          summary.descriptiveStats.getMax(), summary.intervals,
+          summary.getVariable().getValueType() == IntegerType.get());
+      for(double d : summary.descriptiveStats.getSortedValues()) {
+        intervalFrequency.add(d);
+      }
+
+      for(IntervalFrequency.Interval interval : intervalFrequency.intervals()) {
+        summary.intervalFrequencies.add(interval);
+      }
+
+      ContinuousDistribution cd = summary.distribution.getDistribution(summary.descriptiveStats);
+      for(Double p : summary.defaultPercentiles) {
+        summary.percentiles.add(summary.descriptiveStats.getPercentile(p));
+        try {
+          if(cd != null) summary.distributionPercentiles.add(cd.inverseCumulativeProbability(p / 100d));
+        } catch(MathException ignored) {
+        }
+      }
+    }
+
+    @Override
     @Nonnull
     public ContinuousVariableSummary build() {
-      summary.compute();
+      compute();
       return summary;
     }
   }

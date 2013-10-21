@@ -63,89 +63,6 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
     return CategoricalVariableSummaryFactory.getCacheKey(variable, table, distinct, getOffset(), getLimit());
   }
 
-  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
-  private void add(@Nonnull ValueTable table, @Nonnull ValueSource variableValueSource) {
-    Assert.notNull(table, "ValueTable cannot be null");
-    Assert.notNull(variableValueSource, "variableValueSource cannot be null");
-
-    VectorSource vectorSource = variableValueSource.asVectorSource();
-    if(vectorSource == null) return;
-    for(Value value : vectorSource.getValues(getVariableEntities(table))) {
-      add(value);
-    }
-  }
-
-  private void add(@Nonnull Value value) {
-    Assert.notNull(value, "Value cannot be null");
-    if(empty) empty = false;
-    if(value.isSequence()) {
-      if(value.isNull()) {
-        frequencyDist.addValue(NULL_NAME);
-      } else {
-        //noinspection ConstantConditions
-        for(Value v : value.asSequence().getValue()) {
-          add(v);
-        }
-      }
-    } else {
-      frequencyDist.addValue(value.isNull() ? NULL_NAME : value.toString());
-    }
-  }
-
-  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
-  private void compute() {
-    long max = 0;
-    Iterator<String> concat = distinct //
-        ? freqNames(frequencyDist)  // category names, null values and distinct values
-        : Iterators.concat(categoryNames(), ImmutableList.of(NULL_NAME).iterator()); // category names and null values
-
-    // Iterate over all category names including or not distinct values.
-    // The loop will also determine the mode of the distribution (most frequent value)
-    while(concat.hasNext()) {
-      String value = concat.next();
-      long count = frequencyDist.getCount(value);
-      if(count > max) {
-        max = count;
-        mode = value;
-      }
-      frequencies.add(new Frequency(value, frequencyDist.getCount(value), frequencyDist.getPct(value)));
-    }
-    n = frequencyDist.getSumFreq();
-  }
-
-  /**
-   * Returns an iterator of frequencyDist names
-   */
-  private Iterator<String> freqNames(org.apache.commons.math.stat.Frequency freq) {
-    return Iterators.transform(freq.valuesIterator(), new Function<Comparable<?>, String>() {
-
-      @Override
-      public String apply(Comparable<?> input) {
-        return input.toString();
-      }
-    });
-  }
-
-  /**
-   * Returns an iterator of category names
-   */
-  private Iterator<String> categoryNames() {
-    if(variable.getValueType().equals(BooleanType.get())) {
-      return ImmutableList.<String>builder() //
-          .add(BooleanType.get().trueValue().toString()) //
-          .add(BooleanType.get().falseValue().toString()).build().iterator();
-    }
-
-    return Iterables.transform(variable.getCategories(), new Function<Category, String>() {
-
-      @Override
-      public String apply(Category from) {
-        return from.getName();
-      }
-
-    }).iterator();
-  }
-
   @Nonnull
   public Iterable<Frequency> getFrequencies() {
     return ImmutableList.copyOf(frequencies);
@@ -201,15 +118,19 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
   }
 
   @SuppressWarnings("ParameterHidesMemberVariable")
-  public static class Builder {
+  public static class Builder implements VariableSummaryBuilder<CategoricalVariableSummary> {
 
     private final CategoricalVariableSummary summary;
+
+    @Nonnull
+    private final Variable variable;
 
     private boolean addedTable;
 
     private boolean addedValue;
 
     public Builder(@Nonnull Variable variable) {
+      this.variable = variable;
       summary = new CategoricalVariableSummary(variable);
     }
 
@@ -218,7 +139,7 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
         throw new IllegalStateException("Cannot add value for variable " + summary.variable.getName() +
             " because values where previously added from the whole table with addTable().");
       }
-      summary.add(value);
+      add(value);
       addedValue = true;
       return this;
     }
@@ -228,10 +149,92 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
         throw new IllegalStateException("Cannot add table for variable " + summary.variable.getName() +
             " because values where previously added with addValue().");
       }
-      summary.add(table, valueSource);
+      add(table, valueSource);
       addedTable = true;
 
       return this;
+    }
+
+    private void add(@Nonnull ValueTable table, @Nonnull ValueSource variableValueSource) {
+      Assert.notNull(table, "ValueTable cannot be null");
+      Assert.notNull(variableValueSource, "variableValueSource cannot be null");
+
+      VectorSource vectorSource = variableValueSource.asVectorSource();
+      if(vectorSource == null) return;
+      for(Value value : vectorSource.getValues(summary.getVariableEntities(table))) {
+        add(value);
+      }
+    }
+
+    private void add(@Nonnull Value value) {
+      Assert.notNull(value, "Value cannot be null");
+      if(summary.empty) summary.empty = false;
+      if(value.isSequence()) {
+        if(value.isNull()) {
+          summary.frequencyDist.addValue(NULL_NAME);
+        } else {
+          //noinspection ConstantConditions
+          for(Value v : value.asSequence().getValue()) {
+            add(v);
+          }
+        }
+      } else {
+        summary.frequencyDist.addValue(value.isNull() ? NULL_NAME : value.toString());
+      }
+    }
+
+    /**
+     * Returns an iterator of frequencyDist names
+     */
+    private Iterator<String> freqNames(org.apache.commons.math.stat.Frequency freq) {
+      return Iterators.transform(freq.valuesIterator(), new Function<Comparable<?>, String>() {
+
+        @Override
+        public String apply(Comparable<?> input) {
+          return input.toString();
+        }
+      });
+    }
+
+    /**
+     * Returns an iterator of category names
+     */
+    private Iterator<String> categoryNames() {
+      if(variable.getValueType().equals(BooleanType.get())) {
+        return ImmutableList.<String>builder() //
+            .add(BooleanType.get().trueValue().toString()) //
+            .add(BooleanType.get().falseValue().toString()).build().iterator();
+      }
+
+      return Iterables.transform(variable.getCategories(), new Function<Category, String>() {
+
+        @Override
+        public String apply(Category from) {
+          return from.getName();
+        }
+
+      }).iterator();
+    }
+
+    private void compute() {
+      long max = 0;
+      Iterator<String> concat = summary.distinct //
+          ? freqNames(summary.frequencyDist)  // category names, null values and distinct values
+          : Iterators.concat(categoryNames(), ImmutableList.of(NULL_NAME).iterator()); // category names and null values
+
+      // Iterate over all category names including or not distinct values.
+      // The loop will also determine the mode of the distribution (most frequent value)
+      while(concat.hasNext()) {
+        String value = concat.next();
+        long count = summary.frequencyDist.getCount(value);
+        if(count > max) {
+          max = count;
+          summary.mode = value;
+        }
+        summary.frequencies
+            .add(new Frequency(value, summary.frequencyDist.getCount(value), summary.frequencyDist.getPct(value)));
+      }
+      summary.n = summary.frequencyDist.getSumFreq();
     }
 
     public Builder distinct(boolean distinct) {
@@ -245,9 +248,10 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
       return this;
     }
 
+    @Override
     @Nonnull
     public CategoricalVariableSummary build() {
-      summary.compute();
+      compute();
       return summary;
     }
 

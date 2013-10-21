@@ -1,9 +1,12 @@
 package org.obiba.opal.core.magma.math;
 
+import javax.annotation.Nonnull;
+
+import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 
-public class CategoricalVariableSummaryFactory extends AbstractVariableSummaryFactory {
+public class CategoricalVariableSummaryFactory extends AbstractVariableSummaryFactory<CategoricalVariableSummary> {
 
   private boolean distinct;
 
@@ -11,6 +14,7 @@ public class CategoricalVariableSummaryFactory extends AbstractVariableSummaryFa
 
   private Integer limit;
 
+  @Nonnull
   @Override
   public String getCacheKey() {
     return getCacheKey(getVariable(), getTable(), distinct, offset, limit);
@@ -24,6 +28,8 @@ public class CategoricalVariableSummaryFactory extends AbstractVariableSummaryFa
     return key;
   }
 
+  @Nonnull
+  @Override
   public CategoricalVariableSummary getSummary() {
     return new CategoricalVariableSummary.Builder(getVariable()) //
         .distinct(distinct) //
@@ -57,16 +63,22 @@ public class CategoricalVariableSummaryFactory extends AbstractVariableSummaryFa
   }
 
   @SuppressWarnings("ParameterHidesMemberVariable")
-  public static class Builder
-      extends AbstractVariableSummaryFactory.Builder<CategoricalVariableSummaryFactory, Builder> {
+  public static class Builder {
 
-    @Override
-    protected CategoricalVariableSummaryFactory createFactory() {
-      return new CategoricalVariableSummaryFactory();
+    private final CategoricalVariableSummaryFactory factory = new CategoricalVariableSummaryFactory();
+
+    public Builder variable(Variable variable) {
+      factory.setVariable(variable);
+      return this;
     }
 
-    @Override
-    protected Builder createBuilder() {
+    public Builder table(ValueTable table) {
+      factory.setTable(table);
+      return this;
+    }
+
+    public Builder valueSource(ValueSource valueSource) {
+      factory.setValueSource(valueSource);
       return this;
     }
 
