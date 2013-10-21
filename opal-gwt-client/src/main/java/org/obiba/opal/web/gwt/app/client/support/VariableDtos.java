@@ -283,5 +283,9 @@ public class VariableDtos {
     public boolean is(String value) {
       return label.equals(value.toLowerCase());
     }
+
+    public static ValueType fromString(String value) {
+      return ValueType.valueOf(value.toUpperCase());
+    }
   }
 }

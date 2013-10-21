@@ -11,8 +11,11 @@ package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import org.obiba.opal.web.gwt.ace.client.AceEditor;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ScriptEditorPresenter;
+import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
+import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -37,6 +40,12 @@ public class ScriptEditorView extends ViewImpl implements ScriptEditorPresenter.
 
   @UiField
   Button testScript;
+
+  @UiField
+  Chooser valueTypes;
+
+  @UiField
+  CheckBox repeatable;
 
   public ScriptEditorView() {
     widget = uiBinder.createAndBindUi(this);
@@ -70,6 +79,16 @@ public class ScriptEditorView extends ViewImpl implements ScriptEditorPresenter.
   @Override
   public String getSelectedScript() {
     return scriptArea.getSelectedText();
+  }
+
+  @Override
+  public VariableDtos.ValueType getValueType() {
+    return VariableDtos.ValueType.fromString(valueTypes.getSelectedValue());
+  }
+
+  @Override
+  public boolean isRepeatable() {
+    return repeatable.getValue();
   }
 
   @Override

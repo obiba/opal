@@ -331,3 +331,7 @@ message VcsCommitInfoDto {
   required string commitId = 4;
   repeated string diffEntries = 5;
 }
+
+message VcsBlobDto {
+  required string blob = 1;
+}

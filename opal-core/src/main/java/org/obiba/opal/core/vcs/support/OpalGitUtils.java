@@ -43,7 +43,7 @@ public final class OpalGitUtils {
 
   public static boolean isFilePath(String path) {
     // TODO find a safe check
-    return path.matches("\\w+\\/+\\w+\\.\\w+$");
+    return path.indexOf(File.separator) != -1;
   }
 
 }

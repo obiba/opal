@@ -15,4 +15,5 @@ import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface VariableVcsCommitHistoryUiHandlers extends UiHandlers {
   void showCommitInfo(VcsCommitInfoDto dto);
+  void viewCommitContent(VcsCommitInfoDto dto);
 }

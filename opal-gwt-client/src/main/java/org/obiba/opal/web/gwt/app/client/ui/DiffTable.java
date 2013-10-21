@@ -35,10 +35,10 @@ public class DiffTable extends DefaultFlexTable {
       if(line.startsWith("@@")) {
         fillHunkRow(row, line);
 
-        RegExp regExp = RegExp.compile("@@ -(\\d+),\\d+ \\+(\\d+),\\d+ @@");
+        RegExp regExp = RegExp.compile("@@ -(\\d+)(,\\d+)? \\+(\\d+)(,\\d+)? @@");
         MatchResult matcher = regExp.exec(line);
         aLineNumber = Integer.parseInt(matcher.getGroup(1));
-        bLineNumber = Integer.parseInt(matcher.getGroup(2));
+        bLineNumber = Integer.parseInt(matcher.getGroup(3));
 
         style = "diff-hunk";
 

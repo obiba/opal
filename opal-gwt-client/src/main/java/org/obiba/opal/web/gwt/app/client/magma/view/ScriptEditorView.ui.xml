@@ -54,7 +54,7 @@
               <ui:msg description="Locale label">locale</ui:msg>
             </g:item>
           </o:Chooser>
-          <b:CheckBox addStyleNames="small-indent bottom-margin">
+          <b:CheckBox addStyleNames="small-indent bottom-margin" ui:field="repeatable">
             <ui:msg description="Repeatable label">Repeatable</ui:msg>
           </b:CheckBox>
         </g:FlowPanel>

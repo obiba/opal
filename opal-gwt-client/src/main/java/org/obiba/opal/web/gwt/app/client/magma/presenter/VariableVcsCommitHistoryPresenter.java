@@ -9,18 +9,19 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.opal.VcsBlobDto;
 import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
 import org.obiba.opal.web.model.client.opal.VcsCommitInfosDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -70,6 +71,26 @@ public class VariableVcsCommitHistoryPresenter extends PresenterWidget<VariableV
         }
         vcsHistoryModalPresenter.setCommitInfo(resource);
         vcsHistoryModalProvider.show();
+      }
+    }).get().send();
+  }
+
+  @Override
+  public void viewCommitContent(VcsCommitInfoDto dto) {
+    String requestUri = UriBuilder.create()
+        .segment("datasource", table.getDatasourceName(), "view", table.getName(), "vcs", "variable",
+            variable.getName(), "blob", dto.getCommitId()).build();
+
+    ResourceRequestBuilderFactory.<VcsBlobDto>newBuilder()//
+        .forResource(requestUri).withCallback(new ResourceCallback<VcsBlobDto>() {
+      @Override
+      public void onResource(Response response, VcsBlobDto resource) {
+        GWT.log(">>>>> " + resource.getBlob());
+//        if (vcsHistoryModalPresenter == null) {
+//          vcsHistoryModalPresenter = vcsHistoryModalProvider.create();
+//        }
+//        vcsHistoryModalPresenter.setCommitInfo(resource);
+//        vcsHistoryModalProvider.show();
       }
     }).get().send();
   }

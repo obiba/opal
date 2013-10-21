@@ -183,7 +183,7 @@
                 <ui:msg description="Script Edition label">Script Edition</ui:msg>
               </b:Heading>
               <g:FlowPanel addStyleNames="pull-right form-inline">
-                <b:TextBox placeholder="Update…" addStyleNames="span3"/>
+                <b:TextBox addStyleNames="span3" ui:field="comment"/>
                 <b:Button type="PRIMARY" addStyleNames="small-dual-indent" ui:field="saveScript">
                   <ui:msg description="Save label">Save</ui:msg>
                 </b:Button>

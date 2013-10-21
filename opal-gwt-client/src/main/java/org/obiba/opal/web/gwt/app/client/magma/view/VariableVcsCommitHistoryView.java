@@ -74,6 +74,7 @@ public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<VariableVcs
     commitInfoTable.addColumn(createAuthorColumn(), translations.commitInfoMap().get("Author"));
     commitInfoTable.addColumn(createCommentColumn(), translations.commitInfoMap().get("Comment"));
     commitInfoTable.addColumn(createDiffColumn(), translations.commitInfoMap().get("Diff"));
+    commitInfoTable.addColumn(createViewColumn(), translations.commitInfoMap().get("View"));
     commitInfoDataProvider.addDataDisplay(commitInfoTable);
     commitInfoTable.setEmptyTableWidget(new Label(translations.noVcsCommitHistoryAvailable()));
   }
@@ -112,8 +113,6 @@ public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<VariableVcs
     };
   }
 
-
-
   private Column<VcsCommitInfoDto, String> createDiffColumn() {
 
     ClickableColumn<VcsCommitInfoDto> column = new ClickableColumn<VcsCommitInfoDto>() {
@@ -128,6 +127,26 @@ public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<VariableVcs
       @Override
       public void update(int index, VcsCommitInfoDto dto, String value) {
         getUiHandlers().showCommitInfo(dto);
+      }
+    });
+
+    return column;
+  }
+
+  private Column<VcsCommitInfoDto, String> createViewColumn() {
+
+    ClickableColumn<VcsCommitInfoDto> column = new ClickableColumn<VcsCommitInfoDto>() {
+
+      @Override
+      public String getValue(VcsCommitInfoDto commitInfo) {
+        return translations.commitInfoMap().get("ViewPrevious");
+      }
+    };
+
+    column.setFieldUpdater(new FieldUpdater<VcsCommitInfoDto, String>() {
+      @Override
+      public void update(int index, VcsCommitInfoDto dto, String value) {
+        getUiHandlers().viewCommitContent(dto);
       }
     });
 

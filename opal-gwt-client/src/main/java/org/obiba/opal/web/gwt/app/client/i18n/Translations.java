@@ -1977,9 +1977,15 @@ public interface Translations extends Constants {
       "Date", "Date",//
       "Comment", "Comment",//
       "Diff", "Differences",//
-      "ComparePrevious", "Compare with previous"//
+      "View", "View",//
+      "ComparePrevious", "Compare with previous",//
+      "ViewPrevious", "View previous content"
   })
   Map<String, String> commitInfoMap();
+
+  @Description("Script Update Default Prefix Label")
+  @DefaultStringValue("Update")
+  String scriptUpdateDefaultPrefixLabel();
 
   @Description("User message map")
   @DefaultStringMapValue({ //

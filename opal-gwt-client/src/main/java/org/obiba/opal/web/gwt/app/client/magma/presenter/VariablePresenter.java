@@ -34,6 +34,7 @@ import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -45,6 +46,7 @@ import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -291,6 +293,19 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   @Override
   public void onSaveScript() {
+    VariableDto newVariable = VariableDto.parse(VariableDto.stringify(variable));
+    VariableDtos.setScript(newVariable, scriptEditorPresenter.getScript());
+    newVariable.setValueType(scriptEditorPresenter.getValueEntityType().getLabel());
+    newVariable.setIsRepeatable(scriptEditorPresenter.isRepeatable());
+    UpdateVariableCallbackHandler updateVariableCallbackHandler = new UpdateVariableCallbackHandler(newVariable);
+
+    String uri = UriBuilder.create().segment("datasource", "{}", "view", "{}", "variable", "{}").query("comment", getView().getComment())
+        .build(table.getDatasourceName(), table.getName(), variable.getName());
+
+    ResourceRequestBuilderFactory.newBuilder().forResource(uri).put()
+        .withResourceBody(VariableDto.stringify(newVariable))
+        .withCallback(Response.SC_OK, updateVariableCallbackHandler)
+        .withCallback(Response.SC_BAD_REQUEST, updateVariableCallbackHandler).send();
 
   }
 
@@ -377,6 +392,28 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     }
   }
 
+  private class UpdateVariableCallbackHandler implements ResponseCodeCallback {
+
+    private final VariableDto variable;
+
+    public UpdateVariableCallbackHandler(VariableDto variable) {
+      this.variable = variable;
+    }
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      switch(response.getStatusCode()) {
+        case Response.SC_OK:
+          updateVariableDisplay(variable);
+          getView().backToViewScript();
+          variableUpdatePending = false;
+          break;
+        case Response.SC_NOT_FOUND:
+          break;
+      }
+    }
+  }
+
   /**
    * Update summary on authorization.
    */
@@ -422,9 +459,13 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
     void renderAttributeRows(JsArray<AttributeDto> rows);
 
-    boolean isSummaryTabSelected();
+    String getComment();
+
+    void backToViewScript();
 
     void setSummaryTabWidget(View widget);
+    
+    boolean isSummaryTabSelected();
 
     HasAuthorization getSummaryAuthorizer();
 

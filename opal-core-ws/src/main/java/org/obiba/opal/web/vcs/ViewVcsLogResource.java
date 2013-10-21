@@ -89,16 +89,9 @@ public class ViewVcsLogResource {
       @Nonnull @PathParam("commitId") String commitId) {
     try {
       String blob = vcs.getBlob(datasource, OpalGitUtils.getVariableFilePath(view, variableName), commitId);
-      InputStream is = new ByteArrayInputStream(blob.getBytes());
-
-      return Response.ok()
-          .entity(is).header("Content-Disposition",getHeader(variableName)).build();
+      return Response.ok().entity(Dtos.asDto(blob)).build();
     } catch(OpalGitException e) {
       return Response.status(Response.Status.BAD_REQUEST).entity("FailedToRetrieveVariableCommitInfo").build();
     }
-  }
-
-  public String getHeader(String variableName) {
-    return String.format("attachment; filename=%s", variableName);
   }
 }

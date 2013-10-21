@@ -43,4 +43,8 @@ public final class Dtos {
     return commitInfoDtoBuilder.build();
   }
 
+  public static Opal.VcsBlobDto asDto(String blob) {
+    return Opal.VcsBlobDto.newBuilder().setBlob(blob).build();
+  }
+
 }
