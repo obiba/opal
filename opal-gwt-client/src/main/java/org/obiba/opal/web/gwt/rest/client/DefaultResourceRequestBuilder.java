@@ -298,8 +298,8 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
     }
 
     private void cacheAuthorization(Response response) {
-      // do not cache when server error
-      if (response.getStatusCode() >= Response.SC_INTERNAL_SERVER_ERROR) return;
+      // do not cache when client or server error
+      if (response.getStatusCode() >= Response.SC_BAD_REQUEST) return;
       
       Set<HttpMethod> allowed = getAllowedMethods(response);
       if(allowed.size() > 0) {
