@@ -28,6 +28,8 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.HasWidgets;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.HasData;
 import com.google.inject.Inject;
@@ -41,80 +43,28 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
   interface Binder extends UiBinder<Widget, DatabaseAdministrationView> {}
 
   @UiField
-  Button addSQL;
-
-  @UiField
-  SimplePager sqlPager;
-
-  @UiField
-  Table<DatabaseDto> sqlTable;
-
-  @UiField
-  Button addMongo;
-
-  @UiField
-  SimplePager mongoPager;
-
-  @UiField
-  Table<DatabaseDto> mongoTable;
-
-  @UiField
   HasWidgets breadcrumbs;
 
-  private final Translations translations;
+  @UiField
+  Panel idsPanel;
 
-  private final Columns columns = new Columns();
+  @UiField
+  Panel dataPanel;
 
   @Inject
-  public DatabaseAdministrationView(Binder uiBinder, Translations translations) {
-    this.translations = translations;
+  public DatabaseAdministrationView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
-    initSqlTable();
-    initMongoTable();
-  }
-
-  private void initSqlTable() {
-    sqlPager.setDisplay(sqlTable);
-    sqlTable.addColumn(columns.name, translations.nameLabel());
-    sqlTable.addColumn(columns.sqlUrl, translations.urlLabel());
-    sqlTable.addColumn(columns.usage, translations.usageLabel());
-    sqlTable.addColumn(columns.sqlSchema, translations.sqlSchemaLabel());
-    sqlTable.addColumn(columns.sqlUsername, translations.usernameLabel());
-    sqlTable.addColumn(columns.actions, translations.actionsLabel());
-  }
-
-  private void initMongoTable() {
-    mongoPager.setDisplay(mongoTable);
-    mongoTable.addColumn(columns.name, translations.nameLabel());
-    mongoTable.addColumn(columns.mongoUrl, translations.urlLabel());
-    mongoTable.addColumn(columns.usage, translations.usageLabel());
-    mongoTable.addColumn(columns.mongoUsername, translations.usernameLabel());
-    mongoTable.addColumn(columns.actions, translations.actionsLabel());
   }
 
   @Override
-  public HasClickHandlers getAddSqlButton() {
-    return addSQL;
-  }
-
-  @Override
-  public HasClickHandlers getAddMongoButton() {
-    return addMongo;
-  }
-
-  @Override
-  public HasActionHandler<DatabaseDto> getActions() {
-    return columns.actions;
-  }
-
-  @Override
-  public HasData<DatabaseDto> getSqlTable() {
-    return sqlTable;
-  }
-
-  @Override
-  public HasData<DatabaseDto> getMongoTable() {
-    return mongoTable;
+  public void setInSlot(Object slot, IsWidget content) {
+    if (slot == DatabaseAdministrationPresenter.Slot.IDENTIFIERS) {
+      idsPanel.clear();
+      idsPanel.add(content);
+    } else {
+      dataPanel.clear();
+      dataPanel.add(content);
+    }
   }
 
   @Override
@@ -122,75 +72,5 @@ public class DatabaseAdministrationView extends ViewImpl implements DatabaseAdmi
     return breadcrumbs;
   }
 
-  private final class Columns {
-
-    final Column<DatabaseDto, String> name = new TextColumn<DatabaseDto>() {
-      @Override
-      public String getValue(DatabaseDto dto) {
-        String value = dto.getName();
-        if(dto.getDefaultStorage()) value += " (" + translations.defaultStorage().toLowerCase() + ")";
-        return value;
-      }
-    };
-
-    final Column<DatabaseDto, String> sqlUrl = new TextColumn<DatabaseDto>() {
-
-      @Override
-      public String getValue(DatabaseDto dto) {
-        return ((SqlDatabaseDto) dto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings)).getUrl();
-      }
-    };
-
-    final Column<DatabaseDto, String> mongoUrl = new TextColumn<DatabaseDto>() {
-
-      @Override
-      public String getValue(DatabaseDto dto) {
-        return ((MongoDbDatabaseDto) dto.getExtension(MongoDbDatabaseDto.DatabaseDtoExtensions.settings)).getUrl();
-      }
-    };
-
-    final Column<DatabaseDto, String> usage = new TextColumn<DatabaseDto>() {
-      @Override
-      public String getValue(DatabaseDto dto) {
-        return SqlDatabasePresenter.Usage.valueOf(dto.getUsage().getName()).getLabel();
-      }
-    };
-
-    final Column<DatabaseDto, String> sqlSchema = new TextColumn<DatabaseDto>() {
-      @Override
-      public String getValue(DatabaseDto dto) {
-        return SqlDatabasePresenter.SqlSchema.valueOf(
-            ((SqlDatabaseDto) dto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings)).getSqlSchema().getName())
-            .getLabel();
-      }
-    };
-
-    final Column<DatabaseDto, String> sqlUsername = new TextColumn<DatabaseDto>() {
-      @Override
-      public String getValue(DatabaseDto dto) {
-        return ((SqlDatabaseDto) dto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings)).getUsername();
-      }
-    };
-
-    final Column<DatabaseDto, String> mongoUsername = new TextColumn<DatabaseDto>() {
-      @Override
-      public String getValue(DatabaseDto dto) {
-        return ((MongoDbDatabaseDto) dto.getExtension(MongoDbDatabaseDto.DatabaseDtoExtensions.settings)).getUsername();
-      }
-    };
-
-    final ActionsColumn<DatabaseDto> actions = new ActionsColumn<DatabaseDto>(new ActionsProvider<DatabaseDto>() {
-
-      @Override
-      public String[] allActions() {
-        return new String[] { TEST_ACTION, EDIT_ACTION, DELETE_ACTION };
-      }
-
-      @Override
-      public String[] getActions(DatabaseDto dto) {
-        return dto.getEditable() ? allActions() : new String[] { TEST_ACTION };
-      }
-    });
-  }
 
 }

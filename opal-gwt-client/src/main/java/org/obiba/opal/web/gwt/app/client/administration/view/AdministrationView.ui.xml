@@ -39,61 +39,42 @@
 
             <b:WellNavList>
               <b:NavHeader>
-                <ui:msg description="Main Administration Databases">Databases</ui:msg>
+                <ui:msg description="Main Administration Data Management">Data Management</ui:msg>
               </b:NavHeader>
               <b:Divider/>
-              <o:OpalNavLink ui:field="identifiersDatabasePlace" icon="COG">
-                <ui:msg description="Main Administration Identifiers Database title">Identifiers Database</ui:msg>
+              <o:OpalNavLink ui:field="filesPlace" icon="COG">
+                <ui:msg description="Main Administration Files title">Files</ui:msg>
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Identifiers Databases help">
-                    Configure the identifiers database
-                  </ui:msg>
+                  <ui:msg description="Main Administration Files help">Manage file system</ui:msg>
                 </g:Label>
               </g:FlowPanel>
               <b:Divider/>
-              <o:OpalNavLink ui:field="dataDatabasesPlace" icon="COG">
-                <ui:msg description="Main Administration Data Databases title">Data Databases</ui:msg>
+              <o:OpalNavLink ui:field="tasksPlace" icon="COG">
+                <ui:msg description="Main Administration Tasks title">Tasks</ui:msg>
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Data Databases help">
-                    Manage data databases for storage, import and export
-                  </ui:msg>
+                  <ui:msg description="Main Administration Tasks help">Monitor and schedule tasks</ui:msg>
+                </g:Label>
+              </g:FlowPanel>
+              <b:Divider/>
+              <o:OpalNavLink ui:field="reportsPlace" icon="COG">
+                <ui:msg description="Main Administration Reports title">Reports</ui:msg>
+              </o:OpalNavLink>
+              <g:FlowPanel>
+                <g:Label styleName="help-block">
+                  <ui:msg description="Main Administration Reports help">Configure and schedule reports</ui:msg>
                 </g:Label>
               </g:FlowPanel>
             </b:WellNavList>
 
-            <b:WellNavList>
-              <b:NavHeader>
-                <ui:msg description="Main Administration Search">Search</ui:msg>
-              </b:NavHeader>
-              <b:Divider/>
-              <o:OpalNavLink ui:field="esPlace" icon="COG">
-                <ui:msg description="Main Administration Elastic Search title">Elastic Search</ui:msg>
-              </o:OpalNavLink>
-              <g:FlowPanel>
-                <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Elastic Search help">Configure Elastic Search server</ui:msg>
-                </g:Label>
-              </g:FlowPanel>
-              <b:Divider/>
-              <o:OpalNavLink ui:field="indexPlace" icon="COG">
-                <ui:msg description="Main Administration Index title">Index</ui:msg>
-              </o:OpalNavLink>
-              <g:FlowPanel>
-                <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Index help">Schedule table indexing</ui:msg>
-                </g:Label>
-              </g:FlowPanel>
-            </b:WellNavList>
           </g:FlowPanel>
         </b:Column>
 
         <b:Column size="6">
           <g:FlowPanel addStyleNames="extra-large-bottom-margin">
-
             <b:WellNavList>
               <b:NavHeader>
                 <ui:msg description="Main Administration Data Analysis">Data Analysis</ui:msg>
@@ -120,12 +101,12 @@
                 </g:Label>
               </g:FlowPanel>
               <b:Divider/>
-              <o:OpalNavLink ui:field="reportsPlace" icon="COG">
-                <ui:msg description="Main Administration Reports title">Reports</ui:msg>
+              <o:OpalNavLink ui:field="searchPlace" icon="COG">
+                <ui:msg description="Main Administration Index title">Search</ui:msg>
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Reports help">Configure and schedule reports</ui:msg>
+                  <ui:msg description="Main Administration Index help">Configure Elastic Search server, schedule table indexing</ui:msg>
                 </g:Label>
               </g:FlowPanel>
             </b:WellNavList>
@@ -145,24 +126,18 @@
                 </g:Label>
               </g:FlowPanel>
               <b:Divider/>
-              <o:OpalNavLink ui:field="filesPlace" icon="COG">
-                <ui:msg description="Main Administration Files title">Files</ui:msg>
+              <o:OpalNavLink ui:field="databasesPlace" icon="COG">
+                <ui:msg description="Main Administration Databases title">Databases</ui:msg>
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Files help">Manage file system</ui:msg>
+                  <ui:msg description="Main Administration Databases help">
+                    Manage identifiers database and data databases for storage, import and export
+                  </ui:msg>
                 </g:Label>
               </g:FlowPanel>
               <b:Divider/>
-              <o:OpalNavLink ui:field="tasksPlace" icon="COG">
-                <ui:msg description="Main Administration Tasks title">Tasks</ui:msg>
-              </o:OpalNavLink>
-              <g:FlowPanel>
-                <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Tasks help">Monitor and schedule tasks</ui:msg>
-                </g:Label>
-              </g:FlowPanel>
-              <b:Divider/>
+
               <o:OpalNavLink ui:field="pluginsPlace" icon="COG">
                 <ui:msg description="Main Administration Plugins title">Plugins</ui:msg>
               </o:OpalNavLink>

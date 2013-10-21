@@ -21,15 +21,18 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.database.MongoDbDatabaseDto;
 import org.obiba.opal.web.model.client.database.SqlDatabaseDto;
 
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
+import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyEvent;
@@ -37,85 +40,55 @@ import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
-public class IdentifiersDatabasePresenter
-    extends ItemAdministrationPresenter<IdentifiersDatabasePresenter.Display, IdentifiersDatabasePresenter.Proxy>
-    implements IdentifiersDatabaseUiHandlers {
+public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDatabasePresenter.Display>
+    implements IdentifiersDatabaseUiHandlers, RequestAdministrationPermissionEvent.Handler {
 
   public static final String IDENTIFIERS_DATABASE_NAME = "_identifiers";
-
-  @ProxyStandard
-  @NameToken(Places.IDENTIFIERS_DATABASES)
-  public interface Proxy extends ProxyPlace<IdentifiersDatabasePresenter> {}
 
   private final ModalProvider<SqlDatabasePresenter> sqlDatabaseModalProvider;
 
   private final ModalProvider<MongoDatabasePresenter> mongoDatabaseModalProvider;
 
-  private final BreadcrumbsBuilder breadcrumbsBuilder;
-
   private DatabaseDto databaseDto;
 
   @Inject
-  public IdentifiersDatabasePresenter(Display display, EventBus eventBus, Proxy proxy,
+  public IdentifiersDatabasePresenter(Display display, EventBus eventBus,
       ModalProvider<SqlDatabasePresenter> sqlDatabaseModalProvider,
-      ModalProvider<MongoDatabasePresenter> mongoDatabaseModalProvider, BreadcrumbsBuilder breadcrumbsBuilder) {
-    super(eventBus, display, proxy);
+      ModalProvider<MongoDatabasePresenter> mongoDatabaseModalProvider) {
+    super(eventBus, display);
     getView().setUiHandlers(this);
     this.sqlDatabaseModalProvider = sqlDatabaseModalProvider.setContainer(this);
     this.mongoDatabaseModalProvider = mongoDatabaseModalProvider.setContainer(this);
-    this.breadcrumbsBuilder = breadcrumbsBuilder;
   }
 
-  @ProxyEvent
   @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
-    //TODO identifiers database authorization
-  }
-
-  @Override
-  public void authorize(HasAuthorization authorizer) {
-    //TODO identifiers database authorization
-  }
-
-  @Override
-  public String getName() {
-    return "Identifiers Database";
+    //To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
   protected void onReveal() {
-    breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs()).build();
     refresh();
-  }
-
-  @Override
-  @TitleFunction
-  public String getTitle() {
-    return translations.pageIdentifiersDatabaseTitle();
   }
 
   @Override
   protected void onBind() {
     super.onBind();
 
-    registerHandler(
-        getEventBus().addHandler(DatabaseCreatedEvent.getType(), new DatabaseCreatedEvent.DatabaseCreatedHandler() {
-          @Override
-          public void onDatabaseCreated(DatabaseCreatedEvent event) {
-            databaseDto = event.getDto();
-            getView().setDatabase(event.getDto());
-          }
-        }));
-    registerHandler(
-        getEventBus().addHandler(DatabaseUpdatedEvent.getType(), new DatabaseUpdatedEvent.DatabaseUpdatedHandler() {
-          @Override
-          public void onDatabaseUpdated(DatabaseUpdatedEvent event) {
-            databaseDto = event.getDto();
-            getView().setDatabase(event.getDto());
-          }
-        }));
-
-    breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs());
+    addRegisteredHandler(DatabaseCreatedEvent.getType(), new DatabaseCreatedEvent.DatabaseCreatedHandler() {
+      @Override
+      public void onDatabaseCreated(DatabaseCreatedEvent event) {
+        databaseDto = event.getDto();
+        getView().setDatabase(event.getDto());
+      }
+    });
+    addRegisteredHandler(DatabaseUpdatedEvent.getType(), new DatabaseUpdatedEvent.DatabaseUpdatedHandler() {
+      @Override
+      public void onDatabaseUpdated(DatabaseUpdatedEvent event) {
+        databaseDto = event.getDto();
+        getView().setDatabase(event.getDto());
+      }
+    });
   }
 
   @Override
@@ -167,10 +140,17 @@ public class IdentifiersDatabasePresenter
             getView().setDatabase(dto);
           }
         }) //
+        .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            databaseDto = null;
+            getView().setDatabase(null);
+          }
+        })
         .get().send();
   }
 
-  public interface Display extends View, HasBreadcrumbs, HasUiHandlers<IdentifiersDatabaseUiHandlers> {
+  public interface Display extends View, HasUiHandlers<IdentifiersDatabaseUiHandlers> {
 
     void setDatabase(@Nullable DatabaseDto database);
   }

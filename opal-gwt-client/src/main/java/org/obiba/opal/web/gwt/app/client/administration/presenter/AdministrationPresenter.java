@@ -29,11 +29,7 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
 
     void setUnitsHistoryToken(String historyToken);
 
-    void setIdentifiersDatabasePlaceHistoryToken(String historyToken);
-
-    void setDataDatabasesHistoryToken(String historyToken);
-
-    void setEsHistoryToken(String historyToken);
+    void setDatabasesHistoryToken(String historyToken);
 
     void setIndexHistoryToken(String historyToken);
 
@@ -89,8 +85,7 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
 
   private void setHistoryTokens() {
     getView().setUsersGroupsHistoryToken(getHistoryToken(Places.USERS_GROUPS));
-    getView().setIdentifiersDatabasePlaceHistoryToken(getHistoryToken(Places.IDENTIFIERS_DATABASES));
-    getView().setDataDatabasesHistoryToken(getHistoryToken(Places.DATA_DATABASES));
+    getView().setDatabasesHistoryToken(getHistoryToken(Places.DATABASES));
     getView().setIndexHistoryToken(getHistoryToken(Places.INDEX));
     getView().setRHistoryToken(getHistoryToken(Places.R));
     getView().setUnitsHistoryToken(getHistoryToken(Places.UNITS));

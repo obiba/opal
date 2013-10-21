@@ -1839,13 +1839,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("Datasources")
   String pageDatasourcesTitle();
 
-  @Description("Page Identifiers Database title")
-  @DefaultStringValue("Identifiers Database")
-  String pageIdentifiersDatabaseTitle();
-
-  @Description("Page Data Databases title")
-  @DefaultStringValue("Data Databases")
-  String pageDataDatabasesTitle();
+  @Description("Page Databases title")
+  @DefaultStringValue("Databases")
+  String pageDatabasesTitle();
 
   @Description("Page DataSHIELD title")
   @DefaultStringValue("DataSHIELD")

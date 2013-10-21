@@ -289,7 +289,12 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
 
       if(resourceCallback != null && code < Response.SC_BAD_REQUEST) {
         handled = true;
-        resourceCallback.onResource(response, (T) JsonUtils.unsafeEval(response.getText()));
+
+        try {
+          resourceCallback.onResource(response, (T) JsonUtils.unsafeEval(response.getText()));
+        } catch(Exception e) {
+          GWT.log(uri + " -> " + response.getText());
+        }
       }
 
       if(!handled) {
@@ -299,8 +304,8 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
 
     private void cacheAuthorization(Response response) {
       // do not cache when client or server error
-      if (response.getStatusCode() >= Response.SC_BAD_REQUEST) return;
-      
+      if(response.getStatusCode() >= Response.SC_BAD_REQUEST) return;
+
       Set<HttpMethod> allowed = getAllowedMethods(response);
       if(allowed.size() > 0) {
         authorizationCache.put(uri, allowed);

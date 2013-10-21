@@ -11,10 +11,12 @@ package org.obiba.opal.web.gwt.app.client.inject;
 
 import org.obiba.opal.web.gwt.app.client.administration.configuration.presenter.ConfigurationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.configuration.view.ConfigurationView;
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DataDatabasesPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.IdentifiersDatabasePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.MongoDatabasePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.SqlDatabasePresenter;
+import org.obiba.opal.web.gwt.app.client.administration.database.view.DataDatabasesView;
 import org.obiba.opal.web.gwt.app.client.administration.database.view.DatabaseAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.database.view.IdentifiersDatabaseView;
 import org.obiba.opal.web.gwt.app.client.administration.database.view.MongoDatabaseView;
@@ -138,8 +140,8 @@ public class AdministrationModule extends AbstractPresenterModule {
   private void configureDatabases() {
     bindPresenter(DatabaseAdministrationPresenter.class, DatabaseAdministrationPresenter.Display.class,
         DatabaseAdministrationView.class, DatabaseAdministrationPresenter.Proxy.class);
-    bindPresenter(IdentifiersDatabasePresenter.class, IdentifiersDatabasePresenter.Display.class,
-        IdentifiersDatabaseView.class, IdentifiersDatabasePresenter.Proxy.class);
+    bindPresenterWidget(IdentifiersDatabasePresenter.class, IdentifiersDatabasePresenter.Display.class, IdentifiersDatabaseView.class);
+    bindPresenterWidget(DataDatabasesPresenter.class, DataDatabasesPresenter.Display.class, DataDatabasesView.class);
     bindPresenterWidget(SqlDatabasePresenter.class, SqlDatabasePresenter.Display.class, SqlDatabaseView.class);
     bindPresenterWidget(MongoDatabasePresenter.class, MongoDatabasePresenter.Display.class, MongoDatabaseView.class);
   }

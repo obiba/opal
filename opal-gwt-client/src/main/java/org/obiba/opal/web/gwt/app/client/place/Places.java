@@ -41,9 +41,7 @@ public final class Places {
 
   public static final String USERS_GROUPS = ADMINISTRATION + ".users";
 
-  public static final String IDENTIFIERS_DATABASES = "!databases.identifiers";
-
-  public static final String DATA_DATABASES = "!databases.data";
+  public static final String DATABASES = "!databases";
 
   public static final String INDEX = ADMINISTRATION + ".index";
 

@@ -9,6 +9,7 @@ import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.springframework.stereotype.Component;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 @Component
 @Provider
@@ -17,8 +18,7 @@ public class IdentifiersDatabaseNotFoundExceptionMapper
 
   @Override
   public Response toResponse(IdentifiersDatabaseNotFoundException exception) {
-    return Response.status(BAD_REQUEST)
-        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "IdentifiersDatabaseNotFound", exception)).build();
+    return Response.status(NOT_FOUND).build();
   }
 
 }

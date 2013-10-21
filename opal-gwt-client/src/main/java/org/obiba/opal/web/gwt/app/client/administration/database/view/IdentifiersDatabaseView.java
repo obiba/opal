@@ -27,7 +27,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.HasVisibility;
-import com.google.gwt.user.client.ui.HasWidgets;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
@@ -38,22 +38,13 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
   interface Binder extends UiBinder<Widget, IdentifiersDatabaseView> {}
 
   @UiField
-  HasWidgets breadcrumbs;
-
-  @UiField
-  Button createSql;
-
-  @UiField
-  Button createMongo;
+  Panel createPanel;
 
   @UiField
   PropertiesTable properties;
 
   @UiField
   IconAnchor edit;
-
-  @UiField
-  HasVisibility propertiesWrapper;
 
   @UiField
   Button testConnection;
@@ -65,12 +56,8 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
     edit.setTitle(translations.editLabel());
-    propertiesWrapper.setVisible(false);
-  }
-
-  @Override
-  public HasWidgets getBreadcrumbs() {
-    return breadcrumbs;
+    properties.setVisible(false);
+    testConnection.setVisible(false);
   }
 
   @UiHandler("createSql")
@@ -97,9 +84,10 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
   public void setDatabase(@Nullable DatabaseDto database) {
     properties.clearProperties();
     boolean hasDatabase = database != null;
-    createSql.setVisible(!hasDatabase);
-    createMongo.setVisible(!hasDatabase);
-    propertiesWrapper.setVisible(hasDatabase);
+    createPanel.setVisible(!hasDatabase);
+    properties.setVisible(hasDatabase);
+    testConnection.setVisible(hasDatabase);
+    edit.setVisible(hasDatabase);
     if(hasDatabase) {
       showSqlProperties((SqlDatabaseDto) database.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings));
       showMongoProperties(

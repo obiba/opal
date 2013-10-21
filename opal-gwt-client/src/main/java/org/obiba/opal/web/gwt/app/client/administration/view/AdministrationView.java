@@ -21,16 +21,10 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   OpalNavLink unitsPlace;
 
   @UiField
-  OpalNavLink identifiersDatabasePlace;
+  OpalNavLink databasesPlace;
 
   @UiField
-  OpalNavLink dataDatabasesPlace;
-
-  @UiField
-  OpalNavLink esPlace;
-
-  @UiField
-  OpalNavLink indexPlace;
+  OpalNavLink searchPlace;
 
   @UiField
   OpalNavLink rPlace;
@@ -76,23 +70,13 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   }
 
   @Override
-  public void setIdentifiersDatabasePlaceHistoryToken(String historyToken) {
-    identifiersDatabasePlace.setHistoryToken(historyToken);
-  }
-
-  @Override
-  public void setDataDatabasesHistoryToken(String historyToken) {
-    dataDatabasesPlace.setHistoryToken(historyToken);
-  }
-
-  @Override
-  public void setEsHistoryToken(String historyToken) {
-    esPlace.setHistoryToken(historyToken);
+  public void setDatabasesHistoryToken(String historyToken) {
+    databasesPlace.setHistoryToken(historyToken);
   }
 
   @Override
   public void setIndexHistoryToken(String historyToken) {
-    indexPlace.setHistoryToken(historyToken);
+    searchPlace.setHistoryToken(historyToken);
   }
 
   @Override

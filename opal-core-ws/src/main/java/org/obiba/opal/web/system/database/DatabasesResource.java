@@ -48,11 +48,7 @@ public class DatabasesResource {
   @GET
   @Path("/identifiers")
   public DatabaseDto getIdentifiersDatabase() {
-    try {
-      return Dtos.asDto(databaseRegistry.getIdentifiersDatabase());
-    } catch(IdentifiersDatabaseNotFoundException e) {
-      return null;
-    }
+    return Dtos.asDto(databaseRegistry.getIdentifiersDatabase());
   }
 
   private List<DatabaseDto> asDto(Iterable<? extends Database> databases) {
