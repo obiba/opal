@@ -64,7 +64,6 @@ public class OpalServer {
 
   final void boot() {
     if(ctx.isActive()) {
-      ctx.getBean(OpalRuntime.class).start();
       System.out.println("Opal Server successfully started.");
     }
   }

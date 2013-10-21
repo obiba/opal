@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
+import javax.annotation.PostConstruct;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -62,6 +63,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
   private final Object syncFs = new Object();
 
   @Override
+  @PostConstruct
   public void start() {
     initExtensions();
     initMagmaEngine();
@@ -160,15 +162,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
 
           for(MagmaEngineExtension extension : magmaEngineFactory.extensions()) {
             MagmaEngine.get().extend(extension);
-          }
-
-          for(DatasourceFactory factory : magmaEngineFactory.factories()) {
-            try {
-              MagmaEngine.get().addDatasource(factory);
-            } catch(RuntimeException e) {
-              log.warn("Cannot initialise datasource '{}' : {}", factory.getName(), e.getMessage());
-              log.debug("Datasource exception:", e);
-            }
           }
         }
       };
