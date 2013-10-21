@@ -10,7 +10,7 @@
     </b:ResponsiveNavbar>
     <g:FlowPanel addStyleNames="container">
       <b:Row addStyleNames="top-margin">
-        <b:Column size="4" offset="4">
+        <b:Column size="3" offset="4">
           <g:SimplePanel ui:field="alertPanel"/>
           <b:Well>
             <b:ControlGroup>
