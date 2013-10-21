@@ -11,12 +11,14 @@ import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.event.RequestCredentialsExpiredEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestEventBus;
 import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 import org.obiba.opal.web.model.client.opal.Subject;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.http.client.Response;
@@ -71,24 +73,34 @@ public class OpalBootstrapperImpl implements Bootstrapper {
 
     initConfirmationPresenter();
 
-    ResourceRequestBuilderFactory.<Subject>newBuilder()
-        .forResource("/auth/session/" + requestCredentials.extractCredentials() + "/username").get()
-        .withCallback(new ResourceCallback<Subject>() {
-          @Override
-          public void onResource(Response response, Subject subject) {
-            if(response.getStatusCode() == Response.SC_OK) {
-              requestCredentials.setUsername(subject.getPrincipal());
-            } else {
-              // Force logout/login
-              ResourceRequestBuilderFactory.newBuilder()
-                  .forResource("/auth/session/" + requestCredentials.extractCredentials()).delete().send();
-              requestCredentials.invalidate();
-            }
-            placeManager.revealCurrentPlace();
-          }
-        }).send();
+    initUserSession();
 
     registerHandlers();
+  }
+
+  private void initUserSession() {
+    final String username = requestCredentials.extractCredentials();
+
+    if(Strings.isNullOrEmpty(username) || "undefined".equals(username)) {
+      placeManager.revealUnauthorizedPlace(Places.LOGIN);
+    } else {
+      UriBuilder builder = UriBuilder.create().segment("auth", "session", username, "username");
+      ResourceRequestBuilderFactory.<Subject>newBuilder().forResource(builder.build()).get()
+          .withCallback(new ResourceCallback<Subject>() {
+            @Override
+            public void onResource(Response response, Subject subject) {
+              if(response.getStatusCode() == Response.SC_OK) {
+                requestCredentials.setUsername(subject.getPrincipal());
+              } else {
+                // Force logout/login
+                ResourceRequestBuilderFactory.newBuilder()
+                    .forResource(UriBuilder.create().segment("auth", "session", username).build()).delete().send();
+                requestCredentials.invalidate();
+              }
+              placeManager.revealCurrentPlace();
+            }
+          }).send();
+    }
   }
 
   private void initConfirmationPresenter() {
