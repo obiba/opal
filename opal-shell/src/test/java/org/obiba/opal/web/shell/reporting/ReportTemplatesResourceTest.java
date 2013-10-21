@@ -44,23 +44,19 @@ import static org.easymock.EasyMock.verify;
 
 public class ReportTemplatesResourceTest {
 
-  public static final String BASE_URI = "http://localhost:8888/ws";
-
-  private OpalConfiguration opalConfiguration;
-
   private OpalConfigurationService opalConfigurationServiceMock;
 
   private CommandRegistry commandRegistry;
 
   private CommandSchedulerService commandSchedulerServiceMock;
 
-  Set<ReportTemplate> reportTemplates;
+  private Set<ReportTemplate> reportTemplates;
 
   @Before
   public void setUp() {
-    new MagmaEngine();
+    if(!MagmaEngine.isInstanciated()) new MagmaEngine();
     opalConfigurationServiceMock = createMock(OpalConfigurationService.class);
-    opalConfiguration = new OpalConfiguration();
+    OpalConfiguration opalConfiguration = new OpalConfiguration();
     commandRegistry = createMock(CommandRegistry.class);
 
     commandSchedulerServiceMock = createMock(CommandSchedulerService.class);

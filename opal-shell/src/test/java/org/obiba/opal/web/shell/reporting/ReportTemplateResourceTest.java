@@ -17,7 +17,6 @@ import java.util.Set;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.easymock.EasyMock;
@@ -53,16 +52,14 @@ public class ReportTemplateResourceTest {
 
   private OpalConfigurationService opalConfigurationServiceMock;
 
-  private OpalConfiguration opalConfiguration;
-
   Set<ReportTemplate> reportTemplates;
 
   @Before
   public void setUp() {
-    new MagmaEngine();
+    if(!MagmaEngine.isInstanciated()) new MagmaEngine();
     opalRuntimeMock = createMock(OpalRuntime.class);
     opalConfigurationServiceMock = createMock(OpalConfigurationService.class);
-    opalConfiguration = new OpalConfiguration();
+    OpalConfiguration opalConfiguration = new OpalConfiguration();
 
     reportTemplates = new LinkedHashSet<ReportTemplate>();
     reportTemplates.add(getReportTemplate("template1"));
