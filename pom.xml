@@ -591,12 +591,20 @@
         <scope>runtime</scope>
       </dependency>
 
-      <!-- Use log4j during testing -->
       <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-log4j12</artifactId>
-        <version>${slf4j.version}</version>
-        <scope>test</scope>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${logback.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-core</artifactId>
+        <version>${logback.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-access</artifactId>
+        <version>${logback.version}</version>
       </dependency>
 
       <dependency>
@@ -639,6 +647,12 @@
         <groupId>org.quartz-scheduler</groupId>
         <artifactId>quartz</artifactId>
         <version>${quartz.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
@@ -1168,24 +1182,23 @@
   </dependencyManagement>
 
   <dependencies>
+
     <!-- Logging -->
-    <!-- Every child should use SLF4J for logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-
-    <!-- We've excluded commons-logging from our transitive dependencies. We replace it here. -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
-      <scope>test</scope>
     </dependency>
-
-    <!-- Internally, we'll use log4j when unit-testing (scope is defined above) -->
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
+      <artifactId>jul-to-slf4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
     </dependency>
 
     <dependency>
@@ -1398,6 +1411,40 @@
           <version>${maven-processor-plugin.version}</version>
         </plugin>
 
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>${maven.enforcer.plugin}</version>
+          <executions>
+            <execution>
+              <id>enforce-banned-dependencies</id>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <bannedDependencies>
+                    <searchTransitive>true</searchTransitive>
+                    <excludes>
+                      <exclude>commons-logging</exclude>
+                      <exclude>log4j:log4j</exclude>
+                      <exclude>org.slf4j:1.5*</exclude>
+                      <exclude>org.slf4j:slf4j-log4j12</exclude>
+                    </excludes>
+                  </bannedDependencies>
+                  <requireMavenVersion>
+                    <version>[3.0.0,3.1.1)</version>
+                  </requireMavenVersion>
+                  <requireJavaVersion>
+                    <version>${maven.compiler.target}</version>
+                  </requireJavaVersion>
+                </rules>
+                <fail>true</fail>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
       </plugins>
 
     </pluginManagement>
@@ -1422,6 +1469,11 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
       </plugin>
 
     </plugins>
@@ -1563,6 +1615,7 @@
     <jta.version>1.1</jta.version>
     <junit.version>4.11</junit.version>
     <liquibase.version>1.9.4</liquibase.version>
+    <logback.version>1.0.13</logback.version>
     <magma.version>1.8-SNAPSHOT</magma.version>
     <public-datasources.version>1.0</public-datasources.version>
     <mail.version>1.5.0-b01</mail.version>
@@ -1602,6 +1655,7 @@
     <maven-cobertura-plugin.version>2.6</maven-cobertura-plugin.version>
     <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
     <maven-deploy-plugin.version>2.8</maven-deploy-plugin.version>
+    <maven.enforcer.plugin>1.2</maven.enforcer.plugin>
     <maven-findbugs-plugin.version>2.5.2</maven-findbugs-plugin.version>
     <maven-jar-plugin.version>2.4</maven-jar-plugin.version>
     <maven-javacc-plugin.version>2.6</maven-javacc-plugin.version>
