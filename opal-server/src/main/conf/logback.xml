@@ -10,7 +10,7 @@
       <level>ERROR</level>
     </filter>
     <encoder>
-      <pattern>%d - %-5p - %-26.26c{3} - %m%n</pattern>
+      <pattern>%date - %-5level - %-26.26logger{3} - %message%n</pattern>
     </encoder>
   </appender>
 
@@ -24,7 +24,7 @@
       <maxFileSize>10MB</maxFileSize>
     </triggeringPolicy>
     <encoder>
-      <pattern>%d - %-5p - %c - %m%n</pattern>
+      <pattern>%date - %-5level - %logger:%line - %message%n</pattern>
     </encoder>
   </appender>
 
@@ -41,7 +41,7 @@
       <maxFileSize>10MB</maxFileSize>
     </triggeringPolicy>
     <encoder>
-      <pattern>%d - %-5p - %c - %m%n</pattern>
+      <pattern>%date - %-5level - %logger - %message%n</pattern>
     </encoder>
   </appender>
 
@@ -58,7 +58,7 @@
       <maxFileSize>10MB</maxFileSize>
     </triggeringPolicy>
     <encoder>
-      <pattern>%d - %p - %m%n</pattern>
+      <pattern>%date - %level - %message%n</pattern>
     </encoder>
   </appender>
 
@@ -88,7 +88,7 @@
   <!--<logger name="org.obiba" level="debug"/>-->
   <!--<logger name="org.obiba.magma.security" level="info"/>-->
   <!--<logger name="org.obiba.opal.web.security" level="info"/>-->
-  <!--<logger name="org.obiba.opal.server.httpd.security" level="info"/>-->
+  <!--<logger name="org.obiba.opal.server.httpd" level="info"/>-->
   <!--<logger name="org.obiba.opal.search.IndexSynchronizationManager" level="info"/>-->
 
   <root level="info">
