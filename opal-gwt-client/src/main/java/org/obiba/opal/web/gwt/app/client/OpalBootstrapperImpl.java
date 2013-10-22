@@ -47,9 +47,6 @@ public class OpalBootstrapperImpl implements Bootstrapper {
   ConfirmationPresenter confirmationPresenter;
 
   @Inject
-  UnhandledResponseNotificationPresenter unhandledResponseNotificationPresenter;
-
-  @Inject
   public OpalBootstrapperImpl(PlaceManager placeManager) {
     this.placeManager = placeManager;
   }
@@ -79,27 +76,12 @@ public class OpalBootstrapperImpl implements Bootstrapper {
   }
 
   private void initUserSession() {
-    final String username = requestCredentials.extractCredentials();
-
-    if(Strings.isNullOrEmpty(username) || "undefined".equals(username)) {
-      placeManager.revealUnauthorizedPlace(Places.LOGIN);
-    } else {
-      UriBuilder builder = UriBuilder.create().segment("auth", "session", username, "username");
+    if(requestCredentials.hasCredentials()) {
+      UriBuilder builder = UriBuilder.create().segment("auth", "session", requestCredentials.getUsername(), "username");
       ResourceRequestBuilderFactory.<Subject>newBuilder().forResource(builder.build()).get()
-          .withCallback(new ResourceCallback<Subject>() {
-            @Override
-            public void onResource(Response response, Subject subject) {
-              if(response.getStatusCode() == Response.SC_OK) {
-                requestCredentials.setUsername(subject.getPrincipal());
-              } else {
-                // Force logout/login
-                ResourceRequestBuilderFactory.newBuilder()
-                    .forResource(UriBuilder.create().segment("auth", "session", username).build()).delete().send();
-                requestCredentials.invalidate();
-              }
-              placeManager.revealCurrentPlace();
-            }
-          }).send();
+          .withCallback(new SubjectResourceCallback()).send();
+    } else {
+      placeManager.revealUnauthorizedPlace(Places.LOGIN);
     }
   }
 
@@ -108,15 +90,6 @@ public class OpalBootstrapperImpl implements Bootstrapper {
   }
 
   private void registerHandlers() {
-
-    eventBus.addHandler(UnhandledResponseEvent.getType(), new UnhandledResponseEvent.Handler() {
-      @Override
-      public void onUnhandledResponse(UnhandledResponseEvent e) {
-        RevealRootPopupContentEvent
-            .fire(unhandledResponseNotificationPresenter, unhandledResponseNotificationPresenter.withResponseEvent(e));
-      }
-    });
-
     eventBus.addHandler(RequestErrorEvent.getType(), new RequestErrorEvent.RequestErrorHandler() {
       @Override
       public void onRequestError(RequestErrorEvent e) {
@@ -141,12 +114,11 @@ public class OpalBootstrapperImpl implements Bootstrapper {
 
       @Override
       public void onSessionEnded(SessionEndedEvent event) {
-        RequestCredentials credentials = requestCredentials;
-        if(credentials != null && credentials.hasCredentials()) {
-          // calling this makes the session expired event to be fired in return
-          ResourceRequestBuilderFactory.newBuilder().forResource("/auth/session/" + credentials.extractCredentials())
-              .delete().send();
-          credentials.invalidate();
+        if(requestCredentials.hasCredentials()) {
+          ResourceRequestBuilderFactory.newBuilder().forResource(
+              UriBuilder.create().segment("auth", "session", requestCredentials.extractCredentials()).build()).delete()
+              .send();
+          requestCredentials.invalidate();
         }
         // Reload application and reset history
         Window.Location.replace("/");
@@ -158,10 +130,25 @@ public class OpalBootstrapperImpl implements Bootstrapper {
 
       @Override
       public void onWindowClosing(ClosingEvent arg0) {
-        // opalGinjector.getEventBus().fireEvent(new SessionEndedEvent());
+        eventBus.fireEvent(new SessionEndedEvent());
       }
 
     });
 
+  }
+
+  private class SubjectResourceCallback implements ResourceCallback<Subject> {
+
+    SubjectResourceCallback() {}
+
+    @Override
+    public void onResource(Response response, Subject subject) {
+      if(response.getStatusCode() == Response.SC_OK) {
+        requestCredentials.setUsername(subject.getPrincipal());
+        placeManager.revealCurrentPlace();
+      } else {
+        eventBus.fireEvent(new SessionEndedEvent());
+      }
+    }
   }
 }

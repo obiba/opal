@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.rest.client.event;
 
+import org.obiba.opal.web.gwt.rest.client.HttpMethod;
+
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.http.client.Request;
@@ -25,17 +27,20 @@ public class UnhandledResponseEvent extends GwtEvent<UnhandledResponseEvent.Hand
     void onUnhandledResponse(UnhandledResponseEvent e);
   }
 
-  private final Request request;
+  private final HttpMethod method;
+
+  private final String uri;
 
   private final Response response;
 
-  public UnhandledResponseEvent(Request request, Response response) {
-    this.request = request;
+  public UnhandledResponseEvent(HttpMethod method, String uri, Response response) {
+    this.method = method;
+    this.uri = uri;
     this.response = response;
   }
 
-  public Request getRequest() {
-    return request;
+  public String getShortMessage() {
+    return method + " " + uri.substring(3) + " : " + response.getStatusText() + " (" + response.getStatusCode() +")";
   }
 
   public Response getResponse() {

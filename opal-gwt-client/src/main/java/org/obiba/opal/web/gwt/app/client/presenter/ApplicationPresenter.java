@@ -34,6 +34,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFac
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
 import com.google.gwt.event.logical.shared.SelectionEvent;
@@ -72,6 +73,8 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   private final NotificationPresenter messageDialog;
 
+  private final UnhandledResponseNotificationPresenter unhandledResponseNotificationPresenter;
+
   private final ModalProvider<FileSelectorPresenter> fileSelectorProvider;
 
   private final ModalProvider<ValueMapPopupPresenter> valueMapPopupProvider;
@@ -83,12 +86,15 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   @Inject
   @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
   public ApplicationPresenter(Display display, Proxy proxy, EventBus eventBus, RequestCredentials credentials,
-      NotificationPresenter messageDialog, ModalProvider<FileSelectorPresenter> fileSelectorProvider,
+      NotificationPresenter messageDialog,
+      UnhandledResponseNotificationPresenter unhandledResponseNotificationPresenter,
+      ModalProvider<FileSelectorPresenter> fileSelectorProvider,
       ModalProvider<ValueMapPopupPresenter> valueMapPopupProvider, RequestUrlBuilder urlBuilder,
       PlaceManager placeManager) {
     super(eventBus, display, proxy);
     this.credentials = credentials;
     this.messageDialog = messageDialog;
+    this.unhandledResponseNotificationPresenter = unhandledResponseNotificationPresenter;
     this.fileSelectorProvider = fileSelectorProvider.setContainer(this);
     this.valueMapPopupProvider = valueMapPopupProvider.setContainer(this);
     this.urlBuilder = urlBuilder;
@@ -203,6 +209,14 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
       public void onUserMessage(NotificationEvent event) {
         messageDialog.setNotification(event);
         setInSlot(NOTIFICATION, messageDialog);
+      }
+    });
+
+    addRegisteredHandler(UnhandledResponseEvent.getType(), new UnhandledResponseEvent.Handler() {
+      @Override
+      public void onUnhandledResponse(UnhandledResponseEvent e) {
+        unhandledResponseNotificationPresenter.withResponseEvent(e);
+        setInSlot(NOTIFICATION, unhandledResponseNotificationPresenter);
       }
     });
   }

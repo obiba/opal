@@ -11,23 +11,16 @@ package org.obiba.opal.web.gwt.app.client.presenter;
 
 import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.gwt.user.client.ui.Label;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PopupView;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
+import com.gwtplatform.mvp.client.View;
 
 public class UnhandledResponseNotificationPresenter
     extends PresenterWidget<UnhandledResponseNotificationPresenter.Display> {
 
-  public interface Display extends PopupView {
-
-    HasClickHandlers getOkay();
-
-    Label getErrorMessage();
+  public interface Display extends View {
+    void setErrorMessage(String msg);
   }
 
   @Inject
@@ -35,26 +28,15 @@ public class UnhandledResponseNotificationPresenter
     super(eventBus, display);
   }
 
-  @Override
-  protected void onBind() {
-
-    getView().getOkay().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getView().hide();
-      }
-    });
-  }
-
   public UnhandledResponseNotificationPresenter withResponseEvent(UnhandledResponseEvent event) {
 
-    String message = event.getResponse().getStatusText() + " (" + event.getResponse().getStatusCode() + ")";
+    String message = event.getShortMessage();
 
     if(!event.getResponse().getText().isEmpty()) {
       message += ": " + event.getResponse().getText();
     }
 
-    getView().getErrorMessage().setText(message);
+    getView().setErrorMessage(message);
 
     return this;
   }

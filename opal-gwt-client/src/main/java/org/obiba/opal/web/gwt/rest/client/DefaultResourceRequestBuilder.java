@@ -298,7 +298,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
       }
 
       if(!handled) {
-        eventBus.fireEvent(new UnhandledResponseEvent(request, response));
+        eventBus.fireEvent(new UnhandledResponseEvent(method, uri, response));
       }
     }
 
