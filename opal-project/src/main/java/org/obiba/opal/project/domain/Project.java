@@ -22,6 +22,7 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.opal.core.domain.AbstractOrientDbTimestampedEntity;
 import org.obiba.opal.core.validator.Unique;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 
 /**
@@ -112,6 +113,11 @@ public class Project extends AbstractOrientDbTimestampedEntity {
   @Transient
   public Datasource getDatasource() {
     return MagmaEngine.get().getDatasource(name);
+  }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this).add("name", name).add("database", database).toString();
   }
 
   @SuppressWarnings("ParameterHidesMemberVariable")

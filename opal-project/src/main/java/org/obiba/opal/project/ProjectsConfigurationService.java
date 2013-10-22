@@ -132,9 +132,11 @@ public class ProjectsConfigurationService implements ProjectService {
   @Nonnull
   @Override
   public Project getProject(@Nonnull String name) throws NoSuchProjectException {
-    Project project = orientDbService.uniqueResult("select from Project where name = ?", name);
-    if(project == null) throw new NoSuchProjectException(name);
-    return project;
+    // TODO replace by orientDbService.uniqueResult("select from Project where name = ?", name) with Orient-1.6
+    for(Project project : orientDbService.list(Project.class)) {
+      if(name.equals(project.getName())) return project;
+    }
+    throw new NoSuchProjectException(name);
   }
 
   @Nonnull
