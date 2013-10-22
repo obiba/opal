@@ -13,6 +13,11 @@ message JdbcDriverDto {
   required string jdbcUrlExample = 5; // e.g., "jdbc:mysql://localhost:3306/opal"
 }
 
+message DatabasesStatusDto {
+  required bool hasIdentifiers = 1 [default = false];
+  required bool hasStorage = 2 [default = false];
+}
+
 message DatabaseDto {
   enum Usage {
     IMPORT = 0;

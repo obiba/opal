@@ -35,6 +35,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
@@ -142,6 +143,11 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     return orientDbService.list("select from Database where usedForIdentifiers = ? and usage = ?", false, usage);
   }
 
+  @Override
+  public boolean hasDatabases(@Nullable Database.Usage usage) {
+    return Iterables.size(list(usage)) > 0;
+  }
+
   @Nonnull
   @Override
   public Database getDatabase(@Nonnull String name) throws NoSuchDatabaseException {
@@ -236,6 +242,11 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     database.setEditable(true);
     orientDbService.save(database);
     registrations.remove(databaseName, usedByDatasource);
+  }
+
+  @Override
+  public boolean hasIdentifiersDatabase() {
+    return orientDbService.uniqueResult("select from Database where usedForIdentifiers = ?", true) != null;
   }
 
   @Nonnull

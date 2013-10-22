@@ -12,13 +12,13 @@ import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbDatabase;
 import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
-import org.obiba.opal.core.runtime.database.IdentifiersDatabaseNotFoundException;
 import org.obiba.opal.core.runtime.database.MultipleIdentifiersDatabaseException;
 import org.obiba.opal.web.database.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static org.obiba.opal.web.model.Database.DatabaseDto;
+import static org.obiba.opal.web.model.Database.DatabasesStatusDto;
 
 @Component
 @Path("/system/databases")
@@ -26,6 +26,15 @@ public class DatabasesResource {
 
   @Autowired
   private DatabaseRegistry databaseRegistry;
+
+  @GET
+  @Path("/_status")
+  public DatabasesStatusDto getDatabases() {
+    DatabasesStatusDto.Builder builder = DatabasesStatusDto.newBuilder();
+    builder.setHasIdentifiers(databaseRegistry.hasIdentifiersDatabase());
+    builder.setHasStorage(databaseRegistry.hasDatabases(Database.Usage.STORAGE));
+    return builder.build();
+  }
 
   @GET
   @Path("/sql")

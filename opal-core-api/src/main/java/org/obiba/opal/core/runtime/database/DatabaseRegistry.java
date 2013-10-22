@@ -18,6 +18,8 @@ public interface DatabaseRegistry extends SystemService {
 
   Iterable<Database> list(@Nullable Database.Usage usage);
 
+  boolean hasDatabases(@Nullable Database.Usage usage);
+
   @Nonnull
   Database getDatabase(@Nonnull String name) throws NoSuchDatabaseException;
 
@@ -31,6 +33,8 @@ public interface DatabaseRegistry extends SystemService {
   SessionFactory getSessionFactory(@Nonnull String name, @Nullable String usedByDatasource);
 
   void unregister(@Nonnull String databaseName, @Nullable String usedByDatasource);
+
+  boolean hasIdentifiersDatabase();
 
   @Nonnull
   Database getIdentifiersDatabase() throws IdentifiersDatabaseNotFoundException;
