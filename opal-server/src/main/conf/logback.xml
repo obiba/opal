@@ -73,6 +73,7 @@
   <!--Uncomment the following line to see copy progress-->
   <!--<logger name="org.obiba.magma.support.DatasourceCopier" level="debug"/>-->
 
+  <!--hide verbose dependencies-->
   <logger name="jetty.util.log" level="error"/>
   <logger name="com.atomikos" level="warn"/>
   <logger name="org.hibernate.stat.Statistics" level="warn"/>
@@ -87,6 +88,7 @@
   <!--<logger name="org.obiba" level="debug"/>-->
   <!--<logger name="org.obiba.magma.security" level="info"/>-->
   <!--<logger name="org.obiba.opal.web.security" level="info"/>-->
+  <!--<logger name="org.obiba.opal.server.httpd.security" level="info"/>-->
   <!--<logger name="org.obiba.opal.search.IndexSynchronizationManager" level="info"/>-->
 
   <root level="info">
