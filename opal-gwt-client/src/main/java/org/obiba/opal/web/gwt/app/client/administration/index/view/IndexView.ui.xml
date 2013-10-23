@@ -34,10 +34,10 @@
 
     <b:ModalFooter>
       <b:Button ui:field="saveButton" type="PRIMARY">
-        <ui:msg description="Index Save button label">Save</ui:msg>
+        <ui:msg description="Save button label">Save</ui:msg>
       </b:Button>
       <b:Button ui:field="cancelButton">
-        <ui:msg description="Index Cancel button label">Cancel</ui:msg>
+        <ui:msg description="Cancel button label">Cancel</ui:msg>
       </b:Button>
     </b:ModalFooter>
   </o:Modal>
