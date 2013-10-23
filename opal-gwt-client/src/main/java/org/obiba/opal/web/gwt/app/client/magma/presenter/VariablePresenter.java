@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
+import org.obiba.opal.web.gwt.app.client.magma.derive.helper.VariableDuplicationHelper;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveVariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.SiblingVariableSelectionEvent;
@@ -39,13 +40,13 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
+import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
@@ -227,7 +228,10 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     }
     String script = VariableDtos.getScript(variable);
     getView().setDerivedVariable(true, script);
+    scriptEditorPresenter.setTable(table);
     scriptEditorPresenter.setScript(script);
+    scriptEditorPresenter.setRepeatable(variable.getIsRepeatable());
+    scriptEditorPresenter.setValueEntityType(variable.getValueType());
   }
 
   private void updateDerivedVariableByCommitInfo(VcsCommitInfoDto commitInfo) {
@@ -306,7 +310,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   @Override
   public void onSaveScript() {
-    VariableDto newVariable = VariableDto.parse(VariableDto.stringify(variable));
+    VariableDuplicationHelper variableDuplicationHelper = new VariableDuplicationHelper(variable);
+    VariableDto newVariable = variableDuplicationHelper.getDerivedVariable();
     VariableDtos.setScript(newVariable, scriptEditorPresenter.getScript());
     newVariable.setValueType(scriptEditorPresenter.getValueEntityType().getLabel());
     newVariable.setIsRepeatable(scriptEditorPresenter.isRepeatable());
@@ -319,7 +324,6 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
         .withResourceBody(VariableDto.stringify(newVariable))
         .withCallback(Response.SC_OK, updateVariableCallbackHandler)
         .withCallback(Response.SC_BAD_REQUEST, updateVariableCallbackHandler).send();
-
   }
 
   @Override
@@ -417,9 +421,9 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     public void onResponseCode(Request request, Response response) {
       switch(response.getStatusCode()) {
         case Response.SC_OK:
-          updateVariableDisplay(variable);
-          getView().backToViewScript();
           variableUpdatePending = false;
+          getEventBus().fireEvent(new VariableRefreshEvent());
+          getView().backToViewScript();
           break;
         case Response.SC_NOT_FOUND:
           break;

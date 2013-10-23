@@ -19,16 +19,15 @@ import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public class ScriptEditorView extends ViewImpl implements ScriptEditorPresenter.Display {
 
-  @UiTemplate("ScriptEditorView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, ScriptEditorView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
@@ -69,6 +68,16 @@ public class ScriptEditorView extends ViewImpl implements ScriptEditorPresenter.
   @Override
   public String getBeautifiedScript() {
     return scriptArea.getBeautifiedText();
+  }
+
+  @Override
+  public void setIsRepeatable(boolean value) {
+    repeatable.setEnabled(value);
+  }
+
+  @Override
+  public void setValueType(String value) {
+    valueTypes.setSelectedValue(value);
   }
 
   @Override
