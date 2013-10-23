@@ -27,12 +27,16 @@ public class CommitInfo {
 
   private List<String> diffEntries;
 
+  private String blob;
+
+  private boolean isHead = false;
+
   public String getAuthor() {
     return author;
   }
 
   public Date getDate() {
-    return date;
+    return (Date)date.clone();
   }
 
   public String getDateAsIso8601() {
@@ -51,7 +55,15 @@ public class CommitInfo {
   }
 
   public List<String> getDiffEntries() {
-    return diffEntries;
+    return diffEntries != null ? diffEntries.subList(0, diffEntries.size()) : null;
+  }
+
+  public String getBlob() {
+    return blob;
+  }
+
+  public boolean getIsHead() {
+    return isHead;
   }
 
   public String toString() {
@@ -68,6 +80,10 @@ public class CommitInfo {
     private String commitId;
 
     private List<String> diffEntries;
+
+    private String blob;
+
+    private boolean isHead = false;
 
     public static Builder createFromObject(CommitInfo commitInfo) {
       return new Builder().setAuthor(commitInfo.author).setComment(commitInfo.comment).setCommitId(commitInfo.commitId)
@@ -99,6 +115,16 @@ public class CommitInfo {
       return this;
     }
 
+    public Builder setBlob(String value) {
+      blob = value;
+      return this;
+    }
+
+    public Builder setIsHead(boolean value) {
+      isHead = value;
+      return this;
+    }
+
     public CommitInfo build() {
       CommitInfo commitInfo = new CommitInfo();
       commitInfo.author = author;
@@ -106,6 +132,8 @@ public class CommitInfo {
       commitInfo.comment = comment;
       commitInfo.commitId = commitId;
       commitInfo.diffEntries = diffEntries;
+      commitInfo.blob = blob;
+      commitInfo.isHead = isHead;
 
       return commitInfo;
     }

@@ -16,14 +16,15 @@ import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableVcsCommitHistoryPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableVcsCommitHistoryUiHandlers;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.datetime.client.FormatType;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
 
 import com.github.gwtbootstrap.client.ui.CellTable;
 import com.github.gwtbootstrap.client.ui.SimplePager;
-import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -69,17 +70,23 @@ public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<VariableVcs
     commitInfoTablePager.setVisible(commitInfoDataProvider.getList().size() > commitInfoTablePager.getPageSize());
   }
 
+  @Override
+  public HasActionHandler<VcsCommitInfoDto> getActions() {
+    return Columns.ACTIONS;
+  }
+
   private void createTableColumns() {
-    commitInfoTable.addColumn(createDateColumn(), translations.commitInfoMap().get("Date"));
-    commitInfoTable.addColumn(createAuthorColumn(), translations.commitInfoMap().get("Author"));
-    commitInfoTable.addColumn(createCommentColumn(), translations.commitInfoMap().get("Comment"));
-    commitInfoTable.addColumn(createDiffColumn(), translations.commitInfoMap().get("Diff"));
+    commitInfoTable.addColumn(Columns.DATE, translations.commitInfoMap().get("Date"));
+    commitInfoTable.addColumn(Columns.AUTHOR, translations.commitInfoMap().get("Author"));
+    commitInfoTable.addColumn(Columns.COMMENT, translations.commitInfoMap().get("Comment"));
+    commitInfoTable.addColumn(Columns.ACTIONS, translations.actionsLabel());
     commitInfoDataProvider.addDataDisplay(commitInfoTable);
     commitInfoTable.setEmptyTableWidget(new Label(translations.noVcsCommitHistoryAvailable()));
   }
 
-  private Column<VcsCommitInfoDto, String> createDateColumn() {
-    return new TextColumn<VcsCommitInfoDto>() {
+  private static final class Columns {
+
+    static final Column<VcsCommitInfoDto, String> DATE = new TextColumn<VcsCommitInfoDto>() {
 
       @Override
       public String getValue(VcsCommitInfoDto commitInfo) {
@@ -88,49 +95,41 @@ public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<VariableVcs
             .replaceArguments(translations.momentWithAgo(), m.format(FormatType.MONTH_NAME_TIME_SHORT), m.fromNow());
       }
     };
-  }
 
-  private Column<VcsCommitInfoDto, String> createAuthorColumn() {
-
-    return new TextColumn<VcsCommitInfoDto>() {
+    static final Column<VcsCommitInfoDto, String> AUTHOR = new TextColumn<VcsCommitInfoDto>() {
 
       @Override
       public String getValue(VcsCommitInfoDto commitInfo) {
         return commitInfo.getAuthor();
       }
     };
-  }
 
-  private Column<VcsCommitInfoDto, String> createCommentColumn() {
-
-    return new TextColumn<VcsCommitInfoDto>() {
+    static final Column<VcsCommitInfoDto, String> COMMENT = new TextColumn<VcsCommitInfoDto>() {
 
       @Override
       public String getValue(VcsCommitInfoDto commitInfo) {
         return commitInfo.getComment();
       }
     };
-  }
 
-
-
-  private Column<VcsCommitInfoDto, String> createDiffColumn() {
-
-    ClickableColumn<VcsCommitInfoDto> column = new ClickableColumn<VcsCommitInfoDto>() {
+    static final ActionsColumn<VcsCommitInfoDto> ACTIONS = new ActionsColumn<VcsCommitInfoDto>(new ActionsProvider<VcsCommitInfoDto>() {
 
       @Override
-      public String getValue(VcsCommitInfoDto commitInfo) {
-        return translations.commitInfoMap().get("ComparePrevious");
+      public String[] allActions() {
+        return new String[] { ActionsColumn.EDIT_ACTION, DIFF_ACTION, DIFF_CURRENT_ACTION };
       }
-    };
 
-    column.setFieldUpdater(new FieldUpdater<VcsCommitInfoDto, String>() {
       @Override
-      public void update(int index, VcsCommitInfoDto dto, String value) {
-        getUiHandlers().showCommitInfo(dto);
+      public String[] getActions(VcsCommitInfoDto value) {
+        return value.getIsHead() ? getHeadOnlyActions() : allActions();
+      }
+
+      private String[] getHeadOnlyActions() {
+        return new String[] { DIFF_ACTION };
       }
     });
 
-    return column;
   }
+
+
 }

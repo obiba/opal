@@ -88,6 +88,14 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
     return getView().getSelectedScript();
   }
 
+  public ValueType getValueEntityType() {
+    return getView().getValueType();
+  }
+
+  public boolean isRepeatable() {
+    return getView().isRepeatable();
+  }
+
   public String getScript() {
     String script = getView().getScript();
     return "".equals(script.trim()) ? "null" : script;
@@ -136,6 +144,10 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
     void setScript(String script);
 
     String getSelectedScript();
+
+    ValueType getValueType();
+
+    boolean isRepeatable();
 
     HandlerRegistration addTestScriptClickHandler(ClickHandler handler);
 

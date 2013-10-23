@@ -30,6 +30,7 @@ import com.github.gwtbootstrap.client.ui.CodeBlock;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TabPanel;
+import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.google.common.base.Strings;
@@ -165,6 +166,9 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @UiField
   IconAnchor editProperties;
 
+  @UiField
+  TextBox comment;
+
   private JsArray<LocaleDto> languages;
 
   private final Translations translations;
@@ -214,10 +218,22 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     }
   }
 
-  @UiHandler("backToScript")
-  public void onBackToScript(ClickEvent event) {
+  @Override
+  public void goToEditScript() {
+    backToScript.setVisible(true);
+    scriptControls.setVisible(false);
+    scriptNavPanel.showWidget(1);
+  }
+
+  @Override
+  public void backToViewScript() {
     scriptNavPanel.showWidget(0);
     updateScriptNavPanel(0);
+  }
+
+  @UiHandler("backToScript")
+  public void onBackToScript(ClickEvent event) {
+    backToViewScript();
   }
 
   @UiHandler("editScript")
@@ -233,8 +249,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   @UiHandler("cancelEditScript")
   public void onCancelEditScript(ClickEvent event) {
-    scriptNavPanel.showWidget(0);
-    updateScriptNavPanel(0);
+    backToViewScript();
   }
 
   @UiHandler("historyScript")
@@ -305,6 +320,13 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     renderVariableLabels(rows);
   }
 
+  @Override
+  public String getComment() {
+    String commentText = comment.getText();
+    String placeholder = comment.getPlaceholder();
+    return Strings.isNullOrEmpty(commentText) ? placeholder : commentText;
+  }
+
   private void renderVariableLabels(JsArray<AttributeDto> rows) {
 //    label.clear();
 //    for(AttributeDto attr : JsArrays.toIterable(rows)) {
@@ -359,7 +381,12 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     repeatable.setText(variable.getIsRepeatable() ? translations.yesLabel() : translations.noLabel());
     occurrenceGroup.setText(variable.getIsRepeatable() ? variable.getOccurrenceGroup() : "");
 
+    updateComment(variable.getName());
     updateScriptNavPanel(scriptNavPanel.getVisibleWidget());
+  }
+
+  private void updateComment(String variableName) {
+    comment.setPlaceholder(translations.scriptUpdateDefaultPrefixLabel() + " " + variableName);
   }
 
   private void updateScriptNavPanel(int selectedIndex) {

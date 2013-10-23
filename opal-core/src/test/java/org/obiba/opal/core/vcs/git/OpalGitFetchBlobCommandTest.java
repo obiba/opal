@@ -51,5 +51,12 @@ public class OpalGitFetchBlobCommandTest {
       Assert.fail();
     }
   }
+
+  @Test(expected = OpalGitException.class)
+  public void testBlobRetrievalWithFolderPath() {
+    OpalGitFetchBlobCommand command = new OpalGitFetchBlobCommand.Builder(vcs.getRepository(DATASOURCE_NAME),
+        "TestView", COMMIT_ID).addDatasourceName(DATASOURCE_NAME).build();
+    command.execute();
+  }
 }
 

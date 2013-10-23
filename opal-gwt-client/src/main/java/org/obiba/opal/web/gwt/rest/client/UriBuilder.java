@@ -132,6 +132,9 @@ public class UriBuilder {
   public static final UriBuilder URI_DATASOURCE_TABLE_VARIABLE = create()
       .segment("datasource", "{}", "table", "{}", "variable", "{}");
 
+  public static final UriBuilder URI_DATASOURCE_VIEW_VARIABLE = create()
+      .segment("datasource", "{}", "view", "{}", "variable", "{}");
+
   public static final UriBuilder URI_DATASOURCE_TABLE_LOCALES = create()
       .segment("datasource", "{}", "table", "{}", "locales");
 

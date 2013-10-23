@@ -9,10 +9,7 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
-import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
-
 import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface VariableVcsCommitHistoryUiHandlers extends UiHandlers {
-  void showCommitInfo(VcsCommitInfoDto dto);
 }

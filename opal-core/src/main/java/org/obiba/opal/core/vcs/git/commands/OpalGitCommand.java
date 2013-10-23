@@ -20,6 +20,7 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.obiba.opal.core.vcs.OpalGitException;
+import org.obiba.opal.core.vcs.support.OpalGitUtils;
 
 /**
  * Base class for all Opal GIT commands. All subclasses are immutables and must be created by their respective builders
@@ -39,6 +40,20 @@ public abstract class OpalGitCommand<T> implements Command<T> {
   protected OpalGitCommand(@Nonnull Repository repository, @Nullable String datasourceName) {
     this.repository = repository;
     this.datasourceName = datasourceName;
+  }
+
+  public boolean isHead(String commitId) throws IOException {
+    if (OpalGitUtils.HEAD_COMMIT_ID.equals(commitId)) {
+      return true;
+    }
+
+    ObjectId id = repository.resolve(OpalGitUtils.HEAD_COMMIT_ID);
+
+    if(id != null) {
+      return id.getName().equals(commitId);
+    }
+
+    return false;
   }
 
   protected RevCommit getCommitById(String commitId) throws IOException {

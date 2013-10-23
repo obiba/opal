@@ -42,6 +42,8 @@ public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
 
   private final String commitId;
 
+  private String previousCommitId;
+
   private int nthCommit = 1;
 
   private OpalGitDiffCommand(Builder builder) {
@@ -49,6 +51,7 @@ public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
     commitId = builder.commitId;
     path = builder.path;
     nthCommit = builder.nthCommit;
+    previousCommitId = builder.previousCommitId;
   }
 
   @Override
@@ -103,6 +106,8 @@ public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
 
     private int nthCommit = 1;
 
+    private String previousCommitId;
+
     public Builder(@Nonnull Repository repository, @Nonnull String commitId) {
       super(repository);
       this.commitId = commitId;
@@ -110,6 +115,11 @@ public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
 
     public Builder addNthCommit(int value) {
       nthCommit = value;
+      return this;
+    }
+
+    public Builder addPreviousCommitId(String value) {
+      previousCommitId = value;
       return this;
     }
 
@@ -148,7 +158,9 @@ public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
       currentCommitParser.reset(reader, currentCommit.getTree());
 
       previousCommitParser = null;
-      RevCommit previousCommit = getCommitById(OpalGitUtils.getNthCommitId(commitId, nthCommit));
+      RevCommit previousCommit = !Strings.isNullOrEmpty(previousCommitId)
+          ? getCommitById(previousCommitId)
+          : getCommitById(OpalGitUtils.getNthCommitId(commitId, nthCommit));
 
       if(previousCommit == null) {
         // currentCommit is the first commit in the tree

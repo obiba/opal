@@ -10,8 +10,6 @@
 
 package org.obiba.opal.web.vcs;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -28,6 +26,8 @@ import org.obiba.opal.web.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 @Component
 @Scope("request")
@@ -56,10 +56,10 @@ public class ViewVcsLogResource {
 
   @GET
   @Path("/variable/{variableName}/commits")
-  public Response getVariableCommitsInfo(@Nonnull @PathParam("variableName") String variabeName) {
+  public Response getVariableCommitsInfo(@Nonnull @PathParam("variableName") String variableName) {
     try {
       List<CommitInfo> commitInfos = vcs
-          .getCommitsInfo(datasource, OpalGitUtils.getVariableFilePath(view, variabeName));
+          .getCommitsInfo(datasource, OpalGitUtils.getVariableFilePath(view, variableName));
       return Response.ok().entity(Dtos.asDto(commitInfos)).build();
     } catch(OpalGitException e) {
       return Response.status(Response.Status.BAD_REQUEST).entity("FailedToRetrieveVariableCommitInfos").build();
@@ -68,16 +68,29 @@ public class ViewVcsLogResource {
 
   @GET
   @Path("/variable/{variableName}/commit/{commitId}")
-  public Response getVariableCommitInfo(@Nonnull @PathParam("variableName") String variabeName,
+  public Response getVariableCommitInfo(@Nonnull @PathParam("variableName") String variableName,
       @Nonnull @PathParam("commitId") String commitId) {
 
     try {
-      String path = OpalGitUtils.getVariableFilePath(view, variabeName);
-      CommitInfo commitInfo = vcs.getCommitInfo(datasource, path, commitId);
-      List<String> diffEntries = vcs.getDiffEntries(datasource, commitId, path);
-      commitInfo = CommitInfo.Builder.createFromObject(commitInfo).setDiffEntries(diffEntries).build();
+      String path = OpalGitUtils.getVariableFilePath(view, variableName);
+      return Response.ok().entity(
+          Dtos.asDto(getVariableDiffInternal(vcs.getCommitInfo(datasource, path, commitId), path, commitId, null)))
+          .build();
+    } catch(OpalGitException e) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("FailedToRetrieveVariableCommitInfo").build();
+    }
+  }
 
-      return Response.ok().entity(Dtos.asDto(commitInfo)).build();
+  @GET
+  @Path("/variable/{variableName}/commit/head/{commitId}")
+  public Response getVariableCommitInfoFromHead(@Nonnull @PathParam("variableName") String variableName,
+      @Nonnull @PathParam("commitId") String commitId) {
+
+    try {
+      String path = OpalGitUtils.getVariableFilePath(view, variableName);
+      return Response.ok().entity(Dtos.asDto(
+          getVariableDiffInternal(vcs.getCommitInfo(datasource, path, commitId), path, OpalGitUtils.HEAD_COMMIT_ID,
+              commitId))).build();
     } catch(OpalGitException e) {
       return Response.status(Response.Status.BAD_REQUEST).entity("FailedToRetrieveVariableCommitInfo").build();
     }
@@ -89,16 +102,18 @@ public class ViewVcsLogResource {
       @Nonnull @PathParam("commitId") String commitId) {
     try {
       String blob = vcs.getBlob(datasource, OpalGitUtils.getVariableFilePath(view, variableName), commitId);
-      InputStream is = new ByteArrayInputStream(blob.getBytes());
-
-      return Response.ok()
-          .entity(is).header("Content-Disposition",getHeader(variableName)).build();
+      String path = OpalGitUtils.getVariableFilePath(view, variableName);
+      CommitInfo commitInfo = CommitInfo.Builder.createFromObject(vcs.getCommitInfo(datasource, path, commitId))
+          .setBlob(blob).build();
+      return Response.ok().entity(Dtos.asDto(commitInfo)).build();
     } catch(OpalGitException e) {
       return Response.status(Response.Status.BAD_REQUEST).entity("FailedToRetrieveVariableCommitInfo").build();
     }
   }
 
-  public String getHeader(String variableName) {
-    return String.format("attachment; filename=%s", variableName);
+  private CommitInfo getVariableDiffInternal(@Nonnull CommitInfo commitInfo, @Nonnull String path,
+      @Nonnull String commitId, @Nullable String prevCommitId) {
+    List<String> diffEntries = vcs.getDiffEntries(datasource, commitId, prevCommitId, path);
+    return CommitInfo.Builder.createFromObject(commitInfo).setDiffEntries(diffEntries).build();
   }
 }

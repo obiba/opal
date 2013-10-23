@@ -50,7 +50,7 @@ public class OpalGitCommitLogCommand extends OpalGitCommand<CommitInfo> {
         // There is indeed the path in this commit
         PersonIdent personIdent = commit.getAuthorIdent();
         return new CommitInfo.Builder().setAuthor(personIdent.getName()).setDate(personIdent.getWhen())
-            .setComment(commit.getFullMessage()).setCommitId(commit.getName()).build();
+            .setComment(commit.getFullMessage()).setCommitId(commit.getName()).setIsHead(isHead(commitId)).build();
 
       }
     } catch(IOException e) {

@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.SiblingTableSelectionEvent.
 import org.obiba.opal.web.gwt.app.client.magma.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexStatusRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
@@ -181,6 +182,16 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     addRegisteredHandler(VariableSelectionChangeEvent.getType(), this);
     addRegisteredHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler());
     addRegisteredHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler());
+
+    addRegisteredHandler(VariableRefreshEvent.getType(), new VariableRefreshEvent.Handler() {
+      @Override
+      public void onVariableRefresh(VariableRefreshEvent event) {
+        updateVariables();
+      }
+    });
+
+
+
     getView().setValuesTabCommand(new ValuesCommand());
     getView().setVariablesTabCommand(new VariablesCommand());
 
