@@ -28,6 +28,8 @@ import org.obiba.opal.core.vcs.git.commands.OpalGitFetchBlobCommand;
 import org.obiba.opal.core.vcs.support.OpalGitUtils;
 import org.springframework.stereotype.Component;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 @Component
 public class OpalGitVersionControlSystem implements OpalVersionControlSystem {
 
@@ -53,9 +55,10 @@ public class OpalGitVersionControlSystem implements OpalVersionControlSystem {
   }
 
   @Override
-  public List<String> getDiffEntries(@Nonnull String datasource, @Nonnull String commitId, String path) {
+  public List<String> getDiffEntries(@Nonnull String datasource, @Nonnull String commitId,
+      @Nullable String prevCommitId, @Nullable String path) {
     OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(getRepository(datasource), commitId).addPath(path)
-        .addDatasourceName(datasource).build();
+        .addDatasourceName(datasource).addPreviousCommitId(prevCommitId).build();
 
     return command.execute();
   }

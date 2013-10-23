@@ -219,6 +219,13 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   }
 
   @Override
+  public void goToEditScript() {
+    backToScript.setVisible(true);
+    scriptControls.setVisible(false);
+    scriptNavPanel.showWidget(1);
+  }
+
+  @Override
   public void backToViewScript() {
     scriptNavPanel.showWidget(0);
     updateScriptNavPanel(0);

@@ -330,8 +330,6 @@ message VcsCommitInfoDto {
   required string comment = 3;
   required string commitId = 4;
   repeated string diffEntries = 5;
-}
-
-message VcsBlobDto {
-  required string blob = 1;
+  optional string blob = 6;
+  optional bool isHead = 7 [default = false];
 }

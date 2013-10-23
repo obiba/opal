@@ -16,6 +16,8 @@ import java.util.List;
 import org.obiba.opal.core.vcs.CommitInfo;
 import org.obiba.opal.web.model.Opal;
 
+import com.google.common.base.Strings;
+
 public final class Dtos {
 
   private Dtos() {}
@@ -33,18 +35,20 @@ public final class Dtos {
   public static Opal.VcsCommitInfoDto asDto(CommitInfo commitInfo) {
     Opal.VcsCommitInfoDto.Builder commitInfoDtoBuilder = Opal.VcsCommitInfoDto.newBuilder()
         .setAuthor(commitInfo.getAuthor()).setDate(commitInfo.getDateAsIso8601()).setCommitId(commitInfo.getCommitId())
-        .setComment(commitInfo.getComment());
+        .setComment(commitInfo.getComment()).setIsHead(commitInfo.getIsHead());
 
     List<String> diffEntries = commitInfo.getDiffEntries();
 
     if(diffEntries != null) {
       commitInfoDtoBuilder.addAllDiffEntries(diffEntries);
     }
+
+    String blob = commitInfo.getBlob();
+
+    if(!Strings.isNullOrEmpty(blob)) {
+      commitInfoDtoBuilder.setBlob(blob);
+    }
+
     return commitInfoDtoBuilder.build();
   }
-
-  public static Opal.VcsBlobDto asDto(String blob) {
-    return Opal.VcsBlobDto.newBuilder().setBlob(blob).build();
-  }
-
 }

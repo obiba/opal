@@ -22,5 +22,6 @@ public interface OpalVersionControlSystem {
 
   String getBlob(@Nonnull String datasource, @Nonnull String path, @Nonnull String commitId);
 
-  List<String> getDiffEntries(@Nonnull String datasource, @Nonnull String commitId, @Nullable String path);
+  List<String> getDiffEntries(@Nonnull String datasource, @Nonnull String commitId, @Nullable String prevCmmitId,
+      @Nullable String path);
 }

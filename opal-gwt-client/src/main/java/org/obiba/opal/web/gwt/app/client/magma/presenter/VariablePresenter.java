@@ -24,6 +24,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.SiblingVariableSelectionEve
 import org.obiba.opal.web.gwt.app.client.magma.event.SummaryRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.magma.event.VcsCommitInfoReceivedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CategoriesEditorModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.PropertiesEditorModalPresenter;
@@ -38,6 +39,7 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -149,6 +151,12 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
     summaryTabPresenter.bind();
     getView().setSummaryTabWidget(summaryTabPresenter.getView());
+    addRegisteredHandler(VcsCommitInfoReceivedEvent.getType(), new VcsCommitInfoReceivedEvent.Handler() {
+      @Override
+      public void onVcsCommitInfoReceived(VcsCommitInfoReceivedEvent event) {
+        updateDerivedVariableByCommitInfo(event.getCommitInfoDto());
+      }
+    });
   }
 
   @Override
@@ -220,6 +228,11 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     String script = VariableDtos.getScript(variable);
     getView().setDerivedVariable(true, script);
     scriptEditorPresenter.setScript(script);
+  }
+
+  private void updateDerivedVariableByCommitInfo(VcsCommitInfoDto commitInfo) {
+    getView().goToEditScript();
+    scriptEditorPresenter.setScript(commitInfo.getBlob());
   }
 
   private void authorize() {
@@ -458,6 +471,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     void renderCategoryRows(JsArray<CategoryDto> rows);
 
     void renderAttributeRows(JsArray<AttributeDto> rows);
+
+    void goToEditScript();
 
     String getComment();
 

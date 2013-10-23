@@ -4,6 +4,8 @@ import java.io.File;
 
 public final class OpalGitUtils {
 
+  public static final String HEAD_COMMIT_ID = "HEAD";
+
   public static final Object VIEW_FILE_NAME = "View.xml";
 
   public static final Object VARIABLE_FILE_EXTENSION = ".js";

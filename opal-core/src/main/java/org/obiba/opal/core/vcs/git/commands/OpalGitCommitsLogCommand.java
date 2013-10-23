@@ -10,6 +10,7 @@
 
 package org.obiba.opal.core.vcs.git.commands;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,9 +53,10 @@ public class OpalGitCommitsLogCommand extends OpalGitCommand<List<CommitInfo>> {
       List<CommitInfo> commits = new ArrayList<CommitInfo>();
 
       for(RevCommit commit : commitLog) {
+        String commitId = commit.getName();
         PersonIdent personIdent = commit.getAuthorIdent();
         commits.add(new CommitInfo.Builder().setAuthor(personIdent.getName()).setDate(personIdent.getWhen())
-            .setComment(commit.getFullMessage()).setCommitId(commit.getName()).build());
+            .setComment(commit.getFullMessage()).setCommitId(commitId).setIsHead(isHead(commitId)).build());
       }
 
       if(commits.isEmpty()) {
@@ -63,6 +65,8 @@ public class OpalGitCommitsLogCommand extends OpalGitCommand<List<CommitInfo>> {
 
       return commits;
     } catch(GitAPIException e) {
+      throw new OpalGitException(e.getMessage(), e);
+    } catch(IOException e) {
       throw new OpalGitException(e.getMessage(), e);
     }
   }

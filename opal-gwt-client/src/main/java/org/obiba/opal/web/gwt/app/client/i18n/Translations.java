@@ -123,7 +123,11 @@ public interface Translations extends Constants {
       "Clear", "Clear",//
       "View", "View",//
       "Remove", "Remove",//
-      "Publish methods", "Publish methods", "Permissions", "Permissions" })
+      "Publish methods", "Publish methods",
+      "Permissions", "Permissions",
+      "CommitDiff", "Diff",
+      "DiffWithCurrent", "Diff with current",
+  })
   Map<String, String> actionMap();
 
   @Description("Permission map")
@@ -454,6 +458,7 @@ public interface Translations extends Constants {
       "FileNotAccessible", "File not accessible: {0}",//
       "MultipleIdentifiersDatabase", "Database for identifiers already exists: {0}", //
       "DatabaseAlreadyExists", "Database named {0} already exists", //
+      "VcsScriptContentInfo", "The retrieved script content is from '{0}' committed by '{1}'.", //
       "GeneralConfigSaved", "Opal general configuration was successfully saved." })
   Map<String, String> userMessageMap();
 
@@ -1975,11 +1980,7 @@ public interface Translations extends Constants {
   @DefaultStringMapValue({ "id", "ID",//
       "Author", "Author",//
       "Date", "Date",//
-      "Comment", "Comment",//
-      "Diff", "Differences",//
-      "View", "View",//
-      "ComparePrevious", "Compare with previous",//
-      "ViewPrevious", "View previous content"
+      "Comment", "Comment"
   })
   Map<String, String> commitInfoMap();
 
@@ -1990,7 +1991,8 @@ public interface Translations extends Constants {
   @Description("User message map")
   @DefaultStringMapValue({ //
       "FailedToRetrieveVariableCommitInfos", "Failed to retrieve all variable commit information.", //
-      "FailedToRetrieveVariableCommitInfo", "Failed to retrieve variable commit information for the given id." })
+      "FailedToRetrieveVariableContent", "Failed to retrieve variable content for the given id.", //
+      "FailedToRetrieveVariableCommitInfo", "Failed to retrieve variable commit information for the given id." })//
   Map<String, String> vcsResourceErrorMap();
 
   @Description("Edit label")
