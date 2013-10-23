@@ -88,6 +88,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Start")
   String startLabel();
 
+  @Description("Stop label")
+  @DefaultStringValue("Stop")
+  String stopLabel();
+
   @Description("End label")
   @DefaultStringValue("End")
   String endLabel();

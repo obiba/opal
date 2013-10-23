@@ -12,9 +12,11 @@ package org.obiba.opal.web.gwt.app.client.administration.index.view;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsIndexColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
@@ -26,15 +28,16 @@ import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
+import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HasText;
@@ -45,7 +48,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.ViewImpl;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 import static org.obiba.opal.web.model.client.opal.ScheduleType.DAILY;
 import static org.obiba.opal.web.model.client.opal.ScheduleType.HOURLY;
@@ -55,17 +58,15 @@ import static org.obiba.opal.web.model.client.opal.ScheduleType.MINUTES_5;
 import static org.obiba.opal.web.model.client.opal.ScheduleType.NOT_SCHEDULED;
 import static org.obiba.opal.web.model.client.opal.ScheduleType.WEEKLY;
 
-public class IndexAdministrationView extends ViewImpl implements IndexAdministrationPresenter.Display {
+public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrationUiHandlers>
+    implements IndexAdministrationPresenter.Display {
 
   interface Binder extends UiBinder<Widget, IndexAdministrationView> {}
 
   private static final Translations translations = GWT.create(Translations.class);
 
   @UiField
-  Button startButton;
-
-  @UiField
-  Button stopButton;
+  Button startStopButton;
 
   @UiField
   Button configureButton;
@@ -101,21 +102,7 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
 
   private final CheckboxColumn<TableIndexStatusDto> checkboxColumn;
 
-  private static final ActionsIndexColumn<TableIndexStatusDto> ACTIONS_COLUMNS
-      = new ActionsIndexColumn<TableIndexStatusDto>(new ActionsProvider<TableIndexStatusDto>() {
-
-    private final String[] all = new String[] { CLEAR_ACTION, INDEX_ACTION };
-
-    @Override
-    public String[] allActions() {
-      return all;
-    }
-
-    @Override
-    public String[] getActions(TableIndexStatusDto value) {
-      return allActions();
-    }
-  });
+  private final ActionsIndexColumn<TableIndexStatusDto> actionsColumn;
 
   @Inject
   public IndexAdministrationView(Binder uiBinder) {
@@ -123,6 +110,20 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
     indexTablePager.setDisplay(indexTable);
 
     checkboxColumn = new CheckboxColumn<TableIndexStatusDto>(new TableIndexStatusDtoDisplay());
+    actionsColumn = new ActionsIndexColumn<TableIndexStatusDto>(new ActionsProvider<TableIndexStatusDto>() {
+
+      private final String[] all = new String[] { CLEAR_ACTION, INDEX_ACTION };
+
+      @Override
+      public String[] allActions() {
+        return all;
+      }
+
+      @Override
+      public String[] getActions(TableIndexStatusDto value) {
+        return allActions();
+      }
+    });
 
     indexTable.addColumn(checkboxColumn, checkboxColumn.getTableListCheckColumnHeader());
     indexTable.addColumn(Columns.datasource, translations.datasourceLabel());
@@ -131,11 +132,51 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
     indexTable.addColumn(Columns.indexLastUpdate, translations.indexLastUpdateLabel());
     indexTable.addColumn(Columns.scheduleType, translations.scheduleLabel());
     indexTable.addColumn(Columns.status, translations.statusLabel());
-    indexTable.addColumn(ACTIONS_COLUMNS, translations.actionsLabel());
+    indexTable.addColumn(actionsColumn, translations.actionsLabel());
     indexTable.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
     indexTable.setColumnWidth(checkboxColumn, 1, Style.Unit.PX);
 
     dataProvider.addDataDisplay(indexTable);
+
+    actionsColumn.setActionHandler(new ActionHandler<TableIndexStatusDto>() {
+      @Override
+      public void doAction(TableIndexStatusDto object, String actionName) {
+        if(actionName.trim().equalsIgnoreCase(CLEAR_ACTION)) {
+          getUiHandlers().clear(object);
+        } else if(actionName.trim().equalsIgnoreCase(INDEX_ACTION)) {
+          getUiHandlers().indexNow(object);
+        }
+      }
+    });
+  }
+
+  @UiHandler("startStopButton")
+  public void onStartStop(ClickEvent event) {
+    if(configureButton.isEnabled()) {
+      getUiHandlers().start();
+    } else {
+      getUiHandlers().stop();
+    }
+  }
+
+  @UiHandler("refreshIndicesButton")
+  public void onRefresh(ClickEvent event) {
+    getUiHandlers().refresh();
+  }
+
+  @UiHandler("configureButton")
+  public void onConfigure(ClickEvent event) {
+    getUiHandlers().configure();
+  }
+
+  @UiHandler("clearLink")
+  public void onClear(ClickEvent event) {
+    getUiHandlers().clear();
+  }
+
+  @UiHandler("scheduleLink")
+  public void onSchedule(ClickEvent event) {
+    getUiHandlers().schedule();
   }
 
   @Override
@@ -155,50 +196,26 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
   }
 
   @Override
-  public void serviceStartable() {
-    stopButton.setVisible(false);
-    startButton.setVisible(true);
-    startButton.setEnabled(true);
-    configureButton.setEnabled(true);
-  }
-
-  @Override
-  public void serviceStoppable() {
-    startButton.setVisible(false);
-    stopButton.setVisible(true);
-    stopButton.setEnabled(true);
-    configureButton.setEnabled(false);
-  }
-
-  @Override
-  public void serviceExecutionPending() {
-    stopButton.setEnabled(!stopButton.isVisible());
-    startButton.setEnabled(!startButton.isVisible());
-  }
-
-  @Override
-  public HasClickHandlers getStartButton() {
-    return startButton;
-  }
-
-  @Override
-  public HasClickHandlers getStopButton() {
-    return stopButton;
-  }
-
-  @Override
-  public Button getConfigureButton() {
-    return configureButton;
-  }
-
-  @Override
-  public HasClickHandlers getRefreshButton() {
-    return refreshIndicesButton;
-  }
-
-  @Override
-  public DropdownButton getActionsDropdown() {
-    return actionsDropdown;
+  public void setServiceStatus(Status status) {
+    switch(status) {
+      case Startable:
+        startStopButton.setText(translations.startLabel());
+        startStopButton.setEnabled(true);
+        configureButton.setEnabled(true);
+        refreshIndicesButton.setEnabled(false);
+        actionsDropdown.setVisible(false);
+        break;
+      case Stoppable:
+        startStopButton.setText(translations.stopLabel());
+        startStopButton.setEnabled(true);
+        configureButton.setEnabled(false);
+        refreshIndicesButton.setEnabled(true);
+        actionsDropdown.setVisible(true);
+        break;
+      case Pending:
+        startStopButton.setEnabled(false);
+        break;
+    }
   }
 
   @Override
@@ -209,11 +226,6 @@ public class IndexAdministrationView extends ViewImpl implements IndexAdministra
   @Override
   public void unselectIndex(TableIndexStatusDto object) {
     checkboxColumn.setSelected(object, false);
-  }
-
-  @Override
-  public HasActionHandler<TableIndexStatusDto> getActions() {
-    return ACTIONS_COLUMNS;
   }
 
   @Override

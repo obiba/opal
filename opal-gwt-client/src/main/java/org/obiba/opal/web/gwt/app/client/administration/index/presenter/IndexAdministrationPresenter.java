@@ -50,6 +50,7 @@ import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyEvent;
@@ -58,7 +59,8 @@ import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
 public class IndexAdministrationPresenter
-    extends ItemAdministrationPresenter<IndexAdministrationPresenter.Display, IndexAdministrationPresenter.Proxy> {
+    extends ItemAdministrationPresenter<IndexAdministrationPresenter.Display, IndexAdministrationPresenter.Proxy>
+    implements IndexAdministrationUiHandlers {
 
   @ProxyStandard
   @NameToken(Places.INDEX)
@@ -66,33 +68,23 @@ public class IndexAdministrationPresenter
 
   private static final int DELAY_MILLIS = 1500;
 
-  public interface Display extends View, HasBreadcrumbs {
-
-    String INDEX_ACTION = "Index now";
-
-    String CLEAR_ACTION = "Clear";
-
-    String SCHEDULE = "Schedule indexing";
-
-    void serviceStartable();
-
-    void serviceStoppable();
-
-    void serviceExecutionPending();
-
-    void unselectIndex(TableIndexStatusDto object);
+  public interface Display extends View, HasBreadcrumbs, HasUiHandlers<IndexAdministrationUiHandlers> {
 
     enum Slots {
       Drivers, Permissions
     }
 
-    HasClickHandlers getStartButton();
+    enum Status {
+      Startable, Stoppable, Pending
+    }
 
-    HasClickHandlers getStopButton();
+    String INDEX_ACTION = "Index now";
 
-    Button getConfigureButton();
+    String CLEAR_ACTION = "Clear";
 
-    HasClickHandlers getRefreshButton();
+    void setServiceStatus(Status status);
+
+    void unselectIndex(TableIndexStatusDto object);
 
     void renderRows(JsArray<TableIndexStatusDto> rows);
 
@@ -100,12 +92,7 @@ public class IndexAdministrationPresenter
 
     List<TableIndexStatusDto> getSelectedIndices();
 
-    DropdownButton getActionsDropdown();
-
-    HasActionHandler<TableIndexStatusDto> getActions();
-
     HasData<TableIndexStatusDto> getIndexTable();
-
   }
 
   private final ModalProvider<IndexPresenter> indexModalProvider;
@@ -123,6 +110,7 @@ public class IndexAdministrationPresenter
     this.indexModalProvider = indexModalProvider.setContainer(this);
     this.indexConfigurationProvider = indexConfigurationProvider.setContainer(this);
     this.breadcrumbsHelper = breadcrumbsHelper;
+    getView().setUiHandlers(this);
   }
 
   @ProxyEvent
@@ -139,7 +127,6 @@ public class IndexAdministrationPresenter
 
   @Override
   protected void onReveal() {
-    super.onReveal();
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
     // stop start search service
     ResourceRequestBuilderFactory.<ServiceDto>newBuilder().forResource(Resources.searchService()).get()
@@ -148,9 +135,9 @@ public class IndexAdministrationPresenter
           public void onResource(Response response, ServiceDto resource) {
             if(response.getStatusCode() == Response.SC_OK) {
               if(resource.getStatus().isServiceStatus(ServiceStatus.RUNNING)) {
-                getView().serviceStoppable();
+                getView().setServiceStatus(Display.Status.Stoppable);
               } else {
-                getView().serviceStartable();
+                getView().setServiceStatus(Display.Status.Startable);
               }
             }
           }
@@ -176,209 +163,170 @@ public class IndexAdministrationPresenter
   protected void onBind() {
     super.onBind();
 
-    // Dropdown Actions
-    getView().getActionsDropdown().addChangeHandler(new ChangeHandler() {
+    addRegisteredHandler(TableIndicesRefreshEvent.getType(), new TableIndicesRefreshEvent.TableIndicesRefreshHandler() {
       @Override
-      public void onChange(ChangeEvent event) {
-        getView();
-        if(getView().getActionsDropdown().getLastSelectedNavLink().getText().trim().equals(Display.CLEAR_ACTION)) {
-          doClear();
-        } else if(getView().getActionsDropdown().getLastSelectedNavLink().getText().trim().equals(Display.SCHEDULE)) {
-          doSchedule();
-        }
-      }
-
-      private void doClear() {
-        if(getView().getSelectedIndices().isEmpty()) {
-          getEventBus()
-              .fireEvent(NotificationEvent.Builder.newNotification().error("IndexClearSelectAtLeastOne").build());
-        } else {
-
-          for(TableIndexStatusDto object : getView().getSelectedIndices()) {
-            ResponseCodeCallback callback = new ResponseCodeCallback() {
-
-              @Override
-              public void onResponseCode(Request request, Response response) {
-                refresh();
-              }
-
-            };
-            ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-                .forResource(Resources.index(object.getDatasource(), object.getTable())).accept("application/json")//
-                .withCallback(Response.SC_OK, callback)//
-                .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).delete().send();
-
-            getView().unselectIndex(object);
-          }
-        }
-      }
-
-      private void doSchedule() {
-        if(getView().getSelectedIndices().isEmpty()) {
-          getEventBus()
-              .fireEvent(NotificationEvent.Builder.newNotification().error("IndexScheduleSelectAtLeastOne").build());
-        } else {
-
-          List<TableIndexStatusDto> objects = new ArrayList<TableIndexStatusDto>();
-          for(TableIndexStatusDto object : getView().getSelectedIndices()) {
-            objects.add(object);
-          }
-
-          IndexPresenter dialog = indexModalProvider.get();
-          dialog.updateSchedules(objects);
-        }
-      }
-    });
-
-    getView().getActions().setActionHandler(new ActionHandler<TableIndexStatusDto>() {
-
-      @SuppressWarnings("UnnecessaryFinalOnLocalVariableOrParameter")
-      @Override
-      public void doAction(final TableIndexStatusDto object, String actionName) {
-        if(actionName.trim().equalsIgnoreCase(Display.CLEAR_ACTION)) {
-          ResponseCodeCallback callback = new ResponseCodeCallback() {
-
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              if(response.getStatusCode() == Response.SC_OK) {
-                refresh();
-              } else {
-                ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-                getEventBus().fireEvent(
-                    NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
-                        .build());
-              }
-            }
-
-          };
-          ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-              .forResource(Resources.index(object.getDatasource(), object.getTable())).accept("application/json")//
-              .withCallback(Response.SC_OK, callback)//
-              .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).delete().send();
-        } else if(actionName.trim().equalsIgnoreCase(Display.INDEX_ACTION)) {
-          ResponseCodeCallback callback = new ResponseCodeCallback() {
-
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              if(response.getStatusCode() == Response.SC_OK) {
-                // Wait a few seconds for the task to launch before checking its status
-                Timer t = new Timer() {
-                  @Override
-                  public void run() {
-                    refresh(false);
-                  }
-                };
-                // Schedule the timer to run once in X seconds.
-                t.schedule(DELAY_MILLIS);
-              } else {
-                ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-                getEventBus().fireEvent(
-                    NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
-                        .build());
-              }
-            }
-
-          };
-          ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-              .forResource(Resources.index(object.getDatasource(), object.getTable())).accept("application/json")//
-              .withCallback(Response.SC_OK, callback) //
-              .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).put().send();
-        }
-      }
-
-    });
-
-    // REFRESH
-    registerHandler(getView().getRefreshButton().addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
+      public void onTableIndicesRefresh(TableIndicesRefreshEvent event) {
         refresh();
-      }
-    }));
-
-    registerHandler(getEventBus()
-        .addHandler(TableIndicesRefreshEvent.getType(), new TableIndicesRefreshEvent.TableIndicesRefreshHandler() {
-          @Override
-          public void onTableIndicesRefresh(TableIndicesRefreshEvent event) {
-            refresh();
-          }
-        }));
-
-    // STOP
-    registerHandler(getView().getStopButton().addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        ResponseCodeCallback callback = new ResponseCodeCallback() {
-
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            if(response.getStatusCode() == Response.SC_OK) {
-              getView().serviceStartable();
-              getView().clear();
-              getEventBus().fireEvent(new TableIndexStatusRefreshEvent());
-            } else {
-              getView().clear();
-              getView().serviceStoppable();
-              ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-              getEventBus().fireEvent(
-                  NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
-                      .build());
-            }
-          }
-
-        };
-
-        // Stop service
-        getView().serviceExecutionPending();
-        ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-            .forResource(Resources.searchServiceEnabled()).accept("application/json")//
-            .withCallback(Response.SC_OK, callback)//
-            .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback).delete().send();
-      }
-    }));
-
-    // START
-    registerHandler(getView().getStartButton().addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        ResponseCodeCallback callback = new ResponseCodeCallback() {
-
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            if(response.getStatusCode() == Response.SC_OK) {
-              getView().serviceStoppable();
-              refresh();
-              getEventBus().fireEvent(new TableIndexStatusRefreshEvent());
-            } else {
-              getView().serviceStartable();
-              getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
-            }
-          }
-
-        };
-
-        // Start service
-        getView().serviceExecutionPending();
-        ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-            .forResource(Resources.searchServiceEnabled()).accept("application/json")//
-            .withCallback(callback, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR).put().send();
-      }
-    }));
-
-    // CONFIGURE
-    getView().getConfigureButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        indexConfigurationProvider.get();
       }
     });
   }
 
-  private void refresh() {
+  @Override
+  public void start() {
+    ResponseCodeCallback callback = new ResponseCodeCallback() {
+
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        if(response.getStatusCode() == Response.SC_OK) {
+          getView().setServiceStatus(Display.Status.Stoppable);
+          refresh();
+          getEventBus().fireEvent(new TableIndexStatusRefreshEvent());
+        } else {
+          getView().setServiceStatus(Display.Status.Startable);
+          getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
+        }
+      }
+
+    };
+
+    // Start service
+    getView().setServiceStatus(Display.Status.Pending);
+    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
+        .forResource(Resources.searchServiceEnabled()).accept("application/json")//
+        .withCallback(callback, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR).put().send();
+  }
+
+  @Override
+  public void stop() {
+    ResponseCodeCallback callback = new ResponseCodeCallback() {
+
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        if(response.getStatusCode() == Response.SC_OK) {
+          getView().setServiceStatus(Display.Status.Startable);
+          getView().clear();
+          getEventBus().fireEvent(new TableIndexStatusRefreshEvent());
+        } else {
+          getView().clear();
+          getView().setServiceStatus(Display.Status.Stoppable);
+          ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+          getEventBus().fireEvent(
+              NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+                  .build());
+        }
+      }
+
+    };
+
+    // Stop service
+    getView().setServiceStatus(Display.Status.Pending);
+    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
+        .forResource(Resources.searchServiceEnabled()).accept("application/json")//
+        .withCallback(Response.SC_OK, callback)//
+        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback).delete().send();
+  }
+
+  @Override
+  public void refresh() {
     refresh(true);
+  }
+
+  @Override
+  public void configure() {
+    indexConfigurationProvider.get();
+  }
+
+  @Override
+  public void clear() {
+    if(getView().getSelectedIndices().isEmpty()) {
+      fireEvent(NotificationEvent.Builder.newNotification().error("IndexClearSelectAtLeastOne").build());
+    } else {
+      for(TableIndexStatusDto object : getView().getSelectedIndices()) {
+        ResponseCodeCallback callback = new ResponseCodeCallback() {
+
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            refresh();
+          }
+
+        };
+        ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
+            .forResource(Resources.index(object.getDatasource(), object.getTable())).accept("application/json")//
+            .withCallback(Response.SC_OK, callback)//
+            .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).delete().send();
+
+        getView().unselectIndex(object);
+      }
+    }
+  }
+
+  @Override
+  public void clear(TableIndexStatusDto table) {
+    ResponseCodeCallback callback = new ResponseCodeCallback() {
+
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        if(response.getStatusCode() == Response.SC_OK) {
+          refresh();
+        } else {
+          ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+          getEventBus().fireEvent(
+              NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+                  .build());
+        }
+      }
+
+    };
+    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
+        .forResource(Resources.index(table.getDatasource(), table.getTable())).accept("application/json")//
+        .withCallback(Response.SC_OK, callback)//
+        .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).delete().send();
+  }
+
+  @Override
+  public void schedule() {
+    if(getView().getSelectedIndices().isEmpty()) {
+      fireEvent(NotificationEvent.Builder.newNotification().error("IndexScheduleSelectAtLeastOne").build());
+    } else {
+      List<TableIndexStatusDto> objects = new ArrayList<TableIndexStatusDto>();
+      for(TableIndexStatusDto object : getView().getSelectedIndices()) {
+        objects.add(object);
+      }
+
+      IndexPresenter dialog = indexModalProvider.get();
+      dialog.updateSchedules(objects);
+    }
+  }
+
+  @Override
+  public void indexNow(TableIndexStatusDto table) {
+    ResponseCodeCallback callback = new ResponseCodeCallback() {
+
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        if(response.getStatusCode() == Response.SC_OK) {
+          // Wait a few seconds for the task to launch before checking its status
+          Timer t = new Timer() {
+            @Override
+            public void run() {
+              refresh(false);
+            }
+          };
+          // Schedule the timer to run once in X seconds.
+          t.schedule(DELAY_MILLIS);
+        } else {
+          ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+          getEventBus().fireEvent(
+              NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+                  .build());
+        }
+      }
+
+    };
+    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
+        .forResource(Resources.index(table.getDatasource(), table.getTable())).accept("application/json")//
+        .withCallback(Response.SC_OK, callback) //
+        .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).put().send();
   }
 
   private void refresh(boolean clearIndices) {
