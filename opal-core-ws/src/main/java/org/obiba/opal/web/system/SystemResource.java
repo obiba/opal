@@ -18,7 +18,9 @@ import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.cfg.TaxonomyService;
 import org.obiba.opal.core.domain.OpalGeneralConfig;
+import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
+import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.core.service.impl.DefaultGeneralConfigService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.taxonomy.Dtos;
@@ -27,15 +29,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import static org.obiba.opal.web.model.Database.DatabasesStatusDto;
+
 @Component
 @Path("/system")
 public class SystemResource {
 
-  @Autowired
-  private VersionProvider opalVersionProvider;
+  private final VersionProvider opalVersionProvider;
 
-  @Autowired
-  private DefaultGeneralConfigService serverService;
+  private final DefaultGeneralConfigService serverService;
+
+  private final TaxonomyService taxonomyService;
+
+  private final DatabaseRegistry databaseRegistry;
 
   @Value("${org.obiba.opal.languages}")
   private String localesProperty;
@@ -44,7 +50,13 @@ public class SystemResource {
   private String publicURL;
 
   @Autowired
-  private TaxonomyService taxonomyService;
+  public SystemResource(VersionProvider opalVersionProvider, DefaultGeneralConfigService serverService,
+      TaxonomyService taxonomyService, DatabaseRegistry databaseRegistry) {
+    this.opalVersionProvider = opalVersionProvider;
+    this.serverService = serverService;
+    this.taxonomyService = taxonomyService;
+    this.databaseRegistry = databaseRegistry;
+  }
 
   @GET
   @Path("/version")
@@ -77,7 +89,6 @@ public class SystemResource {
   @GET
   @Path("/status")
   public Opal.OpalStatus getStatus() {
-
     List<GarbageCollectorMXBean> garbageCollectorMXBeanList = ManagementFactory.getGarbageCollectorMXBeans();
     Collection<Opal.OpalStatus.GarbageCollectorUsage> garbageCollectorUsagesValues
         = new ArrayList<Opal.OpalStatus.GarbageCollectorUsage>();
@@ -91,7 +102,17 @@ public class SystemResource {
         .setHeapMemory(getMemory(ManagementFactory.getMemoryMXBean().getHeapMemoryUsage()))
         .setNonHeapMemory(getMemory(ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage()))
         .setThreads(getThread(ManagementFactory.getThreadMXBean()))//
-        .addAllGcs(garbageCollectorUsagesValues).build();
+        .addAllGcs(garbageCollectorUsagesValues)//
+        .build();
+  }
+
+  @GET
+  @Path("/status/databases")
+  public DatabasesStatusDto getDatabasesStatus() {
+    DatabasesStatusDto.Builder db = DatabasesStatusDto.newBuilder();
+    db.setHasIdentifiers(databaseRegistry.hasIdentifiersDatabase());
+    db.setHasStorage(databaseRegistry.hasDatabases(Database.Usage.STORAGE));
+    return db.build();
   }
 
   private Opal.OpalStatus.MemoryUsage getMemory(MemoryUsage memoryUsage) {

@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.rest.client.event.RequestCredentialsExpiredEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestEventBus;
 import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
+import org.obiba.opal.web.model.client.database.DatabasesStatusDto;
 import org.obiba.opal.web.model.client.opal.Subject;
 
 import com.google.common.base.Strings;
@@ -29,6 +30,7 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Bootstrapper;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.RevealRootPopupContentEvent;
 
 public class OpalBootstrapperImpl implements Bootstrapper {
@@ -107,7 +109,9 @@ public class OpalBootstrapperImpl implements Bootstrapper {
     eventBus.addHandler(SessionCreatedEvent.getType(), new SessionCreatedEvent.Handler() {
       @Override
       public void onSessionCreated(SessionCreatedEvent event) {
-        placeManager.revealCurrentPlace();
+        ResourceRequestBuilderFactory.<DatabasesStatusDto>newBuilder()
+            .forResource(UriBuilder.create().segment("system", "status", "databases").build()).get()
+            .withCallback(new DatabasesStatusResourceCallback()).send();
       }
     });
 
@@ -139,9 +143,6 @@ public class OpalBootstrapperImpl implements Bootstrapper {
   }
 
   private class SubjectResourceCallback implements ResourceCallback<Subject> {
-
-    SubjectResourceCallback() {}
-
     @Override
     public void onResource(Response response, Subject subject) {
       if(response.getStatusCode() == Response.SC_OK) {
@@ -149,6 +150,17 @@ public class OpalBootstrapperImpl implements Bootstrapper {
         placeManager.revealCurrentPlace();
       } else {
         eventBus.fireEvent(new SessionEndedEvent());
+      }
+    }
+  }
+
+  private class DatabasesStatusResourceCallback implements ResourceCallback<DatabasesStatusDto> {
+    @Override
+    public void onResource(Response response, DatabasesStatusDto resource) {
+      if (!resource.getHasIdentifiers() || !resource.getHasStorage()) {
+        placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.INSTALL).build());
+      } else {
+        placeManager.revealCurrentPlace();
       }
     }
   }

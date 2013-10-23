@@ -17,13 +17,13 @@ public final class Places {
 
   public static final String LOGIN = "!login";
 
+  public static final String INSTALL = "!install";
+
   public static final String DASHBOARD = "!dashboard";
 
   public static final String PROJECTS = "!projects";
 
   public static final String PROJECT = "!project";
-
-  public static final String NAVIGATOR = "!navigator";
 
   public static final String UNITS = "!units";
 

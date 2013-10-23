@@ -18,22 +18,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static org.obiba.opal.web.model.Database.DatabaseDto;
-import static org.obiba.opal.web.model.Database.DatabasesStatusDto;
 
 @Component
 @Path("/system/databases")
 public class DatabasesResource {
 
-  @Autowired
-  private DatabaseRegistry databaseRegistry;
+  private final DatabaseRegistry databaseRegistry;
 
-  @GET
-  @Path("/_status")
-  public DatabasesStatusDto getDatabases() {
-    DatabasesStatusDto.Builder builder = DatabasesStatusDto.newBuilder();
-    builder.setHasIdentifiers(databaseRegistry.hasIdentifiersDatabase());
-    builder.setHasStorage(databaseRegistry.hasDatabases(Database.Usage.STORAGE));
-    return builder.build();
+  @Autowired
+  public DatabasesResource(DatabaseRegistry databaseRegistry) {
+    this.databaseRegistry = databaseRegistry;
   }
 
   @GET

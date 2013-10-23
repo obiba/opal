@@ -34,7 +34,6 @@ import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.NoGatekeeper;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
-import com.gwtplatform.mvp.client.proxy.RevealRootContentEvent;
 
 public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPresenter.Proxy> {
 
@@ -70,7 +69,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
   @Inject
   public LoginPresenter(Display display, EventBus eventBus, Proxy proxy, RequestCredentials credentials,
       ResourceAuthorizationCache authorizationCache) {
-    super(eventBus, display, proxy);
+    super(eventBus, display, proxy, RevealType.Root);
     this.credentials = credentials;
     this.authorizationCache = authorizationCache;
   }
@@ -103,11 +102,6 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
 
   private void createSecurityResource() {
     createSecurityResource(getView().getUserName().getValue(), getView().getPassword().getValue());
-  }
-
-  @Override
-  protected void revealInParent() {
-    RevealRootContentEvent.fire(this, this);
   }
 
   @Override

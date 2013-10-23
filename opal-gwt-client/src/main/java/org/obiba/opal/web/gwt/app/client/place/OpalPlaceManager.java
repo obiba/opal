@@ -27,6 +27,7 @@ public class OpalPlaceManager extends PlaceManagerImpl {
   @Override
   public void revealErrorPlace(String invalidHistoryToken) {
     GWT.log("invalid token " + invalidHistoryToken);
+    revealPlace(defaultPlaceRequest, true);
   }
 
   @Override
