@@ -79,12 +79,16 @@ public class OpalBootstrapperImpl implements Bootstrapper {
 
   private void initUserSession() {
     String username = requestCredentials.getUsername();
-    if(!Strings.isNullOrEmpty(username) && !"undefined".equals(username)) {
-      UriBuilder builder = UriBuilder.create().segment("auth", "session", username, "username");
+    if(!requestCredentials.hasCredentials()) {
+      placeManager.revealUnauthorizedPlace(Places.LOGIN);
+    } else if(Strings.isNullOrEmpty(username) || "undefined".equals(username)) {
+      // get the username
+      UriBuilder builder = UriBuilder.create()
+          .segment("auth", "session", requestCredentials.extractCredentials(), "username");
       ResourceRequestBuilderFactory.<Subject>newBuilder().forResource(builder.build()).get()
           .withCallback(new SubjectResourceCallback()).send();
     } else {
-      placeManager.revealUnauthorizedPlace(Places.LOGIN);
+      placeManager.revealCurrentPlace();
     }
   }
 
@@ -157,7 +161,7 @@ public class OpalBootstrapperImpl implements Bootstrapper {
   private class DatabasesStatusResourceCallback implements ResourceCallback<DatabasesStatusDto> {
     @Override
     public void onResource(Response response, DatabasesStatusDto resource) {
-      if (!resource.getHasIdentifiers() || !resource.getHasStorage()) {
+      if(!resource.getHasIdentifiers() || !resource.getHasStorage()) {
         placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.INSTALL).build());
       } else {
         placeManager.revealCurrentPlace();
