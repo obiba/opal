@@ -126,7 +126,7 @@ public interface Translations extends Constants {
       "Publish methods", "Publish methods",
       "Permissions", "Permissions",
       "CommitDiff", "Diff",
-      "DiffWithCurrent", "Diff with current",
+      "DiffWithCurrent", "Diff with current"
   })
   Map<String, String> actionMap();
 
