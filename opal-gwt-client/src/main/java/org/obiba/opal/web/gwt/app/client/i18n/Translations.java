@@ -399,6 +399,7 @@ public interface Translations extends Constants {
       "DatabaseAlreadyExists", "A database with this name already exists.",//
       "DatabaseConnectionOk", "Connection successful.",//
       "DatabaseConnectionFailed", "Failed to connect: {0}.",//
+      "FailedToConnectToDatabase", "Failed to connect to database '{0}'.",//
       "DatabaseIsNotEditable", "Database is used by a Datasource and is not editable",//
       "CannotFindDatabase", "Cannot find database named {0}",//
       "NameIsRequired", "A name is required.",//
