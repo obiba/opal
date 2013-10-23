@@ -112,7 +112,7 @@ public class DatabaseResource {
   }
 
   private Response testMongoConnection() {
-    Ws.ClientErrorDto error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed").build();
+    Ws.ClientErrorDto error = null;
     try {
       MongoDbDatabase database = (MongoDbDatabase) getDatabase();
       MongoDBDatasourceFactory datasourceFactory = database.createMongoDBDatasourceFactory("_test");
@@ -120,6 +120,8 @@ public class DatabaseResource {
       if(dbs.contains(datasourceFactory.getMongoDbDatabaseName())) {
         return Response.ok().build();
       }
+      error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "FailedToConnectToDatabase", database.getName())
+          .build();
     } catch(RuntimeException e) {
       error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed", e);
     }

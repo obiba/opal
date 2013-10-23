@@ -100,6 +100,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
 
   @Override
   public DefaultResourceRequestBuilder<T> withCallback(int code, ResponseCodeCallback callback) {
+    accept(RESOURCE_MEDIA_TYPE);
     if(codes == null) {
       codes = new ResponseCodeCallback[Response.SC_HTTP_VERSION_NOT_SUPPORTED];
     }
@@ -109,6 +110,7 @@ public class DefaultResourceRequestBuilder<T extends JavaScriptObject> implement
 
   @Override
   public ResourceRequestBuilder<T> withCallback(ResponseCodeCallback callback, int... responseCodes) {
+    accept(RESOURCE_MEDIA_TYPE);
     if(codes == null) {
       codes = new ResponseCodeCallback[Response.SC_HTTP_VERSION_NOT_SUPPORTED];
     }
