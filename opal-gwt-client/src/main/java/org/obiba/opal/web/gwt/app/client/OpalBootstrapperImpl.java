@@ -130,7 +130,7 @@ public class OpalBootstrapperImpl implements Bootstrapper {
 
       @Override
       public void onWindowClosing(ClosingEvent arg0) {
-        eventBus.fireEvent(new SessionEndedEvent());
+        //eventBus.fireEvent(new SessionEndedEvent());
       }
 
     });
