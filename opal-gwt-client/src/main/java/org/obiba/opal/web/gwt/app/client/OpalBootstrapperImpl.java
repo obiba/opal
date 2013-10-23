@@ -76,8 +76,9 @@ public class OpalBootstrapperImpl implements Bootstrapper {
   }
 
   private void initUserSession() {
-    if(requestCredentials.hasCredentials()) {
-      UriBuilder builder = UriBuilder.create().segment("auth", "session", requestCredentials.getUsername(), "username");
+    String username = requestCredentials.getUsername();
+    if(!Strings.isNullOrEmpty(username) && !"undefined".equals(username)) {
+      UriBuilder builder = UriBuilder.create().segment("auth", "session", username, "username");
       ResourceRequestBuilderFactory.<Subject>newBuilder().forResource(builder.build()).get()
           .withCallback(new SubjectResourceCallback()).send();
     } else {
