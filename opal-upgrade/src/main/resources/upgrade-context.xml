@@ -1,0 +1,113 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+  <context:component-scan base-package="org.obiba.runtime.upgrade"/>
+
+  <context:annotation-config/>
+
+  <import resource="spring/opal-core/tx.xml"/>
+  <import resource="spring/opal-core/version.xml"/>
+  <import resource="spring/opal-core/hibernate-properties.xml"/>
+
+  <bean id="dataSource" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactoryBean">
+    <property name="name" value="opal-config-upgrade"/>
+    <property name="driverClass" value="${org.obiba.opal.datasource.driver}"/>
+    <property name="url" value="${org.obiba.opal.datasource.url}"/>
+    <property name="username" value="${org.obiba.opal.datasource.username}"/>
+    <property name="password" value="${org.obiba.opal.datasource.password}"/>
+  </bean>
+
+  <bean id="dataSourceFactory" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactory"/>
+
+  <bean id="sessionFactoryFactory" class="org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory"/>
+
+  <bean id="defaultBeanValidator" class="org.obiba.opal.core.service.impl.DefaultBeanValidator"/>
+  <bean id="orientDbService" class="org.obiba.opal.core.service.impl.OrientDbServiceImpl"/>
+  <bean id="localOrientDbServerFactory" class="org.obiba.opal.core.service.impl.LocalOrientDbServerFactory"/>
+
+  <bean id="databaseRegistry" class="org.obiba.opal.core.runtime.database.DefaultDatabaseRegistry"/>
+
+  <bean id="generalConfigService" class="org.obiba.opal.core.service.impl.DefaultGeneralConfigService"/>
+
+  <bean id="upgradeOpalConfigurationService" class="org.obiba.opal.core.cfg.DefaultOpalConfigurationService">
+    <constructor-arg>
+      <bean class="org.obiba.opal.core.cfg.OpalConfigurationIo"/>
+    </constructor-arg>
+  </bean>
+
+  <bean id="upgradeUtils" class="org.obiba.opal.core.upgrade.support.UpgradeUtils">
+    <constructor-arg index="0" ref="databaseRegistry"/>
+  </bean>
+
+  <bean id="opalVersionModifier" class="org.obiba.opal.core.upgrade.support.OpalVersionModifier"/>
+
+  <bean id="upgradeManager" class="org.obiba.runtime.upgrade.support.DefaultUpgradeManager">
+    <property name="currentVersionProvider" ref="opalVersionModifier"/>
+
+    <property name="runtimeVersionProvider" ref="runtimeVersionProvider"/>
+
+    <property name="newInstallationDetectionStrategy">
+      <bean class="org.obiba.runtime.upgrade.support.NullVersionNewInstallationDetectionStrategy">
+        <property name="versionProvider" ref="opalVersionModifier"/>
+      </bean>
+    </property>
+
+    <property name="installSteps">
+      <list>
+        <bean class="org.obiba.opal.core.install.SetOpalVersionInstallStep"/>
+        <bean class="org.obiba.runtime.upgrade.InstallStepAdapter">
+          <property name="upgradeStep">
+            <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
+              <property name="description" value="Install Quartz Schema."/>
+              <property name="dataSource" ref="dataSource"/>
+              <property name="scriptPath" value="classpath:/META-INF/opal/install-scripts/quartz/"/>
+              <property name="scriptBasename" value="tables"/>
+            </bean>
+          </property>
+        </bean>
+        <bean class="org.obiba.opal.core.install.CreateOpalSecretKeyInstallStep"/>
+        <bean class="org.obiba.opal.core.install.CreateOpalGeneralConfigInstallStep"/>
+      </list>
+    </property>
+
+    <property name="upgradeSteps">
+      <list>
+        <!-- 1.14.0 / clear ES indexes -->
+        <bean parent="clearElasticSearchIndexes">
+          <property name="appliesTo" value="1.14.0"/>
+        </bean>
+
+        <!-- 1.14.4 / clear ES indexes -->
+        <bean parent="clearElasticSearchIndexes">
+          <property name="appliesTo" value="1.14.4"/>
+        </bean>
+
+        <!-- 1.14.5 / clear ES indexes -->
+        <bean parent="clearElasticSearchIndexes">
+          <property name="appliesTo" value="1.14.5"/>
+        </bean>
+
+        <!-- 1.14.6 / clear ES indexes -->
+        <bean parent="clearElasticSearchIndexes">
+          <property name="appliesTo" value="1.14.6"/>
+        </bean>
+
+      </list>
+    </property>
+
+    <property name="stepListeners">
+      <list>
+        <bean class="org.obiba.runtime.upgrade.support.LoggingUpgradeManagerListener"/>
+      </list>
+    </property>
+  </bean>
+
+  <bean id="clearElasticSearchIndexes" class="org.obiba.opal.core.upgrade.ClearElasticSearchIndexes"
+      abstract="true">
+    <property name="description" value="Clear Elastic Search indexes."/>
+    <property name="indexPath" value="${OPAL_HOME}/data"/>
+  </bean>
+
+</beans>

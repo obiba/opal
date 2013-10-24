@@ -16,8 +16,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.obiba.opal.core.runtime.upgrade.ConfigFolderUpgrade;
-import org.obiba.opal.core.runtime.upgrade.database.Opal2DatabaseConfigurator;
+import org.obiba.opal.core.upgrade.ConfigFolderUpgrade;
+import org.obiba.opal.core.upgrade.database.Opal2DatabaseConfigurator;
 import org.obiba.runtime.upgrade.UpgradeException;
 import org.obiba.runtime.upgrade.UpgradeManager;
 import org.slf4j.Logger;

@@ -2,6 +2,6 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <import resource="config.xml"/>
-  <import resource="classpath:spring/opal-core/upgrade-context.xml"/>
+  <import resource="classpath:upgrade-context.xml"/>
 
 </beans>

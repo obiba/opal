@@ -69,11 +69,9 @@
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-project</artifactId>
     </dependency>
-
     <dependency>
-      <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache-core</artifactId>
-      <scope>runtime</scope>
+      <groupId>org.obiba.opal</groupId>
+      <artifactId>opal-upgrade</artifactId>
     </dependency>
 
     <dependency>

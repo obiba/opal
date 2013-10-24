@@ -43,6 +43,7 @@
     <module>opal-datashield</module>
     <module>opal-search</module>
     <module>opal-project</module>
+    <module>opal-upgrade</module>
   </modules>
 
   <dependencyManagement>
@@ -151,6 +152,11 @@
       <dependency>
         <groupId>org.obiba.opal</groupId>
         <artifactId>opal-project</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.obiba.opal</groupId>
+        <artifactId>opal-upgrade</artifactId>
         <version>${project.version}</version>
       </dependency>
 

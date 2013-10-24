@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -47,7 +46,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
   private static final Logger log = LoggerFactory.getLogger(OpalRuntime.class);
 
   @Autowired
-  private PlatformTransactionManager txManager;
+  private TransactionTemplate transactionTemplate;
 
   @Autowired
   private Set<Service> services;
@@ -83,7 +82,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
       }
     }
 
-    new TransactionTemplate(txManager).execute(new TransactionCallbackWithoutResult() {
+    transactionTemplate.execute(new TransactionCallbackWithoutResult() {
       @Override
       protected void doInTransactionWithoutResult(TransactionStatus status) {
         // Remove all datasources before writing the configuration.
@@ -166,7 +165,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
           }
         }
       };
-      new TransactionalThread(txManager, magmaEngineInit).start();
+      new TransactionalThread(transactionTemplate, magmaEngineInit).start();
     } catch(RuntimeException e) {
       log.error("Could not create MagmaEngine.", e);
     }
@@ -206,19 +205,20 @@ public class DefaultOpalRuntime implements OpalRuntime {
   // Inner Classes
   //
 
-  static class TransactionalThread extends Thread {
-    private final PlatformTransactionManager txManager;
+  private static class TransactionalThread extends Thread {
+
+    private final TransactionTemplate transactionTemplate;
 
     private final Runnable runnable;
 
-    TransactionalThread(PlatformTransactionManager txManager, Runnable runnable) {
-      this.txManager = txManager;
+    TransactionalThread(TransactionTemplate transactionTemplate, Runnable runnable) {
+      this.transactionTemplate = transactionTemplate;
       this.runnable = runnable;
     }
 
     @Override
     public void run() {
-      new TransactionTemplate(txManager).execute(new TransactionCallbackWithoutResult() {
+      transactionTemplate.execute(new TransactionCallbackWithoutResult() {
         @Override
         protected void doInTransactionWithoutResult(TransactionStatus status) {
           runnable.run();
