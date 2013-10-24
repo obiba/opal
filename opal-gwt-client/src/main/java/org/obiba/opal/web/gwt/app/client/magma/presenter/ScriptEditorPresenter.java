@@ -133,9 +133,20 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
     public VariableDto create() {
       String selectedScript = getView().getSelectedScript();
       VariableDto derived = VariableDto.create();
-      derived.setValueType(ValueType.TEXT.getLabel());
-      derived.setIsRepeatable(repeatable);
-      VariableDtos.setScript(derived, Strings.isNullOrEmpty(selectedScript) ? getScript() : selectedScript);
+      String script = null;
+
+      if (Strings.isNullOrEmpty(selectedScript)) {
+        derived.setValueType(getValueEntityType().getLabel());
+        derived.setIsRepeatable(isRepeatable());
+        script = getScript();
+      }
+      else {
+        derived.setValueType(ValueType.TEXT.getLabel());
+        derived.setIsRepeatable(false);
+        script = selectedScript;
+      }
+
+      VariableDtos.setScript(derived, script);
       return derived;
     }
   }

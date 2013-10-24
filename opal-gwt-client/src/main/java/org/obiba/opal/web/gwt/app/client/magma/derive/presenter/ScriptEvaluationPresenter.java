@@ -119,7 +119,6 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
   public void setOriginalVariable(VariableDto originalVariable) {
     this.originalVariable = originalVariable;
     getView().setOriginalVariable(originalVariable);
-    requestSummary();
   }
 
   public void setScriptEvaluationCallback(ScriptEvaluationCallback scriptEvaluationCallback) {
@@ -261,6 +260,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
             getView().setValuesVisible(true);
             getView().getValueSetsProvider()
                 .populateValues(offset, (ValueSetsDto) JsonUtils.unsafeEval(response.getText()));
+            requestSummary();
           }
           break;
         case Response.SC_FORBIDDEN:
