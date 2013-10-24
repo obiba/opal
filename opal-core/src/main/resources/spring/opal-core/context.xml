@@ -6,7 +6,8 @@
   <context:annotation-config/>
 
   <import resource="tx.xml"/>
-  <import resource="hibernate-session.xml"/>
+  <import resource="jdbc-datasource.xml"/>
+  <import resource="hibernate-properties.xml"/>
   <import resource="version.xml"/>
   <import resource="quartz.xml"/>
   <import resource="email.xml"/>

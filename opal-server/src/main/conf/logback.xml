@@ -10,7 +10,7 @@
       <level>ERROR</level>
     </filter>
     <encoder>
-      <pattern>%date - %-5level - %-26.26logger{3} - %message%n</pattern>
+      <pattern>%date - %-5level - %logger - %message%n</pattern>
     </encoder>
   </appender>
 

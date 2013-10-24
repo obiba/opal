@@ -7,28 +7,20 @@
 
   <import resource="version.xml"/>
 
-  <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+  <bean id="dataSource" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactoryBean">
+    <property name="name" value="opal-data-upgrade-2.0"/>
+    <property name="driverClass" value="${org.obiba.opal.datasource.opal.driver}"/>
     <property name="url" value="${org.obiba.opal.datasource.opal.url}"/>
-    <property name="driverClassName" value="${org.obiba.opal.datasource.opal.driver}"/>
     <property name="username" value="${org.obiba.opal.datasource.opal.username}"/>
     <property name="password" value="${org.obiba.opal.datasource.opal.password}"/>
-    <property name="maxIdle" value="10"/>
-    <property name="maxActive" value="100"/>
-    <property name="maxWait" value="10000"/>
-    <property name="initialSize" value="2"/>
-    <property name="testOnBorrow" value="true"/>
   </bean>
 
-  <bean id="configDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+  <bean id="configDataSource" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactoryBean">
+    <property name="name" value="opal-config-upgrade-2.0"/>
+    <property name="driverClass" value="${org.obiba.opal.datasource.driver}"/>
     <property name="url" value="${org.obiba.opal.datasource.url}"/>
-    <property name="driverClassName" value="${org.obiba.opal.datasource.driver}"/>
     <property name="username" value="${org.obiba.opal.datasource.username}"/>
     <property name="password" value="${org.obiba.opal.datasource.password}"/>
-    <property name="maxIdle" value="10"/>
-    <property name="maxActive" value="100"/>
-    <property name="maxWait" value="10000"/>
-    <property name="initialSize" value="2"/>
-    <property name="testOnBorrow" value="true"/>
   </bean>
 
   <bean id="configSessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">

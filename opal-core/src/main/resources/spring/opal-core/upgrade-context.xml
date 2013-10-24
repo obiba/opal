@@ -9,17 +9,15 @@
 
   <import resource="tx.xml"/>
   <import resource="version.xml"/>
-  <import resource="hibernate-session.xml"/>
+  <import resource="hibernate-properties.xml"/>
 
-  <!--<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">-->
-  <!--<property name="customEditors">-->
-  <!--<map>-->
-  <!--<entry key="org.obiba.runtime.Version">-->
-  <!--<bean id="versionEditor" class="org.obiba.runtime.upgrade.support.VersionPropertyEditor"/>-->
-  <!--</entry>-->
-  <!--</map>-->
-  <!--</property>-->
-  <!--</bean>-->
+  <bean id="dataSource" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactoryBean">
+    <property name="name" value="opal-config-upgrade"/>
+    <property name="driverClass" value="${org.obiba.opal.datasource.driver}"/>
+    <property name="url" value="${org.obiba.opal.datasource.url}"/>
+    <property name="username" value="${org.obiba.opal.datasource.username}"/>
+    <property name="password" value="${org.obiba.opal.datasource.password}"/>
+  </bean>
 
   <bean id="dataSourceFactory" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactory"/>
 

@@ -2,28 +2,13 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <!--
-    Hibernate stuff for Opal internal configuration database
+    Default Hibernate properties used when creating SessionFactory for Magma Hibernate Datasources
   -->
-
-  <!-- configure a JTA-aware datasource -->
-  <bean id="dataSource" class="com.atomikos.jdbc.nonxa.AtomikosNonXADataSourceBean" init-method="init"
-      destroy-method="close">
-    <property name="uniqueResourceName" value="opal-config"/>
-    <property name="driverClassName" value="${org.obiba.opal.datasource.driver}"/>
-    <property name="url" value="${org.obiba.opal.datasource.url}"/>
-    <property name="user" value="${org.obiba.opal.datasource.username}"/>
-    <property name="password" value="${org.obiba.opal.datasource.password}"/>
-    <property name="minPoolSize" value="3"/>
-    <property name="poolSize" value="50"/>
-    <!--<property name="maxIdleTime" value="10"/>-->
-    <property name="testQuery" value="${org.obiba.opal.datasource.validationQuery}"/>
-  </bean>
-
-  <!-- Default Hibernate properties used when creating SessionFactory for Magma Hibernate Datasources -->
   <bean id="hibernateProperties" class="org.obiba.opal.core.runtime.jdbc.HsqlDialectOverride">
     <qualifier value="hibernate"/>
     <property name="properties">
       <props>
+        <prop key="hibernate.hbm2ddl.auto">update</prop>
         <prop key="hibernate.generate_statistics">false</prop>
         <prop key="hibernate.cache.use_structured_entries">true</prop>
         <prop key="hibernate.cache.use_query_cache">true</prop>
