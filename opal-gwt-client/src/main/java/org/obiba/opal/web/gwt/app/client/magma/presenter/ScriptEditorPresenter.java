@@ -78,6 +78,7 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
 
   public void setRepeatable(boolean repeatable) {
     this.repeatable = repeatable;
+    getView().setIsRepeatable(repeatable);
   }
 
   public void setScript(String script) {
@@ -86,6 +87,10 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
 
   public String getSelectedScript() {
     return getView().getSelectedScript();
+  }
+
+  public void setValueEntityType(String value) {
+    getView().setValueType(value);
   }
 
   public ValueType getValueEntityType() {
@@ -158,6 +163,10 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
     HandlerRegistration addScriptChangeHandler(ChangeHandler handler);
 
     String getBeautifiedScript();
+
+    void setIsRepeatable(boolean repeatable);
+
+    void setValueType(String value);
   }
 
 }
