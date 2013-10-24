@@ -9,13 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.presenter;
 
-import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DataDatabasesPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.IdentifiersDatabasePresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -31,20 +29,19 @@ import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
-public class InstallPresenter extends Presenter<InstallPresenter.Display, InstallPresenter.Proxy>
-    implements InstallUiHandlers {
+public class PostInstallPresenter extends Presenter<PostInstallPresenter.Display, PostInstallPresenter.Proxy>
+    implements PostInstallUiHandlers {
 
-  public interface Display extends View, HasUiHandlers<InstallUiHandlers> {
+  public interface Display extends View, HasUiHandlers<PostInstallUiHandlers> {
 
     void setUsername(String username);
   }
 
   @ProxyStandard
   @NameToken(Places.INSTALL)
-  public interface Proxy extends ProxyPlace<InstallPresenter> {}
+  public interface Proxy extends ProxyPlace<PostInstallPresenter> {}
 
   public enum Slot {
     IDENTIFIERS, DATA, NOTIFICATION
@@ -61,7 +58,7 @@ public class InstallPresenter extends Presenter<InstallPresenter.Display, Instal
   private final DataDatabasesPresenter dataDatabasesPresenter;
 
   @Inject
-  public InstallPresenter(Display display, EventBus eventBus, Proxy proxy, PlaceManager placeManager,
+  public PostInstallPresenter(Display display, EventBus eventBus, Proxy proxy, PlaceManager placeManager,
       RequestCredentials credentials, NotificationPresenter messageDialog,
       IdentifiersDatabasePresenter identifiersDatabasePresenter, DataDatabasesPresenter dataDatabasesPresenter) {
     super(eventBus, display, proxy, RevealType.Root);

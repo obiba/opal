@@ -10,28 +10,23 @@
 
 package org.obiba.opal.web.gwt.app.client.view;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.presenter.InstallPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.InstallUiHandlers;
+import org.obiba.opal.web.gwt.app.client.presenter.PostInstallPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.PostInstallUiHandlers;
 
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.ViewImpl;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-public class InstallView extends ViewWithUiHandlers<InstallUiHandlers> implements InstallPresenter.Display {
+public class PostInstallView extends ViewWithUiHandlers<PostInstallUiHandlers> implements PostInstallPresenter.Display {
 
-  interface Binder extends UiBinder<Widget, InstallView> {}
-
-  private final Translations translations;
+  interface Binder extends UiBinder<Widget, PostInstallView> {}
 
   @UiField
   NavLink username;
@@ -46,20 +41,19 @@ public class InstallView extends ViewWithUiHandlers<InstallUiHandlers> implement
   Panel dataPanel;
 
   @Inject
-  public InstallView(Binder uiBinder, Translations translations) {
+  public PostInstallView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
-    this.translations = translations;
   }
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {
-    if(slot == InstallPresenter.Slot.IDENTIFIERS) {
+    if(slot == PostInstallPresenter.Slot.IDENTIFIERS) {
       idsPanel.clear();
       idsPanel.add(content);
-    } else if(slot == InstallPresenter.Slot.DATA) {
+    } else if(slot == PostInstallPresenter.Slot.DATA) {
       dataPanel.clear();
       dataPanel.add(content);
-    } else if(slot == InstallPresenter.Slot.NOTIFICATION) {
+    } else if(slot == PostInstallPresenter.Slot.NOTIFICATION) {
       notification.add(content);
     }
   }
