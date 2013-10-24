@@ -67,3 +67,7 @@ th input[type="checkbox"], td input[type="checkbox"] {
 .table th, .table td {
   border-bottom-color: #EEEEEE;
 }
+
+a:hover {
+  cursor: pointer;
+}

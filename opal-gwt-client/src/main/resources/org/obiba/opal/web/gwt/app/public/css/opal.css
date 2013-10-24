@@ -348,3 +348,12 @@ input.database-url {
 .error-popup {
   z-index: 1500;
 }
+
+  /*
+   * Actions
+   */
+td.row-actions span {
+  margin-right: 0.5em;
+  cursor: pointer;
+  text-decoration: underline;
+}
