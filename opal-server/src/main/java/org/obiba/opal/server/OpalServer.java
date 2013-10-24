@@ -1,6 +1,5 @@
 package org.obiba.opal.server;
 
-import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.impl.LocalOrientDbServerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,12 +82,8 @@ public class OpalServer {
   }
 
   final void shutdown() {
-    System.out.println("Opal Server shutting down.");
-    try {
-      ctx.getBean(OpalRuntime.class).stop();
-    } finally {
-      ctx.close();
-    }
+    System.out.println("Opal Server shutting down...");
+    ctx.close();
     //TODO remove this static access when restarting embedded server will work
     LocalOrientDbServerFactory.stop();
   }

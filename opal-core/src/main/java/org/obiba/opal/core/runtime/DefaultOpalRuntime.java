@@ -14,11 +14,11 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
-import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaEngineExtension;
 import org.obiba.magma.support.MagmaEngineFactory;
@@ -72,6 +72,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
   }
 
   @Override
+  @PreDestroy
   public void stop() {
     for(Service service : services) {
       try {
