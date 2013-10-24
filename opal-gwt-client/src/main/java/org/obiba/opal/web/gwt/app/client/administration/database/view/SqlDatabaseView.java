@@ -456,7 +456,8 @@ public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHand
     for(JdbcDriverDto driverDto : JsArrays.toIterable(availableDrivers)) {
       driver.addItem(driverDto.getDriverName(), driverDto.getDriverClass());
     }
-    getDriver().setText(null);
+    // select MySQL by default
+    getDriver().setText("com.mysql.jdbc.Driver");
   }
 
   @Nullable
