@@ -54,6 +54,7 @@ public class PostInstallView extends ViewWithUiHandlers<PostInstallUiHandlers> i
       dataPanel.clear();
       dataPanel.add(content);
     } else if(slot == PostInstallPresenter.Slot.NOTIFICATION) {
+      notification.clear();
       notification.add(content);
     }
   }

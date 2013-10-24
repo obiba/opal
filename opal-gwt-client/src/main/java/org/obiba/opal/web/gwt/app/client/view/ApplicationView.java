@@ -106,6 +106,7 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
       workbench.clear();
       workbench.add(content.asWidget());
     } else {
+      notification.clear();
       notification.add(content);
     }
   }
