@@ -26,6 +26,8 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
+import org.obiba.opal.project.ProjectService;
+import org.obiba.opal.project.domain.Project;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
 import org.slf4j.Logger;
@@ -75,6 +77,8 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
 
   private DatabaseRegistry databaseRegistry;
 
+  private ProjectService projectService;
+
   @Override
   public void execute(Version currentVersion) {
     extractOpalDatasource();
@@ -100,7 +104,7 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
           .sqlSchema(SqlDatabase.SqlSchema.HIBERNATE) //
           .build();
       log.debug("Import opalData: {}", opalData);
-      databaseRegistry.addOrReplaceDatabase(opalData);
+      saveDatabaseAndProject(opalData);
 
       SqlDatabase opalKey = new SqlDatabase.Builder() //
           .name("opal-key") //
@@ -120,6 +124,15 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
     } catch(IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private void saveDatabaseAndProject(SqlDatabase database) {
+    log.debug("Import database: {}", database);
+    databaseRegistry.addOrReplaceDatabase(database);
+
+    String databaseName = database.getName();
+    Project project = new Project.Builder().name(databaseName).title(databaseName).database(databaseName).build();
+    projectService.createProject(project);
   }
 
   private void commentDeprecatedProperties() {
@@ -171,8 +184,7 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
             .usage(Database.Usage.STORAGE) //
             .sqlSchema(SqlDatabase.SqlSchema.HIBERNATE) //
             .build();
-        log.debug("Import sqlDatabase: {}", sqlDatabase);
-        databaseRegistry.addOrReplaceDatabase(sqlDatabase);
+        saveDatabaseAndProject(sqlDatabase);
       }
     } catch(XPathExpressionException e) {
       throw new RuntimeException(e);
@@ -296,6 +308,10 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
 
   public void setDatabaseRegistry(DatabaseRegistry databaseRegistry) {
     this.databaseRegistry = databaseRegistry;
+  }
+
+  public void setProjectService(ProjectService projectService) {
+    this.projectService = projectService;
   }
 
   @SuppressWarnings("UnusedDeclaration")
