@@ -1,12 +1,13 @@
 package org.obiba.opal.core.upgrade.database;
 
 import org.obiba.opal.core.cfg.OpalConfiguration;
-import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.cfg.OpalConfigurationIo;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
 import org.obiba.runtime.upgrade.VersionProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 @SuppressWarnings("SpringJavaAutowiringInspection")
@@ -19,16 +20,16 @@ public class MoveVersionToOpalConfigurationUpgradeStep extends AbstractUpgradeSt
   private VersionProvider versionProvider;
 
   @Autowired
-  private OpalConfigurationService configurationService;
+  private ApplicationContext applicationContext;
 
   @Override
   public void execute(Version currentVersion) {
-    configurationService.modifyConfiguration(new OpalConfigurationService.ConfigModificationTask() {
-      @Override
-      public void doWithConfig(OpalConfiguration config) {
-        config.setVersion(versionProvider.getVersion());
-      }
-    });
+    OpalConfigurationIo opalConfigurationIo = new OpalConfigurationIo();
+    applicationContext.getAutowireCapableBeanFactory().autowireBean(opalConfigurationIo);
+
+    OpalConfiguration configuration = opalConfigurationIo.readConfiguration();
+    configuration.setVersion(versionProvider.getVersion());
+    opalConfigurationIo.writeConfiguration(configuration);
 
     JdbcTemplate dataJdbcTemplate = new JdbcTemplate(databaseRegistry.getDataSource("opal-data", null));
     dataJdbcTemplate.execute("drop table version");
