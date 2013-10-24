@@ -135,6 +135,10 @@ li.no-icon > a {
   display: inline-block;
 }
 
+.section {
+  margin-top: 20px;
+}
+
   /* Suggest list box */
 
 ul.closeables {

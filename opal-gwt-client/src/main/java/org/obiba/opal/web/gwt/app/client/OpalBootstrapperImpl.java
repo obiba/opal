@@ -34,6 +34,7 @@ import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.RevealRootPopupContentEvent;
 
 public class OpalBootstrapperImpl implements Bootstrapper {
+
   private final PlaceManager placeManager;
 
   @Inject

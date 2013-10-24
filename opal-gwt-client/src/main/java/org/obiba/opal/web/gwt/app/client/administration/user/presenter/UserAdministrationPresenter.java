@@ -278,7 +278,7 @@ public class UserAdministrationPresenter
               if(response.getStatusCode() != Response.SC_OK) {
                 ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
                 getEventBus().fireEvent(
-                    NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+                    NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray())
                         .build());
               }
             }

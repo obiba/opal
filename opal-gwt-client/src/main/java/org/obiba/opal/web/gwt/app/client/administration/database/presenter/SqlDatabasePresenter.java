@@ -266,8 +266,6 @@ public class SqlDatabasePresenter extends AbstractDatabasePresenter<SqlDatabaseP
 
     HasVisibility getNameGroupVisibility();
 
-    HasVisibility getUsageGroupVisibility();
-
     HasVisibility getDefaultStorageGroupVisibility();
 
     HasVisibility getSqlSchemaGroupVisibility();

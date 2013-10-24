@@ -464,7 +464,9 @@ public interface Translations extends Constants {
       "MultipleIdentifiersDatabase", "Database for identifiers already exists: {0}", //
       "DatabaseAlreadyExists", "Database named {0} already exists", //
       "VcsScriptContentInfo", "The retrieved script content is from '{0}' committed by '{1}'.", //
-      "GeneralConfigSaved", "Opal general configuration was successfully saved." })
+      "GeneralConfigSaved", "Opal general configuration was successfully saved.", //
+      "PostInstallNotCompleted", "Post-install configuration not completed."
+  })
   Map<String, String> userMessageMap();
 
   @Description("You must select a file message")

@@ -183,7 +183,7 @@ public class IndexAdministrationPresenter
           getEventBus().fireEvent(new TableIndexStatusRefreshEvent());
         } else {
           getView().setServiceStatus(Display.Status.Startable);
-          getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         }
       }
 
@@ -211,7 +211,7 @@ public class IndexAdministrationPresenter
           getView().setServiceStatus(Display.Status.Stoppable);
           ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
           getEventBus().fireEvent(
-              NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+              NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray())
                   .build());
         }
       }
@@ -239,7 +239,7 @@ public class IndexAdministrationPresenter
   @Override
   public void clear() {
     if(getView().getSelectedIndices().isEmpty()) {
-      fireEvent(NotificationEvent.Builder.newNotification().error("IndexClearSelectAtLeastOne").build());
+      fireEvent(NotificationEvent.newBuilder().error("IndexClearSelectAtLeastOne").build());
     } else {
       for(TableIndexStatusDto object : getView().getSelectedIndices()) {
         ResponseCodeCallback callback = new ResponseCodeCallback() {
@@ -271,7 +271,7 @@ public class IndexAdministrationPresenter
         } else {
           ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
           getEventBus().fireEvent(
-              NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+              NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray())
                   .build());
         }
       }
@@ -286,7 +286,7 @@ public class IndexAdministrationPresenter
   @Override
   public void schedule() {
     if(getView().getSelectedIndices().isEmpty()) {
-      fireEvent(NotificationEvent.Builder.newNotification().error("IndexScheduleSelectAtLeastOne").build());
+      fireEvent(NotificationEvent.newBuilder().error("IndexScheduleSelectAtLeastOne").build());
     } else {
       List<TableIndexStatusDto> objects = new ArrayList<TableIndexStatusDto>();
       for(TableIndexStatusDto object : getView().getSelectedIndices()) {
@@ -317,7 +317,7 @@ public class IndexAdministrationPresenter
         } else {
           ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
           getEventBus().fireEvent(
-              NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+              NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray())
                   .build());
         }
       }

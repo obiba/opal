@@ -90,14 +90,6 @@ public class NotificationView extends ViewImpl implements NotificationPresenter.
 
   @Override
   public void close() {
-//    for (Iterator<Widget> iterator = alertPanel.iterator(); iterator.hasNext();) {
-//      Widget widget = iterator.next();
-//      if (widget instanceof Alert) {
-//        Alert alert = (Alert)widget;
-//        alertPanel.remove(alert);
-//        alert.close();
-//      }
-//    }
     alertPanel.clear();
   }
 

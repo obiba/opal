@@ -155,7 +155,7 @@ public class IndexConfigurationPresenter extends ModalPresenterWidget<IndexConfi
       getView().hideDialog();
       getEventBus().fireEvent(new TableIndicesRefreshEvent());
       if(response.getStatusCode() != Response.SC_OK) {
-        getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
+        getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
       }
     }
   }

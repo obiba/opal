@@ -20,6 +20,7 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.HasVisibility;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -124,8 +125,9 @@ public abstract class AbstractDatabasePresenter<TView extends AbstractDatabasePr
   /**
    * Setup the dialog for creating a method
    */
-  void createNewDatabase() {
+  void createNewDatabase(boolean storageOnly) {
     setDialogMode(Mode.CREATE);
+    getView().getUsageGroupVisibility().setVisible(!storageOnly);
   }
 
   void createNewIdentifierDatabase(DatabaseDto dto) {
@@ -217,6 +219,8 @@ public abstract class AbstractDatabasePresenter<TView extends AbstractDatabasePr
     TakesValue<Usage> getUsage();
 
     HasChangeHandlers getUsageChangeHandlers();
+
+    HasVisibility getUsageGroupVisibility();
 
     HasText getUrl();
 

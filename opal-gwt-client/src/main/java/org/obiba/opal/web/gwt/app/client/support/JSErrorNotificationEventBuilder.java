@@ -24,12 +24,12 @@ public class JSErrorNotificationEventBuilder {
       JsArray<JavaScriptErrorDto> errors = (JsArray<JavaScriptErrorDto>) error
           .getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors);
 
-      return NotificationEvent.Builder.newNotification().error("JavascriptError").args(errors.get(0).getSourceName(), //
+      return NotificationEvent.newBuilder().error("JavascriptError").args(errors.get(0).getSourceName(), //
           errors.get(0).getMessage(), //
           String.valueOf(errors.get(0).getLineNumber()),//
           String.valueOf(errors.get(0).getColumnNumber())).build();
     }
 
-    return NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray()).build();
+    return NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray()).build();
   }
 }

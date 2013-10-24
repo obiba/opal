@@ -16,27 +16,52 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <g:FlowPanel>
-      <b:Heading size="4" addStyleNames="inline-block">
-        <ui:msg description="SQL Databases label">SQL Databases</ui:msg>
-      </b:Heading>
-      <b:SimplePager ui:field="sqlPager" location="RIGHT" addStyleNames="pull-right"/>
-      <b:Button ui:field="addSQL" type="INFO" icon="PLUS" addStyleNames="pull-right small-top-margin right-indent">
-        <ui:msg description="Add SQL database label">Add SQL database</ui:msg>
-      </b:Button>
+    <b:Heading size="4" addStyleNames="inline-block">
+      <ui:msg description="SQL Databases label">Data Databases</ui:msg>
+    </b:Heading>
+    <b:Paragraph>
+      Data databases can have different purposes: storage, import, export.
+    </b:Paragraph>
+    <g:FlowPanel ui:field="createPanel">
+      <b:Paragraph>
+        At least one data storage database is required for importing data.
+      </b:Paragraph>
+      <b:DropdownButton text="Create data storage database" icon="PLUS" type="INFO">
+        <b:NavLink ui:field="createSql">
+          <ui:msg description="Create SQL database label">SQL</ui:msg>
+        </b:NavLink>
+        <b:NavLink ui:field="createMongo">
+          <ui:msg description="Create MongoDB database label">MongoDB</ui:msg>
+        </b:NavLink>
+      </b:DropdownButton>
     </g:FlowPanel>
-    <o:Table ui:field="sqlTable" width="100%"/>
 
-    <g:FlowPanel>
-      <b:Heading size="4" addStyleNames="inline-block">
-        <ui:msg description="MongoDB Databases label">MongoDB Databases</ui:msg>
-      </b:Heading>
-      <b:SimplePager ui:field="mongoPager" location="RIGHT" addStyleNames="pull-right"/>
-      <b:Button ui:field="addMongo" type="INFO" icon="PLUS" addStyleNames="pull-right small-top-margin right-indent">
-        <ui:msg description="Add MongoDB database label">Add MongoDB database</ui:msg>
-      </b:Button>
+    <g:FlowPanel ui:field="databasesPanel">
+      <b:DropdownButton text="Add data database" icon="PLUS" type="INFO">
+        <b:NavLink ui:field="addSQL">
+          <ui:msg description="Create SQL database label">SQL</ui:msg>
+        </b:NavLink>
+        <b:NavLink ui:field="addMongo">
+          <ui:msg description="Create MongoDB database label">MongoDB</ui:msg>
+        </b:NavLink>
+      </b:DropdownButton>
+
+      <g:FlowPanel addStyleNames="top-margin">
+        <b:Heading size="5" addStyleNames="inline-block">
+          <ui:msg description="SQL Databases label">SQL Databases</ui:msg>
+        </b:Heading>
+        <b:SimplePager ui:field="sqlPager" location="RIGHT" addStyleNames="pull-right"/>
+      </g:FlowPanel>
+      <o:Table ui:field="sqlTable" width="100%"/>
+
+      <g:FlowPanel>
+        <b:Heading size="5" addStyleNames="inline-block">
+          <ui:msg description="MongoDB Databases label">MongoDB Databases</ui:msg>
+        </b:Heading>
+        <b:SimplePager ui:field="mongoPager" location="RIGHT" addStyleNames="pull-right"/>
+      </g:FlowPanel>
+      <o:Table ui:field="mongoTable" width="100%"/>
     </g:FlowPanel>
-    <o:Table ui:field="mongoTable" width="100%"/>
 
   </g:FlowPanel>
 

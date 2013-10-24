@@ -46,10 +46,12 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
+import com.google.gwt.view.client.RangeChangeEvent;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.Event;
 import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
@@ -61,7 +63,8 @@ import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 
-public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresenter.Display> implements RequestAdministrationPermissionEvent.Handler {
+public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresenter.Display>
+    implements RequestAdministrationPermissionEvent.Handler, DataDatabasesUiHandlers {
 
   private final ModalProvider<SqlDatabasePresenter> sqlDatabaseModalProvider;
 
@@ -86,18 +89,23 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
     this.sqlDatabaseModalProvider = sqlDatabaseModalProvider.setContainer(this);
     this.mongoDatabaseModalProvider = mongoDatabaseModalProvider.setContainer(this);
     this.authorizationPresenter = authorizationPresenter.get();
+    getView().setUiHandlers(this);
   }
 
   @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
     ResourceAuthorizationRequestBuilderFactory.newBuilder() //
         .forResource(DatabaseResources.sqlDatabases()) //
-        .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListSqlDatabasesAuthorization())) //
+        .authorize(event == null
+            ? new ListSqlDatabasesAuthorization()
+            : new CompositeAuthorizer(event.getHasAuthorization(), new ListSqlDatabasesAuthorization())) //
         .get().send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder() //
         .forResource(DatabaseResources.mongoDatabases()) //
-        .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListMongoDbAuthorization())) //
+        .authorize(event == null
+            ? new ListMongoDbAuthorization()
+            : new CompositeAuthorizer(event.getHasAuthorization(), new ListMongoDbAuthorization())) //
         .get().send();
   }
 
@@ -122,21 +130,23 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
   protected void onBind() {
     super.onBind();
 
-    registerHandler(
-        getEventBus().addHandler(DatabaseCreatedEvent.getType(), new DatabaseCreatedEvent.DatabaseCreatedHandler() {
-          @Override
-          public void onDatabaseCreated(DatabaseCreatedEvent event) {
-            refresh();
-          }
-        }));
-    registerHandler(
-        getEventBus().addHandler(DatabaseUpdatedEvent.getType(), new DatabaseUpdatedEvent.DatabaseUpdatedHandler() {
-          @Override
-          public void onDatabaseUpdated(DatabaseUpdatedEvent event) {
-            refresh();
-          }
-        }));
-    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEvent.Handler() {
+    addRegisteredHandler(DatabaseCreatedEvent.getType(), new DatabaseCreatedEvent.DatabaseCreatedHandler() {
+      @Override
+      public void onDatabaseCreated(DatabaseCreatedEvent event) {
+        if(!event.getDto().getUsedForIdentifiers()) {
+          refresh();
+        }
+      }
+    });
+    addRegisteredHandler(DatabaseUpdatedEvent.getType(), new DatabaseUpdatedEvent.DatabaseUpdatedHandler() {
+      @Override
+      public void onDatabaseUpdated(DatabaseUpdatedEvent event) {
+        if(!event.getDto().getUsedForIdentifiers()) {
+          refresh();
+        }
+      }
+    });
+    addRegisteredHandler(ConfirmationEvent.getType(), new ConfirmationEvent.Handler() {
 
       @Override
       public void onConfirmation(ConfirmationEvent event) {
@@ -144,7 +154,7 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
           confirmedCommand.execute();
         }
       }
-    }));
+    });
 
     getView().getActions().setActionHandler(new ActionHandler<DatabaseDto>() {
 
@@ -175,23 +185,6 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
 
     });
 
-    registerHandler(getView().getAddSqlButton().addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        sqlDatabaseModalProvider.get().createNewDatabase();
-      }
-
-    }));
-    registerHandler(getView().getAddMongoButton().addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        mongoDatabaseModalProvider.get().createNewDatabase();
-      }
-
-    }));
-
     authorizationPresenter
         .setAclRequest("databases", new AclRequest(AclAction.DATABASES_ALL, DatabaseResources.databases()));
   }
@@ -201,21 +194,25 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
     getView().getMongoTable().setVisibleRangeAndClearData(new Range(0, 10), true);
   }
 
+  @Override
+  public void createSql(boolean storageOnly) {
+    sqlDatabaseModalProvider.get().createNewDatabase(storageOnly);
+  }
 
+  @Override
+  public void createMongo(boolean storageOnly) {
+    mongoDatabaseModalProvider.get().createNewDatabase(storageOnly);
+  }
 
-  public interface Display extends View {
+  public interface Display extends View, HasUiHandlers<DataDatabasesUiHandlers> {
 
     String TEST_ACTION = "Test";
 
     HasActionHandler<DatabaseDto> getActions();
 
-    HasClickHandlers getAddSqlButton();
-
     HasData<DatabaseDto> getSqlTable();
 
     HasData<DatabaseDto> getMongoTable();
-
-    HasClickHandlers getAddMongoButton();
 
   }
 
@@ -229,12 +226,8 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
 
     @Override
     public void execute() {
-      deleteDatabase(dto);
-    }
-
-    private void deleteDatabase(DatabaseDto database) {
       ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
-          .forResource(DatabaseResources.database(database.getName())) //
+          .forResource(DatabaseResources.database(dto.getName())) //
           .withCallback(Response.SC_OK, new ResponseCodeCallback() {
 
             @Override
@@ -246,8 +239,6 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
           .delete().send();
     }
   }
-
-
 
   private final class ListSqlDatabasesAuthorization implements HasAuthorization {
 

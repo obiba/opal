@@ -116,7 +116,7 @@ public class VariableVcsCommitHistoryPresenter extends PresenterWidget<VariableV
         .replaceArguments(translations.momentWithAgo(), m.format(FormatType.MONTH_NAME_TIME_SHORT), m.fromNow());
 
     getEventBus().fireEvent(
-        NotificationEvent.Builder.newNotification().info("VcsScriptContentInfo").args(age, dto.getAuthor()).build());
+        NotificationEvent.newBuilder().info("VcsScriptContentInfo").args(age, dto.getAuthor()).build());
 
     String requestUri = UriBuilder.create()
         .segment("datasource", table.getDatasourceName(), "view", table.getName(), "vcs", "variable",

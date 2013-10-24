@@ -88,9 +88,6 @@ public class MongoDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHa
   @UiField
   CheckBox defaultStorage;
 
-  @UiField
-  ControlGroup defaultStorageGroup;
-
   private final Translations translations;
 
   @Inject
@@ -267,13 +264,13 @@ public class MongoDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHa
 
   @Override
   public HasVisibility getDefaultStorageGroupVisibility() {
-    return defaultStorageGroup;
+    return defaultStorage;
   }
 
   @Override
   public void toggleDefaultStorage(boolean enabled) {
     if(!enabled) defaultStorage.setValue(false);
-    defaultStorage.setEnabled(enabled);
+    defaultStorage.setVisible(enabled);
   }
 
 }

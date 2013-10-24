@@ -204,7 +204,7 @@ public class EntityModalPresenter extends ModalPresenterWidget<EntityModalPresen
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      NotificationEvent.Builder notificationBuilder = NotificationEvent.Builder.newNotification();
+      NotificationEvent.Builder notificationBuilder = NotificationEvent.newBuilder();
 
       notificationBuilder.error(message.isEmpty() ? response.getStatusText() : message);
 

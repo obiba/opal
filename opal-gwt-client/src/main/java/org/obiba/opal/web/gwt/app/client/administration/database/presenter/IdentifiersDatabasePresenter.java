@@ -79,14 +79,18 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
       @Override
       public void onDatabaseCreated(DatabaseCreatedEvent event) {
         databaseDto = event.getDto();
-        getView().setDatabase(event.getDto());
+        if(databaseDto.getUsedForIdentifiers()) {
+          getView().setDatabase(event.getDto());
+        }
       }
     });
     addRegisteredHandler(DatabaseUpdatedEvent.getType(), new DatabaseUpdatedEvent.DatabaseUpdatedHandler() {
       @Override
       public void onDatabaseUpdated(DatabaseUpdatedEvent event) {
         databaseDto = event.getDto();
-        getView().setDatabase(event.getDto());
+        if(databaseDto.getUsedForIdentifiers()) {
+          getView().setDatabase(event.getDto());
+        }
       }
     });
   }
@@ -146,8 +150,7 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
             databaseDto = null;
             getView().setDatabase(null);
           }
-        })
-        .get().send();
+        }).get().send();
   }
 
   public interface Display extends View, HasUiHandlers<IdentifiersDatabaseUiHandlers> {

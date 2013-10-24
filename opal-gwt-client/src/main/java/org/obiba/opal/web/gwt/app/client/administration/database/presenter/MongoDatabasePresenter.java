@@ -129,8 +129,6 @@ public class MongoDatabasePresenter extends AbstractDatabasePresenter<MongoDatab
 
     HasVisibility getDefaultStorageGroupVisibility();
 
-    HasVisibility getUsageGroupVisibility();
-
   }
 
 }

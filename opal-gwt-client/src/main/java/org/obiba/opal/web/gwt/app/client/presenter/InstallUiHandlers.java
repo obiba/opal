@@ -18,4 +18,5 @@ public interface InstallUiHandlers extends UiHandlers {
 
   void onQuit();
 
+  void onGoToMain();
 }

@@ -12,13 +12,28 @@
         <ui:msg description="Identifiers Database label">Identifiers Database</ui:msg>
       </b:Heading>
       <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="edit"/>
-      <b:Button ui:field="testConnection" addStyleNames="pull-right small-top-margin">
-        <ui:msg description="Test connection label">Test connection</ui:msg>
-      </b:Button>
 
     </g:FlowPanel>
-    <o:PropertiesTable ui:field="properties"/>
-    <g:FlowPanel ui:field="createPanel">
+    <b:Paragraph>
+      For security reasons the participant identifiers are stored in a database which is distinct from the data
+      databases. See
+      <a href="http://wiki.obiba.org/display/OPALDOC/Functional+Units" target="_blank">documentation about participant
+        identifier
+      </a>
+      for more details.
+    </b:Paragraph>
+    <b:Row ui:field="databasePanel">
+      <b:Column size="6">
+        <b:Button ui:field="testConnection">
+          <ui:msg description="Test connection label">Test connection</ui:msg>
+        </b:Button>
+        <o:PropertiesTable ui:field="properties" addStyleNames="top-margin"/>
+      </b:Column>
+    </b:Row>
+    <g:FlowPanel ui:field="createPanel" addStyleNames="bottom-margin">
+      <b:Paragraph>
+        This database definition is required for importing data.
+      </b:Paragraph>
       <b:DropdownButton text="Create identifiers database" icon="PLUS" type="INFO">
         <b:NavLink ui:field="createSql">
           <ui:msg description="Create SQL database label">SQL</ui:msg>

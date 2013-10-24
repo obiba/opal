@@ -223,7 +223,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
           .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
-              getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error("EntityIdentifierNotFound")
+              fireEvent(NotificationEvent.newBuilder().error("EntityIdentifierNotFound")
                   .args(table.getEntityType(), identifier, table.getName()).build());
             }
           }).withCallback(Response.SC_OK, new ResponseCodeCallback() {

@@ -459,7 +459,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         } else {
           ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
           fireEvent(
-              NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+              NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray())
                   .build());
         }
       }
@@ -487,7 +487,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           // Schedule the timer to run once in X seconds.
           t.schedule(DELAY_MILLIS);
         } else {
-          fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
+          fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         }
       }
 
@@ -509,7 +509,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         } else {
           ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
           fireEvent(
-              NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+              NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray())
                   .build());
         }
       }

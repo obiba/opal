@@ -142,10 +142,10 @@ public class DatabaseAdministrationPresenter extends
     public void onResponseCode(Request request, Response response) {
       Event<?> event = null;
       if(response.getStatusCode() == Response.SC_OK) {
-        event = NotificationEvent.Builder.newNotification().info("DatabaseConnectionOk").build();
+        event = NotificationEvent.newBuilder().info("DatabaseConnectionOk").build();
       } else {
         ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-        event = NotificationEvent.Builder.newNotification().error(error.getStatus()).args(error.getArgumentsArray())
+        event = NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray())
             .build();
       }
       eventBus.fireEvent(event);

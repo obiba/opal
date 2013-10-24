@@ -21,7 +21,7 @@ public class OpalPlaceManager extends PlaceManagerImpl {
 
   @Override
   public void revealDefaultPlace() {
-    revealPlace(defaultPlaceRequest, false);
+    revealPlace(defaultPlaceRequest, true);
   }
 
   @Override

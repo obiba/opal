@@ -83,9 +83,6 @@ public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHand
   ControlGroup driverGroup;
 
   @UiField
-  ControlGroup defaultStorageGroup;
-
-  @UiField
   TextBox name;
 
   @UiField
@@ -445,7 +442,7 @@ public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHand
 
   @Override
   public HasVisibility getDefaultStorageGroupVisibility() {
-    return defaultStorageGroup;
+    return defaultStorage;
   }
 
   @Override
@@ -476,7 +473,7 @@ public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHand
   @Override
   public void toggleDefaultStorage(boolean show) {
     if(!show) defaultStorage.setValue(false);
-    defaultStorage.setEnabled(show);
+    defaultStorage.setVisible(show);
   }
 
   @Override

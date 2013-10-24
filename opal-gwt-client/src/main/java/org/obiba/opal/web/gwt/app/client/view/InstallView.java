@@ -19,6 +19,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
@@ -34,6 +35,9 @@ public class InstallView extends ViewWithUiHandlers<InstallUiHandlers> implement
 
   @UiField
   NavLink username;
+
+  @UiField
+  Panel notification;
 
   @UiField
   Panel idsPanel;
@@ -52,9 +56,11 @@ public class InstallView extends ViewWithUiHandlers<InstallUiHandlers> implement
     if(slot == InstallPresenter.Slot.IDENTIFIERS) {
       idsPanel.clear();
       idsPanel.add(content);
-    } else {
+    } else if(slot == InstallPresenter.Slot.DATA) {
       dataPanel.clear();
       dataPanel.add(content);
+    } else if(slot == InstallPresenter.Slot.NOTIFICATION) {
+      notification.add(content);
     }
   }
 
@@ -71,5 +77,10 @@ public class InstallView extends ViewWithUiHandlers<InstallUiHandlers> implement
   @UiHandler("quitItem")
   void onQuit(ClickEvent event) {
     getUiHandlers().onQuit();
+  }
+
+  @UiHandler("gotoMain")
+  void onGotToMain(ClickEvent event) {
+    getUiHandlers().onGoToMain();
   }
 }

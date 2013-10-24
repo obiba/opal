@@ -117,9 +117,9 @@ public class ServerPresenter extends ItemAdministrationPresenter<ServerPresenter
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == Response.SC_OK) {
           initGeneralConfig();
-          getEventBus().fireEvent(NotificationEvent.Builder.newNotification().info("GeneralConfigSaved").build());
+          getEventBus().fireEvent(NotificationEvent.newBuilder().info("GeneralConfigSaved").build());
         } else {
-          getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error(response.getText()).build());
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         }
       }
     }, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_NOT_FOUND).put().send();

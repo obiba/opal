@@ -9,12 +9,20 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.presenter;
 
+import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DataDatabasesPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.IdentifiersDatabasePresenter;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.model.client.database.DatabasesStatusDto;
 
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -22,9 +30,12 @@ import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
-public class InstallPresenter extends Presenter<InstallPresenter.Display, InstallPresenter.Proxy> implements InstallUiHandlers {
+public class InstallPresenter extends Presenter<InstallPresenter.Display, InstallPresenter.Proxy>
+    implements InstallUiHandlers {
 
   public interface Display extends View, HasUiHandlers<InstallUiHandlers> {
 
@@ -36,18 +47,27 @@ public class InstallPresenter extends Presenter<InstallPresenter.Display, Instal
   public interface Proxy extends ProxyPlace<InstallPresenter> {}
 
   public enum Slot {
-    IDENTIFIERS, DATA
+    IDENTIFIERS, DATA, NOTIFICATION
   }
+
+  private final PlaceManager placeManager;
+
   private final RequestCredentials credentials;
+
+  private final NotificationPresenter messageDialog;
+
   private final IdentifiersDatabasePresenter identifiersDatabasePresenter;
 
   private final DataDatabasesPresenter dataDatabasesPresenter;
 
   @Inject
-  public InstallPresenter(Display display, EventBus eventBus, Proxy proxy, RequestCredentials credentials,
+  public InstallPresenter(Display display, EventBus eventBus, Proxy proxy, PlaceManager placeManager,
+      RequestCredentials credentials, NotificationPresenter messageDialog,
       IdentifiersDatabasePresenter identifiersDatabasePresenter, DataDatabasesPresenter dataDatabasesPresenter) {
     super(eventBus, display, proxy, RevealType.Root);
+    this.placeManager = placeManager;
     this.credentials = credentials;
+    this.messageDialog = messageDialog;
     this.identifiersDatabasePresenter = identifiersDatabasePresenter;
     this.dataDatabasesPresenter = dataDatabasesPresenter;
     getView().setUiHandlers(this);
@@ -56,7 +76,20 @@ public class InstallPresenter extends Presenter<InstallPresenter.Display, Instal
   @Override
   protected void onBind() {
     setInSlot(Slot.IDENTIFIERS, identifiersDatabasePresenter);
+    identifiersDatabasePresenter.onAdministrationPermissionRequest(null);
     setInSlot(Slot.DATA, dataDatabasesPresenter);
+    dataDatabasesPresenter.onAdministrationPermissionRequest(null);
+
+    addRegisteredHandler(NotificationEvent.getType(), new NotificationEvent.Handler() {
+
+      @Override
+      public void onUserMessage(NotificationEvent event) {
+        if(isVisible()) {
+          messageDialog.setNotification(event);
+          setInSlot(Slot.NOTIFICATION, messageDialog);
+        }
+      }
+    });
   }
 
   @Override
@@ -71,6 +104,22 @@ public class InstallPresenter extends Presenter<InstallPresenter.Display, Instal
 
   @Override
   public void onQuit() {
-    getEventBus().fireEvent(new SessionEndedEvent());
+    fireEvent(new SessionEndedEvent());
+  }
+
+  @Override
+  public void onGoToMain() {
+    ResourceRequestBuilderFactory.<DatabasesStatusDto>newBuilder()
+        .forResource(UriBuilder.create().segment("system", "status", "databases").build()).get()
+        .withCallback(new ResourceCallback<DatabasesStatusDto>() {
+          @Override
+          public void onResource(Response response, DatabasesStatusDto resource) {
+            if(resource.getHasIdentifiers() && resource.getHasStorage()) {
+              placeManager.revealDefaultPlace();
+            } else {
+              fireEvent(NotificationEvent.newBuilder().error("PostInstallNotCompleted.").build());
+            }
+          }
+        }).send();
   }
 }

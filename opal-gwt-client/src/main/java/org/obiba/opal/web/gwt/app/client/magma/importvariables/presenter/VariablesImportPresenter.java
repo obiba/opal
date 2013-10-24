@@ -205,7 +205,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
       if(DatasourceFileType.INVALID != DatasourceFileType.getFileType(getView().getSelectedFile())) {
         return true;
       }
-      getEventBus().fireEvent(NotificationEvent.Builder.newNotification().error("InvalidFileType").build());
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error("InvalidFileType").build());
       return false;
     }
   }

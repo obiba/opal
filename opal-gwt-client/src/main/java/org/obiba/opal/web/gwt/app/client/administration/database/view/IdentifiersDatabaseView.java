@@ -38,6 +38,9 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
   interface Binder extends UiBinder<Widget, IdentifiersDatabaseView> {}
 
   @UiField
+  Panel databasePanel;
+
+  @UiField
   Panel createPanel;
 
   @UiField
@@ -46,9 +49,6 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
   @UiField
   IconAnchor edit;
 
-  @UiField
-  Button testConnection;
-
   private final Translations translations;
 
   @Inject
@@ -56,8 +56,7 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
     edit.setTitle(translations.editLabel());
-    properties.setVisible(false);
-    testConnection.setVisible(false);
+    databasePanel.setVisible(false);;
   }
 
   @UiHandler("createSql")
@@ -85,8 +84,7 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
     properties.clearProperties();
     boolean hasDatabase = database != null;
     createPanel.setVisible(!hasDatabase);
-    properties.setVisible(hasDatabase);
-    testConnection.setVisible(hasDatabase);
+    databasePanel.setVisible(hasDatabase);
     edit.setVisible(hasDatabase);
     if(hasDatabase) {
       showSqlProperties((SqlDatabaseDto) database.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings));

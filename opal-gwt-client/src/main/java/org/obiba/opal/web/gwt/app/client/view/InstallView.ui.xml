@@ -29,7 +29,20 @@
       </b:Nav>
     </b:ResponsiveNavbar>
     <g:FlowPanel addStyleNames="container">
-      <g:SimplePanel ui:field="idsPanel">
+      <g:SimplePanel ui:field="notification"/>
+      <g:FlowPanel addStyleNames="page-header">
+        <b:Heading size="3">
+          <ui:msg description="Install label">Post-Install Configuration</ui:msg>
+        </b:Heading>
+      </g:FlowPanel>
+      <b:Paragraph>
+        Congratulations! You have just installed Opal server and now it is time to set up the minimum requirements for
+        having a fully functional server.
+      </b:Paragraph>
+      <b:Button ui:field="gotoMain" type="SUCCESS" icon="CHEVRON_RIGHT" iconPosition="RIGHT">
+        <ui:msg description="Continue to main site label">Continue to main site</ui:msg>
+      </b:Button>
+      <g:SimplePanel ui:field="idsPanel" addStyleNames="top-margin">
       </g:SimplePanel>
       <g:SimplePanel ui:field="dataPanel">
       </g:SimplePanel>

@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.administration.database.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DataDatabasesPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DataDatabasesUiHandlers;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.SqlDatabasePresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
@@ -22,35 +23,42 @@ import org.obiba.opal.web.model.client.database.SqlDatabaseDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.SimplePager;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.HasWidgets;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.HasData;
+import com.google.gwt.view.client.RangeChangeEvent;
+import com.google.gwt.view.client.RowCountChangeEvent;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 
-public class DataDatabasesView extends ViewImpl implements DataDatabasesPresenter.Display {
+public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandlers> implements DataDatabasesPresenter.Display {
 
   interface Binder extends UiBinder<Widget, DataDatabasesView> {}
 
   @UiField
-  Button addSQL;
+  Panel createPanel;
+
+  @UiField
+  Panel databasesPanel;
 
   @UiField
   SimplePager sqlPager;
 
   @UiField
   Table<DatabaseDto> sqlTable;
-
-  @UiField
-  Button addMongo;
 
   @UiField
   SimplePager mongoPager;
@@ -66,6 +74,7 @@ public class DataDatabasesView extends ViewImpl implements DataDatabasesPresente
   public DataDatabasesView(Binder uiBinder, Translations translations) {
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
+    databasesPanel.setVisible(false);
     initSqlTable();
     initMongoTable();
   }
@@ -89,14 +98,40 @@ public class DataDatabasesView extends ViewImpl implements DataDatabasesPresente
     mongoTable.addColumn(columns.actions, translations.actionsLabel());
   }
 
-  @Override
-  public HasClickHandlers getAddSqlButton() {
-    return addSQL;
+  @UiHandler("addSQL")
+  public void onAddSQL(ClickEvent event) {
+    getUiHandlers().createSql(false);
   }
 
-  @Override
-  public HasClickHandlers getAddMongoButton() {
-    return addMongo;
+  @UiHandler("createSql")
+  public void onCreateSQL(ClickEvent event) {
+    getUiHandlers().createSql(true);
+  }
+
+  @UiHandler("addMongo")
+  public void onAddMongo(ClickEvent event) {
+    getUiHandlers().createMongo(false);
+  }
+
+  @UiHandler("createMongo")
+  public void onCreateMongo(ClickEvent event) {
+    getUiHandlers().createMongo(true);
+  }
+
+  @UiHandler("sqlTable")
+  public void onSqlTableChange(RowCountChangeEvent event) {
+    createPanel.setVisible(!isDatabasesVisible());
+    databasesPanel.setVisible(isDatabasesVisible());
+  }
+
+  @UiHandler("mongoTable")
+  public void onMongoTableChange(RowCountChangeEvent event) {
+    createPanel.setVisible(!isDatabasesVisible());
+    databasesPanel.setVisible(isDatabasesVisible());
+  }
+
+  private boolean isDatabasesVisible() {
+    return sqlTable.getRowCount() > 0 || mongoTable.getRowCount() > 0;
   }
 
   @Override
