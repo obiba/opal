@@ -58,7 +58,7 @@
 
         <!-- 2.0.0 / import database config from XML to OrientDB -->
         <bean class="org.obiba.opal.core.upgrade.database.ExtractOpalJdbcConfigToDatabaseUpgradeStep">
-          <property name="description" value="Extract database config from properties file to Opal config database"/>
+          <property name="description" value="Extract database config from properties file to OrientDB"/>
           <property name="appliesTo" value="2.0.0"/>
           <property name="configFile" value="file:${OPAL_HOME}/conf/opal-config.xml"/>
           <property name="propertiesFile" value="file:${OPAL_HOME}/conf/opal-config.properties"/>
@@ -68,7 +68,7 @@
 
         <!-- 2.0.0 / create quartz schema in opal config database -->
         <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
-          <property name="description" value="Install Quartz Schema."/>
+          <property name="description" value="Create quartz schema in opal config database"/>
           <property name="dataSource" ref="configDataSource"/>
           <property name="scriptPath" value="classpath:/META-INF/opal/install-scripts/quartz/"/>
           <property name="scriptBasename" value="tables"/>
@@ -77,7 +77,7 @@
 
         <!-- 2.0.0 / move Quartz tables to opal config database -->
         <bean class="org.obiba.opal.core.upgrade.database.MoveQuartzTablesUpgradeStep">
-          <property name="description" value="Move config tables to config database"/>
+          <property name="description" value="Move Quartz tables to opal config database"/>
           <property name="appliesTo" value="2.0.0"/>
           <property name="configDataSource" ref="configDataSource"/>
           <property name="databaseRegistry" ref="databaseRegistry"/>
@@ -91,24 +91,20 @@
           <property name="generalConfigService" ref="generalConfigService"/>
         </bean>
 
-        <!-- 2.0.0 / move version from table to opal-config.xml -->
-        <bean class="org.obiba.opal.core.upgrade.database.MoveVersionToOpalConfigurationUpgradeStep">
-          <property name="description"
-              value="Drop version table from previous opal-data database because it's now moved to opal-config database"/>
-          <property name="appliesTo" value="2.0.0"/>
-        </bean>
-
-        <!-- 2.0.0 / move config tables to OrientDB -->
+        <!-- 2.0.0 / move Unit Key Store to OrientDB -->
         <bean class="org.obiba.opal.core.upgrade.database.MoveUnitKeyStoreToOrientDbUpgradeStep">
           <property name="description" value="Move Unit Key Store to OrientDB"/>
           <property name="appliesTo" value="2.0.0"/>
         </bean>
 
-        <!-- 2.0.0 / move config tables to OrientDB -->
+        <!-- 2.0.0 / move Subject ACL to OrientDB -->
         <bean class="org.obiba.opal.core.upgrade.database.MoveSubjectAclToOrientDbUpgradeStep">
           <property name="description" value="Move Subject ACL to OrientDB"/>
           <property name="appliesTo" value="2.0.0"/>
         </bean>
+
+        <!-- 2.0.0 / move version from table to opal-config.xml -->
+        <bean class="org.obiba.opal.core.upgrade.database.MoveVersionToOpalConfigurationUpgradeStep"/>
 
         <!-- 2.0.0 / update Opal Configuration -->
         <bean class="org.obiba.opal.core.upgrade.database.UpdateOpalConfigurationFlagUpgradeStep"/>

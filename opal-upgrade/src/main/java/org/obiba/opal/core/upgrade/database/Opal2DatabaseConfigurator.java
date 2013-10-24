@@ -48,7 +48,7 @@ public class Opal2DatabaseConfigurator {
     PropertiesConfiguration config = new PropertiesConfiguration(propertiesFile);
     PropertiesConfigurationLayout layout = config.getLayout();
     config.setProperty(DRIVER, "org.hsqldb.jdbcDriver");
-    config.setProperty(URL, "jdbc:hsqldb:file:opal_config_db;shutdown=true;hsqldb.tx=mvcc");
+    config.setProperty(URL, "jdbc:hsqldb:file:data/hsql/opal_config;shutdown=true;hsqldb.tx=mvcc");
     config.setProperty(USERNAME, "sa");
     config.setProperty(PASSWORD, "");
     config.setProperty(DIALECT, "org.hibernate.dialect.HSQLDialect");
