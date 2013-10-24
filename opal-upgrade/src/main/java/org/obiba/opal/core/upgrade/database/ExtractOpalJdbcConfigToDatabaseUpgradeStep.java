@@ -26,7 +26,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
-import org.obiba.opal.project.ProjectService;
+import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.project.domain.Project;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
@@ -77,7 +77,7 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
 
   private DatabaseRegistry databaseRegistry;
 
-  private ProjectService projectService;
+  private OrientDbService orientDbService;
 
   @Override
   public void execute(Version currentVersion) {
@@ -132,7 +132,7 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
 
     String databaseName = database.getName();
     Project project = new Project.Builder().name(databaseName).title(databaseName).database(databaseName).build();
-    projectService.createProject(project);
+    orientDbService.save(project);
   }
 
   private void commentDeprecatedProperties() {
@@ -310,8 +310,8 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
     this.databaseRegistry = databaseRegistry;
   }
 
-  public void setProjectService(ProjectService projectService) {
-    this.projectService = projectService;
+  public void setOrientDbService(OrientDbService orientDbService) {
+    this.orientDbService = orientDbService;
   }
 
   @SuppressWarnings("UnusedDeclaration")

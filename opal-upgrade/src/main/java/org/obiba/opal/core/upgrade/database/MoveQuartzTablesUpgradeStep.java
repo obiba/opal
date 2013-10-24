@@ -20,9 +20,9 @@ import com.google.common.collect.Lists;
 
 import static org.springframework.util.StringUtils.collectionToDelimitedString;
 
-public class MoveConfigTablesUpgradeStep extends AbstractUpgradeStep {
+public class MoveQuartzTablesUpgradeStep extends AbstractUpgradeStep {
 
-  private static final Logger log = LoggerFactory.getLogger(MoveConfigTablesUpgradeStep.class);
+  private static final Logger log = LoggerFactory.getLogger(MoveQuartzTablesUpgradeStep.class);
 
   private static final String[] TABLES = { "QRTZ_BLOB_TRIGGERS", "QRTZ_CALENDARS", "QRTZ_CRON_TRIGGERS",
       "QRTZ_FIRED_TRIGGERS", "QRTZ_JOB_DETAILS", "QRTZ_JOB_LISTENERS", "QRTZ_PAUSED_TRIGGER_GRPS",

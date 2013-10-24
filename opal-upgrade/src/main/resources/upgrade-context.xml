@@ -24,7 +24,9 @@
   <bean id="sessionFactoryFactory" class="org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory"/>
 
   <bean id="defaultBeanValidator" class="org.obiba.opal.core.service.impl.DefaultBeanValidator"/>
+
   <bean id="orientDbService" class="org.obiba.opal.core.service.impl.OrientDbServiceImpl"/>
+
   <bean id="localOrientDbServerFactory" class="org.obiba.opal.core.service.impl.LocalOrientDbServerFactory"/>
 
   <bean id="databaseRegistry" class="org.obiba.opal.core.runtime.database.DefaultDatabaseRegistry"/>
@@ -35,10 +37,6 @@
     <constructor-arg>
       <bean class="org.obiba.opal.core.cfg.OpalConfigurationIo"/>
     </constructor-arg>
-  </bean>
-
-  <bean id="upgradeUtils" class="org.obiba.opal.core.upgrade.support.UpgradeUtils">
-    <constructor-arg index="0" ref="databaseRegistry"/>
   </bean>
 
   <bean id="opalVersionModifier" class="org.obiba.opal.core.upgrade.support.OpalVersionModifier"/>

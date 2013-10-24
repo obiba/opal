@@ -33,14 +33,6 @@ public class ExtractOpalGeneralConfigToDatabaseUpgradeStep extends AbstractUpgra
 
   private DefaultGeneralConfigService generalConfigService;
 
-  public void setPropertiesFile(File propertiesFile) {
-    this.propertiesFile = propertiesFile;
-  }
-
-  public void setGeneralConfigService(DefaultGeneralConfigService generalConfigService) {
-    this.generalConfigService = generalConfigService;
-  }
-
   @Override
   public void execute(Version currentVersion) {
     extractOpalGeneralConfig();
@@ -91,5 +83,13 @@ public class ExtractOpalGeneralConfigToDatabaseUpgradeStep extends AbstractUpgra
   private void removeAndAddComment(String key, Collection<String> comments, Configuration config) {
     comments.add(key + " = " + config.getProperty(key));
     config.clearProperty(key);
+  }
+
+  public void setPropertiesFile(File propertiesFile) {
+    this.propertiesFile = propertiesFile;
+  }
+
+  public void setGeneralConfigService(DefaultGeneralConfigService generalConfigService) {
+    this.generalConfigService = generalConfigService;
   }
 }
