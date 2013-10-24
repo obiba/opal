@@ -81,11 +81,20 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
 
   @Override
   public void execute(Version currentVersion) {
+    initOrientProjectTable();
     extractOpalDatasource();
     importExtraDatasources();
     deleteJdbcDataSourcesFromConfig();
     deleteHibernateDatasourceFactoryFromConfig();
     commentDeprecatedProperties();
+  }
+
+  /**
+   * Init OrientDB project table here as we cannot inject ProjectService that depend on OpalRuntime...
+   */
+  private void initOrientProjectTable() {
+    orientDbService.registerEntityClass(Project.class);
+    orientDbService.createUniqueStringIndex(Project.class, "name");
   }
 
   private void extractOpalDatasource() {

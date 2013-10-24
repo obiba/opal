@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
+import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.metadata.schema.OType;
+
 @SuppressWarnings("SpringJavaAutowiringInspection")
 public class MoveSubjectAclToOrientDbUpgradeStep extends AbstractUpgradeStep {
 
@@ -26,6 +29,12 @@ public class MoveSubjectAclToOrientDbUpgradeStep extends AbstractUpgradeStep {
 
   @Override
   public void execute(Version currentVersion) {
+    orientDbService.registerEntityClass(SubjectAcl.class);
+    orientDbService.createIndex(SubjectAcl.class, "domain", OClass.INDEX_TYPE.NOTUNIQUE, OType.STRING);
+    orientDbService.createIndex(SubjectAcl.class, "node", OClass.INDEX_TYPE.NOTUNIQUE, OType.STRING);
+    orientDbService.createIndex(SubjectAcl.class, "principal", OClass.INDEX_TYPE.NOTUNIQUE, OType.STRING);
+    orientDbService.createIndex(SubjectAcl.class, "type", OClass.INDEX_TYPE.NOTUNIQUE, OType.STRING);
+
     JdbcTemplate dataJdbcTemplate = new JdbcTemplate(databaseRegistry.getDataSource("opal-data", null));
     List<SubjectAcl> list = dataJdbcTemplate.query("select * from subject_acl", new RowMapper<SubjectAcl>() {
       @Override

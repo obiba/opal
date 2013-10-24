@@ -26,6 +26,10 @@ public class MoveUnitKeyStoreToOrientDbUpgradeStep extends AbstractUpgradeStep {
 
   @Override
   public void execute(Version currentVersion) {
+
+    orientDbService.registerEntityClass(UnitKeyStoreState.class);
+    orientDbService.createUniqueStringIndex(UnitKeyStoreState.class, "unit");
+
     JdbcTemplate dataJdbcTemplate = new JdbcTemplate(databaseRegistry.getDataSource("opal-data", null));
     List<UnitKeyStoreState> states = dataJdbcTemplate
         .query("select * from unit_key_store", new RowMapper<UnitKeyStoreState>() {
