@@ -14,10 +14,13 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CategoryAttributeColumn;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.IconCell;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.InlineLabel;
 
@@ -55,11 +58,19 @@ public class CategoriesTable extends Table<CategoryDto> {
 
     addColumn(new CategoryAttributeColumn("label"), translations.labelLabel());
 
-    addColumn(new TextColumn<CategoryDto>() {
+    Column<CategoryDto, Boolean> missings = new Column<CategoryDto, Boolean>(new IconCell<Boolean>() {
       @Override
-      public String getValue(CategoryDto object) {
-        return object.getIsMissing() ? translations.yesLabel() : translations.noLabel();
+      public IconType getIconType(Boolean value) {
+        //return value ? IconType.CHECK : IconType.CHECK_EMPTY;
+        return value ? IconType.OK : null;
       }
-    }, translations.missingLabel());
+    }) {
+      @Override
+      public Boolean getValue(CategoryDto object) {
+        return object.getIsMissing();
+      }
+    };
+    addColumn(missings, translations.missingLabel());
+    setColumnWidth(missings,"100px");
   }
 }
