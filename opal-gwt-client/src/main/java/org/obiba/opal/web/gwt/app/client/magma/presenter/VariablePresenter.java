@@ -144,6 +144,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
               @Override
               public void onResource(Response response, VariableDto resource) {
                 updateVariableDisplay(resource);
+                updateDerivedVariableDisplay();
                 variableUpdatePending = false;
               }
             }).send();

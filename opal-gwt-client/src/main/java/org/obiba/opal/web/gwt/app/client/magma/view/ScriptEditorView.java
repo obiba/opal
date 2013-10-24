@@ -72,7 +72,7 @@ public class ScriptEditorView extends ViewImpl implements ScriptEditorPresenter.
 
   @Override
   public void setIsRepeatable(boolean value) {
-    repeatable.setEnabled(value);
+    repeatable.setValue(value);
   }
 
   @Override
