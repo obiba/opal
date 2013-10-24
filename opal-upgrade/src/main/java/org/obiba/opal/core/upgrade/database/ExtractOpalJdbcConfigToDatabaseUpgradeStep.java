@@ -131,7 +131,7 @@ public class ExtractOpalJdbcConfigToDatabaseUpgradeStep extends AbstractUpgradeS
     databaseRegistry.addOrReplaceDatabase(database);
 
     String databaseName = database.getName();
-    Project project = new Project.Builder().name(databaseName).title(databaseName).database(databaseName).build();
+    Project project = Project.Builder.create().name(databaseName).title(databaseName).database(databaseName).build();
     orientDbService.save(project);
   }
 

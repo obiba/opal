@@ -120,10 +120,13 @@ public class Project extends AbstractOrientDbTimestampedEntity {
     return Objects.toStringHelper(this).add("name", name).add("database", database).toString();
   }
 
-  @SuppressWarnings("ParameterHidesMemberVariable")
+  @SuppressWarnings({ "ParameterHidesMemberVariable", "UnusedDeclaration" })
   public static class Builder {
 
     private Project project;
+
+    private Builder() {
+    }
 
     public static Builder create(@Nullable Project project) {
       Builder builder = new Builder();
