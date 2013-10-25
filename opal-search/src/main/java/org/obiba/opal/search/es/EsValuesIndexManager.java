@@ -155,10 +155,10 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
       public void onComplete() {
         if(stop) {
           index.delete();
-          //variableStatsService.clearComputingSummaries(getValueTable());
+          variableStatsService.clearComputingSummaries(getValueTable());
         } else {
           sendAndCheck(bulkRequest);
-          //variableStatsService.computeSummaries(getValueTable());
+          variableStatsService.computeSummaries(getValueTable());
           index.updateTimestamps();
         }
       }

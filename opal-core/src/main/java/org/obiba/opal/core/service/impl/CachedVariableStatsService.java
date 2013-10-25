@@ -28,6 +28,9 @@ public class CachedVariableStatsService implements VariableStatsService {
 
   private static final Logger log = LoggerFactory.getLogger(CachedVariableStatsService.class);
 
+  @org.springframework.beans.factory.annotation.Value("${org.obiba.opal.cache.variableSummaries}")
+  private boolean cacheSummaries;
+
   private final CacheManager cacheManager;
 
   private final ContinuousVariableSummaryCachedService continuousSummaryService;
@@ -42,6 +45,8 @@ public class CachedVariableStatsService implements VariableStatsService {
 
   @Override
   public void stackVariable(@Nonnull ValueTable valueTable, @Nonnull Variable variable, @Nonnull Value value) {
+    if(!cacheSummaries) log.debug("Variable summaries cache disabled!");
+
     // skip binary variable
     Preconditions.checkArgument(!BinaryType.get().equals(variable.getValueType()),
         "Cannot compute summary for binary variable " + variable.getName());
@@ -55,6 +60,10 @@ public class CachedVariableStatsService implements VariableStatsService {
 
   @Override
   public void computeSummaries(@Nonnull ValueTable table) {
+    if(!cacheSummaries) {
+      log.info("Variable summaries cache disabled!");
+      return;
+    }
     TimedExecution timedExecution = new TimedExecution().start();
     continuousSummaryService.computeAndCacheSummaries(table);
     categoricalSummaryService.computeAndCacheSummaries(table);
@@ -65,6 +74,7 @@ public class CachedVariableStatsService implements VariableStatsService {
 
   @Override
   public void clearComputingSummaries(@Nonnull ValueTable valueTable) {
+    if(!cacheSummaries) return;
     continuousSummaryService.clearComputingSummaries(valueTable);
     categoricalSummaryService.clearComputingSummaries(valueTable);
   }
