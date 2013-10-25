@@ -11,52 +11,49 @@ package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ScriptEvaluationPopupPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.web.bindery.event.shared.EventBus;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
-import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PopupViewImpl;
+import com.google.web.bindery.event.shared.EventBus;
 
-public class ScriptEvaluationPopupView extends PopupViewImpl implements Display {
+public class ScriptEvaluationPopupView extends ModalPopupViewWithUiHandlers<ModalUiHandlers> implements Display {
 
-  @UiTemplate("ScriptEvaluationPopupView.ui.xml")
   interface ViewUiBinder extends UiBinder<Widget, ScriptEvaluationPopupView> {}
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
-  private static final Translations translations = GWT.create(Translations.class);
+  private static final int MINIMUM_WIDTH = 610;
+
+  private static final int MINIMUM_HEIGHT = 585;
+
+  private final Translations translations;
 
   private final Widget widget;
 
   @UiField
-  DialogBox dialogBox;
+  Modal dialogBox;
 
   @UiField
-  DockLayoutPanel content;
-
-  @UiField
-  Button closeButton;
-
-  @UiField
-  ResizeHandle resizeHandle;
+  FlowPanel evaluation;
 
   @Inject
-  public ScriptEvaluationPopupView(EventBus eventBus) {
+  public ScriptEvaluationPopupView(EventBus eventBus, Translations translations) {
     super(eventBus);
     widget = uiBinder.createAndBindUi(this);
-    dialogBox.setText(translations.scriptEvaluationLabel());
-    resizeHandle.makeResizable(content);
+    this.translations = translations;
+    dialogBox.setTitle(translations.scriptEvaluationLabel());
+    dialogBox.setMinWidth(MINIMUM_WIDTH);
+    dialogBox.setMinHeight(MINIMUM_HEIGHT);
   }
 
   @Override
@@ -64,18 +61,15 @@ public class ScriptEvaluationPopupView extends PopupViewImpl implements Display 
     return widget;
   }
 
-  @Override
-  public HasClickHandlers getButton() {
-    return closeButton;
+  @UiHandler("closeButton")
+  public void onClosedClicked (ClickEvent event) {
+    dialogBox.hide();
   }
 
   @Override
   public void setInSlot(Object slot, IsWidget display) {
     if(slot == Slots.Evaluation) {
-      ScrollPanel scroll = new ScrollPanel();
-      display.asWidget().addStyleName("small-dual-indent");
-      scroll.add(display);
-      content.add(scroll);
+      evaluation.add(display);
     }
   }
 

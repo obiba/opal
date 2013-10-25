@@ -14,35 +14,31 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
+import org.obiba.opal.web.gwt.app.client.magma.derive.helper.DerivedVariableGenerator;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ScriptEditorPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.ScriptEvaluationPopupPresenter;
+import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.BranchingWizardStepController;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController;
-import org.obiba.opal.web.gwt.app.client.magma.derive.helper.DerivedVariableGenerator;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.common.base.Strings;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.View;
 
 import static org.obiba.opal.web.gwt.app.client.support.VariableDtos.ValueType;
 
 public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCustomVariablePresenter.Display> {
 
-  private final ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter;
-
   private final ScriptEditorPresenter scriptEditorPresenter;
 
   @Inject
   public DeriveCustomVariablePresenter(EventBus eventBus, Display view,
-      ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter, ScriptEditorPresenter scriptEditorPresenter) {
+      ScriptEditorPresenter scriptEditorPresenter) {
     super(eventBus, view);
-    this.scriptEvaluationPopupPresenter = scriptEvaluationPopupPresenter;
     this.scriptEditorPresenter = scriptEditorPresenter;
     this.scriptEditorPresenter.setVariableDtoFactory(new DeriveCustomVariableDtoFactory());
   }
@@ -68,11 +64,6 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
       scriptEditorPresenter.setScript("$('" + name + "')");
     }
     scriptEditorPresenter.setTable(originalTable);
-  }
-
-  @Override
-  public void onClose() {
-    scriptEvaluationPopupPresenter.getView().hide();
   }
 
   public class DeriveCustomVariableDtoFactory implements ScriptEditorPresenter.VariableDtoFactory {
