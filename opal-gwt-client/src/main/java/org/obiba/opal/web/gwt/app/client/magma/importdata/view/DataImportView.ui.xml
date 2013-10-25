@@ -14,7 +14,7 @@
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <o:WizardModalBox ui:field="dialog" title="Import Data">
+  <o:WizardModalBox ui:field="dialog" title="Import Data" resizable="true">
     <g:FlowPanel>
       <o:WizardStep ui:field="formatSelectionStep">
         <g:FlowPanel styleName="input">
