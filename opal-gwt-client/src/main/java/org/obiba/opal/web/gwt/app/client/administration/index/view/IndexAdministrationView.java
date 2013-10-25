@@ -126,7 +126,7 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     });
 
     indexTable.addColumn(checkboxColumn, checkboxColumn.getTableListCheckColumnHeader());
-    indexTable.addColumn(Columns.datasource, translations.datasourceLabel());
+    indexTable.addColumn(Columns.datasource, translations.projectLabel());
     indexTable.addColumn(Columns.table, translations.tableLabel());
     indexTable.addColumn(Columns.tableLastUpdate, translations.tableLastUpdateLabel());
     indexTable.addColumn(Columns.indexLastUpdate, translations.indexLastUpdateLabel());
