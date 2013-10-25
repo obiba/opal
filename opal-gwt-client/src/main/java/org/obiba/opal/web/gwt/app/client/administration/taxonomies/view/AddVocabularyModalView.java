@@ -12,8 +12,9 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.TaxonomiesOrVocabulariesModalPanel;
+import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
-import org.obiba.opal.web.model.client.opal.TaxonomyDto.VocabularyDto;
+import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
@@ -98,7 +99,7 @@ public class AddVocabularyModalView extends ModalPopupViewWithUiHandlers<AddVoca
 
   @Override
   public void setEditionMode(boolean edit, JsArray<TaxonomyDto> taxonomiesList, TaxonomyDto taxonomy,
-      TaxonomyDto.VocabularyDto vocabulary) {
+      VocabularyDto vocabulary) {
     editionMode = edit;
     this.taxonomy = taxonomy;
     this.vocabulary = vocabulary;
@@ -134,15 +135,15 @@ public class AddVocabularyModalView extends ModalPopupViewWithUiHandlers<AddVoca
   }
 
   private VocabularyDto setTitleAndDescription(VocabularyDto vocabularyDto) {
-    JsArray<TaxonomyDto.TextDto> titles = JsArrays.create();
-    JsArray<TaxonomyDto.TextDto> descriptions = JsArrays.create();
+    JsArray<LocaleTextDto> titles = JsArrays.create();
+    JsArray<LocaleTextDto> descriptions = JsArrays.create();
 
     for(int i = 0; i < availableLocales.size(); i++) {
       if(!panelList.get(i).getTitleTxt().isEmpty()) {
-        titles.push(asTextDto(panelList.get(i).getTitleTxt(), availableLocales.get(i)));
+        titles.push(asLocaleTextDto(availableLocales.get(i), panelList.get(i).getTitleTxt()));
       }
       if(!panelList.get(i).getDescriptionTxt().isEmpty()) {
-        descriptions.push(asTextDto(panelList.get(i).getDescriptionTxt(), availableLocales.get(i)));
+        descriptions.push(asLocaleTextDto(availableLocales.get(i), panelList.get(i).getDescriptionTxt()));
       }
     }
     vocabularyDto.setTitlesArray(titles);
@@ -150,10 +151,10 @@ public class AddVocabularyModalView extends ModalPopupViewWithUiHandlers<AddVoca
     return vocabularyDto;
   }
 
-  private TaxonomyDto.TextDto asTextDto(String text, String locale) {
-    TaxonomyDto.TextDto dto = TaxonomyDto.TextDto.create();
-    dto.setText(text);
+  private LocaleTextDto asLocaleTextDto(String locale, String text) {
+    LocaleTextDto dto = LocaleTextDto.create();
     dto.setLocale(locale);
+    dto.setText(text);
     return dto;
   }
 
@@ -178,8 +179,8 @@ public class AddVocabularyModalView extends ModalPopupViewWithUiHandlers<AddVoca
       tab.setHeading(locale);
       TaxonomiesOrVocabulariesModalPanel panel = new TaxonomiesOrVocabulariesModalPanel();
       if(editionMode) {
-        String title = getText(vocabulary.getTitlesArray(), locale);
-        String description = getText(vocabulary.getDescriptionsArray(), locale);
+        String title = getText(locale, vocabulary.getTitlesArray());
+        String description = getText(locale, vocabulary.getDescriptionsArray());
         if(title != null) {
           panel.setTitleTxt(title);
         }
@@ -194,7 +195,7 @@ public class AddVocabularyModalView extends ModalPopupViewWithUiHandlers<AddVoca
     modal.add(localesTabs);
   }
 
-  private String getText(JsArray<TaxonomyDto.TextDto> array, String locale) {
+  private String getText(String locale, JsArray<LocaleTextDto> array) {
     for(int i = 0; i < array.length(); i++) {
       if(array.get(i).getLocale().equals(locale)) {
         return array.get(i).getText();

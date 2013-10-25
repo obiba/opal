@@ -20,9 +20,8 @@ import javax.ws.rs.core.Response;
 import org.obiba.opal.core.cfg.TaxonomyService;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.domain.taxonomy.Vocabulary;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.taxonomy.Dtos;
-
-import static org.obiba.opal.web.model.Opal.TaxonomyDto.VocabularyDto;
 
 public class VocabulariesResource {
 
@@ -36,19 +35,19 @@ public class VocabulariesResource {
   }
 
   @GET
-  public List<VocabularyDto> getVocabularies() {
-    List<VocabularyDto> vocabularies = new ArrayList<VocabularyDto>();
-    Taxonomy t = taxonomyService.getTaxonomy(taxonomyName);
-    if(t != null) {
-      for(Vocabulary v : t.getVocabularies()) {
-        vocabularies.add(Dtos.asDto(v));
-      }
+  public List<Opal.VocabularyDto> getVocabularies() {
+    List<Opal.VocabularyDto> vocabularies = new ArrayList<Opal.VocabularyDto>();
+    Taxonomy taxonomy = taxonomyService.getTaxonomy(taxonomyName);
+
+    for(Vocabulary v : taxonomy.getVocabularies()) {
+      vocabularies.add(Dtos.asDto(v, taxonomy.getName()));
     }
+
     return vocabularies;
   }
 
   @POST
-  public Response createVocabulary(VocabularyDto vocabulary) {
+  public Response createVocabulary(Opal.VocabularyDto vocabulary) {
     Taxonomy tax = taxonomyService.getTaxonomy(taxonomyName);
 
     if(tax == null) {

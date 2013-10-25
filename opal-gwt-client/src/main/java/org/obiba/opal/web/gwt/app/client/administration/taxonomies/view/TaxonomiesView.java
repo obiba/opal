@@ -4,6 +4,7 @@ import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.Tax
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomiesUiHandlers;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
+import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.Label;
@@ -19,8 +20,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
-
-import static org.obiba.opal.web.model.client.opal.TaxonomyDto.VocabularyDto;
 
 public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> implements TaxonomiesPresenter.Display {
 
@@ -71,8 +70,9 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
       JsArray<VocabularyDto> vocabularies = JsArrays.toSafeArray(taxonomy.getVocabulariesArray());
       if(vocabularies.length() > 0) {
         FlowPanel vocabulariesPanel = new FlowPanel();
-        for(int i = 0; i < vocabularies.length(); i++)
+        for(int i = 0; i < vocabularies.length(); i++) {
           vocabulariesPanel.add(newVocabularyLink(getUiHandlers(), taxonomy, vocabularies.get(i)));
+        }
         panelTaxonomy.add(vocabulariesPanel);
       }
 
@@ -100,7 +100,7 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
   private Widget newVocabularyLink(final TaxonomiesUiHandlers uiHandlers, final TaxonomyDto taxonomy,
       final VocabularyDto vocabulary) {
     NavLink link = new NavLink(vocabulary.getName());
-    link.setIcon(IconType.TAG);
+//    link.setIcon(IconType.TAG);
     link.addStyleName("small-dual-indent");
     link.addClickHandler(new ClickHandler() {
       @Override

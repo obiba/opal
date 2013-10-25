@@ -79,6 +79,9 @@ public class OpalServer {
   final void boot() {
     if(ctx.isActive()) {
       System.out.println("Opal Server successfully started.");
+
+      //TODO remove these default config data
+      ctx.getBean(TempDefaultConfig.class).createDefaultConfig();
     }
   }
 

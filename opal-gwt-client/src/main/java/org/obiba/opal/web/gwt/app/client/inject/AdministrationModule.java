@@ -52,11 +52,13 @@ import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.Add
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.AddVocabularyModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomiesPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomyPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.VocabularyEditPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.VocabularyPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.AddTaxonomyModalView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.AddVocabularyModalView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomiesView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomyView;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.VocabularyEditView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.VocabularyView;
 import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserPresenter;
@@ -105,6 +107,8 @@ public class AdministrationModule extends AbstractPresenterModule {
         TaxonomyPresenter.Proxy.class);
     bindPresenter(VocabularyPresenter.class, VocabularyPresenter.Display.class, VocabularyView.class,
         VocabularyPresenter.Proxy.class);
+    bindPresenter(VocabularyEditPresenter.class, VocabularyEditPresenter.Display.class, VocabularyEditView.class,
+        VocabularyEditPresenter.Proxy.class);
     bindPresenterWidget(AddVocabularyModalPresenter.class, AddVocabularyModalPresenter.Display.class,
         AddVocabularyModalView.class);
   }
@@ -141,7 +145,8 @@ public class AdministrationModule extends AbstractPresenterModule {
   private void configureDatabases() {
     bindPresenter(DatabaseAdministrationPresenter.class, DatabaseAdministrationPresenter.Display.class,
         DatabaseAdministrationView.class, DatabaseAdministrationPresenter.Proxy.class);
-    bindPresenterWidget(IdentifiersDatabasePresenter.class, IdentifiersDatabasePresenter.Display.class, IdentifiersDatabaseView.class);
+    bindPresenterWidget(IdentifiersDatabasePresenter.class, IdentifiersDatabasePresenter.Display.class,
+        IdentifiersDatabaseView.class);
     bindPresenterWidget(DataDatabasesPresenter.class, DataDatabasesPresenter.Display.class, DataDatabasesView.class);
     bindPresenterWidget(SqlDatabasePresenter.class, SqlDatabasePresenter.Display.class, SqlDatabaseView.class);
     bindPresenterWidget(MongoDatabasePresenter.class, MongoDatabasePresenter.Display.class, MongoDatabaseView.class);

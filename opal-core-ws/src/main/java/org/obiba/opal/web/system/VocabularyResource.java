@@ -12,13 +12,17 @@ package org.obiba.opal.web.system;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.core.Response;
 
+import org.obiba.opal.core.cfg.NoSuchTaxonomyException;
+import org.obiba.opal.core.cfg.NoSuchVocabularyException;
 import org.obiba.opal.core.cfg.TaxonomyService;
-import org.obiba.opal.core.domain.taxonomy.HasTerms;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.domain.taxonomy.Term;
 import org.obiba.opal.core.domain.taxonomy.Vocabulary;
+import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.taxonomy.Dtos;
 
 public class VocabularyResource {
 
@@ -37,22 +41,22 @@ public class VocabularyResource {
   @SuppressWarnings("ConstantConditions")
   @POST
   @Consumes(value = "text/plain")
-  public Response addVocabularyTerms(String input) {
-    Taxonomy tax = taxonomyService.getTaxonomy(taxonomyName);
+  public Response addVocabularyTerms(String csv) {
+    Taxonomy taxonomy = taxonomyService.getTaxonomy(taxonomyName);
 
-    if(tax == null) {
+    if(taxonomy == null) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
 
-    Vocabulary voc = tax.getVocabulary(vocabularyName);
-    if(voc == null) {
+    Vocabulary vocabulary = taxonomy.getVocabulary(vocabularyName);
+    if(vocabulary == null) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
 
-    voc.getTerms().clear();
+    vocabulary.getTerms().clear();
 
-    // Parse input and add terms
-    String[] lines = input.split("\n");
+    // Parse csv and add terms
+    String[] lines = csv.split("\n");
     Term t = null;
     for(String line : lines) {
       String[] terms = line.split(",");
@@ -60,16 +64,16 @@ public class VocabularyResource {
 
       if(level == 0) {
         if(t != null) {
-          voc.add(t);
+          vocabulary.add(t);
         }
 
         t = new Term(terms[0].replaceAll("\"", ""));
       } else {
-        HasTerms parent = t;
+        Term parent = t;
 
         for(int i = 1; i < level; i++) {
           // find parent
-          parent = parent.getTerms().get(parent.getTerms().size() - 1);
+          parent = (Term) parent.getTerms().get(parent.getTerms().size() - 1);
         }
 
         // Add new term
@@ -77,8 +81,24 @@ public class VocabularyResource {
       }
     }
 
-    tax.add(voc);
-    taxonomyService.addOrReplaceTaxonomy(tax);
+//    tax.getVocabularies().add(voc);
+    taxonomyService.saveTaxonomy(taxonomy);
+
+    return Response.ok().build();
+  }
+
+  @PUT
+  public Response saveVocabulary(Opal.VocabularyDto dto) {
+
+    try {
+
+      Vocabulary vocabulary = taxonomyService.getVocabulary(taxonomyName, vocabularyName);
+      taxonomyService.saveVocabulary(taxonomyName, vocabularyName, Dtos.fromDto(vocabulary, dto));
+    } catch(NoSuchTaxonomyException e) {
+      return Response.status(Response.Status.NOT_FOUND).build();
+    } catch(NoSuchVocabularyException e) {
+      return Response.status(Response.Status.NOT_FOUND).build();
+    }
 
     return Response.ok().build();
   }

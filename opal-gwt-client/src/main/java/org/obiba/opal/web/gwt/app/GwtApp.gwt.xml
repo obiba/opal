@@ -92,6 +92,9 @@
 
   <inherits name="org.obiba.opal.web.gwt.validation.Validation"/>
 
+  <!-- GWT Drag-n-Drop -->
+  <inherits name='com.allen_sauer.gwt.dnd.gwt-dnd'/>
+
   <extend-property name='locale' values='fr'/>
   <extend-property name='locale' values='en'/>
   <set-property-fallback name='locale' value='en'/>

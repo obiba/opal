@@ -11,6 +11,7 @@ import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
+import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
@@ -101,9 +102,10 @@ public class TaxonomiesPresenter extends Presenter<TaxonomiesPresenter.Display, 
   }
 
   @Override
-  public void onVocabularySelection(TaxonomyDto taxonomyDto, TaxonomyDto.VocabularyDto vocabularyDto) {
+  public void onVocabularySelection(TaxonomyDto taxonomyDto, VocabularyDto vocabularyDto) {
     PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.VOCABULARY)
-        .with(ParameterTokens.TOKEN_NAME, taxonomyDto.getName() + "/" + vocabularyDto.getName()).build();
+        .with(TaxonomyTokens.TOKEN_TAXONOMY, taxonomyDto.getName())
+        .with(TaxonomyTokens.TOKEN_VOCABULARY, vocabularyDto.getName()).build();
     placeManager.revealPlace(request);
   }
 

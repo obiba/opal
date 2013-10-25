@@ -4,9 +4,9 @@ import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.Tax
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomyUiHandlers;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.LocalizedLabel;
+import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
-import org.obiba.opal.web.model.client.opal.TaxonomyDto.TextDto;
-import org.obiba.opal.web.model.client.opal.TaxonomyDto.VocabularyDto;
+import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.Heading;
@@ -87,7 +87,7 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
     setTitleOrDescription(taxonomy.getTitlesArray(), titlePanel);
     setTitleOrDescription(taxonomy.getDescriptionsArray(), descriptionPanel);
 
-    JsArray<TaxonomyDto.VocabularyDto> vocabularies = JsArrays.toSafeArray(taxonomy.getVocabulariesArray());
+    JsArray<VocabularyDto> vocabularies = JsArrays.toSafeArray(taxonomy.getVocabulariesArray());
     if(vocabularies.length() > 0) {
       NavPills pills = new NavPills();
       for(int i = 0; i < vocabularies.length(); i++)
@@ -96,8 +96,8 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
     }
   }
 
-  private void setTitleOrDescription(JsArray<TextDto> array, FlowPanel panel) {
-    for(TaxonomyDto.TextDto text : JsArrays.toIterable(array)) {
+  private void setTitleOrDescription(JsArray<LocaleTextDto> array, FlowPanel panel) {
+    for(LocaleTextDto text : JsArrays.toIterable(array)) {
       LocalizedLabel label = new LocalizedLabel();
       label.setLocale(text.getLocale());
       label.setText(text.getText());
