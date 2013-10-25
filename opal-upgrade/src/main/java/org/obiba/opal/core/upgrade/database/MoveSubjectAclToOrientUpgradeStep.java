@@ -17,9 +17,7 @@ import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 
 @SuppressWarnings("SpringJavaAutowiringInspection")
-public class MoveSubjectAclToOrientDbUpgradeStep extends AbstractUpgradeStep {
-
-//  private static final Logger log = LoggerFactory.getLogger(MoveConfigTablesToOrientDbUpgradeStep.class);
+public class MoveSubjectAclToOrientUpgradeStep extends AbstractUpgradeStep {
 
   @Autowired
   private DatabaseRegistry databaseRegistry;

@@ -57,8 +57,8 @@
       <list>
 
         <!-- 2.0.0 / import database config from XML to OrientDB -->
-        <bean class="org.obiba.opal.core.upgrade.database.ExtractOpalJdbcConfigToDatabaseUpgradeStep">
-          <property name="description" value="Extract database config from properties file to OrientDB"/>
+        <bean class="org.obiba.opal.core.upgrade.database.MoveDatasourcesToOrientUpgradeStep">
+          <property name="description" value="Move database config from properties file to OrientDB"/>
           <property name="appliesTo" value="2.0.0"/>
           <property name="configFile" value="file:${OPAL_HOME}/conf/opal-config.xml"/>
           <property name="propertiesFile" value="file:${OPAL_HOME}/conf/opal-config.properties"/>
@@ -84,7 +84,7 @@
         </bean>
 
         <!-- 2.0.0 / import general config to OrientDB -->
-        <bean class="org.obiba.opal.core.upgrade.database.ExtractOpalGeneralConfigToDatabaseUpgradeStep">
+        <bean class="org.obiba.opal.core.upgrade.database.MoveGeneralConfigToOrientUpgradeStep">
           <property name="description" value="Extract general config from properties file to Opal config database"/>
           <property name="appliesTo" value="2.0.0"/>
           <property name="propertiesFile" value="file:${OPAL_HOME}/conf/opal-config.properties"/>
@@ -92,19 +92,19 @@
         </bean>
 
         <!-- 2.0.0 / move Unit Key Store to OrientDB -->
-        <bean class="org.obiba.opal.core.upgrade.database.MoveUnitKeyStoreToOrientDbUpgradeStep">
+        <bean class="org.obiba.opal.core.upgrade.database.MoveUnitKeyStoreToOrientUpgradeStep">
           <property name="description" value="Move Unit Key Store to OrientDB"/>
           <property name="appliesTo" value="2.0.0"/>
         </bean>
 
         <!-- 2.0.0 / move Subject ACL to OrientDB -->
-        <bean class="org.obiba.opal.core.upgrade.database.MoveSubjectAclToOrientDbUpgradeStep">
+        <bean class="org.obiba.opal.core.upgrade.database.MoveSubjectAclToOrientUpgradeStep">
           <property name="description" value="Move Subject ACL to OrientDB"/>
           <property name="appliesTo" value="2.0.0"/>
         </bean>
 
         <!-- 2.0.0 / move version from table to opal-config.xml -->
-        <bean class="org.obiba.opal.core.upgrade.database.MoveVersionToOpalConfigurationUpgradeStep"/>
+        <bean class="org.obiba.opal.core.upgrade.database.CopyVersionToOpalConfigurationUpgradeStep"/>
 
         <!-- 2.0.0 / update Opal Configuration -->
         <bean class="org.obiba.opal.core.upgrade.database.UpdateOpalConfigurationFlagUpgradeStep"/>

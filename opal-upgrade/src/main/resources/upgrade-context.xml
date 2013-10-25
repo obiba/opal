@@ -92,6 +92,12 @@
           <property name="appliesTo" value="1.14.6"/>
         </bean>
 
+        <!-- 2.0.0 / drop version table from legacy opal-data database -->
+        <bean class="org.obiba.opal.core.upgrade.database.DropVersionTableUpgradeStep">
+          <property name="description" value="Drop version table from legacy opal-data database"/>
+          <property name="appliesTo" value="2.0.0"/>
+        </bean>
+
       </list>
     </property>
 

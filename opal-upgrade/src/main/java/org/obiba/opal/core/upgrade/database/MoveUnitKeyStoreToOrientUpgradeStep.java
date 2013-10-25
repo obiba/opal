@@ -14,9 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
 @SuppressWarnings("SpringJavaAutowiringInspection")
-public class MoveUnitKeyStoreToOrientDbUpgradeStep extends AbstractUpgradeStep {
-
-//  private static final Logger log = LoggerFactory.getLogger(MoveConfigTablesToOrientDbUpgradeStep.class);
+public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
 
   @Autowired
   private DatabaseRegistry databaseRegistry;

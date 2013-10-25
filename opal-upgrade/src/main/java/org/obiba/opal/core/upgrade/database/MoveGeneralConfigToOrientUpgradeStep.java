@@ -21,9 +21,9 @@ import org.springframework.util.StringUtils;
 
 import com.google.common.collect.Lists;
 
-public class ExtractOpalGeneralConfigToDatabaseUpgradeStep extends AbstractUpgradeStep {
+public class MoveGeneralConfigToOrientUpgradeStep extends AbstractUpgradeStep {
 
-  private static final Logger log = LoggerFactory.getLogger(ExtractOpalGeneralConfigToDatabaseUpgradeStep.class);
+  private static final Logger log = LoggerFactory.getLogger(MoveGeneralConfigToOrientUpgradeStep.class);
 
   private static final String OPAL_CHARSET = "org.obiba.opal.charset.default";
 
