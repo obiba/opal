@@ -17,8 +17,14 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-      <b:SimplePager ui:field="commitInfoTablePager" location="CENTER" addStyleNames="pull-right"/>
-      <o:Table ui:field="commitInfoTable" addStyleNames="small-top-margin"/>
+
+    <g:FlowPanel addStyleNames="top-margin">
+      <b:Heading size="4" addStyleNames="inline-block">
+        <ui:msg description="History of Changes label">History of Changes</ui:msg>
+      </b:Heading>
+      <b:SimplePager ui:field="commitInfoTablePager" location="RIGHT" addStyleNames="pull-right"/>
+    </g:FlowPanel>
+    <o:Table ui:field="commitInfoTable" width="100%"/>
   </g:FlowPanel>
 
 </ui:UiBinder>

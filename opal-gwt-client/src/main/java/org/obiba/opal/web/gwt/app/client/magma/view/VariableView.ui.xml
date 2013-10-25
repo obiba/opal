@@ -196,9 +196,6 @@
           </g:FlowPanel>
 
           <g:FlowPanel>
-            <b:Heading size="4">
-              <ui:msg description="History of Changes label">History of Changes</ui:msg>
-            </b:Heading>
             <g:FlowPanel ui:field="historyPanel">
             </g:FlowPanel>
           </g:FlowPanel>

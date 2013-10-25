@@ -15,6 +15,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.derive.helper.VariableDuplicationHelper;
@@ -31,6 +32,7 @@ import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CategoriesEdit
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.PropertiesEditorModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -47,8 +49,10 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
 import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -57,6 +61,9 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+
+import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
+import static com.google.gwt.http.client.Response.SC_OK;
 
 public class VariablePresenter extends PresenterWidget<VariablePresenter.Display>
     implements VariableUiHandlers, VariableSelectionChangeEvent.Handler {
@@ -105,6 +112,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   @Override
   public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
+    resetView();
+
     if(event.hasTable()) {
       updateDisplay(event.getTable(), event.getSelection(), event.getPrevious(), event.getNext());
     } else {
@@ -178,9 +187,6 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
         .withCallback(new ResourceCallback<VariableDto>() {
           @Override
           public void onResource(Response response, VariableDto resource) {
-//            if(resource != null) {
-//              updateDisplay(resource, previous, next);
-//            }
             variableUpdatePending = false;
           }
         }).send();
@@ -316,15 +322,28 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     VariableDtos.setScript(newVariable, scriptEditorPresenter.getScript());
     newVariable.setValueType(scriptEditorPresenter.getValueEntityType().getLabel());
     newVariable.setIsRepeatable(scriptEditorPresenter.isRepeatable());
-    UpdateVariableCallbackHandler updateVariableCallbackHandler = new UpdateVariableCallbackHandler(newVariable);
 
-    String uri = UriBuilder.create().segment("datasource", "{}", "view", "{}", "variable", "{}").query("comment", getView().getComment())
-        .build(table.getDatasourceName(), table.getName(), variable.getName());
+    compileScript(newVariable);
+  }
 
-    ResourceRequestBuilderFactory.newBuilder().forResource(uri).put()
-        .withResourceBody(VariableDto.stringify(newVariable))
-        .withCallback(Response.SC_OK, updateVariableCallbackHandler)
-        .withCallback(Response.SC_BAD_REQUEST, updateVariableCallbackHandler).send();
+  private void compileScript(final VariableDto newVariable) {
+    UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName(), "table", table.getName())
+        .query("counts", "false");
+    ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build()).get()
+        .withCallback(new ResourceCallback<TableDto>() {
+          @Override
+          public void onResource(Response response, TableDto resource) {
+            String script = VariableDtos.getScript(newVariable);
+            String uri = resource.getViewLink() + "/from/variable/_transient/_compile?valueType=" +
+                newVariable.getValueType() + "&repeatable=" + newVariable.getIsRepeatable();
+            ResourceRequestBuilderFactory.newBuilder().forResource(uri) //
+                .post() //
+                .withFormBody("script", script) //
+                .withCallback(new ScriptEvaluationCallback(newVariable), SC_BAD_REQUEST, SC_OK) //
+                .send();
+
+          }
+        }).send();
   }
 
   @Override
@@ -381,7 +400,12 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     PropertiesEditorModalPresenter propertiesEditorPresenter = propertiesEditorModalProvider.get();
     propertiesEditorPresenter.initialize(variable, table);
   }
-//
+
+  private void resetView() {
+    getView().backToViewScript();
+  }
+
+  //
   // Interfaces and classes
   //
 
@@ -410,6 +434,37 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     }
   }
 
+  private final class ScriptEvaluationCallback implements ResponseCodeCallback {
+
+    private final VariableDto newVariable;
+
+    /**
+     * @param newVariable
+     */
+    private ScriptEvaluationCallback(VariableDto newVariable) {
+      this.newVariable = newVariable;
+    }
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      if(response.getStatusCode() == SC_OK) {
+        UpdateVariableCallbackHandler updateVariableCallbackHandler = new UpdateVariableCallbackHandler(newVariable);
+
+        String uri = UriBuilder.create().segment("datasource", "{}", "view", "{}", "variable", "{}").query("comment", getView().getComment())
+            .build(table.getDatasourceName(), table.getName(), variable.getName());
+
+        ResourceRequestBuilderFactory.newBuilder().forResource(uri).put()
+            .withResourceBody(VariableDto.stringify(newVariable))
+            .withCallback(Response.SC_OK, updateVariableCallbackHandler)
+            .withCallback(Response.SC_BAD_REQUEST, updateVariableCallbackHandler).send();
+      } else {
+        NotificationEvent notificationEvent = new JSErrorNotificationEventBuilder()
+            .build((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
+        getEventBus().fireEvent(notificationEvent);
+      }
+    }
+  }
+
   private class UpdateVariableCallbackHandler implements ResponseCodeCallback {
 
     private final VariableDto variable;
@@ -421,7 +476,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     @Override
     public void onResponseCode(Request request, Response response) {
       switch(response.getStatusCode()) {
-        case Response.SC_OK:
+        case SC_OK:
           variableUpdatePending = false;
           getEventBus().fireEvent(new VariableRefreshEvent());
           getView().backToViewScript();
