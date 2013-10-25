@@ -112,28 +112,13 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
 
   @Override
   public void initCharts() {
-    memHeapChart = new MonitoringChartFactory();
-    memHeapChart.createAreaSplineChart(translations.jvmMap().get("MEM_HEAP"), translations.jvmMap().get("MEGABYTES"),
-        new String[] { translations.jvmMap().get("COMMITTED"), translations.jvmMap().get("USED") }, DURATION);
-    memHeapChartColumn.clear();
-    memHeapChart.getChart().setHeight(HEIGHT);
-    memHeapChartColumn.add(memHeapChart.getChart());
+    initMemHeapChart();
+    initMemeNonHeapChart();
+    initThreadsCountChart();
+    initGcChart();
+  }
 
-    memNonHeapChart = new MonitoringChartFactory();
-    memNonHeapChart
-        .createAreaSplineChart(translations.jvmMap().get("MEM_NON_HEAP"), translations.jvmMap().get("MEGABYTES"),
-            new String[] { translations.jvmMap().get("COMMITTED"), translations.jvmMap().get("USED") }, DURATION);
-    memNonHeapChartColumn.clear();
-    memNonHeapChart.getChart().setHeight(HEIGHT);
-    memNonHeapChartColumn.add(memNonHeapChart.getChart());
-
-    threadsChart = new MonitoringChartFactory();
-    threadsChart.createSplineChart(translations.jvmMap().get("THREADS"), translations.jvmMap().get("COUNT"),
-        new String[] { translations.jvmMap().get("PEAK"), translations.jvmMap().get("CURRENT") }, DURATION);
-    threadsChartColumn.clear();
-    threadsChart.getChart().setHeight(HEIGHT);
-    threadsChartColumn.add(threadsChart.getChart());
-
+  private void initGcChart() {
     gcChart = new MonitoringChartFactory();
     gcChart.createSplineChart(translations.jvmMap().get("GC_DELTA"), translations.jvmMap().get("DELTA"),
         translations.jvmMap().get("TIME_MS"),
@@ -142,6 +127,34 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
     gcChart.getChart().getYAxis(0).setMin(0);
     gcChartColumn.clear();
     gcChartColumn.add(gcChart.getChart());
+  }
+
+  private void initThreadsCountChart() {
+    threadsChart = new MonitoringChartFactory();
+    threadsChart.createSplineChart(translations.jvmMap().get("THREADS"), translations.jvmMap().get("COUNT"),
+        new String[] { translations.jvmMap().get("PEAK"), translations.jvmMap().get("CURRENT") }, DURATION);
+    threadsChartColumn.clear();
+    threadsChart.getChart().setHeight(HEIGHT);
+    threadsChartColumn.add(threadsChart.getChart());
+  }
+
+  private void initMemeNonHeapChart() {
+    memNonHeapChart = new MonitoringChartFactory();
+    memNonHeapChart
+        .createAreaSplineChart(translations.jvmMap().get("MEM_NON_HEAP"), translations.jvmMap().get("MEGABYTES"),
+            new String[] { translations.jvmMap().get("COMMITTED"), translations.jvmMap().get("USED") }, DURATION);
+    memNonHeapChartColumn.clear();
+    memNonHeapChart.getChart().setHeight(HEIGHT);
+    memNonHeapChartColumn.add(memNonHeapChart.getChart());
+  }
+
+  private void initMemHeapChart() {
+    memHeapChart = new MonitoringChartFactory();
+    memHeapChart.createAreaSplineChart(translations.jvmMap().get("MEM_HEAP"), translations.jvmMap().get("MEGABYTES"),
+        new String[] { translations.jvmMap().get("COMMITTED"), translations.jvmMap().get("USED") }, DURATION);
+    memHeapChartColumn.clear();
+    memHeapChart.getChart().setHeight(HEIGHT);
+    memHeapChartColumn.add(memHeapChart.getChart());
   }
 
   @Override
@@ -166,23 +179,15 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
     threadsChart.updateChart(0, timestamp, status.getThreads().getPeak());
     threadsChart.updateChart(1, timestamp, status.getThreads().getCount());
 
-    // Garbage collectors
-    JsArray<OpalStatus.GarbageCollectorUsage> gcs = JsArrays.toSafeArray(status.getGcsArray());
-    if(gcCountMemento == null) {
-      gcCountMemento = 0;
-      // get the initial gc count
-      for(int i = 0; i < gcs.length(); i++) {
-        gcCountMemento += Double.valueOf(gcs.get(i).getCollectionCount()).intValue();
-      }
-    }
+    updateGcChart(status, timestamp);
 
-    if(gcTimeMemento == null) {
-      gcTimeMemento = 0d;
-      // get the initial gc count
-      for(int i = 0; i < gcs.length(); i++) {
-        gcTimeMemento += gcs.get(i).getCollectionTime();
-      }
-    }
+  }
+
+  private void updateGcChart(OpalStatus status, double timestamp) {// Garbage collectors
+    JsArray<OpalStatus.GarbageCollectorUsage> gcs = JsArrays.toSafeArray(status.getGcsArray());
+
+    initGcCountMemento(gcs);
+    initGcTimeMemento(gcs);
 
     // Count the number of GC
     int gcCount = 0;
@@ -196,5 +201,25 @@ public class JVMView extends ViewImpl implements JVMPresenter.Display {
     gcChart.updateChart(1, 1, timestamp, gcCount - gcCountMemento == 0 ? 0 : gcTotalTime - gcTimeMemento);
     gcCountMemento = gcCount;
     gcTimeMemento = gcTotalTime;
+  }
+
+  private void initGcTimeMemento(JsArray<OpalStatus.GarbageCollectorUsage> gcs) {
+    if(gcTimeMemento == null) {
+      gcTimeMemento = 0d;
+      // get the initial gc count
+      for(int i = 0; i < gcs.length(); i++) {
+        gcTimeMemento += gcs.get(i).getCollectionTime();
+      }
+    }
+  }
+
+  private void initGcCountMemento(JsArray<OpalStatus.GarbageCollectorUsage> gcs) {
+    if(gcCountMemento == null) {
+      gcCountMemento = 0;
+      // get the initial gc count
+      for(int i = 0; i < gcs.length(); i++) {
+        gcCountMemento += Double.valueOf(gcs.get(i).getCollectionCount()).intValue();
+      }
+    }
   }
 }
