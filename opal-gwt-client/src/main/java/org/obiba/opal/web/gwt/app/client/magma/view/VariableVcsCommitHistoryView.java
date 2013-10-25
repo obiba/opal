@@ -121,7 +121,7 @@ public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<VariableVcs
 
       @Override
       public String[] getActions(VcsCommitInfoDto value) {
-        return value.getIsHead() ? getHeadOnlyActions() : allActions();
+        return value.getIsCurrent() ? getHeadOnlyActions() : allActions();
       }
 
       private String[] getHeadOnlyActions() {

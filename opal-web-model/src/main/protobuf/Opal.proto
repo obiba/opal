@@ -331,5 +331,6 @@ message VcsCommitInfoDto {
   required string commitId = 4;
   repeated string diffEntries = 5;
   optional string blob = 6;
-  optional bool isHead = 7 [default = false];
+  optional bool isHead = 7 [default = false]; // head of the commit tree
+  optional bool isCurrent = 8 [default = false]; // current (latest) commit for a given path
 }

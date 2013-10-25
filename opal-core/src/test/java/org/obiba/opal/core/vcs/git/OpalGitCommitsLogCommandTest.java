@@ -18,6 +18,7 @@ import org.obiba.opal.core.vcs.OpalGitException;
 import org.obiba.opal.core.vcs.git.commands.OpalGitCommitsLogCommand;
 import org.obiba.opal.core.vcs.git.support.TestOpalGitVersionControlSystem;
 
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
@@ -105,6 +106,48 @@ public class OpalGitCommitsLogCommandTest {
     } catch(Exception e) {
       Assert.fail();
     }
+  }
+
+  @Test
+  public void testHeadAndCurrentCommitFlags() {
+    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
+        .addDatasourceName(DATASOURCE_NAME).addPath("TestView/TOTO_VAR.js").build();
+
+    List<CommitInfo> commitInfos = command.execute();
+    assertThat(commitInfos, not(is(nullValue())));
+    assertThat(commitInfos.size(), not(is(0)));
+    CommitInfo firstCommit = commitInfos.get(0);
+    assertThat(firstCommit.getCommitId(), not(is(nullValue())));
+    assertThat(firstCommit.getIsHead(), is(true));
+    assertThat(firstCommit.getIsCurrent(), is(true));
+  }
+
+  @Test
+  public void testNotHeadAndCurrentCommitFlagsForVariable() {
+    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
+        .addDatasourceName(DATASOURCE_NAME).addPath("TestView/PLACE_NAME.js").build();
+
+    List<CommitInfo> commitInfos = command.execute();
+    assertThat(commitInfos, not(is(nullValue())));
+    assertThat(commitInfos.size(), not(is(0)));
+    CommitInfo firstCommit = commitInfos.get(0);
+    assertThat(firstCommit.getCommitId(), not(is(nullValue())));
+    assertThat(firstCommit.getIsHead(), is(false));
+    assertThat(firstCommit.getIsCurrent(), is(true));
+  }
+
+  @Test
+  public void testNotHeadNotCurrentCommitFlagsForView() {
+    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
+        .addDatasourceName(DATASOURCE_NAME).addPath("TestView").build();
+
+    List<CommitInfo> commitInfos = command.execute();
+    assertThat(commitInfos, not(is(nullValue())));
+    assertThat(commitInfos.size(),  greaterThan((5)));
+    CommitInfo firstCommit = commitInfos.get(5);
+    assertThat(firstCommit.getCommitId(), not(is(nullValue())));
+    assertThat(firstCommit.getIsHead(), is(false));
+    assertThat(firstCommit.getIsCurrent(), is(false));
   }
 
 }

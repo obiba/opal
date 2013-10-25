@@ -35,7 +35,7 @@ public final class Dtos {
   public static Opal.VcsCommitInfoDto asDto(CommitInfo commitInfo) {
     Opal.VcsCommitInfoDto.Builder commitInfoDtoBuilder = Opal.VcsCommitInfoDto.newBuilder()
         .setAuthor(commitInfo.getAuthor()).setDate(commitInfo.getDateAsIso8601()).setCommitId(commitInfo.getCommitId())
-        .setComment(commitInfo.getComment()).setIsHead(commitInfo.getIsHead());
+        .setComment(commitInfo.getComment()).setIsHead(commitInfo.getIsHead()).setIsCurrent(commitInfo.getIsCurrent());
 
     List<String> diffEntries = commitInfo.getDiffEntries();
 

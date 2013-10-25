@@ -31,6 +31,8 @@ public class CommitInfo {
 
   private boolean isHead = false;
 
+  private boolean isCurrent = false;
+
   public String getAuthor() {
     return author;
   }
@@ -66,6 +68,10 @@ public class CommitInfo {
     return isHead;
   }
 
+  public boolean getIsCurrent() {
+    return isCurrent;
+  }
+
   public String toString() {
     return String.format("CommitInfo Id: %s, Author: %s, Date: %s\n%s", commitId, author, date, comment);
   }
@@ -84,6 +90,8 @@ public class CommitInfo {
     private String blob;
 
     private boolean isHead = false;
+
+    private boolean isCurrent = false;
 
     public static Builder createFromObject(CommitInfo commitInfo) {
       return new Builder().setAuthor(commitInfo.author).setComment(commitInfo.comment).setCommitId(commitInfo.commitId)
@@ -125,6 +133,11 @@ public class CommitInfo {
       return this;
     }
 
+    public Builder setIsCurrent(boolean value) {
+      isCurrent = value;
+      return this;
+    }
+
     public CommitInfo build() {
       CommitInfo commitInfo = new CommitInfo();
       commitInfo.author = author;
@@ -134,6 +147,7 @@ public class CommitInfo {
       commitInfo.diffEntries = diffEntries;
       commitInfo.blob = blob;
       commitInfo.isHead = isHead;
+      commitInfo.isCurrent = isCurrent;
 
       return commitInfo;
     }

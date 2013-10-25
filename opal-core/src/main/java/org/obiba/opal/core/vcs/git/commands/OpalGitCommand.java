@@ -42,20 +42,6 @@ public abstract class OpalGitCommand<T> implements Command<T> {
     this.datasourceName = datasourceName;
   }
 
-  public boolean isHead(String commitId) throws IOException {
-    if (OpalGitUtils.HEAD_COMMIT_ID.equals(commitId)) {
-      return true;
-    }
-
-    ObjectId id = repository.resolve(OpalGitUtils.HEAD_COMMIT_ID);
-
-    if(id != null) {
-      return id.getName().equals(commitId);
-    }
-
-    return false;
-  }
-
   protected RevCommit getCommitById(String commitId) throws IOException {
     ObjectId id = repository.resolve(commitId);
 
@@ -64,6 +50,19 @@ public abstract class OpalGitCommand<T> implements Command<T> {
     }
 
     return null;
+  }
+
+  public boolean isHead(String commitId) throws IOException {
+    return OpalGitUtils.HEAD_COMMIT_ID.equals(commitId) ? true : getHeadCommitId().equals(commitId);
+  }
+
+  protected ObjectId getHeadCommit() throws IOException {
+    return repository.resolve(OpalGitUtils.HEAD_COMMIT_ID);
+  }
+
+  protected String getHeadCommitId() throws IOException {
+    ObjectId id = getHeadCommit();
+    return id != null ? id.getName() : "";
   }
 
   /**
