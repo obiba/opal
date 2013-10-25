@@ -69,7 +69,8 @@ public class DefaultCommandJobServiceTest {
     Command<?> cmd = createMock(Command.class);
     cmd.setShell((OpalShell) EasyMock.anyObject());
     expectLastCall().once();
-    commandJob = new CommandJob(cmd);
+    //expect(cmd.getName()).andReturn("").anyTimes();
+    commandJob = new CommandJob("",cmd);
 
     mockSubject = createMock(Subject.class);
 
@@ -400,7 +401,7 @@ public class DefaultCommandJobServiceTest {
     cmd.setShell((OpalShell) EasyMock.anyObject());
     expectLastCall().once();
 
-    CommandJob aCommandJob = new CommandJob(cmd);
+    CommandJob aCommandJob = new CommandJob("foo",cmd);
     aCommandJob.setId(id);
     aCommandJob.setSubmitTime(submitTime);
     aCommandJob.setStatus(status);

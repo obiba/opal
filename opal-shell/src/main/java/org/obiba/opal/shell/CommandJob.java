@@ -21,6 +21,8 @@ import org.obiba.opal.web.model.Commands.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
+
 /**
  * Contains a command and the state of its execution.
  */
@@ -37,6 +39,8 @@ public class CommandJob implements OpalShell, Runnable {
   //
   // Instance Variables
   //
+
+  private final String name;
 
   private final Command<?> command;
 
@@ -61,7 +65,12 @@ public class CommandJob implements OpalShell, Runnable {
   //
 
   public CommandJob(Command<?> command) {
+    this(command.getName(), command);
+  }
+
+  public CommandJob(String name, Command<?> command) {
     if(command == null) throw new IllegalArgumentException("command cannot be null");
+    this.name = name;
     this.command = command;
     this.command.setShell(this);
     messages = new ArrayList<Message>();
@@ -144,6 +153,10 @@ public class CommandJob implements OpalShell, Runnable {
 
   public void setId(Integer id) {
     this.id = id;
+  }
+
+  public String getName() {
+    return name;
   }
 
   public Command<?> getCommand() {

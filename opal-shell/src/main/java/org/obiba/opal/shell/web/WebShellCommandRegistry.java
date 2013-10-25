@@ -30,6 +30,7 @@ public class WebShellCommandRegistry extends AbstractCommandRegistry {
 
     addAvailableCommand(ImportCommand.class, ImportCommandOptions.class);
     addAvailableCommand(CopyCommand.class, CopyCommandOptions.class);
+    addAvailableCommand("export", CopyCommand.class, CopyCommandOptions.class);
     addAvailableCommand(ReportCommand.class, ReportCommandOptions.class);
   }
 }

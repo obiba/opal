@@ -96,21 +96,13 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   @POST
   @Path("/_copy")
   public Response copyData(Commands.CopyCommandOptionsDto options) {
-    for(String table : options.getTablesList()) {
-      ensureTableValuesAccess(table);
-    }
+    return launchCopyCommand("copy",options);
+  }
 
-    if(options.hasDestination()) {
-      ensureDatasourceWriteAccess(options.getDestination());
-    } else if(options.hasOut()) {
-      ensureFileWriteAccess(options.getOut());
-    }
-
-    CopyCommandOptions copyOptions = new CopyCommandOptionsDtoImpl(opalRuntime, options);
-    Command<CopyCommandOptions> copyCommand = commandRegistry.newCommand("copy");
-    copyCommand.setOptions(copyOptions);
-
-    return launchCommand(copyCommand);
+  @POST
+  @Path("/_export")
+  public Response exportData(Commands.CopyCommandOptionsDto options) {
+    return launchCopyCommand("export",options);
   }
 
   @POST
@@ -126,10 +118,28 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   }
 
   @Override
-  protected CommandJob newCommandJob(Command<?> command) {
-    CommandJob job = super.newCommandJob(command);
-    job.setProject(name);
+  protected CommandJob newCommandJob(String name, Command<?> command) {
+    CommandJob job = super.newCommandJob(name, command);
+    job.setProject(this.name);
     return job;
+  }
+
+  private Response launchCopyCommand(String commandName, Commands.CopyCommandOptionsDto options) {
+    for(String table : options.getTablesList()) {
+      ensureTableValuesAccess(table);
+    }
+
+    if(options.hasDestination()) {
+      ensureDatasourceWriteAccess(options.getDestination());
+    } else if(options.hasOut()) {
+      ensureFileWriteAccess(options.getOut());
+    }
+
+    CopyCommandOptions copyOptions = new CopyCommandOptionsDtoImpl(opalRuntime, options);
+    Command<CopyCommandOptions> copyCommand = commandRegistry.newCommand(commandName);
+    copyCommand.setOptions(copyOptions);
+
+    return launchCommand(commandName, copyCommand);
   }
 
   private void ensureTableValuesAccess(String table) {

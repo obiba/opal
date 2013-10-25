@@ -67,16 +67,25 @@ public abstract class AbstractCommandRegistry implements CommandRegistry {
    * @param commandClass command class
    */
   protected <T> void addAvailableCommand(Class<? extends Command<T>> commandClass, Class<T> optionsClass) {
-    if(commandClass == null) throw new IllegalArgumentException("commandClass cannot be null");
     if(optionsClass == null) throw new IllegalArgumentException("optionClass cannot be null");
-    if(!commandClass.isAnnotationPresent(CommandUsage.class)) throw new IllegalArgumentException(
-        "command class " + commandClass.getName() + " must be annotated with @CommandUsage");
     if(!optionsClass.isAnnotationPresent(CommandLineInterface.class)) throw new IllegalArgumentException(
         "options class " + optionsClass.getName() + " must be annotated with @CommandLineInterface");
 
     CommandLineInterface annotation = optionsClass.getAnnotation(CommandLineInterface.class);
     commandMap.put(annotation.application(), commandClass);
     optionsMap.put(annotation.application(), optionsClass);
+
+    addAvailableCommand(annotation.application(), commandClass, optionsClass);
+  }
+
+  protected <T> void addAvailableCommand(String key, Class<? extends Command<T>> commandClass, Class<T> optionsClass) {
+    if(commandClass == null) throw new IllegalArgumentException("commandClass cannot be null");
+    if(optionsClass == null) throw new IllegalArgumentException("optionClass cannot be null");
+    if(!commandClass.isAnnotationPresent(CommandUsage.class)) throw new IllegalArgumentException(
+        "command class " + commandClass.getName() + " must be annotated with @CommandUsage");
+
+    commandMap.put(key, commandClass);
+    optionsMap.put(key, optionsClass);
   }
 
   @Override

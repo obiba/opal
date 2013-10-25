@@ -20,6 +20,7 @@ public final class Dtos {
   public static Commands.CommandStateDto asDto(CommandJob commandJob) {
     Commands.CommandStateDto.Builder dtoBuilder = Commands.CommandStateDto.newBuilder() //
         .setId(commandJob.getId()) //
+        .setName(commandJob.getName())//
         .setCommand(commandJob.getCommand().getName()) //
         .setCommandArgs(commandJob.getCommand().toString()) //
         .setOwner(commandJob.getOwner()) //

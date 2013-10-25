@@ -16,6 +16,8 @@ import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.service.CommandJobService;
 
+import com.google.common.base.Strings;
+
 public abstract class AbstractCommandsResource {
 
   protected final CommandJobService commandJobService;
@@ -28,12 +30,16 @@ public abstract class AbstractCommandsResource {
   }
 
   protected Response launchCommand(Command<?> command) {
-    CommandJob commandJob = newCommandJob(command);
+    return launchCommand(command.getName(), command);
+  }
+
+  protected Response launchCommand(String name, Command<?> command) {
+    CommandJob commandJob = newCommandJob(name, command);
     return buildLaunchCommandResponse(commandJobService.launchCommand(commandJob));
   }
 
-  protected CommandJob newCommandJob(Command<?> command) {
-    return new CommandJob(command);
+  protected CommandJob newCommandJob(String name, Command<?> command) {
+    return new CommandJob(name, command);
   }
 
   protected abstract Response buildLaunchCommandResponse(Integer jobId);

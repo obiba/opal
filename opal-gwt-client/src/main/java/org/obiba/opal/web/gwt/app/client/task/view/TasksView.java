@@ -137,7 +137,7 @@ public class TasksView extends ViewImpl implements Display {
     table.addColumn(new TextColumn<CommandStateDto>() {
       @Override
       public String getValue(CommandStateDto object) {
-        return object.getCommand();
+        return object.getName();
       }
     }, translations.typeLabel());
 

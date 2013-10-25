@@ -180,7 +180,7 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
     if(datasourceName == null) {
       uriBuilder.segment("shell", "copy");
     } else {
-      uriBuilder.segment("project", datasourceName, "commands", "_copy");
+      uriBuilder.segment("project", datasourceName, "commands", "_export");
     }
     ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).post() //
         .withResourceBody(CopyCommandOptionsDto.stringify(createCopyCommandOptions())) //

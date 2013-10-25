@@ -28,6 +28,7 @@ message CommandStateDto {
   optional string endTime = 7;
   repeated Message messages = 8;
   optional string project = 9;
+  required string name = 10;
 }
 
 message ImportCommandOptionsDto {
