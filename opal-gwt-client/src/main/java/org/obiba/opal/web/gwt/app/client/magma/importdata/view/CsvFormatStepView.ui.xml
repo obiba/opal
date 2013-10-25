@@ -11,7 +11,7 @@
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:w="urn:import:org.obiba.opal.web.gwt.app.client.magma.datasource.view"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
   <!--  <ui:msg description="Csv format summary">Enter additional information for the importation of data in the CSV format</ui:msg>-->
