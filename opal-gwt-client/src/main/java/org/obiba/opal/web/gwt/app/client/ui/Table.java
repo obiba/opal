@@ -22,7 +22,7 @@ import com.google.gwt.view.client.ProvidesKey;
  */
 public class Table<T> extends CellTable<T> {
 
-  public static final int DEFAULT_PAGESIZE = 15;
+  public static final int DEFAULT_PAGESIZE = 50;
 
   private Widget emptyTableWidget;
 
