@@ -41,13 +41,7 @@ public class DeriveCustomVariableStepView extends ViewImpl implements DeriveCust
   WizardStep deriveStep;
 
   @UiField
-  ValueTypeBox valueTypeBox;
-
-  @UiField
   FlowPanel scriptEditor;
-
-  @UiField
-  CheckBox repeatable;
 
   public DeriveCustomVariableStepView() {
     widget = uiBinder.createAndBindUi(this);
@@ -71,15 +65,4 @@ public class DeriveCustomVariableStepView extends ViewImpl implements DeriveCust
       scriptEditor.add(content.asWidget());
     }
   }
-
-  @Override
-  public HasValue<String> getValueType() {
-    return valueTypeBox;
-  }
-
-  @Override
-  public HasValue<Boolean> getRepeatable() {
-    return repeatable;
-  }
-
 }

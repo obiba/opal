@@ -53,8 +53,8 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
   void initialize(TableDto originalTable, @Nullable TableDto destinationTable, VariableDto originalVariable,
       @Nullable VariableDto derivedVariable) {
     super.initialize(originalTable, destinationTable, originalVariable, derivedVariable);
-    getView().getRepeatable().setValue(originalVariable.getIsRepeatable());
-    getView().getValueType().setValue(originalVariable.getValueType());
+    scriptEditorPresenter.setValueEntityType(originalVariable.getValueType());
+    scriptEditorPresenter.setRepeatable(originalVariable.getIsRepeatable());
     String name = originalVariable.getName();
     if(originalTable.hasViewLink()) {
       String datasourceName = originalTable.getDatasourceName();
@@ -86,9 +86,9 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
   public void generateDerivedVariable() {
     VariableDto derived = DerivedVariableGenerator
         .copyVariable(getOriginalVariable(), false, getOriginalVariable().getLink());
-    derived.setIsRepeatable(getView().getRepeatable().getValue());
+    derived.setIsRepeatable(scriptEditorPresenter.isRepeatable());
+    derived.setValueType(scriptEditorPresenter.getValueEntityType().getLabel());
     VariableDtos.setScript(derived, scriptEditorPresenter.getScript());
-    derived.setValueType(getView().getValueType().getValue());
     setDerivedVariable(derived);
   }
 
@@ -106,10 +106,5 @@ public class DeriveCustomVariablePresenter extends DerivationPresenter<DeriveCus
     }
 
     BranchingWizardStepController.Builder getDeriveStepController();
-
-    HasValue<String> getValueType();
-
-    HasValue<Boolean> getRepeatable();
-
   }
 }
