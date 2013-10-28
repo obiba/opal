@@ -12,13 +12,13 @@
       maxElementsOnDisk="10000000"
       diskPersistent="false"/>
 
-  <cache name="opal.variable.summary.categorical"
+  <cache name="opal-variable-summary-categorical"
       maxElementsInMemory="100"
       eternal="true"
       overflowToDisk="true"
       diskPersistent="true"/>
 
-  <cache name="opal.variable.summary.continuous"
+  <cache name="opal-variable-summary-continuous"
       maxElementsInMemory="100"
       eternal="true"
       overflowToDisk="true"

@@ -38,7 +38,7 @@ public class CachedVariableStatsService implements VariableStatsService {
   private final CategoricalVariableSummaryCachedService categoricalSummaryService;
 
   public CachedVariableStatsService() {
-    cacheManager = CacheManager.create(Resources.getResource("opal-ehcache.xml"));
+    cacheManager = CacheManager.create(Resources.getResource("ehcache.xml"));
     continuousSummaryService = new ContinuousVariableSummaryCachedService();
     categoricalSummaryService = new CategoricalVariableSummaryCachedService();
   }
@@ -94,7 +94,7 @@ public class CachedVariableStatsService implements VariableStatsService {
   private class ContinuousVariableSummaryCachedService extends
       AbstractVariableSummaryCachedService<ContinuousVariableSummary, ContinuousVariableSummaryFactory, ContinuousVariableSummary.Builder> {
 
-    private static final String CACHE_NAME = "opal.variable.summary.continuous";
+    private static final String CACHE_NAME = "opal-variable-summary-continuous";
 
     @Nonnull
     @Override
@@ -112,7 +112,7 @@ public class CachedVariableStatsService implements VariableStatsService {
   private class CategoricalVariableSummaryCachedService extends
       AbstractVariableSummaryCachedService<CategoricalVariableSummary, CategoricalVariableSummaryFactory, CategoricalVariableSummary.Builder> {
 
-    private static final String CACHE_NAME = "opal.variable.summary.categorical";
+    private static final String CACHE_NAME = "opal-variable-summary-categorical";
 
     @Nonnull
     @Override
