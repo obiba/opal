@@ -19,7 +19,7 @@ import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredValueValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
-import org.obiba.opal.web.model.client.database.MongoDbDatabaseDto;
+import org.obiba.opal.web.model.client.database.MongoDbSettingsDto;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -54,8 +54,7 @@ public class MongoDatabasePresenter extends AbstractDatabasePresenter<MongoDatab
     getView().getUsage().setValue(Usage.valueOf(dto.getUsage().getName()));
     getView().getDefaultStorage().setValue(dto.getDefaultStorage());
 
-    MongoDbDatabaseDto mongoDto = (MongoDbDatabaseDto) dto
-        .getExtension(MongoDbDatabaseDto.DatabaseDtoExtensions.settings);
+    MongoDbSettingsDto mongoDto = MongoDbSettingsDto.create();
     getView().getUrl().setText(mongoDto.getUrl());
     getView().getUsername().setText(mongoDto.getUsername());
     getView().getPassword().setText(mongoDto.getPassword());
@@ -72,7 +71,7 @@ public class MongoDatabasePresenter extends AbstractDatabasePresenter<MongoDatab
   @Override
   protected DatabaseDto getDto() {
     DatabaseDto dto = DatabaseDto.create();
-    MongoDbDatabaseDto mongoDto = MongoDbDatabaseDto.create();
+    MongoDbSettingsDto mongoDto = MongoDbSettingsDto.create();
 
     dto.setUsedForIdentifiers(usedForIdentifiers);
     dto.setName(getView().getName().getText());
@@ -84,7 +83,7 @@ public class MongoDatabasePresenter extends AbstractDatabasePresenter<MongoDatab
     mongoDto.setPassword(getView().getPassword().getText());
     mongoDto.setProperties(getView().getProperties().getText());
 
-    dto.setExtension(MongoDbDatabaseDto.DatabaseDtoExtensions.settings, mongoDto);
+    dto.setMongoDbSettings(mongoDto);
     return dto;
   }
 

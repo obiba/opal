@@ -26,7 +26,8 @@ public class OpalServer {
     configureSLF4JBridgeHandler();
 
     //TODO remove this static access when restarting embedded server will work
-    LocalOrientDbServerFactory.start();
+    LocalOrientDbServerFactory
+        .start(LocalOrientDbServerFactory.URL.replace("${OPAL_HOME}", System.getProperty("OPAL_HOME")));
 
     upgrade();
     start();

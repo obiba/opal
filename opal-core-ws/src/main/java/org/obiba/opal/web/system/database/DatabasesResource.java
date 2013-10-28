@@ -9,8 +9,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.database.Database;
-import org.obiba.opal.core.domain.database.MongoDbDatabase;
-import org.obiba.opal.core.domain.database.SqlDatabase;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.core.runtime.database.MultipleIdentifiersDatabaseException;
 import org.obiba.opal.web.database.Dtos;
@@ -33,13 +31,13 @@ public class DatabasesResource {
   @GET
   @Path("/sql")
   public List<DatabaseDto> getSqlDatabases() {
-    return asDto(databaseRegistry.list(SqlDatabase.class));
+    return asDto(databaseRegistry.listSqlDatabases());
   }
 
   @GET
   @Path("/mongodb")
   public List<DatabaseDto> getMongoDbDatabases() {
-    return asDto(databaseRegistry.list(MongoDbDatabase.class));
+    return asDto(databaseRegistry.listMongoDatabases());
   }
 
   @GET
@@ -64,7 +62,7 @@ public class DatabasesResource {
 
   @POST
   public Response addDatabase(DatabaseDto database) throws MultipleIdentifiersDatabaseException {
-    databaseRegistry.addOrReplaceDatabase(Dtos.fromDto(database));
+    databaseRegistry.saveDatabase(Dtos.fromDto(database));
     return Response.ok().build();
   }
 

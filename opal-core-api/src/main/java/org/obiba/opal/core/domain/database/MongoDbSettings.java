@@ -4,11 +4,8 @@ import javax.annotation.Nonnull;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasourceFactory;
-import org.obiba.opal.core.validator.Unique;
 
-@SuppressWarnings("ParameterHidesMemberVariable")
-@Unique(properties = "url")
-public class MongoDbDatabase extends Database {
+public class MongoDbSettings {
 
   /**
    * mongodb://{hostname}:{port}/{databaseName}
@@ -60,40 +57,42 @@ public class MongoDbDatabase extends Database {
     this.username = username;
   }
 
-  public static class Builder extends Database.Builder<MongoDbDatabase, Builder> {
+  @SuppressWarnings("ParameterHidesMemberVariable")
+  public static class Builder {
 
-    @Override
-    protected MongoDbDatabase createDatabase() {
-      return new MongoDbDatabase();
+    private MongoDbSettings settings;
+
+    private Builder() {
     }
 
-    @Override
-    protected Builder createBuilder() {
-      return this;
+    public static Builder create() {
+      Builder builder = new Builder();
+      builder.settings = new MongoDbSettings();
+      return builder;
     }
 
     public Builder password(String password) {
-      database.password = password;
+      settings.password = password;
       return this;
     }
 
     public Builder url(String url) {
-      database.url = url;
+      settings.url = url;
       return this;
     }
 
     public Builder username(String username) {
-      database.username = username;
+      settings.username = username;
       return this;
     }
 
     public Builder properties(String properties) {
-      database.properties = properties;
+      settings.properties = properties;
       return this;
     }
 
-    public MongoDbDatabase build() {
-      return database;
+    public MongoDbSettings build() {
+      return settings;
     }
 
   }

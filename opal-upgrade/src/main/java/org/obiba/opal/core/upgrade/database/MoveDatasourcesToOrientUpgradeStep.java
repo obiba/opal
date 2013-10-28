@@ -22,8 +22,9 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
 import org.obiba.opal.core.domain.database.Database;
-import org.obiba.opal.core.domain.database.SqlDatabase;
+import org.obiba.opal.core.domain.database.SqlSettings;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.project.domain.Project;
@@ -97,34 +98,37 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
       Properties prop = new Properties();
       prop.load(new FileInputStream(propertiesFile));
 
-      SqlDatabase opalData = new SqlDatabase.Builder() //
+      Database opalData = Database.Builder.create() //
           .name("opal-data") //
-          .url(prop.getProperty(OPAL_URL)) //
-          .driverClass(prop.getProperty(OPAL_DRIVER)) //
-          .username(prop.getProperty(OPAL_USERNAME)) //
-          .password(prop.getProperty(OPAL_PASSWORD)) //
+          .sqlSettings(SqlSettings.Builder.create() //
+              .url(prop.getProperty(OPAL_URL)) //
+              .driverClass(prop.getProperty(OPAL_DRIVER)) //
+              .username(prop.getProperty(OPAL_USERNAME)) //
+              .password(prop.getProperty(OPAL_PASSWORD)) //
+              .sqlSchema(SqlSettings.SqlSchema.HIBERNATE)) //
           .editable(false) //
           .usage(Database.Usage.STORAGE) //
-          .sqlSchema(SqlDatabase.SqlSchema.HIBERNATE) //
+
           .build();
       log.debug("Import opalData: {}", opalData);
-      databaseRegistry.addOrReplaceDatabase(opalData);
+      databaseRegistry.saveDatabase(opalData);
       orientDbService.save(Project.Builder.create().name("opal-data").title("opal-data").database("opal-data").build());
 
-      SqlDatabase opalKey = new SqlDatabase.Builder() //
+      Database opalKey = Database.Builder.create() //
           .name("_identifiers") //
-          .url(prop.getProperty(KEY_URL)) //
-          .driverClass(prop.getProperty(KEY_DRIVER)) //
-          .username(prop.getProperty(KEY_USERNAME)) //
-          .password(prop.getProperty(KEY_PASSWORD)) //
+          .sqlSettings(SqlSettings.Builder.create() //
+              .url(prop.getProperty(KEY_URL)) //
+              .driverClass(prop.getProperty(KEY_DRIVER)) //
+              .username(prop.getProperty(KEY_USERNAME)) //
+              .password(prop.getProperty(KEY_PASSWORD)) //
+              .sqlSchema(SqlSettings.SqlSchema.HIBERNATE)) //
           .editable(false) //
           .usedForIdentifiers(true) //
           .usage(Database.Usage.STORAGE) //
-          .sqlSchema(SqlDatabase.SqlSchema.HIBERNATE) //
           .build();
       log.debug("Import opalKey: {}", opalKey);
 
-      databaseRegistry.addOrReplaceDatabase(opalKey);
+      databaseRegistry.saveDatabase(opalKey);
 
     } catch(IOException e) {
       throw new RuntimeException(e);
@@ -244,19 +248,19 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
         .evaluate(doc.getDocumentElement(), XPathConstants.NODESET);
     for(int i = 0; i < nodeList.getLength(); i++) {
       Element element = (Element) nodeList.item(i);
-      SqlDatabase sqlDatabase = new SqlDatabase.Builder() //
+      Database sqlDatabase = Database.Builder.create() //
           .name(getChildTextContent(element, "name")) //
-          .url(getChildTextContent(element, "url")) //
-          .driverClass(getChildTextContent(element, "driverClass")) //
-          .username(getChildTextContent(element, "username")) //
-          .password(getChildTextContent(element, "password")) //
-          .properties(getChildTextContent(element, "properties")) //
+          .sqlSettings(SqlSettings.Builder.create() //
+              .url(getChildTextContent(element, "url")) //
+              .driverClass(getChildTextContent(element, "driverClass")) //
+              .username(getChildTextContent(element, "username")) //
+              .password(getChildTextContent(element, "password")) //
+              .sqlSchema(SqlSettings.SqlSchema.HIBERNATE)) //
           .editable(Boolean.valueOf(getChildTextContent(element, "editable"))) //
           .usage(Database.Usage.STORAGE) //
-          .sqlSchema(SqlDatabase.SqlSchema.HIBERNATE) //
           .build();
       log.debug("Import database: {}", sqlDatabase);
-      databaseRegistry.addOrReplaceDatabase(sqlDatabase);
+      databaseRegistry.saveDatabase(sqlDatabase);
     }
   }
 
@@ -310,17 +314,20 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
 
       String name = getChildTextContent(element, "name");
       String databaseName = getChildTextContent(element, "databaseName");
-      SqlDatabase database = (SqlDatabase) databaseRegistry.getDatabase(databaseName);
-      database.setSqlSchema(SqlDatabase.SqlSchema.JDBC);
+      Database database = databaseRegistry.getDatabase(databaseName);
+      if(database.getSqlSettings() == null) {
+        throw new IllegalArgumentException("Cannot find SqlSettings for database " + databaseName);
+      }
+      database.getSqlSettings().setSqlSchema(SqlSettings.SqlSchema.JDBC);
       database.setUsage(Database.Usage.IMPORT);
 
       Element settingsElement = (Element) element.getElementsByTagName("settings").item(0);
 
-      SqlDatabase.JdbcDatasourceSettings settings = new SqlDatabase.JdbcDatasourceSettings();
+      JdbcDatasourceSettings settings = new JdbcDatasourceSettings();
       settings.setDefaultEntityType(getChildTextContent(settingsElement, "defaultEntityType"));
       settings.setUseMetadataTables(Boolean.valueOf(getChildTextContent(settingsElement, "useMetadataTables")));
-      database.setJdbcDatasourceSettings(settings);
-      databaseRegistry.addOrReplaceDatabase(database);
+      database.getSqlSettings().setJdbcDatasourceSettings(settings);
+      databaseRegistry.saveDatabase(database);
 
       if(database.getUsage() == Database.Usage.STORAGE) {
         orientDbService.save(Project.Builder.create().name(name).title(name).database(databaseName).build());

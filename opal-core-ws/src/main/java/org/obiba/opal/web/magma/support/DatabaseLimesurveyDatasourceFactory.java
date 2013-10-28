@@ -16,7 +16,7 @@ import org.obiba.magma.AbstractDatasourceFactory;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.Disposable;
 import org.obiba.magma.datasource.limesurvey.LimesurveyDatasource;
-import org.obiba.opal.core.domain.database.SqlDatabase;
+import org.obiba.opal.core.domain.database.SqlSettings;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -54,15 +54,18 @@ public class DatabaseLimesurveyDatasourceFactory extends AbstractDatasourceFacto
   @Nonnull
   @Override
   protected Datasource internalCreate() {
-    SqlDatabase.LimesurveyDatasourceSettings settings = getSettings();
+    SqlSettings.LimesurveyDatasourceSettings settings = getSettings();
     return new LimesurveyDatasource(getName(), databaseRegistry.getDataSource(databaseName, getName()),
         settings == null ? null : settings.getTablePrefix());
   }
 
   @Nullable
-  private SqlDatabase.LimesurveyDatasourceSettings getSettings() {
-    SqlDatabase database = (SqlDatabase) databaseRegistry.getDatabase(databaseName);
-    return database.getLimesurveyDatasourceSettings();
+  private SqlSettings.LimesurveyDatasourceSettings getSettings() {
+    SqlSettings sqlSettings = databaseRegistry.getDatabase(databaseName).getSqlSettings();
+    if(sqlSettings == null) {
+      throw new IllegalArgumentException("Cannot find SqlSettings for database " + databaseName);
+    }
+    return sqlSettings.getLimesurveyDatasourceSettings();
   }
 
   @Override

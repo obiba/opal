@@ -13,19 +13,14 @@ import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
-import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
-import org.obiba.opal.web.model.client.database.MongoDbDatabaseDto;
-import org.obiba.opal.web.model.client.database.SqlDatabaseDto;
+import org.obiba.opal.web.model.client.database.MongoDbSettingsDto;
+import org.obiba.opal.web.model.client.database.SqlSettingsDto;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -34,11 +29,6 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.annotations.NameToken;
-import com.gwtplatform.mvp.client.annotations.ProxyEvent;
-import com.gwtplatform.mvp.client.annotations.ProxyStandard;
-import com.gwtplatform.mvp.client.annotations.TitleFunction;
-import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
 public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDatabasePresenter.Display>
     implements IdentifiersDatabaseUiHandlers, RequestAdministrationPermissionEvent.Handler {
@@ -98,24 +88,24 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
   @Override
   public void createSql() {
     DatabaseDto dto = createDefaultIdentifiersDatabaseDto();
-    SqlDatabaseDto sqlDatabaseDto = SqlDatabaseDto.create();
-    sqlDatabaseDto.setSqlSchema(SqlDatabaseDto.SqlSchema.HIBERNATE);
-    dto.setExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings, sqlDatabaseDto);
+    SqlSettingsDto sqlSettingsDto = SqlSettingsDto.create();
+    sqlSettingsDto.setSqlSchema(SqlSettingsDto.SqlSchema.HIBERNATE);
+    dto.setSqlSettings(sqlSettingsDto);
     sqlDatabaseModalProvider.get().createNewIdentifierDatabase(dto);
   }
 
   @Override
   public void createMongo() {
     DatabaseDto dto = createDefaultIdentifiersDatabaseDto();
-    dto.setExtension(MongoDbDatabaseDto.DatabaseDtoExtensions.settings, MongoDbDatabaseDto.create());
+    dto.setMongoDbSettings(MongoDbSettingsDto.create());
     mongoDatabaseModalProvider.get().createNewIdentifierDatabase(dto);
   }
 
   @Override
   public void edit() {
-    if(databaseDto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings) != null) {
+    if(databaseDto.hasSqlSettings()) {
       sqlDatabaseModalProvider.get().editDatabase(databaseDto);
-    } else if(databaseDto.getExtension(MongoDbDatabaseDto.DatabaseDtoExtensions.settings) != null) {
+    } else if(databaseDto.hasMongoDbSettings()) {
       mongoDatabaseModalProvider.get().editDatabase(databaseDto);
     }
   }

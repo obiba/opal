@@ -12,14 +12,12 @@ import org.hibernate.SessionFactory;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory;
 import org.obiba.opal.core.domain.database.Database;
-import org.obiba.opal.core.domain.database.MongoDbDatabase;
-import org.obiba.opal.core.domain.database.SqlDatabase;
+import org.obiba.opal.core.domain.database.MongoDbSettings;
+import org.obiba.opal.core.domain.database.SqlSettings;
 import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
 import org.obiba.opal.core.runtime.jdbc.DatabaseSessionFactoryProvider;
 import org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory;
-import org.obiba.opal.core.service.OrientDbService;
-import org.obiba.opal.core.service.OrientDbTransactionCallbackWithoutResult;
-import org.obiba.opal.core.service.impl.DefaultBeanValidator;
+import org.obiba.opal.core.service.impl.OrientDbDocumentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +36,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
-import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
 @SuppressWarnings("OverlyCoupledClass")
 @Component
@@ -53,10 +50,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   private DataSourceFactory dataSourceFactory;
 
   @Autowired
-  private OrientDbService orientDbService;
-
-  @Autowired
-  private DefaultBeanValidator defaultBeanValidator;
+  private OrientDbDocumentService orientDbDocumentService;
 
   private final LoadingCache<String, DataSource> dataSourceCache = CacheBuilder.newBuilder()
       .removalListener(new DataSourceRemovalListener()) //
@@ -72,15 +66,9 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Override
   @PostConstruct
   public void start() {
-    orientDbService
-        .registerEntityClass(Database.class, SqlDatabase.class, SqlDatabase.LimesurveyDatasourceSettings.class,
-            SqlDatabase.JdbcDatasourceSettings.class, SqlDatabase.JdbcDatasourceSettings.JdbcValueTableSettings.class,
-            MongoDbDatabase.class);
-    // don't create index on abstract base class or it will fail
-    orientDbService.createUniqueStringIndex(SqlDatabase.class, "name");
-    orientDbService.createUniqueStringIndex(SqlDatabase.class, "url");
-    orientDbService.createUniqueStringIndex(MongoDbDatabase.class, "name");
-    orientDbService.createUniqueStringIndex(MongoDbDatabase.class, "url");
+    orientDbDocumentService.createUniqueStringIndex(Database.class, "name");
+    orientDbDocumentService.createUniqueStringIndex(Database.class, "sqlSettings.url");
+    orientDbDocumentService.createUniqueStringIndex(Database.class, "mongoDbSettings.url");
   }
 
   @Override
@@ -92,13 +80,8 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   @Override
   public Iterable<Database> list() {
-    return list(Database.class);
-  }
-
-  @Override
-  public <T extends Database> Iterable<T> list(@Nonnull Class<T> databaseClass) {
-    return orientDbService
-        .list("select from " + databaseClass.getSimpleName() + " where usedForIdentifiers = ?", false);
+    return orientDbDocumentService
+        .list(Database.class, "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ?", false);
   }
 
   @Override
@@ -106,7 +89,21 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     if(usage == null) {
       return list();
     }
-    return orientDbService.list("select from Database where usedForIdentifiers = ? and usage = ?", false, usage);
+    return orientDbDocumentService.list(Database.class,
+        "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ? and usage = ?", false, usage);
+  }
+
+  @Override
+  public Iterable<Database> listSqlDatabases() {
+    return orientDbDocumentService.list(Database.class,
+        "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ? and sqlSettings is not null",
+        false);
+  }
+
+  @Override
+  public Iterable<Database> listMongoDatabases() {
+    return orientDbDocumentService.list(Database.class, "select from " + Database.class.getSimpleName() +
+        " where usedForIdentifiers = ? and mongoDbSettings is not null", false);
   }
 
   @Override
@@ -117,7 +114,8 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Nonnull
   @Override
   public Database getDatabase(@Nonnull String name) throws NoSuchDatabaseException {
-    Database database = orientDbService.uniqueResult("select from Database where name = ?", name);
+    Database database = orientDbDocumentService
+        .uniqueResult(Database.class, "select from " + Database.class.getSimpleName() + " where name = ?", name);
     if(database == null) throw new NoSuchDatabaseException(name);
     return database;
   }
@@ -135,36 +133,28 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   }
 
   @Override
-  public void addOrReplaceDatabase(@Nonnull final Database database)
+  public void saveDatabase(@Nonnull Database database)
       throws ConstraintViolationException, MultipleIdentifiersDatabaseException {
 
     validUniqueIdentifiersDatabase(database);
 
     if(database.isDefaultStorage()) {
-      final Database previousDefaultStorageDatabase = getDefaultStorageDatabase();
+      Database previousDefaultStorageDatabase = getDefaultStorageDatabase();
       if(previousDefaultStorageDatabase == null) {
-        orientDbService.save(database);
+        orientDbDocumentService.save(database);
       } else {
-        defaultBeanValidator.validate(database);
         previousDefaultStorageDatabase.setDefaultStorage(false);
-        orientDbService.execute(new OrientDbTransactionCallbackWithoutResult() {
-          @Override
-          protected void doInTransactionWithoutResult(OObjectDatabaseTx db) {
-            db.save(database);
-            db.save(previousDefaultStorageDatabase);
-          }
-        });
+        orientDbDocumentService.save(database, previousDefaultStorageDatabase);
       }
     } else {
-      orientDbService.save(database);
+      orientDbDocumentService.save(database);
     }
   }
 
   private void validUniqueIdentifiersDatabase(Database database) throws MultipleIdentifiersDatabaseException {
     if(database.isUsedForIdentifiers()) {
-      Database identifiersDatabase = null;
       try {
-        identifiersDatabase = getIdentifiersDatabase();
+        Database identifiersDatabase = getIdentifiersDatabase();
         if(!Objects.equal(identifiersDatabase.getName(), database.getName())) {
           throw new MultipleIdentifiersDatabaseException(identifiersDatabase.getName(), database.getName());
         }
@@ -176,14 +166,16 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Nullable
   @Override
   public Database getDefaultStorageDatabase() {
-    return orientDbService
-        .uniqueResult("select from Database where usedForIdentifiers = ? and defaultStorage = ?", false, true);
+    return orientDbDocumentService.uniqueResult(Database.class,
+        "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ? and defaultStorage = ?", false,
+        true);
   }
 
   @Override
   public void deleteDatabase(@Nonnull Database database) throws CannotDeleteDatabaseWithDataException {
     //TODO check if this database has data
-    orientDbService.delete(database);
+    orientDbDocumentService
+        .delete("select from " + Database.class.getSimpleName() + " where name = ?", database.getName());
     destroyDataSource(database.getName());
   }
 
@@ -197,7 +189,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     Database database = getDatabase(databaseName);
     if(database.isEditable()) {
       database.setEditable(false);
-      orientDbService.save(database);
+      orientDbDocumentService.save(database);
     }
     registrations.put(databaseName, usedByDatasource);
   }
@@ -206,19 +198,23 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   public void unregister(@Nonnull String databaseName, String usedByDatasource) {
     Database database = getDatabase(databaseName);
     database.setEditable(true);
-    orientDbService.save(database);
+    orientDbDocumentService.save(database);
     registrations.remove(databaseName, usedByDatasource);
   }
 
   @Override
   public boolean hasIdentifiersDatabase() {
-    return orientDbService.uniqueResult("select from Database where usedForIdentifiers = ?", true) != null;
+    return orientDbDocumentService
+        .uniqueResult(Database.class, "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ?",
+            true) != null;
   }
 
   @Nonnull
   @Override
   public Database getIdentifiersDatabase() throws IdentifiersDatabaseNotFoundException {
-    Database database = orientDbService.uniqueResult("select from Database where usedForIdentifiers = ?", true);
+    Database database = orientDbDocumentService
+        .uniqueResult(Database.class, "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ?",
+            true);
     if(database == null) throw new IdentifiersDatabaseNotFoundException();
     return database;
   }
@@ -231,18 +227,19 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
         "Cannot create DatasourceFactory for non storage database " + databaseName + ": " + database.getUsage());
     register(database.getName(), datasourceName);
 
-    if(database instanceof SqlDatabase) {
-      SqlDatabase sqlDatabase = (SqlDatabase) database;
-      if(sqlDatabase.getSqlSchema() != SqlDatabase.SqlSchema.HIBERNATE) {
+    SqlSettings sqlSettings = database.getSqlSettings();
+    if(sqlSettings != null) {
+      if(sqlSettings.getSqlSchema() != SqlSettings.SqlSchema.HIBERNATE) {
         throw new IllegalArgumentException(
             "Cannot create datasource for non Hibernate storage database " + databaseName + ": " +
-                sqlDatabase.getSqlSchema());
+                sqlSettings.getSqlSchema());
       }
       return new HibernateDatasourceFactory(datasourceName,
           new DatabaseSessionFactoryProvider(datasourceName, this, database.getName()));
     }
-    if(database instanceof MongoDbDatabase) {
-      return ((MongoDbDatabase) database).createMongoDBDatasourceFactory(datasourceName);
+    MongoDbSettings mongoDbSettings = database.getMongoDbSettings();
+    if(mongoDbSettings != null) {
+      return mongoDbSettings.createMongoDBDatasourceFactory(datasourceName);
     }
     throw new IllegalArgumentException("Unknown datasource config for database " + database.getClass());
   }
@@ -252,8 +249,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     @Override
     public DataSource load(String databaseName) throws Exception {
       log.info("Building DataSource {}", databaseName);
-      SqlDatabase database = (SqlDatabase) getDatabase(databaseName);
-      return dataSourceFactory.createDataSource(database);
+      return dataSourceFactory.createDataSource(getDatabase(databaseName));
     }
   }
 

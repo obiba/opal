@@ -17,16 +17,14 @@ import org.obiba.opal.web.gwt.app.client.administration.database.presenter.Ident
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
-import org.obiba.opal.web.model.client.database.MongoDbDatabaseDto;
-import org.obiba.opal.web.model.client.database.SqlDatabaseDto;
+import org.obiba.opal.web.model.client.database.MongoDbSettingsDto;
+import org.obiba.opal.web.model.client.database.SqlSettingsDto;
 
-import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.HasVisibility;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -56,7 +54,7 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
     edit.setTitle(translations.editLabel());
-    databasePanel.setVisible(false);;
+    databasePanel.setVisible(false);
   }
 
   @UiHandler("createSql")
@@ -87,13 +85,12 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
     databasePanel.setVisible(hasDatabase);
     edit.setVisible(hasDatabase);
     if(hasDatabase) {
-      showSqlProperties((SqlDatabaseDto) database.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings));
-      showMongoProperties(
-          (MongoDbDatabaseDto) database.getExtension(MongoDbDatabaseDto.DatabaseDtoExtensions.settings));
+      showSqlProperties(database.getSqlSettings());
+      showMongoProperties(database.getMongoDbSettings());
     }
   }
 
-  private void showSqlProperties(@Nullable SqlDatabaseDto sqlDatabase) {
+  private void showSqlProperties(@Nullable SqlSettingsDto sqlDatabase) {
     if(sqlDatabase == null) return;
     properties.addProperty(translations.typeLabel(), translations.sqlLabel());
     properties.addProperty(translations.sqlSchemaLabel(),
@@ -104,7 +101,7 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
     properties.addProperty(translations.propertiesLabel(), sqlDatabase.getProperties());
   }
 
-  private void showMongoProperties(@Nullable MongoDbDatabaseDto mongoDatabase) {
+  private void showMongoProperties(@Nullable MongoDbSettingsDto mongoDatabase) {
     if(mongoDatabase == null) return;
     properties.addProperty(translations.typeLabel(), translations.mongoDbLabel());
     properties.addProperty(translations.urlLabel(), mongoDatabase.getUrl());

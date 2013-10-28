@@ -1,15 +1,14 @@
 package org.obiba.opal.core.domain.database;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.hibernate.validator.constraints.NotBlank;
-import org.obiba.opal.core.domain.AbstractOrientDbTimestampedEntity;
-import org.obiba.opal.core.validator.Unique;
+import org.obiba.opal.core.domain.AbstractTimestamped;
 
 import com.google.common.base.Objects;
 
-@Unique(properties = "name")
-public abstract class Database extends AbstractOrientDbTimestampedEntity {
+public class Database extends AbstractTimestamped {
 
   public enum Usage {
     IMPORT, STORAGE, EXPORT
@@ -33,6 +32,12 @@ public abstract class Database extends AbstractOrientDbTimestampedEntity {
   private boolean defaultStorage;
 
   private boolean usedForIdentifiers;
+
+  @Nullable
+  private SqlSettings sqlSettings;
+
+  @Nullable
+  private MongoDbSettings mongoDbSettings;
 
   public boolean isDefaultStorage() {
     return defaultStorage;
@@ -84,6 +89,32 @@ public abstract class Database extends AbstractOrientDbTimestampedEntity {
     this.usedForIdentifiers = usedForIdentifiers;
   }
 
+  @Nullable
+  public SqlSettings getSqlSettings() {
+    return sqlSettings;
+  }
+
+  public void setSqlSettings(@Nullable SqlSettings sqlSettings) {
+    this.sqlSettings = sqlSettings;
+  }
+
+  public boolean hasSqlSettings() {
+    return sqlSettings != null;
+  }
+
+  @Nullable
+  public MongoDbSettings getMongoDbSettings() {
+    return mongoDbSettings;
+  }
+
+  public void setMongoDbSettings(@Nullable MongoDbSettings mongoDbSettings) {
+    this.mongoDbSettings = mongoDbSettings;
+  }
+
+  public boolean hasMongoDbSettings() {
+    return mongoDbSettings != null;
+  }
+
   @Override
   public int hashCode() {
     return Objects.hashCode(name);
@@ -105,51 +136,78 @@ public abstract class Database extends AbstractOrientDbTimestampedEntity {
   }
 
   @SuppressWarnings("ParameterHidesMemberVariable")
-  public static abstract class Builder<TDatabase extends Database, TBuilder extends Builder<TDatabase, TBuilder>> {
+  public static class Builder {
 
-    protected final TDatabase database;
+    private Database database;
 
-    protected final TBuilder builder;
+    private MongoDbSettings.Builder mongoDbSettingsBuilder;
 
-    protected Builder() {
-      database = createDatabase();
-      builder = createBuilder();
+    private SqlSettings.Builder sqlSettingsBuilder;
+
+    private Builder() {
     }
 
-    protected abstract TDatabase createDatabase();
-
-    protected abstract TBuilder createBuilder();
-
-    public TBuilder defaultStorage(boolean defaultStorage) {
-      database.setDefaultStorage(defaultStorage);
+    public static Builder create() {
+      Builder builder = new Builder();
+      builder.database = new Database();
       return builder;
     }
 
-    public TBuilder description(String description) {
-      database.setDescription(description);
-      return builder;
+    public Builder defaultStorage(boolean defaultStorage) {
+      database.defaultStorage = defaultStorage;
+      return this;
     }
 
-    public TBuilder editable(boolean editable) {
-      database.setEditable(editable);
-      return builder;
+    public Builder description(String description) {
+      database.description = description;
+      return this;
     }
 
-    public TBuilder name(String name) {
-      database.setName(name);
-      return builder;
+    public Builder editable(boolean editable) {
+      database.editable = editable;
+      return this;
     }
 
-    public TBuilder usage(Usage usage) {
-      database.setUsage(usage);
-      return builder;
+    public Builder name(String name) {
+      database.name = name;
+      return this;
     }
 
-    public TBuilder usedForIdentifiers(boolean usedForIdentifiers) {
-      database.setUsedForIdentifiers(usedForIdentifiers);
-      return builder;
+    public Builder usage(Usage usage) {
+      database.usage = usage;
+      return this;
     }
 
+    public Builder usedForIdentifiers(boolean usedForIdentifiers) {
+      database.usedForIdentifiers = usedForIdentifiers;
+      return this;
+    }
+
+    public Builder mongoDbSettings(MongoDbSettings mongoDbSettings) {
+      database.mongoDbSettings = mongoDbSettings;
+      return this;
+    }
+
+    public Builder mongoDbSettings(MongoDbSettings.Builder mongoDbSettingsBuilder) {
+      this.mongoDbSettingsBuilder = mongoDbSettingsBuilder;
+      return this;
+    }
+
+    public Builder sqlSettings(SqlSettings sqlSettings) {
+      database.sqlSettings = sqlSettings;
+      return this;
+    }
+
+    public Builder sqlSettings(SqlSettings.Builder sqlSettingsBuilder) {
+      this.sqlSettingsBuilder = sqlSettingsBuilder;
+      return this;
+    }
+
+    public Database build() {
+      if(sqlSettingsBuilder != null) database.sqlSettings = sqlSettingsBuilder.build();
+      if(mongoDbSettingsBuilder != null) database.mongoDbSettings = mongoDbSettingsBuilder.build();
+      return database;
+    }
   }
 
 }

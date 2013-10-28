@@ -3,17 +3,16 @@ package org.obiba.opal.core.service;
 import javax.annotation.Nullable;
 import javax.validation.ConstraintViolationException;
 
-import com.orientechnologies.common.exception.OException;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 
 public interface OrientDbService {
 
-  <T> T save(T t) throws ConstraintViolationException, OException;
+  <T> T save(T t) throws ConstraintViolationException;
 
-  void delete(Object obj) throws OException;
+  void delete(Object obj);
 
-  <T> T execute(OrientDbTransactionCallback<T> action) throws OException;
+  <T> T execute(OrientDbTransactionCallback<T> action);
 
   void registerEntityClass(Class<?>... classes);
 

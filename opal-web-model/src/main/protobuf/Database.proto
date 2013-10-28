@@ -30,10 +30,11 @@ message DatabaseDto {
   required bool defaultStorage = 4 [default = false];
   required Usage usage = 5;
   optional bool usedForIdentifiers = 6;
-  extensions 1000 to max;
+  optional SqlSettingsDto sqlSettings = 7;
+  optional MongoDbSettingsDto mongoDbSettings = 8;
 }
 
-message SqlDatabaseDto {
+message SqlSettingsDto {
   enum SqlSchema {
     HIBERNATE = 0;
     JDBC = 1;
@@ -50,17 +51,11 @@ message SqlDatabaseDto {
   required SqlSchema sqlSchema = 6;
   optional Magma.JdbcDatasourceSettingsDto jdbcDatasourceSettings = 7;
   optional LimesurveyDatasourceSettingsDto limesurveyDatasourceSettings = 8;
-  extend DatabaseDto {
-    optional SqlDatabaseDto settings = 1000;
-  }
 }
 
-message MongoDbDatabaseDto {
+message MongoDbSettingsDto {
   required string url = 1; // mongodb://{hostname}:{port}/{databaseName}
   optional string username = 2;
   optional string password = 3;
   optional string properties = 4;
-  extend DatabaseDto {
-    optional MongoDbDatabaseDto settings = 1001;
-  }
 }

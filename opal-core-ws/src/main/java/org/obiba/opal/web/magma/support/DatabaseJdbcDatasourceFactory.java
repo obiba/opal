@@ -16,10 +16,8 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.Disposable;
 import org.obiba.magma.datasource.jdbc.JdbcDatasource;
 import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
-import org.obiba.magma.datasource.jdbc.JdbcValueTableSettings;
-import org.obiba.opal.core.domain.database.SqlDatabase;
+import org.obiba.opal.core.domain.database.SqlSettings;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class DatabaseJdbcDatasourceFactory extends AbstractDatasourceFactory implements Disposable {
@@ -49,20 +47,11 @@ public class DatabaseJdbcDatasourceFactory extends AbstractDatasourceFactory imp
   }
 
   private JdbcDatasourceSettings getSettings() {
-    SqlDatabase database = (SqlDatabase) databaseRegistry.getDatabase(databaseName);
-    JdbcDatasourceSettings settings = new JdbcDatasourceSettings();
-    SqlDatabase.JdbcDatasourceSettings dbSettings = database.getJdbcDatasourceSettings();
-    if(dbSettings != null) {
-      BeanUtils.copyProperties(dbSettings, settings, new String[] { "tableSettings" });
-      if(dbSettings.getTableSettings() != null) {
-        for(SqlDatabase.JdbcDatasourceSettings.JdbcValueTableSettings dbTableSettings : dbSettings.getTableSettings()) {
-          JdbcValueTableSettings tableSettings = new JdbcValueTableSettings();
-          BeanUtils.copyProperties(dbTableSettings, tableSettings);
-          settings.addTableSettings(tableSettings);
-        }
-      }
+    SqlSettings sqlSettings = databaseRegistry.getDatabase(databaseName).getSqlSettings();
+    if(sqlSettings == null) {
+      throw new IllegalArgumentException("Cannot find sqlSettings for database " + databaseName);
     }
-    return settings;
+    return sqlSettings.getJdbcDatasourceSettings();
   }
 
   @Override

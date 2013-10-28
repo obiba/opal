@@ -12,19 +12,25 @@ package org.obiba.opal.core.runtime.jdbc;
 import javax.annotation.Nonnull;
 import javax.sql.DataSource;
 
-import org.obiba.opal.core.domain.database.SqlDatabase;
+import org.obiba.opal.core.domain.database.Database;
+import org.obiba.opal.core.domain.database.SqlSettings;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DataSourceFactory {
 
-  public DataSource createDataSource(@Nonnull SqlDatabase database) {
+  public DataSource createDataSource(@Nonnull Database database) {
     DataSourceFactoryBean factoryBean = new DataSourceFactoryBean();
     factoryBean.setName(database.getName());
-    factoryBean.setDriverClass(database.getDriverClass());
-    factoryBean.setUrl(database.getUrl());
-    factoryBean.setUsername(database.getUsername());
-    factoryBean.setPassword(database.getPassword());
+
+    SqlSettings sqlSettings = database.getSqlSettings();
+    if(sqlSettings == null) {
+      throw new IllegalArgumentException("Cannot create a JDBC DataSource without SqlSettings");
+    }
+    factoryBean.setDriverClass(sqlSettings.getDriverClass());
+    factoryBean.setUrl(sqlSettings.getUrl());
+    factoryBean.setUsername(sqlSettings.getUsername());
+    factoryBean.setPassword(sqlSettings.getPassword());
     return factoryBean.getObject();
   }
 

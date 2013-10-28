@@ -14,7 +14,9 @@ public interface DatabaseRegistry extends SystemService {
 
   Iterable<Database> list();
 
-  <T extends Database> Iterable<T> list(@Nonnull Class<T> databaseClass);
+  Iterable<Database> listSqlDatabases();
+
+  Iterable<Database> listMongoDatabases();
 
   Iterable<Database> list(@Nullable Database.Usage usage);
 
@@ -23,7 +25,7 @@ public interface DatabaseRegistry extends SystemService {
   @Nonnull
   Database getDatabase(@Nonnull String name) throws NoSuchDatabaseException;
 
-  void addOrReplaceDatabase(@Nonnull Database database)
+  void saveDatabase(@Nonnull Database database)
       throws ConstraintViolationException, MultipleIdentifiersDatabaseException;
 
   void deleteDatabase(@Nonnull Database database) throws CannotDeleteDatabaseWithDataException;

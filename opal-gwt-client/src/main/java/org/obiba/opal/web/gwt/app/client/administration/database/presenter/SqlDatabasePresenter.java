@@ -24,7 +24,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.database.JdbcDriverDto;
-import org.obiba.opal.web.model.client.database.SqlDatabaseDto;
+import org.obiba.opal.web.model.client.database.SqlSettingsDto;
 import org.obiba.opal.web.model.client.magma.JdbcDatasourceSettingsDto;
 
 import com.google.common.base.Strings;
@@ -41,7 +41,6 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
 import static org.obiba.opal.web.gwt.app.client.administration.database.presenter.SqlDatabasePresenter.Display.FormField;
-import static org.obiba.opal.web.model.client.database.SqlDatabaseDto.SqlSchema.HIBERNATE;
 import static org.obiba.opal.web.model.client.database.SqlDatabaseDto.SqlSchema.JDBC;
 import static org.obiba.opal.web.model.client.database.SqlDatabaseDto.SqlSchema.LIMESURVEY;
 
@@ -91,24 +90,24 @@ public class SqlDatabasePresenter extends AbstractDatabasePresenter<SqlDatabaseP
     getView().getName().setText(dto.getName());
     getView().getUsage().setValue(Usage.valueOf(dto.getUsage().getName()));
     getView().getDefaultStorage().setValue(dto.getDefaultStorage());
-    SqlDatabaseDto sqlDatabaseDto = (SqlDatabaseDto) dto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings);
-    getView().getUrl().setText(sqlDatabaseDto.getUrl());
-    getView().getDriver().setText(sqlDatabaseDto.getDriverClass());
-    getView().getUsername().setText(sqlDatabaseDto.getUsername());
-    getView().getPassword().setText(sqlDatabaseDto.getPassword());
-    getView().getProperties().setText(sqlDatabaseDto.getProperties());
-    getView().getSqlSchema().setValue(SqlSchema.valueOf(sqlDatabaseDto.getSqlSchema().getName()));
-    JdbcDatasourceSettingsDto jdbcDatasourceSettings = sqlDatabaseDto.getJdbcDatasourceSettings();
-    if(JDBC.getName().equals(sqlDatabaseDto.getSqlSchema().getName()) && jdbcDatasourceSettings != null) {
+    SqlSettingsDto sqlSettings = dto.getSqlSettings();
+    getView().getUrl().setText(sqlSettings.getUrl());
+    getView().getDriver().setText(sqlSettings.getDriverClass());
+    getView().getUsername().setText(sqlSettings.getUsername());
+    getView().getPassword().setText(sqlSettings.getPassword());
+    getView().getProperties().setText(sqlSettings.getProperties());
+    getView().getSqlSchema().setValue(SqlSchema.valueOf(sqlSettings.getSqlSchema().getName()));
+    JdbcDatasourceSettingsDto jdbcDatasourceSettings = sqlSettings.getJdbcDatasourceSettings();
+    if(JDBC.getName().equals(sqlSettings.getSqlSchema().getName()) && jdbcDatasourceSettings != null) {
       getView().getDefaultEntityType().setText(jdbcDatasourceSettings.getDefaultEntityType());
       getView().getDefaultCreatedTimestampColumn()
           .setText(jdbcDatasourceSettings.getDefaultCreatedTimestampColumnName());
       getView().getDefaultUpdatedTimestampColumn()
           .setText(jdbcDatasourceSettings.getDefaultUpdatedTimestampColumnName());
       getView().getUseMetadataTables().setValue(jdbcDatasourceSettings.getUseMetadataTables());
-    } else if(LIMESURVEY.getName().equals(sqlDatabaseDto.getSqlSchema().getName()) &&
-        sqlDatabaseDto.getLimesurveyDatasourceSettings() != null) {
-      getView().getTablePrefix().setText(sqlDatabaseDto.getLimesurveyDatasourceSettings().getTablePrefix());
+    } else if(LIMESURVEY.getName().equals(sqlSettings.getSqlSchema().getName()) &&
+        sqlSettings.getLimesurveyDatasourceSettings() != null) {
+      getView().getTablePrefix().setText(sqlSettings.getLimesurveyDatasourceSettings().getTablePrefix());
     }
   }
 
@@ -123,7 +122,7 @@ public class SqlDatabasePresenter extends AbstractDatabasePresenter<SqlDatabaseP
   @Override
   protected DatabaseDto getDto() {
     DatabaseDto dto = DatabaseDto.create();
-    SqlDatabaseDto sqlDto = SqlDatabaseDto.create();
+    SqlSettingsDto sqlDto = SqlSettingsDto.create();
 
     dto.setUsedForIdentifiers(usedForIdentifiers);
     dto.setName(getView().getName().getText());
@@ -135,7 +134,7 @@ public class SqlDatabasePresenter extends AbstractDatabasePresenter<SqlDatabaseP
     sqlDto.setUsername(getView().getUsername().getText());
     sqlDto.setPassword(getView().getPassword().getText());
     sqlDto.setProperties(getView().getProperties().getText());
-    SqlDatabaseDto.SqlSchema sqlSchema = parseSqlSchema(getView().getSqlSchema().getValue());
+    SqlSettingsDto.SqlSchema sqlSchema = parseSqlSchema(getView().getSqlSchema().getValue());
     sqlDto.setSqlSchema(sqlSchema);
 
     if(JDBC.getName().equals(sqlSchema.getName())) {
@@ -144,12 +143,12 @@ public class SqlDatabasePresenter extends AbstractDatabasePresenter<SqlDatabaseP
       sqlDto.setLimesurveyDatasourceSettings(getLimesurveyDatasourceSettingsDto());
     }
 
-    dto.setExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings, sqlDto);
+    dto.setSqlSettings(sqlDto);
     return dto;
   }
 
-  private SqlDatabaseDto.LimesurveyDatasourceSettingsDto getLimesurveyDatasourceSettingsDto() {
-    SqlDatabaseDto.LimesurveyDatasourceSettingsDto limesurveySettings = SqlDatabaseDto.LimesurveyDatasourceSettingsDto
+  private SqlSettingsDto.LimesurveyDatasourceSettingsDto getLimesurveyDatasourceSettingsDto() {
+    SqlSettingsDto.LimesurveyDatasourceSettingsDto limesurveySettings = SqlSettingsDto.LimesurveyDatasourceSettingsDto
         .create();
     limesurveySettings.setTablePrefix(getView().getTablePrefix().getText());
     return limesurveySettings;
@@ -164,14 +163,14 @@ public class SqlDatabasePresenter extends AbstractDatabasePresenter<SqlDatabaseP
     return jdbcSettings;
   }
 
-  private SqlDatabaseDto.SqlSchema parseSqlSchema(@Nonnull SqlSchema sqlSchema) {
+  private SqlSettingsDto.SqlSchema parseSqlSchema(@Nonnull SqlSchema sqlSchema) {
     switch(sqlSchema) {
       case HIBERNATE:
-        return HIBERNATE;
+        return SqlSettingsDto.SqlSchema.HIBERNATE;
       case JDBC:
-        return JDBC;
+        return SqlSettingsDto.SqlSchema.JDBC;
       case LIMESURVEY:
-        return LIMESURVEY;
+        return SqlSettingsDto.SqlSchema.LIMESURVEY;
       default:
         throw new IllegalArgumentException("Unknown Sql Schema: " + sqlSchema);
     }

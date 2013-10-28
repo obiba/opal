@@ -18,33 +18,26 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
-import org.obiba.opal.web.model.client.database.MongoDbDatabaseDto;
-import org.obiba.opal.web.model.client.database.SqlDatabaseDto;
 
-import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.SimplePager;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.HasData;
-import com.google.gwt.view.client.RangeChangeEvent;
 import com.google.gwt.view.client.RowCountChangeEvent;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.ViewImpl;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 
-public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandlers> implements DataDatabasesPresenter.Display {
+public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandlers>
+    implements DataDatabasesPresenter.Display {
 
   interface Binder extends UiBinder<Widget, DataDatabasesView> {}
 
@@ -164,7 +157,7 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
 
       @Override
       public String getValue(DatabaseDto dto) {
-        return ((SqlDatabaseDto) dto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings)).getUrl();
+        return dto.getSqlSettings().getUrl();
       }
     };
 
@@ -172,7 +165,7 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
 
       @Override
       public String getValue(DatabaseDto dto) {
-        return ((MongoDbDatabaseDto) dto.getExtension(MongoDbDatabaseDto.DatabaseDtoExtensions.settings)).getUrl();
+        return dto.getMongoDbSettings().getUrl();
       }
     };
 
@@ -186,23 +179,21 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
     final Column<DatabaseDto, String> sqlSchema = new TextColumn<DatabaseDto>() {
       @Override
       public String getValue(DatabaseDto dto) {
-        return SqlDatabasePresenter.SqlSchema.valueOf(
-            ((SqlDatabaseDto) dto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings)).getSqlSchema().getName())
-            .getLabel();
+        return SqlDatabasePresenter.SqlSchema.valueOf(dto.getSqlSettings().getSqlSchema().getName()).getLabel();
       }
     };
 
     final Column<DatabaseDto, String> sqlUsername = new TextColumn<DatabaseDto>() {
       @Override
       public String getValue(DatabaseDto dto) {
-        return ((SqlDatabaseDto) dto.getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings)).getUsername();
+        return dto.getSqlSettings().getUsername();
       }
     };
 
     final Column<DatabaseDto, String> mongoUsername = new TextColumn<DatabaseDto>() {
       @Override
       public String getValue(DatabaseDto dto) {
-        return ((MongoDbDatabaseDto) dto.getExtension(MongoDbDatabaseDto.DatabaseDtoExtensions.settings)).getUsername();
+        return dto.getMongoDbSettings().getUsername();
       }
     };
 

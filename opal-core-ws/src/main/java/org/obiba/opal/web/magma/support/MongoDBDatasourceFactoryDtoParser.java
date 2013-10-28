@@ -12,7 +12,7 @@ package org.obiba.opal.web.magma.support;
 import javax.annotation.Nonnull;
 
 import org.obiba.magma.DatasourceFactory;
-import org.obiba.opal.core.domain.database.MongoDbDatabase;
+import org.obiba.opal.core.domain.database.MongoDbSettings;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
@@ -36,8 +36,11 @@ public class MongoDBDatasourceFactoryDtoParser extends AbstractDatasourceFactory
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
     Magma.MongoDBDatasourceFactoryDto mongoDto = dto.getExtension(Magma.MongoDBDatasourceFactoryDto.params);
-    MongoDbDatabase database = (MongoDbDatabase) databaseRegistry.getDatabase(mongoDto.getDatabase());
-    return database.createMongoDBDatasourceFactory(dto.getName());
+    MongoDbSettings mongoDbSettings = databaseRegistry.getDatabase(mongoDto.getDatabase()).getMongoDbSettings();
+    if(mongoDbSettings == null) {
+      throw new IllegalArgumentException("Cannot find mongoDbSettings for database " + dto.getName());
+    }
+    return mongoDbSettings.createMongoDBDatasourceFactory(dto.getName());
   }
 
   @Override

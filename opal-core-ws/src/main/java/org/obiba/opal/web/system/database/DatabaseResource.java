@@ -14,8 +14,7 @@ import javax.ws.rs.core.Response;
 
 import org.obiba.magma.datasource.mongodb.MongoDBDatasourceFactory;
 import org.obiba.opal.core.domain.database.Database;
-import org.obiba.opal.core.domain.database.MongoDbDatabase;
-import org.obiba.opal.core.domain.database.SqlDatabase;
+import org.obiba.opal.core.domain.database.MongoDbSettings;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.core.runtime.database.MultipleIdentifiersDatabaseException;
 import org.obiba.opal.web.database.Dtos;
@@ -66,14 +65,13 @@ public class DatabaseResource {
   @PUT
   public Response update(DatabaseDto dto) throws MultipleIdentifiersDatabaseException {
 
-    Database database = databaseRegistry.getDatabase(dto.getName());
-    Dtos.fromDto(dto, database);
+    Database database = Dtos.fromDto(dto);
     if(!database.isEditable()) {
       return Response.status(BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatabaseIsNotEditable").build()).build();
     }
 
-    databaseRegistry.addOrReplaceDatabase(database);
+    databaseRegistry.saveDatabase(database);
 
     return Response.ok().build();
   }
@@ -82,11 +80,11 @@ public class DatabaseResource {
   @Path("/connections")
   public Response testConnection() {
     Database database = getDatabase();
-    if(database instanceof SqlDatabase) {
+    if(database.hasSqlSettings()) {
       return testSqlConnection();
     }
-    if(database instanceof MongoDbDatabase) {
-      return testMongoConnection();
+    if(database.hasMongoDbSettings()) {
+      return testMongoConnection(database.getMongoDbSettings());
     }
     throw new RuntimeException("Connection test not yet implemented for database " + database.getClass());
   }
@@ -111,17 +109,15 @@ public class DatabaseResource {
     return Response.status(SERVICE_UNAVAILABLE).entity(error).build();
   }
 
-  private Response testMongoConnection() {
+  private Response testMongoConnection(MongoDbSettings mongoDbSettings) {
     Ws.ClientErrorDto error = null;
     try {
-      MongoDbDatabase database = (MongoDbDatabase) getDatabase();
-      MongoDBDatasourceFactory datasourceFactory = database.createMongoDBDatasourceFactory("_test");
+      MongoDBDatasourceFactory datasourceFactory = mongoDbSettings.createMongoDBDatasourceFactory("_test");
       List<String> dbs = datasourceFactory.getMongoDBFactory().getMongoClient().getDatabaseNames();
       if(dbs.contains(datasourceFactory.getMongoDbDatabaseName())) {
         return Response.ok().build();
       }
-      error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "FailedToConnectToDatabase", database.getName())
-          .build();
+      error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "FailedToConnectToDatabase", name).build();
     } catch(RuntimeException e) {
       error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed", e);
     }

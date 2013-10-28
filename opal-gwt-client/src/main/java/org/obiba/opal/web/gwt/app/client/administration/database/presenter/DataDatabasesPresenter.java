@@ -11,17 +11,12 @@ package org.obiba.opal.web.gwt.app.client.administration.database.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.place.Places;
-import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -31,34 +26,20 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
-import org.obiba.opal.web.model.client.database.MongoDbDatabaseDto;
-import org.obiba.opal.web.model.client.database.SqlDatabaseDto;
 import org.obiba.opal.web.model.client.opal.AclAction;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
-import com.google.gwt.view.client.RangeChangeEvent;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.web.bindery.event.shared.Event;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.annotations.NameToken;
-import com.gwtplatform.mvp.client.annotations.ProxyEvent;
-import com.gwtplatform.mvp.client.annotations.ProxyStandard;
-import com.gwtplatform.mvp.client.annotations.TitleFunction;
-import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
@@ -168,13 +149,9 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
 
         } else if(dto.getEditable() && actionName.equalsIgnoreCase(EDIT_ACTION)) {
 
-          SqlDatabaseDto sqlDatabaseDto = (SqlDatabaseDto) dto
-              .getExtension(SqlDatabaseDto.DatabaseDtoExtensions.settings);
-          MongoDbDatabaseDto mongoDbDatabaseDto = (MongoDbDatabaseDto) dto
-              .getExtension(MongoDbDatabaseDto.DatabaseDtoExtensions.settings);
-          if(sqlDatabaseDto != null) {
+          if(dto.hasSqlSettings()) {
             sqlDatabaseModalProvider.get().editDatabase(dto);
-          } else if(mongoDbDatabaseDto != null) {
+          } else if(dto.hasMongoDbSettings()) {
             mongoDatabaseModalProvider.get().editDatabase(dto);
           }
 

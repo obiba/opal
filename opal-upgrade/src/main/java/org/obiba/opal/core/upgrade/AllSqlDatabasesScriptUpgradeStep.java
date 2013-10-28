@@ -1,6 +1,6 @@
 package org.obiba.opal.core.upgrade;
 
-import org.obiba.opal.core.domain.database.SqlDatabase;
+import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
@@ -17,7 +17,7 @@ public class AllSqlDatabasesScriptUpgradeStep extends AbstractUpgradeStep {
 
   @Override
   public void execute(Version currentVersion) {
-    for(SqlDatabase database : databaseRegistry.list(SqlDatabase.class)) {
+    for(Database database : databaseRegistry.listSqlDatabases()) {
       SqlScriptUpgradeStep step = new SqlScriptUpgradeStep(databaseRegistry.getDataSource(database.getName(), null),
           scriptBasename, scriptPath);
       step.setAppliesTo(getAppliesTo());

@@ -1,109 +1,82 @@
 package org.obiba.opal.web.database;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
 import org.obiba.opal.core.domain.database.Database;
-import org.obiba.opal.core.domain.database.MongoDbDatabase;
-import org.obiba.opal.core.domain.database.SqlDatabase;
+import org.obiba.opal.core.domain.database.MongoDbSettings;
+import org.obiba.opal.core.domain.database.SqlSettings;
 import org.obiba.opal.web.model.Magma;
 
 import com.google.common.base.Strings;
 
 import static org.obiba.opal.web.model.Database.DatabaseDto;
-import static org.obiba.opal.web.model.Database.MongoDbDatabaseDto;
-import static org.obiba.opal.web.model.Database.SqlDatabaseDto;
+import static org.obiba.opal.web.model.Database.MongoDbSettingsDto;
+import static org.obiba.opal.web.model.Database.SqlSettingsDto;
 
 public class Dtos {
 
   private Dtos() {}
 
-  public static void fromDto(@Nonnull DatabaseDto dto, @Nonnull Database database) {
-    if(dto.hasExtension(SqlDatabaseDto.settings)) {
-      fromDto(dto, dto.getExtension(SqlDatabaseDto.settings), (SqlDatabase) database);
-    } else if(dto.hasExtension(MongoDbDatabaseDto.settings)) {
-      fromDto(dto, dto.getExtension(MongoDbDatabaseDto.settings), (MongoDbDatabase) database);
-    } else {
-      throw new IllegalArgumentException("Unsupported DatabaseDto extension");
-    }
-  }
-
   public static Database fromDto(DatabaseDto dto) {
-    if(dto.hasExtension(SqlDatabaseDto.settings)) {
-      return fromDto(dto, dto.getExtension(SqlDatabaseDto.settings));
-    }
-    if(dto.hasExtension(MongoDbDatabaseDto.settings)) {
-      return fromDto(dto, dto.getExtension(MongoDbDatabaseDto.settings));
-    }
-    throw new IllegalArgumentException("Unsupported DatabaseDto extension");
-  }
-
-  private static void fromDto(Database db, DatabaseDto dto) {
+    Database db = new Database();
     db.setEditable(dto.getEditable());
     db.setDefaultStorage(dto.getDefaultStorage());
     db.setDescription(dto.getDescription());
     db.setName(dto.getName());
     db.setUsage(Database.Usage.valueOf(dto.getUsage().name()));
     db.setUsedForIdentifiers(dto.getUsedForIdentifiers());
-  }
-
-  private static void fromDto(DatabaseDto dto, SqlDatabaseDto sqlDto, SqlDatabase db) {
-    fromDto(db, dto);
-    db.setDriverClass(sqlDto.getDriverClass());
-    db.setSqlSchema(SqlDatabase.SqlSchema.valueOf(sqlDto.getSqlSchema().name()));
-    db.setUrl(sqlDto.getUrl());
-    db.setUsername(sqlDto.getUsername());
-    db.setPassword(sqlDto.getPassword());
-    db.setProperties(sqlDto.getProperties());
-    switch(db.getSqlSchema()) {
-      case JDBC:
-        db.setJdbcDatasourceSettings(getJdbcDatasourceSettings(sqlDto.getJdbcDatasourceSettings()));
-        break;
-      case LIMESURVEY:
-        db.setLimesurveyDatasourceSettings(getLimesurveyDatasourceSettings(sqlDto.getLimesurveyDatasourceSettings()));
-        break;
-    }
+    db.setSqlSettings(fromDto(dto.getSqlSettings()));
+    db.setMongoDbSettings(fromDto(dto.getMongoDbSettings()));
+    return db;
   }
 
   @Nullable
-  private static SqlDatabase.LimesurveyDatasourceSettings getLimesurveyDatasourceSettings(
-      @Nullable SqlDatabaseDto.LimesurveyDatasourceSettingsDto limesurveySettingsDto) {
-    if(limesurveySettingsDto == null) return null;
-    SqlDatabase.LimesurveyDatasourceSettings limesurveySettings = new SqlDatabase.LimesurveyDatasourceSettings();
-    limesurveySettings.setTablePrefix(limesurveySettingsDto.getTablePrefix());
+  private static SqlSettings fromDto(@Nullable SqlSettingsDto dto) {
+    if(dto == null) return null;
+
+    SqlSettings settings = new SqlSettings();
+    settings.setDriverClass(dto.getDriverClass());
+    settings.setSqlSchema(SqlSettings.SqlSchema.valueOf(dto.getSqlSchema().name()));
+    settings.setUrl(dto.getUrl());
+    settings.setUsername(dto.getUsername());
+    settings.setPassword(dto.getPassword());
+    settings.setProperties(dto.getProperties());
+    settings.setJdbcDatasourceSettings(fromDto(dto.getJdbcDatasourceSettings()));
+    settings.setLimesurveyDatasourceSettings(fromDto(dto.getLimesurveyDatasourceSettings()));
+    return settings;
+  }
+
+  @Nullable
+  private static SqlSettings.LimesurveyDatasourceSettings fromDto(
+      @Nullable SqlSettingsDto.LimesurveyDatasourceSettingsDto dto) {
+    if(dto == null) return null;
+
+    SqlSettings.LimesurveyDatasourceSettings limesurveySettings = new SqlSettings.LimesurveyDatasourceSettings();
+    limesurveySettings.setTablePrefix(dto.getTablePrefix());
     return limesurveySettings;
   }
 
   @Nullable
-  private static SqlDatabase.JdbcDatasourceSettings getJdbcDatasourceSettings(
-      @Nullable Magma.JdbcDatasourceSettingsDto jdbcSettingsDto) {
-    if(jdbcSettingsDto == null) return null;
-    SqlDatabase.JdbcDatasourceSettings jdbcSettings = new SqlDatabase.JdbcDatasourceSettings();
-    jdbcSettings.setDefaultEntityType(jdbcSettingsDto.getDefaultEntityType());
-    jdbcSettings.setDefaultCreatedTimestampColumnName(jdbcSettingsDto.getDefaultCreatedTimestampColumnName());
-    jdbcSettings.setDefaultUpdatedTimestampColumnName(jdbcSettingsDto.getDefaultUpdatedTimestampColumnName());
-    jdbcSettings.setUseMetadataTables(jdbcSettingsDto.getUseMetadataTables());
+  private static JdbcDatasourceSettings fromDto(@Nullable Magma.JdbcDatasourceSettingsDto dto) {
+    if(dto == null) return null;
+    JdbcDatasourceSettings jdbcSettings = new JdbcDatasourceSettings();
+    jdbcSettings.setDefaultEntityType(dto.getDefaultEntityType());
+    jdbcSettings.setDefaultCreatedTimestampColumnName(dto.getDefaultCreatedTimestampColumnName());
+    jdbcSettings.setDefaultUpdatedTimestampColumnName(dto.getDefaultUpdatedTimestampColumnName());
+    jdbcSettings.setUseMetadataTables(dto.getUseMetadataTables());
     return jdbcSettings;
   }
 
-  private static SqlDatabase fromDto(DatabaseDto dto, SqlDatabaseDto sqlDto) {
-    SqlDatabase db = new SqlDatabase();
-    fromDto(dto, sqlDto, db);
-    return db;
-  }
-
-  private static void fromDto(DatabaseDto dto, MongoDbDatabaseDto mongoDto, MongoDbDatabase db) {
-    fromDto(db, dto);
-    db.setUrl(mongoDto.getUrl());
-    db.setUsername(mongoDto.getUsername());
-    db.setPassword(mongoDto.getPassword());
-    db.setProperties(mongoDto.getProperties());
-  }
-
-  private static MongoDbDatabase fromDto(DatabaseDto dto, MongoDbDatabaseDto mongoDto) {
-    MongoDbDatabase db = new MongoDbDatabase();
-    fromDto(dto, mongoDto, db);
-    return db;
+  @Nullable
+  private static MongoDbSettings fromDto(@Nullable MongoDbSettingsDto dto) {
+    if(dto == null) return null;
+    MongoDbSettings settings = new MongoDbSettings();
+    settings.setUrl(dto.getUrl());
+    settings.setUsername(dto.getUsername());
+    settings.setPassword(dto.getPassword());
+    settings.setProperties(dto.getProperties());
+    return settings;
   }
 
   public static DatabaseDto asDto(Database db) {
@@ -114,68 +87,74 @@ public class Dtos {
     builder.setEditable(db.isEditable());
     builder.setUsedForIdentifiers(db.isUsedForIdentifiers());
     builder.setUsage(DatabaseDto.Usage.valueOf(db.getUsage().name()));
-    if(db instanceof SqlDatabase) {
-      return builder.setExtension(SqlDatabaseDto.settings, asDto((SqlDatabase) db)).build();
+
+    SqlSettings sqlSettings = db.getSqlSettings();
+    if(sqlSettings != null) {
+      return builder.setSqlSettings(asDto(sqlSettings)).build();
     }
-    if(db instanceof MongoDbDatabase) {
-      return builder.setExtension(MongoDbDatabaseDto.settings, asDto((MongoDbDatabase) db)).build();
+    MongoDbSettings mongoDbSettings = db.getMongoDbSettings();
+    if(mongoDbSettings != null) {
+      return builder.setMongoDbSettings(asDto(mongoDbSettings)).build();
     }
     throw new IllegalArgumentException("Unsupported database class " + db.getClass());
   }
 
-  private static SqlDatabaseDto asDto(SqlDatabase db) {
-    SqlDatabaseDto.Builder builder = SqlDatabaseDto.newBuilder() //
+  private static SqlSettingsDto.Builder asDto(SqlSettings db) {
+    SqlSettingsDto.Builder builder = SqlSettingsDto.newBuilder() //
         .setDriverClass(db.getDriverClass()) //
-        .setSqlSchema(SqlDatabaseDto.SqlSchema.valueOf(db.getSqlSchema().name())) //
+        .setSqlSchema(SqlSettingsDto.SqlSchema.valueOf(db.getSqlSchema().name())) //
         .setUrl(db.getUrl()) //
         .setUsername(db.getUsername());
     if(!Strings.isNullOrEmpty(db.getPassword())) builder.setPassword(db.getPassword());
     if(!Strings.isNullOrEmpty(db.getProperties())) builder.setProperties(db.getProperties());
     switch(db.getSqlSchema()) {
       case JDBC:
-        setJdbcDatasourceSettings(builder, db.getJdbcDatasourceSettings());
+        JdbcDatasourceSettings jdbcSettings = db.getJdbcDatasourceSettings();
+        if(jdbcSettings != null) {
+          builder.setJdbcDatasourceSettings(asDto(jdbcSettings));
+        }
         break;
       case LIMESURVEY:
-        setLimesurveyDatasourceSettings(builder, db.getLimesurveyDatasourceSettings());
+        SqlSettings.LimesurveyDatasourceSettings limesurveySettings = db.getLimesurveyDatasourceSettings();
+        if(limesurveySettings != null) {
+          builder.setLimesurveyDatasourceSettings(asDto(limesurveySettings));
+        }
         break;
     }
-    return builder.build();
+    return builder;
   }
 
-  private static void setJdbcDatasourceSettings(SqlDatabaseDto.Builder builder,
-      @Nullable SqlDatabase.JdbcDatasourceSettings jdbcSettings) {
-    if(jdbcSettings == null) return;
-    Magma.JdbcDatasourceSettingsDto.Builder jdbcSettingsBuilder = Magma.JdbcDatasourceSettingsDto.newBuilder();
-    jdbcSettingsBuilder.setDefaultEntityType(jdbcSettings.getDefaultEntityType());
+  private static SqlSettingsDto.LimesurveyDatasourceSettingsDto.Builder asDto(
+      SqlSettings.LimesurveyDatasourceSettings limesurveySettings) {
+    SqlSettingsDto.LimesurveyDatasourceSettingsDto.Builder builder = SqlSettingsDto.LimesurveyDatasourceSettingsDto
+        .newBuilder();
+    String tablePrefix = limesurveySettings.getTablePrefix();
+    if(!Strings.isNullOrEmpty(tablePrefix)) builder.setTablePrefix(tablePrefix);
+    return builder;
+  }
+
+  private static Magma.JdbcDatasourceSettingsDto.Builder asDto(JdbcDatasourceSettings jdbcSettings) {
+    Magma.JdbcDatasourceSettingsDto.Builder builder = Magma.JdbcDatasourceSettingsDto.newBuilder();
+    builder.setDefaultEntityType(jdbcSettings.getDefaultEntityType());
     String defaultCreatedTimestampColumnName = jdbcSettings.getDefaultCreatedTimestampColumnName();
     if(!Strings.isNullOrEmpty(defaultCreatedTimestampColumnName)) {
-      jdbcSettingsBuilder.setDefaultCreatedTimestampColumnName(defaultCreatedTimestampColumnName);
+      builder.setDefaultCreatedTimestampColumnName(defaultCreatedTimestampColumnName);
     }
     String defaultUpdatedTimestampColumnName = jdbcSettings.getDefaultUpdatedTimestampColumnName();
     if(!Strings.isNullOrEmpty(defaultUpdatedTimestampColumnName)) {
-      jdbcSettingsBuilder.setDefaultUpdatedTimestampColumnName(defaultUpdatedTimestampColumnName);
+      builder.setDefaultUpdatedTimestampColumnName(defaultUpdatedTimestampColumnName);
     }
-    jdbcSettingsBuilder.setUseMetadataTables(jdbcSettings.isUseMetadataTables());
-    builder.setJdbcDatasourceSettings(jdbcSettingsBuilder);
+    builder.setUseMetadataTables(jdbcSettings.isUseMetadataTables());
+    return builder;
   }
 
-  private static void setLimesurveyDatasourceSettings(SqlDatabaseDto.Builder builder,
-      @Nullable SqlDatabase.LimesurveyDatasourceSettings limesurveySettings) {
-    if(limesurveySettings == null) return;
-    SqlDatabaseDto.LimesurveyDatasourceSettingsDto.Builder limesurveySettingsBuilder = SqlDatabaseDto
-        .LimesurveyDatasourceSettingsDto.newBuilder();
-    String tablePrefix = limesurveySettings.getTablePrefix();
-    if(!Strings.isNullOrEmpty(tablePrefix)) limesurveySettingsBuilder.setTablePrefix(tablePrefix);
-    builder.setLimesurveyDatasourceSettings(limesurveySettingsBuilder);
-  }
-
-  private static MongoDbDatabaseDto asDto(MongoDbDatabase db) {
-    MongoDbDatabaseDto.Builder builder = MongoDbDatabaseDto.newBuilder() //
+  private static MongoDbSettingsDto.Builder asDto(MongoDbSettings db) {
+    MongoDbSettingsDto.Builder builder = MongoDbSettingsDto.newBuilder() //
         .setUrl(db.getUrl());
     if(!Strings.isNullOrEmpty(db.getUsername())) builder.setUsername(db.getUsername());
     if(!Strings.isNullOrEmpty(db.getPassword())) builder.setPassword(db.getPassword());
     if(!Strings.isNullOrEmpty(db.getProperties())) builder.setProperties(db.getProperties());
-    return builder.build();
+    return builder;
   }
 
 }

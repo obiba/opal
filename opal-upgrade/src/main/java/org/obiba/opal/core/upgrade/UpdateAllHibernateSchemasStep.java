@@ -1,7 +1,7 @@
 package org.obiba.opal.core.upgrade;
 
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
-import org.obiba.opal.core.domain.database.SqlDatabase;
+import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
@@ -13,7 +13,7 @@ public class UpdateAllHibernateSchemasStep extends AbstractUpgradeStep {
 
   @Override
   public void execute(Version currentVersion) {
-    for(SqlDatabase database : databaseRegistry.list(SqlDatabase.class)) {
+    for(Database database : databaseRegistry.listSqlDatabases()) {
       LocalSessionFactoryBean sessionFactory = (LocalSessionFactoryBean) databaseRegistry
           .getSessionFactory(database.getName(), null);
       new SchemaUpdate(sessionFactory.getConfiguration()).execute(false, true);
