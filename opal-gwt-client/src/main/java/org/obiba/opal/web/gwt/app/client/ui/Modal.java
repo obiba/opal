@@ -166,11 +166,12 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     // NOTE: setting the height and the body height causes footer draw glitches
     // for now we only set the width on the body
 //    setHeight(minHeight + "px");
+    setMaxHeigth(minHeight + "px");
   }
 
   private void setInitialWidth() {
     if(minWidth == 0 || getOffsetWidth() > minWidth) return;
-    setWidth(minWidth + "px");
+    setWidth(minWidth);
   }
 
   private void sinkMouseEvents() {
@@ -279,7 +280,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
       // NOTE: setting the height and the body height causes footer draw glitches
       // for now we only set the width on the body
 //      setHeight(height + "px");
-      setWidth(width + "px");
+      setWidth(width);
       setMaxHeigth(height + "px");
     }
   }
