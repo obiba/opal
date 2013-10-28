@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.orientechnologies.orient.core.db.ODatabase;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.object.db.OObjectDatabasePool;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 import com.orientechnologies.orient.server.OServer;
@@ -20,7 +22,6 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
 
   public static final String URL = "local:${OPAL_HOME}/data/orientdb/opal-config";
 
-  @Value(URL)
   private String url;
 
   //  @Value("${org.obiba.opal.config.username}")
@@ -31,9 +32,14 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
 
   private static OServer server;
 
+  @Value(URL)
+  @Override
+  public void setUrl(@Nonnull String url) {
+    this.url = url;
+  }
+
   //  @PostConstruct
-  public static void start() {
-    String url = URL.replace("${OPAL_HOME}", System.getProperty("OPAL_HOME"));
+  public static void start(String url) {
     log.info("Start OrientDB server ({})", url);
     System.setProperty("ORIENTDB_HOME", url);
     try {
@@ -68,8 +74,14 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
 
   @Nonnull
   @Override
-  public OObjectDatabaseTx getDatabaseDocumentTx() {
+  public OObjectDatabaseTx getObjectTx() {
     return OObjectDatabasePool.global().acquire(url, username, password);
+  }
+
+  @Nonnull
+  @Override
+  public ODatabaseDocumentTx getDocumentTx() {
+    return ODatabaseDocumentPool.global().acquire(url, username, password);
   }
 
 }

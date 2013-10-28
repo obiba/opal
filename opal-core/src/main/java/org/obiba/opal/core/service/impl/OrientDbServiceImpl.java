@@ -38,8 +38,8 @@ public class OrientDbServiceImpl implements OrientDbService {
   private OrientDbServerFactory serverFactory;
 
   @Override
-  public <T> T execute(OrientDbTransactionCallback<T> action) throws OException {
-    OObjectDatabaseTx db = serverFactory.getDatabaseDocumentTx();
+  public <T> T execute(OrientDbTransactionCallback<T> action) {
+    OObjectDatabaseTx db = serverFactory.getObjectTx();
     try {
       db.begin(OTransaction.TXTYPE.OPTIMISTIC);
       T t = action.doInTransaction(db);
@@ -54,7 +54,7 @@ public class OrientDbServiceImpl implements OrientDbService {
   }
 
   @Override
-  public <T> T save(final T t) throws ConstraintViolationException, OException {
+  public <T> T save(final T t) throws ConstraintViolationException {
     defaultBeanValidator.validate(t);
     return execute(new OrientDbTransactionCallback<T>() {
       @Override
@@ -65,7 +65,7 @@ public class OrientDbServiceImpl implements OrientDbService {
   }
 
   @Override
-  public void delete(final Object obj) throws OException {
+  public void delete(final Object obj) {
     execute(new OrientDbTransactionCallbackWithoutResult() {
       @Override
       protected void doInTransactionWithoutResult(OObjectDatabaseTx db) {
@@ -76,7 +76,7 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   @Override
   public <T> Iterable<T> list(Class<T> clazz) {
-    OObjectDatabaseTx db = serverFactory.getDatabaseDocumentTx();
+    OObjectDatabaseTx db = serverFactory.getObjectTx();
     try {
       return detachAll(db.browseClass(clazz), db);
     } finally {
@@ -86,7 +86,7 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   @Override
   public <T> Iterable<T> list(String sql, Object... params) {
-    OObjectDatabaseTx db = serverFactory.getDatabaseDocumentTx();
+    OObjectDatabaseTx db = serverFactory.getObjectTx();
     try {
       return detachAll(db.command(new OSQLSynchQuery(sql)).<Iterable<T>>execute(params), db);
     } finally {
@@ -117,7 +117,7 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   @Override
   public long count(Class<?> clazz) {
-    OObjectDatabaseTx db = serverFactory.getDatabaseDocumentTx();
+    OObjectDatabaseTx db = serverFactory.getObjectTx();
     try {
       return db.countClass(clazz);
     } finally {
@@ -127,7 +127,7 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   @Override
   public void registerEntityClass(Class<?>... classes) {
-    OObjectDatabaseTx db = serverFactory.getDatabaseDocumentTx();
+    OObjectDatabaseTx db = serverFactory.getObjectTx();
     try {
       for(Class<?> clazz : classes) {
         db.getEntityManager().registerEntityClass(clazz);
@@ -139,7 +139,7 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   @Override
   public void createIndex(Class<?> clazz, String property, OClass.INDEX_TYPE indexType, OType type) {
-    OObjectDatabaseTx db = serverFactory.getDatabaseDocumentTx();
+    OObjectDatabaseTx db = serverFactory.getObjectTx();
     try {
       String className = clazz.getSimpleName();
       int clusterId = db.getClusterIdByName(className.toLowerCase());
