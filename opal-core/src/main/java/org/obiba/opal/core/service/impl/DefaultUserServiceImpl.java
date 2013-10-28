@@ -14,7 +14,6 @@ import javax.validation.ConstraintViolationException;
 
 import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.User;
-import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SubjectAclService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,44 +28,43 @@ public class DefaultUserServiceImpl implements UserService {
   private SubjectAclService aclService;
 
   @Autowired
-  private OrientDbService orientDbService;
+  private OrientDbDocumentService orientDbDocumentService;
 
   @Override
   @PostConstruct
   public void start() {
-    orientDbService.registerEntityClass(User.class, Group.class);
-    orientDbService.createUniqueStringIndex(User.class, "name");
-    orientDbService.createUniqueStringIndex(Group.class, "name");
+    orientDbDocumentService.createUniqueStringIndex(User.class, "name");
+    orientDbDocumentService.createUniqueStringIndex(Group.class, "name");
   }
 
   @Override
   public void stop() {
-
   }
 
   @Override
-  public Iterable<User> list() {
-    return orientDbService.list(User.class);
+  public Iterable<User> listUsers() {
+    return orientDbDocumentService.list(User.class);
   }
 
   @Override
-  public long getUserCount() {
-    return orientDbService.count(User.class);
+  public long countUsers() {
+    return orientDbDocumentService.count(User.class);
   }
 
   @Override
-  public long getGroupCount() {
-    return orientDbService.count(Group.class);
+  public long countGroups() {
+    return orientDbDocumentService.count(Group.class);
   }
 
   @Override
-  public User getUserWithName(String name) {
-    return orientDbService.uniqueResult("select from User where name = ?", name);
+  public User getUser(String name) {
+    return orientDbDocumentService
+        .uniqueResult(User.class, "select from " + User.class.getSimpleName() + " where name = ?", name);
   }
 
   @Override
-  public void createOrUpdateUser(User user) throws ConstraintViolationException {
-    orientDbService.save(user);
+  public void save(User user) throws ConstraintViolationException {
+    orientDbDocumentService.save(user);
   }
 
   @Override
@@ -74,25 +72,26 @@ public class DefaultUserServiceImpl implements UserService {
     SubjectAclService.Subject aclSubject = SubjectAclService.SubjectType
         .valueOf(SubjectAclService.SubjectType.USER.name()).subjectFor(user.getName());
 
-    orientDbService.delete(user);
+    orientDbDocumentService.delete("select from " + User.class.getSimpleName() + " where name = ?", user.getName());
 
     // Delete user's permissions
     aclService.deleteSubjectPermissions("opal", null, aclSubject);
   }
 
   @Override
-  public void createOrUpdateGroup(Group group) throws ConstraintViolationException {
-    orientDbService.save(group);
+  public void save(Group group) throws ConstraintViolationException {
+    orientDbDocumentService.save(group);
   }
 
   @Override
-  public Iterable<Group> getGroups() {
-    return orientDbService.list(Group.class);
+  public Iterable<Group> listGroups() {
+    return orientDbDocumentService.list(Group.class);
   }
 
   @Override
-  public Group getGroupWithName(String name) {
-    return orientDbService.uniqueResult("select from Group where name = ?", name);
+  public Group getGroup(String name) {
+    return orientDbDocumentService
+        .uniqueResult(Group.class, "select from " + Group.class.getSimpleName() + " where name = ?", name);
   }
 
   @Override
@@ -100,7 +99,7 @@ public class DefaultUserServiceImpl implements UserService {
     SubjectAclService.Subject aclSubject = SubjectAclService.SubjectType
         .valueOf(SubjectAclService.SubjectType.GROUP.name()).subjectFor(group.getName());
 
-    orientDbService.delete(group);
+    orientDbDocumentService.delete("select from " + Group.class.getSimpleName() + " where name = ?", group.getName());
 
     // Delete group's permissions
     aclService.deleteSubjectPermissions("opal", null, aclSubject);

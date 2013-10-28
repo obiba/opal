@@ -19,13 +19,11 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import org.easymock.EasyMock;
 import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
-import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.unit.UnitKeyStore;
 
 import static org.easymock.EasyMock.createMock;
@@ -43,11 +41,11 @@ public class DefaultUnitKeyStoreServiceImplTest {
 
   private DefaultUnitKeyStoreServiceImpl unitKeyStoreService;
 
-  private OrientDbService mockOrientDbService;
+  private OrientDbDocumentService mockOrientDbService;
 
   @Before
   public void setUp() {
-    mockOrientDbService = createMock(OrientDbService.class);
+    mockOrientDbService = createMock(OrientDbDocumentService.class);
     unitKeyStoreService = new DefaultUnitKeyStoreServiceImpl(createPasswordCallbackHandler(), mockOrientDbService);
   }
 
@@ -74,7 +72,8 @@ public class DefaultUnitKeyStoreServiceImplTest {
     UnitKeyStoreState state = new UnitKeyStoreState();
     state.setUnit("my-unit");
     state.setKeyStore(getTestKeyStoreByteArray());
-    expect(mockOrientDbService.uniqueResult("select from UnitKeyStoreState where unit = ?", state.getUnit()))
+    expect(mockOrientDbService.uniqueResult(UnitKeyStoreState.class,
+        "select from " + UnitKeyStoreState.class.getSimpleName() + " where unit = ?", state.getUnit()))
         .andReturn(state);
 
     replay(mockOrientDbService);
@@ -93,10 +92,12 @@ public class DefaultUnitKeyStoreServiceImplTest {
     UnitKeyStoreState state = new UnitKeyStoreState();
     state.setUnit("my-unit");
 
-    expect(mockOrientDbService.uniqueResult("select from UnitKeyStoreState where unit = ?", state.getUnit()))
-        .andReturn(null).times(2);
+    expect(mockOrientDbService.uniqueResult(UnitKeyStoreState.class,
+        "select from " + UnitKeyStoreState.class.getSimpleName() + " where unit = ?", state.getUnit())) //
+        .andReturn(null) //
+        .times(2);
 
-    expect(mockOrientDbService.save(EasyMock.anyObject())).andReturn(new UnitKeyStoreState());
+//    expect(mockOrientDbService.save(EasyMock.anyObject())).andReturn(new UnitKeyStoreState());
 
     replay(mockOrientDbService);
 

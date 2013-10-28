@@ -32,7 +32,7 @@ public class CreateOpalGeneralConfigInstallStep implements InstallStep {
   public void execute(Version currentVersion) {
     OpalGeneralConfig conf = new OpalGeneralConfig();
     conf.setLocales(Arrays.asList(OpalGeneralConfig.DEFAULT_LOCALE));
-    generalConfigService.createServerConfig(conf);
+    generalConfigService.save(conf);
   }
 
 }

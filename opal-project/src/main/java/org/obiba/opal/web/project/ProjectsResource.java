@@ -56,7 +56,7 @@ public class ProjectsResource {
     try {
 
       Project project = Dtos.fromDto(projectFactoryDto);
-      projectService.createProject(project);
+      projectService.save(project);
       URI projectUri = uriInfo.getBaseUriBuilder().path("project").path(project.getName()).build();
       Projects.ProjectDto projectDto = Dtos.asDto(project, projectService.getProjectDirectoryPath(project));
       response = Response.created(projectUri).entity(projectDto);

@@ -30,7 +30,6 @@ import org.obiba.opal.core.crypt.CachingCallbackHandler;
 import org.obiba.opal.core.crypt.KeyProviderSecurityException;
 import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
-import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.UnitKeyStore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,20 +45,19 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
   private final CallbackHandler callbackHandler;
 
   @Nonnull
-  private final OrientDbService orientDbService;
+  private final OrientDbDocumentService orientDbDocumentService;
 
   @Autowired
   public DefaultUnitKeyStoreServiceImpl(@Nonnull CallbackHandler callbackHandler,
-      @Nonnull OrientDbService orientDbService) {
+      @Nonnull OrientDbDocumentService orientDbDocumentService) {
     this.callbackHandler = callbackHandler;
-    this.orientDbService = orientDbService;
+    this.orientDbDocumentService = orientDbDocumentService;
   }
 
   @Override
   @PostConstruct
   public void start() {
-    orientDbService.registerEntityClass(UnitKeyStoreState.class);
-    orientDbService.createUniqueStringIndex(UnitKeyStoreState.class, "unit");
+    orientDbDocumentService.createUniqueStringIndex(UnitKeyStoreState.class, "name");
   }
 
   @Override
@@ -70,8 +68,13 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
   @Override
   public UnitKeyStore getUnitKeyStore(@Nonnull String unitName) {
     Assert.hasText(unitName, "unitName must not be null or empty");
-    UnitKeyStoreState state = orientDbService.uniqueResult("select from UnitKeyStoreState where unit = ?", unitName);
+    UnitKeyStoreState state = findByUnit(unitName);
     return state == null ? null : loadUnitKeyStore(unitName, state);
+  }
+
+  private UnitKeyStoreState findByUnit(String unitName) {
+    return orientDbDocumentService.uniqueResult(UnitKeyStoreState.class,
+        "select from " + UnitKeyStoreState.class.getSimpleName() + " where unit = ?", unitName);
   }
 
   @Override
@@ -92,7 +95,7 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
 
     UnitKeyStoreState state;
     String unitName = unitKeyStore.getUnitName();
-    UnitKeyStoreState existing = orientDbService.uniqueResult("select from UnitKeyStoreState where unit = ?", unitName);
+    UnitKeyStoreState existing = findByUnit(unitName);
     if(existing == null) {
       state = new UnitKeyStoreState();
       state.setUnit(unitName);
@@ -101,7 +104,7 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
     }
     state.setKeyStore(getKeyStoreByteArray(unitKeyStore));
 
-    orientDbService.save(state);
+    orientDbDocumentService.save(state);
   }
 
   @Override

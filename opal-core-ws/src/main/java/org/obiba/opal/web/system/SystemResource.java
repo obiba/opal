@@ -6,9 +6,9 @@ import java.lang.management.MemoryUsage;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.ws.rs.GET;
@@ -28,6 +28,10 @@ import org.obiba.runtime.upgrade.VersionProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 import static org.obiba.opal.web.model.Database.DatabasesStatusDto;
 
@@ -81,7 +85,7 @@ public class SystemResource {
         .setVersion(opalVersionProvider.getVersion().toString()) //
         .setVmName(runtimeMXBean.getVmName()) //
         .setVmVendor(runtimeMXBean.getVmVendor()) //
-        .setVmVersion(runtimeMXBean.getVmVersion())//
+        .setVmVersion(runtimeMXBean.getVmVersion()) //
         .setJavaVersion(System.getProperty("java.version")) //
         .addAllSystemProperties(systemProperties).build();
   }
@@ -154,35 +158,35 @@ public class SystemResource {
   @GET
   @Path("/conf/general")
   public Opal.GeneralConf getOpalGeneralConfiguration() {
-    OpalGeneralConfig conf = serverService.getServerConfig();
+    OpalGeneralConfig conf = serverService.getConfig();
 
     return Opal.GeneralConf.newBuilder()//
         .setName(conf.getName())//
-        .addAllLanguages(conf.getLocales())//
+        .addAllLanguages(conf.getLocalesAsString())//
         .setDefaultCharSet(conf.getDefaultCharacterSet()).build();
   }
 
   @PUT
   @Path("/conf/general")
-  public Response updateGeneralConfigurations(Opal.GeneralConf confDto) {
-    OpalGeneralConfig conf = serverService.getServerConfig();
+  public Response updateGeneralConfigurations(Opal.GeneralConf dto) {
+    OpalGeneralConfig conf = serverService.getConfig();
+    conf.setName(dto.getName().isEmpty() ? OpalGeneralConfig.DEFAULT_NAME : dto.getName());
 
-    if(conf == null) {
-      conf = new OpalGeneralConfig();
+    if(dto.getLanguagesList().isEmpty()) {
+      conf.setLocales(Lists.newArrayList(OpalGeneralConfig.DEFAULT_LOCALE));
+    } else {
+      conf.setLocales(Lists.newArrayList(Iterables.transform(dto.getLanguagesList(), new Function<String, Locale>() {
+        @Override
+        public Locale apply(String locale) {
+          return new Locale(locale);
+        }
+      })));
     }
 
-    conf.setName(confDto.getName().isEmpty() //
-        ? OpalGeneralConfig.DEFAULT_NAME //
-        : confDto.getName());
+    conf.setDefaultCharacterSet(
+        dto.getDefaultCharSet().isEmpty() ? OpalGeneralConfig.DEFAULT_CHARSET : dto.getDefaultCharSet());
 
-    conf.setLocales(confDto.getLanguagesList().isEmpty() ? Arrays.asList(OpalGeneralConfig.DEFAULT_LOCALE)//
-        : confDto.getLanguagesList());
-
-    conf.setDefaultCharacterSet(confDto.getDefaultCharSet().isEmpty() //
-        ? OpalGeneralConfig.DEFAULT_CHARSET //
-        : confDto.getDefaultCharSet());
-
-    serverService.updateServerConfig(conf);
+    serverService.save(conf);
 
     return Response.ok().build();
   }

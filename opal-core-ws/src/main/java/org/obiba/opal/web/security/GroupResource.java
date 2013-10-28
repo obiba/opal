@@ -16,39 +16,43 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.user.Group;
+import org.obiba.opal.core.service.impl.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component
 @Scope("request")
 @Path("/group/{name}")
-public class GroupResource extends AbstractUserGroupResource {
+public class GroupResource {
 
   @PathParam("name")
   private String name;
 
+  @Autowired
+  private UserService userService;
+
   @GET
   public Response getGroup() {
-    Group group = userService.getGroupWithName(name);
+    Group group = userService.getGroup(name);
     if(group == null) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
-    return Response.ok().entity(asDto(group)).build();
+    return Response.ok().entity(Dtos.asDto(group)).build();
   }
 
   @DELETE
   public Response deleteGroup() {
-    Group group = userService.getGroupWithName(name);
-    if(group != null && !group.getUsers().isEmpty()) {
-      // cannot delete a group with users
-      //TODO add message to explain what failed
-      return Response.status(Response.Status.PRECONDITION_FAILED).build();
-    }
-
+    Group group = userService.getGroup(name);
     if(group != null) {
-      userService.deleteGroup(group);
+      if(group.getUsers().isEmpty()) {
+        userService.deleteGroup(group);
+      } else {
+        // cannot delete a group with users
+        //TODO add message to explain what failed
+        return Response.status(Response.Status.PRECONDITION_FAILED).build();
+      }
     }
-
     return Response.ok().build();
   }
 }

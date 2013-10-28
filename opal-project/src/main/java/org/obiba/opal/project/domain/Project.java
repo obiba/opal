@@ -19,8 +19,7 @@ import javax.persistence.Transient;
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
-import org.obiba.opal.core.domain.AbstractOrientDbTimestampedEntity;
-import org.obiba.opal.core.validator.Unique;
+import org.obiba.opal.core.domain.AbstractTimestamped;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
@@ -28,8 +27,7 @@ import com.google.common.base.Strings;
 /**
  * Description of a project in Opal.
  */
-@Unique(properties = "name")
-public class Project extends AbstractOrientDbTimestampedEntity {
+public class Project extends AbstractTimestamped implements Comparable<Project> {
 
   @Nonnull
   @NotBlank
@@ -120,7 +118,25 @@ public class Project extends AbstractOrientDbTimestampedEntity {
     return Objects.toStringHelper(this).add("name", name).add("database", database).toString();
   }
 
-  @SuppressWarnings({ "ParameterHidesMemberVariable", "UnusedDeclaration" })
+  @Override
+  public boolean equals(Object o) {
+    if(this == o) return true;
+    if(!(o instanceof Project)) return false;
+    Project project = (Project) o;
+    return name.equals(project.name);
+  }
+
+  @Override
+  public int hashCode() {
+    return name.hashCode();
+  }
+
+  @Override
+  public int compareTo(Project project) {
+    return name.compareTo(project.name);
+  }
+
+  @SuppressWarnings("ParameterHidesMemberVariable")
   public static class Builder {
 
     private Project project;

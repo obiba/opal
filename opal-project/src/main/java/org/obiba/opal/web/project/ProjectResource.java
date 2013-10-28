@@ -55,14 +55,14 @@ public class ProjectResource {
     if(!name.equals(projectDto.getName())) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
-    projectService.updateProject(Dtos.fromDto(projectDto, project));
+    projectService.save(Dtos.fromDto(projectDto));
     return Response.ok().build();
   }
 
   @DELETE
   public Response delete() throws FileSystemException {
     try {
-      projectService.deleteProject(name);
+      projectService.delete(name);
     } catch(NoSuchProjectException e) {
       // silently ignore project not found
     }

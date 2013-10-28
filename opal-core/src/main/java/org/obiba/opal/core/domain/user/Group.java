@@ -15,25 +15,15 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 
 import org.hibernate.validator.constraints.NotBlank;
-import org.obiba.opal.core.domain.AbstractOrientDbTimestampedEntity;
-import org.obiba.opal.core.validator.Unique;
+import org.obiba.opal.core.domain.AbstractTimestamped;
 
-@Unique(properties = "name")
-@SuppressWarnings("ComparableImplementedButEqualsNotOverridden")
-public class Group extends AbstractOrientDbTimestampedEntity implements Comparable<Group> {
+public class Group extends AbstractTimestamped implements Comparable<Group> {
 
   @Nonnull
   @NotBlank
   private String name;
 
-  private Set<User> users;
-
-  public Group() {
-  }
-
-  public Group(@Nonnull String name) {
-    this.name = name;
-  }
+  private Set<String> users = new HashSet<String>();
 
   @Nonnull
   public String getName() {
@@ -44,8 +34,12 @@ public class Group extends AbstractOrientDbTimestampedEntity implements Comparab
     this.name = name;
   }
 
-  public Set<User> getUsers() {
-    return users == null ? (users = new HashSet<User>()) : users;
+  public Set<String> getUsers() {
+    return users;
+  }
+
+  public void setUsers(Set<String> users) {
+    this.users = users;
   }
 
   @Override
@@ -54,8 +48,49 @@ public class Group extends AbstractOrientDbTimestampedEntity implements Comparab
   }
 
   @Override
+  public boolean equals(Object o) {
+    if(this == o) return true;
+    if(!(o instanceof Group)) return false;
+    Group group = (Group) o;
+    return name.equals(group.name);
+  }
+
+  @Override
+  public int hashCode() {
+    return name.hashCode();
+  }
+
+  @Override
   public int compareTo(Group group) {
     return name.compareTo(group.name);
   }
 
+  @SuppressWarnings("ParameterHidesMemberVariable")
+  public static class Builder {
+
+    private Group group;
+
+    private Builder() {
+    }
+
+    public static Builder create() {
+      Builder builder = new Builder();
+      builder.group = new Group();
+      return builder;
+    }
+
+    public Builder name(String name) {
+      group.name = name;
+      return this;
+    }
+
+    public Builder users(Set<String> users) {
+      group.users = users;
+      return this;
+    }
+
+    public Group build() {
+      return group;
+    }
+  }
 }

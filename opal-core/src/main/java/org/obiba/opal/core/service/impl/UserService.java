@@ -22,14 +22,14 @@ public interface UserService extends SystemService {
    *
    * @return a list of user instances
    */
-  Iterable<User> list();
+  Iterable<User> listUsers();
 
   /**
    * Returns the count of users that match the specified template
    *
    * @return the number of users that match the template
    */
-  long getUserCount();
+  long countUsers();
 
   /**
    * Returns the user with the specified login
@@ -37,14 +37,14 @@ public interface UserService extends SystemService {
    * @param login the unique login to match
    * @return the user with the specified login or null if none exist
    */
-  User getUserWithName(String name);
+  User getUser(String name);
 
   /**
    * Create a user when id is not provided, otherwise, updates the changed fields
    *
    * @param user
    */
-  void createOrUpdateUser(User user) throws ConstraintViolationException;
+  void save(User user) throws ConstraintViolationException;
 
   /**
    * Deletes a user from user table and from subject_acl
@@ -58,14 +58,14 @@ public interface UserService extends SystemService {
    *
    * @return
    */
-  void createOrUpdateGroup(Group group) throws ConstraintViolationException;
+  void save(Group group) throws ConstraintViolationException;
 
   /**
    * Returns the list of groups
    *
    * @return
    */
-  Iterable<Group> getGroups();
+  Iterable<Group> listGroups();
 
   /**
    * Returns the group with the specified name
@@ -73,7 +73,7 @@ public interface UserService extends SystemService {
    * @param name
    * @return the group with the specified name or null if none exist
    */
-  Group getGroupWithName(String name);
+  Group getGroup(String name);
 
   /**
    * Deletes a group from group table and from subject_acl
@@ -82,5 +82,5 @@ public interface UserService extends SystemService {
    */
   void deleteGroup(Group group);
 
-  long getGroupCount();
+  long countGroups();
 }

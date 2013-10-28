@@ -50,11 +50,7 @@ public class Dtos {
   @Nullable
   private static SqlSettings.LimesurveyDatasourceSettings fromDto(
       @Nullable SqlSettingsDto.LimesurveyDatasourceSettingsDto dto) {
-    if(dto == null) return null;
-
-    SqlSettings.LimesurveyDatasourceSettings limesurveySettings = new SqlSettings.LimesurveyDatasourceSettings();
-    limesurveySettings.setTablePrefix(dto.getTablePrefix());
-    return limesurveySettings;
+    return dto == null ? null : new SqlSettings.LimesurveyDatasourceSettings(dto.getTablePrefix());
   }
 
   @Nullable

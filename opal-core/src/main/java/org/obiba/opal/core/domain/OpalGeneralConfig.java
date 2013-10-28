@@ -11,16 +11,21 @@ package org.obiba.opal.core.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
 import org.hibernate.validator.constraints.NotBlank;
 
-public class OpalGeneralConfig extends AbstractOrientDbTimestampedEntity {
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
+public class OpalGeneralConfig extends AbstractTimestamped {
 
   public static final String DEFAULT_NAME = "Opal";
 
-  public static final String DEFAULT_LOCALE = "en";
+  public static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
 
   public static final String DEFAULT_CHARSET = "ISO-8859-1";
 
@@ -28,7 +33,7 @@ public class OpalGeneralConfig extends AbstractOrientDbTimestampedEntity {
   @NotBlank
   private String name = DEFAULT_NAME;
 
-  private List<String> locales = new ArrayList<String>();
+  private List<Locale> locales = new ArrayList<Locale>();
 
   private String defaultCharacterSet = DEFAULT_CHARSET;
 
@@ -41,11 +46,20 @@ public class OpalGeneralConfig extends AbstractOrientDbTimestampedEntity {
     this.name = name;
   }
 
-  public List<String> getLocales() {
+  public List<Locale> getLocales() {
     return locales;
   }
 
-  public void setLocales(List<String> locales) {
+  public List<String> getLocalesAsString() {
+    return Lists.newArrayList(Iterables.transform(getLocales(), new Function<Locale, String>() {
+      @Override
+      public String apply(Locale locale) {
+        return locale.getLanguage();
+      }
+    }));
+  }
+
+  public void setLocales(List<Locale> locales) {
     this.locales = locales;
   }
 
@@ -55,5 +69,18 @@ public class OpalGeneralConfig extends AbstractOrientDbTimestampedEntity {
 
   public void setDefaultCharacterSet(String defaultCharacterSet) {
     this.defaultCharacterSet = defaultCharacterSet;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if(this == o) return true;
+    //noinspection SimplifiableIfStatement
+    if(!(o instanceof OpalGeneralConfig)) return false;
+    return name.equals(((OpalGeneralConfig) o).name);
+  }
+
+  @Override
+  public int hashCode() {
+    return name.hashCode();
   }
 }

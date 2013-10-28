@@ -27,7 +27,6 @@ import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.User;
 import org.obiba.opal.core.service.impl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +53,7 @@ public class OrientDbRealm extends AuthorizingRealm {
       throw new AccountException("Null usernames are not allowed by this realm.");
     }
 
-    User user = userService.getUserWithName(username);
+    User user = userService.getUser(username);
     if(user == null) {
       throw new UnknownAccountException("No account found for user [" + username + "]");
     }
@@ -70,10 +69,10 @@ public class OrientDbRealm extends AuthorizingRealm {
 
       Set<String> roleNames = new HashSet<String>();
       String username = (String) getAvailablePrincipal(simplePrincipals);
-      User user = userService.getUserWithName(username);
+      User user = userService.getUser(username);
       if(user != null) {
-        for(Group group : user.getGroups()) {
-          roleNames.add(group.getName());
+        for(String group : user.getGroups()) {
+          roleNames.add(group);
         }
       }
       return new SimpleAuthorizationInfo(roleNames);

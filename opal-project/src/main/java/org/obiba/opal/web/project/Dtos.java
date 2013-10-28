@@ -12,7 +12,6 @@ package org.obiba.opal.web.project;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.magma.Datasource;
@@ -60,8 +59,8 @@ public class Dtos {
     return builder.build();
   }
 
-  public static Project fromDto(ProjectDto projectDto, @Nullable Project project) {
-    return Project.Builder.create(project) //
+  public static Project fromDto(ProjectDto projectDto) {
+    return Project.Builder.create() //
         .name(projectDto.getName()) //
         .title(projectDto.getTitle()) //
         .description(projectDto.getDescription()) //
@@ -81,6 +80,7 @@ public class Dtos {
         .build();
   }
 
+  @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
   public static Projects.ProjectSummaryDto asSummaryDto(Project project) {
     Projects.ProjectSummaryDto.Builder builder = Projects.ProjectSummaryDto.newBuilder();
     builder.setName(project.getName());

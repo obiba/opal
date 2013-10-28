@@ -17,28 +17,31 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.user.User;
+import org.obiba.opal.core.service.impl.UserService;
 import org.obiba.opal.web.model.Opal;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component
 @Scope("request")
 @Path("/user/{name}")
-public class UserResource extends AbstractUserGroupResource {
+public class UserResource {
 
   @PathParam("name")
   private String name;
 
+  @Autowired
+  private UserService userService;
+
   @GET
   public Response getUser() {
     //TODO: Use TimestampedResponses.evaluate(request, ...); ?
-    User user = userService.getUserWithName(name);
-
+    User user = userService.getUser(name);
     if(user == null) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
-
-    return Response.ok().entity(asDto(user)).build();
+    return Response.ok().entity(Dtos.asDto(user)).build();
   }
 
   @PUT
@@ -46,25 +49,21 @@ public class UserResource extends AbstractUserGroupResource {
     if(!name.equals(dto.getName())) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
-    User user = userService.getUserWithName(dto.getName());
-    fromDto(dto, user);
+    User user = Dtos.fromDto(dto);
     if(dto.hasPassword()) {
       user.setPassword(User.digest(dto.getPassword()));
     }
-    userService.createOrUpdateUser(user);
+    userService.save(user);
     return Response.ok().build();
   }
 
   @DELETE
   public Response deleteUser() {
-
-    User user = userService.getUserWithName(name);
+    User user = userService.getUser(name);
     if(user == null) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
     userService.deleteUser(user);
-
-    // TODO: Clear Acl permission
     return Response.ok().build();
   }
 }

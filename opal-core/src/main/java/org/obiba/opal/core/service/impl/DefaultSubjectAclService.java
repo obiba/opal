@@ -16,7 +16,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
 
 import org.obiba.opal.core.domain.security.SubjectAcl;
-import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SubjectAclService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,16 +40,15 @@ public class DefaultSubjectAclService implements SubjectAclService {
   private final Set<SubjectAclChangeCallback> callbacks = Sets.newHashSet();
 
   @Autowired
-  private OrientDbService orientDbService;
+  private OrientDbDocumentService orientDbDocumentService;
 
   @Override
   @PostConstruct
   public void start() {
-    orientDbService.registerEntityClass(SubjectAcl.class);
-    orientDbService.createIndex(SubjectAcl.class, "domain", INDEX_TYPE.NOTUNIQUE, OType.STRING);
-    orientDbService.createIndex(SubjectAcl.class, "node", INDEX_TYPE.NOTUNIQUE, OType.STRING);
-    orientDbService.createIndex(SubjectAcl.class, "principal", INDEX_TYPE.NOTUNIQUE, OType.STRING);
-    orientDbService.createIndex(SubjectAcl.class, "type", INDEX_TYPE.NOTUNIQUE, OType.STRING);
+    orientDbDocumentService.createIndex(SubjectAcl.class, "domain", INDEX_TYPE.NOTUNIQUE, OType.STRING);
+    orientDbDocumentService.createIndex(SubjectAcl.class, "node", INDEX_TYPE.NOTUNIQUE, OType.STRING);
+    orientDbDocumentService.createIndex(SubjectAcl.class, "principal", INDEX_TYPE.NOTUNIQUE, OType.STRING);
+    orientDbDocumentService.createIndex(SubjectAcl.class, "type", INDEX_TYPE.NOTUNIQUE, OType.STRING);
   }
 
   @Override
@@ -66,9 +64,11 @@ public class DefaultSubjectAclService implements SubjectAclService {
   @Override
   public void deleteNodePermissions(String node) {
     Set<SubjectAclService.Subject> subjects = Sets.newTreeSet();
-    Iterable<SubjectAcl> subjectAcls = Sets.newHashSet(Iterables
-        .concat(orientDbService.<SubjectAcl>list("select from SubjectAcl where node = ?", node),
-            orientDbService.<SubjectAcl>list("select from SubjectAcl where node like = ?", node + "/%")));
+    Iterable<SubjectAcl> subjectAcls = Sets.newHashSet(Iterables.concat(orientDbDocumentService
+        .<SubjectAcl>list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() + " where node = ?",
+            node), orientDbDocumentService
+        .<SubjectAcl>list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() + " where node like = ?",
+            node + "/%")));
     for(SubjectAcl acl : subjectAcls) {
       subjects.add(acl.getSubject());
       delete(acl);
@@ -77,14 +77,17 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   private void delete(SubjectAcl acl) {
-    orientDbService.delete(acl);
+    orientDbDocumentService.delete("select from " + SubjectAcl.class.getSimpleName() +
+        " where domain = ? and node = ? and principal = ? and type = ? and permission = ?", acl.getDomain(),
+        acl.getNode(), acl.getPrincipal(), acl.getType(), acl.getPermission());
   }
 
   @Override
   public void deleteNodePermissions(String domain, String node) {
     Set<SubjectAclService.Subject> subjects = Sets.newTreeSet();
-    Iterable<SubjectAcl> list = orientDbService
-        .list("select from SubjectAcl where domain = ? and node = ?", domain, node);
+    Iterable<SubjectAcl> list = orientDbDocumentService
+        .list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() + " where domain = ? and node = ?",
+            domain, node);
     for(SubjectAcl acl : list) {
       subjects.add(acl.getSubject());
       delete(acl);
@@ -95,9 +98,9 @@ public class DefaultSubjectAclService implements SubjectAclService {
   @Override
   public void deleteSubjectPermissions(String domain, String node, SubjectAclService.Subject subject) {
 
-    for(SubjectAcl acl : orientDbService
-        .<SubjectAcl>list("select from SubjectAcl where domain = ? and node = ? and subject = ?", domain, node,
-            subject)) {
+    for(SubjectAcl acl : orientDbDocumentService.list(SubjectAcl.class,
+        "select from " + SubjectAcl.class.getSimpleName() + " where domain = ? and node = ? and subject = ?", domain,
+        node, subject)) {
       delete(acl);
     }
     notifyListeners(subject);
@@ -107,9 +110,9 @@ public class DefaultSubjectAclService implements SubjectAclService {
   public void deleteSubjectPermissions(String domain, String node, SubjectAclService.Subject subject,
       String permission) {
 
-    for(SubjectAcl acl : orientDbService
-        .<SubjectAcl>list("select from SubjectAcl where domain = ? and node = ? and subject = ? and permission = ?",
-            domain, node, subject, permission)) {
+    for(SubjectAcl acl : orientDbDocumentService
+        .list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() +
+            " where domain = ? and node = ? and subject = ? and permission = ?", domain, node, subject, permission)) {
       delete(acl);
     }
     notifyListeners(subject);
@@ -128,7 +131,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
       @Nonnull String permission) {
     Assert.notNull(subject, "subject cannot be null");
     Assert.notNull(permission, "permission cannot be null");
-    orientDbService.save(new SubjectAcl(domain, node, subject, permission));
+    orientDbDocumentService.save(new SubjectAcl(domain, node, subject, permission));
     notifyListeners(subject);
   }
 
@@ -168,23 +171,27 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   private Iterable<SubjectAcl> find(SubjectAclService.Subject subject) {
-    return orientDbService.list("select from SubjectAcl where principal = ? and type = ?", subject.getPrincipal(),
-        subject.getType().toString());
+    return orientDbDocumentService
+        .list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() + " where principal = ? and type = ?",
+            subject.getPrincipal(), subject.getType().toString());
   }
 
   private Iterable<SubjectAcl> find(String domain, String node, SubjectType type) {
-    return orientDbService
-        .list("select from SubjectAcl where domain = ? and node = ? and type = ?", domain, node, type.toString());
+    return orientDbDocumentService.list(SubjectAcl.class,
+        "select from " + SubjectAcl.class.getSimpleName() + " where domain = ? and node = ? and type = ?", domain, node,
+        type.toString());
   }
 
   private Iterable<SubjectAcl> find(String domain, SubjectType type) {
-    return orientDbService.list("select from SubjectAcl where domain = ? and type = ?", domain, type.toString());
+    return orientDbDocumentService
+        .list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() + " where domain = ? and type = ?",
+            domain, type.toString());
   }
 
   private Iterable<SubjectAcl> find(String domain, String node, SubjectAclService.Subject subject) {
-    return orientDbService
-        .list("select from SubjectAcl where domain = ? and node = ? and principal = ? and type = ?", domain, node,
-            subject.getPrincipal(), subject.getType().toString());
+    return orientDbDocumentService.list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() +
+        " where domain = ? and node = ? and principal = ? and type = ?", domain, node, subject.getPrincipal(),
+        subject.getType().toString());
   }
 
   @Override

@@ -26,7 +26,7 @@ import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
-import org.obiba.opal.core.service.OrientDbService;
+import org.obiba.opal.core.service.impl.OrientDbDocumentService;
 import org.obiba.opal.project.domain.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -43,7 +43,7 @@ public class ProjectsConfigurationService implements ProjectService {
   private OpalRuntime opalRuntime;
 
   @Autowired
-  private OrientDbService orientDbService;
+  private OrientDbDocumentService orientDbDocumentService;
 
   @Autowired
   private DatabaseRegistry databaseRegistry;
@@ -57,8 +57,8 @@ public class ProjectsConfigurationService implements ProjectService {
   @Override
   @PostConstruct
   public void start() {
-    orientDbService.registerEntityClass(Project.class);
-    orientDbService.createUniqueStringIndex(Project.class, "name");
+    orientDbDocumentService.createUniqueStringIndex(Project.class, "name");
+    orientDbDocumentService.createUniqueStringIndex(Project.class, "title");
 
     // In the @PostConstruct there is no way to ensure that all the post processing is already done,
     // so (indeed) there can be no Transactions.
@@ -87,7 +87,7 @@ public class ProjectsConfigurationService implements ProjectService {
 
   @Override
   public Iterable<Project> getProjects() {
-    return orientDbService.list(Project.class);
+    return orientDbDocumentService.list(Project.class);
   }
 
   @Override
@@ -101,9 +101,9 @@ public class ProjectsConfigurationService implements ProjectService {
   }
 
   @Override
-  public void deleteProject(@Nonnull String name) throws NoSuchProjectException, FileSystemException {
+  public void delete(@Nonnull String name) throws NoSuchProjectException, FileSystemException {
     Project project = getProject(name);
-    orientDbService.delete(project);
+    orientDbDocumentService.delete("select from " + Project.class.getSimpleName() + " where name = ?", name);
 
     Datasource datasource = project.getDatasource();
 
@@ -119,24 +119,18 @@ public class ProjectsConfigurationService implements ProjectService {
   }
 
   @Override
-  public void createProject(@Nonnull Project project) throws ConstraintViolationException {
+  public void save(@Nonnull Project project) throws ConstraintViolationException {
     registerDatasource(project);
-    orientDbService.save(project);
-  }
-
-  @Override
-  public void updateProject(@Nonnull Project project) throws ConstraintViolationException {
-    orientDbService.save(project);
+    orientDbDocumentService.save(project);
   }
 
   @Nonnull
   @Override
   public Project getProject(@Nonnull String name) throws NoSuchProjectException {
-    // TODO replace by orientDbService.uniqueResult("select from Project where name = ?", name) with Orient-1.6
-    for(Project project : orientDbService.list(Project.class)) {
-      if(name.equals(project.getName())) return project;
-    }
-    throw new NoSuchProjectException(name);
+    Project project = orientDbDocumentService
+        .uniqueResult(Project.class, "select from " + Project.class.getSimpleName() + " where name = ?", name);
+    if(project == null) throw new NoSuchProjectException(name);
+    return project;
   }
 
   @Nonnull

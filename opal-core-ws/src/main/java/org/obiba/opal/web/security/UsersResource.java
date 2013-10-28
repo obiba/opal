@@ -17,38 +17,39 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.user.User;
+import org.obiba.opal.core.service.impl.UserService;
 import org.obiba.opal.web.model.Opal;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 @Component
 @Scope("request")
 @Path("/users")
-public class UsersResource extends AbstractUserGroupResource {
+public class UsersResource {
+
+  @Autowired
+  private UserService userService;
 
   @GET
   public List<Opal.UserDto> getUsers() {
-
-    //TODO: Use TimestampedResponses.evaluate(request, ...); ?
-    Iterable<User> users = userService.list();
-
-    List<Opal.UserDto> userDtos = Lists.newArrayList();
-
-    if(users != null) {
-      for(User u : users) {
-        userDtos.add(asDto(u));
+    return Lists.newArrayList(Iterables.transform(userService.listUsers(), new Function<User, Opal.UserDto>() {
+      @Override
+      public Opal.UserDto apply(User user) {
+        return Dtos.asDto(user);
       }
-    }
-    return userDtos;
+    }));
   }
 
   @POST
   public Response createUser(Opal.UserDto dto) {
-    User user = fromDto(dto);
+    User user = Dtos.fromDto(dto);
     user.setPassword(User.digest(dto.getPassword()));
-    userService.createOrUpdateUser(user);
+    userService.save(user);
     return Response.ok().build();
   }
 }

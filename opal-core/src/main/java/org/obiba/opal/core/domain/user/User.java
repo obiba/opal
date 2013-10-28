@@ -18,12 +18,9 @@ import javax.annotation.Nonnull;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.core.util.HexUtil;
-import org.obiba.opal.core.domain.AbstractOrientDbTimestampedEntity;
-import org.obiba.opal.core.validator.Unique;
+import org.obiba.opal.core.domain.AbstractTimestamped;
 
-@Unique(properties = "name")
-@SuppressWarnings("ComparableImplementedButEqualsNotOverridden")
-public class User extends AbstractOrientDbTimestampedEntity implements Comparable<User> {
+public class User extends AbstractTimestamped implements Comparable<User> {
 
   public enum Status {
     ACTIVE, INACTIVE
@@ -39,14 +36,7 @@ public class User extends AbstractOrientDbTimestampedEntity implements Comparabl
 
   private boolean enabled;
 
-  private Set<Group> groups;
-
-  public User() {
-  }
-
-  public User(@Nonnull String name) {
-    this.name = name;
-  }
+  private Set<String> groups = new HashSet<String>();
 
   @Nonnull
   public String getName() {
@@ -66,26 +56,25 @@ public class User extends AbstractOrientDbTimestampedEntity implements Comparabl
     this.password = password;
   }
 
-  public Set<Group> getGroups() {
-    return groups == null ? (groups = new HashSet<Group>()) : groups;
+  public Set<String> getGroups() {
+    return groups;
   }
 
-  public void setGroups(Set<Group> groups) {
+  public void setGroups(Set<String> groups) {
     this.groups = groups;
   }
 
-  public void addGroup(Group group) {
-    if(!getGroups().contains(group)) {
-      getGroups().add(group);
-    }
+  public void addGroup(String group) {
+    if(groups == null) groups = new HashSet<String>();
+    groups.add(group);
   }
 
   public boolean hasGroup(Group group) {
-    return groups.contains(group);
+    return groups != null && groups.contains(group.getName());
   }
 
   public void removeGroup(Group group) {
-    if(getGroups().remove(group)) group.getUsers().remove(this);
+    if(groups != null) groups.remove(group.getName());
   }
 
   public boolean getEnabled() {
@@ -111,8 +100,70 @@ public class User extends AbstractOrientDbTimestampedEntity implements Comparabl
   }
 
   @Override
+  public String toString() {
+    return name;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if(this == o) return true;
+    if(!(o instanceof User)) return false;
+    User user = (User) o;
+    return name.equals(user.name);
+  }
+
+  @Override
+  public int hashCode() {
+    return name.hashCode();
+  }
+
+  @Override
   public int compareTo(User user) {
     return name.compareTo(user.name);
+  }
+
+  @SuppressWarnings("ParameterHidesMemberVariable")
+  public static class Builder {
+
+    private User user;
+
+    private Builder() {
+    }
+
+    public static Builder create() {
+      Builder builder = new Builder();
+      builder.user = new User();
+      return builder;
+    }
+
+    public Builder name(String name) {
+      user.name = name;
+      return this;
+    }
+
+    public Builder password(String password) {
+      user.password = password;
+      return this;
+    }
+
+    public Builder enabled(boolean enabled) {
+      user.enabled = enabled;
+      return this;
+    }
+
+    public Builder groups(Set<String> groups) {
+      user.groups = groups;
+      return this;
+    }
+
+    public Builder group(String group) {
+      user.addGroup(group);
+      return this;
+    }
+
+    public User build() {
+      return user;
+    }
   }
 
 }

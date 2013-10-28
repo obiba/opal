@@ -17,50 +17,46 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.user.Group;
-import org.obiba.opal.core.domain.user.User;
+import org.obiba.opal.core.service.impl.UserService;
 import org.obiba.opal.web.model.Opal;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 @Component
 @Scope("request")
 @Path("/groups")
-public class GroupsResource extends AbstractUserGroupResource {
+public class GroupsResource {
+
+  @Autowired
+  private UserService userService;
 
   @GET
   public List<Opal.GroupDto> getGroups() {
-    Iterable<Group> groups = userService.getGroups();
-    List<Opal.GroupDto> groupDtos = Lists.newArrayList();
-    for(Group group : groups) {
-      groupDtos.add(toDto(group));
-    }
-    return groupDtos;
+    return Lists.newArrayList(Iterables.transform(userService.listGroups(), new Function<Group, Opal.GroupDto>() {
+      @Override
+      public Opal.GroupDto apply(Group group) {
+        return Dtos.asDto(group);
+      }
+    }));
   }
 
   @POST
   public Response createGroup(Opal.GroupDto groupDto) {
 
-    if(userService.getGroupWithName(groupDto.getName()) != null) {
+    if(userService.getGroup(groupDto.getName()) != null) {
       return Response.status(Response.Status.NOT_MODIFIED).build();
     }
 
     Group group = new Group();
     group.setName(groupDto.getName());
-    userService.createOrUpdateGroup(group);
+    userService.save(group);
 
     return Response.ok().build();
-  }
-
-  private Opal.GroupDto toDto(Group group) {
-    List<String> users = Lists.newArrayList();
-    if(group.getUsers() != null) {
-      for(User u : group.getUsers()) {
-        users.add(u.getName());
-      }
-    }
-    return Opal.GroupDto.newBuilder().setName(group.getName()).addAllUsers(users).build();
   }
 
 }

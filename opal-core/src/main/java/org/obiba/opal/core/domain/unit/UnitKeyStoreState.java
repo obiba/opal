@@ -14,14 +14,12 @@ import java.util.Arrays;
 import javax.annotation.Nonnull;
 
 import org.hibernate.validator.constraints.NotBlank;
-import org.obiba.opal.core.domain.AbstractOrientDbTimestampedEntity;
-import org.obiba.opal.core.validator.Unique;
+import org.obiba.opal.core.domain.AbstractTimestamped;
 
 /**
  * Persisted keystore.
  */
-@Unique(properties = "unit")
-public class UnitKeyStoreState extends AbstractOrientDbTimestampedEntity {
+public class UnitKeyStoreState extends AbstractTimestamped {
 
   @Nonnull
   @NotBlank
@@ -46,5 +44,18 @@ public class UnitKeyStoreState extends AbstractOrientDbTimestampedEntity {
 
   public void setKeyStore(@Nonnull byte... keyStore) {
     this.keyStore = Arrays.copyOf(keyStore, keyStore.length);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if(this == o) return true;
+    //noinspection SimplifiableIfStatement
+    if(!(o instanceof UnitKeyStoreState)) return false;
+    return unit.equals(((UnitKeyStoreState) o).unit);
+  }
+
+  @Override
+  public int hashCode() {
+    return unit.hashCode();
   }
 }

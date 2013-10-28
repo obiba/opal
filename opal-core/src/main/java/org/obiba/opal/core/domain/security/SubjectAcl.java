@@ -12,10 +12,12 @@ package org.obiba.opal.core.domain.security;
 import javax.annotation.Nonnull;
 
 import org.hibernate.validator.constraints.NotBlank;
-import org.obiba.opal.core.domain.AbstractOrientDbTimestampedEntity;
+import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.service.SubjectAclService;
 
-public class SubjectAcl extends AbstractOrientDbTimestampedEntity {
+import com.google.common.base.Objects;
+
+public class SubjectAcl extends AbstractTimestamped {
 
   @Nonnull
   @NotBlank
@@ -102,5 +104,24 @@ public class SubjectAcl extends AbstractOrientDbTimestampedEntity {
 
   public SubjectAclService.Subject getSubject() {
     return SubjectAclService.SubjectType.valueOf(getType()).subjectFor(getPrincipal());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(domain, node, principal, type, permission);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if(this == obj) {
+      return true;
+    }
+    if(obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+    SubjectAcl other = (SubjectAcl) obj;
+    return Objects.equal(domain, other.domain) && Objects.equal(node, other.node) &&
+        Objects.equal(principal, other.principal) && Objects.equal(type, other.type) &&
+        Objects.equal(permission, other.permission);
   }
 }

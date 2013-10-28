@@ -9,10 +9,12 @@
  */
 package org.obiba.opal.core.service.impl;
 
+import java.util.Iterator;
+
+import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
 
 import org.obiba.opal.core.domain.OpalGeneralConfig;
-import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,37 +26,27 @@ import org.springframework.stereotype.Component;
 public class DefaultGeneralConfigService implements SystemService {
 
   @Autowired
-  private OrientDbService orientDbService;
+  private OrientDbDocumentService orientDbDocumentService;
 
   @Override
   @PostConstruct
   public void start() {
-    orientDbService.registerEntityClass(OpalGeneralConfig.class);
+    orientDbDocumentService.createUniqueStringIndex(OpalGeneralConfig.class, "name");
   }
 
   @Override
   public void stop() {
   }
 
-  public void createServerConfig(OpalGeneralConfig config) throws OpalGeneralConfigAlreadyExistsException {
-    if(orientDbService.count(OpalGeneralConfig.class) != 0) {
-      throw new OpalGeneralConfigAlreadyExistsException();
-    }
-    orientDbService.save(config);
+  public void save(@Nonnull OpalGeneralConfig config) {
+    orientDbDocumentService.save(config);
   }
 
-  public void updateServerConfig(OpalGeneralConfig config) throws OpalGeneralConfigMissingException {
-    checkUniqueConfig();
-    orientDbService.save(config);
-  }
-
-  public OpalGeneralConfig getServerConfig() throws OpalGeneralConfigMissingException {
-    checkUniqueConfig();
-    return orientDbService.list(OpalGeneralConfig.class).iterator().next();
-  }
-
-  private void checkUniqueConfig() throws OpalGeneralConfigMissingException {
-    if(orientDbService.count(OpalGeneralConfig.class) != 1) throw new OpalGeneralConfigMissingException();
+  @Nonnull
+  public OpalGeneralConfig getConfig() throws OpalGeneralConfigMissingException {
+    Iterator<OpalGeneralConfig> iterator = orientDbDocumentService.list(OpalGeneralConfig.class).iterator();
+    if(iterator.hasNext()) return iterator.next();
+    throw new OpalGeneralConfigMissingException();
   }
 
 }

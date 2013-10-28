@@ -3,9 +3,9 @@ package org.obiba.opal.core.upgrade.database;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 
 import org.apache.commons.configuration.Configuration;
@@ -19,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 public class MoveGeneralConfigToOrientUpgradeStep extends AbstractUpgradeStep {
@@ -48,10 +50,16 @@ public class MoveGeneralConfigToOrientUpgradeStep extends AbstractUpgradeStep {
       conf.setName(OpalGeneralConfig.DEFAULT_NAME);
       conf.setDefaultCharacterSet(prop.getProperty(OPAL_CHARSET, OpalGeneralConfig.DEFAULT_CHARSET));
 
-      String[] languages = prop.getProperty(OPAL_LANGUAGES, OpalGeneralConfig.DEFAULT_LOCALE).split(",");
-      conf.setLocales(Arrays.asList(languages));
+      String[] languages = prop.getProperty(OPAL_LANGUAGES, OpalGeneralConfig.DEFAULT_LOCALE.getLanguage()).split(",");
+      conf.setLocales(
+          Lists.newArrayList(Iterables.transform(Lists.newArrayList(languages), new Function<String, Locale>() {
+            @Override
+            public Locale apply(String locale) {
+              return new Locale(locale);
+            }
+          })));
 
-      generalConfigService.createServerConfig(conf);
+      generalConfigService.save(conf);
 
       log.debug("Import general configuration. name: {}, characterSet: {}, languages: {}", conf.getName(),
           conf.getDefaultCharacterSet(), StringUtils.arrayToDelimitedString(languages, ","));
