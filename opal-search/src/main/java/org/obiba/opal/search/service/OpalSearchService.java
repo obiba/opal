@@ -34,6 +34,10 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
 
   private static final String DEFAULT_SETTINGS_RESOURCE = "org/obiba/opal/search/service/default-settings.yml";
 
+  public static final String PATH_DATA = "${OPAL_HOME}/work/elasticsearch/data";
+
+  public static final String PATH_WORK = "${OPAL_HOME}/work/elasticsearch/work";
+
   private final ElasticSearchConfigurationService configService;
 
   private final ApplicationContext applicationContext;
@@ -69,7 +73,10 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
           .settings(ImmutableSettings.settingsBuilder() //
               .classLoader(OpalSearchService.class.getClassLoader()) //
               .loadFromClasspath(DEFAULT_SETTINGS_RESOURCE) //
-              .loadFromSource(esConfig.getEsSettings())) //
+              .put("path.data", PATH_DATA.replace("${OPAL_HOME}", System.getProperty("OPAL_HOME"))) //
+              .put("path.work", PATH_WORK.replace("${OPAL_HOME}", System.getProperty("OPAL_HOME"))) //
+              .loadFromSource(esConfig.getEsSettings()) //
+          ) //
           .clusterName(esConfig.getClusterName()) //
           .client(!esConfig.isDataNode()) //
           .node();
