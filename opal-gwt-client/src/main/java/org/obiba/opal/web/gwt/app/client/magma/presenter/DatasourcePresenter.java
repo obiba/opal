@@ -59,7 +59,6 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
   protected void onBind() {
     super.onBind();
     addRegisteredHandler(DatasourceSelectionChangeEvent.getType(), this);
-    getView().setTableNameFieldUpdater(new TableNameFieldUpdater());
   }
 
   private int getTableIndex(String tableName) {
@@ -235,31 +234,6 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     }
   }
 
-  class TableNameFieldUpdater implements FieldUpdater<TableDto, String> {
-    @Override
-    public void update(int index, TableDto tableDto, String value) {
-      getEventBus().fireEvent(
-          new TableSelectionChangeEvent(DatasourcePresenter.this, tableDto, getPreviousTableName(index),
-              getNextTableName(index)));
-    }
-
-    private String getPreviousTableName(int index) {
-      TableDto previous = null;
-      if(index > 0) {
-        previous = tables.get(index - 1);
-      }
-      return previous == null ? null : previous.getName();
-    }
-
-    private String getNextTableName(int index) {
-      TableDto next = null;
-      if(index < tables.length() - 1) {
-        next = tables.get(index + 1);
-      }
-      return next == null ? null : next.getName();
-    }
-  }
-
   public interface Display extends View, HasUiHandlers<DatasourceUiHandlers> {
 
     void setTableSelection(TableDto variable, int index);
@@ -271,8 +245,6 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     void afterRenderRows();
 
     void setDatasource(DatasourceDto dto);
-
-    void setTableNameFieldUpdater(FieldUpdater<TableDto, String> updater);
 
     HasAuthorization getAddUpdateTablesAuthorizer();
 

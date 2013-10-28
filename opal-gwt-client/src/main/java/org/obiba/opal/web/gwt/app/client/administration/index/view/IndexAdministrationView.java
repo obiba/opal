@@ -15,6 +15,9 @@ import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdm
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsIndexColumn;
@@ -50,6 +53,8 @@ import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 import static org.obiba.opal.web.model.client.opal.ScheduleType.DAILY;
 import static org.obiba.opal.web.model.client.opal.ScheduleType.HOURLY;
@@ -99,6 +104,8 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
   @UiField
   Panel breadcrumbs;
 
+  private final PlaceManager placeManager;
+
   private final ListDataProvider<TableIndexStatusDto> dataProvider = new ListDataProvider<TableIndexStatusDto>();
 
   private final CheckboxColumn<TableIndexStatusDto> checkboxColumn;
@@ -106,7 +113,8 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
   private final ActionsIndexColumn<TableIndexStatusDto> actionsColumn;
 
   @Inject
-  public IndexAdministrationView(Binder uiBinder) {
+  public IndexAdministrationView(Binder uiBinder, PlaceManager placeManager) {
+    this.placeManager = placeManager;
     initWidget(uiBinder.createAndBindUi(this));
     indexTablePager.setDisplay(indexTable);
 
@@ -127,12 +135,12 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     });
 
     indexTable.addColumn(checkboxColumn, checkboxColumn.getTableListCheckColumnHeader());
-    indexTable.addColumn(Columns.datasource, translations.projectLabel());
-    indexTable.addColumn(Columns.table, translations.tableLabel());
-    indexTable.addColumn(Columns.tableLastUpdate, translations.tableLastUpdateLabel());
-    indexTable.addColumn(Columns.indexLastUpdate, translations.indexLastUpdateLabel());
-    indexTable.addColumn(Columns.scheduleType, translations.scheduleLabel());
-    indexTable.addColumn(Columns.status, translations.statusLabel());
+    indexTable.addColumn(new DatasourceColumn(), translations.projectLabel());
+    indexTable.addColumn(new TableColumn(), translations.tableLabel());
+    indexTable.addColumn(new TableLastUpdateColumn(), translations.tableLastUpdateLabel());
+    indexTable.addColumn(new IndexLastUpdateColumn(), translations.indexLastUpdateLabel());
+    indexTable.addColumn(new ScheduleTypeColumn(), translations.scheduleLabel());
+    indexTable.addColumn(new StatusColumn(), translations.statusLabel());
     indexTable.addColumn(actionsColumn, translations.actionsLabel());
     indexTable.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
     indexTable.setColumnWidth(checkboxColumn, 1, Style.Unit.PX);
@@ -239,101 +247,6 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     return breadcrumbs;
   }
 
-  private static final class Columns {
-
-    static final Column<TableIndexStatusDto, String> datasource = new Column<TableIndexStatusDto, String>(
-        new LinkCell<String>() {
-          @Override
-          public String getLink(String value) {
-            return "#!project;name=" + value;
-          }
-        }) {
-      @Override
-      public String getValue(TableIndexStatusDto object) {
-        return object.getDatasource();
-      }
-    };
-
-    static final Column<TableIndexStatusDto, TableIndexStatusDto> table = new Column<TableIndexStatusDto, TableIndexStatusDto>(new LinkCell<TableIndexStatusDto>() {
-      @Override
-      public String getLink(TableIndexStatusDto value) {
-        return "#!project;name=" + value.getDatasource() + ";tab=TABLES;path=" + value.getDatasource() + "." + value.getTable();
-      }
-
-      @Override
-      public String getText(TableIndexStatusDto value) {
-        return value.getTable();
-      }
-    }) {
-
-      @Override
-      public TableIndexStatusDto getValue(TableIndexStatusDto object) {
-        return object;
-      }
-    };
-
-    static final Column<TableIndexStatusDto, String> tableLastUpdate = new TextColumn<TableIndexStatusDto>() {
-
-      @Override
-      public String getValue(TableIndexStatusDto object) {
-        return ValueRenderer.DATETIME.render(object.getTableLastUpdate());
-      }
-    };
-
-    static final Column<TableIndexStatusDto, String> indexLastUpdate = new TextColumn<TableIndexStatusDto>() {
-
-      @Override
-      public String getValue(TableIndexStatusDto object) {
-        return object.getIndexLastUpdate().isEmpty() ? "-" : ValueRenderer.DATETIME.render(object.getIndexLastUpdate());
-      }
-    };
-
-    static final Column<TableIndexStatusDto, String> scheduleType = new TextColumn<TableIndexStatusDto>() {
-
-      @Override
-      public String getValue(TableIndexStatusDto object) {
-        if(object.getSchedule().getType().getName().equals(NOT_SCHEDULED.getName())) {
-          return translations.manuallyLabel();
-        }
-        if(object.getSchedule().getType().getName().equals(MINUTES_5.getName())) {
-          return translations.minutes5Label();
-        }
-        if(object.getSchedule().getType().getName().equals(MINUTES_15.getName())) {
-          return translations.minutes15Label();
-        }
-        if(object.getSchedule().getType().getName().equals(MINUTES_30.getName())) {
-          return translations.minutes30Label();
-        }
-        String minutes = object.getSchedule().getMinutes() < 10
-            ? "0" + object.getSchedule().getMinutes()
-            : String.valueOf(object.getSchedule().getMinutes());
-        if(object.getSchedule().getType().getName().equals(HOURLY.getName())) {
-          return translations.hourlyAtLabel().replace("{0}", minutes);
-        }
-        if(object.getSchedule().getType().getName().equals(DAILY.getName())) {
-          return translations.dailyAtLabel().replace("{0}", Integer.toString(object.getSchedule().getHours()))
-              .replace("{1}", minutes);
-        }
-        if(object.getSchedule().getType().getName().equals(WEEKLY.getName())) {
-          return translations.weeklyAtLabel()
-              .replace("{0}", translations.timeMap().get(object.getSchedule().getDay().getName()))
-              .replace("{1}", Integer.toString(object.getSchedule().getHours())).replace("{2}", minutes);
-        }
-
-        return object.getSchedule().getType().toString();
-      }
-    };
-
-    static final Column<TableIndexStatusDto, String> status = new Column<TableIndexStatusDto, String>(
-        new IndexStatusImageCell()) {
-
-      @Override
-      public String getValue(TableIndexStatusDto tableIndexStatusDto) {
-        return IndexStatusImageCell.getSrc(tableIndexStatusDto);
-      }
-    };
-  }
-
   private class TableIndexStatusDtoDisplay implements CheckboxColumn.Display<TableIndexStatusDto> {
 
     @Override
@@ -379,6 +292,113 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     @Override
     public Alert getAlert() {
       return selectAllAlert;
+    }
+  }
+
+  private class DatasourceColumn extends Column<TableIndexStatusDto, String> {
+    public DatasourceColumn() {
+      super(new LinkCell<String>() {
+        @Override
+        public String getLink(String value) {
+          return "#" + IndexAdministrationView.this.placeManager
+              .buildHistoryToken(new PlaceRequest.Builder().nameToken(Places.PROJECT) //
+                  .with(ParameterTokens.TOKEN_NAME, value) //
+                  .build());
+        }
+      });
+    }
+
+    @Override
+    public String getValue(TableIndexStatusDto object) {
+      return object.getDatasource();
+    }
+  }
+
+  private class TableColumn extends Column<TableIndexStatusDto, TableIndexStatusDto> {
+
+    public TableColumn() {
+      super(new LinkCell<TableIndexStatusDto>() {
+        @Override
+        public String getLink(TableIndexStatusDto value) {
+          return "#" + placeManager.buildHistoryToken(new PlaceRequest.Builder().nameToken(Places.PROJECT) //
+              .with(ParameterTokens.TOKEN_NAME, value.getDatasource()) //
+              .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString()) //
+              .with(ParameterTokens.TOKEN_PATH, value.getDatasource() + "." + value.getTable()) //
+              .build());
+        }
+
+        @Override
+        public String getText(TableIndexStatusDto value) {
+          return value.getTable();
+        }
+      });
+    }
+
+    @Override
+    public TableIndexStatusDto getValue(TableIndexStatusDto object) {
+      return object;
+    }
+  }
+
+  private class TableLastUpdateColumn extends TextColumn<TableIndexStatusDto> {
+
+    @Override
+    public String getValue(TableIndexStatusDto object) {
+      return ValueRenderer.DATETIME.render(object.getTableLastUpdate());
+    }
+  }
+
+  private class IndexLastUpdateColumn extends TextColumn<TableIndexStatusDto> {
+
+    @Override
+    public String getValue(TableIndexStatusDto object) {
+      return object.getIndexLastUpdate().isEmpty() ? "-" : ValueRenderer.DATETIME.render(object.getIndexLastUpdate());
+    }
+  }
+
+  private class ScheduleTypeColumn extends TextColumn<TableIndexStatusDto> {
+
+    @Override
+    public String getValue(TableIndexStatusDto object) {
+      if(object.getSchedule().getType().getName().equals(NOT_SCHEDULED.getName())) {
+        return translations.manuallyLabel();
+      }
+      if(object.getSchedule().getType().getName().equals(MINUTES_5.getName())) {
+        return translations.minutes5Label();
+      }
+      if(object.getSchedule().getType().getName().equals(MINUTES_15.getName())) {
+        return translations.minutes15Label();
+      }
+      if(object.getSchedule().getType().getName().equals(MINUTES_30.getName())) {
+        return translations.minutes30Label();
+      }
+      String minutes = object.getSchedule().getMinutes() < 10
+          ? "0" + object.getSchedule().getMinutes()
+          : String.valueOf(object.getSchedule().getMinutes());
+      if(object.getSchedule().getType().getName().equals(HOURLY.getName())) {
+        return translations.hourlyAtLabel().replace("{0}", minutes);
+      }
+      if(object.getSchedule().getType().getName().equals(DAILY.getName())) {
+        return translations.dailyAtLabel().replace("{0}", Integer.toString(object.getSchedule().getHours()))
+            .replace("{1}", minutes);
+      }
+      if(object.getSchedule().getType().getName().equals(WEEKLY.getName())) {
+        return translations.weeklyAtLabel()
+            .replace("{0}", translations.timeMap().get(object.getSchedule().getDay().getName()))
+            .replace("{1}", Integer.toString(object.getSchedule().getHours())).replace("{2}", minutes);
+      }
+
+      return object.getSchedule().getType().toString();
+    }
+  }
+
+  private class StatusColumn extends Column<TableIndexStatusDto, String> {
+
+    public StatusColumn() {super(new IndexStatusImageCell());}
+
+    @Override
+    public String getValue(TableIndexStatusDto tableIndexStatusDto) {
+      return IndexStatusImageCell.getSrc(tableIndexStatusDto);
     }
   }
 }

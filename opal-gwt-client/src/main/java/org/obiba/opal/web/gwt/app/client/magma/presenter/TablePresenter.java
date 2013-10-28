@@ -195,9 +195,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     getView().setValuesTabCommand(new ValuesCommand());
     getView().setVariablesTabCommand(new VariablesCommand());
 
-    FieldUpdater<VariableDto, String> updater = new VariableNameFieldUpdater();
-    getView().setVariableNameFieldUpdater(updater);
-    getView().setVariableIndexFieldUpdater(updater);
     registerHandler(getView().addVariableSortHandler(new VariableSortHandler()));
 
     // Filter variable event
@@ -684,14 +681,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     }
   }
 
-  private class VariableNameFieldUpdater implements FieldUpdater<VariableDto, String> {
-    @Override
-    public void update(int index, VariableDto variableDto, String value) {
-      fireEvent(new VariableSelectionChangeEvent(TablePresenter.this, table, variableDto, getPreviousVariable(index),
-          getNextVariable(index)));
-    }
-  }
-
   private class SiblingVariableSelectionHandler implements SiblingVariableSelectionEvent.Handler {
     @Override
     public void onSiblingVariableSelection(SiblingVariableSelectionEvent event) {
@@ -754,10 +743,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     void clear(boolean cleanFilter);
 
     void setTable(TableDto dto);
-
-    void setVariableNameFieldUpdater(FieldUpdater<VariableDto, String> updater);
-
-    void setVariableIndexFieldUpdater(FieldUpdater<VariableDto, String> updater);
 
     HandlerRegistration addVariableSortHandler(ColumnSortEvent.Handler handler);
 

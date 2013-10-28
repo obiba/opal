@@ -13,8 +13,12 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourceUiHandlers;
+import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.LinkCell;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -30,6 +34,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
@@ -37,6 +42,8 @@ import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> implements DatasourcePresenter.Display {
 
@@ -74,14 +81,15 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
 
   private final ListDataProvider<TableDto> dataProvider = new ListDataProvider<TableDto>();
 
-  private ClickableColumn<TableDto> tableNameColumn;
-
   private final Translations translations;
 
+  private final PlaceManager placeManager;
+
   @Inject
-  public DatasourceView(Binder uiBinder, Translations translations) {
+  public DatasourceView(Binder uiBinder, Translations translations, PlaceManager placeManager) {
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
+    this.placeManager = placeManager;
     addTableColumns();
   }
 
@@ -117,11 +125,24 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
 
   private void addTableColumns() {
 
-    table.addColumn(tableNameColumn = new ClickableColumn<TableDto>() {
+    table.addColumn(new Column<TableDto, TableDto>(new LinkCell<TableDto>() {
+      @Override
+      public String getLink(TableDto value) {
+        return "#" + placeManager.buildHistoryToken(new PlaceRequest.Builder().nameToken(Places.PROJECT) //
+            .with(ParameterTokens.TOKEN_NAME, value.getDatasourceName()) //
+            .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString()) //
+            .with(ParameterTokens.TOKEN_PATH, value.getDatasourceName() + "." + value.getName()) //
+            .build());
+      }
 
       @Override
-      public String getValue(TableDto object) {
-        return object.getName();
+      public String getText(TableDto value) {
+        return value.getName();
+      }
+    }) {
+      @Override
+      public TableDto getValue(TableDto object) {
+        return object;
       }
     }, translations.nameLabel());
 
@@ -194,11 +215,6 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     boolean isNull = "null".equals(dto.getType());
     importData.setDisabled(isNull);
     addTable.setDisabled(isNull);
-  }
-
-  @Override
-  public void setTableNameFieldUpdater(FieldUpdater<TableDto, String> updater) {
-    tableNameColumn.setFieldUpdater(updater);
   }
 
   @Override

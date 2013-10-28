@@ -14,11 +14,15 @@ import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TableUiHandlers;
+import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
+import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.LinkCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.VariableAttributeColumn;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
@@ -69,6 +73,8 @@ import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements TablePresenter.Display {
 
@@ -167,19 +173,24 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
 
-  private VariableClickableColumn variableNameColumn;
-
-  private VariableClickableColumn variableIndexColumn;
-
   private final Translations translations;
+
+  private final PlaceManager placeManager;
+
+  private TableDto tableDto;
+
+  private VariableColumn variableNameColumn;
+
+  private VariableColumn variableIndexColumn;
 
   private CheckboxColumn<VariableDto> checkColumn;
 
   private boolean hasLinkAuthorization = true;
 
   @Inject
-  public TableView(Binder uiBinder, Translations translations) {
+  public TableView(Binder uiBinder, Translations translations, PlaceManager placeManager) {
     this.translations = translations;
+    this.placeManager = placeManager;
     initWidget(uiBinder.createAndBindUi(this));
     addTableColumns();
     initializeAnchorTexts();
@@ -209,22 +220,18 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   private void addTableColumns() {
     addCheckColumn();
 
-    variableIndexColumn = new VariableClickableColumn("index") {
+    variableIndexColumn = new VariableColumn(new VariableLinkCell() {
       @Override
-      public String getValue(VariableDto object) {
-        return object.getIndex() + 1 + "";
+      public String getText(VariableDto value) {
+        return value.getIndex() + 1 + "";
       }
-    };
+    });
+
     table.addColumn(variableIndexColumn, "#");
     table.setColumnWidth(variableIndexColumn, 1, Unit.PX);
     variableIndexColumn.setSortable(true);
 
-    table.addColumn(variableNameColumn = new VariableClickableColumn("name") {
-      @Override
-      public String getValue(VariableDto object) {
-        return object.getName();
-      }
-    }, translations.nameLabel());
+    table.addColumn(variableNameColumn = new VariableColumn(new VariableLinkCell()), translations.nameLabel());
     variableNameColumn.setSortable(true);
 
     table.addColumn(new VariableAttributeColumn("label"), translations.labelLabel());
@@ -319,6 +326,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @Override
   public void setTable(TableDto dto) {
+    this.tableDto = dto;
     name.setText(dto.getName());
     entityType.setText(dto.getEntityType());
     edit.setVisible(dto.hasViewLink());
@@ -425,16 +433,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
       return name;
     }
 
-  }
-
-  @Override
-  public void setVariableNameFieldUpdater(FieldUpdater<VariableDto, String> updater) {
-    variableNameColumn.setFieldUpdater(updater);
-  }
-
-  @Override
-  public void setVariableIndexFieldUpdater(FieldUpdater<VariableDto, String> updater) {
-    variableIndexColumn.setFieldUpdater(updater);
   }
 
   @Override
@@ -653,5 +651,34 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @Override
   public void setCancelVisible(boolean b) {
     cancelLink.setVisible(b);
+  }
+
+  private class VariableLinkCell extends LinkCell<VariableDto> {
+    @Override
+    public String getLink(VariableDto value) {
+      return "#" + placeManager.buildHistoryToken(new PlaceRequest.Builder().nameToken(Places.PROJECT) //
+          .with(ParameterTokens.TOKEN_NAME, tableDto.getDatasourceName()) //
+          .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString()) //
+          .with(ParameterTokens.TOKEN_PATH,
+              tableDto.getDatasourceName() + "." + tableDto.getName() + ":" + value.getName()) //
+          .build());
+    }
+
+    @Override
+    public String getText(VariableDto value) {
+      return value.getName();
+    }
+  }
+
+  private class VariableColumn extends Column<VariableDto, VariableDto> {
+
+    public VariableColumn(VariableLinkCell cell) {
+      super(cell);
+    }
+
+    @Override
+    public VariableDto getValue(VariableDto object) {
+      return object;
+    }
   }
 }
