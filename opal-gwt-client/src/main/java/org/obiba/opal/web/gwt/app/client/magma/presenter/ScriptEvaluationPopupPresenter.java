@@ -10,20 +10,17 @@
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.ScriptEvaluationPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.ScriptEvaluationPresenter.ScriptEvaluationCallback;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.PresenterWidget;
-import com.gwtplatform.mvp.client.proxy.RevealRootPopupContentEvent;
 
-public class ScriptEvaluationPopupPresenter extends PresenterWidget<ScriptEvaluationPopupPresenter.Display> {
+public class ScriptEvaluationPopupPresenter extends ModalPresenterWidget<ScriptEvaluationPopupPresenter.Display> {
 
   private final ScriptEvaluationPresenter scriptEvaluationPresenter;
 
@@ -33,6 +30,7 @@ public class ScriptEvaluationPopupPresenter extends PresenterWidget<ScriptEvalua
     super(eventBus, view);
     this.scriptEvaluationPresenter = scriptEvaluationPresenter;
     this.scriptEvaluationPresenter.getView().setCommentVisible(false);
+    getView().setUiHandlers(this);
   }
 
   public void initialize(TableDto table, VariableDto variable) {
@@ -44,38 +42,12 @@ public class ScriptEvaluationPopupPresenter extends PresenterWidget<ScriptEvalua
   protected void onBind() {
     super.onBind();
     setInSlot(Display.Slots.Evaluation, scriptEvaluationPresenter);
-    scriptEvaluationPresenter.setScriptEvaluationCallback(new ScriptEvaluationCallback() {
-
-      @Override
-      public void onSuccess(VariableDto variable) {
-        RevealRootPopupContentEvent.fire(ScriptEvaluationPopupPresenter.this, ScriptEvaluationPopupPresenter.this);
-//        RevealRootPopupContentEvent.fire(getEventBus(), ScriptEvaluationPopupPresenter.this);
-      }
-
-      @Override
-      public void onFailure(VariableDto variable) {
-      }
-    });
-    addHandler();
   }
 
-  private void addHandler() {
-    registerHandler(getView().getButton().addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        getView().hide();
-      }
-    }));
-  }
-
-  public interface Display extends PopupView {
-
+  public interface Display extends PopupView, HasUiHandlers<ModalUiHandlers> {
     enum Slots {
       Evaluation
     }
-
-    HasClickHandlers getButton();
   }
 
 }

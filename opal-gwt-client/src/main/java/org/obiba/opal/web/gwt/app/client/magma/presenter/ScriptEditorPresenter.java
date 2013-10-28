@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos.ValueType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -22,10 +23,10 @@ import com.google.common.base.Strings;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
@@ -33,17 +34,15 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
 
   private TableDto table;
 
-  private final ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter;
-
-  private boolean repeatable;
+  private final ModalProvider<ScriptEvaluationPopupPresenter> scriptEvaluationPopupProvider;
 
   private VariableDtoFactory variableDtoFactory = new DefaultVariableDtoFactory();
 
   @Inject
   public ScriptEditorPresenter(EventBus eventBus, Display view,
-      ScriptEvaluationPopupPresenter scriptEvaluationPopupPresenter) {
+      ModalProvider<ScriptEvaluationPopupPresenter> scriptEvaluationPopupProvider) {
     super(eventBus, view);
-    this.scriptEvaluationPopupPresenter = scriptEvaluationPopupPresenter;
+    this.scriptEvaluationPopupProvider = scriptEvaluationPopupProvider.setContainer(this);
   }
 
   @Override
@@ -55,7 +54,7 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
     registerHandler(getView().addTestScriptClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        scriptEvaluationPopupPresenter.initialize(table, getVariableDtoFactory().create());
+        scriptEvaluationPopupProvider.get().initialize(table, getVariableDtoFactory().create());
       }
     }));
   }
@@ -77,7 +76,6 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
   }
 
   public void setRepeatable(boolean repeatable) {
-    this.repeatable = repeatable;
     getView().setIsRepeatable(repeatable);
   }
 
@@ -135,12 +133,11 @@ public class ScriptEditorPresenter extends PresenterWidget<ScriptEditorPresenter
       VariableDto derived = VariableDto.create();
       String script = null;
 
-      if (Strings.isNullOrEmpty(selectedScript)) {
+      if(Strings.isNullOrEmpty(selectedScript)) {
         derived.setValueType(getValueEntityType().getLabel());
         derived.setIsRepeatable(isRepeatable());
         script = getScript();
-      }
-      else {
+      } else {
         derived.setValueType(ValueType.TEXT.getLabel());
         derived.setIsRepeatable(false);
         script = selectedScript;
