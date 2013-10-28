@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.IndexStatusImageCell;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.LinkCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueRenderer;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 
@@ -240,19 +241,34 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   private static final class Columns {
 
-    static final Column<TableIndexStatusDto, String> datasource = new TextColumn<TableIndexStatusDto>() {
-
+    static final Column<TableIndexStatusDto, String> datasource = new Column<TableIndexStatusDto, String>(
+        new LinkCell<String>() {
+          @Override
+          public String getLink(String value) {
+            return "#!project;name=" + value;
+          }
+        }) {
       @Override
       public String getValue(TableIndexStatusDto object) {
         return object.getDatasource();
       }
     };
 
-    static final Column<TableIndexStatusDto, String> table = new TextColumn<TableIndexStatusDto>() {
+    static final Column<TableIndexStatusDto, TableIndexStatusDto> table = new Column<TableIndexStatusDto, TableIndexStatusDto>(new LinkCell<TableIndexStatusDto>() {
+      @Override
+      public String getLink(TableIndexStatusDto value) {
+        return "#!project;name=" + value.getDatasource() + ";tab=TABLES;path=" + value.getDatasource() + "." + value.getTable();
+      }
 
       @Override
-      public String getValue(TableIndexStatusDto object) {
-        return object.getTable();
+      public String getText(TableIndexStatusDto value) {
+        return value.getTable();
+      }
+    }) {
+
+      @Override
+      public TableIndexStatusDto getValue(TableIndexStatusDto object) {
+        return object;
       }
     };
 

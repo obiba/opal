@@ -53,7 +53,7 @@ public abstract class IconCell<C> extends AbstractCell<C> {
       if(iconType != null) {
         Icon i = new Icon(iconType);
         sb.append(SafeHtmlUtils.fromSafeConstant("<span class=\"icon\">")).appendHtmlConstant(i.toString())
-            .append(SafeHtmlUtils.fromSafeConstant("</a>"));
+            .append(SafeHtmlUtils.fromSafeConstant("</span>"));
       } else {
         sb.append(SafeHtmlUtils.fromSafeConstant("<span class=\"icon\">"))
             .append(SafeHtmlUtils.fromSafeConstant("</span>"));

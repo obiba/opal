@@ -49,7 +49,7 @@
         <ui:msg description="Indices label">Table indices</ui:msg>
       </b:Heading>
 
-      <g:FlowPanel>
+      <g:FlowPanel addStyleNames="pull-left">
         <b:ButtonGroup>
           <b:Button ui:field="refreshIndicesButton" icon="REFRESH">
             <ui:msg description="Refresh indices label">Refresh</ui:msg>
