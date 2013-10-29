@@ -20,8 +20,8 @@ import org.obiba.opal.core.domain.database.SqlSettings;
 import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
 import org.obiba.opal.core.runtime.jdbc.DatabaseSessionFactoryProvider;
 import org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory;
+import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.impl.DefaultBeanValidator;
-import org.obiba.opal.core.service.impl.OrientDbDocumentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +61,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   private DataSourceFactory dataSourceFactory;
 
   @Autowired
-  private OrientDbDocumentService orientDbDocumentService;
+  private OrientDbService orientDbService;
 
   @Autowired
   private DefaultBeanValidator defaultBeanValidator;
@@ -80,7 +80,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Override
   @PostConstruct
   public void start() {
-    orientDbDocumentService.createUniqueStringIndex(Database.class, UNIQUE_INDEX);
+    orientDbService.createUniqueStringIndex(Database.class, UNIQUE_INDEX);
   }
 
   @Override
@@ -92,7 +92,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   @Override
   public Iterable<Database> list() {
-    return orientDbDocumentService
+    return orientDbService
         .list(Database.class, "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ?", false);
   }
 
@@ -101,20 +101,20 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     if(usage == null) {
       return list();
     }
-    return orientDbDocumentService.list(Database.class,
+    return orientDbService.list(Database.class,
         "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ? and usage = ?", false, usage);
   }
 
   @Override
   public Iterable<Database> listSqlDatabases() {
-    return orientDbDocumentService.list(Database.class,
+    return orientDbService.list(Database.class,
         "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ? and sqlSettings is not null",
         false);
   }
 
   @Override
   public Iterable<Database> listMongoDatabases() {
-    return orientDbDocumentService.list(Database.class, "select from " + Database.class.getSimpleName() +
+    return orientDbService.list(Database.class, "select from " + Database.class.getSimpleName() +
         " where usedForIdentifiers = ? and mongoDbSettings is not null", false);
   }
 
@@ -126,13 +126,13 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Nonnull
   @Override
   public Database getDatabase(@Nonnull final String name) throws NoSuchDatabaseException {
-    return orientDbDocumentService.execute(new OrientDbDocumentService.WithinDocumentTxCallback<Database>() {
+    return orientDbService.execute(new OrientDbService.WithinDocumentTxCallback<Database>() {
       @Override
       public Database withinDocumentTx(ODatabaseDocumentTx db) {
         OIndex<?> index = db.getMetadata().getIndexManager().getIndex("Database.name");
         OIdentifiable identifiable = (OIdentifiable) index.get(name);
         if(identifiable == null) throw new NoSuchDatabaseException(name);
-        return orientDbDocumentService.fromDocument(Database.class, identifiable.<ODocument>getRecord());
+        return orientDbService.fromDocument(Database.class, identifiable.<ODocument>getRecord());
       }
     });
   }
@@ -170,7 +170,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   }
 
   private void save(@Nonnull Database database) {
-    orientDbDocumentService.save(database, UNIQUE_INDEX);
+    orientDbService.save(database, UNIQUE_INDEX);
   }
 
   private void save(@Nonnull final Database... databases) {
@@ -178,17 +178,16 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
       defaultBeanValidator.validate(database);
     }
 
-    orientDbDocumentService.execute(new OrientDbDocumentService.WithinDocumentTxCallbackWithoutResult() {
+    orientDbService.execute(new OrientDbService.WithinDocumentTxCallbackWithoutResult() {
       @Override
       protected void withinDocumentTxWithoutResult(ODatabaseDocumentTx db) {
         Collection<ODocument> documents = new ArrayList<ODocument>(databases.length);
         for(Database database : databases) {
-          ODocument document = orientDbDocumentService
-              .findUnique(db, database.getClass(), UNIQUE_INDEX, database.getName());
+          ODocument document = orientDbService.findUnique(db, database.getClass(), UNIQUE_INDEX, database.getName());
           if(document == null) {
-            document = orientDbDocumentService.toDocument(database);
+            document = orientDbService.toDocument(database);
           } else {
-            orientDbDocumentService.copyToDocument(database, document);
+            orientDbService.copyToDocument(database, document);
           }
           documents.add(document);
         }
@@ -217,7 +216,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Nullable
   @Override
   public Database getDefaultStorageDatabase() {
-    return orientDbDocumentService.uniqueResult(Database.class,
+    return orientDbService.uniqueResult(Database.class,
         "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ? and defaultStorage = ?", false,
         true);
   }
@@ -225,7 +224,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Override
   public void deleteDatabase(@Nonnull Database database) throws CannotDeleteDatabaseWithDataException {
     //TODO check if this database has data
-    orientDbDocumentService.deleteUnique(Database.class, UNIQUE_INDEX, database.getName());
+    orientDbService.deleteUnique(Database.class, UNIQUE_INDEX, database.getName());
     destroyDataSource(database.getName());
   }
 
@@ -254,7 +253,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   @Override
   public boolean hasIdentifiersDatabase() {
-    return orientDbDocumentService
+    return orientDbService
         .uniqueResult(Database.class, "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ?",
             true) != null;
   }
@@ -262,7 +261,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Nonnull
   @Override
   public Database getIdentifiersDatabase() throws IdentifiersDatabaseNotFoundException {
-    Database database = orientDbDocumentService
+    Database database = orientDbService
         .uniqueResult(Database.class, "select from " + Database.class.getSimpleName() + " where usedForIdentifiers = ?",
             true);
     if(database == null) throw new IdentifiersDatabaseNotFoundException();

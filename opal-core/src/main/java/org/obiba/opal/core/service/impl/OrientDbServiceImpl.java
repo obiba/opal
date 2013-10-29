@@ -1,35 +1,42 @@
 package org.obiba.opal.core.service.impl;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.NonUniqueResultException;
 import javax.validation.ConstraintViolationException;
 
 import org.obiba.opal.core.service.OrientDbServerFactory;
 import org.obiba.opal.core.service.OrientDbService;
-import org.obiba.opal.core.service.OrientDbTransactionCallback;
-import org.obiba.opal.core.service.OrientDbTransactionCallbackWithoutResult;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.orientechnologies.common.exception.OException;
-import com.orientechnologies.orient.core.index.OIndexManager;
-import com.orientechnologies.orient.core.index.ONullOutputListener;
-import com.orientechnologies.orient.core.index.OPropertyIndexDefinition;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.db.record.OIdentifiable;
+import com.orientechnologies.orient.core.index.OIndex;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.metadata.schema.OProperty;
+import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import com.orientechnologies.orient.core.tx.OTransaction;
-import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
 @Component
 public class OrientDbServiceImpl implements OrientDbService {
-
-//  private static final Logger log = LoggerFactory.getLogger(OrientDbServiceImpl.class);
 
   @Autowired
   private DefaultBeanValidator defaultBeanValidator;
@@ -37,14 +44,13 @@ public class OrientDbServiceImpl implements OrientDbService {
   @Autowired
   private OrientDbServerFactory serverFactory;
 
+  private final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+
   @Override
-  public <T> T execute(OrientDbTransactionCallback<T> action) {
-    OObjectDatabaseTx db = serverFactory.getObjectTx();
+  public <T> T execute(WithinDocumentTxCallback<T> callback) {
+    ODatabaseDocumentTx db = serverFactory.getDocumentTx();
     try {
-      db.begin(OTransaction.TXTYPE.OPTIMISTIC);
-      T t = action.doInTransaction(db);
-      db.commit();
-      return t;
+      return callback.withinDocumentTx(db);
     } catch(OException e) {
       db.rollback();
       throw e;
@@ -54,116 +60,233 @@ public class OrientDbServiceImpl implements OrientDbService {
   }
 
   @Override
-  public <T> T save(final T t) throws ConstraintViolationException {
-    defaultBeanValidator.validate(t);
-    return execute(new OrientDbTransactionCallback<T>() {
-      @Override
-      public T doInTransaction(OObjectDatabaseTx db) {
-        return db.save(t);
-      }
-    });
+  public <T> ODocument toDocument(T t) {
+    ODocument document = new ODocument(t.getClass().getSimpleName());
+    copyToDocument(t, document);
+    return document;
   }
 
   @Override
-  public void delete(final Object obj) {
-    execute(new OrientDbTransactionCallbackWithoutResult() {
-      @Override
-      protected void doInTransactionWithoutResult(OObjectDatabaseTx db) {
-        db.delete(obj);
+  public <T> void copyToDocument(T t, ODocument document) {
+    document.fromJSON(gson.toJson(t));
+  }
+
+  @Override
+  public <T> T fromDocument(Class<T> clazz, ODocument document) {
+    return gson.fromJson(document.toJSON(), clazz);
+  }
+
+  // uniqueProperty is there to force at least one unique property
+  @Override
+  public <T> void save(@Nonnull T t, @Nonnull String uniqueProperty, String... otherUniqueProperties)
+      throws ConstraintViolationException {
+
+    defaultBeanValidator.validate(t);
+
+    List<String> uniqueProperties = Lists.asList(uniqueProperty, otherUniqueProperties);
+
+    ODatabaseDocumentTx db = serverFactory.getDocumentTx();
+    try {
+      BeanWrapperImpl beanWrapper = new BeanWrapperImpl(t);
+      Map<String, Object> uniquePropertyValues = new HashMap<String, Object>(uniqueProperties.size());
+      for(String property : uniqueProperties) {
+        uniquePropertyValues.put(property, beanWrapper.getPropertyValue(property));
       }
-    });
+      ODocument document = findUnique(db, t.getClass(), uniquePropertyValues);
+      if(document == null) {
+        document = toDocument(t);
+      } else {
+        copyToDocument(t, document);
+      }
+
+      db.begin(OTransaction.TXTYPE.OPTIMISTIC);
+      document.save();
+      db.commit();
+
+    } catch(OException e) {
+      db.rollback();
+      throw e;
+    } finally {
+      db.close();
+    }
+  }
+
+  @Override
+  public <T> T findUnique(Class<T> clazz, String uniqueProperty, Object uniqueValue) {
+    Map<String, Object> map = new HashMap<String, Object>();
+    map.put(uniqueProperty, uniqueValue);
+    return findUnique(clazz, map);
+  }
+
+  @Override
+  public <T> T findUnique(Class<T> clazz, Map<String, Object> uniquePropertyValues) {
+    ODatabaseDocumentTx db = serverFactory.getDocumentTx();
+    try {
+      ODocument document = findUnique(db, clazz, uniquePropertyValues);
+      return document == null ? null : fromDocument(clazz, document);
+    } finally {
+      db.close();
+    }
+  }
+
+  @Override
+  public <T> ODocument findUnique(ODatabaseDocumentTx db, Class<T> clazz, String uniqueProperty, Object uniqueValue) {
+    Map<String, Object> map = new HashMap<String, Object>();
+    map.put(uniqueProperty, uniqueValue);
+    return findUnique(db, clazz, map);
+  }
+
+  @Override
+  public <T> ODocument findUnique(ODatabaseDocumentTx db, Class<T> clazz, Map<String, Object> uniquePropertyValues) {
+    Set<String> uniqueProperties = uniquePropertyValues.keySet();
+    OIndex<?> index = db.getMetadata().getIndexManager()
+        .getIndex(getIndexName(clazz, uniqueProperties.toArray(new String[uniqueProperties.size()])));
+    Collection<Object> values = uniquePropertyValues.values();
+    OIdentifiable identifiable = (OIdentifiable) index
+        .get(values.size() > 1 ? values : Iterables.getOnlyElement(values));
+    return identifiable == null ? null : identifiable.<ODocument>getRecord();
   }
 
   @Override
   public <T> Iterable<T> list(Class<T> clazz) {
-    OObjectDatabaseTx db = serverFactory.getObjectTx();
+    ODatabaseDocumentTx db = serverFactory.getDocumentTx();
     try {
-      return detachAll(db.browseClass(clazz), db);
+      return fromDocuments(db.browseClass(clazz.getSimpleName()), clazz);
     } finally {
       db.close();
     }
   }
 
   @Override
-  public <T> Iterable<T> list(String sql, Object... params) {
-    OObjectDatabaseTx db = serverFactory.getObjectTx();
+  public <T> Iterable<T> list(Class<T> clazz, String sql, Object... params) {
+    ODatabaseDocumentTx db = serverFactory.getDocumentTx();
     try {
-      return detachAll(db.command(new OSQLSynchQuery(sql)).<Iterable<T>>execute(params), db);
+      return fromDocuments(db.<List<ODocument>>query(new OSQLSynchQuery<ODocument>(sql), params), clazz);
     } finally {
       db.close();
     }
   }
 
-  private <T> Iterable<T> detachAll(Iterable<T> iterable, final OObjectDatabaseTx db) {
-    return Iterables.transform(iterable, new Function<T, T>() {
-      @Override
-      public T apply(T input) {
-        return db.detach(input, true);
-      }
-    });
-  }
-
-  @SuppressWarnings("unchecked")
   @Nullable
   @Override
-  public <T> T uniqueResult(String sql, Object... params) {
+  public <T> T uniqueResult(Class<T> clazz, String sql, Object... params) {
     try {
-      return (T) Iterables.getOnlyElement(list(sql, params), null);
+      return Iterables.getOnlyElement(list(clazz, sql, params), null);
     } catch(IllegalArgumentException e) {
       throw new NonUniqueResultException(
           "Non unique result for query '" + sql + "' with args: " + Arrays.asList(params));
     }
   }
 
-  @Override
-  public long count(Class<?> clazz) {
-    OObjectDatabaseTx db = serverFactory.getObjectTx();
-    try {
-      return db.countClass(clazz);
-    } finally {
-      db.close();
-    }
-  }
-
-  @Override
-  public void registerEntityClass(Class<?>... classes) {
-    OObjectDatabaseTx db = serverFactory.getObjectTx();
-    try {
-      for(Class<?> clazz : classes) {
-        db.getEntityManager().registerEntityClass(clazz);
+  private <T> Iterable<T> fromDocuments(Iterable<ODocument> documents, final Class<T> clazz) {
+    return Iterables.transform(documents, new Function<ODocument, T>() {
+      @Override
+      public T apply(ODocument document) {
+        return fromDocument(clazz, document);
       }
+    });
+  }
+
+  @Override
+  public <T> long count(Class<T> clazz) {
+    ODatabaseDocumentTx db = serverFactory.getDocumentTx();
+    try {
+      return db.countClass(clazz.getSimpleName());
     } finally {
       db.close();
     }
   }
 
   @Override
-  public void createIndex(Class<?> clazz, String property, OClass.INDEX_TYPE indexType, OType type) {
-    OObjectDatabaseTx db = serverFactory.getObjectTx();
+  public void delete(String sql, Object... params) {
+    ODatabaseDocumentTx db = serverFactory.getDocumentTx();
+    try {
+      List<ODocument> documents = db.query(new OSQLSynchQuery<ODocument>(sql), params);
+
+      db.begin(OTransaction.TXTYPE.OPTIMISTIC);
+      for(ODocument document : documents) {
+        document.delete();
+      }
+      db.commit();
+
+    } catch(OException e) {
+      db.rollback();
+      throw e;
+    } finally {
+      db.close();
+    }
+  }
+
+  @Override
+  public <T> void deleteUnique(Class<T> clazz, String uniqueProperty, Object uniqueValue) {
+    Map<String, Object> map = new HashMap<String, Object>();
+    map.put(uniqueProperty, uniqueValue);
+    deleteUnique(clazz, map);
+  }
+
+  @Override
+  public <T> void deleteUnique(Class<T> clazz, Map<String, Object> uniquePropertyValues) {
+    ODatabaseDocumentTx db = serverFactory.getDocumentTx();
+    try {
+
+      ODocument document = findUnique(db, clazz, uniquePropertyValues);
+      db.begin(OTransaction.TXTYPE.OPTIMISTIC);
+      document.delete();
+      db.commit();
+
+    } catch(OException e) {
+      db.rollback();
+      throw e;
+    } finally {
+      db.close();
+    }
+  }
+
+  @Override
+  public void createIndex(Class<?> clazz, OClass.INDEX_TYPE indexType, OType type, @Nonnull String... propertyPath) {
+    ODatabaseDocumentTx db = serverFactory.getDocumentTx();
     try {
       String className = clazz.getSimpleName();
-      int clusterId = db.getClusterIdByName(className.toLowerCase());
-      OIndexManager indexManager = db.getMetadata().getIndexManager();
-      indexManager.createIndex(className + "." + property, indexType.name(),
-          new OPropertyIndexDefinition(className, property, type), new int[] { clusterId },
-          ONullOutputListener.INSTANCE);
+
+      OClass indexClass;
+      OSchema schema = db.getMetadata().getSchema();
+      if(schema.existsClass(className)) {
+        indexClass = schema.getClass(className);
+      } else {
+        indexClass = schema.createClass(className);
+        schema.save();
+      }
+
+      for(String prop : propertyPath) {
+        OProperty property = indexClass.getProperty(prop);
+        if(property == null) {
+          indexClass.createProperty(prop, type);
+          schema.save();
+        }
+      }
+      indexClass.createIndex(getIndexName(clazz, propertyPath), indexType, propertyPath);
+
     } finally {
       db.close();
     }
   }
 
   @Override
-  public void createUniqueIndex(Class<?> clazz, String property, OType type) {
-    createIndex(clazz, property, OClass.INDEX_TYPE.UNIQUE, type);
+  public void createUniqueIndex(Class<?> clazz, OType type, @Nonnull String... propertyPath) {
+    createIndex(clazz, OClass.INDEX_TYPE.UNIQUE, type, propertyPath);
   }
 
   @Override
-  public void createUniqueStringIndex(Class<?> clazz, String property) {
-    createUniqueIndex(clazz, property, OType.STRING);
+  public void createUniqueStringIndex(Class<?> clazz, @Nonnull String... propertyPath) {
+    createUniqueIndex(clazz, OType.STRING, propertyPath);
   }
 
-  @VisibleForTesting
-  public void setServerFactory(OrientDbServerFactory serverFactory) {
-    this.serverFactory = serverFactory;
+  @Override
+  public String getIndexName(Class<?> clazz, @Nonnull String... propertyPath) {
+    StringBuilder indexName = new StringBuilder(clazz.getSimpleName());
+    for(String prop : propertyPath) {
+      indexName.append(".").append(prop);
+    }
+    return indexName.toString();
   }
 }

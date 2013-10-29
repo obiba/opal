@@ -30,6 +30,7 @@ import org.obiba.opal.core.crypt.CachingCallbackHandler;
 import org.obiba.opal.core.crypt.KeyProviderSecurityException;
 import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.UnitKeyStore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,19 +48,19 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
   private final CallbackHandler callbackHandler;
 
   @Nonnull
-  private final OrientDbDocumentService orientDbDocumentService;
+  private final OrientDbService orientDbService;
 
   @Autowired
   public DefaultUnitKeyStoreServiceImpl(@Nonnull CallbackHandler callbackHandler,
-      @Nonnull OrientDbDocumentService orientDbDocumentService) {
+      @Nonnull OrientDbService orientDbService) {
     this.callbackHandler = callbackHandler;
-    this.orientDbDocumentService = orientDbDocumentService;
+    this.orientDbService = orientDbService;
   }
 
   @Override
   @PostConstruct
   public void start() {
-    orientDbDocumentService.createUniqueStringIndex(UnitKeyStoreState.class, UNIQUE_INDEX);
+    orientDbService.createUniqueStringIndex(UnitKeyStoreState.class, UNIQUE_INDEX);
   }
 
   @Override
@@ -75,7 +76,7 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
   }
 
   private UnitKeyStoreState findByUnit(String unitName) {
-    return orientDbDocumentService.findUnique(UnitKeyStoreState.class, UNIQUE_INDEX, unitName);
+    return orientDbService.findUnique(UnitKeyStoreState.class, UNIQUE_INDEX, unitName);
   }
 
   @Override
@@ -105,7 +106,7 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
     }
     state.setKeyStore(getKeyStoreByteArray(unitKeyStore));
 
-    orientDbDocumentService.save(state, "name");
+    orientDbService.save(state, UNIQUE_INDEX);
   }
 
   @Override

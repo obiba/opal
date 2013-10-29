@@ -7,6 +7,7 @@ import java.util.List;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.core.service.OrientDbService;
+import org.obiba.opal.core.service.impl.DefaultSubjectAclService;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +28,11 @@ public class MoveSubjectAclToOrientUpgradeStep extends AbstractUpgradeStep {
 
   @Override
   public void execute(Version currentVersion) {
-    orientDbService.registerEntityClass(SubjectAcl.class);
-    orientDbService.createIndex(SubjectAcl.class, "domain", OClass.INDEX_TYPE.NOTUNIQUE, OType.STRING);
-    orientDbService.createIndex(SubjectAcl.class, "node", OClass.INDEX_TYPE.NOTUNIQUE, OType.STRING);
-    orientDbService.createIndex(SubjectAcl.class, "principal", OClass.INDEX_TYPE.NOTUNIQUE, OType.STRING);
-    orientDbService.createIndex(SubjectAcl.class, "type", OClass.INDEX_TYPE.NOTUNIQUE, OType.STRING);
+    orientDbService.createUniqueStringIndex(SubjectAcl.class, DefaultSubjectAclService.UNIQUE_INDEX);
+    orientDbService.createIndex(SubjectAcl.class, OClass.INDEX_TYPE.NOTUNIQUE, OType.STRING, "domain");
+    orientDbService.createIndex(SubjectAcl.class, OClass.INDEX_TYPE.NOTUNIQUE, OType.STRING, "node");
+    orientDbService.createIndex(SubjectAcl.class, OClass.INDEX_TYPE.NOTUNIQUE, OType.STRING, "principal");
+    orientDbService.createIndex(SubjectAcl.class, OClass.INDEX_TYPE.NOTUNIQUE, OType.STRING, "type");
 
     JdbcTemplate dataJdbcTemplate = new JdbcTemplate(databaseRegistry.getDataSource("opal-data", null));
     List<SubjectAcl> list = dataJdbcTemplate.query("select * from subject_acl", new RowMapper<SubjectAcl>() {
@@ -47,7 +48,7 @@ public class MoveSubjectAclToOrientUpgradeStep extends AbstractUpgradeStep {
       }
     });
     for(SubjectAcl acl : list) {
-      orientDbService.save(acl);
+      orientDbService.save(acl, "domain", "node", "principal", "type", "permission");
     }
     dataJdbcTemplate.execute("drop table subject_acl");
   }

@@ -103,10 +103,6 @@
     </dependency>
     <dependency>
       <groupId>com.orientechnologies</groupId>
-      <artifactId>orientdb-object</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.orientechnologies</groupId>
       <artifactId>orientdb-server</artifactId>
     </dependency>
   </dependencies>

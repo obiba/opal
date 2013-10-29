@@ -41,8 +41,6 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
 import static org.obiba.opal.web.gwt.app.client.administration.database.presenter.SqlDatabasePresenter.Display.FormField;
-import static org.obiba.opal.web.model.client.database.SqlDatabaseDto.SqlSchema.JDBC;
-import static org.obiba.opal.web.model.client.database.SqlDatabaseDto.SqlSchema.LIMESURVEY;
 
 public class SqlDatabasePresenter extends AbstractDatabasePresenter<SqlDatabasePresenter.Display> {
 
@@ -98,14 +96,15 @@ public class SqlDatabasePresenter extends AbstractDatabasePresenter<SqlDatabaseP
     getView().getProperties().setText(sqlSettings.getProperties());
     getView().getSqlSchema().setValue(SqlSchema.valueOf(sqlSettings.getSqlSchema().getName()));
     JdbcDatasourceSettingsDto jdbcDatasourceSettings = sqlSettings.getJdbcDatasourceSettings();
-    if(JDBC.getName().equals(sqlSettings.getSqlSchema().getName()) && jdbcDatasourceSettings != null) {
+    if(SqlSettingsDto.SqlSchema.JDBC.getName().equals(sqlSettings.getSqlSchema().getName()) &&
+        jdbcDatasourceSettings != null) {
       getView().getDefaultEntityType().setText(jdbcDatasourceSettings.getDefaultEntityType());
       getView().getDefaultCreatedTimestampColumn()
           .setText(jdbcDatasourceSettings.getDefaultCreatedTimestampColumnName());
       getView().getDefaultUpdatedTimestampColumn()
           .setText(jdbcDatasourceSettings.getDefaultUpdatedTimestampColumnName());
       getView().getUseMetadataTables().setValue(jdbcDatasourceSettings.getUseMetadataTables());
-    } else if(LIMESURVEY.getName().equals(sqlSettings.getSqlSchema().getName()) &&
+    } else if(SqlSettingsDto.SqlSchema.LIMESURVEY.getName().equals(sqlSettings.getSqlSchema().getName()) &&
         sqlSettings.getLimesurveyDatasourceSettings() != null) {
       getView().getTablePrefix().setText(sqlSettings.getLimesurveyDatasourceSettings().getTablePrefix());
     }
@@ -137,9 +136,9 @@ public class SqlDatabasePresenter extends AbstractDatabasePresenter<SqlDatabaseP
     SqlSettingsDto.SqlSchema sqlSchema = parseSqlSchema(getView().getSqlSchema().getValue());
     sqlDto.setSqlSchema(sqlSchema);
 
-    if(JDBC.getName().equals(sqlSchema.getName())) {
+    if(SqlSettingsDto.SqlSchema.JDBC.getName().equals(sqlSchema.getName())) {
       sqlDto.setJdbcDatasourceSettings(getJdbcDatasourceSettingsDto());
-    } else if(LIMESURVEY.getName().equals(sqlSchema.getName())) {
+    } else if(SqlSettingsDto.SqlSchema.LIMESURVEY.getName().equals(sqlSchema.getName())) {
       sqlDto.setLimesurveyDatasourceSettings(getLimesurveyDatasourceSettingsDto());
     }
 

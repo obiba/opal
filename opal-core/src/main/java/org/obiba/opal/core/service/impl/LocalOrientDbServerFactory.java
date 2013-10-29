@@ -11,8 +11,6 @@ import org.springframework.stereotype.Component;
 import com.orientechnologies.orient.core.db.ODatabase;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.object.db.OObjectDatabasePool;
-import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 import com.orientechnologies.orient.server.OServer;
 
 @Component
@@ -44,11 +42,11 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
     System.setProperty("ORIENTDB_HOME", url);
     try {
       server = new OServer() //
-          .startup(OrientDbServiceImpl.class.getResourceAsStream("/orientdb-server-config.xml")) //
+          .startup(LocalOrientDbServerFactory.class.getResourceAsStream("/orientdb-server-config.xml")) //
           .activate();
 
       // create database if does not exist
-      ODatabase database = new OObjectDatabaseTx(url);
+      ODatabase database = new ODatabaseDocumentTx(url);
       if(!database.exists()) {
         database.create();
       }
@@ -70,12 +68,6 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
   @Override
   public OServer getServer() {
     return server;
-  }
-
-  @Nonnull
-  @Override
-  public OObjectDatabaseTx getObjectTx() {
-    return OObjectDatabasePool.global().acquire(url, username, password);
   }
 
   @Nonnull

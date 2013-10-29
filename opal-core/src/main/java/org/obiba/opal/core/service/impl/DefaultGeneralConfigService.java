@@ -15,6 +15,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
 
 import org.obiba.opal.core.domain.OpalGeneralConfig;
+import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,12 +29,12 @@ public class DefaultGeneralConfigService implements SystemService {
   private static final String UNIQUE_INDEX = "name";
 
   @Autowired
-  private OrientDbDocumentService orientDbDocumentService;
+  private OrientDbService orientDbService;
 
   @Override
   @PostConstruct
   public void start() {
-    orientDbDocumentService.createUniqueStringIndex(OpalGeneralConfig.class, UNIQUE_INDEX);
+    orientDbService.createUniqueStringIndex(OpalGeneralConfig.class, UNIQUE_INDEX);
   }
 
   @Override
@@ -41,12 +42,12 @@ public class DefaultGeneralConfigService implements SystemService {
   }
 
   public void save(@Nonnull OpalGeneralConfig config) {
-    orientDbDocumentService.save(config, UNIQUE_INDEX);
+    orientDbService.save(config, UNIQUE_INDEX);
   }
 
   @Nonnull
   public OpalGeneralConfig getConfig() throws OpalGeneralConfigMissingException {
-    Iterator<OpalGeneralConfig> iterator = orientDbDocumentService.list(OpalGeneralConfig.class).iterator();
+    Iterator<OpalGeneralConfig> iterator = orientDbService.list(OpalGeneralConfig.class).iterator();
     if(iterator.hasNext()) return iterator.next();
     throw new OpalGeneralConfigMissingException();
   }
