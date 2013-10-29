@@ -26,6 +26,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFac
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -90,7 +91,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
   private void initDatasource() {
     if(datasource == null || !datasource.getName().equals(datasourceName)) {
       ResourceRequestBuilderFactory.<DatasourceDto>newBuilder() //
-          .forResource(UriBuilder.URI_DATASOURCE.build(datasourceName)) //
+          .forResource(UriBuilders.DATASOURCE.create().build(datasourceName)) //
           .withCallback(new InitResourceCallback()) //
           .get().send();
     }
@@ -156,7 +157,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     }
 
     private void updateTable(@Nullable String tableName) {
-      UriBuilder ub = UriBuilder.URI_DATASOURCE_TABLES.query("counts", "true");
+      UriBuilder ub = UriBuilders.DATASOURCE_TABLES.create().query("counts", "true");
       ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(ub.build(datasourceName)).get()
           .withCallback(new TablesResourceCallback(datasourceName, tableName)).send();
     }

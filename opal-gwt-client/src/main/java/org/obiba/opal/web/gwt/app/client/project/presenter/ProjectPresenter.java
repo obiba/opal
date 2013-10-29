@@ -33,6 +33,7 @@ import org.obiba.opal.web.gwt.app.client.ui.HasTabPanel;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.ProjectSummaryDto;
 
@@ -169,7 +170,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     if(name == null) return;
     // reset
     getView().setProjectSummary(null);
-    ResourceRequestBuilderFactory.<ProjectDto>newBuilder().forResource(UriBuilder.URI_PROJECT.build(name)).get()
+    ResourceRequestBuilderFactory.<ProjectDto>newBuilder().forResource(UriBuilders.PROJECT.create().build(name)).get()
         .withCallback(new ResourceCallback<ProjectDto>() {
           @Override
           public void onResource(Response response, ProjectDto resource) {
@@ -180,7 +181,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
             getView().selectTab(tab.ordinal());
           }
         }).send();
-    ResourceRequestBuilderFactory.<ProjectSummaryDto>newBuilder().forResource(UriBuilder.URI_PROJECT_SUMMARY.build(name)).get()
+    ResourceRequestBuilderFactory.<ProjectSummaryDto>newBuilder().forResource(UriBuilders.PROJECT_SUMMARY.create().build(name)).get()
         .withCallback(new ResourceCallback<ProjectSummaryDto>() {
           @Override
           public void onResource(Response response, ProjectSummaryDto resource) {

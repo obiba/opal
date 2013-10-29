@@ -20,6 +20,7 @@ import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEven
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -59,9 +60,9 @@ public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateL
   private void refreshReportTemplates(ReportTemplateDto templateToSelect) {
     String uri;
     if(project == null) {
-      uri = UriBuilder.URI_REPORT_TEMPLATES.build();
+      uri = UriBuilders.REPORT_TEMPLATES.create().build();
     } else {
-      uri = UriBuilder.URI_PROJECT_REPORT_TEMPLATES.build(project);
+      uri = UriBuilders.PROJECT_REPORT_TEMPLATES.create().build(project);
     }
     ResourceRequestBuilderFactory.<JsArray<ReportTemplateDto>>newBuilder().forResource(uri).get()
         .withCallback(new ReportTemplatesResourceCallback(templateToSelect)).send();

@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -69,14 +70,14 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
 
     // Fetch locales and render categories
     ResourceRequestBuilderFactory.<JsArray<LocaleDto>>newBuilder()
-        .forResource(UriBuilder.URI_DATASOURCE_TABLE_LOCALES.build(table.getDatasourceName(), table.getName())).get()
-        .withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
-          @Override
-          public void onResource(Response response, JsArray<LocaleDto> resource) {
-            locales = JsArrays.toList(JsArrays.toSafeArray(resource));
-            getView().renderCategoryRows(CategoriesEditorModalPresenter.this.variable.getCategoriesArray(), locales);
-          }
-        }).send();
+        .forResource(UriBuilders.DATASOURCE_TABLE_LOCALES.create().build(table.getDatasourceName(), table.getName()))
+        .get().withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
+      @Override
+      public void onResource(Response response, JsArray<LocaleDto> resource) {
+        locales = JsArrays.toList(JsArrays.toSafeArray(resource));
+        getView().renderCategoryRows(CategoriesEditorModalPresenter.this.variable.getCategoriesArray(), locales);
+      }
+    }).send();
 
   }
 
@@ -98,7 +99,7 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
 
     // If variable from a view
     if(Strings.isNullOrEmpty(tableDto.getViewLink())) {
-      ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilder.URI_DATASOURCE_TABLE_VARIABLE
+      ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
           .build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())) //
           .put() //
           .withResourceBody(VariableDto.stringify(v)).accept("application/json") //

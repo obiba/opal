@@ -40,6 +40,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
@@ -120,7 +121,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
       updateDisplay(event.getDatasourceName(), event.getTableName(), event.getVariableName(), null, null);
     }
     ResourceRequestBuilderFactory.<JsArray<LocaleDto>>newBuilder()
-        .forResource(UriBuilder.URI_DATASOURCE_LOCALES.build(event.getDatasourceName())).get()
+        .forResource(UriBuilders.DATASOURCE_LOCALES.create().build(event.getDatasourceName())).get()
         .withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
           @Override
           public void onResource(Response response, JsArray<LocaleDto> resource) {
@@ -183,7 +184,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
     if(variableUpdatePending) return;
     ResourceRequestBuilderFactory.<VariableDto>newBuilder()
-        .forResource(UriBuilder.URI_DATASOURCE_TABLE_VARIABLE.build(datasourceName, tableName, variableName)).get()
+        .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create().build(datasourceName, tableName, variableName)).get()
         .withCallback(new ResourceCallback<VariableDto>() {
           @Override
           public void onResource(Response response, VariableDto resource) {

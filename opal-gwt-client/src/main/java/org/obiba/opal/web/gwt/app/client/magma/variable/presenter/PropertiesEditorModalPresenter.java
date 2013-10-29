@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
@@ -62,7 +63,7 @@ public class PropertiesEditorModalPresenter extends ModalPresenterWidget<Propert
 
     // If variable from a view
     if(Strings.isNullOrEmpty(tableDto.getViewLink())) {
-      ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilder.URI_DATASOURCE_TABLE_VARIABLE
+      ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
           .build(tableDto.getDatasourceName(), tableDto.getName(), v.getName())) //
           .put() //
           .withResourceBody(VariableDto.stringify(v)).accept("application/json") //

@@ -43,6 +43,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -255,7 +256,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     if(tableUpdatePending) return;
 
     tableUpdatePending = true;
-    UriBuilder ub = UriBuilder.URI_DATASOURCE_TABLE.query("counts", "true");
+    UriBuilder ub = UriBuilders.DATASOURCE_TABLE.create().query("counts", "true");
     ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(datasourceName, tableName)).get()
         .withCallback(new ResourceCallback<TableDto>() {
           @Override
@@ -463,7 +464,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
     };
     ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-        .forResource(UriBuilder.URI_DATASOURCE_TABLE_INDEX.build(table.getDatasourceName(), table.getName()))//
+        .forResource(UriBuilders.DATASOURCE_TABLE_INDEX.create().build(table.getDatasourceName(), table.getName()))//
         .withCallback(callback, SC_OK, SC_SERVICE_UNAVAILABLE).delete().send();
   }
 
@@ -513,7 +514,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
     };
     ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-        .forResource(UriBuilder.URI_DATASOURCE_TABLE_INDEX.build(table.getDatasourceName(), table.getName()))//
+        .forResource(UriBuilders.DATASOURCE_TABLE_INDEX.create().build(table.getDatasourceName(), table.getName()))//
         .withCallback(callback, SC_OK, SC_SERVICE_UNAVAILABLE).delete().send();
   }
 

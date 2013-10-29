@@ -11,6 +11,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
@@ -110,14 +111,14 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
 
   private void show(final String datasource, final String table, final String variable) {
     // table counts are required for having variable summary and values
-    UriBuilder ub = UriBuilder.URI_DATASOURCE_TABLE.query("counts", "true");
+    UriBuilder ub = UriBuilders.DATASOURCE_TABLE.create().query("counts", "true");
     ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(datasource, table)).get()
         .withCallback(new ResourceCallback<TableDto>() {
           @Override
           public void onResource(Response response, final TableDto tableDto) {
             if(tableDto == null) return;
 
-            UriBuilder ub = UriBuilder.URI_DATASOURCE_TABLE_VARIABLES;
+            UriBuilder ub = UriBuilders.DATASOURCE_TABLE_VARIABLES.create();
             ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(ub.build(datasource, table))
                 .get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
 
