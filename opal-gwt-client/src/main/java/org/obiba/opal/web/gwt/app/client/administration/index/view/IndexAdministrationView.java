@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
@@ -301,9 +302,7 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
       super(new PlaceRequestCell<String>(placeManager) {
         @Override
         public PlaceRequest getPlaceRequest(String value) {
-          return new PlaceRequest.Builder().nameToken(Places.PROJECT) //
-              .with(ParameterTokens.TOKEN_NAME, value) //
-              .build();
+          return ProjectPlacesHelper.getProjectPlace(value);
         }
       });
     }
@@ -320,11 +319,7 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
       super(new PlaceRequestCell<TableIndexStatusDto>(placeManager) {
         @Override
         public PlaceRequest getPlaceRequest(TableIndexStatusDto value) {
-          return new PlaceRequest.Builder().nameToken(Places.PROJECT) //
-              .with(ParameterTokens.TOKEN_NAME, value.getDatasource()) //
-              .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString()) //
-              .with(ParameterTokens.TOKEN_PATH, value.getDatasource() + "." + value.getTable()) //
-              .build();
+          return ProjectPlacesHelper.getTablePlace(value.getDatasource(), value.getTable());
         }
 
         @Override

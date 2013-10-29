@@ -92,10 +92,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private TableIndexStatusDto statusDto;
 
-  private String previous;
-
-  private String next;
-
   private boolean cancelIndexation = false;
 
   private final Provider<AuthorizationPresenter> authorizationPresenter;
@@ -140,16 +136,16 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @Override
   public void onTableSelectionChanged(TableSelectionChangeEvent event) {
     if(event.hasTable()) {
-      updateDisplay(event.getTable(), event.getPrevious(), event.getNext());
+      updateDisplay(event.getTable());
     } else {
-      updateDisplay(event.getDatasourceName(), event.getTableName(), event.getPrevious(), event.getNext());
+      updateDisplay(event.getDatasourceName(), event.getTableName());
     }
   }
 
   @Override
   public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
     if(this != event.getSource() && event.hasTable() && event.getTable().hasValueSetCount()) {
-      updateDisplay(event.getTable(), null, null);
+      updateDisplay(event.getTable());
     }
   }
 
@@ -251,7 +247,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         .authorize(getView().getValuesAuthorizer()).send();
   }
 
-  private void updateDisplay(String datasourceName, String tableName, final String previous, final String next) {
+  private void updateDisplay(String datasourceName, String tableName) {
     if(table != null && table.getDatasourceName().equals(datasourceName) && table.getName().equals(tableName)) return;
     if(tableUpdatePending) return;
 
@@ -262,20 +258,18 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           @Override
           public void onResource(Response response, TableDto resource) {
             if(resource != null) {
-              updateDisplay(resource, previous, next);
+              updateDisplay(resource);
             }
             tableUpdatePending = false;
           }
         }).send();
   }
 
-  private void updateDisplay(TableDto tableDto, String previous, String next) {
+  private void updateDisplay(TableDto tableDto) {
     if(table == null || !table.getLink().equals(tableDto.getLink())) {
       getView().clear(true);
 
       table = tableDto;
-      this.previous = previous;
-      this.next = next;
 
       getView().setTable(tableDto);
 
@@ -345,12 +339,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     }//
         .withQuery(getView().getFilter().getText())//
         .withVariable(true)//
-            //.withLimit(table.getVariableCount())//
         .withSortDir(
             sortAscending == null || sortAscending ? VariablesFilter.SORT_ASCENDING : VariablesFilter.SORT_DESCENDING)//
-        .withSortField(getView().getClickableColumnName(sortColumn) == null
-            ? "index"
-            : getView().getClickableColumnName(sortColumn))//
         .filter(getEventBus(), table);
 
   }
@@ -555,8 +545,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       if(valuesTablePresenter.getView().getFilterText().isEmpty()) {
         updateVariables();
       } else {
-        String sortColumnName = getView().getClickableColumnName(sortColumn);
-        doFilterVariables(sortColumnName);
+        doFilterVariables();
       }
     }
   }
@@ -567,7 +556,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     public void onColumnSort(ColumnSortEvent event) {
       sortAscending = event.isSortAscending();
       sortColumn = event.getColumn();
-      updateDisplay(table, previous, next);
+      updateDisplay(table);
     }
   }
 
@@ -575,18 +564,17 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
     @Override
     public void onKeyUp(KeyUpEvent event) {
-      String sortColumnName = getView().getClickableColumnName(sortColumn);
       String filter = getView().getFilter().getText();
 
       if(filter.isEmpty()) {
         updateVariables();
       } else if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-        doFilterVariables(sortColumnName);
+        doFilterVariables();
       }
     }
   }
 
-  private void doFilterVariables(final String sortColumnName) {
+  private void doFilterVariables() {
     final String query = getView().getFilter().getText();
 
     new VariablesFilter() {
@@ -611,10 +599,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     }//
         .withVariable(true)//
         .withQuery(query)//
-            //.withLimit(table.getVariableCount())//
         .withSortDir(
             sortAscending == null || sortAscending ? VariablesFilter.SORT_ASCENDING : VariablesFilter.SORT_DESCENDING)//
-        .withSortField(sortColumnName == null ? "index" : sortColumnName)//
         .filter(getEventBus(), table);
   }
 
@@ -714,7 +700,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     @Override
     public void onViewSaved(ViewSavedEvent event) {
       if(table != null) {
-        updateDisplay(table, previous, next);
+        updateDisplay(table);
       }
     }
   }
@@ -764,8 +750,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     HasAuthorization getTableIndexStatusAuthorizer();
 
     HasAuthorization getTableIndexEditAuthorizer();
-
-    String getClickableColumnName(Column<?, ?> column);
 
     void setValuesTabCommand(Command cmd);
 

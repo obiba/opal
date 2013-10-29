@@ -31,39 +31,21 @@ public class TableSelectionChangeEvent extends GwtEvent<TableSelectionChangeEven
 
   private final String tableName;
 
-  private final String previous;
-
-  private final String next;
+  private final TableDto table;
 
   private final Object source;
 
-  private final TableDto table;
-
-  public TableSelectionChangeEvent(Object source, TableDto table) {
-    this(source, table.getDatasourceName(), table.getName(), null, null, table);
-  }
-
-  public TableSelectionChangeEvent(Object source, TableDto table, String previous,
-      String next) {
-    this(source, table.getDatasourceName(), table.getName(), previous, next, table);
-  }
-
   public TableSelectionChangeEvent(Object source, String datasourceName, String tableName) {
-    this(source, datasourceName, tableName, null, null, null);
-  }
-
-  public TableSelectionChangeEvent(Object source, String datasourceName, String tableName, String previous,
-      String next) {
-    this(source, datasourceName, tableName, previous, next, null);
-  }
-
-  private TableSelectionChangeEvent(Object source, String datasourceName, String tableName, String previous,
-      String next, TableDto table) {
     this.source = source;
     this.datasourceName = datasourceName;
     this.tableName = tableName;
-    this.previous = previous;
-    this.next = next;
+    table = null;
+  }
+
+  public TableSelectionChangeEvent(Object source, TableDto table) {
+    this.source = source;
+    datasourceName = table.getDatasourceName();
+    tableName = table.getName();
     this.table = table;
   }
 
@@ -90,14 +72,6 @@ public class TableSelectionChangeEvent extends GwtEvent<TableSelectionChangeEven
 
   public boolean isView() {
     return hasTable() && table.hasViewLink();
-  }
-
-  public String getPrevious() {
-    return previous;
-  }
-
-  public String getNext() {
-    return next;
   }
 
   public static Type<Handler> getType() {

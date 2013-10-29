@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourceUiHandlers;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
@@ -130,11 +131,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
 
       @Override
       public PlaceRequest getPlaceRequest(TableDto value) {
-        return new PlaceRequest.Builder().nameToken(Places.PROJECT) //
-            .with(ParameterTokens.TOKEN_NAME, value.getDatasourceName()) //
-            .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString()) //
-            .with(ParameterTokens.TOKEN_PATH, value.getDatasourceName() + "." + value.getName()) //
-            .build();
+        return ProjectPlacesHelper.getTablePlace(value.getDatasourceName(), value.getName());
       }
 
       @Override

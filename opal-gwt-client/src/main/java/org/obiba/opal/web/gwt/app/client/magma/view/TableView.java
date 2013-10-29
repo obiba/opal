@@ -16,7 +16,9 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
+import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
@@ -180,10 +182,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   private TableDto tableDto;
 
-  private VariableColumn variableNameColumn;
-
-  private VariableColumn variableIndexColumn;
-
   private CheckboxColumn<VariableDto> checkColumn;
 
   private boolean hasLinkAuthorization = true;
@@ -221,29 +219,14 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   private void addTableColumns() {
     addCheckColumn();
 
-    variableIndexColumn = new VariableColumn(new VariableLinkCell(placeManager) {
-      @Override
-      public String getText(VariableDto value) {
-        return value.getIndex() + 1 + "";
-      }
-    });
-
-    table.addColumn(variableIndexColumn, "#");
-    table.setColumnWidth(variableIndexColumn, 1, Unit.PX);
-    variableIndexColumn.setSortable(true);
-
-    table.addColumn(variableNameColumn = new VariableColumn(new VariableLinkCell(placeManager)), translations.nameLabel());
-    variableNameColumn.setSortable(true);
-
+    table.addColumn(new VariableColumn(new VariableLinkCell(placeManager)), translations.nameLabel());
     table.addColumn(new VariableAttributeColumn("label"), translations.labelLabel());
-
     table.addColumn(new TextColumn<VariableDto>() {
       @Override
       public String getValue(VariableDto object) {
         return object.getValueType();
       }
     }, translations.valueTypeLabel());
-
     table.addColumn(new TextColumn<VariableDto>() {
 
       @Override
@@ -269,7 +252,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     table.setSelectionModel(new SingleSelectionModel<VariableDto>());
     table.setPageSize(Table.DEFAULT_PAGESIZE);
     table.setEmptyTableWidget(new InlineLabel(translations.noVariablesLabel()));
-    table.getColumnSortList().push(new ColumnSortInfo(variableIndexColumn, true));
     pager.setDisplay(table);
     dataProvider.addDataDisplay(table);
 
@@ -327,7 +309,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @Override
   public void setTable(TableDto dto) {
-    this.tableDto = dto;
+    tableDto = dto;
     name.setText(dto.getName());
     entityType.setText(dto.getEntityType());
     edit.setVisible(dto.hasViewLink());
@@ -351,12 +333,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
         final String tableFullName = tableNames.get(i);
         Anchor a = new Anchor();
         a.setText(tableFullName);
-        a.addClickHandler(new ClickHandler() {
-          @Override
-          public void onClick(ClickEvent event) {
-            getUiHandlers().onFromTable(tableFullName);
-          }
-        });
+        MagmaPath.Parser parser = MagmaPath.Parser.parse(tableFullName);
+        a.setHref("#" + placeManager
+            .buildHistoryToken(ProjectPlacesHelper.getTablePlace(parser.getDatasource(), parser.getTable())));
         fromTableLinks.add(a);
 
         if(i < tableNames.length() - 1) {
@@ -422,20 +401,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     getUiHandlers().onIndexSchedule();
   }
 
-  private abstract static class VariableClickableColumn extends ClickableColumn<VariableDto> {
-
-    private final String name;
-
-    private VariableClickableColumn(String name) {
-      this.name = name;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-  }
-
   @Override
   public HandlerRegistration addVariableSortHandler(ColumnSortEvent.Handler handler) {
     return table.addColumnSortHandler(handler);
@@ -498,14 +463,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
         hasLinkAuthorization = false;
       }
     };
-  }
-
-  @Override
-  public String getClickableColumnName(Column<?, ?> column) {
-    if(column instanceof VariableClickableColumn) {
-      return ((VariableClickableColumn) column).getName();
-    }
-    return null;
   }
 
   @Override
@@ -662,12 +619,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
     @Override
     public PlaceRequest getPlaceRequest(VariableDto value) {
-      return new PlaceRequest.Builder().nameToken(Places.PROJECT) //
-          .with(ParameterTokens.TOKEN_NAME, tableDto.getDatasourceName()) //
-          .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString()) //
-          .with(ParameterTokens.TOKEN_PATH,
-              tableDto.getDatasourceName() + "." + tableDto.getName() + ":" + value.getName()) //
-          .build();
+      return ProjectPlacesHelper.getVariablePlace(tableDto.getDatasourceName(), tableDto.getName(), value.getName());
     }
 
     @Override

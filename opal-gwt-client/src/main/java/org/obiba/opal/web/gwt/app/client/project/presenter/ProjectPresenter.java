@@ -17,11 +17,7 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.MagmaPathSelectionEvent;
-import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
@@ -29,10 +25,10 @@ import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportsPresenter;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
+import org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.HasTabPanel;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.ProjectSummaryDto;
@@ -55,8 +51,7 @@ import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 
 public class ProjectPresenter extends Presenter<ProjectPresenter.Display, ProjectPresenter.Proxy>
-    implements ProjectUiHandlers, DatasourceSelectionChangeEvent.Handler, TableSelectionChangeEvent.Handler,
-    VariableSelectionChangeEvent.Handler, FolderUpdatedEvent.Handler {
+    implements ProjectUiHandlers, FolderUpdatedEvent.Handler {
 
   public interface Display extends View, HasUiHandlers<ProjectUiHandlers>, HasTabPanel {
 
@@ -142,9 +137,6 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   @Override
   protected void onBind() {
     super.onBind();
-    addRegisteredHandler(DatasourceSelectionChangeEvent.getType(), this);
-    addRegisteredHandler(TableSelectionChangeEvent.getType(), this);
-    addRegisteredHandler(VariableSelectionChangeEvent.getType(), this);
     addRegisteredHandler(FolderUpdatedEvent.getType(), this);
   }
 
@@ -277,25 +269,6 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       setInSlot(ADMIN_PANE, projectAdministrationPresenter);
     }
     projectAdministrationPresenter.setProject(project);
-  }
-
-  @Override
-  public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
-    if(event.getSource() == this) return;
-    updateHistory(null);
-  }
-
-  @Override
-  public void onTableSelectionChanged(TableSelectionChangeEvent event) {
-    if(event.getSource() == this) return;
-    updateHistory(MagmaPath.Builder.datasource(event.getDatasourceName()).table(event.getTableName()).build());
-  }
-
-  @Override
-  public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-    if(event.getSource() == this) return;
-    updateHistory(new MagmaPath.Builder().datasource(event.getDatasourceName()).table(event.getTableName())
-        .variable(event.getVariableName()).build());
   }
 
   @Override
