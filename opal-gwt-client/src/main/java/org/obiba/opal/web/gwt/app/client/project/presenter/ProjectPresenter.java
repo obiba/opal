@@ -143,9 +143,12 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   @Override
   public void prepareFromRequest(PlaceRequest request) {
     super.prepareFromRequest(request);
-    name = request.getParameter(ParameterTokens.TOKEN_NAME, null);
+
+    String requestedName = request.getParameter(ParameterTokens.TOKEN_NAME, null);
+
+
     tab = validateTab(request.getParameter(ParameterTokens.TOKEN_TAB, null));
-    String path = validatePath(request.getParameter(ParameterTokens.TOKEN_PATH, null));
+    String path = validatePath(requestedName, request.getParameter(ParameterTokens.TOKEN_PATH, null));
 
     if(tab == Display.ProjectTab.TABLES) {
       // TODO check that datasource name is the one of project
@@ -154,7 +157,13 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       getView().setTabData(tab.ordinal(), null);
     }
 
-    refresh();
+    if (!Strings.isNullOrEmpty(requestedName) && !requestedName.equals(name)) {
+      name = requestedName;
+      refresh();
+    } else {
+      onTabSelected(tab.ordinal());
+      getView().selectTab(tab.ordinal());
+    }
   }
 
   public void refresh() {
@@ -301,7 +310,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     return Display.ProjectTab.HOME;
   }
 
-  private String validatePath(String path) {
+  private String validatePath(String name, String path) {
     if(tab == Display.ProjectTab.TABLES && !Strings.isNullOrEmpty(path)) {
       MagmaPath.Parser parser = new MagmaPath.Parser().parse(path);
       String datasourceName = parser.getDatasource();

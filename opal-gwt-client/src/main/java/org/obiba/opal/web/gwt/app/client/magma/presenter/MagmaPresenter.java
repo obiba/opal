@@ -25,7 +25,7 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
 public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
-    implements MagmaUiHandlers, MagmaPathSelectionEvent.Handler, DatasourceSelectionChangeEvent.Handler,
+    implements MagmaPathSelectionEvent.Handler, DatasourceSelectionChangeEvent.Handler,
     TableSelectionChangeEvent.Handler, VariableSelectionChangeEvent.Handler {
 
   private final DatasourcePresenter datasourcePresenter;
@@ -41,7 +41,6 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
     this.datasourcePresenter = datasourcePresenter;
     this.tablePresenter = tablePresenter;
     this.variablePresenter = variablePresenter;
-    getView().setUiHandlers(this);
   }
 
   @Override
@@ -78,17 +77,9 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
   }
 
   @Override
-  public void onDatasourceSelection(String name) {
-    getEventBus().fireEvent(new DatasourceSelectionChangeEvent(this, name));
-  }
-
-  @Override
-  public void onTableSelection(String datasource, String table) {
-    getEventBus().fireEvent(new TableSelectionChangeEvent(this, datasource, table));
-  }
-
-  @Override
   public void onMagmaPathSelection(MagmaPathSelectionEvent event) {
+    if(event.getSource() == this) return;
+
     MagmaPath.Parser parser = event.getParser();
     if(parser.hasVariable()) {
       show(parser.getDatasource(), parser.getTable(), parser.getVariable());
@@ -101,17 +92,17 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
 
   private void show(String datasource) {
     getView().selectDatasource(datasource);
-    onDatasourceSelection(datasource);
+    fireEvent(new DatasourceSelectionChangeEvent(this, datasource));
   }
 
   private void show(String datasource, String table) {
     getView().selectTable(datasource, table, false);
-    onTableSelection(datasource, table);
+    fireEvent(new TableSelectionChangeEvent(this, datasource, table));
   }
 
   private void show(final String datasource, final String table, final String variable) {
     // table counts are required for having variable summary and values
-    UriBuilder ub = UriBuilders.DATASOURCE_TABLE.create().query("counts", "true");
+    UriBuilder ub = UriBuilders.DATASOURCE_TABLE.create();//.query("counts", "true");
     ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(datasource, table)).get()
         .withCallback(new ResourceCallback<TableDto>() {
           @Override
@@ -142,8 +133,7 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
                     }
                   }
                 }
-                getEventBus().fireEvent(
-                    new VariableSelectionChangeEvent(MagmaPresenter.this, tableDto, selection, previous, next));
+                fireEvent(new VariableSelectionChangeEvent(MagmaPresenter.this, tableDto, selection, previous, next));
               }
             })//
                 .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
@@ -157,7 +147,7 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
         }).send();
   }
 
-  public interface Display extends View, HasUiHandlers<MagmaUiHandlers> {
+  public interface Display extends View {
 
     enum Slot {
       DATASOURCE,

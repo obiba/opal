@@ -2,7 +2,7 @@ package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaUiHandlers;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.ui.BreadcrumbsTabPanel;
 
 import com.github.gwtbootstrap.client.ui.Heading;
@@ -16,9 +16,10 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import com.gwtplatform.mvp.client.ViewImpl;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
-public class MagmaView extends ViewWithUiHandlers<MagmaUiHandlers> implements MagmaPresenter.Display {
+public class MagmaView extends ViewImpl implements MagmaPresenter.Display {
 
   private static final Translations translations = GWT.create(Translations.class);
 
@@ -29,6 +30,8 @@ public class MagmaView extends ViewWithUiHandlers<MagmaUiHandlers> implements Ma
 
   @UiField
   BreadcrumbsTabPanel tabPanel;
+
+  private final PlaceManager placeManager;
 
   private Widget datasourceWidget;
 
@@ -43,16 +46,17 @@ public class MagmaView extends ViewWithUiHandlers<MagmaUiHandlers> implements Ma
   private String variable;
 
   @Inject
-  public MagmaView(Binder uiBinder) {
+  public MagmaView(Binder uiBinder, PlaceManager placeManager) {
+    this.placeManager = placeManager;
     initWidget(uiBinder.createAndBindUi(this));
     tabPanel.addSelectionHandler(new SelectionHandler<Integer>() {
       @Override
       public void onSelection(SelectionEvent<Integer> event) {
         if(event.getSelectedItem() == 0) {
-          getUiHandlers().onDatasourceSelection(datasource);
+          //getUiHandlers().onDatasourceSelection(datasource);
           setHeading(datasource, "Datasource");
         } else if(event.getSelectedItem() == 1) {
-          getUiHandlers().onTableSelection(datasource, table);
+          //getUiHandlers().onTableSelection(datasource, table);
           setHeading(table, "Table");
         }
       }
@@ -90,7 +94,7 @@ public class MagmaView extends ViewWithUiHandlers<MagmaUiHandlers> implements Ma
     this.table = table;
     tabPanel.clear();
     tabPanel.add(datasourceWidget, getDatasourceLink(datasource));
-    tabPanel.addAndSelect(tableWidget, table);
+    tabPanel.addAndSelect(tableWidget, getTableLink(datasource, table));
     tabPanel.setMenuVisible(true);
     setHeading(table, isView ? "View" : "Table");
   }
@@ -102,7 +106,7 @@ public class MagmaView extends ViewWithUiHandlers<MagmaUiHandlers> implements Ma
     this.variable = variable;
     tabPanel.clear();
     tabPanel.add(datasourceWidget, getDatasourceLink(datasource));
-    tabPanel.add(tableWidget, table);
+    tabPanel.add(tableWidget, getTableLink(datasource, table));
     tabPanel.addAndSelect(variableWidget, variable);
     tabPanel.setMenuVisible(true);
     setHeading(variable, "Variable");
@@ -116,7 +120,14 @@ public class MagmaView extends ViewWithUiHandlers<MagmaUiHandlers> implements Ma
   private NavLink getDatasourceLink(String name) {
     NavLink link = new NavLink();
     link.setIcon(IconType.TABLE);
+    link.setHref("#" + placeManager.buildHistoryToken(ProjectPlacesHelper.getDatasourcePlace(name)));
     link.setTitle(translations.allTablesLabel());
+    return link;
+  }
+
+  private NavLink getTableLink(String datasource, String table) {
+    NavLink link = new NavLink(table);
+    link.setHref("#" + placeManager.buildHistoryToken(ProjectPlacesHelper.getTablePlace(datasource, table)));
     return link;
   }
 
