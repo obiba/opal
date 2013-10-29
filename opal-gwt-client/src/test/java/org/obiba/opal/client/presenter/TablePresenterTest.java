@@ -95,9 +95,6 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     expect(displayMock.addVariableSortHandler((ColumnSortEvent.Handler) EasyMock.anyObject()))
         .andReturn(handlerRegistrationMock).once();
 
-    displayMock.setVariableNameFieldUpdater((FieldUpdater<VariableDto, String>) EasyMock.anyObject());
-    displayMock.setVariableIndexFieldUpdater((FieldUpdater<VariableDto, String>) EasyMock.anyObject());
-
     usersAuthzDisplayMock.addPrincipalHandler((AddPrincipalHandler) EasyMock.anyObject());
 
     groupsAuthzDisplayMock.addPrincipalHandler((AddPrincipalHandler) EasyMock.anyObject());
