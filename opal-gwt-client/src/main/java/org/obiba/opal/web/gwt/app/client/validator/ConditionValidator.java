@@ -30,6 +30,10 @@ public class ConditionValidator extends AbstractFieldValidator {
     this.condition = condition;
   }
 
+  public ConditionValidator(HasValue<Boolean> condition, String errorMessageKey, String id) {
+    super(errorMessageKey, id);
+    this.condition = condition;
+  }
   //
   // AbstractFieldValidator Methods
   //

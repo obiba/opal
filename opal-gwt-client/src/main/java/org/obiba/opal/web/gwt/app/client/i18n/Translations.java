@@ -127,11 +127,8 @@ public interface Translations extends Constants {
       "Clear", "Clear",//
       "View", "View",//
       "Remove", "Remove",//
-      "Publish methods", "Publish methods",
-      "Permissions", "Permissions",
-      "CommitDiff", "Diff",
-      "DiffWithCurrent", "Diff with current"
-  })
+      "Publish methods", "Publish methods", "Permissions", "Permissions", "CommitDiff", "Diff", "DiffWithCurrent",
+      "Diff with current" })
   Map<String, String> actionMap();
 
   @Description("Permission map")
@@ -277,6 +274,18 @@ public interface Translations extends Constants {
   @Description("Category name duplicated")
   @DefaultStringValue("Duplicated category name {0}.")
   String categoryNameDuplicated();
+
+  @Description("You must select a file message")
+  @DefaultStringValue("You must select a file.")
+  String fileMustBeSelected();
+
+  @Description("Yes label")
+  @DefaultStringValue("Yes")
+  String yesLabel();
+
+  @Description("No label")
+  @DefaultStringValue("No")
+  String noLabel();
 
   @Description("User message map")
   @DefaultStringMapValue({ //
@@ -448,12 +457,10 @@ public interface Translations extends Constants {
       "UserStatusChangedOk", "User {0} has been successfully {1}.",//
       "UserUpdatedOk", "User {0} has been successfully updated.",//
       "UserCreatedOk", "User {0} has been successfully added.",//
-      "UserPasswordLengthError", "Password must contain at least {0} characters.",//
-      "UserPasswordMatchError", "Passwords do not match.",//
       "UserDeletedOk", "User {0} has been successfully deleted.", //
       "UserAlreadyExists", "User name already exists.", //
-      "UserNameRequiredError", "User name is required.",//
-      "UserPasswordRequiredError", "Password is required.",//
+      "PasswordLengthMin", "Password must contain at least {0} characters.",//
+      "PasswordsMustMatch", "Passwords do not match.",//
       "GroupDeletedOk", "Group {0} has been successfully deleted.", //
       "GroupAlreadyExists", "Group already exists.", //
       "ProjectNameRequired", "Project name is required.", //
@@ -465,21 +472,8 @@ public interface Translations extends Constants {
       "DatabaseAlreadyExists", "Database named {0} already exists", //
       "VcsScriptContentInfo", "The retrieved script content is from '{0}' committed by '{1}'.", //
       "GeneralConfigSaved", "Opal general configuration was successfully saved.", //
-      "PostInstallNotCompleted", "Post-install configuration not completed."
-  })
+      "PostInstallNotCompleted", "Post-install configuration not completed." })
   Map<String, String> userMessageMap();
-
-  @Description("You must select a file message")
-  @DefaultStringValue("You must select a file.")
-  String fileMustBeSelected();
-
-  @Description("Yes label")
-  @DefaultStringValue("Yes")
-  String yesLabel();
-
-  @Description("No label")
-  @DefaultStringValue("No")
-  String noLabel();
 
   @Description("Missing label")
   @DefaultStringValue("Missing")
@@ -1987,8 +1981,7 @@ public interface Translations extends Constants {
   @DefaultStringMapValue({ "id", "ID",//
       "Author", "Author",//
       "Date", "Date",//
-      "Comment", "Comment"
-  })
+      "Comment", "Comment" })
   Map<String, String> commitInfoMap();
 
   @Description("Script Update Default Prefix Label")
@@ -1999,7 +1992,8 @@ public interface Translations extends Constants {
   @DefaultStringMapValue({ //
       "FailedToRetrieveVariableCommitInfos", "Failed to retrieve all variable commit information.", //
       "FailedToRetrieveVariableContent", "Failed to retrieve variable content for the given id.", //
-      "FailedToRetrieveVariableCommitInfo", "Failed to retrieve variable commit information for the given id." })//
+      "FailedToRetrieveVariableCommitInfo", "Failed to retrieve variable commit information for the given id." })
+//
   Map<String, String> vcsResourceErrorMap();
 
   @Description("Edit label")
