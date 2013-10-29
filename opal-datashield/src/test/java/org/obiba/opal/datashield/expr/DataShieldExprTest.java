@@ -40,7 +40,12 @@ public class DataShieldExprTest {
       .put("Function with string argument", "A('this')")//
       .put("Function with double quoted string argument", "A(\"this\")")//
       .put("Function with numerical string argument", "A('123')")//
-      .put("Function with alphanumerical string argument and some special characters", "A('this1_that.this')")//
+      .put("Function with alphanumerical string argument and some special characters", "A('this1_that.this-that1')")//
+      .put("Function with a list of colon separated numerical string argument", "A('1.2:1.3:-8.5')")//
+      .put("Function with a list of comma separated numerical string argument", "A('1.2,1.3,-8.5')")//
+      .put("Function with a list of semi colon separated numerical string argument", "A('1.2;1.3;-8.5')")//
+      .put("Function with data frame column name string argument", "A('D$abc')")//
+      .put("Function with data frame index string argument", "A('D[123]')")//
       .build();
 
   @Test
@@ -56,13 +61,8 @@ public class DataShieldExprTest {
   }
 
   @Test(expected = TokenMgrError.class)
-  public void test_dollarInString() throws ParseException {
-    doTest("Function with dollar in string argument", "A('this$that')");
-  }
-
-  @Test(expected = TokenMgrError.class)
   public void test_spaceInString() throws ParseException {
-    doTest("Function with dollar in string argument", "A(\"this that\")");
+    doTest("Function with space in string argument", "A(\"this that\")");
   }
 
   @Test(expected = TokenMgrError.class)
