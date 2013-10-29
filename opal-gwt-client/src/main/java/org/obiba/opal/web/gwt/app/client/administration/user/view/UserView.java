@@ -134,13 +134,13 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
   }
 
   @Override
-  public String getPassword() {
-    return password.getText();
+  public HasText getPassword() {
+    return password;
   }
 
   @Override
-  public String getConfirmPassword() {
-    return confirmPassword.getText();
+  public HasText getConfirmPassword() {
+    return confirmPassword;
   }
 
   @Override
