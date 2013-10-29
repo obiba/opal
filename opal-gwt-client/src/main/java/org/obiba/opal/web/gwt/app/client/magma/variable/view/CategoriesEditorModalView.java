@@ -33,6 +33,7 @@ import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.Heading;
+import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.cell.client.CheckboxCell;
@@ -68,6 +69,8 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   private static final String LABEL = "label";
 
+  private static final int DEFAULT_PAGESIZE = 8;
+
   private final Widget widget;
 
   private final Translations translations = GWT.create(Translations.class);
@@ -88,6 +91,9 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   @UiField
   ControlGroup nameGroup;
+
+  @UiField
+  SimplePager pager;
 
   @UiField
   CategoryEditableTable table;
@@ -137,7 +143,9 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     table.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.DISABLED);
     table.setSelectionModel(new SingleSelectionModel<CategoryDto>());
     table.setEmptyTableWidget(new Label(translations.noCategoriesLabel()));
+    table.setPageSize(DEFAULT_PAGESIZE);
 
+    pager.setDisplay(table);
     dataProvider.addDataDisplay(table);
   }
 
@@ -172,6 +180,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
     dataProvider.setList(categories);
     dataProvider.refresh();
+    pager.setVisible(dataProvider.getList().size() >= DEFAULT_PAGESIZE);
   }
 
   @UiHandler("closeButton")
@@ -239,6 +248,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
     dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
     dataProvider.refresh();
+    pager.setVisible(dataProvider.getList().size() >= DEFAULT_PAGESIZE);
   }
 
   private void addEditableColumns(List<LocaleDto> locales) {
@@ -345,6 +355,10 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
     dataProvider.setList(current);
     dataProvider.refresh();
+    pager.setVisible(dataProvider.getList().size() >= DEFAULT_PAGESIZE);
+    int pageIndex = dataProvider.getList().size() / table.getPageSize();
+    pager.setPage(pageIndex);
+
     addCategoryName.setText("");
   }
 
