@@ -44,15 +44,18 @@ TOKEN : /* Numeric Constants */
 
 TOKEN:
 {
-      < R_IDENTIFIER: ( <LETTER> )+ ( <DIGIT> | <LETTER> | <UNDERSCORE> | <DOLLAR> | <DOT> )* >
-  |   < R_STRING: ( <QUOTE> ) ( <DIGIT> | <LETTER> | <UNDERSCORE> | <DOT> )+ ( <QUOTE> ) >
-  |   < R_DBLSTRING: ( <DOUBLEQUOTE> ) ( <DIGIT> | <LETTER> | <UNDERSCORE> | <DOT> )+ ( <DOUBLEQUOTE> ) >
+      < R_IDENTIFIER: ( <LETTER> )+ ( <DIGIT> | <LETTER> | <UNDERSCORE> | <DOLLAR> | <DOT> | <MINUS> )* >
+  |   < R_STRING: ( <QUOTE> ) ( <DIGIT> | <LETTER> | <UNDERSCORE> | <DOT> | <MINUS> | <SEPARATOR> | <DOLLAR> | <BRACKET> )+ ( <QUOTE> ) >
+  |   < R_DBLSTRING: ( <DOUBLEQUOTE> ) ( <DIGIT> | <LETTER> | <UNDERSCORE> | <DOT> | <MINUS> | <SEPARATOR> | <DOLLAR> | <BRACKET> )+ ( <DOUBLEQUOTE> ) >
   |   < R_OPERATOR: (["/", "!", "="]) | "%*%">
   |   < F_OPERATOR: ([":"] | "%in%") >
   |   < COMMON_OPERATOR: (["+","-","*", "^"]) >
   |   < #LETTER: ["a"-"z", "A"-"Z"] >
   |   < #UNDERSCORE: "_">
+  |   < #SEPARATOR: [";",":",",","_","."]>
+  |   < #BRACKET: ["[", "]"] >
   |   < #DOLLAR: "$">
+  |   < #MINUS: "-">
   |   < #DOT: ".">
   |   < #QUOTE: "'">
   |   < #DOUBLEQUOTE: "\"">
