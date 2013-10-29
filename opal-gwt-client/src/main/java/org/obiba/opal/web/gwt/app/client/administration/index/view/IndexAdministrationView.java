@@ -26,6 +26,7 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.IndexStatusImageCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.LinkCell;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueRenderer;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 
@@ -297,13 +298,12 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
 
   private class DatasourceColumn extends Column<TableIndexStatusDto, String> {
     public DatasourceColumn() {
-      super(new LinkCell<String>() {
+      super(new PlaceRequestCell<String>(placeManager) {
         @Override
-        public String getLink(String value) {
-          return "#" + IndexAdministrationView.this.placeManager
-              .buildHistoryToken(new PlaceRequest.Builder().nameToken(Places.PROJECT) //
-                  .with(ParameterTokens.TOKEN_NAME, value) //
-                  .build());
+        public PlaceRequest getPlaceRequest(String value) {
+          return new PlaceRequest.Builder().nameToken(Places.PROJECT) //
+              .with(ParameterTokens.TOKEN_NAME, value) //
+              .build();
         }
       });
     }
@@ -317,14 +317,14 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
   private class TableColumn extends Column<TableIndexStatusDto, TableIndexStatusDto> {
 
     public TableColumn() {
-      super(new LinkCell<TableIndexStatusDto>() {
+      super(new PlaceRequestCell<TableIndexStatusDto>(placeManager) {
         @Override
-        public String getLink(TableIndexStatusDto value) {
-          return "#" + placeManager.buildHistoryToken(new PlaceRequest.Builder().nameToken(Places.PROJECT) //
+        public PlaceRequest getPlaceRequest(TableIndexStatusDto value) {
+          return new PlaceRequest.Builder().nameToken(Places.PROJECT) //
               .with(ParameterTokens.TOKEN_NAME, value.getDatasource()) //
               .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString()) //
               .with(ParameterTokens.TOKEN_PATH, value.getDatasource() + "." + value.getTable()) //
-              .build());
+              .build();
         }
 
         @Override

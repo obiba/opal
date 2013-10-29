@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.LinkCell;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.VariableAttributeColumn;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
@@ -220,7 +221,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   private void addTableColumns() {
     addCheckColumn();
 
-    variableIndexColumn = new VariableColumn(new VariableLinkCell() {
+    variableIndexColumn = new VariableColumn(new VariableLinkCell(placeManager) {
       @Override
       public String getText(VariableDto value) {
         return value.getIndex() + 1 + "";
@@ -231,7 +232,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     table.setColumnWidth(variableIndexColumn, 1, Unit.PX);
     variableIndexColumn.setSortable(true);
 
-    table.addColumn(variableNameColumn = new VariableColumn(new VariableLinkCell()), translations.nameLabel());
+    table.addColumn(variableNameColumn = new VariableColumn(new VariableLinkCell(placeManager)), translations.nameLabel());
     variableNameColumn.setSortable(true);
 
     table.addColumn(new VariableAttributeColumn("label"), translations.labelLabel());
@@ -653,15 +654,20 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     cancelLink.setVisible(b);
   }
 
-  private class VariableLinkCell extends LinkCell<VariableDto> {
+  private class VariableLinkCell extends PlaceRequestCell<VariableDto> {
+
+    private VariableLinkCell(PlaceManager placeManager) {
+      super(placeManager);
+    }
+
     @Override
-    public String getLink(VariableDto value) {
-      return "#" + placeManager.buildHistoryToken(new PlaceRequest.Builder().nameToken(Places.PROJECT) //
+    public PlaceRequest getPlaceRequest(VariableDto value) {
+      return new PlaceRequest.Builder().nameToken(Places.PROJECT) //
           .with(ParameterTokens.TOKEN_NAME, tableDto.getDatasourceName()) //
           .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString()) //
           .with(ParameterTokens.TOKEN_PATH,
               tableDto.getDatasourceName() + "." + tableDto.getName() + ":" + value.getName()) //
-          .build());
+          .build();
     }
 
     @Override

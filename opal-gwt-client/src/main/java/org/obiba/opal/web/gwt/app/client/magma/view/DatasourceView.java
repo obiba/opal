@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.LinkCell;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -125,14 +126,15 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
 
   private void addTableColumns() {
 
-    table.addColumn(new Column<TableDto, TableDto>(new LinkCell<TableDto>() {
+    table.addColumn(new Column<TableDto, TableDto>(new PlaceRequestCell<TableDto>(placeManager) {
+
       @Override
-      public String getLink(TableDto value) {
-        return "#" + placeManager.buildHistoryToken(new PlaceRequest.Builder().nameToken(Places.PROJECT) //
+      public PlaceRequest getPlaceRequest(TableDto value) {
+        return new PlaceRequest.Builder().nameToken(Places.PROJECT) //
             .with(ParameterTokens.TOKEN_NAME, value.getDatasourceName()) //
             .with(ParameterTokens.TOKEN_TAB, ProjectPresenter.Display.ProjectTab.TABLES.toString()) //
             .with(ParameterTokens.TOKEN_PATH, value.getDatasourceName() + "." + value.getName()) //
-            .build());
+            .build();
       }
 
       @Override
