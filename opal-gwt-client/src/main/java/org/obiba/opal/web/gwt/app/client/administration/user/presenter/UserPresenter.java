@@ -117,6 +117,7 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
     UserDto dto = UserDto.create();
     dto.setName(getView().getName().getText());
     dto.setPassword(getView().getPassword().getText());
+    dto.setEnabled(true);
     dto.setGroupsArray(JsArrays.fromIterable(getView().getGroups().getValue()));
     return dto;
   }
@@ -146,17 +147,16 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
           validators.add(new RequiredTextValidator(getView().getPassword(), "PasswordIsRequired",
               Display.FormField.PASSWORD.name()));
 
-          ConditionValidator minLength = new ConditionValidator(minLengthCondition(getView().getPassword()),
-              "PasswordLengthMin", Display.FormField.PASSWORD.name());
-          minLength.setArgs(Arrays.asList(String.valueOf(MIN_PASSWORD_LENGTH)));
-          validators.add(minLength);
-
-          ConditionValidator minLength2 = new ConditionValidator(
-              passwordsMatchCondition(getView().getPassword(), getView().getConfirmPassword()), "PasswordsMustMatch",
-              Display.FormField.PASSWORD.name());
-          minLength2.setArgs(Arrays.asList(String.valueOf(MIN_PASSWORD_LENGTH + 10)));
-          validators.add(minLength2);
         }
+
+        ConditionValidator minLength = new ConditionValidator(minLengthCondition(getView().getPassword()),
+            "PasswordLengthMin", Display.FormField.PASSWORD.name());
+        minLength.setArgs(Arrays.asList(String.valueOf(MIN_PASSWORD_LENGTH)));
+        validators.add(minLength);
+
+        validators.add(
+            new ConditionValidator(passwordsMatchCondition(getView().getPassword(), getView().getConfirmPassword()),
+                "PasswordsMustMatch", Display.FormField.PASSWORD.name()));
       }
       return validators;
     }
