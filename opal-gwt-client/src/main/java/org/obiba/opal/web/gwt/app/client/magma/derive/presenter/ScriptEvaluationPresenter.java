@@ -12,14 +12,14 @@ package org.obiba.opal.web.gwt.app.client.magma.derive.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.magma.event.ScriptEvaluationFailedEvent;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos.ValueType;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueColumn.ValueSelectionHandler;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -36,12 +36,12 @@ import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
@@ -272,20 +272,22 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
           break;
         default:
           getView().setValuesVisible(true);
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error(translations.scriptEvaluationFailed()).build());
+          getEventBus().fireEvent(ScriptEvaluationFailedEvent.newBuilder().error(translations.scriptEvaluationFailed()).build());
+          summaryTabPresenter.hideSummaryPreview();
           break;
       }
     }
 
     private void scriptInterpretationFail(Response response) {
+      summaryTabPresenter.hideSummaryPreview();
       ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
       if(errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors) != null) {
         List<JavaScriptErrorDto> errors = extractJavaScriptErrors(errorDto);
+        ScriptEvaluationFailedEvent.Builder builder = ScriptEvaluationFailedEvent.newBuilder();
         for(JavaScriptErrorDto error : errors) {
-          getEventBus().fireEvent(NotificationEvent.newBuilder()
-              .error(translationMessages.errorAt(error.getLineNumber(), error.getColumnNumber(), error.getMessage()))
-              .build());
+          builder.error(translationMessages.errorAt(error.getLineNumber(), error.getColumnNumber(), error.getMessage()));
         }
+        getEventBus().fireEvent(builder.build());
       }
     }
 

@@ -17,8 +17,9 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-      <g:FlowPanel addStyleNames="clearfix well no-bottom-margin">
-        <g:FlowPanel addStyleNames="form-inline pull-left">
+    <g:FlowPanel addStyleNames="clearfix well no-bottom-margin">
+      <b:FluidRow>
+        <b:Column size="3">
           <o:Chooser ui:field="valueTypes">
             <g:item value="text">
               <ui:msg description="Text label">text</ui:msg>
@@ -54,22 +55,27 @@
               <ui:msg description="Locale label">locale</ui:msg>
             </g:item>
           </o:Chooser>
-          <b:CheckBox addStyleNames="small-indent bottom-margin" ui:field="repeatable">
+          <b:CheckBox ui:field="repeatable">
             <ui:msg description="Repeatable label">Repeatable</ui:msg>
           </b:CheckBox>
-        </g:FlowPanel>
-        <g:FlowPanel addStyleNames="pull-right">
-          <g:Label styleName="help-block inline">
-            <ui:msg description="Script Help label">
-              Edit the script and test it. Or select a portion of the script and test it.
-            </ui:msg>
-          </g:Label>
-          <b:Button ui:field="testScript" size="SMALL" type="INFO" addStyleNames="small-indent">
-            <ui:msg description="Test label">Test</ui:msg>
-          </b:Button>
-        </g:FlowPanel>
-      </g:FlowPanel>
-      <ace:AceEditor ui:field="scriptArea" addStyleNames="ace-editor"/>
+        </b:Column>
+        <b:Column size="9">
+          <g:FlowPanel addStyleNames="pull-right">
+            <b:Button ui:field="testScript" size="SMALL" type="INFO" addStyleNames="small-indent">
+              <ui:msg description="Test label">Test</ui:msg>
+            </b:Button>
+          </g:FlowPanel>
+        </b:Column>
+      </b:FluidRow>
+      <b:FluidRow addStyleNames="pull-left">
+        <b:HelpInline>
+          <ui:msg description="Script Help label">
+            You can test the whole script or a selected portion.
+          </ui:msg>
+        </b:HelpInline>
+      </b:FluidRow>
+    </g:FlowPanel>
+    <ace:AceEditor ui:field="scriptArea" addStyleNames="ace-editor"/>
   </g:FlowPanel>
 
 </ui:UiBinder>

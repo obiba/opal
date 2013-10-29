@@ -7,6 +7,8 @@ import com.github.gwtbootstrap.client.ui.base.UnorderedList;
 
 public class TabPanelHelper {
 
+  private TabPanelHelper() {}
+
   /**
    * Set the tab text if tab is a link.
    * @param tabs
@@ -35,6 +37,16 @@ public class TabPanelHelper {
    */
   public static void setTabVisible(TabPanel tabs, int i, boolean visible) {
     getNavTab(tabs, i).setVisible(visible);
+  }
+
+  /**
+   * Set a tab active.
+   * @param tabs
+   * @param i
+   * @param visible
+   */
+  public static void setTabActive(TabPanel tabs, int i, boolean active) {
+    ((TabLink)getNavTab(tabs, i)).setActive(active);
   }
 
   private static ListItem getNavTab(TabPanel tabs, int i) {

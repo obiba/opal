@@ -191,4 +191,9 @@ public class SummaryTabView extends ViewImpl implements SummaryTabPresenter.Disp
   public Number getLimit() {
     return limitTextBox.getNumberValue();
   }
+
+  @Override
+  public void hideSummaryPreview() {
+    previewSummary.setVisible(false);
+  }
 }

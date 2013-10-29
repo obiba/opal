@@ -9,12 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
+import javax.annotation.Nonnull;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ScriptEvaluationPopupPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -71,6 +74,11 @@ public class ScriptEvaluationPopupView extends ModalPopupViewWithUiHandlers<Moda
     if(slot == Slots.Evaluation) {
       evaluation.add(display);
     }
+  }
+
+  @Override
+  public void showError(@Nonnull String error) {
+    dialogBox.addAlert(error, AlertType.ERROR);
   }
 
 }

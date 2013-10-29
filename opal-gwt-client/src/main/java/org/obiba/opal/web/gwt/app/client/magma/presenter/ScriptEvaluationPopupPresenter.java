@@ -9,7 +9,10 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
+import javax.annotation.Nonnull;
+
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.ScriptEvaluationPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.event.ScriptEvaluationFailedEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -42,12 +45,20 @@ public class ScriptEvaluationPopupPresenter extends ModalPresenterWidget<ScriptE
   protected void onBind() {
     super.onBind();
     setInSlot(Display.Slots.Evaluation, scriptEvaluationPresenter);
+    registerHandler(getEventBus().addHandler(ScriptEvaluationFailedEvent.getType(), new ScriptEvaluationFailedEvent.Handler() {
+      @Override
+      public void onEvaluationFailed(ScriptEvaluationFailedEvent event) {
+        getView().showError(event.getErrorMessage());
+      }
+    }));
   }
 
   public interface Display extends PopupView, HasUiHandlers<ModalUiHandlers> {
     enum Slots {
       Evaluation
     }
+
+    void showError(@Nonnull String error);
   }
 
 }
