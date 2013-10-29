@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.core.service.impl;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -37,6 +39,8 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultSubjectAclService.class);
 
+  private static final String[] UNIQUE_INDEX = { "domain", "node", "principal", "type", "permission" };
+
   private final Set<SubjectAclChangeCallback> callbacks = Sets.newHashSet();
 
   @Autowired
@@ -45,10 +49,11 @@ public class DefaultSubjectAclService implements SubjectAclService {
   @Override
   @PostConstruct
   public void start() {
-    orientDbDocumentService.createIndex(SubjectAcl.class, "domain", INDEX_TYPE.NOTUNIQUE, OType.STRING);
-    orientDbDocumentService.createIndex(SubjectAcl.class, "node", INDEX_TYPE.NOTUNIQUE, OType.STRING);
-    orientDbDocumentService.createIndex(SubjectAcl.class, "principal", INDEX_TYPE.NOTUNIQUE, OType.STRING);
-    orientDbDocumentService.createIndex(SubjectAcl.class, "type", INDEX_TYPE.NOTUNIQUE, OType.STRING);
+    orientDbDocumentService.createUniqueStringIndex(SubjectAcl.class, UNIQUE_INDEX);
+    orientDbDocumentService.createIndex(SubjectAcl.class, INDEX_TYPE.NOTUNIQUE, OType.STRING, "domain");
+    orientDbDocumentService.createIndex(SubjectAcl.class, INDEX_TYPE.NOTUNIQUE, OType.STRING, "node");
+    orientDbDocumentService.createIndex(SubjectAcl.class, INDEX_TYPE.NOTUNIQUE, OType.STRING, "principal");
+    orientDbDocumentService.createIndex(SubjectAcl.class, INDEX_TYPE.NOTUNIQUE, OType.STRING, "type");
   }
 
   @Override
@@ -77,9 +82,13 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   private void delete(SubjectAcl acl) {
-    orientDbDocumentService.delete("select from " + SubjectAcl.class.getSimpleName() +
-        " where domain = ? and node = ? and principal = ? and type = ? and permission = ?", acl.getDomain(),
-        acl.getNode(), acl.getPrincipal(), acl.getType(), acl.getPermission());
+    Map<String, Object> map = new HashMap<String, Object>();
+    map.put("domain", acl.getDomain());
+    map.put("node", acl.getNode());
+    map.put("principal", acl.getPrincipal());
+    map.put("type", acl.getType());
+    map.put("permission", acl.getPermission());
+    orientDbDocumentService.deleteUnique(SubjectAcl.class, map);
   }
 
   @Override
@@ -131,7 +140,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
       @Nonnull String permission) {
     Assert.notNull(subject, "subject cannot be null");
     Assert.notNull(permission, "permission cannot be null");
-    orientDbDocumentService.save(new SubjectAcl(domain, node, subject, permission));
+    orientDbDocumentService.save(new SubjectAcl(domain, node, subject, permission), UNIQUE_INDEX);
     notifyListeners(subject);
   }
 

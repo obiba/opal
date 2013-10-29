@@ -24,6 +24,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class DefaultUserServiceImpl implements UserService {
 
+  public static final String UNIQUE_INDEX = "name";
+
   @Autowired
   private SubjectAclService aclService;
 
@@ -33,8 +35,8 @@ public class DefaultUserServiceImpl implements UserService {
   @Override
   @PostConstruct
   public void start() {
-    orientDbDocumentService.createUniqueStringIndex(User.class, "name");
-    orientDbDocumentService.createUniqueStringIndex(Group.class, "name");
+    orientDbDocumentService.createUniqueStringIndex(User.class, UNIQUE_INDEX);
+    orientDbDocumentService.createUniqueStringIndex(Group.class, UNIQUE_INDEX);
   }
 
   @Override
@@ -58,13 +60,12 @@ public class DefaultUserServiceImpl implements UserService {
 
   @Override
   public User getUser(String name) {
-    return orientDbDocumentService
-        .uniqueResult(User.class, "select from " + User.class.getSimpleName() + " where name = ?", name);
+    return orientDbDocumentService.findUnique(User.class, UNIQUE_INDEX, name);
   }
 
   @Override
   public void save(User user) throws ConstraintViolationException {
-    orientDbDocumentService.save(user);
+    orientDbDocumentService.save(user, UNIQUE_INDEX);
   }
 
   @Override
@@ -72,7 +73,7 @@ public class DefaultUserServiceImpl implements UserService {
     SubjectAclService.Subject aclSubject = SubjectAclService.SubjectType
         .valueOf(SubjectAclService.SubjectType.USER.name()).subjectFor(user.getName());
 
-    orientDbDocumentService.delete("select from " + User.class.getSimpleName() + " where name = ?", user.getName());
+    orientDbDocumentService.deleteUnique(User.class, UNIQUE_INDEX, user.getName());
 
     // Delete user's permissions
     aclService.deleteSubjectPermissions("opal", null, aclSubject);
@@ -80,7 +81,7 @@ public class DefaultUserServiceImpl implements UserService {
 
   @Override
   public void save(Group group) throws ConstraintViolationException {
-    orientDbDocumentService.save(group);
+    orientDbDocumentService.save(group, UNIQUE_INDEX);
   }
 
   @Override
@@ -90,8 +91,7 @@ public class DefaultUserServiceImpl implements UserService {
 
   @Override
   public Group getGroup(String name) {
-    return orientDbDocumentService
-        .uniqueResult(Group.class, "select from " + Group.class.getSimpleName() + " where name = ?", name);
+    return orientDbDocumentService.findUnique(Group.class, UNIQUE_INDEX, name);
   }
 
   @Override
@@ -99,7 +99,7 @@ public class DefaultUserServiceImpl implements UserService {
     SubjectAclService.Subject aclSubject = SubjectAclService.SubjectType
         .valueOf(SubjectAclService.SubjectType.GROUP.name()).subjectFor(group.getName());
 
-    orientDbDocumentService.delete("select from " + Group.class.getSimpleName() + " where name = ?", group.getName());
+    orientDbDocumentService.deleteUnique(Group.class, UNIQUE_INDEX, group.getName());
 
     // Delete group's permissions
     aclService.deleteSubjectPermissions("opal", null, aclSubject);

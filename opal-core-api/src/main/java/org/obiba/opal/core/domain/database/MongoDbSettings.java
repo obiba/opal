@@ -12,6 +12,7 @@ public class MongoDbSettings {
    */
   @Nonnull
   @NotBlank
+  //TODO url should be unique
   private String url;
 
   private String username;

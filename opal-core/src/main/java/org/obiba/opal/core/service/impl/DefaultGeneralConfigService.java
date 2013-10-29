@@ -25,13 +25,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class DefaultGeneralConfigService implements SystemService {
 
+  private static final String UNIQUE_INDEX = "name";
+
   @Autowired
   private OrientDbDocumentService orientDbDocumentService;
 
   @Override
   @PostConstruct
   public void start() {
-    orientDbDocumentService.createUniqueStringIndex(OpalGeneralConfig.class, "name");
+    orientDbDocumentService.createUniqueStringIndex(OpalGeneralConfig.class, UNIQUE_INDEX);
   }
 
   @Override
@@ -39,7 +41,7 @@ public class DefaultGeneralConfigService implements SystemService {
   }
 
   public void save(@Nonnull OpalGeneralConfig config) {
-    orientDbDocumentService.save(config);
+    orientDbDocumentService.save(config, UNIQUE_INDEX);
   }
 
   @Nonnull

@@ -1,5 +1,7 @@
 package org.obiba.opal.core.service.impl;
 
+import java.util.Map;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.validation.ConstraintViolationException;
@@ -13,7 +15,7 @@ public interface OrientDbDocumentService {
 
   <T> T execute(WithinDocumentTxCallback<T> callback);
 
-  <T> void save(@Nonnull T... t) throws ConstraintViolationException;
+//  <T> void save(@Nonnull T... t) throws ConstraintViolationException;
 
   <T> Iterable<T> list(Class<T> clazz);
 
@@ -24,11 +26,11 @@ public interface OrientDbDocumentService {
   @Nullable
   <T> T uniqueResult(Class<T> clazz, String sql, Object... params);
 
-  void createUniqueStringIndex(Class<?> clazz, String propertyPath);
+  void createUniqueStringIndex(Class<?> clazz, @Nonnull String... propertyPath);
 
-  void createUniqueIndex(Class<?> clazz, String propertyPath, OType type);
+  void createUniqueIndex(Class<?> clazz, OType type, @Nonnull String... propertyPath);
 
-  void createIndex(Class<?> clazz, String propertyPath, OClass.INDEX_TYPE indexType, OType type);
+  void createIndex(Class<?> clazz, OClass.INDEX_TYPE indexType, OType type, @Nonnull String... propertyPath);
 
   /**
    * Must be called within an opened connection but <b>outside</b> the transaction!
@@ -36,6 +38,26 @@ public interface OrientDbDocumentService {
   <T> ODocument toDocument(T t);
 
   void delete(String sql, Object... params);
+
+  <T> void deleteUnique(Class<T> clazz, String uniqueProperty, Object uniqueValue);
+
+  <T> T fromDocument(Class<T> clazz, ODocument document);
+
+  <T> void copyToDocument(T t, ODocument document);
+
+  <T> T findUnique(Class<T> clazz, String uniqueProperty, Object uniqueValue);
+
+  <T> ODocument findUnique(ODatabaseDocumentTx db, Class<T> clazz, String uniqueProperty, Object uniqueValue);
+
+  String getIndexName(Class<?> clazz, @Nonnull String... propertyPath);
+
+  <T> ODocument findUnique(ODatabaseDocumentTx db, Class<T> clazz, Map<String, Object> uniquePropertyValues);
+
+  <T> T findUnique(Class<T> clazz, Map<String, Object> uniquePropertyValues);
+
+  <T> void save(@Nonnull T t, @Nonnull String... uniqueProperties) throws ConstraintViolationException;
+
+  <T> void deleteUnique(Class<T> clazz, Map<String, Object> uniquePropertyValues);
 
   interface WithinDocumentTxCallback<T> {
 

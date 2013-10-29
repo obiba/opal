@@ -1,5 +1,8 @@
 package org.obiba.opal.core.runtime.database;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
@@ -17,6 +20,7 @@ import org.obiba.opal.core.domain.database.SqlSettings;
 import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
 import org.obiba.opal.core.runtime.jdbc.DatabaseSessionFactoryProvider;
 import org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory;
+import org.obiba.opal.core.service.impl.DefaultBeanValidator;
 import org.obiba.opal.core.service.impl.OrientDbDocumentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,12 +40,19 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.db.record.OIdentifiable;
+import com.orientechnologies.orient.core.index.OIndex;
+import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.tx.OTransaction;
 
 @SuppressWarnings("OverlyCoupledClass")
 @Component
 public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultDatabaseRegistry.class);
+
+  private static final String UNIQUE_INDEX = "name";
 
   @Autowired
   private SessionFactoryFactory sessionFactoryFactory;
@@ -51,6 +62,9 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   @Autowired
   private OrientDbDocumentService orientDbDocumentService;
+
+  @Autowired
+  private DefaultBeanValidator defaultBeanValidator;
 
   private final LoadingCache<String, DataSource> dataSourceCache = CacheBuilder.newBuilder()
       .removalListener(new DataSourceRemovalListener()) //
@@ -66,9 +80,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Override
   @PostConstruct
   public void start() {
-    orientDbDocumentService.createUniqueStringIndex(Database.class, "name");
-    orientDbDocumentService.createUniqueStringIndex(Database.class, "sqlSettings.url");
-    orientDbDocumentService.createUniqueStringIndex(Database.class, "mongoDbSettings.url");
+    orientDbDocumentService.createUniqueStringIndex(Database.class, UNIQUE_INDEX);
   }
 
   @Override
@@ -113,11 +125,16 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   @Nonnull
   @Override
-  public Database getDatabase(@Nonnull String name) throws NoSuchDatabaseException {
-    Database database = orientDbDocumentService
-        .uniqueResult(Database.class, "select from " + Database.class.getSimpleName() + " where name = ?", name);
-    if(database == null) throw new NoSuchDatabaseException(name);
-    return database;
+  public Database getDatabase(@Nonnull final String name) throws NoSuchDatabaseException {
+    return orientDbDocumentService.execute(new OrientDbDocumentService.WithinDocumentTxCallback<Database>() {
+      @Override
+      public Database withinDocumentTx(ODatabaseDocumentTx db) {
+        OIndex<?> index = db.getMetadata().getIndexManager().getIndex("Database.name");
+        OIdentifiable identifiable = (OIdentifiable) index.get(name);
+        if(identifiable == null) throw new NoSuchDatabaseException(name);
+        return orientDbDocumentService.fromDocument(Database.class, identifiable.<ODocument>getRecord());
+      }
+    });
   }
 
   @Override
@@ -136,19 +153,53 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   public void saveDatabase(@Nonnull Database database)
       throws ConstraintViolationException, MultipleIdentifiersDatabaseException {
 
+    //TODO valid unique url
     validUniqueIdentifiersDatabase(database);
 
     if(database.isDefaultStorage()) {
       Database previousDefaultStorageDatabase = getDefaultStorageDatabase();
       if(previousDefaultStorageDatabase == null) {
-        orientDbDocumentService.save(database);
+        save(database);
       } else {
         previousDefaultStorageDatabase.setDefaultStorage(false);
-        orientDbDocumentService.save(database, previousDefaultStorageDatabase);
+        save(database, previousDefaultStorageDatabase);
       }
     } else {
-      orientDbDocumentService.save(database);
+      save(database);
     }
+  }
+
+  private void save(@Nonnull Database database) {
+    orientDbDocumentService.save(database, UNIQUE_INDEX);
+  }
+
+  private void save(@Nonnull final Database... databases) {
+    for(Database database : databases) {
+      defaultBeanValidator.validate(database);
+    }
+
+    orientDbDocumentService.execute(new OrientDbDocumentService.WithinDocumentTxCallbackWithoutResult() {
+      @Override
+      protected void withinDocumentTxWithoutResult(ODatabaseDocumentTx db) {
+        Collection<ODocument> documents = new ArrayList<ODocument>(databases.length);
+        for(Database database : databases) {
+          ODocument document = orientDbDocumentService
+              .findUnique(db, database.getClass(), UNIQUE_INDEX, database.getName());
+          if(document == null) {
+            document = orientDbDocumentService.toDocument(database);
+          } else {
+            orientDbDocumentService.copyToDocument(database, document);
+          }
+          documents.add(document);
+        }
+
+        db.begin(OTransaction.TXTYPE.OPTIMISTIC);
+        for(ODocument document : documents) {
+          document.save();
+        }
+        db.commit();
+      }
+    });
   }
 
   private void validUniqueIdentifiersDatabase(Database database) throws MultipleIdentifiersDatabaseException {
@@ -174,8 +225,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Override
   public void deleteDatabase(@Nonnull Database database) throws CannotDeleteDatabaseWithDataException {
     //TODO check if this database has data
-    orientDbDocumentService
-        .delete("select from " + Database.class.getSimpleName() + " where name = ?", database.getName());
+    orientDbDocumentService.deleteUnique(Database.class, UNIQUE_INDEX, database.getName());
     destroyDataSource(database.getName());
   }
 
@@ -189,7 +239,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     Database database = getDatabase(databaseName);
     if(database.isEditable()) {
       database.setEditable(false);
-      orientDbDocumentService.save(database);
+      save(database);
     }
     registrations.put(databaseName, usedByDatasource);
   }
@@ -198,7 +248,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   public void unregister(@Nonnull String databaseName, String usedByDatasource) {
     Database database = getDatabase(databaseName);
     database.setEditable(true);
-    orientDbDocumentService.save(database);
+    save(database);
     registrations.remove(databaseName, usedByDatasource);
   }
 

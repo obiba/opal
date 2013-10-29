@@ -39,6 +39,8 @@ public class ProjectsConfigurationService implements ProjectService {
 
   public static final String PROJECTS_DIR = "projects";
 
+  private static final String UNIQUE_NAME_INDEX = "name";
+
   @Autowired
   private OpalRuntime opalRuntime;
 
@@ -57,7 +59,7 @@ public class ProjectsConfigurationService implements ProjectService {
   @Override
   @PostConstruct
   public void start() {
-    orientDbDocumentService.createUniqueStringIndex(Project.class, "name");
+    orientDbDocumentService.createUniqueStringIndex(Project.class, UNIQUE_NAME_INDEX);
     orientDbDocumentService.createUniqueStringIndex(Project.class, "title");
 
     // In the @PostConstruct there is no way to ensure that all the post processing is already done,
@@ -103,7 +105,8 @@ public class ProjectsConfigurationService implements ProjectService {
   @Override
   public void delete(@Nonnull String name) throws NoSuchProjectException, FileSystemException {
     Project project = getProject(name);
-    orientDbDocumentService.delete("select from " + Project.class.getSimpleName() + " where name = ?", name);
+
+    orientDbDocumentService.deleteUnique(Project.class, UNIQUE_NAME_INDEX, name);
 
     Datasource datasource = project.getDatasource();
 
@@ -127,8 +130,7 @@ public class ProjectsConfigurationService implements ProjectService {
   @Nonnull
   @Override
   public Project getProject(@Nonnull String name) throws NoSuchProjectException {
-    Project project = orientDbDocumentService
-        .uniqueResult(Project.class, "select from " + Project.class.getSimpleName() + " where name = ?", name);
+    Project project = orientDbDocumentService.findUnique(Project.class, UNIQUE_NAME_INDEX, name);
     if(project == null) throw new NoSuchProjectException(name);
     return project;
   }

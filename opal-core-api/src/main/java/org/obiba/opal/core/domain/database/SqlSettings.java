@@ -19,6 +19,7 @@ public class SqlSettings {
    */
   @Nonnull
   @NotBlank
+  //TODO url should be unique
   private String url;
 
   @Nonnull
