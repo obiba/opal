@@ -56,6 +56,11 @@ public class DataShieldScriptValidator implements DataShieldGrammarVisitor {
   }
 
   @Override
+  public Object visit(ASTsubsetCall node, Object data) {
+    return null;
+  }
+
+  @Override
   public Object visit(ASTsymbol node, Object data) {
     return null;
   }
