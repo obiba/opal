@@ -10,97 +10,108 @@
 
 package org.obiba.opal.core.domain.taxonomy;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
+
+import org.hibernate.validator.constraints.NotBlank;
+import org.obiba.opal.core.domain.AbstractTimestamped;
+import org.obiba.opal.core.domain.HasUniqueProperties;
 
 import com.google.common.collect.Lists;
 
 /**
  * A taxonomies is a set of vocabularies that allows to describe the attributes.
  */
-public class Taxonomy {
+public class Taxonomy extends AbstractTimestamped implements HasUniqueProperties {
 
-  @Nullable
+  @Nonnull
+  @NotBlank
   private String name;
 
-  private List<Text> titles;
+  private Map<Locale, String> titles = new HashMap<Locale, String>();
 
-  private List<Text> descriptions;
+  private Map<Locale, String> descriptions = new HashMap<Locale, String>();
 
-  private List<Vocabulary> vocabularies;
+  private List<String> vocabularies;
 
   public Taxonomy() {
   }
 
-  public Taxonomy(@Nullable String name) {
+  public Taxonomy(@Nonnull String name) {
     this.name = name;
   }
 
-  @Nullable
+  @Override
+  public List<String> getUniqueProperties() {
+    return Lists.newArrayList("name");
+  }
+
+  @Override
+  public List<Object> getUniqueValues() {
+    return Lists.<Object>newArrayList(name);
+  }
+
+  @Nonnull
   public String getName() {
     return name;
   }
 
-  public void setName(@Nullable String name) {
+  public void setName(@Nonnull String name) {
     this.name = name;
   }
 
-  public List<Text> getTitles() {
-    return titles == null ? titles = Lists.newArrayList() : titles;
+  public Map<Locale, String> getTitles() {
+    return titles;
   }
 
-  public void setTitles(List<Text> titles) {
+  public void setTitles(Map<Locale, String> titles) {
     this.titles = titles;
   }
 
-  public void addTitle(Text title) {
-    getTitles().add(title);
+  public Map<Locale, String> getDescriptions() {
+    return descriptions;
   }
 
-  public List<Text> getDescriptions() {
-    return descriptions == null ? descriptions = Lists.newArrayList() : descriptions;
-  }
-
-  public void addDescription(Text description) {
-    getDescriptions().add(description);
-  }
-
-  public void setDescriptions(List<Text> descriptions) {
+  public void setDescriptions(Map<Locale, String> descriptions) {
     this.descriptions = descriptions;
   }
 
-  public List<Vocabulary> getVocabularies() {
-    return vocabularies == null ? vocabularies = Lists.newArrayList() : vocabularies;
+  public List<String> getVocabularies() {
+    return vocabularies;
   }
 
-  public void add(Vocabulary vocabulary) {
-    getVocabularies().add(vocabulary);
-  }
-
-  public void removeVocabulary(String vocabularyName) {
-    Vocabulary vocabulary = null;
-    for(Vocabulary v : getVocabularies()) {
-      if(v.getName().equals(vocabularyName)) {
-        vocabulary = v;
-        break;
-      }
-    }
-    if(vocabulary != null) {
-      getVocabularies().remove(vocabulary);
-    }
-  }
-
-  public boolean hasVocabulary(String vocabularyName) {
-    for(Vocabulary v : getVocabularies()) {
-      if(v.getName().equals(vocabularyName)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public void setVocabularies(List<Vocabulary> vocabularies) {
+  public void setVocabularies(List<String> vocabularies) {
     this.vocabularies = vocabularies;
+  }
+
+  public void addVocabulary(String vocabulary) {
+    if(vocabularies == null) vocabularies = new ArrayList<String>();
+    if(!vocabularies.contains(vocabulary)) vocabularies.add(vocabulary);
+  }
+
+  public void removeVocabulary(String vocabulary) {
+    if(vocabularies != null) vocabularies.remove(vocabulary);
+  }
+
+  public boolean hasVocabulary(String vocabulary) {
+    return vocabularies != null && vocabularies.contains(vocabulary);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if(this == o) return true;
+    if(!(o instanceof Taxonomy)) return false;
+    Taxonomy taxonomy = (Taxonomy) o;
+    return name.equals(taxonomy.name);
+  }
+
+  @Override
+  public int hashCode() {
+    return name.hashCode();
   }
 }

@@ -29,12 +29,8 @@ import org.springframework.stereotype.Component;
 @Path("/system/conf/taxonomies")
 public class TaxonomiesResource {
 
-  private final TaxonomyService taxonomyService;
-
   @Autowired
-  public TaxonomiesResource(TaxonomyService taxonomyService) {
-    this.taxonomyService = taxonomyService;
-  }
+  private TaxonomyService taxonomyService;
 
   @GET
   public List<TaxonomyDto> getTaxonomies() {
@@ -46,8 +42,8 @@ public class TaxonomiesResource {
   }
 
   @POST
-  public Response addTaxonomy(TaxonomyDto taxonomy) {
-    taxonomyService.addOrReplaceTaxonomy(Dtos.fromDto(taxonomy));
+  public Response addTaxonomy(TaxonomyDto dto) {
+    taxonomyService.saveTaxonomy(Dtos.fromDto(dto));
     return Response.ok().build();
   }
 }

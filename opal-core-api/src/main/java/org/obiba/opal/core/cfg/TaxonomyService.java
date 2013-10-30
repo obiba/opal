@@ -10,24 +10,34 @@
 
 package org.obiba.opal.core.cfg;
 
-import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
+import org.obiba.opal.core.domain.taxonomy.Vocabulary;
+import org.obiba.opal.core.service.SystemService;
 
 /**
  * Create, update and delete {@link Taxonomy}.
  */
-public interface TaxonomyService {
+public interface TaxonomyService extends SystemService {
 
-  List<Taxonomy> getTaxonomies();
+  Iterable<Taxonomy> getTaxonomies();
 
-  boolean hasTaxonomy(String name);
+  @Nullable
+  Taxonomy getTaxonomy(@Nonnull String name);
 
-  void removeTaxonomy(String name);
+  void saveTaxonomy(@Nonnull Taxonomy taxonomy);
 
-  void addOrReplaceTaxonomy(Taxonomy taxonomy);
+  void deleteTaxonomy(@Nonnull String name);
 
-  Taxonomy getOrCreateTaxonomy(String name);
+  Iterable<Vocabulary> getVocabularies(@Nonnull String taxonomy);
 
-  Taxonomy getTaxonomy(String name);
+  @Nullable
+  Vocabulary getVocabulary(@Nonnull String taxonomy, @Nonnull String name);
+
+  void saveVocabulary(@Nonnull Vocabulary vocabulary);
+
+  void deleteVocabulary(@Nonnull Vocabulary vocabulary);
+
 }

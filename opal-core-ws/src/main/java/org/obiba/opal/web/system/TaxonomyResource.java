@@ -29,15 +29,11 @@ import org.springframework.stereotype.Component;
 @Path("/system/conf/taxonomy/{name}")
 public class TaxonomyResource {
 
-  private final TaxonomyService taxonomyService;
+  @Autowired
+  private TaxonomyService taxonomyService;
 
   @PathParam("name")
   private String name;
-
-  @Autowired
-  public TaxonomyResource(TaxonomyService taxonomyService) {
-    this.taxonomyService = taxonomyService;
-  }
 
   @GET
   public Opal.TaxonomyDto getTaxonomy() {
@@ -46,9 +42,8 @@ public class TaxonomyResource {
   }
 
   @PUT
-  public Response updateTaxonomy() {
-    Taxonomy tax = taxonomyService.getTaxonomy(name);
-    taxonomyService.addOrReplaceTaxonomy(tax);
+  public Response updateTaxonomy(Opal.TaxonomyDto dto) {
+    taxonomyService.saveTaxonomy(Dtos.fromDto(dto));
     return Response.ok().build();
   }
 }

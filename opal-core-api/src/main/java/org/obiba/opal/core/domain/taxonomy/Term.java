@@ -10,13 +10,78 @@
 
 package org.obiba.opal.core.domain.taxonomy;
 
-public class Term extends HasTerms {
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.annotation.Nonnull;
+
+import org.hibernate.validator.constraints.NotBlank;
+
+public class Term {
+
+  @Nonnull
+  @NotBlank
+  private String name;
+
+  private Map<Locale, String> titles = new HashMap<Locale, String>();
+
+  private Map<Locale, String> descriptions = new HashMap<Locale, String>();
+
+  private List<Term> terms = new ArrayList<Term>();
 
   public Term() {
   }
 
-  public Term(String name) {
-    super(name);
+  public Term(@Nonnull String name) {
+    this.name = name;
   }
 
+  @Nonnull
+  public String getName() {
+    return name;
+  }
+
+  public void setName(@Nonnull String name) {
+    this.name = name;
+  }
+
+  public Map<Locale, String> getTitles() {
+    return titles;
+  }
+
+  public void setTitles(Map<Locale, String> titles) {
+    this.titles = titles;
+  }
+
+  public Map<Locale, String> getDescriptions() {
+    return descriptions;
+  }
+
+  public void setDescriptions(Map<Locale, String> descriptions) {
+    this.descriptions = descriptions;
+  }
+
+  public List<Term> getTerms() {
+    return terms;
+  }
+
+  public void setTerms(List<Term> terms) {
+    this.terms = terms;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if(this == o) return true;
+    if(!(o instanceof Term)) return false;
+    Term term = (Term) o;
+    return name.equals(term.name);
+  }
+
+  @Override
+  public int hashCode() {
+    return name.hashCode();
+  }
 }
