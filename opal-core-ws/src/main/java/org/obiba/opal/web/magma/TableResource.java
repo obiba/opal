@@ -23,6 +23,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -78,13 +79,14 @@ public class TableResource extends AbstractValueTableResource {
   }
 
   @GET
-  public TableDto get(@Context UriInfo uriInfo, @QueryParam("counts") @DefaultValue("false") Boolean counts) {
+  public Response get(@Context Request request, @Context UriInfo uriInfo, @QueryParam("counts") @DefaultValue("false") Boolean counts) {
+    TimestampedResponses.evaluate(request, getValueTable());
     String path = uriInfo.getPath(false);
     TableDto.Builder builder = Dtos.asDto(getValueTable(), counts).setLink(path);
     if(getValueTable().isView()) {
       builder.setViewLink(path.replaceFirst("table", "view"));
     }
-    return builder.build();
+    return TimestampedResponses.ok(getValueTable(), builder.build()).build();
   }
 
   @Path("/variables")

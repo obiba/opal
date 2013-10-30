@@ -31,6 +31,8 @@ public final class TimestampedResponses {
    * {@code lastUpdate} timestamp and respond with a 304 (Not Modified) accordingly.
    */
   public static void evaluate(Request request, Timestamped stamped) {
+    if (request == null) return;
+
     Value lastModified = stamped.getTimestamps().getLastUpdate();
     if(!lastModified.isNull()) {
 

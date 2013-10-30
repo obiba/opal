@@ -99,7 +99,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     expect(uriInfoMock.getPath(false)).andReturn("/datasource/" + DATASOURCE2 + "/table/Weight");
 
     replay(uriInfoMock);
-    checkWeightTableDto(resource.get(uriInfoMock, true));
+    checkWeightTableDto((Magma.TableDto) resource.get(null, uriInfoMock, true).getEntity());
     verify(uriInfoMock);
   }
 
