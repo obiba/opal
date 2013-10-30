@@ -21,21 +21,17 @@ import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.Skippable;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.StepInHandler;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.WidgetProvider;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.github.gwtbootstrap.client.ui.Modal;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -100,6 +96,9 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
 
   @UiField
   FlowPanel helpOpalRest;
+
+  @UiField
+  FlowPanel helpJDBC;
 
   @UiField
   FlowPanel helpHealthCanada;
@@ -223,9 +222,20 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
     formatChooser.addGroup(translations.remoteServerBasedDatasources());
     formatChooser.addItemToGroup(translations.limesurveyLabel(), ImportFormat.LIMESURVEY.name());
     formatChooser.addItemToGroup(translations.opalRestLabel(), ImportFormat.REST.name());
+    formatChooser.addItemToGroup(translations.opalJDBCLabel(), ImportFormat.JDBC.name());
     formatChooser.addGroup(translations.publicDatasources());
     formatChooser.addItemToGroup(translations.geonamesPostalCodesLabel(), ImportFormat.GEONAMES_POSTAL_CODES.name());
     formatChooser.addItemToGroup(translations.healthCanadaLabel(), ImportFormat.HEALTH_CANADA.name());
+  }
+
+  @Override
+  public void removeFormat(ImportFormat format) {
+    for(int i = 0; i < formatChooser.getItemCount(); i++) {
+      if(formatChooser.getValue(i).equals(format.name())) {
+        formatChooser.removeItem(i);
+        break;
+      }
+    }
   }
 
   @Override
@@ -382,6 +392,9 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
         break;
       case REST:
         helpOpalRest.setVisible(true);
+        break;
+      case JDBC:
+        helpJDBC.setVisible(true);
         break;
       case SPSS:
         helpSpss.setVisible(true);
