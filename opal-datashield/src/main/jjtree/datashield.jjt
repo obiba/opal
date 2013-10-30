@@ -34,6 +34,7 @@ TOKEN : /* Numeric Constants */
        < NUMBER: ["-"] <FLOAT>
            | <FLOAT> ( ["e","E"] ([ "-","+"])? <FLOAT> )?
        >
+ |     < RANGE: ( <DIGIT> )+ ":" ( <DIGIT> )+ >
  |     < #FLOAT: <INTEGER>
            | <INTEGER> ( "." <INTEGER> )?
            | "." <INTEGER>
@@ -50,7 +51,9 @@ TOKEN:
   |   < R_OPERATOR: (["/", "!", "="]) | "%*%">
   |   < F_OPERATOR: ([":"] | "%in%") >
   |   < COMMON_OPERATOR: (["+","-","*", "^"]) >
+  |   < COMMA: "," >
   |   < #LETTER: ["a"-"z", "A"-"Z"] >
+  |   < #SUBSET: ["0"-"9", " ", ",", ":"] >
   |   < #UNDERSCORE: "_">
   |   < #SEPARATOR: [";",":",",","_","."]>
   |   < #BRACKET: ["[", "]"] >
@@ -82,10 +85,19 @@ void simpleExp() #void :
 {}
 {
  ( LOOKAHEAD(2)
-     funcCall()
+     call()
    | string()
    | symbol()
    | "(" exp() ")"
+ )
+}
+
+void call() #void :
+{}
+{
+ ( LOOKAHEAD(2)
+     funcCall()
+   | subsetCall()
  )
 }
 
@@ -95,12 +107,19 @@ void funcCall() :
   f = <R_IDENTIFIER> "(" [ expList() ] ")" {jjtThis.value = f.image;}
 }
 
+void subsetCall() :
+{Token f;}
+{
+  f = <R_IDENTIFIER> "[" [ subsetExpList() ] "]" {jjtThis.value = f.image;}
+}
+
 void symbol() : 
 {Token s=null;}
 {
  (
     s=<R_IDENTIFIER>
   | s=<NUMBER>
+  | s=<RANGE>
  ) {jjtThis.value = s.image;}
 }
 
@@ -145,5 +164,15 @@ StringBuilder formulaTerm() #void :
 void expList() #void :
 {}
 {
-  ( exp() [ "," expList() ] ) 
+  ( exp() [ <COMMA> expList() ] )
+}
+
+void subsetExpList() #void :
+{}
+{
+  (
+     "[" subsetExpList() "]"
+     | <COMMA> [ subsetExpList() ]
+     | exp() [ subsetExpList() ]
+  )
 }
