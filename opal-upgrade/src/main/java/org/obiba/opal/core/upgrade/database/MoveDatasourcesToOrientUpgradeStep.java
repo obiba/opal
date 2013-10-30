@@ -27,7 +27,6 @@ import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.SqlSettings;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.core.service.OrientDbService;
-import org.obiba.opal.project.ProjectsConfigurationService;
 import org.obiba.opal.project.domain.Project;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
@@ -90,7 +89,7 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
    * Init OrientDB project table here as we cannot inject ProjectService that depends on OpalRuntime...
    */
   private void initOrientProjectTable() {
-    orientDbService.createUniqueStringIndex(Project.class, ProjectsConfigurationService.UNIQUE_NAME_INDEX);
+    orientDbService.createUniqueIndex(Project.class);
   }
 
   private void extractOpalDatasource() {
@@ -112,8 +111,7 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
           .build();
       log.debug("Import opalData: {}", opalData);
       databaseRegistry.saveDatabase(opalData);
-      orientDbService.save(Project.Builder.create().name("opal-data").title("opal-data").database("opal-data").build(),
-          ProjectsConfigurationService.UNIQUE_NAME_INDEX);
+      orientDbService.save(Project.Builder.create().name("opal-data").title("opal-data").database("opal-data").build());
 
       Database opalKey = Database.Builder.create() //
           .name("_identifiers") //
@@ -275,8 +273,7 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
         .evaluate(doc, XPathConstants.NODESET);
     for(int i = 0; i < nodeList.getLength(); i++) {
       String name = nodeList.item(i).getTextContent();
-      orientDbService.save(Project.Builder.create().name(name).title(name).build(),
-          ProjectsConfigurationService.UNIQUE_NAME_INDEX);
+      orientDbService.save(Project.Builder.create().name(name).title(name).build());
     }
   }
 
@@ -304,7 +301,7 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
       } else {
         throw new IllegalArgumentException("Unknown sessionFactoryProviderClass: " + clazz);
       }
-      orientDbService.save(projectBuilder.build(), ProjectsConfigurationService.UNIQUE_NAME_INDEX);
+      orientDbService.save(projectBuilder.build());
     }
   }
 
@@ -332,8 +329,7 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
       databaseRegistry.saveDatabase(database);
 
       if(database.getUsage() == Database.Usage.STORAGE) {
-        orientDbService.save(Project.Builder.create().name(name).title(name).database(databaseName).build(),
-            ProjectsConfigurationService.UNIQUE_NAME_INDEX);
+        orientDbService.save(Project.Builder.create().name(name).title(name).database(databaseName).build());
       }
     }
   }

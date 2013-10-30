@@ -12,6 +12,7 @@ package org.obiba.opal.core.domain.user;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -19,8 +20,11 @@ import javax.annotation.Nonnull;
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.core.util.HexUtil;
 import org.obiba.opal.core.domain.AbstractTimestamped;
+import org.obiba.opal.core.domain.HasUniqueProperties;
 
-public class User extends AbstractTimestamped implements Comparable<User> {
+import com.google.common.collect.Lists;
+
+public class User extends AbstractTimestamped implements Comparable<User>, HasUniqueProperties {
 
   public enum Status {
     ACTIVE, INACTIVE
@@ -37,6 +41,23 @@ public class User extends AbstractTimestamped implements Comparable<User> {
   private boolean enabled;
 
   private Set<String> groups = new HashSet<String>();
+
+  public User() {
+  }
+
+  public User(@Nonnull String name) {
+    this.name = name;
+  }
+
+  @Override
+  public List<String> getUniqueProperties() {
+    return Lists.newArrayList("name");
+  }
+
+  @Override
+  public List<Object> getUniqueValues() {
+    return Lists.<Object>newArrayList(name);
+  }
 
   @Nonnull
   public String getName() {

@@ -10,6 +10,7 @@
 package org.obiba.opal.project.domain;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -20,14 +21,16 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.opal.core.domain.AbstractTimestamped;
+import org.obiba.opal.core.domain.HasUniqueProperties;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 /**
  * Description of a project in Opal.
  */
-public class Project extends AbstractTimestamped implements Comparable<Project> {
+public class Project extends AbstractTimestamped implements HasUniqueProperties, Comparable<Project> {
 
   @Nonnull
   @NotBlank
@@ -44,6 +47,23 @@ public class Project extends AbstractTimestamped implements Comparable<Project> 
   private boolean archived;
 
   private String database;
+
+  public Project() {
+  }
+
+  public Project(@Nonnull String name) {
+    this.name = name;
+  }
+
+  @Override
+  public List<String> getUniqueProperties() {
+    return Lists.newArrayList("name");
+  }
+
+  @Override
+  public List<Object> getUniqueValues() {
+    return Lists.<Object>newArrayList(name);
+  }
 
   @Nonnull
   public String getName() {

@@ -7,7 +7,6 @@ import java.util.List;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.core.service.OrientDbService;
-import org.obiba.opal.core.service.impl.DefaultSubjectAclService;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +27,7 @@ public class MoveSubjectAclToOrientUpgradeStep extends AbstractUpgradeStep {
 
   @Override
   public void execute(Version currentVersion) {
-    orientDbService.createUniqueStringIndex(SubjectAcl.class, DefaultSubjectAclService.UNIQUE_INDEX);
+    orientDbService.createUniqueIndex(SubjectAcl.class);
     orientDbService.createIndex(SubjectAcl.class, OClass.INDEX_TYPE.NOTUNIQUE, OType.STRING, "domain");
     orientDbService.createIndex(SubjectAcl.class, OClass.INDEX_TYPE.NOTUNIQUE, OType.STRING, "node");
     orientDbService.createIndex(SubjectAcl.class, OClass.INDEX_TYPE.NOTUNIQUE, OType.STRING, "principal");
@@ -48,7 +47,7 @@ public class MoveSubjectAclToOrientUpgradeStep extends AbstractUpgradeStep {
       }
     });
     for(SubjectAcl acl : list) {
-      orientDbService.save(acl, "domain", "node", "principal", "type", "permission");
+      orientDbService.save(acl);
     }
     dataJdbcTemplate.execute("drop table subject_acl");
   }

@@ -10,20 +10,41 @@
 package org.obiba.opal.core.domain.user;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
+import org.obiba.opal.core.domain.HasUniqueProperties;
 
-public class Group extends AbstractTimestamped implements Comparable<Group> {
+import com.google.common.collect.Lists;
+
+public class Group extends AbstractTimestamped implements HasUniqueProperties, Comparable<Group> {
 
   @Nonnull
   @NotBlank
   private String name;
 
   private Set<String> users = new HashSet<String>();
+
+  public Group() {
+  }
+
+  public Group(@Nonnull String name) {
+    this.name = name;
+  }
+
+  @Override
+  public List<String> getUniqueProperties() {
+    return Lists.newArrayList("name");
+  }
+
+  @Override
+  public List<Object> getUniqueValues() {
+    return Lists.<Object>newArrayList(name);
+  }
 
   @Nonnull
   public String getName() {

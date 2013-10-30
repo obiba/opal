@@ -10,16 +10,20 @@
 package org.obiba.opal.core.domain.unit;
 
 import java.util.Arrays;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
+import org.obiba.opal.core.domain.HasUniqueProperties;
+
+import com.google.common.collect.Lists;
 
 /**
  * Persisted keystore.
  */
-public class UnitKeyStoreState extends AbstractTimestamped {
+public class UnitKeyStoreState extends AbstractTimestamped implements HasUniqueProperties {
 
   @Nonnull
   @NotBlank
@@ -27,6 +31,23 @@ public class UnitKeyStoreState extends AbstractTimestamped {
 
   @Nonnull
   private byte[] keyStore;
+
+  public UnitKeyStoreState() {
+  }
+
+  public UnitKeyStoreState(@Nonnull String unit) {
+    this.unit = unit;
+  }
+
+  @Override
+  public List<String> getUniqueProperties() {
+    return Lists.newArrayList("unit");
+  }
+
+  @Override
+  public List<Object> getUniqueValues() {
+    return Lists.<Object>newArrayList(unit);
+  }
 
   @Nonnull
   public String getUnit() {

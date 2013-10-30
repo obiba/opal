@@ -25,8 +25,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class DefaultUserServiceImpl implements UserService {
 
-  public static final String UNIQUE_INDEX = "name";
-
   @Autowired
   private SubjectAclService aclService;
 
@@ -36,8 +34,8 @@ public class DefaultUserServiceImpl implements UserService {
   @Override
   @PostConstruct
   public void start() {
-    orientDbService.createUniqueStringIndex(User.class, UNIQUE_INDEX);
-    orientDbService.createUniqueStringIndex(Group.class, UNIQUE_INDEX);
+    orientDbService.createUniqueIndex(User.class);
+    orientDbService.createUniqueIndex(Group.class);
   }
 
   @Override
@@ -61,12 +59,12 @@ public class DefaultUserServiceImpl implements UserService {
 
   @Override
   public User getUser(String name) {
-    return orientDbService.findUnique(User.class, UNIQUE_INDEX, name);
+    return orientDbService.findUnique(new User(name));
   }
 
   @Override
   public void save(User user) throws ConstraintViolationException {
-    orientDbService.save(user, UNIQUE_INDEX);
+    orientDbService.save(user);
   }
 
   @Override
@@ -74,7 +72,7 @@ public class DefaultUserServiceImpl implements UserService {
     SubjectAclService.Subject aclSubject = SubjectAclService.SubjectType
         .valueOf(SubjectAclService.SubjectType.USER.name()).subjectFor(user.getName());
 
-    orientDbService.deleteUnique(User.class, UNIQUE_INDEX, user.getName());
+    orientDbService.delete(user);
 
     // Delete user's permissions
     aclService.deleteSubjectPermissions("opal", null, aclSubject);
@@ -82,7 +80,7 @@ public class DefaultUserServiceImpl implements UserService {
 
   @Override
   public void save(Group group) throws ConstraintViolationException {
-    orientDbService.save(group, UNIQUE_INDEX);
+    orientDbService.save(group);
   }
 
   @Override
@@ -92,7 +90,7 @@ public class DefaultUserServiceImpl implements UserService {
 
   @Override
   public Group getGroup(String name) {
-    return orientDbService.findUnique(Group.class, UNIQUE_INDEX, name);
+    return orientDbService.findUnique(new Group(name));
   }
 
   @Override
@@ -100,7 +98,7 @@ public class DefaultUserServiceImpl implements UserService {
     SubjectAclService.Subject aclSubject = SubjectAclService.SubjectType
         .valueOf(SubjectAclService.SubjectType.GROUP.name()).subjectFor(group.getName());
 
-    orientDbService.deleteUnique(Group.class, UNIQUE_INDEX, group.getName());
+    orientDbService.delete(group);
 
     // Delete group's permissions
     aclService.deleteSubjectPermissions("opal", null, aclSubject);

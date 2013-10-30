@@ -42,8 +42,6 @@ import org.springframework.util.Assert;
 @Transactional
 public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
 
-  public static final String UNIQUE_INDEX = "unit";
-
   @Nonnull
   private final CallbackHandler callbackHandler;
 
@@ -60,7 +58,7 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
   @Override
   @PostConstruct
   public void start() {
-    orientDbService.createUniqueStringIndex(UnitKeyStoreState.class, UNIQUE_INDEX);
+    orientDbService.createUniqueIndex(UnitKeyStoreState.class);
   }
 
   @Override
@@ -76,7 +74,7 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
   }
 
   private UnitKeyStoreState findByUnit(String unitName) {
-    return orientDbService.findUnique(UnitKeyStoreState.class, UNIQUE_INDEX, unitName);
+    return orientDbService.findUnique(new UnitKeyStoreState(unitName));
   }
 
   @Override
@@ -106,7 +104,7 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
     }
     state.setKeyStore(getKeyStoreByteArray(unitKeyStore));
 
-    orientDbService.save(state, UNIQUE_INDEX);
+    orientDbService.save(state);
   }
 
   @Override

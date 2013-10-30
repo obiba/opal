@@ -9,15 +9,19 @@
  ******************************************************************************/
 package org.obiba.opal.core.domain.security;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
+import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.service.SubjectAclService;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
 
-public class SubjectAcl extends AbstractTimestamped {
+public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperties {
 
   @Nonnull
   @NotBlank
@@ -55,6 +59,16 @@ public class SubjectAcl extends AbstractTimestamped {
     this.principal = principal;
     this.type = type;
     this.permission = permission;
+  }
+
+  @Override
+  public List<String> getUniqueProperties() {
+    return Lists.newArrayList("domain", "node", "principal", "type", "permission");
+  }
+
+  @Override
+  public List<Object> getUniqueValues() {
+    return Lists.<Object>newArrayList(domain, node, principal, type, permission);
   }
 
   @Nonnull

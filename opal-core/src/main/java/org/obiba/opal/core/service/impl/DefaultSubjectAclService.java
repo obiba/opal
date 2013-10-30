@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.core.service.impl;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -40,8 +38,6 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultSubjectAclService.class);
 
-  public static final String[] UNIQUE_INDEX = { "domain", "node", "principal", "type", "permission" };
-
   private final Set<SubjectAclChangeCallback> callbacks = Sets.newHashSet();
 
   @Autowired
@@ -50,7 +46,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
   @Override
   @PostConstruct
   public void start() {
-    orientDbService.createUniqueStringIndex(SubjectAcl.class, UNIQUE_INDEX);
+    orientDbService.createUniqueIndex(SubjectAcl.class);
     orientDbService.createIndex(SubjectAcl.class, INDEX_TYPE.NOTUNIQUE, OType.STRING, "domain");
     orientDbService.createIndex(SubjectAcl.class, INDEX_TYPE.NOTUNIQUE, OType.STRING, "node");
     orientDbService.createIndex(SubjectAcl.class, INDEX_TYPE.NOTUNIQUE, OType.STRING, "principal");
@@ -83,13 +79,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   private void delete(SubjectAcl acl) {
-    Map<String, Object> map = new HashMap<String, Object>();
-    map.put("domain", acl.getDomain());
-    map.put("node", acl.getNode());
-    map.put("principal", acl.getPrincipal());
-    map.put("type", acl.getType());
-    map.put("permission", acl.getPermission());
-    orientDbService.deleteUnique(SubjectAcl.class, map);
+    orientDbService.delete(acl);
   }
 
   @Override
@@ -140,8 +130,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
       @Nonnull String permission) {
     Assert.notNull(subject, "subject cannot be null");
     Assert.notNull(permission, "permission cannot be null");
-    orientDbService
-        .save(new SubjectAcl(domain, node, subject, permission), "domain", "node", "principal", "type", "permission");
+    orientDbService.save(new SubjectAcl(domain, node, subject, permission));
     notifyListeners(subject);
   }
 

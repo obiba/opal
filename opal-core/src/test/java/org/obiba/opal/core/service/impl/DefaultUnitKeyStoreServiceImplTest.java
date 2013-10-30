@@ -75,7 +75,7 @@ public class DefaultUnitKeyStoreServiceImplTest {
     state.setUnit("my-unit");
     state.setKeyStore(getTestKeyStoreByteArray());
 
-    expect(mockOrientDbService.findUnique(UnitKeyStoreState.class, "unit", state.getUnit())) //
+    expect(mockOrientDbService.findUnique(state)) //
         .andReturn(state) //
         .once();
 
@@ -95,11 +95,11 @@ public class DefaultUnitKeyStoreServiceImplTest {
     UnitKeyStoreState state = new UnitKeyStoreState();
     state.setUnit("my-unit");
 
-    expect(mockOrientDbService.findUnique(UnitKeyStoreState.class, "unit", state.getUnit())) //
+    expect(mockOrientDbService.findUnique(state)) //
         .andReturn(null) //
         .times(2);
 
-    mockOrientDbService.save(state, "unit");
+    mockOrientDbService.save(state);
     EasyMock.expectLastCall().once();
 
     replay(mockOrientDbService);
