@@ -1,5 +1,6 @@
 package org.obiba.opal.web.database;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
@@ -26,15 +27,13 @@ public class Dtos {
     db.setName(dto.getName());
     db.setUsage(Database.Usage.valueOf(dto.getUsage().name()));
     db.setUsedForIdentifiers(dto.getUsedForIdentifiers());
-    db.setSqlSettings(fromDto(dto.getSqlSettings()));
-    db.setMongoDbSettings(fromDto(dto.getMongoDbSettings()));
+    if(dto.hasSqlSettings()) db.setSqlSettings(fromDto(dto.getSqlSettings()));
+    if(dto.hasMongoDbSettings()) db.setMongoDbSettings(fromDto(dto.getMongoDbSettings()));
     return db;
   }
 
   @Nullable
-  private static SqlSettings fromDto(@Nullable SqlSettingsDto dto) {
-    if(dto == null) return null;
-
+  private static SqlSettings fromDto(@Nonnull SqlSettingsDto dto) {
     SqlSettings settings = new SqlSettings();
     settings.setDriverClass(dto.getDriverClass());
     settings.setSqlSchema(SqlSettings.SqlSchema.valueOf(dto.getSqlSchema().name()));
@@ -42,20 +41,23 @@ public class Dtos {
     settings.setUsername(dto.getUsername());
     settings.setPassword(dto.getPassword());
     settings.setProperties(dto.getProperties());
-    settings.setJdbcDatasourceSettings(fromDto(dto.getJdbcDatasourceSettings()));
-    settings.setLimesurveyDatasourceSettings(fromDto(dto.getLimesurveyDatasourceSettings()));
+    if(dto.hasJdbcDatasourceSettings()) {
+      settings.setJdbcDatasourceSettings(fromDto(dto.getJdbcDatasourceSettings()));
+    }
+    if(dto.hasLimesurveyDatasourceSettings()) {
+      settings.setLimesurveyDatasourceSettings(fromDto(dto.getLimesurveyDatasourceSettings()));
+    }
     return settings;
   }
 
   @Nullable
   private static SqlSettings.LimesurveyDatasourceSettings fromDto(
-      @Nullable SqlSettingsDto.LimesurveyDatasourceSettingsDto dto) {
-    return dto == null ? null : new SqlSettings.LimesurveyDatasourceSettings(dto.getTablePrefix());
+      @Nonnull SqlSettingsDto.LimesurveyDatasourceSettingsDto dto) {
+    return new SqlSettings.LimesurveyDatasourceSettings(dto.getTablePrefix());
   }
 
   @Nullable
-  private static JdbcDatasourceSettings fromDto(@Nullable Magma.JdbcDatasourceSettingsDto dto) {
-    if(dto == null) return null;
+  private static JdbcDatasourceSettings fromDto(@Nonnull Magma.JdbcDatasourceSettingsDto dto) {
     JdbcDatasourceSettings jdbcSettings = new JdbcDatasourceSettings();
     jdbcSettings.setDefaultEntityType(dto.getDefaultEntityType());
     jdbcSettings.setDefaultCreatedTimestampColumnName(dto.getDefaultCreatedTimestampColumnName());
@@ -65,8 +67,7 @@ public class Dtos {
   }
 
   @Nullable
-  private static MongoDbSettings fromDto(@Nullable MongoDbSettingsDto dto) {
-    if(dto == null) return null;
+  private static MongoDbSettings fromDto(@Nonnull MongoDbSettingsDto dto) {
     MongoDbSettings settings = new MongoDbSettings();
     settings.setUrl(dto.getUrl());
     settings.setUsername(dto.getUsername());
