@@ -58,7 +58,7 @@ public interface UserService extends SystemService {
    *
    * @return
    */
-  void save(Group group) throws ConstraintViolationException;
+  void createGroup(String name) throws ConstraintViolationException;
 
   /**
    * Returns the list of groups

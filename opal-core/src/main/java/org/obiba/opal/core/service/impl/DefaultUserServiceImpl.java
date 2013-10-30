@@ -9,9 +9,15 @@
  */
 package org.obiba.opal.core.service.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.validation.ConstraintViolationException;
 
+import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.User;
 import org.obiba.opal.core.service.OrientDbService;
@@ -19,11 +25,17 @@ import org.obiba.opal.core.service.SubjectAclService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
+
 /**
  * Default implementation of User Service
  */
 @Component
 public class DefaultUserServiceImpl implements UserService {
+
+  public static final String OPAL_DOMAIN = "opal";
 
   @Autowired
   private SubjectAclService aclService;
@@ -64,23 +76,76 @@ public class DefaultUserServiceImpl implements UserService {
 
   @Override
   public void save(User user) throws ConstraintViolationException {
-    orientDbService.save(user);
+    List<HasUniqueProperties> toSave = new ArrayList<HasUniqueProperties>();
+    toSave.add(user);
+    Iterables.addAll(toSave, findImpactedGroups(user));
+    orientDbService.save(toSave.toArray(new HasUniqueProperties[toSave.size()]));
+  }
+
+  private Iterable<Group> findImpactedGroups(final User user) {
+
+    Collection<Group> groups = new ArrayList<Group>();
+
+    // check removed group
+    User previousUser = orientDbService.findUnique(user);
+    if(previousUser != null) {
+      Iterables.addAll(groups, Iterables.transform(previousUser.getGroups(), new Function<String, Group>() {
+        @Nullable
+        @Override
+        public Group apply(String groupName) {
+          if(user.hasGroup(groupName)) return null;
+          Group group = getGroup(groupName);
+          group.removeUser(user.getName());
+          return group;
+        }
+      }));
+    }
+
+    // check added group
+    Iterables.addAll(groups, Iterables.transform(user.getGroups(), new Function<String, Group>() {
+      @Nullable
+      @Override
+      public Group apply(String groupName) {
+        Group group = getGroup(groupName);
+        if(group == null) {
+          group = new Group(groupName);
+          group.addUser(user.getName());
+          return group;
+        }
+        if(!group.hasUser(user.getName())) {
+          group.addUser(user.getName());
+          return group;
+        }
+        return null;
+      }
+    }));
+
+    return Iterables.filter(groups, Predicates.notNull());
   }
 
   @Override
-  public void deleteUser(User user) {
-    SubjectAclService.Subject aclSubject = SubjectAclService.SubjectType
-        .valueOf(SubjectAclService.SubjectType.USER.name()).subjectFor(user.getName());
+  public void deleteUser(final User user) {
 
+    Iterable<Group> groups = Iterables.transform(user.getGroups(), new Function<String, Group>() {
+      @Override
+      public Group apply(String groupName) {
+        Group group = getGroup(groupName);
+        group.removeUser(user.getName());
+        return group;
+      }
+    });
+
+    // TODO we should execute these steps in a single transaction
     orientDbService.delete(user);
-
-    // Delete user's permissions
-    aclService.deleteSubjectPermissions("opal", null, aclSubject);
+    orientDbService.save(Iterables.toArray(groups, Group.class));
+    aclService.deleteSubjectPermissions(OPAL_DOMAIN, null,
+        SubjectAclService.SubjectType.valueOf(SubjectAclService.SubjectType.USER.name())
+            .subjectFor(user.getName())); // Delete user's permissions
   }
 
   @Override
-  public void save(Group group) throws ConstraintViolationException {
-    orientDbService.save(group);
+  public void createGroup(String name) throws ConstraintViolationException {
+    orientDbService.save(new Group(name));
   }
 
   @Override
@@ -94,14 +159,22 @@ public class DefaultUserServiceImpl implements UserService {
   }
 
   @Override
-  public void deleteGroup(Group group) {
-    SubjectAclService.Subject aclSubject = SubjectAclService.SubjectType
-        .valueOf(SubjectAclService.SubjectType.GROUP.name()).subjectFor(group.getName());
+  public void deleteGroup(final Group group) {
+    Iterable<User> users = Iterables.transform(group.getUsers(), new Function<String, User>() {
+      @Override
+      public User apply(String userName) {
+        User user = getUser(userName);
+        user.removeGroup(group.getName());
+        return user;
+      }
+    });
 
+    // TODO we should execute these steps in a single transaction
     orientDbService.delete(group);
-
-    // Delete group's permissions
-    aclService.deleteSubjectPermissions("opal", null, aclSubject);
+    orientDbService.save(Iterables.toArray(users, User.class));
+    aclService.deleteSubjectPermissions(OPAL_DOMAIN, null,
+        SubjectAclService.SubjectType.valueOf(SubjectAclService.SubjectType.GROUP.name())
+            .subjectFor(group.getName())); // Delete group's permissions
   }
 
 }

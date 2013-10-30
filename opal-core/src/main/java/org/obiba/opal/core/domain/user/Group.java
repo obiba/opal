@@ -63,6 +63,19 @@ public class Group extends AbstractTimestamped implements HasUniqueProperties, C
     this.users = users;
   }
 
+  public void addUser(String user) {
+    if(users == null) users = new HashSet<String>();
+    users.add(user);
+  }
+
+  public void removeUser(String user) {
+    if(users != null) users.remove(user);
+  }
+
+  public boolean hasUser(String user) {
+    return users != null && users.contains(user);
+  }
+
   @Override
   public String toString() {
     return name;

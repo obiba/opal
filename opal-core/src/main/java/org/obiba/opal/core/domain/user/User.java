@@ -90,12 +90,12 @@ public class User extends AbstractTimestamped implements Comparable<User>, HasUn
     groups.add(group);
   }
 
-  public boolean hasGroup(Group group) {
-    return groups != null && groups.contains(group.getName());
+  public boolean hasGroup(String group) {
+    return groups != null && groups.contains(group);
   }
 
-  public void removeGroup(Group group) {
-    if(groups != null) groups.remove(group.getName());
+  public void removeGroup(String group) {
+    if(groups != null) groups.remove(group);
   }
 
   public boolean getEnabled() {

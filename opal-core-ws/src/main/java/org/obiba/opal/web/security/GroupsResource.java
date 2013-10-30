@@ -47,15 +47,10 @@ public class GroupsResource {
 
   @POST
   public Response createGroup(Opal.GroupDto groupDto) {
-
     if(userService.getGroup(groupDto.getName()) != null) {
       return Response.status(Response.Status.NOT_MODIFIED).build();
     }
-
-    Group group = new Group();
-    group.setName(groupDto.getName());
-    userService.save(group);
-
+    userService.createGroup(groupDto.getName());
     return Response.ok().build();
   }
 
