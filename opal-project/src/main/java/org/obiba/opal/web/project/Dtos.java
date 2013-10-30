@@ -104,23 +104,9 @@ public class Dtos {
   }
 
   private static void addTimestamps(ProjectDto.Builder builder, Datasource datasource) {
-    Value created = DateTimeType.get().now();
-    Value lastUpdate = null;
-    for(ValueTable table : datasource.getValueTables()) {
-      Timestamps ts = table.getTimestamps();
-      if(created.compareTo(ts.getCreated()) > 0) {
-        created = ts.getCreated();
-      }
-      if(lastUpdate == null || lastUpdate.compareTo(ts.getLastUpdate()) < 0) {
-        lastUpdate = ts.getLastUpdate();
-      }
-    }
-    if(lastUpdate == null) {
-      lastUpdate = created;
-    }
-
+    Timestamps ts = datasource.getTimestamps();
     Magma.TimestampsDto.Builder tsBuilder = Magma.TimestampsDto.newBuilder();
-    tsBuilder.setCreated(created.toString()).setLastUpdate(lastUpdate.toString());
+    tsBuilder.setCreated(ts.getCreated().toString()).setLastUpdate(ts.getLastUpdate().toString());
     builder.setTimestamps(tsBuilder);
   }
 }
