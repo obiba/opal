@@ -14,10 +14,14 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.ConfigureViewStepPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.SiblingTableSelectionEvent;
@@ -28,16 +32,12 @@ import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
-import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyPresenter;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -52,7 +52,6 @@ import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
@@ -63,7 +62,6 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
@@ -110,10 +108,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   private Runnable removeConfirmation;
 
   private Boolean sortAscending;
-
-  private Column<?, ?> sortColumn;
-
-  private boolean tableUpdatePending = false;
 
   /**
    * @param display
@@ -187,8 +181,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       }
     });
 
-
-
     getView().setValuesTabCommand(new ValuesCommand());
     getView().setVariablesTabCommand(new VariablesCommand());
 
@@ -248,10 +240,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   }
 
   private void updateDisplay(String datasourceName, String tableName) {
-    if(table != null && table.getDatasourceName().equals(datasourceName) && table.getName().equals(tableName)) return;
-    if(tableUpdatePending) return;
-
-    tableUpdatePending = true;
+    // rely on 304 response
     UriBuilder ub = UriBuilders.DATASOURCE_TABLE.create().query("counts", "true");
     ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(ub.build(datasourceName, tableName)).get()
         .withCallback(new ResourceCallback<TableDto>() {
@@ -260,7 +249,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
             if(resource != null) {
               updateDisplay(resource);
             }
-            tableUpdatePending = false;
           }
         }).send();
   }
@@ -446,9 +434,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           updateIndexStatus();
         } else {
           ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-          fireEvent(
-              NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray())
-                  .build());
+          fireEvent(NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray()).build());
         }
       }
 
@@ -496,9 +482,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           updateIndexStatus();
         } else {
           ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-          fireEvent(
-              NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray())
-                  .build());
+          fireEvent(NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray()).build());
         }
       }
 
@@ -555,7 +539,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     @Override
     public void onColumnSort(ColumnSortEvent event) {
       sortAscending = event.isSortAscending();
-      sortColumn = event.getColumn();
       updateDisplay(table);
     }
   }
