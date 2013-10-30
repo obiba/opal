@@ -271,6 +271,8 @@ public final class Dtos {
     builder.addAllTable(tableNames);
     builder.addAllView(viewNames);
 
+    addTimestamps(builder, datasource);
+
     return builder;
   }
 
@@ -405,6 +407,18 @@ public final class Dtos {
       continuousBuilder.addIntervalFrequency(freqBuilder);
     }
     return continuousBuilder.setSummary(descriptiveBuilder);
+  }
+
+  private static void addTimestamps(DatasourceDto.Builder builder, Datasource datasource) {
+    Timestamps ts = datasource.getTimestamps();
+    Magma.TimestampsDto.Builder tsBuilder = Magma.TimestampsDto.newBuilder();
+    if(!ts.getCreated().isNull()) {
+      tsBuilder.setCreated(ts.getCreated().toString());
+    }
+    if(!ts.getLastUpdate().isNull()) {
+      tsBuilder.setLastUpdate(ts.getLastUpdate().toString());
+    }
+    builder.setTimestamps(tsBuilder);
   }
 
   private static boolean isNumeric(double d) {

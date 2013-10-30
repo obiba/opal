@@ -373,7 +373,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     DatasourceResource resource = createDatasource(uid);
 
-    Magma.DatasourceDto dto = resource.get();
+    Magma.DatasourceDto dto = (Magma.DatasourceDto)resource.get(null).getEntity();
 
     Assert.assertNotNull(dto);
     Assert.assertEquals(uid, dto.getName());
@@ -402,7 +402,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
   public void testDatasourceGET() {
     DatasourceResource resource = createDatasource(DATASOURCE1);
 
-    Magma.DatasourceDto dto = resource.get();
+    Magma.DatasourceDto dto = (Magma.DatasourceDto)resource.get(null).getEntity();
 
     Assert.assertNotNull(dto);
     Assert.assertEquals(DATASOURCE1, dto.getName());

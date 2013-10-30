@@ -89,12 +89,11 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
   }
 
   private void initDatasource() {
-    if(datasource == null || !datasource.getName().equals(datasourceName)) {
-      ResourceRequestBuilderFactory.<DatasourceDto>newBuilder() //
-          .forResource(UriBuilders.DATASOURCE.create().build(datasourceName)) //
-          .withCallback(new InitResourceCallback()) //
-          .get().send();
-    }
+    // rely on 304
+    ResourceRequestBuilderFactory.<DatasourceDto>newBuilder() //
+        .forResource(UriBuilders.DATASOURCE.create().build(datasourceName)) //
+        .withCallback(new InitResourceCallback()) //
+        .get().send();
   }
 
   @Override

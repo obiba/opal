@@ -177,6 +177,7 @@ message DatasourceDto {
   repeated string table = 3;
   repeated string view = 4;
   required string type = 5;
+  optional TimestampsDto timestamps = 6;
 }
 
 message TableDto {

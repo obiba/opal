@@ -23,6 +23,9 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
@@ -36,6 +39,7 @@ import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.opal.core.runtime.security.support.OpalPermissions;
+import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
@@ -68,8 +72,17 @@ public class DatasourceTablesResource implements AbstractTablesResource {
    * @return
    */
   @GET
-  public List<Magma.TableDto> getTables(@QueryParam("counts") @DefaultValue("false") Boolean counts,
+  public Response getTables(@Context Request request, @QueryParam("counts") @DefaultValue("false") Boolean counts,
       @Nullable @QueryParam("entityType") String entityType) {
+    TimestampedResponses.evaluate(request, datasource);
+    
+    // The use of "GenericEntity" is required because otherwise JAX-RS can't determine the type using reflection.
+    return TimestampedResponses.ok(datasource, new GenericEntity<List<TableDto>>(getTables(counts, entityType)) {
+      // Nothing to implement. Subclassed to keep generic information at runtime.
+    }).build();
+  }
+
+  List<TableDto> getTables(boolean counts, String entityType) {
     List<Magma.TableDto> tables = Lists.newArrayList();
     UriBuilder tableLink = UriBuilder.fromPath("/").path(DatasourceResource.class)
         .path(DatasourceResource.class, "getTable");

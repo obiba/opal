@@ -23,6 +23,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -44,6 +45,7 @@ import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.VariableStatsService;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.Schedule;
+import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.ViewDto;
@@ -119,9 +121,10 @@ public class DatasourceResource {
   }
 
   @GET
-  // @Cache(isPrivate = true, mustRevalidate = true, maxAge = 10)
-  public Magma.DatasourceDto get() {
-    return Dtos.asDto(getDatasource()).build();
+  public Response get(@Context Request request) {
+    Datasource ds = getDatasource();
+    TimestampedResponses.evaluate(request, ds);
+    return TimestampedResponses.ok(ds, Dtos.asDto(ds).build()).build();
   }
 
   @DELETE
