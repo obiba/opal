@@ -73,12 +73,26 @@ public class Taxonomy extends AbstractTimestamped implements HasUniqueProperties
     this.titles = titles;
   }
 
+  public void addTitle(Locale locale, String title) {
+    if(titles == null) titles = new HashMap<Locale, String>();
+    titles.put(locale, title);
+  }
+
   public Map<Locale, String> getDescriptions() {
     return descriptions;
   }
 
   public void setDescriptions(Map<Locale, String> descriptions) {
     this.descriptions = descriptions;
+  }
+
+  public void addDescription(Locale locale, String title) {
+    if(descriptions == null) descriptions = new HashMap<Locale, String>();
+    descriptions.put(locale, title);
+  }
+
+  public boolean hasVocabularies() {
+    return vocabularies != null && vocabularies.size() > 0;
   }
 
   public List<String> getVocabularies() {

@@ -64,23 +64,25 @@ public class TaxonomyServiceImpl implements TaxonomyService {
   public void saveTaxonomy(@Nonnull final Taxonomy taxonomy) {
 
     // create new vocabularies
-    Iterable<Vocabulary> vocabularies = filter(
-        transform(taxonomy.getVocabularies(), new Function<String, Vocabulary>() {
-          @Nullable
-          @Override
-          public Vocabulary apply(String vocabularyName) {
-            Vocabulary vocabulary = getVocabulary(taxonomy.getName(), vocabularyName);
-            if(vocabulary == null) {
-              return new Vocabulary(taxonomy.getName(), vocabularyName);
-            }
-            return null;
+    Iterable<Vocabulary> vocabularies = null;
+    if(taxonomy.hasVocabularies()) {
+      vocabularies = filter(transform(taxonomy.getVocabularies(), new Function<String, Vocabulary>() {
+        @Nullable
+        @Override
+        public Vocabulary apply(String vocabularyName) {
+          Vocabulary vocabulary = getVocabulary(taxonomy.getName(), vocabularyName);
+          if(vocabulary == null) {
+            return new Vocabulary(taxonomy.getName(), vocabularyName);
           }
-        }), Predicates.notNull());
+          return null;
+        }
+      }), Predicates.notNull());
+    }
 
     // delete removed vocabularies
     Taxonomy previousTaxonomy = getTaxonomy(taxonomy.getName());
     Iterable<Vocabulary> deletedVocabularies = null;
-    if(previousTaxonomy != null) {
+    if(previousTaxonomy != null && previousTaxonomy.hasVocabularies()) {
       deletedVocabularies = filter(transform(previousTaxonomy.getVocabularies(), new Function<String, Vocabulary>() {
         @Nullable
         @Override
@@ -92,7 +94,9 @@ public class TaxonomyServiceImpl implements TaxonomyService {
 
     List<HasUniqueProperties> toSave = new ArrayList<HasUniqueProperties>();
     toSave.add(taxonomy);
-    Iterables.addAll(toSave, vocabularies);
+    if(vocabularies != null) {
+      Iterables.addAll(toSave, vocabularies);
+    }
 
     // TODO we should execute these steps in a single transaction
     orientDbService.save(toSave.toArray(new HasUniqueProperties[toSave.size()]));
