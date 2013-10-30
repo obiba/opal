@@ -82,6 +82,10 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     summary = null;
   }
 
+  public void hideSummaryPreview() {
+    getView().hideSummaryPreview();
+  }
+
   public void setResourceUri(String resourceUri, int entitiesCount) {
     cancelPendingSummaryRequest();
 
@@ -161,6 +165,8 @@ public class SummaryTabPresenter extends PresenterWidget<SummaryTabPresenter.Dis
     HasClickHandlers getRefreshSummary();
 
     Number getLimit();
+
+    void hideSummaryPreview();
   }
 
   class DeferredSummaryRequestHandler implements SummaryRequiredEvent.Handler {

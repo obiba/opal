@@ -57,6 +57,8 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   interface Binder extends UiBinder<Widget, VariableView> {}
 
+  private static final int DICTIONARY_TAB_INDEX = 0;
+
   private static final int SCRIPT_TAB_INDEX = 1;
 
   private static final int SUMMARY_TAB_INDEX = 2;
@@ -89,6 +91,9 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   @UiField
   FlowPanel historyPanel;
+
+  @UiField
+  FlowPanel scriptHeaderPanel;
 
   @UiField
   TabDeckPanel scriptNavPanel;
@@ -317,7 +322,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     attributeTablePager.setVisible(size > Table.DEFAULT_PAGESIZE);
     attributeTable.setupSort(attributeProvider);
     attributeProvider.refresh();
-    renderVariableLabels(rows);
   }
 
   @Override
@@ -326,30 +330,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     String placeholder = comment.getPlaceholder();
     return Strings.isNullOrEmpty(commentText) ? placeholder : commentText;
   }
-
-  private void renderVariableLabels(JsArray<AttributeDto> rows) {
-//    label.clear();
-//    for(AttributeDto attr : JsArrays.toIterable(rows)) {
-//      if("label".equals(attr.getName())) {
-//        renderVariableLabel(attr);
-//      }
-//    }
-  }
-
-//  private void renderVariableLabel(AttributeDto attr) {
-//    if(attr.hasValue() && attr.getValue().trim().length() > 0) {
-//      FlowPanel item = new FlowPanel();
-//      if(attr.hasLocale() && attr.getLocale().trim().length() > 0) {
-//        InlineLabel lang = new InlineLabel(attr.getLocale());
-//        lang.setStyleName("label");
-//        item.add(lang);
-//      }
-//      InlineLabel value = new InlineLabel(attr.getValue());
-//      value.addStyleName("xsmall-indent");
-//      item.add(value);
-//      label.add(item);
-//    }
-//  }
 
   @Override
   public boolean isSummaryTabSelected() {
@@ -445,9 +425,11 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @Override
   public void setDerivedVariable(boolean derived, String value) {
     TabPanelHelper.setTabVisible(tabPanel, SCRIPT_TAB_INDEX, derived);
-    notDerived.setVisible(!derived);
+    TabPanelHelper.setTabActive(tabPanel, SCRIPT_TAB_INDEX, derived);
+    TabPanelHelper.setTabActive(tabPanel, DICTIONARY_TAB_INDEX, !derived);
+    scriptHeaderPanel.setVisible(derived);
     noScript.setVisible(derived && value.isEmpty());
-    script.setVisible(derived && value.length() > 0);
+    script.setVisible(derived && !value.isEmpty());
     script.setText(value);
   }
 
