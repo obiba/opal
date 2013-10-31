@@ -215,9 +215,17 @@ public class UserAdministrationPresenter
       public void doAction(GroupDto object, String actionName) {
         if(ActionsColumn.DELETE_ACTION.equals(actionName)) {
           removeConfirmation = new RemoveRunnable(object.getName(), false);
-          fireEvent(ConfirmationRequiredEvent
-              .createWithMessages(removeConfirmation, translations.confirmationTitleMap().get("removeGroup"),
-                  translations.confirmationMessageMap().get("confirmRemoveGroup").replace("{0}", object.getName())));
+
+          if(object.getUsersCount() > 0) {
+            fireEvent(ConfirmationRequiredEvent
+                .createWithMessages(removeConfirmation, translations.confirmationTitleMap().get("removeGroup"),
+                    translations.confirmationMessageMap().get("confirmRemoveGroupWithUsers")
+                        .replace("{0}", object.getName())));
+          } else {
+            fireEvent(ConfirmationRequiredEvent
+                .createWithMessages(removeConfirmation, translations.confirmationTitleMap().get("removeGroup"),
+                    translations.confirmationMessageMap().get("confirmRemoveGroup").replace("{0}", object.getName())));
+          }
         }
       }
     });
@@ -278,8 +286,7 @@ public class UserAdministrationPresenter
               if(response.getStatusCode() != Response.SC_OK) {
                 ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
                 getEventBus().fireEvent(
-                    NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray())
-                        .build());
+                    NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray()).build());
               }
             }
           }) //

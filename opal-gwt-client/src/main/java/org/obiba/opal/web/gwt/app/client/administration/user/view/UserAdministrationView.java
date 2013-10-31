@@ -221,13 +221,9 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
         return new String[] { DELETE_ACTION, PERMISSIONS_ACTION };
       }
 
-      public String[] permissionsActions() {
-        return new String[] { PERMISSIONS_ACTION };
-      }
-
       @Override
       public String[] getActions(GroupDto value) {
-        return value.getUsersCount() > 0 ? permissionsActions() : allActions();
+        return allActions();
       }
     });
   }
