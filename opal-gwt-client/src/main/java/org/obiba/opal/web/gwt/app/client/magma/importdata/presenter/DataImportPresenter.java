@@ -11,7 +11,11 @@ package org.obiba.opal.web.gwt.app.client.magma.importdata.presenter;
 
 import javax.annotation.Nullable;
 
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseResources;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.magma.createdatasource.presenter.DatasourceCreatedCallback;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
+import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
 import org.obiba.opal.web.gwt.app.client.support.DatasourceDtos;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardProxy;
@@ -19,31 +23,31 @@ import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.StepInHa
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardView;
-import org.obiba.opal.web.gwt.app.client.magma.createdatasource.presenter.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter.Display.Slots;
-import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallbacks;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.model.client.database.DatabaseDto;
+import org.obiba.opal.web.model.client.database.SqlDatabaseDto;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.opal.ImportCommandOptionsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 
 import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
 import static com.google.gwt.http.client.Response.SC_CREATED;
@@ -68,6 +72,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   private final LimesurveyStepPresenter limesurveyStepPresenter;
 
+  private final JdbcStepPresenter jdbcStepPresenter;
+
   private final RestStepPresenter restStepPresenter;
 
   private final NoFormatStepPresenter noFormatStepPresenter;
@@ -90,7 +96,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
   public DataImportPresenter(Display display, EventBus eventBus, //
       CsvFormatStepPresenter csvFormatStepPresenter, XmlFormatStepPresenter xmlFormatStepPresenter, //
-      LimesurveyStepPresenter limesurveyStepPresenter, SpssFormatStepPresenter spssFormatStepPresenter,//
+      LimesurveyStepPresenter limesurveyStepPresenter, JdbcStepPresenter jdbcStepPresenter, //
+      SpssFormatStepPresenter spssFormatStepPresenter,//
       RestStepPresenter restStepPresenter,//
       NoFormatStepPresenter noFormatStepPresenter,//
       DestinationSelectionStepPresenter destinationSelectionStepPresenter,
@@ -103,6 +110,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     this.xmlFormatStepPresenter = xmlFormatStepPresenter;
     this.spssFormatStepPresenter = spssFormatStepPresenter;
     this.limesurveyStepPresenter = limesurveyStepPresenter;
+    this.jdbcStepPresenter = jdbcStepPresenter;
     this.restStepPresenter = restStepPresenter;
     this.noFormatStepPresenter = noFormatStepPresenter;
     this.destinationSelectionStepPresenter = destinationSelectionStepPresenter;
@@ -119,17 +127,19 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     xmlFormatStepPresenter.bind();
     spssFormatStepPresenter.bind();
     limesurveyStepPresenter.bind();
+    jdbcStepPresenter.bind();
     restStepPresenter.bind();
     comparedDatasourcesReportPresenter.bind();
 
     comparedDatasourcesReportPresenter.allowIgnoreAllModifications(false);
 
-    setInSlot(Slots.Destination, destinationSelectionStepPresenter);
-    setInSlot(Slots.Unit, unitSelectionStepPresenter);
-    setInSlot(Slots.Values, datasourceValuesStepPresenter);
-    setInSlot(Slots.Archive, archiveStepPresenter);
-    setInSlot(Slots.Limesurvey, limesurveyStepPresenter);
-    setInSlot(Slots.Rest, restStepPresenter);
+    setInSlot(Display.Slots.Destination, destinationSelectionStepPresenter);
+    setInSlot(Display.Slots.Unit, unitSelectionStepPresenter);
+    setInSlot(Display.Slots.Values, datasourceValuesStepPresenter);
+    setInSlot(Display.Slots.Archive, archiveStepPresenter);
+    setInSlot(Display.Slots.Limesurvey, limesurveyStepPresenter);
+    setInSlot(Display.Slots.Jdbc, jdbcStepPresenter);
+    setInSlot(Display.Slots.Rest, restStepPresenter);
 
     getView().setUnitSelectionStepInHandler(new UnitSelectionStepInHandler());
     getView().setComparedDatasourcesReportDisplay(comparedDatasourcesReportPresenter.getView());
@@ -137,6 +147,38 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     getView().setDatasourceValuesStepInHandler(new DatasourceValuesHandler());
 
     addEventHandlers();
+    updateFormatChooser();
+
+  }
+
+  private void updateFormatChooser() {
+    // Remove LimeSurvey and/or JDBC formats if no database of those types exists
+    ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder().forResource(DatabaseResources.sqlDatabases())
+        .withCallback(new ResourceCallback<JsArray<DatabaseDto>>() {
+
+          @Override
+          public void onResource(Response response, JsArray<DatabaseDto> resource) {
+            boolean limeSurvey = false;
+            boolean jdbc = false;
+            for(int i = 0; i < resource.length(); i++) {
+              SqlDatabaseDto sqlDatabaseDto = (SqlDatabaseDto) resource.get(i)
+                  .getExtension("Database.SqlDatabaseDto.settings");
+              if(sqlDatabaseDto.getSqlSchema().getName().equals(SqlDatabaseDto.SqlSchema.LIMESURVEY.getName())) {
+                limeSurvey = true;
+              } else if(sqlDatabaseDto.getSqlSchema().getName().equals(SqlDatabaseDto.SqlSchema.JDBC.getName()) &&
+                  resource.get(i).getUsage().getName().equals(DatabaseDto.Usage.IMPORT.getName())) {
+                jdbc = true;
+              }
+            }
+//            Hide if not found
+            if(!limeSurvey) {
+              getView().removeFormat(ImportFormat.LIMESURVEY);
+            }
+            if(!jdbc) {
+              getView().removeFormat(ImportFormat.JDBC);
+            }
+          }
+        }).get().send();
   }
 
   private void addEventHandlers() {
@@ -172,6 +214,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     xmlFormatStepPresenter.unbind();
     spssFormatStepPresenter.unbind();
     limesurveyStepPresenter.unbind();
+    jdbcStepPresenter.unbind();
     restStepPresenter.unbind();
   }
 
@@ -223,6 +266,10 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         formatStepPresenter = limesurveyStepPresenter;
         getView().setFormatStepDisplay(limesurveyStepPresenter.getView());
         break;
+      case JDBC:
+        formatStepPresenter = jdbcStepPresenter;
+        getView().setFormatStepDisplay(jdbcStepPresenter.getView());
+        break;
       case REST:
         formatStepPresenter = restStepPresenter;
         getView().setFormatStepDisplay(restStepPresenter.getView());
@@ -238,6 +285,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     }
   }
 
+  @SuppressWarnings("OverlyLongMethod")
   private void launchImport(@SuppressWarnings("ParameterHidesMemberVariable") ImportConfig importConfig) {
     this.importConfig = importConfig;
     switch(importConfig.getImportFormat()) {
@@ -249,6 +297,9 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         break;
       case LIMESURVEY:
         submitJob(createLimesurveyImportCommandOptionsDto());
+        break;
+      case JDBC:
+        submitJob(createJdbcImportCommandOptionsDto());
         break;
       case REST:
         submitJob(createRestImportCommandOptionsDto());
@@ -275,6 +326,10 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   }
 
   private ImportCommandOptionsDto createLimesurveyImportCommandOptionsDto() {
+    return createImportCommandOptionsDto(null);
+  }
+
+  private ImportCommandOptionsDto createJdbcImportCommandOptionsDto() {
     return createImportCommandOptionsDto(null);
   }
 
@@ -489,7 +544,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   public interface Display extends WizardView {
 
     enum Slots {
-      Destination, Unit, Values, Archive, Limesurvey, Rest
+      Destination, Unit, Values, Archive, Limesurvey, Jdbc, Rest
     }
 
     ImportFormat getImportFormat();
@@ -516,6 +571,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
     void setFormatStepDisplay(WizardStepDisplay display);
 
+    void removeFormat(ImportFormat format);
   }
 
   public interface DataConfigFormatStepPresenter {

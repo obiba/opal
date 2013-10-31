@@ -10,27 +10,23 @@
 package org.obiba.opal.web.gwt.app.client.magma.importdata.view;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.LimesurveyStepPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.JdbcStepPresenter;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
 
-public class LimesurveyStepView extends ViewImpl implements LimesurveyStepPresenter.Display {
+public class JdbcStepView extends ViewImpl implements JdbcStepPresenter.Display {
 
   @UiField
   ListBox database;
 
-  @UiField
-  TextBox tablePrefix;
-
-  interface Binder extends UiBinder<Widget, LimesurveyStepView> {}
+  interface Binder extends UiBinder<Widget, JdbcStepView> {}
 
   @Override
   public void setDatabases(JsArray<DatabaseDto> resource) {
@@ -45,14 +41,8 @@ public class LimesurveyStepView extends ViewImpl implements LimesurveyStepPresen
     return database.getItemText(database.getSelectedIndex());
   }
 
-  @Override
-  public String getTablePrefix() {
-    return tablePrefix.getValue();
-  }
-
   @Inject
-  public LimesurveyStepView(Binder uiBinder) {
+  public JdbcStepView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
   }
-
 }
