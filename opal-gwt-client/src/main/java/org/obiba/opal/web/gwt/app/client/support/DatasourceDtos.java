@@ -19,6 +19,8 @@ import org.obiba.opal.web.model.client.magma.DatasourceUnitConfigDto;
 import org.obiba.opal.web.model.client.magma.FsDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.GNPostalCodesDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.HCDatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.JdbcDatasourceFactoryDto;
+import org.obiba.opal.web.model.client.magma.JdbcDatasourceSettingsDto;
 import org.obiba.opal.web.model.client.magma.LimesurveyDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.RestDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.SpssDatasourceFactoryDto;
@@ -43,6 +45,8 @@ public class DatasourceDtos {
         return createXMLDatasourceFactoryDto(importConfig);
       case LIMESURVEY:
         return createLimesurveyDatasourceFactoryDto(importConfig);
+      case JDBC:
+        return createJdbcDatasourceFactoryDto(importConfig);
       case REST:
         return createRestDatasourceFactoryDto(importConfig);
       case SPSS:
@@ -54,6 +58,19 @@ public class DatasourceDtos {
       default:
         throw new IllegalArgumentException("Import data format not supported: " + importConfig.getImportFormat());
     }
+  }
+
+  private static DatasourceFactoryDto createJdbcDatasourceFactoryDto(ImportConfig importConfig) {
+    JdbcDatasourceFactoryDto factoryDto = JdbcDatasourceFactoryDto.create();
+    factoryDto.setDatabase(importConfig.getDatabase());
+
+    JdbcDatasourceSettingsDto settingsDto = JdbcDatasourceSettingsDto.create();
+    settingsDto.setDefaultEntityType(importConfig.getString("defaultEntityType"));
+    settingsDto.setUseMetadataTables(Boolean.parseBoolean(importConfig.getString("useMetadataTables")));
+    factoryDto.setSettings(settingsDto);
+
+    return createAndConfigureDatasourceFactoryDto(importConfig,
+        JdbcDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, factoryDto);
   }
 
   private static DatasourceFactoryDto createLimesurveyDatasourceFactoryDto(ImportConfig importConfig) {
@@ -171,7 +188,6 @@ public class DatasourceDtos {
 
     return dto;
   }
-
 
   private static DatasourceFactoryDto createGNPostalCodesDatasourceFactoryDto(ImportConfig importConfig) {
     GNPostalCodesDatasourceFactoryDto factoryDto = GNPostalCodesDatasourceFactoryDto.create();

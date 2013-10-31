@@ -421,6 +421,7 @@ public interface Translations extends Constants {
       "DatabaseUsageIsRequired", "Database usage is required.",//
       "SQLSchemaIsRequired", "SQL schema is required.",//
       "LimeSurveyDatabaseIsRequired", "LimeSurvey database is required.",//
+      "JdbcDatabaseIsRequired", "Jdbc database is required.",//
       "UrlIsRequired", "A url is required.",//
       "UsernameIsRequired", "A username is required.",//
       "TableSelectionIsRequired", "At least one table must be selected.",//

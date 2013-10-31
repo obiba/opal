@@ -60,6 +60,13 @@
               </ui:msg>
             </g:Label>
           </g:FlowPanel>
+          <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpJDBC" visible="false">
+            <g:Label styleName="help-block">
+              <ui:msg description="JDBC Information">This format imports variable dictionaries and data from a
+                flat schema SQL database.
+              </ui:msg>
+            </g:Label>
+          </g:FlowPanel>
           <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpHealthCanada" visible="false">
             <g:Label styleName="help-block">
               <ui:msg description="Health Canada Information">Medications from Health Canada.</ui:msg>
@@ -67,7 +74,8 @@
           </g:FlowPanel>
           <g:FlowPanel addStyleNames="small-top-margin" ui:field="helpGeonamesPostalCodes" visible="false">
             <g:Label styleName="help-block">
-              <ui:msg description="Geonames Postal Codes Information">Postal Codes by country from geonames.org.</ui:msg>
+              <ui:msg description="Geonames Postal Codes Information">Postal Codes by country from geonames.org.
+              </ui:msg>
             </g:Label>
           </g:FlowPanel>
         </g:FlowPanel>

@@ -29,11 +29,11 @@ import com.gwtplatform.mvp.client.View;
 
 import static org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig.ImportFormat;
 
-public class LimesurveyStepPresenter extends PresenterWidget<LimesurveyStepPresenter.Display>
+public class JdbcStepPresenter extends PresenterWidget<JdbcStepPresenter.Display>
     implements DataImportPresenter.DataConfigFormatStepPresenter {
 
   @Inject
-  public LimesurveyStepPresenter(EventBus eventBus, Display view) {
+  public JdbcStepPresenter(EventBus eventBus, Display view) {
     super(eventBus, view);
   }
 
@@ -54,12 +54,12 @@ public class LimesurveyStepPresenter extends PresenterWidget<LimesurveyStepPrese
             for(int i = 0; i < resource.length(); i++) {
               SqlDatabaseDto sqlDatabaseDto = (SqlDatabaseDto) resource.get(i)
                   .getExtension("Database.SqlDatabaseDto.settings");
-              if(sqlDatabaseDto.getSqlSchema().getName().equals(SqlDatabaseDto.SqlSchema.LIMESURVEY.getName())) {
+              if(sqlDatabaseDto.getSqlSchema().getName().equals(SqlDatabaseDto.SqlSchema.JDBC.getName()) &&
+                  resource.get(i).getUsage().getName().equals(DatabaseDto.Usage.IMPORT.getName())) {
                 databases.push(resource.get(i));
               }
-
-              getView().setDatabases(databases);
             }
+            getView().setDatabases(databases);
           }
         })//
         .withCallback(Response.SC_FORBIDDEN, new ResponseCodeCallback() {
@@ -73,16 +73,17 @@ public class LimesurveyStepPresenter extends PresenterWidget<LimesurveyStepPrese
   @Override
   public ImportConfig getImportConfig() {
     ImportConfig importConfig = new ImportConfig();
-    importConfig.setImportFormat(ImportFormat.LIMESURVEY);
+    importConfig.setImportFormat(ImportFormat.JDBC);
     importConfig.setDatabase(getView().getSelectedDatabase());
-    importConfig.setTablePrefix(getView().getTablePrefix());
+    importConfig.put("defaultEntityType", "");
+    importConfig.put("useMetadataTables", "");
     return importConfig;
   }
 
   @Override
   public boolean validate() {
     if(getView().getSelectedDatabase().isEmpty()) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error("LimeSurveyDatabaseIsRequired").build());
+      getEventBus().fireEvent(NotificationEvent.newBuilder().error("JdbcDatabaseIsRequired").build());
       return false;
     }
     return true;
@@ -93,7 +94,5 @@ public class LimesurveyStepPresenter extends PresenterWidget<LimesurveyStepPrese
     void setDatabases(JsArray<DatabaseDto> resource);
 
     String getSelectedDatabase();
-
-    String getTablePrefix();
   }
 }

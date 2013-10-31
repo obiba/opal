@@ -205,7 +205,8 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
           @Override
           public boolean skip() {
             String selection = formatChooser.getSelectedValue();
-            return ImportFormat.LIMESURVEY.name().equals(selection) || ImportFormat.REST.name().equals(selection) ||
+            return ImportFormat.LIMESURVEY.name().equals(selection) || ImportFormat.JDBC.name().equals(selection) ||
+                ImportFormat.REST.name().equals(selection) ||
                 ImportFormat.GEONAMES_POSTAL_CODES.name().equals(selection) ||
                 ImportFormat.HEALTH_CANADA.name().equals(selection);
           }
@@ -413,6 +414,7 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
     helpCsv.setVisible(false);
     helpOpalXml.setVisible(false);
     helpLimeSurvey.setVisible(false);
+    helpJDBC.setVisible(false);
     helpOpalRest.setVisible(false);
     helpSpss.setVisible(false);
     helpHealthCanada.setVisible(false);
