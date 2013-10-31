@@ -37,10 +37,9 @@ public class VocabulariesResource {
   @GET
   public List<Opal.VocabularyDto> getVocabularies() {
     List<Opal.VocabularyDto> vocabularies = new ArrayList<Opal.VocabularyDto>();
-    Taxonomy taxonomy = taxonomyService.getTaxonomy(taxonomyName);
 
-    for(Vocabulary v : taxonomy.getVocabularies()) {
-      vocabularies.add(Dtos.asDto(v, taxonomy.getName()));
+    for(Vocabulary v : taxonomyService.getVocabularies(taxonomyName)) {
+      vocabularies.add(Dtos.asDto(v));
     }
 
     return vocabularies;
@@ -59,7 +58,7 @@ public class VocabulariesResource {
     }
 
     Vocabulary v = Dtos.fromDto(vocabulary);
-    tax.getVocabularies().add(v);
+    taxonomyService.saveVocabulary(v);
 
     return Response.ok().build();
   }

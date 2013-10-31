@@ -38,7 +38,7 @@ public class VocabularyResource {
     this.vocabularyName = vocabularyName;
   }
 
-  @SuppressWarnings("ConstantConditions")
+  @SuppressWarnings({ "ConstantConditions", "OverlyLongMethod" })
   @POST
   @Consumes(value = "text/plain")
   public Response addVocabularyTerms(String csv) {
@@ -48,7 +48,7 @@ public class VocabularyResource {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
 
-    Vocabulary vocabulary = taxonomy.getVocabulary(vocabularyName);
+    Vocabulary vocabulary = taxonomyService.getVocabulary(taxonomyName, vocabularyName);
     if(vocabulary == null) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
@@ -64,7 +64,7 @@ public class VocabularyResource {
 
       if(level == 0) {
         if(t != null) {
-          vocabulary.add(t);
+          vocabulary.getTerms().add(t);
         }
 
         t = new Term(terms[0].replaceAll("\"", ""));
@@ -73,11 +73,11 @@ public class VocabularyResource {
 
         for(int i = 1; i < level; i++) {
           // find parent
-          parent = (Term) parent.getTerms().get(parent.getTerms().size() - 1);
+          parent = parent.getTerms().get(parent.getTerms().size() - 1);
         }
 
         // Add new term
-        parent.add(new Term(terms[terms.length - 1].replaceAll("\"", "")));
+        parent.getTerms().add(new Term(terms[terms.length - 1].replaceAll("\"", "")));
       }
     }
 
@@ -93,7 +93,7 @@ public class VocabularyResource {
     try {
 
       Vocabulary vocabulary = taxonomyService.getVocabulary(taxonomyName, vocabularyName);
-      taxonomyService.saveVocabulary(taxonomyName, vocabularyName, Dtos.fromDto(vocabulary, dto));
+      taxonomyService.saveVocabulary(Dtos.fromDto(dto)); //taxonomyName, vocabularyName, ,vocabulary
     } catch(NoSuchTaxonomyException e) {
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch(NoSuchVocabularyException e) {

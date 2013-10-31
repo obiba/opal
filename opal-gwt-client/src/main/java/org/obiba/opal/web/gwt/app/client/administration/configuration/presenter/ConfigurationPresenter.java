@@ -4,10 +4,15 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.model.client.opal.GeneralConf;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -25,6 +30,10 @@ import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Display, ConfigurationPresenter.Proxy>
     implements ConfigurationUiHandlers {
 
+  private final ModalProvider<GeneralConfModalPresenter> generalConfModalProvider;
+
+  private GeneralConf conf = null;
+
   @ContentSlot
   public static final GwtEvent.Type<RevealContentHandler<?>> CONTENT = new GwtEvent.Type<RevealContentHandler<?>>();
 
@@ -34,6 +43,8 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
 
   public interface Display extends View, HasUiHandlers<ConfigurationUiHandlers>, HasBreadcrumbs {
     void setTaxonomiesHistoryToken(String historyToken);
+
+    void renderGeneralProperties(GeneralConf resource);
   }
 
   private static final Translations translations = GWT.create(Translations.class);
@@ -43,9 +54,11 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
   private final BreadcrumbsBuilder breadcrumbsBuilder;
 
   @Inject
-  public ConfigurationPresenter(Display display, EventBus eventBus, Proxy proxy, PlaceManager placeManager,
+  public ConfigurationPresenter(Display display, EventBus eventBus, Proxy proxy,
+      ModalProvider<GeneralConfModalPresenter> generalConfModalProvider, PlaceManager placeManager,
       BreadcrumbsBuilder breadcrumbsBuilder) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
+    this.generalConfModalProvider = generalConfModalProvider.setContainer(this);
     this.placeManager = placeManager;
     this.breadcrumbsBuilder = breadcrumbsBuilder;
     getView().setUiHandlers(this);
@@ -64,12 +77,27 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
   }
 
   @Override
-  public void prepareFromRequest(PlaceRequest placeRequest) {
+  protected void onBind() {
+    ResourceRequestBuilderFactory.<GeneralConf>newBuilder()//
+        .forResource("/system/conf/general").withCallback(new ResourceCallback<GeneralConf>() {
 
+      @Override
+      public void onResource(Response response, GeneralConf resource) {
+        conf = resource;
+        getView().renderGeneralProperties(resource);
+      }
+    }).get().send();
+  }
+
+  @Override
+  public void onEditGeneralSettings() {
+    GeneralConfModalPresenter dialog = generalConfModalProvider.get();
+    dialog.setGeneralConf(conf);
   }
 
   private void setHistoryTokens() {
     getView().setTaxonomiesHistoryToken(
         placeManager.buildRelativeHistoryToken(new PlaceRequest.Builder().nameToken(Places.TAXONOMIES).build(), 2));
   }
+
 }

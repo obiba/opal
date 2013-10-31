@@ -2,7 +2,6 @@ package org.obiba.opal.web.taxonomy;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.domain.taxonomy.Term;
@@ -20,7 +19,7 @@ public class Dtos {
 //    builder.addAllTitles(toTextDtoList(taxonomy.getTitles()));
 //    builder.addAllDescriptions(toTextDtoList(taxonomy.getDescriptions()));
 
-    Collection<Opal.TaxonomyDto.VocabularyDto> vocabularyDtos = new ArrayList<Opal.TaxonomyDto.VocabularyDto>();
+    Iterable<Opal.VocabularyDto> vocabularyDtos = new ArrayList<Opal.VocabularyDto>();
 //    for(Vocabulary v : taxonomy.getVocabularies()) {
 //      vocabularyDtos.add(asDto(v));
 //    }
@@ -34,16 +33,16 @@ public class Dtos {
 //    taxonomy.setTitles(fromTextDtoList(dto.getTitlesList()));
 //    taxonomy.setDescriptions(fromTextDtoList(dto.getDescriptionsList()));
 
-    List<Vocabulary> vocabularies = new ArrayList<Vocabulary>();
-    for(Opal.TaxonomyDto.VocabularyDto v : dto.getVocabulariesList()) {
+    Collection<Vocabulary> vocabularies = new ArrayList<Vocabulary>();
+    for(Opal.VocabularyDto v : dto.getVocabulariesList()) {
       vocabularies.add(fromDto(v));
     }
 //    taxonomy.setVocabularies(vocabularies);
     return taxonomy;
   }
 
-  public static Opal.TaxonomyDto.TermDto asDto(Term term) {
-    Opal.TaxonomyDto.TermDto.Builder builder = Opal.TaxonomyDto.TermDto.newBuilder();
+  public static Opal.TermDto asDto(Term term) {
+    Opal.TermDto.Builder builder = Opal.TermDto.newBuilder();
     builder.setName(term.getName());
     //TODO
 //    builder.addAllTitles(toTextDtoList(term.getTitles()));
@@ -52,8 +51,8 @@ public class Dtos {
     return builder.build();
   }
 
-  private static Iterable<Opal.TaxonomyDto.TermDto> asDto(Iterable<Term> terms) {
-    Collection<Opal.TaxonomyDto.TermDto> termDto = new ArrayList<Opal.TaxonomyDto.TermDto>();
+  private static Iterable<Opal.TermDto> asDto(Iterable<Term> terms) {
+    Iterable<Opal.TermDto> termDto = new ArrayList<Opal.TermDto>();
 //    for(HasTerms t : terms) {
 //      termDto.add(asDto((Term) t));
 //    }
@@ -68,7 +67,7 @@ public class Dtos {
 //    return termDto;
 //  }
 
-  public static Term fromDto(Opal.TaxonomyDto.TermDto from) {
+  public static Term fromDto(Opal.TermDto from) {
     Term term = new Term(from.getName());
     //TODO
 //    term.setTitles(fromTextDtoList(from.getTitlesList()));
@@ -77,8 +76,8 @@ public class Dtos {
     return term;
   }
 
-  public static Opal.TaxonomyDto.VocabularyDto asDto(Vocabulary vocabulary) {
-    Opal.TaxonomyDto.VocabularyDto.Builder builder = Opal.TaxonomyDto.VocabularyDto.newBuilder();
+  public static Opal.VocabularyDto asDto(Vocabulary vocabulary) {
+    Opal.VocabularyDto.Builder builder = Opal.VocabularyDto.newBuilder();
     builder.setName(vocabulary.getName());
     //TODO
 //    builder.addAllTitles(toTextDtoList(vocabulary.getTitles()));
@@ -88,7 +87,7 @@ public class Dtos {
     return builder.build();
   }
 
-  public static Vocabulary fromDto(Opal.TaxonomyDto.VocabularyDto dto) {
+  public static Vocabulary fromDto(Opal.VocabularyDto dto) {
     Vocabulary vocabulary = new Vocabulary();
     //TODO
 //    vocabulary.setTitles(fromTextDtoList(dto.getTitlesList()));

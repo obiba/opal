@@ -8,13 +8,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.administration.server.presenter;
+package org.obiba.opal.web.gwt.app.client.administration.configuration.presenter;
 
-import com.gwtplatform.mvp.client.UiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
-public interface ServerUiHandlers extends UiHandlers {
+public interface GeneralConfModalUiHandlers extends ModalUiHandlers {
 
   void save();
-
-  void cancel();
 }

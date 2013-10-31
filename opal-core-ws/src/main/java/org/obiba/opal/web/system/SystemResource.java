@@ -147,7 +147,7 @@ public class SystemResource {
   @Path("/conf")
   public Opal.OpalConf getOpalConfiguration() {
     Collection<Opal.TaxonomyDto> taxonomies = new ArrayList<Opal.TaxonomyDto>();
-    for(Taxonomy taxonomy : taxonomyService.list()) {
+    for(Taxonomy taxonomy : taxonomyService.getTaxonomies()) {
       taxonomies.add(Dtos.asDto(taxonomy));
     }
     return Opal.OpalConf.newBuilder()//
