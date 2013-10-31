@@ -12,6 +12,8 @@ package org.obiba.opal.core.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -28,6 +30,7 @@ import org.springframework.stereotype.Component;
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.transform;
@@ -61,7 +64,7 @@ public class TaxonomyServiceImpl implements TaxonomyService {
   }
 
   @Override
-  public void saveTaxonomy(@Nonnull final Taxonomy taxonomy) {
+  public void saveTaxonomy(@Nullable Taxonomy template, @Nonnull final Taxonomy taxonomy) {
 
     // create new vocabularies
     Iterable<Vocabulary> vocabularies = null;
@@ -80,26 +83,30 @@ public class TaxonomyServiceImpl implements TaxonomyService {
     }
 
     // delete removed vocabularies
-    Taxonomy previousTaxonomy = getTaxonomy(taxonomy.getName());
     Iterable<Vocabulary> deletedVocabularies = null;
-    if(previousTaxonomy != null && previousTaxonomy.hasVocabularies()) {
-      deletedVocabularies = filter(transform(previousTaxonomy.getVocabularies(), new Function<String, Vocabulary>() {
-        @Nullable
-        @Override
-        public Vocabulary apply(String vocabularyName) {
-          return taxonomy.hasVocabulary(vocabularyName) ? null : getVocabulary(taxonomy.getName(), vocabularyName);
-        }
-      }), Predicates.notNull());
+    if(template != null) {
+      Taxonomy previousTaxonomy = orientDbService.findUnique(template);
+      if(previousTaxonomy != null && previousTaxonomy.hasVocabularies()) {
+        deletedVocabularies = filter(transform(previousTaxonomy.getVocabularies(), new Function<String, Vocabulary>() {
+          @Nullable
+          @Override
+          public Vocabulary apply(String vocabularyName) {
+            return taxonomy.hasVocabulary(vocabularyName) ? null : getVocabulary(taxonomy.getName(), vocabularyName);
+          }
+        }), Predicates.notNull());
+      }
     }
 
-    List<HasUniqueProperties> toSave = new ArrayList<HasUniqueProperties>();
-    toSave.add(taxonomy);
+    Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
+    toSave.put(template == null ? taxonomy : template, taxonomy);
     if(vocabularies != null) {
-      Iterables.addAll(toSave, vocabularies);
+      for(Vocabulary vocabulary : vocabularies) {
+        toSave.put(vocabulary, vocabulary);
+      }
     }
 
     // TODO we should execute these steps in a single transaction
-    orientDbService.save(toSave.toArray(new HasUniqueProperties[toSave.size()]));
+    orientDbService.save(toSave);
     if(deletedVocabularies != null) {
       orientDbService.delete(Iterables.toArray(deletedVocabularies, Vocabulary.class));
     }
@@ -132,14 +139,25 @@ public class TaxonomyServiceImpl implements TaxonomyService {
   }
 
   @Override
-  public void saveVocabulary(@Nonnull Vocabulary vocabulary) {
+  public void saveVocabulary(@Nullable Vocabulary template, @Nonnull Vocabulary vocabulary) {
+    Taxonomy previousTaxonomy = template == null ? null : getTaxonomy(template.getTaxonomy());
     Taxonomy taxonomy = getTaxonomy(vocabulary.getTaxonomy());
     if(taxonomy == null) {
       throw new IllegalArgumentException(
           "Cannot create vocabulary for non-existing taxonomy " + vocabulary.getTaxonomy());
     }
-    taxonomy.addVocabulary(vocabulary.getName());
-    orientDbService.save(vocabulary, taxonomy);
+
+    Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
+    toSave.put(template == null ? vocabulary : template, vocabulary);
+    if(!Objects.equals(previousTaxonomy, taxonomy)) {
+      taxonomy.addVocabulary(vocabulary.getName());
+      toSave.put(taxonomy, taxonomy);
+      if(previousTaxonomy != null) {
+        previousTaxonomy.removeVocabulary(template.getName());
+        toSave.put(previousTaxonomy, previousTaxonomy);
+      }
+    }
+    orientDbService.save(toSave);
   }
 
   @Override
@@ -154,7 +172,7 @@ public class TaxonomyServiceImpl implements TaxonomyService {
 
     // TODO we should execute these steps in a single transaction
     orientDbService.delete(vocabulary);
-    orientDbService.save(taxonomy);
+    orientDbService.save(taxonomy, taxonomy);
   }
 
 }

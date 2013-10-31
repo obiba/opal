@@ -56,6 +56,12 @@ public class Term {
     this.titles = titles;
   }
 
+  public Term addTitle(Locale locale, String title) {
+    if(titles == null) titles = new HashMap<Locale, String>();
+    titles.put(locale, title);
+    return this;
+  }
+
   public Map<Locale, String> getDescriptions() {
     return descriptions;
   }
@@ -64,12 +70,25 @@ public class Term {
     this.descriptions = descriptions;
   }
 
+  public Term addDescription(Locale locale, String title) {
+    if(descriptions == null) descriptions = new HashMap<Locale, String>();
+    descriptions.put(locale, title);
+    return this;
+  }
+
   public List<Term> getTerms() {
     return terms;
   }
 
   public void setTerms(List<Term> terms) {
     this.terms = terms;
+  }
+
+  public Term addTerm(Term term) {
+    if(terms == null) terms = new ArrayList<Term>();
+    if(terms.contains(term)) terms.remove(term);
+    terms.add(term);
+    return this;
   }
 
   @Override

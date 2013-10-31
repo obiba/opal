@@ -37,7 +37,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 @Component
 public class ProjectsConfigurationService implements ProjectService {
 
-  public static final String PROJECTS_DIR = "projects";
+  private static final String PROJECTS_DIR = "projects";
 
   @Autowired
   private OpalRuntime opalRuntime;
@@ -121,7 +121,7 @@ public class ProjectsConfigurationService implements ProjectService {
   @Override
   public void save(@Nonnull Project project) throws ConstraintViolationException {
     registerDatasource(project);
-    orientDbService.save(project);
+    orientDbService.save(project, project);
   }
 
   @Nonnull

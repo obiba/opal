@@ -12,6 +12,7 @@ package org.obiba.opal.core.service.impl;
 import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
 
+import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.OpalGeneralConfig;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SystemService;
@@ -24,7 +25,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DefaultGeneralConfigService implements SystemService {
 
-  public static final OpalGeneralConfig TEMPLATE = new OpalGeneralConfig();
+  private static final HasUniqueProperties TEMPLATE = new OpalGeneralConfig();
 
   @Autowired
   private OrientDbService orientDbService;
@@ -40,7 +41,7 @@ public class DefaultGeneralConfigService implements SystemService {
   }
 
   public void save(@SuppressWarnings("TypeMayBeWeakened") @Nonnull OpalGeneralConfig config) {
-    orientDbService.save(config);
+    orientDbService.save(config, config);
   }
 
   @Nonnull

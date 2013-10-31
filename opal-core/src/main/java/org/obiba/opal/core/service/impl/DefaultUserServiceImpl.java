@@ -11,7 +11,7 @@ package org.obiba.opal.core.service.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 
 /**
  * Default implementation of User Service
@@ -35,7 +36,7 @@ import com.google.common.collect.Iterables;
 @Component
 public class DefaultUserServiceImpl implements UserService {
 
-  public static final String OPAL_DOMAIN = "opal";
+  private static final String OPAL_DOMAIN = "opal";
 
   @Autowired
   private SubjectAclService aclService;
@@ -76,10 +77,12 @@ public class DefaultUserServiceImpl implements UserService {
 
   @Override
   public void save(User user) throws ConstraintViolationException {
-    List<HasUniqueProperties> toSave = new ArrayList<HasUniqueProperties>();
-    toSave.add(user);
-    Iterables.addAll(toSave, findImpactedGroups(user));
-    orientDbService.save(toSave.toArray(new HasUniqueProperties[toSave.size()]));
+    Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
+    toSave.put(user, user);
+    for(Group group : findImpactedGroups(user)) {
+      toSave.put(group, group);
+    }
+    orientDbService.save(toSave);
   }
 
   private Iterable<Group> findImpactedGroups(final User user) {
@@ -124,20 +127,17 @@ public class DefaultUserServiceImpl implements UserService {
   }
 
   @Override
-  public void deleteUser(final User user) {
+  public void deleteUser(User user) {
 
-    Iterable<Group> groups = Iterables.transform(user.getGroups(), new Function<String, Group>() {
-      @Override
-      public Group apply(String groupName) {
-        Group group = getGroup(groupName);
-        group.removeUser(user.getName());
-        return group;
-      }
-    });
-
+    Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
+    for(String groupName : user.getGroups()) {
+      Group group = getGroup(groupName);
+      group.removeUser(user.getName());
+      toSave.put(group, group);
+    }
     // TODO we should execute these steps in a single transaction
     orientDbService.delete(user);
-    orientDbService.save(Iterables.toArray(groups, Group.class));
+    orientDbService.save(toSave);
     aclService.deleteSubjectPermissions(OPAL_DOMAIN, null,
         SubjectAclService.SubjectType.valueOf(SubjectAclService.SubjectType.USER.name())
             .subjectFor(user.getName())); // Delete user's permissions
@@ -145,7 +145,7 @@ public class DefaultUserServiceImpl implements UserService {
 
   @Override
   public void createGroup(String name) throws ConstraintViolationException {
-    orientDbService.save(new Group(name));
+    orientDbService.save(null, new Group(name));
   }
 
   @Override
@@ -159,19 +159,17 @@ public class DefaultUserServiceImpl implements UserService {
   }
 
   @Override
-  public void deleteGroup(final Group group) {
-    Iterable<User> users = Iterables.transform(group.getUsers(), new Function<String, User>() {
-      @Override
-      public User apply(String userName) {
-        User user = getUser(userName);
-        user.removeGroup(group.getName());
-        return user;
-      }
-    });
+  public void deleteGroup(Group group) {
+    Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
+    for(String userName : group.getUsers()) {
+      User user = getUser(userName);
+      user.removeGroup(group.getName());
+      toSave.put(user, user);
+    }
 
     // TODO we should execute these steps in a single transaction
     orientDbService.delete(group);
-    orientDbService.save(Iterables.toArray(users, User.class));
+    orientDbService.save(toSave);
     aclService.deleteSubjectPermissions(OPAL_DOMAIN, null,
         SubjectAclService.SubjectType.valueOf(SubjectAclService.SubjectType.GROUP.name())
             .subjectFor(group.getName())); // Delete group's permissions

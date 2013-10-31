@@ -99,7 +99,7 @@ public class DefaultUnitKeyStoreServiceImplTest {
         .andReturn(null) //
         .times(2);
 
-    mockOrientDbService.save(state);
+    mockOrientDbService.save(state, state);
     EasyMock.expectLastCall().once();
 
     replay(mockOrientDbService);

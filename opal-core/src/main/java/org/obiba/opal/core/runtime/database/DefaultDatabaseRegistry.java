@@ -11,6 +11,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory;
+import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbSettings;
 import org.obiba.opal.core.domain.database.SqlSettings;
@@ -34,11 +35,11 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
 
-@SuppressWarnings("OverlyCoupledClass")
 @Component
 public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
@@ -141,13 +142,15 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     if(database.isDefaultStorage()) {
       Database previousDefaultStorageDatabase = getDefaultStorageDatabase();
       if(previousDefaultStorageDatabase == null) {
-        orientDbService.save(database);
+        orientDbService.save(database, database);
       } else {
         previousDefaultStorageDatabase.setDefaultStorage(false);
-        orientDbService.save(database, previousDefaultStorageDatabase);
+        orientDbService.save(ImmutableMap
+            .<HasUniqueProperties, HasUniqueProperties>of(database, database, previousDefaultStorageDatabase,
+                previousDefaultStorageDatabase));
       }
     } else {
-      orientDbService.save(database);
+      orientDbService.save(database, database);
     }
   }
 
@@ -188,7 +191,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     Database database = getDatabase(databaseName);
     if(database.isEditable()) {
       database.setEditable(false);
-      orientDbService.save(database);
+      orientDbService.save(database, database);
     }
     registrations.put(databaseName, usedByDatasource);
   }
@@ -197,7 +200,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   public void unregister(@Nonnull String databaseName, String usedByDatasource) {
     Database database = getDatabase(databaseName);
     database.setEditable(true);
-    orientDbService.save(database);
+    orientDbService.save(database, database);
     registrations.remove(databaseName, usedByDatasource);
   }
 

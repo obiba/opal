@@ -53,7 +53,7 @@ import com.google.common.collect.Lists;
 /**
  * Utilities for manipulating Magma Dto instances
  */
-@SuppressWarnings({ "OverlyCoupledClass", "OverlyComplexClass" })
+@SuppressWarnings("OverlyCoupledClass")
 public final class Dtos {
 
   // private static final Logger log = LoggerFactory.getLogger(Dtos.class);
@@ -241,7 +241,6 @@ public final class Dtos {
     return builder;
   }
 
-  @SuppressWarnings("ConstantConditions")
   public static Magma.TimestampsDto.Builder asDto(Timestamps ts) {
     Magma.TimestampsDto.Builder tsBuilder = Magma.TimestampsDto.newBuilder();
     if(!ts.getCreated().isNull()) {

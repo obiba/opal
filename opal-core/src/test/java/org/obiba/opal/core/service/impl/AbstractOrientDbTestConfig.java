@@ -16,8 +16,6 @@ import java.util.Properties;
 
 import org.obiba.opal.core.service.OrientDbServerFactory;
 import org.obiba.opal.core.service.OrientDbService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
@@ -26,13 +24,11 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public abstract class AbstractOrientDbTestConfig {
 
-  private static final Logger log = LoggerFactory.getLogger(AbstractOrientDbTestConfig.class);
-
-  protected static final File TEMP_FILE;
+  private static final File TEMP_FILE;
 
   static {
     try {
-      TEMP_FILE = File.createTempFile("orient", "");
+      TEMP_FILE = File.createTempFile("opal-test-", "");
       TEMP_FILE.delete();
       TEMP_FILE.mkdirs();
 //      TEMP_FILE.deleteOnExit();
@@ -58,7 +54,6 @@ public abstract class AbstractOrientDbTestConfig {
   @Bean
   public OrientDbServerFactory orientDbServerFactory() {
     String url = LocalOrientDbServerFactory.URL.replace("${OPAL_HOME}", TEMP_FILE.getAbsolutePath());
-    log.info("Start OrientDB with {}", url);
     LocalOrientDbServerFactory.start(url);
     return new LocalOrientDbServerFactory();
   }

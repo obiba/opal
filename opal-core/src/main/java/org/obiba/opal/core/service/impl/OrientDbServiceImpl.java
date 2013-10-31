@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -14,13 +15,17 @@ import javax.validation.ConstraintViolationException;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.service.OrientDbServerFactory;
 import org.obiba.opal.core.service.OrientDbService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.orientechnologies.common.collection.OCompositeKey;
@@ -40,6 +45,8 @@ import com.orientechnologies.orient.core.tx.OTransaction;
 
 @Component
 public class OrientDbServiceImpl implements OrientDbService {
+
+  private static final Logger log = LoggerFactory.getLogger(OrientDbServiceImpl.class);
 
   @Autowired
   private DefaultBeanValidator defaultBeanValidator;
@@ -63,30 +70,32 @@ public class OrientDbServiceImpl implements OrientDbService {
   }
 
   @Override
-  public void save(@Nonnull HasUniqueProperties... hasUniqueProperties) throws ConstraintViolationException {
+  public void save(@Nullable HasUniqueProperties template, @Nonnull HasUniqueProperties hasUniqueProperties)
+      throws ConstraintViolationException {
     //noinspection ConstantConditions
     Preconditions.checkArgument(hasUniqueProperties != null, "hasUniqueProperties cannot be null");
+    save(ImmutableMap.of(template, hasUniqueProperties));
+  }
 
-    for(HasUniqueProperties bean : hasUniqueProperties) {
+  @Override
+  public void save(@Nonnull Map<HasUniqueProperties, HasUniqueProperties> beansByTemplate)
+      throws ConstraintViolationException {
+    //noinspection ConstantConditions
+    Preconditions.checkArgument(beansByTemplate != null, "beansByTemplate cannot be null");
+    Preconditions.checkArgument(beansByTemplate.size() > 0, "beansByTemplate cannot be empty");
+
+    for(HasUniqueProperties bean : beansByTemplate.values()) {
       defaultBeanValidator.validate(bean);
     }
 
     ODatabaseDocumentTx db = serverFactory.getDocumentTx();
     try {
 
-      Collection<ODocument> documents = new ArrayList<ODocument>(hasUniqueProperties.length);
-      for(HasUniqueProperties bean : hasUniqueProperties) {
-        ODocument document = findUniqueDocument(db, bean);
-        if(document == null) {
-          document = toDocument(bean);
-        } else {
-          copyToDocument(bean, document);
-        }
-        documents.add(document);
-      }
+      Iterable<ODocument> documents = getDocuments(db, beansByTemplate);
 
       db.begin(OTransaction.TXTYPE.OPTIMISTIC);
       for(ODocument document : documents) {
+        log.debug("save {}", document);
         document.save();
       }
       db.commit();
@@ -97,6 +106,21 @@ public class OrientDbServiceImpl implements OrientDbService {
     } finally {
       db.close();
     }
+  }
+
+  private Iterable<ODocument> getDocuments(ODatabaseComplex<?> db,
+      Map<HasUniqueProperties, HasUniqueProperties> beansByTemplate) {
+    Collection<ODocument> documents = new ArrayList<ODocument>(beansByTemplate.size());
+    for(Map.Entry<HasUniqueProperties, HasUniqueProperties> entry : beansByTemplate.entrySet()) {
+      ODocument document = findUniqueDocument(db, entry.getKey());
+      if(document == null) {
+        document = toDocument(entry.getValue());
+      } else {
+        copyToDocument(entry.getValue(), document);
+      }
+      documents.add(document);
+    }
+    return documents;
   }
 
   @SuppressWarnings("unchecked")
@@ -112,15 +136,24 @@ public class OrientDbServiceImpl implements OrientDbService {
   }
 
   private ODocument findUniqueDocument(ODatabaseComplex<?> db, HasUniqueProperties template) {
-    OIndex<?> index = db.getMetadata().getIndexManager().getIndex(getIndexName(template));
-    OIdentifiable identifiable;
-    if(template.getUniqueValues().size() == 1) {
-      identifiable = (OIdentifiable) index.get(template.getUniqueValues().get(0));
-    } else {
-      OCompositeKey key = new OCompositeKey(template.getUniqueValues());
-      identifiable = (OIdentifiable) index.get(key);
-    }
+    OIndex<?> index = getIndex(db, template);
+    OIdentifiable identifiable = (OIdentifiable) index.get(getKey(template));
     return identifiable == null ? null : identifiable.<ODocument>getRecord();
+  }
+
+  private OIndex<?> getIndex(ODatabaseComplex<?> db, HasUniqueProperties template) {
+    return db.getMetadata().getIndexManager().getIndex(getIndexName(template));
+  }
+
+  private OIndex<?> getIndex(ODatabaseComplex<?> db, Class<? extends HasUniqueProperties> clazz) {
+    String indexName = getIndexName(clazz);
+    return db.getMetadata().getIndexManager().getIndex(indexName);
+  }
+
+  private Object getKey(HasUniqueProperties template) {
+    return template.getUniqueValues().size() == 1
+        ? template.getUniqueValues().get(0)
+        : new OCompositeKey(template.getUniqueValues());
   }
 
   private <T> ODocument toDocument(T t) {
@@ -188,14 +221,21 @@ public class OrientDbServiceImpl implements OrientDbService {
   }
 
   @Override
-  public void delete(@Nonnull String sql, Object... params) {
+  public void delete(@Nonnull HasUniqueProperties... templates) {
     ODatabaseDocumentTx db = serverFactory.getDocumentTx();
     try {
-      List<ODocument> documents = db.query(new OSQLSynchQuery<ODocument>(sql), params);
+
+      Collection<ODocument> documents = new ArrayList<ODocument>(templates.length);
+      for(HasUniqueProperties template : templates) {
+        documents.add(findUniqueDocument(db, template));
+      }
 
       db.begin(OTransaction.TXTYPE.OPTIMISTIC);
       for(ODocument document : documents) {
-        document.delete();
+        db.delete(document);
+      }
+      for(HasUniqueProperties template : templates) {
+        getIndex(db, template).remove(getKey(template));
       }
       db.commit();
 
@@ -208,19 +248,15 @@ public class OrientDbServiceImpl implements OrientDbService {
   }
 
   @Override
-  public void delete(@Nonnull HasUniqueProperties... templates) {
+  public void deleteAll(@Nonnull Class<? extends HasUniqueProperties> clazz) {
     ODatabaseDocumentTx db = serverFactory.getDocumentTx();
     try {
 
-      Collection<ODocument> documents = new ArrayList<ODocument>(templates.length);
-      for(HasUniqueProperties template : templates) {
-        documents.add(findUniqueDocument(db, template));
-      }
-
       db.begin(OTransaction.TXTYPE.OPTIMISTIC);
-      for(ODocument document : documents) {
-        document.delete();
+      for(ODocument document : db.browseClass(clazz.getSimpleName())) {
+        db.delete(document);
       }
+      getIndex(db, clazz).clear();
       db.commit();
 
     } catch(OException e) {
@@ -289,21 +325,25 @@ public class OrientDbServiceImpl implements OrientDbService {
           schema.save();
         }
       }
-      indexClass.createIndex(getIndexName(clazz, propertyPath), indexType, propertyPath);
+      indexClass.createIndex(getIndexName(clazz, Lists.newArrayList(propertyPath)), indexType, propertyPath);
 
     } finally {
       db.close();
     }
   }
 
-  private String getIndexName(HasUniqueProperties hasUniqueProperties) {
-    List<String> properties = hasUniqueProperties.getUniqueProperties();
-    return getIndexName(hasUniqueProperties.getClass(), properties.toArray(new String[properties.size()]));
+  private String getIndexName(Class<? extends HasUniqueProperties> clazz) {
+    return getIndexName(BeanUtils.instantiate(clazz));
   }
 
-  private String getIndexName(Class<?> clazz, @Nonnull String... propertyPath) {
+  private String getIndexName(HasUniqueProperties hasUniqueProperties) {
+    List<String> properties = hasUniqueProperties.getUniqueProperties();
+    return getIndexName(hasUniqueProperties.getClass(), properties);
+  }
+
+  private String getIndexName(Class<?> clazz, @Nonnull Iterable<String> uniqueProperties) {
     StringBuilder indexName = new StringBuilder(clazz.getSimpleName());
-    for(String prop : propertyPath) {
+    for(String prop : uniqueProperties) {
       indexName.append(".").append(prop);
     }
     return indexName.toString();

@@ -94,6 +94,12 @@ public class Vocabulary extends AbstractTimestamped implements HasUniqueProperti
     this.titles = titles;
   }
 
+  public Vocabulary addTitle(Locale locale, String title) {
+    if(titles == null) titles = new HashMap<Locale, String>();
+    titles.put(locale, title);
+    return this;
+  }
+
   public Map<Locale, String> getDescriptions() {
     return descriptions;
   }
@@ -102,12 +108,25 @@ public class Vocabulary extends AbstractTimestamped implements HasUniqueProperti
     this.descriptions = descriptions;
   }
 
+  public Vocabulary addDescription(Locale locale, String title) {
+    if(descriptions == null) descriptions = new HashMap<Locale, String>();
+    descriptions.put(locale, title);
+    return this;
+  }
+
   public List<Term> getTerms() {
     return terms;
   }
 
   public void setTerms(List<Term> terms) {
     this.terms = terms;
+  }
+
+  public Vocabulary addTerm(Term term) {
+    if(terms == null) terms = new ArrayList<Term>();
+    if(terms.contains(term)) terms.remove(term);
+    terms.add(term);
+    return this;
   }
 
   @Override

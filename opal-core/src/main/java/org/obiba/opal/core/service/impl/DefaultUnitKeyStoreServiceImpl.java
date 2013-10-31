@@ -104,7 +104,7 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
     }
     state.setKeyStore(getKeyStoreByteArray(unitKeyStore));
 
-    orientDbService.save(state);
+    orientDbService.save(state, state);
   }
 
   @Override

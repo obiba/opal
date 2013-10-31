@@ -27,7 +27,7 @@ public interface TaxonomyService extends SystemService {
   @Nullable
   Taxonomy getTaxonomy(@Nonnull String name);
 
-  void saveTaxonomy(@Nonnull Taxonomy taxonomy);
+  void saveTaxonomy(@Nullable Taxonomy template, @Nonnull Taxonomy taxonomy);
 
   void deleteTaxonomy(@Nonnull String name);
 
@@ -36,7 +36,7 @@ public interface TaxonomyService extends SystemService {
   @Nullable
   Vocabulary getVocabulary(@Nonnull String taxonomy, @Nonnull String name);
 
-  void saveVocabulary(@Nonnull Vocabulary vocabulary);
+  void saveVocabulary(@Nullable Vocabulary template, @Nonnull Vocabulary vocabulary);
 
   void deleteVocabulary(@Nonnull Vocabulary vocabulary);
 

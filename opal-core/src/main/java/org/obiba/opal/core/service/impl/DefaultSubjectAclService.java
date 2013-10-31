@@ -9,12 +9,14 @@
  ******************************************************************************/
 package org.obiba.opal.core.service.impl;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
 import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
 
+import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SubjectAclService;
@@ -130,7 +132,8 @@ public class DefaultSubjectAclService implements SubjectAclService {
       @Nonnull String permission) {
     Assert.notNull(subject, "subject cannot be null");
     Assert.notNull(permission, "permission cannot be null");
-    orientDbService.save(new SubjectAcl(domain, node, subject, permission));
+    HasUniqueProperties acl = new SubjectAcl(domain, node, subject, permission);
+    orientDbService.save(acl, acl);
     notifyListeners(subject);
   }
 
@@ -282,8 +285,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
       }
 
     }).filter(new Predicate<SubjectAclService.Subject>() {
-
-      final TreeSet<SubjectAclService.Subject> set = new TreeSet<SubjectAclService.Subject>();
+      final Collection<Subject> set = new TreeSet<SubjectAclService.Subject>();
 
       @Override
       public boolean apply(SubjectAclService.Subject input) {
