@@ -30,7 +30,7 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallbacks;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
-import org.obiba.opal.web.model.client.database.SqlDatabaseDto;
+import org.obiba.opal.web.model.client.database.SqlSettingsDto;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.opal.ImportCommandOptionsDto;
@@ -161,11 +161,10 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
             boolean limeSurvey = false;
             boolean jdbc = false;
             for(int i = 0; i < resource.length(); i++) {
-              SqlDatabaseDto sqlDatabaseDto = (SqlDatabaseDto) resource.get(i)
-                  .getExtension("Database.SqlDatabaseDto.settings");
-              if(sqlDatabaseDto.getSqlSchema().getName().equals(SqlDatabaseDto.SqlSchema.LIMESURVEY.getName())) {
+              SqlSettingsDto sqlSettingsDto = (SqlSettingsDto) resource.get(i).getSqlSettings();
+              if(sqlSettingsDto.getSqlSchema().getName().equals(SqlSettingsDto.SqlSchema.LIMESURVEY.getName())) {
                 limeSurvey = true;
-              } else if(sqlDatabaseDto.getSqlSchema().getName().equals(SqlDatabaseDto.SqlSchema.JDBC.getName()) &&
+              } else if(sqlSettingsDto.getSqlSchema().getName().equals(SqlSettingsDto.SqlSchema.JDBC.getName()) &&
                   resource.get(i).getUsage().getName().equals(DatabaseDto.Usage.IMPORT.getName())) {
                 jdbc = true;
               }
