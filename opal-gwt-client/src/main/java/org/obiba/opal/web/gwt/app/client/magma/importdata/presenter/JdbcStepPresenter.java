@@ -17,7 +17,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
-import org.obiba.opal.web.model.client.database.SqlDatabaseDto;
+import org.obiba.opal.web.model.client.database.SqlSettingsDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
@@ -52,9 +52,8 @@ public class JdbcStepPresenter extends PresenterWidget<JdbcStepPresenter.Display
           public void onResource(Response response, JsArray<DatabaseDto> resource) {
             JsArray<DatabaseDto> databases = JsArrays.create();
             for(int i = 0; i < resource.length(); i++) {
-              SqlDatabaseDto sqlDatabaseDto = (SqlDatabaseDto) resource.get(i)
-                  .getExtension("Database.SqlDatabaseDto.settings");
-              if(sqlDatabaseDto.getSqlSchema().getName().equals(SqlDatabaseDto.SqlSchema.JDBC.getName()) &&
+              SqlSettingsDto sqlSettingsDto = resource.get(i).getSqlSettings();
+              if(sqlSettingsDto.getSqlSchema().getName().equals(SqlSettingsDto.SqlSchema.JDBC.getName()) &&
                   resource.get(i).getUsage().getName().equals(DatabaseDto.Usage.IMPORT.getName())) {
                 databases.push(resource.get(i));
               }
