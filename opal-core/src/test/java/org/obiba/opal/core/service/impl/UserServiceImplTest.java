@@ -2,13 +2,17 @@ package org.obiba.opal.core.service.impl;
 
 import java.util.List;
 
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.User;
 import org.obiba.opal.core.service.OrientDbService;
+import org.obiba.opal.core.service.SubjectAclService;
 import org.obiba.opal.core.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
@@ -20,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-@ContextConfiguration(classes = UserServiceTestConfig.class)
+@ContextConfiguration(classes = UserServiceImplTest.UserServiceTestConfig.class)
 public class UserServiceImplTest extends AbstractJUnit4SpringContextTests {
 
 //  private static final Logger log = LoggerFactory.getLogger(UserServiceImplTest.class);
@@ -48,6 +52,24 @@ public class UserServiceImplTest extends AbstractJUnit4SpringContextTests {
 
     User found = userService.getUser(user.getName());
     assertUserEquals(user, found);
+  }
+
+  @Test
+  public void test_update_user() {
+
+    User user = User.Builder.create().name("user1").password("password").enabled(true).build();
+    userService.save(user);
+
+    user.setPassword("new password");
+    userService.save(user);
+
+    List<User> users = newArrayList(userService.getUsers());
+    assertEquals(1, users.size());
+    assertUserEquals(user, users.get(0));
+
+    User found = userService.getUser(user.getName());
+    assertUserEquals(user, found);
+    Asserts.assertUpdatedTimestamps(user, found);
   }
 
   @Test
@@ -154,7 +176,7 @@ public class UserServiceImplTest extends AbstractJUnit4SpringContextTests {
     assertEquals(expected.getPassword(), found.getPassword());
     assertEquals(expected.isEnabled(), found.isEnabled());
     assertTrue(Iterables.elementsEqual(expected.getGroups(), found.getGroups()));
-    Asserts.assertTimestamps(expected, found);
+    Asserts.assertCreatedTimestamps(expected, found);
   }
 
   private void assertGroupEquals(Group expected, Group found) {
@@ -162,6 +184,22 @@ public class UserServiceImplTest extends AbstractJUnit4SpringContextTests {
     assertEquals(expected, found);
     assertEquals(expected.getName(), found.getName());
     assertTrue(Iterables.elementsEqual(expected.getUsers(), found.getUsers()));
-    Asserts.assertTimestamps(expected, found);
+    Asserts.assertCreatedTimestamps(expected, found);
   }
+
+  @Configuration
+  public static class UserServiceTestConfig extends AbstractOrientDbTestConfig {
+
+    @Bean
+    public UserService userService() {
+      return new UserServiceImpl();
+    }
+
+    @Bean
+    public SubjectAclService subjectAclService() {
+      return EasyMock.createMock(SubjectAclService.class);
+    }
+
+  }
+
 }

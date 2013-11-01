@@ -9,6 +9,8 @@ import org.obiba.opal.core.service.OpalGeneralConfigMissingException;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.OrientDbService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
@@ -19,7 +21,7 @@ import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@ContextConfiguration(classes = OpalGeneralConfigTestConfig.class)
+@ContextConfiguration(classes = OpalGeneralConfigServiceImplTest.OpalGeneralConfigTestConfig.class)
 public class OpalGeneralConfigServiceImplTest extends AbstractJUnit4SpringContextTests {
 
   @Autowired
@@ -69,6 +71,8 @@ public class OpalGeneralConfigServiceImplTest extends AbstractJUnit4SpringContex
 
     OpalGeneralConfig found = opalGeneralConfigService.getConfig();
     assertConfigEquals(config, found);
+    Asserts.assertUpdatedTimestamps(config, found);
+
   }
 
   private void assertConfigEquals(OpalGeneralConfig config, OpalGeneralConfig found) {
@@ -77,5 +81,16 @@ public class OpalGeneralConfigServiceImplTest extends AbstractJUnit4SpringContex
     assertEquals(config.getName(), found.getName());
     assertEquals(config.getDefaultCharacterSet(), found.getDefaultCharacterSet());
     assertEquals(config.getLocalesAsString(), found.getLocalesAsString());
+    Asserts.assertCreatedTimestamps(config, found);
+  }
+
+  @Configuration
+  public static class OpalGeneralConfigTestConfig extends AbstractOrientDbTestConfig {
+
+    @Bean
+    public OpalGeneralConfigService userService() {
+      return new OpalGeneralConfigServiceImpl();
+    }
+
   }
 }

@@ -27,6 +27,8 @@ import org.obiba.opal.core.service.OrientDbService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
@@ -37,7 +39,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-@ContextConfiguration(classes = TaxonomyServiceTestConfig.class)
+@ContextConfiguration(classes = TaxonomyServiceImplTest.TaxonomyServiceTestConfig.class)
 public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
 
   private static final Logger log = LoggerFactory.getLogger(TaxonomyServiceImplTest.class);
@@ -242,7 +244,7 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     assertEquals(expected.getTitles(), found.getTitles());
     assertEquals(expected.getDescriptions(), found.getDescriptions());
     assertEquals(expected.getVocabularies(), found.getVocabularies());
-    Asserts.assertTimestamps(expected, found);
+    Asserts.assertCreatedTimestamps(expected, found);
   }
 
   private void assertVocabularyEquals(Vocabulary expected, Vocabulary found) {
@@ -253,7 +255,16 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     assertEquals(expected.getTitles(), found.getTitles());
     assertEquals(expected.getDescriptions(), found.getDescriptions());
     assertEquals(expected.getTerms(), found.getTerms());
-    Asserts.assertTimestamps(expected, found);
+    Asserts.assertCreatedTimestamps(expected, found);
   }
 
+  @Configuration
+  public static class TaxonomyServiceTestConfig extends AbstractOrientDbTestConfig {
+
+    @Bean
+    public TaxonomyService taxonomyService() {
+      return new TaxonomyServiceImpl();
+    }
+
+  }
 }
