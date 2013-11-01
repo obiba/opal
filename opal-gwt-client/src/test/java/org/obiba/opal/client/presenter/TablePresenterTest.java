@@ -74,7 +74,7 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
 
     ValuesTablePresenter values = new ValuesTablePresenter(null, null, modalProviderValueSequence,
         modalEntityModalPresenter);
-    presenter = new TablePresenter(displayMock, new CountingEventBus(), values, mockProvider, mockIndexProvider,
+    presenter = new TablePresenter(displayMock, new CountingEventBus(), null, values, mockProvider, mockIndexProvider,
         modalConfigureViewStepProvider, variablesToViewProvider);
   }
 

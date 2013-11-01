@@ -67,7 +67,7 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
     ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider = createMock(ModalProvider.class);
     ModalProvider<PropertiesEditorModalPresenter> propertiesEditorModalProvider = createMock(ModalProvider.class);
 
-    variablePresenter = new VariablePresenter(displayMock, new CountingEventBus(), null,
+    variablePresenter = new VariablePresenter(displayMock, new CountingEventBus(), null, null,
         new SummaryTabPresenter(eventBusMock, summaryTabMock), null, mockProvider,
         variableVcsCommitHistoryPresenterMock, variablesToViewProvider, categoriesEditorModalProvider,
         propertiesEditorModalProvider);
