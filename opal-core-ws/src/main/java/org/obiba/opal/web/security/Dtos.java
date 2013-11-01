@@ -21,7 +21,7 @@ public class Dtos {
   public static Opal.UserDto asDto(User user) {
     return Opal.UserDto.newBuilder() //
         .setName(user.getName()) //
-        .setEnabled(user.getEnabled()) //
+        .setEnabled(user.isEnabled()) //
         .addAllGroups(user.getGroups()) //
         .build();
   }

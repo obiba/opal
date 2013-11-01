@@ -82,7 +82,8 @@ public class VocabularyResource {
     }
 
 //    tax.getVocabularies().add(voc);
-    taxonomyService.saveTaxonomy(taxonomy);
+    //TODO use right template
+    taxonomyService.saveTaxonomy(null, taxonomy);
 
     return Response.ok().build();
   }
@@ -93,7 +94,8 @@ public class VocabularyResource {
     try {
 
       Vocabulary vocabulary = taxonomyService.getVocabulary(taxonomyName, vocabularyName);
-      taxonomyService.saveVocabulary(Dtos.fromDto(dto)); //taxonomyName, vocabularyName, ,vocabulary
+      //TODO use right template
+      taxonomyService.saveVocabulary(vocabulary, Dtos.fromDto(dto)); //taxonomyName, vocabularyName, ,vocabulary
     } catch(NoSuchTaxonomyException e) {
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch(NoSuchVocabularyException e) {
