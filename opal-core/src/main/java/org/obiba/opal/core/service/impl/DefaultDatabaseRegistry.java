@@ -112,7 +112,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   @Override
   public boolean hasDatabases(@Nullable Database.Usage usage) {
-    return Iterables.size(list(usage)) > 0;
+    return !Iterables.isEmpty(list(usage));
   }
 
   @NotNull
@@ -142,7 +142,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
     if(database.isDefaultStorage()) {
       Database previousDefaultStorageDatabase = getDefaultStorageDatabase();
-      if(previousDefaultStorageDatabase == null) {
+      if(previousDefaultStorageDatabase == null || previousDefaultStorageDatabase.equals(database)) {
         orientDbService.save(database, database);
       } else {
         previousDefaultStorageDatabase.setDefaultStorage(false);

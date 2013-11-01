@@ -22,9 +22,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
-import com.google.common.collect.Lists;
-
+import static com.google.common.collect.Iterables.size;
+import static com.google.common.collect.Lists.newArrayList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -43,31 +44,100 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   }
 
   @Test
-  public void test_new_database() {
-    Database database = createDatabase();
+  public void test_new_sql_database() {
+    Database database = createSqlDatabase();
     databaseRegistry.save(database);
 
-    List<Database> databases = Lists.newArrayList(databaseRegistry.list());
+    List<Database> databases = newArrayList(databaseRegistry.list());
     assertEquals(1, databases.size());
     assertDatabaseEquals(database, databases.get(0));
 
     Database found = databaseRegistry.getDatabase(database.getName());
     assertDatabaseEquals(database, found);
+
+    assertEquals(1, size(databaseRegistry.list(Database.Usage.IMPORT)));
+    assertEquals(0, size(databaseRegistry.list(Database.Usage.STORAGE)));
+    assertEquals(0, size(databaseRegistry.list(Database.Usage.EXPORT)));
+    assertEquals(1, size(databaseRegistry.listSqlDatabases()));
+    assertEquals(0, size(databaseRegistry.listMongoDatabases()));
   }
 
   @Test
-  public void test_new_database_with_sql_and_mongo_settings() {
+  public void test_new_mongo_database() {
+    Database database = createMongoDatabase();
+    databaseRegistry.save(database);
 
+    List<Database> databases = newArrayList(databaseRegistry.list());
+    assertEquals(1, databases.size());
+    assertDatabaseEquals(database, databases.get(0));
+
+    Database found = databaseRegistry.getDatabase(database.getName());
+    assertDatabaseEquals(database, found);
+
+    assertEquals(1, size(databaseRegistry.listMongoDatabases()));
+    assertEquals(0, size(databaseRegistry.listSqlDatabases()));
+  }
+
+  @Test
+  public void test_update_sql_database() {
+    Database database = createSqlDatabase();
+    databaseRegistry.save(database);
+
+    database.setUsage(Database.Usage.STORAGE);
+    assertNotNull(database.getSqlSettings());
+    database.getSqlSettings().setUsername("user2");
+    database.getSqlSettings().setUrl("url2");
+    databaseRegistry.save(database);
+
+    List<Database> databases = newArrayList(databaseRegistry.list());
+    assertEquals(1, databases.size());
+    assertDatabaseEquals(database, databases.get(0));
+
+    Database found = databaseRegistry.getDatabase(database.getName());
+    assertDatabaseEquals(database, found);
+
+    assertEquals(1, size(databaseRegistry.listSqlDatabases()));
+    assertEquals(0, size(databaseRegistry.listMongoDatabases()));
+  }
+
+  @Test
+  public void test_update_mongo_database() {
+    Database database = createMongoDatabase();
+    databaseRegistry.save(database);
+
+    database.setUsage(Database.Usage.STORAGE);
+    assertNotNull(database.getMongoDbSettings());
+    database.getMongoDbSettings().setUsername("user2");
+    database.getMongoDbSettings().setUrl("url2");
+    databaseRegistry.save(database);
+
+    List<Database> databases = newArrayList(databaseRegistry.list());
+    assertEquals(1, databases.size());
+    assertDatabaseEquals(database, databases.get(0));
+
+    Database found = databaseRegistry.getDatabase(database.getName());
+    assertDatabaseEquals(database, found);
+
+    assertEquals(1, size(databaseRegistry.listMongoDatabases()));
+    assertEquals(0, size(databaseRegistry.listSqlDatabases()));
   }
 
   @Test
   public void test_get_identifiers_database() {
-    Database database = Database.Builder.create().name("sql database").usedForIdentifiers(true).build();
+    Database database = Database.Builder.create().name("sql database").usage(Database.Usage.STORAGE)
+        .usedForIdentifiers(true).build();
     databaseRegistry.save(database);
     Database found = databaseRegistry.getIdentifiersDatabase();
     assertTrue(found.isUsedForIdentifiers());
 
-    assertEquals(0, Lists.newArrayList(databaseRegistry.list()).size());
+    assertTrue(databaseRegistry.hasIdentifiersDatabase());
+
+    assertEquals(0, size(databaseRegistry.list()));
+    assertEquals(0, size(databaseRegistry.list(Database.Usage.IMPORT)));
+    assertEquals(0, size(databaseRegistry.list(Database.Usage.STORAGE)));
+    assertEquals(0, size(databaseRegistry.list(Database.Usage.EXPORT)));
+    assertEquals(0, size(databaseRegistry.listMongoDatabases()));
+    assertEquals(0, size(databaseRegistry.listSqlDatabases()));
   }
 
   @Test(expected = IdentifiersDatabaseNotFoundException.class)
@@ -75,22 +145,76 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     databaseRegistry.getIdentifiersDatabase();
   }
 
-  private Database createDatabase() {
+  @Test
+  public void test_has_identifiers_database() {
+    assertFalse(databaseRegistry.hasIdentifiersDatabase());
+  }
+
+  @Test
+  public void test_delete_database() {
+    Database database = createSqlDatabase();
+    databaseRegistry.save(database);
+    databaseRegistry.delete(database);
+
+    assertEquals(0, size(databaseRegistry.list()));
+  }
+
+  @Test
+  public void test_list_sql_databases() {
+    databaseRegistry.save(createSqlDatabase());
+    assertEquals(1, size(databaseRegistry.list()));
+    assertEquals(1, size(databaseRegistry.listSqlDatabases()));
+    assertEquals(0, size(databaseRegistry.listMongoDatabases()));
+  }
+
+  @Test
+  public void test_list_mongo_databases() {
+
+  }
+
+  @Test
+  public void test_change_default_storage() {
+    Database database = createSqlDatabase();
+    databaseRegistry.save(database);
+
+    Database database2 = createSqlDatabase();
+    database2.setName("default storage");
+    databaseRegistry.save(database2);
+
+    assertEquals(2, size(databaseRegistry.list()));
+
+    assertFalse(databaseRegistry.getDatabase(database.getName()).isDefaultStorage());
+    assertTrue(databaseRegistry.getDatabase(database2.getName()).isDefaultStorage());
+  }
+
+  private Database createSqlDatabase() {
+    return createDatabase().sqlSettings(SqlSettings.Builder.create() //
+        .sqlSchema(SqlSettings.SqlSchema.HIBERNATE) //
+        .driverClass("mysql") //
+        .url("jdbc") //
+        .username("root") //
+        .password("password") //
+        .properties("props")) //
+        .build();
+  }
+
+  private Database createMongoDatabase() {
+    return createDatabase().mongoDbSettings(MongoDbSettings.Builder.create() //
+        .url("mongodb") //
+        .username("admin") //
+        .password("password") //
+        .properties("props")) //
+        .build();
+  }
+
+  private Database.Builder createDatabase() {
     return Database.Builder.create() //
         .name("sql database") //
         .usedForIdentifiers(false) //
         .editable(true) //
         .description("description") //
         .defaultStorage(true) //
-        .usage(Database.Usage.IMPORT) //
-        .sqlSettings(SqlSettings.Builder.create() //
-            .sqlSchema(SqlSettings.SqlSchema.HIBERNATE) //
-            .driverClass("mysql") //
-            .url("localhost") //
-            .username("root") //
-            .password("password") //
-            .properties("props")) //
-        .build();
+        .usage(Database.Usage.IMPORT);
   }
 
   private void assertDatabaseEquals(Database expected, Database found) {
