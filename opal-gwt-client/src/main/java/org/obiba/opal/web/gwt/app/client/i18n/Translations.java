@@ -2247,4 +2247,8 @@ public interface Translations extends Constants {
   @Description("None label")
   @DefaultStringValue("None")
   String none();
+
+  @Description("General Settings label")
+  @DefaultStringValue("General settings")
+  String generalSettings();
 }

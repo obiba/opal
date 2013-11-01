@@ -1,6 +1,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
@@ -11,9 +12,18 @@
       <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
     <b:NavPills>
-      <b:NavLink>General</b:NavLink>
+      <b:NavLink ui:field="generalNavLink">General</b:NavLink>
       <o:OpalNavLink ui:field="taxonomies">Taxonomies</o:OpalNavLink>
     </b:NavPills>
-    <g:FlowPanel ui:field="content"/>
+
+    <g:FlowPanel ui:field="generalPanel">
+      <b:Heading size="4" addStyleNames="inline-block">
+        <ui:msg description="General settings label">General Settings</ui:msg>
+      </b:Heading>
+      <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="editGeneralSettings">
+      </b2:IconAnchor>
+    </g:FlowPanel>
+
   </g:FlowPanel>
+
 </ui:UiBinder>

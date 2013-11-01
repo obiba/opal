@@ -28,7 +28,7 @@ public abstract class EditableTabableColumn<T> extends EditableColumn<T> {
       SafeHtml input(String value);
     }
 
-    private Template template = GWT.create(Template.class);
+    private final Template template = GWT.create(Template.class);
 
     @Override
     public void render(Context context, String value, SafeHtmlBuilder sb) {

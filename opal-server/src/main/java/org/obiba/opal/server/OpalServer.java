@@ -79,6 +79,7 @@ public class OpalServer {
   final void boot() {
     if(ctx.isActive()) {
       System.out.println("Opal Server successfully started.");
+
     }
   }
 

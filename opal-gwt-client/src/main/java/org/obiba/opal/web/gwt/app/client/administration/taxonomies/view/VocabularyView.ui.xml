@@ -1,7 +1,8 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
-    xmlns="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+    xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -10,58 +11,53 @@
     <g:FlowPanel addStyleNames="page-header">
       <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
-    <FluidRow addStyleNames="page-header">
-      <Column size="9">
-        <Heading size="3">
+    <b:FluidRow addStyleNames="page-header">
+      <b:Column size="9">
+        <b:Heading size="3">
           <ui:msg description="Vocabulary label">Vocabulary</ui:msg>
-        </Heading>
-      </Column>
-      <Column size="3">
-        <ButtonGroup addStyleNames="pull-right">
-          <Button type="INFO" size="SMALL" ui:field="edit">
-            <ui:msg description="Edit Vocabulary">Edit Vocabulary</ui:msg>
-          </Button>
-        </ButtonGroup>
-        <ButtonGroup addStyleNames="pull-right">
-          <Button type="INFO" icon="PLUS" size="SMALL" ui:field="add">
-            <ui:msg description="Add Term">Add Term</ui:msg>
-          </Button>
-        </ButtonGroup>
-      </Column>
-    </FluidRow>
-    <b:Heading size="4" ui:field="vocabularyName"/>
-    <g:FlowPanel>
-      <FluidRow>
-        <Column size="1">
-          <b:Heading size="5">Title</b:Heading>
-        </Column>
-        <b:Column size="11">
-          <g:FlowPanel ui:field="titlePanel"/>
-        </b:Column>
-      </FluidRow>
-    </g:FlowPanel>
-    <g:FlowPanel>
-      <FluidRow>
-        <Column size="1">
-          <b:Heading size="5">Description</b:Heading>
-        </Column>
-        <b:Column size="11">
-          <g:FlowPanel ui:field="descriptionPanel"/>
-        </b:Column>
-      </FluidRow>
-    </g:FlowPanel>
-    <g:FlowPanel>
-      <FluidRow>
-        <Column size="1">
-          <b:Heading size="5">Taxonomy:</b:Heading>
-        </Column>
-        <b:Column size="11">
-          <g:InlineLabel ui:field="taxonomyName"/>
-        </b:Column>
-      </FluidRow>
-    </g:FlowPanel>
-    <b:Heading size="5">Terms</b:Heading>
-    <g:FlowPanel ui:field="termsPanel" addStyleNames="items"></g:FlowPanel>
-    <b:CheckBox ui:field="isRepeatable">Repeatable</b:CheckBox>
+        </b:Heading>
+      </b:Column>
+    </b:FluidRow>
+    <b:FluidRow>
+      <b:Column size="12">
+        <b:FluidRow>
+          <b:Column size="9">
+            <b:Heading size="4" ui:field="vocabularyName" addStyleNames="inline-block"/>
+            <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="editVocabulary">
+            </b2:IconAnchor>
+          </b:Column>
+        </b:FluidRow>
+      </b:Column>
+    </b:FluidRow>
+    <b:FluidRow>
+      <b:Column size="12">
+        <o:PropertiesTable ui:field="vocabularyProperties"/>
+      </b:Column>
+    </b:FluidRow>
+
+    <b:FluidRow>
+      <b:Column size="12">
+        <b:Heading size="4" addStyleNames="inline-block">Terms</b:Heading>
+      </b:Column>
+    </b:FluidRow>
+
+    <b:FluidRow>
+      <b:Column size="6">
+        <g:FlowPanel ui:field="termsLinks" addStyleNames="items"/>
+      </b:Column>
+      <b:Column size="6">
+        <b:FluidRow>
+          <b:Column size="9">
+            <b:Heading size="4" addStyleNames="inline-block, no-top-margin" ui:field="termTitle"/>
+          </b:Column>
+        </b:FluidRow>
+        <b:FluidRow>
+          <b:Column size="12">
+            <o:PropertiesTable ui:field="termProperties"/>
+          </b:Column>
+        </b:FluidRow>
+      </b:Column>
+    </b:FluidRow>
+
   </g:FlowPanel>
 </ui:UiBinder>

@@ -9,8 +9,8 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.TaxonomiesOrVocabulariesModalPanel;
+import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
-import org.obiba.opal.web.model.client.opal.TaxonomyDto.TextDto;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.Modal;
@@ -93,15 +93,15 @@ public class AddTaxonomyModalView extends ModalPopupViewWithUiHandlers<AddTaxono
     TaxonomyDto taxonomyDto = TaxonomyDto.create();
     taxonomyDto.setName(nameTxt.getText());
 
-    JsArray<TextDto> titles = JsArrays.create();
-    JsArray<TextDto> descriptions = JsArrays.create();
+    JsArray<LocaleTextDto> titles = JsArrays.create();
+    JsArray<LocaleTextDto> descriptions = JsArrays.create();
 
     for(int i = 0; i < availableLocales.size(); i++) {
       if(!panelList.get(i).getTitleTxt().isEmpty()) {
-        titles.push(asTextDto(panelList.get(i).getTitleTxt(), availableLocales.get(i)));
+        titles.push(asLocaleTextDto(availableLocales.get(i), panelList.get(i).getTitleTxt()));
       }
       if(!panelList.get(i).getDescriptionTxt().isEmpty()) {
-        descriptions.push(asTextDto(panelList.get(i).getDescriptionTxt(), availableLocales.get(i)));
+        descriptions.push(asLocaleTextDto(availableLocales.get(i), panelList.get(i).getDescriptionTxt()));
       }
     }
 
@@ -113,10 +113,10 @@ public class AddTaxonomyModalView extends ModalPopupViewWithUiHandlers<AddTaxono
     }
   }
 
-  private TextDto asTextDto(String text, String locale) {
-    TextDto dto = TextDto.create();
-    dto.setText(text);
+  private LocaleTextDto asLocaleTextDto(String locale, String text) {
+    LocaleTextDto dto = LocaleTextDto.create();
     dto.setLocale(locale);
+    dto.setText(text);
     return dto;
   }
 
@@ -137,8 +137,8 @@ public class AddTaxonomyModalView extends ModalPopupViewWithUiHandlers<AddTaxono
       tab.setHeading(locale);
       TaxonomiesOrVocabulariesModalPanel panel = new TaxonomiesOrVocabulariesModalPanel();
       if(editionMode) {
-        String title = getText(taxonomy.getTitlesArray(), locale);
-        String description = getText(taxonomy.getDescriptionsArray(), locale);
+        String title = getText(locale, taxonomy.getTitlesArray());
+        String description = getText(locale, taxonomy.getDescriptionsArray());
         if(title != null) {
           panel.setTitleTxt(title);
         }
@@ -153,7 +153,7 @@ public class AddTaxonomyModalView extends ModalPopupViewWithUiHandlers<AddTaxono
     modal.add(localesTabs);
   }
 
-  private String getText(JsArray<TextDto> array, String locale) {
+  private String getText(String locale, JsArray<LocaleTextDto> array) {
     for(int i = 0; i < array.length(); i++) {
       if(array.get(i).getLocale().equals(locale)) {
         return array.get(i).getText();
