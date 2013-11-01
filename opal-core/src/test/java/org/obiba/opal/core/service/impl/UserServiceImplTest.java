@@ -19,6 +19,7 @@ import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
+import static com.google.common.collect.Iterables.size;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -92,8 +93,7 @@ public class UserServiceImplTest extends AbstractJUnit4SpringContextTests {
         .build();
     userService.save(user);
 
-    List<Group> groups = newArrayList(userService.getGroups());
-    assertEquals(2, groups.size());
+    assertEquals(2, size(userService.getGroups()));
 
     Group group1 = userService.getGroup("group1");
     assertNotNull(group1);
@@ -118,8 +118,7 @@ public class UserServiceImplTest extends AbstractJUnit4SpringContextTests {
     User found = userService.getUser(user.getName());
     assertUserEquals(user, found);
 
-    List<Group> groups = newArrayList(userService.getGroups());
-    assertEquals(2, groups.size());
+    assertEquals(2, size(userService.getGroups()));
 
     Group group1 = userService.getGroup("group1");
     assertNotNull(group1);
@@ -136,7 +135,7 @@ public class UserServiceImplTest extends AbstractJUnit4SpringContextTests {
     User user = User.Builder.create().name("user1").password("password").build();
     userService.save(user);
     userService.delete(user);
-    assertEquals(0, newArrayList(userService.getUsers()).size());
+    assertEquals(0, size(userService.getUsers()));
   }
 
   @Test
@@ -147,7 +146,7 @@ public class UserServiceImplTest extends AbstractJUnit4SpringContextTests {
 
     userService.delete(user);
 
-    assertEquals(0, newArrayList(userService.getUsers()).size());
+    assertEquals(0, size(userService.getUsers()));
 
     Group group1 = userService.getGroup("group1");
     assertEquals(0, group1.getUsers().size());
@@ -161,7 +160,7 @@ public class UserServiceImplTest extends AbstractJUnit4SpringContextTests {
     Group group = Group.Builder.create().name("group1").build();
     userService.createGroup(group.getName());
     userService.delete(group);
-    assertEquals(0, newArrayList(userService.getGroups()).size());
+    assertEquals(0, size(userService.getGroups()));
   }
 
   @Test

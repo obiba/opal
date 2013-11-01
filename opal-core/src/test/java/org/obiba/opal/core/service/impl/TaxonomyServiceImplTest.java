@@ -32,6 +32,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
+import com.google.common.collect.Iterables;
+
+import static com.google.common.collect.Iterables.size;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -94,8 +97,7 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     taxonomy.setName("new name");
     taxonomyService.saveTaxonomy(taxonomy, taxonomy);
 
-    List<Taxonomy> taxonomies = newArrayList(taxonomyService.getTaxonomies());
-    assertEquals(2, taxonomies.size());
+    assertEquals(2, size(taxonomyService.getTaxonomies()));
   }
 
   @Test
@@ -106,8 +108,7 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     taxonomy.setName("new name");
     taxonomyService.saveTaxonomy(createTaxonomy(), taxonomy);
 
-    List<Taxonomy> taxonomies = newArrayList(taxonomyService.getTaxonomies());
-    assertEquals(1, taxonomies.size());
+    assertEquals(1, size(taxonomyService.getTaxonomies()));
 
     assertTaxonomyEquals(taxonomy, taxonomyService.getTaxonomy(taxonomy.getName()));
   }
@@ -122,23 +123,20 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
 
     assertTaxonomyEquals(taxonomy, taxonomyService.getTaxonomy(taxonomy.getName()));
 
-    List<Taxonomy> taxonomies = newArrayList(taxonomyService.getTaxonomies());
-    assertEquals(1, taxonomies.size());
+    assertEquals(1, size(taxonomyService.getTaxonomies()));
+    assertEquals(2, size(taxonomyService.getVocabularies(taxonomy.getName())));
 
-    List<Vocabulary> vocabularies = newArrayList(taxonomyService.getVocabularies(taxonomy.getName()));
-    assertEquals(2, vocabularies.size());
   }
 
   @Test
   public void test_delete_taxonomy() {
     Taxonomy taxonomy = createTaxonomy();
     taxonomyService.saveTaxonomy(taxonomy, taxonomy);
-    assertEquals(1, newArrayList(taxonomyService.getTaxonomies()).size());
+    assertEquals(1, size(taxonomyService.getTaxonomies()));
 
     taxonomyService.deleteTaxonomy(taxonomy.getName());
-    assertEquals(0, newArrayList(taxonomyService.getTaxonomies()).size());
-    assertEquals(0,
-        newArrayList(orientDbService.list(Taxonomy.class, "select from " + Taxonomy.class.getSimpleName())).size());
+    assertEquals(0, size(taxonomyService.getTaxonomies()));
+    assertEquals(0, size(orientDbService.list(Taxonomy.class, "select from " + Taxonomy.class.getSimpleName())));
     assertEquals(0, orientDbService.count(Taxonomy.class));
   }
 
@@ -146,7 +144,7 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
   public void test_save_vocabulary() {
     Taxonomy taxonomy = createTaxonomy();
     taxonomyService.saveTaxonomy(taxonomy, taxonomy);
-    assertEquals(1, newArrayList(taxonomyService.getTaxonomies()).size());
+    assertEquals(1, size(taxonomyService.getTaxonomies()));
 
     Vocabulary vocabulary = createVocabulary(taxonomy);
     taxonomyService.saveVocabulary(null, vocabulary);
@@ -203,12 +201,8 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     taxonomyService.saveTaxonomy(taxonomy, taxonomy);
 
     assertTaxonomyEquals(taxonomy, taxonomyService.getTaxonomy(taxonomy.getName()));
-
-    List<Taxonomy> taxonomies = newArrayList(taxonomyService.getTaxonomies());
-    assertEquals(1, taxonomies.size());
-
-    List<Vocabulary> vocabularies = newArrayList(taxonomyService.getVocabularies(taxonomy.getName()));
-    assertTrue(vocabularies.isEmpty());
+    assertEquals(1, size(taxonomyService.getTaxonomies()));
+    assertTrue(Iterables.isEmpty(taxonomyService.getVocabularies(taxonomy.getName())));
   }
 
   private Taxonomy createTaxonomy() {

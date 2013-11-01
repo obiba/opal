@@ -28,6 +28,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.obiba.opal.core.domain.database.Database.Usage;
 
 @ContextConfiguration(classes = DefaultDatabaseRegistryTest.Config.class)
 public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTests {
@@ -55,9 +56,9 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     Database found = databaseRegistry.getDatabase(database.getName());
     assertDatabaseEquals(database, found);
 
-    assertEquals(1, size(databaseRegistry.list(Database.Usage.IMPORT)));
-    assertEquals(0, size(databaseRegistry.list(Database.Usage.STORAGE)));
-    assertEquals(0, size(databaseRegistry.list(Database.Usage.EXPORT)));
+    assertEquals(1, size(databaseRegistry.list(Usage.IMPORT)));
+    assertEquals(0, size(databaseRegistry.list(Usage.STORAGE)));
+    assertEquals(0, size(databaseRegistry.list(Usage.EXPORT)));
     assertEquals(1, size(databaseRegistry.listSqlDatabases()));
     assertEquals(0, size(databaseRegistry.listMongoDatabases()));
   }
@@ -83,7 +84,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     Database database = createSqlDatabase();
     databaseRegistry.save(database);
 
-    database.setUsage(Database.Usage.STORAGE);
+    database.setUsage(Usage.STORAGE);
     assertNotNull(database.getSqlSettings());
     database.getSqlSettings().setUsername("user2");
     database.getSqlSettings().setUrl("url2");
@@ -105,7 +106,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     Database database = createMongoDatabase();
     databaseRegistry.save(database);
 
-    database.setUsage(Database.Usage.STORAGE);
+    database.setUsage(Usage.STORAGE);
     assertNotNull(database.getMongoDbSettings());
     database.getMongoDbSettings().setUsername("user2");
     database.getMongoDbSettings().setUrl("url2");
@@ -124,8 +125,8 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
 
   @Test
   public void test_get_identifiers_database() {
-    Database database = Database.Builder.create().name("sql database").usage(Database.Usage.STORAGE)
-        .usedForIdentifiers(true).build();
+    Database database = Database.Builder.create().name("sql database").usage(Usage.STORAGE).usedForIdentifiers(true)
+        .build();
     databaseRegistry.save(database);
     Database found = databaseRegistry.getIdentifiersDatabase();
     assertTrue(found.isUsedForIdentifiers());
@@ -133,9 +134,9 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     assertTrue(databaseRegistry.hasIdentifiersDatabase());
 
     assertEquals(0, size(databaseRegistry.list()));
-    assertEquals(0, size(databaseRegistry.list(Database.Usage.IMPORT)));
-    assertEquals(0, size(databaseRegistry.list(Database.Usage.STORAGE)));
-    assertEquals(0, size(databaseRegistry.list(Database.Usage.EXPORT)));
+    assertEquals(0, size(databaseRegistry.list(Usage.IMPORT)));
+    assertEquals(0, size(databaseRegistry.list(Usage.STORAGE)));
+    assertEquals(0, size(databaseRegistry.list(Usage.EXPORT)));
     assertEquals(0, size(databaseRegistry.listMongoDatabases()));
     assertEquals(0, size(databaseRegistry.listSqlDatabases()));
   }
@@ -214,7 +215,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
         .editable(true) //
         .description("description") //
         .defaultStorage(true) //
-        .usage(Database.Usage.IMPORT);
+        .usage(Usage.IMPORT);
   }
 
   private void assertDatabaseEquals(Database expected, Database found) {
