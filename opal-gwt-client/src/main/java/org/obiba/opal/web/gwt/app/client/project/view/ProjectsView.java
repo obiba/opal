@@ -121,6 +121,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     sortBy.sort(getUiHandlers(), archivedPanel, archivedProjects);
   }
 
+  @SuppressWarnings("ParameterHidesMemberVariable")
   private enum SortBy {
     NAME {
       @Override
@@ -138,7 +139,10 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
           public int compare(ProjectDto o1, ProjectDto o2) {
             Moment m1 = Moment.create(o1.getTimestamps().getLastUpdate());
             Moment m2 = Moment.create(o2.getTimestamps().getLastUpdate());
-            return m2.unix() - m1.unix();
+            if(m1 == null) {
+              return m2 == null ? 0 : 1;
+            }
+            return m2 == null ? -1 : m2.unix() - m1.unix();
           }
         });
         for(ProjectDto project : projectList) {
@@ -156,20 +160,18 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
      */
     abstract void sort(ProjectsUiHandlers handlers, Panel content, JsArray<ProjectDto> projects);
 
-    protected Panel newProjectPanel(final ProjectsUiHandlers handlers, final ProjectDto project) {
+    protected Panel newProjectPanel(ProjectsUiHandlers handlers, ProjectDto project) {
       FlowPanel panel = new FlowPanel();
       panel.addStyleName("item");
+      panel.add(newProjectLink(handlers, project));
+      addTags(project, panel);
+      addTableNames(handlers, project, panel);
+      addDescription(project, panel);
+      addTimestamps(project, panel);
+      return panel;
+    }
 
-      Widget projectLink = newProjectLink(handlers, project);
-      panel.add(projectLink);
-
-      FlowPanel tagsPanel = new FlowPanel();
-      tagsPanel.addStyleName("tags inline-block");
-      for(String tag : JsArrays.toIterable(JsArrays.toSafeArray(project.getTagsArray()))) {
-        tagsPanel.add(new com.github.gwtbootstrap.client.ui.Label(tag));
-      }
-      panel.add(tagsPanel);
-
+    private void addTableNames(final ProjectsUiHandlers handlers, final ProjectDto project, FlowPanel panel) {
       JsArrayString tableNames = JsArrays.toSafeArray(project.getDatasource().getTableArray());
       if(tableNames.length() > 0) {
         Anchor countLabel = new Anchor(tableNames.length() == 1
@@ -191,7 +193,19 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
         }
         panel.add(countLabel);
       }
+    }
 
+    private void addTimestamps(ProjectDto project, FlowPanel panel) {
+      if(project.hasTimestamps()) {
+        Moment lastUpdate = Moment.create(project.getTimestamps().getLastUpdate());
+        Label ago = new Label(
+            TranslationsUtils.replaceArguments(translations.lastUpdateAgoLabel(), lastUpdate.fromNow()));
+        ago.addStyleName("help-block");
+        panel.add(ago);
+      }
+    }
+
+    private void addDescription(ProjectDto project, FlowPanel panel) {
       if(project.hasDescription()) {
         // find first phrase
         String desc = project.getDescription();
@@ -200,16 +214,15 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
         Label descriptionLabel = new Label(desc);
         panel.add(descriptionLabel);
       }
+    }
 
-      if(project.hasTimestamps()) {
-        Moment lastUpdate = Moment.create(project.getTimestamps().getLastUpdate());
-        Label ago = new Label(
-            TranslationsUtils.replaceArguments(translations.lastUpdateAgoLabel(), lastUpdate.fromNow()));
-        ago.addStyleName("help-block");
-        panel.add(ago);
+    private void addTags(ProjectDto project, FlowPanel panel) {
+      FlowPanel tagsPanel = new FlowPanel();
+      tagsPanel.addStyleName("tags inline-block");
+      for(String tag : JsArrays.toIterable(JsArrays.toSafeArray(project.getTagsArray()))) {
+        tagsPanel.add(new com.github.gwtbootstrap.client.ui.Label(tag));
       }
-
-      return panel;
+      panel.add(tagsPanel);
     }
 
     Widget newProjectLink(final ProjectsUiHandlers handlers, final ProjectDto project) {
