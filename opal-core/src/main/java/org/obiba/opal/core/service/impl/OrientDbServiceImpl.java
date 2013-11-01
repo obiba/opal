@@ -71,6 +71,29 @@ public class OrientDbServiceImpl implements OrientDbService {
     }
   }
 
+  public <T> void saveNonUnique(@Nonnull T t) {
+    //noinspection ConstantConditions
+    Preconditions.checkArgument(t != null, "t cannot be null");
+
+    defaultBeanValidator.validate(t);
+
+    ODatabaseDocumentTx db = serverFactory.getDocumentTx();
+    try {
+
+      ODocument document = toDocument(t);
+      db.begin(OTransaction.TXTYPE.OPTIMISTIC);
+      log.debug("save {}", document);
+      document.save();
+      db.commit();
+
+    } catch(OException e) {
+      db.rollback();
+      throw e;
+    } finally {
+      db.close();
+    }
+  }
+
   @Override
   public void save(@Nullable HasUniqueProperties template, @Nonnull HasUniqueProperties hasUniqueProperties)
       throws ConstraintViolationException {
@@ -164,11 +187,13 @@ public class OrientDbServiceImpl implements OrientDbService {
     return document;
   }
 
-  private <T> void copyToDocument(T t, ORecord<?> document) {
-    document.fromJSON(gson.toJson(t));
+  @Override
+  public void copyToDocument(Object obj, ORecord<?> document) {
+    document.fromJSON(gson.toJson(obj));
   }
 
-  private <T> T fromDocument(Class<T> clazz, ORecord<?> document) {
+  @Override
+  public <T> T fromDocument(Class<T> clazz, ORecord<?> document) {
     return gson.fromJson(document.toJSON(), clazz);
   }
 

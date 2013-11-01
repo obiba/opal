@@ -37,7 +37,7 @@
 
   <bean id="databaseRegistry" class="org.obiba.opal.core.runtime.database.DefaultDatabaseRegistry"/>
 
-  <bean id="generalConfigService" class="org.obiba.opal.core.service.impl.DefaultGeneralConfigService"/>
+  <bean id="generalConfigService" class="org.obiba.opal.core.service.impl.OpalGeneralConfigServiceImpl"/>
 
   <bean id="versionProvider" class="org.obiba.runtime.upgrade.support.JdbcVersionModifier">
     <property name="datasource" ref="dataSource"/>

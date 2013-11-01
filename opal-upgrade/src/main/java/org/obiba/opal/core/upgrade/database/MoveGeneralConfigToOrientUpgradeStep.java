@@ -12,7 +12,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.obiba.opal.core.domain.OpalGeneralConfig;
-import org.obiba.opal.core.service.impl.DefaultGeneralConfigService;
+import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
 import org.slf4j.Logger;
@@ -33,7 +33,7 @@ public class MoveGeneralConfigToOrientUpgradeStep extends AbstractUpgradeStep {
 
   private File propertiesFile;
 
-  private DefaultGeneralConfigService generalConfigService;
+  private OpalGeneralConfigService generalConfigService;
 
   @Override
   public void execute(Version currentVersion) {
@@ -97,7 +97,7 @@ public class MoveGeneralConfigToOrientUpgradeStep extends AbstractUpgradeStep {
     this.propertiesFile = propertiesFile;
   }
 
-  public void setGeneralConfigService(DefaultGeneralConfigService generalConfigService) {
+  public void setGeneralConfigService(OpalGeneralConfigService generalConfigService) {
     this.generalConfigService = generalConfigService;
   }
 }

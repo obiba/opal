@@ -21,7 +21,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-public class OpalGeneralConfig extends AbstractTimestamped implements HasUniqueProperties {
+public class OpalGeneralConfig extends AbstractTimestamped {
 
   public static final String DEFAULT_NAME = "Opal";
 
@@ -36,16 +36,6 @@ public class OpalGeneralConfig extends AbstractTimestamped implements HasUniqueP
   private List<Locale> locales = new ArrayList<Locale>();
 
   private String defaultCharacterSet = DEFAULT_CHARSET;
-
-  @Override
-  public List<String> getUniqueProperties() {
-    return Lists.newArrayList("name");
-  }
-
-  @Override
-  public List<Object> getUniqueValues() {
-    return Lists.<Object>newArrayList(name);
-  }
 
   @Nonnull
   public String getName() {

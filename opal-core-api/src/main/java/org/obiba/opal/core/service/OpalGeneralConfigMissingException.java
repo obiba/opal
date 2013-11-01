@@ -1,4 +1,4 @@
-package org.obiba.opal.core.service.impl;
+package org.obiba.opal.core.service;
 
 public class OpalGeneralConfigMissingException extends RuntimeException {
 

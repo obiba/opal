@@ -21,7 +21,7 @@ import org.obiba.opal.core.domain.OpalGeneralConfig;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.runtime.database.DatabaseRegistry;
-import org.obiba.opal.core.service.impl.DefaultGeneralConfigService;
+import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.taxonomy.Dtos;
 import org.obiba.runtime.upgrade.VersionProvider;
@@ -41,7 +41,7 @@ public class SystemResource {
 
   private final VersionProvider opalVersionProvider;
 
-  private final DefaultGeneralConfigService serverService;
+  private final OpalGeneralConfigService serverService;
 
   private final TaxonomyService taxonomyService;
 
@@ -54,7 +54,7 @@ public class SystemResource {
   private String publicURL;
 
   @Autowired
-  public SystemResource(VersionProvider opalVersionProvider, DefaultGeneralConfigService serverService,
+  public SystemResource(VersionProvider opalVersionProvider, OpalGeneralConfigService serverService,
       TaxonomyService taxonomyService, DatabaseRegistry databaseRegistry) {
     this.opalVersionProvider = opalVersionProvider;
     this.serverService = serverService;

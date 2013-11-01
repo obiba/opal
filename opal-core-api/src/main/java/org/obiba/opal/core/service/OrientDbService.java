@@ -11,6 +11,7 @@ import org.obiba.opal.core.domain.HasUniqueProperties;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.orientechnologies.orient.core.record.ORecord;
 
 public interface OrientDbService {
 
@@ -64,6 +65,10 @@ public interface OrientDbService {
   void createUniqueIndex(@Nonnull Class<? extends HasUniqueProperties> clazz);
 
   void createIndex(Class<?> clazz, OClass.INDEX_TYPE indexType, OType type, @Nonnull String... propertyPath);
+
+  void copyToDocument(Object obj, ORecord<?> document);
+
+  <T> T fromDocument(Class<T> clazz, ORecord<?> document);
 
   interface WithinDocumentTxCallback<T> {
 

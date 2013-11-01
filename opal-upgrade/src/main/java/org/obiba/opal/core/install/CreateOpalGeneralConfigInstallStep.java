@@ -12,16 +12,15 @@ package org.obiba.opal.core.install;
 import java.util.Arrays;
 
 import org.obiba.opal.core.domain.OpalGeneralConfig;
-import org.obiba.opal.core.service.impl.DefaultGeneralConfigService;
+import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.InstallStep;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@SuppressWarnings("SpringJavaAutowiringInspection")
 public class CreateOpalGeneralConfigInstallStep implements InstallStep {
 
   @Autowired
-  private DefaultGeneralConfigService generalConfigService;
+  private OpalGeneralConfigService generalConfigService;
 
   @Override
   public String getDescription() {
