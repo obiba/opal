@@ -90,8 +90,7 @@ public class TableResource extends AbstractValueTableResource {
   }
 
   @Path("/variables")
-  public VariablesResource getVariables(@Context Request request) {
-    TimestampedResponses.evaluate(request, getValueTable());
+  public VariablesResource getVariables() {
     return new VariablesResource(getValueTable(), getLocales());
   }
 

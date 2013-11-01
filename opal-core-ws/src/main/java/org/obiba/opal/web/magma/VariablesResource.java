@@ -24,6 +24,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
@@ -72,9 +73,9 @@ public class VariablesResource extends AbstractValueTableResource {
    * @return
    */
   @GET
-  @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
-  public Response getVariables(@Context UriInfo uriInfo, @QueryParam("script") String script,
+  public Response getVariables(@Context Request request, @Context UriInfo uriInfo, @QueryParam("script") String script,
       @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit) {
+    TimestampedResponses.evaluate(request, getValueTable());
 
     if(offset < 0) {
       throw new InvalidRequestException("IllegalParameterValue", "offset", String.valueOf(limit));
@@ -110,8 +111,8 @@ public class VariablesResource extends AbstractValueTableResource {
   @Produces("application/vnd.ms-excel")
   @AuthenticatedByCookie
   @AuthorizeResource
-  @Cache(isPrivate = true, mustRevalidate = true, maxAge = 0)
-  public Response getExcelDictionary() throws MagmaRuntimeException, IOException {
+  public Response getExcelDictionary(@Context Request request) throws MagmaRuntimeException, IOException {
+    TimestampedResponses.evaluate(request, getValueTable());
     String destinationName = getValueTable().getDatasource().getName() + "." + getValueTable().getName() +
         "-dictionary";
     ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();

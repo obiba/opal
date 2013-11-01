@@ -150,12 +150,6 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     setInSlot(Display.Slots.History, variableVcsCommitHistoryPresenter);
 
     addRegisteredHandler(VariableSelectionChangeEvent.getType(), this);
-    addRegisteredHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionChangeEvent.Handler() {
-      @Override
-      public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
-
-      }
-    });
     addRegisteredHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler());
     addRegisteredHandler(VariableRefreshEvent.getType(), new VariableRefreshEvent.Handler() {
       @Override

@@ -80,7 +80,7 @@ import static com.google.gwt.http.client.Response.SC_OK;
 import static com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE;
 
 public class TablePresenter extends PresenterWidget<TablePresenter.Display>
-    implements TableUiHandlers, TableSelectionChangeEvent.Handler, VariableSelectionChangeEvent.Handler {
+    implements TableUiHandlers, TableSelectionChangeEvent.Handler {
 
   private static final int DELAY_MILLIS = 1000;
 
@@ -140,13 +140,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   }
 
   @Override
-  public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-    if(this != event.getSource() && event.hasTable() && event.getTable().hasValueSetCount()) {
-      updateDisplay(event.getTable());
-    }
-  }
-
-  @Override
   protected void onBind() {
     super.onBind();
     setInSlot(Display.Slots.Values, valuesTablePresenter);
@@ -173,7 +166,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @SuppressWarnings({ "OverlyLongMethod" })
   private void addEventHandlers() {
     addRegisteredHandler(TableSelectionChangeEvent.getType(), this);
-    addRegisteredHandler(VariableSelectionChangeEvent.getType(), this);
     addRegisteredHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler());
     addRegisteredHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler());
 
@@ -257,27 +249,25 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   }
 
   private void updateDisplay(TableDto tableDto) {
-    if(table == null || !table.getLink().equals(tableDto.getLink())) {
-      getView().clear(true);
+    getView().clear(table == null || !table.getLink().equals(tableDto.getLink()));
 
-      table = tableDto;
+    table = tableDto;
 
-      getView().setTable(tableDto);
+    getView().setTable(tableDto);
 
-      if(tableIsView()) {
-        showFromTables(table);
-      } else {
-        getView().setFromTables(null);
-      }
-
-      if(getView().isValuesTabSelected()) {
-        valuesTablePresenter.setTable(tableDto);
-      }
-
-      updateVariables();
-      updateTableIndexStatus();
-      authorize();
+    if(tableIsView()) {
+      showFromTables(table);
+    } else {
+      getView().setFromTables(null);
     }
+
+    if(getView().isValuesTabSelected()) {
+      valuesTablePresenter.setTable(tableDto);
+    }
+
+    updateVariables();
+    updateTableIndexStatus();
+    authorize();
   }
 
   private void showFromTables(TableDto tableDto) {// Show from tables

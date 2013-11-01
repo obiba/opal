@@ -127,7 +127,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     replay(segments.toArray());
 
     Response r = new VariablesResource(datasource.getValueTable("Weight"), Collections.<Locale>emptySet())
-        .getVariables(uriInfoMock, null, 0, null);
+        .getVariables(null, uriInfoMock, null, 0, null);
     @SuppressWarnings("unchecked")
     List<VariableDto> dtos = ImmutableList.copyOf(((GenericEntity<Iterable<VariableDto>>) r.getEntity()).getEntity());
 
