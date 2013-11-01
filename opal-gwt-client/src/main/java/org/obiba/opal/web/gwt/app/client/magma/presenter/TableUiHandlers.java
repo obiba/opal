@@ -8,10 +8,6 @@ import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface TableUiHandlers extends UiHandlers {
 
-  void onNextTable();
-
-  void onPreviousTable();
-
   void onExportData();
 
   void onCopyData();
@@ -33,7 +29,5 @@ public interface TableUiHandlers extends UiHandlers {
   void onIndexCancel();
 
   void onIndexSchedule();
-
-  void onFromTable(String tableFullName);
 
 }

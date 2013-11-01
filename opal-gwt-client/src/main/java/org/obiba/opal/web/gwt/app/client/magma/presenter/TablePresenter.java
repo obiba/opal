@@ -24,8 +24,6 @@ import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.Configure
 import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.magma.event.SiblingTableSelectionEvent;
-import org.obiba.opal.web.gwt.app.client.magma.event.SiblingTableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.magma.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexStatusRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
@@ -35,6 +33,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEv
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
@@ -72,6 +71,7 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
 import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
@@ -91,6 +91,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   private TableIndexStatusDto statusDto;
 
   private boolean cancelIndexation = false;
+
+  private final PlaceManager placeManager;
 
   private final Provider<AuthorizationPresenter> authorizationPresenter;
 
@@ -114,11 +116,12 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
    * @param eventBus
    */
   @Inject
-  public TablePresenter(Display display, EventBus eventBus, ValuesTablePresenter valuesTablePresenter,
-      Provider<AuthorizationPresenter> authorizationPresenter, Provider<IndexPresenter> indexPresenter,
-      ModalProvider<ConfigureViewStepPresenter> configureViewStepProvider,
+  public TablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
+      ValuesTablePresenter valuesTablePresenter, Provider<AuthorizationPresenter> authorizationPresenter,
+      Provider<IndexPresenter> indexPresenter, ModalProvider<ConfigureViewStepPresenter> configureViewStepProvider,
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider) {
     super(eventBus, display);
+    this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
     this.authorizationPresenter = authorizationPresenter;
     this.indexPresenter = indexPresenter;
@@ -354,16 +357,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   }
 
   @Override
-  public void onNextTable() {
-    fireEvent(new SiblingTableSelectionEvent(table, Direction.NEXT));
-  }
-
-  @Override
-  public void onPreviousTable() {
-    fireEvent(new SiblingTableSelectionEvent(table, Direction.PREVIOUS));
-  }
-
-  @Override
   public void onExportData() {
     fireEvent(new WizardRequiredEvent(DataExportPresenter.WizardType, table));
   }
@@ -502,12 +495,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     dialog.setUpdateMethodCallbackRefreshTable(true);
     dialog.updateSchedules(objects);
     addToPopupSlot(dialog);
-  }
-
-  @Override
-  public void onFromTable(String tableFullName) {
-    String[] s = tableFullName.split("\\.");
-    fireEvent(new TableSelectionChangeEvent(this, s[0], s[1]));
   }
 
   private final class ValuesCommand implements Command {
@@ -763,6 +750,10 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       }
     }
 
+    private void gotoDatasource() {
+      placeManager.revealPlace(ProjectPlacesHelper.getDatasourcePlace(table.getDatasourceName()));
+    }
+
     private void removeView() {
 
       ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
@@ -770,8 +761,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         @Override
         public void onResponseCode(Request request, Response response) {
           if(response.getStatusCode() == SC_OK) {
-            fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
-            fireEvent(new DatasourceSelectionChangeEvent(TablePresenter.this, table.getDatasourceName()));
+            gotoDatasource();
           } else {
             String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
             fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
@@ -791,8 +781,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         @Override
         public void onResponseCode(Request request, Response response) {
           if(response.getStatusCode() == SC_OK) {
-            fireEvent(new DatasourceUpdatedEvent(table.getDatasourceName()));
-            fireEvent(new DatasourceSelectionChangeEvent(TablePresenter.this, table.getDatasourceName()));
+            gotoDatasource();
           } else {
             String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
             fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
