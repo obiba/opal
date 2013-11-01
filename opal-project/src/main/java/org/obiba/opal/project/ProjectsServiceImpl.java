@@ -35,7 +35,7 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 @Component
-public class ProjectsConfigurationService implements ProjectService {
+public class ProjectsServiceImpl implements ProjectService {
 
   private static final String PROJECTS_DIR = "projects";
 
