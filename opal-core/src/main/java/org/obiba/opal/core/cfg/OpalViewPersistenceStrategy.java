@@ -204,7 +204,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     try {
       localRepo = cloneDatasourceViewsGit(datasourceName);
       Git git = new Git(new FileRepository(new File(localRepo, ".git")));
-      git.rm().addFilepattern(viewName);
+      git.rm().addFilepattern(viewName).call();
       doCommitPush(git, "Remove " + viewName);
     } catch(Exception e) {
       throw new RuntimeException("Failed removing view '" + viewName + "' from git for datasource: " + datasourceName,
