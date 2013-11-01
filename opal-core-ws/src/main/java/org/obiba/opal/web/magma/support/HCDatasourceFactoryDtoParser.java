@@ -9,7 +9,7 @@
  */
 package org.obiba.opal.web.magma.support;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.healthcanada.HCDatasourceFactory;
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class HCDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoParser {
 
-  @Nonnull
+  @NotNull
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
     DatasourceFactory factory = new HCDatasourceFactory();

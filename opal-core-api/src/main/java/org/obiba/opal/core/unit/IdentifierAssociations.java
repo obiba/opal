@@ -15,8 +15,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeSet;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
@@ -148,7 +148,7 @@ public class IdentifierAssociations implements Iterable<IdentifierAssociations.I
       }
     }
 
-    public void put(@Nonnull String unitIdentifier, @Nonnull String opalIdentifier) {
+    public void put(@NotNull String unitIdentifier, @NotNull String opalIdentifier) {
       if(unitIdentifier == null) throw new IllegalArgumentException("unitIdentifier cannot be null");
       if(opalIdentifier == null) throw new IllegalArgumentException("opalIdentifier cannot be null");
       unitIdentifierToOpalIdentifier.put(unitIdentifier, opalIdentifier);

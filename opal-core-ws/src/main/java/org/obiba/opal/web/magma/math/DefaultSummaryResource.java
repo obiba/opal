@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.math;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 
@@ -24,7 +24,7 @@ import org.obiba.opal.web.model.Math.SummaryStatisticsDto;
  */
 public class DefaultSummaryResource extends AbstractSummaryResource {
 
-  public DefaultSummaryResource(@Nonnull VariableStatsService variableStatsService, ValueTable valueTable,
+  public DefaultSummaryResource(@NotNull VariableStatsService variableStatsService, ValueTable valueTable,
       Variable variable, VariableValueSource variableValueSource) {
     super(variableStatsService, valueTable, variable, variableValueSource);
   }

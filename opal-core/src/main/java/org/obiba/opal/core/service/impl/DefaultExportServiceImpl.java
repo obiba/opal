@@ -17,8 +17,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ThreadFactory;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
@@ -55,22 +55,22 @@ import com.google.common.base.Function;
 @Component
 public class DefaultExportServiceImpl implements ExportService {
 
-  @Nonnull
+  @NotNull
   private final ThreadFactory threadFactory;
 
-  @Nonnull
+  @NotNull
   private final TransactionTemplate txTemplate;
 
-  @Nonnull
+  @NotNull
   private final FunctionalUnitService functionalUnitService;
 
-  @Nonnull
+  @NotNull
   private final IdentifiersTableService identifiersTableService;
 
   @SuppressWarnings("ConstantConditions")
   @Autowired
-  public DefaultExportServiceImpl(@Nonnull ThreadFactory threadFactory, @Nonnull TransactionTemplate txTemplate,
-      @Nonnull FunctionalUnitService functionalUnitService, @Nonnull IdentifiersTableService identifiersTableService) {
+  public DefaultExportServiceImpl(@NotNull ThreadFactory threadFactory, @NotNull TransactionTemplate txTemplate,
+      @NotNull FunctionalUnitService functionalUnitService, @NotNull IdentifiersTableService identifiersTableService) {
     if(threadFactory == null) throw new IllegalArgumentException("threadFactory cannot be null");
     if(txTemplate == null) throw new IllegalArgumentException("txTemplate cannot be null");
     if(functionalUnitService == null) throw new IllegalArgumentException("functionalUnitService cannot be null");
@@ -93,8 +93,8 @@ public class DefaultExportServiceImpl implements ExportService {
   }
 
   @Override
-  public void exportTablesToDatasource(@Nullable String unitName, @Nonnull List<String> sourceTableNames,
-      @Nonnull String destinationDatasourceName, boolean incremental) throws InterruptedException {
+  public void exportTablesToDatasource(@Nullable String unitName, @NotNull List<String> sourceTableNames,
+      @NotNull String destinationDatasourceName, boolean incremental) throws InterruptedException {
     Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName must not be null or empty");
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(destinationDatasourceName);
@@ -104,8 +104,8 @@ public class DefaultExportServiceImpl implements ExportService {
   }
 
   @Override
-  public void exportTablesToDatasource(@Nullable String unitName, @Nonnull List<String> sourceTableNames,
-      @Nonnull String destinationDatasourceName, @Nonnull DatasourceCopier.Builder datasourceCopier,
+  public void exportTablesToDatasource(@Nullable String unitName, @NotNull List<String> sourceTableNames,
+      @NotNull String destinationDatasourceName, @NotNull DatasourceCopier.Builder datasourceCopier,
       boolean incremental) throws InterruptedException {
     Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName must not be null or empty");
@@ -115,8 +115,8 @@ public class DefaultExportServiceImpl implements ExportService {
   }
 
   @Override
-  public void exportTablesToDatasource(@Nullable String unitName, @Nonnull Set<ValueTable> sourceTables,
-      @Nonnull Datasource destinationDatasource, @Nonnull DatasourceCopier.Builder datasourceCopier,
+  public void exportTablesToDatasource(@Nullable String unitName, @NotNull Set<ValueTable> sourceTables,
+      @NotNull Datasource destinationDatasource, @NotNull DatasourceCopier.Builder datasourceCopier,
       boolean incremental) throws InterruptedException {
     Assert.notEmpty(sourceTables, "sourceTables must not be null or empty");
     Assert.notNull(destinationDatasource, "destinationDatasource must not be null");
@@ -139,8 +139,8 @@ public class DefaultExportServiceImpl implements ExportService {
     }
   }
 
-  @Nonnull
-  private Set<ValueTable> getValueTablesByName(@Nonnull Iterable<String> tableNames)
+  @NotNull
+  private Set<ValueTable> getValueTablesByName(@NotNull Iterable<String> tableNames)
       throws NoSuchDatasourceException, NoSuchValueTableException, ExportException {
     Set<ValueTable> tables = new HashSet<ValueTable>();
     for(String tableName : tableNames) {
@@ -155,7 +155,7 @@ public class DefaultExportServiceImpl implements ExportService {
     return tables;
   }
 
-  @Nonnull
+  @NotNull
   private FunctionalUnit validateFunctionalUnit(String unitName) {
     FunctionalUnit unit = functionalUnitService.getFunctionalUnit(unitName);
     if(unit == null) {
@@ -164,8 +164,8 @@ public class DefaultExportServiceImpl implements ExportService {
     return unit;
   }
 
-  private void validateSourceDatasourceNotEqualDestinationDatasource(@Nonnull Iterable<ValueTable> sourceTables,
-      @Nonnull Datasource destinationDatasource) {
+  private void validateSourceDatasourceNotEqualDestinationDatasource(@NotNull Iterable<ValueTable> sourceTables,
+      @NotNull Datasource destinationDatasource) {
     for(ValueTable sourceTable : sourceTables) {
       if(sourceTable.getDatasource().equals(destinationDatasource)) {
         throw new ExportException(
@@ -178,13 +178,13 @@ public class DefaultExportServiceImpl implements ExportService {
 
   private class ExportActionTemplate extends LockingActionTemplate {
 
-    @Nonnull
+    @NotNull
     private final Set<ValueTable> sourceTables;
 
-    @Nonnull
+    @NotNull
     private final Datasource destinationDatasource;
 
-    @Nonnull
+    @NotNull
     private final Builder datasourceCopier;
 
     private final boolean incremental;
@@ -192,8 +192,8 @@ public class DefaultExportServiceImpl implements ExportService {
     @Nullable
     private final FunctionalUnit unit;
 
-    private ExportActionTemplate(@Nonnull Set<ValueTable> sourceTables, @Nonnull Datasource destinationDatasource,
-        @Nonnull Builder datasourceCopier, boolean incremental, @Nullable FunctionalUnit unit) {
+    private ExportActionTemplate(@NotNull Set<ValueTable> sourceTables, @NotNull Datasource destinationDatasource,
+        @NotNull Builder datasourceCopier, boolean incremental, @Nullable FunctionalUnit unit) {
       this.sourceTables = sourceTables;
       this.destinationDatasource = destinationDatasource;
       this.datasourceCopier = datasourceCopier;
@@ -201,7 +201,7 @@ public class DefaultExportServiceImpl implements ExportService {
       this.unit = unit;
     }
 
-    @Nonnull
+    @NotNull
     @Override
     protected Set<String> getLockNames() {
       Set<String> tablesToLock = new TreeSet<String>();
@@ -216,7 +216,7 @@ public class DefaultExportServiceImpl implements ExportService {
       return txTemplate;
     }
 
-    @Nonnull
+    @NotNull
     @Override
     protected Action getAction() {
       return new ExportAction();
@@ -237,7 +237,7 @@ public class DefaultExportServiceImpl implements ExportService {
         }
       }
 
-      private void exportTableToDatasource(@Nonnull ValueTable table) throws InterruptedException, IOException {
+      private void exportTableToDatasource(@NotNull ValueTable table) throws InterruptedException, IOException {
         if(Thread.interrupted()) {
           throw new InterruptedException("Thread interrupted");
         }
@@ -263,8 +263,8 @@ public class DefaultExportServiceImpl implements ExportService {
         return identifiersTableService.getValueTable();
       }
 
-      @Nonnull
-      private ValueTable getIncrementalView(@Nonnull ValueTable valueTable, @Nonnull Datasource destination) {
+      @NotNull
+      private ValueTable getIncrementalView(@NotNull ValueTable valueTable, @NotNull Datasource destination) {
         WhereClause whereClause = new IncrementalWhereClause(destination.getName() + "." + valueTable.getName());
         return View.Builder.newView(valueTable.getName(), valueTable).where(whereClause).build();
       }

@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
@@ -65,7 +65,8 @@ public class MagmaAssignROperation extends AbstractROperation {
   private final Set<MagmaRConverter> magmaRConverters = Sets
       .newHashSet(new DatasourceRConverter(), new ValueTableRConverter(), new VariableRConverter());
 
-  public MagmaAssignROperation(VariableEntitiesHolder holder, String symbol, String path, String variableFilter, boolean withMissings) {
+  public MagmaAssignROperation(VariableEntitiesHolder holder, String symbol, String path, String variableFilter,
+      boolean withMissings) {
     if(holder == null) throw new IllegalArgumentException("holder cannot be null");
     if(symbol == null) throw new IllegalArgumentException("symbol cannot be null");
     if(path == null) throw new IllegalArgumentException("path cannot be null");
@@ -244,7 +245,6 @@ public class MagmaAssignROperation extends AbstractROperation {
     }
 
     /**
-     *
      * @param ids
      * @param values
      * @return
@@ -282,13 +282,13 @@ public class MagmaAssignROperation extends AbstractROperation {
         return Variable.Builder.newVariable(ENTITY_ID_SYMBOL, TextType.get(), table.getEntityType()).build();
       }
 
-      @Nonnull
+      @NotNull
       @Override
       public ValueType getValueType() {
         return TextType.get();
       }
 
-      @Nonnull
+      @NotNull
       @Override
       public Value getValue(ValueSet valueSet) {
         return TextType.get().valueOf(valueSet.getVariableEntity().getIdentifier());
@@ -307,7 +307,7 @@ public class MagmaAssignROperation extends AbstractROperation {
           public Iterable<Value> getValues(SortedSet<VariableEntity> entities) {
             return Iterables.transform(holder.getEntities(), new Function<VariableEntity, Value>() {
               @Override
-              public Value apply(@Nonnull VariableEntity input) {
+              public Value apply(@NotNull VariableEntity input) {
                 return TextType.get().valueOf(input.getIdentifier());
               }
             });

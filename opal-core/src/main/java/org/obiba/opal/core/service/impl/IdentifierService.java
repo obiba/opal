@@ -9,8 +9,8 @@
  */
 package org.obiba.opal.core.service.impl;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
@@ -26,7 +26,7 @@ import org.obiba.opal.core.unit.FunctionalUnit;
  */
 public interface IdentifierService {
 
-  Variable createKeyVariable(@Nullable ValueTable privateView, @Nonnull String keyVariableName);
+  Variable createKeyVariable(@Nullable ValueTable privateView, @NotNull String keyVariableName);
 
   /**
    * Write the key variable and the identifier variables values; update the participant key private/public map.

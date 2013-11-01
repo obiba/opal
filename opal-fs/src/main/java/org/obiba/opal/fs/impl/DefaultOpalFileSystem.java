@@ -7,8 +7,8 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileName;
 import org.apache.commons.vfs2.FileObject;
@@ -31,10 +31,10 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
 
   private static final Logger log = LoggerFactory.getLogger(OpalFileSystem.class);
 
-  @Nonnull
+  @NotNull
   private final FileObject root;
 
-  @Nonnull
+  @NotNull
   private final String nativeRootURL;
 
   public DefaultOpalFileSystem(String fsRoot) {
@@ -71,7 +71,7 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
     }
   }
 
-  @Nonnull
+  @NotNull
   @Override
   public FileObject getRoot() {
     return root;
@@ -144,7 +144,7 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
 
   @SuppressWarnings("ChainOfInstanceofChecks")
   @Override
-  public boolean isLocalFile(@Nonnull FileObject virtualFile) {
+  public boolean isLocalFile(@NotNull FileObject virtualFile) {
     Preconditions.checkNotNull(virtualFile);
     FileObject currentFile = virtualFile;
     while(true) {

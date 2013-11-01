@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.core.service;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 public interface SubjectAclService extends SystemService {
 
@@ -36,11 +36,11 @@ public interface SubjectAclService extends SystemService {
 
   void addSubjectPermissions(String domain, String node, Subject subject, Iterable<String> permissions);
 
-  void addSubjectPermission(String domain, String node, @Nonnull Subject subject, @Nonnull String permission);
+  void addSubjectPermission(String domain, String node, @NotNull Subject subject, @NotNull String permission);
 
   Iterable<Permissions> getSubjectPermissions(Subject subject);
 
-  Permissions getSubjectPermissions(@Nonnull String domain, @Nonnull String node, @Nonnull Subject subject);
+  Permissions getSubjectPermissions(@NotNull String domain, @NotNull String node, @NotNull Subject subject);
 
   Iterable<Permissions> getNodePermissions(String domain, String node, SubjectType type);
 

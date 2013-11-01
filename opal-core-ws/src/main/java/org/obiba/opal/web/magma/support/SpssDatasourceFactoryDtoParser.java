@@ -9,7 +9,7 @@
  */
 package org.obiba.opal.web.magma.support;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.spss.support.SpssDatasourceFactory;
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SpssDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoParser {
 
-  @Nonnull
+  @NotNull
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
     SpssDatasourceFactory factory = new SpssDatasourceFactory();
@@ -39,7 +39,7 @@ public class SpssDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDto
       factory.setEntityType(spssDto.getEntityType());
     }
 
-    if (spssDto.hasLocale()) {
+    if(spssDto.hasLocale()) {
       factory.setLocale(spssDto.getLocale());
     }
 

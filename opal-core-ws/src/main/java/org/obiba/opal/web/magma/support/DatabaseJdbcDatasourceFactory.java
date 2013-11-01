@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.support;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.AbstractDatasourceFactory;
 import org.obiba.magma.Datasource;
@@ -40,7 +40,7 @@ public class DatabaseJdbcDatasourceFactory extends AbstractDatasourceFactory imp
     this.databaseRegistry = databaseRegistry;
   }
 
-  @Nonnull
+  @NotNull
   @Override
   protected Datasource internalCreate() {
     return new JdbcDatasource(getName(), databaseRegistry.getDataSource(databaseName, getName()), getSettings());

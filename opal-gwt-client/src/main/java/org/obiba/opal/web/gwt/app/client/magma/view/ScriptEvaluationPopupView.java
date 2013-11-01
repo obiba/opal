@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ScriptEvaluationPopupPresenter.Display;
@@ -65,7 +65,7 @@ public class ScriptEvaluationPopupView extends ModalPopupViewWithUiHandlers<Moda
   }
 
   @UiHandler("closeButton")
-  public void onClosedClicked (ClickEvent event) {
+  public void onClosedClicked(ClickEvent event) {
     dialogBox.hide();
   }
 
@@ -77,7 +77,7 @@ public class ScriptEvaluationPopupView extends ModalPopupViewWithUiHandlers<Moda
   }
 
   @Override
-  public void showError(@Nonnull String error) {
+  public void showError(@NotNull String error) {
     dialogBox.addAlert(error, AlertType.ERROR);
   }
 

@@ -14,8 +14,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
@@ -61,26 +61,26 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
   protected static final int ES_BATCH_SIZE = 100;
 
   @Autowired
-  @Nonnull
+  @NotNull
   protected OpalSearchService opalSearchService;
 
   @Autowired
-  @Nonnull
+  @NotNull
   private ElasticSearchConfigurationService esConfig;
 
   @Autowired
-  @Nonnull
+  @NotNull
   private IndexManagerConfigurationService indexConfig;
 
   @Autowired
-  @Nonnull
+  @NotNull
   protected VersionProvider runtimeVersionProvider;
 
   private final Map<String, ValueTableIndex> indices = Maps.newHashMap();
 
-  @Nonnull
+  @NotNull
   @Override
-  public ValueTableIndex getIndex(@Nonnull ValueTable vt) {
+  public ValueTableIndex getIndex(@NotNull ValueTable vt) {
     Assert.notNull(vt);
 
     String tableFullName = vt.getTableReference();
@@ -93,14 +93,14 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
   }
 
   @Override
-  public boolean hasIndex(@Nonnull ValueTable valueTable) {
+  public boolean hasIndex(@NotNull ValueTable valueTable) {
     ClusterStateResponse resp = opalSearchService.getClient().admin().cluster().prepareState().execute().actionGet();
     Map<String, MappingMetaData> mappings = resp.getState().metaData().index(getName()).mappings();
     return mappings.containsKey(getIndex(valueTable).getIndexName());
 
   }
 
-  protected abstract ValueTableIndex createIndex(@Nonnull ValueTable vt);
+  protected abstract ValueTableIndex createIndex(@NotNull ValueTable vt);
 
   @Override
   public boolean isReady() {
@@ -108,12 +108,12 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
   }
 
   @Override
-  public boolean isIndexable(@Nonnull ValueTable valueTable) {
+  public boolean isIndexable(@NotNull ValueTable valueTable) {
     return indexConfig.getConfig().isReadyForIndexing(valueTable, getIndex(valueTable));
   }
 
   @Override
-  public boolean isIndexUpToDate(@Nonnull ValueTable valueTable) {
+  public boolean isIndexUpToDate(@NotNull ValueTable valueTable) {
     return getIndex(valueTable).isUpToDate();
   }
 
@@ -127,7 +127,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
         .put("number_of_replicas", esConfig.getConfig().getReplicas()).build();
   }
 
-  @Nonnull
+  @NotNull
   protected IndexMetaData createIndex() {
     IndicesAdminClient idxAdmin = opalSearchService.getClient().admin().indices();
     if(!idxAdmin.exists(new IndicesExistsRequest(getName())).actionGet().isExists()) {
@@ -139,17 +139,17 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
   }
 
   @Override
-  public void onDelete(@Nonnull ValueTable vt) {
+  public void onDelete(@NotNull ValueTable vt) {
     // Delete index
     getIndex(vt).delete();
   }
 
   protected abstract class EsIndexer implements IndexSynchronization {
 
-    @Nonnull
+    @NotNull
     protected final ValueTable valueTable;
 
-    @Nonnull
+    @NotNull
     private final EsValueTableIndex index;
 
     private final int total;
@@ -158,7 +158,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
 
     protected boolean stop = false;
 
-    protected EsIndexer(@Nonnull ValueTable table, @Nonnull EsValueTableIndex index) {
+    protected EsIndexer(@NotNull ValueTable table, @NotNull EsValueTableIndex index) {
       valueTable = table;
       this.index = index;
       total = valueTable.getVariableEntities().size();
@@ -197,7 +197,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
       return index;
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public ValueTable getValueTable() {
       return valueTable;
@@ -226,10 +226,10 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
 
   protected abstract class EsValueTableIndex implements ValueTableIndex {
 
-    @Nonnull
+    @NotNull
     private final String name;
 
-    @Nonnull
+    @NotNull
     private final String valueTableReference;
 
     private boolean mappingCreated;
@@ -238,18 +238,18 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
      * @param vt
      * @param prefixName used to avoid same type name. (Must be unique in ES (even though in different ES indices))
      */
-    EsValueTableIndex(@Nonnull ValueTable vt) {
+    EsValueTableIndex(@NotNull ValueTable vt) {
       name = indexName(vt);
       valueTableReference = vt.getTableReference();
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public String getIndexName() {
       return name;
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public String getRequestPath() {
       return getName() + "/" + getIndexName();
@@ -268,7 +268,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
       }
     }
 
-    @Nonnull
+    @NotNull
     public String getValueTableReference() {
       return valueTableReference;
     }
@@ -336,13 +336,13 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
           meta = readMapping().meta();
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public Value getLastUpdate() {
           return DateTimeType.get().valueOf(meta.getString("_updated"));
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public Value getCreated() {
           return DateTimeType.get().valueOf(meta.getString("_created"));
@@ -351,16 +351,16 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
       };
     }
 
-    boolean isForTable(@Nonnull ValueTable valueTable) {
+    boolean isForTable(@NotNull ValueTable valueTable) {
       return valueTableReference.equals(valueTable.getTableReference());
     }
 
-    @Nonnull
-    private String indexName(@Nonnull ValueTable table) {
+    @NotNull
+    private String indexName(@NotNull ValueTable table) {
       return table.getTableReference().replace(' ', '_').replace('.', '-');
     }
 
-    @Nonnull
+    @NotNull
     protected EsMapping readMapping() {
       try {
         try {
@@ -398,7 +398,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
       return imd == null ? createIndex() : imd;
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public Calendar now() {
       Calendar c = Calendar.getInstance();

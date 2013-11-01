@@ -9,8 +9,8 @@
  */
 package org.obiba.opal.core.service.impl;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.core.domain.OpalGeneralConfig;
 import org.obiba.opal.core.service.OpalGeneralConfigMissingException;
@@ -48,7 +48,7 @@ public class OpalGeneralConfigServiceImpl implements OpalGeneralConfigService {
   }
 
   @Override
-  public void save(@Nonnull final OpalGeneralConfig config) {
+  public void save(@NotNull final OpalGeneralConfig config) {
     orientDbService.execute(new OrientDbService.WithinDocumentTxCallbackWithoutResult() {
       @Override
       protected void withinDocumentTxWithoutResult(ODatabaseDocumentTx db) {
@@ -68,7 +68,7 @@ public class OpalGeneralConfigServiceImpl implements OpalGeneralConfigService {
   }
 
   @Override
-  @Nonnull
+  @NotNull
   public OpalGeneralConfig getConfig() throws OpalGeneralConfigMissingException {
     return orientDbService.execute(new OrientDbService.WithinDocumentTxCallback<OpalGeneralConfig>() {
       @Override

@@ -9,10 +9,10 @@
  */
 package org.obiba.opal.project;
 
-import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -90,7 +90,7 @@ public class ProjectsServiceImpl implements ProjectService {
   }
 
   @Override
-  public boolean hasProject(@Nonnull String name) {
+  public boolean hasProject(@NotNull String name) {
     try {
       getProject(name);
       return true;
@@ -100,7 +100,7 @@ public class ProjectsServiceImpl implements ProjectService {
   }
 
   @Override
-  public void delete(@Nonnull String name) throws NoSuchProjectException, FileSystemException {
+  public void delete(@NotNull String name) throws NoSuchProjectException, FileSystemException {
     Project project = getProject(name);
 
     orientDbService.delete(project);
@@ -119,22 +119,22 @@ public class ProjectsServiceImpl implements ProjectService {
   }
 
   @Override
-  public void save(@Nonnull Project project) throws ConstraintViolationException {
+  public void save(@NotNull Project project) throws ConstraintViolationException {
     registerDatasource(project);
     orientDbService.save(project, project);
   }
 
-  @Nonnull
+  @NotNull
   @Override
-  public Project getProject(@Nonnull String name) throws NoSuchProjectException {
+  public Project getProject(@NotNull String name) throws NoSuchProjectException {
     Project project = orientDbService.findUnique(new Project(name));
     if(project == null) throw new NoSuchProjectException(name);
     return project;
   }
 
-  @Nonnull
+  @NotNull
   @Override
-  public FileObject getProjectDirectory(@Nonnull Project project)
+  public FileObject getProjectDirectory(@NotNull Project project)
       throws NoSuchFunctionalUnitException, FileSystemException {
     FileObject projectDir = opalRuntime.getFileSystem().getRoot().resolveFile(PROJECTS_DIR)
         .resolveFile(project.getName());
@@ -142,9 +142,9 @@ public class ProjectsServiceImpl implements ProjectService {
     return projectDir;
   }
 
-  @Nonnull
+  @NotNull
   @Override
-  public String getProjectDirectoryPath(@Nonnull Project project) {
+  public String getProjectDirectoryPath(@NotNull Project project) {
     try {
       FileObject fo = getProjectDirectory(project);
       return fo.getURL().getPath().substring(2);
@@ -159,8 +159,8 @@ public class ProjectsServiceImpl implements ProjectService {
    * @param project
    * @return
    */
-  @Nonnull
-  private DatasourceFactory registerDatasource(@Nonnull Project project) {
+  @NotNull
+  private DatasourceFactory registerDatasource(@NotNull Project project) {
     DatasourceFactory dataSourceFactory = null;
     if(project.hasDatabase()) {
       Database database = databaseRegistry.getDatabase(project.getDatabase());

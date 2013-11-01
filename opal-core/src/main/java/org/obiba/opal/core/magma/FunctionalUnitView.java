@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.core.magma;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
@@ -54,17 +54,17 @@ public class FunctionalUnitView extends View {
 
   private static final Logger log = LoggerFactory.getLogger(FunctionalUnitView.class);
 
-  @Nonnull
+  @NotNull
   private final FunctionalUnit unit;
 
-  @Nonnull
+  @NotNull
   private final PrivateVariableEntityMap entityMap;
 
   private final boolean allowIdentifierGeneration;
 
   private final boolean ignoreUnknownIdentifier;
 
-  @Nonnull
+  @NotNull
   private final BijectiveFunction<VariableEntity, VariableEntity> mappingFunction;
 
   /**
@@ -78,8 +78,8 @@ public class FunctionalUnitView extends View {
    * will not be generated
    */
   @SuppressWarnings({ "ConstantConditions", "OverlyLongMethod", "PMD.NcssMethodCount" })
-  public FunctionalUnitView(@Nonnull FunctionalUnit unit, @Nonnull Policy policy, @Nonnull ValueTable dataTable,
-      @Nonnull ValueTable keysTable, @Nullable IParticipantIdentifier identifierGenerator,
+  public FunctionalUnitView(@NotNull FunctionalUnit unit, @NotNull Policy policy, @NotNull ValueTable dataTable,
+      @NotNull ValueTable keysTable, @Nullable IParticipantIdentifier identifierGenerator,
       boolean ignoreUnknownIdentifier) {
 
     // Null check on dataTable is required. If dataTable is null, we'll get NPE instead of IllegalArgumentException
@@ -113,12 +113,12 @@ public class FunctionalUnitView extends View {
         policy);
   }
 
-  public FunctionalUnitView(@Nonnull FunctionalUnit unit, @Nonnull Policy policy, @Nonnull ValueTable dataTable,
-      @Nonnull ValueTable keysTable) {
+  public FunctionalUnitView(@NotNull FunctionalUnit unit, @NotNull Policy policy, @NotNull ValueTable dataTable,
+      @NotNull ValueTable keysTable) {
     this(unit, policy, dataTable, keysTable, null, false);
   }
 
-  @Nonnull
+  @NotNull
   public PrivateVariableEntityMap getPrivateVariableEntityMap() {
     return entityMap;
   }
@@ -128,7 +128,7 @@ public class FunctionalUnitView extends View {
     return mappingFunction;
   }
 
-  @Nonnull
+  @NotNull
   public FunctionalUnit getUnit() {
     return unit;
   }

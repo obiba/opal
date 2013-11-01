@@ -13,8 +13,8 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.security.SubjectAcl;
@@ -128,8 +128,8 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public void addSubjectPermission(String domain, String node, @Nonnull SubjectAclService.Subject subject,
-      @Nonnull String permission) {
+  public void addSubjectPermission(String domain, String node, @NotNull SubjectAclService.Subject subject,
+      @NotNull String permission) {
     Assert.notNull(subject, "subject cannot be null");
     Assert.notNull(permission, "permission cannot be null");
     HasUniqueProperties acl = new SubjectAcl(domain, node, subject, permission);
@@ -138,8 +138,8 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public Permissions getSubjectPermissions(@Nonnull final String domain, @Nonnull final String node,
-      @Nonnull final SubjectAclService.Subject subject) {
+  public Permissions getSubjectPermissions(@NotNull final String domain, @NotNull final String node,
+      @NotNull final SubjectAclService.Subject subject) {
     Assert.notNull(node, "node cannot be null");
     Assert.notNull(subject, "subject cannot be null");
 

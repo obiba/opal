@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.support;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory;
@@ -38,7 +38,7 @@ public class HibernateDatasourceFactoryDtoParser extends AbstractDatasourceFacto
     this.databaseRegistry = databaseRegistry;
   }
 
-  @Nonnull
+  @NotNull
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
     DatabaseSessionFactoryProvider sessionFactoryProvider = null;

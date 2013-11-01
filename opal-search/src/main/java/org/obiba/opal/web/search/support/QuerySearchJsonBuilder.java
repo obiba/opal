@@ -12,7 +12,7 @@ package org.obiba.opal.web.search.support;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -72,22 +72,22 @@ public class QuerySearchJsonBuilder {
     return this;
   }
 
-  public QuerySearchJsonBuilder setFields(@Nonnull Collection<String> value) {
+  public QuerySearchJsonBuilder setFields(@NotNull Collection<String> value) {
     fields = value;
     return this;
   }
 
-  public QuerySearchJsonBuilder setSortField(@Nonnull String value) {
+  public QuerySearchJsonBuilder setSortField(@NotNull String value) {
     sortField = value;
     return this;
   }
 
-  public QuerySearchJsonBuilder setSortDir(@Nonnull String value) {
+  public QuerySearchJsonBuilder setSortDir(@NotNull String value) {
     sortDir = value.toLowerCase(); // elastic search accepts only lower case
     return this;
   }
 
-  public QuerySearchJsonBuilder setQuery(@Nonnull String value) {
+  public QuerySearchJsonBuilder setQuery(@NotNull String value) {
     if(Strings.isNullOrEmpty(value)) {
       throw new IllegalArgumentException();
     }
@@ -96,7 +96,7 @@ public class QuerySearchJsonBuilder {
     return this;
   }
 
-  public QuerySearchJsonBuilder setFilterTypes(@Nonnull Collection<String> value) {
+  public QuerySearchJsonBuilder setFilterTypes(@NotNull Collection<String> value) {
     filterTypes = value;
     return this;
   }
@@ -105,8 +105,8 @@ public class QuerySearchJsonBuilder {
     JSONObject jsonQuery = new JSONObject();
     jsonQuery.accumulate("query", new JSONObject().put("query_string", buildQueryStringJson()));
     jsonQuery.put("sort", buildSortJson());
-    if (fields != null && fields.size() > 0) jsonQuery.put("fields", new JSONArray(fields));
-    if (filterTypes != null && filterTypes.size() > 0) jsonQuery.put("filter", buildFilter());
+    if(fields != null && fields.size() > 0) jsonQuery.put("fields", new JSONArray(fields));
+    if(filterTypes != null && filterTypes.size() > 0) jsonQuery.put("filter", buildFilter());
     jsonQuery.put("from", from);
     jsonQuery.put("size", size);
 
@@ -127,7 +127,7 @@ public class QuerySearchJsonBuilder {
   }
 
   private JSONObject buildSortJson() throws JSONException {
-    if (Strings.isNullOrEmpty(sortField)) {
+    if(Strings.isNullOrEmpty(sortField)) {
       return new JSONObject();
     }
 

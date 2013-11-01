@@ -1,6 +1,6 @@
 package org.obiba.opal.core.magma.math;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
@@ -14,7 +14,7 @@ public class CategoricalVariableSummaryFactory extends AbstractVariableSummaryFa
 
   private Integer limit;
 
-  @Nonnull
+  @NotNull
   @Override
   public String getCacheKey() {
     return getCacheKey(getVariable(), getTable(), distinct, offset, limit);
@@ -28,7 +28,7 @@ public class CategoricalVariableSummaryFactory extends AbstractVariableSummaryFa
     return key;
   }
 
-  @Nonnull
+  @NotNull
   @Override
   public CategoricalVariableSummary getSummary() {
     return new CategoricalVariableSummary.Builder(getVariable()) //

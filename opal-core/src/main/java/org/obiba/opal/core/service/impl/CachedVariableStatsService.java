@@ -1,6 +1,6 @@
 package org.obiba.opal.core.service.impl;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -44,7 +44,7 @@ public class CachedVariableStatsService implements VariableStatsService {
   }
 
   @Override
-  public void stackVariable(@Nonnull ValueTable valueTable, @Nonnull Variable variable, @Nonnull Value value) {
+  public void stackVariable(@NotNull ValueTable valueTable, @NotNull Variable variable, @NotNull Value value) {
     if(!cacheSummaries) log.debug("Variable summaries cache disabled!");
 
     // skip binary variable
@@ -59,7 +59,7 @@ public class CachedVariableStatsService implements VariableStatsService {
   }
 
   @Override
-  public void computeSummaries(@Nonnull ValueTable table) {
+  public void computeSummaries(@NotNull ValueTable table) {
     if(!cacheSummaries) {
       log.info("Variable summaries cache disabled!");
       return;
@@ -73,21 +73,21 @@ public class CachedVariableStatsService implements VariableStatsService {
   }
 
   @Override
-  public void clearComputingSummaries(@Nonnull ValueTable valueTable) {
+  public void clearComputingSummaries(@NotNull ValueTable valueTable) {
     if(!cacheSummaries) return;
     continuousSummaryService.clearComputingSummaries(valueTable);
     categoricalSummaryService.clearComputingSummaries(valueTable);
   }
 
-  @Nonnull
+  @NotNull
   @Override
-  public CategoricalVariableSummary getCategoricalSummary(@Nonnull CategoricalVariableSummaryFactory summaryFactory) {
+  public CategoricalVariableSummary getCategoricalSummary(@NotNull CategoricalVariableSummaryFactory summaryFactory) {
     return categoricalSummaryService.getSummary(summaryFactory);
   }
 
-  @Nonnull
+  @NotNull
   @Override
-  public ContinuousVariableSummary getContinuousSummary(@Nonnull ContinuousVariableSummaryFactory summaryFactory) {
+  public ContinuousVariableSummary getContinuousSummary(@NotNull ContinuousVariableSummaryFactory summaryFactory) {
     return continuousSummaryService.getSummary(summaryFactory);
   }
 
@@ -96,15 +96,15 @@ public class CachedVariableStatsService implements VariableStatsService {
 
     private static final String CACHE_NAME = "opal-variable-summary-continuous";
 
-    @Nonnull
+    @NotNull
     @Override
     protected Cache getCache() {
       return cacheManager.getCache(CACHE_NAME);
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    protected ContinuousVariableSummary.Builder newVariableSummaryBuilder(@Nonnull Variable variable) {
+    protected ContinuousVariableSummary.Builder newVariableSummaryBuilder(@NotNull Variable variable) {
       return new ContinuousVariableSummary.Builder(variable, ContinuousVariableSummary.Distribution.normal);
     }
   }
@@ -114,15 +114,15 @@ public class CachedVariableStatsService implements VariableStatsService {
 
     private static final String CACHE_NAME = "opal-variable-summary-categorical";
 
-    @Nonnull
+    @NotNull
     @Override
     protected Cache getCache() {
       return cacheManager.getCache(CACHE_NAME);
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    protected CategoricalVariableSummary.Builder newVariableSummaryBuilder(@Nonnull Variable variable) {
+    protected CategoricalVariableSummary.Builder newVariableSummaryBuilder(@NotNull Variable variable) {
       boolean distinct = TextType.get().equals(variable.getValueType()) && variable.areAllCategoriesMissing();
       return new CategoricalVariableSummary.Builder(variable).distinct(distinct);
     }

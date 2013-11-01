@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
@@ -26,11 +26,11 @@ import com.google.common.collect.Lists;
 
 public class Vocabulary extends AbstractTimestamped implements HasUniqueProperties {
 
-  @Nonnull
+  @NotNull
   @NotBlank
   private String taxonomy;
 
-  @Nonnull
+  @NotNull
   @NotBlank
   private String name;
 
@@ -45,7 +45,7 @@ public class Vocabulary extends AbstractTimestamped implements HasUniqueProperti
   public Vocabulary() {
   }
 
-  public Vocabulary(@Nonnull String taxonomy, @Nonnull String name) {
+  public Vocabulary(@NotNull String taxonomy, @NotNull String name) {
     this.taxonomy = taxonomy;
     this.name = name;
   }
@@ -60,21 +60,21 @@ public class Vocabulary extends AbstractTimestamped implements HasUniqueProperti
     return Lists.<Object>newArrayList(taxonomy, name);
   }
 
-  @Nonnull
+  @NotNull
   public String getTaxonomy() {
     return taxonomy;
   }
 
-  public void setTaxonomy(@Nonnull String taxonomy) {
+  public void setTaxonomy(@NotNull String taxonomy) {
     this.taxonomy = taxonomy;
   }
 
-  @Nonnull
+  @NotNull
   public String getName() {
     return name;
   }
 
-  public void setName(@Nonnull String name) {
+  public void setName(@NotNull String name) {
     this.name = name;
   }
 

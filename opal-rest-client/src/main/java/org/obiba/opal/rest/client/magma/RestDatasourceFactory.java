@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.rest.client.magma;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.apache.http.params.CoreConnectionPNames;
 import org.obiba.magma.AbstractDatasourceFactory;
@@ -61,7 +61,7 @@ public class RestDatasourceFactory extends AbstractDatasourceFactory {
     return client;
   }
 
-  @Nonnull
+  @NotNull
   @Override
   protected Datasource internalCreate() {
     try {

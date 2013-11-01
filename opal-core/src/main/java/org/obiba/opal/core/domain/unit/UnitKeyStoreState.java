@@ -12,7 +12,7 @@ package org.obiba.opal.core.domain.unit;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
@@ -25,17 +25,17 @@ import com.google.common.collect.Lists;
  */
 public class UnitKeyStoreState extends AbstractTimestamped implements HasUniqueProperties {
 
-  @Nonnull
+  @NotNull
   @NotBlank
   private String unit;
 
-  @Nonnull
+  @NotNull
   private byte[] keyStore;
 
   public UnitKeyStoreState() {
   }
 
-  public UnitKeyStoreState(@Nonnull String unit) {
+  public UnitKeyStoreState(@NotNull String unit) {
     this.unit = unit;
   }
 
@@ -49,21 +49,21 @@ public class UnitKeyStoreState extends AbstractTimestamped implements HasUniqueP
     return Lists.<Object>newArrayList(unit);
   }
 
-  @Nonnull
+  @NotNull
   public String getUnit() {
     return unit;
   }
 
-  public void setUnit(@Nonnull String unit) {
+  public void setUnit(@NotNull String unit) {
     this.unit = unit;
   }
 
-  @Nonnull
+  @NotNull
   public byte[] getKeyStore() {
     return Arrays.copyOf(keyStore, keyStore.length);
   }
 
-  public void setKeyStore(@Nonnull byte... keyStore) {
+  public void setKeyStore(@NotNull byte... keyStore) {
     this.keyStore = Arrays.copyOf(keyStore, keyStore.length);
   }
 

@@ -11,7 +11,7 @@ package org.obiba.opal.core.domain.security;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
@@ -23,23 +23,23 @@ import com.google.common.collect.Lists;
 
 public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperties {
 
-  @Nonnull
+  @NotNull
   @NotBlank
   private String domain;
 
-  @Nonnull
+  @NotNull
   @NotBlank
   private String node;
 
-  @Nonnull
+  @NotNull
   @NotBlank
   private String principal;
 
-  @Nonnull
+  @NotNull
   @NotBlank
   private String type;
 
-  @Nonnull
+  @NotNull
   @NotBlank
   private String permission;
 
@@ -47,13 +47,13 @@ public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperti
 
   }
 
-  public SubjectAcl(@Nonnull String domain, @Nonnull String node, @Nonnull SubjectAclService.Subject subject,
-      @Nonnull String permission) {
+  public SubjectAcl(@NotNull String domain, @NotNull String node, @NotNull SubjectAclService.Subject subject,
+      @NotNull String permission) {
     this(domain, node, subject.getPrincipal(), subject.getType().toString(), permission);
   }
 
-  private SubjectAcl(@Nonnull String domain, @Nonnull String node, @Nonnull String principal, @Nonnull String type,
-      @Nonnull String permission) {
+  private SubjectAcl(@NotNull String domain, @NotNull String node, @NotNull String principal, @NotNull String type,
+      @NotNull String permission) {
     this.domain = domain;
     this.node = node;
     this.principal = principal;
@@ -71,48 +71,48 @@ public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperti
     return Lists.<Object>newArrayList(domain, node, principal, type, permission);
   }
 
-  @Nonnull
+  @NotNull
   public String getDomain() {
     return domain;
   }
 
-  public void setDomain(@Nonnull String domain) {
+  public void setDomain(@NotNull String domain) {
     this.domain = domain;
   }
 
-  @Nonnull
+  @NotNull
   public String getNode() {
     return node;
   }
 
-  public void setNode(@Nonnull String node) {
+  public void setNode(@NotNull String node) {
     this.node = node;
   }
 
-  @Nonnull
+  @NotNull
   public String getPermission() {
     return permission;
   }
 
-  public void setPermission(@Nonnull String permission) {
+  public void setPermission(@NotNull String permission) {
     this.permission = permission;
   }
 
-  @Nonnull
+  @NotNull
   public String getPrincipal() {
     return principal;
   }
 
-  public void setPrincipal(@Nonnull String principal) {
+  public void setPrincipal(@NotNull String principal) {
     this.principal = principal;
   }
 
-  @Nonnull
+  @NotNull
   public String getType() {
     return type;
   }
 
-  public void setType(@Nonnull String type) {
+  public void setType(@NotNull String type) {
     this.type = type;
   }
 

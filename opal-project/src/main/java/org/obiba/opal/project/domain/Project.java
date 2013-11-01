@@ -13,9 +13,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.magma.Datasource;
@@ -32,11 +32,11 @@ import com.google.common.collect.Lists;
  */
 public class Project extends AbstractTimestamped implements HasUniqueProperties, Comparable<Project> {
 
-  @Nonnull
+  @NotNull
   @NotBlank
   private String name;
 
-  @Nonnull
+  @NotNull
   @NotBlank
   private String title;
 
@@ -51,7 +51,7 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
   public Project() {
   }
 
-  public Project(@Nonnull String name) {
+  public Project(@NotNull String name) {
     this.name = name;
   }
 
@@ -65,21 +65,21 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
     return Lists.<Object>newArrayList(name);
   }
 
-  @Nonnull
+  @NotNull
   public String getName() {
     return name;
   }
 
-  public void setName(@Nonnull String name) {
+  public void setName(@NotNull String name) {
     this.name = name;
   }
 
-  @Nonnull
+  @NotNull
   public String getTitle() {
     return title;
   }
 
-  public void setTitle(@Nonnull String title) {
+  public void setTitle(@NotNull String title) {
     this.title = title;
   }
 

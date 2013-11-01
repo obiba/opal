@@ -8,10 +8,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeSet;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.mozilla.javascript.Scriptable;
 import org.obiba.magma.Datasource;
@@ -103,7 +102,7 @@ abstract class AbstractValueTableResource {
     return entities;
   }
 
-  private Iterable<VariableEntity> getFilteredEntities(@Nonnull String script) {
+  private Iterable<VariableEntity> getFilteredEntities(@NotNull String script) {
     //noinspection ConstantConditions
     Preconditions.checkArgument(script != null, "Entities filter script cannot be null.");
 

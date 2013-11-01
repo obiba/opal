@@ -12,7 +12,7 @@ package org.obiba.opal.web.vcs;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -56,7 +56,7 @@ public class ViewVcsLogResource {
 
   @GET
   @Path("/variable/{variableName}/commits")
-  public Response getVariableCommitsInfo(@Nonnull @PathParam("variableName") String variableName) {
+  public Response getVariableCommitsInfo(@NotNull @PathParam("variableName") String variableName) {
     try {
       List<CommitInfo> commitInfos = vcs
           .getCommitsInfo(datasource, OpalGitUtils.getVariableFilePath(view, variableName));
@@ -68,8 +68,8 @@ public class ViewVcsLogResource {
 
   @GET
   @Path("/variable/{variableName}/commit/{commitId}")
-  public Response getVariableCommitInfo(@Nonnull @PathParam("variableName") String variableName,
-      @Nonnull @PathParam("commitId") String commitId) {
+  public Response getVariableCommitInfo(@NotNull @PathParam("variableName") String variableName,
+      @NotNull @PathParam("commitId") String commitId) {
 
     try {
       String path = OpalGitUtils.getVariableFilePath(view, variableName);
@@ -83,8 +83,8 @@ public class ViewVcsLogResource {
 
   @GET
   @Path("/variable/{variableName}/commit/head/{commitId}")
-  public Response getVariableCommitInfoFromHead(@Nonnull @PathParam("variableName") String variableName,
-      @Nonnull @PathParam("commitId") String commitId) {
+  public Response getVariableCommitInfoFromHead(@NotNull @PathParam("variableName") String variableName,
+      @NotNull @PathParam("commitId") String commitId) {
 
     try {
       String path = OpalGitUtils.getVariableFilePath(view, variableName);
@@ -98,8 +98,8 @@ public class ViewVcsLogResource {
 
   @GET
   @Path("/variable/{variableName}/blob/{commitId}")
-  public Response getVariableContent(@Nonnull @PathParam("variableName") String variableName,
-      @Nonnull @PathParam("commitId") String commitId) {
+  public Response getVariableContent(@NotNull @PathParam("variableName") String variableName,
+      @NotNull @PathParam("commitId") String commitId) {
     try {
       String blob = vcs.getBlob(datasource, OpalGitUtils.getVariableFilePath(view, variableName), commitId);
       String path = OpalGitUtils.getVariableFilePath(view, variableName);
@@ -111,8 +111,8 @@ public class ViewVcsLogResource {
     }
   }
 
-  private CommitInfo getVariableDiffInternal(@Nonnull CommitInfo commitInfo, @Nonnull String path,
-      @Nonnull String commitId, @Nullable String prevCommitId) {
+  private CommitInfo getVariableDiffInternal(@NotNull CommitInfo commitInfo, @NotNull String path,
+      @NotNull String commitId, @Nullable String prevCommitId) {
     List<String> diffEntries = vcs.getDiffEntries(datasource, commitId, prevCommitId, path);
     return CommitInfo.Builder.createFromObject(commitInfo).setDiffEntries(diffEntries).build();
   }

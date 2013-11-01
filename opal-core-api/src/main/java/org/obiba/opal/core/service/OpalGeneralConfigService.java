@@ -1,13 +1,13 @@
 package org.obiba.opal.core.service;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.core.domain.OpalGeneralConfig;
 
 public interface OpalGeneralConfigService extends SystemService {
 
-  void save(@Nonnull OpalGeneralConfig config);
+  void save(@NotNull OpalGeneralConfig config);
 
-  @Nonnull
+  @NotNull
   OpalGeneralConfig getConfig() throws OpalGeneralConfigMissingException;
 }

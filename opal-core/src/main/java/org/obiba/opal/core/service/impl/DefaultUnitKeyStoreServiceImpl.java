@@ -18,11 +18,11 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.UnrecoverableKeyException;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;
 import org.obiba.opal.core.crypt.CacheablePasswordCallback;
@@ -42,15 +42,15 @@ import org.springframework.util.Assert;
 @Transactional
 public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
 
-  @Nonnull
+  @NotNull
   private final CallbackHandler callbackHandler;
 
-  @Nonnull
+  @NotNull
   private final OrientDbService orientDbService;
 
   @Autowired
-  public DefaultUnitKeyStoreServiceImpl(@Nonnull CallbackHandler callbackHandler,
-      @Nonnull OrientDbService orientDbService) {
+  public DefaultUnitKeyStoreServiceImpl(@NotNull CallbackHandler callbackHandler,
+      @NotNull OrientDbService orientDbService) {
     this.callbackHandler = callbackHandler;
     this.orientDbService = orientDbService;
   }
@@ -67,7 +67,7 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
 
   @Nullable
   @Override
-  public UnitKeyStore getUnitKeyStore(@Nonnull String unitName) {
+  public UnitKeyStore getUnitKeyStore(@NotNull String unitName) {
     Assert.hasText(unitName, "unitName must not be null or empty");
     UnitKeyStoreState state = findByUnit(unitName);
     return state == null ? null : loadUnitKeyStore(unitName, state);
@@ -78,7 +78,7 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
   }
 
   @Override
-  public UnitKeyStore getOrCreateUnitKeyStore(@Nonnull String unitName) {
+  public UnitKeyStore getOrCreateUnitKeyStore(@NotNull String unitName) {
     Assert.hasText(unitName, "unitName must not be null or empty");
 
     UnitKeyStore unitKeyStore = getUnitKeyStore(unitName);
@@ -90,7 +90,7 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
   }
 
   @Override
-  public void saveUnitKeyStore(@Nonnull UnitKeyStore unitKeyStore) {
+  public void saveUnitKeyStore(@NotNull UnitKeyStore unitKeyStore) {
     Assert.notNull(unitKeyStore, "unitKeyStore must not be null");
 
     UnitKeyStoreState state;
@@ -108,8 +108,8 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
   }
 
   @Override
-  public void createOrUpdateKey(@Nonnull String unitName, @Nonnull String alias, @Nonnull String algorithm, int size,
-      @Nonnull String certificateInfo) {
+  public void createOrUpdateKey(@NotNull String unitName, @NotNull String alias, @NotNull String algorithm, int size,
+      @NotNull String certificateInfo) {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.hasText(algorithm, "algorithm must not be null or empty");
@@ -130,14 +130,14 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
   }
 
   @Override
-  public boolean aliasExists(@Nonnull String unitName, @Nonnull String alias) {
+  public boolean aliasExists(@NotNull String unitName, @NotNull String alias) {
     Assert.hasText(alias, "alias must not be null or empty");
     UnitKeyStore unitKeyStore = getUnitKeyStore(unitName);
     return unitKeyStore != null && unitKeyStore.aliasExists(alias);
   }
 
   @Override
-  public void deleteKey(@Nonnull String unitName, @Nonnull String alias) {
+  public void deleteKey(@NotNull String unitName, @NotNull String alias) {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
 
@@ -151,8 +151,8 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
   }
 
   @Override
-  public void importKey(@Nonnull String unitName, @Nonnull String alias, @Nonnull FileObject privateKey,
-      @Nonnull FileObject certificate) {
+  public void importKey(@NotNull String unitName, @NotNull String alias, @NotNull FileObject privateKey,
+      @NotNull FileObject certificate) {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(privateKey, "privateKey must not be null");
@@ -165,8 +165,8 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
   }
 
   @Override
-  public void importKey(@Nonnull String unitName, @Nonnull String alias, @Nonnull InputStream privateKey,
-      @Nonnull InputStream certificate) throws NoSuchFunctionalUnitException {
+  public void importKey(@NotNull String unitName, @NotNull String alias, @NotNull InputStream privateKey,
+      @NotNull InputStream certificate) throws NoSuchFunctionalUnitException {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(privateKey, "privateKey must not be null");
@@ -179,8 +179,8 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
   }
 
   @Override
-  public void importKey(@Nonnull String unitName, @Nonnull String alias, @Nonnull FileObject privateKey,
-      @Nonnull String certificateInfo) {
+  public void importKey(@NotNull String unitName, @NotNull String alias, @NotNull FileObject privateKey,
+      @NotNull String certificateInfo) {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(privateKey, "privateKey must not be null");
@@ -193,8 +193,8 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
   }
 
   @Override
-  public void importKey(@Nonnull String unitName, @Nonnull String alias, @Nonnull InputStream privateKey,
-      @Nonnull String certificateInfo) throws NoSuchFunctionalUnitException {
+  public void importKey(@NotNull String unitName, @NotNull String alias, @NotNull InputStream privateKey,
+      @NotNull String certificateInfo) throws NoSuchFunctionalUnitException {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(privateKey, "privateKey must not be null");
@@ -207,7 +207,7 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
   }
 
   @Override
-  public void importCertificate(@Nonnull String unitName, @Nonnull String alias, @Nonnull InputStream certStream) {
+  public void importCertificate(@NotNull String unitName, @NotNull String alias, @NotNull InputStream certStream) {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(certStream, "certStream must not be null");
@@ -218,7 +218,7 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
     saveUnitKeyStore(unitKeyStore);
   }
 
-  private UnitKeyStore loadUnitKeyStore(@Nonnull String unitName, @Nonnull UnitKeyStoreState state) {
+  private UnitKeyStore loadUnitKeyStore(@NotNull String unitName, @NotNull UnitKeyStoreState state) {
     CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName)
         .prompt(getPasswordFor(unitName)).build();
 

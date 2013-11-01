@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.support;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.opal.rest.client.magma.RestDatasourceFactory;
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class RestDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoParser {
 
-  @Nonnull
+  @NotNull
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
     RestDatasourceFactoryDto rDto = dto.getExtension(RestDatasourceFactoryDto.params);

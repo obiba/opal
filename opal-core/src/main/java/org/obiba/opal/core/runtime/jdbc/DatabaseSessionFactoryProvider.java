@@ -1,6 +1,6 @@
 package org.obiba.opal.core.runtime.jdbc;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.SessionFactory;
 import org.obiba.magma.Disposable;
@@ -28,8 +28,8 @@ public class DatabaseSessionFactoryProvider implements SessionFactoryProvider, D
   }
 
   @SuppressWarnings("ConstantConditions")
-  public DatabaseSessionFactoryProvider(@Nonnull String datasourceName, @Nonnull DatabaseRegistry databaseRegistry,
-      @Nonnull String databaseName) {
+  public DatabaseSessionFactoryProvider(@NotNull String datasourceName, @NotNull DatabaseRegistry databaseRegistry,
+      @NotNull String databaseName) {
     Preconditions.checkArgument(datasourceName != null);
     Preconditions.checkArgument(databaseRegistry != null);
     Preconditions.checkArgument(databaseName != null);

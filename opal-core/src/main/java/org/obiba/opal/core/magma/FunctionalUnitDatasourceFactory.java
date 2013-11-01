@@ -9,8 +9,8 @@
  */
 package org.obiba.opal.core.magma;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.AbstractDatasourceFactory;
 import org.obiba.magma.Datasource;
@@ -23,13 +23,13 @@ import org.obiba.opal.core.unit.FunctionalUnit;
 
 public class FunctionalUnitDatasourceFactory extends AbstractDatasourceFactory implements Initialisable {
 
-  @Nonnull
+  @NotNull
   private final DatasourceFactory wrappedFactory;
 
-  @Nonnull
+  @NotNull
   private final FunctionalUnit unit;
 
-  @Nonnull
+  @NotNull
   private final ValueTable keysTable;
 
   @Nullable
@@ -37,8 +37,8 @@ public class FunctionalUnitDatasourceFactory extends AbstractDatasourceFactory i
 
   private final boolean ignoreUnknownIdentifier;
 
-  public FunctionalUnitDatasourceFactory(@Nonnull DatasourceFactory wrappedFactory, @Nonnull FunctionalUnit unit,
-      @Nonnull ValueTable keysTable, @Nullable IParticipantIdentifier identifierGenerator,
+  public FunctionalUnitDatasourceFactory(@NotNull DatasourceFactory wrappedFactory, @NotNull FunctionalUnit unit,
+      @NotNull ValueTable keysTable, @Nullable IParticipantIdentifier identifierGenerator,
       boolean ignoreUnknownIdentifier) {
     this.wrappedFactory = wrappedFactory;
     this.unit = unit;
@@ -57,7 +57,7 @@ public class FunctionalUnitDatasourceFactory extends AbstractDatasourceFactory i
     return wrappedFactory.getName();
   }
 
-  @Nonnull
+  @NotNull
   @Override
   protected Datasource internalCreate() {
     return new FunctionalUnitDatasource(wrappedFactory.create(), unit,

@@ -1,7 +1,7 @@
 package org.obiba.opal.core.domain.database;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
@@ -17,16 +17,16 @@ public class SqlSettings {
   /**
    * jdbc:{mysql|hsqldb|postgresql}://{hostname}:{port}/{databaseName}
    */
-  @Nonnull
+  @NotNull
   @NotBlank
   //TODO url should be unique
   private String url;
 
-  @Nonnull
+  @NotNull
   @NotBlank
   private String driverClass;
 
-  @Nonnull
+  @NotNull
   @NotBlank
   private String username;
 
@@ -34,7 +34,7 @@ public class SqlSettings {
 
   private String properties;
 
-  @Nonnull
+  @NotNull
   private SqlSchema sqlSchema;
 
   @Nullable
@@ -43,12 +43,12 @@ public class SqlSettings {
   @Nullable
   private LimesurveyDatasourceSettings limesurveyDatasourceSettings;
 
-  @Nonnull
+  @NotNull
   public String getDriverClass() {
     return driverClass;
   }
 
-  public void setDriverClass(@Nonnull String driverClass) {
+  public void setDriverClass(@NotNull String driverClass) {
     this.driverClass = driverClass;
   }
 
@@ -68,30 +68,30 @@ public class SqlSettings {
     this.properties = properties;
   }
 
-  @Nonnull
+  @NotNull
   public String getUrl() {
     return url;
   }
 
-  public void setUrl(@Nonnull String url) {
+  public void setUrl(@NotNull String url) {
     this.url = url;
   }
 
-  @Nonnull
+  @NotNull
   public String getUsername() {
     return username;
   }
 
-  public void setUsername(@Nonnull String username) {
+  public void setUsername(@NotNull String username) {
     this.username = username;
   }
 
-  @Nonnull
+  @NotNull
   public SqlSchema getSqlSchema() {
     return sqlSchema;
   }
 
-  public void setSqlSchema(@Nonnull SqlSchema sqlSchema) {
+  public void setSqlSchema(@NotNull SqlSchema sqlSchema) {
     this.sqlSchema = sqlSchema;
   }
 

@@ -11,7 +11,7 @@ package org.obiba.opal.web.project;
 
 import java.util.Set;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.magma.Datasource;
@@ -34,7 +34,7 @@ public class Dtos {
 
   private Dtos() {}
 
-  public static ProjectDto asDto(Project project, @Nonnull String directory) {
+  public static ProjectDto asDto(Project project, @NotNull String directory) {
     ProjectDto.Builder builder = ProjectDto.newBuilder() //
         .setName(project.getName()) //
         .setTitle(project.getTitle()) //
@@ -109,9 +109,9 @@ public class Dtos {
     Timestamps ts = timestamped.getTimestamps();
     Magma.TimestampsDto.Builder builder = Magma.TimestampsDto.newBuilder();
     Value created = ts.getCreated();
-    if (!created.isNull()) builder.setCreated(created.toString());
+    if(!created.isNull()) builder.setCreated(created.toString());
     Value lastUpdate = ts.getLastUpdate();
-    if (!lastUpdate.isNull()) builder.setLastUpdate(lastUpdate.toString());
+    if(!lastUpdate.isNull()) builder.setLastUpdate(lastUpdate.toString());
     return builder.build();
   }
 }

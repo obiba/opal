@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.core.util.HexUtil;
@@ -30,11 +30,11 @@ public class User extends AbstractTimestamped implements Comparable<User>, HasUn
     ACTIVE, INACTIVE
   }
 
-  @Nonnull
+  @NotNull
   @NotBlank
   private String name;
 
-  @Nonnull
+  @NotNull
   @NotBlank
   private String password;
 
@@ -45,7 +45,7 @@ public class User extends AbstractTimestamped implements Comparable<User>, HasUn
   public User() {
   }
 
-  public User(@Nonnull String name) {
+  public User(@NotNull String name) {
     this.name = name;
   }
 
@@ -59,21 +59,21 @@ public class User extends AbstractTimestamped implements Comparable<User>, HasUn
     return Lists.<Object>newArrayList(name);
   }
 
-  @Nonnull
+  @NotNull
   public String getName() {
     return name;
   }
 
-  public void setName(@Nonnull String name) {
+  public void setName(@NotNull String name) {
     this.name = name;
   }
 
-  @Nonnull
+  @NotNull
   public String getPassword() {
     return password;
   }
 
-  public void setPassword(@Nonnull String password) {
+  public void setPassword(@NotNull String password) {
     this.password = password;
   }
 

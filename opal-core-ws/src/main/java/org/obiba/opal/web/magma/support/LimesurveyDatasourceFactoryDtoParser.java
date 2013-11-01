@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.support;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
@@ -28,7 +28,7 @@ public class LimesurveyDatasourceFactoryDtoParser extends AbstractDatasourceFact
     this.databaseRegistry = databaseRegistry;
   }
 
-  @Nonnull
+  @NotNull
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
     LimesurveyDatasourceFactoryDto limesurveyDto = dto.getExtension(LimesurveyDatasourceFactoryDto.params);

@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
@@ -35,14 +35,14 @@ public abstract class AbstractVariableSummaryCachedService< //
   private final Map<String, Map<String, TVariableSummaryBuilder>> summaryBuilders = Collections
       .synchronizedMap(new HashMap<String, Map<String, TVariableSummaryBuilder>>());
 
-  @Nonnull
+  @NotNull
   protected abstract Cache getCache();
 
-  @Nonnull
-  protected abstract TVariableSummaryBuilder newVariableSummaryBuilder(@Nonnull Variable variable);
+  @NotNull
+  protected abstract TVariableSummaryBuilder newVariableSummaryBuilder(@NotNull Variable variable);
 
-  @Nonnull
-  protected TVariableSummaryBuilder getSummaryBuilder(@Nonnull ValueTable valueTable, @Nonnull Variable variable) {
+  @NotNull
+  protected TVariableSummaryBuilder getSummaryBuilder(@NotNull ValueTable valueTable, @NotNull Variable variable) {
     Map<String, TVariableSummaryBuilder> buildersByVariable = summaryBuilders.get(valueTable.getTableReference());
     if(buildersByVariable == null) {
       buildersByVariable = Maps.newHashMap();
@@ -56,7 +56,7 @@ public abstract class AbstractVariableSummaryCachedService< //
     return builder;
   }
 
-  private Iterable<TVariableSummaryBuilder> getSummaryBuilders(@Nonnull ValueTable valueTable) {
+  private Iterable<TVariableSummaryBuilder> getSummaryBuilders(@NotNull ValueTable valueTable) {
     Map<String, TVariableSummaryBuilder> buildersByVariable = summaryBuilders.get(valueTable.getTableReference());
     return buildersByVariable == null ? Collections.<TVariableSummaryBuilder>emptyList() : buildersByVariable.values();
   }
@@ -71,12 +71,12 @@ public abstract class AbstractVariableSummaryCachedService< //
     }
   }
 
-  protected void clearComputingSummaries(@Nonnull ValueTable valueTable) {
+  protected void clearComputingSummaries(@NotNull ValueTable valueTable) {
     summaryBuilders.remove(valueTable.getTableReference());
   }
 
-  @Nonnull
-  public TVariableSummary getSummary(@Nonnull TVariableSummaryFactory summaryFactory) {
+  @NotNull
+  public TVariableSummary getSummary(@NotNull TVariableSummaryFactory summaryFactory) {
     Variable variable = summaryFactory.getVariable();
     Preconditions.checkArgument(!BinaryType.get().equals(variable.getValueType()),
         "Cannot compute summary for binary variable " + variable.getName());

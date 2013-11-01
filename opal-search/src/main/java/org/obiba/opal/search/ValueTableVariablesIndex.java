@@ -9,7 +9,7 @@
  */
 package org.obiba.opal.search;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.Attribute;
 
@@ -24,6 +24,6 @@ public interface ValueTableVariablesIndex extends ValueTableIndex {
    * @param attribute Attribute
    * @return
    */
-  @Nonnull
-  String getFieldName(@Nonnull Attribute attribute);
+  @NotNull
+  String getFieldName(@NotNull Attribute attribute);
 }

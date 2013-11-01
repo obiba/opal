@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ThreadFactory;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueSet;
@@ -117,9 +117,9 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
             addMissingEntitiesToKeysTable(valueTable);
             MultithreadedDatasourceCopier.Builder.newCopier() //
                 .withThreads(new ThreadFactory() {
-                  @Nonnull
+                  @NotNull
                   @Override
-                  public Thread newThread(@Nonnull Runnable r) {
+                  public Thread newThread(@NotNull Runnable r) {
                     return new TransactionalThread(r);
                   }
                 }) //

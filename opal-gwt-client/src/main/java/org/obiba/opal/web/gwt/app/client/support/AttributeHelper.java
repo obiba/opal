@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.support;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
@@ -47,7 +47,7 @@ public class AttributeHelper {
    * @param name the attribute name
    * @return empty string if attribute was not found
    */
-  @Nonnull
+  @NotNull
   public static String getAttributeValue(JsArray<AttributeDto> attributes, String name) {
     AttributeDto attribute = null;
 

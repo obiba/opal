@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadFactory;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.index.IndexRequestBuilder;
@@ -50,31 +50,31 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
 //  private static final Logger log = LoggerFactory.getLogger(EsValuesIndexManager.class);
 
   @Autowired
-  @Nonnull
+  @NotNull
   private ThreadFactory threadFactory;
 
   @Autowired
-  @Nonnull
+  @NotNull
   private VariableStatsService variableStatsService;
 
-  @Nonnull
+  @NotNull
   @Override
-  public EsValueTableValuesIndex getIndex(@Nonnull ValueTable vt) {
+  public EsValueTableValuesIndex getIndex(@NotNull ValueTable vt) {
     return (EsValueTableValuesIndex) super.getIndex(vt);
   }
 
   @Override
-  protected ValueTableIndex createIndex(@Nonnull ValueTable vt) {
+  protected ValueTableIndex createIndex(@NotNull ValueTable vt) {
     return new EsValueTableValuesIndex(vt);
   }
 
-  @Nonnull
+  @NotNull
   @Override
   public IndexSynchronization createSyncTask(ValueTable valueTable, ValueTableIndex index) {
     return new Indexer(valueTable, (EsValueTableValuesIndex) index);
   }
 
-  @Nonnull
+  @NotNull
   @Override
   public String getName() {
     return esIndexName() + "-values";

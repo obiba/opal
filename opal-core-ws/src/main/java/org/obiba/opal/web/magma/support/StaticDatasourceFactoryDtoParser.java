@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.AbstractDatasourceFactory;
 import org.obiba.magma.Datasource;
@@ -44,7 +44,7 @@ public class StaticDatasourceFactoryDtoParser extends AbstractDatasourceFactoryD
     this.viewDtos = viewDtos;
   }
 
-  @Nonnull
+  @NotNull
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
     return new StaticDatasourceFactory(dto);
@@ -65,7 +65,7 @@ public class StaticDatasourceFactoryDtoParser extends AbstractDatasourceFactoryD
       }
     }
 
-    @Nonnull
+    @NotNull
     @Override
     protected Datasource internalCreate() {
       StaticDatasourceFactoryDto staticDto = dto.getExtension(StaticDatasourceFactoryDto.params);

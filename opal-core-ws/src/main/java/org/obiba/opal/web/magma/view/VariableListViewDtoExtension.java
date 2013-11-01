@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
@@ -42,12 +42,12 @@ import org.springframework.stereotype.Component;
 public class VariableListViewDtoExtension implements ViewDtoExtension {
 
   @Override
-  public boolean isExtensionOf(@Nonnull ViewDto viewDto) {
+  public boolean isExtensionOf(@NotNull ViewDto viewDto) {
     return viewDto.hasExtension(VariableListViewDto.view);
   }
 
   @Override
-  public boolean isDtoOf(@Nonnull View view) {
+  public boolean isDtoOf(@NotNull View view) {
     return !(view.getListClause() instanceof NoneClause);
   }
 

@@ -12,9 +12,9 @@ package org.obiba.opal.core.runtime;
 import java.io.File;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -108,7 +108,7 @@ public class DefaultOpalRuntime implements OpalRuntime {
     return false;
   }
 
-  @Nonnull
+  @NotNull
   @Override
   public Service getService(String name) throws NoSuchServiceException {
     for(Service service : services) {

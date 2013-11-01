@@ -1,17 +1,17 @@
 package org.obiba.opal.core.service;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.server.OServer;
 
 public interface OrientDbServerFactory {
 
-  @Nonnull
+  @NotNull
   OServer getServer();
 
-  @Nonnull
+  @NotNull
   ODatabaseDocumentTx getDocumentTx();
 
-  void setUrl(@Nonnull String url);
+  void setUrl(@NotNull String url);
 }

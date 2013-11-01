@@ -13,8 +13,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;
 import org.obiba.magma.Datasource;
@@ -42,7 +42,7 @@ public interface ImportService {
    * @throws IOException on any I/O error
    * @throws InterruptedException if the current thread was interrupted
    */
-  void importData(@Nullable String unitName, @Nonnull FileObject sourceFile, @Nonnull String destinationDatasourceName,
+  void importData(@Nullable String unitName, @NotNull FileObject sourceFile, @NotNull String destinationDatasourceName,
       boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
       throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException,
       InterruptedException;

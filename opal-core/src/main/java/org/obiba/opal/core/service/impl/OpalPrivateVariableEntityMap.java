@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.Value;
@@ -45,20 +45,20 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
 
   private static final Logger log = LoggerFactory.getLogger(OpalPrivateVariableEntityMap.class);
 
-  @Nonnull
+  @NotNull
   private final ValueTable keysValueTable;
 
-  @Nonnull
+  @NotNull
   private final Variable ownerVariable;
 
-  @Nonnull
+  @NotNull
   private final IParticipantIdentifier participantIdentifier;
 
-  @Nonnull
+  @NotNull
   private final BiMap<VariableEntity, VariableEntity> publicToPrivate = HashBiMap.create();
 
-  public OpalPrivateVariableEntityMap(@Nonnull ValueTable keysValueTable, @Nonnull Variable ownerVariable,
-      @Nonnull IParticipantIdentifier participantIdentifier) {
+  public OpalPrivateVariableEntityMap(@NotNull ValueTable keysValueTable, @NotNull Variable ownerVariable,
+      @NotNull IParticipantIdentifier participantIdentifier) {
     Assert.notNull(keysValueTable, "keysValueTable cannot be null");
     Assert.notNull(ownerVariable, "ownerVariable cannot be null");
     Assert.notNull(participantIdentifier, "participantIdentifier cannot be null");
@@ -71,7 +71,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
   }
 
   @Override
-  public VariableEntity publicEntity(@Nonnull VariableEntity privateEntity) {
+  public VariableEntity publicEntity(@NotNull VariableEntity privateEntity) {
     Assert.notNull(privateEntity, "privateEntity cannot be null");
     VariableEntity entity = publicToPrivate.inverse().get(privateEntity);
     log.debug("({}) <--> {}", privateEntity.getIdentifier(), entity == null ? null : entity.getIdentifier());
@@ -79,7 +79,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
   }
 
   @Override
-  public VariableEntity privateEntity(@Nonnull VariableEntity publicEntity) {
+  public VariableEntity privateEntity(@NotNull VariableEntity publicEntity) {
     Assert.notNull(publicEntity, "publicEntity cannot be null");
     VariableEntity entity = publicToPrivate.get(publicEntity);
     log.debug("{} <--> ({})", publicEntity.getIdentifier(), entity == null ? null : entity.getIdentifier());
@@ -87,19 +87,19 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
   }
 
   @Override
-  public boolean hasPrivateEntity(@Nonnull VariableEntity privateEntity) {
+  public boolean hasPrivateEntity(@NotNull VariableEntity privateEntity) {
     Assert.notNull(privateEntity, "privateEntity cannot be null");
     return publicToPrivate.inverse().containsKey(privateEntity);
   }
 
   @Override
-  public boolean hasPublicEntity(@Nonnull VariableEntity publicEntity) {
+  public boolean hasPublicEntity(@NotNull VariableEntity publicEntity) {
     Assert.notNull(publicEntity, "publicEntity cannot be null");
     return publicToPrivate.containsKey(publicEntity);
   }
 
   @Override
-  public VariableEntity createPrivateEntity(@Nonnull VariableEntity publicEntity) {
+  public VariableEntity createPrivateEntity(@NotNull VariableEntity publicEntity) {
     Assert.notNull(publicEntity, "publicEntity cannot be null");
     for(int i = 0; i < 100; i++) {
       VariableEntity privateEntity = entityFor(participantIdentifier.generateParticipantIdentifier());
@@ -120,7 +120,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
   }
 
   @Override
-  public VariableEntity createPublicEntity(@Nonnull VariableEntity privateEntity) {
+  public VariableEntity createPublicEntity(@NotNull VariableEntity privateEntity) {
     Assert.notNull(privateEntity, "privateEntity cannot be null");
     for(int i = 0; i < 100; i++) {
       VariableEntity publicEntity = entityFor(participantIdentifier.generateParticipantIdentifier());
@@ -165,7 +165,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     log.debug("Cache constructed: {}", publicToPrivate);
   }
 
-  private void constructCacheFromTable(@Nonnull ValueTable keyTable, @Nonnull ValueSource ownerVariableSource) {
+  private void constructCacheFromTable(@NotNull ValueTable keyTable, @NotNull ValueSource ownerVariableSource) {
     for(ValueSet valueSet : keyTable.getValueSets()) {
       Value value = ownerVariableSource.getValue(valueSet);
       // OPAL-619: The value could be null, in which case don't cache it. Whenever new participant
@@ -181,7 +181,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     }
   }
 
-  private void constructCacheFromVector(@Nonnull ValueTable keyTable, @Nonnull VectorSource vs) {
+  private void constructCacheFromVector(@NotNull ValueTable keyTable, @NotNull VectorSource vs) {
     SortedSet<VariableEntity> entities = new TreeSet<VariableEntity>(keyTable.getVariableEntities());
     Iterator<Value> values = vs.getValues(entities).iterator();
     for(VariableEntity opalEntity : entities) {

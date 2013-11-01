@@ -2,9 +2,9 @@ package org.obiba.opal.core.service;
 
 import java.util.Map;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.core.domain.HasUniqueProperties;
 
@@ -26,7 +26,7 @@ public interface OrientDbService {
   @Nullable
   <T> T uniqueResult(Class<T> clazz, String sql, Object... params);
 
-  <T extends HasUniqueProperties> T findUnique(@Nonnull HasUniqueProperties template);
+  <T extends HasUniqueProperties> T findUnique(@NotNull HasUniqueProperties template);
 
   /**
    * Find <b>template</b> document and save it with <b>hasUniqueProperties</b> properties:
@@ -40,7 +40,7 @@ public interface OrientDbService {
    * @param hasUniqueProperties
    * @throws ConstraintViolationException
    */
-  void save(@Nullable HasUniqueProperties template, @Nonnull HasUniqueProperties hasUniqueProperties)
+  void save(@Nullable HasUniqueProperties template, @NotNull HasUniqueProperties hasUniqueProperties)
       throws ConstraintViolationException;
 
   /**
@@ -56,15 +56,15 @@ public interface OrientDbService {
    * @param hasUniqueProperties
    * @throws ConstraintViolationException
    */
-  void save(@Nonnull Map<HasUniqueProperties, HasUniqueProperties> beansByTemplate) throws ConstraintViolationException;
+  void save(@NotNull Map<HasUniqueProperties, HasUniqueProperties> beansByTemplate) throws ConstraintViolationException;
 
-  void delete(@Nonnull HasUniqueProperties... templates);
+  void delete(@NotNull HasUniqueProperties... templates);
 
-  void deleteAll(@Nonnull Class<? extends HasUniqueProperties> clazz);
+  void deleteAll(@NotNull Class<? extends HasUniqueProperties> clazz);
 
-  void createUniqueIndex(@Nonnull Class<? extends HasUniqueProperties> clazz);
+  void createUniqueIndex(@NotNull Class<? extends HasUniqueProperties> clazz);
 
-  void createIndex(Class<?> clazz, OClass.INDEX_TYPE indexType, OType type, @Nonnull String... propertyPath);
+  void createIndex(Class<?> clazz, OClass.INDEX_TYPE indexType, OType type, @NotNull String... propertyPath);
 
   void copyToDocument(Object obj, ORecord<?> document);
 

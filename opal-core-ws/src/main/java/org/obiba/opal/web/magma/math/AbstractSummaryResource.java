@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.math;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
@@ -21,17 +21,17 @@ public class AbstractSummaryResource {
 
   protected final VariableStatsService variableStatsService;
 
-  @Nonnull
+  @NotNull
   private final ValueTable valueTable;
 
-  @Nonnull
+  @NotNull
   private final Variable variable;
 
-  @Nonnull
+  @NotNull
   private final ValueSource variableValueSource;
 
-  protected AbstractSummaryResource(@Nonnull VariableStatsService variableStatsService, @Nonnull ValueTable valueTable,
-      @Nonnull Variable variable, @Nonnull ValueSource variableValueSource) {
+  protected AbstractSummaryResource(@NotNull VariableStatsService variableStatsService, @NotNull ValueTable valueTable,
+      @NotNull Variable variable, @NotNull ValueSource variableValueSource) {
     Assert.notNull(variableStatsService);
     Assert.notNull(valueTable);
     Assert.notNull(variable);
@@ -43,17 +43,17 @@ public class AbstractSummaryResource {
     this.variable = variable;
   }
 
-  @Nonnull
+  @NotNull
   public ValueTable getValueTable() {
     return valueTable;
   }
 
-  @Nonnull
+  @NotNull
   public Variable getVariable() {
     return variable;
   }
 
-  @Nonnull
+  @NotNull
   public ValueSource getVariableValueSource() {
     return variableValueSource;
   }

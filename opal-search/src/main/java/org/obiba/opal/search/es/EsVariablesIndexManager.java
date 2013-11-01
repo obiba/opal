@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -40,29 +40,29 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
 
 //  private static final Logger log = LoggerFactory.getLogger(EsVariablesIndexManager.class);
 
-  @Nonnull
+  @NotNull
   @Override
-  public EsValueTableVariablesIndex getIndex(@Nonnull ValueTable vt) {
+  public EsValueTableVariablesIndex getIndex(@NotNull ValueTable vt) {
     return (EsValueTableVariablesIndex) super.getIndex(vt);
   }
 
   @Override
-  protected ValueTableIndex createIndex(@Nonnull ValueTable vt) {
+  protected ValueTableIndex createIndex(@NotNull ValueTable vt) {
     return new EsValueTableVariablesIndex(vt);
   }
 
   @Override
-  public boolean isIndexable(@Nonnull ValueTable valueTable) {
+  public boolean isIndexable(@NotNull ValueTable valueTable) {
     return !getIndex(valueTable).isUpToDate();
   }
 
-  @Nonnull
+  @NotNull
   @Override
   public IndexSynchronization createSyncTask(ValueTable valueTable, ValueTableIndex index) {
     return new Indexer(valueTable, (EsValueTableVariablesIndex) index);
   }
 
-  @Nonnull
+  @NotNull
   @Override
   public String getName() {
     return esIndexName() + "-variables";
@@ -172,9 +172,9 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
           .createMapping(runtimeVersionProvider.getVersion(), getIndexName(), resolveTable());
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public String getFieldName(@Nonnull Attribute attribute) {
+    public String getFieldName(@NotNull Attribute attribute) {
       return AttributeMapping.getFieldName(attribute);
     }
 

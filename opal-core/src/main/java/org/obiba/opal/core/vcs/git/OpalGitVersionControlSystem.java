@@ -14,7 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
@@ -34,28 +34,28 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 public class OpalGitVersionControlSystem implements OpalVersionControlSystem {
 
   @Override
-  public List<CommitInfo> getCommitsInfo(@Nonnull String datasource, @Nonnull String path) {
+  public List<CommitInfo> getCommitsInfo(@NotNull String datasource, @NotNull String path) {
     OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(getRepository(datasource)).addPath(path)
         .addDatasourceName(datasource).build();
     return command.execute();
   }
 
   @Override
-  public CommitInfo getCommitInfo(@Nonnull String datasource, @Nonnull String path, @Nonnull String commitId) {
+  public CommitInfo getCommitInfo(@NotNull String datasource, @NotNull String path, @NotNull String commitId) {
     OpalGitCommitLogCommand command = new OpalGitCommitLogCommand.Builder(getRepository(datasource), path, commitId)
         .addDatasourceName(datasource).build();
     return command.execute();
   }
 
   @Override
-  public String getBlob(@Nonnull String datasource, @Nonnull String path, @Nonnull String commitId) {
+  public String getBlob(@NotNull String datasource, @NotNull String path, @NotNull String commitId) {
     OpalGitFetchBlobCommand command = new OpalGitFetchBlobCommand.Builder(getRepository(datasource), path, commitId)
         .addDatasourceName(datasource).build();
     return command.execute();
   }
 
   @Override
-  public List<String> getDiffEntries(@Nonnull String datasource, @Nonnull String commitId,
+  public List<String> getDiffEntries(@NotNull String datasource, @NotNull String commitId,
       @Nullable String prevCommitId, @Nullable String path) {
     OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(getRepository(datasource), commitId).addPath(path)
         .addDatasourceName(datasource).addPreviousCommitId(prevCommitId).build();

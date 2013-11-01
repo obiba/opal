@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.rest.client;
 import java.util.Collection;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 
@@ -25,12 +25,12 @@ import com.google.gwt.http.client.Response;
 @SuppressWarnings("ParameterHidesMemberVariable")
 public class DefaultResourceAuthorizationRequestBuilder implements ResourceAuthorizationRequestBuilder {
 
-  @Nonnull
+  @NotNull
   private String resource;
 
   private HttpMethod method;
 
-  @Nonnull
+  @NotNull
   private HasAuthorization toAuthorize;
 
   @SuppressWarnings("StaticNonFinalField")
@@ -41,7 +41,7 @@ public class DefaultResourceAuthorizationRequestBuilder implements ResourceAutho
   }
 
   @Override
-  public DefaultResourceAuthorizationRequestBuilder authorize(@Nonnull HasAuthorization toAuthorize) {
+  public DefaultResourceAuthorizationRequestBuilder authorize(@NotNull HasAuthorization toAuthorize) {
     //noinspection ConstantConditions
     if(toAuthorize == null) throw new IllegalArgumentException("UI object to authorize cannot be null");
     this.toAuthorize = toAuthorize;
@@ -49,13 +49,13 @@ public class DefaultResourceAuthorizationRequestBuilder implements ResourceAutho
   }
 
   @Override
-  public ResourceAuthorizationRequestBuilder request(@Nonnull String resource, HttpMethod method) {
+  public ResourceAuthorizationRequestBuilder request(@NotNull String resource, HttpMethod method) {
     forResource(resource);
     return method(method);
   }
 
   @Override
-  public ResourceAuthorizationRequestBuilder forResource(@Nonnull String resource) {
+  public ResourceAuthorizationRequestBuilder forResource(@NotNull String resource) {
     //noinspection ConstantConditions
     if(resource == null) throw new IllegalArgumentException("path cannot be null");
     this.resource = resource;

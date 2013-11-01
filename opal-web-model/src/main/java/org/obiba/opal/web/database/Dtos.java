@@ -1,7 +1,7 @@
 package org.obiba.opal.web.database;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
 import org.obiba.opal.core.domain.database.Database;
@@ -33,7 +33,7 @@ public class Dtos {
   }
 
   @Nullable
-  private static SqlSettings fromDto(@Nonnull SqlSettingsDto dto) {
+  private static SqlSettings fromDto(@NotNull SqlSettingsDto dto) {
     SqlSettings settings = new SqlSettings();
     settings.setDriverClass(dto.getDriverClass());
     settings.setSqlSchema(SqlSettings.SqlSchema.valueOf(dto.getSqlSchema().name()));
@@ -52,12 +52,12 @@ public class Dtos {
 
   @Nullable
   private static SqlSettings.LimesurveyDatasourceSettings fromDto(
-      @Nonnull SqlSettingsDto.LimesurveyDatasourceSettingsDto dto) {
+      @NotNull SqlSettingsDto.LimesurveyDatasourceSettingsDto dto) {
     return new SqlSettings.LimesurveyDatasourceSettings(dto.getTablePrefix());
   }
 
   @Nullable
-  private static JdbcDatasourceSettings fromDto(@Nonnull Magma.JdbcDatasourceSettingsDto dto) {
+  private static JdbcDatasourceSettings fromDto(@NotNull Magma.JdbcDatasourceSettingsDto dto) {
     JdbcDatasourceSettings jdbcSettings = new JdbcDatasourceSettings();
     jdbcSettings.setDefaultEntityType(dto.getDefaultEntityType());
     jdbcSettings.setDefaultCreatedTimestampColumnName(dto.getDefaultCreatedTimestampColumnName());
@@ -67,7 +67,7 @@ public class Dtos {
   }
 
   @Nullable
-  private static MongoDbSettings fromDto(@Nonnull MongoDbSettingsDto dto) {
+  private static MongoDbSettings fromDto(@NotNull MongoDbSettingsDto dto) {
     MongoDbSettings settings = new MongoDbSettings();
     settings.setUrl(dto.getUrl());
     settings.setUsername(dto.getUsername());

@@ -12,8 +12,8 @@ package org.obiba.opal.core.service;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.NoSuchDatasourceException;
@@ -48,8 +48,8 @@ public interface ExportService {
    * the destinationDatasource.
    * @throws InterruptedException if the current thread was interrupted
    */
-  void exportTablesToDatasource(@Nullable String unit, @Nonnull List<String> sourceTableNames,
-      @Nonnull String destinationDatasourceName, boolean incremental) throws InterruptedException;
+  void exportTablesToDatasource(@Nullable String unit, @NotNull List<String> sourceTableNames,
+      @NotNull String destinationDatasourceName, boolean incremental) throws InterruptedException;
 
   /**
    * Export tables to an existing Datasource using the provided {@link DatasourceCopier}. If logging is required ensure
@@ -67,8 +67,8 @@ public interface ExportService {
    * the destinationDatasource.
    * @throws InterruptedException if the current thread was interrupted
    */
-  void exportTablesToDatasource(@Nullable String unit, @Nonnull List<String> sourceTableNames,
-      @Nonnull String destinationDatasourceName, DatasourceCopier.Builder datasourceCopier, boolean incremental)
+  void exportTablesToDatasource(@Nullable String unit, @NotNull List<String> sourceTableNames,
+      @NotNull String destinationDatasourceName, DatasourceCopier.Builder datasourceCopier, boolean incremental)
       throws InterruptedException;
 
   /**
@@ -85,8 +85,8 @@ public interface ExportService {
    * @throws ExportException if the datasource of a sourceTable matches the destinationDatasource.
    * @throws InterruptedException if the current thread was interrupted
    */
-  void exportTablesToDatasource(@Nullable String unit, @Nonnull Set<ValueTable> sourceTables,
-      @Nonnull Datasource destinationDatasource, @Nonnull DatasourceCopier.Builder datasourceCopier,
+  void exportTablesToDatasource(@Nullable String unit, @NotNull Set<ValueTable> sourceTables,
+      @NotNull Datasource destinationDatasource, @NotNull DatasourceCopier.Builder datasourceCopier,
       boolean incremental) throws InterruptedException;
 
 }

@@ -26,8 +26,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -106,7 +106,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   }
 
   @Override
-  public void writeViews(@Nonnull String datasourceName, @Nonnull Set<View> views, @Nullable String comment) {
+  public void writeViews(@NotNull String datasourceName, @NotNull Set<View> views, @Nullable String comment) {
     w.lock();
     try {
       doWriteGitViews(datasourceName, views, comment);
@@ -116,7 +116,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   }
 
   @Override
-  public void writeView(@Nonnull String datasourceName, @Nonnull View view, @Nullable String comment) {
+  public void writeView(@NotNull String datasourceName, @NotNull View view, @Nullable String comment) {
     w.lock();
     try {
       doWriteGitViews(datasourceName, ImmutableSet.of(view), comment);
@@ -126,7 +126,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   }
 
   @Override
-  public void removeView(@Nonnull String datasourceName, @Nonnull String viewName) {
+  public void removeView(@NotNull String datasourceName, @NotNull String viewName) {
     w.lock();
     try {
       doRemoveGitView(datasourceName, viewName);
@@ -149,7 +149,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   }
 
   @Override
-  public Set<View> readViews(@Nonnull String datasourceName) {
+  public Set<View> readViews(@NotNull String datasourceName) {
     r.lock();
     try {
       File targetDir = getDatasourceViewsGit(datasourceName);
@@ -165,7 +165,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     git.push().setPushAll().setRemote("origin").call();
   }
 
-  private void doWriteGitViews(@Nonnull String datasourceName, @Nonnull Iterable<View> views,
+  private void doWriteGitViews(@NotNull String datasourceName, @NotNull Iterable<View> views,
       @Nullable String comment) {
     File localRepo = null;
 
@@ -199,7 +199,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     }
   }
 
-  private void doRemoveGitView(@Nonnull String datasourceName, @Nonnull String viewName) {
+  private void doRemoveGitView(@NotNull String datasourceName, @NotNull String viewName) {
     File localRepo = null;
     try {
       localRepo = cloneDatasourceViewsGit(datasourceName);
@@ -313,8 +313,8 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   }
 
   @SuppressWarnings("unchecked")
-  @Nonnull
-  private Set<View> doReadViews(@Nonnull String datasourceName) {
+  @NotNull
+  private Set<View> doReadViews(@NotNull String datasourceName) {
     Set<View> result = ImmutableSet.of();
     if(!viewsDirectory.isDirectory()) {
       log.info("The views directory '{}' does not exist.", viewsDirectory.getAbsolutePath());
@@ -332,8 +332,8 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     return result;
   }
 
-  @Nonnull
-  private Set<View> doReadGitViews(@Nonnull String datasourceName) {
+  @NotNull
+  private Set<View> doReadGitViews(@NotNull String datasourceName) {
     ImmutableSet.Builder<View> builder = ImmutableSet.builder();
 
     File localRepo = null;

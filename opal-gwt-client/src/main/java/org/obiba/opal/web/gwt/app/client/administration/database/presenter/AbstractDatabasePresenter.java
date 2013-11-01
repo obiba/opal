@@ -1,6 +1,6 @@
 package org.obiba.opal.web.gwt.app.client.administration.database.presenter;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseUpdatedEvent;
@@ -155,7 +155,7 @@ public abstract class AbstractDatabasePresenter<TView extends AbstractDatabasePr
     getView().setDialogMode(dialogMode);
   }
 
-  DatabaseDto.Usage parseUsage(@Nonnull Usage usage) {
+  DatabaseDto.Usage parseUsage(@NotNull Usage usage) {
     switch(usage) {
       case IMPORT:
         return DatabaseDto.Usage.IMPORT;

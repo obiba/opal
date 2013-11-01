@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.core.magma;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.VariableEntity;
 
@@ -19,15 +19,15 @@ import org.obiba.magma.VariableEntity;
  */
 public interface PrivateVariableEntityMap {
 
-  VariableEntity publicEntity(@Nonnull VariableEntity privateEntity);
+  VariableEntity publicEntity(@NotNull VariableEntity privateEntity);
 
-  boolean hasPublicEntity(@Nonnull VariableEntity publicEntity);
+  boolean hasPublicEntity(@NotNull VariableEntity publicEntity);
 
-  VariableEntity privateEntity(@Nonnull VariableEntity publicEntity);
+  VariableEntity privateEntity(@NotNull VariableEntity publicEntity);
 
-  boolean hasPrivateEntity(@Nonnull VariableEntity privateEntity);
+  boolean hasPrivateEntity(@NotNull VariableEntity privateEntity);
 
-  VariableEntity createPublicEntity(@Nonnull VariableEntity privateEntity);
+  VariableEntity createPublicEntity(@NotNull VariableEntity privateEntity);
 
-  VariableEntity createPrivateEntity(@Nonnull VariableEntity publicEntity);
+  VariableEntity createPrivateEntity(@NotNull VariableEntity publicEntity);
 }

@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -59,7 +59,7 @@ public abstract class AbstractFunctionalUnitResource {
     return getUnitsFromName(reader.readNext());
   }
 
-  protected List<FunctionalUnit> getUnitsFromName(@Nonnull String... unitNames) {
+  protected List<FunctionalUnit> getUnitsFromName(@NotNull String... unitNames) {
     // find the units
     List<FunctionalUnit> units = new ArrayList<FunctionalUnit>();
     Collection<String> visitedUnitNames = new ArrayList<String>();

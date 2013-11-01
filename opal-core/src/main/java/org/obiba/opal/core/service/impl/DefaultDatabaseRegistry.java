@@ -1,11 +1,11 @@
 package org.obiba.opal.core.service.impl;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
@@ -115,26 +115,26 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     return Iterables.size(list(usage)) > 0;
   }
 
-  @Nonnull
+  @NotNull
   @Override
-  public Database getDatabase(@Nonnull String name) throws NoSuchDatabaseException {
+  public Database getDatabase(@NotNull String name) throws NoSuchDatabaseException {
     return orientDbService.findUnique(Database.Builder.create().name(name).build());
   }
 
   @Override
-  public DataSource getDataSource(@Nonnull String name, @Nullable String usedByDatasource) {
+  public DataSource getDataSource(@NotNull String name, @Nullable String usedByDatasource) {
     register(name, usedByDatasource);
     return dataSourceCache.getUnchecked(name);
   }
 
   @Override
-  public SessionFactory getSessionFactory(@Nonnull String name, @Nullable String usedByDatasource) {
+  public SessionFactory getSessionFactory(@NotNull String name, @Nullable String usedByDatasource) {
     register(name, usedByDatasource);
     return sessionFactoryCache.getUnchecked(name);
   }
 
   @Override
-  public void save(@Nonnull Database database)
+  public void save(@NotNull Database database)
       throws ConstraintViolationException, MultipleIdentifiersDatabaseException {
 
     //TODO valid unique url
@@ -176,7 +176,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   }
 
   @Override
-  public void delete(@Nonnull Database database) throws CannotDeleteDatabaseWithDataException {
+  public void delete(@NotNull Database database) throws CannotDeleteDatabaseWithDataException {
     //TODO check if this database has data
     orientDbService.delete(database);
     destroyDataSource(database.getName());
@@ -198,7 +198,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   }
 
   @Override
-  public void unregister(@Nonnull String databaseName, String usedByDatasource) {
+  public void unregister(@NotNull String databaseName, String usedByDatasource) {
     Database database = getDatabase(databaseName);
     database.setEditable(true);
     orientDbService.save(database, database);
@@ -212,7 +212,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
             true) != null;
   }
 
-  @Nonnull
+  @NotNull
   @Override
   public Database getIdentifiersDatabase() throws IdentifiersDatabaseNotFoundException {
     Database database = orientDbService
@@ -222,9 +222,9 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     return database;
   }
 
-  @Nonnull
+  @NotNull
   @Override
-  public DatasourceFactory createDataSourceFactory(@Nonnull String datasourceName, @Nonnull Database database) {
+  public DatasourceFactory createDataSourceFactory(@NotNull String datasourceName, @NotNull Database database) {
     String databaseName = database.getName();
     Preconditions.checkArgument(database.getUsage() == Database.Usage.STORAGE,
         "Cannot create DatasourceFactory for non storage database " + databaseName + ": " + database.getUsage());

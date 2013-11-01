@@ -12,7 +12,7 @@ package org.obiba.opal.fs;
 
 import java.io.File;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;
 
@@ -28,7 +28,7 @@ public interface OpalFileSystem {
    *
    * @return A FileObject representing the root.
    */
-  @Nonnull
+  @NotNull
   FileObject getRoot();
 
   /**

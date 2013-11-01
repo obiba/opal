@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.core.runtime.jdbc;
 
-import javax.annotation.Nonnull;
 import javax.sql.DataSource;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.SqlSettings;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataSourceFactory {
 
-  public DataSource createDataSource(@Nonnull Database database) {
+  public DataSource createDataSource(@NotNull Database database) {
     DataSourceFactoryBean factoryBean = new DataSourceFactoryBean();
     factoryBean.setName(database.getName());
 

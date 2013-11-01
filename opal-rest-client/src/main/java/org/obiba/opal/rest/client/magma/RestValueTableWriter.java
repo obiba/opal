@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -68,21 +68,21 @@ class RestValueTableWriter implements ValueTableWriter {
       }
 
       @Override
-      public void writeVariable(@Nonnull Variable variable) {
+      public void writeVariable(@NotNull Variable variable) {
         variables.add(variable);
       }
 
       @Override
-      public void removeVariable(@Nonnull Variable variable) {
+      public void removeVariable(@NotNull Variable variable) {
         //To change body of implemented methods use File | Settings | File Templates.
       }
 
     };
   }
 
-  @Nonnull
+  @NotNull
   @Override
-  public ValueSetWriter writeValueSet(@Nonnull final VariableEntity entity) {
+  public ValueSetWriter writeValueSet(@NotNull final VariableEntity entity) {
 
     return new ValueSetWriter() {
 
@@ -100,7 +100,7 @@ class RestValueTableWriter implements ValueTableWriter {
       }
 
       @Override
-      public void writeValue(@Nonnull Variable variable, Value value) {
+      public void writeValue(@NotNull Variable variable, Value value) {
         valueSetsDtoBuilder.addVariables(variable.getName());
         valueSetDtoBuilder.addValues(Dtos.asDto(value));
       }

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.Category;
 import org.obiba.magma.Value;
@@ -54,7 +54,7 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
 
   private final Collection<Frequency> frequencies = new ArrayList<Frequency>();
 
-  private CategoricalVariableSummary(@Nonnull Variable variable) {
+  private CategoricalVariableSummary(@NotNull Variable variable) {
     super(variable);
   }
 
@@ -63,7 +63,7 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
     return CategoricalVariableSummaryFactory.getCacheKey(variable, table, distinct, getOffset(), getLimit());
   }
 
-  @Nonnull
+  @NotNull
   public Iterable<Frequency> getFrequencies() {
     return ImmutableList.copyOf(frequencies);
   }
@@ -122,19 +122,19 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
 
     private final CategoricalVariableSummary summary;
 
-    @Nonnull
+    @NotNull
     private final Variable variable;
 
     private boolean addedTable;
 
     private boolean addedValue;
 
-    public Builder(@Nonnull Variable variable) {
+    public Builder(@NotNull Variable variable) {
       this.variable = variable;
       summary = new CategoricalVariableSummary(variable);
     }
 
-    public Builder addValue(@Nonnull Value value) {
+    public Builder addValue(@NotNull Value value) {
       if(addedTable) {
         throw new IllegalStateException("Cannot add value for variable " + summary.variable.getName() +
             " because values where previously added from the whole table with addTable().");
@@ -144,7 +144,7 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
       return this;
     }
 
-    public Builder addTable(@Nonnull ValueTable table, @Nonnull ValueSource valueSource) {
+    public Builder addTable(@NotNull ValueTable table, @NotNull ValueSource valueSource) {
       if(addedValue) {
         throw new IllegalStateException("Cannot add table for variable " + summary.variable.getName() +
             " because values where previously added with addValue().");
@@ -155,7 +155,7 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
       return this;
     }
 
-    private void add(@Nonnull ValueTable table, @Nonnull ValueSource variableValueSource) {
+    private void add(@NotNull ValueTable table, @NotNull ValueSource variableValueSource) {
       Assert.notNull(table, "ValueTable cannot be null");
       Assert.notNull(variableValueSource, "variableValueSource cannot be null");
 
@@ -166,7 +166,7 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
       }
     }
 
-    private void add(@Nonnull Value value) {
+    private void add(@NotNull Value value) {
       Assert.notNull(value, "Value cannot be null");
       if(summary.empty) summary.empty = false;
       if(value.isSequence()) {
@@ -249,7 +249,7 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public CategoricalVariableSummary build() {
       compute();
       return summary;

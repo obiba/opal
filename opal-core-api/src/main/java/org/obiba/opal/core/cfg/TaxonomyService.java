@@ -10,8 +10,8 @@
 
 package org.obiba.opal.core.cfg;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.domain.taxonomy.Vocabulary;
@@ -25,19 +25,19 @@ public interface TaxonomyService extends SystemService {
   Iterable<Taxonomy> getTaxonomies();
 
   @Nullable
-  Taxonomy getTaxonomy(@Nonnull String name);
+  Taxonomy getTaxonomy(@NotNull String name);
 
-  void saveTaxonomy(@Nullable Taxonomy template, @Nonnull Taxonomy taxonomy);
+  void saveTaxonomy(@Nullable Taxonomy template, @NotNull Taxonomy taxonomy);
 
-  void deleteTaxonomy(@Nonnull String name);
+  void deleteTaxonomy(@NotNull String name);
 
-  Iterable<Vocabulary> getVocabularies(@Nonnull String taxonomy);
+  Iterable<Vocabulary> getVocabularies(@NotNull String taxonomy);
 
   @Nullable
-  Vocabulary getVocabulary(@Nonnull String taxonomy, @Nonnull String name);
+  Vocabulary getVocabulary(@NotNull String taxonomy, @NotNull String name);
 
-  void saveVocabulary(@Nullable Vocabulary template, @Nonnull Vocabulary vocabulary);
+  void saveVocabulary(@Nullable Vocabulary template, @NotNull Vocabulary vocabulary);
 
-  void deleteVocabulary(@Nonnull Vocabulary vocabulary);
+  void deleteVocabulary(@NotNull Vocabulary vocabulary);
 
 }

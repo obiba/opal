@@ -11,7 +11,7 @@ package org.obiba.opal.web.magma.support;
 
 import java.io.File;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.NoSuchValueTableException;
@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CsvDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoParser {
 
-  @Nonnull
+  @NotNull
   @Override
   protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
     CsvDatasourceFactory factory = new CsvDatasourceFactory();

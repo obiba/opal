@@ -11,7 +11,7 @@ package org.obiba.opal.web.search.support;
 
 import java.util.Iterator;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -166,7 +166,7 @@ public class QueryTermConverterTest {
     }
 
     @SuppressWarnings("unchecked")
-    public static void assertEquals(@Nonnull JSONObject expected, @Nonnull JSONObject target) {
+    public static void assertEquals(@NotNull JSONObject expected, @NotNull JSONObject target) {
 
       try {
 

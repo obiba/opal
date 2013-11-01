@@ -12,8 +12,8 @@ package org.obiba.opal.web.magma;
 import java.util.HashSet;
 import java.util.Locale;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -55,14 +55,14 @@ public class ValueSetResource extends AbstractValueTableResource {
   @Nullable
   private final VariableValueSource vvs;
 
-  @Nonnull
+  @NotNull
   private final VariableEntity entity;
 
-  public ValueSetResource(ValueTable valueTable, @Nonnull VariableEntity entity) {
+  public ValueSetResource(ValueTable valueTable, @NotNull VariableEntity entity) {
     this(valueTable, null, entity);
   }
 
-  public ValueSetResource(ValueTable valueTable, @Nullable VariableValueSource vvs, @Nonnull VariableEntity entity) {
+  public ValueSetResource(ValueTable valueTable, @Nullable VariableValueSource vvs, @NotNull VariableEntity entity) {
     super(valueTable, new HashSet<Locale>());
     this.vvs = vvs;
     this.entity = entity;

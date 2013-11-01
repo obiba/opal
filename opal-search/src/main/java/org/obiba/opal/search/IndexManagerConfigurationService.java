@@ -9,7 +9,7 @@
  */
 package org.obiba.opal.search;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableUpdateListener;
@@ -57,7 +57,7 @@ public class IndexManagerConfigurationService implements ValueTableUpdateListene
   }
 
   @Override
-  public void onDelete(@Nonnull ValueTable vt) {
+  public void onDelete(@NotNull ValueTable vt) {
     remove(vt);
   }
 }

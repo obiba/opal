@@ -11,9 +11,9 @@ package org.obiba.opal.core.service.impl;
 
 import java.io.IOException;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.PreDestroy;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
@@ -43,11 +43,11 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   @Autowired
   private DatabaseRegistry databaseRegistry;
 
-  @Nonnull
+  @NotNull
   @Value("${org.obiba.opal.keys.tableReference}")
   private String tableReference;
 
-  @Nonnull
+  @NotNull
   @Value("${org.obiba.opal.keys.entityType}")
   private String entityType;
 
@@ -81,13 +81,13 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
     return getTableResolver().getTableName();
   }
 
-  @Nonnull
+  @NotNull
   @Override
   public String getEntityType() {
     return entityType;
   }
 
-  @Nonnull
+  @NotNull
   @Override
   public String getTableReference() {
     return tableReference;
@@ -110,7 +110,7 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
     }
   }
 
-  @Nonnull
+  @NotNull
   private Datasource getDatasource() throws IdentifiersDatabaseNotFoundException {
     if(datasource == null) {
       DatasourceFactory datasourceFactory = databaseRegistry

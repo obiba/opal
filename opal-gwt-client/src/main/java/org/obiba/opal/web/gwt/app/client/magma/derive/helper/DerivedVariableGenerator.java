@@ -14,14 +14,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.support.AttributeHelper;
-import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry;
 import org.obiba.opal.web.gwt.app.client.magma.derive.view.ValueMapEntry.ValueMapEntryType;
+import org.obiba.opal.web.gwt.app.client.support.AttributeHelper;
+import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -229,7 +229,7 @@ public abstract class DerivedVariableGenerator {
     }
   }
 
-  public static VariableDto copyVariable(@Nonnull VariableDto variable) {
+  public static VariableDto copyVariable(@NotNull VariableDto variable) {
     return copyVariable(variable, false, variable.getLink());
   }
 

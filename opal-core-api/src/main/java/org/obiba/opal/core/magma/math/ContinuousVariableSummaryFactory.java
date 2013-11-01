@@ -2,7 +2,7 @@ package org.obiba.opal.core.magma.math;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
@@ -22,7 +22,7 @@ public class ContinuousVariableSummaryFactory extends AbstractVariableSummaryFac
 
   private Integer limit;
 
-  @Nonnull
+  @NotNull
   @Override
   public String getCacheKey() {
     return getCacheKey(getVariable(), getTable(), distribution, percentiles, intervals, offset, limit);
@@ -37,7 +37,7 @@ public class ContinuousVariableSummaryFactory extends AbstractVariableSummaryFac
     return key;
   }
 
-  @Nonnull
+  @NotNull
   @Override
   public ContinuousVariableSummary getSummary() {
     return new ContinuousVariableSummary.Builder(getVariable(), distribution) //

@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.core.support;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.AbstractDatasourceFactory;
 import org.obiba.magma.Datasource;
@@ -37,7 +37,7 @@ public class OnyxDatasourceFactory extends AbstractDatasourceFactory {
     return wrappedFactory.getName();
   }
 
-  @Nonnull
+  @NotNull
   @Override
   protected Datasource internalCreate() {
     return new OnyxDatasource((FsDatasource) wrappedFactory.create());

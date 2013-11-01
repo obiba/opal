@@ -2,8 +2,8 @@ package org.obiba.opal.web.gwt.app.client.validator;
 
 import java.util.Map;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
@@ -26,32 +26,32 @@ public class ConstrainedModal {
 
   private final Map<String, ConstrainedWidget> constrainedWidgets = Maps.newHashMap();
 
-  public ConstrainedModal(@Nonnull Modal modal) {
+  public ConstrainedModal(@NotNull Modal modal) {
     this.modal = modal;
     modal.addHandler(new ModalRequestErrorHandler(), RequestErrorEvent.getType());
   }
 
-  public void registerWidget(@Nonnull String propertyPath, @Nonnull String propertyLabel) {
+  public void registerWidget(@NotNull String propertyPath, @NotNull String propertyLabel) {
     registerWidget(propertyPath, propertyLabel, null);
   }
 
-  public void registerWidget(@Nonnull String propertyPath, @Nonnull String propertyLabel,
+  public void registerWidget(@NotNull String propertyPath, @NotNull String propertyLabel,
       @Nullable ControlGroup group) {
     constrainedWidgets.put(propertyPath, new ConstrainedWidget(propertyPath, propertyLabel, group));
   }
 
   private static class ConstrainedWidget {
 
-    @Nonnull
+    @NotNull
     private final String propertyPath;
 
-    @Nonnull
+    @NotNull
     private final String propertyLabel;
 
     @Nullable
     private final ControlGroup group;
 
-    private ConstrainedWidget(@Nonnull String propertyPath, @Nonnull String propertyLabel,
+    private ConstrainedWidget(@NotNull String propertyPath, @NotNull String propertyLabel,
         @Nullable ControlGroup group) {
       this.propertyPath = propertyPath;
       this.propertyLabel = propertyLabel;
@@ -63,12 +63,12 @@ public class ConstrainedModal {
       return group;
     }
 
-    @Nonnull
+    @NotNull
     private String getPropertyPath() {
       return propertyPath;
     }
 
-    @Nonnull
+    @NotNull
     private String getPropertyLabel() {
       return propertyLabel;
     }

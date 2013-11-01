@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.core.magma;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
@@ -24,13 +24,13 @@ import org.springframework.util.Assert;
  */
 public class FunctionalUnitDatasource extends AbstractDatasourceWrapperWithCachedTables {
 
-  @Nonnull
+  @NotNull
   private final FunctionalUnit unit;
 
-  @Nonnull
+  @NotNull
   private final FunctionalUnitView.Policy policy;
 
-  @Nonnull
+  @NotNull
   private final ValueTable keysTable;
 
   @Nullable
@@ -38,8 +38,8 @@ public class FunctionalUnitDatasource extends AbstractDatasourceWrapperWithCache
 
   private final boolean ignoreUnknownIdentifier;
 
-  public FunctionalUnitDatasource(@Nonnull Datasource wrapped, @Nonnull FunctionalUnit unit,
-      @Nonnull FunctionalUnitView.Policy policy, @Nonnull ValueTable keysTable,
+  public FunctionalUnitDatasource(@NotNull Datasource wrapped, @NotNull FunctionalUnit unit,
+      @NotNull FunctionalUnitView.Policy policy, @NotNull ValueTable keysTable,
       @Nullable IParticipantIdentifier identifierGenerator, boolean ignoreUnknownIdentifier) {
     super(wrapped);
 

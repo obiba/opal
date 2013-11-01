@@ -12,8 +12,8 @@ package org.obiba.opal.web.gwt.app.client.administration.database.presenter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -162,7 +162,7 @@ public class SqlDatabasePresenter extends AbstractDatabasePresenter<SqlDatabaseP
     return jdbcSettings;
   }
 
-  private SqlSettingsDto.SqlSchema parseSqlSchema(@Nonnull SqlSchema sqlSchema) {
+  private SqlSettingsDto.SqlSchema parseSqlSchema(@NotNull SqlSchema sqlSchema) {
     switch(sqlSchema) {
       case HIBERNATE:
         return SqlSettingsDto.SqlSchema.HIBERNATE;

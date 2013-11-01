@@ -11,7 +11,7 @@ package org.obiba.opal.web.magma.view;
 
 import java.io.InputStream;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -58,12 +58,12 @@ public class FileViewDtoExtension implements ViewDtoExtension {
   }
 
   @Override
-  public boolean isExtensionOf(@Nonnull ViewDto viewDto) {
+  public boolean isExtensionOf(@NotNull ViewDto viewDto) {
     return viewDto.hasExtension(FileViewDto.view);
   }
 
   @Override
-  public boolean isDtoOf(@Nonnull View view) {
+  public boolean isDtoOf(@NotNull View view) {
     // Always false: we cannot convert an existing view to a file.
     return false;
   }

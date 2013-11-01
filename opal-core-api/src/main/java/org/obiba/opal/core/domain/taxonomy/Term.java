@@ -16,13 +16,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 
 public class Term {
 
-  @Nonnull
+  @NotNull
   @NotBlank
   private String name;
 
@@ -35,16 +35,16 @@ public class Term {
   public Term() {
   }
 
-  public Term(@Nonnull String name) {
+  public Term(@NotNull String name) {
     this.name = name;
   }
 
-  @Nonnull
+  @NotNull
   public String getName() {
     return name;
   }
 
-  public void setName(@Nonnull String name) {
+  public void setName(@NotNull String name) {
     this.name = name;
   }
 

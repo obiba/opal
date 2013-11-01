@@ -1,6 +1,6 @@
 package org.obiba.opal.core.domain.database;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasourceFactory;
@@ -10,7 +10,7 @@ public class MongoDbSettings {
   /**
    * mongodb://{hostname}:{port}/{databaseName}
    */
-  @Nonnull
+  @NotNull
   @NotBlank
   //TODO url should be unique
   private String url;
@@ -41,12 +41,12 @@ public class MongoDbSettings {
     this.properties = properties;
   }
 
-  @Nonnull
+  @NotNull
   public String getUrl() {
     return url;
   }
 
-  public void setUrl(@Nonnull String url) {
+  public void setUrl(@NotNull String url) {
     this.url = url;
   }
 

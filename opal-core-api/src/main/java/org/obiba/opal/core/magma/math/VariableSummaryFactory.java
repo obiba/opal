@@ -1,6 +1,6 @@
 package org.obiba.opal.core.magma.math;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
@@ -8,21 +8,21 @@ import org.obiba.magma.Variable;
 
 public interface VariableSummaryFactory<TVariableSummary extends VariableSummary> {
 
-  @Nonnull
+  @NotNull
   TVariableSummary getSummary();
 
-  @Nonnull
+  @NotNull
   String getCacheKey();
 
-  @Nonnull
+  @NotNull
   Variable getVariable();
 
-  @Nonnull
+  @NotNull
   ValueTable getTable();
 
   void setValueSource(ValueSource valueSource);
 
-  @Nonnull
+  @NotNull
   ValueSource getValueSource();
 
   void setTable(ValueTable table);

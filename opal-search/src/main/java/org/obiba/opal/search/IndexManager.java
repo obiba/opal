@@ -9,7 +9,7 @@
  */
 package org.obiba.opal.search;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.ValueTable;
 
@@ -23,7 +23,7 @@ public interface IndexManager {
    *
    * @return
    */
-  @Nonnull
+  @NotNull
   String getName();
 
   /**
@@ -32,8 +32,8 @@ public interface IndexManager {
    * @param valueTable
    * @return
    */
-  @Nonnull
-  ValueTableIndex getIndex(@Nonnull ValueTable valueTable);
+  @NotNull
+  ValueTableIndex getIndex(@NotNull ValueTable valueTable);
 
   /**
    * Create a index synchronization task.
@@ -42,7 +42,7 @@ public interface IndexManager {
    * @param index
    * @return
    */
-  @Nonnull
+  @NotNull
   IndexSynchronization createSyncTask(ValueTable valueTable, ValueTableIndex index);
 
   /**
@@ -58,7 +58,7 @@ public interface IndexManager {
    * @param valueTable
    * @return
    */
-  boolean isIndexable(@Nonnull ValueTable valueTable);
+  boolean isIndexable(@NotNull ValueTable valueTable);
 
   /**
    * Returns true of value table is indexed and index is up to date, ie ready to be queried.
@@ -66,11 +66,12 @@ public interface IndexManager {
    * @param valueTable
    * @return
    */
-  boolean isIndexUpToDate(@Nonnull ValueTable valueTable);
+  boolean isIndexUpToDate(@NotNull ValueTable valueTable);
 
   /**
    * Returns true if the given table has an index. In the ES paradigm, this refers to a index type.
+   *
    * @return
    */
-  boolean hasIndex(@Nonnull ValueTable valueTable);
+  boolean hasIndex(@NotNull ValueTable valueTable);
 }

@@ -7,10 +7,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.NonUniqueResultException;
 import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.service.OrientDbServerFactory;
@@ -71,7 +71,7 @@ public class OrientDbServiceImpl implements OrientDbService {
     }
   }
 
-  public <T> void saveNonUnique(@Nonnull T t) {
+  public <T> void saveNonUnique(@NotNull T t) {
     //noinspection ConstantConditions
     Preconditions.checkArgument(t != null, "t cannot be null");
 
@@ -95,7 +95,7 @@ public class OrientDbServiceImpl implements OrientDbService {
   }
 
   @Override
-  public void save(@Nullable HasUniqueProperties template, @Nonnull HasUniqueProperties hasUniqueProperties)
+  public void save(@Nullable HasUniqueProperties template, @NotNull HasUniqueProperties hasUniqueProperties)
       throws ConstraintViolationException {
     //noinspection ConstantConditions
     Preconditions.checkArgument(hasUniqueProperties != null, "hasUniqueProperties cannot be null");
@@ -103,7 +103,7 @@ public class OrientDbServiceImpl implements OrientDbService {
   }
 
   @Override
-  public void save(@Nonnull Map<HasUniqueProperties, HasUniqueProperties> beansByTemplate)
+  public void save(@NotNull Map<HasUniqueProperties, HasUniqueProperties> beansByTemplate)
       throws ConstraintViolationException {
     //noinspection ConstantConditions
     Preconditions.checkArgument(beansByTemplate != null, "beansByTemplate cannot be null");
@@ -150,7 +150,7 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T extends HasUniqueProperties> T findUnique(@Nonnull HasUniqueProperties template) {
+  public <T extends HasUniqueProperties> T findUnique(@NotNull HasUniqueProperties template) {
     ODatabaseDocumentTx db = serverFactory.getDocumentTx();
     try {
       ODocument document = findUniqueDocument(db, template);
@@ -248,7 +248,7 @@ public class OrientDbServiceImpl implements OrientDbService {
   }
 
   @Override
-  public void delete(@Nonnull HasUniqueProperties... templates) {
+  public void delete(@NotNull HasUniqueProperties... templates) {
     ODatabaseDocumentTx db = serverFactory.getDocumentTx();
     try {
 
@@ -275,7 +275,7 @@ public class OrientDbServiceImpl implements OrientDbService {
   }
 
   @Override
-  public void deleteAll(@Nonnull Class<? extends HasUniqueProperties> clazz) {
+  public void deleteAll(@NotNull Class<? extends HasUniqueProperties> clazz) {
     ODatabaseDocumentTx db = serverFactory.getDocumentTx();
     try {
 
@@ -295,7 +295,7 @@ public class OrientDbServiceImpl implements OrientDbService {
   }
 
   @Override
-  public void createUniqueIndex(@Nonnull Class<? extends HasUniqueProperties> clazz) {
+  public void createUniqueIndex(@NotNull Class<? extends HasUniqueProperties> clazz) {
     ODatabaseDocumentTx db = serverFactory.getDocumentTx();
     try {
       String className = clazz.getSimpleName();
@@ -329,7 +329,7 @@ public class OrientDbServiceImpl implements OrientDbService {
   }
 
   @Override
-  public void createIndex(Class<?> clazz, OClass.INDEX_TYPE indexType, OType type, @Nonnull String... propertyPath) {
+  public void createIndex(Class<?> clazz, OClass.INDEX_TYPE indexType, OType type, @NotNull String... propertyPath) {
     //noinspection ConstantConditions
     Preconditions.checkArgument(propertyPath != null, "PropertyPath cannot be null");
     ODatabaseDocumentTx db = serverFactory.getDocumentTx();
@@ -368,7 +368,7 @@ public class OrientDbServiceImpl implements OrientDbService {
     return getIndexName(hasUniqueProperties.getClass(), properties);
   }
 
-  private String getIndexName(Class<?> clazz, @Nonnull Iterable<String> uniqueProperties) {
+  private String getIndexName(Class<?> clazz, @NotNull Iterable<String> uniqueProperties) {
     StringBuilder indexName = new StringBuilder(clazz.getSimpleName());
     for(String prop : uniqueProperties) {
       indexName.append(".").append(prop);

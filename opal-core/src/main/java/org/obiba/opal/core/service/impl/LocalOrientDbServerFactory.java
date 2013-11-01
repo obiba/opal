@@ -1,6 +1,6 @@
 package org.obiba.opal.core.service.impl;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.core.service.OrientDbServerFactory;
 import org.slf4j.Logger;
@@ -32,7 +32,7 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
 
   @Value(URL)
   @Override
-  public void setUrl(@Nonnull String url) {
+  public void setUrl(@NotNull String url) {
     this.url = url;
   }
 
@@ -64,13 +64,13 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
     if(server != null) server.shutdown();
   }
 
-  @Nonnull
+  @NotNull
   @Override
   public OServer getServer() {
     return server;
   }
 
-  @Nonnull
+  @NotNull
   @Override
   public ODatabaseDocumentTx getDocumentTx() {
     return ODatabaseDocumentPool.global().acquire(url, username, password);

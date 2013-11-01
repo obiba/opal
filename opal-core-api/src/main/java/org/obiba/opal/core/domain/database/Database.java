@@ -2,8 +2,8 @@ package org.obiba.opal.core.domain.database;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
@@ -18,11 +18,11 @@ public class Database extends AbstractTimestamped implements HasUniqueProperties
     IMPORT, STORAGE, EXPORT
   }
 
-  @Nonnull
+  @NotNull
   @NotBlank
   private String name;
 
-  @Nonnull
+  @NotNull
   private Usage usage;
 
   private String description;
@@ -77,21 +77,21 @@ public class Database extends AbstractTimestamped implements HasUniqueProperties
     this.editable = editable;
   }
 
-  @Nonnull
+  @NotNull
   public String getName() {
     return name;
   }
 
-  public void setName(@Nonnull String name) {
+  public void setName(@NotNull String name) {
     this.name = name;
   }
 
-  @Nonnull
+  @NotNull
   public Usage getUsage() {
     return usage;
   }
 
-  public void setUsage(@Nonnull Usage usage) {
+  public void setUsage(@NotNull Usage usage) {
     this.usage = usage;
   }
 

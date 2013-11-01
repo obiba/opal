@@ -11,7 +11,7 @@ package org.obiba.opal.search.es.mapping;
 
 import java.io.IOException;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.obiba.magma.Attribute;
@@ -30,7 +30,7 @@ public class AttributeMapping {
     }
   }
 
-  public static String getFieldName(@Nonnull Attribute attribute) {
+  public static String getFieldName(@NotNull Attribute attribute) {
     String field = attribute.getName();
     if(attribute.hasNamespace()) {
       field = attribute.getNamespace() + "-" + field;

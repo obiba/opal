@@ -11,7 +11,7 @@ package org.obiba.opal.web.magma.support;
 
 import java.io.File;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -65,7 +65,7 @@ public abstract class AbstractDatasourceFactoryDtoParser implements DatasourceFa
       }
     }
 
-    if (dto.hasBatchConfig()) {
+    if(dto.hasBatchConfig()) {
       factory = new BatchDatasourceFactory(factory, dto.getBatchConfig().getLimit());
     }
 
@@ -73,7 +73,7 @@ public abstract class AbstractDatasourceFactoryDtoParser implements DatasourceFa
     return factory;
   }
 
-  @Nonnull
+  @NotNull
   protected abstract DatasourceFactory internalParse(DatasourceFactoryDto dto);
 
   @SuppressWarnings("UnusedDeclaration")

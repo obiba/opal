@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma.support;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.AbstractDatasourceFactory;
 import org.obiba.magma.Datasource;
@@ -41,7 +41,7 @@ public class DatabaseLimesurveyDatasourceFactory extends AbstractDatasourceFacto
    * @param tablePrefix
    * @param dataSourceRegistry
    */
-  public DatabaseLimesurveyDatasourceFactory(@Nonnull String name, @Nonnull String databaseName,
+  public DatabaseLimesurveyDatasourceFactory(@NotNull String name, @NotNull String databaseName,
       DatabaseRegistry databaseRegistry) {
     Assert.notNull(name);
     Assert.notNull(databaseName);
@@ -51,7 +51,7 @@ public class DatabaseLimesurveyDatasourceFactory extends AbstractDatasourceFacto
     this.databaseRegistry = databaseRegistry;
   }
 
-  @Nonnull
+  @NotNull
   @Override
   protected Datasource internalCreate() {
     SqlSettings.LimesurveyDatasourceSettings settings = getSettings();

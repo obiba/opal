@@ -9,8 +9,8 @@
  */
 package org.obiba.opal.project;
 
-import javax.annotation.Nonnull;
 import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -25,14 +25,14 @@ public interface ProjectService extends SystemService {
 
   Iterable<Project> getProjects();
 
-  @Nonnull
-  Project getProject(@Nonnull String name) throws NoSuchProjectException;
+  @NotNull
+  Project getProject(@NotNull String name) throws NoSuchProjectException;
 
-  boolean hasProject(@Nonnull String name);
+  boolean hasProject(@NotNull String name);
 
-  void save(@Nonnull Project project) throws ConstraintViolationException;
+  void save(@NotNull Project project) throws ConstraintViolationException;
 
-  void delete(@Nonnull String name) throws NoSuchProjectException, FileSystemException;
+  void delete(@NotNull String name) throws NoSuchProjectException, FileSystemException;
 
   /**
    * Get project directory, create it if it does not exist.
@@ -42,10 +42,10 @@ public interface ProjectService extends SystemService {
    * @throws NoSuchFunctionalUnitException
    * @throws FileSystemException
    */
-  @Nonnull
-  FileObject getProjectDirectory(@Nonnull Project project) throws NoSuchFunctionalUnitException, FileSystemException;
+  @NotNull
+  FileObject getProjectDirectory(@NotNull Project project) throws NoSuchFunctionalUnitException, FileSystemException;
 
-  @Nonnull
-  String getProjectDirectoryPath(@Nonnull Project project);
+  @NotNull
+  String getProjectDirectoryPath(@NotNull Project project);
 
 }

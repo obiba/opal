@@ -9,8 +9,8 @@
  */
 package org.obiba.opal.core.service.impl;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.AttributeAware;
 import org.obiba.magma.Value;
@@ -116,7 +116,7 @@ public class IdentifierServiceImpl implements IdentifierService {
    * @throws java.io.IOException
    */
   @Override
-  public Variable createKeyVariable(@Nullable ValueTable privateView, @Nonnull String keyVariableName) {
+  public Variable createKeyVariable(@Nullable ValueTable privateView, @NotNull String keyVariableName) {
 
     Variable keyVariable = Variable.Builder
         .newVariable(keyVariableName, TextType.get(), identifiersTableService.getEntityType()).build();
@@ -139,7 +139,7 @@ public class IdentifierServiceImpl implements IdentifierService {
     return keyVariable;
   }
 
-  private boolean isIdentifierVariable(@Nonnull AttributeAware variable) {
+  private boolean isIdentifierVariable(@NotNull AttributeAware variable) {
     if(!variable.hasAttribute("identifier")) return false;
     Value value = variable.getAttribute("identifier").getValue();
     return value.equals(BooleanType.get().trueValue()) || "true".equals(value.toString().toLowerCase());

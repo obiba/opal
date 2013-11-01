@@ -14,8 +14,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileType;
@@ -101,8 +101,8 @@ public class DefaultImportService implements ImportService {
   }
 
   @Override
-  public void importData(@Nullable String unitName, @Nonnull FileObject sourceFile,
-      @Nonnull String destinationDatasourceName, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
+  public void importData(@Nullable String unitName, @NotNull FileObject sourceFile,
+      @NotNull String destinationDatasourceName, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
       throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException,
       InterruptedException {
     // If unitName is the empty string, coerce it to null
@@ -132,7 +132,7 @@ public class DefaultImportService implements ImportService {
   }
 
   @Override
-  public void importData(@Nonnull String sourceDatasourceName, String destinationDatasourceName,
+  public void importData(@NotNull String sourceDatasourceName, String destinationDatasourceName,
       boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
       throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException, IOException,
       InterruptedException {
@@ -148,7 +148,7 @@ public class DefaultImportService implements ImportService {
   }
 
   @Override
-  public void importData(@Nonnull List<String> sourceTableNames, String destinationDatasourceName,
+  public void importData(@NotNull List<String> sourceTableNames, String destinationDatasourceName,
       boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
       throws NoSuchFunctionalUnitException, NoSuchDatasourceException, NoSuchValueTableException,
       NonExistentVariableEntitiesException, IOException, InterruptedException {
@@ -172,7 +172,7 @@ public class DefaultImportService implements ImportService {
   }
 
   @Override
-  public void importData(Set<ValueTable> sourceTables, @Nonnull String destinationDatasourceName,
+  public void importData(Set<ValueTable> sourceTables, @NotNull String destinationDatasourceName,
       boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
       throws NoSuchFunctionalUnitException, NonExistentVariableEntitiesException, IOException, InterruptedException {
     Assert.hasText(destinationDatasourceName, "destinationDatasourceName is null or empty");
@@ -182,7 +182,7 @@ public class DefaultImportService implements ImportService {
   }
 
   @Override
-  public int importIdentifiers(@Nonnull String unitName, IParticipantIdentifier pIdentifier) {
+  public int importIdentifiers(@NotNull String unitName, IParticipantIdentifier pIdentifier) {
     Assert.hasText(unitName, "unitName is null or empty");
     IParticipantIdentifier localParticipantIdentifier = pIdentifier == null ? participantIdentifier : pIdentifier;
 
@@ -212,7 +212,7 @@ public class DefaultImportService implements ImportService {
   }
 
   @Override
-  public void importIdentifiers(@Nonnull String unitName, @Nonnull String sourceDatasourceName, String select)
+  public void importIdentifiers(@NotNull String unitName, @NotNull String sourceDatasourceName, String select)
       throws IOException {
     Assert.hasText(unitName, "unitName is null or empty");
     Assert.hasText(sourceDatasourceName, "sourceDatasourceName is null or empty");
@@ -258,7 +258,7 @@ public class DefaultImportService implements ImportService {
   }
 
   @Override
-  public void importIdentifiers(@Nonnull String sourceDatasourceName) throws IOException, NoSuchDatasourceException {
+  public void importIdentifiers(@NotNull String sourceDatasourceName) throws IOException, NoSuchDatasourceException {
     Assert.hasText(sourceDatasourceName, "sourceDatasourceName is null or empty");
 
     importIdentifiers(getDatasourceOrTransientDatasource(sourceDatasourceName));

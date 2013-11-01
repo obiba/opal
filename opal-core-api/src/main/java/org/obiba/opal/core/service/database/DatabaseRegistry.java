@@ -1,9 +1,9 @@
 package org.obiba.opal.core.service.database;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.sql.DataSource;
 import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.SessionFactory;
 import org.obiba.magma.DatasourceFactory;
@@ -22,26 +22,26 @@ public interface DatabaseRegistry extends SystemService {
 
   boolean hasDatabases(@Nullable Database.Usage usage);
 
-  @Nonnull
-  Database getDatabase(@Nonnull String name) throws NoSuchDatabaseException;
+  @NotNull
+  Database getDatabase(@NotNull String name) throws NoSuchDatabaseException;
 
-  void save(@Nonnull Database database) throws ConstraintViolationException, MultipleIdentifiersDatabaseException;
+  void save(@NotNull Database database) throws ConstraintViolationException, MultipleIdentifiersDatabaseException;
 
-  void delete(@Nonnull Database database) throws CannotDeleteDatabaseWithDataException;
+  void delete(@NotNull Database database) throws CannotDeleteDatabaseWithDataException;
 
-  DataSource getDataSource(@Nonnull String name, @Nullable String usedByDatasource);
+  DataSource getDataSource(@NotNull String name, @Nullable String usedByDatasource);
 
-  SessionFactory getSessionFactory(@Nonnull String name, @Nullable String usedByDatasource);
+  SessionFactory getSessionFactory(@NotNull String name, @Nullable String usedByDatasource);
 
-  void unregister(@Nonnull String databaseName, @Nullable String usedByDatasource);
+  void unregister(@NotNull String databaseName, @Nullable String usedByDatasource);
 
   boolean hasIdentifiersDatabase();
 
-  @Nonnull
+  @NotNull
   Database getIdentifiersDatabase() throws IdentifiersDatabaseNotFoundException;
 
-  @Nonnull
-  DatasourceFactory createDataSourceFactory(@Nonnull String datasourceName, @Nonnull Database database);
+  @NotNull
+  DatasourceFactory createDataSourceFactory(@NotNull String datasourceName, @NotNull Database database);
 
   @Nullable
   Database getDefaultStorageDatabase();

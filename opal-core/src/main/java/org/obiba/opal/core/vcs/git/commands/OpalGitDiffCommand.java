@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
@@ -108,7 +108,7 @@ public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
 
     private String previousCommitId;
 
-    public Builder(@Nonnull Repository repository, @Nonnull String commitId) {
+    public Builder(@NotNull Repository repository, @NotNull String commitId) {
       super(repository);
       this.commitId = commitId;
     }

@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.derive.view;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.web.gwt.app.client.support.AttributeHelper;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
@@ -160,7 +160,7 @@ public class ValueMapEntry {
     return new Builder(type);
   }
 
-  @Nonnull
+  @NotNull
   private static String buildLabel(String text) {
     if(Strings.isNullOrEmpty(text)) return "";
 

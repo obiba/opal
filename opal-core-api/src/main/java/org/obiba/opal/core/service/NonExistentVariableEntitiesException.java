@@ -11,7 +11,7 @@ package org.obiba.opal.core.service;
 
 import java.util.Set;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.VariableEntity;
 import org.springframework.util.Assert;
@@ -24,10 +24,10 @@ public class NonExistentVariableEntitiesException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
 
-  @Nonnull
+  @NotNull
   private final Set<VariableEntity> nonExistentVariableEntities;
 
-  public NonExistentVariableEntitiesException(@Nonnull Set<VariableEntity> nonExistentVariableEntities) {
+  public NonExistentVariableEntitiesException(@NotNull Set<VariableEntity> nonExistentVariableEntities) {
     Assert.notNull(nonExistentVariableEntities, "nonExistentVariableEntities must not be null");
     this.nonExistentVariableEntities = nonExistentVariableEntities;
   }

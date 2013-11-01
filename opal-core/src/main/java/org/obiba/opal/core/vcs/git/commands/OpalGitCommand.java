@@ -12,8 +12,8 @@ package org.obiba.opal.core.vcs.git.commands;
 
 import java.io.IOException;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
@@ -37,7 +37,7 @@ public abstract class OpalGitCommand<T> implements Command<T> {
     this(repository, "");
   }
 
-  protected OpalGitCommand(@Nonnull Repository repository, @Nullable String datasourceName) {
+  protected OpalGitCommand(@NotNull Repository repository, @Nullable String datasourceName) {
     this.repository = repository;
     this.datasourceName = datasourceName;
   }
@@ -78,17 +78,17 @@ public abstract class OpalGitCommand<T> implements Command<T> {
 
     protected String datasourceName; // used mainly for debug and meaningful error messages
 
-    protected Builder(@Nonnull Repository repository) {
+    protected Builder(@NotNull Repository repository) {
       if(repository == null) throw new OpalGitException("Repository cannot be null.");
       this.repository = repository;
     }
 
-    public T addPath(@Nonnull String value) {
+    public T addPath(@NotNull String value) {
       path = value;
       return (T) this;
     }
 
-    public T addDatasourceName(@Nonnull String value) {
+    public T addDatasourceName(@NotNull String value) {
       datasourceName = value;
       return (T) this;
     }

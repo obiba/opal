@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
@@ -23,7 +23,7 @@ import com.google.common.collect.Lists;
 
 public class Group extends AbstractTimestamped implements HasUniqueProperties, Comparable<Group> {
 
-  @Nonnull
+  @NotNull
   @NotBlank
   private String name;
 
@@ -32,7 +32,7 @@ public class Group extends AbstractTimestamped implements HasUniqueProperties, C
   public Group() {
   }
 
-  public Group(@Nonnull String name) {
+  public Group(@NotNull String name) {
     this.name = name;
   }
 
@@ -46,12 +46,12 @@ public class Group extends AbstractTimestamped implements HasUniqueProperties, C
     return Lists.<Object>newArrayList(name);
   }
 
-  @Nonnull
+  @NotNull
   public String getName() {
     return name;
   }
 
-  public void setName(@Nonnull String name) {
+  public void setName(@NotNull String name) {
     this.name = name;
   }
 

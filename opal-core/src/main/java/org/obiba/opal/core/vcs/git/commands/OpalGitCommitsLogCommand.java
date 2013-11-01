@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
@@ -97,7 +97,7 @@ public class OpalGitCommitsLogCommand extends OpalGitCommand<List<CommitInfo>> {
    */
   public static class Builder extends OpalGitCommand.Builder<Builder> {
 
-    public Builder(@Nonnull Repository repository) {
+    public Builder(@NotNull Repository repository) {
       super(repository);
     }
 

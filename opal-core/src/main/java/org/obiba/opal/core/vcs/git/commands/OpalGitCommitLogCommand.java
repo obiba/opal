@@ -12,7 +12,7 @@ package org.obiba.opal.core.vcs.git.commands;
 
 import java.io.IOException;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.PersonIdent;
@@ -67,7 +67,7 @@ public class OpalGitCommitLogCommand extends OpalGitCommand<CommitInfo> {
 
     private final String commitId;
 
-    public Builder(@Nonnull Repository repository, @Nonnull String path, @Nonnull String commitId) {
+    public Builder(@NotNull Repository repository, @NotNull String path, @NotNull String commitId) {
       super(repository);
       addPath(path);
       this.commitId = commitId;

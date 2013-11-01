@@ -2,7 +2,7 @@ package org.obiba.opal.fs.security;
 
 import java.io.File;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;
 import org.obiba.magma.security.Authorizer;
@@ -15,18 +15,18 @@ public class SecuredOpalFileSystem implements OpalFileSystem {
 
 //  private static final Logger log = LoggerFactory.getLogger(OpalFileSystem.class);
 
-  @Nonnull
+  @NotNull
   private final OpalFileSystem delegate;
 
   private final Authorizer authorizer = new ShiroAuthorizer();
 
-  public SecuredOpalFileSystem(@Nonnull OpalFileSystem delegate) {
+  public SecuredOpalFileSystem(@NotNull OpalFileSystem delegate) {
     //noinspection ConstantConditions
     Preconditions.checkArgument(delegate != null, "delegate must not be null");
     this.delegate = delegate;
   }
 
-  @Nonnull
+  @NotNull
   @Override
   public FileObject getRoot() {
     return new SecuredFileObject(authorizer, delegate.getRoot());

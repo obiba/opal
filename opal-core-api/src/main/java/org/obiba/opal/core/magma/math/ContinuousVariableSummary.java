@@ -14,8 +14,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.ContinuousDistribution;
@@ -49,29 +49,29 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
       .of(0.05d, 0.5d, 5d, 10d, 15d, 20d, 25d, 30d, 35d, 40d, 45d, 50d, 55d, 60d, 65d, 70d, 75d, 80d, 85d, 90d, 95d,
           99.5d, 99.95d);
 
-  @Nonnull
+  @NotNull
   private final Distribution distribution;
 
-  @Nonnull
+  @NotNull
   private List<Double> defaultPercentiles = DEFAULT_PERCENTILES;
 
   private int intervals = DEFAULT_INTERVALS;
 
   // Holds missing categories
   // (the case of continuous variables that have "special" values such as 8888 or 9999 that indicate a missing value)
-  @Nonnull
+  @NotNull
   private final Set<Value> missing = Sets.newHashSet();
 
-  @Nonnull
+  @NotNull
   private final DescriptiveStatistics descriptiveStats = new DescriptiveStatistics();
 
-  @Nonnull
+  @NotNull
   private final List<Double> percentiles = Lists.newArrayList();
 
-  @Nonnull
+  @NotNull
   private final Collection<Double> distributionPercentiles = Lists.newArrayList();
 
-  @Nonnull
+  @NotNull
   private final Collection<IntervalFrequency.Interval> intervalFrequencies = Lists.newArrayList();
 
   @Override
@@ -80,7 +80,7 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
         .getCacheKey(variable, table, distribution, percentiles, intervals, getOffset(), getLimit());
   }
 
-  private ContinuousVariableSummary(@Nonnull Variable variable, @Nonnull Distribution distribution) {
+  private ContinuousVariableSummary(@NotNull Variable variable, @NotNull Distribution distribution) {
     super(variable);
 
     Assert.notNull(distribution, "Distribution cannot be null");
@@ -97,7 +97,7 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
     }
   }
 
-  @Nonnull
+  @NotNull
   public Distribution getDistribution() {
     return distribution;
   }
@@ -106,27 +106,27 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
     return intervals;
   }
 
-  @Nonnull
+  @NotNull
   public DescriptiveStatistics getDescriptiveStats() {
     return descriptiveStats;
   }
 
-  @Nonnull
+  @NotNull
   public List<Double> getPercentiles() {
     return percentiles;
   }
 
-  @Nonnull
+  @NotNull
   public Collection<Double> getDistributionPercentiles() {
     return distributionPercentiles;
   }
 
-  @Nonnull
+  @NotNull
   public Collection<IntervalFrequency.Interval> getIntervalFrequencies() {
     return intervalFrequencies;
   }
 
-  @Nonnull
+  @NotNull
   public List<Double> getDefaultPercentiles() {
     return defaultPercentiles;
   }
@@ -142,7 +142,7 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
       }
     },
     exponential {
-      @Nonnull
+      @NotNull
       @Override
       public ContinuousDistribution getDistribution(DescriptiveStatistics ds) {
         return new ExponentialDistributionImpl(ds.getMean());
@@ -159,14 +159,14 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
 
     private final ContinuousVariableSummary summary;
 
-    @Nonnull
+    @NotNull
     private final Variable variable;
 
     private boolean addedTable;
 
     private boolean addedValue;
 
-    public Builder(@Nonnull Variable variable, @Nonnull Distribution distribution) {
+    public Builder(@NotNull Variable variable, @NotNull Distribution distribution) {
       this.variable = variable;
       summary = new ContinuousVariableSummary(variable, distribution);
     }
@@ -189,7 +189,7 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
       return this;
     }
 
-    public Builder addValue(@Nonnull Value value) {
+    public Builder addValue(@NotNull Value value) {
       if(addedTable) {
         throw new IllegalStateException("Cannot add value for variable " + summary.getVariable().getName() +
             " because values where previously added from the whole table with addTable().");
@@ -199,7 +199,7 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
       return this;
     }
 
-    public Builder addTable(@Nonnull ValueTable table, @Nonnull ValueSource variableValueSource) {
+    public Builder addTable(@NotNull ValueTable table, @NotNull ValueSource variableValueSource) {
       if(addedValue) {
         throw new IllegalStateException("Cannot add table for variable " + summary.getVariable().getName() +
             " because values where previously added with addValue().");
@@ -210,7 +210,7 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
       return this;
     }
 
-    private void add(@Nonnull ValueTable table, @Nonnull ValueSource variableValueSource) {
+    private void add(@NotNull ValueTable table, @NotNull ValueSource variableValueSource) {
       Assert.notNull(variable, "ValueTable cannot be null");
       Assert.notNull(variableValueSource, "VariableValueSource cannot be null");
 
@@ -222,7 +222,7 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
     }
 
     @SuppressWarnings("ConstantConditions")
-    private void add(@Nonnull Value value) {
+    private void add(@NotNull Value value) {
       Assert.notNull(variable, "Value cannot be null");
       if(!value.isNull() && !summary.missing.contains(value)) {
         if(value.isSequence()) {
@@ -262,7 +262,7 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public ContinuousVariableSummary build() {
       compute();
       return summary;

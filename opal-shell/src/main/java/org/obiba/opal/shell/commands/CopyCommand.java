@@ -14,8 +14,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -60,7 +60,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   @Autowired
   private ExportService exportService;
 
-  @Nonnull
+  @NotNull
   private final FileDatasourceFactory fileDatasourceFactory;
 
   public void setExportService(ExportService exportService) {

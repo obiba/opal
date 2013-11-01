@@ -2,36 +2,34 @@ package org.obiba.opal.core.domain;
 
 import java.util.Date;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.datasource.hibernate.domain.Timestamped;
 
 @SuppressWarnings("AssignmentToDateFieldFromParameter")
 public abstract class AbstractTimestamped implements Timestamped {
 
-  @Nonnull
+  @NotNull
   private Date created = new Date();
 
-  @Nonnull
   private Date updated;
 
   @Override
-  @Nonnull
+  @NotNull
   public Date getCreated() {
     return created;
   }
 
-  public void setCreated(@Nonnull Date created) {
+  public void setCreated(@NotNull Date created) {
     this.created = created;
   }
 
   @Override
-  @Nonnull
   public Date getUpdated() {
     return updated;
   }
 
-  public void setUpdated(@Nonnull Date updated) {
+  public void setUpdated(@NotNull Date updated) {
     this.updated = updated;
   }
 

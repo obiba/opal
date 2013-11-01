@@ -2,7 +2,7 @@ package org.obiba.opal.core.magma.math;
 
 import java.util.SortedSet;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
@@ -16,23 +16,23 @@ public abstract class AbstractVariableSummary implements VariableSummary {
 
   private static final long serialVersionUID = 3105572632716973506L;
 
-  @Nonnull
+  @NotNull
   protected transient final Variable variable;
 
-  @Nonnull
+  @NotNull
   protected final String variableName;
 
   protected Integer offset;
 
   protected Integer limit;
 
-  protected AbstractVariableSummary(@Nonnull Variable variable) {
+  protected AbstractVariableSummary(@NotNull Variable variable) {
     Assert.notNull(variable, "Variable cannot be null");
     this.variable = variable;
     variableName = variable.getName();
   }
 
-  protected SortedSet<VariableEntity> getVariableEntities(@Nonnull ValueTable table) {
+  protected SortedSet<VariableEntity> getVariableEntities(@NotNull ValueTable table) {
     if(offset == null && limit == null) return Sets.newTreeSet(table.getVariableEntities());
 
     Iterable<VariableEntity> entities;
@@ -47,13 +47,13 @@ public abstract class AbstractVariableSummary implements VariableSummary {
     return Sets.newTreeSet(entities);
   }
 
-  @Nonnull
+  @NotNull
   @Override
   public String getVariableName() {
     return variableName;
   }
 
-  @Nonnull
+  @NotNull
   @Override
   public Variable getVariable() {
     return variable;

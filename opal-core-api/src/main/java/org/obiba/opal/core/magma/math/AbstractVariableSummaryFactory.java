@@ -1,6 +1,6 @@
 package org.obiba.opal.core.magma.math;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
@@ -16,7 +16,7 @@ public abstract class AbstractVariableSummaryFactory<TVariableSummary extends Va
   private ValueSource valueSource;
 
   @Override
-  @Nonnull
+  @NotNull
   public Variable getVariable() {
     return variable;
   }
@@ -27,7 +27,7 @@ public abstract class AbstractVariableSummaryFactory<TVariableSummary extends Va
   }
 
   @Override
-  @Nonnull
+  @NotNull
   public ValueTable getTable() {
     return table;
   }
@@ -37,7 +37,7 @@ public abstract class AbstractVariableSummaryFactory<TVariableSummary extends Va
     this.table = table;
   }
 
-  @Nonnull
+  @NotNull
   @Override
   public ValueSource getValueSource() {
     return valueSource;

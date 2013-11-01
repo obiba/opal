@@ -15,8 +15,8 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -75,7 +75,7 @@ class RestValueTable extends AbstractValueTable {
     tableReference = getDatasource().newReference("table", dto.getName());
   }
 
-  @Nonnull
+  @NotNull
   @Override
   public RestDatasource getDatasource() {
     return (RestDatasource) super.getDatasource();
@@ -100,13 +100,13 @@ class RestValueTable extends AbstractValueTable {
           return v;
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public Value getValue(ValueSet valueSet) {
           return ((LazyValueSet) valueSet).get(v);
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public ValueType getValueType() {
           return v.getValueType();
@@ -316,7 +316,7 @@ class RestValueTable extends AbstractValueTable {
       this.tsDto = tsDto;
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public Value getLastUpdate() {
       if(tsDto != null && tsDto.hasLastUpdate()) {
@@ -325,7 +325,7 @@ class RestValueTable extends AbstractValueTable {
       return getTimestamps().getLastUpdate();
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public Value getCreated() {
       if(tsDto != null && tsDto.hasCreated()) {
@@ -341,7 +341,7 @@ class RestValueTable extends AbstractValueTable {
       final Magma.TimestampsDto tsDto = tableDto.getTimestamps();
       tableTimestamps = new Timestamps() {
 
-        @Nonnull
+        @NotNull
         @Override
         public Value getLastUpdate() {
           if(tsDto.hasLastUpdate()) {
@@ -350,7 +350,7 @@ class RestValueTable extends AbstractValueTable {
           return DateTimeType.get().nullValue();
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public Value getCreated() {
           if(tsDto.hasCreated()) {

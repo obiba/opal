@@ -13,7 +13,7 @@ package org.obiba.opal.core.vcs.git.commands;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
@@ -80,7 +80,7 @@ public class OpalGitFetchBlobCommand extends OpalGitCommand<String> {
 
     private String encoding;
 
-    public Builder(@Nonnull Repository repository, @Nonnull String path, @Nonnull String commitId) {
+    public Builder(@NotNull Repository repository, @NotNull String path, @NotNull String commitId) {
       super(repository);
       addPath(path);
       this.commitId = commitId;

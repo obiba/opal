@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
@@ -39,8 +39,8 @@ public final class ViewDtos {
     this.extensions = ImmutableSet.copyOf(extensions);
   }
 
-  @Nonnull
-  public View fromDto(@Nonnull ViewDto viewDto) {
+  @NotNull
+  public View fromDto(@NotNull ViewDto viewDto) {
     List<ValueTable> fromTables = getFromTables(viewDto);
     View.Builder builder = View.Builder
         .newView(viewDto.getName(), (ValueTable[]) fromTables.toArray(new ValueTable[fromTables.size()]));
@@ -52,8 +52,8 @@ public final class ViewDtos {
     throw new IllegalStateException("Unknown view type");
   }
 
-  @Nonnull
-  public TableDto asTableDto(@Nonnull ViewDto viewDto) {
+  @NotNull
+  public TableDto asTableDto(@NotNull ViewDto viewDto) {
     TableDto.Builder builder = TableDto.newBuilder().setName(viewDto.getName());
     for(ViewDtoExtension extension : extensions) {
       if(extension.isExtensionOf(viewDto)) {
@@ -63,8 +63,8 @@ public final class ViewDtos {
     throw new IllegalStateException("Unknown view type");
   }
 
-  @Nonnull
-  public ViewDto asDto(@Nonnull View view) {
+  @NotNull
+  public ViewDto asDto(@NotNull View view) {
     for(ViewDtoExtension extension : extensions) {
       if(extension.isDtoOf(view)) {
         return extension.asDto(view);
@@ -73,8 +73,8 @@ public final class ViewDtos {
     throw new IllegalStateException("Unknown view type");
   }
 
-  @Nonnull
-  private List<ValueTable> getFromTables(@Nonnull ViewDto viewDto) {
+  @NotNull
+  private List<ValueTable> getFromTables(@NotNull ViewDto viewDto) {
     List<ValueTable> fromTables = new ArrayList<ValueTable>();
     for(int i = 0; i < viewDto.getFromCount(); i++) {
       String fromTable = viewDto.getFrom(i);

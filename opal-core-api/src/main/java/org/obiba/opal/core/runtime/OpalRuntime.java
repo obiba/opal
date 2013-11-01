@@ -11,7 +11,7 @@ package org.obiba.opal.core.runtime;
 
 import java.util.Set;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.core.service.SystemService;
 import org.obiba.opal.fs.OpalFileSystem;
@@ -39,7 +39,7 @@ public interface OpalRuntime extends SystemService {
    * @param name Service name
    * @throws throw NoSuchService runtime exception if not found (hasService() must be evaluated first)
    */
-  @Nonnull
+  @NotNull
   Service getService(String name) throws NoSuchServiceException;
 
 }

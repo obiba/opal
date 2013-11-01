@@ -11,8 +11,8 @@ package org.obiba.opal.core.service;
 
 import java.io.InputStream;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;
 import org.obiba.opal.core.unit.FunctionalUnit;
@@ -30,7 +30,7 @@ public interface UnitKeyStoreService extends SystemService {
    * @return the unit's keystore (or <code>null</code> if no keystore exists for that unit)
    */
   @Nullable
-  UnitKeyStore getUnitKeyStore(@Nonnull String unitName);
+  UnitKeyStore getUnitKeyStore(@NotNull String unitName);
 
   /**
    * Gets the {@link UnitKeyStore} for the specified {@link FunctionalUnit} or if it doesn't exist, create, persist and
@@ -40,14 +40,14 @@ public interface UnitKeyStoreService extends SystemService {
    * @return the unit's keystore
    * @throws NoSuchFunctionalUnitException if no unit exists with the specified name
    */
-  UnitKeyStore getOrCreateUnitKeyStore(@Nonnull String unitName) throws NoSuchFunctionalUnitException;
+  UnitKeyStore getOrCreateUnitKeyStore(@NotNull String unitName) throws NoSuchFunctionalUnitException;
 
   /**
    * Save a {@link FunctionalUnit}'s keystore. This will persist any keystore updates.
    *
    * @param unitKeyStore functional unit keystore
    */
-  void saveUnitKeyStore(@Nonnull UnitKeyStore unitKeyStore);
+  void saveUnitKeyStore(@NotNull UnitKeyStore unitKeyStore);
 
   /**
    * Creates a new key or updates an existing key. It is the responsibility of the client to ensure that the caller
@@ -61,8 +61,8 @@ public interface UnitKeyStoreService extends SystemService {
    * L=Montreal, ST=Quebec, C=CA)
    * @throws NoSuchFunctionalUnitException if no unit exists with the specified name
    */
-  void createOrUpdateKey(@Nonnull String unitName, @Nonnull String alias, @Nonnull String algorithm, int size,
-      @Nonnull String certificateInfo) throws NoSuchFunctionalUnitException;
+  void createOrUpdateKey(@NotNull String unitName, @NotNull String alias, @NotNull String algorithm, int size,
+      @NotNull String certificateInfo) throws NoSuchFunctionalUnitException;
 
   /**
    * Returns true if the supplied alias exists in the specified functional unit's keystore.
@@ -72,7 +72,7 @@ public interface UnitKeyStoreService extends SystemService {
    * @return true is the alias exists.
    * @throws NoSuchFunctionalUnitException if no unit exists with the specified name
    */
-  boolean aliasExists(@Nonnull String unitName, @Nonnull String alias) throws NoSuchFunctionalUnitException;
+  boolean aliasExists(@NotNull String unitName, @NotNull String alias) throws NoSuchFunctionalUnitException;
 
   /**
    * Deletes the specified public/private key pair from the specified functional unit's keystore.
@@ -81,7 +81,7 @@ public interface UnitKeyStoreService extends SystemService {
    * @param alias name of the public/private key pair to be deleted
    * @throws NoSuchFunctionalUnitException if no unit exists with the specified name
    */
-  void deleteKey(@Nonnull String unitName, @Nonnull String alias) throws NoSuchFunctionalUnitException;
+  void deleteKey(@NotNull String unitName, @NotNull String alias) throws NoSuchFunctionalUnitException;
 
   /**
    * Import a private key and its associated certificate into the specified keystore at the given alias.
@@ -92,8 +92,8 @@ public interface UnitKeyStoreService extends SystemService {
    * @param certificate certificate in the PEM format
    * @throws NoSuchFunctionalUnitException if no unit exists with the specified name
    */
-  void importKey(@Nonnull String unitName, @Nonnull String alias, @Nonnull FileObject privateKey,
-      @Nonnull FileObject certificate) throws NoSuchFunctionalUnitException;
+  void importKey(@NotNull String unitName, @NotNull String alias, @NotNull FileObject privateKey,
+      @NotNull FileObject certificate) throws NoSuchFunctionalUnitException;
 
   /**
    * Import a private key and its associated certificate into the specified keystore at the given alias.
@@ -104,8 +104,8 @@ public interface UnitKeyStoreService extends SystemService {
    * @param certificate
    * @throws NoSuchFunctionalUnitException
    */
-  void importKey(@Nonnull String unitName, @Nonnull String alias, @Nonnull InputStream privateKey,
-      @Nonnull InputStream certificate) throws NoSuchFunctionalUnitException;
+  void importKey(@NotNull String unitName, @NotNull String alias, @NotNull InputStream privateKey,
+      @NotNull InputStream certificate) throws NoSuchFunctionalUnitException;
 
   /**
    * Import a private key into the specified keystore and generate an associated certificate at the given alias.
@@ -117,8 +117,8 @@ public interface UnitKeyStoreService extends SystemService {
    * L=Montreal, ST=Quebec, C=CA)
    * @throws NoSuchFunctionalUnitException if no unit exists with the specified name
    */
-  void importKey(@Nonnull String unitName, @Nonnull String alias, @Nonnull FileObject privateKey,
-      @Nonnull String certificateInfo) throws NoSuchFunctionalUnitException;
+  void importKey(@NotNull String unitName, @NotNull String alias, @NotNull FileObject privateKey,
+      @NotNull String certificateInfo) throws NoSuchFunctionalUnitException;
 
   /**
    * Import a private key into the specified keystore and generate an associated certificate at the given alias.
@@ -129,14 +129,14 @@ public interface UnitKeyStoreService extends SystemService {
    * @param certificateInfo
    * @throws NoSuchFunctionalUnitException
    */
-  void importKey(@Nonnull String unitName, @Nonnull String alias, @Nonnull InputStream privateKey,
-      @Nonnull String certificateInfo) throws NoSuchFunctionalUnitException;
+  void importKey(@NotNull String unitName, @NotNull String alias, @NotNull InputStream privateKey,
+      @NotNull String certificateInfo) throws NoSuchFunctionalUnitException;
 
   /**
    * @param unit
    * @param alias
    * @param byteArrayInputStream
    */
-  void importCertificate(@Nonnull String unit, @Nonnull String alias, @Nonnull InputStream byteArrayInputStream);
+  void importCertificate(@NotNull String unit, @NotNull String alias, @NotNull InputStream byteArrayInputStream);
 
 }

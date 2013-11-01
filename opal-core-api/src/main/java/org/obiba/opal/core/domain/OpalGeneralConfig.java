@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -29,7 +29,7 @@ public class OpalGeneralConfig extends AbstractTimestamped {
 
   public static final String DEFAULT_CHARSET = "ISO-8859-1";
 
-  @Nonnull
+  @NotNull
   @NotBlank
   private String name = DEFAULT_NAME;
 
@@ -37,12 +37,12 @@ public class OpalGeneralConfig extends AbstractTimestamped {
 
   private String defaultCharacterSet = DEFAULT_CHARSET;
 
-  @Nonnull
+  @NotNull
   public String getName() {
     return name;
   }
 
-  public void setName(@Nonnull String name) {
+  public void setName(@NotNull String name) {
     this.name = name;
   }
 

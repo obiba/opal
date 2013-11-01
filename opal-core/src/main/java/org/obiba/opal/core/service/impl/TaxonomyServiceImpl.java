@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.core.cfg.TaxonomyService;
 import org.obiba.opal.core.domain.HasUniqueProperties;
@@ -59,12 +59,12 @@ public class TaxonomyServiceImpl implements TaxonomyService {
 
   @Nullable
   @Override
-  public Taxonomy getTaxonomy(@Nonnull String name) {
+  public Taxonomy getTaxonomy(@NotNull String name) {
     return orientDbService.findUnique(new Taxonomy(name));
   }
 
   @Override
-  public void saveTaxonomy(@Nullable Taxonomy template, @Nonnull final Taxonomy taxonomy) {
+  public void saveTaxonomy(@Nullable Taxonomy template, @NotNull final Taxonomy taxonomy) {
 
     // create new vocabularies
     Iterable<Vocabulary> vocabularies = null;
@@ -113,7 +113,7 @@ public class TaxonomyServiceImpl implements TaxonomyService {
   }
 
   @Override
-  public void deleteTaxonomy(@Nonnull String name) {
+  public void deleteTaxonomy(@NotNull String name) {
 
     Taxonomy taxonomy = getTaxonomy(name);
     if(taxonomy == null) return;
@@ -127,19 +127,19 @@ public class TaxonomyServiceImpl implements TaxonomyService {
   }
 
   @Override
-  public Iterable<Vocabulary> getVocabularies(@Nonnull String taxonomy) {
+  public Iterable<Vocabulary> getVocabularies(@NotNull String taxonomy) {
     return orientDbService
         .list(Vocabulary.class, "select from " + Vocabulary.class.getSimpleName() + " where taxonomy = ?", taxonomy);
   }
 
   @Nullable
   @Override
-  public Vocabulary getVocabulary(@Nonnull String taxonomy, @Nonnull String name) {
+  public Vocabulary getVocabulary(@NotNull String taxonomy, @NotNull String name) {
     return orientDbService.findUnique(new Vocabulary(taxonomy, name));
   }
 
   @Override
-  public void saveVocabulary(@Nullable Vocabulary template, @Nonnull Vocabulary vocabulary) {
+  public void saveVocabulary(@Nullable Vocabulary template, @NotNull Vocabulary vocabulary) {
     Taxonomy previousTaxonomy = template == null ? null : getTaxonomy(template.getTaxonomy());
     Taxonomy taxonomy = getTaxonomy(vocabulary.getTaxonomy());
     if(taxonomy == null) {
@@ -161,7 +161,7 @@ public class TaxonomyServiceImpl implements TaxonomyService {
   }
 
   @Override
-  public void deleteVocabulary(@Nonnull Vocabulary vocabulary) {
+  public void deleteVocabulary(@NotNull Vocabulary vocabulary) {
     Taxonomy taxonomy = getTaxonomy(vocabulary.getTaxonomy());
     if(taxonomy == null) {
       throw new IllegalArgumentException(

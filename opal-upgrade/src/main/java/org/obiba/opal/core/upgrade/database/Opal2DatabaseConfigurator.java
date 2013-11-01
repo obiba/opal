@@ -1,6 +1,6 @@
 package org.obiba.opal.core.upgrade.database;
 
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -24,7 +24,7 @@ public class Opal2DatabaseConfigurator {
 
   private static final String DRIVER = "org.obiba.opal.datasource.driver";
 
-  @Nonnull
+  @NotNull
   private final String propertiesFile;
 
   public Opal2DatabaseConfigurator() {

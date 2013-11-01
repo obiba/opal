@@ -12,16 +12,16 @@ package org.obiba.opal.core.vcs;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 public interface OpalVersionControlSystem {
-  List<CommitInfo> getCommitsInfo(@Nonnull String datasource, @Nonnull String path);
+  List<CommitInfo> getCommitsInfo(@NotNull String datasource, @NotNull String path);
 
-  CommitInfo getCommitInfo(@Nonnull String datasource, @Nonnull String path, @Nonnull String commitId);
+  CommitInfo getCommitInfo(@NotNull String datasource, @NotNull String path, @NotNull String commitId);
 
-  String getBlob(@Nonnull String datasource, @Nonnull String path, @Nonnull String commitId);
+  String getBlob(@NotNull String datasource, @NotNull String path, @NotNull String commitId);
 
-  List<String> getDiffEntries(@Nonnull String datasource, @Nonnull String commitId, @Nullable String prevCmmitId,
+  List<String> getDiffEntries(@NotNull String datasource, @NotNull String commitId, @Nullable String prevCmmitId,
       @Nullable String path);
 }

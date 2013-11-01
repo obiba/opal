@@ -12,8 +12,8 @@ package org.obiba.opal.search.es.mapping;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.obiba.magma.ValueType;
@@ -23,9 +23,9 @@ import org.obiba.magma.type.DateTimeType;
 import org.obiba.magma.type.DateType;
 import org.obiba.magma.type.DecimalType;
 import org.obiba.magma.type.IntegerType;
+import org.obiba.magma.type.LineStringType;
 import org.obiba.magma.type.LocaleType;
 import org.obiba.magma.type.PointType;
-import org.obiba.magma.type.LineStringType;
 import org.obiba.magma.type.PolygonType;
 import org.obiba.magma.type.TextType;
 
@@ -51,40 +51,40 @@ public class ValueTypeMappings {
         .build();
   }
 
-  @Nonnull
+  @NotNull
   public ValueTypeMapping forType(ValueType type) {
     return mapping.get(type);
   }
 
-  @Nonnull
+  @NotNull
   private static ValueTypeMapping forType(String esType) {
     return new SimpleValueTypeMapping(esType);
   }
 
-  @Nonnull
+  @NotNull
   private static ValueTypeMapping forTypeWithFormat(String esType, String format) {
     return new SimpleValueTypeMapping(esType, format);
   }
 
   private static class SimpleValueTypeMapping implements ValueTypeMapping {
 
-    @Nonnull
+    @NotNull
     private final String esType;
 
     @Nullable
     private final String format;
 
-    private SimpleValueTypeMapping(@Nonnull String esType) {
+    private SimpleValueTypeMapping(@NotNull String esType) {
       this(esType, null);
     }
 
-    private SimpleValueTypeMapping(@Nonnull String esType, @Nullable String format) {
+    private SimpleValueTypeMapping(@NotNull String esType, @Nullable String format) {
       this.esType = esType;
       this.format = format;
     }
 
     @Override
-    public XContentBuilder map(@Nonnull XContentBuilder builder) {
+    public XContentBuilder map(@NotNull XContentBuilder builder) {
       try {
         builder.field("type", esType);
         if(format != null) {
