@@ -35,17 +35,15 @@ public class GroupResource {
   @GET
   public Response getGroup() {
     Group group = userService.getGroup(name);
-    if(group == null) {
-      return Response.status(Response.Status.NOT_FOUND).build();
-    }
-    return Response.ok().entity(Dtos.asDto(group)).build();
+    return group == null
+        ? Response.status(Response.Status.NOT_FOUND).build()
+        : Response.ok().entity(Dtos.asDto(group)).build();
   }
 
   @DELETE
   public Response deleteGroup() {
     Group group = userService.getGroup(name);
-    userService.deleteGroup(group);
-
+    userService.delete(group);
     return Response.ok().build();
   }
 }
