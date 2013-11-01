@@ -645,8 +645,11 @@ public interface Translations extends Constants {
       "confirmDeleteDataShieldPackage", "Please confirm that you want to remove this package and all its methods.",//
       "confirmPublishDataShieldMethods", "Please confirm that you want to publish this package methods.",//
       "confirmDeleteDatabase", "Please confirm that you want to remove this database.",//
-      "confirmRemoveGroup", "Please confirm that you want to remove the group {0}.",//
-      "confirmRemoveUser", "Please confirm that you want to remove the user {0}."//
+      "confirmRemoveGroup", "Please confirm that you want to remove the group '{0}'.",//
+      "confirmRemoveGroupWithUsers",
+      "Please confirm that you want to remove the group '{0}'. The group '{0}' will be removed for users belonging to this group.",
+//
+      "confirmRemoveUser", "Please confirm that you want to remove the user '{0}'."//
   })
   Map<String, String> confirmationMessageMap();
 

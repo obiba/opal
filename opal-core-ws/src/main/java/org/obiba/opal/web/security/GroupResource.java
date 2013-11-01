@@ -44,15 +44,8 @@ public class GroupResource {
   @DELETE
   public Response deleteGroup() {
     Group group = userService.getGroup(name);
-    if(group != null) {
-      if(group.getUsers().isEmpty()) {
-        userService.deleteGroup(group);
-      } else {
-        // cannot delete a group with users
-        //TODO add message to explain what failed
-        return Response.status(Response.Status.PRECONDITION_FAILED).build();
-      }
-    }
+    userService.deleteGroup(group);
+
     return Response.ok().build();
   }
 }
