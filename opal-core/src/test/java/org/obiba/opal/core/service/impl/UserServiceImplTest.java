@@ -36,7 +36,7 @@ public class UserServiceImplTest extends AbstractJUnit4SpringContextTests {
   private OrientDbService orientDbService;
 
   @Before
-  public void setUp() throws Exception {
+  public void clear() throws Exception {
     orientDbService.deleteAll(User.class);
     orientDbService.deleteAll(Group.class);
   }

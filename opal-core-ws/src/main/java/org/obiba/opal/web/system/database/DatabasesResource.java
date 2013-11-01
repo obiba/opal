@@ -62,7 +62,7 @@ public class DatabasesResource {
 
   @POST
   public Response addDatabase(DatabaseDto database) throws MultipleIdentifiersDatabaseException {
-    databaseRegistry.saveDatabase(Dtos.fromDto(database));
+    databaseRegistry.save(Dtos.fromDto(database));
     return Response.ok().build();
   }
 

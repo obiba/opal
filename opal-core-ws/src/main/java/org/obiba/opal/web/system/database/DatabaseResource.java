@@ -58,7 +58,7 @@ public class DatabaseResource {
       return Response.status(BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatabaseIsNotEditable").build()).build();
     }
-    databaseRegistry.deleteDatabase(database);
+    databaseRegistry.delete(database);
     return Response.ok().build();
   }
 
@@ -71,7 +71,7 @@ public class DatabaseResource {
           .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatabaseIsNotEditable").build()).build();
     }
 
-    databaseRegistry.saveDatabase(database);
+    databaseRegistry.save(database);
 
     return Response.ok().build();
   }

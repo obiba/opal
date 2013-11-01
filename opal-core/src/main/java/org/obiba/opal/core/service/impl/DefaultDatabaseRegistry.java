@@ -58,9 +58,6 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @Autowired
   private OrientDbService orientDbService;
 
-  @Autowired
-  private DefaultBeanValidator defaultBeanValidator;
-
   private final LoadingCache<String, DataSource> dataSourceCache = CacheBuilder.newBuilder()
       .removalListener(new DataSourceRemovalListener()) //
       .build(new DataSourceCacheLoader());
@@ -137,7 +134,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   }
 
   @Override
-  public void saveDatabase(@Nonnull Database database)
+  public void save(@Nonnull Database database)
       throws ConstraintViolationException, MultipleIdentifiersDatabaseException {
 
     //TODO valid unique url
@@ -179,7 +176,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   }
 
   @Override
-  public void deleteDatabase(@Nonnull Database database) throws CannotDeleteDatabaseWithDataException {
+  public void delete(@Nonnull Database database) throws CannotDeleteDatabaseWithDataException {
     //TODO check if this database has data
     orientDbService.delete(database);
     destroyDataSource(database.getName());
