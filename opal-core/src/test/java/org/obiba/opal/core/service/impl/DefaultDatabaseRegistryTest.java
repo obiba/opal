@@ -43,8 +43,8 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   }
 
   @Test
-  public void test_create_new_database() {
-    Database database = Database.Builder.create().name("sql database").build();
+  public void test_new_database() {
+    Database database = createDatabase();
     databaseRegistry.save(database);
 
     List<Database> databases = Lists.newArrayList(databaseRegistry.list());
@@ -56,16 +56,41 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   }
 
   @Test
+  public void test_new_database_with_sql_and_mongo_settings() {
+
+  }
+
+  @Test
   public void test_get_identifiers_database() {
     Database database = Database.Builder.create().name("sql database").usedForIdentifiers(true).build();
     databaseRegistry.save(database);
     Database found = databaseRegistry.getIdentifiersDatabase();
     assertTrue(found.isUsedForIdentifiers());
+
+    assertEquals(0, Lists.newArrayList(databaseRegistry.list()).size());
   }
 
   @Test(expected = IdentifiersDatabaseNotFoundException.class)
   public void test_get_null_identifiers_database() {
     databaseRegistry.getIdentifiersDatabase();
+  }
+
+  private Database createDatabase() {
+    return Database.Builder.create() //
+        .name("sql database") //
+        .usedForIdentifiers(false) //
+        .editable(true) //
+        .description("description") //
+        .defaultStorage(true) //
+        .usage(Database.Usage.IMPORT) //
+        .sqlSettings(SqlSettings.Builder.create() //
+            .sqlSchema(SqlSettings.SqlSchema.HIBERNATE) //
+            .driverClass("mysql") //
+            .url("localhost") //
+            .username("root") //
+            .password("password") //
+            .properties("props")) //
+        .build();
   }
 
   private void assertDatabaseEquals(Database expected, Database found) {
