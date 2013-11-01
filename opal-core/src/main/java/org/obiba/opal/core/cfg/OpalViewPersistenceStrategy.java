@@ -195,7 +195,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     } catch(Exception e) {
       throw new RuntimeException("Failed writing views in git for datasource: " + datasourceName, e);
     } finally {
-      if(localRepo != null) localRepo.delete();
+      deleteLocalRepo(localRepo);
     }
   }
 
@@ -210,7 +210,17 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
       throw new RuntimeException("Failed removing view '" + viewName + "' from git for datasource: " + datasourceName,
           e);
     } finally {
-      if(localRepo != null) localRepo.delete();
+      deleteLocalRepo(localRepo);
+    }
+  }
+
+  private void deleteLocalRepo(File localRepo) {
+    if(localRepo == null) return;
+
+    try {
+      FileUtil.delete(localRepo);
+    } catch(IOException e) {
+      log.warn("Failed removing local git repository: {}", localRepo.getAbsolutePath(), e);
     }
   }
 
@@ -339,9 +349,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     } catch(Exception e) {
       throw new RuntimeException("Failed reading views from git for datasource: " + datasourceName, e);
     } finally {
-      if(localRepo != null) {
-        localRepo.delete();
-      }
+      deleteLocalRepo(localRepo);
     }
 
     return builder.build();
