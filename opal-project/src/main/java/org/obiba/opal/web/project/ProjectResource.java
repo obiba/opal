@@ -14,12 +14,16 @@ import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.vfs2.FileSystemException;
+import org.obiba.magma.Datasource;
 import org.obiba.opal.project.NoSuchProjectException;
 import org.obiba.opal.project.ProjectService;
 import org.obiba.opal.project.domain.Project;
+import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Projects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -44,8 +48,11 @@ public class ProjectResource {
 
   @GET
   @Path("/summary")
-  public Projects.ProjectSummaryDto getSummary() {
-    return Dtos.asSummaryDto(getProject());
+  public Response getSummary(@Context Request request) {
+    Project project = getProject();
+    Datasource ds = project.getDatasource();
+    TimestampedResponses.evaluate(request, ds);
+    return TimestampedResponses.ok(ds, Dtos.asSummaryDto(project)).build();
   }
 
   @PUT

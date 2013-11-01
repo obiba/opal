@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalTabPanel;
 import org.obiba.opal.web.gwt.datetime.client.FormatType;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
+import org.obiba.opal.web.model.client.magma.TimestampsDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.ProjectSummaryDto;
 
@@ -115,7 +116,7 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     description.setText(project.getDescription());
 
     setTags();
-    setTimestamps();
+    if (project.hasTimestamps()) setTimestamps(project.getTimestamps());
   }
 
   private void setTags() {
@@ -128,9 +129,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     }
   }
 
-  private void setTimestamps() {
+  private void setTimestamps(TimestampsDto ts) {
     String lastUpdateOn = "?";
-    if(project.hasTimestamps()) lastUpdateOn = Moment.create(project.getTimestamps().getLastUpdate()).fromNow();
+    if(ts.hasLastUpdate()) lastUpdateOn = Moment.create(ts.getLastUpdate()).fromNow();
     timestamps.setText(TranslationsUtils.replaceArguments(translations.lastUpdateOnLabel(), lastUpdateOn));
   }
 
@@ -160,6 +161,8 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     else if("1".equals(count)) count = translations.entityCountLabel();
     else count = TranslationsUtils.replaceArguments(translations.entitiesCountLabel(), count);
     entityCount.setText(count);
+
+    if (projectSummary.hasTimestamps()) setTimestamps(projectSummary.getTimestamps());
   }
 
   @Override

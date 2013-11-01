@@ -30,4 +30,5 @@ message ProjectSummaryDto {
   required int32 tableCount = 2;
   required int32 variableCount = 3;
   required int32 entityCount = 4;
+  optional Magma.TimestampsDto timestamps = 5;
 }

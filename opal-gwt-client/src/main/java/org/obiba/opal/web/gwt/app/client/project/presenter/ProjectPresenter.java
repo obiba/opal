@@ -164,13 +164,13 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       onTabSelected(tab.ordinal());
       getView().selectTab(tab.ordinal());
     }
+    refreshSummary();
   }
 
   public void refresh() {
     // TODO handle wrong or missing project name
     if(name == null) return;
     // reset
-    getView().setProjectSummary(null);
     ResourceRequestBuilderFactory.<ProjectDto>newBuilder().forResource(UriBuilders.PROJECT.create().build(name)).get()
         .withCallback(new ResourceCallback<ProjectDto>() {
           @Override
@@ -182,6 +182,12 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
             getView().selectTab(tab.ordinal());
           }
         }).send();
+  }
+
+  private void refreshSummary() {
+    // TODO handle wrong or missing project name
+    if(name == null) return;
+    getView().setProjectSummary(null);
     ResourceRequestBuilderFactory.<ProjectSummaryDto>newBuilder().forResource(UriBuilders.PROJECT_SUMMARY.create().build(name)).get()
         .withCallback(new ResourceCallback<ProjectSummaryDto>() {
           @Override
