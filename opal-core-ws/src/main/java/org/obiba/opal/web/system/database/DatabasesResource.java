@@ -9,8 +9,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.database.Database;
-import org.obiba.opal.core.runtime.database.DatabaseRegistry;
-import org.obiba.opal.core.runtime.database.MultipleIdentifiersDatabaseException;
+import org.obiba.opal.core.service.database.DatabaseRegistry;
+import org.obiba.opal.core.service.database.MultipleIdentifiersDatabaseException;
 import org.obiba.opal.web.database.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

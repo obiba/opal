@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
 
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.opal.core.domain.database.MongoDbSettings;
-import org.obiba.opal.core.runtime.database.DatabaseRegistry;
+import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.springframework.beans.factory.annotation.Autowired;

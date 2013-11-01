@@ -5,8 +5,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
-import org.obiba.opal.core.runtime.database.DatabaseRegistry;
 import org.obiba.opal.core.service.OrientDbService;
+import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
 import org.springframework.beans.factory.annotation.Autowired;

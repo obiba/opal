@@ -4,7 +4,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import org.obiba.opal.core.runtime.database.MultipleIdentifiersDatabaseException;
+import org.obiba.opal.core.service.database.MultipleIdentifiersDatabaseException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.springframework.stereotype.Component;
 

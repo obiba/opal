@@ -1,4 +1,4 @@
-package org.obiba.opal.core.runtime.database;
+package org.obiba.opal.core.service.database;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

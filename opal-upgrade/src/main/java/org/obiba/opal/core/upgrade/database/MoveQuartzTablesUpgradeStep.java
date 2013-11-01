@@ -8,7 +8,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.obiba.opal.core.runtime.database.DatabaseRegistry;
+import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
 import org.slf4j.Logger;

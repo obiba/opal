@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
 
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
-import org.obiba.opal.core.runtime.database.IdentifiersDatabaseNotFoundException;
+import org.obiba.opal.core.service.database.IdentifiersDatabaseNotFoundException;
 
 /**
  *

@@ -35,7 +35,7 @@
 
   <bean id="localOrientDbServerFactory" class="org.obiba.opal.core.service.impl.LocalOrientDbServerFactory"/>
 
-  <bean id="databaseRegistry" class="org.obiba.opal.core.runtime.database.DefaultDatabaseRegistry"/>
+  <bean id="databaseRegistry" class="org.obiba.opal.core.service.impl.DefaultDatabaseRegistry"/>
 
   <bean id="generalConfigService" class="org.obiba.opal.core.service.impl.OpalGeneralConfigServiceImpl"/>
 

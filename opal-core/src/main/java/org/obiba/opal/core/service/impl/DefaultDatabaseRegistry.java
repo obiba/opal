@@ -1,4 +1,4 @@
-package org.obiba.opal.core.runtime.database;
+package org.obiba.opal.core.service.impl;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -19,7 +19,11 @@ import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
 import org.obiba.opal.core.runtime.jdbc.DatabaseSessionFactoryProvider;
 import org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory;
 import org.obiba.opal.core.service.OrientDbService;
-import org.obiba.opal.core.service.impl.DefaultBeanValidator;
+import org.obiba.opal.core.service.database.CannotDeleteDatabaseWithDataException;
+import org.obiba.opal.core.service.database.DatabaseRegistry;
+import org.obiba.opal.core.service.database.IdentifiersDatabaseNotFoundException;
+import org.obiba.opal.core.service.database.MultipleIdentifiersDatabaseException;
+import org.obiba.opal.core.service.database.NoSuchDatabaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package org.obiba.opal.core.runtime.database;
+package org.obiba.opal.core.service.database;
 
 public class CannotDeleteDatabaseWithDataException extends RuntimeException {
 

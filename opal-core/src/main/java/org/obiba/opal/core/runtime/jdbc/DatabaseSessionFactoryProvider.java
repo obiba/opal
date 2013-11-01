@@ -5,7 +5,7 @@ import javax.annotation.Nonnull;
 import org.hibernate.SessionFactory;
 import org.obiba.magma.Disposable;
 import org.obiba.magma.datasource.hibernate.SessionFactoryProvider;
-import org.obiba.opal.core.runtime.database.DatabaseRegistry;
+import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.base.Preconditions;

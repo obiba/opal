@@ -17,7 +17,7 @@ import org.obiba.magma.Disposable;
 import org.obiba.magma.datasource.jdbc.JdbcDatasource;
 import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
 import org.obiba.opal.core.domain.database.SqlSettings;
-import org.obiba.opal.core.runtime.database.DatabaseRegistry;
+import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class DatabaseJdbcDatasourceFactory extends AbstractDatasourceFactory implements Disposable {

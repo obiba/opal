@@ -1,7 +1,7 @@
 package org.obiba.opal.core.upgrade;
 
 import org.obiba.opal.core.domain.database.Database;
-import org.obiba.opal.core.runtime.database.DatabaseRegistry;
+import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
 import org.springframework.core.io.Resource;

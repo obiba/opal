@@ -12,7 +12,7 @@ package org.obiba.opal.web.magma.support;
 import javax.annotation.Nonnull;
 
 import org.obiba.magma.DatasourceFactory;
-import org.obiba.opal.core.runtime.database.DatabaseRegistry;
+import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.LimesurveyDatasourceFactoryDto;
 import org.springframework.beans.factory.annotation.Autowired;

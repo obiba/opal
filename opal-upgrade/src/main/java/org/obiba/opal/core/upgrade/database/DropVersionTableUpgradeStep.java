@@ -1,6 +1,6 @@
 package org.obiba.opal.core.upgrade.database;
 
-import org.obiba.opal.core.runtime.database.DatabaseRegistry;
+import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.AbstractUpgradeStep;
 import org.springframework.beans.factory.annotation.Autowired;

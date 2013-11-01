@@ -17,7 +17,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.Disposable;
 import org.obiba.magma.datasource.limesurvey.LimesurveyDatasource;
 import org.obiba.opal.core.domain.database.SqlSettings;
-import org.obiba.opal.core.runtime.database.DatabaseRegistry;
+import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
