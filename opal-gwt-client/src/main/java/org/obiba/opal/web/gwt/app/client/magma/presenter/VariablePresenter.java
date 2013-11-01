@@ -15,6 +15,8 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
@@ -32,6 +34,7 @@ import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CategoriesEdit
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.PropertiesEditorModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
@@ -62,12 +65,18 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
 import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
+import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
+import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
+import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_OK;
 
 public class VariablePresenter extends PresenterWidget<VariablePresenter.Display>
     implements VariableUiHandlers, VariableSelectionChangeEvent.Handler {
+
+  private final PlaceManager placeManager;
 
   private final SummaryTabPresenter summaryTabPresenter;
 
@@ -91,15 +100,18 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private boolean variableUpdatePending = false;
 
+  private Runnable removeConfirmation;
+
   @Inject
-  public VariablePresenter(Display display, EventBus eventBus, ValuesTablePresenter valuesTablePresenter,
-      SummaryTabPresenter summaryTabPresenter, ScriptEditorPresenter scriptEditorPresenter,
-      Provider<AuthorizationPresenter> authorizationPresenter,
+  public VariablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
+      ValuesTablePresenter valuesTablePresenter, SummaryTabPresenter summaryTabPresenter,
+      ScriptEditorPresenter scriptEditorPresenter, Provider<AuthorizationPresenter> authorizationPresenter,
       VariableVcsCommitHistoryPresenter variableVcsCommitHistoryPresenter,
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
       ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider,
       ModalProvider<PropertiesEditorModalPresenter> propertiesEditorModalProvider) {
     super(eventBus, display);
+    this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
     this.summaryTabPresenter = summaryTabPresenter;
     this.authorizationPresenter = authorizationPresenter;
@@ -160,6 +172,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
             }).send();
       }
     });
+    addRegisteredHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler());
 
     summaryTabPresenter.bind();
     getView().setSummaryTabWidget(summaryTabPresenter.getView());
@@ -184,13 +197,13 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
     if(variableUpdatePending) return;
     ResourceRequestBuilderFactory.<VariableDto>newBuilder()
-        .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create().build(datasourceName, tableName, variableName)).get()
-        .withCallback(new ResourceCallback<VariableDto>() {
-          @Override
-          public void onResource(Response response, VariableDto resource) {
-            variableUpdatePending = false;
-          }
-        }).send();
+        .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create().build(datasourceName, tableName, variableName))
+        .get().withCallback(new ResourceCallback<VariableDto>() {
+      @Override
+      public void onResource(Response response, VariableDto resource) {
+        variableUpdatePending = false;
+      }
+    }).send();
 
   }
 
@@ -354,7 +367,15 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   @Override
   public void onRemove() {
-    //To change body of implemented methods use File | Settings | File Templates.
+    removeConfirmation = new RemoveRunnable();
+
+    ConfirmationRequiredEvent event;
+    event = table.hasViewLink()
+        ? ConfirmationRequiredEvent
+        .createWithKeys(removeConfirmation, "removeDerivedVariable", "confirmRemoveDerivedVariable")
+        : ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "removeVariable", "confirmRemoveVariable");
+
+    fireEvent(event);
   }
 
   @Override
@@ -410,6 +431,77 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   // Interfaces and classes
   //
 
+  private class RemoveRunnable implements Runnable {
+    @Override
+    public void run() {
+      if(table.hasViewLink()) {
+        removeDerivedVariable();
+      } else {
+        removeVariable();
+      }
+    }
+
+    private void gotoTable() {
+      placeManager.revealPlace(ProjectPlacesHelper.getTablePlace(table.getDatasourceName(), table.getName()));
+    }
+
+    private void removeDerivedVariable() {
+
+      ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          if(response.getStatusCode() == SC_OK) {
+            gotoTable();
+          } else {
+            String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
+            fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
+          }
+        }
+      };
+
+      String uri = UriBuilders.DATASOURCE_VIEW_VARIABLE.create()
+          .build(table.getDatasourceName(), table.getName(), variable.getName());
+      ResourceRequestBuilderFactory.newBuilder().forResource(uri).delete().withCallback(SC_OK, callbackHandler)
+          .withCallback(SC_FORBIDDEN, callbackHandler).withCallback(SC_INTERNAL_SERVER_ERROR, callbackHandler)
+          .withCallback(SC_NOT_FOUND, callbackHandler).send();
+    }
+
+    private void removeVariable() {
+
+      ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          if(response.getStatusCode() == SC_OK) {
+            gotoTable();
+          } else {
+            String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
+            fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
+          }
+        }
+      };
+
+      String uri = UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
+          .build(table.getDatasourceName(), table.getName(), variable.getName());
+      ResourceRequestBuilderFactory.newBuilder().forResource(uri).delete().withCallback(SC_OK, callbackHandler)
+          .withCallback(SC_FORBIDDEN, callbackHandler).withCallback(SC_INTERNAL_SERVER_ERROR, callbackHandler)
+          .withCallback(SC_NOT_FOUND, callbackHandler).send();
+    }
+
+  }
+
+  private class RemoveConfirmationEventHandler implements ConfirmationEvent.Handler {
+
+    @Override
+    public void onConfirmation(ConfirmationEvent event) {
+      if(removeConfirmation != null && event.getSource().equals(removeConfirmation) && event.isConfirmed()) {
+        removeConfirmation.run();
+        removeConfirmation = null;
+      }
+    }
+  }
+
   class ViewSavedEventHandler implements ViewSavedEvent.Handler {
 
     @Override
@@ -451,7 +543,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
       if(response.getStatusCode() == SC_OK) {
         UpdateVariableCallbackHandler updateVariableCallbackHandler = new UpdateVariableCallbackHandler(newVariable);
 
-        String uri = UriBuilder.create().segment("datasource", "{}", "view", "{}", "variable", "{}").query("comment", getView().getComment())
+        String uri = UriBuilder.create().segment("datasource", "{}", "view", "{}", "variable", "{}")
+            .query("comment", getView().getComment())
             .build(table.getDatasourceName(), table.getName(), variable.getName());
 
         ResourceRequestBuilderFactory.newBuilder().forResource(uri).put()
@@ -540,7 +633,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     void backToViewScript();
 
     void setSummaryTabWidget(View widget);
-    
+
     boolean isSummaryTabSelected();
 
     HasAuthorization getSummaryAuthorizer();

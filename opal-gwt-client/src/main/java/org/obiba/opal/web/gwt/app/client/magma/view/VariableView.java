@@ -302,6 +302,12 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   void onEditProperties(ClickEvent event) {
     getUiHandlers().onEditProperties();
   }
+
+  @UiHandler("remove")
+  void onRemove(ClickEvent event) {
+    getUiHandlers().onRemove();
+  }
+
   //
   // VariablePresenter.Display Methods
   //

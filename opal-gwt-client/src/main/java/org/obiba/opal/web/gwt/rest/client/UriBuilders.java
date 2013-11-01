@@ -88,6 +88,13 @@ public enum UriBuilders {
     }
   },
 
+  DATASOURCE_VIEW_VARIABLE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasource", "{}", "view", "{}", "variable", "{}");
+    }
+  },
+
   DATASOURCE_TABLE_LOCALES {
     @Override
     public UriBuilder create() {

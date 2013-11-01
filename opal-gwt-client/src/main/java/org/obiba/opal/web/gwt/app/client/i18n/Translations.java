@@ -587,6 +587,8 @@ public interface Translations extends Constants {
       "createView", "Create View",//
       "removeView", "Remove View",//
       "removeTable", "Remove Table",//
+      "removeDerivedVariable", "Remove Derived Variable",//
+      "removeVariable", "Remove Variable",//
       "deleteDataShieldAggregateMethod", "Delete Aggregating Method",//
       "deleteDataShieldAssignMethod", "Delete Assigning Method",//
       "deleteDataShieldPackage", "Delete Package",//
@@ -633,7 +635,11 @@ public interface Translations extends Constants {
       "confirmRemoveView", "Please confirm that you want to remove the current view.",//
       "confirmRemoveTable",
       "Please confirm that you want to remove the current table. This cannot be undone and all data associated with this table will be lost.",
-//
+      //
+      "confirmRemoveDerivedVariable", "Please confirm that you want to remove the current derived variable.",//
+      "confirmRemoveVariable",
+      "Please confirm that you want to remove the current variable. This cannot be undone and all data associated with this variable will be lost.",
+      //
       "confirmDeleteDataShieldAssignMethod", "Please confirm that you want to remove this assigning method.",//
       "confirmDeleteDataShieldAggregateMethod", "Please confirm that you want to remove this aggregating method.",//
       "confirmDeleteDataShieldPackage", "Please confirm that you want to remove this package and all its methods.",//
