@@ -13,7 +13,6 @@ package org.obiba.opal.core.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -28,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
@@ -149,7 +149,7 @@ public class TaxonomyServiceImpl implements TaxonomyService {
 
     Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
     toSave.put(template == null ? vocabulary : template, vocabulary);
-    if(!Objects.equals(previousTaxonomy, taxonomy)) {
+    if(!Objects.equal(previousTaxonomy, taxonomy)) {
       taxonomy.addVocabulary(vocabulary.getName());
       toSave.put(taxonomy, taxonomy);
       if(previousTaxonomy != null) {
