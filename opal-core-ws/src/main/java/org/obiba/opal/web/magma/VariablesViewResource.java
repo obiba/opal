@@ -44,10 +44,6 @@ public class VariablesViewResource extends VariablesResource {
   @POST
   public Response addOrUpdateVariables(List<VariableDto> variables, @Nullable @QueryParam("comment") String comment) {
     try {
-
-      // @TODO Check if table can be modified and respond with "IllegalTableModification" (it seems like this cannot be
-      // done with the current Magma implementation).
-
       if(!getValueTable().isView()) {
         addOrUpdateTableVariables(variables);
       } else if(viewManager != null || viewDtos == null) {

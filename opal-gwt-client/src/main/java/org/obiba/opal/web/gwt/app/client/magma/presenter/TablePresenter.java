@@ -369,6 +369,11 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   }
 
   @Override
+  public void onAddVariable() {
+    // TODO display modal with variable name, value type and repeatability
+  }
+
+  @Override
   public void onAddVariablesToView(List<VariableDto> variables) {
     if(variables.isEmpty()) {
       fireEvent(NotificationEvent.newBuilder().error("CopyVariableSelectAtLeastOne").build());

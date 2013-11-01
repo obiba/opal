@@ -16,6 +16,8 @@ public interface TableUiHandlers extends UiHandlers {
 
   void onDownloadView();
 
+  void onAddVariable();
+
   void onAddVariablesToView(List<VariableDto> variables);
 
   void onEdit();

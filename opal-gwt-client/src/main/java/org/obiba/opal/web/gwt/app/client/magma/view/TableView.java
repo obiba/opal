@@ -172,6 +172,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   IconAnchor edit;
 
   @UiField
+  Button addVariable;
+
+  @UiField
   Button remove;
 
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
@@ -364,6 +367,11 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiHandler("edit")
   void onEdit(ClickEvent event) {
     getUiHandlers().onEdit();
+  }
+
+  @UiHandler("addVariable")
+  void onAddVariable(ClickEvent event) {
+    getUiHandlers().onAddVariable();
   }
 
   @UiHandler("exportData")
