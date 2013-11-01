@@ -9,13 +9,19 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
 import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.obiba.magma.NoSuchVariableException;
 import org.obiba.magma.ValueTable;
@@ -26,18 +32,35 @@ import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.web.magma.view.ViewDtos;
+import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 
-public class VariableViewResource extends VariablesViewResource {
+public class VariableViewResource extends AbstractValueTableResource {
 
   private final String name;
 
-  public VariableViewResource(ViewManager viewManager, ViewDtos viewDtos, ValueTable valueTable, Set<Locale> locales,
+  protected final ViewManager viewManager;
+
+  public VariableViewResource(ViewManager viewManager, ValueTable valueTable, Set<Locale> locales,
       String name) {
-    super(viewManager, viewDtos, valueTable, locales);
+    super(valueTable, locales);
+    this.viewManager = viewManager;
     this.name = name;
+  }
+
+  @GET
+  public VariableDto get(@Context UriInfo uriInfo) {
+    UriBuilder uriBuilder = UriBuilder.fromPath("/");
+    List<PathSegment> pathSegments = uriInfo.getPathSegments();
+    for(int i = 0; i < 4; i++) {
+      uriBuilder.segment(pathSegments.get(i).getPath());
+    }
+    String tableUri = uriBuilder.build().toString();
+    Magma.LinkDto linkDto = Magma.LinkDto.newBuilder().setLink(tableUri).setRel(getValueTable().getName()).build();
+    
+    return Dtos.asDto(linkDto, getValueTable().getVariable(name)).build();
   }
 
   @PUT
@@ -80,6 +103,7 @@ public class VariableViewResource extends VariablesViewResource {
       for(VariableValueSource v : view.getListClause().getVariableValueSources()) {
         if(v.getVariable().getName().equals(name)) {
           vw.removeVariable(v.getVariable());
+          viewManager.addView(getDatasource().getName(), view, "Remove " + name);
           break;
         }
       }
@@ -89,5 +113,9 @@ public class VariableViewResource extends VariablesViewResource {
     }
 
     return Response.ok().build();
+  }
+
+  protected View getValueTableAsView() {
+    return viewManager.getView(getDatasource().getName(), getValueTable().getName());
   }
 }

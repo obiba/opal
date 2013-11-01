@@ -39,6 +39,7 @@ import org.obiba.opal.web.magma.math.ContinuousSummaryResource;
 import org.obiba.opal.web.magma.math.DefaultSummaryResource;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
+import org.obiba.opal.web.support.InvalidRequestException;
 
 public class VariableResource {
 
@@ -72,6 +73,7 @@ public class VariableResource {
 
   @PUT
   public Response updateVariable(VariableDto variable) {
+    if (getValueTable().isView()) throw new InvalidRequestException("Derived variable must be updated by the view");
 
     ValueTableWriter vtw = null;
     ValueTableWriter.VariableWriter vw = null;
@@ -100,6 +102,8 @@ public class VariableResource {
 
   @DELETE
   public Response deleteVariable() {
+    if (getValueTable().isView()) throw new InvalidRequestException("Derived variable must be deleted by the view");
+
     ValueTableWriter vtw = null;
     ValueTableWriter.VariableWriter vw = null;
     try {

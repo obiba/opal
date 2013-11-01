@@ -136,8 +136,7 @@ public class ViewResource extends AbstractValueTableResource {
    */
   @Path("/variable/{variable}")
   public VariableViewResource getVariable(@Context Request request, @PathParam("variable") String name) {
-//    TimestampedResponses.evaluate(request, getValueTable());
-    return new VariableViewResource(viewManager, viewDtos, getValueTable(), getLocales(), name);
+    return new VariableViewResource(viewManager, getValueTable(), getLocales(), name);
   }
 
   protected View asView() {
