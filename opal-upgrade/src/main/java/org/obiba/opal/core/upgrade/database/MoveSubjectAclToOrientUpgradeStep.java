@@ -16,7 +16,6 @@ import org.springframework.jdbc.core.RowMapper;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 
-@SuppressWarnings("SpringJavaAutowiringInspection")
 public class MoveSubjectAclToOrientUpgradeStep extends AbstractUpgradeStep {
 
   @Autowired
@@ -47,7 +46,7 @@ public class MoveSubjectAclToOrientUpgradeStep extends AbstractUpgradeStep {
       }
     });
     for(SubjectAcl acl : list) {
-      orientDbService.save(acl);
+      orientDbService.save(null, acl);
     }
     dataJdbcTemplate.execute("drop table subject_acl");
   }

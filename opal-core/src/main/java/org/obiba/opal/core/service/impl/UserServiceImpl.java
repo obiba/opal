@@ -22,6 +22,7 @@ import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.User;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SubjectAclService;
+import org.obiba.opal.core.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +35,7 @@ import com.google.common.collect.Maps;
  * Default implementation of User Service
  */
 @Component
-public class DefaultUserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService {
 
   private static final String OPAL_DOMAIN = "opal";
 
@@ -56,7 +57,7 @@ public class DefaultUserServiceImpl implements UserService {
   }
 
   @Override
-  public Iterable<User> listUsers() {
+  public Iterable<User> getUsers() {
     return orientDbService.list(User.class);
   }
 
@@ -127,7 +128,7 @@ public class DefaultUserServiceImpl implements UserService {
   }
 
   @Override
-  public void deleteUser(User user) {
+  public void delete(User user) {
 
     Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
     for(String groupName : user.getGroups()) {
@@ -137,7 +138,7 @@ public class DefaultUserServiceImpl implements UserService {
     }
     // TODO we should execute these steps in a single transaction
     orientDbService.delete(user);
-    orientDbService.save(toSave);
+    if(!toSave.isEmpty()) orientDbService.save(toSave);
     aclService.deleteSubjectPermissions(OPAL_DOMAIN, null,
         SubjectAclService.SubjectType.valueOf(SubjectAclService.SubjectType.USER.name())
             .subjectFor(user.getName())); // Delete user's permissions
@@ -149,7 +150,7 @@ public class DefaultUserServiceImpl implements UserService {
   }
 
   @Override
-  public Iterable<Group> listGroups() {
+  public Iterable<Group> getGroups() {
     return orientDbService.list(Group.class);
   }
 
@@ -159,7 +160,7 @@ public class DefaultUserServiceImpl implements UserService {
   }
 
   @Override
-  public void deleteGroup(Group group) {
+  public void delete(Group group) {
     Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
     for(String userName : group.getUsers()) {
       User user = getUser(userName);
@@ -169,7 +170,7 @@ public class DefaultUserServiceImpl implements UserService {
 
     // TODO we should execute these steps in a single transaction
     orientDbService.delete(group);
-    orientDbService.save(toSave);
+    if(!toSave.isEmpty()) orientDbService.save(toSave);
     aclService.deleteSubjectPermissions(OPAL_DOMAIN, null,
         SubjectAclService.SubjectType.valueOf(SubjectAclService.SubjectType.GROUP.name())
             .subjectFor(group.getName())); // Delete group's permissions

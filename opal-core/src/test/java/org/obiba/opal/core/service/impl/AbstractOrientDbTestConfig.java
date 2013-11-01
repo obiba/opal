@@ -31,7 +31,7 @@ public abstract class AbstractOrientDbTestConfig {
       TEMP_FILE = File.createTempFile("opal-test-", "");
       TEMP_FILE.delete();
       TEMP_FILE.mkdirs();
-//      TEMP_FILE.deleteOnExit();
+      TEMP_FILE.deleteOnExit();
     } catch(IOException e) {
       throw new RuntimeException(e);
     }

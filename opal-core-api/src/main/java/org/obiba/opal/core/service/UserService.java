@@ -7,13 +7,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.core.service.impl;
+package org.obiba.opal.core.service;
 
 import javax.validation.ConstraintViolationException;
 
 import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.User;
-import org.obiba.opal.core.service.SystemService;
 
 public interface UserService extends SystemService {
 
@@ -22,7 +21,7 @@ public interface UserService extends SystemService {
    *
    * @return a list of user instances
    */
-  Iterable<User> listUsers();
+  Iterable<User> getUsers();
 
   /**
    * Returns the count of users that match the specified template
@@ -51,7 +50,7 @@ public interface UserService extends SystemService {
    *
    * @param user
    */
-  void deleteUser(User user);
+  void delete(User user);
 
   /**
    * Create the given group.
@@ -65,7 +64,7 @@ public interface UserService extends SystemService {
    *
    * @return
    */
-  Iterable<Group> listGroups();
+  Iterable<Group> getGroups();
 
   /**
    * Returns the group with the specified name
@@ -80,7 +79,7 @@ public interface UserService extends SystemService {
    *
    * @param group
    */
-  void deleteGroup(Group group);
+  void delete(Group group);
 
   long countGroups();
 }

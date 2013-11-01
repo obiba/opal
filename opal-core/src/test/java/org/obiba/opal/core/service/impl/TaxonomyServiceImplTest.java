@@ -37,7 +37,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-@ContextConfiguration(classes = TestTaxonomyServiceConfig.class)
+@ContextConfiguration(classes = TaxonomyServiceTestConfig.class)
 public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
 
   private static final Logger log = LoggerFactory.getLogger(TaxonomyServiceImplTest.class);
@@ -58,15 +58,8 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
 
   @Before
   public void clear() {
-
-    log.debug("{} taxonomies before delete", orientDbService.count(Taxonomy.class));
-    log.debug("{} vocabularies before delete", orientDbService.count(Taxonomy.class));
-
     orientDbService.deleteAll(Taxonomy.class);
     orientDbService.deleteAll(Vocabulary.class);
-
-    log.debug("{} taxonomies after delete", orientDbService.count(Taxonomy.class));
-    log.debug("{} vocabularies after delete", orientDbService.count(Taxonomy.class));
   }
 
   @Test
@@ -249,6 +242,7 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     assertEquals(expected.getTitles(), found.getTitles());
     assertEquals(expected.getDescriptions(), found.getDescriptions());
     assertEquals(expected.getVocabularies(), found.getVocabularies());
+    Asserts.assertTimestamps(expected, found);
   }
 
   private void assertVocabularyEquals(Vocabulary expected, Vocabulary found) {
@@ -259,6 +253,7 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     assertEquals(expected.getTitles(), found.getTitles());
     assertEquals(expected.getDescriptions(), found.getDescriptions());
     assertEquals(expected.getTerms(), found.getTerms());
+    Asserts.assertTimestamps(expected, found);
   }
 
 }

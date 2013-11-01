@@ -17,7 +17,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.user.User;
-import org.obiba.opal.core.service.impl.UserService;
+import org.obiba.opal.core.service.UserService;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -37,7 +37,7 @@ public class UsersResource {
 
   @GET
   public List<Opal.UserDto> getUsers() {
-    return Lists.newArrayList(Iterables.transform(userService.listUsers(), new Function<User, Opal.UserDto>() {
+    return Lists.newArrayList(Iterables.transform(userService.getUsers(), new Function<User, Opal.UserDto>() {
       @Override
       public Opal.UserDto apply(User user) {
         return Dtos.asDto(user);

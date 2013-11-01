@@ -28,7 +28,7 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.obiba.opal.core.domain.user.User;
-import org.obiba.opal.core.service.impl.UserService;
+import org.obiba.opal.core.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

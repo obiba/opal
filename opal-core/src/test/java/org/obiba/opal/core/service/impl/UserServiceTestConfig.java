@@ -10,16 +10,23 @@
 
 package org.obiba.opal.core.service.impl;
 
-import org.obiba.opal.core.cfg.TaxonomyService;
+import org.easymock.EasyMock;
+import org.obiba.opal.core.service.SubjectAclService;
+import org.obiba.opal.core.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class TestTaxonomyServiceConfig extends AbstractOrientDbTestConfig {
+public class UserServiceTestConfig extends AbstractOrientDbTestConfig {
 
   @Bean
-  public TaxonomyService taxonomyService() {
-    return new TaxonomyServiceImpl();
+  public UserService userService() {
+    return new UserServiceImpl();
+  }
+
+  @Bean
+  public SubjectAclService subjectAclService() {
+    return EasyMock.createMock(SubjectAclService.class);
   }
 
 }

@@ -16,7 +16,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.user.Group;
-import org.obiba.opal.core.service.impl.UserService;
+import org.obiba.opal.core.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

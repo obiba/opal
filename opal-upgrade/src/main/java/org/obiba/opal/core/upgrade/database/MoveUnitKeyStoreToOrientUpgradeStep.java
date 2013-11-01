@@ -39,7 +39,7 @@ public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
           }
         });
     for(UnitKeyStoreState state : states) {
-      orientDbService.save(state);
+      orientDbService.save(null, state);
     }
     dataJdbcTemplate.execute("drop table unit_key_store");
   }

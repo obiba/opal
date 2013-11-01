@@ -17,7 +17,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.user.User;
-import org.obiba.opal.core.service.impl.UserService;
+import org.obiba.opal.core.service.UserService;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -63,7 +63,7 @@ public class UserResource {
     if(user == null) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
-    userService.deleteUser(user);
+    userService.delete(user);
     return Response.ok().build();
   }
 }

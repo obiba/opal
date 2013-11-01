@@ -98,7 +98,7 @@ public class User extends AbstractTimestamped implements Comparable<User>, HasUn
     if(groups != null) groups.remove(group);
   }
 
-  public boolean getEnabled() {
+  public boolean isEnabled() {
     return enabled;
   }
 

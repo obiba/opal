@@ -17,7 +17,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.user.Group;
-import org.obiba.opal.core.service.impl.UserService;
+import org.obiba.opal.core.service.UserService;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -37,7 +37,7 @@ public class GroupsResource {
 
   @GET
   public List<Opal.GroupDto> getGroups() {
-    return Lists.newArrayList(Iterables.transform(userService.listGroups(), new Function<Group, Opal.GroupDto>() {
+    return Lists.newArrayList(Iterables.transform(userService.getGroups(), new Function<Group, Opal.GroupDto>() {
       @Override
       public Opal.GroupDto apply(Group group) {
         return Dtos.asDto(group);

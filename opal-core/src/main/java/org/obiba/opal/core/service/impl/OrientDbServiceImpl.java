@@ -48,13 +48,15 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   private static final Logger log = LoggerFactory.getLogger(OrientDbServiceImpl.class);
 
+  private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
+
   @Autowired
   private DefaultBeanValidator defaultBeanValidator;
 
   @Autowired
   private OrientDbServerFactory serverFactory;
 
-  private final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+  private final Gson gson = new GsonBuilder().setDateFormat(DATE_PATTERN).create();
 
   @Override
   public <T> T execute(WithinDocumentTxCallback<T> callback) {
@@ -74,7 +76,7 @@ public class OrientDbServiceImpl implements OrientDbService {
       throws ConstraintViolationException {
     //noinspection ConstantConditions
     Preconditions.checkArgument(hasUniqueProperties != null, "hasUniqueProperties cannot be null");
-    save(ImmutableMap.of(template, hasUniqueProperties));
+    save(ImmutableMap.of(template == null ? hasUniqueProperties : template, hasUniqueProperties));
   }
 
   @Override
