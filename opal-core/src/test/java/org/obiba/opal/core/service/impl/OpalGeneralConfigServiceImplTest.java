@@ -21,7 +21,7 @@ import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@ContextConfiguration(classes = OpalGeneralConfigServiceImplTest.OpalGeneralConfigTestConfig.class)
+@ContextConfiguration(classes = OpalGeneralConfigServiceImplTest.Config.class)
 public class OpalGeneralConfigServiceImplTest extends AbstractJUnit4SpringContextTests {
 
   @Autowired
@@ -85,7 +85,7 @@ public class OpalGeneralConfigServiceImplTest extends AbstractJUnit4SpringContex
   }
 
   @Configuration
-  public static class OpalGeneralConfigTestConfig extends AbstractOrientDbTestConfig {
+  public static class Config extends AbstractOrientDbTestConfig {
 
     @Bean
     public OpalGeneralConfigService userService() {

@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-@ContextConfiguration(classes = UserServiceImplTest.UserServiceTestConfig.class)
+@ContextConfiguration(classes = UserServiceImplTest.Config.class)
 public class UserServiceImplTest extends AbstractJUnit4SpringContextTests {
 
 //  private static final Logger log = LoggerFactory.getLogger(UserServiceImplTest.class);
@@ -188,7 +188,7 @@ public class UserServiceImplTest extends AbstractJUnit4SpringContextTests {
   }
 
   @Configuration
-  public static class UserServiceTestConfig extends AbstractOrientDbTestConfig {
+  public static class Config extends AbstractOrientDbTestConfig {
 
     @Bean
     public UserService userService() {
