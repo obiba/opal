@@ -3,9 +3,11 @@ package org.obiba.opal.core.service.impl;
 import java.util.List;
 import java.util.Properties;
 
+import javax.sql.DataSource;
 import javax.transaction.TransactionManager;
 
 import org.easymock.EasyMock;
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.domain.database.Database;
@@ -24,6 +26,10 @@ import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 import static com.google.common.collect.Iterables.size;
 import static com.google.common.collect.Lists.newArrayList;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.reset;
+import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -39,8 +45,15 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   @Autowired
   private OrientDbService orientDbService;
 
+  @Autowired
+  private DataSourceFactory dataSourceFactory;
+
+  @Autowired
+  private SessionFactoryFactory sessionFactoryFactory;
+
   @Before
   public void clear() throws Exception {
+    ((DefaultDatabaseRegistry) databaseRegistry).clearCaches();
     orientDbService.deleteAll(Database.class);
   }
 
@@ -160,6 +173,14 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     assertEquals(0, size(databaseRegistry.list()));
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void test_delete_database_non_editable() {
+    Database database = createSqlDatabase();
+    database.setEditable(false);
+    databaseRegistry.save(database);
+    databaseRegistry.delete(database);
+  }
+
   @Test
   public void test_list_sql_databases() {
     databaseRegistry.save(createSqlDatabase());
@@ -170,7 +191,10 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
 
   @Test
   public void test_list_mongo_databases() {
-
+    databaseRegistry.save(createMongoDatabase());
+    assertEquals(1, size(databaseRegistry.list()));
+    assertEquals(0, size(databaseRegistry.listSqlDatabases()));
+    assertEquals(1, size(databaseRegistry.listMongoDatabases()));
   }
 
   @Test
@@ -186,6 +210,63 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
 
     assertFalse(databaseRegistry.getDatabase(database.getName()).isDefaultStorage());
     assertTrue(databaseRegistry.getDatabase(database2.getName()).isDefaultStorage());
+  }
+
+  @Test
+  public void test_get_datasource() {
+    Database database = createSqlDatabase();
+    databaseRegistry.save(database);
+
+    DataSource mockDatasource = EasyMock.createMock(DataSource.class);
+
+    reset(dataSourceFactory);
+    expect(dataSourceFactory.createDataSource(database)).andReturn(mockDatasource).once();
+    replay(dataSourceFactory);
+
+    DataSource datasource = databaseRegistry.getDataSource(database.getName(), "jdbc-datasource");
+    verify(dataSourceFactory);
+
+    assertEquals(mockDatasource, datasource);
+    assertFalse(databaseRegistry.getDatabase(database.getName()).isEditable());
+  }
+
+  @Test
+  public void test_get_session_factory() {
+    Database database = createSqlDatabase();
+    databaseRegistry.save(database);
+
+    DataSource mockDatasource = EasyMock.createMock(DataSource.class);
+    SessionFactory mockSessionFactory = EasyMock.createMock(SessionFactory.class);
+
+    reset(dataSourceFactory, sessionFactoryFactory);
+    expect(dataSourceFactory.createDataSource(database)).andReturn(mockDatasource).once();
+    expect(sessionFactoryFactory.getSessionFactory(mockDatasource)).andReturn(mockSessionFactory).once();
+    replay(dataSourceFactory, sessionFactoryFactory);
+
+    SessionFactory sessionFactory = databaseRegistry.getSessionFactory(database.getName(), "hibernate-datasource");
+    verify(sessionFactoryFactory, dataSourceFactory);
+
+    assertEquals(mockSessionFactory, sessionFactory);
+    assertFalse(databaseRegistry.getDatabase(database.getName()).isEditable());
+  }
+
+  @Test
+  public void test_unregister() {
+    Database database = createSqlDatabase();
+    databaseRegistry.save(database);
+
+    DataSource mockDatasource = EasyMock.createMock(DataSource.class);
+
+    reset(dataSourceFactory);
+    expect(dataSourceFactory.createDataSource(database)).andReturn(mockDatasource).once();
+    replay(dataSourceFactory);
+
+    databaseRegistry.getDataSource(database.getName(), "jdbc-datasource");
+    verify(dataSourceFactory);
+
+    databaseRegistry.unregister(database.getName(), "jdbc-datasource");
+
+    assertTrue(databaseRegistry.getDatabase(database.getName()).isEditable());
   }
 
   private Database createSqlDatabase() {

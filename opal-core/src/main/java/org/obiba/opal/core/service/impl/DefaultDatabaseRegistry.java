@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.atomikos.jdbc.AbstractDataSourceBean;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -177,6 +178,10 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   @Override
   public void delete(@NotNull Database database) throws CannotDeleteDatabaseWithDataException {
+    if(!database.isEditable()) {
+      throw new IllegalArgumentException("Cannot delete non editable database");
+    }
+
     //TODO check if this database has data
     orientDbService.delete(database);
     destroyDataSource(database.getName());
@@ -266,6 +271,15 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     }
   }
 
+  private class SessionFactoryCacheLoader extends CacheLoader<String, SessionFactory> {
+
+    @Override
+    public SessionFactory load(String databaseName) throws Exception {
+      log.info("Building SessionFactory {}", databaseName);
+      return sessionFactoryFactory.getSessionFactory(getDataSource(databaseName, null));
+    }
+  }
+
   private static class SessionFactoryRemovalListener implements RemovalListener<String, SessionFactory> {
     @Override
     public void onRemoval(RemovalNotification<String, SessionFactory> notification) {
@@ -279,13 +293,11 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     }
   }
 
-  private class SessionFactoryCacheLoader extends CacheLoader<String, SessionFactory> {
-
-    @Override
-    public SessionFactory load(String databaseName) throws Exception {
-      log.info("Building SessionFactory {}", databaseName);
-      return sessionFactoryFactory.getSessionFactory(getDataSource(databaseName, null));
-    }
+  @VisibleForTesting
+  void clearCaches() {
+    dataSourceCache.invalidateAll();
+    sessionFactoryCache.invalidateAll();
+    registrations.clear();
   }
 
 }
