@@ -13,6 +13,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.magma.datasource.mongodb.MongoDBDatasourceFactory;
+import org.obiba.magma.support.EntitiesPredicate;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbSettings;
 import org.obiba.opal.core.service.IdentifiersTableService;
@@ -59,7 +60,10 @@ public class DatabaseResource {
   public Response delete() {
     Database database = getDatabase();
     if(database.isUsedForIdentifiers()) {
-      // TODO check if hasEntities()
+      if (identifiersTableService.hasEntities(new EntitiesPredicate.NonViewEntitiesPredicate())) {
+        return Response.status(BAD_REQUEST)
+            .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatabaseHasEntities").build()).build();
+      }
       identifiersTableService.unregisterDatabase();
     } else if(!database.isEditable()) {
       return Response.status(BAD_REQUEST)
