@@ -117,6 +117,8 @@ public class PropertiesEditorModalView extends ModalPopupViewWithUiHandlers<Prop
       refEntityType.setText(variable.getReferencedEntityType());
       mimeType.setText(variable.getMimeType());
       occurenceGroup.setText(variable.getOccurrenceGroup());
+    } else {
+      dialog.setTitle(translations.addVariable());
     }
 
     variableName.setEnabled(modifyValueType);

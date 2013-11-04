@@ -1811,6 +1811,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add selected variables to view")
   String addVariablesToViewTitle();
 
+  @Description("Add variable label")
+  @DefaultStringValue("Add Variable")
+  String addVariable();
+
   @Description("Add variables to view... label")
   @DefaultStringValue("Add Variables to View...")
   String addVariablesToView();
@@ -2232,6 +2236,10 @@ public interface Translations extends Constants {
   @Description("Update {0} properties label")
   @DefaultStringValue("Update {0} properties")
   String updateVariableProperties();
+
+  @Description("Create variable {0} label")
+  @DefaultStringValue("Create variable {0}")
+  String createVariable();
 
   @Description("Moment with ago label")
   @DefaultStringValue("{0} ({1})")

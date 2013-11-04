@@ -134,7 +134,7 @@ public class PropertiesEditorModalPresenter extends ModalPresenterWidget<Propert
     } else {
       // variable from a view
       uriBuilder = UriBuilders.DATASOURCE_VIEW_VARIABLES.create().query("comment",
-          TranslationsUtils.replaceArguments(translations.updateVariableProperties(), variable.getName()));
+          TranslationsUtils.replaceArguments(translations.createVariable(), newVariable.getName()));
     }
 
     ResourceRequestBuilderFactory.newBuilder()
@@ -151,6 +151,7 @@ public class PropertiesEditorModalPresenter extends ModalPresenterWidget<Propert
     v.setIsNewVariable(variable == null);
     v.setEntityType(tableDto.getEntityType());
     if(variable != null) {
+      GWT.log("getVariableDto: " + VariableDto.stringify(variable));
       v.setLink(variable.getLink());
       v.setIndex(variable.getIndex());
 

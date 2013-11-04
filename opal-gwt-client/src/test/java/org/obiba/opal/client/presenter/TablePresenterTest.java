@@ -27,6 +27,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.PropertiesEditorModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
@@ -71,11 +72,12 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     ModalProvider<ValueSequencePopupPresenter> modalProviderValueSequence = createMock(ModalProvider.class);
     ModalProvider<ConfigureViewStepPresenter> modalConfigureViewStepProvider = createMock(ModalProvider.class);
     ModalProvider<VariablesToViewPresenter> variablesToViewProvider = createMock(ModalProvider.class);
+    ModalProvider<PropertiesEditorModalPresenter> propertiesEditorModalProvider = createMock(ModalProvider.class);
 
     ValuesTablePresenter values = new ValuesTablePresenter(null, null, modalProviderValueSequence,
         modalEntityModalPresenter);
     presenter = new TablePresenter(displayMock, new CountingEventBus(), null, values, mockProvider, mockIndexProvider,
-        modalConfigureViewStepProvider, variablesToViewProvider);
+        modalConfigureViewStepProvider, variablesToViewProvider, propertiesEditorModalProvider);
   }
 
   @SuppressWarnings({ "unchecked", "OverlyLongMethod" })
