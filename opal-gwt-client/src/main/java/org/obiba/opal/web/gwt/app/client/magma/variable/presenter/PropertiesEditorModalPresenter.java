@@ -9,23 +9,38 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.variable.presenter;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
+import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.magma.AttributeDto;
+import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -46,25 +61,44 @@ public class PropertiesEditorModalPresenter extends ModalPresenterWidget<Propert
 
   private TableDto tableDto;
 
+  private final ValidationHandler validationHandler;
+
   @Inject
   public PropertiesEditorModalPresenter(EventBus eventBus, Display display, Translations translations,
       PlaceManager placeManager) {
     super(eventBus, display);
     this.translations = translations;
     this.placeManager = placeManager;
+    validationHandler = new PropertiesValidationHandler();
   }
 
+  /**
+   * Will create a new variable in the given table.
+   * @param table
+   */
+  public void initialize(TableDto table) {
+    initialize(null, table);
+  }
+
+  /**
+   * Will update given variable in associated table.
+   * @param dto
+   * @param table
+   */
   public void initialize(VariableDto dto, TableDto table) {
     variable = dto;
     tableDto = table;
 
     getView().setUiHandlers(this);
-    getView().renderProperties(dto, table.hasViewLink());
+    getView().renderProperties(dto,
+        variable == null || table.hasViewLink() || (table.hasValueSetCount() && table.getValueSetCount() == 0));
   }
 
   @Override
   public void onSave(String name, String valueType, boolean repeatable, String unit, String mimeType,
       String occurrenceGroup, String referencedEntityType) {
+    if(!validationHandler.validate()) return;
+
     VariableDto newVariable = getVariableDto(name, valueType, repeatable, unit, mimeType, occurrenceGroup,
         referencedEntityType);
 
@@ -106,7 +140,7 @@ public class PropertiesEditorModalPresenter extends ModalPresenterWidget<Propert
     ResourceRequestBuilderFactory.newBuilder()
         .forResource(uriBuilder.build(tableDto.getDatasourceName(), tableDto.getName())) //
         .post() //
-        .withResourceBody(VariableDto.stringify(newVariable)).accept("application/json") //
+        .withResourceBody("[" + VariableDto.stringify(newVariable) + "]").accept("application/json") //
         .withCallback(new VariableCreateUpdateCallback(newVariable), Response.SC_BAD_REQUEST,
             Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
   }
@@ -115,13 +149,13 @@ public class PropertiesEditorModalPresenter extends ModalPresenterWidget<Propert
       String occurrenceGroup, String referencedEntityType) {
     VariableDto v = VariableDto.create();
     v.setIsNewVariable(variable == null);
+    v.setEntityType(tableDto.getEntityType());
     if(variable != null) {
       v.setLink(variable.getLink());
       v.setIndex(variable.getIndex());
 
       v.setParentLink(variable.getParentLink());
       v.setName(variable.getName());
-      v.setEntityType(variable.getEntityType());
       v.setValueType(variable.getValueType());
 
       if(variable.getAttributesArray().length() > 0) {
@@ -140,14 +174,21 @@ public class PropertiesEditorModalPresenter extends ModalPresenterWidget<Propert
     v.setIsRepeatable(repeatable);
     v.setReferencedEntityType(referencedEntityType);
     v.setMimeType(mimeType);
-    v.setOccurrenceGroup(occurrenceGroup);
+    v.setOccurrenceGroup(repeatable ? occurrenceGroup : "");
     return v;
   }
 
   public interface Display extends PopupView, HasUiHandlers<PropertiesEditorModalUiHandlers> {
-    void renderProperties(VariableDto variable, boolean derived);
 
-    void showError(String message, @Nullable ControlGroup group);
+    enum FormField {
+      NAME
+    }
+
+    void renderProperties(VariableDto variable, boolean modifyValueType);
+
+    void showError(String message, @Nullable FormField id);
+
+    HasText getVariableName();
   }
 
   private class VariableCreateUpdateCallback implements ResponseCodeCallback {
@@ -162,11 +203,28 @@ public class PropertiesEditorModalPresenter extends ModalPresenterWidget<Propert
     public void onResponseCode(Request request, Response response) {
       if(response.getStatusCode() == Response.SC_OK) {
         getView().hide();
+        placeManager.revealPlace(ProjectPlacesHelper
+            .getVariablePlace(tableDto.getDatasourceName(), tableDto.getName(), updatedVariable.getName()));
       } else {
         getView().showError(response.getText(), null);
       }
-      placeManager.revealPlace(ProjectPlacesHelper
-          .getVariablePlace(tableDto.getDatasourceName(), tableDto.getName(), updatedVariable.getName()));
     }
   }
+
+  private class PropertiesValidationHandler extends ViewValidationHandler {
+
+    @Override
+    protected Set<FieldValidator> getValidators() {
+      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      validators
+          .add(new RequiredTextValidator(getView().getVariableName(), "NameIsRequired", Display.FormField.NAME.name()));
+      return validators;
+    }
+
+    @Override
+    protected void showMessage(String id, String message) {
+      getView().showError(message, Display.FormField.valueOf(id));
+    }
+  }
+
 }

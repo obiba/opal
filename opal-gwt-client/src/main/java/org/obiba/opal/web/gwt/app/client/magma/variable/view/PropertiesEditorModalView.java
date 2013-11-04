@@ -22,14 +22,13 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
-import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -47,6 +46,9 @@ public class PropertiesEditorModalView extends ModalPopupViewWithUiHandlers<Prop
 
   @UiField
   Modal dialog;
+
+  @UiField
+  ControlGroup variableGroup;
 
   @UiField
   TextBox variableName;
@@ -106,31 +108,35 @@ public class PropertiesEditorModalView extends ModalPopupViewWithUiHandlers<Prop
   }
 
   @Override
-  public void renderProperties(VariableDto variable, boolean derived) {
-    variableName.setText(variable.getName());
-    variableName.setEnabled(derived);
+  public void renderProperties(VariableDto variable, boolean modifyValueType) {
+    if(variable != null) {
+      variableName.setText(variable.getName());
+      valueType.setSelectedValue(variable.getValueType());
+      repeatable.setValue(variable.getIsRepeatable());
+      unit.setText(variable.getUnit());
+      refEntityType.setText(variable.getReferencedEntityType());
+      mimeType.setText(variable.getMimeType());
+      occurenceGroup.setText(variable.getOccurrenceGroup());
+    }
 
-    valueType.setSelectedValue(variable.getValueType());
-    valueType.setEnabled(derived);
-
-    repeatable.setValue(variable.getIsRepeatable());
-    repeatable.setEnabled(derived);
-
-    unit.setText(variable.getUnit());
-    refEntityType.setText(variable.getReferencedEntityType());
-    mimeType.setText(variable.getMimeType());
-
-    occurenceGroup.setText(variable.getOccurrenceGroup());
-    occurenceGroup.setEnabled(variable.getIsRepeatable());
+    variableName.setEnabled(modifyValueType);
+    valueType.setEnabled(modifyValueType);
+    repeatable.setEnabled(modifyValueType);
+    occurenceGroup.setEnabled(getRepeatable());
   }
 
   @Override
-  public void showError(String message, @Nullable ControlGroup group) {
+  public void showError(String message, @Nullable FormField group) {
     if(group == null) {
       dialog.addAlert(message, AlertType.ERROR);
     } else {
-      dialog.addAlert(message, AlertType.ERROR, group);
+      dialog.addAlert(message, AlertType.ERROR, variableGroup);
     }
+  }
+
+  @Override
+  public HasText getVariableName() {
+    return variableName;
   }
 
   private String getName() {

@@ -31,6 +31,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.PropertiesEditorModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
@@ -100,6 +101,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final ModalProvider<VariablesToViewPresenter> variablesToViewProvider;
 
+  private final ModalProvider<PropertiesEditorModalPresenter> propertiesEditorModalProvider;
+
   @Inject
   private CodingViewModalPresenter codingViewModalPresenter;
 
@@ -119,7 +122,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   public TablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
       ValuesTablePresenter valuesTablePresenter, Provider<AuthorizationPresenter> authorizationPresenter,
       Provider<IndexPresenter> indexPresenter, ModalProvider<ConfigureViewStepPresenter> configureViewStepProvider,
-      ModalProvider<VariablesToViewPresenter> variablesToViewProvider) {
+      ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
+      ModalProvider<PropertiesEditorModalPresenter> propertiesEditorModalProvider) {
     super(eventBus, display);
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
@@ -127,6 +131,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     this.indexPresenter = indexPresenter;
     this.configureViewStepProvider = configureViewStepProvider.setContainer(this);
     this.variablesToViewProvider = variablesToViewProvider.setContainer(this);
+    this.propertiesEditorModalProvider = propertiesEditorModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -370,7 +375,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onAddVariable() {
-    // TODO display modal with variable name, value type and repeatability
+    PropertiesEditorModalPresenter propertiesEditorPresenter = propertiesEditorModalProvider.get();
+    propertiesEditorPresenter.initialize(table);
   }
 
   @Override
