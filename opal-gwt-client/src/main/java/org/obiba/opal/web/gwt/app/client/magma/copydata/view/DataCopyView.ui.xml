@@ -27,17 +27,17 @@
             <g:Label addStyleNames="key">
               <ui:msg description="Options title">Options</ui:msg>
             </g:Label>
-            <g:CheckBox ui:field="incremental" addStyleNames="block">
+            <b:CheckBox ui:field="incremental" addStyleNames="block">
               <ui:msg description="Incremental checkbox label">incremental</ui:msg>
-            </g:CheckBox>
-            <g:CheckBox ui:field="copyNullValues" addStyleNames="block">
+            </b:CheckBox>
+            <b:CheckBox ui:field="copyNullValues" addStyleNames="block">
               <ui:msg description="Incremental checkbox label">copy null values</ui:msg>
-            </g:CheckBox>
-            <g:CheckBox ui:field="useAlias" addStyleNames="block">
+            </b:CheckBox>
+            <b:CheckBox ui:field="useAlias" addStyleNames="block">
               <ui:msg description="Use alias to rename variable checkbox label">use 'alias' attribute to rename
                 variables
               </ui:msg>
-            </g:CheckBox>
+            </b:CheckBox>
           </g:FlowPanel>
         </g:FlowPanel>
       </o:WizardStep>

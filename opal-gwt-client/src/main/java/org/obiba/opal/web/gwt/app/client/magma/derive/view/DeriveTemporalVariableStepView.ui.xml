@@ -2,6 +2,7 @@
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.magma.derive.view"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -11,9 +12,9 @@
       <g:FlowPanel>
 
         <g:FlowPanel styleName="input">
-          <g:RadioButton name="method" ui:field="spanRadio">
+          <b:RadioButton name="method" ui:field="spanRadio">
             <ui:msg description="Group by type of time span label">Group by type of time span</ui:msg>
-          </g:RadioButton>
+          </b:RadioButton>
 
           <g:Grid>
             <g:row>
@@ -31,9 +32,9 @@
         </g:FlowPanel>
 
         <g:FlowPanel styleName="input" ui:field="range">
-          <g:RadioButton name="method" ui:field="rangeRadio">
+          <b:RadioButton name="method" ui:field="rangeRadio">
             <ui:msg description="Group by date ranges label">Group by date ranges</ui:msg>
-          </g:RadioButton>
+          </b:RadioButton>
 
           <g:Grid>
             <g:row>

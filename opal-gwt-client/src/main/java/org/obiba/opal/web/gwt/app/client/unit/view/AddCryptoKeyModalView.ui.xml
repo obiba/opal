@@ -1,6 +1,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -18,13 +19,13 @@
           <g:Label addStyleNames="key">
             <ui:msg description="Key Type label">Key Type</ui:msg>
           </g:Label>
-          <g:RadioButton ui:field="keyPairType" name="keyType" addStyleNames="block small-top-margin">
+          <b:RadioButton ui:field="keyPairType" name="keyType" addStyleNames="block small-top-margin">
             <ui:msg description="Create Key Pair label">create or import a key pair (public-private cryptographic key)
             </ui:msg>
-          </g:RadioButton>
-          <g:RadioButton ui:field="certificateType" name="keyType" addStyleNames="block small-top-margin">
+          </b:RadioButton>
+          <b:RadioButton ui:field="certificateType" name="keyType" addStyleNames="block small-top-margin">
             <ui:msg description="Certificate label">import a certificate (usable to identify this unit)</ui:msg>
-          </g:RadioButton>
+          </b:RadioButton>
         </g:FlowPanel>
       </o:WizardStep>
 
@@ -38,9 +39,9 @@
           <g:Label addStyleNames="key-subtitle">
             <ui:msg description="Private Key label">Private Key</ui:msg>
           </g:Label>
-          <g:RadioButton ui:field="privateKeyCreated" name="privateKeyCreated" addStyleNames="key large-top-margin">
+          <b:RadioButton ui:field="privateKeyCreated" name="privateKeyCreated" addStyleNames="key large-top-margin">
             <ui:msg description="Private Key Create label">create a new private key</ui:msg>
-          </g:RadioButton>
+          </b:RadioButton>
           <g:FlowPanel styleName="input">
             <g:FlowPanel>
               <g:Label addStyleNames="key">
@@ -56,9 +57,9 @@
                   maxConstrained="false"/>
             </g:FlowPanel>
           </g:FlowPanel>
-          <g:RadioButton ui:field="privateKeyImported" name="privateKeyImported" addStyleNames="key">
+          <b:RadioButton ui:field="privateKeyImported" name="privateKeyImported" addStyleNames="key">
             <ui:msg description="Private Key Import label">import a private key</ui:msg>
-          </g:RadioButton>
+          </b:RadioButton>
           <g:FlowPanel styleName="input">
             <g:TextArea addStyleNames="text not-so-full-width" name="privateKeyPEM" ui:field="privateKeyPEM"/>
           </g:FlowPanel>
@@ -70,9 +71,9 @@
           <g:Label addStyleNames="key-subtitle">
             <ui:msg description="Public Key label">Public Key</ui:msg>
           </g:Label>
-          <g:RadioButton ui:field="publicKeyCreated" name="publicKeyCreated" addStyleNames="key large-top-margin">
+          <b:RadioButton ui:field="publicKeyCreated" name="publicKeyCreated" addStyleNames="key large-top-margin">
             <ui:msg description="Public Key Create label">create a new public certificate</ui:msg>
-          </g:RadioButton>
+          </b:RadioButton>
           <g:FlowPanel addStyleNames="large-top-margin">
             <g:FlowPanel>
               <g:Label addStyleNames="key">
@@ -112,9 +113,9 @@
               <g:TextBox addStyleNames="text" name="country" ui:field="country" visibleLength="2"/>
             </g:FlowPanel>
             <g:FlowPanel>
-              <g:RadioButton ui:field="publicKeyImported" name="publicKeyImported" addStyleNames="key">
+              <b:RadioButton ui:field="publicKeyImported" name="publicKeyImported" addStyleNames="key">
                 <ui:msg description="Public Key Import label">import a public certificate</ui:msg>
-              </g:RadioButton>
+              </b:RadioButton>
               <g:TextArea addStyleNames="indent text not-so-full-width" name="publicKeyPEM" ui:field="publicKeyPEM"/>
             </g:FlowPanel>
           </g:FlowPanel>

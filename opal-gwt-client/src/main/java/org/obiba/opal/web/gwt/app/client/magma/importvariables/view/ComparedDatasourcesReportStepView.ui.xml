@@ -18,9 +18,9 @@
 
   <g:FlowPanel>
     <g:HTMLPanel addStyleNames="ignoreAllModifications">
-      <g:CheckBox ui:field="ignoreAllModifications">
+      <b:CheckBox ui:field="ignoreAllModifications">
         <ui:msg description="Ignore all modifications label">Ignore all modifications</ui:msg>
-      </g:CheckBox>
+      </b:CheckBox>
     </g:HTMLPanel>
     <o:BreadcrumbsTabPanel ui:field="tableTabs" />
   </g:FlowPanel>

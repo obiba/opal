@@ -2,6 +2,7 @@
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.magma.derive.view"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -21,9 +22,9 @@
         <g:FlowPanel>
 
           <g:FlowPanel styleName="input">
-            <g:RadioButton name="method" ui:field="rangeRadio">
+            <b:RadioButton name="method" ui:field="rangeRadio">
               <ui:msg description="Group by ranges of values label">Group by ranges of values</ui:msg>
-            </g:RadioButton>
+            </b:RadioButton>
             <g:Label addStyleNames="small-top-margin indent">
               <ui:msg description="Range mapping description label">Each range of values will be mapped to a category.
               </ui:msg>
@@ -63,9 +64,9 @@
                     <g:Grid>
                       <g:row>
                         <g:customCell>
-                          <g:RadioButton name="range" ui:field="lengthRadio">
+                          <b:RadioButton name="range" ui:field="lengthRadio">
                             <ui:msg description="Ranges length label">Ranges length</ui:msg>
-                          </g:RadioButton>
+                          </b:RadioButton>
                         </g:customCell>
                         <g:customCell>
                           <o:NumericTextBox ui:field="lengthBox" width="6em" value="10"
@@ -74,9 +75,9 @@
                       </g:row>
                       <g:row>
                         <g:customCell>
-                          <g:RadioButton name="range" ui:field="countRadio">
+                          <b:RadioButton name="range" ui:field="countRadio">
                             <ui:msg description="Number of ranges label">Number of ranges</ui:msg>
-                          </g:RadioButton>
+                          </b:RadioButton>
                         </g:customCell>
                         <g:customCell>
                           <o:NumericTextBox ui:field="countBox" width="6em" value="10"
@@ -91,9 +92,9 @@
           </g:FlowPanel>
 
           <g:FlowPanel styleName="input">
-            <g:RadioButton name="method" ui:field="discreteRadio">
+            <b:RadioButton name="method" ui:field="discreteRadio">
               <ui:msg description="Map discrete values label">Map discrete values</ui:msg>
-            </g:RadioButton>
+            </b:RadioButton>
             <g:Label addStyleNames="small-top-margin indent">
               <ui:msg description="Discrete value mapping description label">Each value will be mapped to a category.
               </ui:msg>
@@ -101,9 +102,9 @@
           </g:FlowPanel>
 
           <g:FlowPanel styleName="input">
-            <g:RadioButton name="method" ui:field="manualRadio">
+            <b:RadioButton name="method" ui:field="manualRadio">
               <ui:msg description="Manually label">Manually</ui:msg>
-            </g:RadioButton>
+            </b:RadioButton>
             <g:Label addStyleNames="small-top-margin indent">
               <ui:msg description="Manual value mapping description label">No predefined value mapping.</ui:msg>
             </g:Label>
@@ -136,9 +137,9 @@
                   <g:Grid>
                     <g:row>
                       <g:customCell>
-                        <g:RadioButton name="add" ui:field="addRangeRadio">
+                        <b:RadioButton name="add" ui:field="addRangeRadio">
                           <ui:msg description="Range label">Range</ui:msg>
-                        </g:RadioButton>
+                        </b:RadioButton>
                       </g:customCell>
                       <g:customCell>
                         <g:HorizontalPanel>
@@ -152,9 +153,9 @@
                     </g:row>
                     <g:row>
                       <g:customCell>
-                        <g:RadioButton name="add" ui:field="addDiscreteRadio">
+                        <b:RadioButton name="add" ui:field="addDiscreteRadio">
                           <ui:msg description="Value label">Value</ui:msg>
-                        </g:RadioButton>
+                        </b:RadioButton>
                       </g:customCell>
                       <g:customCell>
                         <o:NumericTextBox ui:field="valueBox" width="8em" enabled="false" minConstrained="false"

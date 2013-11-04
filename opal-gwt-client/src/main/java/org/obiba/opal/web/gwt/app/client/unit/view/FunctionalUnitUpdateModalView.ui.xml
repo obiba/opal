@@ -35,9 +35,9 @@
           </g:Label>
         </g:customHeader>
         <g:FlowPanel styleName="input">
-          <g:CheckBox ui:field="selectEnabled" addStyleNames="key">
+          <b:CheckBox ui:field="selectEnabled" addStyleNames="key">
             <ui:msg description="Identifier Variables Filter label">Identifier Variables Filter</ui:msg>
-          </g:CheckBox>
+          </b:CheckBox>
           <g:TextArea name="select" ui:field="select" addStyleNames="not-so-full-width"/>
           <g:FlowPanel addStyleNames="help-block">
             <g:InlineLabel>

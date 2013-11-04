@@ -2,6 +2,7 @@
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     xmlns:o2="urn:import:org.obiba.opal.web.gwt.app.client.magma.derive.view"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -9,18 +10,18 @@
   <g:FlowPanel>
     <o:WizardStep ui:field="methodStep">
       <g:FlowPanel styleName="input">
-        <g:RadioButton ui:field="auto">
+        <b:RadioButton ui:field="auto">
           <ui:msg description="Automatically label">Automatically</ui:msg>
-        </g:RadioButton>
+        </b:RadioButton>
         <g:Label addStyleNames="small-top-margin indent">
           <ui:msg description="Automatically description label">Similar distinct values will be grouped together.
           </ui:msg>
         </g:Label>
       </g:FlowPanel>
       <g:FlowPanel styleName="input">
-        <g:RadioButton ui:field="manual">
+        <b:RadioButton ui:field="manual">
           <ui:msg description="Manually label">Manually</ui:msg>
-        </g:RadioButton>
+        </b:RadioButton>
         <g:Label addStyleNames="small-top-margin indent">
           <ui:msg description="Manual value mapping description label">No predefined value mapping.</ui:msg>
         </g:Label>

@@ -10,6 +10,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -21,18 +22,18 @@
         <ui:msg description="Incremental import">Specify how existing data is managed</ui:msg>
       </g:Label>
       <g:FlowPanel styleName="input">
-        <g:CheckBox ui:field="incremental" addStyleNames="small-indent">
+        <b:CheckBox ui:field="incremental" addStyleNames="small-indent">
           <ui:msg description="Incremental import">Incremental import</ui:msg>
-        </g:CheckBox>
+        </b:CheckBox>
         <g:Label styleName="help-block large-indent">
           <ui:msg description="Import only new data">Import only new data</ui:msg>
         </g:Label>
       </g:FlowPanel>
 
       <g:FlowPanel styleName="input" addStyleNames="small-indent">
-        <g:CheckBox ui:field="limitCheck">
+        <b:CheckBox ui:field="limitCheck">
           <ui:msg description="Limit label">Limit</ui:msg>
-        </g:CheckBox>
+        </b:CheckBox>
         <o:NumericTextBox ui:field="limit" min="0" maxConstrained="false" enabled="false" addStyleNames="span1"/>
         <g:Label styleName="help-block">
           <ui:msg description="Batch import limit help">A maximum number of data that can be imported</ui:msg>
@@ -58,15 +59,15 @@
             </ui:msg>
           </g:InlineLabel>
           <g:FlowPanel styleName="input">
-            <g:RadioButton name="identifierGroup" ui:field="identifierAsIs" addStyleNames="small-indent">
+            <b:RadioButton name="identifierGroup" ui:field="identifierAsIs" addStyleNames="small-indent">
               <ui:msg description="Leave identifier as-is label">be used as-is</ui:msg>
-            </g:RadioButton>
+            </b:RadioButton>
           </g:FlowPanel>
           <g:FlowPanel styleName="input">
-            <g:RadioButton name="identifierGroup" ui:field="identifierSharedWithUnit" addStyleNames="small-indent">
+            <b:RadioButton name="identifierGroup" ui:field="identifierSharedWithUnit" addStyleNames="small-indent">
               <ui:msg description="Share identifier with unit label">be considered as idenfiers shared with unit
               </ui:msg>
-            </g:RadioButton>
+            </b:RadioButton>
             <o:Chooser ui:field="units" enabled="false"/>
             <g:Label styleName="help-block large-indent">
               <ui:msg description="Share identifier with unit help label">Participant's identifiers must have been
