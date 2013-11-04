@@ -84,7 +84,7 @@ public class Chooser extends ChosenListBox {
   }
 
   public String getSelectedValue() {
-    return getValue(getSelectedIndex());
+    return getValue();
   }
 
   public void setSelectedValue(String value) {

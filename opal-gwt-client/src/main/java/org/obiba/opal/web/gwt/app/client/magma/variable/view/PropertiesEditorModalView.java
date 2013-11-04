@@ -41,19 +41,15 @@ public class PropertiesEditorModalView extends ModalPopupViewWithUiHandlers<Prop
 
   private static final int MIN_HEIGHT = 400;
 
-  private final Widget widget;
+  private final Translations translations;
 
-  private final Translations translations = GWT.create(Translations.class);
-
-  interface PropertiesEditorModalUiBinder extends UiBinder<Widget, PropertiesEditorModalView> {}
-
-  private static final PropertiesEditorModalUiBinder uiBinder = GWT.create(PropertiesEditorModalUiBinder.class);
+  interface Binder extends UiBinder<Widget, PropertiesEditorModalView> {}
 
   @UiField
   Modal dialog;
 
   @UiField
-  Heading variableName;
+  TextBox variableName;
 
   @UiField
   Button closeButton;
@@ -83,19 +79,19 @@ public class PropertiesEditorModalView extends ModalPopupViewWithUiHandlers<Prop
   TextBox occurenceGroup;
 
   @Inject
-  public PropertiesEditorModalView(EventBus eventBus) {
+  public PropertiesEditorModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
     super(eventBus);
-
-    widget = uiBinder.createAndBindUi(this);
+    this.translations = translations;
+    initWidget(uiBinder.createAndBindUi(this));
     dialog.setTitle(translations.editProperties());
     dialog.setResizable(true);
     dialog.setMinWidth(MIN_WIDTH);
     dialog.setMinHeight(MIN_HEIGHT);
   }
 
-  @Override
-  public Widget asWidget() {
-    return widget;
+  @UiHandler("repeatable")
+  void onRepeatable(ClickEvent event) {
+    occurenceGroup.setEnabled(getRepeatable());
   }
 
   @UiHandler("closeButton")
@@ -105,23 +101,26 @@ public class PropertiesEditorModalView extends ModalPopupViewWithUiHandlers<Prop
 
   @UiHandler("saveButton")
   void onSave(ClickEvent event) {
-    getUiHandlers().onSave();
+    getUiHandlers().onSave(getName(), getValueType(), getRepeatable(), getUnit(), getMimeType(), getOccurenceGroup(),
+        getReferencedEntityType());
   }
 
   @Override
-  public void renderProperties(VariableDto variable) {
+  public void renderProperties(VariableDto variable, boolean derived) {
     variableName.setText(variable.getName());
+    variableName.setEnabled(derived);
 
     valueType.setSelectedValue(variable.getValueType());
+    valueType.setEnabled(derived);
+
     repeatable.setValue(variable.getIsRepeatable());
+    repeatable.setEnabled(derived);
+
     unit.setText(variable.getUnit());
     refEntityType.setText(variable.getReferencedEntityType());
     mimeType.setText(variable.getMimeType());
-    occurenceGroup.setText(variable.getOccurrenceGroup());
 
-    // if has data do not allow to change value
-    valueType.setEnabled(false);
-    repeatable.setEnabled(false);
+    occurenceGroup.setText(variable.getOccurrenceGroup());
     occurenceGroup.setEnabled(variable.getIsRepeatable());
   }
 
@@ -134,28 +133,31 @@ public class PropertiesEditorModalView extends ModalPopupViewWithUiHandlers<Prop
     }
   }
 
-  @Override
-  public boolean getRepeatable() {
+  private String getName() {
+    return variableName.getText();
+  }
+
+  private String getValueType() {
+    return valueType.getValue();
+  }
+
+  private boolean getRepeatable() {
     return repeatable.getValue();
   }
 
-  @Override
-  public String getUnit() {
+  private String getUnit() {
     return unit.getText();
   }
 
-  @Override
-  public String getReferencedEntityType() {
+  private String getReferencedEntityType() {
     return refEntityType.getText();
   }
 
-  @Override
-  public String getMimeType() {
+  private String getMimeType() {
     return mimeType.getText();
   }
 
-  @Override
-  public String getOccurenceGroup() {
+  private String getOccurenceGroup() {
     return occurenceGroup.getText();
   }
 }

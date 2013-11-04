@@ -9,8 +9,15 @@
   <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false">
     <g:FlowPanel addStyleNames="main">
 
-      <b:Heading size="4" ui:field="variableName"/>
       <b:Form type="INLINE">
+        <!--Unit-->
+        <b:ControlGroup>
+          <b:ControlLabel>Name</b:ControlLabel>
+          <b:Controls>
+            <b:TextBox ui:field="variableName"/>
+          </b:Controls>
+        </b:ControlGroup>
+
         <!--Value Type-->
         <b:ControlGroup ui:field="valueTypeGroup">
           <b:ControlLabel>Value Type</b:ControlLabel>
@@ -62,6 +69,14 @@
           </b:Controls>
         </b:ControlGroup>
 
+        <!--Occurence group-->
+        <b:ControlGroup>
+          <b:ControlLabel>Occurrence Group</b:ControlLabel>
+          <b:Controls>
+            <b:TextBox ui:field="occurenceGroup"/>
+          </b:Controls>
+        </b:ControlGroup>
+
         <!--Unit-->
         <b:ControlGroup>
           <b:ControlLabel>Unit</b:ControlLabel>
@@ -86,13 +101,6 @@
           </b:Controls>
         </b:ControlGroup>
 
-        <!--Occurence group-->
-        <b:ControlGroup>
-          <b:ControlLabel>Occurrence Group</b:ControlLabel>
-          <b:Controls>
-            <b:TextBox ui:field="occurenceGroup"/>
-          </b:Controls>
-        </b:ControlGroup>
       </b:Form>
     </g:FlowPanel>
 

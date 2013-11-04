@@ -13,8 +13,8 @@ import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
-import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
@@ -24,13 +24,13 @@ import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
 /**
  *
@@ -38,15 +38,20 @@ import com.gwtplatform.mvp.client.PopupView;
 public class PropertiesEditorModalPresenter extends ModalPresenterWidget<PropertiesEditorModalPresenter.Display>
     implements PropertiesEditorModalUiHandlers {
 
-  private static final Translations translations = GWT.create(Translations.class);
+  private final Translations translations;
+
+  private final PlaceManager placeManager;
 
   private VariableDto variable;
 
   private TableDto tableDto;
 
   @Inject
-  public PropertiesEditorModalPresenter(EventBus eventBus, Display display) {
+  public PropertiesEditorModalPresenter(EventBus eventBus, Display display, Translations translations,
+      PlaceManager placeManager) {
     super(eventBus, display);
+    this.translations = translations;
+    this.placeManager = placeManager;
   }
 
   public void initialize(VariableDto dto, TableDto table) {
@@ -54,94 +59,114 @@ public class PropertiesEditorModalPresenter extends ModalPresenterWidget<Propert
     tableDto = table;
 
     getView().setUiHandlers(this);
-    getView().renderProperties(dto);
+    getView().renderProperties(dto, table.hasViewLink());
   }
 
   @Override
-  public void onSave() {
-    VariableDto v = getVariableDto();
+  public void onSave(String name, String valueType, boolean repeatable, String unit, String mimeType,
+      String occurrenceGroup, String referencedEntityType) {
+    VariableDto newVariable = getVariableDto(name, valueType, repeatable, unit, mimeType, occurrenceGroup,
+        referencedEntityType);
 
-    // If variable from a view
-    if(Strings.isNullOrEmpty(tableDto.getViewLink())) {
-      ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
-          .build(tableDto.getDatasourceName(), tableDto.getName(), v.getName())) //
-          .put() //
-          .withResourceBody(VariableDto.stringify(v)).accept("application/json") //
-          .withCallback(new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              if(response.getStatusCode() != Response.SC_OK) {
-                getView().showError(response.getText(), null);
-              } else {
-                getView().hide();
-              }
-              fireEvent(new VariableRefreshEvent());
-            }
-          }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
+    if(variable != null) {
+      onUpdate(newVariable);
     } else {
-      UriBuilder uriBuilder = UriBuilder.create().segment("datasource", "{}", "view", "{}", "variable", "{}")
-          .query("comment",
-              TranslationsUtils.replaceArguments(translations.updateVariableProperties(), variable.getName()));
-
-      ResourceRequestBuilderFactory.newBuilder()
-          .forResource(uriBuilder.build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())) //
-          .put() //
-          .withResourceBody(VariableDto.stringify(v)).accept("application/json") //
-          .withCallback(new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              if(response.getStatusCode() == Response.SC_OK) {
-                getView().hide();
-              } else {
-                getView().showError(response.getText(), null);
-              }
-              fireEvent(new VariableRefreshEvent());
-            }
-          }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
+      onCreate(newVariable);
     }
   }
 
-  private VariableDto getVariableDto() {
-    VariableDto v = VariableDto.create();
-    v.setLink(variable.getLink());
-    v.setIndex(variable.getIndex());
-    v.setIsNewVariable(variable.getIsNewVariable());
-    v.setParentLink(variable.getParentLink());
-    v.setName(variable.getName());
-    v.setEntityType(variable.getEntityType());
-    v.setValueType(variable.getValueType());
-
-    if(variable.getAttributesArray().length() > 0) {
-      v.setAttributesArray(variable.getAttributesArray());
+  public void onUpdate(VariableDto updatedVariable) {
+    UriBuilder uriBuilder;
+    if(Strings.isNullOrEmpty(tableDto.getViewLink())) {
+      uriBuilder = UriBuilders.DATASOURCE_TABLE_VARIABLE.create();
+    } else {
+      // variable from a view
+      uriBuilder = UriBuilders.DATASOURCE_VIEW_VARIABLE.create().query("comment",
+          TranslationsUtils.replaceArguments(translations.updateVariableProperties(), variable.getName()));
     }
 
-    if(variable.getCategoriesArray().length() > 0) {
-      v.setCategoriesArray(variable.getCategoriesArray());
+    ResourceRequestBuilderFactory.newBuilder()
+        .forResource(uriBuilder.build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())) //
+        .put() //
+        .withResourceBody(VariableDto.stringify(updatedVariable)).accept("application/json") //
+        .withCallback(new VariableCreateUpdateCallback(updatedVariable), Response.SC_BAD_REQUEST,
+            Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
+  }
+
+  public void onCreate(VariableDto newVariable) {
+    UriBuilder uriBuilder;
+    if(Strings.isNullOrEmpty(tableDto.getViewLink())) {
+      uriBuilder = UriBuilders.DATASOURCE_TABLE_VARIABLES.create();
+    } else {
+      // variable from a view
+      uriBuilder = UriBuilders.DATASOURCE_VIEW_VARIABLES.create().query("comment",
+          TranslationsUtils.replaceArguments(translations.updateVariableProperties(), variable.getName()));
+    }
+
+    ResourceRequestBuilderFactory.newBuilder()
+        .forResource(uriBuilder.build(tableDto.getDatasourceName(), tableDto.getName())) //
+        .post() //
+        .withResourceBody(VariableDto.stringify(newVariable)).accept("application/json") //
+        .withCallback(new VariableCreateUpdateCallback(newVariable), Response.SC_BAD_REQUEST,
+            Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
+  }
+
+  private VariableDto getVariableDto(String name, String valueType, boolean repeatable, String unit, String mimeType,
+      String occurrenceGroup, String referencedEntityType) {
+    VariableDto v = VariableDto.create();
+    v.setIsNewVariable(variable == null);
+    if(variable != null) {
+      v.setLink(variable.getLink());
+      v.setIndex(variable.getIndex());
+
+      v.setParentLink(variable.getParentLink());
+      v.setName(variable.getName());
+      v.setEntityType(variable.getEntityType());
+      v.setValueType(variable.getValueType());
+
+      if(variable.getAttributesArray().length() > 0) {
+        v.setAttributesArray(variable.getAttributesArray());
+      }
+
+      if(variable.getCategoriesArray().length() > 0) {
+        v.setCategoriesArray(variable.getCategoriesArray());
+      }
     }
 
     // Update info from view
-    v.setUnit(getView().getUnit());
-    v.setIsRepeatable(getView().getRepeatable());
-    v.setReferencedEntityType(getView().getReferencedEntityType());
-    v.setMimeType(getView().getMimeType());
-    v.setOccurrenceGroup(getView().getOccurenceGroup());
+    v.setName(name);
+    v.setValueType(valueType);
+    v.setUnit(unit);
+    v.setIsRepeatable(repeatable);
+    v.setReferencedEntityType(referencedEntityType);
+    v.setMimeType(mimeType);
+    v.setOccurrenceGroup(occurrenceGroup);
     return v;
   }
 
   public interface Display extends PopupView, HasUiHandlers<PropertiesEditorModalUiHandlers> {
-    void renderProperties(VariableDto variable);
+    void renderProperties(VariableDto variable, boolean derived);
 
     void showError(String message, @Nullable ControlGroup group);
+  }
 
-    boolean getRepeatable();
+  private class VariableCreateUpdateCallback implements ResponseCodeCallback {
 
-    String getUnit();
+    private final VariableDto updatedVariable;
 
-    String getReferencedEntityType();
+    private VariableCreateUpdateCallback(VariableDto updatedVariable) {
+      this.updatedVariable = updatedVariable;
+    }
 
-    String getMimeType();
-
-    String getOccurenceGroup();
-
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      if(response.getStatusCode() == Response.SC_OK) {
+        getView().hide();
+      } else {
+        getView().showError(response.getText(), null);
+      }
+      placeManager.revealPlace(ProjectPlacesHelper
+          .getVariablePlace(tableDto.getDatasourceName(), tableDto.getName(), updatedVariable.getName()));
+    }
   }
 }
