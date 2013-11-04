@@ -71,4 +71,5 @@ public interface IdentifiersTableService {
    */
   String getTableName();
 
+  void unregisterDatabase();
 }

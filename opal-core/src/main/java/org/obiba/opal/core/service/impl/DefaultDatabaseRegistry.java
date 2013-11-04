@@ -207,6 +207,8 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     Database database = getDatabase(databaseName);
     database.setEditable(true);
     orientDbService.save(database, database);
+    // close SessionFactory or JDBC dataSource
+    destroyDataSource(databaseName);
     registrations.remove(databaseName, usedByDatasource);
   }
 

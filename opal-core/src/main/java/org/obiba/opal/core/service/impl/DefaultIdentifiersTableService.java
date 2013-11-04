@@ -93,6 +93,12 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
     return tableReference;
   }
 
+  @Override
+  public void unregisterDatabase() {
+    destroy();
+    databaseRegistry.unregister(databaseRegistry.getIdentifiersDatabase().getName(), getDatasourceName());
+  }
+
   private MagmaEngineReferenceResolver getTableResolver() {
     if(tableResolver == null) {
       tableResolver = MagmaEngineTableResolver.valueOf(tableReference);
@@ -105,6 +111,7 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
     if(datasource == null) return;
     try {
       Disposables.dispose(datasource);
+      datasource = null;
     } catch(RuntimeException e) {
       log.warn("Ignoring exception during shutdown sequence.", e);
     }
