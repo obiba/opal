@@ -15,6 +15,8 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.opal.core.service.database.IdentifiersDatabaseNotFoundException;
 
+import com.google.common.base.Predicate;
+
 /**
  *
  */
@@ -48,6 +50,11 @@ public interface IdentifiersTableService {
    */
   @NotNull
   String getTableReference();
+
+  /**
+   * Based on the input predicate, returns 'true' if the table has any entities.
+   */
+  boolean hasEntities(Predicate<ValueTable> predicate);
 
   /**
    * Get the entity type as specified by property <code>org.obiba.opal.keys.entityType</code>.
