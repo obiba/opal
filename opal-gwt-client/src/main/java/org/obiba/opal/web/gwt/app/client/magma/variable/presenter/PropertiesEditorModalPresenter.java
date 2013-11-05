@@ -74,6 +74,7 @@ public class PropertiesEditorModalPresenter extends ModalPresenterWidget<Propert
 
   /**
    * Will create a new variable in the given table.
+   *
    * @param table
    */
   public void initialize(TableDto table) {
@@ -82,6 +83,7 @@ public class PropertiesEditorModalPresenter extends ModalPresenterWidget<Propert
 
   /**
    * Will update given variable in associated table.
+   *
    * @param dto
    * @param table
    */
@@ -90,8 +92,8 @@ public class PropertiesEditorModalPresenter extends ModalPresenterWidget<Propert
     tableDto = table;
 
     getView().setUiHandlers(this);
-    getView().renderProperties(dto,
-        variable == null || table.hasViewLink() || (table.hasValueSetCount() && table.getValueSetCount() == 0));
+    getView().renderProperties(dto, variable == null || table.hasViewLink(),
+        table.hasViewLink() || (table.hasValueSetCount() && table.getValueSetCount() == 0));
   }
 
   @Override
@@ -133,8 +135,8 @@ public class PropertiesEditorModalPresenter extends ModalPresenterWidget<Propert
       uriBuilder = UriBuilders.DATASOURCE_TABLE_VARIABLES.create();
     } else {
       // variable from a view
-      uriBuilder = UriBuilders.DATASOURCE_VIEW_VARIABLES.create().query("comment",
-          TranslationsUtils.replaceArguments(translations.createVariable(), newVariable.getName()));
+      uriBuilder = UriBuilders.DATASOURCE_VIEW_VARIABLES.create()
+          .query("comment", TranslationsUtils.replaceArguments(translations.createVariable(), newVariable.getName()));
     }
 
     ResourceRequestBuilderFactory.newBuilder()
@@ -184,7 +186,7 @@ public class PropertiesEditorModalPresenter extends ModalPresenterWidget<Propert
       NAME
     }
 
-    void renderProperties(VariableDto variable, boolean modifyValueType);
+    void renderProperties(VariableDto variable, boolean modifyName, boolean modifyValueType);
 
     void showError(String message, @Nullable FormField id);
 

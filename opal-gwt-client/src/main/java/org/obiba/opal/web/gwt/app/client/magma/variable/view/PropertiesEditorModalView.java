@@ -18,12 +18,15 @@ import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.google.common.base.Strings;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -108,7 +111,7 @@ public class PropertiesEditorModalView extends ModalPopupViewWithUiHandlers<Prop
   }
 
   @Override
-  public void renderProperties(VariableDto variable, boolean modifyValueType) {
+  public void renderProperties(VariableDto variable, boolean modifyName, boolean modifyValueType) {
     if(variable != null) {
       variableName.setText(variable.getName());
       valueType.setSelectedValue(variable.getValueType());
@@ -121,7 +124,7 @@ public class PropertiesEditorModalView extends ModalPopupViewWithUiHandlers<Prop
       dialog.setTitle(translations.addVariable());
     }
 
-    variableName.setEnabled(modifyValueType);
+    variableName.setEnabled(modifyName);
     valueType.setEnabled(modifyValueType);
     repeatable.setEnabled(modifyValueType);
     occurenceGroup.setEnabled(getRepeatable());
@@ -129,10 +132,18 @@ public class PropertiesEditorModalView extends ModalPopupViewWithUiHandlers<Prop
 
   @Override
   public void showError(String message, @Nullable FormField group) {
+    if(Strings.isNullOrEmpty(message)) return;
+
+    String msg = message;
+    try {
+      ClientErrorDto errorDto = JsonUtils.unsafeEval(message);
+      msg = errorDto.getStatus();
+    } catch(Exception ignored) {
+    }
     if(group == null) {
-      dialog.addAlert(message, AlertType.ERROR);
+      dialog.addAlert(msg, AlertType.ERROR);
     } else {
-      dialog.addAlert(message, AlertType.ERROR, variableGroup);
+      dialog.addAlert(msg, AlertType.ERROR, variableGroup);
     }
   }
 

@@ -81,8 +81,12 @@ public class VariableResource {
       // The variable must exist
       Variable v = getValueTable().getVariable(name);
 
-      if(!v.getEntityType().equals(variable.getEntityType()) || !v.getName().equals(variable.getName())) {
-        return Response.status(Response.Status.BAD_REQUEST).build();
+      if(!v.getEntityType().equals(variable.getEntityType())) {
+        throw new InvalidRequestException("Variable entity type must be the same as the one of the table");
+      }
+
+      if (!v.getName().equals(variable.getName())) {
+        throw new InvalidRequestException("Variable cannot be renamed");
       }
 
       vtw = getValueTable().getDatasource().createWriter(getValueTable().getName(), getValueTable().getEntityType());
