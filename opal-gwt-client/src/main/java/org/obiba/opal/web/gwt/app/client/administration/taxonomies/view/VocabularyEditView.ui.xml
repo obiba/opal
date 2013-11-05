@@ -23,15 +23,15 @@
           <b:Column size="9">
             <b:Heading size="4" ui:field="vocabularyName" addStyleNames="inline-block"/>
           </b:Column>
-          <b:Column size="3">
-            <b:ButtonGroup addStyleNames="pull-right">
-              <b:Button type="INFO" size="SMALL" icon="SAVE" addStyleNames="xsmall-indent" ui:field="saveVocabulary">
-                <ui:msg description="Save">Save</ui:msg>
-              </b:Button>
-              <b:Button size="SMALL" addStyleNames="xsmall-indent" ui:field="cancelVocabulary">
-                <ui:msg description="Cancel">Cancel</ui:msg>
-              </b:Button>
-            </b:ButtonGroup>
+          <b:Column size="3" addStyleNames="pull-right">
+            <!--<b:ButtonGroup addStyleNames="pull-right">-->
+            <b:Button type="INFO" size="SMALL" icon="SAVE" addStyleNames="xsmall-indent" ui:field="saveVocabulary">
+              <ui:msg description="Save">Save</ui:msg>
+            </b:Button>
+            <b:Button size="SMALL" addStyleNames="xsmall-indent" ui:field="cancelVocabulary">
+              <ui:msg description="Cancel">Cancel</ui:msg>
+            </b:Button>
+            <!--</b:ButtonGroup>-->
           </b:Column>
         </b:FluidRow>
       </b:Column>
@@ -93,10 +93,12 @@
       <b:Column size="6">
         <g:FlowPanel ui:field="termsEditionPanel">
           <b:TextBox width="20" ui:field="newTermName" addStyleNames="inline-block"/>
-          <b:DropdownButton text="Add" icon="PLUS" size="SMALL" addStyleNames="inline-block">
-            <b:NavLink ui:field="addChild">Child</b:NavLink>
-            <b:NavLink ui:field="addSibling">Sibling</b:NavLink>
-          </b:DropdownButton>
+          <b:Button size="SMALL" icon="PLUS" addStyleNames="xsmall-indent" ui:field="addChild">
+            <ui:msg description="Add Child">Add Child</ui:msg>
+          </b:Button>
+          <b:Button size="SMALL" addStyleNames="xsmall-indent" ui:field="addSibling">
+            <ui:msg description="Add Sibling">Add Sibling</ui:msg>
+          </b:Button>
         </g:FlowPanel>
         <g:FlowPanel ui:field="termsPanel" addStyleNames="items"/>
       </b:Column>

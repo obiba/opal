@@ -6,12 +6,11 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
+    <g:FlowPanel addStyleNames="page-header">
+      <b:Breadcrumbs ui:field="breadcrumbs"/>
+    </g:FlowPanel>
+
     <b:FluidRow>
-      <!--<b:Column size="9">-->
-      <!--<b:Heading size="3">-->
-      <!--<ui:msg description="Taxonomies label">Taxonomies</ui:msg>-->
-      <!--</b:Heading>-->
-      <!--</b:Column>-->
       <b:Column size="3" offset="9">
         <b:ButtonGroup addStyleNames="pull-right">
           <b:Button type="INFO" icon="PLUS" size="SMALL" ui:field="add">

@@ -11,6 +11,7 @@
 package org.obiba.opal.web.system;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.Response;
@@ -36,6 +37,22 @@ public class VocabularyResource {
     this.taxonomyService = taxonomyService;
     this.taxonomyName = taxonomyName;
     this.vocabularyName = vocabularyName;
+  }
+
+  @GET
+  public Response getVocabulary() {
+    Taxonomy taxonomy = taxonomyService.getTaxonomy(taxonomyName);
+
+    if(taxonomy == null) {
+      return Response.status(Response.Status.NOT_FOUND).build();
+    }
+
+    Vocabulary vocabulary = taxonomyService.getVocabulary(taxonomyName, vocabularyName);
+    if(vocabulary == null) {
+      return Response.status(Response.Status.NOT_FOUND).build();
+    }
+
+    return Response.ok().entity(Dtos.asDto(taxonomyName, vocabulary)).build();
   }
 
   @SuppressWarnings({ "ConstantConditions", "OverlyLongMethod" })
@@ -95,7 +112,8 @@ public class VocabularyResource {
 
       Vocabulary vocabulary = taxonomyService.getVocabulary(taxonomyName, vocabularyName);
       //TODO use right template
-      taxonomyService.saveVocabulary(vocabulary, Dtos.fromDto(dto)); //taxonomyName, vocabularyName, ,vocabulary
+      taxonomyService
+          .saveVocabulary(vocabulary, Dtos.fromDto(taxonomyName, dto)); //taxonomyName, vocabularyName, ,vocabulary
     } catch(NoSuchTaxonomyException e) {
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch(NoSuchVocabularyException e) {

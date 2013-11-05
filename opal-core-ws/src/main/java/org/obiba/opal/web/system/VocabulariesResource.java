@@ -39,7 +39,7 @@ public class VocabulariesResource {
     List<Opal.VocabularyDto> vocabularies = new ArrayList<Opal.VocabularyDto>();
 
     for(Vocabulary v : taxonomyService.getVocabularies(taxonomyName)) {
-      vocabularies.add(Dtos.asDto(v));
+      vocabularies.add(Dtos.asDto(taxonomyName, v));
     }
 
     return vocabularies;
@@ -57,7 +57,7 @@ public class VocabulariesResource {
       return Response.status(Response.Status.CONFLICT).build();
     }
 
-    Vocabulary v = Dtos.fromDto(vocabulary);
+    Vocabulary v = Dtos.fromDto(taxonomyName, vocabulary);
     //TODO use right template
     taxonomyService.saveVocabulary(null, v);
 

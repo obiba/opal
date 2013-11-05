@@ -11,10 +11,10 @@ import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
-import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -36,6 +36,8 @@ public class TaxonomiesPresenter extends Presenter<TaxonomiesPresenter.Display, 
 
   public interface Display extends View, HasUiHandlers<TaxonomiesUiHandlers> {
     void setTaxonomies(JsArray<TaxonomyDto> taxonomies);
+
+    HasWidgets getBreadcrumbs();
   }
 
   private final PlaceManager placeManager;
@@ -70,7 +72,7 @@ public class TaxonomiesPresenter extends Presenter<TaxonomiesPresenter.Display, 
     super.onBind();
     registerHandler(getEventBus().addHandler(TaxonomyCreatedEvent.getType(), new TaxonomyCreatedEvent.Handler() {
       @Override
-      public void onProjectCreated(TaxonomyCreatedEvent event) {
+      public void onTaxonomyCreated(TaxonomyCreatedEvent event) {
         refresh();
       }
     }));
@@ -79,11 +81,11 @@ public class TaxonomiesPresenter extends Presenter<TaxonomiesPresenter.Display, 
   @Override
   protected void onReveal() {
     super.onReveal();
-//    breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs()).build();
+    breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs()).build();
     refresh();
   }
 
-  public void refresh() {
+  void refresh() {
     ResourceRequestBuilderFactory.<JsArray<TaxonomyDto>>newBuilder().forResource("/system/conf/taxonomies").get()
         .withCallback(new ResourceCallback<JsArray<TaxonomyDto>>() {
           @Override
@@ -102,10 +104,10 @@ public class TaxonomiesPresenter extends Presenter<TaxonomiesPresenter.Display, 
   }
 
   @Override
-  public void onVocabularySelection(TaxonomyDto taxonomyDto, VocabularyDto vocabularyDto) {
+  public void onVocabularySelection(String taxonomyName, String vocabularyName) {
     PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.VOCABULARY)
-        .with(TaxonomyTokens.TOKEN_TAXONOMY, taxonomyDto.getName())
-        .with(TaxonomyTokens.TOKEN_VOCABULARY, vocabularyDto.getName()).build();
+        .with(TaxonomyTokens.TOKEN_TAXONOMY, taxonomyName).with(TaxonomyTokens.TOKEN_VOCABULARY, vocabularyName)
+        .build();
     placeManager.revealPlace(request);
   }
 
