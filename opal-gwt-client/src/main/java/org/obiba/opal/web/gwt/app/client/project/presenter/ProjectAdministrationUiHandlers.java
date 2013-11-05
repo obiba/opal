@@ -12,14 +12,10 @@ package org.obiba.opal.web.gwt.app.client.project.presenter;
 
 import com.gwtplatform.mvp.client.UiHandlers;
 
-public interface ProjectEditionUiHandlers extends UiHandlers {
+public interface ProjectAdministrationUiHandlers extends UiHandlers {
 
-  void save();
+  void onEdit();
 
-  void saveStorage(String database);
-
-  void cancel();
-
-  void delete();
+  void onDelete();
 
 }

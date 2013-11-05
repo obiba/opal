@@ -10,20 +10,17 @@
 
 package org.obiba.opal.web.gwt.app.client.project.presenter;
 
-import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseResources;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectUpdatedEvent;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -35,7 +32,6 @@ import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
-import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
 import static com.google.gwt.http.client.Response.SC_CREATED;
 import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
@@ -43,63 +39,41 @@ import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_OK;
 
 public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdministrationPresenter.Display>
-    implements ProjectEditionUiHandlers {
+    implements ProjectAdministrationUiHandlers {
 
   private final PlaceManager placeManager;
+
+  private final ModalProvider<AddProjectPresenter> editProjectModalProvider;
 
   private ProjectDto project;
 
   private Runnable removeConfirmation;
 
   @Inject
-  public ProjectAdministrationPresenter(EventBus eventBus, Display view, PlaceManager placeManager) {
+  public ProjectAdministrationPresenter(EventBus eventBus, Display view, PlaceManager placeManager, ModalProvider<AddProjectPresenter> editProjectModalProvider) {
     super(eventBus, view);
-    this.placeManager = placeManager;
     getView().setUiHandlers(this);
+    this.placeManager = placeManager;
+    this.editProjectModalProvider = editProjectModalProvider.setContainer(this);
   }
 
   @Override
   protected void onBind() {
-
     addRegisteredHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler());
   }
 
   public void setProject(ProjectDto project) {
     this.project = project;
     getView().setProject(project);
-    ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder().forResource(DatabaseResources.databases())
-        .withCallback(new ResourceCallback<JsArray<DatabaseDto>>() {
-
-          @Override
-          public void onResource(Response response, JsArray<DatabaseDto> resource) {
-            getView().setAvailableDatabases(resource);
-          }
-        }).get().send();
   }
 
   @Override
-  public void saveStorage(String database) {
-    ProjectDto projectDto = getView().getProject();
-    projectDto.setDatabase(database);
-    ResourceRequestBuilderFactory.newBuilder() //
-        .forResource("database/" + projectDto.getName()) //
-        .withResourceBody(ProjectDto.stringify(projectDto)) //
-        .withCallback(new CreateOrUpdateCallBack(projectDto), SC_OK, SC_CREATED, SC_BAD_REQUEST) //
-        .put().send();
+  public void onEdit() {
+    //editProjectModalProvider.get();
   }
 
   @Override
-  public void save() {
-    //TODO
-  }
-
-  @Override
-  public void cancel() {
-    //TODO
-  }
-
-  @Override
-  public void delete() {
+  public void onDelete() {
     removeConfirmation = new RemoveRunnable(project);
     fireEvent(ConfirmationRequiredEvent.createWithKeys(removeConfirmation, "removeProject", "confirmRemoveProject"));
   }
@@ -172,13 +146,11 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     }
   }
 
-  public interface Display extends View, HasUiHandlers<ProjectEditionUiHandlers> {
+  public interface Display extends View, HasUiHandlers<ProjectAdministrationUiHandlers> {
 
     void setProject(ProjectDto project);
 
     ProjectDto getProject();
-
-    void setAvailableDatabases(JsArray<DatabaseDto> dtos);
   }
 
 }

@@ -196,7 +196,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     }
 
     private void addTimestamps(ProjectDto project, FlowPanel panel) {
-      if(project.hasTimestamps()) {
+      if(project.hasTimestamps() && project.getTimestamps().hasLastUpdate()) {
         Moment lastUpdate = Moment.create(project.getTimestamps().getLastUpdate());
         Label ago = new Label(
             TranslationsUtils.replaceArguments(translations.lastUpdateAgoLabel(), lastUpdate.fromNow()));
