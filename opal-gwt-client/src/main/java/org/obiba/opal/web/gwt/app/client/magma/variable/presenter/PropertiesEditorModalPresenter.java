@@ -151,7 +151,6 @@ public class PropertiesEditorModalPresenter extends ModalPresenterWidget<Propert
     v.setIsNewVariable(variable == null);
     v.setEntityType(tableDto.getEntityType());
     if(variable != null) {
-      GWT.log("getVariableDto: " + VariableDto.stringify(variable));
       v.setLink(variable.getLink());
       v.setIndex(variable.getIndex());
 
@@ -159,11 +158,11 @@ public class PropertiesEditorModalPresenter extends ModalPresenterWidget<Propert
       v.setName(variable.getName());
       v.setValueType(variable.getValueType());
 
-      if(variable.getAttributesArray().length() > 0) {
+      if(variable.getAttributesArray() != null && variable.getAttributesArray().length() > 0) {
         v.setAttributesArray(variable.getAttributesArray());
       }
 
-      if(variable.getCategoriesArray().length() > 0) {
+      if(variable.getCategoriesArray() != null && variable.getCategoriesArray().length() > 0) {
         v.setCategoriesArray(variable.getCategoriesArray());
       }
     }
