@@ -136,7 +136,10 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
 
       @Override
       public String getText(TableDto value) {
-        return value.getName();
+        String name = value.getName();
+        return value.hasViewLink()
+            ? "<i class=\"icon-cog\"></i>&nbsp;" + name
+            : "<i class=\"icon-table\"></i>&nbsp;" + name;
       }
     }) {
       @Override
