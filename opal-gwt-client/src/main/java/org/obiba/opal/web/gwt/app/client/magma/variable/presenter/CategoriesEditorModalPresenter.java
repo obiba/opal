@@ -66,7 +66,6 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
     tableDto = table;
     locales = new ArrayList<LocaleDto>();
     getView().setUiHandlers(this);
-    getView().setVariableName(variable.getName());
 
     // Fetch locales and render categories
     ResourceRequestBuilderFactory.<JsArray<LocaleDto>>newBuilder()
@@ -164,6 +163,5 @@ public class CategoriesEditorModalPresenter extends ModalPresenterWidget<Categor
 
     void showError(String message, @Nullable ControlGroup group);
 
-    void setVariableName(String name);
   }
 }

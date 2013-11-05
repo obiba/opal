@@ -32,7 +32,6 @@ import org.obiba.opal.web.model.client.opal.LocaleDto;
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
-import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
@@ -69,7 +68,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   private static final String LABEL = "label";
 
-  private static final int DEFAULT_PAGESIZE = 8;
+  private static final int DEFAULT_PAGESIZE = 10;
 
   private final Widget widget;
 
@@ -85,9 +84,6 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   @UiField
   Modal dialog;
-
-  @UiField
-  Heading variableName;
 
   @UiField
   ControlGroup nameGroup;
@@ -360,11 +356,6 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     pager.setPage(pageIndex);
 
     addCategoryName.setText("");
-  }
-
-  @Override
-  public void setVariableName(String name) {
-    variableName.setText(name);
   }
 
   private class CategoryDtoDisplay implements CheckboxColumn.Display<CategoryDto> {

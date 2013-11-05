@@ -71,3 +71,7 @@ th input[type="checkbox"], td input[type="checkbox"] {
 a:hover {
   cursor: pointer;
 }
+
+.table select, .table textarea, .table input {
+  margin-bottom: 0;
+}
