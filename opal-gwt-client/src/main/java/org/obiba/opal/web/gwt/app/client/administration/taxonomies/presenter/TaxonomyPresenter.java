@@ -8,7 +8,6 @@ import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
-import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasWidgets;
@@ -104,10 +103,10 @@ public class TaxonomyPresenter extends Presenter<TaxonomyPresenter.Display, Taxo
   }
 
   @Override
-  public void onVocabularySelection(TaxonomyDto taxonomyDto, VocabularyDto vocabulary) {
+  public void onVocabularySelection(String taxonomyName, String vocabularyName) {
     PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.VOCABULARY)
-        .with(TaxonomyTokens.TOKEN_TAXONOMY, taxonomyDto.getName())
-        .with(TaxonomyTokens.TOKEN_VOCABULARY, vocabulary.getName()).build();
+        .with(TaxonomyTokens.TOKEN_TAXONOMY, taxonomyName).with(TaxonomyTokens.TOKEN_VOCABULARY, vocabularyName)
+        .build();
     placeManager.revealPlace(request);
   }
 

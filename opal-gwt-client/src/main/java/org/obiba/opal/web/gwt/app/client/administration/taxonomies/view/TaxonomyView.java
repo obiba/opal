@@ -6,13 +6,13 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.LocalizedLabel;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
-import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.NavPills;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -87,7 +87,7 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
     setTitleOrDescription(taxonomy.getTitlesArray(), titlePanel);
     setTitleOrDescription(taxonomy.getDescriptionsArray(), descriptionPanel);
 
-    JsArray<VocabularyDto> vocabularies = JsArrays.toSafeArray(taxonomy.getVocabulariesArray());
+    JsArrayString vocabularies = JsArrays.toSafeArray(taxonomy.getVocabulariesArray());
     if(vocabularies.length() > 0) {
       NavPills pills = new NavPills();
       for(int i = 0; i < vocabularies.length(); i++)
@@ -105,12 +105,12 @@ public class TaxonomyView extends ViewWithUiHandlers<TaxonomyUiHandlers> impleme
     }
   }
 
-  private Widget newVocabularyLink(final VocabularyDto vocabulary) {
-    NavLink link = new NavLink(vocabulary.getName());
+  private Widget newVocabularyLink(final String vocabulary) {
+    NavLink link = new NavLink(vocabulary);
     link.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent clickEvent) {
-        getUiHandlers().onVocabularySelection(taxonomy, vocabulary);
+        getUiHandlers().onVocabularySelection(taxonomy.getName(), vocabulary);
       }
     });
     return link;

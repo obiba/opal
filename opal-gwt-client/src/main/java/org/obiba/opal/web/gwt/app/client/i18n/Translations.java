@@ -473,7 +473,8 @@ public interface Translations extends Constants {
       "DatabaseAlreadyExists", "Database named {0} already exists", //
       "VcsScriptContentInfo", "The retrieved script content is from '{0}' committed by '{1}'.", //
       "GeneralConfigSaved", "Opal general configuration was successfully saved.", //
-      "PostInstallNotCompleted", "Post-install configuration not completed." })
+      "PostInstallNotCompleted", "Post-install configuration not completed.",//
+      "TermNameMustBeUnique", "Term name must be unique" })
   Map<String, String> userMessageMap();
 
   @Description("Missing label")
@@ -1910,6 +1911,10 @@ public interface Translations extends Constants {
   @Description("Add Taxonomy")
   @DefaultStringValue("Add Taxonomy")
   String addTaxonomy();
+
+  @Description("Page Vocabulary title")
+  @DefaultStringValue("Vocabulary")
+  String pageVocabularyTitle();
 
   @Description("Add Vocabulary")
   @DefaultStringValue("Add Vocabulary")

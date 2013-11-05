@@ -116,22 +116,22 @@ public class AddVocabularyModalView extends ModalPopupViewWithUiHandlers<AddVoca
   @UiHandler("save")
     //TODO
   void onSaveVocabulary(ClickEvent event) {
-    TaxonomyDto taxonomyDto;
-    taxonomyDto = chooser.getSelectedValue().equals(taxonomy.getName())
-        ? taxonomy
-        : taxonomies.get(chooser.getSelectedValue());
-
-    VocabularyDto vocabularyDto = VocabularyDto.create();
-    vocabularyDto.setName(nameTxt.getText());
-    vocabularyDto = setTitleAndDescription(vocabularyDto);
-    vocabularyDto.setRepeatable(isRepeatable.getValue());
-
-    if(editionMode) vocabularyDto.setTermsArray(vocabulary.getTermsArray());
-    taxonomyDto.getVocabulariesArray().push(vocabularyDto); //TODO gerer la duplication
-
-    if(getUiHandlers().addTaxonomyNewVocabulary(taxonomyDto)) {
-      modal.hide();
-    }
+//    TaxonomyDto taxonomyDto;
+//    taxonomyDto = chooser.getSelectedValue().equals(taxonomy.getName())
+//        ? taxonomy
+//        : taxonomies.get(chooser.getSelectedValue());
+//
+//    VocabularyDto vocabularyDto = VocabularyDto.create();
+//    vocabularyDto.setName(nameTxt.getText());
+//    vocabularyDto = setTitleAndDescription(vocabularyDto);
+//    vocabularyDto.setRepeatable(isRepeatable.getValue());
+//
+//    if(editionMode) vocabularyDto.setTermsArray(vocabulary.getTermsArray());
+//    taxonomyDto.getVocabulariesArray().push(vocabularyDto); //TODO gerer la duplication
+//
+//    if(getUiHandlers().addTaxonomyNewVocabulary(taxonomyDto)) {
+//      modal.hide();
+//    }
   }
 
   private VocabularyDto setTitleAndDescription(VocabularyDto vocabularyDto) {

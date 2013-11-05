@@ -6,7 +6,7 @@ import com.google.gwt.event.shared.GwtEvent;
 public class TaxonomyCreatedEvent extends GwtEvent<TaxonomyCreatedEvent.Handler> {
 
   public interface Handler extends EventHandler {
-    void onProjectCreated(TaxonomyCreatedEvent event);
+    void onTaxonomyCreated(TaxonomyCreatedEvent event);
   }
 
   private static final Type<Handler> TYPE = new Type<Handler>();
@@ -20,7 +20,7 @@ public class TaxonomyCreatedEvent extends GwtEvent<TaxonomyCreatedEvent.Handler>
 
   @Override
   protected void dispatch(Handler handler) {
-    handler.onProjectCreated(this);
+    handler.onTaxonomyCreated(this);
   }
 
   @Override

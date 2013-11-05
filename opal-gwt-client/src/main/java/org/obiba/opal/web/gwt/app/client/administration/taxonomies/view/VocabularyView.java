@@ -11,6 +11,7 @@ import org.obiba.opal.web.model.client.opal.VocabularyDto;
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.NavList;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -85,18 +86,28 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
   private void displayTerms(VocabularyDto vocabularyDto) {
     termsLinks.clear();
 
-    addTermsLinks(vocabularyDto.getTermsArray(), 0);
+    NavList navList = new NavList();
+
+    addTermsLinks(navList, vocabularyDto.getTermsArray(), 0);
+    termsLinks.add(navList);
   }
 
-  private void addTermsLinks(final JsArray<TermDto> terms, int level) {
-
-    SafeHtml indent = SafeHtmlUtils.fromString("");
-    for(int i = 1; i < level; i++) {
-      indent = SafeHtmlUtils.fromTrustedString(indent.asString() + "&nbsp;&nbsp;&nbsp;&nbsp;");
-    }
+  private void addTermsLinks(NavList navList, final JsArray<TermDto> terms, int level) {
 
     for(int i = 0; i < terms.length(); i++) {
-      NavLink link = new NavLink(terms.get(i).getName());
+      SafeHtml indent = SafeHtmlUtils.fromString("");
+      for(int j = 0; j < level; j++) {
+        indent = SafeHtmlUtils.fromTrustedString(indent.asString() + "&nbsp;&nbsp;&nbsp;&nbsp;");
+      }
+      InlineHTML spacer = new InlineHTML(indent);
+      spacer.addStyleName("inline-block");
+
+      NavLink link = new NavLink();
+
+      link.add(spacer);
+      NavLink linkTitle = new NavLink(terms.get(i).getName());
+      linkTitle.addStyleName("inline-block");
+      link.add(linkTitle);
       final int finalI = i;
       link.addClickHandler(new ClickHandler() {
         @Override
@@ -106,17 +117,10 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
       });
       link.addStyleName("inline");
 
-      InlineHTML spacer = new InlineHTML(indent);
-      spacer.addStyleName("inline-block");
-
-      FlowPanel p = new FlowPanel();
-      p.add(spacer);
-      p.add(link);
-
-      termsLinks.add(p);
+      navList.add(link);
 
       if(terms.get(i).getTermsCount() > 0) {
-        addTermsLinks(terms.get(i).getTermsArray(), level + 1);
+        addTermsLinks(navList, terms.get(i).getTermsArray(), level + 1);
       }
     }
   }
