@@ -125,7 +125,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   @Override
   public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-    resetView();
+    resetView(event.getTable());
 
     if(event.hasTable()) {
       updateDisplay(event.getTable(), event.getSelection(), event.getPrevious(), event.getNext());
@@ -249,6 +249,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     scriptEditorPresenter.setValueEntityType(variable.getValueType());
   }
 
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void updateDerivedVariableByCommitInfo(VcsCommitInfoDto commitInfo) {
     getView().goToEditScript();
     scriptEditorPresenter.setScript(commitInfo.getBlob());
@@ -417,8 +418,17 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     propertiesEditorPresenter.initialize(variable, table);
   }
 
-  private void resetView() {
+  private void resetView(TableDto tableDto) {
     getView().backToViewScript();
+    if (tableChanged(tableDto)) {
+      getView().resetTabs();
+    }
+  }
+
+  private boolean tableChanged(TableDto tableDto) {
+    String curTableName = table != null ? table.getName() : "";
+    String newTableName = tableDto != null ? tableDto.getName() : "";
+    return !curTableName.equals(newTableName);
   }
 
   //
@@ -535,7 +545,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     @Override
     public void onResponseCode(Request request, Response response) {
       if(response.getStatusCode() == SC_OK) {
-        UpdateVariableCallbackHandler updateVariableCallbackHandler = new UpdateVariableCallbackHandler(newVariable);
+        ResponseCodeCallback updateVariableCallbackHandler = new UpdateVariableCallbackHandler(newVariable);
 
         String uri = UriBuilder.create().segment("datasource", "{}", "view", "{}", "variable", "{}")
             .query("comment", getView().getComment())
@@ -637,5 +647,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     HasAuthorization getEditAuthorizer();
 
     void setDeriveFromMenuVisibility(boolean visible);
+
+    void resetTabs();
   }
 }

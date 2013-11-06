@@ -31,7 +31,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class ContinuousSummaryView extends Composite {
 
-  interface ContinuousSummaryViewUiBinder extends UiBinder<Widget, ContinuousSummaryView> {}
+  private interface ContinuousSummaryViewUiBinder extends UiBinder<Widget, ContinuousSummaryView> {}
 
   private static final ContinuousSummaryViewUiBinder uiBinder = GWT.create(ContinuousSummaryViewUiBinder.class);
 
@@ -46,9 +46,9 @@ public class ContinuousSummaryView extends Composite {
   @UiField
   SimplePanel normalProbability;
 
-  HistogramChartFactory histogram;
+  private HistogramChartFactory histogram;
 
-  NormalProbabilityChartFactory qqPlot;
+  private NormalProbabilityChartFactory qqPlot;
 
   public ContinuousSummaryView(ContinuousSummaryDto continuous) {
     initWidget(uiBinder.createAndBindUi(this));
@@ -103,10 +103,12 @@ public class ContinuousSummaryView extends Composite {
   protected void onLoad() {
     super.onLoad();
     if(histogram != null) {
+      histogramPanel.clear();
       histogramPanel
           .add(histogram.createChart(translations.statsMap().get("HISTOGRAM"), translations.statsMap().get("DENSITY")));
     }
     if(qqPlot != null) {
+      normalProbability.clear();
       normalProbability.add(qqPlot.createChart(translations.statsMap().get("NORMAL_PROB"),
           translations.statsMap().get("THEORETHICAL_QUANTILES"), translations.statsMap().get("SAMPLE_QUANTILES")));
     }
