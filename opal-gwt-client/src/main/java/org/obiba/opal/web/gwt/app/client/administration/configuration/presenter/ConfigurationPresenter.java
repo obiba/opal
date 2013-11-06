@@ -75,14 +75,14 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
   protected void onBind() {
     refresh();
 
-    registerHandler(getEventBus().addHandler(GeneralConfigSavedEvent.getType(), new GeneralConfigSavedEvent.Handler() {
+    registerHandler(getEventBus()
+        .addHandler(GeneralConfigSavedEvent.getType(), new GeneralConfigSavedEvent.GeneralConfigSavedHandler() {
+          @Override
+          public void onGeneralConfigSaved(GeneralConfigSavedEvent event) {
+            refresh();
+          }
+        }));
 
-      @Override
-      public void onGeneralConfigSaved(GeneralConfigSavedEvent event) {
-        //Refresh
-        refresh();
-      }
-    }));
   }
 
   private void refresh() {
