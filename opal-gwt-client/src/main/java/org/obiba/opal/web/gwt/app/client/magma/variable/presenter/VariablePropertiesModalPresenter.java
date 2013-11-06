@@ -16,10 +16,8 @@ import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
-import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
@@ -28,16 +26,11 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.model.client.magma.AttributeDto;
-import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -50,8 +43,8 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 /**
  *
  */
-public class PropertiesEditorModalPresenter extends ModalPresenterWidget<PropertiesEditorModalPresenter.Display>
-    implements PropertiesEditorModalUiHandlers {
+public class VariablePropertiesModalPresenter extends ModalPresenterWidget<VariablePropertiesModalPresenter.Display>
+    implements VariablePropertiesModalUiHandlers {
 
   private final Translations translations;
 
@@ -64,7 +57,7 @@ public class PropertiesEditorModalPresenter extends ModalPresenterWidget<Propert
   private final ValidationHandler validationHandler;
 
   @Inject
-  public PropertiesEditorModalPresenter(EventBus eventBus, Display display, Translations translations,
+  public VariablePropertiesModalPresenter(EventBus eventBus, Display display, Translations translations,
       PlaceManager placeManager) {
     super(eventBus, display);
     this.translations = translations;
@@ -129,7 +122,25 @@ public class PropertiesEditorModalPresenter extends ModalPresenterWidget<Propert
             Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
   }
 
-  public void onCreate(VariableDto newVariable) {
+  public void onCreate(final VariableDto newVariable) {
+    // make sure it does not exist
+    ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
+        .build(tableDto.getDatasourceName(), tableDto.getName(), newVariable.getName())) //
+        .get() //
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if(response.getStatusCode() == Response.SC_NOT_FOUND) {
+              doCreate(newVariable);
+            } else if(response.getStatusCode() == Response.SC_OK) {
+              getView().showError(translations.variableNameAlreadyExists(), Display.FormField.NAME);
+            }
+          }
+        }, Response.SC_OK, Response.SC_NOT_FOUND)//
+        .send();
+  }
+
+  public void doCreate(VariableDto newVariable) {
     UriBuilder uriBuilder;
     if(Strings.isNullOrEmpty(tableDto.getViewLink())) {
       uriBuilder = UriBuilders.DATASOURCE_TABLE_VARIABLES.create();
@@ -180,7 +191,7 @@ public class PropertiesEditorModalPresenter extends ModalPresenterWidget<Propert
     return v;
   }
 
-  public interface Display extends PopupView, HasUiHandlers<PropertiesEditorModalUiHandlers> {
+  public interface Display extends PopupView, HasUiHandlers<VariablePropertiesModalUiHandlers> {
 
     enum FormField {
       NAME

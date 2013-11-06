@@ -12,8 +12,8 @@ package org.obiba.opal.web.gwt.app.client.magma.variable.view;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.PropertiesEditorModalPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.PropertiesEditorModalUiHandlers;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
@@ -36,8 +36,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-public class PropertiesEditorModalView extends ModalPopupViewWithUiHandlers<PropertiesEditorModalUiHandlers>
-    implements PropertiesEditorModalPresenter.Display {
+public class VariablePropertiesModalView extends ModalPopupViewWithUiHandlers<VariablePropertiesModalUiHandlers>
+    implements VariablePropertiesModalPresenter.Display {
 
   private static final int MIN_WIDTH = 480;
 
@@ -45,7 +45,7 @@ public class PropertiesEditorModalView extends ModalPopupViewWithUiHandlers<Prop
 
   private final Translations translations;
 
-  interface Binder extends UiBinder<Widget, PropertiesEditorModalView> {}
+  interface Binder extends UiBinder<Widget, VariablePropertiesModalView> {}
 
   @UiField
   Modal dialog;
@@ -84,7 +84,7 @@ public class PropertiesEditorModalView extends ModalPopupViewWithUiHandlers<Prop
   TextBox occurenceGroup;
 
   @Inject
-  public PropertiesEditorModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
+  public VariablePropertiesModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
     super(eventBus);
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));

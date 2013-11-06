@@ -10,7 +10,7 @@
     <g:FlowPanel addStyleNames="main">
 
       <b:Form type="INLINE">
-        <!--Unit-->
+        <!--Name-->
         <b:ControlGroup ui:field="variableGroup">
           <b:ControlLabel>Name</b:ControlLabel>
           <b:Controls>

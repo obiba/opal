@@ -246,6 +246,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("An attribute name is required.")
   String attributeNameRequired();
 
+  @Description("Variable name already exists label")
+  @DefaultStringValue("A variable already exists with this name.")
+  String variableNameAlreadyExists();
+
   @Description("Attribute name already exists label")
   @DefaultStringValue("The specified attribute name already exists.")
   String attributeNameAlreadyExists();

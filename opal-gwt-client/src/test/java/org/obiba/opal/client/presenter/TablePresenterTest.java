@@ -27,13 +27,11 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
-import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.PropertiesEditorModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
-import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.google.gwt.cell.client.FieldUpdater;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.web.bindery.event.shared.HandlerRegistration;
@@ -72,7 +70,7 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     ModalProvider<ValueSequencePopupPresenter> modalProviderValueSequence = createMock(ModalProvider.class);
     ModalProvider<ConfigureViewStepPresenter> modalConfigureViewStepProvider = createMock(ModalProvider.class);
     ModalProvider<VariablesToViewPresenter> variablesToViewProvider = createMock(ModalProvider.class);
-    ModalProvider<PropertiesEditorModalPresenter> propertiesEditorModalProvider = createMock(ModalProvider.class);
+    ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider = createMock(ModalProvider.class);
 
     ValuesTablePresenter values = new ValuesTablePresenter(null, null, modalProviderValueSequence,
         modalEntityModalPresenter);

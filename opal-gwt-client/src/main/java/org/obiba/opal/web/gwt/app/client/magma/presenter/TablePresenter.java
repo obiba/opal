@@ -29,7 +29,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.PropertiesEditorModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
@@ -99,7 +99,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final ModalProvider<VariablesToViewPresenter> variablesToViewProvider;
 
-  private final ModalProvider<PropertiesEditorModalPresenter> propertiesEditorModalProvider;
+  private final ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider;
 
   @Inject
   private CodingViewModalPresenter codingViewModalPresenter;
@@ -121,7 +121,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       ValuesTablePresenter valuesTablePresenter, Provider<AuthorizationPresenter> authorizationPresenter,
       Provider<IndexPresenter> indexPresenter, ModalProvider<ConfigureViewStepPresenter> configureViewStepProvider,
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
-      ModalProvider<PropertiesEditorModalPresenter> propertiesEditorModalProvider) {
+      ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider) {
     super(eventBus, display);
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
@@ -373,7 +373,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onAddVariable() {
-    PropertiesEditorModalPresenter propertiesEditorPresenter = propertiesEditorModalProvider.get();
+    VariablePropertiesModalPresenter propertiesEditorPresenter = propertiesEditorModalProvider.get();
     propertiesEditorPresenter.initialize(table);
   }
 
