@@ -31,7 +31,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class ContinuousSummaryView extends Composite {
 
-  private interface ContinuousSummaryViewUiBinder extends UiBinder<Widget, ContinuousSummaryView> {}
+  interface ContinuousSummaryViewUiBinder extends UiBinder<Widget, ContinuousSummaryView> {}
 
   private static final ContinuousSummaryViewUiBinder uiBinder = GWT.create(ContinuousSummaryViewUiBinder.class);
 
