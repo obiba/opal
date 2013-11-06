@@ -50,11 +50,11 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
 
   private final Translations translations;
 
-  private final ModalProvider<AddProjectPresenter> addProjectModalProvider;
+  private final ModalProvider<ProjectPropertiesModalPresenter> addProjectModalProvider;
 
   @Inject
   public ProjectsPresenter(EventBus eventBus, Display display, Proxy proxy, Translations translations,
-      PlaceManager placeManager, ModalProvider<AddProjectPresenter> addProjectModalProvider) {
+      PlaceManager placeManager, ModalProvider<ProjectPropertiesModalPresenter> addProjectModalProvider) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     this.translations = translations;
     this.placeManager = placeManager;
@@ -71,8 +71,8 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
   public void onBind() {
     super.onBind();
     ProjectUpdatedHandler projectUpdatedHandler = new ProjectUpdatedHandler();
-    registerHandler(getEventBus().addHandler(ProjectCreatedEvent.getType(), projectUpdatedHandler));
-    registerHandler(getEventBus().addHandler(ProjectUpdatedEvent.getType(), projectUpdatedHandler));
+    addRegisteredHandler(ProjectCreatedEvent.getType(), projectUpdatedHandler);
+    //addRegisteredHandler(ProjectUpdatedEvent.getType(), projectUpdatedHandler);
   }
 
   @Override
@@ -117,7 +117,7 @@ public class ProjectsPresenter extends Presenter<ProjectsPresenter.Display, Proj
 
   @Override
   public void showAddProject() {
-    AddProjectPresenter presenter = addProjectModalProvider.get();
+    ProjectPropertiesModalPresenter presenter = addProjectModalProvider.get();
     presenter.setProjects(projects);
   }
 

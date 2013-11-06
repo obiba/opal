@@ -9,6 +9,7 @@ import org.obiba.opal.web.gwt.app.client.administration.database.presenter.Datab
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.project.event.ProjectUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -18,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.ProjectFactoryDto;
@@ -33,17 +35,25 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
-public class AddProjectPresenter extends ModalPresenterWidget<AddProjectPresenter.Display>
-    implements AddProjectUiHandlers {
+public class ProjectPropertiesModalPresenter
+    extends ModalPresenterWidget<ProjectPropertiesModalPresenter.Display>
+    implements ProjectPropertiesUiHandlers {
+
+  private ProjectDto project;
 
   private JsArray<ProjectDto> projects;
 
   private ValidationHandler validationHandler;
 
   @Inject
-  public AddProjectPresenter(EventBus eventBus, Display display) {
+  public ProjectPropertiesModalPresenter(EventBus eventBus, Display display) {
     super(eventBus, display);
     getView().setUiHandlers(this);
+  }
+
+  public void initialize(ProjectDto project) {
+    this.project = project;
+    getView().setProject(project);
   }
 
   @Override
@@ -57,6 +67,7 @@ public class AddProjectPresenter extends ModalPresenterWidget<AddProjectPresente
           @Override
           public void onResource(Response response, JsArray<DatabaseDto> databases) {
             getView().setAvailableDatabases(databases);
+            if(project != null) getView().getDatabase().setText(project.getDatabase());
           }
         }) //
         .get().send();
@@ -65,10 +76,18 @@ public class AddProjectPresenter extends ModalPresenterWidget<AddProjectPresente
   @Override
   public void save() {
     getView().clearErrors();
+    if (project == null) {
+      create();
+    } else {
+      update();
+    }
+  }
+
+  private void create() {
     if(validationHandler.validate()) {
       ResourceRequestBuilderFactory.<ProjectFactoryDto>newBuilder() //
           .forResource("/projects")  //
-          .withResourceBody(ProjectFactoryDto.stringify(getDto())) //
+          .withResourceBody(ProjectFactoryDto.stringify(getProjectFactoryDto())) //
           .withCallback(Response.SC_CREATED, new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
@@ -82,13 +101,39 @@ public class AddProjectPresenter extends ModalPresenterWidget<AddProjectPresente
     }
   }
 
-  private ProjectFactoryDto getDto() {
+  private void update() {
+    ResourceRequestBuilderFactory.<ProjectFactoryDto>newBuilder() //
+        .forResource(UriBuilders.PROJECT.create().build(project.getName()))  //
+        .withResourceBody(ProjectDto.stringify(getProjectDto())) //
+        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().hideDialog();
+            getEventBus().fireEvent(new ProjectUpdatedEvent(project));
+          }
+        }) //
+        .withCallback(Response.SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
+        .put().send();
+  }
+
+  private ProjectFactoryDto getProjectFactoryDto() {
     ProjectFactoryDto dto = ProjectFactoryDto.create();
     dto.setName(getView().getName().getText());
     String title = getView().getTitle().getText();
     dto.setTitle(Strings.isNullOrEmpty(title) ? dto.getName() : title);
     dto.setDescription(getView().getDescription().getText());
     dto.setDatabase(getView().getDatabase().getText());
+    return dto;
+  }
+
+  private ProjectDto getProjectDto() {
+    ProjectDto dto = ProjectDto.create();
+    dto.setName(getView().getName().getText());
+    String title = getView().getTitle().getText();
+    dto.setTitle(Strings.isNullOrEmpty(title) ? dto.getName() : title);
+    dto.setDescription(getView().getDescription().getText());
+    dto.setDatabase(getView().getDatabase().getText());
+    dto.setArchived(project.getArchived());
     return dto;
   }
 
@@ -140,11 +185,13 @@ public class AddProjectPresenter extends ModalPresenterWidget<AddProjectPresente
 
   }
 
-  public interface Display extends PopupView, HasUiHandlers<AddProjectUiHandlers> {
+  public interface Display extends PopupView, HasUiHandlers<ProjectPropertiesUiHandlers> {
 
     enum FormField {
       NAME,
     }
+
+    void setProject(ProjectDto project);
 
     HasText getName();
 

@@ -43,23 +43,29 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
 
   private final PlaceManager placeManager;
 
-  private final ModalProvider<AddProjectPresenter> editProjectModalProvider;
+  private final ModalProvider<ProjectPropertiesModalPresenter> projectPropertiesModalProvider;
 
   private ProjectDto project;
 
   private Runnable removeConfirmation;
 
   @Inject
-  public ProjectAdministrationPresenter(EventBus eventBus, Display view, PlaceManager placeManager, ModalProvider<AddProjectPresenter> editProjectModalProvider) {
+  public ProjectAdministrationPresenter(EventBus eventBus, Display view, PlaceManager placeManager, ModalProvider<ProjectPropertiesModalPresenter> projectPropertiesModalProvider) {
     super(eventBus, view);
     getView().setUiHandlers(this);
     this.placeManager = placeManager;
-    this.editProjectModalProvider = editProjectModalProvider.setContainer(this);
+    this.projectPropertiesModalProvider = projectPropertiesModalProvider.setContainer(this);
   }
 
   @Override
   protected void onBind() {
     addRegisteredHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler());
+    addRegisteredHandler(ProjectUpdatedEvent.getType(), new ProjectUpdatedEvent.ProjectUpdatedHandler() {
+      @Override
+      public void onProjectUpdated(ProjectUpdatedEvent event) {
+        placeManager.revealPlace(ProjectPlacesHelper.getAdministrationPlace(project.getName()));
+      }
+    });
   }
 
   public void setProject(ProjectDto project) {
@@ -69,7 +75,9 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
 
   @Override
   public void onEdit() {
-    //editProjectModalProvider.get();
+    ProjectPropertiesModalPresenter presenter = projectPropertiesModalProvider.create();
+    presenter.initialize(project);
+    projectPropertiesModalProvider.show();
   }
 
   @Override

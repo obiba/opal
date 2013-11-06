@@ -120,7 +120,21 @@ public class ProjectsServiceImpl implements ProjectService {
 
   @Override
   public void save(@NotNull Project project) throws ConstraintViolationException {
-    registerDatasource(project);
+    try {
+      Project original = getProject(project.getName());
+      String originalDb = original.getDatabase() == null ? "" : original.getDatabase();
+      String newDb = project.getDatabase() == null ? "" : project.getDatabase();
+      if (!newDb.equals(originalDb)) {
+        Datasource datasource = MagmaEngine.get().getDatasource(project.getName());
+        MagmaEngine.get().removeDatasource(datasource);
+        if (datasource.canDrop()) {
+          datasource.drop();
+        }
+        registerDatasource(project);
+      }
+    } catch(NoSuchProjectException e) {
+      registerDatasource(project);
+    }
     orientDbService.save(project, project);
   }
 

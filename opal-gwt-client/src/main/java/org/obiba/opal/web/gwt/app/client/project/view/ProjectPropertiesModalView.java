@@ -4,17 +4,21 @@ import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.project.presenter.AddProjectPresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.AddProjectUiHandlers;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPropertiesModalPresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPropertiesUiHandlers;
+import org.obiba.opal.web.gwt.app.client.support.DatasourceDtos;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
+import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -25,12 +29,12 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-public class AddProjectView extends ModalPopupViewWithUiHandlers<AddProjectUiHandlers>
-    implements AddProjectPresenter.Display {
+public class ProjectPropertiesModalView extends ModalPopupViewWithUiHandlers<ProjectPropertiesUiHandlers>
+    implements ProjectPropertiesModalPresenter.Display {
 
   private static final String DATABASE_NONE = "_none";
 
-  interface Binder extends UiBinder<Widget, AddProjectView> {}
+  interface Binder extends UiBinder<Widget, ProjectPropertiesModalView> {}
 
   @UiField
   Modal modal;
@@ -39,7 +43,7 @@ public class AddProjectView extends ModalPopupViewWithUiHandlers<AddProjectUiHan
   ControlGroup nameGroup;
 
   @UiField
-  HasText name;
+  TextBox name;
 
   @UiField
   HasText title;
@@ -53,7 +57,7 @@ public class AddProjectView extends ModalPopupViewWithUiHandlers<AddProjectUiHan
   private final Translations translations;
 
   @Inject
-  public AddProjectView(EventBus eventBus, Binder uiBinder, Translations translations) {
+  public ProjectPropertiesModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -63,6 +67,17 @@ public class AddProjectView extends ModalPopupViewWithUiHandlers<AddProjectUiHan
 
     ConstrainedModal constrainedModal = new ConstrainedModal(modal);
     constrainedModal.registerWidget("name", translations.nameLabel(), nameGroup);
+  }
+
+  @Override
+  public void setProject(ProjectDto project) {
+    modal.setTitle(translations.editProperties());
+    name.setText(project.getName());
+    name.setEnabled(false);
+    title.setText(project.getTitle());
+    description.setText(project.getDescription());
+    // database will be set when databases list will be available
+    database.setEnabled(!DatasourceDtos.hasPersistedTables(project.getDatasource()));
   }
 
   @Override
@@ -90,8 +105,7 @@ public class AddProjectView extends ModalPopupViewWithUiHandlers<AddProjectUiHan
     return new HasText() {
       @Override
       public String getText() {
-        int selectedIndex = database.getSelectedIndex();
-        String selectedDatabase = selectedIndex < 0 ? null : database.getValue(selectedIndex);
+        String selectedDatabase = database.getSelectedValue();
         return selectedDatabase == null || DATABASE_NONE.equals(selectedDatabase) ? null : selectedDatabase;
       }
 
@@ -124,6 +138,7 @@ public class AddProjectView extends ModalPopupViewWithUiHandlers<AddProjectUiHan
       database.addItem(label.toString(), databaseDto.getName());
     }
     getDatabase().setText(defaultStorageDatabase);
+    GWT.log("  db.item.count=" + database.getItemCount());
   }
 
   @Override

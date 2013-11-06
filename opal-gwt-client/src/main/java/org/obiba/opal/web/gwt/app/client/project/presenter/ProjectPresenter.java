@@ -81,7 +81,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   public static final GwtEvent.Type<RevealContentHandler<?>> FILES_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
 
   @ContentSlot
-  public static final GwtEvent.Type<RevealContentHandler<?>> REPORTS_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
+  public static final GwtEvent.Type<RevealContentHandler<?>> REPORTS_PANE
+      = new GwtEvent.Type<RevealContentHandler<?>>();
 
   @ContentSlot
   public static final GwtEvent.Type<RevealContentHandler<?>> TASKS_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
@@ -121,8 +122,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   public ProjectPresenter(EventBus eventBus, Display display, Proxy proxy, Translations translations,
       PlaceManager placeManager, Provider<MagmaPresenter> magmaPresenterProvider,
       Provider<FileExplorerPresenter> fileExplorerPresenterProvider,
-      Provider<ReportsPresenter> reportsPresenterProvider,
-      Provider<TasksPresenter> tasksPresenterProvider,
+      Provider<ReportsPresenter> reportsPresenterProvider, Provider<TasksPresenter> tasksPresenterProvider,
       Provider<ProjectAdministrationPresenter> projectAdministrationPresenterProvider) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
@@ -146,7 +146,6 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
     String requestedName = request.getParameter(ParameterTokens.TOKEN_NAME, null);
 
-
     tab = validateTab(request.getParameter(ParameterTokens.TOKEN_TAB, null));
     String path = validatePath(requestedName, request.getParameter(ParameterTokens.TOKEN_PATH, null));
 
@@ -157,14 +156,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       getView().setTabData(tab.ordinal(), null);
     }
 
-    if (!Strings.isNullOrEmpty(requestedName) && !requestedName.equals(name)) {
-      name = requestedName;
-      refresh();
-    } else {
-      onTabSelected(tab.ordinal());
-      getView().selectTab(tab.ordinal());
-    }
-    refreshSummary();
+    name = requestedName;
+    refresh();
   }
 
   public void refresh() {
@@ -182,13 +175,15 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
             getView().selectTab(tab.ordinal());
           }
         }).send();
+    refreshSummary();
   }
 
   private void refreshSummary() {
     // TODO handle wrong or missing project name
     if(name == null) return;
     getView().setProjectSummary(null);
-    ResourceRequestBuilderFactory.<ProjectSummaryDto>newBuilder().forResource(UriBuilders.PROJECT_SUMMARY.create().build(name)).get()
+    ResourceRequestBuilderFactory.<ProjectSummaryDto>newBuilder()
+        .forResource(UriBuilders.PROJECT_SUMMARY.create().build(name)).get()
         .withCallback(new ResourceCallback<ProjectSummaryDto>() {
           @Override
           public void onResource(Response response, ProjectSummaryDto resource) {
@@ -263,7 +258,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   private void onReportsTabSelected(String path) {
-    if (reportsPresenter == null) {
+    if(reportsPresenter == null) {
       reportsPresenter = reportsPresenterProvider.get();
       setInSlot(REPORTS_PANE, reportsPresenter);
     }
@@ -271,7 +266,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   private void onTasksTabSelected(String path) {
-    if (tasksPresenter == null) {
+    if(tasksPresenter == null) {
       tasksPresenter = tasksPresenterProvider.get();
       setInSlot(TASKS_PANE, tasksPresenter);
     }

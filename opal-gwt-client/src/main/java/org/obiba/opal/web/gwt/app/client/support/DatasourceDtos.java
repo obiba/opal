@@ -13,6 +13,7 @@ import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
 import org.obiba.opal.web.model.client.magma.CsvDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.CsvDatasourceTableBundleDto;
 import org.obiba.opal.web.model.client.magma.DatasourceBatchConfigDto;
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceIncrementalConfigDto;
 import org.obiba.opal.web.model.client.magma.DatasourceUnitConfigDto;
@@ -35,6 +36,12 @@ import com.google.gwt.core.client.JsArray;
 public class DatasourceDtos {
 
   private DatasourceDtos() {
+  }
+
+  public static boolean hasPersistedTables(DatasourceDto datasource) {
+    if (datasource.getTableArray() == null || datasource.getTableArray().length() == 0) return false;
+    if (datasource.getViewArray() == null || datasource.getViewArray().length() == 0) return true;
+    return datasource.getTableArray().length() > datasource.getViewArray().length();
   }
 
   public static DatasourceFactoryDto createDatasourceFactoryDto(ImportConfig importConfig) {
