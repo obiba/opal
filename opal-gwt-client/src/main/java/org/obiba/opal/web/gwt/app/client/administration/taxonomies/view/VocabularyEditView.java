@@ -259,6 +259,7 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
   private void displayTerms(VocabularyDto vocabulary) {
     termsPanel.clear();
     termsPanel.add(addTermsLinks(vocabulary, vocabulary.getTermsArray(), 0));
+    termPanel.setVisible(false);
   }
 
   private Widget addTermsLinks(VocabularyDto vocabulary, JsArray<TermDto> terms, int level) {
@@ -266,7 +267,7 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
     FlowPanel target = new FlowPanel();
     PickupDragController dragController = new PickupDragController(RootPanel.get(), false);
 
-    int nb = terms.length();
+    int nb = terms != null ? terms.length() : 0;
     if(nb > 0) {
 
       DropController flowPanelDropController = new FlowPanelDropController(target);
@@ -390,7 +391,7 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
     public void setValue(JsArray<LocaleTextDto> value) {
       // Add all TexDto to vocabularyTitles
       target.clear();
-      int size = value.length();
+      int size = value != null ? value.length() : 0;
       int nbLocales = locales.length();
       for(int i = 0; i < nbLocales; i++) {
         // Find the right textDto corresponding with the locale

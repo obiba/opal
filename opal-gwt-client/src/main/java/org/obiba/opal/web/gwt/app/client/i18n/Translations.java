@@ -474,7 +474,9 @@ public interface Translations extends Constants {
       "VcsScriptContentInfo", "The retrieved script content is from '{0}' committed by '{1}'.", //
       "GeneralConfigSaved", "Opal general configuration was successfully saved.", //
       "PostInstallNotCompleted", "Post-install configuration not completed.",//
-      "TermNameMustBeUnique", "Term name must be unique" })
+      "TermNameMustBeUnique", "Term name must be unique",//
+      "VocabularyNameMustBeUnique", "Vocabulary name must be unique"//
+  })
   Map<String, String> userMessageMap();
 
   @Description("Missing label")
@@ -596,7 +598,8 @@ public interface Translations extends Constants {
       "publishDataShieldMethods", "Publish Package Methods",//
       "deleteDatabase", "Delete Database",//
       "removeGroup", "Remove Group",//
-      "removeUser", "Remove User"//
+      "removeUser", "Remove User",//
+      "removeTaxonomy", "Remove Taxonomy"//
   })
   Map<String, String> confirmationTitleMap();
 
@@ -650,7 +653,8 @@ public interface Translations extends Constants {
       "confirmRemoveGroupWithUsers",
       "Please confirm that you want to remove the group '{0}'. The group '{0}' will be removed for users belonging to this group.",
 //
-      "confirmRemoveUser", "Please confirm that you want to remove the user '{0}'."//
+      "confirmRemoveUser", "Please confirm that you want to remove the user '{0}'.",//
+      "confirmRemoveTaxonomy", "Please confirm that you want to remove the taxonomy '{0}'."//
   })
   Map<String, String> confirmationMessageMap();
 

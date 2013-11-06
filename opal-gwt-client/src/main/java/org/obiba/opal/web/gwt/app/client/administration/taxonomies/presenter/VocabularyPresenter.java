@@ -17,9 +17,11 @@ import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.opal.GeneralConf;
 import org.obiba.opal.web.model.client.opal.TermDto;
 import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -70,7 +72,19 @@ public class VocabularyPresenter extends Presenter<Display, VocabularyPresenter.
     vocabularyName = request.getParameter(TaxonomyTokens.TOKEN_VOCABULARY, null);
     termName = request.getParameter(TaxonomyTokens.TOKEN_TERM, null);
 
-    refresh();
+    ResourceRequestBuilderFactory.<GeneralConf>newBuilder()
+        .forResource(UriBuilders.SYSTEM_CONF_GENERAL.create().build())
+        .withCallback(new ResourceCallback<GeneralConf>() {
+          @Override
+          public void onResource(Response response, GeneralConf resource) {
+            JsArrayString locales = JsArrayString.createArray().cast();
+            for(int i = 0; i < resource.getLanguagesArray().length(); i++) {
+              locales.push(resource.getLanguages(i));
+            }
+            getView().setAvailableLocales(locales);
+            refresh();
+          }
+        }).get().send();
   }
 
   @Override
@@ -116,5 +130,7 @@ public class VocabularyPresenter extends Presenter<Display, VocabularyPresenter.
     void displayVocabulary(VocabularyDto vocabulary, String taxonomyName, String termName);
 
     void displayTerm(TermDto termDto);
+
+    void setAvailableLocales(JsArrayString locales);
   }
 }

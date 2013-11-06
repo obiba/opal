@@ -40,10 +40,8 @@
         <g:FlowPanel ui:field="termsLinks" addStyleNames="items"/>
       </b:Column>
       <b:Column size="6">
-        <g:FlowPanel ui:field="termPropertiesPanel">
-          <b:Heading size="4" addStyleNames="inline-block, no-top-margin" ui:field="termTitle"/>
-          <o:PropertiesTable ui:field="termProperties"/>
-        </g:FlowPanel>
+        <b:Heading size="4" addStyleNames="inline-block, no-top-margin" ui:field="termTitle"/>
+        <o:PropertiesTable ui:field="termProperties"/>
       </b:Column>
     </b:FluidRow>
 

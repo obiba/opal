@@ -4,6 +4,7 @@ import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.Ter
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.VocabularyPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.VocabularyUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.LocalizedLabel;
 import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
@@ -61,9 +62,6 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
   @UiField
   FlowPanel termsLinks;
 
-  @UiField
-  FlowPanel termPropertiesPanel;
-
   @Inject
   public VocabularyView(ViewUiBinder viewUiBinder, Translations translations) {
     this.translations = translations;
@@ -86,17 +84,18 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
     vocabularyName.setText(vocabulary.getName());
     vocabularyProperties.clearProperties();
     vocabularyProperties.addProperty(translations.nameLabel(), vocabulary.getName());
-    vocabularyProperties
-        .addProperty(new Label(translations.titleLabel()), getLocalizedText(vocabulary.getTitlesArray()));
-    vocabularyProperties
-        .addProperty(new Label(translations.descriptionLabel()), getLocalizedText(vocabulary.getDescriptionsArray()));
     vocabularyProperties.addProperty(translations.taxonomyLabel(), taxonomyName);
-    vocabularyProperties
-        .addProperty(translations.repeatableLabel(), Boolean.toString(vocabulary.getRepeatable())); // Translations
+
+    vocabularyProperties.addProperty(new Label(translations.titleLabel()),
+        getLocalizedText(JsArrays.toSafeArray(vocabulary.getTitlesArray())));
+    vocabularyProperties.addProperty(new Label(translations.descriptionLabel()),
+        getLocalizedText(JsArrays.toSafeArray(vocabulary.getDescriptionsArray())));
+
+    vocabularyProperties.addProperty(translations.repeatableLabel(), Boolean.toString(vocabulary.getRepeatable()));
 
     termsLinks.clear();
     NavList navList = new NavList();
-    getTermsLinks(navList, vocabulary.getTermsArray(), 0);
+    getTermsLinks(navList, JsArrays.toSafeArray(vocabulary.getTermsArray()), 0);
     termsLinks.add(navList);
 
     displayTerm(TermArrayUtils.findTerm(vocabulary.getTermsArray(), termName));
@@ -139,36 +138,39 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
   public void displayTerm(TermDto termDto) {
     termProperties.clearProperties();
     if(termDto != null) {
-      termPropertiesPanel.setVisible(true);
+      termTitle.setVisible(true);
       termTitle.setText(termDto.getName());
       termProperties.addProperty(translations.nameLabel(), termDto.getName());
-      termProperties.addProperty(new Label(translations.titleLabel()), getLocalizedText(termDto.getTitlesArray()));
-      termProperties
-          .addProperty(new Label(translations.descriptionLabel()), getLocalizedText(termDto.getDescriptionsArray()));
+      termProperties.addProperty(new Label(translations.titleLabel()),
+          getLocalizedText(JsArrays.toSafeArray(termDto.getTitlesArray())));
+      termProperties.addProperty(new Label(translations.descriptionLabel()),
+          getLocalizedText(JsArrays.toSafeArray(termDto.getDescriptionsArray())));
+      termProperties.setVisible(true);
     } else {
-      termPropertiesPanel.setVisible(false);
+      termTitle.setVisible(false);
+      termProperties.setVisible(false);
     }
+  }
+
+  @Override
+  public void setAvailableLocales(JsArrayString locales) {
+    this.locales = locales;
   }
 
   private Widget getLocalizedText(JsArray<LocaleTextDto> texts) {
     FlowPanel textList = new FlowPanel();
 
-    int nb = texts.length();
-    if(nb > 0) {
-      for(int i = 0; i < texts.length(); i++) {
-        textList.add(getTextValue(texts.get(i)));
+    for(int i = 0; i < locales.length(); i++) {
+      String textValue = "";
+      for(int j = 0; j < texts.length(); j++) {
+        if(texts.get(j).getLocale().equals(locales.get(i))) {
+          textValue = texts.get(j).getText();
+          break;
+        }
       }
+      textList.add(new LocalizedLabel(locales.get(i), textValue));
     }
-
     return textList;
   }
 
-  private Widget getTextValue(LocaleTextDto textDto) {
-    LocalizedLabel l = new LocalizedLabel();
-
-    l.setText(textDto.getText());
-    l.setLocale(textDto.getLocale());
-
-    return l;
-  }
 }

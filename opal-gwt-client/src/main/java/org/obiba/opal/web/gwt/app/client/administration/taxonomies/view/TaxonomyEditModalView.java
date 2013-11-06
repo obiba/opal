@@ -211,7 +211,7 @@ public class TaxonomyEditModalView extends ModalPopupViewWithUiHandlers<Taxonomy
     public void setValue(JsArray<LocaleTextDto> value) {
       // Add all TexDto to vocabularyTitles
       target.clear();
-      int size = value.length();
+      int size = value != null ? value.length() : 0;
       int nbLocales = locales.length();
       for(int i = 0; i < nbLocales; i++) {
         // Find the right textDto corresponding with the locale

@@ -175,7 +175,7 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
     placeManager.revealRelativePlace(new PlaceRequest.Builder().nameToken(Places.VOCABULARY)//
         .with(TaxonomyTokens.TOKEN_TAXONOMY, taxonomyName)//
         .with(TaxonomyTokens.TOKEN_VOCABULARY, vocabularyName)//
-        .with(TaxonomyTokens.TOKEN_TERM, currentTerm.getName())//
+        .with(TaxonomyTokens.TOKEN_TERM, currentTerm != null ? currentTerm.getName() : "")//
         .build(), 2);
 
     currentTerm = null;
@@ -201,10 +201,12 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
   }
 
   private void saveCurrentTerm() {
-    // Save currentTerm titles, descriptions to map
-    TermDto t = TermArrayUtils.findTerm(vocabulary.getTermsArray(), currentTerm.getName());
-    t.setDescriptionsArray(getView().getTermDescriptions(currentTerm.getName()).getValue());
-    t.setTitlesArray(getView().getTermTitles(currentTerm.getName()).getValue());
+    if(currentTerm != null) {
+      // Save currentTerm titles, descriptions to map
+      TermDto t = TermArrayUtils.findTerm(vocabulary.getTermsArray(), currentTerm.getName());
+      t.setDescriptionsArray(getView().getTermDescriptions(currentTerm.getName()).getValue());
+      t.setTitlesArray(getView().getTermTitles(currentTerm.getName()).getValue());
+    }
   }
 
   @Override
@@ -214,10 +216,23 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
       newTerm.setName(text);
       JsArray<TermDto> terms = JsArrays.create().cast();
 
-      TermDto t = TermArrayUtils.findTerm(vocabulary.getTermsArray(), currentTerm.getName());
+      if(currentTerm != null) {
+        TermDto t = TermArrayUtils
+            .findTerm(vocabulary.getTermsArray(), currentTerm != null ? currentTerm.getName() : null);
 
-      addTerm(newTerm, terms, t);
+        if(t.getTermsArray() == null) {
+          t.setTermsArray(terms);
+        }
 
+        t.getTermsArray().push(newTerm);
+      } else {
+        // Add at the end of terms
+        for(int i = 0; i < vocabulary.getTermsCount(); i++) {
+          terms.push(vocabulary.getTerms(i));
+        }
+        terms.push(newTerm);
+        vocabulary.setTermsArray(terms);
+      }
       getView().displayVocabulary(vocabulary);
       getView().clearTermName();
       onTermSelection(newTerm);
@@ -233,32 +248,28 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
 
       TermDto t = TermArrayUtils.findParent(null, vocabulary.getTermsArray(), currentTerm);
 
-      addTerm(newTerm, terms, t);
+      if(t != null) {
+        for(int i = 0; i < t.getTermsCount(); i++) {
+          terms.push(t.getTerms(i));
+
+          // Add after sibling
+          if(t.getTerms(i).getName().equals(currentTerm.getName())) {
+            terms.push(newTerm);
+          }
+        }
+
+        t.setTermsArray(terms);
+      } else {
+        for(int i = 0; i < vocabulary.getTermsCount(); i++) {
+          terms.push(vocabulary.getTerms(i));
+        }
+        terms.push(newTerm);
+        vocabulary.setTermsArray(terms);
+      }
 
       getView().displayVocabulary(vocabulary);
       getView().clearTermName();
       onTermSelection(newTerm);
-    }
-  }
-
-  private void addTerm(TermDto newTerm, JsArray<TermDto> terms, TermDto t) {
-    if(t != null) {
-      for(int i = 0; i < t.getTermsCount(); i++) {
-        terms.push(t.getTerms(i));
-
-        // Add after sibling
-        if(t.getTerms(i).getName().equals(currentTerm.getName())) {
-          terms.push(newTerm);
-        }
-      }
-
-      t.setTermsArray(terms);
-    } else {
-      for(int i = 0; i < vocabulary.getTermsCount(); i++) {
-        terms.push(vocabulary.getTerms(i));
-      }
-      terms.push(newTerm);
-      vocabulary.setTermsArray(terms);
     }
   }
 

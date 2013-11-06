@@ -5,6 +5,8 @@ import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -84,15 +86,17 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
 
     fireEvent(ConfirmationRequiredEvent
         .createWithMessages(removeConfirmation, translations.confirmationTitleMap().get("removeTaxonomy"),
-            translations.confirmationMessageMap().get("confirmRemoveTaxonomy")
-                .replace("{0}", originalTaxonomy.getName())));
+            TranslationsUtils.replaceArguments(translations.confirmationMessageMap().get("confirmRemoveTaxonomy"),
+                originalTaxonomy.getName())));
   }
 
   @Override
   public void onAddVocabulary() {
     String name = getView().getNewVocabularyName().getText();
     if(uniqueVocabularyName(name)) {
-      originalTaxonomy.getVocabulariesArray().push(name);
+      JsArrayString vocabularies = JsArrays.toSafeArray(originalTaxonomy.getVocabulariesArray());
+      vocabularies.push(name);
+      originalTaxonomy.setVocabulariesArray(vocabularies);
       refreshVocabularies();
     }
   }
