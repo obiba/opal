@@ -3,8 +3,8 @@ package org.obiba.opal.web.gwt.app.client.administration.taxonomies.view;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TermArrayUtils;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.VocabularyEditUiHandlers;
-import org.obiba.opal.web.gwt.app.client.administration.taxonomies.utils.TermArrayUtils;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
