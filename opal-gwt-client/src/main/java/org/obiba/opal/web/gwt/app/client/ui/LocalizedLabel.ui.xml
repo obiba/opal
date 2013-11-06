@@ -5,12 +5,7 @@
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator">
 
   <b:FluidRow>
-    <!--<b:Column size="1">-->
-    <!--<g:InlineLabel ui:field = "title"/>-->
-    <!--</b:Column>-->
-    <!--<b:Column size="11">-->
     <b:Label ui:field="locale"/>
-    <g:InlineLabel ui:field="text"/>
-    <!--</b:Column>-->
+    <g:InlineLabel ui:field="text" addStyleNames="xsmall-dual-indent"/>
   </b:FluidRow>
 </ui:UiBinder>

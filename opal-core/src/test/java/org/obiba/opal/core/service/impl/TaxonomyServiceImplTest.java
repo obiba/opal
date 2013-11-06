@@ -167,6 +167,23 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
   }
 
   @Test
+  public void test_rename_taxonomy_with_vocabulary() {
+    Taxonomy taxonomy = createTaxonomy();
+    taxonomyService.saveTaxonomy(taxonomy, taxonomy);
+
+    Vocabulary vocabulary = createVocabulary(taxonomy);
+    taxonomyService.saveVocabulary(null, vocabulary);
+
+    Taxonomy foundTaxonomy = taxonomyService.getTaxonomy(taxonomy.getName());
+    foundTaxonomy.setName("new name");
+    taxonomyService.saveTaxonomy(foundTaxonomy, foundTaxonomy);
+
+    foundTaxonomy = taxonomyService.getTaxonomy("new name");
+    assertNotNull(foundTaxonomy);
+    assertTrue(foundTaxonomy.hasVocabulary(vocabulary.getName()));
+  }
+
+  @Test
   public void test_save_vocabulary_without_taxonomy() {
     try {
       taxonomyService.saveVocabulary(null, new Vocabulary("none", "voc1"));
@@ -203,6 +220,33 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
     assertTaxonomyEquals(taxonomy, taxonomyService.getTaxonomy(taxonomy.getName()));
     assertEquals(1, size(taxonomyService.getTaxonomies()));
     assertTrue(Iterables.isEmpty(taxonomyService.getVocabularies(taxonomy.getName())));
+  }
+
+  @Test
+  public void test_move_vocabulary() {
+    Taxonomy taxonomy = createTaxonomy();
+    taxonomyService.saveTaxonomy(taxonomy, taxonomy);
+
+    Vocabulary vocabulary = createVocabulary(taxonomy);
+    taxonomyService.saveVocabulary(null, vocabulary);
+
+    Taxonomy taxonomy1 = createTaxonomy();
+    taxonomy1.setName("taxonomy 1");
+    taxonomyService.saveTaxonomy(taxonomy1, taxonomy1);
+
+    // Move vocabulary
+    Vocabulary template = new Vocabulary(vocabulary.getTaxonomy(), vocabulary.getName());
+    vocabulary.setTaxonomy(taxonomy1.getName());
+    taxonomyService.saveVocabulary(template, vocabulary);
+
+    Taxonomy foundTaxonomy = taxonomyService.getTaxonomy(taxonomy.getName());
+    assertNotNull(foundTaxonomy);
+    assertFalse(foundTaxonomy.hasVocabulary(vocabulary.getName()));
+
+    Taxonomy foundTaxonomy1 = taxonomyService.getTaxonomy(taxonomy1.getName());
+    assertNotNull(foundTaxonomy1);
+    assertTrue(foundTaxonomy1.hasVocabulary(vocabulary.getName()));
+
   }
 
   private Taxonomy createTaxonomy() {

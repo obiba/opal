@@ -2,7 +2,10 @@ package org.obiba.opal.web.gwt.app.client.administration.taxonomies.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomiesPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomiesUiHandlers;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.ui.LocalizedLabel;
+import org.obiba.opal.web.gwt.app.client.ui.OpalNavLink;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
@@ -23,10 +26,21 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
 public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> implements TaxonomiesPresenter.Display {
 
+  private final PlaceManager placeManager;
+
+  private final Translations translations;
+
   interface ViewUiBinder extends UiBinder<Widget, TaxonomiesView> {}
+
+  @UiField
+  NavLink taxonomiesLink;
+
+  @UiField
+  OpalNavLink generalNavLink;
 
   @UiField
   FlowPanel panel;
@@ -37,13 +51,21 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
   private JsArray<TaxonomyDto> taxonomies;
 
   @Inject
-  public TaxonomiesView(ViewUiBinder viewUiBinder) {
+  public TaxonomiesView(ViewUiBinder viewUiBinder, PlaceManager placeManager, Translations translations) {
+    this.placeManager = placeManager;
+    this.translations = translations;
     initWidget(viewUiBinder.createAndBindUi(this));
+    taxonomiesLink.setActive(true);
   }
 
   @Override
   public HasWidgets getBreadcrumbs() {
     return breadcrumbs;
+  }
+
+  @Override
+  public void setGeneralConfigHistoryToken(String historyToken) {
+    generalNavLink.setHistoryToken(historyToken);
   }
 
   @Override
@@ -54,12 +76,11 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
     } else {
       redraw();
     }
-
   }
 
   @UiHandler("add")
   void onShowAddTaxonomy(ClickEvent event) {
-    getUiHandlers().showAddTaxonomy();
+    getUiHandlers().onAddTaxonomy();
   }
 
   private void redraw() {
@@ -72,18 +93,23 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
       panelTaxonomy.add(taxonomyLink);
 
       for(int i = 0; i < taxonomy.getDescriptionsCount(); i++) {
-        panelTaxonomy.add(new Label(taxonomy.getDescriptions(i).getText()));
+        if(!taxonomy.getDescriptions(i).getText().isEmpty()) {
+          panelTaxonomy
+              .add(new LocalizedLabel(taxonomy.getDescriptions(i).getLocale(), taxonomy.getDescriptions(i).getText()));
+        }
       }
 
       JsArrayString vocabularies = JsArrays.toSafeArray(taxonomy.getVocabulariesArray());
       if(vocabularies.length() > 0) {
+        panelTaxonomy.add(new Heading(5, translations.vocabulariesLabel()));
         FlowPanel vocabulariesPanel = new FlowPanel();
         for(int i = 0; i < vocabularies.length(); i++) {
-          vocabulariesPanel.add(newVocabularyLink(getUiHandlers(), taxonomy, vocabularies.get(i)));
+          vocabulariesPanel.add(getVocabularyLink(getUiHandlers(), taxonomy, vocabularies.get(i)));
         }
         panelTaxonomy.add(vocabulariesPanel);
       }
 
+//      panelTaxonomy.add(subPanel);
       panel.add(panelTaxonomy);
     }
   }
@@ -103,7 +129,14 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
     titlePanel.add(taxonomyTitle);
     IconAnchor edit = new IconAnchor();
     edit.setIcon(IconType.EDIT);
-    edit.addStyleName("inline-block");
+    edit.addStyleName("small-dual-indent");
+    edit.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent clickEvent) {
+        handlers.onTaxonomyEdit(taxonomy);
+      }
+    });
+
     titlePanel.add(edit);
 
     Heading head = new Heading(4);
@@ -112,7 +145,7 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
     return head;
   }
 
-  private Widget newVocabularyLink(final TaxonomiesUiHandlers uiHandlers, final TaxonomyDto taxonomy,
+  private Widget getVocabularyLink(final TaxonomiesUiHandlers uiHandlers, final TaxonomyDto taxonomy,
       final String vocabulary) {
     NavLink link = new NavLink(vocabulary);
 //    link.setIcon(IconType.TAG);

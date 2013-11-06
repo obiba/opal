@@ -112,8 +112,8 @@ public class VocabularyResource {
 
       Vocabulary vocabulary = taxonomyService.getVocabulary(taxonomyName, vocabularyName);
       //TODO use right template
-      taxonomyService
-          .saveVocabulary(vocabulary, Dtos.fromDto(taxonomyName, dto)); //taxonomyName, vocabularyName, ,vocabulary
+      taxonomyService.saveVocabulary(vocabulary,
+          Dtos.fromDto(dto.getTaxonomyName(), dto)); //taxonomyName, vocabularyName, ,vocabulary
     } catch(NoSuchTaxonomyException e) {
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch(NoSuchVocabularyException e) {

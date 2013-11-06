@@ -24,6 +24,12 @@ public class LocalizedLabel extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
   }
 
+  public LocalizedLabel(String locale, String text) {
+    initWidget(uiBinder.createAndBindUi(this));
+    this.locale.setText(locale);
+    this.text.setText(text);
+  }
+
   public void setLocale(String locale) {
     this.locale.setText(locale);
   }

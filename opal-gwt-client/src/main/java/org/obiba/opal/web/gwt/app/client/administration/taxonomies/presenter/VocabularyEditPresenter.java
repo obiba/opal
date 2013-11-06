@@ -9,6 +9,7 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter;
 
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.utils.TermArrayUtils;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -19,6 +20,7 @@ import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.opal.GeneralConf;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.opal.TermDto;
@@ -53,8 +55,6 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
 
   private TermDto currentTerm;
 
-  private JsArrayString locales;
-
   @ProxyStandard
   @NameToken(Places.VOCABULARY_EDIT)
   public interface Proxy extends ProxyPlace<VocabularyEditPresenter> {}
@@ -88,20 +88,23 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
     taxonomyName = request.getParameter(TaxonomyTokens.TOKEN_TAXONOMY, null);
     vocabularyName = request.getParameter(TaxonomyTokens.TOKEN_VOCABULARY, null);
 
-    refresh();
+    ResourceRequestBuilderFactory.<GeneralConf>newBuilder().forResource("/system/conf/general")
+        .withCallback(new ResourceCallback<GeneralConf>() {
+          @Override
+          public void onResource(Response response, GeneralConf resource) {
+            JsArrayString locales = JsArrayString.createArray().cast();
+            for(int i = 0; i < resource.getLanguagesArray().length(); i++) {
+              locales.push(resource.getLanguages(i));
+            }
+            getView().setAvailableLocales(locales);
+            refresh();
+          }
+        }).get().send();
   }
 
   @TitleFunction
   public String getTitle() {
     return translations.pageVocabularyTitle();
-  }
-
-  @Override
-  protected void onBind() {
-    super.onBind();
-    locales = JsArrayString.createArray().cast();
-    locales.push("en");
-    locales.push("fr");
   }
 
   @Override
@@ -117,7 +120,7 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
           public void onResource(Response response, final JsArray<TaxonomyDto> taxonomies) {
 
             ResourceRequestBuilderFactory.<VocabularyDto>newBuilder()
-                .forResource("/system/conf/taxonomy/" + taxonomyName + "/vocabularyDto/" + vocabularyName).get()
+                .forResource("/system/conf/taxonomy/" + taxonomyName + "/vocabulary/" + vocabularyName).get()
                 .withCallback(new ResponseCodeCallback() {
                   @Override
                   public void onResponseCode(Request request, Response response) {
@@ -127,8 +130,8 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
                       getView().getVocabularyName().setText(vocabulary.getName());
                       getView().setTaxonomies(taxonomies);
                       getView().setSelectedTaxonomy(taxonomyName);
-                      getView().getTitles(locales).setValue(vocabulary.getTitlesArray());
-                      getView().getDescriptions(locales).setValue(vocabulary.getDescriptionsArray());
+                      getView().getTitles().setValue(vocabulary.getTitlesArray());
+                      getView().getDescriptions().setValue(vocabulary.getDescriptionsArray());
                       getView().getRepeatable().setValue(vocabulary.getRepeatable());
 
                       getView().displayVocabulary(vocabulary);
@@ -145,15 +148,14 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
   public void onSave() {
     //Save current term
     saveCurrentTerm();
-    currentTerm = null;
 
     VocabularyDto dto = VocabularyDto.create();
     dto.setName(getView().getVocabularyName().getText());
-    dto.setTitlesArray(getView().getTitles(locales).getValue());
-    dto.setDescriptionsArray(getView().getDescriptions(locales).getValue());
+    dto.setTitlesArray(getView().getTitles().getValue());
+    dto.setDescriptionsArray(getView().getDescriptions().getValue());
     dto.setTaxonomyName(getView().getSelectedTaxonomy());
     dto.setRepeatable(getView().getRepeatable().getValue());
-    dto.setTermsArray(vocabulary.getTermsArray());
+    dto.setTermsArray(JsArrays.toSafeArray(vocabulary.getTermsArray()));
 
     // Save vocabularyDto
     ResourceRequestBuilderFactory.newBuilder()//
@@ -167,18 +169,20 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
         }, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_BAD_REQUEST)//
         .put().send();
 
-    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.VOCABULARY)
-        .with(TaxonomyTokens.TOKEN_TAXONOMY, taxonomyName).with(TaxonomyTokens.TOKEN_VOCABULARY, vocabularyName)
-        .build();
-    placeManager.revealPlace(request);
+    placeManager.revealRelativePlace(new PlaceRequest.Builder().nameToken(Places.VOCABULARY)//
+        .with(TaxonomyTokens.TOKEN_TAXONOMY, taxonomyName)//
+        .with(TaxonomyTokens.TOKEN_VOCABULARY, vocabularyName)//
+        .with(TaxonomyTokens.TOKEN_TERM, currentTerm.getName())//
+        .build(), 2);
+
+    currentTerm = null;
   }
 
   @Override
   public void onCancel() {
-    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.VOCABULARY)
-        .with(TaxonomyTokens.TOKEN_TAXONOMY, taxonomyName).with(TaxonomyTokens.TOKEN_VOCABULARY, vocabularyName)
-        .build();
-    placeManager.revealPlace(request);
+    placeManager.revealRelativePlace(
+        new PlaceRequest.Builder().nameToken(Places.VOCABULARY).with(TaxonomyTokens.TOKEN_TAXONOMY, taxonomyName)
+            .with(TaxonomyTokens.TOKEN_VOCABULARY, vocabularyName).build(), 2);
   }
 
   @Override
@@ -188,35 +192,44 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
     currentTerm = termDto;
 
     getView().getTermName().setText(termDto.getName());
-    getView().getTermTitles(termDto.getName(), locales).setValue(termDto.getTitlesArray());
-    getView().getTermDescriptions(termDto.getName(), locales).setValue(termDto.getDescriptionsArray());
+    getView().getTermTitles(termDto.getName()).setValue(termDto.getTitlesArray());
+    getView().getTermDescriptions(termDto.getName()).setValue(termDto.getDescriptionsArray());
     getView().getTermPanel().setVisible(true);
   }
 
   private void saveCurrentTerm() {
     // Save currentTerm titles, descriptions to map
     TermDto t = TermArrayUtils.findTerm(vocabulary.getTermsArray(), currentTerm.getName());
-    t.setDescriptionsArray(getView().getTermDescriptions(currentTerm.getName(), locales).getValue());
-    t.setTitlesArray(getView().getTermTitles(currentTerm.getName(), locales).getValue());
+    t.setDescriptionsArray(getView().getTermDescriptions(currentTerm.getName()).getValue());
+    t.setTitlesArray(getView().getTermTitles(currentTerm.getName()).getValue());
   }
 
   @Override
   public void onAddChild(String text) {
     if(uniqueTermName(text)) {
+      TermDto newTerm = TermDto.create();
+      newTerm.setName(text);
+      JsArray<TermDto> terms = JsArrays.create().cast();
+
       if(currentTerm != null) {
         TermDto t = TermArrayUtils.findTerm(vocabulary.getTermsArray(), currentTerm.getName());
-        TermDto newTerm = TermDto.create();
-        newTerm.setName(text);
 
         if(t.getTermsArray() == null) {
-          t.setTermsArray(JsArrays.create().<JsArray<TermDto>>cast());
+          t.setTermsArray(terms);
         }
 
         t.getTermsArray().push(newTerm);
-        getView().displayVocabulary(vocabulary);
-        getView().clearTermName();
-        onTermSelection(newTerm);
+      } else {
+        // Add at the end of terms
+        for(int i = 0; i < vocabulary.getTermsCount(); i++) {
+          terms.push(vocabulary.getTerms(i));
+        }
+        terms.push(newTerm);
+        vocabulary.setTermsArray(terms);
       }
+      getView().displayVocabulary(vocabulary);
+      getView().clearTermName();
+      onTermSelection(newTerm);
     }
   }
 
@@ -246,9 +259,9 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
           terms.push(vocabulary.getTerms(i));
         }
         terms.push(newTerm);
+        vocabulary.setTermsArray(terms);
       }
 
-      vocabulary.setTermsArray(terms);
       getView().displayVocabulary(vocabulary);
       getView().clearTermName();
       onTermSelection(newTerm);
@@ -277,7 +290,7 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
     for(int i = 0; i < terms.length(); i++) {
 
       // When a term has child terms, a FlowPanel was created for those terms
-      if(vocabulary.getTerms(i).getTermsCount() > 0) newPos--;
+      if(terms.get(i).getTermsCount() > 0) newPos--;
 
       if(!insertAfter) {
         if(i == newPos) {
@@ -285,8 +298,8 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
         }
       }
 
-      if(!vocabulary.getTerms(i).getName().equals(term.getName())) {
-        termsArray.push(vocabulary.getTerms(i));
+      if(!terms.get(i).getName().equals(term.getName())) {
+        termsArray.push(terms.get(i));
       }
 
       if(insertAfter) {
@@ -309,11 +322,11 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
 
   public interface Display extends View, HasBreadcrumbs, HasUiHandlers<VocabularyEditUiHandlers> {
 
-    TakesValue<JsArray<LocaleTextDto>> getTitles(JsArrayString localeTitles);
+    TakesValue<JsArray<LocaleTextDto>> getTitles();
 
     HasText getVocabularyName();
 
-    TakesValue<JsArray<LocaleTextDto>> getDescriptions(JsArrayString localeDescriptions);
+    TakesValue<JsArray<LocaleTextDto>> getDescriptions();
 
     void displayVocabulary(VocabularyDto vocabularyDto);
 
@@ -327,51 +340,15 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
 
     HasText getTermName();
 
-    TakesValue<JsArray<LocaleTextDto>> getTermTitles(String termName, JsArrayString localeTitles);
+    TakesValue<JsArray<LocaleTextDto>> getTermTitles(String termName);
 
-    TakesValue<JsArray<LocaleTextDto>> getTermDescriptions(String termName, JsArrayString localeDescriptions);
+    TakesValue<JsArray<LocaleTextDto>> getTermDescriptions(String termName);
 
     Panel getTermPanel();
 
     void clearTermName();
-  }
 
-  public static class TermArrayUtils {
-    private TermArrayUtils() {}
-
-    public static TermDto findTerm(JsArray<TermDto> terms, String termName) {
-      // find in child
-      for(int i = 0; i < terms.length(); i++) {
-        if(terms.get(i).getName().equals(termName)) {
-          return terms.get(i);
-        }
-
-        // Find in child
-        TermDto t = findTerm(terms.get(i).getTermsArray(), termName);
-        if(t != null) {
-          return t;
-        }
-      }
-
-      return null;
-    }
-
-    public static TermDto findParent(TermDto parent, JsArray<TermDto> terms, TermDto termToFind) {
-      // find in child
-      for(int i = 0; i < terms.length(); i++) {
-        if(terms.get(i).getName().equals(termToFind.getName())) {
-          return parent;
-        }
-
-        // Find in child
-        TermDto t = findParent(terms.get(i), terms.get(i).getTermsArray(), termToFind);
-        if(t != null) {
-          return t;
-        }
-      }
-
-      return null;
-    }
+    void setAvailableLocales(JsArrayString locales);
   }
 
 }

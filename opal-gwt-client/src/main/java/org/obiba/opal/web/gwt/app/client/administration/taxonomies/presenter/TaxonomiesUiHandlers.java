@@ -8,7 +8,9 @@ public interface TaxonomiesUiHandlers extends UiHandlers {
 
   void onTaxonomySelection(TaxonomyDto taxonomyDto);
 
-  void onVocabularySelection(String taxonomyName, String vocabularyName);
+  void onAddTaxonomy();
 
-  void showAddTaxonomy();
+  void onTaxonomyEdit(TaxonomyDto taxonomyDto);
+
+  void onVocabularySelection(String name, String vocabulary);
 }

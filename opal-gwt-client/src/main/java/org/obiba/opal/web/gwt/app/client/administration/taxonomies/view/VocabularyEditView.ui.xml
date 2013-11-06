@@ -10,13 +10,6 @@
     <g:FlowPanel addStyleNames="page-header">
       <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
-    <b:FluidRow addStyleNames="page-header">
-      <b:Column size="9">
-        <b:Heading size="3">
-          <ui:msg description="Vocabulary label">Vocabulary</ui:msg>
-        </b:Heading>
-      </b:Column>
-    </b:FluidRow>
     <b:FluidRow>
       <b:Column size="12">
         <b:FluidRow>
