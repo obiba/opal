@@ -10,11 +10,12 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
-import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -34,30 +35,27 @@ public class TaxonomiesPresenter extends Presenter<TaxonomiesPresenter.Display, 
   @NameToken(Places.TAXONOMIES)
   public interface Proxy extends ProxyPlace<TaxonomiesPresenter> {}
 
-  public interface Display extends View, HasUiHandlers<TaxonomiesUiHandlers> {
-    void setTaxonomies(JsArray<TaxonomyDto> taxonomies);
-  }
-
   private final PlaceManager placeManager;
 
   private JsArray<TaxonomyDto> taxonomies;
 
   private final Translations translations;
 
-  private final ModalProvider<AddTaxonomyModalPresenter> addTaxonomyModalProvider;
+  private final ModalProvider<TaxonomyEditModalPresenter> taxonomyEditModalProvider;
 
   private final BreadcrumbsBuilder breadcrumbsBuilder;
 
   @Inject
   public TaxonomiesPresenter(Display display, EventBus eventBus, Proxy proxy, PlaceManager placeManager,
-      Translations translations, ModalProvider<AddTaxonomyModalPresenter> addTaxonomyModalProvider,
+      Translations translations, ModalProvider<TaxonomyEditModalPresenter> taxonomyEditModalProvider,
       BreadcrumbsBuilder breadcrumbsBuilder) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     this.placeManager = placeManager;
     this.breadcrumbsBuilder = breadcrumbsBuilder;
     getView().setUiHandlers(this);
     this.translations = translations;
-    this.addTaxonomyModalProvider = addTaxonomyModalProvider.setContainer(this);
+    this.taxonomyEditModalProvider = taxonomyEditModalProvider.setContainer(this);
+    setHistoryTokens();
   }
 
   @TitleFunction
@@ -68,23 +66,25 @@ public class TaxonomiesPresenter extends Presenter<TaxonomiesPresenter.Display, 
   @Override
   public void onBind() {
     super.onBind();
-    registerHandler(getEventBus().addHandler(TaxonomyCreatedEvent.getType(), new TaxonomyCreatedEvent.Handler() {
-      @Override
-      public void onProjectCreated(TaxonomyCreatedEvent event) {
-        refresh();
-      }
-    }));
+    registerHandler(
+        getEventBus().addHandler(TaxonomyCreatedEvent.getType(), new TaxonomyCreatedEvent.TaxonomyCreatedHandler() {
+          @Override
+          public void onTaxonomyCreated(TaxonomyCreatedEvent event) {
+            refresh();
+          }
+        }));
   }
 
   @Override
   protected void onReveal() {
     super.onReveal();
-//    breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs()).build();
+    breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs()).build();
     refresh();
   }
 
-  public void refresh() {
-    ResourceRequestBuilderFactory.<JsArray<TaxonomyDto>>newBuilder().forResource("/system/conf/taxonomies").get()
+  void refresh() {
+    ResourceRequestBuilderFactory.<JsArray<TaxonomyDto>>newBuilder()
+        .forResource(UriBuilders.SYSTEM_CONF_TAXONOMIES.create().build()).get()
         .withCallback(new ResourceCallback<JsArray<TaxonomyDto>>() {
           @Override
           public void onResource(Response response, JsArray<TaxonomyDto> resource) {
@@ -102,15 +102,33 @@ public class TaxonomiesPresenter extends Presenter<TaxonomiesPresenter.Display, 
   }
 
   @Override
-  public void onVocabularySelection(TaxonomyDto taxonomyDto, VocabularyDto vocabularyDto) {
-    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.VOCABULARY)
-        .with(TaxonomyTokens.TOKEN_TAXONOMY, taxonomyDto.getName())
-        .with(TaxonomyTokens.TOKEN_VOCABULARY, vocabularyDto.getName()).build();
-    placeManager.revealPlace(request);
+  public void onTaxonomyEdit(TaxonomyDto taxonomyDto) {
+    taxonomyEditModalProvider.get().initView(taxonomyDto);
   }
 
   @Override
-  public void showAddTaxonomy() {
-    addTaxonomyModalProvider.get();
+  public void onAddTaxonomy() {
+    taxonomyEditModalProvider.get().initView(TaxonomyDto.create());
+  }
+
+  @Override
+  public void onVocabularySelection(String name, String vocabulary) {
+    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.VOCABULARY)
+        .with(TaxonomyTokens.TOKEN_TAXONOMY, name).with(TaxonomyTokens.TOKEN_VOCABULARY, vocabulary).build();
+    placeManager.revealRelativePlace(request, 2);
+  }
+
+  private void setHistoryTokens() {
+    getView().setGeneralConfigHistoryToken(
+        placeManager.buildRelativeHistoryToken(new PlaceRequest.Builder().nameToken(Places.SERVER).build(), 1));
+  }
+
+  public interface Display extends View, HasUiHandlers<TaxonomiesUiHandlers> {
+
+    void setGeneralConfigHistoryToken(String historyToken);
+
+    void setTaxonomies(JsArray<TaxonomyDto> taxonomies);
+
+    HasWidgets getBreadcrumbs();
   }
 }

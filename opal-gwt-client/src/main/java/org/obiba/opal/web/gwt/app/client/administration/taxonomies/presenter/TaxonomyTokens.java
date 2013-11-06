@@ -16,4 +16,5 @@ public class TaxonomyTokens {
 
   public static final String TOKEN_VOCABULARY = "vocabulary";
 
+  public static final String TOKEN_TERM = "term";
 }

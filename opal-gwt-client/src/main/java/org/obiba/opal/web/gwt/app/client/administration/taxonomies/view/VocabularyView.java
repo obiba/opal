@@ -1,7 +1,9 @@
 package org.obiba.opal.web.gwt.app.client.administration.taxonomies.view;
 
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TermArrayUtils;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.VocabularyPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.VocabularyUiHandlers;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.LocalizedLabel;
 import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
@@ -11,8 +13,10 @@ import org.obiba.opal.web.model.client.opal.VocabularyDto;
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.NavList;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -30,7 +34,11 @@ import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> implements VocabularyPresenter.Display {
 
+  private final Translations translations;
+
   interface ViewUiBinder extends UiBinder<Widget, VocabularyView> {}
+
+  JsArrayString locales;
 
   @UiField
   Breadcrumbs breadcrumbs;
@@ -53,10 +61,13 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
   @UiField
   FlowPanel termsLinks;
 
+  @UiField
+  FlowPanel termPropertiesPanel;
+
   @Inject
-  public VocabularyView(ViewUiBinder viewUiBinder) {
+  public VocabularyView(ViewUiBinder viewUiBinder, Translations translations) {
+    this.translations = translations;
     initWidget(viewUiBinder.createAndBindUi(this));
-    termProperties.setVisible(false);
   }
 
   @Override
@@ -70,33 +81,43 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
   }
 
   @Override
-  public void displayVocabulary(VocabularyDto vocabulary, String taxonomyName) {
+  public void displayVocabulary(VocabularyDto vocabulary, String taxonomyName, String termName) {
+
     vocabularyName.setText(vocabulary.getName());
     vocabularyProperties.clearProperties();
-    vocabularyProperties.addProperty("Name", vocabulary.getName());
-    vocabularyProperties.addProperty(new Label("Title"), getLocalizedText(vocabulary.getTitlesArray()));
-    vocabularyProperties.addProperty(new Label("Description"), getLocalizedText(vocabulary.getDescriptionsArray()));
-    vocabularyProperties.addProperty("Taxonomy", taxonomyName);
-    vocabularyProperties.addProperty("Repeatable", Boolean.toString(vocabulary.getRepeatable())); // Translations
+    vocabularyProperties.addProperty(translations.nameLabel(), vocabulary.getName());
+    vocabularyProperties
+        .addProperty(new Label(translations.titleLabel()), getLocalizedText(vocabulary.getTitlesArray()));
+    vocabularyProperties
+        .addProperty(new Label(translations.descriptionLabel()), getLocalizedText(vocabulary.getDescriptionsArray()));
+    vocabularyProperties.addProperty(translations.taxonomyLabel(), taxonomyName);
+    vocabularyProperties
+        .addProperty(translations.repeatableLabel(), Boolean.toString(vocabulary.getRepeatable())); // Translations
 
-    displayTerms(vocabulary);
-  }
-
-  private void displayTerms(VocabularyDto vocabularyDto) {
     termsLinks.clear();
+    NavList navList = new NavList();
+    getTermsLinks(navList, vocabulary.getTermsArray(), 0);
+    termsLinks.add(navList);
 
-    addTermsLinks(vocabularyDto.getTermsArray(), 0);
+    displayTerm(TermArrayUtils.findTerm(vocabulary.getTermsArray(), termName));
   }
 
-  private void addTermsLinks(final JsArray<TermDto> terms, int level) {
-
-    SafeHtml indent = SafeHtmlUtils.fromString("");
-    for(int i = 1; i < level; i++) {
-      indent = SafeHtmlUtils.fromTrustedString(indent.asString() + "&nbsp;&nbsp;&nbsp;&nbsp;");
-    }
+  private void getTermsLinks(NavList navList, final JsArray<TermDto> terms, int level) {
 
     for(int i = 0; i < terms.length(); i++) {
-      NavLink link = new NavLink(terms.get(i).getName());
+      SafeHtml indent = SafeHtmlUtils.fromString("");
+      for(int j = 0; j < level; j++) {
+        indent = SafeHtmlUtils.fromTrustedString(indent.asString() + "&nbsp;&nbsp;&nbsp;&nbsp;");
+      }
+      InlineHTML spacer = new InlineHTML(indent);
+      spacer.addStyleName("inline-block");
+
+      NavLink link = new NavLink();
+
+      link.add(spacer);
+      NavLink linkTitle = new NavLink(terms.get(i).getName());
+      linkTitle.addStyleName("inline-block");
+      link.add(linkTitle);
       final int finalI = i;
       link.addClickHandler(new ClickHandler() {
         @Override
@@ -106,30 +127,27 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
       });
       link.addStyleName("inline");
 
-      InlineHTML spacer = new InlineHTML(indent);
-      spacer.addStyleName("inline-block");
-
-      FlowPanel p = new FlowPanel();
-      p.add(spacer);
-      p.add(link);
-
-      termsLinks.add(p);
+      navList.add(link);
 
       if(terms.get(i).getTermsCount() > 0) {
-        addTermsLinks(terms.get(i).getTermsArray(), level + 1);
+        getTermsLinks(navList, terms.get(i).getTermsArray(), level + 1);
       }
     }
   }
 
   @Override
   public void displayTerm(TermDto termDto) {
-    termTitle.setText(termDto.getName());
-
-    termProperties.setVisible(true);
     termProperties.clearProperties();
-    termProperties.addProperty("Name", termDto.getName());
-    termProperties.addProperty(new Label("Title"), getLocalizedText(termDto.getTitlesArray()));
-    termProperties.addProperty(new Label("Description"), getLocalizedText(termDto.getDescriptionsArray()));
+    if(termDto != null) {
+      termPropertiesPanel.setVisible(true);
+      termTitle.setText(termDto.getName());
+      termProperties.addProperty(translations.nameLabel(), termDto.getName());
+      termProperties.addProperty(new Label(translations.titleLabel()), getLocalizedText(termDto.getTitlesArray()));
+      termProperties
+          .addProperty(new Label(translations.descriptionLabel()), getLocalizedText(termDto.getDescriptionsArray()));
+    } else {
+      termPropertiesPanel.setVisible(false);
+    }
   }
 
   private Widget getLocalizedText(JsArray<LocaleTextDto> texts) {

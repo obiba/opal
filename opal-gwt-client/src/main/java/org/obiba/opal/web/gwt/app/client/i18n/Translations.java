@@ -473,7 +473,8 @@ public interface Translations extends Constants {
       "DatabaseAlreadyExists", "Database named {0} already exists", //
       "VcsScriptContentInfo", "The retrieved script content is from '{0}' committed by '{1}'.", //
       "GeneralConfigSaved", "Opal general configuration was successfully saved.", //
-      "PostInstallNotCompleted", "Post-install configuration not completed." })
+      "PostInstallNotCompleted", "Post-install configuration not completed.",//
+      "TermNameMustBeUnique", "Term name must be unique" })
   Map<String, String> userMessageMap();
 
   @Description("Missing label")
@@ -1903,9 +1904,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("Projects")
   String pageProjectsTitle();
 
-  @Description("Page Configuration title")
-  @DefaultStringValue("Configuration")
-  String pageConfigurationTitle();
+  @Description("Page General Configuration title")
+  @DefaultStringValue("General Configuration")
+  String pageGeneralConfigurationTitle();
 
   @Description("Page Taxonomies title")
   @DefaultStringValue("Taxonomies")
@@ -1914,6 +1915,14 @@ public interface Translations extends Constants {
   @Description("Add Taxonomy")
   @DefaultStringValue("Add Taxonomy")
   String addTaxonomy();
+
+  @Description("Edit Taxonomy")
+  @DefaultStringValue("Edit Taxonomy")
+  String editTaxonomy();
+
+  @Description("Page Vocabulary title")
+  @DefaultStringValue("Vocabulary")
+  String pageVocabularyTitle();
 
   @Description("Add Vocabulary")
   @DefaultStringValue("Add Vocabulary")
@@ -2272,4 +2281,33 @@ public interface Translations extends Constants {
   @Description("Project Database Name label")
   @DefaultStringValue("Project tables (dictionaries and data) are stored in the database:")
   String projectDatabaseName();
+
+  @Description("Default Character Set label")
+  @DefaultStringValue("Default Character Set")
+  String defaultCharsetLabel();
+
+  @Description("Public URL label")
+  @DefaultStringValue("Public URL")
+  String publicUrl();
+
+  @Description("Vocabularies label")
+  @DefaultStringValue("Vocabularies")
+  String vocabulariesLabel();
+
+  @Description("New vocabulary name label")
+  @DefaultStringValue("New vocabulary name")
+  String newVocabularyNameLabel();
+
+  @Description("Description label")
+  @DefaultStringValue("Description")
+  String descriptionLabel();
+
+  @Description("Taxonomy label")
+  @DefaultStringValue("Taxonomy")
+  String taxonomyLabel();
+
+  @Description("New term name label")
+  @Constants.DefaultStringValue("New term name...")
+  String newTermNameLabel();
+
 }

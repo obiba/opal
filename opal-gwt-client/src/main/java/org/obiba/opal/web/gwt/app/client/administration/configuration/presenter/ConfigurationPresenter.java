@@ -1,5 +1,6 @@
 package org.obiba.opal.web.gwt.app.client.administration.configuration.presenter;
 
+import org.obiba.opal.web.gwt.app.client.administration.configuration.event.GeneralConfigSavedEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
@@ -41,12 +42,6 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
   @NameToken(Places.SERVER)
   public interface Proxy extends ProxyPlace<ConfigurationPresenter> {}
 
-  public interface Display extends View, HasUiHandlers<ConfigurationUiHandlers>, HasBreadcrumbs {
-    void setTaxonomiesHistoryToken(String historyToken);
-
-    void renderGeneralProperties(GeneralConf resource);
-  }
-
   private static final Translations translations = GWT.create(Translations.class);
 
   private final PlaceManager placeManager;
@@ -67,7 +62,7 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
 
   @TitleFunction
   public String getTitle() {
-    return translations.pageConfigurationTitle();
+    return translations.pageGeneralConfigurationTitle();
   }
 
   @Override
@@ -78,6 +73,19 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
 
   @Override
   protected void onBind() {
+    refresh();
+
+    registerHandler(getEventBus()
+        .addHandler(GeneralConfigSavedEvent.getType(), new GeneralConfigSavedEvent.GeneralConfigSavedHandler() {
+          @Override
+          public void onGeneralConfigSaved(GeneralConfigSavedEvent event) {
+            refresh();
+          }
+        }));
+
+  }
+
+  private void refresh() {
     ResourceRequestBuilderFactory.<GeneralConf>newBuilder()//
         .forResource("/system/conf/general").withCallback(new ResourceCallback<GeneralConf>() {
 
@@ -97,7 +105,12 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
 
   private void setHistoryTokens() {
     getView().setTaxonomiesHistoryToken(
-        placeManager.buildRelativeHistoryToken(new PlaceRequest.Builder().nameToken(Places.TAXONOMIES).build(), 2));
+        placeManager.buildRelativeHistoryToken(new PlaceRequest.Builder().nameToken(Places.TAXONOMIES).build(), 1));
   }
 
+  public interface Display extends View, HasUiHandlers<ConfigurationUiHandlers>, HasBreadcrumbs {
+    void setTaxonomiesHistoryToken(String historyToken);
+
+    void renderGeneralProperties(GeneralConf resource);
+  }
 }

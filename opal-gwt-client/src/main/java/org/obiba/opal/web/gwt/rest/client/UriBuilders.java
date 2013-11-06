@@ -107,6 +107,39 @@ public enum UriBuilders {
     public UriBuilder create() {
       return UriBuilder.create().segment("datasource", "{}", "table", "{}", "locales");
     }
+  },
+
+  SYSTEM_CONF_GENERAL {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "conf", "general");
+
+    }
+  },
+
+  SYSTEM_CONF_TAXONOMIES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "conf", "taxonomies");
+
+    }
+  },
+
+  SYSTEM_CONF_TAXONOMY_VOCABULARY {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "conf", "taxonomy", "{}", "vocabulary", "{}");
+
+    }
+  },
+
+  SYSTEM_CONF_TAXONOMY {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "conf", "taxonomy", "{}");
+
+    }
   };
+
   public abstract UriBuilder create();
 }
