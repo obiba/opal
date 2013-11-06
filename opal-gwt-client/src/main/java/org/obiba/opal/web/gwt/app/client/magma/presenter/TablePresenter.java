@@ -322,6 +322,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     }//
         .withQuery(getView().getFilter().getText())//
         .withVariable(true)//
+        .withLimit(table.getVariableCount())//
         .withSortDir(
             sortAscending == null || sortAscending ? VariablesFilter.SORT_ASCENDING : VariablesFilter.SORT_DESCENDING)//
         .filter(getEventBus(), table);
@@ -567,6 +568,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     }//
         .withVariable(true)//
         .withQuery(query)//
+        .withLimit(table.getVariableCount())//
         .withSortDir(
             sortAscending == null || sortAscending ? VariablesFilter.SORT_ASCENDING : VariablesFilter.SORT_DESCENDING)//
         .filter(getEventBus(), table);
