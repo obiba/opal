@@ -412,6 +412,12 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   }
 
   @Override
+  public void resetTabs() {
+    TabPanelHelper.setTabActive(tabPanel, tabPanel.getSelectedTab(), false);
+    TabPanelHelper.setTabActive(tabPanel, DICTIONARY_TAB_INDEX, true);
+  }
+
+  @Override
   public HasAuthorization getEditAuthorizer() {
     return new CompositeAuthorizer(new WidgetAuthorizer(remove), new WidgetAuthorizer(editScript));
   }
@@ -431,8 +437,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @Override
   public void setDerivedVariable(boolean derived, String value) {
     TabPanelHelper.setTabVisible(tabPanel, SCRIPT_TAB_INDEX, derived);
-    TabPanelHelper.setTabActive(tabPanel, SCRIPT_TAB_INDEX, derived);
-    TabPanelHelper.setTabActive(tabPanel, DICTIONARY_TAB_INDEX, !derived);
     scriptHeaderPanel.setVisible(derived);
     noScript.setVisible(derived && value.isEmpty());
     script.setVisible(derived && !value.isEmpty());
