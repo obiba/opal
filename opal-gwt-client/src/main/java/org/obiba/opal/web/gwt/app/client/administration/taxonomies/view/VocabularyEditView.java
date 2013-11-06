@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.VocabularyEditUiHandlers;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.utils.TermArrayUtils;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.LocalizedEditableText;
@@ -51,9 +53,12 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 import static org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.VocabularyEditPresenter.Display;
-import static org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.VocabularyEditPresenter.TermArrayUtils;
 
 public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandlers> implements Display {
+
+  private final Translations translations;
+
+  private JsArrayString locales;
 
   interface ViewUiBinder extends UiBinder<Widget, VocabularyEditView> {}
 
@@ -127,9 +132,10 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
   FlowPanel termDescriptions;
 
   @Inject
-  public VocabularyEditView(ViewUiBinder viewUiBinder) {
+  public VocabularyEditView(ViewUiBinder viewUiBinder, Translations translations) {
+    this.translations = translations;
     initWidget(viewUiBinder.createAndBindUi(this));
-    newTermName.setPlaceholder("New term name...");
+    newTermName.setPlaceholder(translations.newTermNameLabel());
   }
 
   @Override
@@ -138,8 +144,8 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
   }
 
   @Override
-  public TakesValue<JsArray<LocaleTextDto>> getTitles(JsArrayString localeTitles) {
-    return new LocaleTextDtoTakesValue(vocabularyTitles, localeTitles) {
+  public TakesValue<JsArray<LocaleTextDto>> getTitles() {
+    return new LocaleTextDtoTakesValue(vocabularyTitles, locales) {
       @Override
       public Map<String, LocalizedEditableText> getLocalizedEditableTextMap() {
         return vocabularyTitleTexts;
@@ -153,8 +159,8 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
   }
 
   @Override
-  public TakesValue<JsArray<LocaleTextDto>> getDescriptions(JsArrayString localeDescriptions) {
-    return new LocaleTextDtoTakesValue(vocabularyDescriptions, localeDescriptions) {
+  public TakesValue<JsArray<LocaleTextDto>> getDescriptions() {
+    return new LocaleTextDtoTakesValue(vocabularyDescriptions, locales) {
       @Override
       public Map<String, LocalizedEditableText> getLocalizedEditableTextMap() {
         return vocabularyDescriptionTexts;
@@ -192,8 +198,8 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
   }
 
   @Override
-  public TakesValue<JsArray<LocaleTextDto>> getTermTitles(final String title, JsArrayString localeTitles) {
-    return new LocaleTextDtoTakesValue(termTitles, localeTitles) {
+  public TakesValue<JsArray<LocaleTextDto>> getTermTitles(final String title) {
+    return new LocaleTextDtoTakesValue(termTitles, locales) {
       @Override
       public Map<String, LocalizedEditableText> getLocalizedEditableTextMap() {
         if(!termsTitleTexts.containsKey(title)) {
@@ -206,8 +212,8 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
   }
 
   @Override
-  public TakesValue<JsArray<LocaleTextDto>> getTermDescriptions(final String title, JsArrayString localeDescriptions) {
-    return new LocaleTextDtoTakesValue(termDescriptions, localeDescriptions) {
+  public TakesValue<JsArray<LocaleTextDto>> getTermDescriptions(final String title) {
+    return new LocaleTextDtoTakesValue(termDescriptions, locales) {
       @Override
       public Map<String, LocalizedEditableText> getLocalizedEditableTextMap() {
         if(!termsDescriptionTexts.containsKey(title)) {
@@ -264,7 +270,7 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
     if(nb > 0) {
 
       DropController flowPanelDropController = new FlowPanelDropController(target);
-      dragController.addDragHandler(new TermDragHandlerAdapter(target, vocabulary));
+      dragController.addDragHandler(new TermDragHandlerAdapter(target));
       dragController.registerDropController(flowPanelDropController);
 
       for(int i = 0; i < nb; i++) {
@@ -356,6 +362,17 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
     return focusPanel;
   }
 
+  @Override
+  public void setAvailableLocales(JsArrayString locales) {
+    this.locales = locales;
+
+    // reset maps of titles and descriptions
+    vocabularyTitleTexts.clear();
+    vocabularyDescriptionTexts.clear();
+    termsDescriptionTexts.clear();
+    termsTitleTexts.clear();
+  }
+
   private abstract class LocaleTextDtoTakesValue implements TakesValue<JsArray<LocaleTextDto>> {
 
     FlowPanel target;
@@ -423,15 +440,12 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
   private class TermDragHandlerAdapter extends DragHandlerAdapter {
     private final FlowPanel target;
 
-    private final VocabularyDto vocabulary;
-
     int original;
 
     boolean insertAfter = true;
 
-    private TermDragHandlerAdapter(FlowPanel target, VocabularyDto vocabulary) {
+    private TermDragHandlerAdapter(FlowPanel target) {
       this.target = target;
-      this.vocabulary = vocabulary;
       original = 0;
     }
 

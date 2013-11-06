@@ -57,9 +57,9 @@ public final class Places {
 
   public static final String TAXONOMY = ADMINISTRATION + ".taxonomy";
 
-  public static final String VOCABULARY = ADMINISTRATION + TAXONOMY + ".vocabulary";
+  public static final String VOCABULARY = ADMINISTRATION + ".vocabulary";
 
-  public static final String VOCABULARY_EDIT = ADMINISTRATION + TAXONOMY + ".vocabulary.edit";
+  public static final String VOCABULARY_EDIT = ADMINISTRATION + ".vocabulary.edit";
 
   private Places() {}
 

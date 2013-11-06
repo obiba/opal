@@ -48,16 +48,12 @@ import org.obiba.opal.web.gwt.app.client.administration.jvm.view.JVMView;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.view.RAdministrationView;
-import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.AddTaxonomyModalPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.AddVocabularyModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomiesPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomyPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomyEditModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.VocabularyEditPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.VocabularyPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.AddTaxonomyModalView;
-import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.AddVocabularyModalView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomiesView;
-import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomyView;
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomyEditModalView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.VocabularyEditView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.VocabularyView;
 import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserAdministrationPresenter;
@@ -103,16 +99,12 @@ public class AdministrationModule extends AbstractPresenterModule {
   private void configureTaxonomies() {
     bindPresenter(TaxonomiesPresenter.class, TaxonomiesPresenter.Display.class, TaxonomiesView.class,
         TaxonomiesPresenter.Proxy.class);
-    bindPresenterWidget(AddTaxonomyModalPresenter.class, AddTaxonomyModalPresenter.Display.class,
-        AddTaxonomyModalView.class);
-    bindPresenter(TaxonomyPresenter.class, TaxonomyPresenter.Display.class, TaxonomyView.class,
-        TaxonomyPresenter.Proxy.class);
+    bindPresenterWidget(TaxonomyEditModalPresenter.class, TaxonomyEditModalPresenter.Display.class,
+        TaxonomyEditModalView.class);
     bindPresenter(VocabularyPresenter.class, VocabularyPresenter.Display.class, VocabularyView.class,
         VocabularyPresenter.Proxy.class);
     bindPresenter(VocabularyEditPresenter.class, VocabularyEditPresenter.Display.class, VocabularyEditView.class,
         VocabularyEditPresenter.Proxy.class);
-    bindPresenterWidget(AddVocabularyModalPresenter.class, AddVocabularyModalPresenter.Display.class,
-        AddVocabularyModalView.class);
   }
 
   private void configureUserGroups() {

@@ -50,6 +50,8 @@ public class VocabularyPresenter extends Presenter<Display, VocabularyPresenter.
 
   private String vocabularyName;
 
+  private String termName;
+
   @Inject
   public VocabularyPresenter(Display display, EventBus eventBus, Proxy proxy, PlaceManager placeManager,
       Translations translations, BreadcrumbsBuilder breadcrumbsBuilder) {
@@ -65,6 +67,7 @@ public class VocabularyPresenter extends Presenter<Display, VocabularyPresenter.
     super.prepareFromRequest(request);
     taxonomyName = request.getParameter(TaxonomyTokens.TOKEN_TAXONOMY, null);
     vocabularyName = request.getParameter(TaxonomyTokens.TOKEN_VOCABULARY, null);
+    termName = request.getParameter(TaxonomyTokens.TOKEN_TERM, null);
 
     refresh();
   }
@@ -82,7 +85,7 @@ public class VocabularyPresenter extends Presenter<Display, VocabularyPresenter.
 
           @Override
           public void onResource(Response response, VocabularyDto resource) {
-            getView().displayVocabulary(resource, taxonomyName);
+            getView().displayVocabulary(resource, taxonomyName, termName);
 
           }
         }).send();
@@ -101,16 +104,14 @@ public class VocabularyPresenter extends Presenter<Display, VocabularyPresenter.
 
   @Override
   public void onEditVocabulary() {
-    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.VOCABULARY_EDIT)
-        .with(TaxonomyTokens.TOKEN_TAXONOMY, taxonomyName).with(TaxonomyTokens.TOKEN_VOCABULARY, vocabularyName)
-        .build();
-    placeManager.revealPlace(request);
-
+    placeManager.revealRelativePlace(
+        new PlaceRequest.Builder().nameToken(Places.VOCABULARY_EDIT).with(TaxonomyTokens.TOKEN_TAXONOMY, taxonomyName)
+            .with(TaxonomyTokens.TOKEN_VOCABULARY, vocabularyName).build(), 2);
   }
 
   public interface Display extends View, HasBreadcrumbs, HasUiHandlers<VocabularyUiHandlers> {
 
-    void displayVocabulary(VocabularyDto vocabulary, String taxonomyName);
+    void displayVocabulary(VocabularyDto vocabulary, String taxonomyName, String termName);
 
     void displayTerm(TermDto termDto);
   }

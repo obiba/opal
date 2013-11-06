@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.system;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -44,6 +45,12 @@ public class TaxonomyResource {
   @PUT
   public Response updateTaxonomy(Opal.TaxonomyDto dto) {
     taxonomyService.saveTaxonomy(new Taxonomy(name), Dtos.fromDto(dto));
+    return Response.ok().build();
+  }
+
+  @DELETE
+  public Response deleteTaxonomy() {
+    taxonomyService.deleteTaxonomy(name);
     return Response.ok().build();
   }
 
