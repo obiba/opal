@@ -215,22 +215,10 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
       newTerm.setName(text);
       JsArray<TermDto> terms = JsArrays.create().cast();
 
-      if(currentTerm != null) {
-        TermDto t = TermArrayUtils.findTerm(vocabulary.getTermsArray(), currentTerm.getName());
+      TermDto t = TermArrayUtils.findTerm(vocabulary.getTermsArray(), currentTerm.getName());
 
-        if(t.getTermsArray() == null) {
-          t.setTermsArray(terms);
-        }
+      addTerm(newTerm, terms, t);
 
-        t.getTermsArray().push(newTerm);
-      } else {
-        // Add at the end of terms
-        for(int i = 0; i < vocabulary.getTermsCount(); i++) {
-          terms.push(vocabulary.getTerms(i));
-        }
-        terms.push(newTerm);
-        vocabulary.setTermsArray(terms);
-      }
       getView().displayVocabulary(vocabulary);
       getView().clearTermName();
       onTermSelection(newTerm);
@@ -246,28 +234,32 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
 
       TermDto t = TermArrayUtils.findParent(null, vocabulary.getTermsArray(), currentTerm);
 
-      if(t != null) {
-        for(int i = 0; i < t.getTermsCount(); i++) {
-          terms.push(t.getTerms(i));
-
-          // Add after sibling
-          if(t.getTerms(i).getName().equals(currentTerm.getName())) {
-            terms.push(newTerm);
-          }
-        }
-
-        t.setTermsArray(terms);
-      } else {
-        for(int i = 0; i < vocabulary.getTermsCount(); i++) {
-          terms.push(vocabulary.getTerms(i));
-        }
-        terms.push(newTerm);
-        vocabulary.setTermsArray(terms);
-      }
+      addTerm(newTerm, terms, t);
 
       getView().displayVocabulary(vocabulary);
       getView().clearTermName();
       onTermSelection(newTerm);
+    }
+  }
+
+  private void addTerm(TermDto newTerm, JsArray<TermDto> terms, TermDto t) {
+    if(t != null) {
+      for(int i = 0; i < t.getTermsCount(); i++) {
+        terms.push(t.getTerms(i));
+
+        // Add after sibling
+        if(t.getTerms(i).getName().equals(currentTerm.getName())) {
+          terms.push(newTerm);
+        }
+      }
+
+      t.setTermsArray(terms);
+    } else {
+      for(int i = 0; i < vocabulary.getTermsCount(); i++) {
+        terms.push(vocabulary.getTerms(i));
+      }
+      terms.push(newTerm);
+      vocabulary.setTermsArray(terms);
     }
   }
 

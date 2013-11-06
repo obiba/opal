@@ -27,6 +27,8 @@ public class TermArrayUtils {
   }
 
   public static TermDto findParent(TermDto parent, JsArray<TermDto> terms, TermDto termToFind) {
+    if(termToFind == null) return null;
+
     // find in child
     for(int i = 0; i < terms.length(); i++) {
       if(terms.get(i).getName().equals(termToFind.getName())) {
