@@ -1,8 +1,8 @@
 package org.obiba.opal.web.gwt.app.client.administration.taxonomies.view;
 
+import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TermArrayUtils;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.VocabularyPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.VocabularyUiHandlers;
-import org.obiba.opal.web.gwt.app.client.administration.taxonomies.utils.TermArrayUtils;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.LocalizedLabel;
 import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
