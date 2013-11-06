@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.HasCollection;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
@@ -64,10 +65,13 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
 public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewStepPresenter.Display> {
 
   public static final WizardType WizardType = new WizardType();
+
+  private final PlaceManager placeManager;
 
   public static class Wizard extends WizardProxy<CreateViewStepPresenter> {
 
@@ -91,9 +95,11 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
   //
 
   @Inject
-  public CreateViewStepPresenter(Display display, EventBus eventBus, FileSelectionPresenter fileSelectionPresenter) {
+  public CreateViewStepPresenter(Display display, EventBus eventBus, FileSelectionPresenter fileSelectionPresenter,
+      PlaceManager placeManager) {
     super(eventBus, display);
     this.fileSelectionPresenter = fileSelectionPresenter;
+    this.placeManager = placeManager;
   }
 
   @Override
@@ -134,7 +140,7 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
   @Override
   protected void onClose() {
     super.onClose();
-    getEventBus().fireEvent(new DatasourceUpdatedEvent(datasourceDto));
+    placeManager.revealPlace(ProjectPlacesHelper.getDatasourcePlace(datasourceDto.getName()));
   }
 
   @Override
