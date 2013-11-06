@@ -112,8 +112,6 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
     conclusionPresenter.bind();
     getView().setConclusionDisplay(conclusionPresenter.getView());
-
-    initDatasources();
     addEventHandlers();
   }
 
@@ -121,19 +119,6 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   protected void onUnbind() {
     super.onUnbind();
     datasourceName = null;
-  }
-
-  private void initDatasources() {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
-        .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
-          @Override
-          public void onResource(Response response, JsArray<DatasourceDto> resource) {
-            getView().setDatasources(JsArrays.toSafeArray(resource));
-            if(datasourceName != null) {
-              getView().setSelectedDatasource(datasourceName);
-            }
-          }
-        }).send();
   }
 
   protected void addEventHandlers() {
@@ -148,7 +133,6 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   public void onWizardRequired(WizardRequiredEvent event) {
     if(event.getEventParameters().length > 0) {
       datasourceName = (String) event.getEventParameters()[0];
-      getView().setSelectedDatasource(datasourceName);
     }
   }
 
@@ -247,15 +231,9 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
     void hideErrors();
 
-    String getSelectedDatasource();
-
     HasText getSpssEntityType();
 
     String getLocale();
-
-    void setSelectedDatasource(String dsName);
-
-    void setDatasources(JsArray<DatasourceDto> datasources);
 
     void setConclusionDisplay(ConclusionStepPresenter.Display display);
 
@@ -282,7 +260,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
         @Override
         public void onResource(Response response, DatasourceDto resource) {
           if(response.getStatusCode() == SC_CREATED) {
-            comparedDatasourcesReportPresenter.compare(resource.getName(), getView().getSelectedDatasource(),
+            comparedDatasourcesReportPresenter.compare(resource.getName(), datasourceName,
                 getView().getDatasourceCreatedCallback(), factory, resource);
           }
         }

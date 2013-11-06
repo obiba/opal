@@ -75,3 +75,7 @@ a:hover {
 .table select, .table textarea, .table input {
   margin-bottom: 0;
 }
+
+.typeahead {
+  z-index: 10000;
+}

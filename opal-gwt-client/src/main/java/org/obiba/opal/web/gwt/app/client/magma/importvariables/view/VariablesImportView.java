@@ -31,22 +31,19 @@ import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Modal;
+import com.github.gwtbootstrap.client.ui.Paragraph;
+import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -79,19 +76,13 @@ public class VariablesImportView extends ModalViewImpl implements VariablesImpor
   Button downloadExcelTemplateButton;
 
   @UiField
-  Label failed;
+  Paragraph failed;
 
   @UiField
   DatasourceParsingErrorPanel datasourceParsingErrors;
 
   @UiField
-  ListBox datasources;
-
-  @UiField
-  Label destinationLabel;
-
-  @UiField
-  FlowPanel spssPanel;
+  DisclosurePanel options;
 
   @UiField
   CharacterSetView charsetView;
@@ -125,7 +116,7 @@ public class VariablesImportView extends ModalViewImpl implements VariablesImpor
   }
 
   private void initWizardDialog() {
-    spssPanel.setVisible(false);
+    options.setVisible(false);
 
     stepChain = WizardStepChain.Builder.create(dialog)//
         .append(fileSelectionStep)//
@@ -135,7 +126,6 @@ public class VariablesImportView extends ModalViewImpl implements VariablesImpor
           @Override
           public void onReset() {
             fileSelection.clearFile();
-            datasources.setSelectedIndex(0);
             hideErrors();
           }
         })//
@@ -165,31 +155,6 @@ public class VariablesImportView extends ModalViewImpl implements VariablesImpor
     }
 
     localeNameBox.setText(LanguageLocale.EN.getName());
-  }
-
-  @Override
-  public void setSelectedDatasource(String dsName) {
-    for(int i = 0; i < datasources.getItemCount(); i++) {
-      if(datasources.getValue(i).equals(dsName)) {
-        datasources.setSelectedIndex(i);
-        break;
-      }
-    }
-  }
-
-  @Override
-  public String getSelectedDatasource() {
-    return datasources.getValue(datasources.getSelectedIndex());
-  }
-
-  @Override
-  public void setDatasources(JsArray<DatasourceDto> datasources) {
-    this.datasources.clear();
-    for(int i = 0; i < datasources.length(); i++) {
-      this.datasources.addItem(datasources.get(i).getName());
-    }
-    this.datasources.setVisible(datasources.length() > 1);
-    destinationLabel.setVisible(datasources.length() > 1);
   }
 
   @Override
@@ -351,7 +316,7 @@ public class VariablesImportView extends ModalViewImpl implements VariablesImpor
 
   @Override
   public void showSpssSpecificPanel(boolean show) {
-    spssPanel.setVisible(show);
+    options.setVisible(show);
   }
 
   //

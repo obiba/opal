@@ -81,11 +81,11 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
   }
 
   private void downloadMetadata() {
-    getEventBus().fireEvent(new FileDownloadRequestEvent("/datasource/" + datasourceName + "/tables/excel"));
+    fireEvent(new FileDownloadRequestEvent("/datasource/" + datasourceName + "/tables/excel"));
   }
 
   private void addView() {
-    getEventBus().fireEvent(new WizardRequiredEvent(CreateViewStepPresenter.WizardType, datasourceName));
+    fireEvent(new WizardRequiredEvent(CreateViewStepPresenter.WizardType, datasourceName));
   }
 
   private void initDatasource() {
@@ -104,22 +104,22 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   @Override
   public void onImportData() {
-    getEventBus().fireEvent(new WizardRequiredEvent(DataImportPresenter.WizardType, datasourceName));
+    fireEvent(new WizardRequiredEvent(DataImportPresenter.WizardType, datasourceName));
   }
 
   @Override
   public void onExportData() {
-    getEventBus().fireEvent(new WizardRequiredEvent(DataExportPresenter.WizardType, datasourceName));
+    fireEvent(new WizardRequiredEvent(DataExportPresenter.WizardType, datasourceName));
   }
 
   @Override
   public void onCopyData() {
-    getEventBus().fireEvent(new WizardRequiredEvent(DataCopyPresenter.WizardType, datasourceName));
+    fireEvent(new WizardRequiredEvent(DataCopyPresenter.WizardType, datasourceName));
   }
 
   @Override
   public void onAddTable() {
-    getEventBus().fireEvent(new WizardRequiredEvent(VariablesImportPresenter.WIZARD_TYPE, datasourceName));
+    fireEvent(new WizardRequiredEvent(VariablesImportPresenter.WIZARD_TYPE, datasourceName));
   }
 
   @Override

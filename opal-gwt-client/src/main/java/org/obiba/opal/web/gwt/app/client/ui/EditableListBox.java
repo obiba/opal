@@ -9,72 +9,35 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.ui;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collection;
+import java.util.List;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.Typeahead;
+import com.google.common.collect.Lists;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasEnabled;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.MenuBar;
-import com.google.gwt.user.client.ui.MenuItem;
-import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 
 public class EditableListBox extends Composite implements HasText, HasValue<String>, HasEnabled {
 
-  private final TextBox textBox = new TextBox();
+  private final Typeahead suggestBox;
 
-  private final Button ddBtn = new Button();
+  private final TextBox textBox;
 
-  private final PopupPanel panel = new PopupPanel(true);
-
-  private final MenuBar menuBar = new MenuBar(true);
-
-  private final Map<String, MenuItem> menuItemsMap = new HashMap<String, MenuItem>();
+  private final List<String> items = Lists.newArrayList();
 
   public EditableListBox() {
+    suggestBox = new Typeahead();
+    suggestBox.setWidget(textBox = new TextBox());
     FlowPanel layout = new FlowPanel();
-    ddBtn.setStyleName("btn iconb i-sortasc");
-    ddBtn.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        textBox.setFocus(true);
-        displaySuggestions();
-      }
-    });
-
-    layout.add(textBox);
-    layout.add(ddBtn);
-
+    layout.add(suggestBox);
     initWidget(layout);
-
-    textBox.addKeyDownHandler(new KeyDownHandler() {
-      @Override
-      public void onKeyDown(KeyDownEvent event) {
-        int key = event.getNativeKeyCode();
-        if(key == KeyCodes.KEY_DOWN || event.isControlKeyDown() && key == ' ') {
-          displaySuggestions();
-        } else {
-          panel.hide();
-        }
-      }
-    });
-
-    panel.add(menuBar);
-    panel.setStyleName("obiba-EditableListBox gwt-MenuBarPopup");
-
-    setStylePrimaryName("obiba-EditableListBox");
   }
 
   public void setTextStyleNames(String style) {
@@ -82,49 +45,40 @@ public class EditableListBox extends Composite implements HasText, HasValue<Stri
   }
 
   public boolean hasItem(String value) {
-    return menuItemsMap.containsKey(value);
+    return items.contains(value);
+  }
+
+  public MultiWordSuggestOracle getSuggestOracle() {
+    return (MultiWordSuggestOracle) suggestBox.getSuggestOracle();
+  }
+
+  public final void addAllItems(Collection<String> collection) {
+    getSuggestOracle().addAll(collection);
+    items.addAll(collection);
   }
 
   public void addItem(final String value) {
-    if(menuItemsMap.containsKey(value)) {
-      removeItem(value);
-    }
-    MenuItem item = new MenuItem(value, new Command() {
-
-      @Override
-      public void execute() {
-        panel.hide();
-        textBox.setValue(value, true);
-        textBox.setFocus(true);
-      }
-    });
-    menuBar.addItem(item);
-    menuItemsMap.put(value, item);
+    getSuggestOracle().add(value);
+    items.add(value);
   }
 
   public void removeItem(String value) {
-    MenuItem item = menuItemsMap.get(value);
-    if(value != null) {
-      menuBar.removeItem(item);
-      menuItemsMap.remove(value);
+    items.remove(value);
+    getSuggestOracle().clear();
+    for (String i : items) {
+      getSuggestOracle().add(i);
     }
   }
 
   public void clear() {
-    for(String value : menuItemsMap.keySet()) {
-      menuBar.removeItem(menuItemsMap.get(value));
-    }
-    menuItemsMap.clear();
-    setValue("");
-  }
-
-  private void displaySuggestions() {
-    panel.showRelativeTo(textBox);
+    getSuggestOracle().clear();
+    items.clear();
   }
 
   @Override
   public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
-    return textBox.addValueChangeHandler(handler);
+    return null;
+    //return textBox.addValueChangeHandler(handler);
   }
 
   @Override
@@ -155,8 +109,6 @@ public class EditableListBox extends Composite implements HasText, HasValue<Stri
   @Override
   public void setEnabled(boolean enabled) {
     textBox.setEnabled(enabled);
-    ddBtn.setEnabled(enabled);
-    panel.hide();
   }
 
   @Override
@@ -164,9 +116,4 @@ public class EditableListBox extends Composite implements HasText, HasValue<Stri
     return textBox.isEnabled();
   }
 
-  @Override
-  public void setVisible(boolean visible) {
-    super.setVisible(visible);
-    panel.hide();
-  }
 }

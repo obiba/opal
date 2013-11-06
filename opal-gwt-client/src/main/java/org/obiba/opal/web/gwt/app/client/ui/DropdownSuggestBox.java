@@ -9,81 +9,55 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.ui;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
-import com.google.gwt.user.client.ui.SuggestOracle;
 
 /**
  *
  */
 public class DropdownSuggestBox extends Composite implements HasText, HasValue<String> {
 
-  private final DefaultSuggestBox suggestBox;
+  private final Typeahead suggestBox;
+
+  private final TextBox textBox;
 
   public DropdownSuggestBox() {
-    suggestBox = new DefaultSuggestBox();
+    suggestBox = new Typeahead();
+    suggestBox.add(textBox = new TextBox());
+
     FlowPanel layout = new FlowPanel();
-    Button ddBtn = new Button();
-    ddBtn.setStyleName("btn iconb i-sortasc");
-    ddBtn.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        suggestBox.setFocus(true);
-        suggestBox.showSuggestionList();
-      }
-    });
-
-    suggestBox.addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
-      @Override
-      public void onSelection(SelectionEvent<SuggestOracle.Suggestion> suggestionSelectionEvent) {
-        ValueChangeEvent.fire(suggestBox, suggestionSelectionEvent.getSelectedItem().getDisplayString());
-      }
-    });
-
     layout.add(suggestBox);
-    layout.add(ddBtn);
-
     initWidget(layout);
-
-    setStylePrimaryName("obiba-DropdownSuggestBox");
-  }
-
-  public void setTextStyleNames(String style) {
-    suggestBox.addStyleName(style);
   }
 
   @Override
   public String getText() {
-    return suggestBox.getText();
+    return textBox.getText();
   }
 
   @Override
   public void setText(String text) {
-    suggestBox.setText(text);
+    textBox.setText(text);
   }
 
   public void clear() {
-    suggestBox.setText("");
+    textBox.setText("");
   }
 
   public MultiWordSuggestOracle getSuggestOracle() {
-    return suggestBox.getSuggestOracle();
+    return (MultiWordSuggestOracle)suggestBox.getSuggestOracle();
   }
 
   @Override
   public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
-    return suggestBox.addValueChangeHandler(handler);
+    return textBox.addValueChangeHandler(handler);
   }
 
   @Override
@@ -98,7 +72,7 @@ public class DropdownSuggestBox extends Composite implements HasText, HasValue<S
 
   @Override
   public void setValue(String value, boolean fireEvents) {
-    suggestBox.setValue(value, fireEvents);
+    textBox.setValue(value, fireEvents);
   }
 
 }

@@ -12,7 +12,7 @@ package org.obiba.opal.web.gwt.app.client.presenter;
 import com.google.gwt.user.client.ui.HasText;
 import com.gwtplatform.mvp.client.View;
 
-public interface CharacterSetDisplay extends View {
+public interface CharacterSetDisplay {
 
   HasText getCharsetText();
 
