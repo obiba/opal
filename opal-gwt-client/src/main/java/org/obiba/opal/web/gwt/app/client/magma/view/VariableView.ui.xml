@@ -147,9 +147,6 @@
 
       <b:Tab heading="Script" ui:field="scriptTab">
         <g:FlowPanel ui:field="scriptHeaderPanel">
-          <b2:InlineLabel ui:field="notDerived">
-            <ui:msg description="Not Derived Variable label">Not a Derived Variable</ui:msg>
-          </b2:InlineLabel>
           <g:FlowPanel addStyleNames="clearfix">
             <b:NavLink icon="CHEVRON_LEFT" addStyleNames="pull-left" ui:field="backToScript">
               <ui:msg description="Script label">Script</ui:msg>
@@ -172,9 +169,6 @@
         <o:TabDeckPanel ui:field="scriptNavPanel" animationEnabled="false" addStyleNames="top-margin">
           <g:FlowPanel>
             <g:FlowPanel>
-              <b2:InlineLabel ui:field="noScript">
-                <ui:msg description="No Script label">No Script</ui:msg>
-              </b2:InlineLabel>
               <b:CodeBlock ui:field="script"></b:CodeBlock>
             </g:FlowPanel>
           </g:FlowPanel>

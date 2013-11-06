@@ -133,12 +133,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   CodeBlock script;
 
   @UiField
-  InlineLabel noScript;
-
-  @UiField
-  InlineLabel notDerived;
-
-  @UiField
   Button previous;
 
   @UiField
@@ -438,7 +432,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   public void setDerivedVariable(boolean derived, String value) {
     TabPanelHelper.setTabVisible(tabPanel, SCRIPT_TAB_INDEX, derived);
     scriptHeaderPanel.setVisible(derived);
-    noScript.setVisible(derived && value.isEmpty());
     script.setVisible(derived && !value.isEmpty());
     script.setText(value);
   }

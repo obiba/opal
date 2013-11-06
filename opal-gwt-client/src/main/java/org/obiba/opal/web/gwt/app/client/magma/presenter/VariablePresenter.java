@@ -22,7 +22,6 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.derive.helper.VariableDuplicationHelper;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveVariablePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.SiblingVariableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.magma.event.SummaryRequiredEvent;
