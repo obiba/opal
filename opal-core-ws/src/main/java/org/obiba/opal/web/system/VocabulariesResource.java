@@ -58,7 +58,6 @@ public class VocabulariesResource {
     }
 
     Vocabulary v = Dtos.fromDto(taxonomyName, vocabulary);
-    //TODO use right template
     taxonomyService.saveVocabulary(null, v);
 
     return Response.ok().build();
