@@ -47,9 +47,9 @@ import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_
 public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresenter.Display>
     implements RequestAdministrationPermissionEvent.Handler, DataDatabasesUiHandlers {
 
-  private final ModalProvider<SqlDatabasePresenter> sqlDatabaseModalProvider;
+  private final ModalProvider<SqlDatabaseModalPresenter> sqlDatabaseModalProvider;
 
-  private final ModalProvider<MongoDatabasePresenter> mongoDatabaseModalProvider;
+  private final ModalProvider<MongoDatabaseModalPresenter> mongoDatabaseModalProvider;
 
   private final AuthorizationPresenter authorizationPresenter;
 
@@ -63,8 +63,8 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
 
   @Inject
   public DataDatabasesPresenter(Display display, EventBus eventBus,
-      ModalProvider<SqlDatabasePresenter> sqlDatabaseModalProvider,
-      ModalProvider<MongoDatabasePresenter> mongoDatabaseModalProvider,
+      ModalProvider<SqlDatabaseModalPresenter> sqlDatabaseModalProvider,
+      ModalProvider<MongoDatabaseModalPresenter> mongoDatabaseModalProvider,
       Provider<AuthorizationPresenter> authorizationPresenter) {
     super(eventBus, display);
     this.sqlDatabaseModalProvider = sqlDatabaseModalProvider.setContainer(this);

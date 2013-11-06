@@ -29,7 +29,7 @@ import com.gwtplatform.mvp.client.PopupView;
 import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
 import static com.google.gwt.http.client.Response.SC_OK;
 
-public abstract class AbstractDatabasePresenter<TView extends AbstractDatabasePresenter.Display>
+public abstract class AbstractDatabaseModalPresenter<TView extends AbstractDatabaseModalPresenter.Display>
     extends ModalPresenterWidget<TView> implements DatabaseUiHandlers {
 
   public enum Mode {
@@ -85,7 +85,7 @@ public abstract class AbstractDatabasePresenter<TView extends AbstractDatabasePr
   protected boolean usedForIdentifiers;
 
   @Inject
-  public AbstractDatabasePresenter(EventBus eventBus, TView view) {
+  public AbstractDatabaseModalPresenter(EventBus eventBus, TView view) {
     super(eventBus, view);
     getView().setUiHandlers(this);
   }

@@ -11,7 +11,7 @@ package org.obiba.opal.web.gwt.app.client.administration.database.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DataDatabasesPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DataDatabasesUiHandlers;
-import org.obiba.opal.web.gwt.app.client.administration.database.presenter.SqlDatabasePresenter;
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.SqlDatabaseModalPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
@@ -172,14 +172,14 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
     final Column<DatabaseDto, String> usage = new TextColumn<DatabaseDto>() {
       @Override
       public String getValue(DatabaseDto dto) {
-        return SqlDatabasePresenter.Usage.valueOf(dto.getUsage().getName()).getLabel();
+        return SqlDatabaseModalPresenter.Usage.valueOf(dto.getUsage().getName()).getLabel();
       }
     };
 
     final Column<DatabaseDto, String> sqlSchema = new TextColumn<DatabaseDto>() {
       @Override
       public String getValue(DatabaseDto dto) {
-        return SqlDatabasePresenter.SqlSchema.valueOf(dto.getSqlSettings().getSqlSchema().getName()).getLabel();
+        return SqlDatabaseModalPresenter.SqlSchema.valueOf(dto.getSqlSettings().getSqlSchema().getName()).getLabel();
       }
     };
 

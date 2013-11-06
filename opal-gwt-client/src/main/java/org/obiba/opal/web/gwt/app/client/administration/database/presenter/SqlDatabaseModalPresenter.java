@@ -40,12 +40,12 @@ import com.google.gwt.user.client.ui.HasVisibility;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-import static org.obiba.opal.web.gwt.app.client.administration.database.presenter.SqlDatabasePresenter.Display.FormField;
+import static org.obiba.opal.web.gwt.app.client.administration.database.presenter.SqlDatabaseModalPresenter.Display.FormField;
 
-public class SqlDatabasePresenter extends AbstractDatabasePresenter<SqlDatabasePresenter.Display> {
+public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<SqlDatabaseModalPresenter.Display> {
 
   @Inject
-  public SqlDatabasePresenter(EventBus eventBus, Display display) {
+  public SqlDatabaseModalPresenter(EventBus eventBus, Display display) {
     super(eventBus, display);
   }
 
@@ -223,7 +223,7 @@ public class SqlDatabasePresenter extends AbstractDatabasePresenter<SqlDatabaseP
 
   }
 
-  public interface Display extends AbstractDatabasePresenter.Display {
+  public interface Display extends AbstractDatabaseModalPresenter.Display {
 
     enum FormField {
       NAME,

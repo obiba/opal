@@ -11,9 +11,9 @@ package org.obiba.opal.web.gwt.app.client.administration.database.view;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.administration.database.presenter.AbstractDatabasePresenter;
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.AbstractDatabaseModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseUiHandlers;
-import org.obiba.opal.web.gwt.app.client.administration.database.presenter.MongoDatabasePresenter;
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.MongoDatabaseModalPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
@@ -41,16 +41,16 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-import static org.obiba.opal.web.gwt.app.client.administration.database.presenter.AbstractDatabasePresenter.Mode.CREATE;
-import static org.obiba.opal.web.gwt.app.client.administration.database.presenter.AbstractDatabasePresenter.Usage;
+import static org.obiba.opal.web.gwt.app.client.administration.database.presenter.AbstractDatabaseModalPresenter.Mode.CREATE;
+import static org.obiba.opal.web.gwt.app.client.administration.database.presenter.AbstractDatabaseModalPresenter.Usage;
 
 /**
  *
  */
-public class MongoDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandlers>
-    implements MongoDatabasePresenter.Display {
+public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseUiHandlers>
+    implements MongoDatabaseModalPresenter.Display {
 
-  interface Binder extends UiBinder<Widget, MongoDatabaseView> {}
+  interface Binder extends UiBinder<Widget, MongoDatabaseModalView> {}
 
   @UiField
   Modal modal;
@@ -91,7 +91,7 @@ public class MongoDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHa
   private final Translations translations;
 
   @Inject
-  public MongoDatabaseView(EventBus eventBus, Binder uiBinder, Translations translations) {
+  public MongoDatabaseModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
@@ -124,7 +124,7 @@ public class MongoDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHa
   }
 
   @Override
-  public void setDialogMode(AbstractDatabasePresenter.Mode dialogMode) {
+  public void setDialogMode(AbstractDatabaseModalPresenter.Mode dialogMode) {
     name.setEnabled(dialogMode == CREATE);
     modal.setTitle(dialogMode == CREATE ? translations.addDatabase() : translations.editDatabase());
   }

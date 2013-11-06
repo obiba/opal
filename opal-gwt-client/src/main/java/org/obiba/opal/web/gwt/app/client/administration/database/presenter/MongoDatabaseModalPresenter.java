@@ -27,12 +27,12 @@ import com.google.gwt.user.client.ui.HasVisibility;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-import static org.obiba.opal.web.gwt.app.client.administration.database.presenter.MongoDatabasePresenter.Display.FormField;
+import static org.obiba.opal.web.gwt.app.client.administration.database.presenter.MongoDatabaseModalPresenter.Display.FormField;
 
-public class MongoDatabasePresenter extends AbstractDatabasePresenter<MongoDatabasePresenter.Display> {
+public class MongoDatabaseModalPresenter extends AbstractDatabaseModalPresenter<MongoDatabaseModalPresenter.Display> {
 
   @Inject
-  public MongoDatabasePresenter(EventBus eventBus, Display display) {
+  public MongoDatabaseModalPresenter(EventBus eventBus, Display display) {
     super(eventBus, display);
   }
 
@@ -114,7 +114,7 @@ public class MongoDatabasePresenter extends AbstractDatabasePresenter<MongoDatab
 
   }
 
-  public interface Display extends AbstractDatabasePresenter.Display {
+  public interface Display extends AbstractDatabaseModalPresenter.Display {
 
     enum FormField {
       NAME,
