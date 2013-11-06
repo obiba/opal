@@ -55,7 +55,6 @@ public class VocabularyResource {
     return Response.ok().entity(Dtos.asDto(taxonomyName, vocabulary)).build();
   }
 
-  @SuppressWarnings({ "ConstantConditions", "OverlyLongMethod" })
   @POST
   @Consumes(value = "text/plain")
   public Response addVocabularyTerms(String csv) {
@@ -71,8 +70,14 @@ public class VocabularyResource {
     }
 
     vocabulary.getTerms().clear();
+    parseStringAsCsv(csv, vocabulary);
 
-    // Parse csv and add terms
+    taxonomyService.saveTaxonomy(null, taxonomy);
+
+    return Response.ok().build();
+  }
+
+  private void parseStringAsCsv(String csv, Vocabulary vocabulary) {// Parse csv and add terms
     String[] lines = csv.split("\n");
     Term t = null;
     for(String line : lines) {
@@ -90,19 +95,17 @@ public class VocabularyResource {
 
         for(int i = 1; i < level; i++) {
           // find parent
-          parent = parent.getTerms().get(parent.getTerms().size() - 1);
+          if(parent != null) {
+            parent = parent.getTerms().get(parent.getTerms().size() - 1);
+          }
         }
 
         // Add new term
-        parent.getTerms().add(new Term(terms[terms.length - 1].replaceAll("\"", "")));
+        if(parent != null) {
+          parent.getTerms().add(new Term(terms[terms.length - 1].replaceAll("\"", "")));
+        }
       }
     }
-
-//    tax.getVocabularies().add(voc);
-    //TODO use right template
-    taxonomyService.saveTaxonomy(null, taxonomy);
-
-    return Response.ok().build();
   }
 
   @PUT
@@ -111,9 +114,7 @@ public class VocabularyResource {
     try {
 
       Vocabulary vocabulary = taxonomyService.getVocabulary(taxonomyName, vocabularyName);
-      //TODO use right template
-      taxonomyService.saveVocabulary(vocabulary,
-          Dtos.fromDto(dto.getTaxonomyName(), dto)); //taxonomyName, vocabularyName, ,vocabulary
+      taxonomyService.saveVocabulary(vocabulary, Dtos.fromDto(dto.getTaxonomyName(), dto));
     } catch(NoSuchTaxonomyException e) {
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch(NoSuchVocabularyException e) {
