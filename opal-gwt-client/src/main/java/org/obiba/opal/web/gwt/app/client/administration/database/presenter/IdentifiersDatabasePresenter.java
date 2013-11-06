@@ -35,16 +35,16 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
 
   public static final String IDENTIFIERS_DATABASE_NAME = "_identifiers";
 
-  private final ModalProvider<SqlDatabasePresenter> sqlDatabaseModalProvider;
+  private final ModalProvider<SqlDatabaseModalPresenter> sqlDatabaseModalProvider;
 
-  private final ModalProvider<MongoDatabasePresenter> mongoDatabaseModalProvider;
+  private final ModalProvider<MongoDatabaseModalPresenter> mongoDatabaseModalProvider;
 
   private DatabaseDto databaseDto;
 
   @Inject
   public IdentifiersDatabasePresenter(Display display, EventBus eventBus,
-      ModalProvider<SqlDatabasePresenter> sqlDatabaseModalProvider,
-      ModalProvider<MongoDatabasePresenter> mongoDatabaseModalProvider) {
+      ModalProvider<SqlDatabaseModalPresenter> sqlDatabaseModalProvider,
+      ModalProvider<MongoDatabaseModalPresenter> mongoDatabaseModalProvider) {
     super(eventBus, display);
     getView().setUiHandlers(this);
     this.sqlDatabaseModalProvider = sqlDatabaseModalProvider.setContainer(this);
@@ -68,18 +68,20 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
     addRegisteredHandler(DatabaseCreatedEvent.getType(), new DatabaseCreatedEvent.DatabaseCreatedHandler() {
       @Override
       public void onDatabaseCreated(DatabaseCreatedEvent event) {
-        databaseDto = event.getDto();
-        if(databaseDto.getUsedForIdentifiers()) {
-          getView().setDatabase(event.getDto());
+        DatabaseDto dto = event.getDto();
+        if(dto.getUsedForIdentifiers()) {
+          databaseDto = dto;
+          getView().setDatabase(dto);
         }
       }
     });
     addRegisteredHandler(DatabaseUpdatedEvent.getType(), new DatabaseUpdatedEvent.DatabaseUpdatedHandler() {
       @Override
       public void onDatabaseUpdated(DatabaseUpdatedEvent event) {
-        databaseDto = event.getDto();
-        if(databaseDto.getUsedForIdentifiers()) {
-          getView().setDatabase(event.getDto());
+        DatabaseDto dto = event.getDto();
+        if(dto.getUsedForIdentifiers()) {
+          databaseDto = dto;
+          getView().setDatabase(dto);
         }
       }
     });

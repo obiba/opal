@@ -11,7 +11,7 @@ package org.obiba.opal.web.gwt.app.client.administration.database.view;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.administration.database.presenter.AbstractDatabasePresenter;
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.AbstractDatabaseModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.IdentifiersDatabasePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.IdentifiersDatabaseUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -94,7 +94,7 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
     if(sqlDatabase == null) return;
     properties.addProperty(translations.typeLabel(), translations.sqlLabel());
     properties.addProperty(translations.sqlSchemaLabel(),
-        AbstractDatabasePresenter.SqlSchema.valueOf(sqlDatabase.getSqlSchema().getName()).getLabel());
+        AbstractDatabaseModalPresenter.SqlSchema.valueOf(sqlDatabase.getSqlSchema().getName()).getLabel());
     properties.addProperty(translations.urlLabel(), sqlDatabase.getUrl());
     properties.addProperty(translations.driverLabel(), sqlDatabase.getDriverClass());
     properties.addProperty(translations.usernameLabel(), sqlDatabase.getUsername());

@@ -11,9 +11,9 @@ package org.obiba.opal.web.gwt.app.client.administration.database.view;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.administration.database.presenter.AbstractDatabasePresenter;
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.AbstractDatabaseModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseUiHandlers;
-import org.obiba.opal.web.gwt.app.client.administration.database.presenter.SqlDatabasePresenter.Display;
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.SqlDatabaseModalPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
@@ -47,16 +47,16 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-import static org.obiba.opal.web.gwt.app.client.administration.database.presenter.AbstractDatabasePresenter.Mode.CREATE;
-import static org.obiba.opal.web.gwt.app.client.administration.database.presenter.AbstractDatabasePresenter.SqlSchema;
-import static org.obiba.opal.web.gwt.app.client.administration.database.presenter.AbstractDatabasePresenter.Usage;
+import static org.obiba.opal.web.gwt.app.client.administration.database.presenter.AbstractDatabaseModalPresenter.Mode.CREATE;
+import static org.obiba.opal.web.gwt.app.client.administration.database.presenter.AbstractDatabaseModalPresenter.SqlSchema;
+import static org.obiba.opal.web.gwt.app.client.administration.database.presenter.AbstractDatabaseModalPresenter.Usage;
 
 /**
  *
  */
-public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHandlers> implements Display {
+public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseUiHandlers> implements Display {
 
-  interface Binder extends UiBinder<Widget, SqlDatabaseView> {}
+  interface Binder extends UiBinder<Widget, SqlDatabaseModalView> {}
 
   @UiField
   Modal modal;
@@ -144,7 +144,7 @@ public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHand
   private final Translations translations;
 
   @Inject
-  public SqlDatabaseView(EventBus eventBus, Binder uiBinder, Translations translations) {
+  public SqlDatabaseModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
@@ -195,7 +195,7 @@ public class SqlDatabaseView extends ModalPopupViewWithUiHandlers<DatabaseUiHand
   }
 
   @Override
-  public void setDialogMode(AbstractDatabasePresenter.Mode dialogMode) {
+  public void setDialogMode(AbstractDatabaseModalPresenter.Mode dialogMode) {
     name.setEnabled(dialogMode == CREATE);
     modal.setTitle(dialogMode == CREATE ? translations.addDatabase() : translations.editDatabase());
   }

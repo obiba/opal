@@ -16,13 +16,13 @@ import org.obiba.opal.web.gwt.app.client.administration.configuration.view.Gener
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DataDatabasesPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.IdentifiersDatabasePresenter;
-import org.obiba.opal.web.gwt.app.client.administration.database.presenter.MongoDatabasePresenter;
-import org.obiba.opal.web.gwt.app.client.administration.database.presenter.SqlDatabasePresenter;
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.MongoDatabaseModalPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.database.presenter.SqlDatabaseModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.view.DataDatabasesView;
 import org.obiba.opal.web.gwt.app.client.administration.database.view.DatabaseAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.database.view.IdentifiersDatabaseView;
-import org.obiba.opal.web.gwt.app.client.administration.database.view.MongoDatabaseView;
-import org.obiba.opal.web.gwt.app.client.administration.database.view.SqlDatabaseView;
+import org.obiba.opal.web.gwt.app.client.administration.database.view.MongoDatabaseModalView;
+import org.obiba.opal.web.gwt.app.client.administration.database.view.SqlDatabaseModalView;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldMethodPresenter;
@@ -90,7 +90,6 @@ public class AdministrationModule extends AbstractPresenterModule {
 
   private void configureSystemConfig() {
     bindPresenter(JVMPresenter.class, JVMPresenter.Display.class, JVMView.class, JVMPresenter.Proxy.class);
-//    bindPresenter(ServerPresenter.class, ServerPresenter.Display.class, ServerView.class, ServerPresenter.Proxy.class);
 
     bindPresenter(FilesAdministrationPresenter.class, FilesAdministrationPresenter.Display.class,
         FilesAdministrationView.class, FilesAdministrationPresenter.Proxy.class);
@@ -150,8 +149,8 @@ public class AdministrationModule extends AbstractPresenterModule {
     bindPresenterWidget(IdentifiersDatabasePresenter.class, IdentifiersDatabasePresenter.Display.class,
         IdentifiersDatabaseView.class);
     bindPresenterWidget(DataDatabasesPresenter.class, DataDatabasesPresenter.Display.class, DataDatabasesView.class);
-    bindPresenterWidget(SqlDatabasePresenter.class, SqlDatabasePresenter.Display.class, SqlDatabaseView.class);
-    bindPresenterWidget(MongoDatabasePresenter.class, MongoDatabasePresenter.Display.class, MongoDatabaseView.class);
+    bindPresenterWidget(SqlDatabaseModalPresenter.class, SqlDatabaseModalPresenter.Display.class, SqlDatabaseModalView.class);
+    bindPresenterWidget(MongoDatabaseModalPresenter.class, MongoDatabaseModalPresenter.Display.class, MongoDatabaseModalView.class);
   }
 
 }
