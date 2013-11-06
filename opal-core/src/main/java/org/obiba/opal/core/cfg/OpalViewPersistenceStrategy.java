@@ -283,17 +283,15 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   }
 
   private void doWriteGitViewVariable(File viewRepo, Variable variable) throws IOException {
-    if(variable.hasAttribute("script")) {
-      String script = variable.getAttributeStringValue("script");
-      File variableFile = new File(viewRepo, variable.getName() + ".js");
+    String script = variable.hasAttribute("script") ? variable.getAttributeStringValue("script") : "null";
+    File variableFile = new File(viewRepo, variable.getName() + ".js");
 
-      FileWriter fileWriter = new FileWriter(variableFile);
-      try {
-        fileWriter.append(script);
-        fileWriter.flush();
-      } finally {
-        StreamUtil.silentSafeClose(fileWriter);
-      }
+    FileWriter fileWriter = new FileWriter(variableFile);
+    try {
+      fileWriter.append(script);
+      fileWriter.flush();
+    } finally {
+      StreamUtil.silentSafeClose(fileWriter);
     }
   }
 
