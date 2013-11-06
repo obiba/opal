@@ -1783,16 +1783,12 @@ public interface Translations extends Constants {
   @DefaultStringValue("Version")
   String versionLabel();
 
-  @Description("All N items on this page are selected label")
-  @DefaultStringValue("All {0} {1} on this page are selected.")
-  String allNItemsSelected();
-
-  @Description("N item this page is selected label")
-  @DefaultStringValue("{0} {1} on this page is selected.")
+  @Description("N item is selected label")
+  @DefaultStringValue("{0} {1} is selected.")
   String NItemSelected();
 
-  @Description("N items on this page are selected label")
-  @DefaultStringValue("{0} {1} on this page are selected.")
+  @Description("N items are selected label")
+  @DefaultStringValue("{0} {1} are selected.")
   String NItemsSelected();
 
   @Description("Select all N items label")
