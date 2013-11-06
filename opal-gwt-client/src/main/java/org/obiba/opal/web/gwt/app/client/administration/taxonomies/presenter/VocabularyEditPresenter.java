@@ -295,22 +295,18 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
     for(int i = 0; i < terms.length(); i++) {
 
       // When a term has child terms, a FlowPanel was created for those terms
-      if(terms.get(i).getTermsCount() > 0) newPos--;
+      if(terms.get(i).getTermsCount() > 0 && newPos > 0) newPos--;
 
-      if(!insertAfter) {
-        if(i == newPos) {
-          termsArray.push(term);
-        }
+      if(!insertAfter && i == newPos) {
+        termsArray.push(term);
       }
 
       if(!terms.get(i).getName().equals(term.getName())) {
         termsArray.push(terms.get(i));
       }
 
-      if(insertAfter) {
-        if(i == newPos) {
-          termsArray.push(term);
-        }
+      if(insertAfter && i == newPos) {
+        termsArray.push(term);
       }
     }
 

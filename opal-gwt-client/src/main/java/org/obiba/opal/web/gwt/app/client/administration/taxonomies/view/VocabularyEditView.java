@@ -297,11 +297,12 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
     focusPanel.setTitle(term.getName());
     FlowPanel p = new FlowPanel();
 
-    NavLink link = new NavLink(term.getName());
+    final NavLink link = new NavLink(term.getName());
     link.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent clickEvent) {
         getUiHandlers().onTermSelection(term);
+        link.setActive(true);
       }
     });
     link.addStyleName("inline");

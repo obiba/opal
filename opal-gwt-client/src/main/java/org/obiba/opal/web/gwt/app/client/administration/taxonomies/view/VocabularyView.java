@@ -111,7 +111,7 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
       InlineHTML spacer = new InlineHTML(indent);
       spacer.addStyleName("inline-block");
 
-      NavLink link = new NavLink();
+      final NavLink link = new NavLink();
 
       link.add(spacer);
       NavLink linkTitle = new NavLink(terms.get(i).getName());
@@ -122,6 +122,7 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
         @Override
         public void onClick(ClickEvent clickEvent) {
           getUiHandlers().onTermSelection(terms.get(finalI));
+          link.setActive(true);
         }
       });
       link.addStyleName("inline");
