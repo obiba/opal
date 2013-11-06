@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.TermDto;
 import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
@@ -80,7 +81,8 @@ public class VocabularyPresenter extends Presenter<Display, VocabularyPresenter.
 
   private void refresh() {
     ResourceRequestBuilderFactory.<VocabularyDto>newBuilder()
-        .forResource("/system/conf/taxonomy/" + taxonomyName + "/vocabulary/" + vocabularyName).get()
+        .forResource(UriBuilders.SYSTEM_CONF_TAXONOMY_VOCABULARY.create().build(taxonomyName, vocabularyName))//
+        .get()//
         .withCallback(new ResourceCallback<VocabularyDto>() {
 
           @Override

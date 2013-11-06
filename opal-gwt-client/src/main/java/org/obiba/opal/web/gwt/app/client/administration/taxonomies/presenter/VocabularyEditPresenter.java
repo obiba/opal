@@ -20,6 +20,7 @@ import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.GeneralConf;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
@@ -88,7 +89,8 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
     taxonomyName = request.getParameter(TaxonomyTokens.TOKEN_TAXONOMY, null);
     vocabularyName = request.getParameter(TaxonomyTokens.TOKEN_VOCABULARY, null);
 
-    ResourceRequestBuilderFactory.<GeneralConf>newBuilder().forResource("/system/conf/general")
+    ResourceRequestBuilderFactory.<GeneralConf>newBuilder()
+        .forResource(UriBuilders.SYSTEM_CONF_GENERAL.create().build())
         .withCallback(new ResourceCallback<GeneralConf>() {
           @Override
           public void onResource(Response response, GeneralConf resource) {
@@ -114,34 +116,36 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
   }
 
   private void refresh() {
-    ResourceRequestBuilderFactory.<JsArray<TaxonomyDto>>newBuilder().forResource("/system/conf/taxonomies").get()
-        .withCallback(new ResourceCallback<JsArray<TaxonomyDto>>() {
-          @Override
-          public void onResource(Response response, final JsArray<TaxonomyDto> taxonomies) {
+    ResourceRequestBuilderFactory.<JsArray<TaxonomyDto>>newBuilder()
+        .forResource(UriBuilders.SYSTEM_CONF_TAXONOMIES.create().build())//
+        .get().withCallback(new ResourceCallback<JsArray<TaxonomyDto>>() {
+      @Override
+      public void onResource(Response response, final JsArray<TaxonomyDto> taxonomies) {
 
-            ResourceRequestBuilderFactory.<VocabularyDto>newBuilder()
-                .forResource("/system/conf/taxonomy/" + taxonomyName + "/vocabulary/" + vocabularyName).get()
-                .withCallback(new ResponseCodeCallback() {
-                  @Override
-                  public void onResponseCode(Request request, Response response) {
-                    if(response.getStatusCode() == Response.SC_OK) {
+        ResourceRequestBuilderFactory.<VocabularyDto>newBuilder()
+            .forResource(UriBuilders.SYSTEM_CONF_TAXONOMY_VOCABULARY.create().build(taxonomyName, vocabularyName))//
+            .get()//
+            .withCallback(new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                if(response.getStatusCode() == Response.SC_OK) {
 
-                      vocabulary = JsonUtils.unsafeEval(response.getText());
-                      getView().getVocabularyName().setText(vocabulary.getName());
-                      getView().setTaxonomies(taxonomies);
-                      getView().setSelectedTaxonomy(taxonomyName);
-                      getView().getTitles().setValue(vocabulary.getTitlesArray());
-                      getView().getDescriptions().setValue(vocabulary.getDescriptionsArray());
-                      getView().getRepeatable().setValue(vocabulary.getRepeatable());
+                  vocabulary = JsonUtils.unsafeEval(response.getText());
+                  getView().getVocabularyName().setText(vocabulary.getName());
+                  getView().setTaxonomies(taxonomies);
+                  getView().setSelectedTaxonomy(taxonomyName);
+                  getView().getTitles().setValue(vocabulary.getTitlesArray());
+                  getView().getDescriptions().setValue(vocabulary.getDescriptionsArray());
+                  getView().getRepeatable().setValue(vocabulary.getRepeatable());
 
-                      getView().displayVocabulary(vocabulary);
+                  getView().displayVocabulary(vocabulary);
 
-                    }
-                    //TODO: Display error
-                  }
-                }, Response.SC_OK, Response.SC_NOT_FOUND, Response.SC_INTERNAL_SERVER_ERROR).send();
-          }
-        }).get().send();
+                }
+                //TODO: Display error
+              }
+            }, Response.SC_OK, Response.SC_NOT_FOUND, Response.SC_INTERNAL_SERVER_ERROR).send();
+      }
+    }).get().send();
   }
 
   @Override
@@ -159,7 +163,7 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
 
     // Save vocabularyDto
     ResourceRequestBuilderFactory.newBuilder()//
-        .forResource("/system/conf/taxonomy/" + taxonomyName + "/vocabulary/" + vocabularyName)
+        .forResource(UriBuilders.SYSTEM_CONF_TAXONOMY_VOCABULARY.create().build(taxonomyName, vocabularyName))
         .withResourceBody(VocabularyDto.stringify(dto)).accept("application/json")//
         .withCallback(new ResponseCodeCallback() {
           @Override
@@ -236,7 +240,6 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
   @Override
   public void onAddSibling(String text) {
     if(uniqueTermName(text)) {
-
       TermDto newTerm = TermDto.create();
       newTerm.setName(text);
       JsArray<TermDto> terms = JsArrays.create().cast();
