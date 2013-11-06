@@ -99,17 +99,21 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
         }
       }
 
-      JsArrayString vocabularies = JsArrays.toSafeArray(taxonomy.getVocabulariesArray());
-      if(vocabularies.length() > 0) {
-        panelTaxonomy.add(new Heading(5, translations.vocabulariesLabel()));
-        FlowPanel vocabulariesPanel = new FlowPanel();
-        for(int i = 0; i < vocabularies.length(); i++) {
-          vocabulariesPanel.add(getVocabularyLink(getUiHandlers(), taxonomy, vocabularies.get(i)));
-        }
-        panelTaxonomy.add(vocabulariesPanel);
-      }
+      redrawVocabularies(taxonomy, panelTaxonomy);
 
       panel.add(panelTaxonomy);
+    }
+  }
+
+  private void redrawVocabularies(TaxonomyDto taxonomy, FlowPanel panelTaxonomy) {
+    JsArrayString vocabularies = JsArrays.toSafeArray(taxonomy.getVocabulariesArray());
+    if(vocabularies.length() > 0) {
+      panelTaxonomy.add(new Heading(5, translations.vocabulariesLabel()));
+      FlowPanel vocabulariesPanel = new FlowPanel();
+      for(int i = 0; i < vocabularies.length(); i++) {
+        vocabulariesPanel.add(getVocabularyLink(getUiHandlers(), taxonomy, vocabularies.get(i)));
+      }
+      panelTaxonomy.add(vocabulariesPanel);
     }
   }
 
