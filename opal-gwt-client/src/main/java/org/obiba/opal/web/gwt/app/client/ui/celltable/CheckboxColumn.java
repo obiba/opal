@@ -54,7 +54,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
    *
    * @param display
    */
-  public CheckboxColumn(final Display<T> display) {
+  public CheckboxColumn(Display<T> display) {
     this(display, false);
   }
 
@@ -70,6 +70,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
       public void render(Context context, Boolean value, SafeHtmlBuilder sb) {
         // check if forbidden or has conflict
         super.render(context, value, sb);
+
       }
     });
     this.display = display;
@@ -94,7 +95,6 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
       @Override
       public void update(int index, T object, Boolean value) {
         selectionModel.setSelected(object, value);
-
         // hide status message when deselecting an element
         // only redraw when the first checkbox is deselected
         int nbDeselected = 0;
@@ -239,34 +239,18 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
 
   @SuppressWarnings("OverlyLongMethod")
   private void updateStatusAlert() {
+
     if(display.getClearSelection() == null || display.getSelectAll() == null || display.getSelectAllStatus() == null)
       return;
 
-    int currentSelected = 0;
-    for(int i = 0; i < display.getTable().getVisibleItemCount(); i++) {
-      if(selectionModel.isSelected(display.getTable().getVisibleItem(i))) {
-        currentSelected++;
-      }
-    }
-
-    // Count selected items this way instead of selectionModel.getSelectedSet().size(); because it was modifying the
-    // list of items by adding a $H entry...
-    int selectedSize = 0;
-    for(int i = 0; i < display.getDataProvider().getList().size(); i++) {
-      if(selectionModel.isSelected(display.getDataProvider().getList().get(i))) {
-        selectedSize++;
-      }
-    }
+    int selectedSize = selectionModel.getSelectedSet().size();
 
     boolean allSelected = selectedSize == display.getDataProvider().getList().size();
-    boolean allPageSelected = currentSelected == display.getTable().getVisibleItemCount();
 
     if(allSelected) {
-      updateStatusAlertWhenAllSelected(currentSelected);
-    } else if(allPageSelected) {
-      updateStatusAlertWhenAllPageSelected(currentSelected);
-    } else if(currentSelected > 0) {
-      updateStatusAlertWhenNotAllSelected(currentSelected);
+      updateStatusAlertWhenAllSelected(selectedSize);
+    } else if(selectedSize > 0) {
+      updateStatusAlertWhenNotAllSelected(selectedSize);
     } else if(display.getAlert() != null) {
       display.getAlert().setVisible(false);
     }
@@ -286,26 +270,6 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
 
     display.getClearSelection().setVisible(true);
     display.getSelectAll().setVisible(false);
-  }
-
-  private void updateStatusAlertWhenAllPageSelected(int currentSelected) {
-    List<String> args = Lists.newArrayList();
-    args.add(String.valueOf(currentSelected));
-
-    if(currentSelected > 1) {
-      args.add(display.getItemNamePlural());
-      display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.allNItemsSelected(), args));
-    } else {
-      args.add(display.getItemNameSingular());
-      display.getSelectAllStatus().setText(TranslationsUtils.replaceArguments(translations.NItemSelected(), args));
-    }
-    display.getSelectAll().setVisible(true);
-
-    args.clear();
-    args.add(String.valueOf(display.getDataProvider().getList().size()));
-    args.add(display.getItemNamePlural());
-    display.getSelectAll().setText(TranslationsUtils.replaceArguments(translations.selectAllNItems(), args));
-    display.getClearSelection().setVisible(false);
   }
 
   private void updateStatusAlertWhenNotAllSelected(int currentSelected) {
@@ -330,12 +294,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
 
   private void doAction() {
     // Count the number of selected items on the current page.
-    Integer nbSelected = 0;
-    for(int i = 0; i < display.getTable().getVisibleItemCount(); i++) {
-      if(selectionModel.isSelected(display.getTable().getVisibleItem(i))) {
-        nbSelected++;
-      }
-    }
+    Integer nbSelected = selectionModel.getSelectedSet().size();
 
     if(display.getAlert() != null) {
       display.getAlert().setVisible(nbSelected > 0);
