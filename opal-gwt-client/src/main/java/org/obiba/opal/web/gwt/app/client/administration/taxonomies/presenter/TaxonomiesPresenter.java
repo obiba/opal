@@ -66,12 +66,13 @@ public class TaxonomiesPresenter extends Presenter<TaxonomiesPresenter.Display, 
   @Override
   public void onBind() {
     super.onBind();
-    registerHandler(getEventBus().addHandler(TaxonomyCreatedEvent.getType(), new TaxonomyCreatedEvent.Handler() {
-      @Override
-      public void onTaxonomyCreated(TaxonomyCreatedEvent event) {
-        refresh();
-      }
-    }));
+    registerHandler(
+        getEventBus().addHandler(TaxonomyCreatedEvent.getType(), new TaxonomyCreatedEvent.TaxonomyCreatedHandler() {
+          @Override
+          public void onTaxonomyCreated(TaxonomyCreatedEvent event) {
+            refresh();
+          }
+        }));
   }
 
   @Override
