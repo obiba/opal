@@ -9,7 +9,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.GeneralConf;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
@@ -59,7 +59,7 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
     dto.setVocabulariesArray(originalTaxonomy.getVocabulariesArray());
 
     ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder()
-        .forResource("/system/conf/taxonomy/" + originalTaxonomy.getName())//
+        .forResource(UriBuilders.SYSTEM_CONF_TAXONOMY.create().build(originalTaxonomy.getName()))//
         .withResourceBody(TaxonomyDto.stringify(dto))//
         .withCallback(new ResponseCodeCallback() {
           @Override
@@ -121,7 +121,8 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
 
   public void initView(final TaxonomyDto taxonomyDto) {
     originalTaxonomy = taxonomyDto;
-    ResourceRequestBuilderFactory.<GeneralConf>newBuilder().forResource("/system/conf/general")
+    ResourceRequestBuilderFactory.<GeneralConf>newBuilder()
+        .forResource(UriBuilders.SYSTEM_CONF_GENERAL.create().build())
         .withCallback(new ResourceCallback<GeneralConf>() {
           @Override
           public void onResource(Response response, GeneralConf resource) {
@@ -187,8 +188,7 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
 
     @Override
     public void run() {
-      ResourceRequestBuilderFactory.newBuilder()
-          .forResource(UriBuilder.create().segment("system", "conf", "taxonomy", name).build())//
+      ResourceRequestBuilderFactory.newBuilder().forResource(UriBuilders.SYSTEM_CONF_TAXONOMY.create().build(name))//
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {

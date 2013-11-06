@@ -109,7 +109,6 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
         panelTaxonomy.add(vocabulariesPanel);
       }
 
-//      panelTaxonomy.add(subPanel);
       panel.add(panelTaxonomy);
     }
   }

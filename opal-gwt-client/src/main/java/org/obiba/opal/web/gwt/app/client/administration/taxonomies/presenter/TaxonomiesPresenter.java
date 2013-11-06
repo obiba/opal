@@ -10,6 +10,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -81,7 +82,8 @@ public class TaxonomiesPresenter extends Presenter<TaxonomiesPresenter.Display, 
   }
 
   void refresh() {
-    ResourceRequestBuilderFactory.<JsArray<TaxonomyDto>>newBuilder().forResource("/system/conf/taxonomies").get()
+    ResourceRequestBuilderFactory.<JsArray<TaxonomyDto>>newBuilder()
+        .forResource(UriBuilders.SYSTEM_CONF_TAXONOMIES.create().build()).get()
         .withCallback(new ResourceCallback<JsArray<TaxonomyDto>>() {
           @Override
           public void onResource(Response response, JsArray<TaxonomyDto> resource) {
