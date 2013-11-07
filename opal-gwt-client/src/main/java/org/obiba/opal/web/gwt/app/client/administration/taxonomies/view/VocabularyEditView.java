@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.VocabularyEditUiHandlers;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.LocalizedEditableText;
@@ -28,7 +29,6 @@ import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -52,15 +52,26 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 import static org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.VocabularyEditPresenter.Display;
-import static org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.VocabularyEditPresenter.TermArrayUtils;
 
 public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandlers> implements Display {
 
+  private final Translations translations;
+
+  private JsArrayString locales;
+
   interface ViewUiBinder extends UiBinder<Widget, VocabularyEditView> {}
 
-  Map<String, LocalizedEditableText> vocabularyTitleTexts = new HashMap<String, LocalizedEditableText>();
+  private final Map<String, LocalizedEditableText> vocabularyTitleTexts = new HashMap<String, LocalizedEditableText>();
 
-  Map<String, LocalizedEditableText> vocabularyDescriptionTexts = new HashMap<String, LocalizedEditableText>();
+  private final Map<String, LocalizedEditableText> vocabularyDescriptionTexts
+      = new HashMap<String, LocalizedEditableText>();
+
+  // Map of term names with their map of localized texts
+  private final Map<String, Map<String, LocalizedEditableText>> termsDescriptionTexts
+      = new HashMap<String, Map<String, LocalizedEditableText>>();
+
+  private final Map<String, Map<String, LocalizedEditableText>> termsTitleTexts
+      = new HashMap<String, Map<String, LocalizedEditableText>>();
 
   @UiField
   Breadcrumbs breadcrumbs;
@@ -96,10 +107,10 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
   TextBox newTermName;
 
   @UiField
-  NavLink addChild;
+  Button addChild;
 
   @UiField
-  NavLink addSibling;
+  Button addSibling;
 
   @UiField
   FlowPanel termsEditionPanel;
@@ -120,9 +131,10 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
   FlowPanel termDescriptions;
 
   @Inject
-  public VocabularyEditView(ViewUiBinder viewUiBinder) {
+  public VocabularyEditView(ViewUiBinder viewUiBinder, Translations translations) {
     initWidget(viewUiBinder.createAndBindUi(this));
-    newTermName.setPlaceholder("New term name...");
+    this.translations = translations;
+    newTermName.setPlaceholder(translations.newTermNameLabel());
   }
 
   @Override
@@ -131,7 +143,7 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
   }
 
   @Override
-  public TakesValue<JsArray<LocaleTextDto>> getTitles(JsArrayString locales) {
+  public TakesValue<JsArray<LocaleTextDto>> getTitles() {
     return new LocaleTextDtoTakesValue(vocabularyTitles, locales) {
       @Override
       public Map<String, LocalizedEditableText> getLocalizedEditableTextMap() {
@@ -146,7 +158,7 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
   }
 
   @Override
-  public TakesValue<JsArray<LocaleTextDto>> getDescriptions(JsArrayString locales) {
+  public TakesValue<JsArray<LocaleTextDto>> getDescriptions() {
     return new LocaleTextDtoTakesValue(vocabularyDescriptions, locales) {
       @Override
       public Map<String, LocalizedEditableText> getLocalizedEditableTextMap() {
@@ -156,7 +168,7 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
   }
 
   @Override
-  public HasValue getRepeatable() {
+  public HasValue<Boolean> getRepeatable() {
     return repeatable;
   }
 
@@ -185,21 +197,29 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
   }
 
   @Override
-  public TakesValue<JsArray<LocaleTextDto>> getTermTitles(JsArrayString locales) {
+  public TakesValue<JsArray<LocaleTextDto>> getTermTitles(final String title) {
     return new LocaleTextDtoTakesValue(termTitles, locales) {
       @Override
       public Map<String, LocalizedEditableText> getLocalizedEditableTextMap() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        if(!termsTitleTexts.containsKey(title)) {
+          termsTitleTexts.put(title, new HashMap<String, LocalizedEditableText>());
+        }
+
+        return termsTitleTexts.get(title);
       }
     };
   }
 
   @Override
-  public TakesValue<JsArray<LocaleTextDto>> getTermDescriptions(JsArrayString locales) {
+  public TakesValue<JsArray<LocaleTextDto>> getTermDescriptions(final String title) {
     return new LocaleTextDtoTakesValue(termDescriptions, locales) {
       @Override
       public Map<String, LocalizedEditableText> getLocalizedEditableTextMap() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        if(!termsDescriptionTexts.containsKey(title)) {
+          termsDescriptionTexts.put(title, new HashMap<String, LocalizedEditableText>());
+        }
+
+        return termsDescriptionTexts.get(title);
       }
     };
   }
@@ -230,14 +250,15 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
   }
 
   @Override
-  public void displayVocabulary(VocabularyDto vocabulary) {
+  public void displayVocabulary(VocabularyDto vocabularyDto) {
     vocabularyName.setText(name.getText());
-    displayTerms(vocabulary);
+    displayTerms(vocabularyDto);
   }
 
   private void displayTerms(VocabularyDto vocabulary) {
     termsPanel.clear();
     termsPanel.add(addTermsLinks(vocabulary, vocabulary.getTermsArray(), 0));
+    termPanel.setVisible(false);
   }
 
   private Widget addTermsLinks(VocabularyDto vocabulary, JsArray<TermDto> terms, int level) {
@@ -245,28 +266,31 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
     FlowPanel target = new FlowPanel();
     PickupDragController dragController = new PickupDragController(RootPanel.get(), false);
 
-    int nb = terms.length();
+    int nb = terms != null ? terms.length() : 0;
     if(nb > 0) {
 
       DropController flowPanelDropController = new FlowPanelDropController(target);
-      dragController.addDragHandler(new TermDragHandlerAdapter(target, vocabulary));
+      dragController.addDragHandler(new TermDragHandlerAdapter(target));
       dragController.registerDropController(flowPanelDropController);
 
       for(int i = 0; i < nb; i++) {
-        FocusPanel focusPanel = getTermFocusPanel(vocabulary, terms.get(i), dragController, level);
+        FocusPanel focusPanel = getTermFocusPanel(terms.get(i), dragController, level);
         target.add(focusPanel);
         if(terms.get(i).getTermsCount() > 0) {
           target.add(addTermsLinks(vocabulary, terms.get(i).getTermsArray(), level + 1));
         }
-
       }
     }
 
     return target;
   }
 
-  private FocusPanel getTermFocusPanel(final VocabularyDto vocabulary, final TermDto term,
-      DragController dragController, int level) {
+  @Override
+  public void clearTermName() {
+    newTermName.setText("");
+  }
+
+  private FocusPanel getTermFocusPanel(final TermDto term, DragController dragController, int level) {
     FocusPanel focusPanel = new FocusPanel();
     focusPanel.setTitle(term.getName());
     FlowPanel p = new FlowPanel();
@@ -280,79 +304,67 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
     });
     link.addStyleName("inline");
 
+    FocusPanel moveIconPanel = getMoveIconPanel();
+
+    p.setTitle(term.getName());
+    p.add(getInlineHTMLSpacer(level));
+    p.add(moveIconPanel);
+    p.add(link);
+    p.add(getDeleteIconAnchor(term));
+
+    dragController.makeDraggable(focusPanel, moveIconPanel);
+
+    focusPanel.add(p);
+    return focusPanel;
+  }
+
+  private IconAnchor getDeleteIconAnchor(final TermDto term) {
+    IconAnchor delete = new IconAnchor();
+    delete.setIcon(IconType.REMOVE);
+    delete.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        getUiHandlers().onDeleteTerm(term);
+      }
+    });
+    return delete;
+  }
+
+  private FocusPanel getMoveIconPanel() {
+    FocusPanel pMove = new FocusPanel();
+    Icon move = new Icon();
+    move.setIcon(IconType.MOVE);
+    pMove.add(move);
+    pMove.addStyleName("inline-block");
+    return pMove;
+  }
+
+  private InlineHTML getInlineHTMLSpacer(int level) {
     SafeHtml indent = SafeHtmlUtils.fromString("");
     for(int i = 0; i < level; i++) {
       indent = SafeHtmlUtils.fromTrustedString(indent.asString() + "&nbsp;&nbsp;&nbsp;&nbsp;");
     }
     InlineHTML spacer = new InlineHTML(indent);
     spacer.addStyleName("inline-block");
-
-    FocusPanel pMove = new FocusPanel();
-
-    Icon move = new Icon();
-    move.setIcon(IconType.MOVE);
-    pMove.add(move);
-    pMove.addStyleName("inline-block");
-
-    p.setTitle(term.getName());
-    p.add(spacer);
-    p.add(pMove);
-    p.add(link);
-
-    IconAnchor delete = new IconAnchor();
-    delete.setIcon(IconType.REMOVE);
-    delete.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-
-        // Modify vocabulary with the new structure
-        TermDto parent = TermArrayUtils.findParent(null, vocabulary.getTermsArray(), term);
-        if(parent != null) {
-          JsArray<TermDto> termsArray = JsArrays.create().cast();
-          for(int i = 0; i < parent.getTermsCount(); i++) {
-            if(!parent.getTerms(i).getName().equals(term.getName())) {
-              termsArray.push(parent.getTerms(i));
-            }
-          }
-          parent.setTermsArray(termsArray);
-        } else {
-          JsArray<TermDto> termsArray = JsArrays.create().cast();
-          for(int i = 0; i < vocabulary.getTermsCount(); i++) {
-            if(!vocabulary.getTerms(i).getName().equals(term.getName())) {
-              termsArray.push(vocabulary.getTerms(i));
-            }
-          }
-
-          vocabulary.setTermsArray(termsArray);
-        }
-        displayTerms(vocabulary);
-      }
-    });
-
-    p.add(delete);
-    dragController.makeDraggable(focusPanel, pMove);
-
-    focusPanel.add(p);
-
-    return focusPanel;
+    return spacer;
   }
 
-  private LocalizedEditableText getTextValueInput(String locale, String text) {
-//    FlowPanel panel = new FlowPanel();
+  @Override
+  public void setAvailableLocales(JsArrayString locales) {
+    this.locales = locales;
 
-    LocalizedEditableText localizedText = new LocalizedEditableText();
-    localizedText.setValue(new LocalizedEditableText.LocalizedText(locale, text));
-
-//    panel.add(localizedText);
-
-    return localizedText;
+    // reset maps of titles and descriptions
+    vocabularyTitleTexts.clear();
+    vocabularyDescriptionTexts.clear();
+    termsDescriptionTexts.clear();
+    termsTitleTexts.clear();
   }
 
   private abstract class LocaleTextDtoTakesValue implements TakesValue<JsArray<LocaleTextDto>> {
 
-    FlowPanel target;
+    final FlowPanel target;
 
-    JsArrayString locales;
+    final JsArrayString locales;
 
     LocaleTextDtoTakesValue(FlowPanel target, JsArrayString locales) {
       this.target = target;
@@ -365,7 +377,7 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
     public void setValue(JsArray<LocaleTextDto> value) {
       // Add all TexDto to vocabularyTitles
       target.clear();
-      int size = value.length();
+      int size = value != null ? value.length() : 0;
       int nbLocales = locales.length();
       for(int i = 0; i < nbLocales; i++) {
         // Find the right textDto corresponding with the locale
@@ -393,9 +405,7 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
     @Override
     public JsArray<LocaleTextDto> getValue() {
       JsArray<LocaleTextDto> texts = JsArrays.create();
-      GWT.log("COUNT " + getLocalizedEditableTextMap().size());
       for(String locale : getLocalizedEditableTextMap().keySet()) {
-        GWT.log("Text " + getLocalizedEditableTextMap().get(locale).getTextBox().getText());
         LocaleTextDto localeText = LocaleTextDto.create();
         localeText.setText(getLocalizedEditableTextMap().get(locale).getTextBox().getText());
         localeText.setLocale(locale);
@@ -405,25 +415,31 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
 
       return texts;
     }
+
+    private LocalizedEditableText getTextValueInput(String locale, String text) {
+      LocalizedEditableText localizedText = new LocalizedEditableText();
+      localizedText.setValue(new LocalizedEditableText.LocalizedText(locale, text));
+
+      return localizedText;
+    }
   }
 
   private class TermDragHandlerAdapter extends DragHandlerAdapter {
     private final FlowPanel target;
 
-    private final VocabularyDto vocabulary;
-
     int original;
 
-    private TermDragHandlerAdapter(FlowPanel target, VocabularyDto vocabulary) {
+    boolean insertAfter = true;
+
+    private TermDragHandlerAdapter(FlowPanel target) {
       this.target = target;
-      this.vocabulary = vocabulary;
       original = 0;
     }
 
     @Override
     public void onDragStart(DragStartEvent event) {
       super.onDragStart(event);
-      original = target.getWidgetIndex((FocusPanel) event.getSource());
+      original = target.getWidgetIndex((Widget) event.getSource());
     }
 
     @Override
@@ -432,43 +448,11 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
         int pos = target.getWidgetIndex((Widget) event.getSource());
         String title = target.getWidget(pos).getTitle();
 
-        // If move up, pos should be pos -1
         if(pos <= original) {
-          pos = pos - 1;
+          insertAfter = false;
         }
 
-        TermDto t = TermArrayUtils.findTerm(vocabulary.getTermsArray(), title);
-
-        // Modify vocabulary with the new structure
-        TermDto parent = TermArrayUtils.findParent(null, vocabulary.getTermsArray(), t);
-        if(parent != null) {
-          JsArray<TermDto> termsArray = JsArrays.create().cast();
-          for(int i = 0; i < parent.getTermsCount(); i++) {
-            if(i == pos) {
-              termsArray.push(t);
-            }
-
-            if(!parent.getTerms(i).getName().equals(title)) {
-              termsArray.push(parent.getTerms(i));
-            }
-          }
-
-          parent.setTermsArray(termsArray);
-        } else {
-          JsArray<TermDto> termsArray = JsArrays.create().cast();
-          for(int i = 0; i < vocabulary.getTermsCount(); i++) {
-            if(i == pos) {
-              termsArray.push(t);
-            }
-
-            if(!vocabulary.getTerms(i).getName().equals(title)) {
-              termsArray.push(vocabulary.getTerms(i));
-            }
-          }
-
-          vocabulary.setTermsArray(termsArray);
-        }
-        displayTerms(vocabulary);
+        getUiHandlers().onReorderTerms(title, pos, insertAfter);
       }
     }
   }

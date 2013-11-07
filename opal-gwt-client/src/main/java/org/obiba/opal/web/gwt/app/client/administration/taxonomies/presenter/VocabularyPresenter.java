@@ -9,18 +9,18 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter;
 
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.model.client.opal.TaxonomyDto;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.opal.GeneralConf;
 import org.obiba.opal.web.model.client.opal.TermDto;
 import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -30,6 +30,7 @@ import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
+import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
@@ -44,20 +45,21 @@ public class VocabularyPresenter extends Presenter<Display, VocabularyPresenter.
   @NameToken(Places.VOCABULARY)
   public interface Proxy extends ProxyPlace<VocabularyPresenter> {}
 
+  private final Translations translations;
+
   private final BreadcrumbsBuilder breadcrumbsBuilder;
-
-  private TaxonomyDto taxonomy;
-
-  private VocabularyDto vocabulary;
 
   private String taxonomyName;
 
   private String vocabularyName;
 
+  private String termName;
+
   @Inject
   public VocabularyPresenter(Display display, EventBus eventBus, Proxy proxy, PlaceManager placeManager,
-      BreadcrumbsBuilder breadcrumbsBuilder) {
+      Translations translations, BreadcrumbsBuilder breadcrumbsBuilder) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
+    this.translations = translations;
     this.breadcrumbsBuilder = breadcrumbsBuilder;
     this.placeManager = placeManager;
     getView().setUiHandlers(this);
@@ -68,8 +70,21 @@ public class VocabularyPresenter extends Presenter<Display, VocabularyPresenter.
     super.prepareFromRequest(request);
     taxonomyName = request.getParameter(TaxonomyTokens.TOKEN_TAXONOMY, null);
     vocabularyName = request.getParameter(TaxonomyTokens.TOKEN_VOCABULARY, null);
+    termName = request.getParameter(TaxonomyTokens.TOKEN_TERM, null);
 
-    refresh();
+    ResourceRequestBuilderFactory.<GeneralConf>newBuilder()
+        .forResource(UriBuilders.SYSTEM_CONF_GENERAL.create().build())
+        .withCallback(new ResourceCallback<GeneralConf>() {
+          @Override
+          public void onResource(Response response, GeneralConf resource) {
+            JsArrayString locales = JsArrayString.createArray().cast();
+            for(int i = 0; i < resource.getLanguagesArray().length(); i++) {
+              locales.push(resource.getLanguages(i));
+            }
+            getView().setAvailableLocales(locales);
+            refresh();
+          }
+        }).get().send();
   }
 
   @Override
@@ -79,58 +94,43 @@ public class VocabularyPresenter extends Presenter<Display, VocabularyPresenter.
   }
 
   private void refresh() {
-    ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder().forResource("/system/conf/taxonomy/" + taxonomyName).get()
-        .withCallback(new ResourceCallback<TaxonomyDto>() {
+    ResourceRequestBuilderFactory.<VocabularyDto>newBuilder()
+        .forResource(UriBuilders.SYSTEM_CONF_TAXONOMY_VOCABULARY.create().build(taxonomyName, vocabularyName))//
+        .get()//
+        .withCallback(new ResourceCallback<VocabularyDto>() {
+
           @Override
-          public void onResource(Response response, TaxonomyDto resource) {
-            taxonomy = resource;
-            for(int i = 0; i < taxonomy.getVocabulariesCount(); i++) {
-              if(taxonomy.getVocabularies(i).getName().equals(vocabularyName)) {
-                vocabulary = taxonomy.getVocabularies(i);
-              }
-            }
+          public void onResource(Response response, VocabularyDto resource) {
+            getView().displayVocabulary(resource, taxonomyName, termName);
 
-            ResourceRequestBuilderFactory.<JsArray<TaxonomyDto>>newBuilder().forResource("/system/conf/taxonomies")
-                .get().withCallback(new ResourceCallback<JsArray<TaxonomyDto>>() {
-              @Override
-              public void onResource(Response response, JsArray<TaxonomyDto> resource) {
-                JsArray<TaxonomyDto> taxonomies = JsArrays.toSafeArray(resource);
-                JsArrayString locales = JsArrayString.createArray().cast();
-                locales.push("en");
-                locales.push("fr");
-
-                getView().displayVocabulary(vocabulary, taxonomyName);
-
-              }
-            }).send();
           }
         }).send();
 
   }
 
+  @TitleFunction
+  public String getTitle() {
+    return translations.pageVocabularyTitle();
+  }
+
   @Override
   public void onTermSelection(TermDto termDto) {
-//    getView().setCurrentTerm(termDto);
     getView().displayTerm(termDto);
   }
 
   @Override
   public void onEditVocabulary() {
-    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.VOCABULARY_EDIT)
-        .with(TaxonomyTokens.TOKEN_TAXONOMY, taxonomy.getName())
-        .with(TaxonomyTokens.TOKEN_VOCABULARY, vocabulary.getName()).build();
-    placeManager.revealPlace(request);
-
+    placeManager.revealRelativePlace(
+        new PlaceRequest.Builder().nameToken(Places.VOCABULARY_EDIT).with(TaxonomyTokens.TOKEN_TAXONOMY, taxonomyName)
+            .with(TaxonomyTokens.TOKEN_VOCABULARY, vocabularyName).build(), 2);
   }
 
   public interface Display extends View, HasBreadcrumbs, HasUiHandlers<VocabularyUiHandlers> {
 
-    void displayVocabulary(VocabularyDto vocabulary, String taxonomyName);
+    void displayVocabulary(VocabularyDto vocabulary, String taxonomy, String term);
 
     void displayTerm(TermDto termDto);
 
-//    HasValue<Boolean> getRepeatable();
-
-//    void setTaxonomies(JsArray<TaxonomyDto> taxonomies, String taxonomyName);
+    void setAvailableLocales(JsArrayString locales);
   }
 }

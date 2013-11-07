@@ -322,7 +322,7 @@ message TaxonomyDto {
   optional string name = 1; // mapped to attribute namespace
   repeated LocaleTextDto titles = 2;
   repeated LocaleTextDto descriptions = 3;
-  repeated VocabularyDto vocabularies = 4;
+  repeated string vocabularies = 4;
 }
 
 message OpalConf {

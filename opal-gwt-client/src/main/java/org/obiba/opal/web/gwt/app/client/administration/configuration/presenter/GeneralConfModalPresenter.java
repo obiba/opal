@@ -9,8 +9,8 @@
 */
 package org.obiba.opal.web.gwt.app.client.administration.configuration.presenter;
 
+import org.obiba.opal.web.gwt.app.client.administration.configuration.event.GeneralConfigSavedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -28,13 +28,9 @@ import com.gwtplatform.mvp.client.PopupView;
 public class GeneralConfModalPresenter extends ModalPresenterWidget<GeneralConfModalPresenter.Display>
     implements GeneralConfModalUiHandlers {
 
-  private final Translations translations;
-
   @Inject
-  public GeneralConfModalPresenter(Display display, EventBus eventBus, Translations translations) {
+  public GeneralConfModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
-    this.translations = translations;
-
     getView().setUiHandlers(this);
   }
 
@@ -52,6 +48,7 @@ public class GeneralConfModalPresenter extends ModalPresenterWidget<GeneralConfM
         if(response.getStatusCode() == Response.SC_OK) {
           getView().hide();
           getEventBus().fireEvent(NotificationEvent.newBuilder().info("GeneralConfigSaved").build());
+          getEventBus().fireEvent(new GeneralConfigSavedEvent());
         } else {
           getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         }

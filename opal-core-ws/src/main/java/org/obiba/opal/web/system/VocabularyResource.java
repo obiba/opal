@@ -10,7 +10,12 @@
 
 package org.obiba.opal.web.system;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.List;
+
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.Response;
@@ -23,6 +28,8 @@ import org.obiba.opal.core.domain.taxonomy.Term;
 import org.obiba.opal.core.domain.taxonomy.Vocabulary;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.taxonomy.Dtos;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 public class VocabularyResource {
 
@@ -38,7 +45,22 @@ public class VocabularyResource {
     this.vocabularyName = vocabularyName;
   }
 
-  @SuppressWarnings({ "ConstantConditions", "OverlyLongMethod" })
+  @GET
+  public Response getVocabulary() {
+    Taxonomy taxonomy = taxonomyService.getTaxonomy(taxonomyName);
+
+    if(taxonomy == null) {
+      return Response.status(Response.Status.NOT_FOUND).build();
+    }
+
+    Vocabulary vocabulary = taxonomyService.getVocabulary(taxonomyName, vocabularyName);
+    if(vocabulary == null) {
+      return Response.status(Response.Status.NOT_FOUND).build();
+    }
+
+    return Response.ok().entity(Dtos.asDto(vocabulary)).build();
+  }
+
   @POST
   @Consumes(value = "text/plain")
   public Response addVocabularyTerms(String csv) {
@@ -55,37 +77,47 @@ public class VocabularyResource {
 
     vocabulary.getTerms().clear();
 
-    // Parse csv and add terms
-    String[] lines = csv.split("\n");
-    Term t = null;
-    for(String line : lines) {
-      String[] terms = line.split(",");
-      int level = terms.length - 1;
+    try {
+      parseStringAsCsv(csv, vocabulary);
+    } catch(IOException e) {
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
 
+    taxonomyService.saveVocabulary(null, vocabulary);
+
+    return Response.ok().build();
+  }
+
+  private void parseStringAsCsv(String csv, Vocabulary vocabulary) throws IOException {// Parse csv and add terms
+    CSVReader reader = new CSVReader(new StringReader(csv));
+    List<String[]> lines = reader.readAll();
+
+    Term t = null;
+    for(String[] terms : lines) {
+
+      int level = terms.length - 1;
       if(level == 0) {
         if(t != null) {
           vocabulary.getTerms().add(t);
         }
 
-        t = new Term(terms[0].replaceAll("\"", ""));
+        t = new Term(terms[0]);
       } else {
         Term parent = t;
 
         for(int i = 1; i < level; i++) {
           // find parent
-          parent = parent.getTerms().get(parent.getTerms().size() - 1);
+          if(parent != null) {
+            parent = parent.getTerms().get(parent.getTerms().size() - 1);
+          }
         }
 
         // Add new term
-        parent.getTerms().add(new Term(terms[terms.length - 1].replaceAll("\"", "")));
+        if(parent != null) {
+          parent.getTerms().add(new Term(terms[terms.length - 1]));
+        }
       }
     }
-
-//    tax.getVocabularies().add(voc);
-    //TODO use right template
-    taxonomyService.saveTaxonomy(null, taxonomy);
-
-    return Response.ok().build();
   }
 
   @PUT
@@ -94,8 +126,7 @@ public class VocabularyResource {
     try {
 
       Vocabulary vocabulary = taxonomyService.getVocabulary(taxonomyName, vocabularyName);
-      //TODO use right template
-      taxonomyService.saveVocabulary(vocabulary, Dtos.fromDto(dto)); //taxonomyName, vocabularyName, ,vocabulary
+      taxonomyService.saveVocabulary(vocabulary, Dtos.fromDto(dto));
     } catch(NoSuchTaxonomyException e) {
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch(NoSuchVocabularyException e) {

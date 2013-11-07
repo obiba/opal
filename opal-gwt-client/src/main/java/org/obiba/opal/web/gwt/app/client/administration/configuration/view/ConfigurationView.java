@@ -2,6 +2,7 @@ package org.obiba.opal.web.gwt.app.client.administration.configuration.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.configuration.presenter.ConfigurationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.configuration.presenter.ConfigurationUiHandlers;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.OpalNavLink;
 import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
 import org.obiba.opal.web.model.client.opal.GeneralConf;
@@ -9,7 +10,6 @@ import org.obiba.opal.web.model.client.opal.GeneralConf;
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -24,6 +24,8 @@ import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 public class ConfigurationView extends ViewWithUiHandlers<ConfigurationUiHandlers>
     implements ConfigurationPresenter.Display {
+
+  private final Translations translations;
 
   interface Binder extends UiBinder<Widget, ConfigurationView> {}
 
@@ -40,10 +42,14 @@ public class ConfigurationView extends ViewWithUiHandlers<ConfigurationUiHandler
   Panel generalPanel;
 
   @UiField
+  PropertiesTable generalProperties;
+
+  @UiField
   IconAnchor editGeneralSettings;
 
   @Inject
-  public ConfigurationView(Binder uiBinder) {
+  public ConfigurationView(Binder uiBinder, Translations translations) {
+    this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
   }
 
@@ -67,14 +73,11 @@ public class ConfigurationView extends ViewWithUiHandlers<ConfigurationUiHandler
 
   @Override
   public void renderGeneralProperties(GeneralConf resource) {
-    GWT.log("Render General Properties... view");
-
-    PropertiesTable properties = new PropertiesTable();
-    properties.addProperty("Name", resource.getName());
-    properties.addProperty("Default Character Set", resource.getDefaultCharSet());
-    properties.addProperty("Public URL", resource.getPublicURL());
-    properties.addProperty(new Label("Languages"), getLanguages(resource));
-    generalPanel.add(properties);
+    generalProperties.clearProperties();
+    generalProperties.addProperty(translations.nameLabel(), resource.getName());
+    generalProperties.addProperty(translations.defaultCharsetLabel(), resource.getDefaultCharSet());
+    generalProperties.addProperty(translations.publicUrl(), resource.getPublicURL());
+    generalProperties.addProperty(new Label(translations.languageLabel()), getLanguages(resource));
 
     generalNavLink.setActive(true);
   }

@@ -2,6 +2,10 @@ package org.obiba.opal.web.taxonomy;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.domain.taxonomy.Term;
@@ -15,86 +19,97 @@ public class Dtos {
   public static Opal.TaxonomyDto asDto(Taxonomy taxonomy) {
     Opal.TaxonomyDto.Builder builder = Opal.TaxonomyDto.newBuilder();
     builder.setName(taxonomy.getName());
-    //TODO
-//    builder.addAllTitles(toTextDtoList(taxonomy.getTitles()));
-//    builder.addAllDescriptions(toTextDtoList(taxonomy.getDescriptions()));
+    builder.addAllTitles(toLocaleTextDtoList(taxonomy.getTitles()));
+    builder.addAllDescriptions(toLocaleTextDtoList(taxonomy.getDescriptions()));
 
-    Iterable<Opal.VocabularyDto> vocabularyDtos = new ArrayList<Opal.VocabularyDto>();
-//    for(Vocabulary v : taxonomy.getVocabularies()) {
-//      vocabularyDtos.add(asDto(v));
-//    }
-    builder.addAllVocabularies(vocabularyDtos);
+    if(taxonomy.getVocabularies() != null) {
+      builder.addAllVocabularies(taxonomy.getVocabularies());
+    }
     return builder.build();
+  }
+
+  private static Iterable<? extends Opal.LocaleTextDto> toLocaleTextDtoList(Map<Locale, String> map) {
+    Collection<Opal.LocaleTextDto> localeTexts = new ArrayList<Opal.LocaleTextDto>();
+
+    for(Locale locale : map.keySet()) {
+      localeTexts.add(Opal.LocaleTextDto.newBuilder().setText(map.get(locale)).setLocale(locale.getLanguage()).build());
+    }
+
+    return localeTexts;
   }
 
   public static Taxonomy fromDto(Opal.TaxonomyDto dto) {
     Taxonomy taxonomy = new Taxonomy(dto.getName());
-    //TODO
-//    taxonomy.setTitles(fromTextDtoList(dto.getTitlesList()));
-//    taxonomy.setDescriptions(fromTextDtoList(dto.getDescriptionsList()));
+    taxonomy.setTitles(fromLocaleTextDtoList(dto.getTitlesList()));
+    taxonomy.setDescriptions(fromLocaleTextDtoList(dto.getDescriptionsList()));
 
-    Collection<Vocabulary> vocabularies = new ArrayList<Vocabulary>();
-    for(Opal.VocabularyDto v : dto.getVocabulariesList()) {
-      vocabularies.add(fromDto(v));
+    for(String vocabulary : dto.getVocabulariesList()) {
+      taxonomy.addVocabulary(vocabulary);
     }
-//    taxonomy.setVocabularies(vocabularies);
+
     return taxonomy;
   }
 
-  public static Opal.TermDto asDto(Term term) {
+  private static Opal.TermDto asDto(Term term) {
     Opal.TermDto.Builder builder = Opal.TermDto.newBuilder();
     builder.setName(term.getName());
-    //TODO
-//    builder.addAllTitles(toTextDtoList(term.getTitles()));
-//    builder.addAllDescriptions(toTextDtoList(term.getDescriptions()));
+    builder.addAllTitles(toLocaleTextDtoList(term.getTitles()));
+    builder.addAllDescriptions(toLocaleTextDtoList(term.getDescriptions()));
     builder.addAllTerms(asDto(term.getTerms()));
     return builder.build();
   }
 
   private static Iterable<Opal.TermDto> asDto(Iterable<Term> terms) {
-    Iterable<Opal.TermDto> termDto = new ArrayList<Opal.TermDto>();
-//    for(HasTerms t : terms) {
-//      termDto.add(asDto((Term) t));
-//    }
+    Collection<Opal.TermDto> termDto = new ArrayList<Opal.TermDto>();
+    for(Term t : terms) {
+      termDto.add(asDto(t));
+    }
     return termDto;
   }
 
-//  private static List<HasTerms> fromDto(Iterable<Opal.TaxonomyDto.TermDto> termDtos) {
-//    List<HasTerms> termDto = new ArrayList<HasTerms>();
-//    for(Opal.TaxonomyDto.TermDto t : termDtos) {
-//      termDto.add(fromDto(t));
-//    }
-//    return termDto;
-//  }
+  private static List<Term> fromDto(Iterable<Opal.TermDto> termDtos) {
+    List<Term> termDto = new ArrayList<Term>();
+    for(Opal.TermDto t : termDtos) {
+      termDto.add(fromDto(t));
+    }
+    return termDto;
+  }
 
-  public static Term fromDto(Opal.TermDto from) {
+  private static Term fromDto(Opal.TermDto from) {
     Term term = new Term(from.getName());
-    //TODO
-//    term.setTitles(fromTextDtoList(from.getTitlesList()));
-//    term.setDescriptions(fromTextDtoList(from.getDescriptionsList()));
-//    term.setTerms(fromDto(from.getTermsList()));
+    term.setTitles(fromLocaleTextDtoList(from.getTitlesList()));
+    term.setDescriptions(fromLocaleTextDtoList(from.getDescriptionsList()));
+    term.setTerms(fromDto(from.getTermsList()));
     return term;
   }
 
   public static Opal.VocabularyDto asDto(Vocabulary vocabulary) {
     Opal.VocabularyDto.Builder builder = Opal.VocabularyDto.newBuilder();
     builder.setName(vocabulary.getName());
-    //TODO
-//    builder.addAllTitles(toTextDtoList(vocabulary.getTitles()));
-//    builder.addAllDescriptions(toTextDtoList(vocabulary.getDescriptions()));
-//    builder.addAllTerms(asDto(vocabulary.getTerms()));
+    builder.addAllTitles(toLocaleTextDtoList(vocabulary.getTitles()));
+    builder.addAllDescriptions(toLocaleTextDtoList(vocabulary.getDescriptions()));
+    builder.addAllTerms(asDto(vocabulary.getTerms()));
     builder.setRepeatable(vocabulary.isRepeatable());
+    builder.setTaxonomyName(vocabulary.getTaxonomy());
     return builder.build();
   }
 
   public static Vocabulary fromDto(Opal.VocabularyDto dto) {
-    Vocabulary vocabulary = new Vocabulary();
-    //TODO
-//    vocabulary.setTitles(fromTextDtoList(dto.getTitlesList()));
-//    vocabulary.setDescriptions(fromTextDtoList(dto.getDescriptionsList()));
-//    vocabulary.setTerms(fromDto(dto.getTermsList()));
+    Vocabulary vocabulary = new Vocabulary(dto.getTaxonomyName(), dto.getName());
+    vocabulary.setTitles(fromLocaleTextDtoList(dto.getTitlesList()));
+    vocabulary.setDescriptions(fromLocaleTextDtoList(dto.getDescriptionsList()));
+    vocabulary.setTerms(fromDto(dto.getTermsList()));
     vocabulary.setRepeatable(dto.getRepeatable());
     return vocabulary;
   }
 
+  private static Map<Locale, String> fromLocaleTextDtoList(Iterable<Opal.LocaleTextDto> dtos) {
+    Map<Locale, String> localeTexts = new HashMap<Locale, String>();
+
+    for(Opal.LocaleTextDto dto : dtos) {
+      localeTexts.put(new Locale(dto.getLocale()), dto.getText());
+    }
+
+    return localeTexts;
+  }
 }
