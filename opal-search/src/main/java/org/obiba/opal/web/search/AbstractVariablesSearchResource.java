@@ -56,14 +56,11 @@ public abstract class AbstractVariablesSearchResource {
 
   protected QuerySearchJsonBuilder buildQuerySearch(String query, int offset, int limit, Collection<String> fields,
       String sortField, String sortDir) {
-
     addDefaultFields(fields);
-    if(Strings.isNullOrEmpty(sortField)) sortField = DEFAULT_SORT_FIELD;
-    if(Strings.isNullOrEmpty(sortDir)) sortDir = SortDir.DESC.toString();
-
     QuerySearchJsonBuilder jsonBuilder = new QuerySearchJsonBuilder();
-    jsonBuilder.setQuery(query).setFields(fields).setFrom(offset).setSize(limit).setSortField(sortField)
-        .setSortDir(sortDir);
+    jsonBuilder.setQuery(query).setFields(fields).setFrom(offset).setSize(limit) //
+        .setSortField(Strings.isNullOrEmpty(sortField) ? DEFAULT_SORT_FIELD : sortField) //
+        .setSortDir(Strings.isNullOrEmpty(sortDir) ? SortDir.DESC.toString() : sortDir);
 
     return jsonBuilder;
   }
