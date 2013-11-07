@@ -357,8 +357,3 @@ td.row-actions span {
   cursor: pointer;
   text-decoration: underline;
 }
-
-.obiba-DropdownSuggestBox,
-.obiba-EditableListBox {
-  z-index: 2000;
-}
