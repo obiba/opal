@@ -83,14 +83,14 @@ public class Dtos {
     return term;
   }
 
-  public static Opal.VocabularyDto asDto(String taxonomyName, Vocabulary vocabulary) {
+  public static Opal.VocabularyDto asDto(Vocabulary vocabulary) {
     Opal.VocabularyDto.Builder builder = Opal.VocabularyDto.newBuilder();
     builder.setName(vocabulary.getName());
     builder.addAllTitles(toLocaleTextDtoList(vocabulary.getTitles()));
     builder.addAllDescriptions(toLocaleTextDtoList(vocabulary.getDescriptions()));
     builder.addAllTerms(asDto(vocabulary.getTerms()));
     builder.setRepeatable(vocabulary.isRepeatable());
-    builder.setTaxonomyName(taxonomyName);
+    builder.setTaxonomyName(vocabulary.getTaxonomy());
     return builder.build();
   }
 

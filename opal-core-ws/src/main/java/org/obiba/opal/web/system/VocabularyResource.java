@@ -58,7 +58,7 @@ public class VocabularyResource {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
 
-    return Response.ok().entity(Dtos.asDto(taxonomyName, vocabulary)).build();
+    return Response.ok().entity(Dtos.asDto(vocabulary)).build();
   }
 
   @POST

@@ -39,7 +39,7 @@ public class VocabulariesResource {
     List<Opal.VocabularyDto> vocabularies = new ArrayList<Opal.VocabularyDto>();
 
     for(Vocabulary v : taxonomyService.getVocabularies(taxonomyName)) {
-      vocabularies.add(Dtos.asDto(taxonomyName, v));
+      vocabularies.add(Dtos.asDto(v));
     }
 
     return vocabularies;
