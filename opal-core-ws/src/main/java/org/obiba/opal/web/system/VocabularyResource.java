@@ -126,7 +126,7 @@ public class VocabularyResource {
     try {
 
       Vocabulary vocabulary = taxonomyService.getVocabulary(taxonomyName, vocabularyName);
-      taxonomyService.saveVocabulary(vocabulary, Dtos.fromDto(dto.getTaxonomyName(), dto));
+      taxonomyService.saveVocabulary(vocabulary, Dtos.fromDto(dto));
     } catch(NoSuchTaxonomyException e) {
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch(NoSuchVocabularyException e) {

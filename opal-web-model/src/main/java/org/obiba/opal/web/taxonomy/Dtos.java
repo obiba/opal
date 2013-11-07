@@ -94,8 +94,8 @@ public class Dtos {
     return builder.build();
   }
 
-  public static Vocabulary fromDto(String taxonomyName, Opal.VocabularyDto dto) {
-    Vocabulary vocabulary = new Vocabulary(taxonomyName, dto.getName());
+  public static Vocabulary fromDto(Opal.VocabularyDto dto) {
+    Vocabulary vocabulary = new Vocabulary(dto.getTaxonomyName(), dto.getName());
     vocabulary.setTitles(fromLocaleTextDtoList(dto.getTitlesList()));
     vocabulary.setDescriptions(fromLocaleTextDtoList(dto.getDescriptionsList()));
     vocabulary.setTerms(fromDto(dto.getTermsList()));

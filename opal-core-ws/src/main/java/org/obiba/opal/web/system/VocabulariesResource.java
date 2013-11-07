@@ -57,7 +57,7 @@ public class VocabulariesResource {
       return Response.status(Response.Status.CONFLICT).build();
     }
 
-    Vocabulary v = Dtos.fromDto(taxonomyName, vocabulary);
+    Vocabulary v = Dtos.fromDto(vocabulary);
     taxonomyService.saveVocabulary(null, v);
 
     return Response.ok().build();
