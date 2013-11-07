@@ -22,6 +22,9 @@ import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.SiblingTableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
+import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
@@ -55,8 +58,9 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
     eventBusMock = createMock(EventBus.class);
     usersAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
+    ModalProvider<TablePropertiesModalPresenter> propertiesEditorModalProvider = createMock(ModalProvider.class);
 
-    datasourcePresenter = new DatasourcePresenter(displayMock, new CountingEventBus());
+    datasourcePresenter = new DatasourcePresenter(displayMock, new CountingEventBus(), propertiesEditorModalProvider);
   }
 
   @SuppressWarnings("unchecked")
