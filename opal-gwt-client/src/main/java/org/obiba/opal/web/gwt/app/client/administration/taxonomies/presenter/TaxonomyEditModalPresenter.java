@@ -74,10 +74,7 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
           @Override
           public void onResponseCode(Request request, Response response) {
             if(response.getText() != null && response.getText().length() != 0) {
-              ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
-              getEventBus().fireEvent(
-                  NotificationEvent.newBuilder().error("TaxonomyCreationFailed").args(errorDto.getArgumentsArray())
-                      .build());
+              getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
             }
           }
         }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR)//
@@ -204,10 +201,9 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
             @Override
             public void onResponseCode(Request request, Response response) {
               if(response.getText() != null && response.getText().length() != 0) {
-                ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
+                ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
                 getEventBus().fireEvent(
-                    NotificationEvent.newBuilder().error("TaxonomyDeletionFailed").args(errorDto.getArgumentsArray())
-                        .build());
+                    NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray()).build());
               }
             }
           }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR)//

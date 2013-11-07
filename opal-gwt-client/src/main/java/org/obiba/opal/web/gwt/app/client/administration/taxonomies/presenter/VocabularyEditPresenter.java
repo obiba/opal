@@ -26,7 +26,6 @@ import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 import org.obiba.opal.web.model.client.opal.TermDto;
 import org.obiba.opal.web.model.client.opal.VocabularyDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
@@ -168,9 +167,17 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            GWT.log(response.getText());
+            // nothing
           }
-        }, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_BAD_REQUEST)//
+        }, Response.SC_OK)//
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if(response.getText() != null && response.getText().length() != 0) {
+              getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+            }
+          }
+        }, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_BAD_REQUEST)//
         .put().send();
 
     placeManager.revealRelativePlace(new PlaceRequest.Builder().nameToken(Places.VOCABULARY)//
