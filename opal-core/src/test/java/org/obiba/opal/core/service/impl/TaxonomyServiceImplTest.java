@@ -249,6 +249,51 @@ public class TaxonomyServiceImplTest extends AbstractJUnit4SpringContextTests {
 
   }
 
+  @Test
+  public void test_rename_vocabulary() {
+    Taxonomy taxonomy = createTaxonomy();
+    taxonomyService.saveTaxonomy(taxonomy, taxonomy);
+
+    Vocabulary vocabulary = createVocabulary(taxonomy);
+    taxonomyService.saveVocabulary(null, vocabulary);
+
+    Vocabulary vocabulary1 = createVocabulary(taxonomy);
+    vocabulary1.setName("new name");
+    taxonomyService.saveVocabulary(vocabulary, vocabulary1);
+
+    Vocabulary foundVocabulary = taxonomyService.getVocabulary(taxonomy.getName(), vocabulary1.getName());
+    assertNotNull(foundVocabulary);
+
+    Taxonomy found = taxonomyService.getTaxonomy(taxonomy.getName());
+    assertNotNull(found);
+    assertFalse(found.hasVocabulary(vocabulary.getName()));
+    assertTrue(found.hasVocabulary(vocabulary1.getName()));
+    assertEquals(2, found.getVocabularies().size());
+  }
+
+  @Test
+  public void test_delete_remove_rename_vocabulary() {
+    Taxonomy taxonomy = new Taxonomy("taxonomy");
+    taxonomyService.saveTaxonomy(taxonomy, taxonomy);
+
+    Vocabulary vocabulary = new Vocabulary(taxonomy.getName(), "vocabulary 1");
+    taxonomyService.saveVocabulary(null, vocabulary);
+
+    Vocabulary vocabulary2 = new Vocabulary(taxonomy.getName(), "vocabulary 2");
+    vocabulary2.setName("vocabulary 2");
+    taxonomyService.saveVocabulary(null, vocabulary2);
+
+    taxonomyService.deleteVocabulary(vocabulary);
+
+    assertNull(taxonomyService.getVocabulary(taxonomy.getName(), "vocabulary 1"));
+
+    Vocabulary vocabulary3 = new Vocabulary(taxonomy.getName(), "vocabulary 1");
+    taxonomyService.saveVocabulary(vocabulary2, vocabulary3);
+
+    Vocabulary found = taxonomyService.getVocabulary(taxonomy.getName(), "vocabulary 1");
+    assertNotNull(found);
+  }
+
   private Taxonomy createTaxonomy() {
     return new Taxonomy("taxonomy test") //
         .addTitle(Locale.ENGLISH, "English title") //
