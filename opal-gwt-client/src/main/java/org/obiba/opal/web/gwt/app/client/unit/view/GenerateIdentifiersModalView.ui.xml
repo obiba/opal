@@ -11,67 +11,64 @@
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:b1="urn:import:com.github.gwtbootstrap.client.ui.base"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
-  <g:DialogBox ui:field="dialog" autoHide="false" modal="true" glassEnabled="true">
-    <g:DockLayoutPanel unit="EM" ui:field="content" height="360px" width="360px">
-      <g:center>
-        <g:ScrollPanel>
-          <g:FlowPanel addStyleNames="main">
-            <g:FlowPanel styleName="input">
-              <g:Label ui:field="confirmationMessage" addStyleNames="p large-bottom-margin">
-                <ui:msg
-                    description="Specify Generate Functional Unit Identifiers">Description
-                </ui:msg>
-              </g:Label>
-            </g:FlowPanel>
-            <g:FlowPanel styleName="instructions key">
-              <g:InlineLabel>
-                <ui:msg description="Sample Identifier label">Sample Identifier:</ui:msg>
-              </g:InlineLabel>
-              <g:InlineLabel addStyleNames="small-indent" ui:field="sampleIdentifier">
-                <ui:msg>99999</ui:msg>
-              </g:InlineLabel>
-            </g:FlowPanel>
-            <g:FlowPanel styleName="input large-top-margin">
-              <g:Label addStyleNames="key">
-                <ui:msg description="Identifiers size">Identifier size</ui:msg>
-              </g:Label>
-              <o:NumericTextBox ui:field="size" width="6em" minConstrained="true"
-                  maxConstrained="false"></o:NumericTextBox>
-              <g:Label ui:field="sizeHelp" addStyleNames="help-block">
-                <ui:msg description="configure help label">Size Help</ui:msg>
-              </g:Label>
-            </g:FlowPanel>
-            <g:FlowPanel styleName="input">
-              <g:Label addStyleNames="key">
-                <ui:msg description="Identifiers prefix">Identifier Prefix</ui:msg>
-              </g:Label>
-              <g:TextBox name="prefix" ui:field="prefix"></g:TextBox>
-            </g:FlowPanel>
-            <g:FlowPanel>
-              <b:CheckBox ui:field="allowZeros" addStyleNames="key">
-                <ui:msg description="Identifiers Allow zeros label">Allow leading zeros</ui:msg>
-              </b:CheckBox>
-            </g:FlowPanel>
-          </g:FlowPanel>
-        </g:ScrollPanel>
-      </g:center>
-      <g:south size="4">
-        <g:HTMLPanel addStyleNames="footer">
-          <o:ResizeHandle ui:field="resizeHandle"></o:ResizeHandle>
-          <span class="right-aligned top-margin">
-            <g:Button ui:field="generateButton" styleName="btn btn-primary">
-              <ui:msg description="Generate Identifiers button label">Save</ui:msg>
-            </g:Button>
-            <g:Button ui:field="cancelButton" styleName="btn">
-              <ui:msg description="Cancel button label">Cancel</ui:msg>
-            </g:Button>
-          </span>
-        </g:HTMLPanel>
-      </g:south>
-    </g:DockLayoutPanel>
-  </g:DialogBox>
+  <o:Modal ui:field="dialog" resizable="false" closeVisible="true" keyboard="true" animation="false">
+    <g:FlowPanel>
+      <g:FlowPanel addStyleNames="large-bottom-margin">
+        <b:Paragraph ui:field="confirmationMessage">
+          <ui:msg
+              description="Specify Generate Functional Unit Identifiers">Description
+          </ui:msg>
+        </b:Paragraph>
+      </g:FlowPanel>
+
+      <g:FlowPanel>
+        <b:ControlGroup>
+          <b1:InlineLabel addStyleNames="xsmall-right-indent">
+            <ui:msg description="Sample Identifier label">Sample Identifier:</ui:msg>
+          </b1:InlineLabel>
+          <b1:InlineLabel ui:field="sampleIdentifier">
+            <ui:msg>99999</ui:msg>
+          </b1:InlineLabel>
+        </b:ControlGroup>
+
+        <b:ControlGroup>
+          <b:ControlLabel for="size">
+            <ui:msg description="Identifiers size">Identifier size</ui:msg>
+          </b:ControlLabel>
+          <o:NumericTextBox ui:field="size" width="6em" minConstrained="true"
+              maxConstrained="false"></o:NumericTextBox>
+          <b:HelpBlock ui:field="sizeHelp">
+            <ui:msg description="configure help label">Size Help</ui:msg>
+          </b:HelpBlock>
+        </b:ControlGroup>
+
+        <b:ControlGroup>
+          <b:ControlLabel for="prefix">
+            <ui:msg description="Identifiers prefix">Identifier Prefix</ui:msg>
+          </b:ControlLabel>
+          <b:TextBox ui:field="prefix"></b:TextBox>
+        </b:ControlGroup>
+
+        <b:ControlGroup>
+          <b:CheckBox ui:field="allowZeros">
+            <ui:msg description="Identifiers Allow zeros label">Allow leading zeros</ui:msg>
+          </b:CheckBox>
+        </b:ControlGroup>
+      </g:FlowPanel>
+    </g:FlowPanel>
+
+    <b:ModalFooter>
+      <b:Button ui:field="generateButton" type="PRIMARY">
+        <ui:msg description="Add button label">Save</ui:msg>
+      </b:Button>
+      <b:Button ui:field="cancelButton">
+        <ui:msg description="Cancel button label">Cancel</ui:msg>
+      </b:Button>
+    </b:ModalFooter>
+  </o:Modal>
 
 </ui:UiBinder>
