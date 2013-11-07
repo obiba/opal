@@ -51,6 +51,8 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableVcsCommitHistoryPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VcsCommitHistoryModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.table.view.TablePropertiesModalView;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CategoriesEditorModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.view.CategoriesEditorModalView;
@@ -106,6 +108,8 @@ public class NavigatorModule extends AbstractOpalModule {
     bindPresenterWidget(VcsCommitHistoryModalPresenter.class, VcsCommitHistoryModalPresenter.Display.class,
         VcsCommitHistoryModalView.class);
 
+    bindPresenterWidget(TablePropertiesModalPresenter.class, TablePropertiesModalPresenter.Display.class,
+        TablePropertiesModalView.class);
     bindPresenterWidget(CategoriesEditorModalPresenter.class, CategoriesEditorModalPresenter.Display.class,
         CategoriesEditorModalView.class);
     bindPresenterWidget(VariablePropertiesModalPresenter.class, VariablePropertiesModalPresenter.Display.class,

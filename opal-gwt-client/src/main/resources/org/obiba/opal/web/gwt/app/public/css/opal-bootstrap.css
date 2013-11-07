@@ -79,3 +79,7 @@ a:hover {
 .typeahead {
   z-index: 10000;
 }
+
+.tab-content {
+  min-height: 150px;
+}

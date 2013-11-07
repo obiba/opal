@@ -246,6 +246,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("An attribute name is required.")
   String attributeNameRequired();
 
+  @Description("Table name already exists label")
+  @DefaultStringValue("A table already exists with this name.")
+  String tableNameAlreadyExists();
+
   @Description("Variable name already exists label")
   @DefaultStringValue("A variable already exists with this name.")
   String variableNameAlreadyExists();
@@ -420,6 +424,7 @@ public interface Translations extends Constants {
       "DatabaseIsNotEditable", "Database is used by a Datasource and is not editable",//
       "CannotFindDatabase", "Cannot find database named {0}",//
       "NameIsRequired", "A name is required.",//
+      "EntityTypeIsRequired", "An entity type is required.",//
       "DriverIsRequired", "A driver is required.",//
       "DefaultEntityTypeIsRequired", "Default Entity Type is required for Custom SQL schema.",//
       "DatabaseUsageIsRequired", "Database usage is required.",//
@@ -957,6 +962,10 @@ public interface Translations extends Constants {
   @Description("Add View label")
   @DefaultStringValue("Add View")
   String addViewLabel();
+
+  @Description("Add Table label")
+  @DefaultStringValue("Add Table")
+  String addTableLabel();
 
   @Description("Add Update Tables label")
   @DefaultStringValue("Add/Update Tables")

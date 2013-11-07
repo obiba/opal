@@ -99,7 +99,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final ModalProvider<VariablesToViewPresenter> variablesToViewProvider;
 
-  private final ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider;
+  private final ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider;
 
   @Inject
   private CodingViewModalPresenter codingViewModalPresenter;
@@ -121,7 +121,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       ValuesTablePresenter valuesTablePresenter, Provider<AuthorizationPresenter> authorizationPresenter,
       Provider<IndexPresenter> indexPresenter, ModalProvider<ConfigureViewStepPresenter> configureViewStepProvider,
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
-      ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider) {
+      ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider) {
     super(eventBus, display);
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
@@ -129,7 +129,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     this.indexPresenter = indexPresenter;
     this.configureViewStepProvider = configureViewStepProvider.setContainer(this);
     this.variablesToViewProvider = variablesToViewProvider.setContainer(this);
-    this.propertiesEditorModalProvider = propertiesEditorModalProvider.setContainer(this);
+    this.variablePropertiesModalProvider = variablePropertiesModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -373,7 +373,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onAddVariable() {
-    VariablePropertiesModalPresenter propertiesEditorPresenter = propertiesEditorModalProvider.get();
+    VariablePropertiesModalPresenter propertiesEditorPresenter = variablePropertiesModalProvider.get();
     propertiesEditorPresenter.initialize(table);
   }
 

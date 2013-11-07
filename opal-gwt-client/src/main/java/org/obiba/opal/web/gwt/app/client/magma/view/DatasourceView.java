@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.LinkCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -73,6 +74,9 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   NavLink addTable;
 
   @UiField
+  NavLink addUpdateTables;
+
+  @UiField
   NavLink addView;
 
   @UiField
@@ -118,6 +122,11 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   @UiHandler("addTable")
   void onAddTable(ClickEvent event) {
     getUiHandlers().onAddTable();
+  }
+
+  @UiHandler("addUpdateTables")
+  void onAddUpdateTables(ClickEvent event) {
+    getUiHandlers().onAddUpdateTables();
   }
 
   @UiHandler("addView")
@@ -217,18 +226,17 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     boolean isNull = "null".equals(dto.getType());
     importData.setDisabled(isNull);
     addTable.setDisabled(isNull);
+    addUpdateTables.setDisabled(isNull);
   }
 
   @Override
   public HasAuthorization getAddUpdateTablesAuthorizer() {
-    return new WidgetAuthorizer(addTable) {
-
+    return new CompositeAuthorizer(new WidgetAuthorizer(addTable), new WidgetAuthorizer(addUpdateTables)) {
       @Override
       public void authorized() {
         super.authorized();
         addBtn.setVisible(true);
       }
-
     };
   }
 

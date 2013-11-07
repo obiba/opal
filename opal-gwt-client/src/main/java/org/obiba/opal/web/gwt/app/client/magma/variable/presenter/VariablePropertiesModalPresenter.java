@@ -63,6 +63,7 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
     this.translations = translations;
     this.placeManager = placeManager;
     validationHandler = new PropertiesValidationHandler();
+    getView().setUiHandlers(this);
   }
 
   /**
@@ -84,7 +85,6 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
     variable = dto;
     tableDto = table;
 
-    getView().setUiHandlers(this);
     getView().renderProperties(dto, variable == null || table.hasViewLink(),
         table.hasViewLink() || (table.hasValueSetCount() && table.getValueSetCount() == 0));
   }

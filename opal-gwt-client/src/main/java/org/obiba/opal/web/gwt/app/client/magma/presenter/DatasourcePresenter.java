@@ -20,6 +20,8 @@ import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
@@ -44,6 +46,8 @@ import com.gwtplatform.mvp.client.View;
 public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Display>
     implements DatasourceUiHandlers, DatasourceSelectionChangeEvent.Handler {
 
+  private final ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider;
+
   private String datasourceName;
 
   private JsArray<TableDto> tables;
@@ -51,8 +55,9 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
   private DatasourceDto datasource;
 
   @Inject
-  public DatasourcePresenter(Display display, EventBus eventBus) {
+  public DatasourcePresenter(Display display, EventBus eventBus, ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider) {
     super(eventBus, display);
+    this.tablePropertiesModalProvider = tablePropertiesModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -82,10 +87,6 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   private void downloadMetadata() {
     fireEvent(new FileDownloadRequestEvent("/datasource/" + datasourceName + "/tables/excel"));
-  }
-
-  private void addView() {
-    fireEvent(new WizardRequiredEvent(CreateViewStepPresenter.WizardType, datasourceName));
   }
 
   private void initDatasource() {
@@ -119,12 +120,18 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   @Override
   public void onAddTable() {
+    TablePropertiesModalPresenter p = tablePropertiesModalProvider.get();
+    p.initialize(datasource);
+  }
+
+  @Override
+  public void onAddUpdateTables() {
     fireEvent(new WizardRequiredEvent(VariablesImportPresenter.WIZARD_TYPE, datasourceName));
   }
 
   @Override
   public void onAddView() {
-    addView();
+    fireEvent(new WizardRequiredEvent(CreateViewStepPresenter.WizardType, datasourceName));
   }
 
   @Override

@@ -12,6 +12,8 @@ public interface DatasourceUiHandlers extends UiHandlers {
 
   void onAddTable();
 
+  void onAddUpdateTables();
+
   void onAddView();
 
   void onDownloadDictionary();

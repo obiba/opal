@@ -127,14 +127,6 @@ public class DatasourceTablesResource implements AbstractTablesResource {
   public Response createTable(TableDto table) {
 
     try {
-      // ClientErrorDto errorDto;
-
-      // @TODO Verify that the datasource allows table creation (Magma does not offer this yet)
-      // if(datasource.isReadOnly()) {
-      // errorMessage = return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST,
-      // "CannotCreateTable")).build();
-      // } else
-
       if(datasource.hasValueTable(table.getName())) {
         return Response.status(Status.BAD_REQUEST)
             .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "TableAlreadyExists").build()).build();
