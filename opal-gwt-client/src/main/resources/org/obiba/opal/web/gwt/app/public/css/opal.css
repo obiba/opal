@@ -9,19 +9,19 @@ li {
   list-style-type: none;
 }
 
-  /*
-   * Pretty print
+/*
+ * Pretty print
 
-  .container pre.prettyprint {
-    border: 1px dashed #CCCCCC;
-    padding: 10px;
-    margin-bottom: 0;
-  }
-   */
+.container pre.prettyprint {
+  border: 1px dashed #CCCCCC;
+  padding: 10px;
+  margin-bottom: 0;
+}
+ */
 
-  /*
-   * Opal
-   */
+/*
+ * Opal
+ */
 
 .tags .label {
   margin-right: 10px;
@@ -139,7 +139,7 @@ li.no-icon > a {
   margin-top: 20px;
 }
 
-  /* Suggest list box */
+/* Suggest list box */
 
 ul.closeables {
   float: left;
@@ -147,7 +147,7 @@ ul.closeables {
   margin-left: 0;
 }
 
-  /* Truncate labels depending on screen resolution */
+/* Truncate labels depending on screen resolution */
 ul.closeables li {
   float: left;
   list-style: none outside none;
@@ -165,7 +165,7 @@ ul.closeables li {
   font-size: 1.1em;
 }
 
-  /* Truncate labels depending on screen resolution */
+/* Truncate labels depending on screen resolution */
 ul.closeables li span {
   display: inline-block;
   vertical-align: middle;
@@ -243,7 +243,7 @@ ul.closeables li a {
   padding: 0px;
 }
 
-  /* Width is dependent of screen resolution */
+/* Width is dependent of screen resolution */
 @media all and (max-width: 1189px) {
   .obiba-SuggestListBox input {
     width: 130px;
@@ -285,16 +285,16 @@ div.obiba-SuggestListBox {
   padding-top: 2px;
 }
 
-  /*
-   * Properties Table
-   */
+/*
+ * Properties Table
+ */
 .property-key {
   font-weight: bold;
 }
 
-  /*
-   * Ace editor
-   */
+/*
+ * Ace editor
+ */
 .ace-editor {
   height: 600px;
   border: 1px solid #DDD;
@@ -304,16 +304,16 @@ div.obiba-SuggestListBox {
   font-size: 1em;
 }
 
-  /*
-   * Magma widget
-   */
+/*
+ * Magma widget
+ */
 .magma {
   min-height: 200px;
 }
 
-  /*
-   * Diff widget
-   */
+/*
+ * Diff widget
+ */
 .table td.diff-rm {
   background-color: #FDD;
 }
@@ -349,9 +349,9 @@ input.database-url {
   z-index: 1500;
 }
 
-  /*
-   * Actions
-   */
+/*
+ * Actions
+ */
 td.row-actions span {
   margin-right: 0.5em;
   cursor: pointer;

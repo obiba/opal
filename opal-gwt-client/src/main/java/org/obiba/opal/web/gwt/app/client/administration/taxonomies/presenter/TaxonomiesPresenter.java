@@ -46,6 +46,7 @@ public class TaxonomiesPresenter extends Presenter<TaxonomiesPresenter.Display, 
   private final BreadcrumbsBuilder breadcrumbsBuilder;
 
   @Inject
+  @SuppressWarnings("PMD.ExcessiveParameterList")
   public TaxonomiesPresenter(Display display, EventBus eventBus, Proxy proxy, PlaceManager placeManager,
       Translations translations, ModalProvider<TaxonomyEditModalPresenter> taxonomyEditModalProvider,
       BreadcrumbsBuilder breadcrumbsBuilder) {
