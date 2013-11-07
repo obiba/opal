@@ -302,7 +302,6 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
       @Override
       public void onClick(ClickEvent clickEvent) {
         getUiHandlers().onTermSelection(term);
-        link.setActive(true);
       }
     });
     link.addStyleName("inline");
