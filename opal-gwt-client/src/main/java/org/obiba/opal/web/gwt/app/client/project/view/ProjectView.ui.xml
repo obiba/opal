@@ -79,7 +79,6 @@
         <b:Paragraph>
           TODO
         </b:Paragraph>
-        <o:CharacterSetView ui:field="charsetView"/>
       </b:Tab>
       <b:Tab icon="BOOK">
         <b:Heading size="3">Administration</b:Heading>
