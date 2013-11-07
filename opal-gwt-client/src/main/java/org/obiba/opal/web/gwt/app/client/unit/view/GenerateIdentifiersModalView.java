@@ -15,37 +15,38 @@ import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
-import org.obiba.opal.web.gwt.app.client.unit.presenter.GenerateIdentifiersModalPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
-import org.obiba.opal.web.gwt.app.client.ui.ResizeHandle;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.GenerateIdentifiersModalPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.unit.presenter.GenerateIdentifiersModalUiHandlers;
 
+import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.CheckBox;
+import com.github.gwtbootstrap.client.ui.HelpBlock;
+import com.github.gwtbootstrap.client.ui.Paragraph;
+import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.gwtplatform.mvp.client.PopupViewImpl;
+import com.google.web.bindery.event.shared.EventBus;
 
 /**
  *
  */
-public class GenerateIdentifiersModalView extends PopupViewImpl implements Display {
+public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<GenerateIdentifiersModalUiHandlers>
+    implements Display {
 
-  @UiTemplate("GenerateIdentifiersModalView.ui.xml")
-  interface GenerateIdentifiersModalUiBinder extends UiBinder<DialogBox, GenerateIdentifiersModalView> {}
+  interface GenerateIdentifiersModalUiBinder extends UiBinder<Widget, GenerateIdentifiersModalView> {}
 
   //
   // Constants
@@ -57,7 +58,7 @@ public class GenerateIdentifiersModalView extends PopupViewImpl implements Displ
 
   private static final GenerateIdentifiersModalUiBinder uiBinder = GWT.create(GenerateIdentifiersModalUiBinder.class);
 
-  private static final Translations translations = GWT.create(Translations.class);
+  private final Translations translations;
 
   //
   // Data members
@@ -66,19 +67,19 @@ public class GenerateIdentifiersModalView extends PopupViewImpl implements Displ
   private int affectedEntities = 0;
 
   @UiField
-  DialogBox dialog;
+  Modal dialog;
 
   @UiField
-  Label confirmationMessage;
+  Paragraph confirmationMessage;
 
   @UiField
   NumericTextBox size;
 
   @UiField
-  Label sizeHelp;
+  HelpBlock sizeHelp;
 
   @UiField
-  Label sampleIdentifier;
+  InlineLabel sampleIdentifier;
 
   @UiField
   TextBox prefix;
@@ -89,27 +90,16 @@ public class GenerateIdentifiersModalView extends PopupViewImpl implements Displ
   @UiField
   Button generateButton;
 
-  @UiField
-  Button cancelButton;
-
-  @UiField
-  DockLayoutPanel content;
-
-  @UiField
-  ResizeHandle resizeHandle;
-
   //
   // Constructors
   //
   @Inject
-  public GenerateIdentifiersModalView(EventBus eventBus) {
+  public GenerateIdentifiersModalView(EventBus eventBus, Translations translations) {
     super(eventBus);
-    uiBinder.createAndBindUi(this);
+    this.translations = translations;
+    initWidget(uiBinder.createAndBindUi(this));
     initializeTexts();
     initializeHandlers();
-    resizeHandle.makeResizable(content);
-    clear();
-    dialog.hide();
   }
 
   //
@@ -122,14 +112,8 @@ public class GenerateIdentifiersModalView extends PopupViewImpl implements Displ
   }
 
   @Override
-  public Widget asWidget() {
-    return dialog;
-  }
-
-  @Override
   public void hideDialog() {
-    clear();
-    hide();
+    dialog.hide();
   }
 
   @Override
@@ -138,14 +122,14 @@ public class GenerateIdentifiersModalView extends PopupViewImpl implements Displ
     updateDescriptionText();
   }
 
-  @Override
-  public HasClickHandlers getGenerateIdentifiersButton() {
-    return generateButton;
+  @UiHandler("generateButton")
+  public void onGenerateButtonClicked(ClickEvent event) {
+    getUiHandlers().generateIdentifiers();
   }
 
-  @Override
-  public HasClickHandlers getCancelButton() {
-    return cancelButton;
+  @UiHandler("cancelButton")
+  public void onCancelButtonClicked(ClickEvent event) {
+    hideDialog();
   }
 
   @Override
@@ -161,14 +145,6 @@ public class GenerateIdentifiersModalView extends PopupViewImpl implements Displ
   @Override
   public boolean getAllowZeros() {
     return allowZeros.getValue();
-  }
-
-  @Override
-  public void clear() {
-    allowZeros.setValue(false);
-    prefix.setText("");
-    size.setValue(Integer.toString(MIN_IDENTIFIER_SIZE), false);
-    updateFields();
   }
 
   //
@@ -212,15 +188,13 @@ public class GenerateIdentifiersModalView extends PopupViewImpl implements Displ
   }
 
   private void initializeTexts() {
-    dialog.setText(translations.generateUnitIdentifiers());
+    dialog.setTitle(translations.generateUnitIdentifiers());
     updateDescriptionText();
     List<String> args = new ArrayList<String>();
     args.clear();
     args.add(String.valueOf(MIN_IDENTIFIER_SIZE));
     args.add(String.valueOf(MAX_IDENTIFIER_SIZE));
     sizeHelp.setText(TranslationsUtils.replaceArguments(translations.generateIdentifiersSizeHelp(), args));
-
-    dialog.setModal(false);
     generateButton.setText(translations.generateIdentifiersButton());
   }
 

@@ -76,7 +76,7 @@ public class FunctionalUnitDetailsPresenter
 
   private final Provider<AddKeyPairModalPresenter> addKeyPairModalPresenter;
 
-  private final GenerateIdentifiersModalPresenter generateIdentifiersModalPresenter;
+  private final ModalProvider<GenerateIdentifiersModalPresenter> generateIdentifiersModalProvider;
 
   private FunctionalUnitDto functionalUnit;
 
@@ -122,14 +122,14 @@ public class FunctionalUnitDetailsPresenter
   @Inject
   public FunctionalUnitDetailsPresenter(EventBus eventBus, Display display, Proxy proxy,
       ModalProvider<FunctionalUnitUpdateModalPresenter> functionalUnitModalProvider,
-      GenerateIdentifiersModalPresenter generateIdentifiersModalPresenter,
-      Provider<AddKeyPairModalPresenter> addKeyPairModalPresenter, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
+      Provider<AddKeyPairModalPresenter> addKeyPairModalPresenter, DefaultBreadcrumbsBuilder breadcrumbsHelper,
+      ModalProvider<GenerateIdentifiersModalPresenter> generateIdentifiersModalProvider) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
-    getView().setUiHandlers(this);
+    this.generateIdentifiersModalProvider = generateIdentifiersModalProvider.setContainer(this);
     this.functionalUnitModalProvider = functionalUnitModalProvider.setContainer(this);
     this.addKeyPairModalPresenter = addKeyPairModalPresenter;
-    this.generateIdentifiersModalPresenter = generateIdentifiersModalPresenter;
     this.breadcrumbsHelper = breadcrumbsHelper;
+    getView().setUiHandlers(this);
   }
 
   @TitleFunction
@@ -432,8 +432,8 @@ public class FunctionalUnitDetailsPresenter
               .build());
       return;
     }
-    generateIdentifiersModalPresenter.setAffectedEntitiesCount(affectedCount);
-    addToPopupSlot(generateIdentifiersModalPresenter);
+
+    generateIdentifiersModalProvider.get().setAffectedEntitiesCount(affectedCount);
   }
 
   //

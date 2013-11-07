@@ -9,20 +9,19 @@
  */
 package org.obiba.opal.web.gwt.app.client.unit.presenter;
 
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.unit.event.GenerateIdentifiersConfirmationEvent;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.PresenterWidget;
 
 /**
  *
  */
-public class GenerateIdentifiersModalPresenter extends PresenterWidget<GenerateIdentifiersModalPresenter.Display> {
+public class GenerateIdentifiersModalPresenter extends ModalPresenterWidget<GenerateIdentifiersModalPresenter.Display>
+    implements GenerateIdentifiersModalUiHandlers {
 
   //
   // Instance Variables
@@ -35,69 +34,35 @@ public class GenerateIdentifiersModalPresenter extends PresenterWidget<GenerateI
   @Inject
   public GenerateIdentifiersModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
-  }
-
-  @Override
-  protected void onBind() {
-    super.onBind();
-    addEventHandlers();
-  }
-
-  @Override
-  protected void onUnbind() {
-    super.onUnbind();
-    getView().clear();
+    getView().setUiHandlers(this);
   }
 
   public void setAffectedEntitiesCount(int affectedEntitiesCount) {
     getView().setAffectedEntities(affectedEntitiesCount);
   }
 
+  @Override
+  public void generateIdentifiers() {
+    Display view = getView();
+    getEventBus()
+        .fireEvent(new GenerateIdentifiersConfirmationEvent(view.getSize(), view.getAllowZeros(), view.getPrefix()));
+    view.hideDialog();
+  }
+
   //
   // Inner Classes / Interfaces
   //
 
-  public interface Display extends PopupView {
+  public interface Display extends PopupView, HasUiHandlers<GenerateIdentifiersModalUiHandlers> {
 
     void hideDialog();
 
     void setAffectedEntities(int count);
-
-    HasClickHandlers getGenerateIdentifiersButton();
-
-    HasClickHandlers getCancelButton();
 
     Number getSize();
 
     String getPrefix();
 
     boolean getAllowZeros();
-
-    void clear();
-  }
-
-  public class GetGenerateIdentifiersClickHandler implements ClickHandler {
-    @Override
-    public void onClick(ClickEvent event) {
-      Display view = getView();
-      getEventBus()
-          .fireEvent(new GenerateIdentifiersConfirmationEvent(view.getSize(), view.getAllowZeros(), view.getPrefix()));
-      getView().hideDialog();
-    }
-
-  }
-
-  //
-  // Private members
-  //
-
-  private void addEventHandlers() {
-    registerHandler(getView().getGenerateIdentifiersButton().addClickHandler(new GetGenerateIdentifiersClickHandler()));
-    registerHandler(getView().getCancelButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getView().hideDialog();
-      }
-    }));
   }
 }
