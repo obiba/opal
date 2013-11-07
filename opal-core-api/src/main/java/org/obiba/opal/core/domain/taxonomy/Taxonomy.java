@@ -132,4 +132,12 @@ public class Taxonomy extends AbstractTimestamped implements HasUniqueProperties
   public int hashCode() {
     return name.hashCode();
   }
+
+  public void renameVocabulary(String templateName, String name) {
+    int pos = vocabularies.indexOf(templateName);
+
+    if(pos >= 0) {
+      vocabularies.set(pos, name);
+    }
+  }
 }

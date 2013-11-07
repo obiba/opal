@@ -149,7 +149,12 @@ public class TaxonomyServiceImpl implements TaxonomyService {
 
     Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
     toSave.put(template == null ? vocabulary : template, vocabulary);
-    if(!Objects.equal(previousTaxonomy, taxonomy)) {
+    if(Objects.equal(previousTaxonomy, taxonomy)) {
+      if(template != null && !template.getName().equals(vocabulary.getName())) {
+        taxonomy.renameVocabulary(template.getName(), vocabulary.getName());
+        toSave.put(taxonomy, taxonomy);
+      }
+    } else {
       taxonomy.addVocabulary(vocabulary.getName());
       toSave.put(taxonomy, taxonomy);
       if(previousTaxonomy != null) {
