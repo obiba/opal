@@ -127,22 +127,23 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
             .withCallback(new ResponseCodeCallback() {
               @Override
               public void onResponseCode(Request request, Response response) {
-                if(response.getStatusCode() == Response.SC_OK) {
+                vocabulary = JsonUtils.unsafeEval(response.getText());
+                getView().getVocabularyName().setText(vocabulary.getName());
+                getView().setTaxonomies(taxonomies);
+                getView().setSelectedTaxonomy(taxonomyName);
+                getView().getTitles().setValue(vocabulary.getTitlesArray());
+                getView().getDescriptions().setValue(vocabulary.getDescriptionsArray());
+                getView().getRepeatable().setValue(vocabulary.getRepeatable());
 
-                  vocabulary = JsonUtils.unsafeEval(response.getText());
-                  getView().getVocabularyName().setText(vocabulary.getName());
-                  getView().setTaxonomies(taxonomies);
-                  getView().setSelectedTaxonomy(taxonomyName);
-                  getView().getTitles().setValue(vocabulary.getTitlesArray());
-                  getView().getDescriptions().setValue(vocabulary.getDescriptionsArray());
-                  getView().getRepeatable().setValue(vocabulary.getRepeatable());
-
-                  getView().displayVocabulary(vocabulary);
-
-                }
-                //TODO: Display error
+                getView().displayVocabulary(vocabulary);
               }
-            }, Response.SC_OK, Response.SC_NOT_FOUND, Response.SC_INTERNAL_SERVER_ERROR).send();
+            }, Response.SC_OK)//
+            .withCallback(new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                vocabulary = null;
+              }
+            }, Response.SC_NOT_FOUND, Response.SC_INTERNAL_SERVER_ERROR).send();
       }
     }).get().send();
   }
