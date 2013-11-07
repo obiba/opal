@@ -26,11 +26,8 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
 public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> implements TaxonomiesPresenter.Display {
-
-  private final PlaceManager placeManager;
 
   private final Translations translations;
 
@@ -51,8 +48,7 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
   private JsArray<TaxonomyDto> taxonomies;
 
   @Inject
-  public TaxonomiesView(ViewUiBinder viewUiBinder, PlaceManager placeManager, Translations translations) {
-    this.placeManager = placeManager;
+  public TaxonomiesView(ViewUiBinder viewUiBinder, Translations translations) {
     this.translations = translations;
     initWidget(viewUiBinder.createAndBindUi(this));
     taxonomiesLink.setActive(true);

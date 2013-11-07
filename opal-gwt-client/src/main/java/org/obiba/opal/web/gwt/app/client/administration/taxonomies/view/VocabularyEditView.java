@@ -3,7 +3,6 @@ package org.obiba.opal.web.gwt.app.client.administration.taxonomies.view;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TermArrayUtils;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.VocabularyEditUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -133,8 +132,8 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
 
   @Inject
   public VocabularyEditView(ViewUiBinder viewUiBinder, Translations translations) {
-    this.translations = translations;
     initWidget(viewUiBinder.createAndBindUi(this));
+    this.translations = translations;
     newTermName.setPlaceholder(translations.newTermNameLabel());
   }
 
@@ -169,7 +168,7 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
   }
 
   @Override
-  public HasValue getRepeatable() {
+  public HasValue<Boolean> getRepeatable() {
     return repeatable;
   }
 
@@ -275,7 +274,7 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
       dragController.registerDropController(flowPanelDropController);
 
       for(int i = 0; i < nb; i++) {
-        FocusPanel focusPanel = getTermFocusPanel(vocabulary, terms.get(i), dragController, level);
+        FocusPanel focusPanel = getTermFocusPanel(terms.get(i), dragController, level);
         target.add(focusPanel);
         if(terms.get(i).getTermsCount() > 0) {
           target.add(addTermsLinks(vocabulary, terms.get(i).getTermsArray(), level + 1));
@@ -291,13 +290,12 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
     newTermName.setText("");
   }
 
-  private FocusPanel getTermFocusPanel(final VocabularyDto vocabulary, final TermDto term,
-      DragController dragController, int level) {
+  private FocusPanel getTermFocusPanel(final TermDto term, DragController dragController, int level) {
     FocusPanel focusPanel = new FocusPanel();
     focusPanel.setTitle(term.getName());
     FlowPanel p = new FlowPanel();
 
-    final NavLink link = new NavLink(term.getName());
+    NavLink link = new NavLink(term.getName());
     link.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent clickEvent) {
@@ -306,61 +304,49 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
     });
     link.addStyleName("inline");
 
+    FocusPanel moveIconPanel = getMoveIconPanel();
+
+    p.setTitle(term.getName());
+    p.add(getInlineHTMLSpacer(level));
+    p.add(moveIconPanel);
+    p.add(link);
+    p.add(getDeleteIconAnchor(term));
+
+    dragController.makeDraggable(focusPanel, moveIconPanel);
+
+    focusPanel.add(p);
+    return focusPanel;
+  }
+
+  private IconAnchor getDeleteIconAnchor(final TermDto term) {
+    IconAnchor delete = new IconAnchor();
+    delete.setIcon(IconType.REMOVE);
+    delete.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        getUiHandlers().onDeleteTerm(term);
+      }
+    });
+    return delete;
+  }
+
+  private FocusPanel getMoveIconPanel() {
+    FocusPanel pMove = new FocusPanel();
+    Icon move = new Icon();
+    move.setIcon(IconType.MOVE);
+    pMove.add(move);
+    pMove.addStyleName("inline-block");
+    return pMove;
+  }
+
+  private InlineHTML getInlineHTMLSpacer(int level) {
     SafeHtml indent = SafeHtmlUtils.fromString("");
     for(int i = 0; i < level; i++) {
       indent = SafeHtmlUtils.fromTrustedString(indent.asString() + "&nbsp;&nbsp;&nbsp;&nbsp;");
     }
     InlineHTML spacer = new InlineHTML(indent);
     spacer.addStyleName("inline-block");
-
-    FocusPanel pMove = new FocusPanel();
-
-    Icon move = new Icon();
-    move.setIcon(IconType.MOVE);
-    pMove.add(move);
-    pMove.addStyleName("inline-block");
-
-    p.setTitle(term.getName());
-    p.add(spacer);
-    p.add(pMove);
-    p.add(link);
-
-    IconAnchor delete = new IconAnchor();
-    delete.setIcon(IconType.REMOVE);
-    delete.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-
-        // Modify vocabularyDto with the new structure
-        TermDto parent = TermArrayUtils.findParent(null, vocabulary.getTermsArray(), term);
-        if(parent != null) {
-          JsArray<TermDto> termsArray = JsArrays.create().cast();
-          for(int i = 0; i < parent.getTermsCount(); i++) {
-            if(!parent.getTerms(i).getName().equals(term.getName())) {
-              termsArray.push(parent.getTerms(i));
-            }
-          }
-          parent.setTermsArray(termsArray);
-        } else {
-          JsArray<TermDto> termsArray = JsArrays.create().cast();
-          for(int i = 0; i < vocabulary.getTermsCount(); i++) {
-            if(!vocabulary.getTerms(i).getName().equals(term.getName())) {
-              termsArray.push(vocabulary.getTerms(i));
-            }
-          }
-
-          vocabulary.setTermsArray(termsArray);
-        }
-        displayTerms(vocabulary);
-      }
-    });
-
-    p.add(delete);
-    dragController.makeDraggable(focusPanel, pMove);
-
-    focusPanel.add(p);
-
-    return focusPanel;
+    return spacer;
   }
 
   @Override
@@ -376,9 +362,9 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
 
   private abstract class LocaleTextDtoTakesValue implements TakesValue<JsArray<LocaleTextDto>> {
 
-    FlowPanel target;
+    final FlowPanel target;
 
-    JsArrayString locales;
+    final JsArrayString locales;
 
     LocaleTextDtoTakesValue(FlowPanel target, JsArrayString locales) {
       this.target = target;

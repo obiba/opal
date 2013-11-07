@@ -217,26 +217,30 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
       newTerm.setName(text);
       JsArray<TermDto> terms = JsArrays.create().cast();
 
-      if(currentTerm != null) {
-        TermDto t = TermArrayUtils
-            .findTerm(vocabulary.getTermsArray(), currentTerm != null ? currentTerm.getName() : null);
-
-        if(t.getTermsArray() == null) {
-          t.setTermsArray(terms);
-        }
-
-        t.getTermsArray().push(newTerm);
-      } else {
-        // Add at the end of terms
-        for(int i = 0; i < vocabulary.getTermsCount(); i++) {
-          terms.push(vocabulary.getTerms(i));
-        }
-        terms.push(newTerm);
-        vocabulary.setTermsArray(terms);
-      }
+      updateVocabularyWithChild(newTerm, terms);
       getView().displayVocabulary(vocabulary);
       getView().clearTermName();
       onTermSelection(newTerm);
+    }
+  }
+
+  private void updateVocabularyWithChild(TermDto newTerm, JsArray<TermDto> terms) {
+    if(currentTerm != null) {
+      TermDto t = TermArrayUtils
+          .findTerm(vocabulary.getTermsArray(), currentTerm != null ? currentTerm.getName() : null);
+
+      if(t.getTermsArray() == null) {
+        t.setTermsArray(terms);
+      }
+
+      t.getTermsArray().push(newTerm);
+    } else {
+      // Add at the end of terms
+      for(int i = 0; i < vocabulary.getTermsCount(); i++) {
+        terms.push(vocabulary.getTerms(i));
+      }
+      terms.push(newTerm);
+      vocabulary.setTermsArray(terms);
     }
   }
 
@@ -249,28 +253,32 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
 
       TermDto t = TermArrayUtils.findParent(null, vocabulary.getTermsArray(), currentTerm);
 
-      if(t != null) {
-        for(int i = 0; i < t.getTermsCount(); i++) {
-          terms.push(t.getTerms(i));
-
-          // Add after sibling
-          if(t.getTerms(i).getName().equals(currentTerm.getName())) {
-            terms.push(newTerm);
-          }
-        }
-
-        t.setTermsArray(terms);
-      } else {
-        for(int i = 0; i < vocabulary.getTermsCount(); i++) {
-          terms.push(vocabulary.getTerms(i));
-        }
-        terms.push(newTerm);
-        vocabulary.setTermsArray(terms);
-      }
+      updateVocabularyWithSibling(newTerm, terms, t);
 
       getView().displayVocabulary(vocabulary);
       getView().clearTermName();
       onTermSelection(newTerm);
+    }
+  }
+
+  private void updateVocabularyWithSibling(TermDto newTerm, JsArray<TermDto> terms, TermDto t) {
+    if(t != null) {
+      for(int i = 0; i < t.getTermsCount(); i++) {
+        terms.push(t.getTerms(i));
+
+        // Add after sibling
+        if(t.getTerms(i).getName().equals(currentTerm.getName())) {
+          terms.push(newTerm);
+        }
+      }
+
+      t.setTermsArray(terms);
+    } else {
+      for(int i = 0; i < vocabulary.getTermsCount(); i++) {
+        terms.push(vocabulary.getTerms(i));
+      }
+      terms.push(newTerm);
+      vocabulary.setTermsArray(terms);
     }
   }
 
@@ -312,6 +320,31 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
     }
 
     return termsArray;
+  }
+
+  @Override
+  public void onDeleteTerm(TermDto term) {
+    // Modify vocabularyDto with the new structure
+    TermDto parent = TermArrayUtils.findParent(null, vocabulary.getTermsArray(), term);
+    if(parent != null) {
+      JsArray<TermDto> termsArray = JsArrays.create().cast();
+      for(int i = 0; i < parent.getTermsCount(); i++) {
+        if(!parent.getTerms(i).getName().equals(term.getName())) {
+          termsArray.push(parent.getTerms(i));
+        }
+      }
+      parent.setTermsArray(termsArray);
+    } else {
+      JsArray<TermDto> termsArray = JsArrays.create().cast();
+      for(int i = 0; i < vocabulary.getTermsCount(); i++) {
+        if(!vocabulary.getTerms(i).getName().equals(term.getName())) {
+          termsArray.push(vocabulary.getTerms(i));
+        }
+      }
+
+      vocabulary.setTermsArray(termsArray);
+    }
+    getView().displayVocabulary(vocabulary);
   }
 
   private boolean uniqueTermName(String name) {

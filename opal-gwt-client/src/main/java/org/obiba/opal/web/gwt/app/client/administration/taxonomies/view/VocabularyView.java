@@ -79,12 +79,12 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
   }
 
   @Override
-  public void displayVocabulary(VocabularyDto vocabulary, String taxonomyName, String termName) {
+  public void displayVocabulary(VocabularyDto vocabulary, String taxonomy, String term) {
 
     vocabularyName.setText(vocabulary.getName());
     vocabularyProperties.clearProperties();
     vocabularyProperties.addProperty(translations.nameLabel(), vocabulary.getName());
-    vocabularyProperties.addProperty(translations.taxonomyLabel(), taxonomyName);
+    vocabularyProperties.addProperty(translations.taxonomyLabel(), taxonomy);
 
     vocabularyProperties.addProperty(new Label(translations.titleLabel()),
         getLocalizedText(JsArrays.toSafeArray(vocabulary.getTitlesArray())));
@@ -98,26 +98,20 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
     getTermsLinks(navList, JsArrays.toSafeArray(vocabulary.getTermsArray()), 0);
     termsLinks.add(navList);
 
-    displayTerm(TermArrayUtils.findTerm(vocabulary.getTermsArray(), termName));
+    displayTerm(TermArrayUtils.findTerm(vocabulary.getTermsArray(), term));
   }
 
   private void getTermsLinks(NavList navList, final JsArray<TermDto> terms, int level) {
 
     for(int i = 0; i < terms.length(); i++) {
-      SafeHtml indent = SafeHtmlUtils.fromString("");
-      for(int j = 0; j < level; j++) {
-        indent = SafeHtmlUtils.fromTrustedString(indent.asString() + "&nbsp;&nbsp;&nbsp;&nbsp;");
-      }
-      InlineHTML spacer = new InlineHTML(indent);
-      spacer.addStyleName("inline-block");
+      final int finalI = i;
+      NavLink link = new NavLink();
 
-      final NavLink link = new NavLink();
-
-      link.add(spacer);
       NavLink linkTitle = new NavLink(terms.get(i).getName());
       linkTitle.addStyleName("inline-block");
+
+      link.add(getInlineHTMLSpacer(level));
       link.add(linkTitle);
-      final int finalI = i;
       link.addClickHandler(new ClickHandler() {
         @Override
         public void onClick(ClickEvent clickEvent) {
@@ -155,6 +149,16 @@ public class VocabularyView extends ViewWithUiHandlers<VocabularyUiHandlers> imp
   @Override
   public void setAvailableLocales(JsArrayString locales) {
     this.locales = locales;
+  }
+
+  private InlineHTML getInlineHTMLSpacer(int level) {
+    SafeHtml indent = SafeHtmlUtils.fromString("");
+    for(int i = 0; i < level; i++) {
+      indent = SafeHtmlUtils.fromTrustedString(indent.asString() + "&nbsp;&nbsp;&nbsp;&nbsp;");
+    }
+    InlineHTML spacer = new InlineHTML(indent);
+    spacer.addStyleName("inline-block");
+    return spacer;
   }
 
   private Widget getLocalizedText(JsArray<LocaleTextDto> texts) {

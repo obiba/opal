@@ -122,11 +122,6 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
     getView().getNewVocabularyName().setText("");
   }
 
-  public void setTaxonomy(TaxonomyDto taxonomy) {
-    originalTaxonomy = taxonomy;
-    getView().setTaxonomy(taxonomy);
-  }
-
   public void initView(final TaxonomyDto taxonomyDto) {
     originalTaxonomy = taxonomyDto;
     ResourceRequestBuilderFactory.<GeneralConf>newBuilder()
@@ -139,7 +134,8 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
               locales.push(resource.getLanguages(i));
             }
             getView().setAvailableLocales(locales);
-            getView().setTaxonomy(taxonomyDto);
+            getView()
+                .setTitle(taxonomyDto.getName().isEmpty() ? translations.addTaxonomy() : translations.editTaxonomy());
             getView().getName().setText(taxonomyDto.getName());
             getView().getTitles().setValue(taxonomyDto.getTitlesArray());
             getView().getDescriptions().setValue(taxonomyDto.getDescriptionsArray());
@@ -170,7 +166,7 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
 
     void setAvailableLocales(JsArrayString locales);
 
-    void setTaxonomy(TaxonomyDto taxonomyDto);
+    void setTitle(String title);
 
     TakesValue<JsArray<LocaleTextDto>> getTitles();
 

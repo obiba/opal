@@ -127,7 +127,7 @@ public class VocabularyPresenter extends Presenter<Display, VocabularyPresenter.
 
   public interface Display extends View, HasBreadcrumbs, HasUiHandlers<VocabularyUiHandlers> {
 
-    void displayVocabulary(VocabularyDto vocabulary, String taxonomyName, String termName);
+    void displayVocabulary(VocabularyDto vocabulary, String taxonomy, String term);
 
     void displayTerm(TermDto termDto);
 

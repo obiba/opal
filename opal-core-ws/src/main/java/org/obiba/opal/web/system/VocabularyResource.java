@@ -10,6 +10,10 @@
 
 package org.obiba.opal.web.system;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -24,6 +28,8 @@ import org.obiba.opal.core.domain.taxonomy.Term;
 import org.obiba.opal.core.domain.taxonomy.Vocabulary;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.taxonomy.Dtos;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 public class VocabularyResource {
 
@@ -70,26 +76,32 @@ public class VocabularyResource {
     }
 
     vocabulary.getTerms().clear();
-    parseStringAsCsv(csv, vocabulary);
 
-    taxonomyService.saveTaxonomy(null, taxonomy);
+    try {
+      parseStringAsCsv(csv, vocabulary);
+    } catch(IOException e) {
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
+    taxonomyService.saveVocabulary(null, vocabulary);
 
     return Response.ok().build();
   }
 
-  private void parseStringAsCsv(String csv, Vocabulary vocabulary) {// Parse csv and add terms
-    String[] lines = csv.split("\n");
-    Term t = null;
-    for(String line : lines) {
-      String[] terms = line.split(",");
-      int level = terms.length - 1;
+  private void parseStringAsCsv(String csv, Vocabulary vocabulary) throws IOException {// Parse csv and add terms
+    CSVReader reader = new CSVReader(new StringReader(csv));
+    List<String[]> lines = reader.readAll();
 
+    Term t = null;
+    for(String[] terms : lines) {
+
+      int level = terms.length - 1;
       if(level == 0) {
         if(t != null) {
           vocabulary.getTerms().add(t);
         }
 
-        t = new Term(terms[0].replaceAll("\"", ""));
+        t = new Term(terms[0]);
       } else {
         Term parent = t;
 
@@ -102,7 +114,7 @@ public class VocabularyResource {
 
         // Add new term
         if(parent != null) {
-          parent.getTerms().add(new Term(terms[terms.length - 1].replaceAll("\"", "")));
+          parent.getTerms().add(new Term(terms[terms.length - 1]));
         }
       }
     }

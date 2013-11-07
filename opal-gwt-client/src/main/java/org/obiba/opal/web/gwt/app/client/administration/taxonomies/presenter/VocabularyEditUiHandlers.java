@@ -17,4 +17,6 @@ public interface VocabularyEditUiHandlers extends UiHandlers {
   void onSave();
 
   void onReorderTerms(String termName, int pos, boolean insertAfter);
+
+  void onDeleteTerm(TermDto term);
 }

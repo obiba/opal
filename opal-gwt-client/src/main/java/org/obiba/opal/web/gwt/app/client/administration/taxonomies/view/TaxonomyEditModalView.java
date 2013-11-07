@@ -13,7 +13,6 @@ import org.obiba.opal.web.gwt.app.client.ui.LocalizedEditableText;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.model.client.opal.LocaleTextDto;
-import org.obiba.opal.web.model.client.opal.TaxonomyDto;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
@@ -39,9 +38,10 @@ import com.google.web.bindery.event.shared.EventBus;
 public class TaxonomyEditModalView extends ModalPopupViewWithUiHandlers<TaxonomyEditModalUiHandlers>
     implements TaxonomyEditModalPresenter.Display {
 
-  private Map<String, LocalizedEditableText> taxonomyTitleTexts = new HashMap<String, LocalizedEditableText>();
+  private final Map<String, LocalizedEditableText> taxonomyTitleTexts = new HashMap<String, LocalizedEditableText>();
 
-  private Map<String, LocalizedEditableText> taxonomyDescriptionTexts = new HashMap<String, LocalizedEditableText>();
+  private final Map<String, LocalizedEditableText> taxonomyDescriptionTexts
+      = new HashMap<String, LocalizedEditableText>();
 
   interface AddTaxonomyModalViewUiBinder extends UiBinder<Widget, TaxonomyEditModalView> {}
 
@@ -72,8 +72,6 @@ public class TaxonomyEditModalView extends ModalPopupViewWithUiHandlers<Taxonomy
 
   private JsArrayString availableLocales;
 
-  private TaxonomyDto taxonomy;
-
   @Inject
   public TaxonomyEditModalView(EventBus eventBus) {
     super(eventBus);
@@ -94,11 +92,9 @@ public class TaxonomyEditModalView extends ModalPopupViewWithUiHandlers<Taxonomy
   }
 
   @Override
-  public void setTaxonomy(TaxonomyDto taxonomy) {
-    this.taxonomy = taxonomy;
-
+  public void setTitle(String title) {
     // Set title for Add or Edit
-    modal.setTitle(taxonomy.getName().isEmpty() ? translations.addTaxonomy() : translations.editTaxonomy());
+    modal.setTitle(title);
   }
 
   @UiHandler("save")
@@ -194,11 +190,11 @@ public class TaxonomyEditModalView extends ModalPopupViewWithUiHandlers<Taxonomy
     }
   }
 
-  private abstract class LocaleTextDtoTakesValue implements TakesValue<JsArray<LocaleTextDto>> {
+  private abstract static class LocaleTextDtoTakesValue implements TakesValue<JsArray<LocaleTextDto>> {
 
-    FlowPanel target;
+    final FlowPanel target;
 
-    JsArrayString locales;
+    final JsArrayString locales;
 
     LocaleTextDtoTakesValue(FlowPanel target, JsArrayString locales) {
       this.target = target;
