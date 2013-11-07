@@ -9,6 +9,9 @@
  */
 package org.obiba.opal.web.project;
 
+import java.util.Arrays;
+
+import javax.annotation.Nonnull;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -20,6 +23,9 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
+import org.obiba.magma.Timestamped;
+import org.obiba.magma.Timestamps;
+import org.obiba.magma.support.UnionTimestamps;
 import org.obiba.opal.project.NoSuchProjectException;
 import org.obiba.opal.project.ProjectService;
 import org.obiba.opal.project.domain.Project;
@@ -41,9 +47,12 @@ public class ProjectResource {
   private String name;
 
   @GET
-  public Projects.ProjectDto get() {
+  public Response get(@Context Request request) {
     Project project = getProject();
-    return Dtos.asDto(project, projectService.getProjectDirectoryPath(project));
+    Timestamped projectTimestamps = new ProjectTimestamps(project);
+    TimestampedResponses.evaluate(request, projectTimestamps);
+    return TimestampedResponses
+        .ok(projectTimestamps, Dtos.asDto(project, projectService.getProjectDirectoryPath(project))).build();
   }
 
   @GET
@@ -58,6 +67,7 @@ public class ProjectResource {
   @PUT
   public Response update(Projects.ProjectDto projectDto) {
     // will throw a no such project exception
+    //noinspection UnusedDeclaration
     Project project = projectService.getProject(name);
     if(!name.equals(projectDto.getName())) {
       return Response.status(Response.Status.BAD_REQUEST).build();
@@ -78,5 +88,19 @@ public class ProjectResource {
 
   private Project getProject() {
     return projectService.getProject(name);
+  }
+
+  private static class ProjectTimestamps implements Timestamped {
+    final UnionTimestamps timestamps;
+
+    private ProjectTimestamps(Project project) {
+      timestamps = new UnionTimestamps(Arrays.asList(project, project.getDatasource()));
+    }
+
+    @Nonnull
+    @Override
+    public Timestamps getTimestamps() {
+      return timestamps;
+    }
   }
 }
