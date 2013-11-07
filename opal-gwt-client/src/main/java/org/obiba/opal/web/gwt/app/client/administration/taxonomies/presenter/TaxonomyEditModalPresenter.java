@@ -66,17 +66,21 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_CREATED) {
-              getView().hide();
-              getEventBus().fireEvent(new TaxonomyCreatedEvent());
-            } else if(response.getText() != null && response.getText().length() != 0) {
+            getView().hide();
+            getEventBus().fireEvent(new TaxonomyCreatedEvent());
+          }
+        }, Response.SC_OK, Response.SC_CREATED)//
+        .withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            if(response.getText() != null && response.getText().length() != 0) {
               ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
               getEventBus().fireEvent(
                   NotificationEvent.newBuilder().error("TaxonomyCreationFailed").args(errorDto.getArgumentsArray())
                       .build());
             }
           }
-        }, Response.SC_OK, Response.SC_CREATED, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR)//
+        }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR)//
         .put().send();
   }
 
@@ -196,17 +200,21 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
           .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
-              if(response.getStatusCode() == Response.SC_OK) {
-                getView().hide();
-                getEventBus().fireEvent(new TaxonomyCreatedEvent());
-              } else if(response.getText() != null && response.getText().length() != 0) {
+              getView().hide();
+              getEventBus().fireEvent(new TaxonomyCreatedEvent());
+            }
+          }, Response.SC_OK)//
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              if(response.getText() != null && response.getText().length() != 0) {
                 ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
                 getEventBus().fireEvent(
                     NotificationEvent.newBuilder().error("TaxonomyDeletionFailed").args(errorDto.getArgumentsArray())
                         .build());
               }
             }
-          }, Response.SC_OK, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR)//
+          }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR)//
           .delete().send();
     }
   }
