@@ -29,6 +29,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
@@ -99,6 +100,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final ModalProvider<VariablesToViewPresenter> variablesToViewProvider;
 
+  private final ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider;
+
   private final ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider;
 
   @Inject
@@ -121,7 +124,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       ValuesTablePresenter valuesTablePresenter, Provider<AuthorizationPresenter> authorizationPresenter,
       Provider<IndexPresenter> indexPresenter, ModalProvider<ConfigureViewStepPresenter> configureViewStepProvider,
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
-      ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider) {
+      ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider,
+      ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider) {
     super(eventBus, display);
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
@@ -130,6 +134,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     this.configureViewStepProvider = configureViewStepProvider.setContainer(this);
     this.variablesToViewProvider = variablesToViewProvider.setContainer(this);
     this.variablePropertiesModalProvider = variablePropertiesModalProvider.setContainer(this);
+    this.viewPropertiesModalProvider = viewPropertiesModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -389,18 +394,16 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onEdit() {
-    UriBuilder ub = UriBuilder.create().segment("datasource", table.getDatasourceName(), "view", table.getName());
-    ResourceRequestBuilderFactory.<ViewDto>newBuilder().forResource(ub.build()).get()
-        .withCallback(new ResourceCallback<ViewDto>() {
+    if(!table.hasViewLink()) return;
 
+    UriBuilder ub = UriBuilders.DATASOURCE_VIEW.create();
+    ResourceRequestBuilderFactory.<ViewDto>newBuilder()
+        .forResource(ub.build(table.getDatasourceName(), table.getName())).get()
+        .withCallback(new ResourceCallback<ViewDto>() {
           @Override
           public void onResource(Response response, ViewDto viewDto) {
-            viewDto.setDatasourceName(table.getDatasourceName());
-            viewDto.setName(table.getName());
-            // TODO: this popup is going to die soon and won't need a ModalProvider
-            configureViewStepProvider.get();
-            fireEvent(new ViewConfigurationRequiredEvent(viewDto));
-
+            ViewPropertiesModalPresenter p = viewPropertiesModalProvider.get();
+            p.initialize(viewDto);
           }
         }).send();
   }

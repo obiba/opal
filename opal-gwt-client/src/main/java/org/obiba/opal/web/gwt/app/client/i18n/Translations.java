@@ -2251,6 +2251,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Custom SQL")
   String jdbcDatasourceLabel();
 
+  @Description("Update {0} label")
+  @DefaultStringValue("Update {0}")
+  String updateComment();
+
+  @Description("Rename {0} to {1} label")
+  @DefaultStringValue("Rename {0} to {1}")
+  String renameToComment();
+
   @Description("Update {0} categories label")
   @DefaultStringValue("Update {0} categories")
   String updateVariableCategories();

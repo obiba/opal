@@ -72,25 +72,28 @@ public class ViewResource extends AbstractValueTableResource {
   @PUT
   public Response updateView(ViewDto viewDto, @Nullable @QueryParam("comment") String comment) {
     if(!viewDto.hasName()) return Response.status(Status.BAD_REQUEST).build();
-    if(!viewDto.getName().equals(getValueTable().getName())) return Response.status(Status.BAD_REQUEST).build();
 
     // Validate that all variable entity types are the same as the base value table
-    Magma.VariableListViewDto derivedVariables = viewDto.getExtension(Magma.VariableListViewDto.view);
+//    Magma.VariableListViewDto derivedVariables = viewDto.getExtension(Magma.VariableListViewDto.view);
+//
+//    for(Magma.VariableDto variable : derivedVariables.getVariablesList()) {
+//      if(!variable.getEntityType().equals(getValueTable().getEntityType())) {
+//
+//        Collection<String> args = new ArrayList<String>();
+//        args.add(variable.getEntityType());
+//        args.add(getValueTable().getEntityType());
+//
+//        return Response.status(Response.Status.BAD_REQUEST).entity(
+//            Ws.ClientErrorDto.newBuilder().setCode(Status.BAD_REQUEST.getStatusCode())
+//                .setStatus("CopyVariableIncompatibleEntityType").addAllArguments(args).build()).build();
+//
+//      }
+//    }
 
-    for(Magma.VariableDto variable : derivedVariables.getVariablesList()) {
-      if(!variable.getEntityType().equals(getValueTable().getEntityType())) {
-
-        Collection<String> args = new ArrayList<String>();
-        args.add(variable.getEntityType());
-        args.add(getValueTable().getEntityType());
-
-        return Response.status(Response.Status.BAD_REQUEST).entity(
-            Ws.ClientErrorDto.newBuilder().setCode(Status.BAD_REQUEST.getStatusCode())
-                .setStatus("CopyVariableIncompatibleEntityType").addAllArguments(args).build()).build();
-
-      }
-    }
     viewManager.addView(getDatasource().getName(), viewDtos.fromDto(viewDto), comment);
+    if(!viewDto.getName().equals(getValueTable().getName())) {
+      viewManager.removeView(getDatasource().getName(), getValueTable().getName());
+    }
 
     return Response.ok().build();
   }

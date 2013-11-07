@@ -27,6 +27,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueSequencePopupPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
+import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
@@ -62,20 +63,20 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     eventBusMock = createMock(EventBus.class);
     usersAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
-    ValueSequencePopupPresenter.Display valueSequenceDisplayMock = createMock(
-        ValueSequencePopupPresenter.Display.class);
     Provider<AuthorizationPresenter> mockProvider = createMock(Provider.class);
     Provider<IndexPresenter> mockIndexProvider = createMock(Provider.class);
     ModalProvider<EntityModalPresenter> modalEntityModalPresenter = createMock(ModalProvider.class);
     ModalProvider<ValueSequencePopupPresenter> modalProviderValueSequence = createMock(ModalProvider.class);
     ModalProvider<ConfigureViewStepPresenter> modalConfigureViewStepProvider = createMock(ModalProvider.class);
     ModalProvider<VariablesToViewPresenter> variablesToViewProvider = createMock(ModalProvider.class);
-    ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider = createMock(ModalProvider.class);
+    ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider = createMock(ModalProvider.class);
+    ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider = createMock(ModalProvider.class);
 
     ValuesTablePresenter values = new ValuesTablePresenter(null, null, modalProviderValueSequence,
         modalEntityModalPresenter);
     presenter = new TablePresenter(displayMock, new CountingEventBus(), null, values, mockProvider, mockIndexProvider,
-        modalConfigureViewStepProvider, variablesToViewProvider, propertiesEditorModalProvider);
+        modalConfigureViewStepProvider, variablesToViewProvider, variablePropertiesModalProvider,
+        viewPropertiesModalProvider);
   }
 
   @SuppressWarnings({ "unchecked", "OverlyLongMethod" })

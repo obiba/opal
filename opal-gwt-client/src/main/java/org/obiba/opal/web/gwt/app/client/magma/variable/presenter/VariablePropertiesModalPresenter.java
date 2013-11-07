@@ -116,7 +116,7 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
     ResourceRequestBuilderFactory.newBuilder()
         .forResource(uriBuilder.build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())) //
         .put() //
-        .withResourceBody(VariableDto.stringify(updatedVariable)).accept("application/json") //
+        .withResourceBody(VariableDto.stringify(updatedVariable)) //
         .withCallback(new VariableUpdateCallback(updatedVariable), Response.SC_BAD_REQUEST,
             Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
   }
@@ -152,7 +152,7 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
     ResourceRequestBuilderFactory.newBuilder()
         .forResource(uriBuilder.build(tableDto.getDatasourceName(), tableDto.getName())) //
         .post() //
-        .withResourceBody("[" + VariableDto.stringify(newVariable) + "]").accept("application/json") //
+        .withResourceBody("[" + VariableDto.stringify(newVariable) + "]") //
         .withCallback(new VariableCreateCallback(newVariable), Response.SC_BAD_REQUEST,
             Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
   }

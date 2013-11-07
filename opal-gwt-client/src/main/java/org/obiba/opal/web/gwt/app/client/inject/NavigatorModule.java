@@ -52,7 +52,9 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableVcsCommitHistoryPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VcsCommitHistoryModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.view.TablePropertiesModalView;
+import org.obiba.opal.web.gwt.app.client.magma.table.view.ViewPropertiesModalView;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CategoriesEditorModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.view.CategoriesEditorModalView;
@@ -66,12 +68,12 @@ import org.obiba.opal.web.gwt.app.client.magma.view.ValuesTableView;
 import org.obiba.opal.web.gwt.app.client.magma.view.VariableVcsCommitHistoryView;
 import org.obiba.opal.web.gwt.app.client.magma.view.VariableView;
 import org.obiba.opal.web.gwt.app.client.magma.view.VcsCommitHistoryModalView;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsPresenter;
-import org.obiba.opal.web.gwt.app.client.project.view.ProjectPropertiesModalView;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectAdministrationView;
+import org.obiba.opal.web.gwt.app.client.project.view.ProjectPropertiesModalView;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectView;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectsView;
 
@@ -95,7 +97,8 @@ public class NavigatorModule extends AbstractOpalModule {
         ProjectPresenter.Proxy.class);
     bindPresenterWidget(ProjectAdministrationPresenter.class, ProjectAdministrationPresenter.Display.class,
         ProjectAdministrationView.class);
-    bindPresenterWidget(ProjectPropertiesModalPresenter.class, ProjectPropertiesModalPresenter.Display.class, ProjectPropertiesModalView.class);
+    bindPresenterWidget(ProjectPropertiesModalPresenter.class, ProjectPropertiesModalPresenter.Display.class,
+        ProjectPropertiesModalView.class);
 
     bindPresenterWidget(MagmaPresenter.class, MagmaPresenter.Display.class, MagmaView.class);
     bindPresenterWidget(DatasourcePresenter.class, DatasourcePresenter.Display.class, DatasourceView.class);
@@ -110,6 +113,8 @@ public class NavigatorModule extends AbstractOpalModule {
 
     bindPresenterWidget(TablePropertiesModalPresenter.class, TablePropertiesModalPresenter.Display.class,
         TablePropertiesModalView.class);
+    bindPresenterWidget(ViewPropertiesModalPresenter.class, ViewPropertiesModalPresenter.Display.class,
+        ViewPropertiesModalView.class);
     bindPresenterWidget(CategoriesEditorModalPresenter.class, CategoriesEditorModalPresenter.Display.class,
         CategoriesEditorModalView.class);
     bindPresenterWidget(VariablePropertiesModalPresenter.class, VariablePropertiesModalPresenter.Display.class,

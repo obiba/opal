@@ -29,13 +29,13 @@ public class MatchingTableEntitiesValidator extends AbstractFieldValidator {
   // Constructors
   //
 
-  public MatchingTableEntitiesValidator(HasCollection<TableDto> tableCollectionField, String errorMessageKey) {
-    super(errorMessageKey);
-    this.tableCollectionField = tableCollectionField;
+  public MatchingTableEntitiesValidator(HasCollection<TableDto> tableCollectionField) {
+    this(tableCollectionField, null);
   }
 
-  public MatchingTableEntitiesValidator(HasCollection<TableDto> tableCollectionField) {
-    this(tableCollectionField, "TableEntityTypesDoNotMatch");
+  public MatchingTableEntitiesValidator(HasCollection<TableDto> tableCollectionField, String id) {
+    super("TableEntityTypesDoNotMatch", id);
+    this.tableCollectionField = tableCollectionField;
   }
 
   //

@@ -28,7 +28,11 @@ public class MinimumSizeCollectionValidator<T> extends AbstractFieldValidator {
   //
 
   public MinimumSizeCollectionValidator(HasCollection<T> collectionField, int minSize, String errorMessageKey) {
-    super(errorMessageKey);
+    this(collectionField, minSize, errorMessageKey, null);
+  }
+
+  public MinimumSizeCollectionValidator(HasCollection<T> collectionField, int minSize, String errorMessageKey, String id) {
+    super(errorMessageKey, id);
     this.collectionField = collectionField;
     this.minSize = minSize;
   }
