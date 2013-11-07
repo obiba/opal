@@ -22,8 +22,6 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.derive.helper.VariableDuplicationHelper;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveVariablePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.event.SiblingVariableSelectionEvent;
-import org.obiba.opal.web.gwt.app.client.magma.event.SiblingVariableSelectionEvent.Direction;
 import org.obiba.opal.web.gwt.app.client.magma.event.SummaryRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
@@ -93,9 +91,11 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private final ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider;
 
-  private VariableDto variable;
-
   private TableDto table;
+  private VariableDto variable;
+  private VariableDto nextVariable;
+  private VariableDto previousVariable;
+
 
   private boolean variableUpdatePending = false;
 
@@ -129,7 +129,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     if(event.hasTable()) {
       updateDisplay(event.getTable(), event.getSelection(), event.getPrevious(), event.getNext());
     } else {
-      updateDisplay(event.getDatasourceName(), event.getTableName(), event.getVariableName(), null, null);
+      updateDisplay(event.getDatasourceName(), event.getTableName(), event.getVariableName());
     }
     ResourceRequestBuilderFactory.<JsArray<LocaleDto>>newBuilder()
         .forResource(UriBuilders.DATASOURCE_LOCALES.create().build(event.getDatasourceName())).get()
@@ -183,8 +183,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     summaryTabPresenter.unbind();
   }
 
-  private void updateDisplay(String datasourceName, String tableName, String variableName, @Nullable String previous,
-      @Nullable String next) {
+  private void updateDisplay(String datasourceName, String tableName, String variableName) {
     if(table != null && table.getDatasourceName().equals(datasourceName) && table.getName().equals(tableName) &&
         variable != null && variable.getName().equals(variableName)) return;
 
@@ -204,6 +203,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
       @Nullable VariableDto next) {
     table = tableDto;
     variable = variableDto;
+    nextVariable = next;
+    previousVariable = previous;
 
     if(variable.getLink().isEmpty()) {
       variable.setLink(variable.getParentLink().getLink() + "/variable/" + variable.getName());
@@ -271,39 +272,18 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     }
   }
 
-  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
-  private boolean isCurrentVariable(VariableDto variableDto) {
-    return variableDto.getName().equals(variable.getName()) &&
-        variableDto.getParentLink().getLink().equals(variable.getParentLink().getLink());
-  }
-
-  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
-  private boolean isCurrentTable(ViewDto viewDto) {
-    return table != null && table.getDatasourceName().equals(viewDto.getDatasourceName()) &&
-        table.getName().equals(viewDto.getName());
-  }
-
-  /**
-   * @param selection
-   */
-  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
-  private void requestSummary(VariableDto selection) {
-    getEventBus().fireEvent(new SummaryRequiredEvent(selection.getLink() + "/summary"));
-  }
-
-  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private String getViewLink() {
     return variable.getParentLink().getLink().replaceFirst("/table/", "/view/");
   }
 
   @Override
   public void onNextVariable() {
-    getEventBus().fireEvent(new SiblingVariableSelectionEvent(variable, Direction.NEXT));
+    placeManager.revealPlace(ProjectPlacesHelper.getVariablePlace(table.getDatasourceName(), table.getName(), nextVariable.getName()));
   }
 
   @Override
   public void onPreviousVariable() {
-    getEventBus().fireEvent(new SiblingVariableSelectionEvent(variable, Direction.PREVIOUS));
+    placeManager.revealPlace(ProjectPlacesHelper.getVariablePlace(table.getDatasourceName(), table.getName(), previousVariable.getName()));
   }
 
   @Override
@@ -313,7 +293,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
           @Override
           public void onResource(Response response, ViewDto viewDto) {
-            getEventBus().fireEvent(new ViewConfigurationRequiredEvent(viewDto, variable));
+            fireEvent(new ViewConfigurationRequiredEvent(viewDto, variable));
           }
         }).send();
   }
@@ -382,17 +362,17 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   @Override
   public void onCategorizeToAnother() {
-    getEventBus().fireEvent(new WizardRequiredEvent(DeriveVariablePresenter.CategorizeWizardType, variable, table));
+    fireEvent(new WizardRequiredEvent(DeriveVariablePresenter.CategorizeWizardType, variable, table));
   }
 
   @Override
   public void onCategorizeToThis() {
-    getEventBus().fireEvent(new WizardRequiredEvent(DeriveVariablePresenter.FromWizardType, variable, table));
+    fireEvent(new WizardRequiredEvent(DeriveVariablePresenter.FromWizardType, variable, table));
   }
 
   @Override
   public void onDeriveCustom() {
-    getEventBus().fireEvent(new WizardRequiredEvent(DeriveVariablePresenter.CustomWizardType, variable, table));
+    fireEvent(new WizardRequiredEvent(DeriveVariablePresenter.CustomWizardType, variable, table));
   }
 
   @Override
@@ -419,7 +399,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private void resetView(TableDto tableDto) {
     getView().backToViewScript();
-    if (tableChanged(tableDto)) {
+    if(tableChanged(tableDto)) {
       getView().resetTabs();
     }
   }
@@ -525,8 +505,18 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
               }
             }
           }
+
+          private boolean isCurrentVariable(VariableDto variableDto) {
+            return variableDto.getName().equals(variable.getName()) &&
+                variableDto.getParentLink().getLink().equals(variable.getParentLink().getLink());
+          }
         }).send();
       }
+    }
+
+    private boolean isCurrentTable(ViewDto viewDto) {
+      return table != null && table.getDatasourceName().equals(viewDto.getDatasourceName()) &&
+          table.getName().equals(viewDto.getName());
     }
   }
 
@@ -544,7 +534,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     @Override
     public void onResponseCode(Request request, Response response) {
       if(response.getStatusCode() == SC_OK) {
-        ResponseCodeCallback updateVariableCallbackHandler = new UpdateVariableCallbackHandler(newVariable);
+        ResponseCodeCallback updateVariableCallbackHandler = new UpdateVariableCallbackHandler();
 
         String uri = UriBuilder.create().segment("datasource", "{}", "view", "{}", "variable", "{}")
             .query("comment", getView().getComment())
@@ -557,28 +547,22 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
       } else {
         NotificationEvent notificationEvent = new JSErrorNotificationEventBuilder()
             .build((ClientErrorDto) JsonUtils.unsafeEval(response.getText()));
-        getEventBus().fireEvent(notificationEvent);
+        fireEvent(notificationEvent);
       }
     }
   }
 
   private class UpdateVariableCallbackHandler implements ResponseCodeCallback {
 
-    private final VariableDto variable;
-
-    public UpdateVariableCallbackHandler(VariableDto variable) {
-      this.variable = variable;
-    }
-
     @Override
     public void onResponseCode(Request request, Response response) {
       switch(response.getStatusCode()) {
         case SC_OK:
           variableUpdatePending = false;
-          getEventBus().fireEvent(new VariableRefreshEvent());
+          fireEvent(new VariableRefreshEvent());
           getView().backToViewScript();
           break;
-        case Response.SC_NOT_FOUND:
+        case SC_NOT_FOUND:
           break;
       }
     }
@@ -604,6 +588,10 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
       if(getView().isSummaryTabSelected()) {
         summaryTabPresenter.onReset();
       }
+    }
+
+    private void requestSummary(VariableDto selection) {
+      fireEvent(new SummaryRequiredEvent(selection.getLink() + "/summary"));
     }
   }
 

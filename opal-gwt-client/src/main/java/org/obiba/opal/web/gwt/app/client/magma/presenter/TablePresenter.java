@@ -22,12 +22,9 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexStatusRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
-import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
@@ -173,7 +170,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private void addEventHandlers() {
     addRegisteredHandler(TableSelectionChangeEvent.getType(), this);
-    addRegisteredHandler(SiblingVariableSelectionEvent.getType(), new SiblingVariableSelectionHandler());
     addRegisteredHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler());
 
     addRegisteredHandler(VariableRefreshEvent.getType(), new VariableRefreshEvent.Handler() {
@@ -638,32 +634,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     public void onResource(Response response, JsArray<ViewDto> resource) {
       ViewDto viewDto = ViewDto.get(JsArrays.toSafeArray(resource));
       getView().setFromTables(viewDto.getFromArray());
-    }
-  }
-
-  private class SiblingVariableSelectionHandler implements SiblingVariableSelectionEvent.Handler {
-    @Override
-    public void onSiblingVariableSelection(SiblingVariableSelectionEvent event) {
-
-      // Look for the variable and its position in the list by its name.
-      // Having a position of the current variable would be more efficient.
-      int siblingIndex = 0;
-      for(int i = 0; i < variables.length(); i++) {
-        if(variables.get(i).getName().equals(event.getCurrentSelection().getName())) {
-          if(event.getDirection() == SiblingVariableSelectionEvent.Direction.NEXT && i < variables.length() - 1) {
-            siblingIndex = i + 1;
-          } else siblingIndex = event.getDirection() == SiblingVariableSelectionEvent.Direction.PREVIOUS && i != 0
-              ? i - 1
-              : i;
-          break;
-        }
-      }
-      VariableDto variableDto = variables.get(siblingIndex);
-
-      getView().setVariableSelection(variableDto, siblingIndex);
-      fireEvent(
-          new VariableSelectionChangeEvent(TablePresenter.this, table, variableDto, getPreviousVariable(siblingIndex),
-              getNextVariable(siblingIndex)));
     }
   }
 

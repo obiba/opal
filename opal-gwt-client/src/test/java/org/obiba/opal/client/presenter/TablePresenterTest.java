@@ -19,7 +19,6 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPre
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.AddPrincipalHandler;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.ConfigureViewStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.event.SiblingVariableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
@@ -72,7 +71,7 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider = createMock(ModalProvider.class);
     ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider = createMock(ModalProvider.class);
 
-    ValuesTablePresenter values = new ValuesTablePresenter(null, null, modalProviderValueSequence,
+    ValuesTablePresenter values = new ValuesTablePresenter(null, null, null, modalProviderValueSequence,
         modalEntityModalPresenter);
     presenter = new TablePresenter(displayMock, new CountingEventBus(), null, values, mockProvider, mockIndexProvider,
         modalConfigureViewStepProvider, variablesToViewProvider, variablePropertiesModalProvider,
@@ -86,8 +85,6 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     HandlerRegistration handlerRegistrationMock = createMock(HandlerRegistration.class);
     expect(eventBusMock.addHandler((Type<TableSelectionChangeEvent.Handler>) EasyMock.anyObject(),
         (TableSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
-    expect(eventBusMock.addHandler((Type<SiblingVariableSelectionEvent.Handler>) EasyMock.anyObject(),
-        (SiblingVariableSelectionEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
     expect(eventBusMock.addHandler((Type<ConfirmationEvent.Handler>) EasyMock.anyObject(),
         (ConfirmationEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
     expect(eventBusMock
