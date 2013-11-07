@@ -10,16 +10,6 @@ li {
 }
 
 /*
- * Pretty print
-
-.container pre.prettyprint {
-  border: 1px dashed #CCCCCC;
-  padding: 10px;
-  margin-bottom: 0;
-}
- */
-
-/*
  * Opal
  */
 
@@ -356,4 +346,11 @@ td.row-actions span {
   margin-right: 0.5em;
   cursor: pointer;
   text-decoration: underline;
+}
+
+/*
+ * Chooser
+ */
+.chooser + div {
+  margin-bottom: 10px;
 }

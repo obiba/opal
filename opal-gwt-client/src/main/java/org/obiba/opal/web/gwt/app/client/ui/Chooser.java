@@ -45,6 +45,7 @@ public class Chooser extends ChosenListBox {
   private void initWidget() {
     setDisableSearchThreshold(5);
     setSearchContains(true);
+    addStyleName("chooser");
   }
 
   @Override
@@ -75,12 +76,6 @@ public class Chooser extends ChosenListBox {
   public void removeItem(int index) {
     super.removeItem(index);
     update();
-  }
-
-  @Override
-  public void insertItemToGroup(String item, String value, int groupIndex, int itemIndex) {
-    // TODO should be fixed in next gwtchosen release
-    insertItemToGroup(item, null, value, groupIndex, itemIndex);
   }
 
   public String getSelectedValue() {
