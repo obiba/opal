@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
@@ -44,6 +45,7 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
 import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
 import static com.google.gwt.http.client.Response.SC_OK;
@@ -54,15 +56,18 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private DataFetcher fetcher;
 
+  private final PlaceManager placeManager;
+
   private final ModalProvider<ValueSequencePopupPresenter> valueSequencePopupProvider;
 
   private final ModalProvider<EntityModalPresenter> entityModalProvider;
 
   @Inject
-  public ValuesTablePresenter(Display display, EventBus eventBus,
+  public ValuesTablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
       ModalProvider<ValueSequencePopupPresenter> valueSequencePopupProvider,
       ModalProvider<EntityModalPresenter> entityModalProvider) {
     super(eventBus, display);
+    this.placeManager = placeManager;
     this.valueSequencePopupProvider = valueSequencePopupProvider.setContainer(this);
     this.entityModalProvider = entityModalProvider.setContainer(this);
   }
@@ -88,21 +93,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     getView().setVariableLabelFieldUpdater(new ValueUpdater<String>() {
       @Override
       public void update(String value) {
-        // Get the variable
-        UriBuilder uriBuilder = UriBuilder.create()
-            .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variable", value);
-
-        ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(uriBuilder.build()).get()
-            .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
-              @Override
-              public void onResource(Response response, JsArray<VariableDto> resource) {
-                if(response.getStatusCode() == SC_OK) {
-                  VariableDto dto = VariableDto.get(JsArrays.toSafeArray(resource));
-                  getEventBus().fireEvent(new VariableSelectionChangeEvent(this, table, dto));
-                }
-              }
-
-            }).send();
+        placeManager.revealPlace(ProjectPlacesHelper.getVariablePlace(table.getDatasourceName(), table.getName(), value));
       }
     });
     fetcher.updateVariables(select);
