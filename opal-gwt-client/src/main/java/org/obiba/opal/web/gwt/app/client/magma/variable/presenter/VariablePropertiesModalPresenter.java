@@ -30,7 +30,6 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -118,7 +117,7 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
         .forResource(uriBuilder.build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())) //
         .put() //
         .withResourceBody(VariableDto.stringify(updatedVariable)).accept("application/json") //
-        .withCallback(new VariableCreateUpdateCallback(updatedVariable), Response.SC_BAD_REQUEST,
+        .withCallback(new VariableUpdateCallback(updatedVariable), Response.SC_BAD_REQUEST,
             Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
   }
 
@@ -154,7 +153,7 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
         .forResource(uriBuilder.build(tableDto.getDatasourceName(), tableDto.getName())) //
         .post() //
         .withResourceBody("[" + VariableDto.stringify(newVariable) + "]").accept("application/json") //
-        .withCallback(new VariableCreateUpdateCallback(newVariable), Response.SC_BAD_REQUEST,
+        .withCallback(new VariableCreateCallback(newVariable), Response.SC_BAD_REQUEST,
             Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
   }
 
@@ -204,11 +203,11 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
     HasText getVariableName();
   }
 
-  private class VariableCreateUpdateCallback implements ResponseCodeCallback {
+  private class VariableUpdateCallback implements ResponseCodeCallback {
 
     private final VariableDto updatedVariable;
 
-    private VariableCreateUpdateCallback(VariableDto updatedVariable) {
+    private VariableUpdateCallback(VariableDto updatedVariable) {
       this.updatedVariable = updatedVariable;
     }
 
@@ -216,11 +215,28 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
     public void onResponseCode(Request request, Response response) {
       if(response.getStatusCode() == Response.SC_OK) {
         getView().hide();
-        placeManager.revealPlace(ProjectPlacesHelper
-            .getVariablePlace(tableDto.getDatasourceName(), tableDto.getName(), updatedVariable.getName()));
+        onSuccess();
       } else {
         getView().showError(response.getText(), null);
       }
+    }
+
+    protected void onSuccess() {
+      placeManager.revealPlace(ProjectPlacesHelper
+          .getVariablePlace(tableDto.getDatasourceName(), tableDto.getName(), updatedVariable.getName()));
+    }
+  }
+
+  private class VariableCreateCallback extends VariableUpdateCallback {
+
+    private VariableCreateCallback(VariableDto newVariable) {
+      super(newVariable);
+    }
+
+    @Override
+    protected void onSuccess() {
+      placeManager.revealPlace(ProjectPlacesHelper
+          .getTablePlace(tableDto.getDatasourceName(), tableDto.getName()));
     }
   }
 
