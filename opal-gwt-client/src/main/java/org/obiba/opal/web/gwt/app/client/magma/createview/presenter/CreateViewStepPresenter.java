@@ -14,13 +14,20 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.HasCollection;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardProxy;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardType;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardView;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
@@ -31,15 +38,6 @@ import org.obiba.opal.web.gwt.app.client.validator.MinimumSizeCollectionValidato
 import org.obiba.opal.web.gwt.app.client.validator.RequiredOptionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardProxy;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardType;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardView;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -57,14 +55,14 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
 public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewStepPresenter.Display> {
@@ -305,19 +303,7 @@ public class CreateViewStepPresenter extends WizardPresenterWidget<CreateViewSte
   final class ConfigureHandler implements ClickHandler {
     @Override
     public void onClick(ClickEvent evt) {
-      getEventBus().fireEvent(new DatasourceUpdatedEvent(datasourceDto));
-
-      // Get the new view dto
-      getViewRequest(datasourceName, getView().getViewName().getText())//
-          .withCallback(new ResourceCallback<ViewDto>() {
-
-            @Override
-            public void onResource(Response response, ViewDto resource) {
-              getView().hide();
-              getEventBus().fireEvent(new ViewConfigurationRequiredEvent(resource));
-            }
-          }).send();
-
+      // TODO ignore the callback until further UI changes
     }
   }
 

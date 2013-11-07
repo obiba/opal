@@ -49,24 +49,31 @@ public class Table<T> extends CellTable<T> {
     setBordered(true);
   }
 
+  /**
+   * Saves the real empty widget before adding it to its container.
+   * @param widget
+   */
   @Override
   public void setEmptyTableWidget(Widget widget) {
+    emptyTableWidget = widget;
     super.setEmptyTableWidget(widget);
   }
 
   /**
    * Hack because of loading indicator does not work with data provider.
+   * <p>NOTE: use the base class to set the temporary empty widget in order to preserve the real one {@link #setEmptyTableWidget} </p>
    */
   public void showLoadingIndicator(ListDataProvider<?> listDataProvider) {
-    emptyTableWidget = getEmptyTableWidget();
-    setEmptyTableWidget(getLoadingIndicator());
+    super.setEmptyTableWidget(getLoadingIndicator());
     listDataProvider.getList().clear();
     listDataProvider.flush();
   }
 
-  // I call this method after my I've updated the data in my ListDataProvider
+  /**
+   * The complementary method used to hide the temporary empty widget {@link #showLoadingIndicator}
+   */
   public void hideLoadingIndicator() {
-    setEmptyTableWidget(emptyTableWidget);
+    super.setEmptyTableWidget(emptyTableWidget);
   }
 
 }

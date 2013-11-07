@@ -12,9 +12,9 @@ package org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ResourceRequestPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ResourceRequestPresenter.ResourceClickHandler;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.view.ResourceRequestView;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
@@ -26,12 +26,13 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
 public class ConclusionStepPresenter extends PresenterWidget<ConclusionStepPresenter.Display> {
   //
@@ -50,13 +51,16 @@ public class ConclusionStepPresenter extends PresenterWidget<ConclusionStepPrese
 
   private String targetDatasourceName;
 
+  private final PlaceManager placeManager;
+
   //
   // Constructors
   //
 
   @Inject
-  public ConclusionStepPresenter(EventBus eventBus, Display display) {
+  public ConclusionStepPresenter(EventBus eventBus, Display display, PlaceManager placeManager) {
     super(eventBus, display);
+    this.placeManager = placeManager;
 
     resourceRequests = new LinkedHashSet<ResourceRequestPresenter<? extends JavaScriptObject>>();
   }
@@ -128,7 +132,7 @@ public class ConclusionStepPresenter extends PresenterWidget<ConclusionStepPrese
 
         @Override
         public void onResource(Response response, DatasourceDto resource) {
-          getEventBus().fireEvent(new DatasourceUpdatedEvent(resource));
+          placeManager.revealPlace(ProjectPlacesHelper.getDatasourcePlace(resource.getName()));
         }
       };
       UriBuilder ub = UriBuilder.create().segment("datasource", targetDatasourceName);
