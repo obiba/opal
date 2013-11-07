@@ -38,12 +38,18 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
 
   private RemoveRunnable removeConfirmation;
 
+  private EDIT_MODE mode;
+
+  enum EDIT_MODE {
+    CREATE,
+    EDIT
+  }
+
   @Inject
   public TaxonomyEditModalPresenter(EventBus eventBus, Display display, Translations translations) {
     super(eventBus, display);
     this.translations = translations;
     getView().setUiHandlers(this);
-//    setLocales();
   }
 
   @Override
@@ -60,25 +66,47 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
     dto.setDescriptionsArray(getView().getDescriptions().getValue());
     dto.setVocabulariesArray(originalTaxonomy.getVocabulariesArray());
 
-    ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder()
-        .forResource(UriBuilders.SYSTEM_CONF_TAXONOMY.create().build(originalTaxonomy.getName()))//
-        .withResourceBody(TaxonomyDto.stringify(dto))//
-        .withCallback(new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            getView().hide();
-            getEventBus().fireEvent(new TaxonomyCreatedEvent());
-          }
-        }, Response.SC_OK, Response.SC_CREATED)//
-        .withCallback(new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            if(response.getText() != null && response.getText().length() != 0) {
-              getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+    if(mode == EDIT_MODE.EDIT) {
+      ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder()
+          .forResource(UriBuilders.SYSTEM_CONF_TAXONOMY.create().build(originalTaxonomy.getName()))//
+          .withResourceBody(TaxonomyDto.stringify(dto))//
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              getView().hide();
+              getEventBus().fireEvent(new TaxonomyCreatedEvent());
             }
-          }
-        }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR)//
-        .put().send();
+          }, Response.SC_OK, Response.SC_CREATED)//
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              if(response.getText() != null && response.getText().length() != 0) {
+                getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+              }
+            }
+          }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR)//
+          .put().send();
+    } else {
+      ResourceRequestBuilderFactory.<TaxonomyDto>newBuilder()
+          .forResource(UriBuilders.SYSTEM_CONF_TAXONOMIES.create().build())//
+          .withResourceBody(TaxonomyDto.stringify(dto))//
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              getView().hide();
+              getEventBus().fireEvent(new TaxonomyCreatedEvent());
+            }
+          }, Response.SC_OK, Response.SC_CREATED)//
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              if(response.getText() != null && response.getText().length() != 0) {
+                getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+              }
+            }
+          }, Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR)//
+          .post().send();
+    }
   }
 
   @Override
@@ -119,8 +147,10 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
     getView().getNewVocabularyName().setText("");
   }
 
-  public void initView(final TaxonomyDto taxonomyDto) {
+  public void initView(final TaxonomyDto taxonomyDto, final EDIT_MODE editionMode) {
     originalTaxonomy = taxonomyDto;
+    mode = editionMode;
+
     ResourceRequestBuilderFactory.<GeneralConf>newBuilder()
         .forResource(UriBuilders.SYSTEM_CONF_GENERAL.create().build())
         .withCallback(new ResourceCallback<GeneralConf>() {
@@ -132,7 +162,7 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
             }
             getView().setAvailableLocales(locales);
             getView()
-                .setTitle(taxonomyDto.getName().isEmpty() ? translations.addTaxonomy() : translations.editTaxonomy());
+                .setTitle(editionMode == EDIT_MODE.CREATE ? translations.addTaxonomy() : translations.editTaxonomy());
             getView().getName().setText(taxonomyDto.getName());
             getView().getTitles().setValue(taxonomyDto.getTitlesArray());
             getView().getDescriptions().setValue(taxonomyDto.getDescriptionsArray());
@@ -151,7 +181,7 @@ public class TaxonomyEditModalPresenter extends ModalPresenterWidget<TaxonomyEdi
     return true;
   }
 
-  protected void showMessage(String id, String message) {
+  void showMessage(String id, String message) {
     getView().showError(Display.FormField.valueOf(id), message);
   }
 

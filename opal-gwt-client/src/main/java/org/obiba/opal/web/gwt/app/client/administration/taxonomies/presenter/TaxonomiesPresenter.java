@@ -28,6 +28,8 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
+import static org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomyEditModalPresenter.EDIT_MODE;
+
 public class TaxonomiesPresenter extends Presenter<TaxonomiesPresenter.Display, TaxonomiesPresenter.Proxy>
     implements TaxonomiesUiHandlers {
 
@@ -104,12 +106,12 @@ public class TaxonomiesPresenter extends Presenter<TaxonomiesPresenter.Display, 
 
   @Override
   public void onTaxonomyEdit(TaxonomyDto taxonomyDto) {
-    taxonomyEditModalProvider.get().initView(taxonomyDto);
+    taxonomyEditModalProvider.get().initView(taxonomyDto, EDIT_MODE.EDIT);
   }
 
   @Override
   public void onAddTaxonomy() {
-    taxonomyEditModalProvider.get().initView(TaxonomyDto.create());
+    taxonomyEditModalProvider.get().initView(TaxonomyDto.create(), EDIT_MODE.CREATE);
   }
 
   @Override
