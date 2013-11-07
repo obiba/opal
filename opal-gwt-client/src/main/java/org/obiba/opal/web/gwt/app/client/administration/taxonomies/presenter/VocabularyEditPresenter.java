@@ -295,7 +295,7 @@ public class VocabularyEditPresenter extends Presenter<Display, VocabularyEditPr
     for(int i = 0; i < terms.length(); i++) {
 
       // When a term has child terms, a FlowPanel was created for those terms
-      if(terms.get(i).getTermsCount() > 0 && newPos > 0) newPos--;
+      if(terms.get(i).getTermsCount() > 0 && newPos > i) newPos--;
 
       if(!insertAfter && i == newPos) {
         termsArray.push(term);

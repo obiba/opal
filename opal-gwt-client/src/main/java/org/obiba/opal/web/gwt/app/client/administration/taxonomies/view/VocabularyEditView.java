@@ -468,7 +468,6 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
         }
 
         getUiHandlers().onReorderTerms(title, pos, insertAfter);
-
       }
     }
   }
