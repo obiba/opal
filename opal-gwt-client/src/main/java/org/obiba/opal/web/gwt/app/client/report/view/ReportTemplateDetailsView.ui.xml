@@ -27,31 +27,31 @@
     <o:PropertiesTable ui:field="reportTemplatePanel" keyStyleNames="span3">
       <g:FlowPanel>
         <g:Label>
-          <ui:msg description="BIRT Report Design label">BIRT Report Design:</ui:msg>
+          <ui:msg description="BIRT Report Design label">BIRT Report Design</ui:msg>
         </g:Label>
         <g:Anchor ui:field="design"/>
       </g:FlowPanel>
       <g:FlowPanel>
         <g:Label>
-          <ui:msg description="Schedule label">Schedule:</ui:msg>
+          <ui:msg description="Schedule label">Schedule</ui:msg>
         </g:Label>
         <g:Label ui:field="schedule"/>
       </g:FlowPanel>
       <g:FlowPanel>
         <g:Label>
-          <ui:msg description="Format label">Format:</ui:msg>
+          <ui:msg description="Format label">Format</ui:msg>
         </g:Label>
         <g:Label ui:field="format"/>
       </g:FlowPanel>
       <g:FlowPanel>
         <g:Label>
-          <ui:msg description="Parameters label">Parameters:</ui:msg>
+          <ui:msg description="Parameters label">Parameters</ui:msg>
         </g:Label>
         <g:Label ui:field="parameters"/>
       </g:FlowPanel>
       <g:FlowPanel>
         <g:Label>
-          <ui:msg description="Notification emails label">Notifications Emails:</ui:msg>
+          <ui:msg description="Notification emails label">Notifications Emails</ui:msg>
         </g:Label>
         <g:Label ui:field="emails"/>
       </g:FlowPanel>
