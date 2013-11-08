@@ -196,6 +196,7 @@ public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<G
     args.add(String.valueOf(MAX_IDENTIFIER_SIZE));
     sizeHelp.setText(TranslationsUtils.replaceArguments(translations.generateIdentifiersSizeHelp(), args));
     generateButton.setText(translations.generateIdentifiersButton());
+    size.setValue(Integer.toString(MIN_IDENTIFIER_SIZE), false);
   }
 
   private void updateDescriptionText() {

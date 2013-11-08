@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
@@ -53,6 +54,12 @@ public class ProjectPropertiesModalView extends ModalPopupViewWithUiHandlers<Pro
 
   @UiField
   HasText description;
+
+  @UiField
+  Button saveButton;
+
+  @UiField
+  Button cancelButton;
 
   private final Translations translations;
 
@@ -142,6 +149,21 @@ public class ProjectPropertiesModalView extends ModalPopupViewWithUiHandlers<Pro
   }
 
   @Override
+  public void setBusy(boolean busy) {
+    if (busy) {
+      modal.setBusy(busy);
+      modal.setCloseVisible(false);
+      saveButton.setEnabled(false);
+      cancelButton.setEnabled(false);
+    } else {
+      modal.setBusy(busy);
+      modal.setCloseVisible(true);
+      saveButton.setEnabled(true);
+      cancelButton.setEnabled(true);
+    }
+  }
+
+  @Override
   public void showError(@Nullable FormField formField, String message) {
     ControlGroup group = formField == FormField.NAME ? nameGroup : null;
     if(group == null) {
@@ -151,12 +173,12 @@ public class ProjectPropertiesModalView extends ModalPopupViewWithUiHandlers<Pro
     }
   }
 
-  @UiHandler("save")
+  @UiHandler("saveButton")
   public void onSave(ClickEvent event) {
     getUiHandlers().save();
   }
 
-  @UiHandler("cancel")
+  @UiHandler("cancelButton")
   public void onCancel(ClickEvent event) {
     getUiHandlers().cancel();
   }
