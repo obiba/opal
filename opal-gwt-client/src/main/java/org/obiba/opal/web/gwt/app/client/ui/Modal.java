@@ -14,6 +14,7 @@ import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
 import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
 import com.github.gwtbootstrap.client.ui.event.ShowEvent;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.DOM;
@@ -125,6 +126,16 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     setInitialDimension();
   }
 
+  public void setBusy(boolean value) {
+    updateCursor(value ? Style.Cursor.WAIT : Style.Cursor.DEFAULT);
+
+    if(value) {
+      unsinkMouseEvents();
+    } else {
+      sinkMouseEvents();
+    }
+  }
+
   public void setMinWidth(int width) {
     if(width < DEFAULT_MINIMUM_WIDTH) return;
     minWidth = width;
@@ -182,6 +193,10 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
         Event.ONMOUSEOVER);
   }
 
+  private void unsinkMouseEvents() {
+    DOM.sinkEvents(getElement(), 0);
+  }
+
   /**
    * processes the mouse-events to showCurrent cursor or change states
    * - mouseover
@@ -229,11 +244,11 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   private void onMouseOverEvent(Event event) {
     //showCurrent different cursors
     if(resizable && isCursorResize(event)) {
-      DOM.setStyleAttribute(getElement(), "cursor", "se-resize");
+      updateCursor(Style.Cursor.SE_RESIZE);
     } else if(draggable && isCursorMove(event)) {
-      DOM.setStyleAttribute(movePanel.getElement(), "cursor", "move");
+      updateCursor(Style.Cursor.MOVE);
     } else {
-      DOM.setStyleAttribute(getElement(), "cursor", "default");
+      updateCursor(Style.Cursor.DEFAULT);
     }
   }
 
@@ -253,11 +268,6 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   }
 
   private void onMouseMoveEvent(Event event) {
-    //reset cursor-type
-    if(!isCursorResize(event) && !isCursorMove(event)) {
-      DOM.setStyleAttribute(getElement(), "cursor", "default");
-    }
-
     //calculate and set the new size or move
 
     if(resize) {
@@ -336,13 +346,17 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     if(move) {
       move = false;
       DOM.releaseCapture(getElement());
-      DOM.setStyleAttribute(movePanel.getElement(), "cursor", "default");
+      updateCursor(Style.Cursor.DEFAULT);
     }
     if(resize) {
       resize = false;
       DOM.releaseCapture(getElement());
-      DOM.setStyleAttribute(getElement(), "cursor", "default");
+      updateCursor(Style.Cursor.DEFAULT);
     }
+  }
+
+  private void updateCursor(Style.Cursor cursor) {
+    getElement().getStyle().setCursor(cursor);
   }
 
   /**

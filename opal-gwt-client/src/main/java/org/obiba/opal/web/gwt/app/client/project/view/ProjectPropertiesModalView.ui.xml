@@ -58,10 +58,10 @@
     </b:ControlGroup>
 
     <b:ModalFooter>
-      <b:Button type="PRIMARY" ui:field="save">
+      <b:Button type="PRIMARY" ui:field="saveButton">
         <ui:msg description="Save button label">Save</ui:msg>
       </b:Button>
-      <b:Button ui:field="cancel">
+      <b:Button ui:field="cancelButton">
         <ui:msg description="Cancel button label">Cancel</ui:msg>
       </b:Button>
     </b:ModalFooter>

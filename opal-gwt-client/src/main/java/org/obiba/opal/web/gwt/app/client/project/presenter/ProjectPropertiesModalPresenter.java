@@ -60,7 +60,6 @@ public class ProjectPropertiesModalPresenter
   protected void onBind() {
     super.onBind();
     validationHandler = new ProjectValidationHandler();
-
     ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
         .forResource(DatabaseResources.storageDatabases()) //
         .withCallback(new ResourceCallback<JsArray<DatabaseDto>>() {
@@ -75,6 +74,7 @@ public class ProjectPropertiesModalPresenter
 
   @Override
   public void save() {
+    getView().setBusy(true);
     getView().clearErrors();
     if (project == null) {
       create();
@@ -208,5 +208,7 @@ public class ProjectPropertiesModalPresenter
     void clearErrors();
 
     void setAvailableDatabases(JsArray<DatabaseDto> availableDatabases);
+
+    void setBusy(boolean busy);
   }
 }
