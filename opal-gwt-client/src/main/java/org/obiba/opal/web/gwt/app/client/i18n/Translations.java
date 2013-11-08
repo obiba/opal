@@ -463,6 +463,7 @@ public interface Translations extends Constants {
       "CopyVariableNameColon", "Variable name '{0}' cannot contain ':'.",//
       "CopyVariableNameAlreadyExists", "Duplicate variable name: {0}.",//
       "CopyVariableIncompatibleEntityType", "Incompatible entity types: {0} / {1}",//
+      "DeleteVariableSelectAtLeastOne", "Select at least one variable to delete",//
       "SearchServiceUnavailable", "Search operation failed. Please make sure the service is started.",//
       "UserStatusChangedOk", "User {0} has been successfully {1}.",//
       "UserUpdatedOk", "User {0} has been successfully updated.",//
@@ -608,8 +609,8 @@ public interface Translations extends Constants {
       "deleteDatabase", "Delete Database",//
       "removeGroup", "Remove Group",//
       "removeUser", "Remove User",//
-      "removeTaxonomy", "Remove Taxonomy"//
-  })
+      "removeTaxonomy", "Remove Taxonomy",//
+      "deleteVariables", "Delete Variables" })
   Map<String, String> confirmationTitleMap();
 
   @Description("Confirmation message map")
@@ -663,7 +664,8 @@ public interface Translations extends Constants {
       "Please confirm that you want to remove the group '{0}'. The group '{0}' will be removed for users belonging to this group.",
 //
       "confirmRemoveUser", "Please confirm that you want to remove the user '{0}'.",//
-      "confirmRemoveTaxonomy", "Please confirm that you want to remove the taxonomy '{0}'."//
+      "confirmRemoveTaxonomy", "Please confirm that you want to remove the taxonomy '{0}'.",//
+      "confirmDeleteVariables", "Please confirm that you want to delete {0} variables"//
   })
   Map<String, String> confirmationMessageMap();
 

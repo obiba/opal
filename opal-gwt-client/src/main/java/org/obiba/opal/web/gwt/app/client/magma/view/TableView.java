@@ -14,17 +14,12 @@ import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TableUiHandlers;
-import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
-import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.ui.PropertiesTable;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.LinkCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.VariableAttributeColumn;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
@@ -48,20 +43,17 @@ import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
-import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
-import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Anchor;
@@ -262,7 +254,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     filter.getTextBox().setPlaceholder(translations.filterVariables());
   }
 
-  @SuppressWarnings({ "unchecked" })
   private void addCheckColumn() {
     checkColumn = new CheckboxColumn<VariableDto>(new VariableDtoDisplay());
 
@@ -273,6 +264,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @Override
   public void beforeRenderRows() {
     pager.setVisible(false);
+    selectAllItemsAlert.setVisible(false);
     table.showLoadingIndicator(dataProvider);
   }
 
@@ -291,15 +283,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     dataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
     pager.firstPage();
     dataProvider.refresh();
-  }
-
-  @Override
-  public void setVariableSelection(VariableDto variable, int index) {
-    int pageIndex = index / table.getPageSize();
-    if(pageIndex != pager.getPage()) {
-      pager.setPage(pageIndex);
-    }
-    table.getSelectionModel().setSelected(variable, true);
   }
 
   @Override
@@ -333,7 +316,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     if(tableNames != null) {
       FlowPanel fromTableLinks = new FlowPanel();
       for(int i = 0; i < tableNames.length(); i++) {
-        final String tableFullName = tableNames.get(i);
+        String tableFullName = tableNames.get(i);
         Anchor a = new Anchor();
         a.setText(tableFullName);
         MagmaPath.Parser parser = MagmaPath.Parser.parse(tableFullName);
@@ -387,6 +370,11 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiHandler("copyVariables")
   void onAddVariablesToView(ClickEvent event) {
     getUiHandlers().onAddVariablesToView(checkColumn.getSelectedItems());
+  }
+
+  @UiHandler("deleteVariables")
+  void onDeleteVariables(ClickEvent event) {
+    getUiHandlers().onDeleteVariables(checkColumn.getSelectedItems());
   }
 
   @UiHandler("clearIndexLink")
@@ -526,7 +514,6 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     }
   }
 
-  @SuppressWarnings("PMD.ExcessiveParameterList")
   private void setStatusText(String text, AlertType type, boolean clear, boolean indexNow, boolean schedule,
       boolean cancel, boolean progressBar) {
     indexStatusText.setText(text);
@@ -638,7 +625,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   private class VariableColumn extends Column<VariableDto, VariableDto> {
 
-    public VariableColumn(VariableLinkCell cell) {
+    private VariableColumn(VariableLinkCell cell) {
       super(cell);
     }
 

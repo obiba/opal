@@ -18,6 +18,8 @@ import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.ConfigureViewStepPresenter;
@@ -108,7 +110,11 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final Provider<IndexPresenter> indexPresenter;
 
+  private final Translations translations;
+
   private Runnable removeConfirmation;
+
+  private Runnable deleteVariablesConfirmation;
 
   private Boolean sortAscending;
 
@@ -116,18 +122,20 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
    * @param display
    * @param eventBus
    */
+  @SuppressWarnings("ConstructorWithTooManyParameters")
   @Inject
   public TablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
       ValuesTablePresenter valuesTablePresenter, Provider<AuthorizationPresenter> authorizationPresenter,
       Provider<IndexPresenter> indexPresenter, ModalProvider<ConfigureViewStepPresenter> configureViewStepProvider,
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
       ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider,
-      ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider) {
+      ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider, Translations translations) {
     super(eventBus, display);
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
     this.authorizationPresenter = authorizationPresenter;
     this.indexPresenter = indexPresenter;
+    this.translations = translations;
     this.configureViewStepProvider = configureViewStepProvider.setContainer(this);
     this.variablesToViewProvider = variablesToViewProvider.setContainer(this);
     this.variablePropertiesModalProvider = variablePropertiesModalProvider.setContainer(this);
@@ -150,11 +158,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     setInSlot(Display.Slots.Values, valuesTablePresenter);
 
     addEventHandlers();
-  }
-
-  @Override
-  protected void onReveal() {
-    super.onReveal();
   }
 
   private void updateTableIndexStatus() {
@@ -193,6 +196,9 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     addRegisteredHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler());
 
     addRegisteredHandler(TableIndexStatusRefreshEvent.getType(), new TableIndexStatusRefreshHandler());
+
+    // Delete variables confirmation handler
+    addRegisteredHandler(ConfirmationEvent.getType(), new DeleteVariableConfirmationEventHandler());
   }
 
   private String getIndexResource(String datasource, String table) {
@@ -211,7 +217,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/commands/_copy").post()
         .authorize(getView().getCopyDataAuthorizer()).send();
 
-    ub = UriBuilder.create().segment("datasource", table.getDatasourceName());
     // export variables in excel
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/variables/excel").get()
         .authorize(getView().getExcelDownloadAuthorizer()).send();
@@ -330,22 +335,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   }
 
-  private VariableDto getPreviousVariable(int index) {
-    VariableDto previous = null;
-    if(index > 0) {
-      previous = variables.get(index - 1);
-    }
-    return previous;
-  }
-
-  private VariableDto getNextVariable(int index) {
-    VariableDto next = null;
-    if(index < variables.length() - 1) {
-      next = variables.get(index + 1);
-    }
-    return next;
-  }
-
   private boolean tableIsView() {
     return table.hasViewLink();
   }
@@ -379,12 +368,31 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   }
 
   @Override
-  public void onAddVariablesToView(List<VariableDto> variables) {
-    if(variables.isEmpty()) {
+  public void onAddVariablesToView(List<VariableDto> variableDtos) {
+    if(variableDtos.isEmpty()) {
       fireEvent(NotificationEvent.newBuilder().error("CopyVariableSelectAtLeastOne").build());
     } else {
       VariablesToViewPresenter variablesToViewPresenter = variablesToViewProvider.get();
-      variablesToViewPresenter.initialize(table, variables);
+      variablesToViewPresenter.initialize(table, variableDtos);
+    }
+  }
+
+  @Override
+  public void onDeleteVariables(List<VariableDto> variableDtos) {
+    if(variableDtos.isEmpty()) {
+      fireEvent(NotificationEvent.newBuilder().error("DeleteVariableSelectAtLeastOne").build());
+    } else {
+      JsArrayString variableNames = JsArrays.create().cast();
+      for(VariableDto variable : variableDtos) {
+        variableNames.push(variable.getName());
+      }
+
+      deleteVariablesConfirmation = new RemoveVariablesRunnable(variableNames);
+
+      fireEvent(ConfirmationRequiredEvent
+          .createWithMessages(deleteVariablesConfirmation, translations.confirmationTitleMap().get("deleteVariables"),
+              TranslationsUtils.replaceArguments(translations.confirmationMessageMap().get("confirmDeleteVariables"),
+                  String.valueOf(variableNames.length()))));
     }
   }
 
@@ -543,7 +551,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   }
 
   private void doFilterVariables() {
-    final String query = getView().getFilter().getText();
+    String query = getView().getFilter().getText();
 
     new VariablesFilter() {
       @Override
@@ -587,6 +595,18 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       if(removeConfirmation != null && event.getSource().equals(removeConfirmation) && event.isConfirmed()) {
         removeConfirmation.run();
         removeConfirmation = null;
+      }
+    }
+  }
+
+  private class DeleteVariableConfirmationEventHandler implements ConfirmationEvent.Handler {
+
+    @Override
+    public void onConfirmation(ConfirmationEvent event) {
+      if(deleteVariablesConfirmation != null && event.getSource().equals(deleteVariablesConfirmation) &&
+          event.isConfirmed()) {
+        deleteVariablesConfirmation.run();
+        deleteVariablesConfirmation = null;
       }
     }
   }
@@ -661,8 +681,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     enum Slots {
       Permissions, Values
     }
-
-    void setVariableSelection(VariableDto variable, int index);
 
     void beforeRenderRows();
 
@@ -768,4 +786,58 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     }
 
   }
+
+  private class RemoveVariablesRunnable implements Runnable {
+
+    private static final int BATCH_SIZE = 25;
+
+    int nb_deleted = 0;
+
+    JsArrayString variableNames;
+
+    private RemoveVariablesRunnable(JsArrayString variableNames) {
+      this.variableNames = variableNames;
+    }
+
+    private String getUri() {
+      UriBuilder uriBuilder = tableIsView()
+          ? UriBuilders.DATASOURCE_VIEW_VARIABLES.create()
+          : UriBuilders.DATASOURCE_TABLE_VARIABLES.create();
+
+      for(int i = nb_deleted, added = 0; i < variableNames.length() && added < BATCH_SIZE; i++, added++) {
+        uriBuilder.query("variables", variableNames.get(i));
+      }
+
+      return uriBuilder.build(table.getDatasourceName(), table.getName());
+    }
+
+    @Override
+    public void run() {
+      // show loading
+      getView().beforeRenderRows();
+      ResourceRequestBuilderFactory.newBuilder().forResource(getUri())//
+          .delete()//
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              if(response.getStatusCode() == SC_OK) {
+                nb_deleted += BATCH_SIZE;
+
+                if(nb_deleted < variableNames.length()) {
+                  run();
+                } else {
+                  placeManager
+                      .revealPlace(ProjectPlacesHelper.getTablePlace(table.getDatasourceName(), table.getName()));
+                }
+              } else {
+
+                String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
+                fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
+              }
+
+            }
+          }, SC_OK, SC_FORBIDDEN, SC_INTERNAL_SERVER_ERROR, SC_NOT_FOUND).send();
+    }
+  }
+
 }

@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
@@ -32,9 +30,7 @@ import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.VariableStatsService;
 import org.obiba.opal.web.magma.view.ViewDtos;
-import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.ViewDto;
-import org.obiba.opal.web.model.Ws;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 

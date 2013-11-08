@@ -13,13 +13,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
+import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
@@ -72,6 +75,29 @@ public class VariablesViewResource extends VariablesResource {
     } finally {
       Closeables.closeQuietly(vw);
     }
+  }
+
+  @Override
+  @DELETE
+  public Response deleteVariables(@QueryParam("variables") List<String> variables) {
+    ValueTableWriter.VariableWriter vw = null;
+    try {
+      View view = getValueTableAsView();
+      vw = view.getListClause().createWriter();
+
+      // Remove from listClause
+      for(VariableValueSource v : view.getListClause().getVariableValueSources()) {
+        if(variables.contains(v.getVariable().getName())) {
+          vw.removeVariable(v.getVariable());
+          viewManager.addView(getDatasource().getName(), view, "Remove " + v.getVariable().getName());
+        }
+      }
+
+    } finally {
+      Closeables.closeQuietly(vw);
+    }
+
+    return Response.ok().build();
   }
 
   //

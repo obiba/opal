@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -30,9 +31,9 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaRuntimeException;
+import org.obiba.magma.NoSuchVariableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
@@ -101,6 +102,7 @@ public class VariablesResource extends AbstractValueTableResource {
         }, Dtos.asDtoFunc(tableLinkBuilder.build())));
 
     // The use of "GenericEntity" is required because otherwise JAX-RS can't determine the type using reflection.
+    //noinspection EmptyClass
     return TimestampedResponses.ok(getValueTable(), new GenericEntity<Iterable<VariableDto>>(entity) {
       // Nothing to implement. Subclassed to keep generic information at runtime.
     }).build();
@@ -153,12 +155,37 @@ public class VariablesResource extends AbstractValueTableResource {
     ValueTableWriter vtw = null;
     VariableWriter vw = null;
     try {
-      vtw = getValueTable().getDatasource()
-          .createWriter(getValueTable().getName(), getValueTable().getEntityType());
+      vtw = getValueTable().getDatasource().createWriter(getValueTable().getName(), getValueTable().getEntityType());
       vw = vtw.writeVariables();
       for(VariableDto variable : variables) {
         vw.writeVariable(Dtos.fromDto(variable));
       }
+    } finally {
+      Closeables.closeQuietly(vw);
+      Closeables.closeQuietly(vtw);
+    }
+  }
+
+  @DELETE
+  public Response deleteVariables(@QueryParam("variables") List<String> variables) {
+
+    if(getValueTable().isView()) throw new InvalidRequestException("Derived variable must be deleted by the view");
+
+    ValueTableWriter vtw = null;
+    ValueTableWriter.VariableWriter vw = null;
+    try {
+      vtw = getValueTable().getDatasource().createWriter(getValueTable().getName(), getValueTable().getEntityType());
+      vw = vtw.writeVariables();
+
+      for(String name : variables) {
+        // The variable must exist
+        Variable v = getValueTable().getVariable(name);
+        vw.removeVariable(v);
+      }
+
+      return Response.ok().build();
+    } catch(NoSuchVariableException e) {
+      return Response.status(Response.Status.NOT_FOUND).entity(e.getName()).build();
     } finally {
       Closeables.closeQuietly(vw);
       Closeables.closeQuietly(vtw);
