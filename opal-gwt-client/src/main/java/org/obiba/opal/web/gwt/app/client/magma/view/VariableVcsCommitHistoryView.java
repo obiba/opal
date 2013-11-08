@@ -116,7 +116,7 @@ public class VariableVcsCommitHistoryView extends ViewWithUiHandlers<VariableVcs
 
       @Override
       public String[] allActions() {
-        return new String[] { ActionsColumn.EDIT_ACTION, DIFF_ACTION, DIFF_CURRENT_ACTION };
+        return new String[] { DIFF_ACTION, DIFF_CURRENT_ACTION, ActionsColumn.EDIT_ACTION };
       }
 
       @Override

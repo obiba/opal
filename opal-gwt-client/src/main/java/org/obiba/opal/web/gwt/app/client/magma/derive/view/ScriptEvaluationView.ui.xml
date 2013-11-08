@@ -21,7 +21,7 @@
       <g:InlineLabel ui:field="noValues">
         <ui:msg description="No Values label">No Values</ui:msg>
       </g:InlineLabel>
-      <c:SimplePager ui:field="pager" location="CENTER" addStyleNames="right-aligned"/>
+      <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="right-aligned"/>
       <o:Table width="100%" ui:field="valuesTable" addStyleNames="left-aligned"/>
     </g:FlowPanel>
 

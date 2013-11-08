@@ -23,7 +23,7 @@
         <b:Button icon="PLUS" type="INFO" ui:field="addUser" addStyleNames="top-margin">
           <ui:msg description="Add user button label">Add User</ui:msg>
         </b:Button>
-        <b:SimplePager ui:field="indexTablePager" location="CENTER" addStyleNames="pull-right"/>
+        <b:SimplePager ui:field="indexTablePager" location="RIGHT" addStyleNames="pull-right"/>
         <o:Table ui:field="usersTable" addStyleNames="small-top-margin"/>
       </g:FlowPanel>
 

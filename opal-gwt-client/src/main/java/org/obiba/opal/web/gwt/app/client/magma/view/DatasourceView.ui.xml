@@ -31,7 +31,7 @@
         <b:Heading size="4" addStyleNames="inline-block">
           <ui:msg description="Properties label">Tables</ui:msg>
         </b:Heading>
-        <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right small-indent"/>
+        <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right small-top-margin small-indent"/>
         <b:DropdownButton text="Add Table" type="INFO" icon="PLUS" ui:field="addBtn" addStyleNames="pull-right small-top-margin">
           <b:NavLink icon="TABLE" ui:field="addTable">
             <ui:msg description="Add table label">Add table...</ui:msg>

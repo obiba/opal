@@ -76,7 +76,7 @@
           <b:Heading size="4" addStyleNames="inline-block">
             <ui:msg description="Variables label">Variables</ui:msg>
           </b:Heading>
-          <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
+          <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right small-top-margin"/>
           <b:Controls addStyleNames="pull-right small-top-margin small-right-indent">
             <b:InputAddOn prependIcon="FILTER">
               <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"></o:TextBoxClearable>
@@ -91,24 +91,24 @@
 
         <g:FlowPanel>
           <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false"
-              addStyleNames="block clear select-all-variables">
+              addStyleNames="select">
             <g:Grid>
               <g:row>
-                <g:customCell styleName="top-aligned">
+                <g:customCell>
                   <g:Label ui:field="selectAllStatus" addStyleNames="inline"></g:Label>
                 </g:customCell>
-                <g:customCell styleName="top-aligned">
-                  <g:Anchor ui:field="selectAllAnchor" addStyleNames="inline xsmall-indent action"></g:Anchor>
+                <g:customCell>
+                  <g:Anchor ui:field="selectAllAnchor" addStyleNames="inline xsmall-indent"></g:Anchor>
                 </g:customCell>
-                <g:customCell styleName="top-aligned">
-                  <g:Anchor ui:field="clearSelectionAnchor" visible="false" addStyleNames="inline xsmall-indent action">
+                <g:customCell>
+                  <g:Anchor ui:field="clearSelectionAnchor" visible="false" addStyleNames="inline xsmall-indent">
                     <ui:msg description="Clear selection label">Clear selection</ui:msg>
                   </g:Anchor>
                 </g:customCell>
-                <g:customCell styleName="top-aligned">
+                <g:customCell>
                   <g:FlowPanel addStyleNames="indent">
                     <b:Icon type="PLUS_SIGN"/>
-                    <g:Anchor ui:field="copyVariables" addStyleNames="inline xsmall-indent action">
+                    <g:Anchor ui:field="copyVariables" addStyleNames="inline xsmall-indent">
                       <ui:msg description="Add to variables to view... label">Add variables to view...</ui:msg>
                     </g:Anchor>
                   </g:FlowPanel>
@@ -116,7 +116,7 @@
               </g:row>
             </g:Grid>
           </b:Alert>
-          <o:Table ui:field="table" width="100%" addStyleNames="left-aligned first-column-checkbox"/>
+          <o:Table ui:field="table"/>
         </g:FlowPanel>
       </b:Tab>
 

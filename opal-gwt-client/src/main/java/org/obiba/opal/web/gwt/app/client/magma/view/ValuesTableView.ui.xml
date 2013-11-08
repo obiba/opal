@@ -17,7 +17,7 @@
       <b:InputAddOn prependIcon="SEARCH" addStyleNames="inline-block">
         <b:TextBox ui:field="searchBox" placeholder="search for an identifier..."/>
       </b:InputAddOn>
-      <b:SimplePager ui:field="pager" location="CENTER" addStyleNames="pull-right"></b:SimplePager>
+      <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"></b:SimplePager>
     </g:FlowPanel>
 
     <o:CollapsiblePanel ui:field="addPanel">

@@ -24,7 +24,7 @@
       </b:Heading>
       <b:SimplePager ui:field="commitInfoTablePager" location="RIGHT" addStyleNames="pull-right"/>
     </g:FlowPanel>
-    <o:Table ui:field="commitInfoTable" width="100%"/>
+    <o:Table ui:field="commitInfoTable"/>
   </g:FlowPanel>
 
 </ui:UiBinder>

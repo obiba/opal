@@ -16,15 +16,15 @@
   <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false">
     <b:ControlGroup>
       <b:Controls>
-        <b:ControlLabel addStyleNames="key">
+        <b:ControlLabel>
           <ui:msg description="Index Schedule type label">Check index for update</ui:msg>
         </b:ControlLabel>
         <o:Chooser name="type" ui:field="type"/>
-        <b:ControlLabel addStyleNames="Index Schedule on" ui:field="on">
+        <b:ControlLabel ui:field="on">
           <ui:msg description="on">on</ui:msg>
         </b:ControlLabel>
         <o:Chooser name="day" ui:field="day"/>
-        <b:ControlLabel addStyleNames="key" ui:field="at">
+        <b:ControlLabel ui:field="at">
           <ui:msg description="Index Schedule at">at</ui:msg>
         </b:ControlLabel>
         <o:Chooser name="hour" ui:field="hour"/>

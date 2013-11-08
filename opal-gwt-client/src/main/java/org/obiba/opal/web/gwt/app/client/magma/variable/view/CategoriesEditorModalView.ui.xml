@@ -8,54 +8,58 @@
     ui:generateLocales="default">
 
   <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false">
-    <g:FlowPanel>
-      <b:Form type="INLINE">
-        <b:ControlGroup ui:field="nameGroup">
-          <b:ControlLabel>
-            <ui:msg description="Name label">Name</ui:msg>
-          </b:ControlLabel>
-          <b:Controls>
-            <b:InputAddOn>
-              <b:TextBox ui:field="addCategoryName"/>
-              <b:Button icon="PLUS" type="SUCCESS" ui:field="addButton" addStyleNames="small-indent">
-                <ui:msg description="Add label">Add</ui:msg>
-              </b:Button>
-            </b:InputAddOn>
-            <b:HelpBlock>
-              <ui:msg description="Add categories help block">Add categories by pressing Enter or the "Add" button.
-              </ui:msg>
-            </b:HelpBlock>
-          </b:Controls>
-        </b:ControlGroup>
-      </b:Form>
 
-      <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false"
-          addStyleNames="block clear select-all-variables">
+    <b:Form type="INLINE">
+      <b:ControlGroup ui:field="nameGroup">
+        <b:ControlLabel>
+          <ui:msg description="Name label">Name</ui:msg>
+        </b:ControlLabel>
+        <b:Controls>
+          <b:InputAddOn>
+            <b:TextBox ui:field="addCategoryName"/>
+            <b:Button icon="PLUS" type="SUCCESS" ui:field="addButton" addStyleNames="small-indent">
+              <ui:msg description="Add label">Add</ui:msg>
+            </b:Button>
+          </b:InputAddOn>
+          <b:HelpBlock>
+            <ui:msg description="Add categories help block">Add categories by pressing Enter or the "Add" button.
+            </ui:msg>
+          </b:HelpBlock>
+        </b:Controls>
+      </b:ControlGroup>
+    </b:Form>
+
+    <g:FlowPanel addStyleNames="clearfix">
+      <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
+    </g:FlowPanel>
+
+    <g:FlowPanel addStyleNames="small-top-margin">
+      <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false" addStyleNames="select">
         <g:Grid>
           <g:row>
-            <g:customCell styleName="top-aligned">
+            <g:customCell>
               <g:Label ui:field="selectAllStatus" addStyleNames="inline"></g:Label>
             </g:customCell>
-            <g:customCell styleName="top-aligned">
-              <g:Anchor ui:field="selectAllAnchor" addStyleNames="inline xsmall-indent action"></g:Anchor>
+            <g:customCell>
+              <g:Anchor ui:field="selectAllAnchor" addStyleNames="inline xsmall-indent"></g:Anchor>
             </g:customCell>
-            <g:customCell styleName="top-aligned">
-              <g:Anchor ui:field="clearSelectionAnchor" visible="false" addStyleNames="inline xsmall-indent action">
+            <g:customCell>
+              <g:Anchor ui:field="clearSelectionAnchor" visible="false" addStyleNames="inline xsmall-indent">
                 <ui:msg description="Clear selection label">Clear selection</ui:msg>
               </g:Anchor>
             </g:customCell>
-            <g:customCell styleName="top-aligned">
+            <g:customCell>
               <g:FlowPanel addStyleNames="indent">
                 <b:Icon type="TRASH"/>
-                <g:Anchor addStyleNames="inline xsmall-indent action" ui:field="deleteLink">
+                <g:Anchor addStyleNames="inline xsmall-indent" ui:field="deleteLink">
                   <ui:msg description="Delete category label">Delete</ui:msg>
                 </g:Anchor>
                 <b:Icon type="ARROW_UP" addStyleNames="xsmall-indent"/>
-                <g:Anchor addStyleNames="inline xsmall-indent action" ui:field="moveUpLink">
+                <g:Anchor addStyleNames="inline xsmall-indent" ui:field="moveUpLink">
                   <ui:msg description="Move up label">Move up</ui:msg>
                 </g:Anchor>
                 <b:Icon type="ARROW_DOWN" addStyleNames="xsmall-indent"/>
-                <g:Anchor addStyleNames="inline xsmall-indent action" ui:field="moveDownLink">
+                <g:Anchor addStyleNames="inline xsmall-indent" ui:field="moveDownLink">
                   <ui:msg description="Move down label">Move down</ui:msg>
                 </g:Anchor>
               </g:FlowPanel>
@@ -63,9 +67,10 @@
           </g:row>
         </g:Grid>
       </b:Alert>
-      <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
-      <c:CategoryEditableTable ui:field="table"/>
     </g:FlowPanel>
+
+    <c:CategoryEditableTable ui:field="table"/>
+
 
     <b:ModalFooter>
       <b:Button ui:field="saveButton" type="PRIMARY">

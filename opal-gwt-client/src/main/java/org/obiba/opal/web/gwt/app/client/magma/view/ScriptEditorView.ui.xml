@@ -17,29 +17,18 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <g:FlowPanel addStyleNames="clearfix well no-bottom-margin">
-      <b:FluidRow>
-        <b:Column size="3">
-          <o:ValueTypeChooser ui:field="valueTypes"/>
-          <b:CheckBox ui:field="repeatable">
-            <ui:msg description="Repeatable label">Repeatable</ui:msg>
-          </b:CheckBox>
-        </b:Column>
-        <b:Column size="9">
-          <g:FlowPanel addStyleNames="pull-right">
-            <b:Button ui:field="testScript" size="SMALL" type="INFO" addStyleNames="small-indent">
-              <ui:msg description="Test label">Test</ui:msg>
-            </b:Button>
-          </g:FlowPanel>
-        </b:Column>
-      </b:FluidRow>
-      <b:FluidRow addStyleNames="pull-left">
-        <b:HelpInline>
-          <ui:msg description="Script Help label">
-            You can test the whole script or a selected portion.
-          </ui:msg>
-        </b:HelpInline>
-      </b:FluidRow>
+    <g:FlowPanel addStyleNames="well no-bottom-margin">
+      <g:SimplePanel addStyleNames="pull-left">
+        <o:ValueTypeChooser ui:field="valueTypes"/>
+      </g:SimplePanel>
+      <b:CheckBox ui:field="repeatable" addStyleNames="pull-left small-indent">
+        <ui:msg description="Repeatable label">Repeatable</ui:msg>
+      </b:CheckBox>
+
+      <b:Button ui:field="testScript" type="INFO" addStyleNames="pull-right">
+        <ui:msg description="Test label">Test</ui:msg>
+      </b:Button>
+
     </g:FlowPanel>
     <ace:AceEditor ui:field="scriptArea" addStyleNames="ace-editor"/>
   </g:FlowPanel>

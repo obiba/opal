@@ -85,7 +85,7 @@
       <b:Button ui:field="addMethodButton" icon="PLUS">
         <ui:msg description="Add DataShield method label">Add Method</ui:msg>
       </b:Button>
-      <b:SimplePager ui:field="methodsTablePager" location="CENTER" addStyleNames="pull-right" visible="false"/>
+      <b:SimplePager ui:field="methodsTablePager" location="RIGHT" addStyleNames="pull-right" visible="false"/>
       <o:Table width="100%" ui:field="methodsTable" visible="false"/>
     </g:VerticalPanel>
   </g:FlowPanel>

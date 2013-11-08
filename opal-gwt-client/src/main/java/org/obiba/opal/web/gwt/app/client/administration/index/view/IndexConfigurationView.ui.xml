@@ -19,7 +19,7 @@
 
     <g:FlowPanel>
       <b:ControlGroup>
-        <b:ControlLabel addStyleNames="key">
+        <b:ControlLabel>
           <ui:msg description="Index Configuration Cluster name label">Cluster Name</ui:msg>
         </b:ControlLabel>
         <b:Controls>
@@ -28,7 +28,7 @@
       </b:ControlGroup>
 
       <b:ControlGroup>
-        <b:ControlLabel addStyleNames="key">
+        <b:ControlLabel>
           <ui:msg description="Index Configuration Index name label">Index Name</ui:msg>
         </b:ControlLabel>
         <b:Controls>
@@ -37,8 +37,8 @@
       </b:ControlGroup>
 
       <b:ControlGroup>
-        <b:ControlLabel addStyleNames="key">
-          <b:ControlLabel addStyleNames="key">
+        <b:ControlLabel>
+          <b:ControlLabel>
             <ui:msg description="Index Configuration Number of shards label">Number of shards</ui:msg>
           </b:ControlLabel>
           <b:Controls>
@@ -49,8 +49,8 @@
       </b:ControlGroup>
 
       <b:ControlGroup>
-        <b:ControlLabel addStyleNames="key">
-          <b:ControlLabel addStyleNames="key">
+        <b:ControlLabel>
+          <b:ControlLabel>
             <ui:msg description="Index Configuration Number of replicas label">Number of replicas</ui:msg>
           </b:ControlLabel>
           <b:Controls>
@@ -61,8 +61,8 @@
       </b:ControlGroup>
 
       <b:ControlGroup>
-        <b:ControlLabel addStyleNames="key">
-          <b:ControlLabel addStyleNames="key">
+        <b:ControlLabel>
+          <b:ControlLabel>
             <ui:msg description="Index Configuration Settings">Settings</ui:msg>
           </b:ControlLabel>
           <b:Controls>

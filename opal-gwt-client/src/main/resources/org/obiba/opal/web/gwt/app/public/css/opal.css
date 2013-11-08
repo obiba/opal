@@ -361,3 +361,11 @@ td.row-actions span {
 .collapsible .header {
   margin-bottom: 10px;
 }
+
+/*
+ * Select Alert
+ */
+
+.alert.select {
+  margin-bottom: 0.4em;
+}

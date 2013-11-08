@@ -7,9 +7,9 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
-    xmlns:c="urn:import:com.google.gwt.user.cellview.client"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
@@ -25,6 +25,12 @@
         <ui:msg description="Search service label">Search service</ui:msg>
       </b:Heading>
 
+      <b:Paragraph>
+        <ui:msg description="configure help label">Search service must be stopped to edit configuration. Changes will
+          take effect on service start.
+        </ui:msg>
+      </b:Paragraph>
+
       <g:FlowPanel>
         <b:ButtonGroup>
           <b:Button ui:field="startStopButton">
@@ -37,11 +43,6 @@
           </b:Button>
         </b:ButtonGroup>
       </g:FlowPanel>
-      <b:HelpBlock>
-        <ui:msg description="configure help label">Search service must be stopped to edit configuration. Changes will
-          take effect on service start.
-        </ui:msg>
-      </b:HelpBlock>
     </g:FlowPanel>
 
     <g:FlowPanel>
@@ -49,24 +50,27 @@
         <ui:msg description="Indices label">Table indices</ui:msg>
       </b:Heading>
 
-      <g:FlowPanel addStyleNames="pull-left">
-        <b:ButtonGroup>
-          <b:Button ui:field="refreshIndicesButton" icon="REFRESH">
-            <ui:msg description="Refresh indices label">Refresh</ui:msg>
-          </b:Button>
-        </b:ButtonGroup>
-        <b:DropdownButton ui:field="actionsDropdown" text="Actions">
-          <b:NavLink ui:field="scheduleLink">
-            <ui:msg description="Index Action Schedule Indexing">Schedule indexing</ui:msg>
-          </b:NavLink>
-          <b:NavLink ui:field="clearLink">
-            <ui:msg description="Index Action Clear">Clear</ui:msg>
-          </b:NavLink>
-        </b:DropdownButton>
+      <g:FlowPanel addStyleNames="clearfix small-bottom-margin">
+        <g:FlowPanel addStyleNames="pull-left">
+          <b:ButtonGroup>
+            <b:Button ui:field="refreshIndicesButton" icon="REFRESH">
+              <ui:msg description="Refresh indices label">Refresh</ui:msg>
+            </b:Button>
+          </b:ButtonGroup>
+          <b:DropdownButton ui:field="actionsDropdown" text="Actions">
+            <b:NavLink ui:field="scheduleLink">
+              <ui:msg description="Index Action Schedule Indexing">Schedule indexing</ui:msg>
+            </b:NavLink>
+            <b:NavLink ui:field="clearLink">
+              <ui:msg description="Index Action Clear">Clear</ui:msg>
+            </b:NavLink>
+          </b:DropdownButton>
+        </g:FlowPanel>
+
+        <b:SimplePager ui:field="indexTablePager" location="RIGHT" addStyleNames="pull-right"/>
       </g:FlowPanel>
-      <b:SimplePager ui:field="indexTablePager" location="RIGHT" addStyleNames="pull-right"/>
-      <b:Alert ui:field="selectAllAlert" close="false" visible="false"
-          addStyleNames="small-top-margin">
+
+      <b:Alert ui:field="selectAllAlert" close="false" visible="false" addStyleNames="select">
         <g:Grid>
           <g:row>
             <g:customCell>
