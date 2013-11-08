@@ -79,7 +79,7 @@
           <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right small-top-margin"/>
           <b:Controls addStyleNames="pull-right small-top-margin small-right-indent">
             <b:InputAddOn prependIcon="FILTER">
-              <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"></o:TextBoxClearable>
+              <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
             </b:InputAddOn>
           </b:Controls>
           <b:ButtonGroup addStyleNames="pull-right">
@@ -107,10 +107,13 @@
                 </g:customCell>
                 <g:customCell>
                   <g:FlowPanel addStyleNames="indent">
-                    <b:Icon type="PLUS_SIGN"/>
-                    <g:Anchor ui:field="copyVariables" addStyleNames="inline xsmall-indent">
+                    <b2:IconAnchor icon="PLUS_SIGN" ui:field="copyVariables"
+                        addStyleNames="inline xsmall-indent">
                       <ui:msg description="Add to variables to view... label">Add variables to view...</ui:msg>
-                    </g:Anchor>
+                    </b2:IconAnchor>
+                    <b2:IconAnchor icon="REMOVE" ui:field="deleteVariables" addStyleNames="inline xsmall-indent">
+                      <ui:msg description="Delete label">Delete</ui:msg>
+                    </b2:IconAnchor>
                   </g:FlowPanel>
                 </g:customCell>
               </g:row>
@@ -127,11 +130,11 @@
             <g:Grid>
               <g:row>
                 <g:customCell styleName="top-aligned">
-                  <g:Label ui:field="indexStatusText" addStyleNames="inline"></g:Label>
+                  <g:Label ui:field="indexStatusText" addStyleNames="inline"/>
                 </g:customCell>
                 <g:customCell styleName="top-aligned">
 
-                  <b:ProgressBar ui:field="progress" addStyleNames="xsmall-indent progress"></b:ProgressBar>
+                  <b:ProgressBar ui:field="progress" addStyleNames="xsmall-indent progress"/>
                 </g:customCell>
                 <g:customCell styleName="top-aligned">
 

@@ -18,26 +18,27 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.AddPrincipalHandler;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValueSequencePopupPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent.Type;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.testing.CountingEventBus;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
@@ -70,12 +71,13 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     ModalProvider<VariablesToViewPresenter> variablesToViewProvider = createMock(ModalProvider.class);
     ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider = createMock(ModalProvider.class);
     ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider = createMock(ModalProvider.class);
+    Translations translations = createMock(Translations.class);
 
     ValuesTablePresenter values = new ValuesTablePresenter(null, null, null, modalProviderValueSequence,
         modalEntityModalPresenter);
     presenter = new TablePresenter(displayMock, new CountingEventBus(), null, values, mockProvider, mockIndexProvider,
         modalConfigureViewStepProvider, variablesToViewProvider, variablePropertiesModalProvider,
-        viewPropertiesModalProvider);
+        viewPropertiesModalProvider, translations);
   }
 
   @SuppressWarnings({ "unchecked", "OverlyLongMethod" })

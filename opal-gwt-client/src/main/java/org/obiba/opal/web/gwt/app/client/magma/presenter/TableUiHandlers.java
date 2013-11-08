@@ -32,4 +32,5 @@ public interface TableUiHandlers extends UiHandlers {
 
   void onIndexSchedule();
 
+  void onDeleteVariables(List<VariableDto> variables);
 }
