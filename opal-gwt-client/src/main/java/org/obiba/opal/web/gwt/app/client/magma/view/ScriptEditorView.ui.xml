@@ -20,41 +20,7 @@
     <g:FlowPanel addStyleNames="clearfix well no-bottom-margin">
       <b:FluidRow>
         <b:Column size="3">
-          <o:Chooser ui:field="valueTypes">
-            <g:item value="text">
-              <ui:msg description="Text label">text</ui:msg>
-            </g:item>
-            <g:item value="decimal">
-              <ui:msg description="Decimal label">decimal</ui:msg>
-            </g:item>
-            <g:item value="integer">
-              <ui:msg description="Integer label">integer</ui:msg>
-            </g:item>
-            <g:item value="binary">
-              <ui:msg description="Binary label">binary</ui:msg>
-            </g:item>
-            <g:item value="boolean">
-              <ui:msg description="Boolean label">boolean</ui:msg>
-            </g:item>
-            <g:item value="datetime">
-              <ui:msg description="Datetime label">datetime</ui:msg>
-            </g:item>
-            <g:item value="date">
-              <ui:msg description="Date label">date</ui:msg>
-            </g:item>
-            <g:item value="point">
-              <ui:msg description="Point label">point</ui:msg>
-            </g:item>
-            <g:item value="linestring">
-              <ui:msg description="LineString label">line</ui:msg>
-            </g:item>
-            <g:item value="polygon">
-              <ui:msg description="Polygon label">polygon</ui:msg>
-            </g:item>
-            <g:item value="locale">
-              <ui:msg description="Locale label">locale</ui:msg>
-            </g:item>
-          </o:Chooser>
+          <o:ValueTypeChooser ui:field="valueTypes"/>
           <b:CheckBox ui:field="repeatable">
             <ui:msg description="Repeatable label">Repeatable</ui:msg>
           </b:CheckBox>

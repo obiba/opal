@@ -1300,6 +1300,26 @@ public interface Translations extends Constants {
   @DefaultStringValue("Who")
   String whoLabel();
 
+  @Description("Value Type map")
+  @DefaultStringMapValue({ "TEXTUAL", "Textual", //
+      "text","text",//
+      "NUMERICAL", "Numerical", //
+      "integer","integer",//
+      "decimal","decimal",//
+      "TEMPORAL","Temporal",//
+      "date","date",//
+      "datetime","datetime",//
+      "GEOSPATIAL","Geospatial",//
+      "point","point",//
+      "linestring","linestring",//
+      "polygon","polygon",//
+      "OTHER","Other",//
+      "binary","binary",//
+      "boolean","boolean",//
+      "locale","locale"//
+  })
+  Map<String, String> valueTypeMap();
+
   @Description("Subject Type map")
   @DefaultStringMapValue({ "USER", "User Name", //
       "GROUP", "Group Name" })

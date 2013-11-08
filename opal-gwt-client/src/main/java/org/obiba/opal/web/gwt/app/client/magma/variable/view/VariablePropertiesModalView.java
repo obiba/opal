@@ -39,10 +39,6 @@ import com.google.web.bindery.event.shared.EventBus;
 public class VariablePropertiesModalView extends ModalPopupViewWithUiHandlers<VariablePropertiesModalUiHandlers>
     implements VariablePropertiesModalPresenter.Display {
 
-  private static final int MIN_WIDTH = 480;
-
-  private static final int MIN_HEIGHT = 400;
-
   private final Translations translations;
 
   interface Binder extends UiBinder<Widget, VariablePropertiesModalView> {}
@@ -90,8 +86,6 @@ public class VariablePropertiesModalView extends ModalPopupViewWithUiHandlers<Va
     initWidget(uiBinder.createAndBindUi(this));
     dialog.setTitle(translations.editProperties());
     dialog.setResizable(true);
-    dialog.setMinWidth(MIN_WIDTH);
-    dialog.setMinHeight(MIN_HEIGHT);
   }
 
   @UiHandler("repeatable")

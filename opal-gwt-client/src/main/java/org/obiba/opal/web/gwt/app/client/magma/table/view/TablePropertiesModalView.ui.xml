@@ -18,8 +18,6 @@
 
   <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false">
     <g:FlowPanel addStyleNames="main">
-
-      <b:Form type="INLINE">
         <!--Name-->
         <b:ControlGroup ui:field="nameGroup">
           <b:ControlLabel>
@@ -30,7 +28,7 @@
             <b:TextBox ui:field="name"/>
           </b:Controls>
           <b:HelpBlock>
-            <ui:msg description="Table Name help">A table must have a unique name</ui:msg>
+            <ui:msg description="Table Name help">A table must have a unique name.</ui:msg>
           </b:HelpBlock>
         </b:ControlGroup>
 
@@ -44,11 +42,9 @@
             <b:TextBox ui:field="entityType">Participant</b:TextBox>
           </b:Controls>
           <b:HelpBlock>
-            <ui:msg description="Table entity type help">What the table data are about</ui:msg>
+            <ui:msg description="Table entity type help">What the table data are about.</ui:msg>
           </b:HelpBlock>
         </b:ControlGroup>
-
-      </b:Form>
     </g:FlowPanel>
 
     <b:ModalFooter>

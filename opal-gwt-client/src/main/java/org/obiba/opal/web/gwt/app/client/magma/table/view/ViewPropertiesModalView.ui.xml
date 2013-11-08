@@ -18,8 +18,6 @@
 
   <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false">
     <g:FlowPanel addStyleNames="main">
-
-      <b:Form type="INLINE">
         <!--Name-->
         <b:ControlGroup ui:field="nameGroup">
           <b:ControlLabel>
@@ -30,7 +28,7 @@
             <b:TextBox ui:field="name"/>
           </b:Controls>
           <b:HelpBlock>
-            <ui:msg description="View Name help">A view must have a unique name</ui:msg>
+            <ui:msg description="View Name help">A view must have a unique name.</ui:msg>
           </b:HelpBlock>
         </b:ControlGroup>
 
@@ -44,11 +42,9 @@
             <o:TableChooser ui:field="tableChooser"/>
           </b:Controls>
           <b:HelpBlock>
-            <ui:msg description="Table references help">The table(s) from which the entities are extracted</ui:msg>
+            <ui:msg description="Table references help">The table(s) from which the entities are extracted.</ui:msg>
           </b:HelpBlock>
         </b:ControlGroup>
-
-      </b:Form>
     </g:FlowPanel>
 
     <b:ModalFooter>
