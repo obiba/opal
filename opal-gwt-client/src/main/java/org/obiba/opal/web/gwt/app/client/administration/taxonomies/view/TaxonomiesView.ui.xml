@@ -16,15 +16,11 @@
       <b:NavLink ui:field="taxonomiesLink">Taxonomies</b:NavLink>
     </b:NavPills>
 
-    <b:FluidRow>
-      <b:Column size="3" offset="9">
-        <b:ButtonGroup addStyleNames="pull-right">
-          <b:Button type="INFO" icon="PLUS" size="SMALL" ui:field="add">
-            <ui:msg description="Add Taxonomy label">Add Taxonomy</ui:msg>
-          </b:Button>
-        </b:ButtonGroup>
-      </b:Column>
-    </b:FluidRow>
+    <b:ButtonGroup>
+      <b:Button type="INFO" icon="PLUS" ui:field="add">
+        <ui:msg description="Add Taxonomy label">Add Taxonomy</ui:msg>
+      </b:Button>
+    </b:ButtonGroup>
     <g:FlowPanel ui:field="panel" addStyleNames="items"></g:FlowPanel>
   </g:FlowPanel>
 </ui:UiBinder>

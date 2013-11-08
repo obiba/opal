@@ -12,38 +12,29 @@
       <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
 
-    <b:FluidRow>
-      <b:Column size="12">
-        <b:FluidRow>
-          <b:Column size="9">
-            <b:Heading size="4" ui:field="vocabularyName" addStyleNames="inline-block"/>
-            <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="editVocabulary">
-            </b2:IconAnchor>
-          </b:Column>
-        </b:FluidRow>
-      </b:Column>
-    </b:FluidRow>
-    <b:FluidRow>
-      <b:Column size="12">
-        <o:PropertiesTable ui:field="vocabularyProperties"/>
-      </b:Column>
-    </b:FluidRow>
+    <g:FlowPanel>
+      <b:Heading size="4" ui:field="vocabularyName" addStyleNames="inline-block"/>
+      <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="editVocabulary">
+      </b2:IconAnchor>
+    </g:FlowPanel>
 
-    <b:FluidRow>
-      <b:Column size="12">
-        <b:Heading size="4" addStyleNames="inline-block">Terms</b:Heading>
-      </b:Column>
-    </b:FluidRow>
-
-    <b:FluidRow>
+    <b:Row>
       <b:Column size="6">
+        <o:PropertiesTable ui:field="vocabularyProperties" keyStyleNames="span2"/>
+      </b:Column>
+    </b:Row>
+
+    <b:Heading size="4" addStyleNames="inline-block">Terms</b:Heading>
+
+    <b:Row>
+      <b:Column size="3">
         <g:FlowPanel ui:field="termsLinks" addStyleNames="items"/>
       </b:Column>
-      <b:Column size="6">
-        <b:Heading size="4" addStyleNames="inline-block, no-top-margin" ui:field="termTitle"/>
-        <o:PropertiesTable ui:field="termProperties"/>
+      <b:Column size="9">
+        <b:Heading size="4" addStyleNames="inline-block no-top-margin" ui:field="termTitle"/>
+        <o:PropertiesTable ui:field="termProperties" keyStyleNames="span2"/>
       </b:Column>
-    </b:FluidRow>
+    </b:Row>
 
   </g:FlowPanel>
 </ui:UiBinder>

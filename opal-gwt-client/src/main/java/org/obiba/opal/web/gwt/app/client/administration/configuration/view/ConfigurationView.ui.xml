@@ -11,6 +11,8 @@
     <g:FlowPanel addStyleNames="page-header">
       <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
+
+
     <b:NavPills>
       <b:NavLink ui:field="generalNavLink">General</b:NavLink>
       <o:OpalNavLink ui:field="taxonomies">Taxonomies</o:OpalNavLink>
@@ -22,7 +24,11 @@
       </b:Heading>
       <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="editGeneralSettings">
       </b2:IconAnchor>
-      <o:PropertiesTable ui:field="generalProperties"/>
+      <b:Row>
+        <b:Column size="6">
+          <o:PropertiesTable ui:field="generalProperties" keyStyleNames="span3"/>
+        </b:Column>
+      </b:Row>
     </g:FlowPanel>
 
   </g:FlowPanel>

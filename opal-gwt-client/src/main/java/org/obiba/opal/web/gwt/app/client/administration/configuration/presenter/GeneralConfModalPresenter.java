@@ -47,10 +47,9 @@ public class GeneralConfModalPresenter extends ModalPresenterWidget<GeneralConfM
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == Response.SC_OK) {
           getView().hide();
-          getEventBus().fireEvent(NotificationEvent.newBuilder().info("GeneralConfigSaved").build());
-          getEventBus().fireEvent(new GeneralConfigSavedEvent());
+          fireEvent(new GeneralConfigSavedEvent());
         } else {
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+          fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         }
       }
     }, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR, Response.SC_NOT_FOUND).put().send();
