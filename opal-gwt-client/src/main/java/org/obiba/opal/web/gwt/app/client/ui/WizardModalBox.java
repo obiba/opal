@@ -143,9 +143,9 @@ public class WizardModalBox extends Modal {
 
   public void setProgress(boolean progress) {
     if(progress) {
-      addStyleName("progress");
+      addStyleName("modal-progress");
     } else {
-      removeStyleName("progress");
+      removeStyleName("modal-progress");
     }
   }
 }
