@@ -5,44 +5,38 @@
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator" ui:generateLocales="default">
 
   <o:Modal ui:field="dialog" resizable="false" closeVisible="true" keyboard="true" animation="false">
-    <g:FlowPanel>
-      <g:FlowPanel styleName="input">
-        <b:RadioButton name="pkg" ui:field="allPkg">
-          <ui:msg description="Install all Datashield Packages label">Install all DataSHIELD packages</ui:msg>
-        </b:RadioButton>
-        <b:RadioButton name="pkg" ui:field="namedPkg">
-          <ui:msg description="Install specific Datashield Package label">Install a specific DataSHIELD package</ui:msg>
-        </b:RadioButton>
-        <g:FlowPanel addStyleNames="indent">
-          <b:TextBox ui:field="name"/>
-          <b:HelpBlock>
-            <ui:msg description="DataShield package name description">Name of the DataSHIELD package to be installed
-              on R server.
-            </ui:msg>
-          </b:HelpBlock>
-        </g:FlowPanel>
-      </g:FlowPanel>
 
-      <g:DisclosurePanel>
-        <g:customHeader>
-          <g:Label>
-            <ui:msg description="Advanced options label">Advanced Options</ui:msg>
-          </g:Label>
-        </g:customHeader>
-        <g:FlowPanel>
-          <g:Label addStyleNames="key">
-            <ui:msg description="Git reference label">Git reference</ui:msg>
-          </g:Label>
-          <b:TextBox name="reference" ui:field="reference"/>
-          <g:FlowPanel>
-            <g:HTMLPanel addStyleNames="help-block">
-              <ui:msg description="Git reference description">Could be a commit, tag, or branch name on</ui:msg>
-              <g:Anchor href="https://github.com/datashield" target="_blank">DataSHIELD source</g:Anchor>
-            </g:HTMLPanel>
-          </g:FlowPanel>
-        </g:FlowPanel>
-      </g:DisclosurePanel>
+    <g:FlowPanel styleName="input">
+      <b:RadioButton name="pkg" ui:field="allPkg">
+        <ui:msg description="Install all Datashield Packages label">Install all DataSHIELD packages</ui:msg>
+      </b:RadioButton>
+      <b:RadioButton name="pkg" ui:field="namedPkg">
+        <ui:msg description="Install specific Datashield Package label">Install a specific DataSHIELD package</ui:msg>
+      </b:RadioButton>
+      <g:FlowPanel addStyleNames="indent">
+        <b:TextBox ui:field="name"/>
+        <b:HelpBlock>
+          <ui:msg description="DataShield package name description">Name of the DataSHIELD package to be installed
+            on R server.
+          </ui:msg>
+        </b:HelpBlock>
+      </g:FlowPanel>
     </g:FlowPanel>
+
+    <o:CollapsiblePanel>
+      <b:ControlGroup>
+        <b:ControlLabel>
+          <ui:msg description="Git reference label">Git reference</ui:msg>
+        </b:ControlLabel>
+        <b:Controls>
+          <b:TextBox name="reference" ui:field="reference"/>
+        </b:Controls>
+        <b:HelpBlock>
+          <ui:msg description="Git reference description">Could be a commit, tag, or branch name on</ui:msg>
+          <g:Anchor href="https://github.com/datashield" target="_blank">DataSHIELD source</g:Anchor>
+        </b:HelpBlock>
+      </b:ControlGroup>
+    </o:CollapsiblePanel>
 
     <b:ModalFooter>
       <b:Button ui:field="installButton" type="PRIMARY">

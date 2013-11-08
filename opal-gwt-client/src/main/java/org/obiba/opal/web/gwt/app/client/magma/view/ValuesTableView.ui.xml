@@ -20,16 +20,8 @@
       <b:SimplePager ui:field="pager" location="CENTER" addStyleNames="pull-right"></b:SimplePager>
     </g:FlowPanel>
 
-    <g:DisclosurePanel ui:field="addPanel">
-      <g:customHeader>
-        <g:FlowPanel>
-          <g:InlineLabel>
-            <ui:msg description="Display Options label">Display options</ui:msg>
-          </g:InlineLabel>
-          <g:Image ui:field="refreshPending" url="image/loading.gif" addStyleNames="small-indent"/>
-        </g:FlowPanel>
-      </g:customHeader>
-
+    <o:CollapsiblePanel ui:field="addPanel">
+      <g:Image ui:field="refreshPending" url="image/loading.gif" addStyleNames="small-indent"/>
       <g:Grid>
         <g:row>
           <g:customCell styleName="top-aligned">
@@ -64,8 +56,8 @@
           </g:customCell>
         </g:row>
       </g:Grid>
+    </o:CollapsiblePanel>
 
-    </g:DisclosurePanel>
     <o:Table ui:field="valuesTable"></o:Table>
   </g:FlowPanel>
 

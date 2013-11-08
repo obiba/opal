@@ -17,55 +17,47 @@
       </g:Label>
     </g:FlowPanel>
 
-    <g:DisclosurePanel ui:field="advancedOptions" addStyleNames="full-width">
-      <g:customHeader>
-        <g:Label>
-          <ui:msg description="Advanced Options label">Advanced Options</ui:msg>
-        </g:Label>
-      </g:customHeader>
-      <g:FlowPanel>
-        <g:Grid width="100%">
-          <g:row>
-            <g:customCell styleName="top">
-              <g:FlowPanel styleName="input block">
-                <g:Label addStyleNames="key">
-                  <ui:msg description="From row label">From Row</ui:msg>
-                </g:Label>
-                <o:NumericTextBox ui:field="row" addStyleNames="span1"/>
-              </g:FlowPanel>
-            </g:customCell>
-            <g:customCell styleName="top small-indent">
-              <g:FlowPanel styleName="input block">
-                <g:Label addStyleNames="key">
-                  <ui:msg description="Separators label">Separators</ui:msg>
-                </g:Label>
-                <g:FlowPanel>
-                  <g:FlowPanel addStyleNames="inline">
-                    <o:EditableListBox ui:field="field" textStyleNames="span1"/>
-                    <g:Label styleName="help-block">
-                      <ui:msg description="Field label">Field</ui:msg>
-                    </g:Label>
-                  </g:FlowPanel>
-                  <g:FlowPanel addStyleNames="inline">
-                    <o:EditableListBox ui:field="quote" textStyleNames="span1"/>
-                    <g:Label styleName="help-block">
-                      <ui:msg description="Quote label">Quote</ui:msg>
-                    </g:Label>
-                  </g:FlowPanel>
+    <o:CollapsiblePanel ui:field="advancedOptions">
+      <g:Grid>
+        <g:row>
+          <g:customCell styleName="top">
+            <g:FlowPanel styleName="input block">
+              <g:Label addStyleNames="key">
+                <ui:msg description="From row label">From Row</ui:msg>
+              </g:Label>
+              <o:NumericTextBox ui:field="row" addStyleNames="span1"/>
+            </g:FlowPanel>
+          </g:customCell>
+          <g:customCell styleName="top small-indent">
+            <g:FlowPanel styleName="input block">
+              <g:Label addStyleNames="key">
+                <ui:msg description="Separators label">Separators</ui:msg>
+              </g:Label>
+              <g:FlowPanel>
+                <g:FlowPanel addStyleNames="inline">
+                  <o:EditableListBox ui:field="field" textStyleNames="span1"/>
+                  <g:Label styleName="help-block">
+                    <ui:msg description="Field label">Field</ui:msg>
+                  </g:Label>
+                </g:FlowPanel>
+                <g:FlowPanel addStyleNames="inline">
+                  <o:EditableListBox ui:field="quote" textStyleNames="span1"/>
+                  <g:Label styleName="help-block">
+                    <ui:msg description="Quote label">Quote</ui:msg>
+                  </g:Label>
                 </g:FlowPanel>
               </g:FlowPanel>
-            </g:customCell>
-          </g:row>
-        </g:Grid>
-        <g:FlowPanel styleName="input block">
-          <g:Label addStyleNames="key">
-            <ui:msg description="Character set label">Character Set</ui:msg>
-          </g:Label>
-          <o:CharacterSetView ui:field='charsetView'></o:CharacterSetView>
-        </g:FlowPanel>
+            </g:FlowPanel>
+          </g:customCell>
+        </g:row>
+      </g:Grid>
+      <g:FlowPanel styleName="input block">
+        <g:Label addStyleNames="key">
+          <ui:msg description="Character set label">Character Set</ui:msg>
+        </g:Label>
+        <o:CharacterSetView ui:field='charsetView'></o:CharacterSetView>
       </g:FlowPanel>
-
-    </g:DisclosurePanel>
+    </o:CollapsiblePanel>
 
   </g:FlowPanel>
 

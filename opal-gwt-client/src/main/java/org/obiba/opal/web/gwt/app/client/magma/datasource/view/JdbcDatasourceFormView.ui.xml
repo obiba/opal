@@ -14,40 +14,33 @@
       <o:Chooser ui:field="database"/>
     </g:FlowPanel>
 
-    <g:DisclosurePanel>
-      <g:customHeader>
-        <g:Label>
-          <ui:msg description="Advanced Options label">Advanced Options</ui:msg>
+    <o:CollapsiblePanel>
+      <g:FlowPanel styleName="input">
+        <g:Label addStyleNames="key">
+          <ui:msg description="Created Timestamp Column Name label">Created Timestamp Column Name</ui:msg>
         </g:Label>
-      </g:customHeader>
-      <g:FlowPanel>
-        <g:FlowPanel styleName="input">
-          <g:Label addStyleNames="key">
-            <ui:msg description="Created Timestamp Column Name label">Created Timestamp Column Name</ui:msg>
-          </g:Label>
-          <g:TextBox ui:field="defaultCreatedTimestampColumnName"/>
-        </g:FlowPanel>
-        <g:FlowPanel styleName="input">
-          <g:Label addStyleNames="key">
-            <ui:msg description="Updated Timestamp Column Name label">Updated Timestamp Column Name</ui:msg>
-          </g:Label>
-          <g:TextBox ui:field="defaultUpdatedTimestampColumnName"/>
-        </g:FlowPanel>
-        <g:FlowPanel styleName="input">
-          <g:Label addStyleNames="key">
-            <ui:msg description="Include meta-data tables label">Include meta-data tables</ui:msg>
-          </g:Label>
-          <b:RadioButton name="includeMetaDataTablesGroup" ui:field="useMetadataTablesOption"
-              addStyleNames="top-margin">
-            <ui:msg description="Yes label">Yes</ui:msg>
-          </b:RadioButton>
-          <b:RadioButton name="includeMetaDataTablesGroup" ui:field="doNotUseMetadataTablesOption"
-              addStyleNames="top-margin">
-            <ui:msg description="No label">No</ui:msg>
-          </b:RadioButton>
-        </g:FlowPanel>
+        <g:TextBox ui:field="defaultCreatedTimestampColumnName"/>
       </g:FlowPanel>
-    </g:DisclosurePanel>
+      <g:FlowPanel styleName="input">
+        <g:Label addStyleNames="key">
+          <ui:msg description="Updated Timestamp Column Name label">Updated Timestamp Column Name</ui:msg>
+        </g:Label>
+        <g:TextBox ui:field="defaultUpdatedTimestampColumnName"/>
+      </g:FlowPanel>
+      <g:FlowPanel styleName="input">
+        <g:Label addStyleNames="key">
+          <ui:msg description="Include meta-data tables label">Include meta-data tables</ui:msg>
+        </g:Label>
+        <b:RadioButton name="includeMetaDataTablesGroup" ui:field="useMetadataTablesOption"
+            addStyleNames="top-margin">
+          <ui:msg description="Yes label">Yes</ui:msg>
+        </b:RadioButton>
+        <b:RadioButton name="includeMetaDataTablesGroup" ui:field="doNotUseMetadataTablesOption"
+            addStyleNames="top-margin">
+          <ui:msg description="No label">No</ui:msg>
+        </b:RadioButton>
+      </g:FlowPanel>
+    </o:CollapsiblePanel>
 
   </g:FlowPanel>
 

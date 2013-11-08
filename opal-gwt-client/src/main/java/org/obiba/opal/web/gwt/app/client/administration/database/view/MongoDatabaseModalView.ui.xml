@@ -58,19 +58,12 @@
       <b:PasswordTextBox ui:field="password" b:id="password"/>
     </b:ControlGroup>
 
-    <g:DisclosurePanel ui:field="advancedOptions">
-      <g:customHeader>
-        <g:Label>
-          <ui:msg description="Advanced Options label">Advanced Options</ui:msg>
-        </g:Label>
-      </g:customHeader>
-      <g:FlowPanel>
-        <b:ControlLabel for="properties">
-          <ui:msg description="Properties label">Properties</ui:msg>
-        </b:ControlLabel>
-        <b:TextArea ui:field="properties" b:id="properties" alternateSize="XLARGE"/>
-      </g:FlowPanel>
-    </g:DisclosurePanel>
+    <o:CollapsiblePanel ui:field="advancedOptions">
+      <b:ControlLabel for="properties">
+        <ui:msg description="Properties label">Properties</ui:msg>
+      </b:ControlLabel>
+      <b:TextArea ui:field="properties" b:id="properties" alternateSize="XLARGE"/>
+    </o:CollapsiblePanel>
 
     <b:ModalFooter>
       <b:Button ui:field="saveButton" type="PRIMARY">

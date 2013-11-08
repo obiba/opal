@@ -816,6 +816,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("LimeSurvey")
   String limesurveyLabel();
 
+  @Description("Limesurvey label")
+  @DefaultStringValue("LimeSurvey Options")
+  String limesurveyOptionsLabel();
+
   @Description("JDBC label")
   @DefaultStringValue("JDBC")
   String opalJDBCLabel();
@@ -1302,21 +1306,21 @@ public interface Translations extends Constants {
 
   @Description("Value Type map")
   @DefaultStringMapValue({ "TEXTUAL", "Textual", //
-      "text","text",//
+      "text", "text",//
       "NUMERICAL", "Numerical", //
-      "integer","integer",//
-      "decimal","decimal",//
-      "TEMPORAL","Temporal",//
-      "date","date",//
-      "datetime","datetime",//
-      "GEOSPATIAL","Geospatial",//
-      "point","point",//
-      "linestring","linestring",//
-      "polygon","polygon",//
-      "OTHER","Other",//
-      "binary","binary",//
-      "boolean","boolean",//
-      "locale","locale"//
+      "integer", "integer",//
+      "decimal", "decimal",//
+      "TEMPORAL", "Temporal",//
+      "date", "date",//
+      "datetime", "datetime",//
+      "GEOSPATIAL", "Geospatial",//
+      "point", "point",//
+      "linestring", "linestring",//
+      "polygon", "polygon",//
+      "OTHER", "Other",//
+      "binary", "binary",//
+      "boolean", "boolean",//
+      "locale", "locale"//
   })
   Map<String, String> valueTypeMap();
 
@@ -2268,6 +2272,10 @@ public interface Translations extends Constants {
   String hibernateDatasourceLabel();
 
   @Description("Custom SQL label")
+  @DefaultStringValue("Custom SQL Options")
+  String jdbcOptionsLabel();
+
+  @Description("Custom SQL label")
   @DefaultStringValue("Custom SQL")
   String jdbcDatasourceLabel();
 
@@ -2348,7 +2356,23 @@ public interface Translations extends Constants {
   String taxonomyLabel();
 
   @Description("New term name label")
-  @Constants.DefaultStringValue("New term name...")
+  @DefaultStringValue("New term name...")
   String newTermNameLabel();
 
+  @Description("Details label")
+  @DefaultStringValue("Details")
+  String details();
+
+  @Description("Collapsible Headings")
+  @DefaultStringMapValue({ "ADVANCED_OPTIONS", "Advanced Options",//
+      "DETAILS", "Details" })
+  Map<String, String> collapsibleMap();
+
+  @Description("Display Options label")
+  @DefaultStringValue("Display Options")
+  String displayOptionsLabel();
+
+  @Description("Add a value mapping label")
+  @DefaultStringValue("Add a value mapping")
+  String addValueMapping();
 }

@@ -26,33 +26,26 @@
       </g:Label>
     </g:FlowPanel>
 
-    <g:DisclosurePanel ui:field="options" addStyleNames="full-width">
-      <g:customHeader>
-        <g:Label>
-          <ui:msg description="Options title">Advanced Options</ui:msg>
+    <o:CollapsiblePanel>
+      <g:FlowPanel styleName="input">
+        <g:Label addStyleNames="key">
+          <ui:msg description="Spss Entity type">Label Locale</ui:msg>
         </g:Label>
-      </g:customHeader>
-      <g:FlowPanel>
-        <g:FlowPanel styleName="input">
-          <g:Label addStyleNames="key">
-            <ui:msg description="Spss Entity type">Label Locale</ui:msg>
-          </g:Label>
-          <o:DropdownSuggestBox ui:field="localeNameBox"/>
-        </g:FlowPanel>
-        <g:FlowPanel styleName="input">
-          <g:Label addStyleNames="key">
-            <ui:msg description="Character set label">Character Set</ui:msg>
-          </g:Label>
-          <o:CharacterSetView ui:field='charsetView'></o:CharacterSetView>
-        </g:FlowPanel>
-        <g:FlowPanel styleName="input">
-          <g:Label addStyleNames="key">
-            <ui:msg description="Spss Entity type">Entity type</ui:msg>
-          </g:Label>
-          <g:TextBox name="entity" ui:field="entityType"/>
-        </g:FlowPanel>
+        <o:DropdownSuggestBox ui:field="localeNameBox"/>
       </g:FlowPanel>
-    </g:DisclosurePanel>
+      <g:FlowPanel styleName="input">
+        <g:Label addStyleNames="key">
+          <ui:msg description="Character set label">Character Set</ui:msg>
+        </g:Label>
+        <o:CharacterSetView ui:field='charsetView'></o:CharacterSetView>
+      </g:FlowPanel>
+      <g:FlowPanel styleName="input">
+        <g:Label addStyleNames="key">
+          <ui:msg description="Spss Entity type">Entity type</ui:msg>
+        </g:Label>
+        <g:TextBox name="entity" ui:field="entityType"/>
+      </g:FlowPanel>
+    </o:CollapsiblePanel>
 
   </g:FlowPanel>
 

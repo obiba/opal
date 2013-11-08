@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.administration.database.presenter.Abstr
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseUiHandlers;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.MongoDatabaseModalPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
@@ -80,7 +81,7 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
   PasswordTextBox password;
 
   @UiField
-  DisclosurePanel advancedOptions;
+  CollapsiblePanel advancedOptions;
 
   @UiField
   TextArea properties;

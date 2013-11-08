@@ -16,6 +16,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
 import org.obiba.opal.web.gwt.app.client.ui.RadioGroup;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController.Builder;
@@ -70,7 +71,7 @@ public class DeriveOpenTextualVariableStepView extends ViewImpl
   // --- Map fields ---
 
   @UiField
-  DisclosurePanel addPanel;
+  CollapsiblePanel addPanel;
 
   @UiField(provided = true)
   SuggestBox value;
@@ -96,6 +97,7 @@ public class DeriveOpenTextualVariableStepView extends ViewImpl
     radioGroup.addButton(manual, Method.MANUAL);
     auto.setValue(true);
     addButton.setText("Add");
+    addPanel.setText(translations.addValueMapping());
   }
 
   @Override

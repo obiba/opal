@@ -29,33 +29,26 @@
           </b:HelpBlock>
         </b:ControlGroup>
 
-        <g:DisclosurePanel ui:field="options">
-          <g:customHeader>
-            <g:Label>
-              <ui:msg description="Options title">Advanced Options</ui:msg>
-            </g:Label>
-          </g:customHeader>
+        <o:CollapsiblePanel ui:field="options">
           <g:FlowPanel>
-            <g:FlowPanel>
-              <g:Label>
-                <ui:msg description="Spss Entity type">Label Locale</ui:msg>
-              </g:Label>
-              <o:DropdownSuggestBox ui:field="localeNameBox"/>
-            </g:FlowPanel>
-            <g:FlowPanel>
-              <g:Label>
-                <ui:msg description="Character set label">Character Set</ui:msg>
-              </g:Label>
-              <o:CharacterSetView ui:field="charsetView"/>
-            </g:FlowPanel>
-            <g:FlowPanel>
-              <g:Label>
-                <ui:msg description="Spss Entity type">Entity type</ui:msg>
-              </g:Label>
-              <b:TextBox name="entity" ui:field="spssEntityType">Participant</b:TextBox>
-            </g:FlowPanel>
+            <g:Label>
+              <ui:msg description="Spss Entity type">Label Locale</ui:msg>
+            </g:Label>
+            <o:DropdownSuggestBox ui:field="localeNameBox"/>
           </g:FlowPanel>
-        </g:DisclosurePanel>
+          <g:FlowPanel>
+            <g:Label>
+              <ui:msg description="Character set label">Character Set</ui:msg>
+            </g:Label>
+            <o:CharacterSetView ui:field="charsetView"/>
+          </g:FlowPanel>
+          <g:FlowPanel>
+            <g:Label>
+              <ui:msg description="Spss Entity type">Entity type</ui:msg>
+            </g:Label>
+            <b:TextBox name="entity" ui:field="spssEntityType">Participant</b:TextBox>
+          </g:FlowPanel>
+        </o:CollapsiblePanel>
 
         <g:FlowPanel>
           <b:Paragraph ui:field="failed">

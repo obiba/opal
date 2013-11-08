@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter.DataFetcher;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter.EntitySelectionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
@@ -87,7 +88,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   private final Widget widget;
 
   @UiField
-  DisclosurePanel addPanel;
+  CollapsiblePanel addPanel;
 
   @UiField
   SimplePager pager;
@@ -180,6 +181,8 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
         return Math.min(maxVisibleColumns, listVariable.size() - firstVisibleIndex);
       }
     };
+
+    addPanel.setText(translations.displayOptionsLabel());
   }
 
   @Override

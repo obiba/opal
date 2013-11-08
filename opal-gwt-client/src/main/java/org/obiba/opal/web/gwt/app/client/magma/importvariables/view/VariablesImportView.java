@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.Conclus
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportPresenter;
 import org.obiba.opal.web.gwt.app.client.support.LanguageLocale;
 import org.obiba.opal.web.gwt.app.client.ui.CharacterSetView;
+import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
 import org.obiba.opal.web.gwt.app.client.ui.DatasourceParsingErrorPanel;
 import org.obiba.opal.web.gwt.app.client.ui.DropdownSuggestBox;
 import org.obiba.opal.web.gwt.app.client.ui.ModalViewImpl;
@@ -82,7 +83,7 @@ public class VariablesImportView extends ModalViewImpl implements VariablesImpor
   DatasourceParsingErrorPanel datasourceParsingErrors;
 
   @UiField
-  DisclosurePanel options;
+  CollapsiblePanel options;
 
   @UiField
   CharacterSetView charsetView;

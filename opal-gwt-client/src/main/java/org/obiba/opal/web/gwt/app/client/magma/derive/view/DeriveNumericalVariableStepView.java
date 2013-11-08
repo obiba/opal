@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.magma.derive.view;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveNumericalVariableStepPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
@@ -86,7 +87,7 @@ public class DeriveNumericalVariableStepView extends ViewImpl implements DeriveN
   NumericTextBox countBox;
 
   @UiField
-  DisclosurePanel addPanel;
+  CollapsiblePanel addPanel;
 
   @UiField
   RadioButton addRangeRadio;
@@ -142,6 +143,7 @@ public class DeriveNumericalVariableStepView extends ViewImpl implements DeriveN
 
     addRangeRadio.setValue(true, true);
     valuesMapGrid.enableRowDeletion(true);
+    addPanel.setText(translations.addValueMapping());
   }
 
   private void initializeMethodForm() {

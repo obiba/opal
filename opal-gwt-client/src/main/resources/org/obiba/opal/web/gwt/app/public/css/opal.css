@@ -354,3 +354,10 @@ td.row-actions span {
 .chooser + div {
   margin-bottom: 10px;
 }
+
+/*
+ * Collapsible
+ */
+.collapsible .header {
+  margin-bottom: 10px;
+}

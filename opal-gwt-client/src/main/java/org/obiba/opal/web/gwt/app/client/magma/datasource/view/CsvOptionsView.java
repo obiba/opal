@@ -13,6 +13,7 @@ import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.CsvOptionsDi
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.ui.CharacterSetView;
+import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
 import org.obiba.opal.web.gwt.app.client.ui.EditableListBox;
 
 import com.google.gwt.core.client.GWT;
@@ -55,7 +56,7 @@ public class CsvOptionsView extends Composite implements CsvOptionsDisplay {
   CharacterSetView charsetView;
 
   @UiField
-  DisclosurePanel advancedOptions;
+  CollapsiblePanel advancedOptions;
 
   //
   // Constructors

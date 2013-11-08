@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.app.client.administration.database.presenter.Datab
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.SqlDatabaseModalPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
@@ -43,6 +44,7 @@ import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.HasVisibility;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -113,16 +115,16 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   CheckBox defaultStorage;
 
   @UiField
-  DisclosurePanel limesurveyOptions;
+  CollapsiblePanel limesurveyOptions;
 
   @UiField
   TextBox tablePrefix;
 
   @UiField
-  DisclosurePanel jdbcOptions;
+  CollapsiblePanel jdbcOptions;
 
   @UiField
-  DisclosurePanel advancedOptions;
+  CollapsiblePanel advancedOptions;
 
   @UiField
   TextBox defaultEntityType;
@@ -175,6 +177,9 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
     constrainedModal
         .registerWidget("sqlSchema.jdbcDatasourceSettings.defaultEntityType", translations.defaultEntityTypeLabel(),
             defaultEntityTypeGroup);
+
+    limesurveyOptions.setText(translations.limesurveyLabel());
+    jdbcOptions.setText(translations.jdbcOptionsLabel());
   }
 
   private void setDriverContextualInfo() {
@@ -481,7 +486,6 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   public void toggleLimesurveyOptions(boolean show) {
     if(!show) tablePrefix.setValue(null);
     limesurveyOptions.setVisible(show);
-    limesurveyOptions.setOpen(show);
   }
 
   @Override
@@ -492,7 +496,6 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
       useMetadataTables.setValue(false);
     }
     jdbcOptions.setVisible(show);
-    jdbcOptions.setOpen(show);
   }
 
 }

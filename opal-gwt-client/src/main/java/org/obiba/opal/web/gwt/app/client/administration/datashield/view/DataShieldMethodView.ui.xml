@@ -11,9 +11,8 @@
   </ui:style>
 
   <o:Modal ui:field="dialog" resizable="false" closeVisible="true" keyboard="true" animation="false">
-    <g:FlowPanel addStyleNames="main {style.optionsPanelMsg}">
       <b:ControlGroup>
-        <b:ControlLabel addStyleNames="key">
+        <b:ControlLabel>
           <ui:msg description="Name label">Name</ui:msg>
         </b:ControlLabel>
         <b:Controls>
@@ -21,7 +20,7 @@
         </b:Controls>
       </b:ControlGroup>
       <b:ControlGroup>
-        <b:ControlLabel addStyleNames="key">
+        <b:ControlLabel>
           <ui:msg description="Type label">Type</ui:msg>
         </b:ControlLabel>
         <b:Controls>
@@ -29,20 +28,20 @@
         </b:Controls>
       </b:ControlGroup>
       <b:ControlGroup>
-        <b:ControlLabel addStyleNames="key" ui:field="functionLabel">
+        <b:ControlLabel ui:field="functionLabel">
           <ui:msg description="DataShield function label">Function</ui:msg>
         </b:ControlLabel>
         <b:TextBox name="function" ui:field="function"/>
       </b:ControlGroup>
       <b:ControlGroup>
-        <b:ControlLabel addStyleNames="key" ui:field="scriptLabel">
+        <b:ControlLabel ui:field="scriptLabel">
           <ui:msg description="DataShield script label">Script</ui:msg>
         </b:ControlLabel>
         <Controls>
-          <b:TextArea addStyleNames="not-so-full-width" name="script" ui:field="script"/>
+          <b:TextArea name="script" ui:field="script"/>
         </Controls>
       </b:ControlGroup>
-    </g:FlowPanel>
+    
     <b:ModalFooter>
       <b:Button ui:field="saveButton" type="PRIMARY">
         <ui:msg description="Save button label">Save</ui:msg>

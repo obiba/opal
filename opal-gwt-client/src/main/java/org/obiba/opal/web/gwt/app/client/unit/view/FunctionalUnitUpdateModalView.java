@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.unit.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitUpdateModalPresenter.Display;
@@ -64,7 +65,7 @@ public class FunctionalUnitUpdateModalView extends ModalPopupViewWithUiHandlers<
   CheckBox selectEnabled;
 
   @UiField
-  DisclosurePanel options;
+  CollapsiblePanel options;
 
   @Inject
   public FunctionalUnitUpdateModalView(EventBus eventBus) {

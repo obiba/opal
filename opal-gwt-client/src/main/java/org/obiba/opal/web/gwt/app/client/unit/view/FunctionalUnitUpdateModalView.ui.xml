@@ -28,12 +28,7 @@
         </g:Label>
         <g:TextArea name="select" ui:field="functionalUnitDescription" addStyleNames="not-so-full-width"/>
       </g:FlowPanel>
-      <g:DisclosurePanel ui:field="options" addStyleNames="full-width">
-        <g:customHeader>
-          <g:Label>
-            <ui:msg description="Options title">Advanced Options</ui:msg>
-          </g:Label>
-        </g:customHeader>
+      <o:CollapsiblePanel ui:field="options">
         <g:FlowPanel styleName="input">
           <b:CheckBox ui:field="selectEnabled" addStyleNames="key">
             <ui:msg description="Identifier Variables Filter label">Identifier Variables Filter</ui:msg>
@@ -49,7 +44,7 @@
                 target="_blank" text="Magma Javascript API."/>
           </g:FlowPanel>
         </g:FlowPanel>
-      </g:DisclosurePanel>
+      </o:CollapsiblePanel>
     </g:FlowPanel>
     <b:ModalFooter>
       <b:Button ui:field="updateFunctionalUnitButton" styleName="btn btn-primary">

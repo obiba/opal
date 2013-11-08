@@ -16,12 +16,7 @@
           aggregation method is identified by a name that will be used from the R-DataShield client.
         </ui:msg>
       </b:Paragraph>
-      <b:CollapseTrigger target="#toggle1">
-        <b:NavLink addStyleNames="bottom-margin">
-          <ui:msg description="Details label">Details</ui:msg>
-        </b:NavLink>
-      </b:CollapseTrigger>
-      <b:Collapse existTrigger="true" b:id="toggle1" defaultOpen="false">
+      <o:CollapsiblePanel heading="DETAILS">
         <b:FluidRow>
           <b:Column size="6">
             <b:Heading size="6">
@@ -46,7 +41,7 @@
             </b:Paragraph>
           </b:Column>
         </b:FluidRow>
-      </b:Collapse>
+      </o:CollapsiblePanel>
 
     </g:FlowPanel>
 
@@ -58,12 +53,7 @@
           Each assign method is identified by a name that will be used from the R-DataShield client.
         </ui:msg>
       </b:Paragraph>
-      <b:CollapseTrigger target="#toggle2">
-        <b:NavLink addStyleNames="bottom-margin">
-          <ui:msg description="Details label">Details</ui:msg>
-        </b:NavLink>
-      </b:CollapseTrigger>
-      <b:Collapse existTrigger="true" b:id="toggle2" defaultOpen="false">
+      <o:CollapsiblePanel heading="DETAILS">
         <b:FluidRow>
           <b:Column size="6">
             <b:Heading size="6">
@@ -88,7 +78,7 @@
             </b:Paragraph>
           </b:Column>
         </b:FluidRow>
-      </b:Collapse>
+      </o:CollapsiblePanel>
     </g:FlowPanel>
 
     <g:VerticalPanel width="100%" addStyleNames="content">
