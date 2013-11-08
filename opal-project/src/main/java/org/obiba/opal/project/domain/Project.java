@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
@@ -20,6 +21,10 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.Timestamped;
+import org.obiba.magma.Timestamps;
+import org.obiba.magma.Value;
+import org.obiba.magma.type.DateTimeType;
 import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 
@@ -30,7 +35,7 @@ import com.google.common.collect.Lists;
 /**
  * Description of a project in Opal.
  */
-public class Project extends AbstractTimestamped implements HasUniqueProperties, Comparable<Project> {
+public class Project extends AbstractTimestamped implements HasUniqueProperties, Comparable<Project>, Timestamped {
 
   @NotNull
   @NotBlank
@@ -154,6 +159,24 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
   @Override
   public int compareTo(Project project) {
     return name.compareTo(project.name);
+  }
+
+  @Nonnull
+  @Override
+  public Timestamps getTimestamps() {
+    return new Timestamps() {
+      @Nonnull
+      @Override
+      public Value getLastUpdate() {
+        return DateTimeType.get().valueOf(getUpdated());
+      }
+
+      @Nonnull
+      @Override
+      public Value getCreated() {
+        return DateTimeType.get().valueOf(Project.this.getCreated());
+      }
+    };
   }
 
   @SuppressWarnings("ParameterHidesMemberVariable")
