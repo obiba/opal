@@ -805,7 +805,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           : UriBuilders.DATASOURCE_TABLE_VARIABLES.create();
 
       for(int i = nb_deleted, added = 0; i < variableNames.length() && added < BATCH_SIZE; i++, added++) {
-        uriBuilder.query("variables", variableNames.get(i));
+        uriBuilder.query("variable", variableNames.get(i));
       }
 
       return uriBuilder.build(table.getDatasourceName(), table.getName());

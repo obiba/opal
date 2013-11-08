@@ -167,7 +167,7 @@ public class VariablesResource extends AbstractValueTableResource {
   }
 
   @DELETE
-  public Response deleteVariables(@QueryParam("variables") List<String> variables) {
+  public Response deleteVariables(@QueryParam("variable") List<String> variables) {
 
     if(getValueTable().isView()) throw new InvalidRequestException("Derived variable must be deleted by the view");
 

@@ -79,7 +79,7 @@ public class VariablesViewResource extends VariablesResource {
 
   @Override
   @DELETE
-  public Response deleteVariables(@QueryParam("variables") List<String> variables) {
+  public Response deleteVariables(@QueryParam("variable") List<String> variables) {
     ValueTableWriter.VariableWriter vw = null;
     try {
       View view = getValueTableAsView();
