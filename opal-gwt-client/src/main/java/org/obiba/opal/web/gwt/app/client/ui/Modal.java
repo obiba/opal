@@ -290,7 +290,8 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
       // NOTE: setting the height and the body height causes footer draw glitches
       // for now we only set the width on the body
 //      setHeight(height + "px");
-      setWidth(width);
+      // NOTE: com.github.gwtbootstrap.client.ui.Modal.setWith() also centers the window, using UIObject.setWidth()
+      setWidth(width + "px");
       setMaxHeigth(height + "px");
     }
   }
