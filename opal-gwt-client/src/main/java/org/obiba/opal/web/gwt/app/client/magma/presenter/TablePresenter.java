@@ -122,7 +122,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
    * @param display
    * @param eventBus
    */
-  @SuppressWarnings("ConstructorWithTooManyParameters")
+  @SuppressWarnings({ "ConstructorWithTooManyParameters", "PMD.ExcessiveParameterList" })
   @Inject
   public TablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
       ValuesTablePresenter valuesTablePresenter, Provider<AuthorizationPresenter> authorizationPresenter,
