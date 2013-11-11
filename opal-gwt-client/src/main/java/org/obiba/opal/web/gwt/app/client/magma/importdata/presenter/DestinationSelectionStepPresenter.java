@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -34,6 +35,8 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
   JsArray<DatasourceDto> datasources;
 
   private String destination;
+
+  private DatasourceDto datasource;
 
   @Inject
   public DestinationSelectionStepPresenter(EventBus eventBus, Display display) {
@@ -69,7 +72,8 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
           public void onResource(Response response, DatasourceDto resource) {
             resource.setTableArray(JsArrays.toSafeArray(resource.getTableArray()));
             resource.setViewArray(JsArrays.toSafeArray(resource.getViewArray()));
-            getView().setDatasource(resource);
+            datasource = resource;
+            getView().setDatasource(datasource);
           }
         }).send();
   }
@@ -77,17 +81,18 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
   public boolean validate() {
     if(ImportFormat.CSV == importFormat || ImportFormat.EXCEL == importFormat) {
       String selectedTable = getView().getSelectedTable();
-      // table cannot be empty and cannot be a view
-      if(selectedTable.trim().isEmpty()) {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error("DestinationTableRequired").build());
+//      // table cannot be empty and cannot be a view
+      if(Strings.isNullOrEmpty(selectedTable) || selectedTable.trim().isEmpty()) {
+        fireEvent(NotificationEvent.newBuilder().error("DestinationTableRequired").build());
         return false;
       }
       if(selectedTable.contains(".") || selectedTable.contains(":")) {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error("DestinationTableNameInvalid").build());
+        fireEvent(NotificationEvent.newBuilder().error("DestinationTableNameInvalid").build());
         return false;
       }
-      if(getView().getSelectedEntityType().trim().isEmpty()) {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error("DestinationTableEntityTypeRequired").build());
+      String selectedEntityType = getView().getSelectedEntityType();
+      if(Strings.isNullOrEmpty(selectedEntityType) || selectedEntityType.trim().isEmpty()) {
+        fireEvent(NotificationEvent.newBuilder().error("DestinationTableEntityTypeRequired").build());
         return false;
       }
       return validateDestinationTableIsNotView();
@@ -95,20 +100,15 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
     return true;
   }
 
-  @SuppressWarnings("OverlyNestedMethod")
   private boolean validateDestinationTableIsNotView() {
-    String dsName = getView().getSelectedDatasource();
+    if(datasource.getViewArray() == null) return true;
+
     String tableName = getView().getSelectedTable();
-    for(int i = 0; i < datasources.length(); i++) {
-      DatasourceDto ds = datasources.get(i);
-      if(ds.getName().equals(dsName) && ds.getViewArray() != null) {
-        for(int j = 0; j < ds.getViewArray().length(); j++) {
-          if(ds.getViewArray().get(j).equals(tableName)) {
-            getEventBus().fireEvent(NotificationEvent.newBuilder().error("DestinationTableCannotBeView").build());
-            return false;
-          }
-        }
-        return true;
+
+    for(int j = 0; j < datasource.getViewArray().length(); j++) {
+      if(datasource.getViewArray().get(j).equals(tableName)) {
+        fireEvent(NotificationEvent.newBuilder().error("DestinationTableCannotBeView").build());
+        return false;
       }
     }
 
@@ -121,7 +121,7 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
   }
 
   public void updateImportConfig(ImportConfig importConfig) {
-    importConfig.setDestinationDatasourceName(getView().getSelectedDatasource());
+    importConfig.setDestinationDatasourceName(destination);
     if(ImportFormat.CSV == importFormat || ImportFormat.EXCEL == importFormat) {
       importConfig.setDestinationTableName(getView().getSelectedTable());
       importConfig.setDestinationEntityType(getView().getSelectedEntityType());
@@ -150,8 +150,6 @@ public class DestinationSelectionStepPresenter extends PresenterWidget<Destinati
     void setTable(String name);
 
     void setEntityType(String entityType);
-
-    String getSelectedDatasource();
 
     String getSelectedTable();
 

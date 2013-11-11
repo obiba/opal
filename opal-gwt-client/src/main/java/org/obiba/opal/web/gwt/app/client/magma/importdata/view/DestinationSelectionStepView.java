@@ -72,15 +72,10 @@ public class DestinationSelectionStepView extends ViewImpl implements Destinatio
         boolean knownTable = tableListBox.hasItem(tableListBox.getText());
         entityTypeListBox.setEnabled(!knownTable);
         if(knownTable) {
-          tableSelectionHandler.onTableSelected(getSelectedDatasource(), getSelectedTable());
+          tableSelectionHandler.onTableSelected(datasource.getName(), getSelectedTable());
         }
       }
     });
-  }
-
-  @Override
-  public String getSelectedDatasource() {
-    return datasource.getName();
   }
 
   @Override
