@@ -55,6 +55,7 @@ public class TableVariablesSearchResource extends AbstractVariablesSearchResourc
     super(opalSearchService, esProvider, manager);
   }
 
+  @SuppressWarnings("PMD.ExcessiveParameterList")
   @GET
   @POST
   @Path("_search")

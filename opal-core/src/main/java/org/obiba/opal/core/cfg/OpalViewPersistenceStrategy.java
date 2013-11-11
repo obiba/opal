@@ -412,14 +412,15 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
    * @throws Exception
    */
   private void cloneRepository(File repositoriesFolder, String name, String fromUrl) throws Exception {
+    String repoName = name;
     // normal repository, strip .git suffix
     if(name.toLowerCase().endsWith(Constants.DOT_GIT_EXT)) {
-      name = name.substring(0, name.indexOf(Constants.DOT_GIT_EXT));
+      repoName = name.substring(0, name.indexOf(Constants.DOT_GIT_EXT));
     }
 
-    File folder = new File(repositoriesFolder, name);
+    File folder = new File(repositoriesFolder, repoName);
     if(folder.exists()) {
-      File gitDir = RepositoryCache.FileKey.resolve(new File(repositoriesFolder, name), FS.DETECTED);
+      File gitDir = RepositoryCache.FileKey.resolve(new File(repositoriesFolder, repoName), FS.DETECTED);
       Repository repository = new FileRepositoryBuilder().setGitDir(gitDir).build();
       fetchRepository(repository);
       repository.close();

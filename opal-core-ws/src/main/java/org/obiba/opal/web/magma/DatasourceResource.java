@@ -90,7 +90,7 @@ public class DatasourceResource {
 
   private Set<Locale> locales;
 
-  @SuppressWarnings("NullableProblems")
+  @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters", "NullableProblems" })
   @Autowired
   public DatasourceResource(OpalConfigurationService configService, ImportService importService,
       ViewManager viewManager, IndexManagerConfigurationService indexManagerConfigService,

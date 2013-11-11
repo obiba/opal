@@ -103,7 +103,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   private final VariableStatsService variableStatsService;
 
-  @SuppressWarnings("ConstructorWithTooManyParameters")
+  @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
   @Autowired
   public FunctionalUnitsResource(FunctionalUnitService functionalUnitService, OpalRuntime opalRuntime,
       UnitKeyStoreService unitKeyStoreService, ImportService importService,

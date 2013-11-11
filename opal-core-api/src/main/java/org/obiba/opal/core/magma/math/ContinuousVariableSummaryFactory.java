@@ -28,6 +28,7 @@ public class ContinuousVariableSummaryFactory extends AbstractVariableSummaryFac
     return getCacheKey(getVariable(), getTable(), distribution, percentiles, intervals, offset, limit);
   }
 
+  @SuppressWarnings("PMD.ExcessiveParameterList")
   public static String getCacheKey(Variable variable, ValueTable table, Distribution distribution,
       List<Double> percentiles, int intervals, Integer offset, Integer limit) {
     String key = variable.getVariableReference(table) + "." + distribution + "." + intervals;
