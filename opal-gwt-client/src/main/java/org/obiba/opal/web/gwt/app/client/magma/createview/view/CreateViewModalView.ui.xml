@@ -1,0 +1,57 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+
+  <o:Modal ui:field="dialog" resizable="false" closeVisible="true" keyboard="true" animation="false">
+    <g:FlowPanel>
+      <b:ControlGroup>
+        <b:ControlLabel>
+          <ui:msg description="Create View Name label">Name</ui:msg>
+          <o:RequiredIcon/>
+        </b:ControlLabel>
+        <b:Controls>
+          <b:TextBox name="reportTemplateName" ui:field="viewNameTextBox"/>
+        </b:Controls>
+      </b:ControlGroup>
+
+      <b:ControlGroup>
+        <b:ControlLabel>
+          <ui:msg description="Create View Table label">Tables</ui:msg>
+          <o:RequiredIcon/>
+        </b:ControlLabel>
+        <b:Controls>
+          <o:TableChooser ui:field="tableChooser"/>
+        </b:Controls>
+      </b:ControlGroup>
+
+      <b:ControlGroup>
+        <b:ControlLabel>
+          <ui:msg description="Select how the variables will be defined label">Use an existing view or an existing
+            dictionary
+          </ui:msg>
+        </b:ControlLabel>
+        <b:Controls>
+          <g:SimplePanel ui:field="fileSelectionPanel"/>
+          <b:HelpBlock>
+            <ui:msg description="Name of organization help">Valid file formats are XML and Excel XLS
+            </ui:msg>
+          </b:HelpBlock>
+        </b:Controls>
+      </b:ControlGroup>
+    </g:FlowPanel>
+
+    <b:ModalFooter>
+      <b:Button type="PRIMARY" ui:field="saveButton">
+        <ui:msg description="Create View Create Button label">Save</ui:msg>
+      </b:Button>
+      <b:Button ui:field="cancelButton">
+        <ui:msg description="Create View Cancel Button label">Cancel</ui:msg>
+      </b:Button>
+    </b:ModalFooter>
+  </o:Modal>
+
+</ui:UiBinder>

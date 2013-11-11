@@ -115,7 +115,7 @@ public class CreateDatasourceView extends ModalViewImpl implements CreateDatasou
   }
 
   //
-  // CreateViewStepPresenter.Display Methods
+  // CreateViewModalPresenter.Display Methods
   //
 
   @Override
