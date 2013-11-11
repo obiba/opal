@@ -9,6 +9,8 @@
  */
 package org.obiba.opal.project;
 
+import java.util.Set;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.validation.ConstraintViolationException;
@@ -20,6 +22,8 @@ import org.apache.commons.vfs2.FileType;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableUpdateListener;
 import org.obiba.magma.datasource.nil.support.NullDatasourceFactory;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.domain.database.Database;
@@ -53,6 +57,9 @@ public class ProjectsServiceImpl implements ProjectService {
 
   @Autowired
   private TransactionTemplate transactionTemplate;
+
+  @Autowired
+  private Set<ValueTableUpdateListener> tableListeners;
 
   @Override
   @PostConstruct
@@ -107,6 +114,15 @@ public class ProjectsServiceImpl implements ProjectService {
 
     Datasource datasource = project.getDatasource();
 
+    // call tables listeners
+    if(tableListeners != null && !tableListeners.isEmpty()) {
+      for(ValueTableUpdateListener listener : tableListeners) {
+        for(ValueTable valueTable : datasource.getValueTables()) {
+          listener.onDelete(valueTable);
+        }
+      }
+    }
+
     // disconnect datasource
     MagmaEngine.get().removeDatasource(datasource);
     // remove all views
@@ -124,10 +140,10 @@ public class ProjectsServiceImpl implements ProjectService {
       Project original = getProject(project.getName());
       String originalDb = original.getDatabase() == null ? "" : original.getDatabase();
       String newDb = project.getDatabase() == null ? "" : project.getDatabase();
-      if (!newDb.equals(originalDb)) {
+      if(!newDb.equals(originalDb)) {
         Datasource datasource = MagmaEngine.get().getDatasource(project.getName());
         MagmaEngine.get().removeDatasource(datasource);
-        if (datasource.canDrop()) {
+        if(datasource.canDrop()) {
           datasource.drop();
         }
         registerDatasource(project);
