@@ -23,7 +23,6 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.obiba.magma.Category;
@@ -69,13 +68,14 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
 
   @Test
   public void testTablesGET() {
-    DatasourceTablesResource resource = new DatasourceTablesResource(MagmaEngine.get().getDatasource(DATASOURCE2));
+    DatasourceTablesResource resource = new DatasourceTablesResource(MagmaEngine.get().getDatasource(DATASOURCE2),
+        null);
 
     List<Magma.TableDto> dtos = resource.getTables(true, null);
     // alphabetical order
-    Assert.assertEquals(2, dtos.size());
-    Assert.assertEquals("Impedance418", dtos.get(0).getName());
-    Assert.assertEquals("Weight", dtos.get(1).getName());
+    assertEquals(2, dtos.size());
+    assertEquals("Impedance418", dtos.get(0).getName());
+    assertEquals("Weight", dtos.get(1).getName());
 
     checkWeightTableDto(dtos.get(1));
   }
@@ -135,40 +135,40 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     verify(segments.toArray());
 
     // alphabetical order
-    Assert.assertEquals(9, dtos.size());
-    Assert.assertEquals("InstrumentRun.Contraindication.code", dtos.get(0).getName());
-    Assert.assertEquals("InstrumentRun.Contraindication.type", dtos.get(1).getName());
-    Assert.assertEquals("InstrumentRun.instrumentBarcode", dtos.get(2).getName());
-    Assert.assertEquals("InstrumentRun.otherContraindication", dtos.get(3).getName());
-    Assert.assertEquals("InstrumentRun.timeEnd", dtos.get(4).getName());
-    Assert.assertEquals("InstrumentRun.timeStart", dtos.get(5).getName());
-    Assert.assertEquals("InstrumentRun.user", dtos.get(6).getName());
-    Assert.assertEquals("RES_WEIGHT", dtos.get(7).getName());
-    Assert.assertEquals("RES_WEIGHT.captureMethod", dtos.get(8).getName());
+    assertEquals(9, dtos.size());
+    assertEquals("InstrumentRun.Contraindication.code", dtos.get(0).getName());
+    assertEquals("InstrumentRun.Contraindication.type", dtos.get(1).getName());
+    assertEquals("InstrumentRun.instrumentBarcode", dtos.get(2).getName());
+    assertEquals("InstrumentRun.otherContraindication", dtos.get(3).getName());
+    assertEquals("InstrumentRun.timeEnd", dtos.get(4).getName());
+    assertEquals("InstrumentRun.timeStart", dtos.get(5).getName());
+    assertEquals("InstrumentRun.user", dtos.get(6).getName());
+    assertEquals("RES_WEIGHT", dtos.get(7).getName());
+    assertEquals("RES_WEIGHT.captureMethod", dtos.get(8).getName());
 
-    Assert.assertEquals("/datasource/" + DATASOURCE2 + "/table/Weight/variable/InstrumentRun.Contraindication.code",
+    assertEquals("/datasource/" + DATASOURCE2 + "/table/Weight/variable/InstrumentRun.Contraindication.code",
         dtos.get(0).getLink());
-    Assert.assertEquals("Weight", dtos.get(0).getParentLink().getRel());
-    Assert.assertEquals("/datasource/" + DATASOURCE2 + "/table/Weight", dtos.get(0).getParentLink().getLink());
+    assertEquals("Weight", dtos.get(0).getParentLink().getRel());
+    assertEquals("/datasource/" + DATASOURCE2 + "/table/Weight", dtos.get(0).getParentLink().getLink());
 
-    Assert.assertEquals(3, dtos.get(8).getCategoriesCount());
-    Assert.assertEquals("MANUAL", dtos.get(8).getCategories(0).getName());
-    Assert.assertEquals("AUTOMATIC", dtos.get(8).getCategories(1).getName());
-    Assert.assertEquals("COMPUTED", dtos.get(8).getCategories(2).getName());
+    assertEquals(3, dtos.get(8).getCategoriesCount());
+    assertEquals("MANUAL", dtos.get(8).getCategories(0).getName());
+    assertEquals("AUTOMATIC", dtos.get(8).getCategories(1).getName());
+    assertEquals("COMPUTED", dtos.get(8).getCategories(2).getName());
 
-    Assert.assertEquals(5, dtos.get(7).getAttributesCount());
-    Assert.assertEquals(1, dtos.get(8).getAttributesCount());
-    Assert.assertEquals("stage", dtos.get(8).getAttributes(0).getName());
+    assertEquals(5, dtos.get(7).getAttributesCount());
+    assertEquals(1, dtos.get(8).getAttributesCount());
+    assertEquals("stage", dtos.get(8).getAttributes(0).getName());
   }
 
   private void checkWeightTableDto(Magma.TableDto dto) {
-    Assert.assertNotNull(dto);
-    Assert.assertEquals("Weight", dto.getName());
-    Assert.assertEquals("Participant", dto.getEntityType());
-    Assert.assertEquals(9, dto.getVariableCount());
-    Assert.assertEquals(0, dto.getValueSetCount());
-    Assert.assertEquals(DATASOURCE2, dto.getDatasourceName());
-    Assert.assertEquals("/datasource/" + DATASOURCE2 + "/table/Weight", dto.getLink());
+    assertNotNull(dto);
+    assertEquals("Weight", dto.getName());
+    assertEquals("Participant", dto.getEntityType());
+    assertEquals(9, dto.getVariableCount());
+    assertEquals(0, dto.getValueSetCount());
+    assertEquals(DATASOURCE2, dto.getDatasourceName());
+    assertEquals("/datasource/" + DATASOURCE2 + "/table/Weight", dto.getLink());
   }
 
   @Test
@@ -208,7 +208,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testAddOrUpdateVariables_InternalServerError() {
     Response response = new VariablesResource(null, Collections.<Locale>emptySet()).addOrUpdateVariables(null, null);
-    Assert.assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
+    assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
   }
 
   @Test

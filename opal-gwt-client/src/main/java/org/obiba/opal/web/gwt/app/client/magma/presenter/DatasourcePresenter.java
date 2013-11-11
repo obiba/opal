@@ -9,14 +9,20 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.createview.presenter.CreateViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
-import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportPresenter;
@@ -27,6 +33,7 @@ import org.obiba.opal.web.gwt.rest.client.HttpMethod;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
@@ -34,8 +41,9 @@ import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
-import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -43,10 +51,17 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
+import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
+import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
+import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
+import static com.google.gwt.http.client.Response.SC_OK;
+
 public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Display>
     implements DatasourceUiHandlers, DatasourceSelectionChangeEvent.Handler {
 
   private final ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider;
+
+  private final Translations translations;
 
   private String datasourceName;
 
@@ -54,9 +69,13 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   private DatasourceDto datasource;
 
+  private Runnable deleteConfirmation;
+
   @Inject
-  public DatasourcePresenter(Display display, EventBus eventBus, ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider) {
+  public DatasourcePresenter(Display display, EventBus eventBus,
+      ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider, Translations translations) {
     super(eventBus, display);
+    this.translations = translations;
     this.tablePropertiesModalProvider = tablePropertiesModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
@@ -65,6 +84,9 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
   protected void onBind() {
     super.onBind();
     addRegisteredHandler(DatasourceSelectionChangeEvent.getType(), this);
+
+    // Delete tables confirmation handler
+    addRegisteredHandler(ConfirmationEvent.getType(), new DeleteConfirmationEventHandler());
   }
 
   private int getTableIndex(String tableName) {
@@ -137,6 +159,26 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
   @Override
   public void onDownloadDictionary() {
     downloadMetadata();
+  }
+
+  @Override
+  public void onDeleteTables(List<TableDto> tableDtos) {
+    if(tableDtos.isEmpty()) {
+      fireEvent(NotificationEvent.newBuilder().error("DeleteTableSelectAtLeastOne").build());
+    } else {
+      JsArrayString tableNames = JsArrays.create().cast();
+      for(TableDto table : tableDtos) {
+        tableNames.push(table.getName());
+      }
+
+      deleteConfirmation = new RemoveRunnable(tableNames);
+//
+      fireEvent(ConfirmationRequiredEvent
+          .createWithMessages(deleteConfirmation, translations.confirmationTitleMap().get("deleteTables"),
+              TranslationsUtils.replaceArguments(translations.confirmationMessageMap()
+                  .get(tableNames.length() > 1 ? "confirmDeleteTables" : "confirmDeleteTable"),
+                  String.valueOf(tableNames.length()))));
+    }
   }
 
   //
@@ -237,6 +279,67 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
         getView().renderRows(resource);
         selectTable(selectTableName);
         getView().afterRenderRows();
+      }
+    }
+  }
+
+  private class RemoveRunnable implements Runnable {
+
+    private static final int BATCH_SIZE = 20;
+
+    int nb_deleted = 0;
+
+    final JsArrayString tableNames;
+
+    private RemoveRunnable(JsArrayString tableNames) {
+      this.tableNames = tableNames;
+    }
+
+    private String getUri() {
+      UriBuilder uriBuilder = UriBuilders.DATASOURCE_TABLES.create();
+
+      for(int i = nb_deleted, added = 0; i < tableNames.length() && added < BATCH_SIZE; i++, added++) {
+        uriBuilder.query("table", tableNames.get(i));
+      }
+
+      return uriBuilder.build(datasource.getName());
+    }
+
+    @Override
+    public void run() {
+      // show loading
+      getView().beforeRenderRows();
+      ResourceRequestBuilderFactory.newBuilder().forResource(getUri())//
+          .delete()//
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              if(response.getStatusCode() == SC_OK) {
+                nb_deleted += BATCH_SIZE;
+
+                if(nb_deleted < tableNames.length()) {
+                  run();
+                } else {
+                  initDatasource();
+                }
+              } else {
+                String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
+                fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
+              }
+
+            }
+          }, SC_OK, SC_FORBIDDEN, SC_INTERNAL_SERVER_ERROR, SC_NOT_FOUND).send();
+    }
+  }
+
+  private class DeleteConfirmationEventHandler implements ConfirmationEvent.Handler {
+
+    @Override
+    public void onConfirmation(ConfirmationEvent event) {
+      if(deleteConfirmation != null && event.getSource().equals(deleteConfirmation) &&
+          event.isConfirmed()) {
+        deleteConfirmation.run();
+        deleteConfirmation = null;
       }
     }
   }

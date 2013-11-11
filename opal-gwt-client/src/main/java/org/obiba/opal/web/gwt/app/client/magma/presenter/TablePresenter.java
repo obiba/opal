@@ -201,8 +201,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     addRegisteredHandler(ConfirmationEvent.getType(), new DeleteVariableConfirmationEventHandler());
   }
 
-  private String getIndexResource(String datasource, String table) {
-    return UriBuilder.create().segment("datasource", "{}", "table", "{}", "index").build(datasource, table);
+  private String getIndexResource(String datasource, String tableName) {
+    return UriBuilder.create().segment("datasource", "{}", "table", "{}", "index").build(datasource, tableName);
   }
 
   private void authorize() {
@@ -391,7 +391,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
       fireEvent(ConfirmationRequiredEvent
           .createWithMessages(deleteVariablesConfirmation, translations.confirmationTitleMap().get("deleteVariables"),
-              TranslationsUtils.replaceArguments(translations.confirmationMessageMap().get("confirmDeleteVariables"),
+              TranslationsUtils.replaceArguments(translations.confirmationMessageMap()
+                  .get(variableNames.length() > 1 ? "confirmDeleteVariables" : "confirmDeleteVariable"),
                   String.valueOf(variableNames.length()))));
     }
   }
@@ -789,11 +790,11 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private class RemoveVariablesRunnable implements Runnable {
 
-    private static final int BATCH_SIZE = 25;
+    private static final int BATCH_SIZE = 20;
 
     int nb_deleted = 0;
 
-    JsArrayString variableNames;
+    final JsArrayString variableNames;
 
     private RemoveVariablesRunnable(JsArrayString variableNames) {
       this.variableNames = variableNames;

@@ -485,7 +485,8 @@ public interface Translations extends Constants {
       "GeneralConfigSaved", "Opal general configuration was successfully saved.", //
       "PostInstallNotCompleted", "Post-install configuration not completed.",//
       "TermNameMustBeUnique", "Term name must be unique",//
-      "VocabularyNameMustBeUnique", "Vocabulary name must be unique"//
+      "VocabularyNameMustBeUnique", "Vocabulary name must be unique",//
+      "DeleteTableSelectAtLeastOne", "Select at least one table to delete"//
   })
   Map<String, String> userMessageMap();
 
@@ -610,7 +611,9 @@ public interface Translations extends Constants {
       "removeGroup", "Remove Group",//
       "removeUser", "Remove User",//
       "removeTaxonomy", "Remove Taxonomy",//
-      "deleteVariables", "Delete Variables" })
+      "deleteVariables", "Delete Variables",//
+      "deleteTables", "Delete Tables"//
+  })
   Map<String, String> confirmationTitleMap();
 
   @Description("Confirmation message map")
@@ -665,7 +668,10 @@ public interface Translations extends Constants {
 //
       "confirmRemoveUser", "Please confirm that you want to remove the user '{0}'.",//
       "confirmRemoveTaxonomy", "Please confirm that you want to remove the taxonomy '{0}'.",//
-      "confirmDeleteVariables", "Please confirm that you want to delete {0} variables"//
+      "confirmDeleteVariable", "Please confirm that you want to delete {0} variable",//
+      "confirmDeleteVariables", "Please confirm that you want to delete {0} variables",//
+      "confirmDeleteTable", "Please confirm that you want to delete {0} table",//
+      "confirmDeleteTables", "Please confirm that you want to delete {0} tables"//
   })
   Map<String, String> confirmationMessageMap();
 

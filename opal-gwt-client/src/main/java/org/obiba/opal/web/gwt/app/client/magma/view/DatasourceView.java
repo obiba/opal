@@ -13,13 +13,9 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourceUiHandlers;
-import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
-import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.LinkCell;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -27,19 +23,22 @@ import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
+import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.SimplePager;
-import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.InlineLabel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -80,6 +79,18 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   NavLink addView;
 
   @UiField
+  Alert selectAllItemsAlert;
+
+  @UiField
+  Label selectAllStatus;
+
+  @UiField
+  Anchor selectAllAnchor;
+
+  @UiField
+  Anchor clearSelectionAnchor;
+
+  @UiField
   Table<TableDto> table;
 
   @UiField
@@ -90,6 +101,8 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   private final Translations translations;
 
   private final PlaceManager placeManager;
+
+  private CheckboxColumn<TableDto> checkColumn;
 
   @Inject
   public DatasourceView(Binder uiBinder, Translations translations, PlaceManager placeManager) {
@@ -134,7 +147,16 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     getUiHandlers().onAddView();
   }
 
+  @UiHandler("deleteTables")
+  void onDeleteTables(ClickEvent event) {
+    getUiHandlers().onDeleteTables(checkColumn.getSelectedItems());
+  }
+
   private void addTableColumns() {
+    checkColumn = new CheckboxColumn<TableDto>(new DatasourceCheckStatusDisplay());
+
+    table.addColumn(checkColumn, checkColumn.getTableListCheckColumnHeader());
+    table.setColumnWidth(checkColumn, 1, Style.Unit.PX);
 
     table.addColumn(new Column<TableDto, TableDto>(new PlaceRequestCell<TableDto>(placeManager) {
 
@@ -227,6 +249,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     importData.setDisabled(isNull);
     addTable.setDisabled(isNull);
     addUpdateTables.setDisabled(isNull);
+    checkColumn.clearSelection();
   }
 
   @Override
@@ -273,4 +296,50 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     return new WidgetAuthorizer(downloadDictionary);
   }
 
+  private class DatasourceCheckStatusDisplay implements CheckboxColumn.Display<TableDto> {
+    @Override
+    public Table<TableDto> getTable() {
+      return table;
+    }
+
+    @Override
+    public Object getItemKey(TableDto item) {
+      return item.getName();
+    }
+
+    @Override
+    public Anchor getClearSelection() {
+      return clearSelectionAnchor;
+    }
+
+    @Override
+    public Anchor getSelectAll() {
+      return selectAllAnchor;
+    }
+
+    @Override
+    public ListDataProvider<TableDto> getDataProvider() {
+      return dataProvider;
+    }
+
+    @Override
+    public Label getSelectAllStatus() {
+      return selectAllStatus;
+    }
+
+    @Override
+    public String getItemNamePlural() {
+      return translations.tablesLabel().toLowerCase();
+    }
+
+    @Override
+    public String getItemNameSingular() {
+      return translations.tableLabel().toLowerCase();
+    }
+
+    @Override
+    public Alert getAlert() {
+      return selectAllItemsAlert;
+    }
+  }
 }
