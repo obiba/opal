@@ -151,7 +151,7 @@ public class DatasourceTablesResource implements AbstractTablesResource {
   }
 
   @DELETE
-  public Response deleteTables(@QueryParam("table") Iterable<String> tables) {
+  public Response deleteTables(@QueryParam("table") List<String> tables) {
 
     for(String table : tables) {
       if(datasource.canDropTable(table)) {

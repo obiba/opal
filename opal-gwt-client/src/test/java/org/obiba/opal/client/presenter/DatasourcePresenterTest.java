@@ -56,7 +56,8 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
     groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     ModalProvider<TablePropertiesModalPresenter> propertiesEditorModalProvider = createMock(ModalProvider.class);
 
-    datasourcePresenter = new DatasourcePresenter(displayMock, new CountingEventBus(), propertiesEditorModalProvider);
+    datasourcePresenter = new DatasourcePresenter(displayMock, new CountingEventBus(), propertiesEditorModalProvider,
+        null);
   }
 
   @SuppressWarnings("unchecked")
