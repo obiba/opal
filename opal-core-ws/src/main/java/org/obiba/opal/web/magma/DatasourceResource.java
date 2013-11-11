@@ -47,7 +47,6 @@ import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.Schedule;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.magma.view.ViewDtos;
-import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.AclAction;
@@ -161,7 +160,7 @@ public class DatasourceResource {
 
   @Path("/tables")
   public DatasourceTablesResource getTables() {
-    return new DatasourceTablesResource(getDatasource());
+    return new DatasourceTablesResource(getDatasource(), tableListeners);
   }
 
   public TableResource getTableResource(ValueTable table) {

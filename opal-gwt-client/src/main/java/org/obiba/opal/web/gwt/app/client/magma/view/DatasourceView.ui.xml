@@ -1,6 +1,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
@@ -32,7 +33,8 @@
           <ui:msg description="Properties label">Tables</ui:msg>
         </b:Heading>
         <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right small-top-margin small-indent"/>
-        <b:DropdownButton text="Add Table" type="INFO" icon="PLUS" ui:field="addBtn" addStyleNames="pull-right small-top-margin">
+        <b:DropdownButton text="Add Table" type="INFO" icon="PLUS" ui:field="addBtn"
+            addStyleNames="pull-right small-top-margin">
           <b:NavLink icon="TABLE" ui:field="addTable">
             <ui:msg description="Add table label">Add table...</ui:msg>
           </b:NavLink>
@@ -43,6 +45,33 @@
             <ui:msg description="Add view label">Add view...</ui:msg>
           </b:NavLink>
         </b:DropdownButton>
+
+        <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false"
+            addStyleNames="select">
+          <g:Grid>
+            <g:row>
+              <g:customCell>
+                <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
+              </g:customCell>
+              <g:customCell>
+                <g:Anchor ui:field="selectAllAnchor" addStyleNames="inline xsmall-indent"/>
+              </g:customCell>
+              <g:customCell>
+                <g:Anchor ui:field="clearSelectionAnchor" visible="false" addStyleNames="inline xsmall-indent">
+                  <ui:msg description="Clear selection label">Clear selection</ui:msg>
+                </g:Anchor>
+              </g:customCell>
+              <g:customCell>
+                <g:FlowPanel addStyleNames="indent">
+                  <b2:IconAnchor icon="REMOVE" ui:field="deleteTables" addStyleNames="inline xsmall-indent">
+                    <ui:msg description="Delete label">Delete</ui:msg>
+                  </b2:IconAnchor>
+                </g:FlowPanel>
+              </g:customCell>
+            </g:row>
+          </g:Grid>
+        </b:Alert>
+
         <o:Table ui:field="table"/>
       </b:Tab>
     </b:TabPanel>

@@ -15,8 +15,10 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nullable;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -34,6 +36,7 @@ import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableUpdateListener;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
@@ -59,9 +62,12 @@ public class DatasourceTablesResource implements AbstractTablesResource {
 
   private final Datasource datasource;
 
-  public DatasourceTablesResource(Datasource datasource) {
+  private final Set<ValueTableUpdateListener> tableListeners;
+
+  public DatasourceTablesResource(Datasource datasource, @Nullable Set<ValueTableUpdateListener> tableListeners) {
     if(datasource == null) throw new IllegalArgumentException("datasource cannot be null");
     this.datasource = datasource;
+    this.tableListeners = tableListeners;
   }
 
   /**
@@ -75,7 +81,7 @@ public class DatasourceTablesResource implements AbstractTablesResource {
   public Response getTables(@Context Request request, @QueryParam("counts") @DefaultValue("false") Boolean counts,
       @Nullable @QueryParam("entityType") String entityType) {
     TimestampedResponses.evaluate(request, datasource);
-    
+
     // The use of "GenericEntity" is required because otherwise JAX-RS can't determine the type using reflection.
     return TimestampedResponses.ok(datasource, new GenericEntity<List<TableDto>>(getTables(counts, entityType)) {
       // Nothing to implement. Subclassed to keep generic information at runtime.
@@ -142,6 +148,24 @@ public class DatasourceTablesResource implements AbstractTablesResource {
       return Response.status(Status.INTERNAL_SERVER_ERROR)
           .entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, e.getMessage()).build()).build();
     }
+  }
+
+  @DELETE
+  public Response deleteTables(@QueryParam("table") List<String> tables) {
+
+    for(String table : tables) {
+      if(datasource.canDropTable(table)) {
+        if(tableListeners != null && !tableListeners.isEmpty()) {
+          for(ValueTableUpdateListener listener : tableListeners) {
+            listener.onDelete(datasource.getValueTable(table));
+          }
+        }
+
+        datasource.dropTable(table);
+      }
+    }
+
+    return Response.ok().build();
   }
 
   private void writeVariablesToTable(TableDto table) {

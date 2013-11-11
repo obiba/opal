@@ -514,6 +514,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     }
   }
 
+  @SuppressWarnings("PMD.ExcessiveParameterList")
   private void setStatusText(String text, AlertType type, boolean clear, boolean indexNow, boolean schedule,
       boolean cancel, boolean progressBar) {
     indexStatusText.setText(text);
