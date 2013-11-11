@@ -31,6 +31,7 @@ import org.obiba.magma.DuplicateDatasourceNameException;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.support.DatasourceParsingException;
+import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
@@ -58,15 +59,18 @@ public class DatasourcesResource {
 
   private final OpalConfigurationService configService;
 
+  private ViewManager viewManager;
+
   @Autowired
   public DatasourcesResource(DatasourceFactoryRegistry datasourceFactoryRegistry,
-      OpalConfigurationService configService) {
+      OpalConfigurationService configService, ViewManager viewManager) {
     if(datasourceFactoryRegistry == null)
       throw new IllegalArgumentException("datasourceFactoryRegistry cannot be null");
     if(configService == null) throw new IllegalArgumentException("configService cannot be null");
 
     this.configService = configService;
     this.datasourceFactoryRegistry = datasourceFactoryRegistry;
+    this.viewManager = viewManager;
   }
 
   @GET
@@ -120,7 +124,7 @@ public class DatasourcesResource {
     List<Magma.TableDto> tables = Lists.newArrayList();
 
     for(Datasource from : MagmaEngine.get().getDatasources()) {
-      tables.addAll(new DatasourceTablesResource(from, null).getTables(false, entityType));
+      tables.addAll(new DatasourceTablesResource(from, viewManager, null).getTables(false, entityType));
     }
 
     return tables;

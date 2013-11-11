@@ -76,7 +76,9 @@ import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.obiba.core.util.FileUtil.getFileFromResource;
 
 /**
@@ -96,27 +98,27 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testDatasourcesGET() {
     OpalConfigurationService opalRuntimeMock = createMock(OpalConfigurationService.class);
-    DatasourcesResource resource = new DatasourcesResource(newDatasourceFactoryRegistry(), opalRuntimeMock);
+    DatasourcesResource resource = new DatasourcesResource(newDatasourceFactoryRegistry(), opalRuntimeMock, null);
 
     List<Magma.DatasourceDto> dtos = resource.getDatasources();
-    Assert.assertEquals(2, dtos.size());
-    Assert.assertEquals(DATASOURCE1, dtos.get(0).getName());
-    Assert.assertEquals(DATASOURCE2, dtos.get(1).getName());
+    assertEquals(2, dtos.size());
+    assertEquals(DATASOURCE1, dtos.get(0).getName());
+    assertEquals(DATASOURCE2, dtos.get(1).getName());
   }
 
   @Test
   public void testCreateDatasource_DatasourceCreatedSuccessfully() {
     Response response = createNewDatasource("newDatasourceCreated");
-    Assert.assertTrue(MagmaEngine.get().hasDatasource("newDatasourceCreated"));
-    Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+    assertTrue(MagmaEngine.get().hasDatasource("newDatasourceCreated"));
+    assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
     MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource("newDatasourceCreated"));
   }
 
   @Test
   public void testCreateDatasource_SpssDatasourceCreatedSuccessfully() {
     Response response = createNewSpssDatasource("newSpssDatasourceCreated");
-    Assert.assertTrue(MagmaEngine.get().hasDatasource("newSpssDatasourceCreated"));
-    Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+    assertTrue(MagmaEngine.get().hasDatasource("newSpssDatasourceCreated"));
+    assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
     MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource("newSpssDatasourceCreated"));
   }
 
@@ -129,7 +131,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     replay(uriInfoMock, opalRuntimeMock);
 
-    DatasourcesResource resource = new DatasourcesResource(newDatasourceFactoryRegistry(), opalRuntimeMock);
+    DatasourcesResource resource = new DatasourcesResource(newDatasourceFactoryRegistry(), opalRuntimeMock, null);
     Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder().setName(name)
         .setExtension(ExcelDatasourceFactoryDto.params,
             Magma.ExcelDatasourceFactoryDto.newBuilder().setFile(getDatasourcePath(DATASOURCE1)).setReadOnly(true)
@@ -150,7 +152,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     replay(uriInfoMock, opalRuntimeMock);
 
-    DatasourcesResource resource = new DatasourcesResource(newSpssDatasourceFactoryRegistry(), opalRuntimeMock);
+    DatasourcesResource resource = new DatasourcesResource(newSpssDatasourceFactoryRegistry(), opalRuntimeMock, null);
     Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder().setName(name)
         .setExtension(Magma.SpssDatasourceFactoryDto.params, Magma.SpssDatasourceFactoryDto.newBuilder()
             .setFile(FileUtil.getFileFromResource("spss/DatabaseTest.sav").getAbsolutePath()).build()).build();
@@ -168,15 +170,15 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     OpalConfigurationService opalRuntimeMock = createMock(OpalConfigurationService.class);
     UriInfo uriInfoMock = createMock(UriInfo.class);
 
-    DatasourcesResource resource = new DatasourcesResource(newDatasourceFactoryRegistry(), opalRuntimeMock);
+    DatasourcesResource resource = new DatasourcesResource(newDatasourceFactoryRegistry(), opalRuntimeMock, null);
     Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder().setName("newDatasourceDuplicate")
         .setExtension(ExcelDatasourceFactoryDto.params,
             Magma.ExcelDatasourceFactoryDto.newBuilder().setFile(getDatasourcePath(DATASOURCE1)).setReadOnly(true)
                 .build()).build();
     Response response = resource.createDatasource(uriInfoMock, factoryDto);
 
-    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-    Assert.assertEquals(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DuplicateDatasourceName").build(),
+    assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    assertEquals(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DuplicateDatasourceName").build(),
         response.getEntity());
     MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource("newDatasourceDuplicate"));
   }
@@ -203,7 +205,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     DatasourceResource resource = createDatasource("datasourceToRemove", opalRuntimeMock);
     Response response = resource.removeDatasource();
 
-    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    assertEquals(Status.OK.getStatusCode(), response.getStatus());
   }
 
   private DatasourceResource createDatasource(String name) {
@@ -267,14 +269,14 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     resource.setName("datasourceNotExist");
     Response response = resource.removeDatasource();
 
-    Assert.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
   }
 
   @Test
   public void testDatasourcesPOST() {
     OpalConfigurationService opalRuntimeMock = createMock(OpalConfigurationService.class);
 
-    DatasourcesResource resource = new DatasourcesResource(newDatasourceFactoryRegistry(), opalRuntimeMock);
+    DatasourcesResource resource = new DatasourcesResource(newDatasourceFactoryRegistry(), opalRuntimeMock, null);
 
     UriInfo uriInfoMock = createMock(UriInfo.class);
     expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromPath("/"));
@@ -288,18 +290,17 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     replay(uriInfoMock, opalRuntimeMock);
     Response response = resource.createDatasource(uriInfoMock, factoryDto);
-    Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+    assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
     Object entity = response.getEntity();
-    Assert.assertNotNull(entity);
+    assertNotNull(entity);
     try {
       Magma.DatasourceDto dto = (Magma.DatasourceDto) entity;
-      Assert.assertTrue(MagmaEngine.get().hasDatasource(dto.getName()));
-      Assert.assertNotNull(response.getMetadata().get("Location"));
-      Assert
-          .assertEquals("[" + "/datasource/" + dto.getName() + "]", response.getMetadata().get("Location").toString());
+      assertTrue(MagmaEngine.get().hasDatasource(dto.getName()));
+      assertNotNull(response.getMetadata().get("Location"));
+      assertEquals("[" + "/datasource/" + dto.getName() + "]", response.getMetadata().get("Location").toString());
     } catch(Exception e) {
-      Assert.assertFalse(true);
+      assertFalse(true);
     }
 
     verify(uriInfoMock, opalRuntimeMock);
@@ -319,18 +320,17 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     replay(uriInfoMock);
     Response response = resource.createDatasource(uriInfoMock, factoryDto);
-    Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+    assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
     Object entity = response.getEntity();
-    Assert.assertNotNull(entity);
+    assertNotNull(entity);
     try {
       Magma.DatasourceDto dto = (Magma.DatasourceDto) entity;
-      Assert.assertTrue(MagmaEngine.get().hasTransientDatasource(dto.getName()));
-      Assert.assertNotNull(response.getMetadata().get("Location"));
-      Assert
-          .assertEquals("[" + "/datasource/" + dto.getName() + "]", response.getMetadata().get("Location").toString());
+      assertTrue(MagmaEngine.get().hasTransientDatasource(dto.getName()));
+      assertNotNull(response.getMetadata().get("Location"));
+      assertEquals("[" + "/datasource/" + dto.getName() + "]", response.getMetadata().get("Location").toString());
     } catch(Exception e) {
-      Assert.assertFalse(true);
+      assertFalse(true);
     }
 
     verify(uriInfoMock);
@@ -339,7 +339,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testDatasourcesPOSTUserDefinedBogus() {
     OpalConfigurationService opalRuntimeMock = createMock(OpalConfigurationService.class);
-    DatasourcesResource resource = new DatasourcesResource(newDatasourceFactoryRegistry(), opalRuntimeMock);
+    DatasourcesResource resource = new DatasourcesResource(newDatasourceFactoryRegistry(), opalRuntimeMock, null);
 
     UriInfo uriInfoMock = createMock(UriInfo.class);
     expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromPath("/"));
@@ -352,15 +352,15 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     replay(uriInfoMock);
     Response response = resource.createDatasource(uriInfoMock, factoryDto);
-    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     ClientErrorDto error = (ClientErrorDto) response.getEntity();
     // System.out.println(JsonFormat.printToString(error));
-    Assert.assertEquals("DatasourceCreationFailed", error.getStatus());
-    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), error.getCode());
-    Assert.assertEquals(15, error.getExtensionCount(Magma.DatasourceParsingErrorDto.errors));
+    assertEquals("DatasourceCreationFailed", error.getStatus());
+    assertEquals(Status.BAD_REQUEST.getStatusCode(), error.getCode());
+    assertEquals(15, error.getExtensionCount(Magma.DatasourceParsingErrorDto.errors));
     Magma.DatasourceParsingErrorDto parsingError = error.getExtension(Magma.DatasourceParsingErrorDto.errors, 0);
-    Assert.assertEquals("DuplicateCategoryName", parsingError.getKey());
-    Assert.assertEquals("[Categories, 4, Table1, Var1, C2]", parsingError.getArgumentsList().toString());
+    assertEquals("DuplicateCategoryName", parsingError.getKey());
+    assertEquals("[Categories, 4, Table1, Var1, C2]", parsingError.getArgumentsList().toString());
   }
 
   @Test
@@ -373,10 +373,10 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     DatasourceResource resource = createDatasource(uid);
 
-    Magma.DatasourceDto dto = (Magma.DatasourceDto)resource.get(null).getEntity();
+    Magma.DatasourceDto dto = (Magma.DatasourceDto) resource.get(null).getEntity();
 
-    Assert.assertNotNull(dto);
-    Assert.assertEquals(uid, dto.getName());
+    assertNotNull(dto);
+    assertEquals(uid, dto.getName());
   }
 
   @Test
@@ -391,25 +391,25 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     Response response = resource.removeDatasource();
 
-    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
-    Assert.assertFalse(MagmaEngine.get().hasTransientDatasource(uid));
+    assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    assertFalse(MagmaEngine.get().hasTransientDatasource(uid));
 
     response = resource.removeDatasource();
-    Assert.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
   }
 
   @Test
   public void testDatasourceGET() {
     DatasourceResource resource = createDatasource(DATASOURCE1);
 
-    Magma.DatasourceDto dto = (Magma.DatasourceDto)resource.get(null).getEntity();
+    Magma.DatasourceDto dto = (Magma.DatasourceDto) resource.get(null).getEntity();
 
-    Assert.assertNotNull(dto);
+    assertNotNull(dto);
     Assert.assertEquals(DATASOURCE1, dto.getName());
     List<String> tableNames = dto.getTableList();
-    Assert.assertEquals(2, tableNames.size());
-    Assert.assertEquals("CIPreliminaryQuestionnaire", tableNames.get(0));
-    Assert.assertEquals("StandingHeight", tableNames.get(1));
+    assertEquals(2, tableNames.size());
+    assertEquals("CIPreliminaryQuestionnaire", tableNames.get(0));
+    assertEquals("StandingHeight", tableNames.get(1));
   }
 
   @Test
@@ -435,9 +435,8 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     DatasourceResource datasourceResource = createDatasource(datasourceMock.getName());
     Response response = datasourceResource.getTables().createTable(createTableDto());
 
-    Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
-    Assert
-        .assertEquals("/datasource/testDatasource/table/table", response.getMetadata().getFirst("Location").toString());
+    assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+    assertEquals("/datasource/testDatasource/table/table", response.getMetadata().getFirst("Location").toString());
 
     MagmaEngine.get().removeDatasource(datasourceMock);
 
@@ -462,8 +461,8 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     DatasourceResource datasourceResource = createDatasource(datasourceMock.getName());
     Response response = datasourceResource.getTables().createTable(createTableDto());
 
-    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-    Assert.assertEquals("TableAlreadyExists", ((ClientErrorDto) response.getEntity()).getStatus());
+    assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    assertEquals("TableAlreadyExists", ((ClientErrorDto) response.getEntity()).getStatus());
 
     MagmaEngine.get().removeDatasource(datasourceMock);
 

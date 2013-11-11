@@ -160,7 +160,7 @@ public class DatasourceResource {
 
   @Path("/tables")
   public DatasourceTablesResource getTables() {
-    return new DatasourceTablesResource(getDatasource(), tableListeners);
+    return new DatasourceTablesResource(getDatasource(), viewManager, tableListeners);
   }
 
   public TableResource getTableResource(ValueTable table) {
