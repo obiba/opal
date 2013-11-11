@@ -69,8 +69,6 @@ import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
-import static com.mongodb.util.MyAsserts.assertFalse;
-import static com.mongodb.util.MyAsserts.assertTrue;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
@@ -78,7 +76,9 @@ import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.obiba.core.util.FileUtil.getFileFromResource;
 
 /**
@@ -330,7 +330,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
       assertNotNull(response.getMetadata().get("Location"));
       assertEquals("[" + "/datasource/" + dto.getName() + "]", response.getMetadata().get("Location").toString());
     } catch(Exception e) {
-      Assert.assertFalse(true);
+      assertFalse(true);
     }
 
     verify(uriInfoMock);
