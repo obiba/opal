@@ -41,6 +41,7 @@ import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
+import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.runtime.security.support.OpalPermissions;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Magma;
@@ -57,6 +58,8 @@ import com.google.common.collect.Lists;
 
 public class DatasourceTablesResource implements AbstractTablesResource {
 
+  private final ViewManager viewManager;
+
   @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(DatasourceTablesResource.class);
 
@@ -64,9 +67,11 @@ public class DatasourceTablesResource implements AbstractTablesResource {
 
   private final Set<ValueTableUpdateListener> tableListeners;
 
-  public DatasourceTablesResource(Datasource datasource, @Nullable Set<ValueTableUpdateListener> tableListeners) {
+  public DatasourceTablesResource(Datasource datasource, ViewManager viewManager,
+      @Nullable Set<ValueTableUpdateListener> tableListeners) {
     if(datasource == null) throw new IllegalArgumentException("datasource cannot be null");
     this.datasource = datasource;
+    this.viewManager = viewManager;
     this.tableListeners = tableListeners;
   }
 
@@ -154,14 +159,18 @@ public class DatasourceTablesResource implements AbstractTablesResource {
   public Response deleteTables(@QueryParam("table") List<String> tables) {
 
     for(String table : tables) {
-      if(datasource.canDropTable(table)) {
+      if(datasource.hasValueTable(table) && datasource.canDropTable(table)) {
         if(tableListeners != null && !tableListeners.isEmpty()) {
           for(ValueTableUpdateListener listener : tableListeners) {
             listener.onDelete(datasource.getValueTable(table));
           }
         }
 
-        datasource.dropTable(table);
+        if(datasource.getValueTable(table).isView()) {
+          viewManager.removeView(datasource.getName(), table);
+        } else {
+          datasource.dropTable(table);
+        }
       }
     }
 
