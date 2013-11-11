@@ -178,7 +178,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
         .registerWidget("sqlSchema.jdbcDatasourceSettings.defaultEntityType", translations.defaultEntityTypeLabel(),
             defaultEntityTypeGroup);
 
-    limesurveyOptions.setText(translations.limesurveyLabel());
+    limesurveyOptions.setText(translations.limesurveyOptionsLabel());
     jdbcOptions.setText(translations.jdbcOptionsLabel());
   }
 
