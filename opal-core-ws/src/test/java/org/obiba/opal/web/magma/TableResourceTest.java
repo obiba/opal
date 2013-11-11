@@ -68,7 +68,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
 
   @Test
   public void testTablesGET() {
-    DatasourceTablesResource resource = new DatasourceTablesResource(MagmaEngine.get().getDatasource(DATASOURCE2),
+    DatasourceTablesResource resource = new DatasourceTablesResource(MagmaEngine.get().getDatasource(DATASOURCE2), null,
         null);
 
     List<Magma.TableDto> dtos = resource.getTables(true, null);
