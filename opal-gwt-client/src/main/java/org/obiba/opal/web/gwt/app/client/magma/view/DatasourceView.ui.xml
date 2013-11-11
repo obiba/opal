@@ -63,7 +63,7 @@
               </g:customCell>
               <g:customCell>
                 <g:FlowPanel addStyleNames="indent">
-                  <b2:IconAnchor icon="REMOVE" ui:field="deleteTables" addStyleNames="inline xsmall-indent">
+                  <b2:IconAnchor icon="TRASH" ui:field="deleteTables" addStyleNames="inline xsmall-indent">
                     <ui:msg description="Delete label">Delete</ui:msg>
                   </b2:IconAnchor>
                 </g:FlowPanel>
