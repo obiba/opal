@@ -82,6 +82,14 @@ public class Chooser extends ChosenListBox {
     return getValue();
   }
 
+  public String getId() {
+    return getElement().getId();
+  }
+
+  public void setId(String id) {
+    getElement().setId(id);
+  }
+
   public void setSelectedValue(String value) {
     for(int i = 0; i < getItemCount(); i++) {
       if(getValue(i).equals(value)) {

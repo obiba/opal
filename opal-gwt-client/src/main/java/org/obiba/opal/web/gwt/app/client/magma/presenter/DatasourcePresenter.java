@@ -21,7 +21,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.createview.presenter.CreateViewStepPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.table.presenter.AddViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter;
@@ -60,6 +60,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     implements DatasourceUiHandlers, DatasourceSelectionChangeEvent.Handler {
 
   private final ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider;
+  private final ModalProvider<AddViewModalPresenter> createViewModalProvider;
 
   private final Translations translations;
 
@@ -73,10 +74,12 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   @Inject
   public DatasourcePresenter(Display display, EventBus eventBus,
-      ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider, Translations translations) {
+      ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider, Translations translations,
+      ModalProvider<AddViewModalPresenter> createViewModalProvider) {
     super(eventBus, display);
     this.translations = translations;
     this.tablePropertiesModalProvider = tablePropertiesModalProvider.setContainer(this);
+    this.createViewModalProvider = createViewModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -153,7 +156,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   @Override
   public void onAddView() {
-    fireEvent(new WizardRequiredEvent(CreateViewStepPresenter.WizardType, datasourceName));
+    createViewModalProvider.get().setDatasourceName(datasourceName);
   }
 
   @Override
