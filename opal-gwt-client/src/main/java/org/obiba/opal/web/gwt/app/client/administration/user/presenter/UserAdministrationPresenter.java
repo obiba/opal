@@ -15,7 +15,6 @@ import org.obiba.opal.web.gwt.app.client.administration.user.event.GroupsRefresh
 import org.obiba.opal.web.gwt.app.client.administration.user.event.UsersRefreshedEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
@@ -23,21 +22,18 @@ import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.IconActionCell;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.GroupDto;
 import org.obiba.opal.web.model.client.opal.UserDto;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -53,6 +49,8 @@ import com.gwtplatform.mvp.client.annotations.ProxyEvent;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
+
+import static com.google.gwt.http.client.Response.SC_OK;
 
 public class UserAdministrationPresenter
     extends ItemAdministrationPresenter<UserAdministrationPresenter.Display, UserAdministrationPresenter.Proxy>
@@ -140,8 +138,6 @@ public class UserAdministrationPresenter
   protected void onBind() {
     super.onBind();
 
-    getView().setDelegate(new UserStatusChangeDelegate());
-
     // Register event handlers
     registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler()));
 
@@ -204,6 +200,17 @@ public class UserAdministrationPresenter
           fireEvent(ConfirmationRequiredEvent
               .createWithMessages(removeConfirmation, translations.confirmationTitleMap().get("removeUser"),
                   translations.confirmationMessageMap().get("confirmRemoveUser").replace("{0}", object.getName())));
+        } else if(Display.DISABLE_ACTION.equals(actionName) || Display.ENABLE_ACTION.equals(actionName)) {
+          object.setEnabled(!object.getEnabled());
+          ResourceRequestBuilderFactory.newBuilder() //
+              .forResource(UriBuilders.USER.create().build(object.getName())) //
+              .withResourceBody(UserDto.stringify(object)) //
+              .withCallback(new ResponseCodeCallback() {
+                @Override
+                public void onResponseCode(Request request, Response response) {
+                  getEventBus().fireEvent(new UsersRefreshedEvent());
+                }
+              }, SC_OK).put().send();
         }
       }
     });
@@ -257,49 +264,6 @@ public class UserAdministrationPresenter
     }
   }
 
-  public class UserStatusChangeDelegate implements IconActionCell.Delegate<UserDto> {
-    @Override
-    public void executeClick(NativeEvent event, UserDto value) {
-      // Enable/Disable user all groups
-      value.setEnabled(!value.getEnabled());
-      ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder() //
-          .forResource("/user/" + value.getName()) //
-          .withResourceBody(UserDto.stringify(value)).withCallback(Response.SC_OK, new ResponseCodeCallback() {
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          // Fetch all users
-          ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder() //
-              .forResource("/users") //
-              .withCallback(new ResourceCallback<JsArray<UserDto>>() {
-
-                @Override
-                public void onResource(Response response, JsArray<UserDto> resource) {
-                  getView().renderUserRows(resource);
-                }
-              }) //
-              .get().send();
-        }
-      })//
-          .withCallback(new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              if(response.getStatusCode() != Response.SC_OK) {
-                ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-                getEventBus().fireEvent(
-                    NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray()).build());
-              }
-            }
-          }) //
-          .put().send();
-
-    }
-
-    @Override
-    public void executeMouseDown(NativeEvent event, UserDto value) {
-      // empty
-    }
-  }
-
   // Remove group/user confirmation event
   private class RemoveRunnable implements Runnable {
 
@@ -341,6 +305,10 @@ public class UserAdministrationPresenter
 
     String PERMISSIONS_ACTION = "Permissions";
 
+    String ENABLE_ACTION = "Enable";
+
+    String DISABLE_ACTION = "Disable";
+
     void renderUserRows(JsArray<UserDto> rows);
 
     void renderGroupRows(JsArray<GroupDto> rows);
@@ -348,8 +316,6 @@ public class UserAdministrationPresenter
     void clear();
 
     HasClickHandlers getAddUserButton();
-
-    void setDelegate(IconActionCell.Delegate<UserDto> delegate);
 
     HasData<UserDto> getUsersTable();
 

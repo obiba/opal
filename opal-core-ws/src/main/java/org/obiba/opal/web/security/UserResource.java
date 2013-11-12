@@ -50,7 +50,7 @@ public class UserResource {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
     User user = Dtos.fromDto(dto);
-    if(dto.hasPassword()) {
+    if(dto.hasPassword() && !dto.getPassword().isEmpty()) {
       user.setPassword(User.digest(dto.getPassword()));
     }
     userService.save(user);

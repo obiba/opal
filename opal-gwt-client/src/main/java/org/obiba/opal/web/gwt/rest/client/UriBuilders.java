@@ -146,6 +146,14 @@ public enum UriBuilders {
       return UriBuilder.create().segment("system", "conf", "taxonomy", "{}");
 
     }
+  },
+
+  USER {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("user", "{}");
+
+    }
   };
 
   public abstract UriBuilder create();

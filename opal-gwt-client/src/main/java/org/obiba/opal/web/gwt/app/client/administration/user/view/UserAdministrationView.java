@@ -15,14 +15,14 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.IconActionCell;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.UserStatusIconActionCell;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.IconCell;
 import org.obiba.opal.web.model.client.opal.GroupDto;
 import org.obiba.opal.web.model.client.opal.UserDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CellTable;
 import com.github.gwtbootstrap.client.ui.SimplePager;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -40,7 +40,6 @@ import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-import static com.github.gwtbootstrap.client.ui.constants.IconType.OK;
 import static org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserAdministrationPresenter.Display;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
@@ -99,11 +98,6 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
     } else {
       getUiHandlers().onGroupsSelected();
     }
-  }
-
-  @Override
-  public void setDelegate(IconActionCell.Delegate<UserDto> delegate) {
-    ((IconActionCell<UserDto>) UserColumns.STATUS.getCell()).setDelegate(delegate);
   }
 
   @Override
@@ -172,12 +166,15 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
       }
     };
 
-    static final Column<UserDto, UserDto> STATUS = new Column<UserDto, UserDto>(
-        new UserStatusIconActionCell(OK, null)) {
-
+    static final Column<UserDto, Boolean> STATUS = new Column<UserDto, Boolean>(new IconCell<Boolean>() {
       @Override
-      public UserDto getValue(UserDto object) {
-        return object;
+      public IconType getIconType(Boolean value) {
+        return value ? IconType.OK : IconType.REMOVE;
+      }
+    }) {
+      @Override
+      public Boolean getValue(UserDto object) {
+        return object.getEnabled();
       }
     };
 
@@ -185,12 +182,15 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
 
       @Override
       public String[] allActions() {
-        return new String[] { EDIT_ACTION, DELETE_ACTION, PERMISSIONS_ACTION };
+        return new String[] { EDIT_ACTION, DELETE_ACTION, ENABLE_ACTION, DISABLE_ACTION, PERMISSIONS_ACTION };
       }
 
       @Override
       public String[] getActions(UserDto value) {
-        return allActions();
+        if(value.getEnabled()) {
+          return new String[] { EDIT_ACTION, DELETE_ACTION, DISABLE_ACTION, PERMISSIONS_ACTION };
+        }
+        return new String[] { EDIT_ACTION, DELETE_ACTION, ENABLE_ACTION, PERMISSIONS_ACTION };
       }
     });
 
