@@ -26,7 +26,6 @@ import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFac
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -78,7 +77,7 @@ public class UserAdministrationPresenter
   @ProxyEvent
   @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/users").get()
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(UriBuilders.USERS.create().build()).get()
         .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListUsersAuthorization())).send();
   }
 
@@ -96,7 +95,8 @@ public class UserAdministrationPresenter
 
   @Override
   public void authorize(HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/users").post().authorize(authorizer).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(UriBuilders.USERS.create().build()).post()
+        .authorize(authorizer).send();
   }
 
   @Override
@@ -108,7 +108,7 @@ public class UserAdministrationPresenter
   @Override
   public void onUsersSelected() {
     ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder() //
-        .forResource("/users") //
+        .forResource(UriBuilders.USERS.create().build()) //
         .withCallback(new ResourceCallback<JsArray<UserDto>>() {
 
           @Override
@@ -123,7 +123,7 @@ public class UserAdministrationPresenter
   public void onGroupsSelected() {
     // Fetch all groups
     ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder() //
-        .forResource("/groups") //
+        .forResource(UriBuilders.GROUPS.create().build()) //
         .withCallback(new ResourceCallback<JsArray<GroupDto>>() {
 
           @Override
@@ -144,19 +144,9 @@ public class UserAdministrationPresenter
     // Refresh user list
     registerHandler(
         getEventBus().addHandler(UsersRefreshedEvent.getType(), new UsersRefreshedEvent.UsersRefreshedHandler() {
-
           @Override
           public void onUsersRefreshed(UsersRefreshedEvent event) {
-            ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder() //
-                .forResource("/users") //
-                .withCallback(new ResourceCallback<JsArray<UserDto>>() {
-
-                  @Override
-                  public void onResource(Response response, JsArray<UserDto> resource) {
-                    getView().renderUserRows(resource);
-                  }
-                }) //
-                .get().send();
+            onUsersSelected();
           }
         }));
 
@@ -165,16 +155,7 @@ public class UserAdministrationPresenter
         getEventBus().addHandler(GroupsRefreshedEvent.getType(), new GroupsRefreshedEvent.GroupsRefreshedHandler() {
           @Override
           public void onGroupsRefreshed(GroupsRefreshedEvent event) {
-            ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder() //
-                .forResource("/groups") //
-                .withCallback(new ResourceCallback<JsArray<GroupDto>>() {
-
-                  @Override
-                  public void onResource(Response response, JsArray<GroupDto> resource) {
-                    getView().renderGroupRows(resource);
-                  }
-                }) //
-                .get().send();
+            onGroupsSelected();
           }
         }));
 
@@ -248,7 +229,7 @@ public class UserAdministrationPresenter
     public void authorized() {
       // Fetch all users
       ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder() //
-          .forResource("/users") //
+          .forResource(UriBuilders.USERS.create().build()) //
           .withCallback(new ResourceCallback<JsArray<UserDto>>() {
 
             @Override
@@ -279,14 +260,13 @@ public class UserAdministrationPresenter
     @Override
     public void run() {
       ResourceRequestBuilderFactory.newBuilder() //
-          .forResource(UriBuilder.create().segment(isUser ? "user" : "group", name).build()) //
+          .forResource(isUser ? UriBuilders.USER.create().build(name) : UriBuilders.GROUP.create().build(name)) //
           .withCallback(Response.SC_OK, new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
               getEventBus().fireEvent(isUser ? new UsersRefreshedEvent() : new GroupsRefreshedEvent());
             }
-          }) //
-          .delete().send();
+          }).delete().send();
     }
   }
 
