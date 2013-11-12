@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -45,7 +46,9 @@ import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
+import org.obiba.opal.core.domain.OpalGeneralConfig;
 import org.obiba.opal.core.service.ImportService;
+import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.VariableStatsService;
 import org.obiba.opal.search.IndexManagerConfiguration;
 import org.obiba.opal.search.IndexManagerConfigurationService;
@@ -214,13 +217,23 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
   private DatasourceResource createDatasource(String name, OpalConfigurationService opalConfigurationService) {
     ViewManager viewManagerMock = createMock(ViewManager.class);
+    OpalGeneralConfigService serverServiceMock = createMock(OpalGeneralConfigService.class);
+    OpalGeneralConfig configMock = createMock(OpalGeneralConfig.class);
+    List<Locale> locales = new ArrayList<Locale>();
+    locales.add(Locale.ENGLISH);
+    locales.add(Locale.FRENCH);
+
+    expect(configMock.getLocales()).andReturn(locales).atLeastOnce();
+    expect(serverServiceMock.getConfig()).andReturn(configMock).atLeastOnce();
+    replay(serverServiceMock, configMock);
+
     ImportService importService = createMock(ImportService.class);
     VariableStatsService variableStatsService = createMock(VariableStatsService.class);
     IndexManagerConfigurationService indexManagerConfigService = new IndexManagerConfigurationService(
         opalConfigurationService);
 
-    DatasourceResource resource = new DatasourceResource(opalConfigurationService, importService, viewManagerMock,
-        indexManagerConfigService, variableStatsService, newViewDtos(),
+    DatasourceResource resource = new DatasourceResource(opalConfigurationService, serverServiceMock, importService,
+        viewManagerMock, indexManagerConfigService, variableStatsService, newViewDtos(),
         Collections.<ValueTableUpdateListener>emptySet());
     resource.setName(name);
     return resource;
@@ -228,6 +241,16 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
   private DatasourceResource createDatasource(String mockDatasourceName, final Datasource mockDatasource,
       OpalConfigurationService mockOpalRuntime, ViewManager mockViewManager) {
+
+    OpalGeneralConfigService serverServiceMock = createMock(OpalGeneralConfigService.class);
+    OpalGeneralConfig configMock = createMock(OpalGeneralConfig.class);
+    List<Locale> locales = new ArrayList<Locale>();
+    locales.add(Locale.ENGLISH);
+    locales.add(Locale.FRENCH);
+
+    expect(configMock.getLocales()).andReturn(locales).atLeastOnce();
+    expect(serverServiceMock.getConfig()).andReturn(configMock).atLeastOnce();
+
     ImportService importService = createMock(ImportService.class);
 
     IndexManagerConfigurationService indexManagerConfigService = new IndexManagerConfigurationService(mockOpalRuntime);
@@ -239,9 +262,9 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     mockOpalRuntime.modifyConfiguration(EasyMock.<ConfigModificationTask>anyObject());
     expectLastCall();
     //mockOpalRuntime.getOpalConfiguration()
-    replay(mockOpalRuntime);
+    replay(mockOpalRuntime, serverServiceMock, configMock);
 
-    DatasourceResource sut = new DatasourceResource(mockOpalRuntime, importService, mockViewManager,
+    DatasourceResource sut = new DatasourceResource(mockOpalRuntime, serverServiceMock, importService, mockViewManager,
         indexManagerConfigService, variableStatsService, newViewDtos(),
         Collections.<ValueTableUpdateListener>emptySet()) {
 
@@ -258,13 +281,14 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testRemoveDatasource_DatasourceNotFound() {
     OpalConfigurationService opalRuntimeMock = createMock(OpalConfigurationService.class);
+    OpalGeneralConfigService serverServiceMock = createMock(OpalGeneralConfigService.class);
     ViewManager viewManagerMock = createMock(ViewManager.class);
     ImportService importService = createMock(ImportService.class);
     VariableStatsService variableStatsService = createMock(VariableStatsService.class);
     IndexManagerConfigurationService indexManagerConfigService = new IndexManagerConfigurationService(opalRuntimeMock);
 
-    DatasourceResource resource = new DatasourceResource(opalRuntimeMock, importService, viewManagerMock,
-        indexManagerConfigService, variableStatsService, newViewDtos(),
+    DatasourceResource resource = new DatasourceResource(opalRuntimeMock, serverServiceMock, importService,
+        viewManagerMock, indexManagerConfigService, variableStatsService, newViewDtos(),
         Collections.<ValueTableUpdateListener>emptySet());
     resource.setName("datasourceNotExist");
     Response response = resource.removeDatasource();
@@ -469,6 +493,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     verify(datasourceMock);
   }
 
+  @SuppressWarnings("OverlyLongMethod")
   @Test
   public void testCreateView_AddsViewByDelegatingToViewManager() throws URISyntaxException {
     // Setup
@@ -517,6 +542,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
   }
 
+  @SuppressWarnings("OverlyLongMethod")
   @Test
   public void testUpdateView_UpdatesViewIfViewExistsByDelegatingToViewManager() {
     // Setup
@@ -547,7 +573,6 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     OpalConfigurationService mockOpalRuntime = createMock(OpalConfigurationService.class);
     DatasourceResource sut = createDatasource(mockDatasourceName, mockDatasource, mockOpalRuntime, mockViewManager);
-    sut.setLocalesProperty("en, fr");
 
     replay(mockDatasource, mockFromTable, mockViewManager);
 
@@ -584,7 +609,6 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     DatasourceResource sut = createDatasource(mockDatasourceName, mockDatasource,
         createMock(OpalConfigurationService.class), mockViewManager);
-    sut.setLocalesProperty("en, fr");
 
     replay(mockDatasource, mockFromTable, mockViewManager);
 
@@ -613,7 +637,6 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     DatasourceResource sut = createDatasource(mockDatasourceName, mockDatasource,
         createMock(OpalConfigurationService.class), mockViewManager);
-    sut.setLocalesProperty("en");
 
     replay(mockDatasource, mockViewManager);
 
@@ -641,7 +664,6 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     DatasourceResource sut = createDatasource(mockDatasourceName, mockDatasource,
         createMock(OpalConfigurationService.class), mockViewManager);
-    sut.setLocalesProperty("en");
 
     replay(mockDatasource, mockViewManager);
 
@@ -653,7 +675,6 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
   public void testGetLocales_WhenDisplayLocaleSpecifiedReturnsLocaleDtosWithDisplayFieldSet() {
     // Setup
     DatasourceResource sut = createDatasource("theDatasource");
-    sut.setLocalesProperty("en, fr");
 
     // Exercise
     String displayLocaleName = "en";
@@ -663,15 +684,14 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     assertNotNull(localeDtos);
     ImmutableList<LocaleDto> localeDtoList = ImmutableList.copyOf(localeDtos);
     assertEquals(2, localeDtoList.size());
-    assertEqualsLocaleDto(localeDtoList.get(0), "en", displayLocaleName);
-    assertEqualsLocaleDto(localeDtoList.get(1), "fr", displayLocaleName);
+    assertEqualsLocaleDto(localeDtoList, "en", displayLocaleName);
+    assertEqualsLocaleDto(localeDtoList, "fr", displayLocaleName);
   }
 
   @Test
   public void testGetLocales_WhenDisplayLocaleNotSpecifiedReturnsLocaleDtosWithDisplayFieldNotSet() {
     // Setup
     DatasourceResource sut = createDatasource("theDatasource");
-    sut.setLocalesProperty("en, fr");
 
     // Exercise
     Iterable<LocaleDto> localeDtos = sut.getLocales(null);
@@ -680,8 +700,8 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     assertNotNull(localeDtos);
     ImmutableList<LocaleDto> localeDtoList = ImmutableList.copyOf(localeDtos);
     assertEquals(2, localeDtoList.size());
-    assertEqualsLocaleDto(localeDtoList.get(0), "en", null);
-    assertEqualsLocaleDto(localeDtoList.get(1), "fr", null);
+    assertEqualsLocaleDto(localeDtoList, "en", null);
+    assertEqualsLocaleDto(localeDtoList, "fr", null);
   }
 
   private DatasourceFactoryRegistry newDatasourceFactoryRegistry() {
@@ -716,14 +736,20 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     return builder.build();
   }
 
-  private void assertEqualsLocaleDto(LocaleDto localeDto, String localeName, String displayLocaleName) {
-    assertEquals(localeName, localeDto.getName());
+  private void assertEqualsLocaleDto(List<LocaleDto> localeDto, String localeName, String displayLocaleName) {
+    boolean found = false;
+    for(LocaleDto dto : localeDto) {
+      if(dto.getName().equals(localeName)) {
+        found = true;
+        assertEquals(displayLocaleName != null, dto.hasDisplay());
+        if(dto.hasDisplay()) {
+          assertEquals(new Locale(localeName).getDisplayName(new Locale(displayLocaleName)), dto.getDisplay());
+        }
 
-    assertEquals(displayLocaleName != null, localeDto.hasDisplay());
-
-    if(localeDto.hasDisplay()) {
-      assertEquals(new Locale(localeName).getDisplayName(new Locale(displayLocaleName)), localeDto.getDisplay());
+        break;
+      }
     }
+    assertTrue(found);
   }
 
   //
