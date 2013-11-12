@@ -127,8 +127,13 @@ public interface Translations extends Constants {
       "Clear", "Clear",//
       "View", "View",//
       "Remove", "Remove",//
-      "Publish methods", "Publish methods", "Permissions", "Permissions", "CommitDiff", "Diff", "DiffWithCurrent",
-      "Diff with current" })
+      "Publish methods", "Publish methods", //
+      "Permissions", "Permissions", //
+      "CommitDiff", "Diff", //
+      "DiffWithCurrent", "Diff with current",//
+      "Enable", "Enable",//
+      "Disable", "Disable"//
+  })
   Map<String, String> actionMap();
 
   @Description("Permission map")

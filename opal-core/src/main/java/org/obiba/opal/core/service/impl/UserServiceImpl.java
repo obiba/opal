@@ -79,6 +79,11 @@ public class UserServiceImpl implements UserService {
   @Override
   public void save(User user) throws ConstraintViolationException {
     Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
+    // Copy current password if password is empty
+    if(user.getPassword() == null) {
+      user.setPassword(getUser(user.getName()).getPassword());
+    }
+
     toSave.put(user, user);
     for(Group group : findImpactedGroups(user)) {
       toSave.put(group, group);

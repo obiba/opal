@@ -146,6 +146,38 @@ public enum UriBuilders {
       return UriBuilder.create().segment("system", "conf", "taxonomy", "{}");
 
     }
+  },
+
+  USERS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("users");
+
+    }
+  },
+
+  GROUPS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("groups");
+
+    }
+  },
+
+  USER {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("user", "{}");
+
+    }
+  },
+
+  GROUP {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("group", "{}");
+
+    }
   };
 
   public abstract UriBuilder create();

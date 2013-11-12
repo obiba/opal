@@ -17,7 +17,6 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.administration.user.event.UsersRefreshedEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
@@ -29,6 +28,7 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.UserDto;
 
 import com.google.gwt.http.client.Request;
@@ -48,8 +48,6 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
 
   private static final int MIN_PASSWORD_LENGTH = 6;
 
-  private final Translations translations;
-
   protected ValidationHandler validationHandler;
 
   private Mode dialogMode;
@@ -59,9 +57,8 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
   }
 
   @Inject
-  public UserPresenter(Display display, EventBus eventBus, Translations translations) {
+  public UserPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
-    this.translations = translations;
     getView().setUiHandlers(this);
   }
 
@@ -95,7 +92,7 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
       switch(dialogMode) {
         case CREATE:
           ResourceRequestBuilderFactory.newBuilder() //
-              .forResource("/users") //
+              .forResource(UriBuilders.USERS.create().build()) //
               .withResourceBody(UserDto.stringify(userDto)) //
               .withCallback(SC_OK, callback) //
               .withCallback(SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
@@ -103,7 +100,7 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
           break;
         case UPDATE:
           ResourceRequestBuilderFactory.newBuilder() //
-              .forResource("/user/" + userDto.getName()) //
+              .forResource(UriBuilders.USER.create().build(userDto.getName())) //
               .withResourceBody(UserDto.stringify(userDto)) //
               .withCallback(SC_OK, callback) //
               .withCallback(SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
