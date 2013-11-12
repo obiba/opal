@@ -491,7 +491,9 @@ public interface Translations extends Constants {
       "PostInstallNotCompleted", "Post-install configuration not completed.",//
       "TermNameMustBeUnique", "Term name must be unique",//
       "VocabularyNameMustBeUnique", "Vocabulary name must be unique",//
-      "DeleteTableSelectAtLeastOne", "Select at least one table to delete"//
+      "DeleteTableSelectAtLeastOne", "Select at least one table to delete",//
+      "XMLOrExcelFileRequired", "An Excel or a XML file is required.",//
+      "CreateViewFailed", "Failed to create view. Make sure the view file is valid."//
   })
   Map<String, String> userMessageMap();
 

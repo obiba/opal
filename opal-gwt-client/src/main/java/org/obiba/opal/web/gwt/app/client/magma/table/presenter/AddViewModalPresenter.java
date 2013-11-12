@@ -7,15 +7,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.magma.createview.presenter;
+package org.obiba.opal.web.gwt.app.client.magma.table.presenter;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -24,13 +24,12 @@ import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.HasCollection;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.DisallowedCharactersValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.MatchingTableEntitiesValidator;
 import org.obiba.opal.web.gwt.app.client.validator.MinimumSizeCollectionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
+import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -56,8 +55,8 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
-public class CreateViewModalPresenter extends ModalPresenterWidget<CreateViewModalPresenter.Display>
-    implements CreateViewModalUiHandlers {
+public class AddViewModalPresenter extends ModalPresenterWidget<AddViewModalPresenter.Display>
+    implements AddViewModalUiHandlers {
 
   private final PlaceManager placeManager;
 
@@ -67,14 +66,14 @@ public class CreateViewModalPresenter extends ModalPresenterWidget<CreateViewMod
 
   private DatasourceDto datasourceDto;
 
-  private Runnable overwriteConfirmation;
+  private ViewValidationHandler viewValidator;
 
   //
   // Constructors
   //
 
   @Inject
-  public CreateViewModalPresenter(Display display, EventBus eventBus, FileSelectionPresenter fileSelectionPresenter,
+  public AddViewModalPresenter(Display display, EventBus eventBus, FileSelectionPresenter fileSelectionPresenter,
       PlaceManager placeManager) {
     super(eventBus, display);
     this.fileSelectionPresenter = fileSelectionPresenter;
@@ -88,8 +87,7 @@ public class CreateViewModalPresenter extends ModalPresenterWidget<CreateViewMod
     fileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE);
     fileSelectionPresenter.bind();
     getView().setFileSelectionDisplay(fileSelectionPresenter.getView());
-
-    addEventHandlers();
+    viewValidator = new ViewValidator();
   }
 
   @Override
@@ -125,15 +123,11 @@ public class CreateViewModalPresenter extends ModalPresenterWidget<CreateViewMod
         }).send();
   }
 
-  protected void addEventHandlers() {
-    getView().setTablesValidator(new TablesValidator());
-    getView().setSelectTypeValidator(new SelectTypeValidator());
-    registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new ConfirmationEventHandler()));
-  }
-
   @Override
   public void createView() {
-    if (!validate()) return;
+    getView().clearErrors();
+
+    if (!viewValidator.validate()) return;
 
     ResponseCodeCallback completed = new CompletedCallback();
     ResponseCodeCallback failed = new FailedCallback();
@@ -161,27 +155,24 @@ public class CreateViewModalPresenter extends ModalPresenterWidget<CreateViewMod
     resourceRequestBuilder.send();
   }
 
-  private boolean validate() {
-    return new SelectTypeValidator().validate() && new TablesValidator().validate();
-  }
-
   private ViewDto createViewDto(ViewDtoBuilder viewDtoBuilder) {
     String fileName = fileSelectionPresenter.getSelectedFile();
-    if(!Strings.isNullOrEmpty(fileName)) {
+    if(Strings.isNullOrEmpty(fileName)) {
+      viewDtoBuilder.defaultVariableListView();
+    }
+    else {
       FileViewDto fileView = FileViewDto.create();
       fileView.setFilename(fileName);
       fileView.setType(getFileType(fileName));
       viewDtoBuilder.fileView(fileView);
-    }
-    else {
-      viewDtoBuilder.defaultVariableListView();
     }
 
     return viewDtoBuilder.build();
   }
 
   private FileViewDto.FileViewType getFileType(String fileName) {
-    if(fileName.toLowerCase().matches("\\.xml$")) {
+    RegExp regExp = RegExp.compile("\\.xml$");
+    if(regExp.test(fileName.toLowerCase())) {
       return FileViewDto.FileViewType.SERIALIZED_XML;
     }
 
@@ -192,15 +183,17 @@ public class CreateViewModalPresenter extends ModalPresenterWidget<CreateViewMod
   // Inner Classes / Interfaces
   //
 
-  public interface Display extends PopupView, HasUiHandlers<CreateViewModalUiHandlers> {
+  public interface Display extends PopupView, HasUiHandlers<AddViewModalUiHandlers> {
+
+    enum FormField {
+      VIEW_NAME,
+      TABLES,
+      FILE_SELECTION
+    }
 
     void setFileSelectionDisplay(FileSelectionPresenter.Display display);
 
     HasText getViewName();
-
-    void setSelectTypeValidator(ValidationHandler validator);
-
-    void setTablesValidator(ValidationHandler validator);
 
     void addTableSelections(JsArray<TableDto> tables);
 
@@ -208,95 +201,90 @@ public class CreateViewModalPresenter extends ModalPresenterWidget<CreateViewMod
 
     void closeDialog();
 
+    void clearErrors();
+
+    void showError(@Nullable FormField formField, String message);
+
+    void showError(String msg);
   }
 
   private class CompletedCallback implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
       placeManager.revealPlace(ProjectPlacesHelper.getDatasourcePlace(datasourceDto.getName()));
+      getView().closeDialog();
     }
   }
 
   private class FailedCallback implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      String msg = "UnknownError";
+      String msg = "CreateViewFailed";
       if(response.getText() != null && response.getText().length() != 0) {
         try {
           ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
           msg = errorDto.getStatus();
         } catch(Exception ignored) {
-
         }
       }
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error(msg).build());
+
+      getView().clearErrors();
+      getView().showError(msg);
     }
   }
 
-  class SelectTypeValidator extends AbstractValidationHandler {
-
-    SelectTypeValidator() {
-      super(getEventBus());
-    }
+  class ViewValidator extends ViewValidationHandler {
 
     @Override
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
-
-      validators.add(new RequiredTextValidator(getView().getViewName(), "ViewNameRequired"));
-      validators.add(new DisallowedCharactersValidator(getView().getViewName(), new char[] { '.', ':' },
-          "ViewNameDisallowedChars"));
-      validators.add(new RequiredFileSelectionValidator("XMLFileRequired"));
+      addViewNameValidators(validators);
+      addTablesValidators(validators);
+      addFileSelectionValidators(validators);
       return validators;
     }
-  }
-
-  class TablesValidator extends AbstractValidationHandler {
-
-    TablesValidator() {
-      super(getEventBus());
-    }
 
     @Override
-    protected Set<FieldValidator> getValidators() {
-      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+    protected void showMessage(String id, String message) {
+      getView().showError(Display.FormField.valueOf(id), message);
+    }
+
+    private void addViewNameValidators(Collection<FieldValidator> validators) {
+      validators.add(new RequiredTextValidator(getView().getViewName(), "ViewNameRequired", Display.FormField.VIEW_NAME.name()));
+      validators.add(new DisallowedCharactersValidator(getView().getViewName(), new char[] { '.', ':' },
+          "ViewNameDisallowedChars", Display.FormField.VIEW_NAME.name()));
+    }
+
+    private void addTablesValidators(Collection<FieldValidator> validators) {
       HasCollection<TableDto> tablesField = new HasCollection<TableDto>() {
         @Override
         public Collection<TableDto> getCollection() {
           return getView().getSelectedTables();
         }
       };
-      validators.add(new MinimumSizeCollectionValidator<TableDto>(tablesField, 1, "TableSelectionRequired"));
-      validators.add(new MatchingTableEntitiesValidator(tablesField));
-      return validators;
+      validators.add(new MinimumSizeCollectionValidator<TableDto>(tablesField, 1, "TableSelectionRequired",
+          Display.FormField.TABLES.name()));
+      validators.add(new MatchingTableEntitiesValidator(tablesField, Display.FormField.TABLES.name()));
     }
 
-  }
-
-  private class ConfirmationEventHandler implements ConfirmationEvent.Handler {
-
-    @SuppressWarnings("AssignmentToNull")
-    @Override
-    public void onConfirmation(ConfirmationEvent event) {
-      if(overwriteConfirmation != null && event.getSource().equals(overwriteConfirmation) && event.isConfirmed()) {
-        overwriteConfirmation.run();
-        overwriteConfirmation = null;
-      }
+    private void addFileSelectionValidators(Collection<FieldValidator> validators) {
+      validators.add(new RequiredFileSelectionValidator(Display.FormField.FILE_SELECTION.name()));
     }
+
   }
 
   class RequiredFileSelectionValidator extends AbstractFieldValidator {
 
     private static final String EXTENSION_PATTERN = "\\.(xml|xls|xlsx)$";
 
-    RequiredFileSelectionValidator(String msg) {
-      super(msg);
+    RequiredFileSelectionValidator(String id) {
+      super("XMLOrExcelFileRequired", id);
     }
 
     @Override
     protected boolean hasError() {
-      String fileName = fileSelectionPresenter.getSelectedFile();
-      return !Strings.isNullOrEmpty(fileName) ? !RegExp.compile(EXTENSION_PATTERN).test(fileName) : false;
+      String fileName = fileSelectionPresenter.getSelectedFile().toLowerCase();
+      return !Strings.isNullOrEmpty(fileName) && !RegExp.compile(EXTENSION_PATTERN).test(fileName);
     }
 
   }

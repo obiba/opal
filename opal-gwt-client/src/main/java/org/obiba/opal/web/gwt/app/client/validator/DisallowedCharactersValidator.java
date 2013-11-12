@@ -28,7 +28,11 @@ public class DisallowedCharactersValidator extends AbstractFieldValidator {
   //
 
   public DisallowedCharactersValidator(HasText textField, char[] disallowedChars, String errorMessageKey) {
-    super(errorMessageKey);
+    this(textField, disallowedChars, errorMessageKey, null);
+  }
+
+  public DisallowedCharactersValidator(HasText textField, char[] disallowedChars, String errorMessageKey, String id) {
+    super(errorMessageKey, id);
 
     if(disallowedChars == null) {
       throw new IllegalArgumentException("null disallowedChars");

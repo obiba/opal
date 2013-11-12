@@ -8,10 +8,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.magma.createview.presenter;
+package org.obiba.opal.web.gwt.app.client.magma.table.presenter;
 
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
-public interface CreateViewModalUiHandlers extends ModalUiHandlers {
+public interface AddViewModalUiHandlers extends ModalUiHandlers {
   void createView();
 }
