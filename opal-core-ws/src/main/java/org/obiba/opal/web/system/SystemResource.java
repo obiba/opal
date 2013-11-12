@@ -26,7 +26,6 @@ import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.taxonomy.Dtos;
 import org.obiba.runtime.upgrade.VersionProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
@@ -46,12 +45,6 @@ public class SystemResource {
   private final TaxonomyService taxonomyService;
 
   private final DatabaseRegistry databaseRegistry;
-
-  @Value("${org.obiba.opal.languages}")
-  private String localesProperty;
-
-  @Value("${org.obiba.opal.public.url}")
-  private String publicURL;
 
   @Autowired
   public SystemResource(VersionProvider opalVersionProvider, OpalGeneralConfigService serverService,

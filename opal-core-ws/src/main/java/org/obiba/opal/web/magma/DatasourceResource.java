@@ -12,7 +12,7 @@ package org.obiba.opal.web.magma;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
@@ -40,8 +40,10 @@ import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
+import org.obiba.opal.core.domain.OpalGeneralConfig;
 import org.obiba.opal.core.runtime.security.support.OpalPermissions;
 import org.obiba.opal.core.service.ImportService;
+import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.VariableStatsService;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.Schedule;
@@ -54,7 +56,6 @@ import org.obiba.opal.web.model.Opal.LocaleDto;
 import org.obiba.opal.web.security.AuthorizationInterceptor;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -73,6 +74,8 @@ public class DatasourceResource {
 
   private final OpalConfigurationService configService;
 
+  private final OpalGeneralConfigService serverService;
+
   private final ViewManager viewManager;
 
   private final ImportService importService;
@@ -85,15 +88,10 @@ public class DatasourceResource {
 
   private final Set<ValueTableUpdateListener> tableListeners;
 
-  @Value("${org.obiba.opal.languages}")
-  private String localesProperty;
-
-  private Set<Locale> locales;
-
   @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters", "NullableProblems" })
   @Autowired
-  public DatasourceResource(OpalConfigurationService configService, ImportService importService,
-      ViewManager viewManager, IndexManagerConfigurationService indexManagerConfigService,
+  public DatasourceResource(OpalConfigurationService configService, OpalGeneralConfigService serverService,
+      ImportService importService, ViewManager viewManager, IndexManagerConfigurationService indexManagerConfigService,
       VariableStatsService variableStatsService, ViewDtos viewDtos, Set<ValueTableUpdateListener> tableListeners) {
 
     if(configService == null) throw new IllegalArgumentException("configService cannot be null");
@@ -103,6 +101,7 @@ public class DatasourceResource {
     if(viewDtos == null) throw new IllegalArgumentException("viewDtos cannot be null");
 
     this.configService = configService;
+    this.serverService = serverService;
     this.importService = importService;
     this.viewManager = viewManager;
     this.indexManagerConfigService = indexManagerConfigService;
@@ -113,10 +112,6 @@ public class DatasourceResource {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public void setLocalesProperty(String localesProperty) {
-    this.localesProperty = localesProperty;
   }
 
   @GET
@@ -232,15 +227,11 @@ public class DatasourceResource {
   }
 
   private Set<Locale> getLocales() {
-    if(locales == null) {
-      locales = new LinkedHashSet<Locale>();
+    // Get locales from server config
+    OpalGeneralConfig conf = serverService.getConfig();
 
-      String[] localeNames = localesProperty.split(",");
-      for(String localeName : localeNames) {
-        locales.add(new Locale(localeName.trim()));
-      }
-    }
-
+    Set<Locale> locales = new HashSet<Locale>();
+    locales.addAll(conf.getLocales());
     return locales;
   }
 }
