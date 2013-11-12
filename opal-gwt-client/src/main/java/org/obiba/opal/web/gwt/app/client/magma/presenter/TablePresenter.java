@@ -28,6 +28,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexStatusRefreshEven
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
@@ -99,6 +100,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final ModalProvider<VariablesToViewPresenter> variablesToViewProvider;
 
+  private final ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider;
+
   private final ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider;
 
   private final ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider;
@@ -129,7 +132,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       Provider<IndexPresenter> indexPresenter, ModalProvider<ConfigureViewStepPresenter> configureViewStepProvider,
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
       ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider,
-      ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider, Translations translations) {
+      ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider,
+      ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider, Translations translations) {
     super(eventBus, display);
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
@@ -139,6 +143,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     this.configureViewStepProvider = configureViewStepProvider.setContainer(this);
     this.variablesToViewProvider = variablesToViewProvider.setContainer(this);
     this.variablePropertiesModalProvider = variablePropertiesModalProvider.setContainer(this);
+    this.tablePropertiesModalProvider = tablePropertiesModalProvider.setContainer(this);
     this.viewPropertiesModalProvider = viewPropertiesModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
@@ -399,18 +404,21 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onEdit() {
-    if(!table.hasViewLink()) return;
-
-    UriBuilder ub = UriBuilders.DATASOURCE_VIEW.create();
-    ResourceRequestBuilderFactory.<ViewDto>newBuilder()
-        .forResource(ub.build(table.getDatasourceName(), table.getName())).get()
-        .withCallback(new ResourceCallback<ViewDto>() {
-          @Override
-          public void onResource(Response response, ViewDto viewDto) {
-            ViewPropertiesModalPresenter p = viewPropertiesModalProvider.get();
-            p.initialize(viewDto);
-          }
-        }).send();
+    if(table.hasViewLink()) {
+      UriBuilder ub = UriBuilders.DATASOURCE_VIEW.create();
+      ResourceRequestBuilderFactory.<ViewDto>newBuilder()
+          .forResource(ub.build(table.getDatasourceName(), table.getName())).get()
+          .withCallback(new ResourceCallback<ViewDto>() {
+            @Override
+            public void onResource(Response response, ViewDto viewDto) {
+              ViewPropertiesModalPresenter p = viewPropertiesModalProvider.get();
+              p.initialize(viewDto);
+            }
+          }).send();
+    } else {
+      TablePropertiesModalPresenter p = tablePropertiesModalProvider.get();
+      p.initialize(table);
+    }
   }
 
   @Override

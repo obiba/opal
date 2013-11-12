@@ -50,7 +50,9 @@ public class TablePropertiesModalPresenter extends ModalPresenterWidget<TablePro
 
   private final PlaceManager placeManager;
 
-  private DatasourceDto datasource;
+  private String datasource;
+
+  private TableDto table;
 
   private final ValidationHandler validationHandler;
 
@@ -70,7 +72,19 @@ public class TablePropertiesModalPresenter extends ModalPresenterWidget<TablePro
    * @param table
    */
   public void initialize(DatasourceDto datasource) {
-    this.datasource = datasource;
+    this.datasource = datasource.getName();
+  }
+
+  /**
+   * Will update given table.
+   *
+   * @param datasource
+   * @param table
+   */
+  public void initialize(TableDto table) {
+    datasource = table.getDatasourceName();
+    this.table = table;
+    getView().renderProperties(table);
   }
 
   @Override
@@ -79,9 +93,27 @@ public class TablePropertiesModalPresenter extends ModalPresenterWidget<TablePro
 
     final TableDto newTable = getTableDto(name, entityType);
 
+    if(table == null) {
+      onCreate(newTable);
+    } else {
+      onUpdate(newTable);
+    }
+  }
+
+  private void onUpdate(final TableDto updatedTable) {
+    UriBuilder uriBuilder = UriBuilders.DATASOURCE_TABLE.create();
+
+    ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build(datasource, table.getName())) //
+        .put() //
+        .withResourceBody(TableDto.stringify(updatedTable)) //
+        .withCallback(new TableUpdateCallback(updatedTable), Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR,
+            Response.SC_OK).send();
+  }
+
+  private void onCreate(final TableDto newTable) {
     // make sure it does not exist
     ResourceRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.DATASOURCE_TABLE.create().build(datasource.getName(), newTable.getName())) //
+        .forResource(UriBuilders.DATASOURCE_TABLE.create().build(datasource, newTable.getName())) //
         .get() //
         .withCallback(new ResponseCodeCallback() {
           @Override
@@ -99,10 +131,10 @@ public class TablePropertiesModalPresenter extends ModalPresenterWidget<TablePro
   public void doCreate(TableDto newTable) {
     UriBuilder uriBuilder = UriBuilders.DATASOURCE_TABLES.create();
 
-    ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build(datasource.getName())) //
+    ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build(datasource)) //
         .post() //
         .withResourceBody(TableDto.stringify(newTable)) //
-        .withCallback(new TableCreateCallback(), Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR,
+        .withCallback(new TableCreateCallback(newTable), Response.SC_BAD_REQUEST, Response.SC_INTERNAL_SERVER_ERROR,
             Response.SC_CREATED).send();
   }
 
@@ -120,6 +152,8 @@ public class TablePropertiesModalPresenter extends ModalPresenterWidget<TablePro
       NAME, ENTITY_TYPE
     }
 
+    void renderProperties(TableDto table);
+
     void showError(String message, @Nullable FormField id);
 
     HasText getName();
@@ -127,16 +161,38 @@ public class TablePropertiesModalPresenter extends ModalPresenterWidget<TablePro
     HasText getEntityType();
   }
 
-  private class TableCreateCallback implements ResponseCodeCallback {
+  private class TableCreateCallback extends TableUpdateCallback {
+
+    private TableCreateCallback(TableDto tableDto) {
+      super(tableDto);
+    }
+
+    @Override
+    protected void onSuccess() {
+      placeManager.revealPlace(ProjectPlacesHelper.getDatasourcePlace(datasource));
+    }
+  }
+
+  private class TableUpdateCallback implements ResponseCodeCallback {
+
+    private final TableDto updatedTable;
+
+    private TableUpdateCallback(TableDto tableDto) {
+      updatedTable = tableDto;
+    }
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      if(response.getStatusCode() == Response.SC_CREATED) {
+      if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_CREATED) {
         getView().hide();
-        placeManager.revealPlace(ProjectPlacesHelper.getDatasourcePlace(datasource.getName()));
+        onSuccess();
       } else {
         getView().showError(response.getText(), null);
       }
+    }
+
+    protected void onSuccess() {
+      placeManager.revealPlace(ProjectPlacesHelper.getTablePlace(datasource, updatedTable.getName()));
     }
   }
 
@@ -146,7 +202,8 @@ public class TablePropertiesModalPresenter extends ModalPresenterWidget<TablePro
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
       validators.add(new RequiredTextValidator(getView().getName(), "NameIsRequired", Display.FormField.NAME.name()));
-      validators.add(new RequiredTextValidator(getView().getEntityType(), "EntityTypeIsRequired", Display.FormField.ENTITY_TYPE.name()));
+      validators.add(new RequiredTextValidator(getView().getEntityType(), "EntityTypeIsRequired",
+          Display.FormField.ENTITY_TYPE.name()));
       return validators;
     }
 

@@ -19,6 +19,7 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
@@ -79,7 +80,8 @@ public class TableResource extends AbstractValueTableResource {
   }
 
   @GET
-  public Response get(@Context Request request, @Context UriInfo uriInfo, @QueryParam("counts") @DefaultValue("false") Boolean counts) {
+  public Response get(@Context Request request, @Context UriInfo uriInfo,
+      @QueryParam("counts") @DefaultValue("false") Boolean counts) {
     TimestampedResponses.evaluate(request, getValueTable());
     String path = uriInfo.getPath(false);
     TableDto.Builder builder = Dtos.asDto(getValueTable(), counts).setLink(path);
@@ -87,6 +89,25 @@ public class TableResource extends AbstractValueTableResource {
       builder.setViewLink(path.replaceFirst("table", "view"));
     }
     return TimestampedResponses.ok(getValueTable(), builder.build()).build();
+  }
+
+  @PUT
+  public Response update(TableDto table) {
+    ValueTable valueTable = getValueTable();
+    if(!valueTable.getEntityType().equals(table.getEntityType())) return Response.status(BAD_REQUEST)
+        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "EntityTypeUpdateNotSupported").build()).build();
+
+    if(valueTable.getName().equals(table.getName())) return Response.ok().build();
+
+    if (!getDatasource().canRenameTable(valueTable.getName())) return Response.status(BAD_REQUEST)
+        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "TableRenamingNotSupported").build()).build();
+
+    if (getDatasource().hasValueTable(table.getName())) return Response.status(BAD_REQUEST)
+        .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "TableAlreadyExists").build()).build();
+
+    getDatasource().renameTable(valueTable.getName(),table.getName());
+
+    return Response.ok().build();
   }
 
   @Path("/variables")

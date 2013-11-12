@@ -113,8 +113,8 @@ public class MagmaView extends ViewImpl implements MagmaPresenter.Display {
   }
 
   private void setHeading(String text, String subtext) {
-    heading.setText(text);
-    heading.setSubtext("[" + subtext + "]");
+    heading.setText(translations.tablesLabel());
+    //heading.setSubtext("[" + subtext + "]");
   }
 
   private NavLink getDatasourceLink(String name) {

@@ -298,7 +298,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     tableDto = dto;
     name.setText(dto.getName());
     entityType.setText(dto.getEntityType());
-    edit.setVisible(dto.hasViewLink());
+    //edit.setVisible(dto.hasViewLink());
 
     timestamps.setText(TranslationsUtils.replaceArguments(translations.lastUpdateOnLabel(),
         Moment.create(dto.getTimestamps().getLastUpdate()).fromNow()));

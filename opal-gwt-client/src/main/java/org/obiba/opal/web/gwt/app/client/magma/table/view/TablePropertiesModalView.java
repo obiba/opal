@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableProper
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
@@ -42,6 +43,8 @@ public class TablePropertiesModalView extends ModalPopupViewWithUiHandlers<Table
     implements TablePropertiesModalPresenter.Display {
 
   interface Binder extends UiBinder<Widget, TablePropertiesModalView> {}
+
+  private final Translations translations;
 
   @UiField
   Modal dialog;
@@ -67,6 +70,7 @@ public class TablePropertiesModalView extends ModalPopupViewWithUiHandlers<Table
   @Inject
   public TablePropertiesModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
     super(eventBus);
+    this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
     dialog.setTitle(translations.addTableLabel());
   }
@@ -82,6 +86,14 @@ public class TablePropertiesModalView extends ModalPopupViewWithUiHandlers<Table
   }
 
   @Override
+  public void renderProperties(TableDto table) {
+    name.setText(table.getName());
+    entityType.setText(table.getEntityType());
+    entityType.setEnabled(false);
+    dialog.setTitle(translations.editProperties());
+  }
+
+  @Override
   public void showError(String message, @Nullable FormField group) {
     if(Strings.isNullOrEmpty(message)) return;
 
@@ -89,6 +101,7 @@ public class TablePropertiesModalView extends ModalPopupViewWithUiHandlers<Table
     try {
       ClientErrorDto errorDto = JsonUtils.unsafeEval(message);
       msg = errorDto.getStatus();
+      if(translations.userMessageMap().containsKey(msg)) msg = translations.userMessageMap().get(errorDto.getStatus());
     } catch(Exception ignored) {
     }
 
