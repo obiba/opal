@@ -15,18 +15,13 @@ import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdm
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
-import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsIndexColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.IndexStatusImageCell;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.LinkCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ValueRenderer;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
@@ -35,6 +30,7 @@ import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.SimplePager;
+import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
@@ -45,7 +41,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Label;
@@ -95,10 +90,10 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
   Label selectAllStatus;
 
   @UiField
-  Anchor selectAllAnchor;
+  IconAnchor selectAllAnchor;
 
   @UiField
-  Anchor clearSelectionAnchor;
+  IconAnchor clearSelectionAnchor;
 
   @UiField
   Table<TableIndexStatusDto> indexTable;
@@ -262,12 +257,12 @@ public class IndexAdministrationView extends ViewWithUiHandlers<IndexAdministrat
     }
 
     @Override
-    public Anchor getClearSelection() {
+    public IconAnchor getClearSelection() {
       return clearSelectionAnchor;
     }
 
     @Override
-    public Anchor getSelectAll() {
+    public IconAnchor getSelectAll() {
       return selectAllAnchor;
     }
 

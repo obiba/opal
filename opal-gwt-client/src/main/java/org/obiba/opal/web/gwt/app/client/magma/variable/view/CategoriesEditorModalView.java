@@ -34,6 +34,7 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
@@ -48,7 +49,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -113,19 +113,19 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   Label selectAllStatus;
 
   @UiField
-  Anchor selectAllAnchor;
+  IconAnchor selectAllAnchor;
 
   @UiField
-  Anchor clearSelectionAnchor;
+  IconAnchor clearSelectionAnchor;
 
   @UiField
-  Anchor deleteLink;
+  IconAnchor deleteLink;
 
   @UiField
-  Anchor moveUpLink;
+  IconAnchor moveUpLink;
 
   @UiField
-  Anchor moveDownLink;
+  IconAnchor moveDownLink;
 
   @Inject
   public CategoriesEditorModalView(EventBus eventBus) {
@@ -217,7 +217,7 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   @UiHandler("moveDownLink")
   void onMoveDown(ClickEvent event) {
     List<CategoryDto> categories = new ArrayList<CategoryDto>();
-    List<CategoryDto> reordered = new ArrayList<CategoryDto>();
+    Collection<CategoryDto> reordered = new ArrayList<CategoryDto>();
 
     int i = 0;
     int pos = 0;
@@ -371,12 +371,12 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
     }
 
     @Override
-    public Anchor getClearSelection() {
+    public IconAnchor getClearSelection() {
       return clearSelectionAnchor;
     }
 
     @Override
-    public Anchor getSelectAll() {
+    public IconAnchor getSelectAll() {
       return selectAllAnchor;
     }
 
