@@ -83,3 +83,7 @@ a:hover {
 .tab-content {
   min-height: 150px;
 }
+
+.controls .btn-group {
+  margin-bottom: 10px;
+}

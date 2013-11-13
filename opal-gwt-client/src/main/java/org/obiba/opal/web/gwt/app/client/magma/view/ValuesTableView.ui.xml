@@ -14,9 +14,53 @@
     <g:PopupPanel ui:field="navigationPopup" autoHideEnabled="true" styleName="gwt-MenuBarPopup"></g:PopupPanel>
 
     <g:FlowPanel ui:field="searchPanel">
-      <b:InputAddOn prependIcon="SEARCH" addStyleNames="inline-block">
-        <b:TextBox ui:field="searchBox" placeholder="search for an identifier..."/>
-      </b:InputAddOn>
+      <b:ControlGroup>
+        <b:InputAddOn prependIcon="SEARCH" addStyleNames="inline-block">
+          <b:TextBox ui:field="searchBox" placeholder="search for an identifier..."/>
+        </b:InputAddOn>
+      </b:ControlGroup>
+
+      <b:ControlGroup>
+        <b:ControlLabel>
+          <ui:msg description="Values Filter label">Values Filter</ui:msg>
+        </b:ControlLabel>
+        <b:Controls>
+          <b:DropdownButton text="VAR1: all">
+            <b:NavWidget>
+              <b:RadioButton name="radio">All</b:RadioButton>
+              <b:RadioButton name="radio">Empty</b:RadioButton>
+              <b:RadioButton name="radio">Not empty</b:RadioButton>
+            </b:NavWidget>
+            <b:Divider/>
+            <b:NavWidget>
+              <g:SimplePanel>
+                <o:Chooser>
+                  <g:item value="in">
+                    <ui:msg description="In label">In</ui:msg>
+                  </g:item>
+                  <g:item value="not_in">
+                    <ui:msg description="Not in label">Not in</ui:msg>
+                  </g:item>
+                </o:Chooser>
+              </g:SimplePanel>
+              <o:Chooser multipleSelect="true">
+                <g:item value="C1">C1 (234)</g:item>
+                <g:item value="C2">C2 (22)</g:item>
+                <g:item value="C3">C3 (123)</g:item>
+              </o:Chooser>
+            </b:NavWidget>
+            <b:Divider/>
+            <b:NavLink icon="REMOVE">Remove</b:NavLink>
+          </b:DropdownButton>
+          <b:Typeahead ui:field="variableTypeahead">
+            <b:TextBox placeholder="search for a variable..."/>
+          </b:Typeahead>
+        </b:Controls>
+        <b:HelpBlock>
+          <ui:msg description="Values Filter help">Select variables and apply value filter on each of them.</ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
+
       <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"></b:SimplePager>
     </g:FlowPanel>
 
@@ -24,13 +68,13 @@
       <g:Image ui:field="refreshPending" url="image/loading.gif" addStyleNames="small-indent"/>
       <g:Grid>
         <g:row>
-          <g:customCell styleName="top-aligned">
-            <g:FlowPanel styleName="input block">
-              <g:Label addStyleNames="key">
+          <g:customCell>
+            <g:FlowPanel>
+              <g:Label>
                 <ui:msg description="Filter Variables label">Variables filter</ui:msg>
               </g:Label>
               <g:HorizontalPanel>
-                <b:Controls addStyleNames="nowrap">
+                <b:Controls>
                   <b:InputAddOn prependIcon="FILTER">
                     <o:TextBoxClearable ui:field="filter"></o:TextBoxClearable>
                   </b:InputAddOn>
@@ -38,17 +82,17 @@
               </g:HorizontalPanel>
             </g:FlowPanel>
           </g:customCell>
-          <g:customCell styleName="top-aligned small-indent">
-            <g:FlowPanel styleName="input block">
-              <g:Label addStyleNames="key">
+          <g:customCell styleName="small-indent">
+            <g:FlowPanel>
+              <g:Label>
                 <ui:msg description="Number of Visible Variables label">Number of visible variables</ui:msg>
               </g:Label>
               <o:NumericTextBox ui:field="visibleColumns" addStyleNames="span1"></o:NumericTextBox>
             </g:FlowPanel>
           </g:customCell>
-          <g:customCell styleName="top-aligned small-indent">
-            <g:FlowPanel styleName="input block">
-              <g:Label addStyleNames="key">
+          <g:customCell styleName="small-indent">
+            <g:FlowPanel>
+              <g:Label>
                 <ui:msg description="Number of Rows label">Number of rows</ui:msg>
               </g:Label>
               <o:NumericTextBox ui:field="pageSize" addStyleNames="span1"></o:NumericTextBox>
