@@ -53,22 +53,13 @@ public class ValueSetsResource extends AbstractValueTableResource {
   @Nullable
   private final VariableValueSource vvs;
 
-  @Nullable
-  private final Iterable<VariableEntity> entities;
-
   public ValueSetsResource(ValueTable valueTable) {
-    this(valueTable, null, null);
+    this(valueTable, null);
   }
 
   public ValueSetsResource(ValueTable valueTable, VariableValueSource vvs) {
-    this(valueTable, vvs, null);
-  }
-
-  public ValueSetsResource(ValueTable valueTable, @Nullable VariableValueSource vvs,
-      @Nullable Iterable<VariableEntity> entities) {
     super(valueTable, new HashSet<Locale>());
     this.vvs = vvs;
-    this.entities = entities;
   }
 
   /**
@@ -90,7 +81,7 @@ public class ValueSetsResource extends AbstractValueTableResource {
       @QueryParam("filterBinary") @DefaultValue("true") Boolean filterBinary) {
 
     // filter entities
-    Iterable<VariableEntity> variableEntities = entities == null ? filterEntities(null, offset, limit) : entities;
+    Iterable<VariableEntity> variableEntities = filterEntities(offset, limit);
     ValueSetsDto vs = vvs == null
         ? getValueSetsDto(uriInfo, select, variableEntities, filterBinary)
         : getValueSetsDto(uriInfo, variableEntities, filterBinary);
@@ -111,7 +102,7 @@ public class ValueSetsResource extends AbstractValueTableResource {
       @QueryParam("limit") @DefaultValue("100") int limit) {
 
     // filter entities
-    Iterable<VariableEntity> variableEntities = entities == null ? filterEntities(null, offset, limit) : entities;
+    Iterable<VariableEntity> variableEntities = filterEntities(offset, limit);
 
     ValueSetsDto.Builder builder = ValueSetsDto.newBuilder().setEntityType(getValueTable().getEntityType());
     builder.addAllValueSets(Iterables.transform(variableEntities, new Function<VariableEntity, ValueSetDto>() {

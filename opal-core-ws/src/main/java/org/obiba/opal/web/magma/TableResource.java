@@ -99,13 +99,13 @@ public class TableResource extends AbstractValueTableResource {
 
     if(valueTable.getName().equals(table.getName())) return Response.ok().build();
 
-    if (!getDatasource().canRenameTable(valueTable.getName())) return Response.status(BAD_REQUEST)
+    if(!getDatasource().canRenameTable(valueTable.getName())) return Response.status(BAD_REQUEST)
         .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "TableRenamingNotSupported").build()).build();
 
-    if (getDatasource().hasValueTable(table.getName())) return Response.status(BAD_REQUEST)
+    if(getDatasource().hasValueTable(table.getName())) return Response.status(BAD_REQUEST)
         .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "TableAlreadyExists").build()).build();
 
-    getDatasource().renameTable(valueTable.getName(),table.getName());
+    getDatasource().renameTable(valueTable.getName(), table.getName());
 
     return Response.ok().build();
   }
@@ -123,8 +123,8 @@ public class TableResource extends AbstractValueTableResource {
    */
   @GET
   @Path("/entities")
-  public Set<VariableEntityDto> getEntities(@QueryParam("script") String script) {
-    Iterable<VariableEntity> entities = filterEntities(script);
+  public Set<VariableEntityDto> getEntities() {
+    Iterable<VariableEntity> entities = filterEntities(null, null);
 
     return ImmutableSet.copyOf(Iterables.transform(entities, new Function<VariableEntity, VariableEntityDto>() {
       @Override

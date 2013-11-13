@@ -84,14 +84,10 @@ abstract class AbstractValueTableResource {
     return filteredVariables.subList(fromIndex, toIndex);
   }
 
-  protected Iterable<VariableEntity> filterEntities(String script) {
-    return filterEntities(script, null, null);
-  }
-
-  protected Iterable<VariableEntity> filterEntities(@Nullable String script, @Nullable Integer offset,
+  protected Iterable<VariableEntity> filterEntities(@Nullable Integer offset,
       @Nullable Integer limit) {
     Iterable<VariableEntity> entities;
-    entities = script == null ? Sets.newTreeSet(valueTable.getVariableEntities()) : getFilteredEntities(script);
+    entities = Sets.newTreeSet(valueTable.getVariableEntities());
     // Apply offset then limit (in that order)
     if(offset != null) {
       entities = Iterables.skip(entities, offset);
@@ -100,54 +96,6 @@ abstract class AbstractValueTableResource {
       entities = Iterables.limit(entities, limit);
     }
     return entities;
-  }
-
-  private Iterable<VariableEntity> getFilteredEntities(@NotNull String script) {
-    //noinspection ConstantConditions
-    Preconditions.checkArgument(script != null, "Entities filter script cannot be null.");
-
-    JavascriptValueSource jvs = newJavaScriptValueSource(BooleanType.get(), script);
-
-    SortedSet<VariableEntity> entities = Sets.newTreeSet(valueTable.getVariableEntities());
-    final Iterator<Value> values = jvs.asVectorSource().getValues(entities).iterator();
-
-    // filter the entities once and for all
-    ImmutableList.Builder<VariableEntity> entityDtos = ImmutableList.builder();
-    for(VariableEntity dto : Iterables.filter(entities, new Predicate<VariableEntity>() {
-
-      @Override
-      public boolean apply(VariableEntity input) {
-        return values.next().getValue() == Boolean.TRUE;
-      }
-    })) {
-      entityDtos.add(dto);
-    }
-
-    return entityDtos.build();
-  }
-
-  protected JavascriptValueSource newJavaScriptValueSource(ValueType valueType, String script) {
-    JavascriptValueSource jvs = new JavascriptValueSource(valueType, script) {
-      @Override
-      protected void enterContext(MagmaContext ctx, Scriptable scope) {
-        super.enterContext(ctx, scope);
-
-        if(getValueTable() instanceof ValueTableWrapper) {
-          ctx.push(ValueTable.class, ((ValueTableWrapper) getValueTable()).getWrappedValueTable());
-        } else {
-          ctx.push(ValueTable.class, getValueTable());
-        }
-      }
-
-      @Override
-      protected void exitContext(MagmaContext ctx) {
-        super.exitContext(ctx);
-
-        ctx.pop(ValueTable.class);
-      }
-    };
-    jvs.initialise();
-    return jvs;
   }
 
 }
