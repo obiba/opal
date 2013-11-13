@@ -20,6 +20,7 @@ import javax.annotation.Nullable;
 import org.obiba.opal.web.gwt.app.client.event.ModalClosedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
@@ -28,7 +29,6 @@ import org.obiba.opal.web.gwt.app.client.magma.createdatasource.presenter.Dataso
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.support.DatasourceFileType;
 import org.obiba.opal.web.gwt.app.client.presenter.CharacterSetDisplay;
 import org.obiba.opal.web.gwt.app.client.support.DatasourceParsingErrorDtos;
-import org.obiba.opal.web.gwt.app.client.support.LanguageLocale;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardProxy;
@@ -36,16 +36,17 @@ import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardView;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.CharacterSetEncodingValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
-import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.LocaleValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
-import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.FileViewDto;
 import org.obiba.opal.web.model.client.magma.FileViewDto.FileViewType;
@@ -54,31 +55,30 @@ import org.obiba.opal.web.model.client.magma.StaticDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 
 import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
 import static com.google.gwt.http.client.Response.SC_CREATED;
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
+import static com.google.gwt.http.client.Response.SC_OK;
 
 public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImportPresenter.Display>
     implements VariablesImportUiHandlers {
 
-  public static final WizardType WIZARD_TYPE = new WizardType();
 
-  private ViewValidator viewValidaror;
+  public static final WizardType WIZARD_TYPE = new WizardType();
 
   public static class Wizard extends WizardProxy<VariablesImportPresenter> {
 
@@ -97,6 +97,8 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
   private final FileSelectionPresenter fileSelectionPresenter;
 
+  private String transientDatasourceName;
+
   private String datasourceName;
 
   @Inject
@@ -113,7 +115,6 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
   private void init() {
     getView().setUiHandlers(this);
-    viewValidaror = new ViewValidator();
     setDefaultCharset();
 
     getEventBus().addHandler(FileSelectionUpdatedEvent.getType(), new FileSelectionUpdatedEvent.Handler() {
@@ -126,21 +127,34 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   }
 
   @Override
-  public void onModalHidden() {
-    getEventBus().fireEventFromSource(new ModalClosedEvent(this), this);
+  public void onCancel() {
+    super.onCancel();
+    deleteTransientDatasource();
   }
 
   @Override
-  public void selectVariableFile() {
+  public void onModalHidden() {
+    deleteTransientDatasource();
+  }
+
+  @Override
+  public void processVariablesFile() {
     getView().clearErrors();
-    if (!viewValidaror.validate()) return;
+    if (!new ViewValidator().validate()) return;
     createTransientDatasource();
     getView().gotoPreview();
   }
 
   @Override
+  public void createTable() {
+    if (!new ViewImportValidator().validate()) return;
+    conclusionPresenter.sendResourceRequests();
+    getView().hide();
+  }
+
+  @Override
   public void downExcelTemplate() {
-    getEventBus().fireEvent(new FileDownloadRequestEvent("/templates" + EXCEL_TEMPLATE));
+    fireEvent(new FileDownloadRequestEvent("/templates" + EXCEL_TEMPLATE));
   }
 
   @Override
@@ -152,10 +166,15 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     fileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE);
     fileSelectionPresenter.bind();
     getView().setFileSelectionDisplay(fileSelectionPresenter.getView());
+    addHandler(FileSelectionEvent.getType(), new FileSelectionEvent.Handler() {
+      @Override
+      public void onFileSelection(FileSelectionEvent event) {
+        getView().clearErrors();
+      }
+    });
 
     conclusionPresenter.bind();
     getView().setConclusionDisplay(conclusionPresenter.getView());
-    addEventHandlers();
   }
 
   @Override
@@ -164,21 +183,11 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     datasourceName = null;
   }
 
-  protected void addEventHandlers() {
-    getView().setImportableValidator(new ImportableValidator());
-  }
-
   @Override
   public void onWizardRequired(WizardRequiredEvent event) {
     if(event.getEventParameters().length > 0) {
       datasourceName = (String) event.getEventParameters()[0];
     }
-  }
-
-  @Override
-  protected void onFinish() {
-    super.onFinish();
-    conclusionPresenter.sendResourceRequests();
   }
 
   private void setDefaultCharset() {
@@ -193,119 +202,9 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
         }).send();
   }
 
-  private final class ImportableValidator implements ValidationHandler {
-    @Override
-    public boolean validate() {
-      if(comparedDatasourcesReportPresenter.getSelectedTables().isEmpty()) {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error("TableSelectionIsRequired").build());
-        return false;
-      }
-      if(!comparedDatasourcesReportPresenter.canBeSubmitted()) {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error("NotIgnoredConflicts").build());
-        return false;
-      }
-
-      conclusionPresenter.clearResourceRequests();
-      comparedDatasourcesReportPresenter.addUpdateVariablesResourceRequests(conclusionPresenter);
-      if(conclusionPresenter.getResourceRequestCount() == 0) {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error("NoVariablesToBeImported").build());
-        return false;
-      }
-
-      return true;
-    }
-  }
-
-  private final class FileSelectionValidator extends AbstractFieldValidator {
-
-    FileSelectionValidator(String id) {
-      super("InvalidFileType", id);
-    }
-
-    @Override
-    protected boolean hasError() {
-      return DatasourceFileType.INVALID == DatasourceFileType.getFileType(getView().getSelectedFile());
-    }
-  }
-
-  private final class LocaleValidator extends AbstractFieldValidator {
-
-    LocaleValidator(String id) {
-      super("InvalidLocaleName", id);
-    }
-
-    @Override
-    public boolean hasError() {
-      String localeName = getView().getLocale();
-      setArgs(Arrays.asList(localeName));
-      return !LanguageLocale.isValid(localeName);
-    }
-  }
-
-  public interface Display extends WizardView, CharacterSetDisplay, HasUiHandlers<VariablesImportUiHandlers> {
-
-
-    enum FormField {
-      FIEL_SELECTION,
-      LOCALE
-    }
-
-    void gotoPreview();
-
-    void enableCompletion();
-
-    void disableCompletion();
-
-    void setFileSelectionDisplay(FileSelectionPresenter.Display display);
-
-    void setImportableValidator(ValidationHandler handler);
-
-    void setComparedDatasourcesReportDisplay(ComparedDatasourcesReportStepPresenter.Display display);
-
-    void showSpssSpecificPanel(boolean show);
-
-    HasText getSelectedFileText();
-
-    String getSelectedFile();
-
-    void clearErrors();
-
-    void hideErrors();
-
-    void showError(@Nullable FormField formField, String message);
-
-    HasText getSpssEntityType();
-
-    String getLocale();
-
-    void setConclusionDisplay(ConclusionStepPresenter.Display display);
-
-  }
-
-  class ViewValidator extends ViewValidationHandler {
-    @Override
-    protected Set<FieldValidator> getValidators() {
-      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
-
-      validators.add(new LocaleValidator(Display.FormField.LOCALE.name()));
-
-      validators.add(new RequiredTextValidator(getView().getSelectedFileText(), "ViewNameRequired",
-          Display.FormField.FIEL_SELECTION.name()));
-      validators.add(new FileSelectionValidator(Display.FormField.FIEL_SELECTION.name()));
-
-
-      return validators;
-    }
-
-    @Override
-    protected void showMessage(String id, String message) {
-      getView().showError(Display.FormField.valueOf(id), message);
-    }
-  }
-
   private void createTransientDatasource() {
-    final DatasourceFactoryDto factory = createDatasourceFactoryDto(getView().getSelectedFile());
-    ResponseCodeCallback errorCallback = new TransientDatasourceFailureCallback(factory);
+    DatasourceFactoryDto factory = createDatasourceFactoryDto(getView().getSelectedFile());
+    ResponseCodeCallback errorCallback = new TransientDatasourceFailureCallback();
 
     ResourceRequestBuilderFactory.<DatasourceDto>newBuilder() //
         .forResource("/transient-datasources") //
@@ -316,60 +215,17 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
         .withCallback(SC_INTERNAL_SERVER_ERROR, errorCallback).send();
   }
 
-  class TransientDatasourceSuccessCallback implements ResourceCallback<DatasourceDto> {
+  private void deleteTransientDatasource() {
+    if (Strings.isNullOrEmpty(transientDatasourceName)) return;
 
-    private final DatasourceFactoryDto factory;
-
-    TransientDatasourceSuccessCallback(DatasourceFactoryDto factory) {
-      this.factory = factory;
-    }
-
-    @Override
-    public void onResource(Response response, DatasourceDto resource) {
-      if(response.getStatusCode() == SC_CREATED) {
-        comparedDatasourcesReportPresenter.compare(resource.getName(), datasourceName,
-            new DatasourceComparisonSuccessCallback(), factory, resource);
-      }
-    }
-
-    class DatasourceComparisonSuccessCallback implements DatasourceCreatedCallback {
-
-      @Override
-      public void onSuccess(DatasourceFactoryDto factory, DatasourceDto datasource) {
-        getView().enableCompletion();
-      }
-
-      @Override
-      public void onFailure(DatasourceFactoryDto factory, ClientErrorDto errorDto) {
-        // show client error
-        Collection<String> errors = DatasourceParsingErrorDtos.getErrors(errorDto);
-        for (String error : errors) {
-          getView().showError(null, error);
-        }
-        getView().disableCompletion();
-      }
-    }
-
+    UriBuilder builder = UriBuilder.create().segment("datasource", transientDatasourceName);
+    ResourceRequestBuilderFactory.newBuilder() //
+        .forResource(builder.build()) //
+        .withCallback(SC_OK, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {}
+        }).delete().send();
   }
-
-  class TransientDatasourceFailureCallback implements ResponseCodeCallback {
-    private final DatasourceFactoryDto factory;
-
-    TransientDatasourceFailureCallback(DatasourceFactoryDto factory) {
-      this.factory = factory;
-    }
-
-    @Override
-    public void onResponseCode(Request request, Response response) {
-      ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
-
-      Collection<String> errors = DatasourceParsingErrorDtos.getErrors(errorDto);
-      for (String error : errors) {
-        getView().showError(null, error);
-      }
-      getView().disableCompletion();
-    }
-  };
 
   private DatasourceFactoryDto createDatasourceFactoryDto(String tmpFilePath) {
     DatasourceFileType type = DatasourceFileType.getFileType(tmpFilePath);
@@ -430,5 +286,193 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
     return dto;
   }
+
+  private final class ViewImportValidator extends ViewValidationHandler {
+    @Override
+    protected Set<FieldValidator> getValidators() {
+      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      validators.add(new ImportableValidator());
+      return validators;
+    }
+
+    @Override
+    protected void showMessage(String id, String message) {
+      getView().showError(null, message);
+    }
+  }
+
+  private final class ViewValidator extends ViewValidationHandler {
+    @Override
+    protected Set<FieldValidator> getValidators() {
+      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      DatasourceFileType fileType = DatasourceFileType.getFileType(getView().getSelectedFile());
+      validators.add(new FileTypeValidator(fileType, Display.FormField.FILE_SELECTION.name()));
+
+      if (DatasourceFileType.SAV == fileType) {
+        validators.add(createLocaleValidator());
+        validators.add(createCharacterSetEncodingValidator());
+      }
+
+      return validators;
+    }
+
+    private FieldValidator createLocaleValidator() {
+      String localeName = getView().getLocale();
+      LocaleValidator localeValidator = new LocaleValidator(localeName, "InvalidLocaleName",
+          Display.FormField.LOCALE.name());
+      localeValidator.setArgs(Arrays.asList(localeName));
+
+      return localeValidator;
+    }
+
+    private FieldValidator createCharacterSetEncodingValidator() {
+      String encoding = getView().getCharsetText().getText();
+      CharacterSetEncodingValidator encodingValidator = new CharacterSetEncodingValidator(encoding,
+          "InvalidCharacterSetName", Display.FormField.CHARSET.name());
+      encodingValidator.setArgs(Arrays.asList(encoding));
+
+      return encodingValidator;
+    }
+
+    @Override
+    protected void showMessage(String id, String message) {
+      getView().showError(Display.FormField.valueOf(id), message);
+    }
+  }
+
+  private final class ImportableValidator extends AbstractFieldValidator {
+
+    ImportableValidator() {
+      super("");
+    }
+
+    @Override
+    protected boolean hasError() {
+      if(comparedDatasourcesReportPresenter.getSelectedTables().isEmpty()) {
+        setErrorMessageKey("TableSelectionIsRequired");
+        return true;
+      }
+      if(!comparedDatasourcesReportPresenter.canBeSubmitted()) {
+        setErrorMessageKey("NotIgnoredConflicts");
+        return true;
+      }
+
+      conclusionPresenter.clearResourceRequests();
+      comparedDatasourcesReportPresenter.addUpdateVariablesResourceRequests(conclusionPresenter);
+      if(conclusionPresenter.getResourceRequestCount() == 0) {
+        setErrorMessageKey("NoVariablesToBeImported");
+        return true;
+      }
+
+      return false;
+    }
+  }
+
+  private final static class FileTypeValidator extends AbstractFieldValidator {
+
+    private final DatasourceFileType fileType;
+
+    FileTypeValidator(DatasourceFileType fileType, String id) {
+      super("InvalidFileType", id);
+      this.fileType = fileType;
+    }
+
+    @Override
+    protected boolean hasError() {
+      return DatasourceFileType.INVALID == fileType;
+    }
+  }
+
+  private final class TransientDatasourceSuccessCallback implements ResourceCallback<DatasourceDto> {
+
+    private final DatasourceFactoryDto factory;
+
+    TransientDatasourceSuccessCallback(DatasourceFactoryDto factory) {
+      this.factory = factory;
+    }
+
+    @Override
+    public void onResource(Response response, DatasourceDto resource) {
+      if(response.getStatusCode() == SC_CREATED) {
+        comparedDatasourcesReportPresenter.compare(resource.getName(), datasourceName,
+            new DatasourceComparisonSuccessCallback(), factory, resource);
+      }
+    }
+
+    private final class DatasourceComparisonSuccessCallback implements DatasourceCreatedCallback {
+
+      @Override
+      public void onSuccess(DatasourceFactoryDto factoryDto, DatasourceDto datasource) {
+        transientDatasourceName = datasource.getName();
+        getView().enableCompletion();
+      }
+
+      @Override
+      public void onFailure(DatasourceFactoryDto factoryDto, ClientErrorDto errorDto) {
+        // show client error
+        Collection<String> errors = DatasourceParsingErrorDtos.getErrors(errorDto);
+        for (String error : errors) {
+          getView().showError(null, error);
+        }
+        getView().disableCompletion();
+      }
+    }
+
+  }
+
+  private final class TransientDatasourceFailureCallback implements ResponseCodeCallback {
+
+    TransientDatasourceFailureCallback() {
+    }
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
+
+      Collection<String> errors = DatasourceParsingErrorDtos.getErrors(errorDto);
+      for (String error : errors) {
+        getView().showError(null, error);
+      }
+      getView().disableCompletion();
+    }
+  }
+
+
+  public interface Display extends WizardView, CharacterSetDisplay, HasUiHandlers<VariablesImportUiHandlers> {
+
+    enum FormField {
+      FILE_SELECTION,
+      LOCALE,
+      CHARSET
+    }
+
+    void gotoPreview();
+
+    void enableCompletion();
+
+    void disableCompletion();
+
+    void setFileSelectionDisplay(FileSelectionPresenter.Display display);
+
+    void setComparedDatasourcesReportDisplay(ComparedDatasourcesReportStepPresenter.Display display);
+
+    void showSpssSpecificPanel(boolean show);
+
+    String getSelectedFile();
+
+    void clearErrors();
+
+    void hideErrors();
+
+    void showError(@Nullable FormField formField, String message);
+
+    HasText getSpssEntityType();
+
+    String getLocale();
+
+    void setConclusionDisplay(ConclusionStepPresenter.Display display);
+
+  }
+
 
 }

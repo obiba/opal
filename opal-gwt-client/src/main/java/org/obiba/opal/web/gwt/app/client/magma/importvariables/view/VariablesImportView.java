@@ -11,10 +11,10 @@ package org.obiba.opal.web.gwt.app.client.magma.importvariables.view;
 
 import javax.annotation.Nullable;
 
+import org.obiba.opal.web.gwt.app.client.event.ModalClosedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.magma.createdatasource.presenter.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.ConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportPresenter;
@@ -29,7 +29,6 @@ import org.obiba.opal.web.gwt.app.client.ui.WizardModalBox;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.ResetHandler;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
@@ -38,6 +37,8 @@ import com.github.gwtbootstrap.client.ui.Modal;
 import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.github.gwtbootstrap.client.ui.event.HiddenEvent;
+import com.github.gwtbootstrap.client.ui.event.HiddenHandler;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -89,6 +90,9 @@ public class VariablesImportView extends ModalPopupViewWithUiHandlers<VariablesI
   CollapsiblePanel options;
 
   @UiField
+  ControlGroup charsetGroup;
+
+  @UiField
   CharacterSetView charsetView;
 
   @UiField
@@ -104,10 +108,6 @@ public class VariablesImportView extends ModalPopupViewWithUiHandlers<VariablesI
 
   private WizardStepChain stepChain;
 
-  private ComparedDatasourcesReportStepPresenter.Display compareDisplay;
-
-  private ValidationHandler importableValidator;
-
   @Inject
   public VariablesImportView(EventBus eventBus) {
     super(eventBus);
@@ -122,7 +122,14 @@ public class VariablesImportView extends ModalPopupViewWithUiHandlers<VariablesI
 
       @Override
       public void onClick(ClickEvent evt) {
-        getUiHandlers().selectVariableFile();
+        getUiHandlers().processVariablesFile();
+      }
+    });
+
+    dialog.addHiddenHandler(new HiddenHandler() {
+      @Override
+      public void onHidden(HiddenEvent hiddenEvent) {
+        getUiHandlers().onModalHidden();
       }
     });
   }
@@ -151,14 +158,6 @@ public class VariablesImportView extends ModalPopupViewWithUiHandlers<VariablesI
         .onPrevious().onCancel().onClose().build();
   }
 
-  private void showErrors(ClientErrorDto errorDto) {
-    if(errorDto != null && errorDto.getExtension(ClientErrorDtoExtensions.errors) != null) {
-      failed.setVisible(true);
-      datasourceParsingErrors.setErrors(errorDto);
-      datasourceParsingErrors.setVisible(true);
-    }
-  }
-
   private void initializeLocales() {
     localeNameBox.getSuggestOracle().clear();
 
@@ -182,6 +181,7 @@ public class VariablesImportView extends ModalPopupViewWithUiHandlers<VariablesI
 
   @Override
   public void gotoPreview() {
+    clearErrors();
     dialog.setProgress(true);
     dialog.setNextEnabled(false);
     dialog.setCancelEnabled(false);
@@ -209,26 +209,17 @@ public class VariablesImportView extends ModalPopupViewWithUiHandlers<VariablesI
   }
 
   @Override
-  public HasText getSelectedFileText() {
-    return fileSelection.getFileText();
-  }
-
-  @Override
   public String getSelectedFile() {
     return fileSelection.getFile();
   }
 
   @Override
-  public HandlerRegistration addFinishClickHandler(final ClickHandler handler) {
+  public HandlerRegistration addFinishClickHandler(ClickHandler handler) {
     return dialog.addFinishClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent evt) {
-        if(importableValidator.validate()) {
-          handler.onClick(evt);
-          stepChain.onNext();
-          dialog.setCancelEnabled(false);
-        }
+        getUiHandlers().createTable();
       }
     });
   }
@@ -244,13 +235,10 @@ public class VariablesImportView extends ModalPopupViewWithUiHandlers<VariablesI
   }
 
   @Override
-  public void setImportableValidator(ValidationHandler handler) {
-    importableValidator = handler;
-  }
-
-  @Override
   public void clearErrors() {
-    dialog.clearAlert();
+    dialog.clearAlert(fileSelectionGroup);
+    dialog.clearAlert(localeGroup);
+    dialog.clearAlert(charsetGroup);
   }
 
   @Override
@@ -264,8 +252,14 @@ public class VariablesImportView extends ModalPopupViewWithUiHandlers<VariablesI
     ControlGroup group = null;
     if(formField != null) {
       switch(formField) {
-        case FIEL_SELECTION:
+        case FILE_SELECTION:
           group = fileSelectionGroup;
+          break;
+        case LOCALE:
+          group = localeGroup;
+          break;
+        case CHARSET:
+          group = charsetGroup;
           break;
       }
     }
@@ -278,7 +272,6 @@ public class VariablesImportView extends ModalPopupViewWithUiHandlers<VariablesI
 
   @Override
   public void setComparedDatasourcesReportDisplay(ComparedDatasourcesReportStepPresenter.Display display) {
-    compareDisplay = display;
     compareStep.removeStepContent();
     compareStep.add(display.asWidget());
   }

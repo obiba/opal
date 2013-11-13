@@ -57,7 +57,7 @@ public class EditableListBox extends Composite implements HasText, HasValue<Stri
     items.addAll(collection);
   }
 
-  public void addItem(final String value) {
+  public void addItem(String value) {
     getSuggestOracle().add(value);
     items.add(value);
   }
@@ -73,6 +73,14 @@ public class EditableListBox extends Composite implements HasText, HasValue<Stri
   public void clear() {
     getSuggestOracle().clear();
     items.clear();
+  }
+
+  public String getId() {
+    return getElement().getId();
+  }
+
+  public void setId(String id) {
+    getElement().setId(id);
   }
 
   @Override

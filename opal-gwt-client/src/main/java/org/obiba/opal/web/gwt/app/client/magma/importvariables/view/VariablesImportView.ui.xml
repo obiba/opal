@@ -37,12 +37,13 @@
             <o:DropdownSuggestBox ui:field="localeNameBox" o:id="localeNameBox"/>
           </b:ControlGroup>
 
-          <g:FlowPanel>
-            <g:Label>
+          <b:ControlGroup ui:field="charsetGroup">
+            <b:ControlLabel>
               <ui:msg description="Character set label">Character Set</ui:msg>
-            </g:Label>
-            <o:CharacterSetView ui:field="charsetView"/>
-          </g:FlowPanel>
+            </b:ControlLabel>
+            <o:CharacterSetView ui:field="charsetView" o:id="charsetView"/>
+          </b:ControlGroup>
+
           <g:FlowPanel>
             <g:Label>
               <ui:msg description="Spss Entity type">Entity type</ui:msg>

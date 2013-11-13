@@ -13,7 +13,9 @@ package org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter;
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
 public interface VariablesImportUiHandlers extends ModalUiHandlers {
-  void selectVariableFile();
+  void processVariablesFile();
 
   void downExcelTemplate();
+
+  void createTable();
 }
