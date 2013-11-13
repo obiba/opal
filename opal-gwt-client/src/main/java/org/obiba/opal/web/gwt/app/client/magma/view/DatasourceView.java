@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
@@ -294,6 +296,16 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   @Override
   public HasAuthorization getExcelDownloadAuthorizer() {
     return new WidgetAuthorizer(downloadDictionary);
+  }
+
+  @Override
+  public List<TableDto> getSelectedTables() {
+    return checkColumn.getSelectedItems();
+  }
+
+  @Override
+  public List<TableDto> getAllTables() {
+    return dataProvider.getList();
   }
 
   private class DatasourceCheckStatusDisplay implements CheckboxColumn.Display<TableDto> {

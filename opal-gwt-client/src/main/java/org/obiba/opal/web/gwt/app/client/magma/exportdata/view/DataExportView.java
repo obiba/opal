@@ -10,69 +10,57 @@
 package org.obiba.opal.web.gwt.app.client.magma.exportdata.view;
 
 import java.util.Date;
-import java.util.List;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.ui.WizardModalBox;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepChain;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.ResetHandler;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
-import org.obiba.opal.web.gwt.app.client.ui.ModalViewImpl;
-import org.obiba.opal.web.gwt.app.client.ui.TableChooser;
-import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
-import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
-import com.github.gwtbootstrap.client.ui.Modal;
-import com.google.gwt.core.client.GWT;
+import com.github.gwtbootstrap.client.ui.Alert;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.github.gwtbootstrap.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.Panel;
-import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 
 /**
  * View of the dialog used to export data from Opal.
  */
-public class DataExportView extends ModalViewImpl implements DataExportPresenter.Display {
+public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHandlers>
+    implements DataExportPresenter.Display {
 
   private final Translations translations;
 
   private String username;
 
+  private ValidationHandler destinationValidator;
+
+  @UiTemplate("DataExportView.ui.xml")
   interface Binder extends UiBinder<Widget, DataExportView> {}
 
   @UiField
-  WizardModalBox dialog;
+  Modal modal;
 
   @UiField
-  WizardStep tablesStep;
+  Alert exportNTable;
 
   @UiField
-  WizardStep destinationStep;
-
-  @UiField
-  WizardStep unitStep;
+  FlowPanel unitsPanel;
 
   @UiField
   ListBox units;
-
-  @UiField(provided = true)
-  TableChooser tableChooser;
 
   @UiField
   SimplePanel filePanel;
@@ -80,130 +68,42 @@ public class DataExportView extends ModalViewImpl implements DataExportPresenter
   @UiField
   ListBox fileFormat;
 
-  @UiField
-  RadioButton opalId;
-
-  @UiField
-  RadioButton unitId;
-
-  @UiField
-  CheckBox useAlias;
-
-  @UiField
-  Panel unitSelection;
-
-  @UiField
-  Label noUnitSelection;
-
-  @UiField
-  Label noUnitLabel;
-
   private FileSelectionPresenter.Display fileSelection;
-
-  private ValidationHandler tablesValidator;
-
-  private ValidationHandler destinationValidator;
-
-  private WizardStepChain stepChain;
 
   @Inject
   public DataExportView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
     this.translations = translations;
-    tableChooser = new TableChooser(true);
     initWidget(uiBinder.createAndBindUi(this));
-    initWidgets();
-    initWizardDialog();
+
+    modal.setTitle(translations.exportData());
   }
 
-  private void initWizardDialog() {
-    stepChain = WizardStepChain.Builder.create(dialog)//
-        .append(tablesStep)//
-        .title(translations.dataExportInstructions())//
-        .onValidate(new ValidationHandler() {
-
-          @Override
-          public boolean validate() {
-            return tablesValidator.validate();
-          }
-        })//
-        .onReset(new ResetHandler() {
-
-          @Override
-          public void onReset() {
-            clearTablesStep();
-          }
-        })//
-        .append(destinationStep)//
-        .title(translations.dataExportDestination())//
-        .onValidate(new ValidationHandler() {
-
-          @Override
-          public boolean validate() {
-            return destinationValidator.validate();
-          }
-        })//
-        .onReset(new ResetHandler() {
-
-          @Override
-          public void onReset() {
-            clearDestinationStep();
-          }
-        })//
-        .append(unitStep)//
-        .title(translations.dataExportUnit())//
-        .onReset(new ResetHandler() {
-
-          @Override
-          public void onReset() {
-            clearUnitStep();
-          }
-        })//
-
-        .onNext().onPrevious().build();
+  @UiHandler("cancelButton")
+  public void onCancel(ClickEvent event) {
+    getUiHandlers().cancel();
   }
 
-  private void initWidgets() {
-    opalId.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        units.setEnabled(false);
-      }
-    });
-    unitId.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        units.setEnabled(true);
-      }
-    });
+  @UiHandler("submitButton")
+  public void onSubmit(ClickEvent event) {
+    getUiHandlers().onSubmit();
   }
 
   @Override
   public String getSelectedUnit() {
-    return units.getValue(units.getSelectedIndex());
+    return units.getSelectedIndex() < 0
+        ? translations.opalDefaultIdentifiersLabel()
+        : units.getValue(units.getSelectedIndex());
   }
 
   @Override
-  public void setUnits(JsArray<FunctionalUnitDto> units) {
-    this.units.clear();
-    for(int i = 0; i < units.length(); i++) {
-      this.units.addItem(units.get(i).getName());
+  public void setUnits(JsArray<FunctionalUnitDto> unitDtos) {
+    units.addItem(translations.opalDefaultIdentifiersLabel());
+    for(int i = 0; i < unitDtos.length(); i++) {
+      units.addItem(unitDtos.get(i).getName());
     }
-    noUnitLabel.setVisible(units.length() == 0);
-    unitSelection.setVisible(units.length() > 0);
-  }
-
-  @Override
-  public HandlerRegistration addFinishClickHandler(final ClickHandler submitHandler) {
-    return dialog.addFinishClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent evt) {
-        submitHandler.onClick(evt);
-      }
-    });
+    units.setSelectedIndex(0);
+    unitsPanel.setVisible(unitDtos.length() > 0);
   }
 
   @Override
@@ -212,18 +112,8 @@ public class DataExportView extends ModalViewImpl implements DataExportPresenter
   }
 
   @Override
-  public boolean isUseAlias() {
-    return useAlias.getValue();
-  }
-
-  @Override
   public boolean isWithVariables() {
     return true;
-  }
-
-  @Override
-  public boolean isUnitId() {
-    return unitId.getValue();
   }
 
   @Override
@@ -245,27 +135,6 @@ public class DataExportView extends ModalViewImpl implements DataExportPresenter
   }
 
   @Override
-  public void addTableSelections(JsArray<TableDto> tables) {
-    tableChooser.clear();
-    tableChooser.addTableSelections(tables);
-  }
-
-  @Override
-  public void selectTable(TableDto tableDto) {
-    tableChooser.selectTable(tableDto);
-  }
-
-  @Override
-  public void selectAllTables() {
-    tableChooser.selectAllTables();
-  }
-
-  @Override
-  public List<TableDto> getSelectedTables() {
-    return tableChooser.getSelectedTables();
-  }
-
-  @Override
   public String getFileFormat() {
     return fileFormat.getValue(fileFormat.getSelectedIndex());
   }
@@ -280,61 +149,22 @@ public class DataExportView extends ModalViewImpl implements DataExportPresenter
   }
 
   @Override
-  public void show() {
-    stepChain.reset();
-    super.show();
-  }
-
-  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
-  private void clearTablesStep() {
-    tablesStep.setVisible(true);
-    tableChooser.clear();
-  }
-
-  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
-  private void clearDestinationStep() {
-    fileFormat.setEnabled(true);
-    if(fileSelection != null) {
-      fileSelection.setEnabled(true);
-    }
-  }
-
-  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
-  private void clearUnitStep() {
-    opalId.setValue(true);
-    unitId.setValue(false);
-    units.setEnabled(false);
-  }
-
-  @Override
-  public HandlerRegistration addCancelClickHandler(ClickHandler handler) {
-    return dialog.addCancelClickHandler(handler);
-  }
-
-  @Override
-  public HandlerRegistration addCloseClickHandler(ClickHandler handler) {
-    return dialog.addCloseClickHandler(handler);
-  }
-
-  @Override
-  public void setTablesValidator(ValidationHandler handler) {
-    tablesValidator = handler;
-  }
-
-  @Override
   public void setDestinationValidator(ValidationHandler handler) {
     destinationValidator = handler;
   }
 
   @Override
-  public void renderUnitSelection(boolean identifierEntityTable) {
-    noUnitSelection.setVisible(!identifierEntityTable);
-    unitSelection.setVisible(identifierEntityTable && units.getItemCount() > 0);
-    noUnitLabel.setVisible(identifierEntityTable && units.getItemCount() == 0);
+  public void setUsername(String username) {
+    this.username = username;
   }
 
   @Override
-  public void setUsername(String username) {
-    this.username = username;
+  public Alert getExportNAlert() {
+    return exportNTable;
+  }
+
+  @Override
+  public void hideDialog() {
+    modal.hide();
   }
 }

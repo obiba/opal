@@ -9,7 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -21,11 +23,11 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.table.presenter.AddViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.table.presenter.AddViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
@@ -60,7 +62,10 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     implements DatasourceUiHandlers, DatasourceSelectionChangeEvent.Handler {
 
   private final ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider;
+
   private final ModalProvider<AddViewModalPresenter> createViewModalProvider;
+
+  private final ModalProvider<DataExportPresenter> dataExportModalProvider;
 
   private final Translations translations;
 
@@ -74,11 +79,13 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   @Inject
   public DatasourcePresenter(Display display, EventBus eventBus,
-      ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider, Translations translations,
-      ModalProvider<AddViewModalPresenter> createViewModalProvider) {
+      ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider,
+      ModalProvider<DataExportPresenter> dataExportModalProvider,
+      ModalProvider<AddViewModalPresenter> createViewModalProvider, Translations translations) {
     super(eventBus, display);
     this.translations = translations;
     this.tablePropertiesModalProvider = tablePropertiesModalProvider.setContainer(this);
+    this.dataExportModalProvider = dataExportModalProvider.setContainer(this);
     this.createViewModalProvider = createViewModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
@@ -135,7 +142,20 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   @Override
   public void onExportData() {
-    fireEvent(new WizardRequiredEvent(DataExportPresenter.WizardType, datasourceName));
+    DataExportPresenter export = dataExportModalProvider.get();
+    Set<TableDto> tables = new HashSet<TableDto>();
+
+    int selectedTablesSize = getView().getSelectedTables().size();
+    if(selectedTablesSize > 0) {
+      tables.addAll(getView().getSelectedTables());
+      export.setExportTables(tables, getView().getAllTables().size() == selectedTablesSize);
+    } else {
+      // Get all tables
+      tables.addAll(getView().getAllTables());
+      export.setExportTables(tables, true);
+    }
+
+    export.setDatasourceName(datasourceName);
   }
 
   @Override
@@ -370,5 +390,9 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     HasAuthorization getCopyDataAuthorizer();
 
     HasAuthorization getExcelDownloadAuthorizer();
+
+    List<TableDto> getSelectedTables();
+
+    List<TableDto> getAllTables();
   }
 }
