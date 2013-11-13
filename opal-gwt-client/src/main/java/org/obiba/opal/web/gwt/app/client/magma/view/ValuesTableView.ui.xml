@@ -1,8 +1,8 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
-    xmlns:c="urn:import:com.google.gwt.user.cellview.client"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -25,20 +25,20 @@
           <ui:msg description="Values Filter label">Values Filter</ui:msg>
         </b:ControlLabel>
         <b:Controls>
-          <b:DropdownButton text="VAR1: all">
-            <b:NavWidget>
-              <b:RadioButton name="radio">All</b:RadioButton>
+          <b:DropdownButton text="VAR1: All">
+            <b2:ListItem addStyleNames="controls">
+              <b:RadioButton name="radio" checked="true">All</b:RadioButton>
               <b:RadioButton name="radio">Empty</b:RadioButton>
               <b:RadioButton name="radio">Not empty</b:RadioButton>
-            </b:NavWidget>
+            </b2:ListItem>
             <b:Divider/>
-            <b:NavWidget>
+            <b2:ListItem addStyleNames="controls">
               <g:SimplePanel>
                 <o:Chooser>
-                  <g:item value="in">
+                  <g:item value="IN">
                     <ui:msg description="In label">In</ui:msg>
                   </g:item>
-                  <g:item value="not_in">
+                  <g:item value="NOT_IN">
                     <ui:msg description="Not in label">Not in</ui:msg>
                   </g:item>
                 </o:Chooser>
@@ -48,12 +48,12 @@
                 <g:item value="C2">C2 (22)</g:item>
                 <g:item value="C3">C3 (123)</g:item>
               </o:Chooser>
-            </b:NavWidget>
+            </b2:ListItem>
             <b:Divider/>
             <b:NavLink icon="REMOVE">Remove</b:NavLink>
           </b:DropdownButton>
           <b:Typeahead ui:field="variableTypeahead">
-            <b:TextBox placeholder="search for a variable..."/>
+            <b:TextBox placeholder="more variable criteria..."/>
           </b:Typeahead>
         </b:Controls>
         <b:HelpBlock>

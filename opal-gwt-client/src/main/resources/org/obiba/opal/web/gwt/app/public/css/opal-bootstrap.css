@@ -87,3 +87,7 @@ a:hover {
 .controls .btn-group {
   margin-bottom: 10px;
 }
+
+.dropdown-menu > li.controls {
+  padding: 3px 20px;
+}
