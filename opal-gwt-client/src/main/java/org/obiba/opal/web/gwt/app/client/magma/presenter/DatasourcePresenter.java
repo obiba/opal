@@ -67,6 +67,8 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   private final ModalProvider<DataExportPresenter> dataExportModalProvider;
 
+  private final ModalProvider<DataCopyPresenter> dataCopyModalProvider;
+
   private final Translations translations;
 
   private String datasourceName;
@@ -81,12 +83,14 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
   public DatasourcePresenter(Display display, EventBus eventBus,
       ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider,
       ModalProvider<DataExportPresenter> dataExportModalProvider,
-      ModalProvider<AddViewModalPresenter> createViewModalProvider, Translations translations) {
+      ModalProvider<AddViewModalPresenter> createViewModalProvider,
+      ModalProvider<DataCopyPresenter> dataCopyModalProvider, Translations translations) {
     super(eventBus, display);
     this.translations = translations;
     this.tablePropertiesModalProvider = tablePropertiesModalProvider.setContainer(this);
     this.dataExportModalProvider = dataExportModalProvider.setContainer(this);
     this.createViewModalProvider = createViewModalProvider.setContainer(this);
+    this.dataCopyModalProvider = dataCopyModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -160,7 +164,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   @Override
   public void onCopyData() {
-    fireEvent(new WizardRequiredEvent(DataCopyPresenter.WizardType, datasourceName));
+    DataCopyPresenter copy = dataCopyModalProvider.get();
   }
 
   @Override

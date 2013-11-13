@@ -29,7 +29,7 @@
           <ui:msg description="Export data label">Export data</ui:msg>
         </b:NavLink>
         <b:NavLink icon="COPY" ui:field="copyData">
-          <ui:msg description="Copy data label">Copy data...</ui:msg>
+          <ui:msg description="Copy data label">Copy data</ui:msg>
         </b:NavLink>
       </b:DropdownButton>
       <b:DropdownButton text="Download" icon="DOWNLOAD" ui:field="downloadBtn" addStyleNames="pull-right">
@@ -111,7 +111,7 @@
                   <g:FlowPanel addStyleNames="indent">
                     <b2:IconAnchor icon="PLUS_SIGN" ui:field="copyVariables"
                         addStyleNames="inline xsmall-indent">
-                      <ui:msg description="Add to variables to view... label">Add variables to view...</ui:msg>
+                      <ui:msg description="Add to variables to view label">Add variables to view</ui:msg>
                     </b2:IconAnchor>
                     <b2:IconAnchor icon="TRASH" ui:field="deleteVariables" addStyleNames="inline xsmall-indent">
                       <ui:msg description="Delete label">Delete</ui:msg>

@@ -6,51 +6,43 @@
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <o:WizardModalBox ui:field="dialog" title="Copy Data">
+  <o:Modal ui:field="modal" resizable="false" closeVisible="true" keyboard="true" animation="false">
+
+    <b:Alert ui:field="copyNTable" close="false" visible="true" type="INFO"/>
+
     <g:FlowPanel>
-
-      <o:WizardStep ui:field="tablesStep">
-        <g:FlowPanel addStyleNames="full-width">
-          <o:TableChooser ui:field="tableChooser"/>
-        </g:FlowPanel>
-      </o:WizardStep>
-
-      <o:WizardStep ui:field="destinationStep">
-        <g:FlowPanel>
-          <g:FlowPanel styleName="input">
-            <g:Label addStyleNames="key">
-              <ui:msg description="Destination field">Destination</ui:msg>
-            </g:Label>
-            <o:Chooser ui:field="datasources"/>
-          </g:FlowPanel>
-          <g:FlowPanel styleName="input">
-            <g:Label addStyleNames="key">
-              <ui:msg description="Options title">Options</ui:msg>
-            </g:Label>
-            <b:CheckBox ui:field="incremental" addStyleNames="block">
-              <ui:msg description="Incremental checkbox label">incremental</ui:msg>
-            </b:CheckBox>
-            <b:CheckBox ui:field="copyNullValues" addStyleNames="block">
-              <ui:msg description="Incremental checkbox label">copy null values</ui:msg>
-            </b:CheckBox>
-            <b:CheckBox ui:field="useAlias" addStyleNames="block">
-              <ui:msg description="Use alias to rename variable checkbox label">use 'alias' attribute to rename
-                variables
-              </ui:msg>
-            </b:CheckBox>
-          </g:FlowPanel>
-        </g:FlowPanel>
-      </o:WizardStep>
-
-      <o:WizardStep ui:field="conclusionStep">
-        <b:Paragraph>
-          <ui:msg description="Data copy job">The data copy process can be followed using the Job ID:</ui:msg>
-        </b:Paragraph>
-        <g:Anchor ui:field="jobLink" addStyleNames="large-indent">Job ID</g:Anchor>
-      </o:WizardStep>
-
+      <g:FlowPanel styleName="input">
+        <g:Label addStyleNames="key">
+          <ui:msg description="Destination field">Destination</ui:msg>
+        </g:Label>
+        <o:Chooser ui:field="datasources"/>
+      </g:FlowPanel>
+      <g:FlowPanel styleName="input">
+        <g:Label addStyleNames="key">
+          <ui:msg description="Options title">Options</ui:msg>
+        </g:Label>
+        <b:CheckBox ui:field="incremental" addStyleNames="block">
+          <ui:msg description="Incremental checkbox label">incremental</ui:msg>
+        </b:CheckBox>
+        <b:CheckBox ui:field="copyNullValues" addStyleNames="block">
+          <ui:msg description="Incremental checkbox label">copy null values</ui:msg>
+        </b:CheckBox>
+        <b:CheckBox ui:field="useAlias" addStyleNames="block">
+          <ui:msg description="Use alias to rename variable checkbox label">use 'alias' attribute to rename
+            variables
+          </ui:msg>
+        </b:CheckBox>
+      </g:FlowPanel>
     </g:FlowPanel>
 
-  </o:WizardModalBox>
+    <b:ModalFooter>
+      <b:Button ui:field="submitButton" type="PRIMARY">
+        <ui:msg description="Submit button label">Submit</ui:msg>
+      </b:Button>
+      <b:Button ui:field="cancelButton">
+        <ui:msg description="Cancel button label">Cancel</ui:msg>
+      </b:Button>
+    </b:ModalFooter>
+  </o:Modal>
 
 </ui:UiBinder>

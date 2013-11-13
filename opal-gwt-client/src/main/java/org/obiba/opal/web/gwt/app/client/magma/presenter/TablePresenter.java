@@ -38,7 +38,6 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -110,6 +109,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final ModalProvider<DataExportPresenter> dataExportModalProvider;
 
+  private final ModalProvider<DataCopyPresenter> dataCopyModalProvider;
+
   @Inject
   private CodingViewModalPresenter codingViewModalPresenter;
 
@@ -138,7 +139,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider,
       ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider,
       ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider,
-      ModalProvider<DataExportPresenter> dataExportModalProvider, Translations translations) {
+      ModalProvider<DataExportPresenter> dataExportModalProvider,
+      ModalProvider<DataCopyPresenter> dataCopyModalProvider, Translations translations) {
 
     super(eventBus, display);
     this.placeManager = placeManager;
@@ -152,6 +154,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     this.tablePropertiesModalProvider = tablePropertiesModalProvider.setContainer(this);
     this.viewPropertiesModalProvider = viewPropertiesModalProvider.setContainer(this);
     this.dataExportModalProvider = dataExportModalProvider.setContainer(this);
+    this.dataCopyModalProvider = dataCopyModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -362,7 +365,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onCopyData() {
-    fireEvent(new WizardRequiredEvent(DataCopyPresenter.WizardType, table));
+    DataCopyPresenter copy = dataCopyModalProvider.get();
   }
 
   @Override

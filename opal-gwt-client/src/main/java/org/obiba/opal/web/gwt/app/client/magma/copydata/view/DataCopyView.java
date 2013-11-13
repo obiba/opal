@@ -12,59 +12,37 @@ package org.obiba.opal.web.gwt.app.client.magma.copydata.view;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.ui.WizardModalBox;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepChain;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyPresenter;
-import org.obiba.opal.web.gwt.app.client.ui.ModalViewImpl;
-import org.obiba.opal.web.gwt.app.client.ui.TableChooser;
-import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
+import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
-import org.obiba.opal.web.model.client.magma.TableDto;
 
+import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.Modal;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Anchor;
-import com.github.gwtbootstrap.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 
 /**
  * View of the dialog used to export data from Opal.
  */
-public class DataCopyView extends ModalViewImpl implements DataCopyPresenter.Display {
+public class DataCopyView extends ModalPopupViewWithUiHandlers<DataCopyUiHandlers>
+    implements DataCopyPresenter.Display {
 
   private final Translations translations;
 
+  @UiTemplate("DataCopyView.ui.xml")
   interface Binder extends UiBinder<Widget, DataCopyView> {}
 
   @UiField
-  WizardModalBox dialog;
-
-  @UiField
-  WizardStep tablesStep;
-
-  @UiField
-  WizardStep destinationStep;
-
-  @UiField
-  WizardStep conclusionStep;
-
-  @UiField
-  Anchor jobLink;
-
-  @UiField(provided = true)
-  final TableChooser tableChooser;
+  Modal modal;
 
   @UiField
   ListBox datasources;
@@ -75,75 +53,21 @@ public class DataCopyView extends ModalViewImpl implements DataCopyPresenter.Dis
   @UiField
   CheckBox copyNullValues;
 
-  @UiField
-  CheckBox useAlias;
-
-  private ValidationHandler tablesValidator;
-
   private ValidationHandler destinationValidator;
-
-  private WizardStepChain stepChain;
 
   @Inject
   public DataCopyView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
     this.translations = translations;
-    tableChooser = new TableChooser(true);
+
     initWidget(uiBinder.createAndBindUi(this));
-    initWizardDialog();
+
+    modal.setTitle(translations.copyData());
   }
 
-  private void initWizardDialog() {
-    stepChain = WizardStepChain.Builder.create(dialog)//
-        .append(tablesStep)//
-        .title(translations.dataCopyInstructions())//
-        .onValidate(new ValidationHandler() {
-
-          @Override
-          public boolean validate() {
-            return tablesValidator.validate();
-          }
-        })//
-        .onReset(new ResetHandler() {
-
-          @Override
-          public void onReset() {
-            clearTablesStep();
-          }
-
-          private void clearTablesStep() {
-            tablesStep.setVisible(true);
-            tableChooser.clear();
-          }
-
-        })//
-        .append(destinationStep)//
-        .title(translations.dataCopyDestination())//
-        .onValidate(new ValidationHandler() {
-
-          @Override
-          public boolean validate() {
-            return destinationValidator.validate();
-          }
-        })//
-        .onReset(new ResetHandler() {
-
-          @Override
-          public void onReset() {
-            clearDestinationStep();
-          }
-
-          private void clearDestinationStep() {
-            // TODO datasources
-            datasources.setSelectedIndex(0);
-            incremental.setValue(true);
-          }
-        })//
-        .append(conclusionStep)//
-        .title(translations.dataCopyPendingConclusion())//
-        .conclusion()//
-
-        .onNext().onPrevious().build();
+  @UiHandler("cancelButton")
+  public void onCancel(ClickEvent event) {
+    getUiHandlers().cancel();
   }
 
   @Override
@@ -162,22 +86,6 @@ public class DataCopyView extends ModalViewImpl implements DataCopyPresenter.Dis
   }
 
   @Override
-  public HandlerRegistration addFinishClickHandler(final ClickHandler submitHandler) {
-    return dialog.addFinishClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent evt) {
-        submitHandler.onClick(evt);
-      }
-    });
-  }
-
-  @Override
-  public HandlerRegistration addJobLinkClickHandler(ClickHandler handler) {
-    return jobLink.addClickHandler(handler);
-  }
-
-  @Override
   public boolean isIncremental() {
     return incremental.getValue();
   }
@@ -193,81 +101,13 @@ public class DataCopyView extends ModalViewImpl implements DataCopyPresenter.Dis
   }
 
   @Override
-  public void renderPendingConclusion() {
-    conclusionStep.setStepTitle(translations.dataCopyPendingConclusion());
-    jobLink.setText("");
-    dialog.setProgress(true);
-    stepChain.onNext();
-    dialog.setCancelEnabled(false);
-    dialog.setPreviousEnabled(false);
-    dialog.setFinishEnabled(false);
-  }
-
-  @Override
-  public void renderCompletedConclusion(String jobId) {
-    dialog.setProgress(false);
-    conclusionStep.setStepTitle(translations.dataCopyCompletedConclusion());
-    jobLink.setText(translations.jobLabel() + " #" + jobId);
-    dialog.setFinishEnabled(true);
-  }
-
-  @Override
-  public void renderFailedConclusion() {
-    dialog.setProgress(false);
-    conclusionStep.setStepTitle(translations.dataCopyFailedConclusion());
-    dialog.setCancelEnabled(true);
-    dialog.setPreviousEnabled(true);
-  }
-
-  @Override
-  public void show() {
-    stepChain.reset();
-    super.show();
-  }
-
-  @Override
-  public HandlerRegistration addCancelClickHandler(ClickHandler handler) {
-    return dialog.addCancelClickHandler(handler);
-  }
-
-  @Override
-  public HandlerRegistration addCloseClickHandler(ClickHandler handler) {
-    return dialog.addCloseClickHandler(handler);
-  }
-
-  @Override
-  public void setTablesValidator(ValidationHandler handler) {
-    tablesValidator = handler;
-  }
-
-  @Override
   public void setDestinationValidator(ValidationHandler handler) {
     destinationValidator = handler;
   }
 
   @Override
-  public boolean isUseAlias() {
-    return useAlias.getValue();
-  }
-
-  @Override
-  public void addTableSelections(JsArray<TableDto> tables) {
-    tableChooser.addTableSelections(tables);
-  }
-
-  @Override
-  public void selectTable(TableDto table) {
-    tableChooser.selectTable(table);
-  }
-
-  @Override
-  public void selectAllTables() {
-    tableChooser.selectAllTables();
-  }
-
-  @Override
-  public List<TableDto> getSelectedTables() {
-    return tableChooser.getSelectedTables();
+  public void hideDialog() {
+    modal.hide();
   }
 
 }
