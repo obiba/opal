@@ -1,31 +1,45 @@
-/*******************************************************************************
- * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
+/*
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ */
+
 package org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import javax.annotation.Nullable;
+
+import org.obiba.opal.web.gwt.app.client.event.ModalClosedEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.support.LanguageLocale;
-import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
-import org.obiba.opal.web.gwt.app.client.presenter.CharacterSetDisplay;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.createdatasource.presenter.DatasourceCreatedCallback;
+import org.obiba.opal.web.gwt.app.client.magma.importvariables.support.DatasourceFileType;
+import org.obiba.opal.web.gwt.app.client.presenter.CharacterSetDisplay;
+import org.obiba.opal.web.gwt.app.client.support.DatasourceParsingErrorDtos;
+import org.obiba.opal.web.gwt.app.client.support.LanguageLocale;
+import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardProxy;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardView;
-import org.obiba.opal.web.gwt.app.client.magma.createdatasource.presenter.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
-import org.obiba.opal.web.gwt.app.client.magma.importvariables.support.DatasourceFileType;
+import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
+import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -40,26 +54,31 @@ import org.obiba.opal.web.model.client.magma.StaticDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 
 import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
 import static com.google.gwt.http.client.Response.SC_CREATED;
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
 
-public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImportPresenter.Display> {
+public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImportPresenter.Display>
+    implements VariablesImportUiHandlers {
 
   public static final WizardType WIZARD_TYPE = new WizardType();
+
+  private ViewValidator viewValidaror;
 
   public static class Wizard extends WizardProxy<VariablesImportPresenter> {
 
@@ -89,6 +108,12 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     this.comparedDatasourcesReportPresenter = comparedDatasourcesReportPresenter;
     this.conclusionPresenter = conclusionPresenter;
     this.fileSelectionPresenter = fileSelectionPresenter;
+    init();
+  }
+
+  private void init() {
+    getView().setUiHandlers(this);
+    viewValidaror = new ViewValidator();
     setDefaultCharset();
 
     getEventBus().addHandler(FileSelectionUpdatedEvent.getType(), new FileSelectionUpdatedEvent.Handler() {
@@ -98,6 +123,24 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
         getView().showSpssSpecificPanel(DatasourceFileType.isSpssFile(selectedFile));
       }
     });
+  }
+
+  @Override
+  public void onModalHidden() {
+    getEventBus().fireEventFromSource(new ModalClosedEvent(this), this);
+  }
+
+  @Override
+  public void selectVariableFile() {
+    getView().clearErrors();
+    if (!viewValidaror.validate()) return;
+    createTransientDatasource();
+    getView().gotoPreview();
+  }
+
+  @Override
+  public void downExcelTemplate() {
+    getEventBus().fireEvent(new FileDownloadRequestEvent("/templates" + EXCEL_TEMPLATE));
   }
 
   @Override
@@ -122,11 +165,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   }
 
   protected void addEventHandlers() {
-    registerHandler(getView().addDownloadExcelTemplateClickHandler(new DownloadExcelTemplateClickHandler()));
-    registerHandler(getView().addFileSelectedClickHandler(new FileSelectedHandler()));
-    getView().setFileSelectionValidator(new FileSelectionValidator());
     getView().setImportableValidator(new ImportableValidator());
-    getView().setLocaleValidator(new LocaleValidator());
   }
 
   @Override
@@ -177,59 +216,63 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     }
   }
 
-  private final class FileSelectionValidator implements ValidationHandler {
+  private final class FileSelectionValidator extends AbstractFieldValidator {
+
+    FileSelectionValidator(String id) {
+      super("InvalidFileType", id);
+    }
+
     @Override
-    public boolean validate() {
-      String selectedFile = getView().getSelectedFile();
-
-      if(selectedFile.isEmpty()) {
-        return false;
-      }
-
-      if(DatasourceFileType.INVALID != DatasourceFileType.getFileType(getView().getSelectedFile())) {
-        return true;
-      }
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error("InvalidFileType").build());
-      return false;
+    protected boolean hasError() {
+      return DatasourceFileType.INVALID == DatasourceFileType.getFileType(getView().getSelectedFile());
     }
   }
 
-  private final class LocaleValidator implements ValidationHandler {
-    @Override
-    public boolean validate() {
-      String selectedLocale = getView().getLocale();
-      if(!LanguageLocale.isValid(selectedLocale)) {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error("InvalidLocaleName").args(selectedLocale).build());
-        return false;
-      }
+  private final class LocaleValidator extends AbstractFieldValidator {
 
-      return true;
+    LocaleValidator(String id) {
+      super("InvalidLocaleName", id);
+    }
+
+    @Override
+    public boolean hasError() {
+      String localeName = getView().getLocale();
+      setArgs(Arrays.asList(localeName));
+      return !LanguageLocale.isValid(localeName);
     }
   }
 
-  public interface Display extends WizardView, CharacterSetDisplay {
+  public interface Display extends WizardView, CharacterSetDisplay, HasUiHandlers<VariablesImportUiHandlers> {
+
+
+    enum FormField {
+      FIEL_SELECTION,
+      LOCALE
+    }
+
+    void gotoPreview();
+
+    void enableCompletion();
+
+    void disableCompletion();
 
     void setFileSelectionDisplay(FileSelectionPresenter.Display display);
 
-    void setFileSelectionValidator(ValidationHandler handler);
-
     void setImportableValidator(ValidationHandler handler);
-
-    void setLocaleValidator(ValidationHandler handler);
 
     void setComparedDatasourcesReportDisplay(ComparedDatasourcesReportStepPresenter.Display display);
 
     void showSpssSpecificPanel(boolean show);
 
-    HandlerRegistration addDownloadExcelTemplateClickHandler(ClickHandler handler);
-
-    HandlerRegistration addFileSelectedClickHandler(ClickHandler handler);
+    HasText getSelectedFileText();
 
     String getSelectedFile();
 
-    DatasourceCreatedCallback getDatasourceCreatedCallback();
+    void clearErrors();
 
     void hideErrors();
+
+    void showError(@Nullable FormField formField, String message);
 
     HasText getSpssEntityType();
 
@@ -239,114 +282,153 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
 
   }
 
-  class DownloadExcelTemplateClickHandler implements ClickHandler {
+  class ViewValidator extends ViewValidationHandler {
+    @Override
+    protected Set<FieldValidator> getValidators() {
+      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+
+      validators.add(new LocaleValidator(Display.FormField.LOCALE.name()));
+
+      validators.add(new RequiredTextValidator(getView().getSelectedFileText(), "ViewNameRequired",
+          Display.FormField.FIEL_SELECTION.name()));
+      validators.add(new FileSelectionValidator(Display.FormField.FIEL_SELECTION.name()));
+
+
+      return validators;
+    }
 
     @Override
-    public void onClick(ClickEvent event) {
-      getEventBus().fireEvent(new FileDownloadRequestEvent("/templates" + EXCEL_TEMPLATE));
+    protected void showMessage(String id, String message) {
+      getView().showError(Display.FormField.valueOf(id), message);
     }
   }
 
-  class FileSelectedHandler implements ClickHandler {
+  private void createTransientDatasource() {
+    final DatasourceFactoryDto factory = createDatasourceFactoryDto(getView().getSelectedFile());
+    ResponseCodeCallback errorCallback = new TransientDatasourceFailureCallback(factory);
+
+    ResourceRequestBuilderFactory.<DatasourceDto>newBuilder() //
+        .forResource("/transient-datasources") //
+        .post() //
+        .withResourceBody(DatasourceFactoryDto.stringify(factory)) //
+        .withCallback(new TransientDatasourceSuccessCallback(factory)) //
+        .withCallback(SC_BAD_REQUEST, errorCallback) //
+        .withCallback(SC_INTERNAL_SERVER_ERROR, errorCallback).send();
+  }
+
+  class TransientDatasourceSuccessCallback implements ResourceCallback<DatasourceDto> {
+
+    private final DatasourceFactoryDto factory;
+
+    TransientDatasourceSuccessCallback(DatasourceFactoryDto factory) {
+      this.factory = factory;
+    }
 
     @Override
-    public void onClick(ClickEvent arg0) {
-      getView().hideErrors();
-
-      final DatasourceFactoryDto factory = createDatasourceFactoryDto(getView().getSelectedFile());
-
-      ResourceCallback<DatasourceDto> callback = new ResourceCallback<DatasourceDto>() {
-
-        @Override
-        public void onResource(Response response, DatasourceDto resource) {
-          if(response.getStatusCode() == SC_CREATED) {
-            comparedDatasourcesReportPresenter.compare(resource.getName(), datasourceName,
-                getView().getDatasourceCreatedCallback(), factory, resource);
-          }
-        }
-      };
-
-      ResponseCodeCallback errorCallback = new ResponseCodeCallback() {
-
-        @Override
-        public void onResponseCode(Request request, Response response) {
-          ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
-
-          if(errorDto.getExtension(ClientErrorDtoExtensions.errors) == null) {
-            getEventBus().fireEvent(NotificationEvent.newBuilder().error("fileReadError").build());
-          }
-          getView().getDatasourceCreatedCallback().onFailure(factory, errorDto);
-        }
-      };
-
-      ResourceRequestBuilderFactory.<DatasourceDto>newBuilder() //
-          .forResource("/transient-datasources") //
-          .post() //
-          .withResourceBody(DatasourceFactoryDto.stringify(factory)) //
-          .withCallback(callback) //
-          .withCallback(SC_BAD_REQUEST, errorCallback) //
-          .withCallback(SC_INTERNAL_SERVER_ERROR, errorCallback).send();
+    public void onResource(Response response, DatasourceDto resource) {
+      if(response.getStatusCode() == SC_CREATED) {
+        comparedDatasourcesReportPresenter.compare(resource.getName(), datasourceName,
+            new DatasourceComparisonSuccessCallback(), factory, resource);
+      }
     }
 
-    private DatasourceFactoryDto createDatasourceFactoryDto(String tmpFilePath) {
-      DatasourceFileType type = DatasourceFileType.getFileType(tmpFilePath);
+    class DatasourceComparisonSuccessCallback implements DatasourceCreatedCallback {
 
-      switch(type) {
-        case XLS:
-        case XLSX:
-          return createExcelDatasourceFactoryDto(tmpFilePath);
-
-        case SAV:
-          return createSpssDatasourceFactoryDto(tmpFilePath);
+      @Override
+      public void onSuccess(DatasourceFactoryDto factory, DatasourceDto datasource) {
+        getView().enableCompletion();
       }
 
-      return createStaticDatasourceFactoryDto(tmpFilePath);
+      @Override
+      public void onFailure(DatasourceFactoryDto factory, ClientErrorDto errorDto) {
+        // show client error
+        Collection<String> errors = DatasourceParsingErrorDtos.getErrors(errorDto);
+        for (String error : errors) {
+          getView().showError(null, error);
+        }
+        getView().disableCompletion();
+      }
     }
 
-    private DatasourceFactoryDto createExcelDatasourceFactoryDto(String tmpFilePath) {
-      ExcelDatasourceFactoryDto excelDto = ExcelDatasourceFactoryDto.create();
-      excelDto.setFile(tmpFilePath);
-      excelDto.setReadOnly(true);
+  }
 
-      DatasourceFactoryDto dto = DatasourceFactoryDto.create();
-      dto.setExtension(ExcelDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, excelDto);
+  class TransientDatasourceFailureCallback implements ResponseCodeCallback {
+    private final DatasourceFactoryDto factory;
 
-      return dto;
+    TransientDatasourceFailureCallback(DatasourceFactoryDto factory) {
+      this.factory = factory;
     }
 
-    private DatasourceFactoryDto createSpssDatasourceFactoryDto(String tmpFilePath) {
-      SpssDatasourceFactoryDto spssDto = SpssDatasourceFactoryDto.create();
-      spssDto.setFile(tmpFilePath);
-      spssDto.setCharacterSet(getView().getCharsetText().getText());
-      spssDto.setEntityType(getView().getSpssEntityType().getText());
-      spssDto.setLocale(getView().getLocale());
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
 
-      DatasourceFactoryDto dto = DatasourceFactoryDto.create();
-      dto.setExtension(SpssDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, spssDto);
+      Collection<String> errors = DatasourceParsingErrorDtos.getErrors(errorDto);
+      for (String error : errors) {
+        getView().showError(null, error);
+      }
+      getView().disableCompletion();
+    }
+  };
 
-      return dto;
+  private DatasourceFactoryDto createDatasourceFactoryDto(String tmpFilePath) {
+    DatasourceFileType type = DatasourceFileType.getFileType(tmpFilePath);
+
+    switch(type) {
+      case XLS:
+      case XLSX:
+        return createExcelDatasourceFactoryDto(tmpFilePath);
+
+      case SAV:
+        return createSpssDatasourceFactoryDto(tmpFilePath);
     }
 
-    private DatasourceFactoryDto createStaticDatasourceFactoryDto(String tmpFilePath) {
-      StaticDatasourceFactoryDto staticDto = StaticDatasourceFactoryDto.create();
-      ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder();
-      String name = tmpFilePath.substring(tmpFilePath.lastIndexOf('/') + 1, tmpFilePath.lastIndexOf('.'));
-      viewDtoBuilder.setName(name);
+    return createStaticDatasourceFactoryDto(tmpFilePath);
+  }
 
-      FileViewDto fileView = FileViewDto.create();
-      fileView.setFilename(tmpFilePath);
-      fileView.setType(FileViewType.SERIALIZED_XML);
+  private DatasourceFactoryDto createExcelDatasourceFactoryDto(String tmpFilePath) {
+    ExcelDatasourceFactoryDto excelDto = ExcelDatasourceFactoryDto.create();
+    excelDto.setFile(tmpFilePath);
+    excelDto.setReadOnly(true);
 
-      viewDtoBuilder.fileView(fileView);
-      JsArray<ViewDto> views = JsArrays.create();
-      views.push(viewDtoBuilder.build());
-      staticDto.setViewsArray(views);
+    DatasourceFactoryDto dto = DatasourceFactoryDto.create();
+    dto.setExtension(ExcelDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, excelDto);
 
-      DatasourceFactoryDto dto = DatasourceFactoryDto.create();
-      dto.setExtension(StaticDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, staticDto);
+    return dto;
+  }
 
-      return dto;
-    }
+  private DatasourceFactoryDto createSpssDatasourceFactoryDto(String tmpFilePath) {
+    SpssDatasourceFactoryDto spssDto = SpssDatasourceFactoryDto.create();
+    spssDto.setFile(tmpFilePath);
+    spssDto.setCharacterSet(getView().getCharsetText().getText());
+    spssDto.setEntityType(getView().getSpssEntityType().getText());
+    spssDto.setLocale(getView().getLocale());
+
+    DatasourceFactoryDto dto = DatasourceFactoryDto.create();
+    dto.setExtension(SpssDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, spssDto);
+
+    return dto;
+  }
+
+  private DatasourceFactoryDto createStaticDatasourceFactoryDto(String tmpFilePath) {
+    StaticDatasourceFactoryDto staticDto = StaticDatasourceFactoryDto.create();
+    ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder();
+    String name = tmpFilePath.substring(tmpFilePath.lastIndexOf('/') + 1, tmpFilePath.lastIndexOf('.'));
+    viewDtoBuilder.setName(name);
+
+    FileViewDto fileView = FileViewDto.create();
+    fileView.setFilename(tmpFilePath);
+    fileView.setType(FileViewType.SERIALIZED_XML);
+
+    viewDtoBuilder.fileView(fileView);
+    JsArray<ViewDto> views = JsArrays.create();
+    views.push(viewDtoBuilder.build());
+    staticDto.setViewsArray(views);
+
+    DatasourceFactoryDto dto = DatasourceFactoryDto.create();
+    dto.setExtension(StaticDatasourceFactoryDto.DatasourceFactoryDtoExtensions.params, staticDto);
+
+    return dto;
   }
 
 }

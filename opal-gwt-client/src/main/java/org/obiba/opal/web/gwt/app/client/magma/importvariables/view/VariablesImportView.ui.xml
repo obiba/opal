@@ -19,23 +19,24 @@
           </b:Button>
         </b:Paragraph>
 
-        <b:ControlGroup>
+        <b:ControlGroup ui:field="fileSelectionGroup">
           <b:ControlLabel>
             <ui:msg description="Variables File label">Variables File</ui:msg>
           </b:ControlLabel>
-          <g:SimplePanel ui:field="fileSelectionPanel"/>
+          <o:OpalSimplePanel ui:field="fileSelectionPanel" o:id="fileSelectionPanel"/>
           <b:HelpBlock>
             <ui:msg description="Supported file formats">Valid file extensions: xls, xlsx and sav</ui:msg>
           </b:HelpBlock>
         </b:ControlGroup>
 
         <o:CollapsiblePanel ui:field="options">
-          <g:FlowPanel>
-            <g:Label>
+          <b:ControlGroup ui:field="localeGroup">
+            <b:ControlLabel>
               <ui:msg description="Spss Entity type">Label Locale</ui:msg>
-            </g:Label>
-            <o:DropdownSuggestBox ui:field="localeNameBox"/>
-          </g:FlowPanel>
+            </b:ControlLabel>
+            <o:DropdownSuggestBox ui:field="localeNameBox" o:id="localeNameBox"/>
+          </b:ControlGroup>
+
           <g:FlowPanel>
             <g:Label>
               <ui:msg description="Character set label">Character Set</ui:msg>

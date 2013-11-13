@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.importvariables.view;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -16,33 +18,33 @@ import org.obiba.opal.web.gwt.app.client.magma.createdatasource.presenter.Dataso
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.ConclusionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportUiHandlers;
 import org.obiba.opal.web.gwt.app.client.support.LanguageLocale;
 import org.obiba.opal.web.gwt.app.client.ui.CharacterSetView;
 import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
 import org.obiba.opal.web.gwt.app.client.ui.DatasourceParsingErrorPanel;
 import org.obiba.opal.web.gwt.app.client.ui.DropdownSuggestBox;
-import org.obiba.opal.web.gwt.app.client.ui.ModalViewImpl;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.WizardModalBox;
 import org.obiba.opal.web.gwt.app.client.ui.WizardStep;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepChain;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.ResetHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
-import org.obiba.opal.web.model.client.magma.DatasourceDto;
-import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.Modal;
 import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -50,7 +52,8 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
-public class VariablesImportView extends ModalViewImpl implements VariablesImportPresenter.Display {
+public class VariablesImportView extends ModalPopupViewWithUiHandlers<VariablesImportUiHandlers>
+    implements VariablesImportPresenter.Display {
 
   private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
 
@@ -71,10 +74,10 @@ public class VariablesImportView extends ModalViewImpl implements VariablesImpor
   WizardStep conclusionStep;
 
   @UiField
-  SimplePanel fileSelectionPanel;
+  ControlGroup fileSelectionGroup;
 
   @UiField
-  Button downloadExcelTemplateButton;
+  SimplePanel fileSelectionPanel;
 
   @UiField
   Paragraph failed;
@@ -92,21 +95,18 @@ public class VariablesImportView extends ModalViewImpl implements VariablesImpor
   TextBox spssEntityType;
 
   @UiField
+  ControlGroup localeGroup;
+
+  @UiField
   DropdownSuggestBox localeNameBox;
 
   private FileSelectionPresenter.Display fileSelection;
 
   private WizardStepChain stepChain;
 
-  private DatasourceCreatedCallback datasourceCreatedCallback;
-
   private ComparedDatasourcesReportStepPresenter.Display compareDisplay;
 
-  private ValidationHandler fileSelectionValidator;
-
   private ValidationHandler importableValidator;
-
-  private ValidationHandler localeValidator;
 
   @Inject
   public VariablesImportView(EventBus eventBus) {
@@ -114,6 +114,17 @@ public class VariablesImportView extends ModalViewImpl implements VariablesImpor
     widget = uiBinder.createAndBindUi(this);
     initWizardDialog();
     initializeLocales();
+    initDialogEventHandlers();
+  }
+
+  private void initDialogEventHandlers() {
+    dialog.addNextClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent evt) {
+        getUiHandlers().selectVariableFile();
+      }
+    });
   }
 
   private void initWizardDialog() {
@@ -158,15 +169,36 @@ public class VariablesImportView extends ModalViewImpl implements VariablesImpor
     localeNameBox.setText(LanguageLocale.EN.getName());
   }
 
-  @Override
-  public HandlerRegistration addDownloadExcelTemplateClickHandler(ClickHandler handler) {
-    return downloadExcelTemplateButton.addClickHandler(handler);
+  @UiHandler("downloadExcelTemplateButton")
+  public void onDownloadExcelTemplateClicked(ClickEvent event) {
+    getUiHandlers().downExcelTemplate();
   }
 
   @Override
   public void show() {
     stepChain.reset();
     super.show();
+  }
+
+  @Override
+  public void gotoPreview() {
+    dialog.setProgress(true);
+    dialog.setNextEnabled(false);
+    dialog.setCancelEnabled(false);
+  }
+
+  @Override
+  public void enableCompletion() {
+    dialog.setCancelEnabled(true);
+    dialog.setProgress(false);
+    stepChain.onNext();
+  }
+
+  @Override
+  public void disableCompletion() {
+    dialog.setProgress(false);
+    dialog.setNextEnabled(true);
+    dialog.setCancelEnabled(true);
   }
 
   @Override
@@ -177,28 +209,13 @@ public class VariablesImportView extends ModalViewImpl implements VariablesImpor
   }
 
   @Override
-  public String getSelectedFile() {
-    return fileSelection.getFile();
+  public HasText getSelectedFileText() {
+    return fileSelection.getFileText();
   }
 
   @Override
-  public HandlerRegistration addFileSelectedClickHandler(final ClickHandler handler) {
-    return dialog.addNextClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent evt) {
-        if(!localeValidator.validate()) return;
-
-        if(fileSelectionStep.isVisible()) {
-          if(fileSelectionValidator.validate()) {
-            handler.onClick(evt);
-            dialog.setProgress(true);
-            dialog.setNextEnabled(false);
-            dialog.setCancelEnabled(false);
-          }
-        } else stepChain.onNext();
-      }
-    });
+  public String getSelectedFile() {
+    return fileSelection.getFile();
   }
 
   @Override
@@ -227,24 +244,36 @@ public class VariablesImportView extends ModalViewImpl implements VariablesImpor
   }
 
   @Override
-  public void setFileSelectionValidator(ValidationHandler handler) {
-    fileSelectionValidator = handler;
-  }
-
-  @Override
-  public void setLocaleValidator(ValidationHandler handler) {
-    localeValidator = handler;
-  }
-
-  @Override
   public void setImportableValidator(ValidationHandler handler) {
     importableValidator = handler;
+  }
+
+  @Override
+  public void clearErrors() {
+    dialog.clearAlert();
   }
 
   @Override
   public void hideErrors() {
     failed.setVisible(false);
     datasourceParsingErrors.setVisible(false);
+  }
+
+  @Override
+  public void showError(@Nullable FormField formField, String message) {
+    ControlGroup group = null;
+    if(formField != null) {
+      switch(formField) {
+        case FIEL_SELECTION:
+          group = fileSelectionGroup;
+          break;
+      }
+    }
+    if(group == null) {
+      dialog.addAlert(message, AlertType.ERROR);
+    } else {
+      dialog.addAlert(message, AlertType.ERROR, group);
+    }
   }
 
   @Override
@@ -259,30 +288,6 @@ public class VariablesImportView extends ModalViewImpl implements VariablesImpor
     // conclusionDisplay = display;
     conclusionStep.removeStepContent();
     conclusionStep.add(display.asWidget());
-  }
-
-  @Override
-  public DatasourceCreatedCallback getDatasourceCreatedCallback() {
-    if(datasourceCreatedCallback == null) {
-      datasourceCreatedCallback = new DatasourceCreatedCallback() {
-
-        @Override
-        public void onSuccess(DatasourceFactoryDto factory, DatasourceDto datasource) {
-          dialog.setCancelEnabled(true);
-          dialog.setProgress(false);
-          stepChain.onNext();
-        }
-
-        @Override
-        public void onFailure(DatasourceFactoryDto factory, ClientErrorDto error) {
-          showErrors(error);
-          dialog.setProgress(false);
-          dialog.setNextEnabled(true);
-          dialog.setCancelEnabled(true);
-        }
-      };
-    }
-    return datasourceCreatedCallback;
   }
 
   @Override

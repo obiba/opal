@@ -205,7 +205,7 @@ public class AddViewModalPresenter extends ModalPresenterWidget<AddViewModalPres
 
     void showError(@Nullable FormField formField, String message);
 
-    void showError(String msg);
+    void showError(String messageKey);
   }
 
   private class CompletedCallback implements ResponseCodeCallback {
@@ -219,17 +219,18 @@ public class AddViewModalPresenter extends ModalPresenterWidget<AddViewModalPres
   private class FailedCallback implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      String msg = "CreateViewFailed";
+      getView().clearErrors();
+
       if(response.getText() != null && response.getText().length() != 0) {
         try {
           ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
-          msg = errorDto.getStatus();
+          getView().showError(null, errorDto.getStatus());
+          return;
         } catch(Exception ignored) {
         }
       }
 
-      getView().clearErrors();
-      getView().showError(msg);
+      getView().showError("CreateViewFailed");
     }
   }
 
