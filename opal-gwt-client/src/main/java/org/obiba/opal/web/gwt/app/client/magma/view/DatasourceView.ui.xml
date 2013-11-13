@@ -57,16 +57,22 @@
                 <b2:IconAnchor ui:field="selectAllAnchor" addStyleNames="inline xsmall-indent"/>
               </g:customCell>
               <g:customCell>
-                <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" visible="false"
-                    addStyleNames="inline xsmall-indent">
-                  <ui:msg description="Clear selection label">Clear selection</ui:msg>
-                </b2:IconAnchor>
-              </g:customCell>
-              <g:customCell>
-                <g:FlowPanel addStyleNames="indent">
+                <g:FlowPanel>
+
+                  <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE"
+                      addStyleNames="inline xsmall-indent">
+                    <ui:msg description="Clear selection label">Clear selection</ui:msg>
+                  </b2:IconAnchor>
+
+                  <b2:IconAnchor ui:field="exportSelectionAnchor" icon="SIGNOUT"
+                      addStyleNames="inline xsmall-indent">
+                    <ui:msg description="Export data label">Export data</ui:msg>
+                  </b2:IconAnchor>
+
                   <b2:IconAnchor icon="TRASH" ui:field="deleteTables" addStyleNames="inline xsmall-indent">
                     <ui:msg description="Delete label">Delete</ui:msg>
                   </b2:IconAnchor>
+
                 </g:FlowPanel>
               </g:customCell>
             </g:row>

@@ -154,6 +154,11 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     getUiHandlers().onDeleteTables(checkColumn.getSelectedItems());
   }
 
+  @UiHandler("exportSelectionAnchor")
+  void onExportSelection(ClickEvent event) {
+    getUiHandlers().onExportData();
+  }
+
   private void addTableColumns() {
     checkColumn = new CheckboxColumn<TableDto>(new DatasourceCheckStatusDisplay());
 
