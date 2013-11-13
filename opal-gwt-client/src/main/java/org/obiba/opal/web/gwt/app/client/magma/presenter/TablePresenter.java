@@ -10,7 +10,9 @@
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
@@ -106,6 +108,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider;
 
+  private final ModalProvider<DataExportPresenter> dataExportModalProvider;
+
   @Inject
   private CodingViewModalPresenter codingViewModalPresenter;
 
@@ -133,7 +137,9 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
       ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider,
       ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider,
-      ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider, Translations translations) {
+      ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider,
+      ModalProvider<DataExportPresenter> dataExportModalProvider, Translations translations) {
+
     super(eventBus, display);
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
@@ -145,6 +151,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     this.variablePropertiesModalProvider = variablePropertiesModalProvider.setContainer(this);
     this.tablePropertiesModalProvider = tablePropertiesModalProvider.setContainer(this);
     this.viewPropertiesModalProvider = viewPropertiesModalProvider.setContainer(this);
+    this.dataExportModalProvider = dataExportModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -346,7 +353,11 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onExportData() {
-    fireEvent(new WizardRequiredEvent(DataExportPresenter.WizardType, table));
+    DataExportPresenter export = dataExportModalProvider.get();
+    Set<TableDto> tables = new HashSet<TableDto>();
+    tables.add(table);
+    export.setExportTables(tables, false);
+    export.setDatasourceName(table.getDatasourceName());
   }
 
   @Override

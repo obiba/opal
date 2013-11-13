@@ -10,20 +10,17 @@
 package org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardProxy;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardType;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardView;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -33,44 +30,44 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.CopyCommandOptionsDto;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
+import com.github.gwtbootstrap.client.ui.Alert;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
+import com.gwtplatform.mvp.client.PopupView;
 
-public class DataExportPresenter extends WizardPresenterWidget<DataExportPresenter.Display> {
+public class DataExportPresenter extends ModalPresenterWidget<DataExportPresenter.Display>
+    implements DataExportUiHandlers {
 
-  public static final WizardType WizardType = new WizardType();
+  private static String DEFAULT_UNIT_NAME;
 
   private final RequestCredentials credentials;
 
-  public static class Wizard extends WizardProxy<DataExportPresenter> {
+  private Set<TableDto> exportTables = new HashSet<TableDto>();
 
-    @Inject
-    protected Wizard(EventBus eventBus, Provider<DataExportPresenter> wizardProvider) {
-      super(eventBus, WizardType, wizardProvider);
-    }
-
-  }
+  private final Translations translations;
 
   private final FileSelectionPresenter fileSelectionPresenter;
 
   private String datasourceName;
 
-  private TableDto table;
-
   protected String identifierEntityType;
 
   @Inject
-  public DataExportPresenter(Display display, EventBus eventBus, FileSelectionPresenter fileSelectionPresenter,
-      RequestCredentials credentials) {
+  public DataExportPresenter(Display display, EventBus eventBus, Translations translations,
+      FileSelectionPresenter fileSelectionPresenter, RequestCredentials credentials) {
     super(eventBus, display);
+    this.translations = translations;
     this.fileSelectionPresenter = fileSelectionPresenter;
     this.credentials = credentials;
+
+    DEFAULT_UNIT_NAME = translations.opalDefaultIdentifiersLabel();
+    getView().setUiHandlers(this);
   }
 
   @Override
@@ -84,7 +81,6 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
     fileSelectionPresenter.bind();
     fileSelectionPresenter.getView().setFile("/home/" + credentials.getUsername() + "/export");
     getView().setFileWidgetDisplay(fileSelectionPresenter.getView());
-    getView().setTablesValidator(new TablesValidator());
     getView().setDestinationValidator(new DestinationValidator());
   }
 
@@ -97,7 +93,7 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
     super.onUnbind();
     fileSelectionPresenter.unbind();
     datasourceName = null;
-    table = null;
+    exportTables = null;
   }
 
   @Override
@@ -106,75 +102,67 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
     getView().setUsername(credentials.getUsername());
   }
 
+  @Override
+  public void cancel() {
+    getView().hideDialog();
+  }
+
+  public void setExportTables(Set<TableDto> tables, boolean allTables) {
+    exportTables = tables;
+
+    if(allTables) {
+      getView().getExportNAlert().setText(translations.exportAllTables());
+    } else if(exportTables.size() == 1) {
+      getView().getExportNAlert().setText(translations.export1Table());
+    } else {
+      getView().getExportNAlert().setText(
+          TranslationsUtils.replaceArguments(translations.exportNTables(), String.valueOf(exportTables.size())));
+    }
+  }
+
+  public void setDatasourceName(String name) {
+    datasourceName = name;
+  }
+
   private void initUnits() {
-    ResponseCodeCallback errorCallback = new ResponseCodeCallback() {
+
+    final ResponseCodeCallback errorCallback = new ResponseCodeCallback() {
       @Override
       public void onResponseCode(Request request, Response response) {
       }
     };
-    ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>>newBuilder().forResource("/functional-units").get()
-        .withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
-          @Override
-          public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
-            getView().setUnits(units);
-          }
-        }).withCallback(Response.SC_FORBIDDEN, errorCallback).send();
+
     ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource("/functional-units/entities/table").get()
         .withCallback(new ResourceCallback<TableDto>() {
           @Override
           public void onResource(Response response, TableDto resource) {
             identifierEntityType = resource.getEntityType();
+
+            // if exporting at least one table of type 'identifiersEntityType', show units selection
+            boolean fetchUnits = false;
+            for(TableDto table : exportTables) {
+              if(table.hasEntityType() && table.getEntityType().equals(identifierEntityType)) {
+                fetchUnits = true;
+                break;
+              }
+            }
+
+            if(fetchUnits) {
+              ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>>newBuilder().forResource("/functional-units")
+                  .get().withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
+                @Override
+                public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
+                  getView().setUnits(units);
+                }
+              }).withCallback(Response.SC_FORBIDDEN, errorCallback).send();
+            }
           }
         }).withCallback(Response.SC_FORBIDDEN, errorCallback).send();
   }
 
   @Override
-  public void onWizardRequired(WizardRequiredEvent event) {
-    if(event.getEventParameters().length == 0) {
-      datasourceName = null;
-      ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource("/datasources/tables").get()
-          .withCallback(new ResourceCallback<JsArray<TableDto>>() {
-            @Override
-            public void onResource(Response response, JsArray<TableDto> resource) {
-              getView().addTableSelections(JsArrays.toSafeArray(resource));
-            }
-
-          }).send();
-    } else {
-      //noinspection ChainOfInstanceofChecks
-      if(event.getEventParameters()[0] instanceof String) {
-        datasourceName = (String) event.getEventParameters()[0];
-      } else if(event.getEventParameters()[0] instanceof TableDto) {
-        table = (TableDto) event.getEventParameters()[0];
-        datasourceName = table.getDatasourceName();
-      } else {
-        throw new IllegalArgumentException("unexpected event parameter type (expected String)");
-      }
-      ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder()
-          .forResource("/datasource/" + datasourceName + "/tables").get()
-          .withCallback(new ResourceCallback<JsArray<TableDto>>() {
-            @Override
-            public void onResource(Response response, JsArray<TableDto> resource) {
-              getView().addTableSelections(JsArrays.toSafeArray(resource));
-              if(table != null) {
-                getView().selectTable(table);
-              } else {
-                getView().selectAllTables();
-              }
-            }
-
-          }).send();
-    }
-  }
-
-  @Override
-  protected boolean hideOnFinish() {
-    return true;
-  }
-
-  @Override
-  protected void onFinish() {
-    super.onFinish();
+  public void onSubmit() {
+    getView().hideDialog();
 
     UriBuilder uriBuilder = UriBuilder.create();
     if(datasourceName == null) {
@@ -192,12 +180,9 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
     CopyCommandOptionsDto dto = CopyCommandOptionsDto.create();
 
     JsArrayString selectedTables = JavaScriptObject.createArray().cast();
-    if(table != null) {
-      selectedTables.push(table.getDatasourceName() + "." + table.getName());
-    } else {
-      for(TableDto tableDto : getView().getSelectedTables()) {
-        selectedTables.push(tableDto.getDatasourceName() + "." + tableDto.getName());
-      }
+
+    for(TableDto exportTable : exportTables) {
+      selectedTables.push(exportTable.getDatasourceName() + "." + exportTable.getName());
     }
 
     dto.setTablesArray(selectedTables);
@@ -205,8 +190,7 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
     dto.setOut(getView().getOutFile());
     dto.setNonIncremental(!getView().isIncremental());
     dto.setNoVariables(!getView().isWithVariables());
-    if(getView().isUseAlias()) dto.setTransform("attribute('alias').isNull().value ? name() : attribute('alias')");
-    if(getView().isUnitId()) dto.setUnit(getView().getSelectedUnit());
+    if(!getView().getSelectedUnit().equals(DEFAULT_UNIT_NAME)) dto.setUnit(getView().getSelectedUnit());
 
     return dto;
   }
@@ -237,36 +221,6 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
     }
   }
 
-  private final class TablesValidator implements ValidationHandler {
-    @Override
-    public boolean validate() {
-      if(getView().getSelectedTables().isEmpty()) {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error("ExportDataMissingTables").build());
-        return false;
-      }
-      // Check for duplicate table names
-      Collection<String> namesMemento = new HashSet<String>();
-      for(TableDto dto : getView().getSelectedTables()) {
-        if(namesMemento.contains(dto.getName())) {
-          getEventBus().fireEvent(
-              NotificationEvent.newBuilder().error("ExportDataDuplicateTableNames").args(dto.getName()).build());
-          return false;
-        }
-        namesMemento.add(dto.getName());
-      }
-
-      boolean identifierEntityTable = false;
-      for(TableDto dto : getView().getSelectedTables()) {
-        if(dto.getEntityType().equals(identifierEntityType)) {
-          identifierEntityTable = true;
-          break;
-        }
-      }
-      getView().renderUnitSelection(identifierEntityTable);
-      return true;
-    }
-  }
-
   class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
@@ -285,11 +239,7 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
     }
   }
 
-  public interface Display extends WizardView {
-
-    void renderUnitSelection(boolean identifierEntityTable);
-
-    void setTablesValidator(ValidationHandler validationHandler);
+  public interface Display extends PopupView, HasUiHandlers<DataExportUiHandlers> {
 
     void setDestinationValidator(ValidationHandler handler);
 
@@ -305,27 +255,21 @@ public class DataExportPresenter extends WizardPresenterWidget<DataExportPresent
 
     String getOutFile();
 
-    void addTableSelections(JsArray<TableDto> tables);
-
-    void selectTable(TableDto tableDto);
-
-    void selectAllTables();
-
-    List<TableDto> getSelectedTables();
-
     String getFileFormat();
 
     boolean isIncremental();
 
     boolean isWithVariables();
 
-    boolean isUseAlias();
-
-    boolean isUnitId();
+//    boolean isUnitId();
 
     void setFileWidgetDisplay(FileSelectionPresenter.Display display);
 
     void setUsername(String username);
+
+    Alert getExportNAlert();
+
+    void hideDialog();
   }
 
 }

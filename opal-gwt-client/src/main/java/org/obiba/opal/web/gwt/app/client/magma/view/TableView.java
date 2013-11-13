@@ -128,10 +128,10 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   Label selectAllStatus;
 
   @UiField
-  Anchor selectAllAnchor;
+  IconAnchor selectAllAnchor;
 
   @UiField
-  Anchor clearSelectionAnchor;
+  IconAnchor clearSelectionAnchor;
 
   @UiField
   Table<VariableDto> table;
@@ -557,12 +557,12 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     }
 
     @Override
-    public Anchor getClearSelection() {
+    public IconAnchor getClearSelection() {
       return clearSelectionAnchor;
     }
 
     @Override
-    public Anchor getSelectAll() {
+    public IconAnchor getSelectAll() {
       return selectAllAnchor;
     }
 

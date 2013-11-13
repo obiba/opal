@@ -71,7 +71,8 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     ModalProvider<ConfigureViewStepPresenter> modalConfigureViewStepProvider = createMock(ModalProvider.class);
     ModalProvider<VariablesToViewPresenter> variablesToViewProvider = createMock(ModalProvider.class);
     ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider = createMock(ModalProvider.class);
-    ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalPresenterModalProvider = createMock(ModalProvider.class);
+    ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalPresenterModalProvider = createMock(
+        ModalProvider.class);
     ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider = createMock(ModalProvider.class);
     Translations translations = createMock(Translations.class);
 
@@ -79,7 +80,7 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
         modalEntityModalPresenter);
     presenter = new TablePresenter(displayMock, new CountingEventBus(), null, values, mockProvider, mockIndexProvider,
         modalConfigureViewStepProvider, variablesToViewProvider, variablePropertiesModalProvider,
-        viewPropertiesModalProvider, tablePropertiesModalPresenterModalProvider, translations);
+        viewPropertiesModalProvider, tablePropertiesModalPresenterModalProvider, null, translations);
   }
 
   @SuppressWarnings({ "unchecked", "OverlyLongMethod" })

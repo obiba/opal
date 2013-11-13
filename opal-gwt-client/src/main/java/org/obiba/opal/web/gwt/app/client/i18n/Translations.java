@@ -2391,4 +2391,20 @@ public interface Translations extends Constants {
   @Description("Add a value mapping label")
   @DefaultStringValue("Add a value mapping")
   String addValueMapping();
+
+  @Description("All tables are selected for being exported label")
+  @DefaultStringValue("All tables are selected for being exported.")
+  String exportAllTables();
+
+  @Description("X tables are selected for being for being exported.")
+  @DefaultStringValue("{0} tables are selected for being exported.")
+  String exportNTables();
+
+  @Description("1 table is selected for being exported.")
+  @DefaultStringValue("1 table is selected for being exported.")
+  String export1Table();
+
+  @Description("Opal default identifiers label")
+  @DefaultStringValue("Default Identifiers")
+  String opalDefaultIdentifiersLabel();
 }

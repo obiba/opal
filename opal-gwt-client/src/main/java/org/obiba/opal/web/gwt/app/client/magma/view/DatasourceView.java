@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
@@ -28,6 +30,7 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.SimplePager;
+import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -36,7 +39,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -85,10 +87,10 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   Label selectAllStatus;
 
   @UiField
-  Anchor selectAllAnchor;
+  IconAnchor selectAllAnchor;
 
   @UiField
-  Anchor clearSelectionAnchor;
+  IconAnchor clearSelectionAnchor;
 
   @UiField
   Table<TableDto> table;
@@ -296,6 +298,16 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     return new WidgetAuthorizer(downloadDictionary);
   }
 
+  @Override
+  public List<TableDto> getSelectedTables() {
+    return checkColumn.getSelectedItems();
+  }
+
+  @Override
+  public List<TableDto> getAllTables() {
+    return dataProvider.getList();
+  }
+
   private class DatasourceCheckStatusDisplay implements CheckboxColumn.Display<TableDto> {
     @Override
     public Table<TableDto> getTable() {
@@ -308,12 +320,12 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     }
 
     @Override
-    public Anchor getClearSelection() {
+    public IconAnchor getClearSelection() {
       return clearSelectionAnchor;
     }
 
     @Override
-    public Anchor getSelectAll() {
+    public IconAnchor getSelectAll() {
       return selectAllAnchor;
     }
 

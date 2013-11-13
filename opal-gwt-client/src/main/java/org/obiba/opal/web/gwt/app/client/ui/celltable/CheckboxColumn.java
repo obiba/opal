@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 
 import com.github.gwtbootstrap.client.ui.Alert;
+import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.common.collect.Lists;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
@@ -29,7 +30,6 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.Header;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.MultiSelectionModel;
@@ -289,7 +289,7 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     args.add(String.valueOf(display.getDataProvider().getList().size()));
     args.add(display.getItemNamePlural());
     display.getSelectAll().setText(TranslationsUtils.replaceArguments(translations.selectAllNItems(), args));
-    display.getClearSelection().setVisible(false);
+    display.getClearSelection().setVisible(true);
   }
 
   private void doAction() {
@@ -325,12 +325,12 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     /**
      * @return The link that displays the "clear selection" action
      */
-    Anchor getClearSelection();
+    IconAnchor getClearSelection();
 
     /**
      * @return The link to select all items
      */
-    Anchor getSelectAll();
+    IconAnchor getSelectAll();
 
     /**
      * @return The label to show that all items on the page are selected

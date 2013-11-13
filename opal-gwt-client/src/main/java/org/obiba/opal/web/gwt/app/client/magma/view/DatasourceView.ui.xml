@@ -14,7 +14,7 @@
           <ui:msg description="Import data label">Import data...</ui:msg>
         </b:NavLink>
         <b:NavLink icon="SIGNOUT" ui:field="exportData">
-          <ui:msg description="Export data label">Export data...</ui:msg>
+          <ui:msg description="Export data label">Export data</ui:msg>
         </b:NavLink>
         <b:NavLink icon="COPY" ui:field="copyData">
           <ui:msg description="Copy data label">Copy data...</ui:msg>
@@ -54,12 +54,13 @@
                 <g:Label ui:field="selectAllStatus" addStyleNames="inline"/>
               </g:customCell>
               <g:customCell>
-                <g:Anchor ui:field="selectAllAnchor" addStyleNames="inline xsmall-indent"/>
+                <b2:IconAnchor ui:field="selectAllAnchor" addStyleNames="inline xsmall-indent"/>
               </g:customCell>
               <g:customCell>
-                <g:Anchor ui:field="clearSelectionAnchor" visible="false" addStyleNames="inline xsmall-indent">
+                <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" visible="false"
+                    addStyleNames="inline xsmall-indent">
                   <ui:msg description="Clear selection label">Clear selection</ui:msg>
-                </g:Anchor>
+                </b2:IconAnchor>
               </g:customCell>
               <g:customCell>
                 <g:FlowPanel addStyleNames="indent">
