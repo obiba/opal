@@ -114,16 +114,6 @@
                       <ui:msg description="Add to variables to view label">Add variables to view</ui:msg>
                     </b2:IconAnchor>
 
-                    <b2:IconAnchor ui:field="exportSelectionAnchor" icon="SIGNOUT"
-                        addStyleNames="inline xsmall-indent">
-                      <ui:msg description="Export label">Export</ui:msg>
-                    </b2:IconAnchor>
-
-                    <b2:IconAnchor ui:field="copySelectionAnchor" icon="COPY"
-                        addStyleNames="inline xsmall-indent">
-                      <ui:msg description="Copy label">Copy</ui:msg>
-                    </b2:IconAnchor>
-
                     <b2:IconAnchor ui:field="deleteVariables" icon="TRASH" addStyleNames="inline xsmall-indent">
                       <ui:msg description="Delete label">Delete</ui:msg>
                     </b2:IconAnchor>

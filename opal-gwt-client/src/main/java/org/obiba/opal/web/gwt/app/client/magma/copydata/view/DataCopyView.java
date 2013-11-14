@@ -11,21 +11,29 @@ package org.obiba.opal.web.gwt.app.client.magma.copydata.view;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 
+import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.CheckBox;
-import com.github.gwtbootstrap.client.ui.Modal;
+import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -45,7 +53,19 @@ public class DataCopyView extends ModalPopupViewWithUiHandlers<DataCopyUiHandler
   Modal modal;
 
   @UiField
+  Alert copyNTable;
+
+  @UiField
   ListBox datasources;
+
+  @UiField
+  ControlGroup newTableNameGroup;
+
+  @UiField
+  FlowPanel newNamePanel;
+
+  @UiField
+  TextBox newName;
 
   @UiField
   CheckBox incremental;
@@ -63,6 +83,12 @@ public class DataCopyView extends ModalPopupViewWithUiHandlers<DataCopyUiHandler
     initWidget(uiBinder.createAndBindUi(this));
 
     modal.setTitle(translations.copyData());
+    newName.setPlaceholder(translations.newTableNameLabel());
+  }
+
+  @UiHandler("submitButton")
+  public void onSubmit(ClickEvent event) {
+    getUiHandlers().onSubmit();
   }
 
   @UiHandler("cancelButton")
@@ -83,6 +109,16 @@ public class DataCopyView extends ModalPopupViewWithUiHandlers<DataCopyUiHandler
         this.datasources.addItem(datasource.getName());
       }
     }
+  }
+
+  @Override
+  public Panel getNewNamePanel() {
+    return newNamePanel;
+  }
+
+  @Override
+  public TextBox getNewName() {
+    return newName;
   }
 
   @Override
@@ -110,4 +146,25 @@ public class DataCopyView extends ModalPopupViewWithUiHandlers<DataCopyUiHandler
     modal.hide();
   }
 
+  @Override
+  public Alert getCopyNAlert() {
+    return copyNTable;
+  }
+
+  @Override
+  public void showError(@Nullable DataCopyPresenter.Display.FormField formField, String message) {
+    ControlGroup group = null;
+    if(formField != null) {
+      switch(formField) {
+        case NEW_TABLE_NAME:
+          group = newTableNameGroup;
+          break;
+      }
+    }
+    if(group == null) {
+      modal.addAlert(message, AlertType.ERROR);
+    } else {
+      modal.addAlert(message, AlertType.ERROR, group);
+    }
+  }
 }

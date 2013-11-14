@@ -59,10 +59,9 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
     ModalProvider<AddViewModalPresenter> createViewModalProvider = createMock(ModalProvider.class);
 
     datasourcePresenter = new DatasourcePresenter(displayMock, new CountingEventBus(), propertiesEditorModalProvider,
-        null, createViewModalProvider, null);
+        null, createViewModalProvider, null, null);
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   @Ignore
   public void testThatEventHandlersAreAddedToUIComponents() throws Exception {

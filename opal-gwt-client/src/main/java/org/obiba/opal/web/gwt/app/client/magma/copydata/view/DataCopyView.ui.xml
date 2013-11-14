@@ -17,22 +17,31 @@
         </g:Label>
         <o:Chooser ui:field="datasources"/>
       </g:FlowPanel>
-      <g:FlowPanel styleName="input">
-        <g:Label addStyleNames="key">
-          <ui:msg description="Options title">Options</ui:msg>
-        </g:Label>
-        <b:CheckBox ui:field="incremental" addStyleNames="block">
-          <ui:msg description="Incremental checkbox label">incremental</ui:msg>
-        </b:CheckBox>
-        <b:CheckBox ui:field="copyNullValues" addStyleNames="block">
-          <ui:msg description="Incremental checkbox label">copy null values</ui:msg>
-        </b:CheckBox>
-        <b:CheckBox ui:field="useAlias" addStyleNames="block">
-          <ui:msg description="Use alias to rename variable checkbox label">use 'alias' attribute to rename
-            variables
-          </ui:msg>
-        </b:CheckBox>
+
+      <g:FlowPanel styleName="input" ui:field="newNamePanel" visible="false">
+        <b:ControlGroup ui:field="newTableNameGroup">
+          <b:Controls>
+            <b:TextBox ui:field="newName"/>
+            <b:HelpBlock>
+              <ui:msg description="New name required when copying in same datasource help">
+                New table name is required when copying within the same datasource.
+              </ui:msg>
+            </b:HelpBlock>
+          </b:Controls>
+        </b:ControlGroup>
       </g:FlowPanel>
+
+      <o:CollapsiblePanel>
+        <g:FlowPanel styleName="input">
+          <b:CheckBox ui:field="incremental" addStyleNames="block">
+            <ui:msg description="Incremental checkbox label">incremental</ui:msg>
+          </b:CheckBox>
+          <b:CheckBox ui:field="copyNullValues" addStyleNames="block">
+            <ui:msg description="Incremental checkbox label">copy null values</ui:msg>
+          </b:CheckBox>
+        </g:FlowPanel>
+      </o:CollapsiblePanel>
+
     </g:FlowPanel>
 
     <b:ModalFooter>

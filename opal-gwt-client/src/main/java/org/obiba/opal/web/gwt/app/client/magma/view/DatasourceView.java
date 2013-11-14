@@ -159,6 +159,11 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     getUiHandlers().onExportData();
   }
 
+  @UiHandler("copySelectionAnchor")
+  void onCopy(ClickEvent event) {
+    getUiHandlers().onCopyData();
+  }
+
   private void addTableColumns() {
     checkColumn = new CheckboxColumn<TableDto>(new DatasourceCheckStatusDisplay());
 
@@ -215,15 +220,6 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     table.setPageSize(Table.DEFAULT_PAGESIZE);
     table.setEmptyTableWidget(new InlineLabel(translations.noTablesLabel()));
     pager.setDisplay(table);
-  }
-
-  @Override
-  public void setTableSelection(TableDto tableDto, int index) {
-    int pageIndex = index / table.getPageSize();
-    if(pageIndex != pager.getPage()) {
-      pager.setPage(pageIndex);
-    }
-    table.getSelectionModel().setSelected(tableDto, true);
   }
 
   @Override

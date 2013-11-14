@@ -371,6 +371,7 @@ public interface Translations extends Constants {
       "You have selected to use a specific character set but have not indicated which one.",//
       "NoDataFileSelected", "You must select a data file.",//
       "NoDataToCopy", "No data to copy to the current destination.",//
+      "DataCopyNewNameRequired", "New table name is required when copying within same datasource.",//
       "NoFileSelected", "You must select a file.",//
       "CharsetNotAvailable", "The character set you have specified is not available.",//
       "FieldSeparatorRequired", "The field separator is required.",//
@@ -423,6 +424,7 @@ public interface Translations extends Constants {
       "DataImportationProcessLaunched", "The data importation process can be followed using the Job ID: {0}",//
       "DataExportationProcessLaunched",
       "The data exportation process can be followed using the Job ID: {0}. Files will be exported to: {1}",//
+      "DataCopyProcessLaunched", "The data copy process can be followed using the Job ID: {0}",//
       "DatabaseAlreadyExists", "A database with this name already exists.",//
       "DatabaseConnectionOk", "Connection successful.",//
       "DatabaseConnectionFailed", "Failed to connect: {0}.",//
@@ -2409,4 +2411,8 @@ public interface Translations extends Constants {
   @Description("Opal default identifiers label")
   @DefaultStringValue("Default Identifiers")
   String opalDefaultIdentifiersLabel();
+
+  @Description("New table name label")
+  @DefaultStringValue("New table name")
+  String newTableNameLabel();
 }

@@ -13,8 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Nullable;
-
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -103,24 +101,6 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     addRegisteredHandler(ConfirmationEvent.getType(), new DeleteConfirmationEventHandler());
   }
 
-  private int getTableIndex(String tableName) {
-    int tableIndex = 0;
-    for(int i = 0; i < tables.length(); i++) {
-      if(tables.get(i).getName().equals(tableName)) {
-        tableIndex = i;
-        break;
-      }
-    }
-    return tableIndex;
-  }
-
-  private void selectTable(String tableName) {
-    if(tableName != null) {
-      int index = getTableIndex(tableName);
-      getView().setTableSelection(tables.get(index), index);
-    }
-  }
-
   private void downloadMetadata() {
     fireEvent(new FileDownloadRequestEvent("/datasource/" + datasourceName + "/tables/excel"));
   }
@@ -147,16 +127,16 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
   @Override
   public void onExportData() {
     DataExportPresenter export = dataExportModalProvider.get();
-    Set<TableDto> tables = new HashSet<TableDto>();
+    Set<TableDto> exportTables = new HashSet<TableDto>();
 
     int selectedTablesSize = getView().getSelectedTables().size();
     if(selectedTablesSize > 0) {
-      tables.addAll(getView().getSelectedTables());
-      export.setExportTables(tables, getView().getAllTables().size() == selectedTablesSize);
+      exportTables.addAll(getView().getSelectedTables());
+      export.setExportTables(exportTables, getView().getAllTables().size() == selectedTablesSize);
     } else {
       // Get all tables
-      tables.addAll(getView().getAllTables());
-      export.setExportTables(tables, true);
+      exportTables.addAll(getView().getAllTables());
+      export.setExportTables(exportTables, true);
     }
 
     export.setDatasourceName(datasourceName);
@@ -165,6 +145,20 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
   @Override
   public void onCopyData() {
     DataCopyPresenter copy = dataCopyModalProvider.get();
+
+    Set<TableDto> copyTables = new HashSet<TableDto>();
+
+    int selectedTablesSize = getView().getSelectedTables().size();
+    if(selectedTablesSize > 0) {
+      copyTables.addAll(getView().getSelectedTables());
+      copy.setCopyTables(copyTables, getView().getAllTables().size() == selectedTablesSize);
+    } else {
+      // Get all tables
+      copyTables.addAll(getView().getAllTables());
+      copy.setCopyTables(copyTables, true);
+    }
+
+    copy.setDatasourceName(datasourceName);
   }
 
   @Override
@@ -216,25 +210,20 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     @Override
     public void onResource(Response response, DatasourceDto resource) {
       datasource = resource;
-      displayDatasource(datasource, null);
+      displayDatasource(datasource);
     }
 
-    private void displayDatasource(DatasourceDto datasourceDto, @Nullable String table) {
+    private void displayDatasource(DatasourceDto datasourceDto) {
       getView().setDatasource(datasourceDto);
-      updateTable(table);
+      updateTables();
       authorize();
-
-      if(table == null) {
-        getView().afterRenderRows();
-      } else {
-        selectTable(table);
-      }
+      getView().afterRenderRows();
     }
 
-    private void updateTable(@Nullable String tableName) {
+    private void updateTables() {
       UriBuilder ub = UriBuilders.DATASOURCE_TABLES.create().query("counts", "true");
       ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(ub.build(datasourceName)).get()
-          .withCallback(new TablesResourceCallback(datasourceName, tableName)).send();
+          .withCallback(new TablesResourceCallback(datasourceName)).send();
     }
 
     private void authorize() {
@@ -291,11 +280,8 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
     private final String datasourceName;
 
-    private final String selectTableName;
-
-    private TablesResourceCallback(String datasourceName, String selectTableName) {
+    private TablesResourceCallback(String datasourceName) {
       this.datasourceName = datasourceName;
-      this.selectTableName = selectTableName;
       getView().beforeRenderRows();
     }
 
@@ -304,7 +290,6 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       if(datasourceName.equals(DatasourcePresenter.this.datasourceName)) {
         tables = JsArrays.toSafeArray(resource);
         getView().renderRows(resource);
-        selectTable(selectTableName);
         getView().afterRenderRows();
       }
     }
@@ -372,8 +357,6 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
   }
 
   public interface Display extends View, HasUiHandlers<DatasourceUiHandlers> {
-
-    void setTableSelection(TableDto variable, int index);
 
     void beforeRenderRows();
 

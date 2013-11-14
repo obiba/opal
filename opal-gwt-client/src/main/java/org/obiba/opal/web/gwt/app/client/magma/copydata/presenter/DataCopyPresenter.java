@@ -15,50 +15,50 @@ import java.util.List;
 import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.CopyCommandOptionsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.github.gwtbootstrap.client.ui.Alert;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Display> implements DataCopyUiHandlers {
 
   private String datasourceName;
 
-  private TableDto table;
+  private Set<TableDto> copyTables = new HashSet<TableDto>();
 
-  public final PlaceManager placeManager;
+  private final Translations translations;
 
   /**
    * @param display
    * @param eventBus
    */
   @Inject
-  public DataCopyPresenter(Display display, EventBus eventBus, PlaceManager placeManager) {
+  public DataCopyPresenter(Display display, EventBus eventBus, Translations translations) {
     super(eventBus, display);
-    this.placeManager = placeManager;
+    this.translations = translations;
 
     getView().setUiHandlers(this);
   }
@@ -77,7 +77,7 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
   protected void onUnbind() {
     super.onUnbind();
     datasourceName = null;
-    table = null;
+    copyTables = null;
   }
 
   @Override
@@ -93,10 +93,22 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
   @Override
   public void onSubmit() {
 
-    UriBuilder uriBuilder = UriBuilder.create();
-    uriBuilder.segment("project", datasourceName, "commands", "_copy");
+    // if only 1 table is selected and is copied to current datasource, validate new table name
+    String selectedDatasource = getView().getSelectedDatasource();
+    String newName = getView().getNewName().getText();
+    if(copyTables.size() == 1 && selectedDatasource.equals(datasourceName) && newName.isEmpty()) {
+      getView()
+          .showError(Display.FormField.NEW_TABLE_NAME, translations.userMessageMap().get("DataCopyNewNameRequired"));
+    } else {
+      sendCommandsCopyRequest();
+    }
+  }
+
+  private void sendCommandsCopyRequest() {
+    getView().hideDialog();
+
     ResourceRequestBuilderFactory.newBuilder() //
-        .forResource(uriBuilder.build()) //
+        .forResource(UriBuilders.PROJECT_COMMANDS_COPY.create().build(datasourceName)) //
         .post() //
         .withResourceBody(CopyCommandOptionsDto.stringify(createCopyCommandOptions())) //
         .withCallback(Response.SC_BAD_REQUEST, new ClientFailureResponseCodeCallBack()) //
@@ -107,16 +119,14 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
     CopyCommandOptionsDto dto = CopyCommandOptionsDto.create();
 
     JsArrayString selectedTables = JavaScriptObject.createArray().cast();
-    if(table == null) {
-//      for(TableDto tableDto : getView().getSelectedTables()) {
-//        selectedTables.push(tableDto.getDatasourceName() + "." + tableDto.getName());
-//      }
-    } else {
-      selectedTables.push(table.getDatasourceName() + "." + table.getName());
+
+    for(TableDto exportTable : copyTables) {
+      selectedTables.push(exportTable.getDatasourceName() + "." + exportTable.getName());
     }
 
     dto.setTablesArray(selectedTables);
     dto.setDestination(getView().getSelectedDatasource());
+    dto.setDestinationTableName(getView().getNewName().getText());
     dto.setNonIncremental(!getView().isIncremental());
     dto.setCopyNullValues(getView().isCopyNullValues());
     dto.setNoVariables(!getView().isWithVariables());
@@ -125,83 +135,55 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
   }
 
   private void initDatasources() {
-    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder().forResource("/datasources").get()
+    ResourceRequestBuilderFactory.<JsArray<DatasourceDto>>newBuilder()
+        .forResource(UriBuilders.DATASOURCES.create().build()).get()
         .withCallback(new ResourceCallback<JsArray<DatasourceDto>>() {
           @Override
           public void onResource(Response response, JsArray<DatasourceDto> resource) {
             List<DatasourceDto> datasources = null;
             if(resource != null && resource.length() > 0) {
               datasources = filterDatasources(resource);
-
             }
+
             if(datasources != null && datasources.size() > 0) {
               getView().setDatasources(datasources);
             } else {
-              getEventBus().fireEvent(NotificationEvent.newBuilder().error("NoDataToCopy").build());
+              getView().showError(null, translations.userMessageMap().get("NoDataToCopy"));
             }
           }
 
           private List<DatasourceDto> filterDatasources(JsArray<DatasourceDto> datasources) {
 
             List<DatasourceDto> filteredDatasources = new ArrayList<DatasourceDto>();
-            Set<String> originDatasourceName = getOriginDatasourceNames();
+
             for(DatasourceDto datasource : JsArrays.toList(datasources)) {
-              if(!originDatasourceName.contains(datasource.getName())) {
+              // Allow to copy in itself if only one table is selected
+              if(copyTables.size() == 1 || !datasource.getName().equals(datasourceName)) {
                 filteredDatasources.add(datasource);
               }
             }
             return filteredDatasources;
           }
-
-          private Set<String> getOriginDatasourceNames() {
-            Set<String> originDatasourceNames = new HashSet<String>();
-//            for(TableDto tableDto : getView().getSelectedTables()) {
-//              originDatasourceNames.add(tableDto.getDatasourceName());
-//            }
-            // can't copy in itself
-            if(datasourceName != null) {
-              originDatasourceNames.add(datasourceName);
-            } else if(table != null) {
-              originDatasourceNames.add(table.getDatasourceName());
-            }
-            return originDatasourceNames;
-          }
-
         }).send();
   }
 
-  //
-  // Wizard Methods
-  //
+  public void setCopyTables(Set<TableDto> tables, boolean allTables) {
+    copyTables = tables;
 
-//  @SuppressWarnings("ChainOfInstanceofChecks")
-//  @Override
-//  public void onWizardRequired(WizardRequiredEvent event) {
-//    if(event.getEventParameters().length != 0) {
-//      if(event.getEventParameters()[0] instanceof String) {
-//        datasourceName = (String) event.getEventParameters()[0];
-//      } else if(event.getEventParameters()[0] instanceof TableDto) {
-//        table = (TableDto) event.getEventParameters()[0];
-//        datasourceName = table.getDatasourceName();
-//      } else {
-//        throw new IllegalArgumentException("unexpected event parameter type (expected String)");
-//      }
-//      ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder()
-//          .forResource("/datasource/" + datasourceName + "/tables").get()
-//          .withCallback(new ResourceCallback<JsArray<TableDto>>() {
-//            @Override
-//            public void onResource(Response response, JsArray<TableDto> resource) {
-//              getView().addTableSelections(JsArrays.toSafeArray(resource));
-//              if(table == null) {
-//                getView().selectAllTables();
-//              } else {
-//                getView().selectTable(table);
-//              }
-//            }
-//
-//          }).send();
-//    }
-//  }
+    if(allTables) {
+      getView().getCopyNAlert().setText(translations.exportAllTables());
+    } else if(copyTables.size() == 1) {
+      getView().getCopyNAlert().setText(translations.export1Table());
+      getView().getNewNamePanel().setVisible(true);
+    } else {
+      getView().getCopyNAlert()
+          .setText(TranslationsUtils.replaceArguments(translations.exportNTables(), String.valueOf(copyTables.size())));
+    }
+  }
+
+  public void setDatasourceName(String datasourceName) {
+    this.datasourceName = datasourceName;
+  }
 
   //
   // Interfaces and classes
@@ -242,21 +224,18 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
     public void onResponseCode(Request request, Response response) {
       String location = response.getHeader("Location");
       String jobId = location.substring(location.lastIndexOf('/') + 1);
-    }
-  }
 
-  class JobLinkClickHandler implements ClickHandler {
-
-    JobLinkClickHandler() {
-    }
-
-    @Override
-    public void onClick(ClickEvent arg0) {
-      placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.JOBS).build());
+      getEventBus().fireEvent(
+          NotificationEvent.newBuilder().info("DataCopyProcessLaunched").args(jobId, getView().getSelectedDatasource())
+              .build());
     }
   }
 
   public interface Display extends PopupView, HasUiHandlers<DataCopyUiHandlers> {
+
+    enum FormField {
+      NEW_TABLE_NAME
+    }
 
     void setDestinationValidator(ValidationHandler handler);
 
@@ -270,17 +249,22 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
      */
     String getSelectedDatasource();
 
+    HasText getNewName();
+
+    Panel getNewNamePanel();
+
     boolean isIncremental();
 
     boolean isWithVariables();
 
-//    void addTableSelections(JsArray<TableDto> tables);
-//
-//    List<TableDto> getSelectedTables();
-
     boolean isCopyNullValues();
 
     void hideDialog();
+
+    Alert getCopyNAlert();
+
+    void showError(FormField field, String message);
+
   }
 
 }

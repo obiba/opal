@@ -366,6 +366,10 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @Override
   public void onCopyData() {
     DataCopyPresenter copy = dataCopyModalProvider.get();
+    Set<TableDto> copyTables = new HashSet<TableDto>();
+    copyTables.add(table);
+    copy.setCopyTables(copyTables, false);
+    copy.setDatasourceName(table.getDatasourceName());
   }
 
   @Override

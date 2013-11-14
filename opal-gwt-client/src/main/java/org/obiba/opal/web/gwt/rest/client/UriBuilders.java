@@ -39,6 +39,20 @@ public enum UriBuilders {
     }
   },
 
+  PROJECT_COMMANDS_COPY {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "commands", "_copy");
+    }
+  },
+
+  DATASOURCES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasources");
+    }
+  },
+
   DATASOURCE {
     @Override
     public UriBuilder create() {
