@@ -2412,7 +2412,4 @@ public interface Translations extends Constants {
   @DefaultStringValue("Default Identifiers")
   String opalDefaultIdentifiersLabel();
 
-  @Description("New table name label")
-  @DefaultStringValue("New table name")
-  String newTableNameLabel();
 }

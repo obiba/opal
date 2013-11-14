@@ -26,10 +26,10 @@
       </b:ButtonGroup>
       <b:DropdownButton text="Tasks" icon="TASKS" ui:field="tasksBtn" addStyleNames="pull-right">
         <b:NavLink icon="SIGNOUT" ui:field="exportData">
-          <ui:msg description="Export data label">Export data</ui:msg>
+          <ui:msg description="Export data label">Export data...</ui:msg>
         </b:NavLink>
         <b:NavLink icon="COPY" ui:field="copyData">
-          <ui:msg description="Copy data label">Copy data</ui:msg>
+          <ui:msg description="Copy data label">Copy data...</ui:msg>
         </b:NavLink>
       </b:DropdownButton>
       <b:DropdownButton text="Download" icon="DOWNLOAD" ui:field="downloadBtn" addStyleNames="pull-right">

@@ -11,34 +11,49 @@
     <b:Alert ui:field="copyNTable" close="false" visible="true" type="INFO"/>
 
     <g:FlowPanel>
-      <g:FlowPanel styleName="input">
-        <g:Label addStyleNames="key">
+      <!--Destination-->
+      <b:ControlGroup>
+        <b:ControlLabel>
           <ui:msg description="Destination field">Destination</ui:msg>
-        </g:Label>
-        <o:Chooser ui:field="datasources"/>
-      </g:FlowPanel>
+          <o:RequiredIcon/>
+        </b:ControlLabel>
+        <b:Controls>
+          <o:Chooser ui:field="datasources"/>
+        </b:Controls>
+        <b:HelpBlock>
+          <ui:msg description="Copy Destination help">Copy into the selected project.</ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
 
-      <g:FlowPanel styleName="input" ui:field="newNamePanel" visible="false">
-        <b:ControlGroup ui:field="newTableNameGroup">
-          <b:Controls>
-            <b:TextBox ui:field="newName"/>
-            <b:HelpBlock>
-              <ui:msg description="New name required when copying in same datasource help">
-                New table name is required when copying within the same datasource.
-              </ui:msg>
-            </b:HelpBlock>
-          </b:Controls>
-        </b:ControlGroup>
-      </g:FlowPanel>
+      <!--New Name-->
+      <b:ControlGroup ui:field="newTableNameGroup" visible="false">
+        <b:ControlLabel>
+          <ui:msg description="Copy Destination Name field">Copy Name</ui:msg>
+        </b:ControlLabel>
+        <b:Controls>
+          <b:TextBox ui:field="newName"/>
+        </b:Controls>
+        <b:HelpBlock>
+          <ui:msg description="Copy Destination Name help">
+            Name under which this table will be copied.
+          </ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
 
       <o:CollapsiblePanel>
-        <g:FlowPanel styleName="input">
-          <b:CheckBox ui:field="incremental" addStyleNames="block">
+        <g:FlowPanel>
+          <b:CheckBox ui:field="incremental">
             <ui:msg description="Incremental checkbox label">incremental</ui:msg>
           </b:CheckBox>
-          <b:CheckBox ui:field="copyNullValues" addStyleNames="block">
+          <b:HelpBlock>
+            <ui:msg description="Copy Incremental help">Whether only new or updated data will be copied.</ui:msg>
+          </b:HelpBlock>
+          <b:CheckBox ui:field="copyNullValues">
             <ui:msg description="Incremental checkbox label">copy null values</ui:msg>
           </b:CheckBox>
+          <b:HelpBlock>
+            <ui:msg description="Copy Destination Name help">Whether a data can be overridden by a null value.</ui:msg>
+          </b:HelpBlock>
         </g:FlowPanel>
       </o:CollapsiblePanel>
 

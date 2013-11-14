@@ -111,11 +111,11 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
     exportTables = tables;
 
     if(allTables) {
-      getView().getExportNAlert().setText(translations.exportAllTables());
+      getView().showExportNAlert(translations.exportAllTables());
     } else if(exportTables.size() == 1) {
-      getView().getExportNAlert().setText(translations.export1Table());
+      getView().showExportNAlert(translations.export1Table());
     } else {
-      getView().getExportNAlert().setText(
+      getView().showExportNAlert(
           TranslationsUtils.replaceArguments(translations.exportNTables(), String.valueOf(exportTables.size())));
     }
   }
@@ -267,7 +267,7 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
 
     void setUsername(String username);
 
-    Alert getExportNAlert();
+    void showExportNAlert(String message);
 
     void hideDialog();
   }

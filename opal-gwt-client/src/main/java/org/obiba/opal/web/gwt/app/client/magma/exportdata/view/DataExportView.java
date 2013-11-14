@@ -30,6 +30,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -57,7 +58,7 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
   Alert exportNTable;
 
   @UiField
-  FlowPanel unitsPanel;
+  Panel unitsPanel;
 
   @UiField
   ListBox units;
@@ -159,8 +160,8 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
   }
 
   @Override
-  public Alert getExportNAlert() {
-    return exportNTable;
+  public void showExportNAlert(String message) {
+    exportNTable.setText(message);
   }
 
   @Override

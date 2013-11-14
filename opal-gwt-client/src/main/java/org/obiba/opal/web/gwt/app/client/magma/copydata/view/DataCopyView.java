@@ -62,9 +62,6 @@ public class DataCopyView extends ModalPopupViewWithUiHandlers<DataCopyUiHandler
   ControlGroup newTableNameGroup;
 
   @UiField
-  FlowPanel newNamePanel;
-
-  @UiField
   TextBox newName;
 
   @UiField
@@ -83,7 +80,6 @@ public class DataCopyView extends ModalPopupViewWithUiHandlers<DataCopyUiHandler
     initWidget(uiBinder.createAndBindUi(this));
 
     modal.setTitle(translations.copyData());
-    newName.setPlaceholder(translations.newTableNameLabel());
   }
 
   @UiHandler("submitButton")
@@ -112,8 +108,9 @@ public class DataCopyView extends ModalPopupViewWithUiHandlers<DataCopyUiHandler
   }
 
   @Override
-  public Panel getNewNamePanel() {
-    return newNamePanel;
+  public void showNewName(String name) {
+    newTableNameGroup.setVisible(true);
+    newName.setText(name);
   }
 
   @Override
@@ -147,8 +144,8 @@ public class DataCopyView extends ModalPopupViewWithUiHandlers<DataCopyUiHandler
   }
 
   @Override
-  public Alert getCopyNAlert() {
-    return copyNTable;
+  public void showCopyNAlert(String message) {
+    copyNTable.setText(message);
   }
 
   @Override

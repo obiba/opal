@@ -171,13 +171,12 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
     copyTables = tables;
 
     if(allTables) {
-      getView().getCopyNAlert().setText(translations.exportAllTables());
+      getView().showCopyNAlert(translations.exportAllTables());
     } else if(copyTables.size() == 1) {
-      getView().getCopyNAlert().setText(translations.export1Table());
-      getView().getNewNamePanel().setVisible(true);
+      getView().showCopyNAlert(translations.export1Table());
+      getView().showNewName(tables.iterator().next().getName());
     } else {
-      getView().getCopyNAlert()
-          .setText(TranslationsUtils.replaceArguments(translations.exportNTables(), String.valueOf(copyTables.size())));
+      getView().showCopyNAlert(TranslationsUtils.replaceArguments(translations.exportNTables(), String.valueOf(copyTables.size())));
     }
   }
 
@@ -251,7 +250,7 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
 
     HasText getNewName();
 
-    Panel getNewNamePanel();
+    void showNewName(String name);
 
     boolean isIncremental();
 
@@ -261,7 +260,7 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
 
     void hideDialog();
 
-    Alert getCopyNAlert();
+    void showCopyNAlert(String message);
 
     void showError(FormField field, String message);
 
