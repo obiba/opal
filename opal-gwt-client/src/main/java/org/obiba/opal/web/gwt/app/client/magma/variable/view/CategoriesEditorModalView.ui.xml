@@ -45,19 +45,20 @@
               <b2:IconAnchor ui:field="selectAllAnchor" addStyleNames="inline xsmall-indent"/>
             </g:customCell>
             <g:customCell>
-              <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" visible="false"
-                  addStyleNames="inline xsmall-indent">
-                <ui:msg description="Clear selection label">Clear selection</ui:msg>
-              </b2:IconAnchor>
-            </g:customCell>
-            <g:customCell>
-              <g:FlowPanel addStyleNames="indent">
+              <g:FlowPanel>
+                <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE" visible="false"
+                    addStyleNames="inline xsmall-indent">
+                  <ui:msg description="Clear selection label">Clear</ui:msg>
+                </b2:IconAnchor>
+
                 <b2:IconAnchor ui:field="deleteLink" icon="TRASH" addStyleNames="inline xsmall-indent">
                   <ui:msg description="Delete category label">Delete</ui:msg>
                 </b2:IconAnchor>
+
                 <b2:IconAnchor ui:field="moveUpLink" icon="ARROW_UP" addStyleNames="inline xsmall-indent">
                   <ui:msg description="Move up label">Move up</ui:msg>
                 </b2:IconAnchor>
+
                 <b2:IconAnchor ui:field="moveDownLink" icon="ARROW_DOWN" addStyleNames="inline xsmall-indent">
                   <ui:msg description="Move down label">Move down</ui:msg>
                 </b2:IconAnchor>

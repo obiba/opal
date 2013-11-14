@@ -61,12 +61,17 @@
 
                   <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE"
                       addStyleNames="inline xsmall-indent">
-                    <ui:msg description="Clear selection label">Clear selection</ui:msg>
+                    <ui:msg description="Clear label">Clear</ui:msg>
                   </b2:IconAnchor>
 
                   <b2:IconAnchor ui:field="exportSelectionAnchor" icon="SIGNOUT"
                       addStyleNames="inline xsmall-indent">
-                    <ui:msg description="Export data label">Export data</ui:msg>
+                    <ui:msg description="Export label">Export</ui:msg>
+                  </b2:IconAnchor>
+
+                  <b2:IconAnchor ui:field="copySelectionAnchor" icon="COPY"
+                      addStyleNames="inline xsmall-indent">
+                    <ui:msg description="Copy label">Copy</ui:msg>
                   </b2:IconAnchor>
 
                   <b2:IconAnchor icon="TRASH" ui:field="deleteTables" addStyleNames="inline xsmall-indent">
