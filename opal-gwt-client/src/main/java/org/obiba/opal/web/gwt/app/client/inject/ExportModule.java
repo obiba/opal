@@ -22,7 +22,6 @@ public class ExportModule extends AbstractOpalModule {
   @Override
   protected void configure() {
     bindPresenterWidget(DataExportPresenter.class, DataExportPresenter.Display.class, DataExportView.class);
-    bindWizardPresenterWidget(DataCopyPresenter.class, DataCopyPresenter.Display.class, DataCopyView.class,
-        DataCopyPresenter.Wizard.class);
+    bindPresenterWidget(DataCopyPresenter.class, DataCopyPresenter.Display.class, DataCopyView.class);
   }
 }

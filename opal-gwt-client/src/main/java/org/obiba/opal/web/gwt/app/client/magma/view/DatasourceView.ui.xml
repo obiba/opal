@@ -11,13 +11,13 @@
     <g:FlowPanel>
       <b:DropdownButton text="Tasks" icon="TASKS" ui:field="tasksBtn" addStyleNames="pull-right">
         <b:NavLink icon="SIGNIN" ui:field="importData">
-          <ui:msg description="Import data label">Import data...</ui:msg>
+          <ui:msg description="Import data label">Import data</ui:msg>
         </b:NavLink>
         <b:NavLink icon="SIGNOUT" ui:field="exportData">
           <ui:msg description="Export data label">Export data</ui:msg>
         </b:NavLink>
         <b:NavLink icon="COPY" ui:field="copyData">
-          <ui:msg description="Copy data label">Copy data...</ui:msg>
+          <ui:msg description="Copy data label">Copy data</ui:msg>
         </b:NavLink>
       </b:DropdownButton>
       <b:ButtonGroup addStyleNames="pull-right">
@@ -61,12 +61,17 @@
 
                   <b2:IconAnchor ui:field="clearSelectionAnchor" icon="REMOVE"
                       addStyleNames="inline xsmall-indent">
-                    <ui:msg description="Clear selection label">Clear selection</ui:msg>
+                    <ui:msg description="Clear label">Clear</ui:msg>
                   </b2:IconAnchor>
 
                   <b2:IconAnchor ui:field="exportSelectionAnchor" icon="SIGNOUT"
                       addStyleNames="inline xsmall-indent">
-                    <ui:msg description="Export data label">Export data</ui:msg>
+                    <ui:msg description="Export label">Export</ui:msg>
+                  </b2:IconAnchor>
+
+                  <b2:IconAnchor ui:field="copySelectionAnchor" icon="COPY"
+                      addStyleNames="inline xsmall-indent">
+                    <ui:msg description="Copy label">Copy</ui:msg>
                   </b2:IconAnchor>
 
                   <b2:IconAnchor icon="TRASH" ui:field="deleteTables" addStyleNames="inline xsmall-indent">

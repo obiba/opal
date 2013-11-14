@@ -80,10 +80,10 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
         modalEntityModalPresenter);
     presenter = new TablePresenter(displayMock, new CountingEventBus(), null, values, mockProvider, mockIndexProvider,
         modalConfigureViewStepProvider, variablesToViewProvider, variablePropertiesModalProvider,
-        viewPropertiesModalProvider, tablePropertiesModalPresenterModalProvider, null, translations);
+        viewPropertiesModalProvider, tablePropertiesModalPresenterModalProvider, null, null, translations);
   }
 
-  @SuppressWarnings({ "unchecked", "OverlyLongMethod" })
+  @SuppressWarnings({ "unchecked" })
   @Test
   @Ignore
   public void testOnBind_RegistersHandlersAndBindsDependencies() {

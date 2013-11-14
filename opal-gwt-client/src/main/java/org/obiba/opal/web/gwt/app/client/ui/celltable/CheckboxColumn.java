@@ -247,12 +247,12 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
 
     boolean allSelected = selectedSize == display.getDataProvider().getList().size();
 
-    if(allSelected) {
+    if(display.getAlert() != null && selectedSize == 0) {
+      display.getAlert().setVisible(false);
+    } else if(allSelected) {
       updateStatusAlertWhenAllSelected(selectedSize);
     } else if(selectedSize > 0) {
       updateStatusAlertWhenNotAllSelected(selectedSize);
-    } else if(display.getAlert() != null) {
-      display.getAlert().setVisible(false);
     }
   }
 
