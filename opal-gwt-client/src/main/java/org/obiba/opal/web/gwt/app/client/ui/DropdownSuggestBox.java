@@ -55,6 +55,14 @@ public class DropdownSuggestBox extends Composite implements HasText, HasValue<S
     return (MultiWordSuggestOracle)suggestBox.getSuggestOracle();
   }
 
+  public String getId() {
+    return getElement().getId();
+  }
+
+  public void setId(String id) {
+    getElement().setId(id);
+  }
+
   @Override
   public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
     return textBox.addValueChangeHandler(handler);

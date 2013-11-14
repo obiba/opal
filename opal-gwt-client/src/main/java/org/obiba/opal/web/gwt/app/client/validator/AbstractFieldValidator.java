@@ -22,7 +22,7 @@ public abstract class AbstractFieldValidator implements FieldValidator {
   // Instance Variables
   //
 
-  private final String errorMessageKey;
+  private String errorMessageKey;
 
   private List<String> args = new ArrayList<String>();
 
@@ -55,13 +55,16 @@ public abstract class AbstractFieldValidator implements FieldValidator {
     this.args = args;
   }
 
+  public void setErrorMessageKey(String value) {
+    errorMessageKey = value;
+  }
+
   public List<String> getArgs() {
     return args;
   }
 
-  @SuppressWarnings("ParameterHidesMemberVariable")
-  public AbstractFieldValidator setId(String id) {
-    this.id = id;
+  public FieldValidator setId(String value) {
+    id = value;
     return this;
   }
 

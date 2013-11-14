@@ -91,7 +91,7 @@ public class AddViewModalView extends ModalPopupViewWithUiHandlers<AddViewModalU
 
   @Override
   public void addTableSelections(JsArray<TableDto> tableDtos) {
-    this.tables.addTableSelections(tableDtos);
+    tables.addTableSelections(tableDtos);
   }
 
   @Override
@@ -106,7 +106,9 @@ public class AddViewModalView extends ModalPopupViewWithUiHandlers<AddViewModalU
 
   @Override
   public void clearErrors() {
-    modal.clearAlert();
+    modal.clearAlert(viewNameGroup);
+    modal.clearAlert(tablesGroup);
+    modal.clearAlert(fileSelectionGroup);
   }
 
   @Override

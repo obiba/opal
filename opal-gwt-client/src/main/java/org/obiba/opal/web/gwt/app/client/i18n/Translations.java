@@ -463,6 +463,7 @@ public interface Translations extends Constants {
       "RPackageInstalledButNotFound",
       "Package was probably successfully installed in R but cannot be found. Restarting R server might solve this issue.",
       "InvalidLocaleName", "Invalid locale name '{0}'. Please choose a valid locale name from the list.",//
+      "InvalidCharacterSetName", "Invalid character set '{0}'. Please choose a valid character set from the list.",//
       "CopyVariableSelectAtLeastOne", "Select at least one variable to add.",//
       "CopyVariableCurrentView", "The view cannot be the current view. Please select another destination view.",//
       "CopyVariableNameRequired", "Variable name cannot be empty.",//
@@ -494,7 +495,8 @@ public interface Translations extends Constants {
       "VocabularyNameMustBeUnique", "Vocabulary name must be unique",//
       "DeleteTableSelectAtLeastOne", "Select at least one table to delete",//
       "XMLOrExcelFileRequired", "An Excel or a XML file is required.",//
-      "CreateViewFailed", "Failed to create view. Make sure the view file is valid."//
+      "CreateViewFailed", "Failed to create view. Make sure the view file is valid.",//
+      "SPSSOrExcelFileRequired", "An Excel or a SPSS file is required."//
   })
   Map<String, String> userMessageMap();
 
