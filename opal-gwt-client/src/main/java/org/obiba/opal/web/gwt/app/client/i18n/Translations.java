@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2013 OBiBa. All rights reserved.
  *
- * This program and the accompanying materials
+ * This program and the accompanying materials&
  * are made available under the terms of the GNU Public License v3.0.
  *
  * You should have received a copy of the GNU General Public License
@@ -372,6 +372,7 @@ public interface Translations extends Constants {
       "NoDataFileSelected", "You must select a data file.",//
       "NoDataToCopy", "No data to copy to the current destination.",//
       "DataCopyNewNameRequired", "New table name is required when copying within same datasource.",//
+      "DataCopyNewNameAlreadyExists", "Table name already exists.",//
       "NoFileSelected", "You must select a file.",//
       "CharsetNotAvailable", "The character set you have specified is not available.",//
       "FieldSeparatorRequired", "The field separator is required.",//

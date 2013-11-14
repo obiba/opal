@@ -1,12 +1,12 @@
-/*******************************************************************************
- * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
+/*
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
- * This program and the accompanying materials
+ * This program and the accompanying materials&
  * are made available under the terms of the GNU Public License v3.0.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ */
 package org.obiba.opal.web.gwt.app.client.magma.copydata.presenter;
 
 import java.util.ArrayList;
@@ -96,9 +96,17 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
     // if only 1 table is selected and is copied to current datasource, validate new table name
     String selectedDatasource = getView().getSelectedDatasource();
     String newName = getView().getNewName().getText();
-    if(copyTables.size() == 1 && selectedDatasource.equals(datasourceName) && newName.isEmpty()) {
-      getView()
-          .showError(Display.FormField.NEW_TABLE_NAME, translations.userMessageMap().get("DataCopyNewNameRequired"));
+
+    if(copyTables.size() == 1) {
+      if(selectedDatasource.equals(datasourceName) && newName.isEmpty()) {
+        getView()
+            .showError(Display.FormField.NEW_TABLE_NAME, translations.userMessageMap().get("DataCopyNewNameRequired"));
+      } else if(selectedDatasource.equals(datasourceName) && copyTables.iterator().next().getName().equals(newName)) {
+        getView().showError(Display.FormField.NEW_TABLE_NAME,
+            translations.userMessageMap().get("DataCopyNewNameAlreadyExists"));
+      } else {
+        sendCommandsCopyRequest();
+      }
     } else {
       sendCommandsCopyRequest();
     }
