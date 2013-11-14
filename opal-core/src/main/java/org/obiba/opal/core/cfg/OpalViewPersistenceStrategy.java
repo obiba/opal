@@ -18,8 +18,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -31,18 +29,10 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-import org.eclipse.jgit.api.CloneCommand;
-import org.eclipse.jgit.api.FetchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
-import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.lib.RepositoryCache;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.eclipse.jgit.transport.FetchResult;
-import org.eclipse.jgit.transport.RefSpec;
-import org.eclipse.jgit.util.FS;
 import org.obiba.core.util.FileUtil;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.magma.Datasource;
@@ -53,6 +43,7 @@ import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewPersistenceStrategy;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.audit.OpalUserProvider;
+import org.obiba.opal.core.vcs.support.OpalGitUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +68,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
 
   public static final String VIEWS_DIRECTORY_NAME = "views";
 
-  public static final String GIT_DIRECTORY_NAME = "git";
+  public static final String GIT_DIRECTORY_NAME = "data" + File.separator + "git";
 
   public static final String VIEW_FILE_NAME = "View.xml";
 
@@ -255,7 +246,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     String remoteUrl = "file://" + targetDir.getAbsolutePath();
     File tmp = getTmpDirectory();
     File localRepo = new File(tmp, "opal-" + Long.toString(System.nanoTime()));
-    cloneRepository(localRepo.getParentFile(), localRepo.getName(), remoteUrl);
+    OpalGitUtils.cloneRepository(localRepo.getParentFile(), localRepo.getName(), remoteUrl);
     return localRepo;
   }
 
@@ -383,15 +374,6 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     return MagmaEngine.get().getExtension(MagmaXStreamExtension.class).getXStreamFactory().createXStream();
   }
 
-  private void createViewsDirectory() {
-    if(!viewsDirectory.isDirectory()) {
-      if(!viewsDirectory.mkdirs()) {
-        throw new RuntimeException(
-            "The views directory '" + viewsDirectory.getAbsolutePath() + "' could not be created.");
-      }
-    }
-  }
-
   private String normalizeDatasourceName(@SuppressWarnings("TypeMayBeWeakened") String datasourceName) {
     Pattern escaper = Pattern.compile("([^a-zA-Z0-9-_. ])");
     return escaper.matcher(datasourceName).replaceAll("");
@@ -401,67 +383,4 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     return new File(viewsDirectory, normalizeDatasourceName(datasourceName) + ".xml");
   }
 
-  /**
-   * Clone or Fetch a repository. If the local repository does not exist,
-   * clone is called. If the repository does exist, fetch is called. By
-   * default the clone/fetch retrieves the remote heads, tags, and notes.
-   *
-   * @param repositoriesFolder
-   * @param name
-   * @param fromUrl
-   * @throws Exception
-   */
-  private void cloneRepository(File repositoriesFolder, String name, String fromUrl) throws Exception {
-    String repoName = name;
-    // normal repository, strip .git suffix
-    if(name.toLowerCase().endsWith(Constants.DOT_GIT_EXT)) {
-      repoName = name.substring(0, name.indexOf(Constants.DOT_GIT_EXT));
-    }
-
-    File folder = new File(repositoriesFolder, repoName);
-    if(folder.exists()) {
-      File gitDir = RepositoryCache.FileKey.resolve(new File(repositoriesFolder, repoName), FS.DETECTED);
-      Repository repository = new FileRepositoryBuilder().setGitDir(gitDir).build();
-      fetchRepository(repository);
-      repository.close();
-    } else {
-      CloneCommand clone = new CloneCommand();
-      clone.setBare(false);
-      clone.setCloneAllBranches(true);
-      clone.setURI(fromUrl);
-      clone.setDirectory(folder);
-      Repository repository = clone.call().getRepository();
-
-      // Now we have to fetch because CloneCommand doesn't fetch
-      // refs/notes nor does it allow manual RefSpec.
-      fetchRepository(repository);
-      repository.close();
-    }
-  }
-
-  /**
-   * Fetch updates from the remote repository. If refSpecs is unspecifed,
-   * remote heads, tags, and notes are retrieved.
-   *
-   * @param credentialsProvider
-   * @param repository
-   * @param refSpecs
-   * @return FetchResult
-   * @throws Exception
-   */
-  private FetchResult fetchRepository(Repository repository, RefSpec... refSpecs) throws Exception {
-    Git git = new Git(repository);
-    FetchCommand fetch = git.fetch();
-    List<RefSpec> specs = new ArrayList<RefSpec>();
-    if (refSpecs == null || refSpecs.length == 0) {
-      specs.add(new RefSpec("+refs/heads/*:refs/remotes/origin/*"));
-      specs.add(new RefSpec("+refs/tags/*:refs/tags/*"));
-      specs.add(new RefSpec("+refs/notes/*:refs/notes/*"));
-    } else {
-      specs.addAll(Arrays.asList(refSpecs));
-    }
-    fetch.setRefSpecs(specs);
-    FetchResult fetchRes = fetch.call();
-    return fetchRes;
-  }
 }
