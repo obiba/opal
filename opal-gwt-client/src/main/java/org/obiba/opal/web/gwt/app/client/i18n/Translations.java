@@ -7,6 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.obiba.opal.web.gwt.app.client.i18n;
 
 import java.util.Map;
@@ -372,6 +373,7 @@ public interface Translations extends Constants {
       "NoDataFileSelected", "You must select a data file.",//
       "NoDataToCopy", "No data to copy to the current destination.",//
       "DataCopyNewNameRequired", "New table name is required when copying within same datasource.",//
+      "DataCopyNewNameAlreadyExists", "Table name already exists.",//
       "NoFileSelected", "You must select a file.",//
       "CharsetNotAvailable", "The character set you have specified is not available.",//
       "FieldSeparatorRequired", "The field separator is required.",//
