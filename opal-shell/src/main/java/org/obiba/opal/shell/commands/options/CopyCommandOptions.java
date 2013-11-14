@@ -38,6 +38,15 @@ public interface CopyCommandOptions extends HelpOption {
   boolean isOut();
 
   //
+  // Table transformation
+  //
+  @Option(shortName = "n",
+      description = "Name of the destination table, when only one table is to be copied.")
+  String getName();
+
+  boolean isName();
+
+  //
   // Values
   // 
 

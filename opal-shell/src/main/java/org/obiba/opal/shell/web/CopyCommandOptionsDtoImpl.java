@@ -103,6 +103,16 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
   }
 
   @Override
+  public String getName() {
+    return dto.getDestinationTableName();
+  }
+
+  @Override
+  public boolean isName() {
+    return dto.hasDestinationTableName();
+  }
+
+  @Override
   public boolean getNonIncremental() {
     return dto.getNonIncremental();
   }

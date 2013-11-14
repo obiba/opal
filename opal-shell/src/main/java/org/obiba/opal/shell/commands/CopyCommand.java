@@ -24,6 +24,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
+import org.obiba.magma.RenameValueTable;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.datasource.csv.CsvDatasource;
 import org.obiba.magma.datasource.csv.support.CsvUtil;
@@ -42,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -52,7 +54,7 @@ import com.google.common.collect.ImmutableSet;
         "The tables can be explicitly named and/or be the ones from a specified source datasource. " +
         "The variables can be optionally processed: dispatched in another table and/or renamed.",
     syntax = "Syntax: copy [--unit UNIT] [--source NAME] (--destination NAME | --out FILE) [--multiplex SCRIPT] " +
-        "[--transform SCRIPT] [--non-incremental] [--no-values | --no-variables] [--copy-null] [TABLE_NAME...]")
+        "[--transform SCRIPT] [--name NAME] [--non-incremental] [--no-values | --no-variables] [--copy-null] [TABLE_NAME...]")
 public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommandOptions> {
 
   private static final Logger log = LoggerFactory.getLogger(CopyCommand.class);
@@ -85,6 +87,12 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       try {
         destinationDatasource = getDestinationDatasource();
         Set<ValueTable> tables = getValueTables();
+        for(ValueTable table : tables) {
+          if(destinationDatasource.getName().equals(table.getDatasource().getName()) &&
+              destinationDatasource.hasValueTable(table.getName())) {
+            throw new IllegalArgumentException("Cannot copy a table into itself: " + table.getName());
+          }
+        }
         getShell().printf("Copying %d tables to %s.\n", tables.size(), destinationDatasource.getName());
         exportService
             .exportTablesToDatasource(options.isUnit() ? options.getUnit() : null, tables, destinationDatasource,
@@ -92,7 +100,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
         getShell().printf("Successfully copied all tables.\n");
         errorCode = CommandResultCode.SUCCESS;
       } catch(Exception e) {
-        getShell().printf("%s\n", e.getMessage());
+        if(!Strings.isNullOrEmpty(e.getMessage())) getShell().printf("%s\n", e.getMessage());
         //noinspection UseOfSystemOutOrSystemErr
         e.printStackTrace(System.err);
       } finally {
@@ -180,6 +188,11 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
           names.put(name, MagmaEngineTableResolver.valueOf(name).resolveTable());
         }
       }
+    }
+
+    if(names.size() == 1 && options.isName()) {
+      String originalName = names.keySet().iterator().next();
+      names.put(originalName, new RenameValueTable(options.getName(), names.get(originalName)));
     }
 
     return ImmutableSet.copyOf(names.values());

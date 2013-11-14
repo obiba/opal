@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -282,7 +283,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   }
 
   private void printThrowable(Throwable ex, boolean withStack) {
-    getShell().printf(ex.getMessage());
+    if(!Strings.isNullOrEmpty(ex.getMessage())) getShell().printf(ex.getMessage());
     if(withStack) {
       for(StackTraceElement elem : ex.getStackTrace()) {
         getShell().printf(elem.toString());
