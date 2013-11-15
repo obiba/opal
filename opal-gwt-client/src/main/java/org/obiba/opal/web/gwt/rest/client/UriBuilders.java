@@ -109,6 +109,13 @@ public enum UriBuilders {
     }
   },
 
+  DATASOURCE_TABLE_FACET_VARIABLE_SEARCH {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasource", "{}", "table", "{}", "facet", "variable", "{}", "_search");
+    }
+  },
+
   DATASOURCE_VIEW_VARIABLES {
     @Override
     public UriBuilder create() {

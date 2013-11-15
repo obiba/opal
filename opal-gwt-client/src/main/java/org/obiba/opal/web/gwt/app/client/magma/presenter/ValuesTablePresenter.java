@@ -1,12 +1,12 @@
-/*******************************************************************************
- * Copyright (c) 2012 OBiBa. All rights reserved.
+/*
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ */
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
 import java.util.ArrayList;
@@ -16,7 +16,6 @@ import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
-import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
@@ -26,6 +25,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -43,14 +43,15 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
 import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
-import static com.google.gwt.http.client.Response.SC_OK;
 
-public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.Display> {
+public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.Display>
+    implements ValuesTableUiHandlers {
 
   private TableDto table;
 
@@ -70,6 +71,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     this.placeManager = placeManager;
     this.valueSequencePopupProvider = valueSequencePopupProvider.setContainer(this);
     this.entityModalProvider = entityModalProvider.setContainer(this);
+
+    getView().setUiHandlers(this);
   }
 
   public void setTable(TableDto table) {
@@ -93,7 +96,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     getView().setVariableLabelFieldUpdater(new ValueUpdater<String>() {
       @Override
       public void update(String value) {
-        placeManager.revealPlace(ProjectPlacesHelper.getVariablePlace(table.getDatasourceName(), table.getName(), value));
+        placeManager
+            .revealPlace(ProjectPlacesHelper.getVariablePlace(table.getDatasourceName(), table.getName(), value));
       }
     });
     fetcher.updateVariables(select);
@@ -142,6 +146,33 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
   }
 
+  @Override
+  public void onVariableFilter(final String variableName) {
+    // Fetch variable and show its filter
+    ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(
+        UriBuilders.DATASOURCE_TABLE_VARIABLE.create().build(table.getDatasourceName(), table.getName(), variableName))
+        .withCallback(new ResourceCallback<VariableDto>() {
+          @Override
+          public void onResource(Response response, final VariableDto resource) {
+
+            //TODO: Do not fetch facets when type is text
+            // Fetch facets
+            if(response.getStatusCode() == Response.SC_OK) {
+              ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(
+                  UriBuilders.DATASOURCE_TABLE_FACET_VARIABLE_SEARCH.create()
+                      .build(table.getDatasourceName(), table.getName(), variableName))
+                  .withCallback(new ResourceCallback<QueryResultDto>() {
+                    @Override
+                    public void onResource(Response response, QueryResultDto term) {
+
+                      getView().addVariableFilter(resource, term);
+                    }
+                  }).get().send();
+            }
+          }
+        }).get().send();
+  }
+
   private class VariablesResourceCallback implements ResourceCallback<QueryResultDto> {
 
     private final TableDto table;
@@ -160,7 +191,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         for(int i = 0; i < resultDto.getTotalHits(); i++) {
           VariableItemDto varDto = (VariableItemDto) resultDto.getHitsArray().get(i)
               .getExtension(VariableItemDto.ItemResultDtoExtensions.item);
-
           variables.push(varDto.getVariable());
         }
         getView().setVariables(variables);
@@ -264,8 +294,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         @Override
         public void onVariableResourceCallback() {
           List<VariableDto> variables = new ArrayList<VariableDto>();
-          for(int i = 0; i < results.size(); i++) {
-            variables.add(results.get(i));
+          for(VariableDto result : results) {
+            variables.add(result);
           }
 
           request(variables, offset, limit);
@@ -382,7 +412,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
   }
 
-  public interface Display extends View {
+  public interface Display extends View, HasUiHandlers<ValuesTableUiHandlers> {
+
     void setTable(TableDto table);
 
     void clearTable();
@@ -404,6 +435,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     TextBoxClearable getFilter();
 
     void populateValues(int offset, ValueSetsDto resource);
+
+    void addVariableFilter(VariableDto variableDto, QueryResultDto termDto);
   }
 
   public enum ViewMode {
