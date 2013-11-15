@@ -94,10 +94,12 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   private final ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider;
 
   private TableDto table;
-  private VariableDto variable;
-  private VariableDto nextVariable;
-  private VariableDto previousVariable;
 
+  private VariableDto variable;
+
+  private VariableDto nextVariable;
+
+  private VariableDto previousVariable;
 
   private boolean variableUpdatePending = false;
 
@@ -269,7 +271,12 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
     // edit variable
     if(table.hasViewLink()) {
-      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).put()
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(UriBuilders.DATASOURCE_VIEW_VARIABLE.create()
+          .build(table.getDatasourceName(), table.getName(), variable.getName())).put()
+          .authorize(getView().getEditAuthorizer()).send();
+    } else {
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
+          .build(table.getDatasourceName(), table.getName(), variable.getName())).put()
           .authorize(getView().getEditAuthorizer()).send();
     }
 
@@ -284,12 +291,14 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   @Override
   public void onNextVariable() {
-    placeManager.revealPlace(ProjectPlacesHelper.getVariablePlace(table.getDatasourceName(), table.getName(), nextVariable.getName()));
+    placeManager.revealPlace(
+        ProjectPlacesHelper.getVariablePlace(table.getDatasourceName(), table.getName(), nextVariable.getName()));
   }
 
   @Override
   public void onPreviousVariable() {
-    placeManager.revealPlace(ProjectPlacesHelper.getVariablePlace(table.getDatasourceName(), table.getName(), previousVariable.getName()));
+    placeManager.revealPlace(
+        ProjectPlacesHelper.getVariablePlace(table.getDatasourceName(), table.getName(), previousVariable.getName()));
   }
 
   @Override
@@ -395,6 +404,11 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   public void onEditCategories() {
     CategoriesEditorModalPresenter categoriesEditorPresenter = categoriesEditorModalProvider.get();
     categoriesEditorPresenter.initialize(variable, table);
+  }
+
+  @Override
+  public void onEditAttributes() {
+    // TODO
   }
 
   @Override

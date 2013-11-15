@@ -165,6 +165,9 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   IconAnchor editCategories;
 
   @UiField
+  IconAnchor editAttributes;
+
+  @UiField
   IconAnchor editProperties;
 
   @UiField
@@ -300,6 +303,11 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     getUiHandlers().onEditCategories();
   }
 
+  @UiHandler("editAttributes")
+  void onEditAttributes(ClickEvent event) {
+    getUiHandlers().onEditAttributes();
+  }
+
   @UiHandler("editProperties")
   void onEditProperties(ClickEvent event) {
     getUiHandlers().onEditProperties();
@@ -421,7 +429,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   @Override
   public HasAuthorization getEditAuthorizer() {
-    return new CompositeAuthorizer(new WidgetAuthorizer(remove), new WidgetAuthorizer(editScript));
+    return new WidgetAuthorizer(remove, editScript, editProperties, editCategories, editAttributes);
   }
 
   @Override

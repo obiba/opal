@@ -412,7 +412,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   @Override
   public HasAuthorization getEditAuthorizer() {
-    return new WidgetAuthorizer(edit);
+    return new WidgetAuthorizer(edit, addVariable);
   }
 
   @Override

@@ -39,6 +39,20 @@ public enum UriBuilders {
     }
   },
 
+  PROJECT_COMMANDS_IMPORT {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "commands", "_import");
+    }
+  },
+
+  PROJECT_COMMANDS_EXPORT {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "commands", "_export");
+    }
+  },
+
   PROJECT_COMMANDS_COPY {
     @Override
     public UriBuilder create() {

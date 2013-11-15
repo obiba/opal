@@ -21,6 +21,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 /**
@@ -28,14 +29,9 @@ import com.gwtplatform.mvp.client.ViewImpl;
  */
 public class AuthorizationView extends ViewImpl implements AuthorizationPresenter.Display {
 
-  @UiTemplate("AuthorizationView.ui.xml")
-  interface AuthorizationViewUiBinder extends UiBinder<Widget, AuthorizationView> {}
-
-  private static final AuthorizationViewUiBinder uiBinder = GWT.create(AuthorizationViewUiBinder.class);
+  interface Binder extends UiBinder<Widget, AuthorizationView> {}
 
   private final Translations translation = GWT.create(Translations.class);
-
-  private final Widget widget;
 
   @UiField
   Label explanation;
@@ -46,13 +42,9 @@ public class AuthorizationView extends ViewImpl implements AuthorizationPresente
   @UiField
   SimplePanel groups;
 
-  public AuthorizationView() {
-    widget = uiBinder.createAndBindUi(this);
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
+  @Inject
+  public AuthorizationView(Binder uiBinder) {
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
   @Override

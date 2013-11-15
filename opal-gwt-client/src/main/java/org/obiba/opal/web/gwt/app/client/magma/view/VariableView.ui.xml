@@ -137,7 +137,7 @@
           <b:Heading size="4" addStyleNames="inline-block">
             <ui:msg description="Attributes label">Attributes</ui:msg>
           </b:Heading>
-          <b2:IconAnchor icon="EDIT" addStyleNames="small-indent">
+          <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="editAttributes">
           </b2:IconAnchor>
           <b:SimplePager ui:field="attributeTablePager" location="RIGHT" addStyleNames="pull-right small-top-margin"/>
         </g:FlowPanel>

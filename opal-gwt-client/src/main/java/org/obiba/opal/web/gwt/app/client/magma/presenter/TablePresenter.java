@@ -226,13 +226,14 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   private void authorize() {
     if(table == null) return;
 
-    UriBuilder ub = UriBuilder.create().segment("project", table.getDatasourceName());
     // export data
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/commands/_copy").post()//
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.PROJECT_COMMANDS_EXPORT.create().build(table.getDatasourceName())).post()//
         .authorize(getView().getExportDataAuthorizer())//
         .send();
     // copy data
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build() + "/commands/_copy").post()
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.PROJECT_COMMANDS_COPY.create().build(table.getDatasourceName())).post()
         .authorize(getView().getCopyDataAuthorizer()).send();
 
     // export variables in excel
@@ -250,6 +251,13 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).put()
           .authorize(getView().getEditAuthorizer()).send();
     } else {
+      // download view
+      getView().getViewDownloadAuthorizer().unauthorized();
+
+      // edit table
+      ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink()).put()
+          .authorize(getView().getEditAuthorizer()).send();
+
       // Drop table
       ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink()).delete()
           .authorize(getView().getRemoveAuthorizer()).send();
@@ -387,7 +395,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   @Override
   public void onDownloadView() {
-    String downloadUrl = table.getViewLink() + "/xml";
+    String downloadUrl = UriBuilders.DATASOURCE_VIEW.create().build(table.getDatasourceName(), table.getName()) +
+        "/xml";
     fireEvent(new FileDownloadRequestEvent(downloadUrl));
   }
 

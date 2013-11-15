@@ -25,12 +25,14 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.obiba.magma.ValueTable;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.VariableStatsService;
 import org.obiba.opal.web.magma.view.ViewDtos;
 import org.obiba.opal.web.model.Magma.ViewDto;
+import org.obiba.opal.web.support.InvalidRequestException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 
@@ -68,23 +70,6 @@ public class ViewResource extends AbstractValueTableResource {
   @PUT
   public Response updateView(ViewDto viewDto, @Nullable @QueryParam("comment") String comment) {
     if(!viewDto.hasName()) return Response.status(Status.BAD_REQUEST).build();
-
-    // Validate that all variable entity types are the same as the base value table
-//    Magma.VariableListViewDto derivedVariables = viewDto.getExtension(Magma.VariableListViewDto.view);
-//
-//    for(Magma.VariableDto variable : derivedVariables.getVariablesList()) {
-//      if(!variable.getEntityType().equals(getValueTable().getEntityType())) {
-//
-//        Collection<String> args = new ArrayList<String>();
-//        args.add(variable.getEntityType());
-//        args.add(getValueTable().getEntityType());
-//
-//        return Response.status(Response.Status.BAD_REQUEST).entity(
-//            Ws.ClientErrorDto.newBuilder().setCode(Status.BAD_REQUEST.getStatusCode())
-//                .setStatus("CopyVariableIncompatibleEntityType").addAllArguments(args).build()).build();
-//
-//      }
-//    }
 
     viewManager.addView(getDatasource().getName(), viewDtos.fromDto(viewDto), comment);
     if(!viewDto.getName().equals(getValueTable().getName())) {
@@ -139,7 +124,9 @@ public class ViewResource extends AbstractValueTableResource {
   }
 
   protected View asView() {
-    return (View) getValueTable();
+    ValueTable table = getValueTable();
+    if (table.isView()) return (View)table;
+    throw new InvalidRequestException("Not a view");
   }
 
 }

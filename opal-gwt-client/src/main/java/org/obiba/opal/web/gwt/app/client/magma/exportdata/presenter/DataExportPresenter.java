@@ -26,6 +26,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.CopyCommandOptionsDto;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
@@ -160,13 +161,8 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
   public void onSubmit(String fileFormat, String outFile, String unit) {
     getView().hideDialog();
 
-    UriBuilder uriBuilder = UriBuilder.create();
-    if(datasourceName == null) {
-      uriBuilder.segment("shell", "copy");
-    } else {
-      uriBuilder.segment("project", datasourceName, "commands", "_export");
-    }
-    ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).post() //
+    UriBuilder uriBuilder = UriBuilders.PROJECT_COMMANDS_EXPORT.create();
+    ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build(datasourceName)).post() //
         .withResourceBody(CopyCommandOptionsDto.stringify(createCopyCommandOptions(fileFormat, outFile, unit))) //
         .withCallback(Response.SC_BAD_REQUEST, new ClientFailureResponseCodeCallBack()) //
         .withCallback(Response.SC_CREATED, new SuccessResponseCodeCallBack(outFile)).send();

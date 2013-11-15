@@ -201,7 +201,7 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
     public boolean validate() {
       List<String> errors = formValidationErrors();
       if(errors.size() > 0) {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error(errors).build());
+        fireEvent(NotificationEvent.newBuilder().error(errors).build());
         return false;
       }
       return true;
@@ -222,7 +222,7 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
       } catch(Exception e) {
         builder.error(response.getText());
       }
-      getEventBus().fireEvent(builder.build());
+      fireEvent(builder.build());
     }
   }
 
@@ -232,7 +232,7 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
       String location = response.getHeader("Location");
       String jobId = location.substring(location.lastIndexOf('/') + 1);
 
-      getEventBus().fireEvent(
+      fireEvent(
           NotificationEvent.newBuilder().info("DataCopyProcessLaunched").args(jobId, getView().getSelectedDatasource())
               .build());
     }
