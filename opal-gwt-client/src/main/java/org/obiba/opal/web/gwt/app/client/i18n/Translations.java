@@ -2410,8 +2410,8 @@ public interface Translations extends Constants {
   @DefaultStringValue("1 table is selected for being exported.")
   String export1Table();
 
-  @Description("Opal default identifiers label")
-  @DefaultStringValue("Default Identifiers")
+  @Description("Opal identifiers label")
+  @DefaultStringValue("[None]")
   String opalDefaultIdentifiersLabel();
 
 }

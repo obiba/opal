@@ -15,12 +15,14 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -46,9 +48,6 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
 
   private String username;
 
-  private ValidationHandler destinationValidator;
-
-  @UiTemplate("DataExportView.ui.xml")
   interface Binder extends UiBinder<Widget, DataExportView> {}
 
   @UiField
@@ -61,13 +60,13 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
   Panel unitsPanel;
 
   @UiField
-  ListBox units;
+  Chooser units;
 
   @UiField
   SimplePanel filePanel;
 
   @UiField
-  ListBox fileFormat;
+  Chooser fileFormat;
 
   private FileSelectionPresenter.Display fileSelection;
 
@@ -87,18 +86,16 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
 
   @UiHandler("submitButton")
   public void onSubmit(ClickEvent event) {
-    getUiHandlers().onSubmit();
+    getUiHandlers().onSubmit(getFileFormat(), getOutFile(), getSelectedUnit());
   }
 
-  @Override
-  public String getSelectedUnit() {
-    return units.getSelectedIndex() < 0
-        ? translations.opalDefaultIdentifiersLabel()
-        : units.getValue(units.getSelectedIndex());
+  private String getSelectedUnit() {
+    return units.getSelectedIndex() == 0 ? null : units.getSelectedValue();
   }
 
   @Override
   public void setUnits(JsArray<FunctionalUnitDto> unitDtos) {
+    units.clear();
     units.addItem(translations.opalDefaultIdentifiersLabel());
     for(int i = 0; i < unitDtos.length(); i++) {
       units.addItem(unitDtos.get(i).getName());
@@ -107,18 +104,7 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
     unitsPanel.setVisible(unitDtos.length() > 0);
   }
 
-  @Override
-  public boolean isIncremental() {
-    return false;
-  }
-
-  @Override
-  public boolean isWithVariables() {
-    return true;
-  }
-
-  @Override
-  public String getOutFile() {
+  private String getOutFile() {
     Date date = new Date();
     DateTimeFormat dateFormat = DateTimeFormat.getFormat("yyyyMMddHHmmss");
 
@@ -135,8 +121,7 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
     return fileSelection.getFile() + suffix;
   }
 
-  @Override
-  public String getFileFormat() {
+  private String getFileFormat() {
     return fileFormat.getValue(fileFormat.getSelectedIndex());
   }
 
@@ -147,11 +132,6 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
     fileSelection.setEnabled(true);
     fileSelection.setFieldWidth("20em");
     fileFormat.setEnabled(true);
-  }
-
-  @Override
-  public void setDestinationValidator(ValidationHandler handler) {
-    destinationValidator = handler;
   }
 
   @Override

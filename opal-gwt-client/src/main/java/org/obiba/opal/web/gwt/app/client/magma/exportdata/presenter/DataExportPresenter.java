@@ -44,8 +44,6 @@ import com.gwtplatform.mvp.client.PopupView;
 public class DataExportPresenter extends ModalPresenterWidget<DataExportPresenter.Display>
     implements DataExportUiHandlers {
 
-  private static String DEFAULT_UNIT_NAME;
-
   private final RequestCredentials credentials;
 
   private Set<TableDto> exportTables = new HashSet<TableDto>();
@@ -66,7 +64,6 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
     this.fileSelectionPresenter = fileSelectionPresenter;
     this.credentials = credentials;
 
-    DEFAULT_UNIT_NAME = translations.opalDefaultIdentifiersLabel();
     getView().setUiHandlers(this);
   }
 
@@ -81,7 +78,6 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
     fileSelectionPresenter.bind();
     fileSelectionPresenter.getView().setFile("/home/" + credentials.getUsername() + "/export");
     getView().setFileWidgetDisplay(fileSelectionPresenter.getView());
-    getView().setDestinationValidator(new DestinationValidator());
   }
 
   private void initFileSelectionType() {
@@ -161,7 +157,7 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
   }
 
   @Override
-  public void onSubmit() {
+  public void onSubmit(String fileFormat, String outFile, String unit) {
     getView().hideDialog();
 
     UriBuilder uriBuilder = UriBuilder.create();
@@ -171,12 +167,12 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
       uriBuilder.segment("project", datasourceName, "commands", "_export");
     }
     ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build()).post() //
-        .withResourceBody(CopyCommandOptionsDto.stringify(createCopyCommandOptions())) //
+        .withResourceBody(CopyCommandOptionsDto.stringify(createCopyCommandOptions(fileFormat, outFile, unit))) //
         .withCallback(Response.SC_BAD_REQUEST, new ClientFailureResponseCodeCallBack()) //
-        .withCallback(Response.SC_CREATED, new SuccessResponseCodeCallBack()).send();
+        .withCallback(Response.SC_CREATED, new SuccessResponseCodeCallBack(outFile)).send();
   }
 
-  private CopyCommandOptionsDto createCopyCommandOptions() {
+  private CopyCommandOptionsDto createCopyCommandOptions(String fileFormat, String outFile, String unit) {
     CopyCommandOptionsDto dto = CopyCommandOptionsDto.create();
 
     JsArrayString selectedTables = JavaScriptObject.createArray().cast();
@@ -186,11 +182,11 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
     }
 
     dto.setTablesArray(selectedTables);
-    dto.setFormat(getView().getFileFormat());
-    dto.setOut(getView().getOutFile());
-    dto.setNonIncremental(!getView().isIncremental());
-    dto.setNoVariables(!getView().isWithVariables());
-    if(!getView().getSelectedUnit().equals(DEFAULT_UNIT_NAME)) dto.setUnit(getView().getSelectedUnit());
+    dto.setFormat(fileFormat);
+    dto.setOut(outFile);
+    dto.setNonIncremental(true);
+    dto.setNoVariables(false);
+    if(unit != null) dto.setUnit(unit);
 
     return dto;
   }
@@ -198,28 +194,6 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
   //
   // Interfaces and classes
   //
-
-  private final class DestinationValidator implements ValidationHandler {
-    @Override
-    public boolean validate() {
-      List<String> errors = formValidationErrors();
-      if(errors.size() > 0) {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error(errors).build());
-        return false;
-      }
-      return true;
-    }
-
-    private List<String> formValidationErrors() {
-      List<String> result = new ArrayList<String>();
-
-      String filename = getView().getOutFile();
-      if(filename == null || "".equals(filename)) {
-        result.add("DestinationFileIsMissing");
-      }
-      return result;
-    }
-  }
 
   class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {
     @Override
@@ -229,39 +203,28 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
   }
 
   class SuccessResponseCodeCallBack implements ResponseCodeCallback {
+
+    private final String outFile;
+
+    SuccessResponseCodeCallBack(String outFile) {
+      this.outFile = outFile;
+    }
+
     @Override
     public void onResponseCode(Request request, Response response) {
       String location = response.getHeader("Location");
       String jobId = location.substring(location.lastIndexOf('/') + 1);
-      String destination = getView().getOutFile();
       getEventBus().fireEvent(
-          NotificationEvent.newBuilder().info("DataExportationProcessLaunched").args(jobId, destination).build());
+          NotificationEvent.newBuilder().info("DataExportationProcessLaunched").args(jobId, outFile).build());
     }
   }
 
   public interface Display extends PopupView, HasUiHandlers<DataExportUiHandlers> {
 
-    void setDestinationValidator(ValidationHandler handler);
-
     /**
      * Set a collection of Opal units retrieved from Opal.
      */
     void setUnits(JsArray<FunctionalUnitDto> units);
-
-    /**
-     * Get the Opal unit selected by the user.
-     */
-    String getSelectedUnit();
-
-    String getOutFile();
-
-    String getFileFormat();
-
-    boolean isIncremental();
-
-    boolean isWithVariables();
-
-//    boolean isUnitId();
 
     void setFileWidgetDisplay(FileSelectionPresenter.Display display);
 
