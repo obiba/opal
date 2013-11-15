@@ -121,7 +121,6 @@ public class OpalBootstrapperImpl implements Bootstrapper {
             .withCallback(new DatabasesStatusResourceCallback()).withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            GWT.log("coucou");
             placeManager.revealCurrentPlace();
           }
         }, Response.SC_FORBIDDEN)//
@@ -171,7 +170,6 @@ public class OpalBootstrapperImpl implements Bootstrapper {
   private class DatabasesStatusResourceCallback implements ResourceCallback<DatabasesStatusDto> {
     @Override
     public void onResource(Response response, DatabasesStatusDto resource) {
-      GWT.log("patate");
       if(!resource.getHasIdentifiers() || !resource.getHasStorage()) {
         placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.INSTALL).build());
       } else {

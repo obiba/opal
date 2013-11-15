@@ -47,6 +47,7 @@ public class ProjectsPermissionConverterTest
         "magma:/datasource/patate/tables:GET:GET", //
         "magma:/datasource/patate/tables:POST:GET", //
         "magma:/project/patate:GET:GET", //
+        "magma:/project/patate/summary:GET:GET", //
         "magma:/files/projects/patate:GET:GET/*", //
         "magma:/files/projects/patate:POST:GET/*",//
         "magma:/files/projects/patate:PUT:GET/*");
@@ -57,7 +58,8 @@ public class ProjectsPermissionConverterTest
     testConversion("/datasource/patate", ProjectsPermissionConverter.Permission.CREATE_VIEW, //
         "magma:/datasource/patate/tables:GET:GET", //
         "magma:/datasource/patate/views:POST:GET", //
-        "magma:/project/patate:GET:GET",//
+        "magma:/project/patate:GET:GET", //
+        "magma:/project/patate/summary:GET:GET",//
         "magma:/files/projects/patate:GET:GET/*",//
         "magma:/files/projects/patate:POST:GET/*",//
         "magma:/files/projects/patate:PUT:GET/*");
@@ -78,7 +80,8 @@ public class ProjectsPermissionConverterTest
         "magma:/datasource/patate/table/pwel/facet:GET:GET/GET",//
         "magma:/datasource/patate/table/pwel/facets/_search:POST:GET",//
         "magma:/datasource/patate/table/pwel/variable/_transient/summary:POST", //
-        "magma:/project/patate:GET:GET");
+        "magma:/project/patate:GET:GET", //
+        "magma:/project/patate/summary:GET:GET");
   }
 
   @Test
@@ -91,7 +94,8 @@ public class ProjectsPermissionConverterTest
         "magma:/datasource/patate/table/pwel/facet:GET:GET/GET",//
         "magma:/datasource/patate/table/pwel/facets/_search:POST:GET",//
         "magma:/datasource/patate/table/pwel/variable/_transient/summary:POST",//
-        "magma:/project/patate:GET:GET");
+        "magma:/project/patate:GET:GET", //
+        "magma:/project/patate/summary:GET:GET");
   }
 
   @Test
@@ -107,13 +111,15 @@ public class ProjectsPermissionConverterTest
         "magma:/datasource/patate/table/pwel/index/_schema:GET", //
         "magma:/project/patate/commands/_copy:POST:GET", //
         "magma:/project/patate:GET:GET", //
+        "magma:/project/patate/summary:GET:GET", //
         "magma:/datasource/patate/table/pwel:GET:GET", //
         "magma:/datasource/patate/table/pwel/variable:GET:GET/GET", //
         "magma:/datasource/patate/table/pwel/variables:GET:GET/GET", //
         "magma:/datasource/patate/table/pwel/facet:GET:GET/GET", //
         "magma:/datasource/patate/table/pwel/facets/_search:POST:GET", //
         "magma:/datasource/patate/table/pwel/variable/_transient/summary:POST", //
-        "magma:/project/patate:GET:GET");
+        "magma:/project/patate:GET:GET", //
+        "magma:/project/patate/summary:GET:GET");
   }
 
   @Test
@@ -122,7 +128,8 @@ public class ProjectsPermissionConverterTest
         ProjectsPermissionConverter.Permission.VARIABLE_READ, //
         "magma:/datasource/patate/table/pwel/variable/pouet:GET:GET/GET", //
         "magma:/datasource/patate/table/pwel/variable/_transient/summary:POST:GET", //
-        "magma:/project/patate:GET:GET");
+        "magma:/project/patate:GET:GET", //
+        "magma:/project/patate/summary:GET:GET");
   }
 
   @Override
