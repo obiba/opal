@@ -73,11 +73,6 @@ public class TasksPresenter extends PresenterWidget<TasksPresenter.Display> {
   }
 
   @Override
-  public void onReset() {
-    updateTable();
-  }
-
-  @Override
   public void onReveal() {
     super.onReveal();
     updateTable();
@@ -109,7 +104,12 @@ public class TasksPresenter extends PresenterWidget<TasksPresenter.Display> {
             getView().showClearJobsButton(containsClearableJobs(resource));
           }
 
-        }).send();
+        }).withCallback(new ResponseCodeCallback() {
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        // ignore
+      }
+    }, Response.SC_FORBIDDEN).send();
   }
 
   private void authorizeCancelJob(CommandStateDto dto, Authorizer authorizer) {

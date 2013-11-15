@@ -147,6 +147,9 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   Button editScript;
 
   @UiField
+  Button historyScript;
+
+  @UiField
   SimplePanel scriptEditor;
 
   @UiField
@@ -429,7 +432,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   @Override
   public HasAuthorization getEditAuthorizer() {
-    return new WidgetAuthorizer(remove, editScript, editProperties, editCategories, editAttributes);
+    return new WidgetAuthorizer(remove, scriptHeaderPanel, editProperties, editCategories, editAttributes);
   }
 
   @Override

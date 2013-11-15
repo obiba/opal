@@ -69,6 +69,7 @@ public class ProjectsPermissionConverterTest
   public void testTableEdit() {
     testConversion("/datasource/patate/table/pwel", ProjectsPermissionConverter.Permission.TABLE_EDIT, //
         "magma:/datasource/patate/table/pwel/variables:POST:GET", //
+        "magma:/datasource/patate/table/pwel:PUT:GET", //
         "magma:/datasource/patate/table/pwel/index:GET:GET", //
         "magma:/datasource/patate/table/pwel/index/schedule:GET:GET", //
         "magma:/files/projects/patate:GET:GET/*",//
@@ -109,6 +110,7 @@ public class ProjectsPermissionConverterTest
         "magma:/datasource/patate/table/pwel/index/_search:GET", //
         "magma:/datasource/patate/table/pwel/index/_search:POST", //
         "magma:/datasource/patate/table/pwel/index/_schema:GET", //
+        "magma:/project/patate/commands/_export:POST:GET", //
         "magma:/project/patate/commands/_copy:POST:GET", //
         "magma:/project/patate:GET:GET", //
         "magma:/project/patate/summary:GET:GET", //

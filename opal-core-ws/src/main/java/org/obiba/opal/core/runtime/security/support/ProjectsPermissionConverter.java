@@ -85,6 +85,7 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)/table/(.+)");
         return Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}", "*:GET/*", args),//
+            magmaConvert("/project/{0}/commands/_export", "POST:GET", args),//
             magmaConvert("/project/{0}/commands/_copy", "POST:GET", args),//
             magmaConvert("/project/{0}", "GET:GET", args),//
             magmaConvert("/project/{0}/summary", "GET:GET", args),//
@@ -120,6 +121,7 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
                 magmaConvert("/datasource/{0}/table/{1}/index/_search", "GET", args),//
                 magmaConvert("/datasource/{0}/table/{1}/index/_search", "POST", args),//
                 magmaConvert("/datasource/{0}/table/{1}/index/_schema", "GET", args),//
+                magmaConvert("/project/{0}/commands/_export", "POST:GET", args),//
                 magmaConvert("/project/{0}/commands/_copy", "POST:GET", args),//
                 magmaConvert("/project/{0}", "GET:GET", args),//
                 magmaConvert("/project/{0}/summary", "GET:GET", args));
@@ -132,7 +134,8 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)/table/(.+)");
-        List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}/variables", "POST:GET", args),
+        List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}/variables", "POST:GET", args),//
+            magmaConvert("/datasource/{0}/table/{1}", "PUT:GET", args),//
             magmaConvert("/datasource/{0}/table/{1}/index", "GET:GET", args),//
             magmaConvert("/datasource/{0}/table/{1}/index/schedule", "GET:GET", args),//
             magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
