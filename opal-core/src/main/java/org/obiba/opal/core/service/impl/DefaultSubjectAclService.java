@@ -27,7 +27,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
@@ -67,22 +66,11 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public void deleteNodePermissions(final String node) {
+  public void deleteNodePermissions(String node) {
+    Iterable<SubjectAcl> subjectAcls = orientDbService
+        .list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() + " where node = ? or node like ?",
+            node, node + "/%");
     Set<SubjectAclService.Subject> subjects = Sets.newTreeSet();
-
-    // temp workaround waiting for https://github.com/orientechnologies/orientdb/issues/1824
-    Iterable<SubjectAcl> subjectAcls = Iterables
-        .filter(orientDbService.list(SubjectAcl.class), new Predicate<SubjectAcl>() {
-          @Override
-          public boolean apply(SubjectAcl acl) {
-            return acl.getNode() != null && (acl.getNode().equals(node) || acl.getNode().startsWith("/%"));
-          }
-        });
-//    Iterable<SubjectAcl> subjectAcls = Sets.newHashSet(Iterables.concat(orientDbService
-//        .<SubjectAcl>list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() + " where node = ?",
-//            node), orientDbService
-//        .<SubjectAcl>list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() + " where node like = ?",
-//            node + "/%")));
     for(SubjectAcl acl : subjectAcls) {
       subjects.add(acl.getSubject());
       delete(acl);
@@ -175,76 +163,33 @@ public class DefaultSubjectAclService implements SubjectAclService {
     };
   }
 
-  private Iterable<SubjectAcl> find(final SubjectAclService.Subject subject) {
-    // temp workaround waiting for https://github.com/orientechnologies/orientdb/issues/1824
-    return Iterables.filter(orientDbService.list(SubjectAcl.class), new Predicate<SubjectAcl>() {
-      @Override
-      public boolean apply(SubjectAcl acl) {
-        return Objects.equal(acl.getPrincipal(), subject.getPrincipal()) && //
-            Objects.equal(acl.getType(), subject.getType().toString());
-      }
-    });
-//    return orientDbService
-//        .list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() + " where principal = ? and type = ?",
-//            subject.getPrincipal(), subject.getType().toString());
+  private Iterable<SubjectAcl> find(SubjectAclService.Subject subject) {
+    return orientDbService
+        .list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() + " where principal = ? and type = ?",
+            subject.getPrincipal(), subject.getType().toString());
   }
 
-  private Iterable<SubjectAcl> find(final String domain, final String node, final SubjectType type) {
-    // temp workaround waiting for https://github.com/orientechnologies/orientdb/issues/1824
-    return Iterables.filter(orientDbService.list(SubjectAcl.class), new Predicate<SubjectAcl>() {
-      @Override
-      public boolean apply(SubjectAcl acl) {
-        return Objects.equal(acl.getDomain(), domain) && //
-            Objects.equal(acl.getNode(), node) && //
-            Objects.equal(acl.getType(), type.toString());
-      }
-    });
-//    return orientDbService.list(SubjectAcl.class,
-//        "select from " + SubjectAcl.class.getSimpleName() + " where domain = ? and node = ? and type = ?", domain, node,
-//        type.toString());
+  private Iterable<SubjectAcl> find(String domain, String node, SubjectType type) {
+    return orientDbService.list(SubjectAcl.class,
+        "select from " + SubjectAcl.class.getSimpleName() + " where domain = ? and node = ? and type = ?", domain, node,
+        type.toString());
   }
 
-  private Iterable<SubjectAcl> find(final String domain, final SubjectType type) {
-    // temp workaround waiting for https://github.com/orientechnologies/orientdb/issues/1824
-    return Iterables.filter(orientDbService.list(SubjectAcl.class), new Predicate<SubjectAcl>() {
-      @Override
-      public boolean apply(SubjectAcl acl) {
-        return Objects.equal(acl.getDomain(), domain) && //
-            Objects.equal(acl.getType(), type.toString());
-      }
-    });
-//    return orientDbService
-//        .list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() + " where domain = ? and type = ?",
-//            domain, type.toString());
+  private Iterable<SubjectAcl> find(String domain, SubjectType type) {
+    return orientDbService
+        .list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() + " where domain = ? and type = ?",
+            domain, type.toString());
   }
 
-  private Iterable<SubjectAcl> find(final String domain, final String node, final SubjectAclService.Subject subject) {
-    // temp workaround waiting for https://github.com/orientechnologies/orientdb/issues/1824
-    return Iterables.filter(orientDbService.list(SubjectAcl.class), new Predicate<SubjectAcl>() {
-      @Override
-      public boolean apply(SubjectAcl acl) {
-        return Objects.equal(acl.getDomain(), domain) && //
-            Objects.equal(acl.getNode(), node) && //
-            Objects.equal(acl.getPrincipal(), subject.getPrincipal()) && //
-            Objects.equal(acl.getType(), subject.getType().toString());
-      }
-    });
-//    return orientDbService.list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() +
-//        " where domain = ? and node = ? and principal = ? and type = ?", domain, node, subject.getPrincipal(),
-//        subject.getType().toString());
+  private Iterable<SubjectAcl> find(String domain, String node, SubjectAclService.Subject subject) {
+    return orientDbService.list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() +
+        " where domain = ? and node = ? and principal = ? and type = ?", domain, node, subject.getPrincipal(),
+        subject.getType().toString());
   }
 
-  private Iterable<SubjectAcl> find(final String domain, final String node) {
-    // temp workaround waiting for https://github.com/orientechnologies/orientdb/issues/1824
-    return Iterables.filter(orientDbService.list(SubjectAcl.class), new Predicate<SubjectAcl>() {
-      @Override
-      public boolean apply(SubjectAcl acl) {
-        return Objects.equal(acl.getDomain(), domain) && //
-            Objects.equal(acl.getNode(), node);
-      }
-    });
-    //    return orientDbService.list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() +
-//        " where domain = ? and node = ?", domain, node);
+  private Iterable<SubjectAcl> find(String domain, String node) {
+    return orientDbService.list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() +
+        " where domain = ? and node = ?", domain, node);
   }
 
   private SubjectAcl find(String domain, String node, SubjectAclService.Subject subject, String permission) {

@@ -1646,7 +1646,7 @@
     <obiba-commons.version>1.5-SNAPSHOT</obiba-commons.version>
     <opal-oda.version>1.2.3</opal-oda.version>
     <opencsv.version>2.3</opencsv.version>
-    <orientdb.version>1.5.1</orientdb.version>
+    <orientdb.version>1.6</orientdb.version>
     <protobuf-java-format.version>1.2.1-obiba</protobuf-java-format.version>
     <protobuf.version>2.3.0</protobuf.version>
     <protostuff.version>1.0.1</protostuff.version>
