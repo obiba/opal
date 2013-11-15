@@ -51,10 +51,10 @@ public class OpalServer {
 
   private void start() {
     System.out.println("Starting Opal.");
-
     jettyServer = new OpalJettyServer();
     try {
       jettyServer.start();
+      System.out.println("Opal Server successfully started.");
     } catch(Exception e) {
       log.error("Exception while starting Opal", e);
       System.out.println(
@@ -66,7 +66,6 @@ public class OpalServer {
         // ignore
       }
     }
-    System.out.println("Opal Server successfully started.");
   }
 
   final void shutdown() {

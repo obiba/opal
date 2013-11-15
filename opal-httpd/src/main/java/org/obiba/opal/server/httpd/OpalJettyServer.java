@@ -38,6 +38,7 @@ import org.jboss.resteasy.plugins.spring.SpringContextLoaderListener;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -102,7 +103,7 @@ public class OpalJettyServer {
     try {
       // ${OPAL_HOME}/conf/opal-config.properties
       inputStream = new FileInputStream(new File(System.getProperty("OPAL_HOME") + "/conf/opal-config.properties"));
-      Properties properties = new Properties();
+      Properties properties = new Properties(PropertiesLoaderUtils.loadAllProperties("META-INF/defaults.properties"));
       properties.load(inputStream);
       return properties;
     } finally {
