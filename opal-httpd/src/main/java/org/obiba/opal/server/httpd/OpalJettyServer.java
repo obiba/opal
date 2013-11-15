@@ -10,12 +10,13 @@
 package org.obiba.opal.server.httpd;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Properties;
 
-import javax.annotation.PostConstruct;
+import javax.annotation.Nullable;
 
 import org.eclipse.jetty.ajp.Ajp13SocketConnector;
 import org.eclipse.jetty.server.Connector;
@@ -34,13 +35,9 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
 import org.jboss.resteasy.plugins.spring.SpringContextLoaderListener;
-import org.obiba.opal.core.cfg.OpalConfigurationExtension;
-import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.core.runtime.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
 import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -49,44 +46,44 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *
  */
 
-public class OpalJettyServer implements Service {
+public class OpalJettyServer {
 
   private static final Logger log = LoggerFactory.getLogger(OpalJettyServer.class);
 
-  private static final int MAX_IDLE_TIME = 30000;
+  private static final String MAX_IDLE_TIME = "30000";
 
   private static final int REQUEST_HEADER_SIZE = 8192;
-
-  //  @Nullable
-//  @Value("${org.obiba.opal.http.port}")
-//  private Integer httpPort;
-//
-//  @Nullable
-//  @Value("${org.obiba.opal.https.port}")
-//  private Integer httpsPort;
-//
-//  @Nullable
-//  @Value("${org.obiba.opal.ajp.port}")
-//  private Integer ajpPort;
-//
-//  @Nullable
-//  @Value("${org.obiba.opal.maxIdleTime}")
-//  private Integer maxIdleTime;
 
   private Server jettyServer;
 
   private ServletContextHandler servletContextHandler;
 
-  @PostConstruct
-  public void init() {
+  public void start() throws Exception {
+    init();
+    log.info("Starting Opal HTTP/s Server on port {}", jettyServer.getConnectors()[0].getPort());
+    jettyServer.start();
+    jettyServer.join();
+  }
+
+  public void stop() throws Exception {
+    jettyServer.stop();
+  }
+
+  private void init() throws IOException, URISyntaxException {
     jettyServer = new Server();
     jettyServer.setSendServerVersion(false);
     // OPAL-342: We will manually stop the Jetty server instead of relying its shutdown hook
     jettyServer.setStopAtShutdown(false);
 
-    configureHttpConnector();
-    configureSslConnector();
-    configureAjpConnector();
+    Properties properties = loadProperties();
+    String httpPort = properties.getProperty("org.obiba.opal.http.port");
+    String httpsPort = properties.getProperty("org.obiba.opal.https.port");
+    String ajpPort = properties.getProperty("org.obiba.opal.ajp.port");
+    int maxIdleTime = Integer.valueOf(properties.getProperty("org.obiba.opal.maxIdleTime", MAX_IDLE_TIME));
+
+    configureHttpConnector(httpPort == null ? null : Integer.valueOf(httpPort), maxIdleTime);
+    configureSslConnector(httpsPort == null ? null : Integer.valueOf(httpsPort), maxIdleTime);
+    configureAjpConnector(ajpPort == null ? null : Integer.valueOf(ajpPort));
 
     HandlerList handlers = new HandlerList();
 
@@ -100,24 +97,37 @@ public class OpalJettyServer implements Service {
     jettyServer.setHandler(handlers);
   }
 
-  private void configureAjpConnector() {
+  private Properties loadProperties() throws IOException {
+    FileInputStream inputStream = null;
+    try {
+      // ${OPAL_HOME}/conf/opal-config.properties
+      inputStream = new FileInputStream(new File(System.getProperty("OPAL_HOME") + "/conf/opal-config.properties"));
+      Properties properties = new Properties();
+      properties.load(inputStream);
+      return properties;
+    } finally {
+      if(inputStream != null) inputStream.close();
+    }
+  }
+
+  private void configureAjpConnector(@Nullable Integer ajpPort) {
     if(ajpPort == null || ajpPort <= 0) return;
     Connector ajp = new Ajp13SocketConnector();
     ajp.setPort(ajpPort);
     jettyServer.addConnector(ajp);
   }
 
-  private void configureHttpConnector() {
+  private void configureHttpConnector(@Nullable Integer httpPort, int maxIdleTime) {
     if(httpPort == null || httpPort <= 0) return;
 
     Connector httpConnector = new SelectChannelConnector();
     httpConnector.setPort(httpPort);
-    httpConnector.setMaxIdleTime(maxIdleTime == null ? MAX_IDLE_TIME : maxIdleTime);
+    httpConnector.setMaxIdleTime(maxIdleTime);
     httpConnector.setRequestHeaderSize(REQUEST_HEADER_SIZE);
     jettyServer.addConnector(httpConnector);
   }
 
-  private void configureSslConnector() {
+  private void configureSslConnector(@Nullable Integer httpsPort, int maxIdleTime) {
     if(httpsPort == null || httpsPort <= 0) return;
 
     SslContextFactory jettySsl = new SslContextFactory() {
@@ -140,52 +150,10 @@ public class OpalJettyServer implements Service {
 
     Connector sslConnector = new SslSelectChannelConnector(jettySsl);
     sslConnector.setPort(httpsPort);
-    sslConnector.setMaxIdleTime(maxIdleTime == null ? MAX_IDLE_TIME : maxIdleTime);
+    sslConnector.setMaxIdleTime(maxIdleTime);
     sslConnector.setRequestHeaderSize(REQUEST_HEADER_SIZE);
 
     jettyServer.addConnector(sslConnector);
-  }
-
-  @Bean
-  public ServletContextHandler getServletContextHandler() {
-    return servletContextHandler;
-  }
-
-  @Override
-  public boolean isRunning() {
-    return jettyServer.isRunning();
-  }
-
-  @Override
-  public void start() {
-    try {
-      log.info("Starting Opal HTTP/s Server on port {}", jettyServer.getConnectors()[0].getPort());
-      jettyServer.start();
-    } catch(Exception e) {
-      log.error("Error starting jetty", e);
-      throw new RuntimeException(e);
-    }
-  }
-
-  @Override
-  public void stop() {
-    try {
-      jettyServer.stop();
-    } catch(Exception e) {
-      // log and ignore
-      log.warn("Exception during HTTPd server shutdown", e);
-    }
-
-  }
-
-  @Override
-  public String getName() {
-    return "jetty";
-  }
-
-  @Override
-  public OpalConfigurationExtension getConfig() throws NoSuchServiceConfigurationException {
-    throw new NoSuchServiceConfigurationException(getName());
   }
 
   private Handler createServletHandler() {
@@ -196,17 +164,17 @@ public class OpalJettyServer implements Service {
     servletContextHandler.addEventListener(new RequestContextListener());
     servletContextHandler.addFilter(new FilterHolder(new OpalVersionFilter()), "/*", FilterMapping.DEFAULT);
     servletContextHandler.addFilter(new FilterHolder(new AuthenticationFilter()), "/ws/*", FilterMapping.DEFAULT);
-    //TODO fix application context xml
-    servletContextHandler.setInitParameter(ContextLoader.CONFIG_LOCATION_PARAM, "classpath:application-context.xml");
+    servletContextHandler
+        .setInitParameter(ContextLoader.CONFIG_LOCATION_PARAM, "classpath:/META-INF/spring/opal-server/context.xml");
     servletContextHandler.addServlet(new ServletHolder(new HttpServletDispatcher()), "/ws/*");
     return servletContextHandler;
   }
 
-  private Handler createDistFileHandler(String directory) {
+  private Handler createDistFileHandler(String directory) throws IOException, URISyntaxException {
     return createFileHandler("file://" + System.getProperty("OPAL_DIST") + directory);
   }
 
-  private Handler createExtensionFileHandler(String filePath) {
+  private Handler createExtensionFileHandler(String filePath) throws IOException, URISyntaxException {
     File file = new File(filePath);
     if(!file.exists()) {
       if(!file.mkdirs()) {
@@ -216,19 +184,11 @@ public class OpalJettyServer implements Service {
     return createFileHandler("file://" + filePath);
   }
 
-  private Handler createFileHandler(String fileUrl) {
+  private Handler createFileHandler(String fileUrl) throws IOException, URISyntaxException {
+    log.info("Creating a file handler for the following URL : {}", fileUrl);
     ResourceHandler resourceHandler = new ResourceHandler();
-    try {
-      resourceHandler.setBaseResource(new FileResource(new URL(fileUrl)));
-      resourceHandler.setAliases(true);
-      log.info("Created a file handler for the following URL : {}", fileUrl);
-    } catch(MalformedURLException e) {
-      throw new RuntimeException(e);
-    } catch(IOException e) {
-      throw new RuntimeException(e);
-    } catch(URISyntaxException e) {
-      throw new RuntimeException(e);
-    }
+    resourceHandler.setBaseResource(new FileResource(new URL(fileUrl)));
+    resourceHandler.setAliases(true);
     return resourceHandler;
   }
 

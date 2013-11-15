@@ -54,7 +54,6 @@
     <dependency>
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-httpd</artifactId>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.obiba.opal</groupId>

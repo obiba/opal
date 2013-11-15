@@ -1,28 +1,20 @@
 package org.obiba.opal.server;
 
 import org.obiba.opal.core.service.impl.LocalOrientDbServerFactory;
+import org.obiba.opal.server.httpd.OpalJettyServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
-import org.springframework.context.support.GenericApplicationContext;
-
-import uk.co.flamingpenguin.jewel.cli.CliFactory;
 
 @SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class OpalServer {
 
   private static final Logger log = LoggerFactory.getLogger(OpalServer.class);
 
-  public interface OpalServerOptions {
+  private OpalJettyServer jettyServer;
 
-  }
-
-  private GenericApplicationContext ctx;
-
-  OpalServer(OpalServerOptions options) {
+  private OpalServer() {
     setProperties();
-
     configureSLF4JBridgeHandler();
 
     //TODO remove this static access when restarting embedded server will work
@@ -59,33 +51,31 @@ public class OpalServer {
 
   private void start() {
     System.out.println("Starting Opal.");
-    ctx = new GenericApplicationContext();
+
+    jettyServer = new OpalJettyServer();
     try {
-      XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(ctx);
-      xmlReader.loadBeanDefinitions("classpath:/META-INF/spring/opal-server/context.xml");
-      ctx.refresh();
+      jettyServer.start();
     } catch(Exception e) {
+      log.error("Exception while starting Opal", e);
       System.out.println(
           String.format("Failed to start Opal Server. See log file for details.\nError message: %s", e.getMessage()));
       e.printStackTrace(System.err);
       try {
-        ctx.destroy();
-      } catch(RuntimeException ignore) {
+        jettyServer.stop();
+      } catch(Exception ignore) {
         // ignore
       }
     }
-  }
-
-  final void boot() {
-    if(ctx.isActive()) {
-      System.out.println("Opal Server successfully started.");
-
-    }
+    System.out.println("Opal Server successfully started.");
   }
 
   final void shutdown() {
     System.out.println("Opal Server shutting down...");
-    ctx.close();
+    try {
+      jettyServer.stop();
+    } catch(Exception e) {
+      log.warn("Exception during HTTPd server shutdown", e);
+    }
     //TODO remove this static access when restarting embedded server will work
     LocalOrientDbServerFactory.stop();
   }
@@ -102,8 +92,7 @@ public class OpalServer {
     try {
       checkSystemProperty("OPAL_HOME", "OPAL_DIST");
 
-      final OpalServer opal = new OpalServer(CliFactory.parseArguments(OpalServerOptions.class, args));
-      opal.boot();
+      final OpalServer opal = new OpalServer();
       Runtime.getRuntime().addShutdownHook(new Thread() {
         @Override
         public void run() {
