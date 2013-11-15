@@ -63,7 +63,7 @@ public class OpalJettyServer {
     init();
     log.info("Starting Opal HTTP/s Server on port {}", jettyServer.getConnectors()[0].getPort());
     jettyServer.start();
-    jettyServer.join();
+//    jettyServer.join();
   }
 
   public void stop() throws Exception {

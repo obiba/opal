@@ -35,7 +35,7 @@ public class HttpHeaderAuthenticatingRealm extends AbstractHttpAuthenticatingRea
   }
 
   @Override
-  protected AuthenticationInfo createtAuthenticationInfo(AuthenticationToken token, PrincipalCollection principals) {
+  protected AuthenticationInfo createAuthenticationInfo(AuthenticationToken token, PrincipalCollection principals) {
     return new SimpleAccount(principals, null);
   }
 

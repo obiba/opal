@@ -33,15 +33,14 @@ public abstract class AbstractHttpAuthenticatingRealm extends AuthorizingRealm {
   @Override
   protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
     Session session = getSession(getSessionId(token));
-    if(session != null) {
-      // Extract the principals from the session
-      PrincipalCollection principals = (PrincipalCollection) session
-          .getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
-      if(principals != null) {
-        return createtAuthenticationInfo(token, principals);
-      }
-    } else {
+    if(session == null) {
       throw new IncorrectCredentialsException();
+    }
+    // Extract the principals from the session
+    PrincipalCollection principals = (PrincipalCollection) session
+        .getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
+    if(principals != null) {
+      return createAuthenticationInfo(token, principals);
     }
     throw new AuthenticationException();
   }
@@ -51,7 +50,7 @@ public abstract class AbstractHttpAuthenticatingRealm extends AuthorizingRealm {
     return null;
   }
 
-  abstract protected AuthenticationInfo createtAuthenticationInfo(AuthenticationToken token,
+  abstract protected AuthenticationInfo createAuthenticationInfo(AuthenticationToken token,
       PrincipalCollection principals);
 
   abstract protected String getSessionId(AuthenticationToken token);
@@ -75,7 +74,6 @@ public abstract class AbstractHttpAuthenticatingRealm extends AuthorizingRealm {
   @Nullable
   protected SessionManager getSessionManager() {
     SecurityManager sm = SecurityUtils.getSecurityManager();
-    if(sm instanceof SessionsSecurityManager) return sm;
-    return null;
+    return sm instanceof SessionsSecurityManager ? sm : null;
   }
 }

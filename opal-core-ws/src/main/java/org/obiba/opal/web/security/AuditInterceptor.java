@@ -18,6 +18,9 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.http.HttpStatus;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.subject.Subject;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.HttpRequest;
@@ -35,14 +38,10 @@ public class AuditInterceptor implements RequestCyclePostProcess {
 
   private static final Logger log = LoggerFactory.getLogger(AuditInterceptor.class);
 
-  private static final String LOG_FORMAT = "{} - {} - {} - {}";
-
-  private final OpalUserProvider opalUserProvider;
+  private static final String LOG_FORMAT = "{} @ {} - {} - {} - {}";
 
   @Autowired
-  public AuditInterceptor(OpalUserProvider opalUserProvider) {
-    this.opalUserProvider = opalUserProvider;
-  }
+  private OpalUserProvider opalUserProvider;
 
   @Override
   public void postProcess(HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response) {
@@ -53,9 +52,15 @@ public class AuditInterceptor implements RequestCyclePostProcess {
   }
 
   private Object[] getArguments(HttpRequest request, ServerResponse response) {
-    // TODO get the remote IP
-    return new Object[] { opalUserProvider.getUsername(), response.getStatus(), request.getHttpMethod(),
+    return new Object[] { opalUserProvider.getUsername(), getHost(), response.getStatus(), request.getHttpMethod(),
         request.getUri().getPath(true) };
+  }
+
+  private String getHost() {
+    Subject subject = SecurityUtils.getSubject();
+    if(subject == null) return "";
+    Session session = subject.getSession();
+    return session == null ? "" : session.getHost();
   }
 
   private void logServerError(HttpRequest request, ServerResponse response) {

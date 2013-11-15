@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.security;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.ServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -49,17 +49,18 @@ public class AuthenticationResource extends AbstractSecurityComponent {
   @POST
   @Path("/sessions")
   @NotAuthenticated
-  public Response createSession(@Context HttpServletRequest servletRequest, @FormParam("username") String username, @FormParam("password") String password)
-      throws FileSystemException {
+  public Response createSession(@Context ServletRequest servletRequest, @FormParam("username") String username,
+      @FormParam("password") String password) throws FileSystemException {
     try {
       SecurityUtils.getSubject().login(new UsernamePasswordToken(username, password));
     } catch(AuthenticationException e) {
-      log.info("Authentication failure of user '{}' at ip: '{}': {}", username, servletRequest.getRemoteAddr(), e.getMessage());
+      log.info("Authentication failure of user '{}' at ip: '{}': {}", username, servletRequest.getRemoteAddr(),
+          e.getMessage());
       // When a request contains credentials and they are invalid, the a 403 (Forbidden) should be returned.
       return Response.status(Status.FORBIDDEN).build();
     }
     String sessionId = SecurityUtils.getSubject().getSession().getId().toString();
-    log.info("Successfull session creation for user '{}' session ID is '{}'.", username, sessionId);
+    log.info("Successful session creation for user '{}' session ID is '{}'.", username, sessionId);
 
     return Response.created(
         UriBuilder.fromPath("/").path(AuthenticationResource.class).path(AuthenticationResource.class, "checkSession")
@@ -70,10 +71,7 @@ public class AuthenticationResource extends AbstractSecurityComponent {
   @Path("/session/{id}")
   public Response checkSession(@PathParam("id") String sessionId) {
     // Find the Shiro Session
-    if(!isValidSessionId(sessionId)) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-    return Response.ok().build();
+    return isValidSessionId(sessionId) ? Response.ok().build() : Response.status(Status.NOT_FOUND).build();
   }
 
   @DELETE
@@ -92,11 +90,10 @@ public class AuthenticationResource extends AbstractSecurityComponent {
   @Path("/session/{id}/username")
   public Opal.Subject getSubject(@PathParam("id") String sessionId) {
     // Find the Shiro username
-    if(!isValidSessionId(sessionId)) {
-      return Opal.Subject.newBuilder().setPrincipal(null).setType(Opal.Subject.SubjectType.USER).build();
-    }
-
-    return Opal.Subject.newBuilder().setPrincipal(SecurityUtils.getSubject().getPrincipal().toString())
-        .setType(Opal.Subject.SubjectType.USER).build();
+    String principal = isValidSessionId(sessionId) ? SecurityUtils.getSubject().getPrincipal().toString() : null;
+    return Opal.Subject.newBuilder() //
+        .setPrincipal(principal) //
+        .setType(Opal.Subject.SubjectType.USER) //
+        .build();
   }
 }

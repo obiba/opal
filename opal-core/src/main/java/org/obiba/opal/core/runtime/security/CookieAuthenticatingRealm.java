@@ -34,7 +34,7 @@ public class CookieAuthenticatingRealm extends AbstractHttpAuthenticatingRealm {
   }
 
   @Override
-  protected AuthenticationInfo createtAuthenticationInfo(AuthenticationToken token, PrincipalCollection principals) {
+  protected AuthenticationInfo createAuthenticationInfo(AuthenticationToken token, PrincipalCollection principals) {
     HttpCookieAuthenticationToken cookieToken = (HttpCookieAuthenticationToken) token;
     String urlHash = getUrlHash(cookieToken.getSessionId(), cookieToken.getUrl());
     return new SimpleAccount(principals, urlHash);
