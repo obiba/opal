@@ -208,6 +208,9 @@
         <g:SimplePanel ui:field="values"/>
       </b:Tab>
 
+      <b:Tab heading="Permissions">
+        <g:SimplePanel ui:field="permissionsPanel"/>
+      </b:Tab>
 
     </b:TabPanel>
 

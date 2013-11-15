@@ -65,6 +65,8 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   private static final int VALUES_TAB_INDEX = 3;
 
+  private static final int PERMISSIONS_TAB_INDEX = 4;
+
   @UiField
   Label name;
 
@@ -168,6 +170,9 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @UiField
   TextBox comment;
 
+  @UiField
+  Panel permissionsPanel;
+
   private JsArray<LocaleDto> languages;
 
   private final Translations translations;
@@ -207,6 +212,9 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
         break;
       case History:
         panel = historyPanel;
+        break;
+      case Permissions:
+        panel = permissionsPanel;
         break;
     }
     if(panel != null) {
@@ -414,6 +422,11 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @Override
   public HasAuthorization getEditAuthorizer() {
     return new CompositeAuthorizer(new WidgetAuthorizer(remove), new WidgetAuthorizer(editScript));
+  }
+
+  @Override
+  public HasAuthorization getPermissionsAuthorizer() {
+    return new TabPanelAuthorizer(tabPanel, PERMISSIONS_TAB_INDEX);
   }
 
   private void initCategoryTable() {

@@ -13,6 +13,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -37,15 +39,18 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.opal.AclAction;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
@@ -67,6 +72,8 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   private final ModalProvider<DataCopyPresenter> dataCopyModalProvider;
 
+  private final Provider<AuthorizationPresenter> authorizationPresenter;
+
   private final Translations translations;
 
   private String datasourceName;
@@ -82,13 +89,15 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider,
       ModalProvider<DataExportPresenter> dataExportModalProvider,
       ModalProvider<AddViewModalPresenter> createViewModalProvider,
-      ModalProvider<DataCopyPresenter> dataCopyModalProvider, Translations translations) {
+      ModalProvider<DataCopyPresenter> dataCopyModalProvider, Provider<AuthorizationPresenter> authorizationPresenter,
+      Translations translations) {
     super(eventBus, display);
     this.translations = translations;
     this.tablePropertiesModalProvider = tablePropertiesModalProvider.setContainer(this);
     this.dataExportModalProvider = dataExportModalProvider.setContainer(this);
     this.createViewModalProvider = createViewModalProvider.setContainer(this);
     this.dataCopyModalProvider = dataCopyModalProvider.setContainer(this);
+    this.authorizationPresenter = authorizationPresenter;
     getView().setUiHandlers(this);
   }
 
@@ -229,6 +238,10 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     private void authorize() {
       authorizeDatasource();
       authorizeProject();
+
+      // set permissions
+      AclRequest.newResourceAuthorizationRequestBuilder()
+          .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
     }
 
     private void authorizeDatasource() {
@@ -356,6 +369,31 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     }
   }
 
+  /**
+   * Update permissions on authorization.
+   */
+  private final class PermissionsUpdate implements HasAuthorization {
+    @Override
+    public void unauthorized() {
+
+    }
+
+    @Override
+    public void beforeAuthorization() {
+      clearSlot(null);
+    }
+
+    @Override
+    public void authorized() {
+      AuthorizationPresenter authz = authorizationPresenter.get();
+      String node = UriBuilder.create().segment("datasource", datasourceName).build();
+      authz.setAclRequest("datasource", new AclRequest(AclAction.CREATE_TABLE, node), //
+          new AclRequest(AclAction.CREATE_VIEW, node), //
+          new AclRequest(AclAction.DATASOURCE_ALL, node));
+      setInSlot(null, authz);
+    }
+  }
+
   public interface Display extends View, HasUiHandlers<DatasourceUiHandlers> {
 
     void beforeRenderRows();
@@ -377,6 +415,8 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     HasAuthorization getCopyDataAuthorizer();
 
     HasAuthorization getExcelDownloadAuthorizer();
+
+    HasAuthorization getPermissionsAuthorizer();
 
     List<TableDto> getSelectedTables();
 

@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
@@ -30,6 +31,7 @@ import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.SimplePager;
+import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style;
@@ -40,7 +42,9 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.InlineLabel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -50,6 +54,8 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> implements DatasourcePresenter.Display {
+
+  private static final int PERMISSIONS_TAB_INDEX = 1;
 
   interface Binder extends UiBinder<Widget, DatasourceView> {}
 
@@ -67,6 +73,9 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
 
   @UiField
   NavLink copyData;
+
+  @UiField
+  TabPanel tabPanel;
 
   @UiField
   DropdownButton addBtn;
@@ -98,6 +107,9 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   @UiField
   SimplePager pager;
 
+  @UiField
+  Panel permissionsPanel;
+
   private final ListDataProvider<TableDto> dataProvider = new ListDataProvider<TableDto>();
 
   private final Translations translations;
@@ -112,6 +124,14 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     this.translations = translations;
     this.placeManager = placeManager;
     addTableColumns();
+  }
+
+  @Override
+  public void setInSlot(Object slot, IsWidget content) {
+    permissionsPanel.clear();
+    if(content != null) {
+      permissionsPanel.add(content);
+    }
   }
 
   @UiHandler("downloadDictionary")
@@ -297,6 +317,11 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
   @Override
   public HasAuthorization getExcelDownloadAuthorizer() {
     return new WidgetAuthorizer(downloadDictionary);
+  }
+
+  @Override
+  public HasAuthorization getPermissionsAuthorizer() {
+    return new TabPanelAuthorizer(tabPanel, PERMISSIONS_TAB_INDEX);
   }
 
   @Override

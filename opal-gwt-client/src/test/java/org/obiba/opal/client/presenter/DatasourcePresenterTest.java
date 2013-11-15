@@ -13,6 +13,7 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.AddPrincipalHandler;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
@@ -28,6 +29,7 @@ import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
 import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.gwt.event.shared.testing.CountingEventBus;
+import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
@@ -53,13 +55,14 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
   public void setUp() {
     displayMock = createMock(DatasourcePresenter.Display.class);
     eventBusMock = createMock(EventBus.class);
+    Provider<AuthorizationPresenter> mockProvider = createMock(Provider.class);
     usersAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     ModalProvider<TablePropertiesModalPresenter> propertiesEditorModalProvider = createMock(ModalProvider.class);
     ModalProvider<AddViewModalPresenter> createViewModalProvider = createMock(ModalProvider.class);
 
     datasourcePresenter = new DatasourcePresenter(displayMock, new CountingEventBus(), propertiesEditorModalProvider,
-        null, createViewModalProvider, null, null);
+        null, createViewModalProvider, null, mockProvider, null);
   }
 
   @Test

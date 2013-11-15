@@ -184,6 +184,11 @@
       <b:Tab heading="Values">
         <g:SimplePanel ui:field="valuesPanel"/>
       </b:Tab>
+
+      <b:Tab heading="Permissions">
+        <g:SimplePanel ui:field="permissionsPanel"/>
+      </b:Tab>
+
     </b:TabPanel>
 
   </g:FlowPanel>

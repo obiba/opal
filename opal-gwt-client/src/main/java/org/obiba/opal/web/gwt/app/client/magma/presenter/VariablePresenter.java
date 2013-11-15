@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
@@ -48,6 +49,7 @@ import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
+import org.obiba.opal.web.model.client.opal.AclAction;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
 import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -270,6 +272,10 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
       ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getViewLink()).put()
           .authorize(getView().getEditAuthorizer()).send();
     }
+
+    // set permissions
+    AclRequest.newResourceAuthorizationRequestBuilder()
+        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
   private String getViewLink() {
@@ -595,6 +601,31 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     }
   }
 
+  /**
+   * Update permissions on authorization.
+   */
+  private final class PermissionsUpdate implements HasAuthorization {
+    @Override
+    public void unauthorized() {
+
+    }
+
+    @Override
+    public void beforeAuthorization() {
+
+    }
+
+    @Override
+    public void authorized() {
+      AuthorizationPresenter authz = authorizationPresenter.get();
+      String node = UriBuilder.create()
+          .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variable", variable.getName())
+          .build();
+      authz.setAclRequest("variable", new AclRequest(AclAction.VARIABLE_READ, node));
+      setInSlot(Display.Slots.Permissions, authz);
+    }
+  }
+
   public interface Display extends View, HasUiHandlers<VariableUiHandlers> {
 
     void setLanguages(JsArray<LocaleDto> languages);
@@ -632,6 +663,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     HasAuthorization getValuesAuthorizer();
 
     HasAuthorization getEditAuthorizer();
+
+    HasAuthorization getPermissionsAuthorizer();
 
     void setDeriveFromMenuVisibility(boolean visible);
 

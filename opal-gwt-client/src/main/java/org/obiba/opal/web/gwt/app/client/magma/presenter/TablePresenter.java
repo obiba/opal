@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
+import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
@@ -44,10 +45,12 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
+import org.obiba.opal.web.model.client.opal.AclAction;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -255,6 +258,10 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     // values
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/valueSets").get()
         .authorize(getView().getValuesAuthorizer()).send();
+
+    // set permissions
+    AclRequest.newResourceAuthorizationRequestBuilder()
+        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
   }
 
   private void updateDisplay(String datasourceName, String tableName) {
@@ -739,6 +746,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
     HasAuthorization getTableIndexEditAuthorizer();
 
+    HasAuthorization getPermissionsAuthorizer();
+
     void setValuesTabCommand(Command cmd);
 
     void setVariablesTabCommand(Command cmd);
@@ -864,6 +873,43 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
             }
           }, SC_OK, SC_FORBIDDEN, SC_INTERNAL_SERVER_ERROR, SC_NOT_FOUND).send();
+    }
+  }
+
+  /**
+   * Update permissions on authorization.
+   */
+  private final class PermissionsUpdate implements HasAuthorization {
+    @Override
+    public void unauthorized() {
+
+    }
+
+    @Override
+    public void beforeAuthorization() {
+
+    }
+
+    @Override
+    public void authorized() {
+      AuthorizationPresenter authz = authorizationPresenter.get();
+      UriBuilder nodeBuilder = UriBuilder.create().segment("datasource", table.getDatasourceName());
+
+      if(table.hasViewLink()) {
+        String node = nodeBuilder.segment("view", table.getName()).build();
+        authz.setAclRequest("view", new AclRequest(AclAction.VIEW_READ, node), //
+            new AclRequest(AclAction.VIEW_VALUES, node), //
+            new AclRequest(AclAction.VIEW_EDIT, node), //
+            new AclRequest(AclAction.VIEW_VALUES_EDIT, node), //
+            new AclRequest(AclAction.VIEW_ALL, node));
+      } else {
+        String node = nodeBuilder.segment("table", table.getName()).build();
+        authz.setAclRequest("table", new AclRequest(AclAction.TABLE_READ, node), //
+            new AclRequest(AclAction.TABLE_VALUES, node), //
+            new AclRequest(AclAction.TABLE_EDIT, node),//
+            new AclRequest(AclAction.TABLE_ALL, node));
+      }
+      setInSlot(Display.Slots.Permissions, authz);
     }
   }
 

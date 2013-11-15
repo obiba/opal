@@ -22,8 +22,12 @@ class PermissionsToAclFunction implements Function<Permissions, Opal.Acl> {
 
   @Override
   public Acl apply(Permissions from) {
-    return Acl.newBuilder().setDomain(from.getDomain()).setSubject(valueOf(from.getSubject()))
-        .setResource(from.getNode()).addAllActions(from.getPermissions()).build();
+    Acl.Builder builder = Acl.newBuilder().setDomain(from.getDomain()).setSubject(valueOf(from.getSubject()))
+        .setResource(from.getNode());//.addAllActions(from.getPermissions());
+    for (String p : from.getPermissions()) {
+      builder.addActions(p);
+    }
+    return builder.build();
   }
 
   static final Opal.Subject valueOf(SubjectAclService.Subject from) {

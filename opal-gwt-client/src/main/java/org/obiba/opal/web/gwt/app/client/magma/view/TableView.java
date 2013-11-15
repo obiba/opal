@@ -61,6 +61,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
@@ -78,6 +79,8 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   private static final int VARIABLES_TAB_INDEX = 0;
 
   private static final int VALUES_TAB_INDEX = 2;
+
+  private static final int PERMISSIONS_TAB_INDEX = 3;
 
   @UiField
   Label name;
@@ -169,6 +172,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   @UiField
   Button remove;
 
+  @UiField
+  Panel permissionsPanel;
+
   private final ListDataProvider<VariableDto> dataProvider = new ListDataProvider<VariableDto>();
 
   private final Translations translations;
@@ -196,6 +202,8 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     HasWidgets panel = null;
     if(slot == Slots.Values) {
       panel = valuesPanel;
+    } else if(slot == Slots.Permissions) {
+      panel = permissionsPanel;
     }
     if(panel != null) {
       panel.clear();
@@ -459,6 +467,11 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
         hasLinkAuthorization = false;
       }
     };
+  }
+
+  @Override
+  public HasAuthorization getPermissionsAuthorizer() {
+    return new TabPanelAuthorizer(tabPanel, PERMISSIONS_TAB_INDEX);
   }
 
   @Override
