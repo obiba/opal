@@ -15,12 +15,12 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.easymock.EasyMock;
-import org.jboss.resteasy.specimpl.UriBuilderImpl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -160,7 +160,7 @@ public class ReportTemplateResourceTest {
   @Test
   public void testUpdateReportTemplate_NewReportTemplateCreated() {
     UriInfo uriInfoMock = createMock(UriInfo.class);
-    expect(uriInfoMock.getAbsolutePath()).andReturn(UriBuilderImpl.fromUri(BASE_URI).build("")).atLeastOnce();
+    expect(uriInfoMock.getAbsolutePath()).andReturn(UriBuilder.fromUri(BASE_URI).build("")).atLeastOnce();
 
     opalConfigurationServiceMock.modifyConfiguration((ConfigModificationTask) EasyMock.anyObject());
     expectLastCall().once();

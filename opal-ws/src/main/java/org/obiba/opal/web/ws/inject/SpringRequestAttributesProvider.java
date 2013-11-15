@@ -14,7 +14,6 @@ import java.net.URI;
 import javax.ws.rs.core.UriInfo;
 
 import org.jboss.resteasy.plugins.server.servlet.ServletUtil;
-import org.obiba.opal.web.ws.cfg.ResteasyServletConfiguration;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -34,13 +33,13 @@ public class SpringRequestAttributesProvider implements RequestAttributesProvide
 
   @Override
   public UriInfo getUriInfo() {
-    return ServletUtil.extractUriInfo(currentRequestAttributes().getRequest(), ResteasyServletConfiguration.WS_ROOT);
+    return ServletUtil.extractUriInfo(currentRequestAttributes().getRequest(), "/ws");
   }
 
   @Override
   public String getResourcePath(URI uri) {
     String path = uri.getPath();
-    return path.replaceFirst(ResteasyServletConfiguration.WS_ROOT, "");
+    return path.replaceFirst("/ws", "");
   }
 
 }

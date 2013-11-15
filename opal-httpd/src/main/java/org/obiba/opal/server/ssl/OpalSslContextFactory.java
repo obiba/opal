@@ -20,8 +20,6 @@ import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.obiba.opal.core.unit.UnitKeyStore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -29,21 +27,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class OpalSslContextFactory implements SslContextFactory {
 
-  private static final Logger log = LoggerFactory.getLogger(OpalSslContextFactory.class);
+//  private static final Logger log = LoggerFactory.getLogger(OpalSslContextFactory.class);
 
-  private final FunctionalUnitService functionalUnitService;
-
-  private final UnitKeyStoreService unitKeystoreService;
-
-  private final String publicUrl;
+  @Value("${org.obiba.opal.public.url}")
+  private String publicUrl;
 
   @Autowired
-  public OpalSslContextFactory(FunctionalUnitService functionalUnitService, UnitKeyStoreService unitKeystoreService,
-      @Value("${org.obiba.opal.public.url}") String publicUrl) {
-    this.functionalUnitService = functionalUnitService;
-    this.unitKeystoreService = unitKeystoreService;
-    this.publicUrl = publicUrl;
-  }
+  private FunctionalUnitService functionalUnitService;
+
+  @Autowired
+  private UnitKeyStoreService unitKeystoreService;
 
   @Override
   public SSLContext createSslContext() {

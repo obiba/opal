@@ -9,12 +9,12 @@
  ******************************************************************************/
 package org.obiba.opal.web.ws.intercept;
 
-import org.jboss.resteasy.core.ResourceMethod;
+import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.HttpRequest;
 
 public interface RequestCyclePostProcess {
 
-  void postProcess(HttpRequest request, ResourceMethod resourceMethod, ServerResponse response);
+  void postProcess(HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response);
 
 }

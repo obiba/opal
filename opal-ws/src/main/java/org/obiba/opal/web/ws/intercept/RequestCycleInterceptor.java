@@ -19,8 +19,9 @@ import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.annotations.interception.SecurityPrecedence;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
-import org.jboss.resteasy.core.ResourceMethod;
+import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
+import org.jboss.resteasy.specimpl.BuiltResponse;
 import org.jboss.resteasy.spi.Failure;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.resteasy.spi.interception.PostProcessInterceptor;
@@ -55,13 +56,16 @@ public class RequestCycleInterceptor implements PreProcessInterceptor, PostProce
   }
 
   @Override
-  public ServerResponse preProcess(HttpRequest request, ResourceMethod method) throws Failure, WebApplicationException {
+  public ServerResponse preProcess(HttpRequest request, ResourceMethodInvoker method)
+      throws Failure, WebApplicationException {
     new RequestCycle(request, method);
 
     for(RequestCyclePreProcess p : preProcesses) {
       Response r = p.preProcess(request, method);
       if(r != null) {
-        return ServerResponse.copyIfNotServerResponse(r);
+        return r instanceof ServerResponse
+            ? (ServerResponse) r
+            : new ServerResponse((BuiltResponse) Response.fromResponse(r).build());
       }
     }
 
@@ -87,9 +91,9 @@ public class RequestCycleInterceptor implements PreProcessInterceptor, PostProce
 
     private final HttpRequest request;
 
-    private final ResourceMethod resourceMethod;
+    private final ResourceMethodInvoker resourceMethod;
 
-    private RequestCycle(HttpRequest request, ResourceMethod method) {
+    private RequestCycle(HttpRequest request, ResourceMethodInvoker method) {
       this.request = request;
       resourceMethod = method;
       requestAttributesProvider.currentRequestAttributes()

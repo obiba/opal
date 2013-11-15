@@ -24,7 +24,8 @@ import javax.ws.rs.ext.ExceptionMapper;
 
 import org.apache.http.HttpStatus;
 import org.apache.shiro.mgt.SessionsSecurityManager;
-import org.jboss.resteasy.core.ResourceMethod;
+import org.jboss.resteasy.core.ResourceInvoker;
+import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.DefaultOptionsMethodException;
 import org.jboss.resteasy.spi.HttpRequest;
@@ -70,20 +71,20 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
   }
 
   @Override
-  public Response preProcess(HttpRequest request, ResourceMethod resourceMethod) {
+  public Response preProcess(HttpRequest request, ResourceMethodInvoker resourceMethod) {
     if(HttpMethod.OPTIONS.equals(request.getHttpMethod())) {
       // Allow header will be added on postProcess
       return Response.ok().build();
     }
-    if(!isWebServicePublic(resourceMethod) && !isWebServiceWithoutAuthorization(resourceMethod) && !getSubject()
-        .isPermitted("magma:" + getResourceMethodUri(request, resourceMethod) + ":" + request.getHttpMethod())) {
+    if(!isWebServicePublic(resourceMethod) && !isWebServiceWithoutAuthorization(resourceMethod) &&
+        !getSubject().isPermitted("magma:" + getResourceMethodUri(request) + ":" + request.getHttpMethod())) {
       return Response.status(Status.FORBIDDEN).build();
     }
     return null;
   }
 
   @Override
-  public void postProcess(HttpRequest request, ResourceMethod resourceMethod, ServerResponse response) {
+  public void postProcess(HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response) {
     if(HttpMethod.GET.equals(request.getHttpMethod()) || HttpMethod.OPTIONS.equals(request.getHttpMethod())) {
       Set<String> allowed = allowed(request, resourceMethod);
       if(allowed != null && allowed.size() > 0) {
@@ -110,12 +111,11 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
     return allow(allowed(uri.getPath(), ImmutableSet.copyOf(availableMethods.split(", "))));
   }
 
-  protected String getResourceMethodUri(HttpRequest request, ResourceMethod resourceMethod) {
-    UriInfo info = request.getUri();
-    return info.getPath();
+  protected String getResourceMethodUri(HttpRequest request) {
+    return request.getUri().getPath();
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "ConstantConditions" })
   private void addPermissions(ServerResponse response) {
     // Add permissions
     URI resourceUri = (URI) response.getMetadata().getFirst(HttpHeaders.LOCATION);
@@ -190,11 +190,11 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
     }), ImmutableSet.of(HttpMethod.OPTIONS)));
   }
 
-  private Set<String> allowed(HttpRequest request, ResourceMethod method) {
+  private Set<String> allowed(HttpRequest request, ResourceMethodInvoker method) {
     return allowed(request.getUri().getPath(), availableMethods(method));
   }
 
-  private Iterable<String> availableMethods(ResourceMethod method) {
+  private Iterable<String> availableMethods(ResourceMethodInvoker method) {
     Set<String> availableMethods = Sets.newHashSet();
     String path = getPath(method);
     for(Method otherMethod : method.getResourceClass().getMethods()) {
@@ -206,7 +206,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
     return availableMethods;
   }
 
-  private String getPath(ResourceMethod method) {
+  private String getPath(ResourceInvoker method) {
     return getPath(method.getMethod());
   }
 

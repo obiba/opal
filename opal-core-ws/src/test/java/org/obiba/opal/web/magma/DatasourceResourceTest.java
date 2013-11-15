@@ -21,11 +21,11 @@ import java.util.Locale;
 import javax.annotation.Nullable;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.easymock.EasyMock;
 import org.easymock.IArgumentMatcher;
-import org.jboss.resteasy.specimpl.UriBuilderImpl;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -130,7 +130,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     UriInfo uriInfoMock = createMock(UriInfo.class);
 
     opalRuntimeMock.modifyConfiguration((ConfigModificationTask) EasyMock.anyObject());
-    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromPath("/"));
+    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilder.fromPath("/"));
 
     replay(uriInfoMock, opalRuntimeMock);
 
@@ -151,7 +151,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     UriInfo uriInfoMock = createMock(UriInfo.class);
 
     opalRuntimeMock.modifyConfiguration((ConfigModificationTask) EasyMock.anyObject());
-    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromPath("/"));
+    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilder.fromPath("/"));
 
     replay(uriInfoMock, opalRuntimeMock);
 
@@ -303,7 +303,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     DatasourcesResource resource = new DatasourcesResource(newDatasourceFactoryRegistry(), opalRuntimeMock, null);
 
     UriInfo uriInfoMock = createMock(UriInfo.class);
-    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromPath("/"));
+    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilder.fromPath("/"));
 
     Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder().setName("patate")
         .setExtension(ExcelDatasourceFactoryDto.params,
@@ -366,7 +366,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     DatasourcesResource resource = new DatasourcesResource(newDatasourceFactoryRegistry(), opalRuntimeMock, null);
 
     UriInfo uriInfoMock = createMock(UriInfo.class);
-    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromPath("/"));
+    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilder.fromPath("/"));
 
     File file = new File(getFileFromResource(DATASOURCES_FOLDER), "user-defined-bogus.xls");
     Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder()

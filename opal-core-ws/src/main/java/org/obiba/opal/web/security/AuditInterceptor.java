@@ -11,20 +11,17 @@
 package org.obiba.opal.web.security;
 
 import java.net.URI;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 
 import org.apache.http.HttpStatus;
-import org.jboss.resteasy.core.ResourceMethod;
+import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.obiba.opal.audit.OpalUserProvider;
-import org.obiba.opal.web.ws.cfg.ResteasyServletConfiguration;
 import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +45,7 @@ public class AuditInterceptor implements RequestCyclePostProcess {
   }
 
   @Override
-  public void postProcess(HttpRequest request, ResourceMethod resourceMethod, ServerResponse response) {
+  public void postProcess(HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response) {
     logServerError(request, response);
     logClientError(request, response);
     logInfo(request, response);
@@ -84,7 +81,7 @@ public class AuditInterceptor implements RequestCyclePostProcess {
     if(response.getStatus() == HttpStatus.SC_CREATED) {
       URI resourceUri = (URI) response.getMetadata().getFirst(HttpHeaders.LOCATION);
       if(resourceUri != null) {
-        String path = resourceUri.getPath().substring(ResteasyServletConfiguration.WS_ROOT.length());
+        String path = resourceUri.getPath().substring("/ws".length());
         List<Object> args = Lists.newArrayList(getArguments(request, response));
         args.add(path);
         log.info(LOG_FORMAT + " - {}", args.toArray());
@@ -92,7 +89,7 @@ public class AuditInterceptor implements RequestCyclePostProcess {
       }
     }
 
-    if (!logged) {
+    if(!logged) {
       log.info(LOG_FORMAT, getArguments(request, response));
     }
   }

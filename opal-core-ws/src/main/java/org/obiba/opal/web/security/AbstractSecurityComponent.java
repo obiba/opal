@@ -16,7 +16,7 @@ import org.apache.shiro.session.SessionException;
 import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionKey;
 import org.apache.shiro.subject.Subject;
-import org.jboss.resteasy.core.ResourceMethod;
+import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
@@ -48,7 +48,7 @@ abstract class AbstractSecurityComponent {
    * @param method
    * @return
    */
-  protected boolean isWebServicePublic(ResourceMethod method) {
+  protected boolean isWebServicePublic(ResourceMethodInvoker method) {
     return method.getMethod().isAnnotationPresent(NotAuthenticated.class) ||
         method.getResourceClass().isAnnotationPresent(NotAuthenticated.class);
   }
@@ -59,7 +59,7 @@ abstract class AbstractSecurityComponent {
    * @param method
    * @return
    */
-  protected boolean isWebServiceWithoutAuthorization(ResourceMethod method) {
+  protected boolean isWebServiceWithoutAuthorization(ResourceMethodInvoker method) {
     return method.getMethod().isAnnotationPresent(NoAuthorization.class) ||
         method.getResourceClass().isAnnotationPresent(NoAuthorization.class);
   }
@@ -70,7 +70,7 @@ abstract class AbstractSecurityComponent {
    * @param method
    * @return
    */
-  protected boolean isWebServiceAuthenticatedByCookie(ResourceMethod method) {
+  protected boolean isWebServiceAuthenticatedByCookie(ResourceMethodInvoker method) {
     return method.getMethod().isAnnotationPresent(AuthenticatedByCookie.class) ||
         method.getResourceClass().isAnnotationPresent(AuthenticatedByCookie.class);
   }

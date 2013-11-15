@@ -22,7 +22,6 @@ import org.obiba.opal.web.model.Opal.AclAction;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.reporting.Dtos;
-import org.obiba.opal.web.ws.cfg.ResteasyServletConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,7 +138,7 @@ public class ReportTemplatesResource extends AbstractReportTemplateResource {
 
     @Override
     public String getNode() {
-      return reportUri.getPath().replaceFirst(ResteasyServletConfiguration.WS_ROOT, "");
+      return reportUri.getPath().replaceFirst("/ws", "");
     }
 
     @Override

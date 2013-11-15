@@ -735,11 +735,6 @@
           </exclusion>
         </exclusions>
       </dependency>
-      <!--dependency>
-        <groupId>org.scannotation</groupId>
-        <artifactId>scannotation</artifactId>
-        <version>${scannotation.version}</version>
-      </dependency-->
 
       <!-- Jetty dependencies -->
       <dependency>
@@ -1652,9 +1647,8 @@
     <protostuff.version>1.0.1</protostuff.version>
     <quartz.version>1.8.3</quartz.version>
     <REngine.version>0.6-8.1</REngine.version>
-    <resteasy.version>2.3.6.Final</resteasy.version>
+    <resteasy.version>3.0.5.Final</resteasy.version>
     <rhino-js.version>1.7R4</rhino-js.version>
-    <scannotation.version>1.0.3</scannotation.version>
     <shiro.version>1.1.0</shiro.version>
     <shiro-extras.version>1.0.1-obiba</shiro-extras.version>
     <slf4j.version>1.7.5</slf4j.version>

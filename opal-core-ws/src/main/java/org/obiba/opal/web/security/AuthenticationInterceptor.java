@@ -21,7 +21,7 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.session.Session;
-import org.jboss.resteasy.core.ResourceMethod;
+import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.Failure;
 import org.jboss.resteasy.spi.HttpRequest;
@@ -54,7 +54,8 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
 
   @Nullable
   @Override
-  public ServerResponse preProcess(HttpRequest request, ResourceMethod method) throws Failure, WebApplicationException {
+  public ServerResponse preProcess(HttpRequest request, ResourceMethodInvoker method)
+      throws Failure, WebApplicationException {
     // Check authentication before processing. If resource requires authentication and user is not authenticated, return
     // "401: Unauthorized"
 
@@ -80,7 +81,7 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
   }
 
   @Override
-  public void postProcess(HttpRequest request, ResourceMethod resourceMethod, ServerResponse response) {
+  public void postProcess(HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response) {
     // Set the cookie if the user is still authenticated
     if(isUserAuthenticated()) {
       Session session = SecurityUtils.getSubject().getSession();

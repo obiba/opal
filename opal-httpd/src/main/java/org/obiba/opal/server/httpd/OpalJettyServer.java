@@ -15,14 +15,8 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.apache.shiro.mgt.SecurityManager;
 import org.eclipse.jetty.ajp.Ajp13SocketConnector;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
@@ -34,39 +28,27 @@ import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.FilterMapping;
 import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.resource.FileResource;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
+import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
+import org.jboss.resteasy.plugins.spring.SpringContextLoaderListener;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
-import org.obiba.opal.core.service.SubjectAclService;
-import org.obiba.opal.server.httpd.security.AuthenticationFilter;
-import org.obiba.opal.server.ssl.SslContextFactory;
-import org.obiba.runtime.Version;
-import org.obiba.runtime.upgrade.VersionProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.support.AbstractRefreshableConfigApplicationContext;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.web.context.ConfigurableWebApplicationContext;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.XmlWebApplicationContext;
-import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.filter.RequestContextFilter;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.request.RequestContextListener;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  *
  */
-@Component
+
 public class OpalJettyServer implements Service {
 
   private static final Logger log = LoggerFactory.getLogger(OpalJettyServer.class);
@@ -75,48 +57,25 @@ public class OpalJettyServer implements Service {
 
   private static final int REQUEST_HEADER_SIZE = 8192;
 
-  @Nullable
-  @Value("${org.obiba.opal.http.port}")
-  private Integer httpPort;
-
-  @Nullable
-  @Value("${org.obiba.opal.https.port}")
-  private Integer httpsPort;
-
-  @Nullable
-  @Value("${org.obiba.opal.ajp.port}")
-  private Integer ajpPort;
-
-  @Nullable
-  @Value("${org.obiba.opal.maxIdleTime}")
-  private Integer maxIdleTime;
-
-  @Autowired
-  private ApplicationContext applicationContext;
-
-  @Autowired
-  private PlatformTransactionManager transactionManager;
-
-  @Autowired
-  private OpalRuntime opalRuntime;
-
-  @Autowired
-  private SubjectAclService subjectAclService;
-
-  @Autowired
-  private VersionProvider opalVersionProvider;
-
-  @Autowired
-  private SecurityManager securityMgr;
-
-  @Autowired
-  private SslContextFactory sslContextFactory;
+  //  @Nullable
+//  @Value("${org.obiba.opal.http.port}")
+//  private Integer httpPort;
+//
+//  @Nullable
+//  @Value("${org.obiba.opal.https.port}")
+//  private Integer httpsPort;
+//
+//  @Nullable
+//  @Value("${org.obiba.opal.ajp.port}")
+//  private Integer ajpPort;
+//
+//  @Nullable
+//  @Value("${org.obiba.opal.maxIdleTime}")
+//  private Integer maxIdleTime;
 
   private Server jettyServer;
 
-  private ServletContextHandler contextHandler;
-
-  private ConfigurableApplicationContext webApplicationContext;
+  private ServletContextHandler servletContextHandler;
 
   @PostConstruct
   public void init() {
@@ -137,7 +96,7 @@ public class OpalJettyServer implements Service {
     handlers.addHandler(createExtensionFileHandler(OpalRuntime.WEBAPP_EXTENSION));
     // Add a file handler that points to the Opal BIRT extension update-site
     handlers.addHandler(createDistFileHandler("/update-site"));
-    handlers.addHandler(contextHandler = createServletHandler());
+    handlers.addHandler(createServletHandler());
     jettyServer.setHandler(handlers);
   }
 
@@ -161,10 +120,14 @@ public class OpalJettyServer implements Service {
   private void configureSslConnector() {
     if(httpsPort == null || httpsPort <= 0) return;
 
-    org.eclipse.jetty.util.ssl.SslContextFactory jettySsl = new org.eclipse.jetty.util.ssl.SslContextFactory() {
+    SslContextFactory jettySsl = new SslContextFactory() {
 
       @Override
       protected void doStart() throws Exception {
+
+        org.obiba.opal.server.ssl.SslContextFactory sslContextFactory = WebApplicationContextUtils
+            .getRequiredWebApplicationContext(servletContextHandler.getServletContext())
+            .getBean(org.obiba.opal.server.ssl.SslContextFactory.class);
         setSslContext(sslContextFactory.createSslContext());
       }
 
@@ -172,7 +135,6 @@ public class OpalJettyServer implements Service {
       public void checkKeyStore() {
       }
     };
-
     jettySsl.setWantClientAuth(true);
     jettySsl.setNeedClientAuth(false);
 
@@ -186,7 +148,7 @@ public class OpalJettyServer implements Service {
 
   @Bean
   public ServletContextHandler getServletContextHandler() {
-    return contextHandler;
+    return servletContextHandler;
   }
 
   @Override
@@ -197,7 +159,6 @@ public class OpalJettyServer implements Service {
   @Override
   public void start() {
     try {
-      webApplicationContext.refresh();
       log.info("Starting Opal HTTP/s Server on port {}", jettyServer.getConnectors()[0].getPort());
       jettyServer.start();
     } catch(Exception e) {
@@ -208,15 +169,6 @@ public class OpalJettyServer implements Service {
 
   @Override
   public void stop() {
-    try {
-      if(webApplicationContext.isActive()) {
-        webApplicationContext.close();
-      }
-    } catch(RuntimeException e) {
-      // log and ignore
-      log.warn("Exception during web application context shutdown", e);
-    }
-
     try {
       jettyServer.stop();
     } catch(Exception e) {
@@ -236,27 +188,18 @@ public class OpalJettyServer implements Service {
     throw new NoSuchServiceConfigurationException(getName());
   }
 
-  private ServletContextHandler createServletHandler() {
-    ServletContextHandler handler = new ServletContextHandler(
-        ServletContextHandler.NO_SESSIONS | ServletContextHandler.NO_SECURITY);
-    handler.setContextPath("/");
-    handler.addFilter(new FilterHolder(new OpalVersionFilter()), "/*", FilterMapping.DEFAULT);
-    handler.addFilter(new FilterHolder(new AuthenticationFilter(securityMgr, opalRuntime, subjectAclService)), "/ws/*",
-        FilterMapping.DEFAULT);
-    // handler.addFilter(new FilterHolder(new X509CertificateAuthenticationFilter()), "/ws/*", FilterMapping.DEFAULT);
-    // handler.addFilter(new FilterHolder(new CrossOriginFilter()), "/*", FilterMapping.DEFAULT);
-    handler.addFilter(new FilterHolder(new RequestContextFilter()), "/*", FilterMapping.DEFAULT);
-    handler.addFilter(new FilterHolder(new TransactionFilter(transactionManager)), "/*", FilterMapping.DEFAULT);
-
-    webApplicationContext = new XmlWebApplicationContext();
-    webApplicationContext.setParent(applicationContext);
-    ((ConfigurableWebApplicationContext) webApplicationContext).setServletContext(handler.getServletContext());
-    ((AbstractRefreshableConfigApplicationContext) webApplicationContext)
-        .setConfigLocation("classpath:/META-INF/spring/opal-httpd/context.xml");
-    handler.getServletContext()
-        .setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, webApplicationContext);
-
-    return handler;
+  private Handler createServletHandler() {
+    servletContextHandler = new ServletContextHandler(ServletContextHandler.NO_SECURITY);
+    servletContextHandler.setContextPath("/");
+    servletContextHandler.addEventListener(new ResteasyBootstrap());
+    servletContextHandler.addEventListener(new SpringContextLoaderListener());
+    servletContextHandler.addEventListener(new RequestContextListener());
+    servletContextHandler.addFilter(new FilterHolder(new OpalVersionFilter()), "/*", FilterMapping.DEFAULT);
+    servletContextHandler.addFilter(new FilterHolder(new AuthenticationFilter()), "/ws/*", FilterMapping.DEFAULT);
+    //TODO fix application context xml
+    servletContextHandler.setInitParameter(ContextLoader.CONFIG_LOCATION_PARAM, "classpath:application-context.xml");
+    servletContextHandler.addServlet(new ServletHolder(new HttpServletDispatcher()), "/ws/*");
+    return servletContextHandler;
   }
 
   private Handler createDistFileHandler(String directory) {
@@ -287,52 +230,6 @@ public class OpalJettyServer implements Service {
       throw new RuntimeException(e);
     }
     return resourceHandler;
-  }
-
-  public class OpalVersionFilter extends OncePerRequestFilter {
-
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-        throws ServletException, IOException {
-      try {
-        Version version = opalVersionProvider.getVersion();
-        if(version != null) {
-          response.addHeader("X-Opal-Version", version.toString());
-        }
-      } catch(RuntimeException ignored) {
-      }
-
-      filterChain.doFilter(request, response);
-    }
-
-  }
-
-  public static class TransactionFilter extends OncePerRequestFilter {
-
-    private final PlatformTransactionManager txManager;
-
-    public TransactionFilter(PlatformTransactionManager txManager) {
-      this.txManager = txManager;
-    }
-
-    @Override
-    protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response,
-        final FilterChain filterChain) throws ServletException, IOException {
-      new TransactionTemplate(txManager).execute(new TransactionCallbackWithoutResult() {
-        @Override
-        protected void doInTransactionWithoutResult(TransactionStatus status) {
-          try {
-            filterChain.doFilter(request, response);
-          } catch(IOException e) {
-            throw new RuntimeException(e);
-          } catch(ServletException e) {
-            throw new RuntimeException(e);
-          }
-        }
-      });
-
-    }
-
   }
 
 }

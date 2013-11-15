@@ -12,12 +12,12 @@ package org.obiba.opal.web.ws.intercept;
 import javax.annotation.Nullable;
 import javax.ws.rs.core.Response;
 
-import org.jboss.resteasy.core.ResourceMethod;
+import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.spi.HttpRequest;
 
 public interface RequestCyclePreProcess {
 
   @Nullable
-  Response preProcess(HttpRequest request, ResourceMethod resourceMethod);
+  Response preProcess(HttpRequest request, ResourceMethodInvoker resourceMethod);
 
 }

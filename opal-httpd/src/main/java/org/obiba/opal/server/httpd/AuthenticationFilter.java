@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.server.httpd.security;
+package org.obiba.opal.server.httpd;
 
 import java.io.IOException;
 import java.security.cert.X509Certificate;
@@ -25,12 +25,8 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.session.Session;
-import org.apache.shiro.session.SessionException;
-import org.apache.shiro.session.mgt.DefaultSessionKey;
-import org.apache.shiro.session.mgt.SessionKey;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.eclipse.jetty.http.HttpHeaders;
@@ -44,6 +40,7 @@ import org.obiba.opal.web.security.HttpHeaderAuthenticationToken;
 import org.obiba.opal.web.security.OpalAuth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 public class AuthenticationFilter extends OncePerRequestFilter {
@@ -54,20 +51,11 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
   private static final String OPAL_REQUEST_ID_COOKIE_NAME = "opalrid";
 
-  private final SessionsSecurityManager securityManager;
+  private SessionsSecurityManager securityManager;
 
-  private final OpalRuntime opalRuntime;
+  private OpalRuntime opalRuntime;
 
-  private final SubjectAclService subjectAclService;
-
-  public AuthenticationFilter(SecurityManager mgr, OpalRuntime opalRuntime, SubjectAclService subjectAclService) {
-    if(!(mgr instanceof SessionsSecurityManager)) {
-      throw new IllegalStateException("SecurityManager does not support session management");
-    }
-    securityManager = (SessionsSecurityManager) mgr;
-    this.opalRuntime = opalRuntime;
-    this.subjectAclService = subjectAclService;
-  }
+  private SubjectAclService subjectAclService;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -87,20 +75,23 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     }
   }
 
-  protected SessionsSecurityManager getSecurityManager() {
+  private SessionsSecurityManager getSecurityManager() {
+    if(securityManager == null) securityManager = getSpringBean(SessionsSecurityManager.class);
     return securityManager;
   }
 
-  protected boolean isValidSessionId(String sessionId) {
-    if(sessionId != null) {
-      SessionKey key = new DefaultSessionKey(sessionId);
-      try {
-        return securityManager.getSessionManager().getSession(key) != null;
-      } catch(SessionException e) {
-        // Means that the session does not exist or has expired.
-      }
-    }
-    return false;
+  private OpalRuntime getOpalRuntime() {
+    if(opalRuntime == null) opalRuntime = getSpringBean(OpalRuntime.class);
+    return opalRuntime;
+  }
+
+  private SubjectAclService getSubjectAclService() {
+    if(subjectAclService == null) subjectAclService = getSpringBean(SubjectAclService.class);
+    return subjectAclService;
+  }
+
+  private <T> T getSpringBean(Class<T> clazz) {
+    return WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext()).getBean(clazz);
   }
 
   /**
@@ -144,7 +135,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
   private void ensureUserHomeExists(String username) {
     try {
-      FileObject home = opalRuntime.getFileSystem().getRoot().resolveFile("/home/" + username);
+      FileObject home = getOpalRuntime().getFileSystem().getRoot().resolveFile("/home/" + username);
       if(!home.exists()) {
         log.info("Creating user home: /home/{}", username);
         home.createFolder();
@@ -158,15 +149,15 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     String folderNode = "/files" + path;
     String homePerm = "FILES_SHARE";
     boolean found = false;
-    for(SubjectAclService.Permissions acl : subjectAclService
+    for(SubjectAclService.Permissions acl : getSubjectAclService()
         .getNodePermissions("opal", folderNode, SubjectAclService.SubjectType.USER)) {
       found = findPermission(acl, homePerm);
       if(found) break;
     }
     if(!found) {
-      subjectAclService
+      getSubjectAclService()
           .addSubjectPermission("opal", folderNode, SubjectAclService.SubjectType.USER.subjectFor(username), homePerm);
-      subjectAclService.addSubjectPermission("opal", folderNode.replace("/files/", "/files/meta/"),
+      getSubjectAclService().addSubjectPermission("opal", folderNode.replace("/files/", "/files/meta/"),
           SubjectAclService.SubjectType.USER.subjectFor(username), "FILES_META");
     }
   }
@@ -185,15 +176,13 @@ public class AuthenticationFilter extends OncePerRequestFilter {
   @Nullable
   private Subject authenticateBySslCert(HttpServletRequest request) {
     X509Certificate[] chain = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-    for(X509Certificate cert : chain) {
-      AuthenticationToken token = new X509CertificateAuthenticationToken(cert);
-      String sessionId = extractSessionId(request);
-      Subject subject = new Subject.Builder(getSecurityManager()).sessionId(sessionId).buildSubject();
-      subject.login(token);
-      log.info("Successfully authenticated subject {}", SecurityUtils.getSubject().getPrincipal());
-      return subject;
-    }
-    return null;
+    if(chain == null || chain.length == 0) return null;
+    AuthenticationToken token = new X509CertificateAuthenticationToken(chain[0]);
+    String sessionId = extractSessionId(request);
+    Subject subject = new Subject.Builder(getSecurityManager()).sessionId(sessionId).buildSubject();
+    subject.login(token);
+    log.info("Successfully authenticated subject {}", SecurityUtils.getSubject().getPrincipal());
+    return subject;
   }
 
   private boolean hasSslCert(ServletRequest request) {

@@ -26,6 +26,7 @@ import java.util.zip.ZipFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.fileupload.FileItem;
@@ -36,7 +37,6 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.hamcrest.Matchers;
-import org.jboss.resteasy.specimpl.UriBuilderImpl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -301,7 +301,7 @@ public class FilesResourceTest {
     expect(fileItemMock.getName()).andReturn("fileToUpload.txt").atLeastOnce();
     expect(fileItemMock.getInputStream()).andReturn(getClass().getResourceAsStream("/files-to-upload/fileToUpload.txt"))
         .once();
-    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromPath("/"));
+    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilder.fromPath("/"));
 
     FilesResource fileResource = new FilesResource(opalRuntimeMock) {
       @Override
@@ -520,7 +520,7 @@ public class FilesResourceTest {
     expect(childFolderMock.isWriteable()).andReturn(true).atLeastOnce();
     expect(parentFolderMock.isWriteable()).andReturn(true).atLeastOnce();
     expect(fileObjectMock.resolveFile("folder")).andReturn(childFolderMock).atLeastOnce();
-    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilderImpl.fromPath("/"));
+    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilder.fromPath("/"));
 
     replay(fileObjectMock, uriInfoMock, parentFolderMock, childFolderMock, fileNameMock, mockContent);
 

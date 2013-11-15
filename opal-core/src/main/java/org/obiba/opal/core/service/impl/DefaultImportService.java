@@ -68,37 +68,23 @@ public class DefaultImportService implements ImportService {
   @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(DefaultImportService.class);
 
-  private final TransactionTemplate txTemplate;
-
-  private final FunctionalUnitService functionalUnitService;
-
-  private final OpalRuntime opalRuntime;
-
-  private final IParticipantIdentifier participantIdentifier;
-
-  private final IdentifiersTableService identifiersTableService;
-
-  private final IdentifierService identifierService;
+  @Autowired
+  private TransactionTemplate txTemplate;
 
   @Autowired
-  public DefaultImportService(TransactionTemplate txTemplate, FunctionalUnitService functionalUnitService,
-      OpalRuntime opalRuntime, IParticipantIdentifier participantIdentifier,
-      IdentifiersTableService identifiersTableService, IdentifierService identifierService) {
+  private FunctionalUnitService functionalUnitService;
 
-    Assert.notNull(txTemplate, "txManager cannot be null");
-    Assert.notNull(functionalUnitService, "functionalUnitService cannot be null");
-    Assert.notNull(opalRuntime, "opalRuntime cannot be null");
-    Assert.notNull(participantIdentifier, "participantIdentifier cannot be null");
-    Assert.notNull(identifiersTableService, "identifiersTableService cannot be null");
+  @Autowired
+  private OpalRuntime opalRuntime;
 
-    this.txTemplate = txTemplate;
-    this.txTemplate.setIsolationLevel(TransactionTemplate.ISOLATION_READ_COMMITTED);
-    this.functionalUnitService = functionalUnitService;
-    this.opalRuntime = opalRuntime;
-    this.participantIdentifier = participantIdentifier;
-    this.identifierService = identifierService;
-    this.identifiersTableService = identifiersTableService;
-  }
+  @Autowired
+  private IParticipantIdentifier participantIdentifier;
+
+  @Autowired
+  private IdentifiersTableService identifiersTableService;
+
+  @Autowired
+  private IdentifierService identifierService;
 
   @Override
   public void importData(@Nullable String unitName, @NotNull FileObject sourceFile,
