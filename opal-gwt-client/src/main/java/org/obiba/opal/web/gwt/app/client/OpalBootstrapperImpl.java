@@ -11,6 +11,7 @@ import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationCache;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.event.RequestCredentialsExpiredEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
@@ -22,6 +23,7 @@ import org.obiba.opal.web.model.client.opal.Subject;
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.ClosingEvent;
@@ -86,7 +88,7 @@ public class OpalBootstrapperImpl implements Bootstrapper {
       // get the username
       UriBuilder builder = UriBuilder.create()
           .segment("auth", "session", requestCredentials.extractCredentials(), "username");
-      ResourceRequestBuilderFactory.<Subject>newBuilder().forResource(builder.build()).get()
+      ResourceRequestBuilderFactory.<Subject>newBuilder().forResource(builder.build()).get() //
           .withCallback(new SubjectResourceCallback()).send();
     } else {
       placeManager.revealCurrentPlace();
@@ -116,7 +118,14 @@ public class OpalBootstrapperImpl implements Bootstrapper {
       public void onSessionCreated(SessionCreatedEvent event) {
         ResourceRequestBuilderFactory.<DatabasesStatusDto>newBuilder()
             .forResource(UriBuilder.create().segment("system", "status", "databases").build()).get()
-            .withCallback(new DatabasesStatusResourceCallback()).send();
+            .withCallback(new DatabasesStatusResourceCallback()).withCallback(new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            GWT.log("coucou");
+            placeManager.revealCurrentPlace();
+          }
+        }, Response.SC_FORBIDDEN)//
+            .send();
       }
     });
 
@@ -162,6 +171,7 @@ public class OpalBootstrapperImpl implements Bootstrapper {
   private class DatabasesStatusResourceCallback implements ResourceCallback<DatabasesStatusDto> {
     @Override
     public void onResource(Response response, DatabasesStatusDto resource) {
+      GWT.log("patate");
       if(!resource.getHasIdentifiers() || !resource.getHasStorage()) {
         placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.INSTALL).build());
       } else {

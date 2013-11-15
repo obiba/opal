@@ -21,6 +21,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.obiba.magma.DuplicateDatasourceNameException;
 import org.obiba.magma.MagmaRuntimeException;
+import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.support.DatasourceParsingException;
 import org.obiba.opal.project.ProjectService;
 import org.obiba.opal.project.domain.Project;
@@ -45,7 +46,11 @@ public class ProjectsResource {
   public List<Projects.ProjectDto> getProjects() {
     List<Projects.ProjectDto> projects = Lists.newArrayList();
     for(Project project : projectService.getProjects()) {
-      projects.add(Dtos.asDto(project, projectService.getProjectDirectoryPath(project)));
+      try {
+        projects.add(Dtos.asDto(project, projectService.getProjectDirectoryPath(project)));
+      } catch(NoSuchDatasourceException e) {
+        // ignore
+      }
     }
     return projects;
   }

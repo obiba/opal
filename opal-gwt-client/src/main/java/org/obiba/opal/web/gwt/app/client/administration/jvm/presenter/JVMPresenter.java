@@ -121,11 +121,6 @@ public class JVMPresenter extends ItemAdministrationPresenter<JVMPresenter.Displ
     return translations.pageJVMTitle();
   }
 
-  @Override
-  protected void onBind() {
-    super.onBind();
-  }
-
   private final class ListEnvironmentAuthorization implements HasAuthorization {
 
     @Override
@@ -148,7 +143,7 @@ public class JVMPresenter extends ItemAdministrationPresenter<JVMPresenter.Displ
 
     @Override
     public void unauthorized() {
-      timer.cancel();
+      if(timer != null) timer.cancel();
     }
   }
 

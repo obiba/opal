@@ -122,8 +122,8 @@ public class LoginPresenter extends Presenter<LoginPresenter.Display, LoginPrese
       }
     };
 
-    ResourceRequestBuilderFactory.newBuilder().forResource("/auth/sessions").post().withCallback(403, authError)
-        .withCallback(401, authError).withCallback(201, new ResponseCodeCallback() {
+    ResourceRequestBuilderFactory.newBuilder().forResource("/auth/sessions").post().withCallback(Response.SC_FORBIDDEN, authError)
+        .withCallback(Response.SC_UNAUTHORIZED, authError).withCallback(Response.SC_CREATED, new ResponseCodeCallback() {
 
       @Override
       public void onResponseCode(Request request, Response response) {
