@@ -1,8 +1,17 @@
+<!--
+  ~ Copyright (c) 2013 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
-    xmlns:b2="urn:import:com.github.gwtbootstrap.client.ui.base"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -25,33 +34,7 @@
           <ui:msg description="Values Filter label">Values Filter</ui:msg>
         </b:ControlLabel>
         <b:Controls>
-          <b:DropdownButton text="VAR1: All">
-            <b2:ListItem addStyleNames="controls">
-              <b:RadioButton name="radio" checked="true">All</b:RadioButton>
-              <b:RadioButton name="radio">Empty</b:RadioButton>
-              <b:RadioButton name="radio">Not empty</b:RadioButton>
-            </b2:ListItem>
-            <b:Divider/>
-            <b2:ListItem addStyleNames="controls">
-              <g:SimplePanel>
-                <o:Chooser>
-                  <g:item value="IN">
-                    <ui:msg description="In label">In</ui:msg>
-                  </g:item>
-                  <g:item value="NOT_IN">
-                    <ui:msg description="Not in label">Not in</ui:msg>
-                  </g:item>
-                </o:Chooser>
-              </g:SimplePanel>
-              <o:Chooser multipleSelect="true">
-                <g:item value="C1">C1 (234)</g:item>
-                <g:item value="C2">C2 (22)</g:item>
-                <g:item value="C3">C3 (123)</g:item>
-              </o:Chooser>
-            </b2:ListItem>
-            <b:Divider/>
-            <b:NavLink icon="REMOVE">Remove</b:NavLink>
-          </b:DropdownButton>
+          <g:FlowPanel ui:field="filters"/>
           <b:Typeahead ui:field="variableTypeahead">
             <b:TextBox placeholder="more variable criteria..."/>
           </b:Typeahead>

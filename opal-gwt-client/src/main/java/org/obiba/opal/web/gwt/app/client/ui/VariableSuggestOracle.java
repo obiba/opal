@@ -7,6 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.obiba.opal.web.gwt.app.client.ui;
 
 import java.util.ArrayList;
@@ -98,13 +99,13 @@ public class VariableSuggestOracle extends SuggestOracle {
 
   private Response defaultResponse;
 
-  private final EventBus eventBus;
+  protected final EventBus eventBus;
 
-  private String datasource;
+  protected String datasource;
 
-  private String table;
+  protected String table;
 
-  private String originalQuery;
+  protected String originalQuery;
 
   /**
    * Constructor for <code>MultiWordSuggestOracle</code> which takes in a set of
@@ -160,7 +161,7 @@ public class VariableSuggestOracle extends SuggestOracle {
     }
 
     originalQuery = request.getQuery();
-    if (originalQuery == null || originalQuery.trim().isEmpty()) return;
+    if(originalQuery == null || originalQuery.trim().isEmpty()) return;
 
     final String query = prefix + originalQuery;
 
@@ -211,29 +212,6 @@ public class VariableSuggestOracle extends SuggestOracle {
             }
           }
 
-          private VariableSuggestion convertToFormattedSuggestions(String query, Map<String, String> attributes) {
-            SafeHtmlBuilder accum = new SafeHtmlBuilder();
-
-            accum.appendHtmlConstant("<span class='variable-search-suggest-box'>");
-            accum.appendHtmlConstant("<strong>");
-            accum.appendEscaped(attributes.get("name"));
-            accum.appendHtmlConstant("</strong>");
-            accum.appendEscaped(" " + attributes.get("datasource") + "." + attributes.get("table") + "");
-
-            if(attributes.containsKey("label")) {
-              accum.appendHtmlConstant("<br>");
-
-              String label = attributes.get("label");
-              if(label.length() > LABEL_MAX_SIZE) {
-                label = label.substring(0, LABEL_MAX_SIZE) + " ...";
-              }
-              accum.appendEscaped(label);
-            }
-            accum.appendHtmlConstant("</span>");
-
-            return createSuggestion(query, accum.toSafeHtml().asString(), attributes.get("datasource"),
-                attributes.get("table"), attributes.get("name"));
-          }
         })//
         .withCallback(com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
           @Override
@@ -243,6 +221,30 @@ public class VariableSuggestOracle extends SuggestOracle {
           }
         }).send();
 
+  }
+
+  protected VariableSuggestion convertToFormattedSuggestions(String query, Map<String, String> attributes) {
+    SafeHtmlBuilder accum = new SafeHtmlBuilder();
+
+    accum.appendHtmlConstant("<span class='variable-search-suggest-box'>");
+    accum.appendHtmlConstant("<strong>");
+    accum.appendEscaped(attributes.get("name"));
+    accum.appendHtmlConstant("</strong>");
+    accum.appendEscaped(" " + attributes.get("datasource") + "." + attributes.get("table") + "");
+
+    if(attributes.containsKey("label")) {
+      accum.appendHtmlConstant("<br>");
+
+      String label = attributes.get("label");
+      if(label.length() > LABEL_MAX_SIZE) {
+        label = label.substring(0, LABEL_MAX_SIZE) + " ...";
+      }
+      accum.appendEscaped(label);
+    }
+    accum.appendHtmlConstant("</span>");
+
+    return createSuggestion(query, accum.toSafeHtml().asString(), attributes.get("datasource"), attributes.get("table"),
+        attributes.get("name"));
   }
 
   /**

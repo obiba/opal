@@ -1,12 +1,12 @@
-/*******************************************************************************
- * Copyright (c) 2012 OBiBa. All rights reserved.
+/*
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ */
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import java.util.AbstractList;
@@ -17,10 +17,14 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter.DataFetcher;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter.EntitySelectionHandler;
+import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTableUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.CategoricalCriterionDropdown;
 import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.TableVariableSuggestOracle;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
+import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.IconActionCell;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.IconActionCell.Delegate;
@@ -30,9 +34,11 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.AbstractSafeHtmlCell;
@@ -61,20 +67,22 @@ import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.AbstractDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
-import com.gwtplatform.mvp.client.ViewImpl;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Display {
+public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> implements ValuesTablePresenter.Display {
 
   private static final int DEFAULT_MAX_VISIBLE_COLUMNS = 5;
 
@@ -123,6 +131,12 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
   @UiField
   NumericTextBox visibleColumns;
 
+  @UiField
+  FlowPanel filters;
+
+  @UiField(provided = true)
+  Typeahead variableTypeahead;
+
   private ValueSetsDataProvider dataProvider;
 
   private List<VariableDto> listVariable;
@@ -149,9 +163,24 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
   private ValueUpdater<String> updater;
 
+  private final VariableSuggestOracle oracle;
+
   private final Translations translations = GWT.create(Translations.class);
 
-  public ValuesTableView() {
+  @Inject
+  public ValuesTableView(EventBus eventBus) {
+    // populate Typeahead
+    oracle = new TableVariableSuggestOracle(eventBus);
+    variableTypeahead = new Typeahead(oracle);
+    variableTypeahead.setMinLength(1);
+    variableTypeahead.setUpdaterCallback(new Typeahead.UpdaterCallback() {
+      @Override
+      public String onSelection(SuggestOracle.Suggestion selectedSuggestion) {
+        getUiHandlers().onVariableFilter(((VariableSuggestOracle.VariableSuggestion) selectedSuggestion).getVariable());
+        return "";
+      }
+    });
+
     widget = uiBinder.createAndBindUi(this);
     valuesTable.setEmptyTableWidget(noValues);
     pager.setDisplay(valuesTable);
@@ -227,6 +256,9 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     lastFilter = "";
     filter.getTextBox().setValue(lastFilter, false);
     setRefreshing(false);
+
+    oracle.setTable(table.getName());
+    oracle.setDatasource(table.getDatasourceName());
   }
 
   @Override
@@ -339,16 +371,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     boolean isExactMatch = false;
     addPanel.setVisible(true);
 
-    listVariable = variables;
-    int visible = listVariable.size() < getMaxVisibleColumns() ? listVariable.size() : getMaxVisibleColumns();
-    for(int i = 0; i < visible; i++) {
-      valuesTable.addColumn(createColumn(getVariableAt(i)), getColumnHeader(i));
-    }
-
-    if(listVariable.size() > getMaxVisibleColumns()) {
-      valuesTable.insertColumn(1, createEmptyColumn(), createHeader(new PreviousActionCell()));
-      valuesTable.insertColumn(valuesTable.getColumnCount(), createEmptyColumn(), createHeader(new NextActionCell()));
-    }
+    insertColumns(variables);
 
     if(listVariable.size() == 1 && table.getVariableCount() != 1 && filter.getTextBox().getText().isEmpty()) {
       lastFilter = escape(listVariable.get(0).getName());
@@ -366,6 +389,19 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     valuesTable.setPageSize(pageSize.getNumberValue().intValue());
     dataProvider = new ValueSetsDataProvider(isExactMatch);
     dataProvider.addDataDisplay(valuesTable);
+  }
+
+  private void insertColumns(List<VariableDto> variables) {
+    listVariable = variables;
+    int visible = listVariable.size() < getMaxVisibleColumns() ? listVariable.size() : getMaxVisibleColumns();
+    for(int i = 0; i < visible; i++) {
+      valuesTable.addColumn(createColumn(getVariableAt(i)), getColumnHeader(i));
+    }
+
+    if(listVariable.size() > getMaxVisibleColumns()) {
+      valuesTable.insertColumn(1, createEmptyColumn(), createHeader(new PreviousActionCell()));
+      valuesTable.insertColumn(valuesTable.getColumnCount(), createEmptyColumn(), createHeader(new NextActionCell()));
+    }
   }
 
   private void initValuesTable() {
@@ -472,7 +508,11 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
     }
   }
 
-  //
+  @Override
+  public void addVariableFilter(VariableDto variableDto, QueryResultDto termDto) {
+    filters.add(new CategoricalCriterionDropdown(variableDto, termDto));
+  }
+//
   // Inner classes
   //
 
@@ -642,7 +682,7 @@ public class ValuesTableView extends ViewImpl implements ValuesTablePresenter.Di
 
     boolean exactMatch = false;
 
-    public ValueSetsDataProvider(boolean exactMatch) {
+    private ValueSetsDataProvider(boolean exactMatch) {
       this.exactMatch = exactMatch;
     }
 
