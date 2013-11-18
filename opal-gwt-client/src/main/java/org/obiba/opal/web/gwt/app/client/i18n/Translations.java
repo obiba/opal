@@ -2421,4 +2421,16 @@ public interface Translations extends Constants {
   @DefaultStringValue("[None]")
   String opalDefaultIdentifiersLabel();
 
+  @Description("Criterion Filters Labels")
+  @DefaultStringMapValue({//
+      "min", "Min",//
+      "max", "Max", //
+      "values", "Values", //
+      "select_operator", "Select an operator...", "in", "In", //
+      "not_in", "Not in",//
+      "select", "Select",//
+      "range", "Range", "values", "Values", //
+  })
+  Map<String, String> criterionFiltersMap();
+
 }

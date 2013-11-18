@@ -10,12 +10,14 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.ControlLabel;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.FocusEvent;
 import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
@@ -25,6 +27,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 
 public class NumericalCriterionDropdown extends CriterionDropdown {
+
+  private static final Translations translations = GWT.create(Translations.class);
 
   private final Chooser operatorChooser = new Chooser();
 
@@ -50,7 +54,7 @@ public class NumericalCriterionDropdown extends CriterionDropdown {
   public Widget getSpecificControls() {
     ListItem specificControls = new ListItem();
 
-    minLabel = new ControlLabel("Min");
+    minLabel = new ControlLabel(translations.criterionFiltersMap().get("min"));
     minLabel.setFor(min.getId());
 
     min.addKeyUpHandler(new KeyUpHandler() {
@@ -60,7 +64,7 @@ public class NumericalCriterionDropdown extends CriterionDropdown {
       }
     });
 
-    maxLabel = new ControlLabel("Max");
+    maxLabel = new ControlLabel(translations.criterionFiltersMap().get("max"));
     maxLabel.setFor(max.getId());
 
     max.addKeyUpHandler(new KeyUpHandler() {
@@ -70,7 +74,7 @@ public class NumericalCriterionDropdown extends CriterionDropdown {
       }
     });
 
-    valuesLabel = new ControlLabel("Values");
+    valuesLabel = new ControlLabel(translations.criterionFiltersMap().get("values"));
 
     values.addKeyUpHandler(new KeyUpHandler() {
       @Override
@@ -117,9 +121,9 @@ public class NumericalCriterionDropdown extends CriterionDropdown {
     FlowPanel inPanel = new FlowPanel();
 
     operatorChooser.addStyleName("inline-block");
-    operatorChooser.addItem("Select an operator", "SELECT_OPERATOR");
-    operatorChooser.addItem("In", "IN");
-    operatorChooser.addItem("Not in", "NOT_IN");
+    operatorChooser.addItem(translations.criterionFiltersMap().get("select_operator"), "SELECT_OPERATOR");
+    operatorChooser.addItem(translations.criterionFiltersMap().get("in"), "IN");
+    operatorChooser.addItem(translations.criterionFiltersMap().get("not_in"), "NOT_IN");
     operatorChooser.addFocusHandler(new FocusHandler() {
       @Override
       public void onFocus(FocusEvent event) {
@@ -139,9 +143,9 @@ public class NumericalCriterionDropdown extends CriterionDropdown {
     });
 
     rangeValueChooser.addStyleName("small-dual-indent");
-    rangeValueChooser.addItem("Select...", "SELECT");
-    rangeValueChooser.addItem("Range", "RANGE");
-    rangeValueChooser.addItem("Values", "VALUES");
+    rangeValueChooser.addItem("select", "select");
+    rangeValueChooser.addItem("range", "range");
+    rangeValueChooser.addItem("values", "values");
     rangeValueChooser.addFocusHandler(new FocusHandler() {
       @Override
       public void onFocus(FocusEvent event) {
@@ -179,7 +183,7 @@ public class NumericalCriterionDropdown extends CriterionDropdown {
     if(rangeValueChooser.getSelectedIndex() > 0) {
       filter += " " + rangeValueChooser.getItemText(rangeValueChooser.getSelectedIndex()).toLowerCase();
 
-      if("RANGE".equals(rangeValueChooser.getSelectedValue())) {
+      if(translations.criterionFiltersMap().get("range").equals(rangeValueChooser.getSelectedValue())) {
         filter += "[" + (min.getText().isEmpty() ? "" : min.getText()) + ", " +
             (max.getText().isEmpty() ? "" : max.getText()) + "]";
       } else {
@@ -196,14 +200,14 @@ public class NumericalCriterionDropdown extends CriterionDropdown {
       resetRadioControls();
 
       // Show/Hide Range-value textbox
-      if("RANGE".equals(rangeValueChooser.getSelectedValue())) {
+      if(translations.criterionFiltersMap().get("range").equals(rangeValueChooser.getSelectedValue())) {
         minLabel.setVisible(true);
         min.setVisible(true);
         maxLabel.setVisible(true);
         max.setVisible(true);
         valuesLabel.setVisible(false);
         values.setVisible(false);
-      } else if("VALUES".equals(rangeValueChooser.getSelectedValue())) {
+      } else if(translations.criterionFiltersMap().get("values").equals(rangeValueChooser.getSelectedValue())) {
         minLabel.setVisible(false);
         min.setVisible(false);
         maxLabel.setVisible(false);
