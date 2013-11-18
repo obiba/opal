@@ -192,7 +192,7 @@ public class CompareResource {
     Collection<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(INITIAL_CAPACITY);
     if(compared.getDatasource().getType().equals(CsvDatasource.TYPE)) {
       // support IncrementalView wrapping compared table
-      CsvValueTable csvValueTable = (CsvValueTable) (compared.isView() //
+      CsvValueTable csvValueTable = (CsvValueTable) (compared instanceof ValueTableWrapper //
           ? ((ValueTableWrapper) compared).getInnermostWrappedValueTable() //
           : compared);
       for(Variable missingVariable : csvValueTable.getMissingVariables()) {
