@@ -7,7 +7,6 @@
 
   <import resource="spring/opal-core/tx.xml"/>
   <import resource="spring/opal-core/version.xml"/>
-  <import resource="spring/opal-core/hibernate-properties.xml"/>
 
   <bean id="dataSource" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactoryBean">
     <property name="name" value="opal-data-upgrade-2.0"/>

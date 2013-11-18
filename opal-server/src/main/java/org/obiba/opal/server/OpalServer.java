@@ -44,13 +44,13 @@ public class OpalServer {
   }
 
   private void upgrade() {
-    System.out.println("Upgrading Opal.");
+    System.out.println("Upgrading Opal...");
     new UpgradeCommand().execute();
     System.out.println("Upgrade successful.");
   }
 
   private void start() {
-    System.out.println("Starting Opal.");
+    System.out.println("Starting Opal...");
     jettyServer = new OpalJettyServer();
     try {
       jettyServer.start();

@@ -4,15 +4,17 @@
   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
   <context:annotation-config/>
-  <context:component-scan base-package="org.obiba.opal.core,org.obiba.opal.audit"/>
+
+  <context:component-scan base-package="org.obiba.opal">
+    <context:exclude-filter type="regex" expression="org.obiba.opal.install"/>
+    <context:exclude-filter type="regex" expression="org.obiba.opal.upgrade"/>
+  </context:component-scan>
 
   <import resource="tx.xml"/>
   <import resource="jdbc-datasource.xml"/>
-  <import resource="hibernate-properties.xml"/>
   <import resource="version.xml"/>
   <import resource="quartz.xml"/>
   <import resource="email.xml"/>
-  <import resource="classpath*:/META-INF/opal/context.xml"/>
 
   <bean class="org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor"/>
 

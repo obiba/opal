@@ -135,7 +135,6 @@ public class OpalJettyServer {
 
       @Override
       protected void doStart() throws Exception {
-
         org.obiba.opal.server.ssl.SslContextFactory sslContextFactory = WebApplicationContextUtils
             .getRequiredWebApplicationContext(servletContextHandler.getServletContext())
             .getBean(org.obiba.opal.server.ssl.SslContextFactory.class);
@@ -167,6 +166,7 @@ public class OpalJettyServer {
     servletContextHandler.addFilter(new FilterHolder(new AuthenticationFilter()), "/ws/*", FilterMapping.DEFAULT);
     servletContextHandler
         .setInitParameter(ContextLoader.CONFIG_LOCATION_PARAM, "classpath:/META-INF/spring/opal-server/context.xml");
+    servletContextHandler.setInitParameter("resteasy.servlet.mapping.prefix", "/ws");
     servletContextHandler.addServlet(new ServletHolder(new HttpServletDispatcher()), "/ws/*");
     return servletContextHandler;
   }
