@@ -10,10 +10,12 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.FocusEvent;
 import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
@@ -23,10 +25,11 @@ import com.google.gwt.user.client.ui.Widget;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 
 public class DefaultCriterionDropdown extends CriterionDropdown {
+  private static final Translations translations = GWT.create(Translations.class);
 
-  Chooser operatorChooser;
+  private final Chooser operatorChooser = new Chooser();
 
-  TextBox matches;
+  private final TextBox matches = new TextBox();
 
   public DefaultCriterionDropdown(VariableDto variableDto, QueryResultDto termDto) {
     super(variableDto, termDto);
@@ -35,14 +38,12 @@ public class DefaultCriterionDropdown extends CriterionDropdown {
   @Override
   public Widget getSpecificControls() {
     ListItem specificControls = new ListItem();
-    operatorChooser = new Chooser();
-    matches = new TextBox();
 
     specificControls.addStyleName("controls");
 
     specificControls.add(getOperatorsChooserPanel());
 
-    matches.setPlaceholder("custom match query");
+    matches.setPlaceholder(translations.criterionFiltersMap().get("custom_match_query"));
     matches.addFocusHandler(new FocusHandler() {
       @Override
       public void onFocus(FocusEvent event) {
@@ -62,7 +63,7 @@ public class DefaultCriterionDropdown extends CriterionDropdown {
 
   private SimplePanel getOperatorsChooserPanel() {
     SimplePanel inPanel = new SimplePanel();
-    operatorChooser.addItem("Like", "LIKE");
+    operatorChooser.addItem(translations.criterionFiltersMap().get("like"));
     operatorChooser.addFocusHandler(new FocusHandler() {
       @Override
       public void onFocus(FocusEvent event) {
@@ -98,7 +99,7 @@ public class DefaultCriterionDropdown extends CriterionDropdown {
     if(matches.getText().isEmpty()) {
       updateCriterionFilter("");
     } else {
-      updateCriterionFilter("Like " + matches.getText());
+      updateCriterionFilter(translations.criterionFiltersMap().get("like") + " " + matches.getText());
     }
   }
 }
