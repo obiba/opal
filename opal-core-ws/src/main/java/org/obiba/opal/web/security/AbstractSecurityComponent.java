@@ -34,7 +34,7 @@ abstract class AbstractSecurityComponent {
     return securityManager;
   }
 
-  protected Subject getSubject() {
+  static Subject getSubject() {
     return SecurityUtils.getSubject();
   }
 
