@@ -13,10 +13,12 @@ package org.obiba.opal.web.gwt.app.client.project.event;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.gwtplatform.dispatch.annotation.GenEvent;
+import com.gwtplatform.dispatch.annotation.Optional;
 
 @GenEvent
 public class ProjectCreated {
 
+  @Optional
   ProjectDto dto;
 
 }

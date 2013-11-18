@@ -92,7 +92,7 @@ public class ProjectPropertiesModalPresenter
             @Override
             public void onResponseCode(Request request, Response response) {
               getView().hideDialog();
-              fireEvent(new ProjectCreatedEvent());
+              fireEvent(new ProjectCreatedEvent.Builder().build());
             }
           }) //
           .withCallback(Response.SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget()) {
