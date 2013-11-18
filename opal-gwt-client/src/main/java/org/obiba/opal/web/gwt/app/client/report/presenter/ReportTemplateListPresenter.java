@@ -19,11 +19,13 @@ import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateDeletedEvent
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -65,7 +67,12 @@ public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateL
       uri = UriBuilders.PROJECT_REPORT_TEMPLATES.create().build(project);
     }
     ResourceRequestBuilderFactory.<JsArray<ReportTemplateDto>>newBuilder().forResource(uri).get()
-        .withCallback(new ReportTemplatesResourceCallback(templateToSelect)).send();
+        .withCallback(new ReportTemplatesResourceCallback(templateToSelect)).withCallback(new ResponseCodeCallback() {
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        // ignore
+      }
+    }, Response.SC_FORBIDDEN).send();
   }
 
   private void addHandlers() {

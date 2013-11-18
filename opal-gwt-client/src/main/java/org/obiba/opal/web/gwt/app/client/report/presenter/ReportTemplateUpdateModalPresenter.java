@@ -34,6 +34,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.ParameterDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -235,13 +236,17 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
 
   private void createReportTemplate() {
     if(validReportTemplate()) {
-      ResponseCodeCallback createReportTemplateCallback = new CreateReportTemplateCallBack();
-      ResourceCallback alreadyExistReportTemplateCallback = new AlreadyExistReportTemplateCallBack();
-      UriBuilder ub = UriBuilder.create().segment("report-template", getView().getName().getText());
-
-      ResourceRequestBuilderFactory.<ReportTemplateDto>newBuilder().forResource(ub.build()).get()
-          .withCallback(alreadyExistReportTemplateCallback)
-          .withCallback(Response.SC_NOT_FOUND, createReportTemplateCallback).send();
+      ReportTemplateDto reportTemplate = getReportTemplateDto();
+      String uri = UriBuilder.create().segment("report-templates").build();
+      if(project != null) {
+        reportTemplate.setProject(project);
+        uri = UriBuilders.PROJECT_REPORT_TEMPLATES.create().build(project);
+      }
+      ResponseCodeCallback callbackHandler = new CreateOrUpdateReportTemplateCallBack(reportTemplate);
+      ResourceRequestBuilderFactory.newBuilder().forResource(uri).post()
+          .withResourceBody(ReportTemplateDto.stringify(reportTemplate)).withCallback(Response.SC_OK, callbackHandler)
+          .withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler)
+          .send();
     }
   }
 
@@ -316,36 +321,6 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
         .send();
   }
 
-  private void doCreateReportTemplate() {
-    ReportTemplateDto reportTemplate = getReportTemplateDto();
-    if(project != null) {
-      reportTemplate.setProject(project);
-    }
-    ResponseCodeCallback callbackHandler = new CreateOrUpdateReportTemplateCallBack(reportTemplate);
-    ResourceRequestBuilderFactory.newBuilder().forResource("/report-templates").post()
-        .withResourceBody(ReportTemplateDto.stringify(reportTemplate)).withCallback(Response.SC_OK, callbackHandler)
-        .withCallback(Response.SC_CREATED, callbackHandler).withCallback(Response.SC_BAD_REQUEST, callbackHandler)
-        .send();
-  }
-
-  private class AlreadyExistReportTemplateCallBack implements ResourceCallback<ReportTemplateDto> {
-
-    @Override
-    public void onResource(Response response, ReportTemplateDto resource) {
-      getEventBus()
-          .fireEvent(NotificationEvent.newBuilder().error("ReportTemplateAlreadyExistForTheSpecifiedName").build());
-    }
-
-  }
-
-  private class CreateReportTemplateCallBack implements ResponseCodeCallback {
-
-    @Override
-    public void onResponseCode(Request request, Response response) {
-      doCreateReportTemplate();
-    }
-  }
-
   private class CreateOrUpdateReportTemplateCallBack implements ResponseCodeCallback {
 
     ReportTemplateDto reportTemplate;
@@ -395,7 +370,6 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
             }
           }));
     }
-
 
   }
 

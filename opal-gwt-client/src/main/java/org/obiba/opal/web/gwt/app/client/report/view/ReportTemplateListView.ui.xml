@@ -20,9 +20,6 @@
       <b:NavHeader>
         <ui:msg description="Reports label">Reports</ui:msg>
       </b:NavHeader>
-      <b:NavLink icon="USER" ui:field="userHome">
-        <ui:msg description="User label">User</ui:msg>
-      </b:NavLink>
     </b:NavList>
   </g:FlowPanel>
 

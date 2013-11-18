@@ -15,16 +15,17 @@ import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.app.client.project.event.ProjectCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectUpdatedEvent;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.Event;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
@@ -32,7 +33,6 @@ import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
-import static com.google.gwt.http.client.Response.SC_CREATED;
 import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
 import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
@@ -71,7 +71,17 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
   public void setProject(ProjectDto project) {
     this.project = project;
     getView().setProject(project);
+    authorize();
   }
+
+  private void authorize() {
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(project.getLink()).put()
+        .authorize(getView().getEditAuthorizer()).send();
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(project.getLink()).delete()
+        .authorize(getView().getDeleteAuthorizer()).send();
+  }
+
 
   @Override
   public void onEdit() {
@@ -133,6 +143,10 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     void setProject(ProjectDto project);
 
     ProjectDto getProject();
+
+    HasAuthorization getEditAuthorizer();
+
+    HasAuthorization getDeleteAuthorizer();
   }
 
 }

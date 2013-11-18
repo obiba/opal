@@ -122,6 +122,8 @@ public class ProjectsPermissionConverterTest
         "magma:/datasource/patate/table/pwel/index/_schema:GET", //
         "magma:/project/patate/commands/_export:POST:GET", //
         "magma:/project/patate/commands/_copy:POST:GET", //
+        "magma:/project/patate/report-templates:GET:GET", //
+        "magma:/project/patate/report-templates:POST:GET", //
         "magma:/project/patate:GET:GET", //
         "magma:/project/patate/summary:GET:GET", //
         "magma:/datasource/patate/table/pwel:GET:GET", //

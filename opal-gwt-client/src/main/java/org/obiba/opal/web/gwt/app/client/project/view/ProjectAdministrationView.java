@@ -13,9 +13,12 @@ package org.obiba.opal.web.gwt.app.client.project.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectAdministrationUiHandlers;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.github.gwtbootstrap.client.ui.Paragraph;
+import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -43,6 +46,9 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   Label description;
 
   @UiField
+  IconAnchor editProperties;
+
+  @UiField
   Paragraph databaseText;
 
   @UiField
@@ -56,6 +62,9 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
 
   @UiField
   Panel noDatabasePanel;
+
+  @UiField
+  Panel deletePanel;
 
   private ProjectDto project;
 
@@ -86,6 +95,16 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   @Override
   public ProjectDto getProject() {
     return project;
+  }
+
+  @Override
+  public HasAuthorization getEditAuthorizer() {
+    return new WidgetAuthorizer(editProperties);
+  }
+
+  @Override
+  public HasAuthorization getDeleteAuthorizer() {
+    return new WidgetAuthorizer(deletePanel);
   }
 
   @UiHandler("editProperties")

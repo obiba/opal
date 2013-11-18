@@ -9,7 +9,7 @@
   <g:FlowPanel>
     <g:FlowPanel>
       <b:ButtonGroup>
-        <b:Button icon="PLUS_SIGN_ALT" ui:field="add">
+        <b:Button icon="PLUS" type="INFO" ui:field="add">
           <ui:msg description="Add Report Template label">Add report template</ui:msg>
         </b:Button>
       </b:ButtonGroup>

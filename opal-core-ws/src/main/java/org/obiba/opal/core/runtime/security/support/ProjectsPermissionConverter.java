@@ -99,6 +99,8 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
         return Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}", "*:GET/*", args),//
             magmaConvert("/project/{0}/commands/_export", "POST:GET", args),//
             magmaConvert("/project/{0}/commands/_copy", "POST:GET", args),//
+            magmaConvert("/project/{0}/report-templates", "GET:GET", args),//
+            magmaConvert("/project/{0}/report-templates", "POST:GET", args),//
             magmaConvert("/project/{0}", "GET:GET", args),//
             magmaConvert("/project/{0}/summary", "GET:GET", args),//
             magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
@@ -135,6 +137,8 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
                 magmaConvert("/datasource/{0}/table/{1}/index/_schema", "GET", args),//
                 magmaConvert("/project/{0}/commands/_export", "POST:GET", args),//
                 magmaConvert("/project/{0}/commands/_copy", "POST:GET", args),//
+                magmaConvert("/project/{0}/report-templates", "GET:GET", args),//
+                magmaConvert("/project/{0}/report-templates", "POST:GET", args),//
                 magmaConvert("/project/{0}", "GET:GET", args),//
                 magmaConvert("/project/{0}/summary", "GET:GET", args));
         Iterables.addAll(perms, TABLE_READ.convert(node));
