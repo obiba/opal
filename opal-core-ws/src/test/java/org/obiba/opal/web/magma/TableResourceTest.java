@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -129,7 +128,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     Response r = new VariablesResource(datasource.getValueTable("Weight"), Collections.<Locale>emptySet())
         .getVariables(null, uriInfoMock, null, 0, null);
     @SuppressWarnings("unchecked")
-    List<VariableDto> dtos = ImmutableList.copyOf(((GenericEntity<Iterable<VariableDto>>) r.getEntity()).getEntity());
+    List<VariableDto> dtos = ImmutableList.copyOf((Iterable<? extends VariableDto>) r.getEntity());
 
     verify(uriInfoMock);
     verify(segments.toArray());
