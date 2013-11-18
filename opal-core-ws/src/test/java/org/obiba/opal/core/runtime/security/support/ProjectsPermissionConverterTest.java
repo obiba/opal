@@ -77,9 +77,9 @@ public class ProjectsPermissionConverterTest
   @Test
   public void testTableEdit() {
     testConversion("/datasource/patate/table/pwel", ProjectsPermissionConverter.Permission.TABLE_EDIT, //
-        "magma:/datasource/patate/table/pwel/variables:POST:GET", //
         "magma:/datasource/patate/table/pwel:PUT:GET", //
         "magma:/datasource/patate/table/pwel/variables:POST:GET/*", //
+        "magma:/datasource/patate/table/pwel/variables:DELETE:GET", //
         "magma:/datasource/patate/table/pwel/index:GET:GET", //
         "magma:/datasource/patate/table/pwel/index/schedule:GET:GET", //
         "magma:/files/projects/patate:GET:GET/*",//

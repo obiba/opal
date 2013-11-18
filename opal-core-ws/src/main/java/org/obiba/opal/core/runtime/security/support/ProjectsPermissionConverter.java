@@ -150,9 +150,9 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)/table/(.+)");
-        List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}/variables", "POST:GET", args),//
-            magmaConvert("/datasource/{0}/table/{1}", "PUT:GET", args),//
+        List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}", "PUT:GET", args),//
             magmaConvert("/datasource/{0}/table/{1}/variables", "POST:GET/*", args),//
+            magmaConvert("/datasource/{0}/table/{1}/variables", "DELETE:GET", args),//
             magmaConvert("/datasource/{0}/table/{1}/index", "GET:GET", args),//
             magmaConvert("/datasource/{0}/table/{1}/index/schedule", "GET:GET", args),//
             magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
@@ -204,6 +204,7 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
         String[] args = args(node, "/datasource/(.+)/view/(.+)");
         List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/view/{1}", "PUT:GET", args),//
             magmaConvert("/datasource/{0}/view/{1}/variables", "POST:GET/*", args),//
+            magmaConvert("/datasource/{0}/view/{1}/variables", "DELETE:GET/*", args),//
             magmaConvert("/datasource/{0}/view/{1}/from/variable/_transient/summary", "GET:GET", args),//
             magmaConvert("/datasource/{0}/view/{1}/from/variable/_transient/summary", "POST:GET", args),//
             magmaConvert("/datasource/{0}/view/{1}/from/variable/_transient/_compile", "POST:GET", args),//
