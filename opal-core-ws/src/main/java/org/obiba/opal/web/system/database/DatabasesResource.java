@@ -6,12 +6,14 @@ import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.database.MultipleIdentifiersDatabaseException;
 import org.obiba.opal.web.database.Dtos;
+import org.obiba.opal.web.support.InvalidRequestException;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,6 +32,16 @@ public class DatabasesResource {
   }
 
   @GET
+  @NoAuthorization
+  public List<DatabaseDto> getDatabases(@QueryParam("usage") String usage) {
+    try {
+      return asDto(databaseRegistry.list(usage == null ? null : Database.Usage.valueOf(usage.toUpperCase())));
+    } catch(IllegalArgumentException e) {
+      throw new InvalidRequestException("Not a valid database usage: " + usage);
+    }
+  }
+
+  @GET
   @Path("/sql")
   @NoAuthorization
   public List<DatabaseDto> getSqlDatabases() {
@@ -41,27 +53,6 @@ public class DatabasesResource {
   @NoAuthorization
   public List<DatabaseDto> getMongoDbDatabases() {
     return asDto(databaseRegistry.listMongoDatabases());
-  }
-
-  @GET
-  @Path("/storage")
-  @NoAuthorization
-  public List<DatabaseDto> getStorageDatabases() {
-    return asDto(databaseRegistry.list(Database.Usage.STORAGE));
-  }
-
-  @GET
-  @Path("/import")
-  @NoAuthorization
-  public List<DatabaseDto> getImportDatabases() {
-    return asDto(databaseRegistry.list(Database.Usage.IMPORT));
-  }
-
-  @GET
-  @Path("/export")
-  @NoAuthorization
-  public List<DatabaseDto> getExportDatabases() {
-    return asDto(databaseRegistry.list(Database.Usage.EXPORT));
   }
 
   @GET

@@ -29,7 +29,15 @@ public final class DatabaseResources {
   }
 
   public static String storageDatabases() {
-    return databases() + "/storage";
+    return databases() + "?usage=storage";
+  }
+
+  public static String importDatabases() {
+    return databases() + "?usage=import";
+  }
+
+  public static String exportDatabases() {
+    return databases() + "?usage=export";
   }
 
   public static String identifiersDatabase() {
