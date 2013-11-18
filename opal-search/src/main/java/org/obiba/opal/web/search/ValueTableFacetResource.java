@@ -15,7 +15,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.codehaus.jettison.json.JSONException;
-import org.obiba.opal.search.IndexManager;
 import org.obiba.opal.search.ValuesIndexManager;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.IndexManagerHelper;
@@ -24,31 +23,29 @@ import org.obiba.opal.web.search.support.SearchQueryExecutorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Elastic Search API resource that provides a secure mechanism of performing queries on the indexes without exposing
  * individual data,
  */
 @Component
+@Transactional
 @Scope("request")
 @Path("/datasource/{ds}/table/{table}/facet")
 public class ValueTableFacetResource {
 
-  private final ValuesIndexManager indexManager;
+  @Autowired
+  private ValuesIndexManager indexManager;
 
-  private final SearchQueryExecutorFactory searchQueryFactory;
+  @Autowired
+  private SearchQueryExecutorFactory searchQueryFactory;
 
   @PathParam("ds")
   private String datasource;
 
   @PathParam("table")
   private String table;
-
-  @Autowired
-  public ValueTableFacetResource(ValuesIndexManager indexManager, SearchQueryExecutorFactory searchQueryFactory) {
-    this.indexManager = indexManager;
-    this.searchQueryFactory = searchQueryFactory;
-  }
 
   /**
    * Given a variable name, returns its corresponding facet (terms, statistical). Only categorical and continuous

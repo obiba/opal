@@ -27,22 +27,20 @@ import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@Transactional
 @Scope("request")
 @Path("/report")
 public class ReportResource {
 
 //  private static final Logger log = LoggerFactory.getLogger(ReportResource.class);
 
-  private final OpalRuntime opalRuntime;
+  @Autowired
+  private OpalRuntime opalRuntime;
 
   private final MimetypesFileTypeMap mimeTypes = new MimetypesFileTypeMap();
-
-  @Autowired
-  public ReportResource(OpalRuntime opalRuntime) {
-    this.opalRuntime = opalRuntime;
-  }
 
   @GET
   @Path("/public/{obfuscated-file:.*}")
@@ -58,10 +56,6 @@ public class ReportResource {
     String mimeType = mimeTypes.getContentType(reportLocalFile);
     return Response.ok(reportLocalFile, MediaType.valueOf(mimeType))
         .header("Content-Disposition", getContentDispositionOfAttachment(reportLocalFile.getName())).build();
-  }
-
-  protected FileObject resolveFileInFileSystem(String path) throws FileSystemException {
-    return opalRuntime.getFileSystem().getRoot().resolveFile(path);
   }
 
   private String getContentDispositionOfAttachment(String fileName) {

@@ -24,7 +24,6 @@ import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.NoSuchDataShieldMethodException;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
-import org.obiba.opal.r.service.OpalRService;
 import org.obiba.opal.web.datashield.support.DataShieldMethodConverterRegistry;
 import org.obiba.opal.web.model.DataShield;
 import org.obiba.opal.web.model.Opal;
@@ -33,6 +32,7 @@ import org.rosuda.REngine.REXPMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Lists;
 
@@ -41,32 +41,30 @@ import com.google.common.collect.Lists;
  */
 @SuppressWarnings("SpringJavaAutowiringInspection")
 @Component
+@Transactional
 @Scope("request")
 @Path("/datashield/package/{name}")
 public class DataShieldPackageResource extends RPackageResource {
 
-  private final DatashieldConfigurationSupplier configurationSupplier;
+  private DatashieldConfigurationSupplier configurationSupplier;
 
-  private final DataShieldMethodConverterRegistry methodConverterRegistry;
+  private DataShieldMethodConverterRegistry methodConverterRegistry;
 
   @PathParam("name")
   private String name;
 
   @Autowired
-  public DataShieldPackageResource(OpalRService opalRService, DatashieldConfigurationSupplier configurationSupplier,
-      DataShieldMethodConverterRegistry methodConverterRegistry) {
-    super(opalRService);
+  public void setConfigurationSupplier(DatashieldConfigurationSupplier configurationSupplier) {
     this.configurationSupplier = configurationSupplier;
+  }
+
+  @Autowired
+  public void setMethodConverterRegistry(DataShieldMethodConverterRegistry methodConverterRegistry) {
     this.methodConverterRegistry = methodConverterRegistry;
   }
 
-  public DataShieldPackageResource(String name, OpalRService opalRService,
-      DatashieldConfigurationSupplier configurationSupplier,
-      DataShieldMethodConverterRegistry methodConverterRegistry) {
-    super(opalRService);
+  public void setName(String name) {
     this.name = name;
-    this.configurationSupplier = configurationSupplier;
-    this.methodConverterRegistry = methodConverterRegistry;
   }
 
   @GET
@@ -76,6 +74,7 @@ public class DataShieldPackageResource extends RPackageResource {
 
   /**
    * Get all the methods of the package.
+   *
    * @return
    * @throws REXPMismatchException
    */
@@ -98,6 +97,7 @@ public class DataShieldPackageResource extends RPackageResource {
 
   /**
    * Publish all the methods of the package.
+   *
    * @return the installed methods
    * @throws REXPMismatchException
    */

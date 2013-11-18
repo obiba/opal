@@ -22,7 +22,6 @@ import javax.ws.rs.core.UriBuilder;
 import org.apache.shiro.SecurityUtils;
 import org.obiba.magma.support.MagmaEngineReferenceResolver;
 import org.obiba.magma.support.MagmaEngineTableResolver;
-import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.Dtos;
@@ -30,7 +29,6 @@ import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
 import org.obiba.opal.shell.commands.options.ReportCommandOptions;
-import org.obiba.opal.shell.service.CommandJobService;
 import org.obiba.opal.shell.web.CopyCommandOptionsDtoImpl;
 import org.obiba.opal.shell.web.ImportCommandOptionsDtoImpl;
 import org.obiba.opal.shell.web.ReportCommandOptionsDtoImpl;
@@ -42,8 +40,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@Transactional
 @Scope("request")
 @Path("/project/{name}/commands")
 public class ProjectCommandsResource extends AbstractCommandsResource {
@@ -54,14 +54,9 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   @PathParam("name")
   protected String name;
 
-  private final CommandRegistry commandRegistry;
-
   @Autowired
-  public ProjectCommandsResource(OpalRuntime opalRuntime, CommandJobService commandJobService,
-      @Qualifier("web") CommandRegistry commandRegistry) {
-    super(opalRuntime, commandJobService);
-    this.commandRegistry = commandRegistry;
-  }
+  @Qualifier("web")
+  private CommandRegistry commandRegistry;
 
   @GET
   public List<Commands.CommandStateDto> getCommands() {
@@ -96,13 +91,13 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   @POST
   @Path("/_copy")
   public Response copyData(Commands.CopyCommandOptionsDto options) {
-    return launchCopyCommand("copy",options);
+    return launchCopyCommand("copy", options);
   }
 
   @POST
   @Path("/_export")
   public Response exportData(Commands.CopyCommandOptionsDto options) {
-    return launchCopyCommand("export",options);
+    return launchCopyCommand("export", options);
   }
 
   @POST

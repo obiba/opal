@@ -82,6 +82,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -90,38 +91,34 @@ import com.google.common.collect.Lists;
 import au.com.bytecode.opencsv.CSVReader;
 
 @Component
+@Transactional
 @Scope("request")
 @Path("/functional-unit/{unit}")
+@SuppressWarnings("OverlyCoupledClass")
 public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
   private static final Logger log = LoggerFactory.getLogger(FunctionalUnitResource.class);
 
-  private final FunctionalUnitService functionalUnitService;
+  @Autowired
+  private FunctionalUnitService functionalUnitService;
 
-  private final OpalRuntime opalRuntime;
+  @Autowired
+  private OpalRuntime opalRuntime;
 
-  private final UnitKeyStoreService unitKeyStoreService;
+  @Autowired
+  private UnitKeyStoreService unitKeyStoreService;
 
-  private final ImportService importService;
+  @Autowired
+  private ImportService importService;
 
-  private final DatasourceFactoryRegistry datasourceFactoryRegistry;
+  @Autowired
+  private DatasourceFactoryRegistry datasourceFactoryRegistry;
 
-  private final IdentifiersTableService identifiersTableService;
+  @Autowired
+  private IdentifiersTableService identifiersTableService;
 
   @PathParam("unit")
   private String unit;
-
-  @Autowired
-  public FunctionalUnitResource(FunctionalUnitService functionalUnitService, OpalRuntime opalRuntime,
-      UnitKeyStoreService unitKeyStoreService, ImportService importService,
-      DatasourceFactoryRegistry datasourceFactoryRegistry, IdentifiersTableService identifiersTableService) {
-    this.functionalUnitService = functionalUnitService;
-    this.opalRuntime = opalRuntime;
-    this.unitKeyStoreService = unitKeyStoreService;
-    this.importService = importService;
-    this.datasourceFactoryRegistry = datasourceFactoryRegistry;
-    this.identifiersTableService = identifiersTableService;
-  }
 
   //
   // Functional Unit

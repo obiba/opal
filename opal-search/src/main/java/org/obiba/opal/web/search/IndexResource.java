@@ -20,27 +20,20 @@ import org.obiba.opal.search.ValuesIndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
 public abstract class IndexResource {
 
-  protected final ValuesIndexManager indexManager;
-
-  protected final IndexManagerConfigurationService configService;
-
-  protected final ElasticSearchProvider esProvider;
-
-  protected final IndexSynchronizationManager synchroManager;
+  @Autowired
+  protected ValuesIndexManager indexManager;
 
   @Autowired
-  protected IndexResource(ValuesIndexManager indexManager, IndexManagerConfigurationService configService,
-      ElasticSearchProvider esProvider, IndexSynchronizationManager synchroManager) {
-    this.indexManager = indexManager;
-    this.configService = configService;
-    this.esProvider = esProvider;
-    this.synchroManager = synchroManager;
-  }
+  protected IndexManagerConfigurationService configService;
+
+  @Autowired
+  protected ElasticSearchProvider esProvider;
+
+  @Autowired
+  protected IndexSynchronizationManager synchroManager;
 
   protected Opal.ScheduleDto getScheduleDto(String datasource, String table) {
     // Set schedule

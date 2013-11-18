@@ -22,11 +22,13 @@ import org.obiba.opal.web.model.Database;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 
 @Component
+@Transactional
 @Path("/system/databases/jdbc-drivers")
 public class JdbcDriversResource {
 

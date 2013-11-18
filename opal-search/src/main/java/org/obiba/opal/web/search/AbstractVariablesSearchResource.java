@@ -22,6 +22,7 @@ import org.obiba.opal.web.search.support.EsQueryExecutor;
 import org.obiba.opal.web.search.support.EsResultConverter;
 import org.obiba.opal.web.search.support.QuerySearchJsonBuilder;
 import org.obiba.opal.web.ws.SortDir;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.base.Strings;
 
@@ -31,18 +32,14 @@ public abstract class AbstractVariablesSearchResource {
 
   protected static final String INDEX_FIELD = "index";
 
-  protected final OpalSearchService opalSearchService;
+  @Autowired
+  protected OpalSearchService opalSearchService;
 
-  protected final ElasticSearchProvider esProvider;
+  @Autowired
+  protected ElasticSearchProvider esProvider;
 
-  protected final VariablesIndexManager indexManager;
-
-  public AbstractVariablesSearchResource(OpalSearchService service, ElasticSearchProvider provider,
-      VariablesIndexManager manager) {
-    opalSearchService = service;
-    esProvider = provider;
-    indexManager = manager;
-  }
+  @Autowired
+  protected VariablesIndexManager indexManager;
 
   //
   // Protected members

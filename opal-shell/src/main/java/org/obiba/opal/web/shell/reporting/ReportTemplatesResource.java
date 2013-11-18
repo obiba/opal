@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
@@ -35,6 +36,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 @Component
+@Transactional
 @Scope("request")
 @Path("/report-templates")
 public class ReportTemplatesResource extends AbstractReportTemplateResource {
@@ -42,18 +44,26 @@ public class ReportTemplatesResource extends AbstractReportTemplateResource {
   @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(ReportTemplatesResource.class);
 
-  private final OpalConfigurationService configService;
+  private OpalConfigurationService configService;
 
-  private final CommandSchedulerService commandSchedulerService;
+  private CommandSchedulerService commandSchedulerService;
 
-  private final CommandRegistry commandRegistry;
+  private CommandRegistry commandRegistry;
 
   @Autowired
-  public ReportTemplatesResource(OpalConfigurationService configService,
-      CommandSchedulerService commandSchedulerService, @Qualifier("web") CommandRegistry commandRegistry) {
-    this.configService = configService;
-    this.commandSchedulerService = commandSchedulerService;
+  @Qualifier("web")
+  public void setCommandRegistry(CommandRegistry commandRegistry) {
     this.commandRegistry = commandRegistry;
+  }
+
+  @Autowired
+  public void setCommandSchedulerService(CommandSchedulerService commandSchedulerService) {
+    this.commandSchedulerService = commandSchedulerService;
+  }
+
+  @Autowired
+  public void setConfigService(OpalConfigurationService configService) {
+    this.configService = configService;
   }
 
   @GET

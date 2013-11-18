@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Strings;
 
@@ -33,20 +34,17 @@ import com.google.common.base.Strings;
  * otherwise the web service calls will fail with a 404 status.
  */
 @Component
+@Transactional
 @Path("/r")
 public class OpalRResource {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRResource.class);
 
-  private final OpalRService opalRService;
-
-  private final OpalRSessionManager opalRSessionManager;
+  @Autowired
+  private OpalRService opalRService;
 
   @Autowired
-  public OpalRResource(OpalRService opalRService, OpalRSessionManager opalRSessionManager) {
-    this.opalRService = opalRService;
-    this.opalRSessionManager = opalRSessionManager;
-  }
+  private OpalRSessionManager opalRSessionManager;
 
   @POST
   @Path("/execute")

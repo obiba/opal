@@ -28,12 +28,14 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 import static org.obiba.opal.web.model.Database.DatabaseDto;
 
 @Component
+@Transactional
 @Scope("request")
 @Path("/system/database/{name}")
 public class DatabaseResource {
@@ -60,7 +62,7 @@ public class DatabaseResource {
   public Response delete() {
     Database database = getDatabase();
     if(database.isUsedForIdentifiers()) {
-      if (identifiersTableService.hasEntities(new EntitiesPredicate.NonViewEntitiesPredicate())) {
+      if(identifiersTableService.hasEntities(new EntitiesPredicate.NonViewEntitiesPredicate())) {
         return Response.status(BAD_REQUEST)
             .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatabaseHasEntities").build()).build();
       }

@@ -23,8 +23,10 @@ import org.obiba.opal.shell.service.NoSuchCommandJobException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@Transactional
 @Scope("request")
 @Path("/project/{name}/command/{id}")
 public class ProjectCommandResource {
@@ -35,12 +37,8 @@ public class ProjectCommandResource {
   @PathParam("id")
   private Integer id;
 
-  protected final CommandJobService commandJobService;
-
   @Autowired
-  public ProjectCommandResource(CommandJobService commandJobService) {
-    this.commandJobService = commandJobService;
-  }
+  protected CommandJobService commandJobService;
 
   @GET
   public Response getCommand() {
@@ -55,7 +53,7 @@ public class ProjectCommandResource {
   public Response deleteCommand() {
     try {
       CommandJob commandJob = getCommandJob();
-      if (commandJob == null) {
+      if(commandJob == null) {
         Response.status(Response.Status.NOT_FOUND).build();
       }
       commandJobService.deleteCommand(id);

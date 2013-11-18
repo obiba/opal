@@ -22,7 +22,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
-import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.Dtos;
@@ -30,7 +29,6 @@ import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
 import org.obiba.opal.shell.commands.options.ReportCommandOptions;
-import org.obiba.opal.shell.service.CommandJobService;
 import org.obiba.opal.shell.service.NoSuchCommandJobException;
 import org.obiba.opal.shell.web.CopyCommandOptionsDtoImpl;
 import org.obiba.opal.shell.web.ImportCommandOptionsDtoImpl;
@@ -42,39 +40,25 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Opal Web Shell services.
  */
 @Component
+@Transactional
 @Path("/shell")
 public class WebShellResource extends AbstractCommandsResource {
-  //
-  // Constants
-  //
 
   private static final Logger log = LoggerFactory.getLogger(WebShellResource.class);
 
-  //
-  // Instance Variables
-  //
-
-  private final CommandRegistry commandRegistry;
-
-  //
-  // Constructors
-  //
+  private CommandRegistry commandRegistry;
 
   @Autowired
-  public WebShellResource(OpalRuntime opalRuntime, CommandJobService commandJobService,
-      @Qualifier("web") CommandRegistry commandRegistry) {
-    super(opalRuntime, commandJobService);
+  @Qualifier("web")
+  public void setCommandRegistry(CommandRegistry commandRegistry) {
     this.commandRegistry = commandRegistry;
   }
-
-  //
-  // Web Service Methods
-  //
 
   @GET
   @Path("/commands")
@@ -94,9 +78,7 @@ public class WebShellResource extends AbstractCommandsResource {
   public Response getCommand(@PathParam("id") Integer id) {
     CommandJob commandJob = commandJobService.getCommand(id);
 
-    return commandJob == null
-        ? Response.status(Status.NOT_FOUND).build()
-        : Response.ok(Dtos.asDto(commandJob)).build();
+    return commandJob == null ? Response.status(Status.NOT_FOUND).build() : Response.ok(Dtos.asDto(commandJob)).build();
   }
 
   @DELETE
@@ -189,6 +171,5 @@ public class WebShellResource extends AbstractCommandsResource {
         UriBuilder.fromPath("/").path(WebShellResource.class).path(WebShellResource.class, "getCommand").build(jobId))
         .build();
   }
-
 
 }

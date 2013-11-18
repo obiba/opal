@@ -25,18 +25,16 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueSetException;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.search.VariablesIndexManager;
-import org.obiba.opal.search.es.ElasticSearchProvider;
-import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.EsResultConverter;
 import org.obiba.opal.web.search.support.ItemResultDtoStrategy;
 import org.obiba.opal.web.search.support.QuerySearchJsonBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@Transactional
 @Scope("request")
 @Path("/datasource/{ds}/table/{table}/variables")
 public class TableVariablesSearchResource extends AbstractVariablesSearchResource {
@@ -48,12 +46,6 @@ public class TableVariablesSearchResource extends AbstractVariablesSearchResourc
 
   @PathParam("table")
   private String table;
-
-  @Autowired
-  public TableVariablesSearchResource(VariablesIndexManager manager, OpalSearchService opalSearchService,
-      ElasticSearchProvider esProvider) {
-    super(opalSearchService, esProvider, manager);
-  }
 
   @SuppressWarnings("PMD.ExcessiveParameterList")
   @GET

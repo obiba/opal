@@ -23,28 +23,20 @@ import javax.ws.rs.core.Response;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.search.VariablesIndexManager;
-import org.obiba.opal.search.es.ElasticSearchProvider;
-import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.QuerySearchJsonBuilder;
 import org.obiba.opal.web.ws.SortDir;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@Transactional
 @Scope("request")
 @Path("/datasources/variables")
 public class DatasourcesVariablesSearchResource extends AbstractVariablesSearchResource {
 
 //  private static final Logger log = LoggerFactory.getLogger(DatasourcesVariablesSearchResource.class);
-
-  @Autowired
-  public DatasourcesVariablesSearchResource(VariablesIndexManager manager, OpalSearchService opalSearchService,
-      ElasticSearchProvider esProvider) {
-    super(opalSearchService, esProvider, manager);
-  }
 
   @GET
   @POST

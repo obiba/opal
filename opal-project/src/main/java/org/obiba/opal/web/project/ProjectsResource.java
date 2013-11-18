@@ -34,12 +34,14 @@ import org.obiba.opal.web.security.AuthorizationInterceptor;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Lists;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
+@Transactional
 @Path("/projects")
 @NoAuthorization
 public class ProjectsResource {

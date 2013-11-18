@@ -31,7 +31,6 @@ import org.obiba.magma.DuplicateDatasourceNameException;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.support.DatasourceParsingException;
-import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
@@ -39,51 +38,46 @@ import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.magma.support.NoSuchDatasourceFactoryException;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.DatasourceDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Lists;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
+@Transactional
 @Path("/datasources")
 public class DatasourcesResource {
 
-  @SuppressWarnings("unused")
-  private static final Logger log = LoggerFactory.getLogger(DatasourcesResource.class);
+  private DatasourceFactoryRegistry datasourceFactoryRegistry;
 
-  private final DatasourceFactoryRegistry datasourceFactoryRegistry;
-
-  private final OpalConfigurationService configService;
-
-  private ViewManager viewManager;
+  private OpalConfigurationService configService;
 
   @Autowired
-  public DatasourcesResource(DatasourceFactoryRegistry datasourceFactoryRegistry,
-      OpalConfigurationService configService, ViewManager viewManager) {
-    if(datasourceFactoryRegistry == null)
-      throw new IllegalArgumentException("datasourceFactoryRegistry cannot be null");
-    if(configService == null) throw new IllegalArgumentException("configService cannot be null");
+  private ApplicationContext applicationContext;
 
+  @Autowired
+  public void setConfigService(OpalConfigurationService configService) {
     this.configService = configService;
+  }
+
+  @Autowired
+  public void setDatasourceFactoryRegistry(DatasourceFactoryRegistry datasourceFactoryRegistry) {
     this.datasourceFactoryRegistry = datasourceFactoryRegistry;
-    this.viewManager = viewManager;
   }
 
   @GET
   public List<Magma.DatasourceDto> getDatasources() {
     List<Magma.DatasourceDto> datasources = Lists.newArrayList();
-
     for(Datasource from : MagmaEngine.get().getDatasources()) {
       URI dsLink = UriBuilder.fromPath("/").path(DatasourceResource.class).build(from.getName());
       Magma.DatasourceDto.Builder ds = Dtos.asDto(from).setLink(dsLink.toString());
       datasources.add(ds.build());
     }
     sortByName(datasources);
-
     return datasources;
   }
 
@@ -122,12 +116,17 @@ public class DatasourcesResource {
   @Path("/tables")
   public List<Magma.TableDto> getTables(@Nullable @QueryParam("entityType") String entityType) {
     List<Magma.TableDto> tables = Lists.newArrayList();
-
-    for(Datasource from : MagmaEngine.get().getDatasources()) {
-      tables.addAll(new DatasourceTablesResource(from, viewManager, null).getTables(false, entityType));
+    for(Datasource datasource : MagmaEngine.get().getDatasources()) {
+      tables.addAll(
+          ((DatasourceTablesResourceImpl) getDatasourceTablesResource(datasource)).getTables(false, entityType));
     }
-
     return tables;
+  }
+
+  private DatasourceTablesResource getDatasourceTablesResource(Datasource datasource) {
+    DatasourceTablesResource datasourceTablesResource = applicationContext.getBean(DatasourceTablesResource.class);
+    datasourceTablesResource.setDatasource(datasource);
+    return datasourceTablesResource;
   }
 
   private void sortByName(List<Magma.DatasourceDto> datasources) {

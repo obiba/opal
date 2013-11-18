@@ -12,26 +12,17 @@ package org.obiba.opal.web.shell;
 
 import javax.ws.rs.Path;
 
-import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.shell.CommandRegistry;
-import org.obiba.opal.shell.service.CommandJobService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Backward compatibility.
  */
 @Component
+@Transactional
 @Scope("request")
 @Path("/datasource/{name}/commands")
 public class DatasourceCommandsResource extends ProjectCommandsResource {
-
-  @Autowired
-  public DatasourceCommandsResource(OpalRuntime opalRuntime, CommandJobService commandJobService,
-      @Qualifier("web") CommandRegistry commandRegistry) {
-    super(opalRuntime,commandJobService,commandRegistry);
-  }
 
 }

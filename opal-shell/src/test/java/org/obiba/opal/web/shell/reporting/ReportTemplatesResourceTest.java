@@ -90,8 +90,11 @@ public class ReportTemplatesResourceTest {
 
     replay(opalConfigurationServiceMock, mockSubject);
 
-    ReportTemplatesResource reportTemplateResource = new ReportTemplatesResource(opalConfigurationServiceMock,
-        commandSchedulerServiceMock, commandRegistry);
+    ReportTemplatesResource reportTemplateResource = new ReportTemplatesResource();
+    reportTemplateResource.setConfigService(opalConfigurationServiceMock);
+    reportTemplateResource.setCommandSchedulerService(commandSchedulerServiceMock);
+    reportTemplateResource.setCommandRegistry(commandRegistry);
+
     Set<ReportTemplateDto> reportTemplatesDtos = reportTemplateResource.getReportTemplates();
     ThreadContext.unbindSubject();
 
@@ -126,8 +129,11 @@ public class ReportTemplatesResourceTest {
 
     replay(opalConfigurationServiceMock, commandSchedulerServiceMock, commandRegistry);
 
-    ReportTemplatesResource reportTemplatesResource = new ReportTemplatesResource(opalConfigurationServiceMock,
-        commandSchedulerServiceMock, commandRegistry);
+    ReportTemplatesResource reportTemplatesResource = new ReportTemplatesResource();
+    reportTemplatesResource.setConfigService(opalConfigurationServiceMock);
+    reportTemplatesResource.setCommandSchedulerService(commandSchedulerServiceMock);
+    reportTemplatesResource.setCommandRegistry(commandRegistry);
+
     Response response = reportTemplatesResource.createReportTemplate(Dtos.asDto(getReportTemplate("template9")));
 
     Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());

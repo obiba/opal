@@ -15,17 +15,21 @@ import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.service.CommandJobService;
-
-import com.google.common.base.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractCommandsResource {
 
-  protected final CommandJobService commandJobService;
+  protected CommandJobService commandJobService;
 
-  protected final OpalRuntime opalRuntime;
+  protected OpalRuntime opalRuntime;
 
-  protected AbstractCommandsResource(OpalRuntime opalRuntime, CommandJobService commandJobService) {
+  @Autowired
+  public void setCommandJobService(CommandJobService commandJobService) {
     this.commandJobService = commandJobService;
+  }
+
+  @Autowired
+  public void setOpalRuntime(OpalRuntime opalRuntime) {
     this.opalRuntime = opalRuntime;
   }
 

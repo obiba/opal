@@ -67,9 +67,14 @@ public class FunctionalUnitsResourceTest {
     ImportService importService = createMock(ImportService.class);
     VariableStatsService variableStatsService = createMock(VariableStatsService.class);
 
-    FunctionalUnitsResource functionalUnitsResource = new FunctionalUnitsResource(functionalUnitServiceMock,
-        opalRuntimeMock, unitKeyStoreServiceMock, importService, null, identifiersTableResolverMock,
-        variableStatsService);
+    FunctionalUnitsResource functionalUnitsResource = new FunctionalUnitsResource();
+    functionalUnitsResource.setFunctionalUnitService(functionalUnitServiceMock);
+    functionalUnitsResource.setOpalRuntime(opalRuntimeMock);
+    functionalUnitsResource.setUnitKeyStoreService(unitKeyStoreServiceMock);
+    functionalUnitsResource.setImportService(importService);
+    functionalUnitsResource.setIdentifiersTableService(identifiersTableResolverMock);
+    functionalUnitsResource.setVariableStatsService(variableStatsService);
+
     List<Opal.FunctionalUnitDto> functionalUnitDtoList = functionalUnitsResource.getFunctionalUnits();
     Assert.assertTrue(functionalUnitDtoList.size() == 3);
 

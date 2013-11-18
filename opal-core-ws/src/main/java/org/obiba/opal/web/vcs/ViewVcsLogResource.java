@@ -26,10 +26,12 @@ import org.obiba.opal.web.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 
 @Component
+@Transactional
 @Scope("request")
 @Path("/datasource/{datasourceName}/view/{viewName}/vcs")
 public class ViewVcsLogResource {

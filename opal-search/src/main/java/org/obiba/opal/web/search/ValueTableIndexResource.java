@@ -29,7 +29,6 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.bytes.BytesReference;
-import org.elasticsearch.common.collect.ImmutableMap;
 import org.elasticsearch.common.collect.Maps;
 import org.elasticsearch.rest.RestChannel;
 import org.elasticsearch.rest.RestResponse;
@@ -37,22 +36,19 @@ import org.elasticsearch.rest.support.AbstractRestRequest;
 import org.elasticsearch.rest.support.RestUtils;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
-import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.IndexSynchronization;
-import org.obiba.opal.search.IndexSynchronizationManager;
 import org.obiba.opal.search.Schedule;
 import org.obiba.opal.search.SearchServiceException;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.ValueTableValuesIndex;
-import org.obiba.opal.search.ValuesIndexManager;
-import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.OpalMap;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@Transactional
 @Scope("request")
 @Path("/datasource/{ds}/table/{table}/index")
 public class ValueTableIndexResource extends IndexResource {
@@ -63,13 +59,6 @@ public class ValueTableIndexResource extends IndexResource {
   @PathParam("table")
   private String table;
 
-  @Autowired
-  public ValueTableIndexResource(ValuesIndexManager indexManager, ElasticSearchProvider esProvider,
-      IndexManagerConfigurationService configService, IndexSynchronizationManager synchroManager) {
-    super(indexManager, configService, esProvider, synchroManager);
-  }
-
-  @SuppressWarnings("ConstantConditions")
   @GET
   @OPTIONS
   @Path("/")
@@ -84,7 +73,8 @@ public class ValueTableIndexResource extends IndexResource {
           .setProgress(getValueTableIndexationProgress(datasource, table)).setLink(link.getPath()).build();
 
       if(!valueTable.getTimestamps().getCreated().isNull()) {
-        tableStatusDto = tableStatusDto.toBuilder().setTableLastUpdate(valueTable.getTimestamps().getLastUpdate().toString()).build();
+        tableStatusDto = tableStatusDto.toBuilder()
+            .setTableLastUpdate(valueTable.getTimestamps().getLastUpdate().toString()).build();
       }
 
       if(!indexManager.getIndex(valueTable).getTimestamps().getCreated().isNull()) {

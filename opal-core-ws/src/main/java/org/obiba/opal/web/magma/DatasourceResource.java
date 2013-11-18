@@ -12,7 +12,6 @@ package org.obiba.opal.web.magma;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
@@ -40,7 +39,6 @@ import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
-import org.obiba.opal.core.domain.OpalGeneralConfig;
 import org.obiba.opal.core.runtime.security.support.OpalPermissions;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
@@ -55,9 +53,15 @@ import org.obiba.opal.web.model.Opal.AclAction;
 import org.obiba.opal.web.model.Opal.LocaleDto;
 import org.obiba.opal.web.security.AuthorizationInterceptor;
 import org.obiba.opal.web.ws.security.NoAuthorization;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.collect.Sets;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 
@@ -65,49 +69,73 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @SuppressWarnings("OverlyCoupledClass")
 @Component
+@Transactional
 @Scope("request")
 @Path("/datasource/{name}")
 public class DatasourceResource {
 
+  private static final Logger log = LoggerFactory.getLogger(DatasourceResource.class);
+
   @PathParam("name")
   private String name;
 
-  private final OpalConfigurationService configService;
+  private OpalConfigurationService configService;
 
-  private final OpalGeneralConfigService serverService;
+  private OpalGeneralConfigService serverService;
 
-  private final ViewManager viewManager;
+  private ViewManager viewManager;
 
-  private final ImportService importService;
+  private ImportService importService;
 
-  private final IndexManagerConfigurationService indexManagerConfigService;
+  private IndexManagerConfigurationService indexManagerConfigService;
 
-  private final VariableStatsService variableStatsService;
+  private VariableStatsService variableStatsService;
 
-  private final ViewDtos viewDtos;
+  private ViewDtos viewDtos;
 
-  private final Set<ValueTableUpdateListener> tableListeners;
+  private Set<ValueTableUpdateListener> tableListeners;
 
-  @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters", "NullableProblems" })
   @Autowired
-  public DatasourceResource(OpalConfigurationService configService, OpalGeneralConfigService serverService,
-      ImportService importService, ViewManager viewManager, IndexManagerConfigurationService indexManagerConfigService,
-      VariableStatsService variableStatsService, ViewDtos viewDtos, Set<ValueTableUpdateListener> tableListeners) {
+  private ApplicationContext applicationContext;
 
-    if(configService == null) throw new IllegalArgumentException("configService cannot be null");
-    if(viewManager == null) throw new IllegalArgumentException("viewManager cannot be null");
-    if(importService == null) throw new IllegalArgumentException("importService cannot be null");
-    if(variableStatsService == null) throw new IllegalArgumentException("variableStatsService cannot be null");
-    if(viewDtos == null) throw new IllegalArgumentException("viewDtos cannot be null");
-
+  @Autowired
+  public void setConfigService(OpalConfigurationService configService) {
     this.configService = configService;
-    this.serverService = serverService;
+  }
+
+  @Autowired
+  public void setImportService(ImportService importService) {
     this.importService = importService;
-    this.viewManager = viewManager;
+  }
+
+  @Autowired
+  public void setIndexManagerConfigService(IndexManagerConfigurationService indexManagerConfigService) {
     this.indexManagerConfigService = indexManagerConfigService;
-    this.viewDtos = viewDtos;
-    this.variableStatsService = variableStatsService;
+  }
+
+  @Autowired
+  public void setServerService(OpalGeneralConfigService serverService) {
+    this.serverService = serverService;
+  }
+
+  @Autowired
+  public void setTableListeners(Set<ValueTableUpdateListener> tableListeners) {
     this.tableListeners = tableListeners;
+  }
+
+  @Autowired
+  public void setVariableStatsService(VariableStatsService variableStatsService) {
+    this.variableStatsService = variableStatsService;
+  }
+
+  @Autowired
+  public void setViewDtos(ViewDtos viewDtos) {
+    this.viewDtos = viewDtos;
+  }
+
+  @Autowired
+  public void setViewManager(ViewManager viewManager) {
+    this.viewManager = viewManager;
   }
 
   public void setName(String name) {
@@ -155,7 +183,9 @@ public class DatasourceResource {
 
   @Path("/tables")
   public DatasourceTablesResource getTables() {
-    return new DatasourceTablesResource(getDatasource(), viewManager, tableListeners);
+    DatasourceTablesResource datasourceTablesResource = applicationContext.getBean(DatasourceTablesResource.class);
+    datasourceTablesResource.setDatasource(getDatasource());
+    return datasourceTablesResource;
   }
 
   public TableResource getTableResource(ValueTable table) {
@@ -228,10 +258,6 @@ public class DatasourceResource {
 
   private Set<Locale> getLocales() {
     // Get locales from server config
-    OpalGeneralConfig conf = serverService.getConfig();
-
-    Set<Locale> locales = new HashSet<Locale>();
-    locales.addAll(conf.getLocales());
-    return locales;
+    return Sets.newHashSet(serverService.getConfig().getLocales());
   }
 }

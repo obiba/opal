@@ -31,7 +31,6 @@ import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.cfg.ReportTemplate;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.fs.OpalFileSystem;
-import org.obiba.opal.reporting.service.ReportService;
 import org.obiba.opal.shell.service.CommandSchedulerService;
 import org.obiba.opal.web.model.Opal.ReportDto;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
@@ -42,11 +41,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import com.google.common.collect.Lists;
 
 @Component
+@Transactional
 @Scope("request")
 @Path("/report-template/{name}")
 public class ReportTemplateResource extends AbstractReportTemplateResource {
@@ -55,32 +56,26 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   private static final Logger log = LoggerFactory.getLogger(ReportTemplateResource.class);
 
   @PathParam("name")
-  private String name;
+  protected String name;
 
-  private final OpalConfigurationService configService;
+  private OpalConfigurationService configService;
 
-  private final CommandSchedulerService commandSchedulerService;
+  private CommandSchedulerService commandSchedulerService;
 
-  private final OpalRuntime opalRuntime;
+  private OpalRuntime opalRuntime;
 
-  // Added for unit tests
-  ReportTemplateResource(String name, OpalConfigurationService configService) {
-    this(name, configService, null);
-  }
-
-  ReportTemplateResource(String name, OpalConfigurationService configService,
-      CommandSchedulerService commandSchedulerService) {
-    this.name = name;
-    this.configService = configService;
+  @Autowired
+  public void setCommandSchedulerService(CommandSchedulerService commandSchedulerService) {
     this.commandSchedulerService = commandSchedulerService;
-    opalRuntime = null;
   }
 
   @Autowired
-  public ReportTemplateResource(ReportService reportService, OpalConfigurationService configService,
-      CommandSchedulerService commandSchedulerService, OpalRuntime opalRuntime) {
+  public void setConfigService(OpalConfigurationService configService) {
     this.configService = configService;
-    this.commandSchedulerService = commandSchedulerService;
+  }
+
+  @Autowired
+  public void setOpalRuntime(OpalRuntime opalRuntime) {
     this.opalRuntime = opalRuntime;
   }
 
@@ -91,9 +86,8 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   @GET
   public Response getReportTemplate() {
     ReportTemplate reportTemplate = getOpalConfigurationService().getOpalConfiguration().getReportTemplate(name);
-    return reportTemplate == null || !authzReadReportTemplate(reportTemplate)
-        ? Response.status(Status.NOT_FOUND).build()
-        : Response.ok(Dtos.asDto(reportTemplate)).build();
+    return reportTemplate == null || !authzReadReportTemplate(reportTemplate) ? Response.status(Status.NOT_FOUND)
+        .build() : Response.ok(Dtos.asDto(reportTemplate)).build();
   }
 
   @DELETE

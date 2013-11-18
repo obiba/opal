@@ -23,16 +23,13 @@ import javax.ws.rs.core.UriInfo;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
 import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.RStringMatrix;
-import org.obiba.opal.r.service.OpalRService;
 import org.obiba.opal.web.datashield.support.DataShieldMethodConverterRegistry;
-import org.obiba.opal.web.datashield.support.NoSuchRPackageException;
 import org.obiba.opal.web.model.OpalR;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -41,21 +38,17 @@ import com.google.common.collect.Lists;
  * Manages Datashield packages.
  */
 @Component
+@Transactional
 @Path("/datashield/packages")
 public class DataShieldPackagesResource extends RPackageResource {
-  private static final Logger log = LoggerFactory.getLogger(DataShieldPackagesResource.class);
 
-  private final DatashieldConfigurationSupplier configurationSupplier;
-
-  private final DataShieldMethodConverterRegistry methodConverterRegistry;
+//  private static final Logger log = LoggerFactory.getLogger(DataShieldPackagesResource.class);
 
   @Autowired
-  public DataShieldPackagesResource(OpalRService opalRService, DatashieldConfigurationSupplier configurationSupplier,
-      DataShieldMethodConverterRegistry methodConverterRegistry) {
-    super(opalRService);
-    this.configurationSupplier = configurationSupplier;
-    this.methodConverterRegistry = methodConverterRegistry;
-  }
+  private DatashieldConfigurationSupplier configurationSupplier;
+
+  @Autowired
+  private DataShieldMethodConverterRegistry methodConverterRegistry;
 
   @GET
   public List<OpalR.RPackageDto> getPackages() throws REXPMismatchException {
@@ -75,8 +68,12 @@ public class DataShieldPackagesResource extends RPackageResource {
     installDatashieldPackage(name, ref);
 
     // install or re-install all known datashield package methods
-    for (OpalR.RPackageDto pkg : getPackages()) {
-      DataShieldPackageResource pkgRes = new DataShieldPackageResource(pkg.getName(), getOpalRService(), configurationSupplier, methodConverterRegistry);
+    for(OpalR.RPackageDto pkg : getPackages()) {
+      DataShieldPackageResource pkgRes = new DataShieldPackageResource();
+      pkgRes.setName(pkg.getName());
+      pkgRes.setOpalRService(getOpalRService());
+      pkgRes.setConfigurationSupplier(configurationSupplier);
+      pkgRes.setMethodConverterRegistry(methodConverterRegistry);
       pkgRes.publishPackageMethods();
     }
 

@@ -22,20 +22,19 @@ import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Lists;
 
 @Component
+@Transactional
 @Scope("request")
 @Path("/services")
 public class ServicesResource {
 
-  private final Set<Service> services;
-
   @Autowired
-  public ServicesResource(Set<Service> services) {
-    this.services = services;
-  }
+  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+  private Set<Service> services;
 
   @GET
   public List<Opal.ServiceDto> services() {

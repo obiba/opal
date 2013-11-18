@@ -38,10 +38,12 @@ import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.annotations.VisibleForTesting;
 
 @SuppressWarnings("OverlyCoupledClass")
+@Transactional
 @NoAuthorization
 public class CompareResource {
 

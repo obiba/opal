@@ -30,23 +30,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
+@Transactional
 @Path("/transient-datasources")
 public class TransientDatasourcesResource {
 
   @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(TransientDatasourcesResource.class);
 
-  private final DatasourceFactoryRegistry datasourceFactoryRegistry;
+  private DatasourceFactoryRegistry datasourceFactoryRegistry;
 
   @Autowired
-  public TransientDatasourcesResource(DatasourceFactoryRegistry datasourceFactoryRegistry) {
-    if(datasourceFactoryRegistry == null) {
-      throw new IllegalArgumentException("datasourceFactoryRegistry cannot be null");
-    }
+  public void setDatasourceFactoryRegistry(DatasourceFactoryRegistry datasourceFactoryRegistry) {
     this.datasourceFactoryRegistry = datasourceFactoryRegistry;
   }
 

@@ -70,6 +70,7 @@ import org.obiba.opal.web.model.Opal.FunctionalUnitDto;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -84,37 +85,58 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @SuppressWarnings("OverlyCoupledClass")
 @Component
+@Transactional
 @Path("/functional-units")
 public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
 //  private static final Logger log = LoggerFactory.getLogger(FunctionalUnitsResource.class);
 
-  private final FunctionalUnitService functionalUnitService;
+  private FunctionalUnitService functionalUnitService;
 
-  private final OpalRuntime opalRuntime;
+  private OpalRuntime opalRuntime;
 
-  private final UnitKeyStoreService unitKeyStoreService;
+  private UnitKeyStoreService unitKeyStoreService;
 
-  private final ImportService importService;
+  private ImportService importService;
 
-  private final DatasourceFactoryRegistry datasourceFactoryRegistry;
+  private DatasourceFactoryRegistry datasourceFactoryRegistry;
 
-  private final IdentifiersTableService identifiersTableService;
+  private IdentifiersTableService identifiersTableService;
 
-  private final VariableStatsService variableStatsService;
+  private VariableStatsService variableStatsService;
 
-  @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
   @Autowired
-  public FunctionalUnitsResource(FunctionalUnitService functionalUnitService, OpalRuntime opalRuntime,
-      UnitKeyStoreService unitKeyStoreService, ImportService importService,
-      DatasourceFactoryRegistry datasourceFactoryRegistry, IdentifiersTableService identifiersTableResolver,
-      VariableStatsService variableStatsService) {
-    this.functionalUnitService = functionalUnitService;
-    this.opalRuntime = opalRuntime;
-    this.unitKeyStoreService = unitKeyStoreService;
-    this.importService = importService;
+  public void setDatasourceFactoryRegistry(DatasourceFactoryRegistry datasourceFactoryRegistry) {
     this.datasourceFactoryRegistry = datasourceFactoryRegistry;
-    identifiersTableService = identifiersTableResolver;
+  }
+
+  @Autowired
+  public void setFunctionalUnitService(FunctionalUnitService functionalUnitService) {
+    this.functionalUnitService = functionalUnitService;
+  }
+
+  @Autowired
+  public void setIdentifiersTableService(IdentifiersTableService identifiersTableService) {
+    this.identifiersTableService = identifiersTableService;
+  }
+
+  @Autowired
+  public void setImportService(ImportService importService) {
+    this.importService = importService;
+  }
+
+  @Autowired
+  public void setOpalRuntime(OpalRuntime opalRuntime) {
+    this.opalRuntime = opalRuntime;
+  }
+
+  @Autowired
+  public void setUnitKeyStoreService(UnitKeyStoreService unitKeyStoreService) {
+    this.unitKeyStoreService = unitKeyStoreService;
+  }
+
+  @Autowired
+  public void setVariableStatsService(VariableStatsService variableStatsService) {
     this.variableStatsService = variableStatsService;
   }
 

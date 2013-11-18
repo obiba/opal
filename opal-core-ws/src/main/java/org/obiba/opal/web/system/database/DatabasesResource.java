@@ -18,19 +18,17 @@ import org.obiba.opal.web.support.InvalidRequestException;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.obiba.opal.web.model.Database.DatabaseDto;
 
 @Component
+@Transactional
 @Path("/system/databases")
 public class DatabasesResource {
 
-  private final DatabaseRegistry databaseRegistry;
-
   @Autowired
-  public DatabasesResource(DatabaseRegistry databaseRegistry) {
-    this.databaseRegistry = databaseRegistry;
-  }
+  private DatabaseRegistry databaseRegistry;
 
   @GET
   @NoAuthorization

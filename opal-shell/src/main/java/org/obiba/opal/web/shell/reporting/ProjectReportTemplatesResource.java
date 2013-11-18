@@ -13,28 +13,19 @@ package org.obiba.opal.web.shell.reporting;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
-import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.ReportTemplate;
-import org.obiba.opal.shell.CommandRegistry;
-import org.obiba.opal.shell.service.CommandSchedulerService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@Transactional
 @Scope("request")
 @Path("/project/{name}/report-templates")
 public class ProjectReportTemplatesResource extends ReportTemplatesResource {
 
   @PathParam("name")
   private String name;
-
-  @Autowired
-  public ProjectReportTemplatesResource(OpalConfigurationService configService,
-      CommandSchedulerService commandSchedulerService, @Qualifier("web") CommandRegistry commandRegistry) {
-    super(configService, commandSchedulerService,commandRegistry);
-  }
 
   @Override
   protected boolean authzReadReportTemplate(ReportTemplate template) {

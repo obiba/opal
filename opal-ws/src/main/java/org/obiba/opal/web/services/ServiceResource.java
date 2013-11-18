@@ -10,7 +10,6 @@
 package org.obiba.opal.web.services;
 
 import java.net.URI;
-import java.util.Set;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -20,16 +19,16 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
-import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier;
-import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@Transactional
 @Scope("request")
 @Path("/service/{name}")
 public class ServiceResource {
@@ -37,26 +36,11 @@ public class ServiceResource {
   @PathParam("name")
   private String name;
 
-  private final Set<Service> services;
-
-  private final OpalRuntime opalRuntime;
-
-  private final ServiceConfigurationHandlerRegistry configHandler;
-
-  private final OpalConfigurationService configService;
-
-  private final ExtensionConfigurationSupplier configSupplier;
+  @Autowired
+  private OpalRuntime opalRuntime;
 
   @Autowired
-  public ServiceResource(Set<Service> services, OpalRuntime opalRuntime,
-      ServiceConfigurationHandlerRegistry configHandler, OpalConfigurationService configService,
-      ExtensionConfigurationSupplier configSupplier) {
-    this.services = services;
-    this.opalRuntime = opalRuntime;
-    this.configHandler = configHandler;
-    this.configService = configService;
-    this.configSupplier = configSupplier;
-  }
+  private ServiceConfigurationHandlerRegistry configHandler;
 
   @GET
   public Response service() {

@@ -28,27 +28,21 @@ import org.obiba.opal.web.r.OpalRSessionResource;
 import org.obiba.opal.web.r.OpalRSessionsResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@Transactional
 @Path("/datashield")
 public class DataShieldResource {
 
-  private final DatashieldConfigurationSupplier configurationSupplier;
-
-  private final OpalRSessionManager opalRSessionManager;
-
-  private final DataShieldMethodConverterRegistry methodConverterRegistry;
+  @Autowired
+  private DatashieldConfigurationSupplier configurationSupplier;
 
   @Autowired
-  public DataShieldResource(DatashieldConfigurationSupplier configurationSupplier,
-      OpalRSessionManager opalRSessionManager, DataShieldMethodConverterRegistry methodConverterRegistry) {
-    if(configurationSupplier == null) throw new IllegalArgumentException("configurationSupplier cannot be null");
-    if(opalRSessionManager == null) throw new IllegalArgumentException("opalRSessionManager cannot be null");
-    if(methodConverterRegistry == null) throw new IllegalArgumentException("methodConverterRegistry cannot be null");
-    this.configurationSupplier = configurationSupplier;
-    this.opalRSessionManager = opalRSessionManager;
-    this.methodConverterRegistry = methodConverterRegistry;
-  }
+  private OpalRSessionManager opalRSessionManager;
+
+  @Autowired
+  private DataShieldMethodConverterRegistry methodConverterRegistry;
 
   @Path("/sessions")
   public OpalRSessionsResource getSessions() {
@@ -68,7 +62,7 @@ public class DataShieldResource {
 
   @Path("/session/current")
   public OpalRSessionResource getCurrentSession() {
-    if(opalRSessionManager.hasSubjectCurrentRSession() == false) {
+    if(!opalRSessionManager.hasSubjectCurrentRSession()) {
       OpalRSession session = opalRSessionManager.newSubjectCurrentRSession();
       onNewDataShieldSession(session);
     }

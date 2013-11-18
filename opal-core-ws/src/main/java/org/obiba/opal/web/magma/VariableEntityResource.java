@@ -22,11 +22,13 @@ import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  */
 @Component
+@Transactional
 @Scope("request")
 @Path("/entity/{id}/type/{type}")
 public class VariableEntityResource {

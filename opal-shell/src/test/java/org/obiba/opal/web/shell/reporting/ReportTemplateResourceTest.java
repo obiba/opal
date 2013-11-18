@@ -22,7 +22,6 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.easymock.EasyMock;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -43,6 +42,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
 
 public class ReportTemplateResourceTest {
 
@@ -85,16 +85,17 @@ public class ReportTemplateResourceTest {
 
     replay(opalRuntimeMock, opalConfigurationServiceMock, mockSubject);
 
-    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template3",
-        opalConfigurationServiceMock);
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource();
+    reportTemplateResource.setName("template3");
+    reportTemplateResource.setConfigService(opalConfigurationServiceMock);
 
     Response response = reportTemplateResource.getReportTemplate();
     ThreadContext.unbindSubject();
 
-    Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
     ReportTemplateDto reportTemplateDto = (ReportTemplateDto) response.getEntity();
-    Assert.assertEquals("template3", reportTemplateDto.getName());
+    assertEquals("template3", reportTemplateDto.getName());
 
     verify(opalRuntimeMock, opalConfigurationServiceMock, mockSubject);
 
@@ -105,11 +106,12 @@ public class ReportTemplateResourceTest {
 
     replay(opalRuntimeMock, opalConfigurationServiceMock);
 
-    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template9",
-        opalConfigurationServiceMock);
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource();
+    reportTemplateResource.setName("template9");
+    reportTemplateResource.setConfigService(opalConfigurationServiceMock);
 
     Response response = reportTemplateResource.getReportTemplate();
-    Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
 
     verify(opalRuntimeMock, opalConfigurationServiceMock);
   }
@@ -129,12 +131,15 @@ public class ReportTemplateResourceTest {
 
     replay(opalRuntimeMock, opalConfigurationServiceMock, commandSchedulerServiceMock, mockSubject);
 
-    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template2",
-        opalConfigurationServiceMock, commandSchedulerServiceMock);
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource();
+    reportTemplateResource.setName("template2");
+    reportTemplateResource.setConfigService(opalConfigurationServiceMock);
+    reportTemplateResource.setCommandSchedulerService(commandSchedulerServiceMock);
+
     Response response = reportTemplateResource.deleteReportTemplate();
     ThreadContext.unbindSubject();
 
-    Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
     // Assert.assertTrue(opalConfiguration.getReportTemplate("template2") == null);
 
@@ -147,11 +152,12 @@ public class ReportTemplateResourceTest {
 
     replay(opalRuntimeMock, opalConfigurationServiceMock);
 
-    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template9",
-        opalConfigurationServiceMock);
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource();
+    reportTemplateResource.setName("template9");
+    reportTemplateResource.setConfigService(opalConfigurationServiceMock);
 
     Response response = reportTemplateResource.deleteReportTemplate();
-    Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
 
     verify(opalRuntimeMock, opalConfigurationServiceMock);
   }
@@ -175,13 +181,16 @@ public class ReportTemplateResourceTest {
 
     replay(opalRuntimeMock, opalConfigurationServiceMock, uriInfoMock, commandSchedulerServiceMock);
 
-    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template9",
-        opalConfigurationServiceMock, commandSchedulerServiceMock);
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource();
+    reportTemplateResource.setName("template9");
+    reportTemplateResource.setConfigService(opalConfigurationServiceMock);
+    reportTemplateResource.setCommandSchedulerService(commandSchedulerServiceMock);
+
     Response response = reportTemplateResource
         .updateReportTemplate(uriInfoMock, Dtos.asDto(getReportTemplate("template9")));
 
-    Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-    Assert.assertEquals(BASE_URI, response.getMetadata().get("location").get(0).toString());
+    assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+    assertEquals(BASE_URI, response.getMetadata().get("location").get(0).toString());
 
     verify(opalRuntimeMock, opalConfigurationServiceMock, uriInfoMock, commandSchedulerServiceMock);
   }
@@ -197,12 +206,15 @@ public class ReportTemplateResourceTest {
 
     replay(opalRuntimeMock, opalConfigurationServiceMock, commandSchedulerServiceMock);
 
-    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template1",
-        opalConfigurationServiceMock, commandSchedulerServiceMock);
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource();
+    reportTemplateResource.setName("template1");
+    reportTemplateResource.setConfigService(opalConfigurationServiceMock);
+    reportTemplateResource.setCommandSchedulerService(commandSchedulerServiceMock);
+
     Response response = reportTemplateResource
         .updateReportTemplate(createMock(UriInfo.class), Dtos.asDto(getReportTemplate("template1")));
 
-    Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
     verify(opalRuntimeMock, opalConfigurationServiceMock, commandSchedulerServiceMock);
 
@@ -214,13 +226,15 @@ public class ReportTemplateResourceTest {
 
     replay(opalRuntimeMock, opalConfigurationServiceMock);
 
-    ReportTemplateResource reportTemplateResource = new ReportTemplateResource("template1",
-        opalConfigurationServiceMock);
+    ReportTemplateResource reportTemplateResource = new ReportTemplateResource();
+    reportTemplateResource.setName("template1");
+    reportTemplateResource.setConfigService(opalConfigurationServiceMock);
+
     Response response = reportTemplateResource
         .updateReportTemplate(uriInfoMock, Dtos.asDto(getReportTemplate("template2")));
 
-    Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-    Assert.assertEquals("CouldNotUpdateTheReportTemplate", ((ClientErrorDto) response.getEntity()).getStatus());
+    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    assertEquals("CouldNotUpdateTheReportTemplate", ((ClientErrorDto) response.getEntity()).getStatus());
 
     verify(opalRuntimeMock, opalConfigurationServiceMock);
   }

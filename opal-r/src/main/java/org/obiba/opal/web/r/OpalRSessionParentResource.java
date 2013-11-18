@@ -16,21 +16,19 @@ import org.obiba.opal.r.service.OpalRSessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  */
 @Component
+@Transactional
 @Scope("request")
 @Path("/r/session")
 public class OpalRSessionParentResource {
 
-  private final OpalRSessionManager opalRSessionManager;
-
   @Autowired
-  public OpalRSessionParentResource(OpalRSessionManager opalRSessionManager) {
-    this.opalRSessionManager = opalRSessionManager;
-  }
+  private OpalRSessionManager opalRSessionManager;
 
   @Path("/{id}")
   public OpalRSessionResource getOpalRSessionResource(@PathParam("id") String id) {

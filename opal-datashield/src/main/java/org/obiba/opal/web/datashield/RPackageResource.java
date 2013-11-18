@@ -12,7 +12,6 @@ package org.obiba.opal.web.datashield;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -27,6 +26,7 @@ import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
 import com.google.common.base.Function;
@@ -52,9 +52,10 @@ public abstract class RPackageResource {
   private static final String[] defaultRepos = new String[] { "http://cran.obiba.org", //"http://cran.datashield.org",
       "http://cran.rstudio.com" };
 
-  protected final OpalRService opalRService;
+  protected OpalRService opalRService;
 
-  protected RPackageResource(OpalRService opalRService) {
+  @Autowired
+  public void setOpalRService(OpalRService opalRService) {
     this.opalRService = opalRService;
   }
 
@@ -66,7 +67,7 @@ public abstract class RPackageResource {
     return getInstalledPackages(new ArrayList<String>());
   }
 
-  protected RScriptROperation getInstalledPackages(List<String> fields) {
+  protected RScriptROperation getInstalledPackages(Iterable<String> fields) {
     Iterable<String> allFields = Iterables.concat(Arrays.asList(defaultFields), fields);
     String fieldStr = StringUtils.collectionToDelimitedString(Lists.newArrayList(allFields), ",", "\"", "\"");
     String cmd = "installed.packages(fields=c(" + fieldStr + "))";
@@ -133,7 +134,7 @@ public abstract class RPackageResource {
             new DataShieldPackagePredicate() {
               @Override
               public boolean apply(@Nullable OpalR.RPackageDto input) {
-                return input.getName().equals(name) && super.apply(input);
+                return input != null && input.getName().equals(name) && super.apply(input);
               }
             }).iterator();
 
@@ -143,7 +144,7 @@ public abstract class RPackageResource {
     throw new NoSuchRPackageException(name);
   }
 
-  public class StringsToRPackageDto implements Function<String[], OpalR.RPackageDto> {
+  public static class StringsToRPackageDto implements Function<String[], OpalR.RPackageDto> {
 
     private int current = 0;
 
@@ -156,12 +157,14 @@ public abstract class RPackageResource {
     @Override
     public OpalR.RPackageDto apply(@Nullable String[] input) {
       OpalR.RPackageDto.Builder builder = OpalR.RPackageDto.newBuilder();
-      for(int i = 0; i < input.length; i++) {
-        if(!Strings.isNullOrEmpty(input[i]) && !"NA".equals(input[i])) {
-          Opal.EntryDto.Builder entry = Opal.EntryDto.newBuilder();
-          entry.setKey(matrix.getColumnName(i));
-          entry.setValue(input[i]);
-          builder.addDescription(entry);
+      if(input != null) {
+        for(int i = 0; i < input.length; i++) {
+          if(!Strings.isNullOrEmpty(input[i]) && !"NA".equals(input[i])) {
+            Opal.EntryDto.Builder entry = Opal.EntryDto.newBuilder();
+            entry.setKey(matrix.getColumnName(i));
+            entry.setValue(input[i]);
+            builder.addDescription(entry);
+          }
         }
       }
       builder.setName(matrix.getRowName(current++));
@@ -172,8 +175,9 @@ public abstract class RPackageResource {
   protected static class DataShieldPackagePredicate implements Predicate<OpalR.RPackageDto> {
     @Override
     public boolean apply(@Nullable OpalR.RPackageDto input) {
+      if(input == null) return false;
       for(Opal.EntryDto entry : input.getDescriptionList()) {
-        if(entry.getKey().equals("AggregateMethods") || entry.getKey().equals("AssignMethods")) {
+        if("AggregateMethods".equals(entry.getKey()) || "AssignMethods".equals(entry.getKey())) {
           return !"NA".equals(entry.getValue());
         }
       }

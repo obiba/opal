@@ -13,16 +13,13 @@ package org.obiba.opal.web.shell.reporting;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
-import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.ReportTemplate;
-import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.reporting.service.ReportService;
-import org.obiba.opal.shell.service.CommandSchedulerService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@Transactional
 @Scope("request")
 @Path("/project/{project}/report-template/{name}")
 public class ProjectReportTemplateResource extends ReportTemplateResource {
@@ -33,10 +30,7 @@ public class ProjectReportTemplateResource extends ReportTemplateResource {
   @PathParam("name")
   private String name;
 
-  @Autowired
-  public ProjectReportTemplateResource(ReportService reportService, OpalConfigurationService configService,
-      CommandSchedulerService commandSchedulerService, OpalRuntime opalRuntime) {
-    super(reportService, configService, commandSchedulerService, opalRuntime);
+  public ProjectReportTemplateResource() {
     setName(name);
   }
 
