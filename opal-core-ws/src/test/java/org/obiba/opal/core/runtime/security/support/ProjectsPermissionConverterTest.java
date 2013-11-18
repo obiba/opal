@@ -35,9 +35,7 @@ public class ProjectsPermissionConverterTest
         "magma:/functional-units/unit:GET:GET/GET", //
         "magma:/functional-units/entities/table:GET",//
         "magma:/project/patate:*:GET/*",//
-        "magma:/files/projects/patate:GET:GET/*",//
-        "magma:/files/projects/patate:POST:GET/*",//
-        "magma:/files/projects/patate:PUT:GET/*");
+        "magma:/files/projects/patate:*:GET/*");
   }
 
   @Test

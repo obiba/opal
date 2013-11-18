@@ -47,9 +47,7 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
             magmaConvert("/functional-units/unit", "GET:GET/GET"), //
             magmaConvert("/functional-units/entities/table", "GET"),//
             magmaConvert("/project/{0}", "*:GET/*", args),//
-            magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "POST:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "PUT:GET/*", args));
+            magmaConvert("/files/projects/{0}", "*:GET/*", args));
       }
 
     },
