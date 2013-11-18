@@ -121,9 +121,9 @@ public class NumericalCriterionDropdown extends CriterionDropdown {
     FlowPanel inPanel = new FlowPanel();
 
     operatorChooser.addStyleName("inline-block");
-    operatorChooser.addItem(translations.criterionFiltersMap().get("select_operator"), "SELECT_OPERATOR");
-    operatorChooser.addItem(translations.criterionFiltersMap().get("in"), "IN");
-    operatorChooser.addItem(translations.criterionFiltersMap().get("not_in"), "NOT_IN");
+    operatorChooser.addItem(translations.criterionFiltersMap().get("select_operator"));
+    operatorChooser.addItem(translations.criterionFiltersMap().get("in"));
+    operatorChooser.addItem(translations.criterionFiltersMap().get("not_in"));
     operatorChooser.addFocusHandler(new FocusHandler() {
       @Override
       public void onFocus(FocusEvent event) {
@@ -143,9 +143,9 @@ public class NumericalCriterionDropdown extends CriterionDropdown {
     });
 
     rangeValueChooser.addStyleName("small-dual-indent");
-    rangeValueChooser.addItem("select", "select");
-    rangeValueChooser.addItem("range", "range");
-    rangeValueChooser.addItem("values", "values");
+    rangeValueChooser.addItem(translations.criterionFiltersMap().get("select"));
+    rangeValueChooser.addItem(translations.criterionFiltersMap().get("range"));
+    rangeValueChooser.addItem(translations.criterionFiltersMap().get("values"));
     rangeValueChooser.addFocusHandler(new FocusHandler() {
       @Override
       public void onFocus(FocusEvent event) {
@@ -183,7 +183,7 @@ public class NumericalCriterionDropdown extends CriterionDropdown {
     if(rangeValueChooser.getSelectedIndex() > 0) {
       filter += " " + rangeValueChooser.getItemText(rangeValueChooser.getSelectedIndex()).toLowerCase();
 
-      if(translations.criterionFiltersMap().get("range").equals(rangeValueChooser.getSelectedValue())) {
+      if(rangeValueChooser.isItemSelected(1)) {
         filter += "[" + (min.getText().isEmpty() ? "" : min.getText()) + ", " +
             (max.getText().isEmpty() ? "" : max.getText()) + "]";
       } else {
@@ -200,14 +200,14 @@ public class NumericalCriterionDropdown extends CriterionDropdown {
       resetRadioControls();
 
       // Show/Hide Range-value textbox
-      if(translations.criterionFiltersMap().get("range").equals(rangeValueChooser.getSelectedValue())) {
+      if(rangeValueChooser.isItemSelected(1)) {
         minLabel.setVisible(true);
         min.setVisible(true);
         maxLabel.setVisible(true);
         max.setVisible(true);
         valuesLabel.setVisible(false);
         values.setVisible(false);
-      } else if(translations.criterionFiltersMap().get("values").equals(rangeValueChooser.getSelectedValue())) {
+      } else if(rangeValueChooser.isItemSelected(2)) {
         minLabel.setVisible(false);
         min.setVisible(false);
         maxLabel.setVisible(false);
