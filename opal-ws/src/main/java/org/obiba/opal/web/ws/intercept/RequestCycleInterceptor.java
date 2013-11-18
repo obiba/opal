@@ -16,6 +16,7 @@ import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
 import org.jboss.resteasy.annotations.interception.SecurityPrecedence;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 
 @Component
+@Provider
 @ServerInterceptor
 @SecurityPrecedence
 public class RequestCycleInterceptor implements PreProcessInterceptor, PostProcessInterceptor {
