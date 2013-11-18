@@ -20,6 +20,11 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
+import org.obiba.opal.web.gwt.app.client.ui.CategoricalCriterionDropdown;
+import org.obiba.opal.web.gwt.app.client.ui.CriterionDropdown;
+import org.obiba.opal.web.gwt.app.client.ui.DateTimeCriterionDropdown;
+import org.obiba.opal.web.gwt.app.client.ui.DefaultCriterionDropdown;
+import org.obiba.opal.web.gwt.app.client.ui.NumericalCriterionDropdown;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -155,19 +160,35 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
           @Override
           public void onResource(Response response, final VariableDto resource) {
 
-            //TODO: Do not fetch facets when type is text
             // Fetch facets
             if(response.getStatusCode() == Response.SC_OK) {
-              ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(
-                  UriBuilders.DATASOURCE_TABLE_FACET_VARIABLE_SEARCH.create()
-                      .build(table.getDatasourceName(), table.getName(), variableName))
-                  .withCallback(new ResourceCallback<QueryResultDto>() {
-                    @Override
-                    public void onResource(Response response, QueryResultDto term) {
+              if(resource.getCategoriesArray().length() == 0) {
 
-                      getView().addVariableFilter(resource, term);
-                    }
-                  }).get().send();
+                if(resource.getValueType().equals("datetime")) {
+                  // DataTime filter
+                  getView().addVariableFilter(new DateTimeCriterionDropdown(resource, null));
+                } else {
+                  // Default filter variable
+                  getView().addVariableFilter(new DefaultCriterionDropdown(resource, null));
+                }
+              } else {
+                // Filter for Categorical variable OR Numerical variable
+                ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(
+                    UriBuilders.DATASOURCE_TABLE_FACET_VARIABLE_SEARCH.create()
+                        .build(table.getDatasourceName(), table.getName(), variableName))
+                    .withCallback(new ResourceCallback<QueryResultDto>() {
+                      @Override
+                      public void onResource(Response response, QueryResultDto term) {
+                        if(resource.getValueType().equals("integer")) {
+                          // Numerical variable
+                          getView().addVariableFilter(new NumericalCriterionDropdown(resource, term));
+                        } else {
+                          // Categorical variable
+                          getView().addVariableFilter(new CategoricalCriterionDropdown(resource, term));
+                        }
+                      }
+                    }).get().send();
+              }
             }
           }
         }).get().send();
@@ -357,11 +378,11 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     public void updateVariables(String select) {
       final String query = select.isEmpty() ? "*" : select;
 
-      UriBuilder ub = UriBuilder.create()
-          .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variables", "_search")
+      String resource = UriBuilders.DATASOURCE_TABLE_VARIABLES_SEARCH.create()//
           .query("query", query)//
           .query("limit", String.valueOf(table.getVariableCount()))//
-          .query("variable", "true");
+          .query("variable", "true")//
+          .build(table.getDatasourceName(), table.getName());
 
       if(variablesRequest != null) {
         variablesRequest.cancel();
@@ -369,7 +390,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       }
       getView().clearTable();
 
-      variablesRequest = ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(ub.build()).get()//
+      variablesRequest = ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(resource).get()//
           .withCallback(new VariablesResourceCallback(table))
           .withCallback(Response.SC_BAD_REQUEST, new BadRequestCallback() {
             @Override
@@ -436,7 +457,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     void populateValues(int offset, ValueSetsDto resource);
 
-    void addVariableFilter(VariableDto variableDto, QueryResultDto termDto);
+    void addVariableFilter(CriterionDropdown criterion);
   }
 
   public enum ViewMode {

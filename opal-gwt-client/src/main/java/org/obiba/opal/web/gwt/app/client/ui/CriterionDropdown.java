@@ -10,6 +10,8 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
@@ -30,35 +32,42 @@ public abstract class CriterionDropdown extends DropdownButton {
 
   protected QueryResultDto queryResult;
 
-  private ListItem radioControls;
+  private final ListItem radioControls = new ListItem();
 
-  protected Widget specificControls;
-
-  public CriterionDropdown(VariableDto variableDto, QueryResultDto termDto) {
+  public CriterionDropdown(VariableDto variableDto, @Nullable QueryResultDto termDto) {
     variable = variableDto;
     queryResult = termDto;
 
     updateCriterionFilter("All");
 
-    radioControls = new ListItem();
     radioControls.addStyleName("controls");
 
     int noEmpty = 0;
-    for(int i = 0; i < queryResult.getFacetsArray().length(); i++) {
-      for(int j = 0; j < queryResult.getFacetsArray().get(i).getFrequenciesArray().length(); j++) {
-        noEmpty += queryResult.getFacetsArray().get(0).getFrequenciesArray().get(j).getCount();
+    if(queryResult != null) {
+
+      // TODO: FacetArray for 1 variable always return only 1 facetArray ?
+      if(queryResult.getFacetsArray().length() > 0) {
+        if(queryResult.getFacetsArray().get(0).hasStatistics()) {
+          // Statistics facet
+          noEmpty += queryResult.getFacetsArray().get(0).getStatistics().getCount();
+        } else {
+          // Categories frequency facet
+          for(int i = 0; i < queryResult.getFacetsArray().get(0).getFrequenciesArray().length(); i++) {
+            noEmpty += queryResult.getFacetsArray().get(0).getFrequenciesArray().get(i).getCount();
+          }
+        }
       }
     }
 
     // All, Empty, Not Empty radio buttons
-    RadioButton radioAll = getRadioButton("All", queryResult.getTotalHits());
+    RadioButton radioAll = getRadioButton("All", queryResult == null ? null : queryResult.getTotalHits());
     radioAll.setValue(true);
     radioControls.add(radioAll);
-    radioControls.add(getRadioButton("Empty", queryResult.getTotalHits() - noEmpty));
-    radioControls.add(getRadioButton("Not Empty", noEmpty));
+    radioControls.add(getRadioButton("Empty", queryResult == null ? null : queryResult.getTotalHits() - noEmpty));
+    radioControls.add(getRadioButton("Not Empty", queryResult == null ? null : noEmpty));
     add(radioControls);
 
-    specificControls = getSpecificControls();
+    Widget specificControls = getSpecificControls();
     if(specificControls != null) {
       add(new Divider());
       add(specificControls);
@@ -80,10 +89,15 @@ public abstract class CriterionDropdown extends DropdownButton {
 
   }
 
-  private RadioButton getRadioButton(final String label, int count) {
-    RadioButton radio = new RadioButton("radio",
-        new SafeHtmlBuilder().appendEscaped(label + " ").appendHtmlConstant("<span style=\"font-size:x-small\">(")
-            .append(count).appendEscaped(")").appendHtmlConstant("</span>").toSafeHtml());
+  private RadioButton getRadioButton(final String label, Integer count) {
+    SafeHtmlBuilder builder = new SafeHtmlBuilder().appendEscaped(label);
+
+    if(count != null) {
+      builder.appendHtmlConstant("<span style=\"font-size:x-small\"> (").append(count).appendEscaped(")")
+          .appendHtmlConstant("</span>");
+    }
+
+    RadioButton radio = new RadioButton("radio", builder.toSafeHtml());
 
     radio.addClickHandler(new ClickHandler() {
       @Override
@@ -104,12 +118,13 @@ public abstract class CriterionDropdown extends DropdownButton {
 
   public void updateCriterionFilter(String filter) {
     setText(filter.isEmpty() ? variable.getName() : variable.getName() + ": " + filter);
-
   }
 
   public abstract Widget getSpecificControls();
 
   public abstract void resetSpecificControls();
+
+  public abstract String getQueryString();
 
   @Override
   protected void onLoad() {
@@ -119,7 +134,7 @@ public abstract class CriterionDropdown extends DropdownButton {
     }
   }
 
-  // TODO: Find the selector that  allows to skip the selection of the first input after the li of chosen options...
+  // TODO: Find the selector that allows to skip the selection of the first input after the li of chosen options...
   private static native void bind(Element e) /*-{
     $wnd.jQuery(e).next().find('label, li').click(function(w) {
         w.stopPropagation();

@@ -18,8 +18,8 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter.DataFetcher;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter.EntitySelectionHandler;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTableUiHandlers;
-import org.obiba.opal.web.gwt.app.client.ui.CategoricalCriterionDropdown;
 import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
+import org.obiba.opal.web.gwt.app.client.ui.CriterionDropdown;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TableVariableSuggestOracle;
@@ -34,7 +34,6 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TextBox;
@@ -82,6 +81,7 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
+@SuppressWarnings("OverlyCoupledClass")
 public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> implements ValuesTablePresenter.Display {
 
   private static final int DEFAULT_MAX_VISIBLE_COLUMNS = 5;
@@ -509,10 +509,11 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   }
 
   @Override
-  public void addVariableFilter(VariableDto variableDto, QueryResultDto termDto) {
-    filters.add(new CategoricalCriterionDropdown(variableDto, termDto));
+  public void addVariableFilter(CriterionDropdown criterion) {
+    filters.add(criterion);
   }
-//
+
+  //
   // Inner classes
   //
 

@@ -18,6 +18,8 @@ import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.common.base.Joiner;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -50,6 +52,12 @@ public class CategoricalCriterionDropdown extends CriterionDropdown {
 
     matches.setPlaceholder("custom match query");
     matches.setVisible(false);
+    matches.addFocusHandler(new FocusHandler() {
+      @Override
+      public void onFocus(FocusEvent event) {
+        resetRadioControls();
+      }
+    });
     matches.addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent event) {
@@ -67,6 +75,12 @@ public class CategoricalCriterionDropdown extends CriterionDropdown {
       categories.addItem(getCategoryItem(variable.getCategoriesArray().get(i).getName()),
           variable.getCategoriesArray().get(i).getName());
     }
+    categories.addFocusHandler(new FocusHandler() {
+      @Override
+      public void onFocus(FocusEvent event) {
+        resetRadioControls();
+      }
+    });
     categories.addChosenChangeHandler(new UpdateFilterChosenHandler());
     categories.setVisible(false);
 
@@ -104,6 +118,11 @@ public class CategoricalCriterionDropdown extends CriterionDropdown {
 
     return name;
 
+  }
+
+  @Override
+  public String getQueryString() {
+    return "";
   }
 
   private class UpdateFilterChosenHandler implements ChosenChangeEvent.ChosenChangeHandler {
