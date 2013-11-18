@@ -13,11 +13,13 @@ package org.obiba.opal.web.gwt.app.client.ui;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.common.base.Joiner;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.FocusEvent;
 import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
@@ -28,11 +30,13 @@ import com.watopi.chosen.client.event.ChosenChangeEvent;
 
 public class CategoricalCriterionDropdown extends CriterionDropdown {
 
-  Chooser operatorChooser;
+  private static final Translations translations = GWT.create(Translations.class);
 
-  Chooser categories;
+  private final Chooser operatorChooser = new Chooser();
 
-  TextBox matches;
+  private final Chooser categories = new Chooser(true);
+
+  private final TextBox matches = new TextBox();
 
   public CategoricalCriterionDropdown(VariableDto variableDto, QueryResultDto termDto) {
     super(variableDto, termDto);
@@ -41,16 +45,13 @@ public class CategoricalCriterionDropdown extends CriterionDropdown {
   @Override
   public Widget getSpecificControls() {
     ListItem specificControls = new ListItem();
-    operatorChooser = new Chooser();
-    categories = new Chooser(true);
-    matches = new TextBox();
 
     specificControls.addStyleName("controls");
 
     specificControls.add(getOperatorsChooserPanel());
     specificControls.add(getCategoriesChooserPanel());
 
-    matches.setPlaceholder("custom match query");
+    matches.setPlaceholder(translations.criterionFiltersMap().get("custom_match_query"));
     matches.setVisible(false);
     matches.addFocusHandler(new FocusHandler() {
       @Override
@@ -90,10 +91,10 @@ public class CategoricalCriterionDropdown extends CriterionDropdown {
 
   private SimplePanel getOperatorsChooserPanel() {
     SimplePanel inPanel = new SimplePanel();
-    operatorChooser.addItem("Select an operator", "SELECT_OPERATOR");
-    operatorChooser.addItem("In", "IN");
-    operatorChooser.addItem("Not in", "NOT_IN");
-    operatorChooser.addItem("Matches", "MATCHES");
+    operatorChooser.addItem(translations.criterionFiltersMap().get("select_operator"));
+    operatorChooser.addItem(translations.criterionFiltersMap().get("in"));
+    operatorChooser.addItem(translations.criterionFiltersMap().get("not_in"));
+    operatorChooser.addItem(translations.criterionFiltersMap().get("like"));
     operatorChooser.addChosenChangeHandler(new UpdateFilterChosenHandler());
 
     inPanel.add(operatorChooser);
@@ -163,7 +164,7 @@ public class CategoricalCriterionDropdown extends CriterionDropdown {
     if(matches.getText().isEmpty()) {
       updateCriterionFilter("");
     } else {
-      updateCriterionFilter("Matches " + matches.getText());
+      updateCriterionFilter(translations.criterionFiltersMap().get("like") + " " + matches.getText());
     }
   }
 }
