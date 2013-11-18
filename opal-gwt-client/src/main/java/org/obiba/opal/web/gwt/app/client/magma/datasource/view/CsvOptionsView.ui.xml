@@ -1,62 +1,79 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
-    xmlns:w="urn:import:org.obiba.opal.web.gwt.app.client.view"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:b1="urn:import:com.github.gwtbootstrap.client.ui.base"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <g:FlowPanel styleName="input">
-      <g:Label addStyleNames="key">
+
+    <b:ControlGroup ui:field="selectCsvFileGroup">
+      <b:ControlLabel>
         <ui:msg description="Data File label">Data File</ui:msg>
-      </g:Label>
-      <g:SimplePanel ui:field="selectCsvFilePanel"/>
-      <g:Label styleName="help-block">
+      </b:ControlLabel>
+      <o:OpalSimplePanel ui:field="selectCsvFilePanel"/>
+      <b:HelpBlock>
         <ui:msg description="CSV File Description label">Data in CSV format are in a text file (.csv)</ui:msg>
-      </g:Label>
-    </g:FlowPanel>
+      </b:HelpBlock>
+    </b:ControlGroup>
 
     <o:CollapsiblePanel ui:field="advancedOptions">
-      <g:Grid>
-        <g:row>
-          <g:customCell styleName="top">
-            <g:FlowPanel styleName="input block">
-              <g:Label addStyleNames="key">
-                <ui:msg description="From row label">From Row</ui:msg>
-              </g:Label>
-              <o:NumericTextBox ui:field="row" addStyleNames="span1"/>
-            </g:FlowPanel>
-          </g:customCell>
-          <g:customCell styleName="top small-indent">
-            <g:FlowPanel styleName="input block">
-              <g:Label addStyleNames="key">
-                <ui:msg description="Separators label">Separators</ui:msg>
-              </g:Label>
-              <g:FlowPanel>
-                <g:FlowPanel addStyleNames="inline">
-                  <o:EditableListBox ui:field="field" textStyleNames="span1"/>
-                  <g:Label styleName="help-block">
-                    <ui:msg description="Field label">Field</ui:msg>
-                  </g:Label>
-                </g:FlowPanel>
-                <g:FlowPanel addStyleNames="inline">
-                  <o:EditableListBox ui:field="quote" textStyleNames="span1"/>
-                  <g:Label styleName="help-block">
-                    <ui:msg description="Quote label">Quote</ui:msg>
-                  </g:Label>
-                </g:FlowPanel>
-              </g:FlowPanel>
-            </g:FlowPanel>
-          </g:customCell>
-        </g:row>
-      </g:Grid>
-      <g:FlowPanel styleName="input block">
-        <g:Label addStyleNames="key">
+      <b:FluidRow>
+        <b:Column size="4">
+          <b:WellNavList>
+            <b1:InlineLabel>
+              <ui:msg description="From row label">From Row</ui:msg>
+            </b1:InlineLabel>
+            <b:ControlGroup ui:field="rowGroup">
+              <o:NumericTextBox ui:field="row" addStyleNames="span12"/>
+              <b:HelpBlock>
+                <ui:msg description="Row help label">Valid number >= 1</ui:msg>
+              </b:HelpBlock>
+            </b:ControlGroup>
+          </b:WellNavList>
+        </b:Column>
+        <b:Column size="8">
+          <b:WellNavList>
+            <b1:InlineLabel>
+              <ui:msg description="Separators label">Separators</ui:msg>
+            </b1:InlineLabel>
+            <b:FluidRow>
+              <b:Column size="6">
+                <b:ControlGroup ui:field="fieldGroup">
+                  <b:Controls>
+                    <o:EditableListBox ui:field="field" textStyleNames="span12"/>
+                    <b:HelpBlock>
+                      <ui:msg description="Field label">Field</ui:msg>
+                    </b:HelpBlock>
+                  </b:Controls>
+                </b:ControlGroup>
+              </b:Column>
+              <b:Column size="6">
+                <b:ControlGroup ui:field="quoteGroup">
+                  <b:Controls>
+                    <o:EditableListBox ui:field="quote" textStyleNames="span12"/>
+                    <b:HelpBlock>
+                      <ui:msg description="Quote label">Quote</ui:msg>
+                    </b:HelpBlock>
+                  </b:Controls>
+                </b:ControlGroup>
+              </b:Column>
+            </b:FluidRow>
+          </b:WellNavList>
+        </b:Column>
+      </b:FluidRow>
+
+      <b:ControlGroup ui:field="charsetGroup">
+        <b:ControlLabel>
           <ui:msg description="Character set label">Character Set</ui:msg>
-        </g:Label>
-        <o:CharacterSetView ui:field='charsetView'></o:CharacterSetView>
-      </g:FlowPanel>
+        </b:ControlLabel>
+        <b:Controls>
+          <o:CharacterSetView ui:field='charsetView'></o:CharacterSetView>
+        </b:Controls>
+      </b:ControlGroup>
+
     </o:CollapsiblePanel>
 
   </g:FlowPanel>

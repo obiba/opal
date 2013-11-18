@@ -234,8 +234,8 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
               new RegExValidator(getView().getCsvOptions().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger"));
           validators.add(new RequiredTextValidator(getView().getCsvOptions().getCharsetText(), "CharsetNotAvailable"));
           validators.add(
-              new RequiredTextValidator(getView().getCsvOptions().getFieldSeparatorText(), "FieldSeparatorRequired"));
-          validators.add(new RequiredTextValidator(getView().getCsvOptions().getQuoteText(), "QuoteSeparatorRequired"));
+              new RequiredTextValidator(getView().getCsvOptions().getFieldSeparator(), "FieldSeparatorRequired"));
+          validators.add(new RequiredTextValidator(getView().getCsvOptions().getQuote(), "QuoteSeparatorRequired"));
           break;
         case XML:
           validators.add(new RegExValidator(getSelectedFile(), ".zip$", "i", "ZipFileRequired"));
@@ -261,8 +261,8 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
     importConfig.setUnit(functionalUnit.getName());
     importConfig.setCharacterSet(getView().getCsvOptions().getCharsetText().getText());
     importConfig.setRow(Integer.parseInt(getView().getCsvOptions().getRowText().getText()));
-    importConfig.setQuote(getView().getCsvOptions().getQuote());
-    importConfig.setField(getView().getCsvOptions().getFieldSeparator());
+    importConfig.setQuote(getView().getCsvOptions().getQuote().getText());
+    importConfig.setField(getView().getCsvOptions().getFieldSeparator().getText());
   }
 
   private void importIdentifiers() {

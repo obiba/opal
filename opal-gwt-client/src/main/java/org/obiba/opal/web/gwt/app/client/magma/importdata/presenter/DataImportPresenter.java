@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.importdata.presenter;
 
+import java.util.Map;
+
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseResources;
@@ -36,6 +38,8 @@ import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.opal.ImportCommandOptionsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.github.gwtbootstrap.client.ui.base.HasType;
+import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -78,8 +82,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   private final NoFormatStepPresenter noFormatStepPresenter;
 
-  private final DestinationSelectionStepPresenter destinationSelectionStepPresenter;
-
   private final UnitSelectionStepPresenter unitSelectionStepPresenter;
 
   private final ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter;
@@ -92,6 +94,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   private ImportConfig importConfig;
 
+  private String destination;
+
   @Inject
   @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
   public DataImportPresenter(Display display, EventBus eventBus, //
@@ -100,7 +104,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       SpssFormatStepPresenter spssFormatStepPresenter,//
       RestStepPresenter restStepPresenter,//
       NoFormatStepPresenter noFormatStepPresenter,//
-      DestinationSelectionStepPresenter destinationSelectionStepPresenter,
       UnitSelectionStepPresenter unitSelectionStepPresenter, //
       ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter,
       ArchiveStepPresenter archiveStepPresenter, //
@@ -113,7 +116,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     this.jdbcStepPresenter = jdbcStepPresenter;
     this.restStepPresenter = restStepPresenter;
     this.noFormatStepPresenter = noFormatStepPresenter;
-    this.destinationSelectionStepPresenter = destinationSelectionStepPresenter;
     this.unitSelectionStepPresenter = unitSelectionStepPresenter;
     this.comparedDatasourcesReportPresenter = comparedDatasourcesReportPresenter;
     this.archiveStepPresenter = archiveStepPresenter;
@@ -133,7 +135,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
     comparedDatasourcesReportPresenter.allowIgnoreAllModifications(false);
 
-    setInSlot(Display.Slots.Destination, destinationSelectionStepPresenter);
     setInSlot(Display.Slots.Unit, unitSelectionStepPresenter);
     setInSlot(Display.Slots.Values, datasourceValuesStepPresenter);
     setInSlot(Display.Slots.Archive, archiveStepPresenter);
@@ -194,8 +195,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   public interface ImportDataInputsHandler {
     boolean validateFormat();
 
-    boolean validateDestination();
-
     boolean validateComparedDatasourcesReport();
   }
 
@@ -219,17 +218,16 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   @Override
   public void onReveal() {
-    destinationSelectionStepPresenter.refreshDisplay(); // to refresh the datasources
     updateFormatStepDisplay();
   }
 
   @Override
   public void onWizardRequired(WizardRequiredEvent event) {
-    destinationSelectionStepPresenter.setDestination(null);
     if(event.getEventParameters().length != 0) {
       if(event.getEventParameters()[0] instanceof String) {
         String datasourceName = (String) event.getEventParameters()[0];
-        destinationSelectionStepPresenter.setDestination(datasourceName);
+        destination = datasourceName;
+        csvFormatStepPresenter.setDestination(datasourceName);
       }
     }
   }
@@ -249,7 +247,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   @SuppressWarnings({ "PMD.NcssMethodCount", "OverlyLongMethod" })
   private void updateFormatStepDisplay() {
-    destinationSelectionStepPresenter.setImportFormat(getView().getImportFormat());
     getView().updateHelp();
     switch(getView().getImportFormat()) {
       case CSV:
@@ -375,22 +372,16 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   private final class ImportDataInputsHandlerImpl implements ImportDataInputsHandler {
     @Override
     public boolean validateFormat() {
+      getView().clearError();
       if(formatStepPresenter.validate()) {
-        if(getView().getImportFormat() == ImportFormat.CSV) {
-          String name = csvFormatStepPresenter.getSelectedFile();
-          name = name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
-          destinationSelectionStepPresenter.getView().setTable(name);
-        } else {
-          destinationSelectionStepPresenter.getView().setTable("");
-        }
         return true;
+      } else {
+        for (Map.Entry<HasType<ControlGroupType>, String> entry : csvFormatStepPresenter.getErrors().entrySet()) {
+          getView().showError(entry.getValue(), entry.getKey());
+        }
       }
-      return false;
-    }
 
-    @Override
-    public boolean validateDestination() {
-      return destinationSelectionStepPresenter.validate();
+      return false;
     }
 
     @Override
@@ -421,7 +412,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     @Override
     public void onStepIn() {
       importConfig = formatStepPresenter.getImportConfig();
-      destinationSelectionStepPresenter.updateImportConfig(importConfig);
+      importConfig.setDestinationDatasourceName(destination);
       unitSelectionStepPresenter.setEntityType(importConfig.getEntityType());
     }
   }
@@ -443,7 +434,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       comparedDatasourcesReportPresenter.getView().clearDisplay();
       removeTransientDatasource();
       importConfig = formatStepPresenter.getImportConfig();
-      destinationSelectionStepPresenter.updateImportConfig(importConfig);
+      importConfig.setDestinationDatasourceName(destination);
       unitSelectionStepPresenter.updateImportConfig(importConfig);
       createTransientDatasource();
     }
@@ -571,6 +562,10 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     void setFormatStepDisplay(WizardStepDisplay display);
 
     void removeFormat(ImportFormat format);
+
+    void showError(String errorMessage, HasType<ControlGroupType> errorType);
+
+    void clearError();
   }
 
   public interface DataConfigFormatStepPresenter {

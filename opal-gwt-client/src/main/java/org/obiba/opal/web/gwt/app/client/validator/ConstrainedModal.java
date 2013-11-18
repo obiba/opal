@@ -13,8 +13,8 @@ import org.obiba.opal.web.model.client.ws.ConstraintViolationErrorDto;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
-import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
-import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
+import com.github.gwtbootstrap.client.ui.event.CloseEvent;
+import com.github.gwtbootstrap.client.ui.event.CloseHandler;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
@@ -100,9 +100,9 @@ public class ConstrainedModal {
           final ControlGroup group = constrainedWidget.getGroup();
           if(group != null) group.setType(ControlGroupType.ERROR);
           modal.addAlert(constrainedWidget.getPropertyLabel() + " " +
-              validationMessageResolver.get(messageTemplate), AlertType.ERROR, new ClosedHandler() {
+              validationMessageResolver.get(messageTemplate), AlertType.ERROR, new CloseHandler() {
             @Override
-            public void onClosed(ClosedEvent closedEvent) {
+            public void onClose(CloseEvent closeEvent) {
               if(group != null) group.setType(ControlGroupType.NONE);
             }
           });
