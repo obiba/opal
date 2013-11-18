@@ -31,12 +31,14 @@ public class DatabasesResource {
 
   @GET
   @Path("/sql")
+  @NoAuthorization
   public List<DatabaseDto> getSqlDatabases() {
     return asDto(databaseRegistry.listSqlDatabases());
   }
 
   @GET
   @Path("/mongodb")
+  @NoAuthorization
   public List<DatabaseDto> getMongoDbDatabases() {
     return asDto(databaseRegistry.listMongoDatabases());
   }
@@ -49,6 +51,20 @@ public class DatabasesResource {
   }
 
   @GET
+  @Path("/import")
+  @NoAuthorization
+  public List<DatabaseDto> getImportDatabases() {
+    return asDto(databaseRegistry.list(Database.Usage.IMPORT));
+  }
+
+  @GET
+  @Path("/export")
+  @NoAuthorization
+  public List<DatabaseDto> getExportDatabases() {
+    return asDto(databaseRegistry.list(Database.Usage.EXPORT));
+  }
+
+  @GET
   @Path("/identifiers")
   public DatabaseDto getIdentifiersDatabase() {
     return Dtos.asDto(databaseRegistry.getIdentifiersDatabase());
@@ -57,7 +73,7 @@ public class DatabasesResource {
   private List<DatabaseDto> asDto(Iterable<? extends Database> databases) {
     List<DatabaseDto> dtos = new ArrayList<DatabaseDto>();
     for(Database database : databases) {
-      dtos.add(Dtos.asDto(database));
+      dtos.add(Dtos.asDto(database, false));
     }
     return dtos;
   }

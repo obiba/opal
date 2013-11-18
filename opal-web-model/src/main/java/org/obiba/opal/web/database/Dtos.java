@@ -77,6 +77,10 @@ public class Dtos {
   }
 
   public static DatabaseDto asDto(Database db) {
+    return asDto(db, true);
+  }
+
+  public static DatabaseDto asDto(Database db, boolean withSettings) {
     DatabaseDto.Builder builder = DatabaseDto.newBuilder();
     builder.setName(db.getName());
     if(!Strings.isNullOrEmpty(db.getDescription())) builder.setDescription(db.getDescription());
@@ -85,15 +89,17 @@ public class Dtos {
     builder.setUsedForIdentifiers(db.isUsedForIdentifiers());
     builder.setUsage(DatabaseDto.Usage.valueOf(db.getUsage().name()));
 
-    SqlSettings sqlSettings = db.getSqlSettings();
-    if(sqlSettings != null) {
-      return builder.setSqlSettings(asDto(sqlSettings)).build();
+    if(withSettings) {
+      SqlSettings sqlSettings = db.getSqlSettings();
+      if(sqlSettings != null) {
+        builder.setSqlSettings(asDto(sqlSettings));
+      }
+      MongoDbSettings mongoDbSettings = db.getMongoDbSettings();
+      if(mongoDbSettings != null) {
+        builder.setMongoDbSettings(asDto(mongoDbSettings));
+      }
     }
-    MongoDbSettings mongoDbSettings = db.getMongoDbSettings();
-    if(mongoDbSettings != null) {
-      return builder.setMongoDbSettings(asDto(mongoDbSettings)).build();
-    }
-    throw new IllegalArgumentException("Unsupported database class " + db.getClass());
+    return builder.build();
   }
 
   private static SqlSettingsDto.Builder asDto(SqlSettings db) {
@@ -102,7 +108,7 @@ public class Dtos {
         .setSqlSchema(SqlSettingsDto.SqlSchema.valueOf(db.getSqlSchema().name())) //
         .setUrl(db.getUrl()) //
         .setUsername(db.getUsername());
-    if(!Strings.isNullOrEmpty(db.getPassword())) builder.setPassword(db.getPassword());
+
     if(!Strings.isNullOrEmpty(db.getProperties())) builder.setProperties(db.getProperties());
     switch(db.getSqlSchema()) {
       case JDBC:
@@ -149,7 +155,6 @@ public class Dtos {
     MongoDbSettingsDto.Builder builder = MongoDbSettingsDto.newBuilder() //
         .setUrl(db.getUrl());
     if(!Strings.isNullOrEmpty(db.getUsername())) builder.setUsername(db.getUsername());
-    if(!Strings.isNullOrEmpty(db.getPassword())) builder.setPassword(db.getPassword());
     if(!Strings.isNullOrEmpty(db.getProperties())) builder.setProperties(db.getProperties());
     return builder;
   }
