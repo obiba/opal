@@ -136,6 +136,7 @@ enum AclAction {
   REPORT_TEMPLATE_ALL = 21;
   REPORT_TEMPLATE_READ = 22;
   PROJECT_ALL = 23;
+  TABLE_VALUES_EDIT = 24;
 }
 
 message OpalMap {

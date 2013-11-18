@@ -916,6 +916,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         authz.setAclRequest("table", new AclRequest(AclAction.TABLE_READ, node), //
             new AclRequest(AclAction.TABLE_VALUES, node), //
             new AclRequest(AclAction.TABLE_EDIT, node),//
+            new AclRequest(AclAction.TABLE_VALUES_EDIT, node),//
             new AclRequest(AclAction.TABLE_ALL, node));
       }
       setInSlot(Display.Slots.Permissions, authz);

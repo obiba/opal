@@ -139,18 +139,24 @@ public interface Translations extends Constants {
 
   @Description("Permission map")
   @DefaultStringMapValue({ //
+      "PROJECT_ALL", "Administrate", //
+
       "DATASOURCE_ALL", "Administrate", //
       "CREATE_TABLE", "Add Table", //
       "CREATE_VIEW", "Add View", //
+
       "TABLE_ALL", "Administrate", //
-      "TABLE_READ", "View variables and summaries", //
-      "TABLE_VALUES", "View values", //
-      "TABLE_EDIT", "Edit variables", //
+      "TABLE_READ", "View dictionary and summaries", //
+      "TABLE_VALUES", "View dictionary and values", //
+      "TABLE_EDIT", "Edit dictionary and view summaries", //
+      "TABLE_VALUES_EDIT", "Edit dictionary and view values", //
+
       "VIEW_ALL", "Administrate", //
-      "VIEW_READ", "View variables and summaries", //
-      "VIEW_VALUES", "View values", //
-      "VIEW_EDIT", "Edit with summaries", //
-      "VIEW_VALUES_EDIT", "Edit with values", //
+      "VIEW_READ", "View dictionary and summaries", //
+      "VIEW_VALUES", "View dictionary and values", //
+      "VIEW_EDIT", "Edit dictionary and view summaries", //
+      "VIEW_VALUES_EDIT", "Edit dictionary and view values", //
+
       "VARIABLE_READ", "View with summary", //
       "DATABASES_ALL", "Administrate", //
       "R_SESSION_ALL", "Use", //

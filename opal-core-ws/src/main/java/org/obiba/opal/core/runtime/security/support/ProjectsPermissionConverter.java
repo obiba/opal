@@ -163,6 +163,16 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
       }
 
     },
+    TABLE_VALUES_EDIT {
+      @Override
+      public Iterable<String> convert(String node) {
+        List<String> perms = Lists.newArrayList();
+        Iterables.addAll(perms, TABLE_VALUES.convert(node));
+        Iterables.addAll(perms, TABLE_EDIT.convert(node));
+        return perms;
+      }
+
+    },
     VIEW_ALL {
       @Override
       public Iterable<String> convert(String node) {
