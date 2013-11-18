@@ -29,12 +29,24 @@ public class ProjectsPermissionConverterTest
   }
 
   @Test
+  public void testProjectAll() {
+    testConversion("/project/patate", ProjectsPermissionConverter.Permission.PROJECT_ALL, //
+        "magma:/datasource/patate:*:GET/*", //
+        "magma:/functional-units/unit:GET:GET/GET", //
+        "magma:/functional-units/entities/table:GET",//
+        "magma:/project/patate:*:GET/*",//
+        "magma:/files/projects/patate:GET:GET/*",//
+        "magma:/files/projects/patate:POST:GET/*",//
+        "magma:/files/projects/patate:PUT:GET/*");
+  }
+
+  @Test
   public void testDatasourceAll() {
     testConversion("/datasource/patate", ProjectsPermissionConverter.Permission.DATASOURCE_ALL, //
         "magma:/datasource/patate:*:GET/*", //
         "magma:/functional-units/unit:GET:GET/GET", //
         "magma:/functional-units/entities/table:GET",//
-        "magma:/project/patate:*:GET/*",//
+        "magma:/project/patate:GET:GET/*",//
         "magma:/files/projects/patate:GET:GET/*",//
         "magma:/files/projects/patate:POST:GET/*",//
         "magma:/files/projects/patate:PUT:GET/*");

@@ -23,11 +23,15 @@ import org.obiba.magma.DuplicateDatasourceNameException;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.support.DatasourceParsingException;
+import org.obiba.opal.core.runtime.security.support.OpalPermissions;
 import org.obiba.opal.project.ProjectService;
 import org.obiba.opal.project.domain.Project;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.support.NoSuchDatasourceFactoryException;
+import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Projects;
+import org.obiba.opal.web.security.AuthorizationInterceptor;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,6 +41,7 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
 @Path("/projects")
+@NoAuthorization
 public class ProjectsResource {
 
   @Autowired
@@ -63,8 +68,9 @@ public class ProjectsResource {
       Project project = Dtos.fromDto(projectFactoryDto);
       projectService.save(project);
       URI projectUri = uriInfo.getBaseUriBuilder().path("project").path(project.getName()).build();
-      Projects.ProjectDto projectDto = Dtos.asDto(project, projectService.getProjectDirectoryPath(project));
-      response = Response.created(projectUri).entity(projectDto);
+      //Projects.ProjectDto projectDto = Dtos.asDto(project, projectService.getProjectDirectoryPath(project));
+      response = Response.created(projectUri).header(AuthorizationInterceptor.ALT_PERMISSIONS,
+          new OpalPermissions(projectUri, Opal.AclAction.PROJECT_ALL));
 
     } catch(NoSuchDatasourceFactoryException e) {
       response = Response.status(BAD_REQUEST)

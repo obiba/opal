@@ -92,11 +92,16 @@ public class ProjectPropertiesModalPresenter
             @Override
             public void onResponseCode(Request request, Response response) {
               getView().hideDialog();
-              ProjectDto projectDto = JsonUtils.unsafeEval(response.getText());
-              getEventBus().fireEvent(new ProjectCreatedEvent(projectDto));
+              fireEvent(new ProjectCreatedEvent());
             }
           }) //
-          .withCallback(Response.SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
+          .withCallback(Response.SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget()) {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              getView().setBusy(false);
+              super.onResponseCode(request, response);
+            }
+          }) //
           .post().send();
     }
   }
@@ -109,10 +114,17 @@ public class ProjectPropertiesModalPresenter
           @Override
           public void onResponseCode(Request request, Response response) {
             getView().hideDialog();
-            getEventBus().fireEvent(new ProjectUpdatedEvent(project));
+            fireEvent(new ProjectUpdatedEvent(project));
           }
         }) //
-        .withCallback(Response.SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
+        .withCallback(Response.SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget()) {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().setBusy(false);
+            super.onResponseCode(request,
+                response);
+          }
+        }) //
         .put().send();
   }
 
@@ -162,6 +174,7 @@ public class ProjectPropertiesModalPresenter
 
     @Override
     protected void showMessage(String id, String message) {
+      getView().setBusy(false);
       getView().showError(Display.FormField.valueOf(id), message);
     }
 

@@ -12,6 +12,7 @@ import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.database.MultipleIdentifiersDatabaseException;
 import org.obiba.opal.web.database.Dtos;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -42,6 +43,7 @@ public class DatabasesResource {
 
   @GET
   @Path("/storage")
+  @NoAuthorization
   public List<DatabaseDto> getStorageDatabases() {
     return asDto(databaseRegistry.list(Database.Usage.STORAGE));
   }

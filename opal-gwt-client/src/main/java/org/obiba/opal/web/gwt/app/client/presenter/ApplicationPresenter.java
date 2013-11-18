@@ -181,10 +181,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
   }
 
   private void authorize() {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/datasources").get()
-        .authorize(getView().getProjectsAutorizer()).send();
-
-    getEventBus().fireEvent(new RequestAdministrationPermissionEvent(new HasAuthorization() {
+    fireEvent(new RequestAdministrationPermissionEvent(new HasAuthorization() {
 
       @Override
       public void unauthorized() {
@@ -245,7 +242,7 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   @Override
   public void onQuit() {
-    getEventBus().fireEvent(new SessionEndedEvent());
+    fireEvent(new SessionEndedEvent());
   }
 
   @Override
@@ -275,8 +272,6 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     void setUsername(String username);
 
     void setVersion(String version);
-
-    HasAuthorization getProjectsAutorizer();
 
     void addSearchItem(String text, VariableSearchListItem.ItemType type);
 

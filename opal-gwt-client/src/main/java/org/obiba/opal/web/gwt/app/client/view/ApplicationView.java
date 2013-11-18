@@ -148,11 +148,6 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
   }
 
   @Override
-  public HasAuthorization getProjectsAutorizer() {
-    return new UIObjectAuthorizer(projectsItem);
-  }
-
-  @Override
   public void addSearchItem(String text, VariableSearchListItem.ItemType type) {
     String qText = quoteIfContainsSpace(text);
     if(VariableSearchListItem.ItemType.DATASOURCE.equals(type)) {

@@ -39,6 +39,21 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
   }
 
   enum Permission {
+    PROJECT_ALL {
+      @Override
+      public Iterable<String> convert(String node) {
+        String[] args = args(node, "/project/(.+)");
+        return Lists.newArrayList(magmaConvert("/datasource/{0}", "*:GET/*", args), //
+            magmaConvert("/functional-units/unit", "GET:GET/GET"), //
+            magmaConvert("/functional-units/entities/table", "GET"),//
+            magmaConvert("/project/{0}", "*:GET/*", args),//
+            magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
+            magmaConvert("/files/projects/{0}", "POST:GET/*", args), //
+            magmaConvert("/files/projects/{0}", "PUT:GET/*", args));
+      }
+
+    },
+
     DATASOURCE_ALL {
       @Override
       public Iterable<String> convert(String node) {
@@ -46,7 +61,7 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
         return Lists.newArrayList(magmaConvert("/datasource/{0}", "*:GET/*", args), //
             magmaConvert("/functional-units/unit", "GET:GET/GET"), //
             magmaConvert("/functional-units/entities/table", "GET"),//
-            magmaConvert("/project/{0}", "*:GET/*", args),//
+            magmaConvert("/project/{0}", "GET:GET/*", args),//
             magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
             magmaConvert("/files/projects/{0}", "POST:GET/*", args), //
             magmaConvert("/files/projects/{0}", "PUT:GET/*", args));

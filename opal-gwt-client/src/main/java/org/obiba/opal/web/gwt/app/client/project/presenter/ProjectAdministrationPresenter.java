@@ -128,32 +128,6 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     }
   }
 
-  private class CreateOrUpdateCallBack implements ResponseCodeCallback {
-
-    private final ProjectDto dto;
-
-    private CreateOrUpdateCallBack(ProjectDto dto) {
-      this.dto = dto;
-    }
-
-    @Override
-    public void onResponseCode(Request request, Response response) {
-      Event<?> event = null;
-      switch(response.getStatusCode()) {
-        case SC_OK:
-          event = new ProjectUpdatedEvent(dto);
-          break;
-        case SC_CREATED:
-          event = new ProjectCreatedEvent(dto);
-          break;
-        default:
-          //TODO supports DatabaseAlreadyExists
-          event = NotificationEvent.newBuilder().error(response.getText()).build();
-      }
-      getEventBus().fireEvent(event);
-    }
-  }
-
   public interface Display extends View, HasUiHandlers<ProjectAdministrationUiHandlers> {
 
     void setProject(ProjectDto project);

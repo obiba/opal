@@ -100,16 +100,6 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   }
 
   @Override
-  public HasAuthorization getDatasourcesAuthorizer() {
-    return new WidgetAuthorizer(datasources);
-  }
-
-  @Override
-  public HasAuthorization getFilesAuthorizer() {
-    return new WidgetAuthorizer(files);
-  }
-
-  @Override
   public HasAuthorization getReportsAuthorizer() {
     return new WidgetAuthorizer(reports);
   }
