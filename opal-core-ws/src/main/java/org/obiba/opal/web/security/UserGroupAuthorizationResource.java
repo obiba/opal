@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.security;
 
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -47,7 +47,7 @@ public class UserGroupAuthorizationResource {
 
     SubjectAclService.Subject aclSubject = type.subjectFor(subject);
 
-    Set<SubjectAclService.Permissions> permissions = new HashSet<SubjectAclService.Permissions>();
+    Collection<SubjectAclService.Permissions> permissions = new HashSet<SubjectAclService.Permissions>();
     for(SubjectAclService.Permissions p : subjectAclService.getSubjectPermissions(aclSubject)) {
       if(p.getDomain().equals(domain)) {
         permissions.add(p);
