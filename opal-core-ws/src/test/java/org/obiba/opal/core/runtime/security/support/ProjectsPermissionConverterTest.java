@@ -32,7 +32,6 @@ public class ProjectsPermissionConverterTest
   public void testDatasourceAll() {
     testConversion("/datasource/patate", ProjectsPermissionConverter.Permission.DATASOURCE_ALL, //
         "magma:/datasource/patate:*:GET/*", //
-        "magma:/project/patate/commands:*:GET/*", //
         "magma:/functional-units/unit:GET:GET/GET", //
         "magma:/functional-units/entities/table:GET",//
         "magma:/project/patate:*:GET/*",//
