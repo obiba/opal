@@ -53,7 +53,7 @@ import com.google.common.collect.Iterables;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
-@Component
+@Component("tableResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Transactional
 public class TableResourceImpl extends AbstractValueTableResource implements TableResource {

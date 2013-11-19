@@ -36,7 +36,7 @@ public class OpalRSessionParentResource {
 
   @Path("/{id}")
   public OpalRSessionResource getOpalRSessionResource(@PathParam("id") String id) {
-    OpalRSessionResource resource = applicationContext.getBean(OpalRSessionResource.class);
+    OpalRSessionResource resource = applicationContext.getBean("opalRSessionResource", OpalRSessionResource.class);
     resource.setOpalRSession(opalRSessionManager.getSubjectRSession(id));
     return resource;
   }
@@ -46,7 +46,7 @@ public class OpalRSessionParentResource {
     if(!opalRSessionManager.hasSubjectCurrentRSession()) {
       opalRSessionManager.newSubjectCurrentRSession();
     }
-    OpalRSessionResource resource = applicationContext.getBean(OpalRSessionResource.class);
+    OpalRSessionResource resource = applicationContext.getBean("opalRSessionResource", OpalRSessionResource.class);
     resource.setOpalRSession(opalRSessionManager.getSubjectCurrentRSession());
     return resource;
   }

@@ -87,7 +87,7 @@ public class ViewResourceImpl extends AbstractValueTableResource implements View
   @Bean
   @Scope("request")
   public TableResource getFrom() {
-    TableResource resource = applicationContext.getBean(TableResource.class);
+    TableResource resource = applicationContext.getBean("tableResource", TableResource.class);
     resource.setValueTable(asView().getWrappedValueTable());
     resource.setLocales(getLocales());
     return resource;

@@ -164,8 +164,9 @@ public class DatasourceResource {
   }
 
   public TableResource getTableResource(ValueTable table) {
-    TableResource resource = applicationContext
-        .getBean(getDatasource().canDropTable(table.getName()) ? DroppableTableResource.class : TableResource.class);
+    TableResource resource = getDatasource().canDropTable(table.getName())
+        ? applicationContext.getBean("droppableTableResource", DroppableTableResource.class)
+        : applicationContext.getBean("tableResource", TableResource.class);
     resource.setValueTable(table);
     resource.setLocales(getLocales());
     return resource;

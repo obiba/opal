@@ -23,7 +23,6 @@ import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.obiba.opal.web.model.DataShield.DataShieldConfigDto;
-import org.obiba.opal.web.r.OpalRSessionResource;
 import org.obiba.opal.web.r.OpalRSessionsResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -53,19 +52,21 @@ public class DataShieldResource {
   }
 
   @Path("/session/{id}")
-  public OpalRSessionResource getSession(@PathParam("id") String id) {
-    OpalDataShieldSessionResource resource = applicationContext.getBean(OpalDataShieldSessionResource.class);
+  public OpalDataShieldSessionResource getSession(@PathParam("id") String id) {
+    OpalDataShieldSessionResource resource = applicationContext
+        .getBean("opalDataShieldSessionResource", OpalDataShieldSessionResource.class);
     resource.setOpalRSession(opalRSessionManager.getSubjectRSession(id));
     return resource;
   }
 
   @Path("/session/current")
-  public OpalRSessionResource getCurrentSession() {
+  public OpalDataShieldSessionResource getCurrentSession() {
     if(!opalRSessionManager.hasSubjectCurrentRSession()) {
       OpalRSession session = opalRSessionManager.newSubjectCurrentRSession();
       onNewDataShieldSession(session);
     }
-    OpalDataShieldSessionResource resource = applicationContext.getBean(OpalDataShieldSessionResource.class);
+    OpalDataShieldSessionResource resource = applicationContext
+        .getBean("opalDataShieldSessionResource", OpalDataShieldSessionResource.class);
     resource.setOpalRSession(opalRSessionManager.getSubjectCurrentRSession());
     return resource;
   }

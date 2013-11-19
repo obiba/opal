@@ -30,7 +30,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Component
+@Component("opalDataShieldSessionResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Transactional
 public class OpalDataShieldSessionResourceImpl extends OpalRSessionResourceImpl
@@ -68,7 +68,8 @@ public class OpalDataShieldSessionResourceImpl extends OpalRSessionResourceImpl
 
   @Override
   protected RSymbolResource onGetRSymbolResource(String name) {
-    DataShieldSymbolResource resource = applicationContext.getBean(DataShieldSymbolResource.class);
+    DataShieldSymbolResource resource = applicationContext
+        .getBean("dataShieldSymbolResource", DataShieldSymbolResource.class);
     resource.setName(name);
     resource.setOpalRSession(getOpalRSession());
     return resource;

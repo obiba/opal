@@ -28,7 +28,7 @@ import com.google.common.base.Strings;
 /**
  * Handles web services on a particular R session of the invoking Opal user.
  */
-@Component
+@Component("opalRSessionResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Transactional
 public class OpalRSessionResourceImpl extends AbstractOpalRSessionResource implements OpalRSessionResource {
@@ -65,11 +65,11 @@ public class OpalRSessionResourceImpl extends AbstractOpalRSessionResource imple
 
   @Override
   public Response execute(String script, String body) {
-    String rscript = script;
-    if(Strings.isNullOrEmpty(rscript)) {
-      rscript = body;
+    String rScript = script;
+    if(Strings.isNullOrEmpty(rScript)) {
+      rScript = body;
     }
-    return executeScript(rSession, rscript);
+    return executeScript(rSession, rScript);
   }
 
   @Override
@@ -89,7 +89,8 @@ public class OpalRSessionResourceImpl extends AbstractOpalRSessionResource imple
   }
 
   protected RSymbolResource onGetRSymbolResource(String name) {
-    SecuredRSymbolResource resource = applicationContext.getBean(SecuredRSymbolResource.class);
+    SecuredRSymbolResource resource = applicationContext
+        .getBean("securedRSymbolResource", SecuredRSymbolResource.class);
     resource.setName(name);
     resource.setOpalRSession(rSession);
     return resource;

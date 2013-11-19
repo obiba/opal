@@ -230,7 +230,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   @Path("/entities/table")
   public TableResource getEntitiesTable() {
-    TableResource tableResource = applicationContext.getBean(TableResource.class);
+    TableResource tableResource = applicationContext.getBean("tableResource", TableResource.class);
     tableResource.setValueTable(identifiersTableService.getValueTable());
     return tableResource;
   }

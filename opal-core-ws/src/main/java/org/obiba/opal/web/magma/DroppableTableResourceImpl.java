@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * A table resource that supports DELETE (drop)
  */
-@Component
+@Component("droppableTableResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Transactional
 public class DroppableTableResourceImpl extends TableResourceImpl implements DroppableTableResource {

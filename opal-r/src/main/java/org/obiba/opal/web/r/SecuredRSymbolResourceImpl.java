@@ -27,10 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.ImmutableSet;
 
-@Component
+@Component("securedRSymbolResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Transactional
-public class SecuredRSymbolResourceImpl extends RSymbolResourceImpl implements SecuredRSymbolResource {
+public class SecuredRSymbolResourceImpl extends AbstractRSymbolResourceImpl implements SecuredRSymbolResource {
 
   @Override
   public Response putMagma(UriInfo uri, String path, String variableFilter, Boolean missings) {
@@ -61,7 +61,6 @@ public class SecuredRSymbolResourceImpl extends RSymbolResourceImpl implements S
       throw new MagmaRRuntimeException("Datasource is not defined in path: " + path);
     }
     Datasource ds = MagmaEngine.get().getDatasource(resolver.getDatasourceName());
-
     return ds.getValueTable(resolver.getTableName());
   }
 

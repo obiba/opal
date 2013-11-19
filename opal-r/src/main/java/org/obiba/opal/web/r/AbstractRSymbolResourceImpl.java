@@ -18,19 +18,12 @@ import org.obiba.opal.r.MagmaAssignROperation;
 import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.StringAssignROperation;
 import org.obiba.opal.r.service.OpalRSession;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Handles web services on the symbols of the current R session of the invoking Opal user. A current R session must be
  * defined, otherwise the web service calls will fail with a 404 status.
  */
-@Component
-@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-@Transactional
-public abstract class RSymbolResourceImpl extends AbstractOpalRSessionResource implements RSymbolResource {
+public abstract class AbstractRSymbolResourceImpl extends AbstractOpalRSessionResource implements RSymbolResource {
 
   private String name;
 

@@ -18,7 +18,7 @@ import org.obiba.opal.datashield.DataShieldLog;
 import org.obiba.opal.datashield.RestrictedAssignmentROperation;
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration;
 import org.obiba.opal.datashield.expr.ParseException;
-import org.obiba.opal.web.r.RSymbolResourceImpl;
+import org.obiba.opal.web.r.AbstractRSymbolResourceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -27,10 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Supplier;
 
-@Component
+@Component("dataShieldSymbolResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Transactional
-public class DataShieldSymbolResourceImpl extends RSymbolResourceImpl implements DataShieldSymbolResource {
+public class DataShieldSymbolResourceImpl extends AbstractRSymbolResourceImpl implements DataShieldSymbolResource {
 
   @Autowired
   private Supplier<DatashieldConfiguration> configSupplier;

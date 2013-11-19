@@ -66,7 +66,7 @@ public class ViewResourceTest {
     expect(fromTableMock.getName()).andReturn("fromTable").atLeastOnce();
 
     ApplicationContext mockContext = createMock(ApplicationContext.class);
-    expect(mockContext.getBean(TableResource.class)).andReturn(new TableResourceImpl()).atLeastOnce();
+    expect(mockContext.getBean("tableResource", TableResource.class)).andReturn(new TableResourceImpl()).atLeastOnce();
 
     ValueTable view = new View("testView", fromTableMock);
     ViewResourceImpl viewResource = new ViewResourceImpl();
