@@ -28,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-@SuppressWarnings({ "OverlyLongMethod", "ReuseOfLocalVariable" })
+@SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount", "ReuseOfLocalVariable" })
 public class IndexManagerConfigurationTest {
 
   @Before

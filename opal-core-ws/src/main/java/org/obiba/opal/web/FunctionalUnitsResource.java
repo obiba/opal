@@ -55,7 +55,6 @@ import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.UnitKeyStoreService;
-import org.obiba.opal.core.service.VariableStatsService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers.UnitIdentifier;
@@ -69,6 +68,7 @@ import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.FunctionalUnitDto;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -83,10 +83,10 @@ import au.com.bytecode.opencsv.CSVReader;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
-@SuppressWarnings("OverlyCoupledClass")
 @Component
 @Transactional
 @Path("/functional-units")
+@SuppressWarnings("OverlyCoupledClass")
 public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
 //  private static final Logger log = LoggerFactory.getLogger(FunctionalUnitsResource.class);
@@ -103,7 +103,8 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   private IdentifiersTableService identifiersTableService;
 
-  private VariableStatsService variableStatsService;
+  @Autowired
+  private ApplicationContext applicationContext;
 
   @Autowired
   public void setDatasourceFactoryRegistry(DatasourceFactoryRegistry datasourceFactoryRegistry) {
@@ -133,11 +134,6 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
   @Autowired
   public void setUnitKeyStoreService(UnitKeyStoreService unitKeyStoreService) {
     this.unitKeyStoreService = unitKeyStoreService;
-  }
-
-  @Autowired
-  public void setVariableStatsService(VariableStatsService variableStatsService) {
-    this.variableStatsService = variableStatsService;
   }
 
   @GET
@@ -234,7 +230,9 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   @Path("/entities/table")
   public TableResource getEntitiesTable() {
-    return new TableResource(identifiersTableService.getValueTable(), importService, variableStatsService);
+    TableResource tableResource = applicationContext.getBean(TableResource.class);
+    tableResource.setValueTable(identifiersTableService.getValueTable());
+    return tableResource;
   }
 
   @GET
@@ -247,10 +245,10 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
       ByteArrayOutputStream ids = new ByteArrayOutputStream();
       PrintWriter writer = new PrintWriter(ids);
-      List<Iterator<UnitIdentifier>> unitIdIters = writeIdentifiersHeader(writer);
+      List<Iterator<UnitIdentifier>> iteratorList = writeIdentifiersHeader(writer);
       // value sets
-      if(unitIdIters.size() > 0) {
-        writeUnitIdentifiers(writer, unitIdIters);
+      if(iteratorList.size() > 0) {
+        writeUnitIdentifiers(writer, iteratorList);
       } else {
         writeOpalIdentifiers(writer);
       }
@@ -284,8 +282,8 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
     while(unitIdIters.get(0).hasNext()) {
       // opal and unit identifiers
       boolean opalIdWritten = false;
-      for(Iterator<UnitIdentifier> unitIdsIter : unitIdIters) {
-        UnitIdentifier unitIdentifier = unitIdsIter.next();
+      for(Iterator<UnitIdentifier> it : unitIdIters) {
+        UnitIdentifier unitIdentifier = it.next();
         if(!opalIdWritten) {
           writer.append('\"').append(unitIdentifier.getOpalIdentifier()).append('\"');
           opalIdWritten = true;

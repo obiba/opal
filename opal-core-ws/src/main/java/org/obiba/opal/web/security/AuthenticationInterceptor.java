@@ -19,7 +19,6 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.session.Session;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
@@ -30,9 +29,6 @@ import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
 import org.obiba.opal.web.ws.intercept.RequestCyclePreProcess;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -42,15 +38,7 @@ import org.springframework.stereotype.Component;
 public class AuthenticationInterceptor extends AbstractSecurityComponent
     implements RequestCyclePreProcess, RequestCyclePostProcess {
 
-  @SuppressWarnings("unused")
-  private static final Logger log = LoggerFactory.getLogger(AuthenticationInterceptor.class);
-
   private static final String OPAL_SESSION_ID_COOKIE_NAME = "opalsid";
-
-  @Autowired
-  public AuthenticationInterceptor(SessionsSecurityManager securityManager) {
-    super(securityManager);
-  }
 
   @Nullable
   @Override

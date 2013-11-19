@@ -19,6 +19,8 @@ import org.obiba.opal.web.model.OpalR;
  */
 public class Dtos {
 
+  private Dtos() {}
+
   public static OpalR.RSessionDto asDto(OpalRSession rSession) {
     UriBuilder ub = UriBuilder.fromPath("/").path(OpalRSessionParentResource.class)
         .path(OpalRSessionParentResource.class, "getOpalRSessionResource");

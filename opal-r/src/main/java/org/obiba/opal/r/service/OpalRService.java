@@ -19,7 +19,6 @@ import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -31,27 +30,20 @@ public class OpalRService implements Service, ROperationTemplate {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRService.class);
 
-  private final String host;
+  @Value("${org.obiba.opal.Rserve.host}")
+  private String host;
 
-  private final Integer port;
+  @Value("${org.obiba.opal.Rserve.port}")
+  private Integer port;
 
-  private final String username;
+  @Value("${org.obiba.opal.Rserve.username}")
+  private String username;
 
-  private final String password;
+  @Value("${org.obiba.opal.Rserve.password}")
+  private String password;
 
-  private final String encoding;
-
-  @Autowired
-  public OpalRService(@Value("${org.obiba.opal.Rserve.host}") String host,
-      @Value("${org.obiba.opal.Rserve.port}") Integer port, @Value("${org.obiba.opal.Rserve.username}") String username,
-      @Value("${org.obiba.opal.Rserve.password}") String password,
-      @Value("${org.obiba.opal.Rserve.encoding}") String encoding) {
-    this.host = host;
-    this.port = port;
-    this.username = username;
-    this.password = password;
-    this.encoding = encoding;
-  }
+  @Value("${org.obiba.opal.Rserve.encoding}")
+  private String encoding;
 
   /**
    * Creates a new connection to R server.

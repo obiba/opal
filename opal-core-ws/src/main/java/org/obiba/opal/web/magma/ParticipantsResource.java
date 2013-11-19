@@ -20,25 +20,19 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.opal.web.ws.security.NoAuthorization;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
 @Component
+@Transactional
 @Path("/participants")
 public class ParticipantsResource {
 
-  @SuppressWarnings("unused")
-  private static final Logger log = LoggerFactory.getLogger(ParticipantsResource.class);
-
   private static final String PARTICIPANT_ENTITY_TYPE = "Participant";
-
-  public ParticipantsResource() {
-  }
 
   @GET
   @Path("/count")

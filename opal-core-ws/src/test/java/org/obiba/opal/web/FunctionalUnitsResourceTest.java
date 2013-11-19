@@ -20,7 +20,6 @@ import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.UnitKeyStoreService;
-import org.obiba.opal.core.service.VariableStatsService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.obiba.opal.web.model.Opal;
@@ -65,7 +64,6 @@ public class FunctionalUnitsResourceTest {
     replay(opalRuntimeMock, functionalUnitServiceMock);
 
     ImportService importService = createMock(ImportService.class);
-    VariableStatsService variableStatsService = createMock(VariableStatsService.class);
 
     FunctionalUnitsResource functionalUnitsResource = new FunctionalUnitsResource();
     functionalUnitsResource.setFunctionalUnitService(functionalUnitServiceMock);
@@ -73,7 +71,6 @@ public class FunctionalUnitsResourceTest {
     functionalUnitsResource.setUnitKeyStoreService(unitKeyStoreServiceMock);
     functionalUnitsResource.setImportService(importService);
     functionalUnitsResource.setIdentifiersTableService(identifiersTableResolverMock);
-    functionalUnitsResource.setVariableStatsService(variableStatsService);
 
     List<Opal.FunctionalUnitDto> functionalUnitDtoList = functionalUnitsResource.getFunctionalUnits();
     Assert.assertTrue(functionalUnitDtoList.size() == 3);

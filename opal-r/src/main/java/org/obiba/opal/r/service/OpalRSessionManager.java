@@ -37,14 +37,10 @@ public class OpalRSessionManager implements SessionListener {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRSessionManager.class);
 
-  private final OpalRService opalRService;
+  @Autowired
+  private OpalRService opalRService;
 
   private final Map<String, SubjectRSessions> rSessionMap = new HashMap<String, SubjectRSessions>();
-
-  @Autowired
-  public OpalRSessionManager(OpalRService opalRService) {
-    this.opalRService = opalRService;
-  }
 
   @PreDestroy
   public void stop() {
@@ -261,7 +257,7 @@ public class OpalRSessionManager implements SessionListener {
     }
 
     public void removeRSessions() {
-      for (OpalRSession rSession : rSessions) {
+      for(OpalRSession rSession : rSessions) {
         try {
           rSession.close();
         } catch(Exception e) {

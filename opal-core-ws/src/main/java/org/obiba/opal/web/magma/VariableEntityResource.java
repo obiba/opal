@@ -15,11 +15,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.magma.support.VariableEntityBean;
-import org.obiba.opal.search.ValuesIndexManager;
-import org.obiba.opal.search.es.ElasticSearchProvider;
-import org.obiba.opal.search.service.OpalSearchService;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,31 +38,27 @@ public class VariableEntityResource {
   private String entityType;
 
   @Autowired
-  private OpalSearchService opalSearchService;
-
-  @Autowired
-  private ValuesIndexManager indexManager;
-
-  @Autowired
-  private ElasticSearchProvider esProvider;
+  private ApplicationContext applicationContext;
 
   @Path("/tables")
   public VariableEntityTablesResource getTables() {
-    return new VariableEntityTablesResource(getVariableEntity(), opalSearchService, indexManager, esProvider);
+    return getVariableEntityTablesResource();
   }
 
   @GET
   @NoAuthorization
   public Response exists() {
-
-    VariableEntityTablesResource var = new VariableEntityTablesResource(getVariableEntity(), opalSearchService,
-        indexManager, esProvider);
-
-    if(var.getTables(1).size() > 0) {
+    VariableEntityTablesResource resource = getVariableEntityTablesResource();
+    if(resource.getTables(1).size() > 0) {
       return Response.ok().entity(Dtos.asDto(getVariableEntity()).build()).build();
     }
-
     return Response.status(Response.Status.NOT_FOUND).build();
+  }
+
+  private VariableEntityTablesResource getVariableEntityTablesResource() {
+    VariableEntityTablesResource resource = applicationContext.getBean(VariableEntityTablesResource.class);
+    resource.setVariableEntity(getVariableEntity());
+    return resource;
   }
 
   private VariableEntityBean getVariableEntity() {

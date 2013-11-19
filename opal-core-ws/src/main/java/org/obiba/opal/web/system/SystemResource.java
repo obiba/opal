@@ -38,22 +38,17 @@ import static org.obiba.opal.web.model.Database.DatabasesStatusDto;
 @Path("/system")
 public class SystemResource {
 
-  private final VersionProvider opalVersionProvider;
-
-  private final OpalGeneralConfigService serverService;
-
-  private final TaxonomyService taxonomyService;
-
-  private final DatabaseRegistry databaseRegistry;
+  @Autowired
+  private VersionProvider opalVersionProvider;
 
   @Autowired
-  public SystemResource(VersionProvider opalVersionProvider, OpalGeneralConfigService serverService,
-      TaxonomyService taxonomyService, DatabaseRegistry databaseRegistry) {
-    this.opalVersionProvider = opalVersionProvider;
-    this.serverService = serverService;
-    this.taxonomyService = taxonomyService;
-    this.databaseRegistry = databaseRegistry;
-  }
+  private OpalGeneralConfigService serverService;
+
+  @Autowired
+  private TaxonomyService taxonomyService;
+
+  @Autowired
+  private DatabaseRegistry databaseRegistry;
 
   @GET
   @Path("/version")

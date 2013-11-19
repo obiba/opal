@@ -12,9 +12,9 @@ package org.obiba.opal.web.r;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.obiba.opal.r.ROperationTemplate;
 import org.obiba.opal.r.ROperationWithResult;
 import org.obiba.opal.r.RScriptROperation;
-import org.obiba.opal.r.service.OpalRSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,17 +31,16 @@ public abstract class AbstractOpalRSessionResource {
    * @param script
    * @return
    */
-  protected Response executeScript(OpalRSession rSession, String script) {
+  Response executeScript(ROperationTemplate rSession, String script) {
     if(script == null) return Response.status(Status.BAD_REQUEST).build();
 
     ROperationWithResult rop = new RScriptROperation(script);
     rSession.execute(rop);
     if(rop.hasResult() && rop.hasRawResult()) {
       return Response.ok().entity(rop.getRawResult().asBytes()).build();
-    } else {
-      log.error("R Script '{}' has result: {}, has raw result: {}", script, rop.hasResult(), rop.hasRawResult());
-      return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
+    log.error("R Script '{}' has result: {}, has raw result: {}", script, rop.hasResult(), rop.hasRawResult());
+    return Response.status(Status.INTERNAL_SERVER_ERROR).build();
   }
 
 }

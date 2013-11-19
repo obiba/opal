@@ -33,7 +33,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.TakesValue;
-import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.HasVisibility;
@@ -141,7 +140,7 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
   }
 
   @Override
-  @SuppressWarnings("OverlyLongMethod")
+  @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
   public void showError(@Nullable FormField formField, String message) {
     ControlGroup group = null;
     if(formField != null) {

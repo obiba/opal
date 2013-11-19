@@ -11,7 +11,6 @@ package org.obiba.opal.web.magma;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
 
@@ -20,18 +19,22 @@ import javax.ws.rs.QueryParam;
 
 import org.obiba.opal.web.model.Opal.LocaleDto;
 import org.obiba.opal.web.ws.security.NoAuthorization;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  *
  */
+@Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @NoAuthorization
 public class LocalesResource {
 
-  private final Set<Locale> locales;
+  private Set<Locale> locales;
 
-  public LocalesResource(Collection<Locale> locales) {
-    this.locales = new LinkedHashSet<Locale>();
-    this.locales.addAll(locales);
+  public void setLocales(Set<Locale> locales) {
+    this.locales = locales;
   }
 
   @GET

@@ -31,15 +31,11 @@ import com.google.common.collect.Iterables;
 @Path("/authz/{resource:.*}")
 public class AuthorizationResource {
 
-  private final SubjectAclService subjectAclService;
+  @Autowired
+  private SubjectAclService subjectAclService;
 
   @PathParam("resource")
   private String resource;
-
-  @Autowired
-  public AuthorizationResource(SubjectAclService subjectAclService) {
-    this.subjectAclService = subjectAclService;
-  }
 
   @GET
   public Iterable<Opal.Acl> get(@QueryParam("domain") @DefaultValue("opal") String domain,

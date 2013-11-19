@@ -36,12 +36,8 @@ import com.google.common.collect.Lists;
 @Path("/authz/query")
 public class AuthorizationQueryResource {
 
-  private final SubjectAclService subjectAclService;
-
   @Autowired
-  public AuthorizationQueryResource(SubjectAclService subjectAclService) {
-    this.subjectAclService = subjectAclService;
-  }
+  private SubjectAclService subjectAclService;
 
   @GET
   public Iterable<Acls> get(@QueryParam("domain") String domain, @QueryParam("type") SubjectAclService.SubjectType type,
@@ -51,7 +47,7 @@ public class AuthorizationQueryResource {
     return getAclsGroupedBySubject(domain, type, nodes);
   }
 
-  public Iterable<Acls> getSubjects(String domain, SubjectAclService.SubjectType type) {
+  Iterable<Acls> getSubjects(String domain, SubjectAclService.SubjectType type) {
     List<Acls> acls = Lists.newArrayList();
     for(SubjectAclService.Subject subject : subjectAclService.getSubjects(domain, type)) {
       acls.add(newAcls(subject).build());

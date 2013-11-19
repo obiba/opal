@@ -22,6 +22,7 @@ import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.taxonomy.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +33,9 @@ public class TaxonomyResource {
 
   @Autowired
   private TaxonomyService taxonomyService;
+
+  @Autowired
+  private ApplicationContext applicationContext;
 
   @PathParam("name")
   private String name;
@@ -56,11 +60,16 @@ public class TaxonomyResource {
 
   @Path("vocabularies")
   public VocabulariesResource getVocabularies() {
-    return new VocabulariesResource(taxonomyService, name);
+    VocabulariesResource resource = applicationContext.getBean(VocabulariesResource.class);
+    resource.setTaxonomyName(name);
+    return resource;
   }
 
   @Path("vocabulary/{vocabularyName}")
   public VocabularyResource getVocabulary(@PathParam("vocabularyName") String vocabularyName) {
-    return new VocabularyResource(taxonomyService, name, vocabularyName);
+    VocabularyResource resource = applicationContext.getBean(VocabularyResource.class);
+    resource.setTaxonomyName(name);
+    resource.setVocabularyName(vocabularyName);
+    return resource;
   }
 }

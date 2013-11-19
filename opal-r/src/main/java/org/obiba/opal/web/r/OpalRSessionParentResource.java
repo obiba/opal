@@ -14,6 +14,7 @@ import javax.ws.rs.PathParam;
 
 import org.obiba.opal.r.service.OpalRSessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,9 +31,14 @@ public class OpalRSessionParentResource {
   @Autowired
   private OpalRSessionManager opalRSessionManager;
 
+  @Autowired
+  private ApplicationContext applicationContext;
+
   @Path("/{id}")
   public OpalRSessionResource getOpalRSessionResource(@PathParam("id") String id) {
-    return new OpalRSessionResource(opalRSessionManager, opalRSessionManager.getSubjectRSession(id));
+    OpalRSessionResource resource = applicationContext.getBean(OpalRSessionResource.class);
+    resource.setOpalRSession(opalRSessionManager.getSubjectRSession(id));
+    return resource;
   }
 
   @Path("/current")
@@ -40,7 +46,9 @@ public class OpalRSessionParentResource {
     if(!opalRSessionManager.hasSubjectCurrentRSession()) {
       opalRSessionManager.newSubjectCurrentRSession();
     }
-    return new OpalRSessionResource(opalRSessionManager, opalRSessionManager.getSubjectCurrentRSession());
+    OpalRSessionResource resource = applicationContext.getBean(OpalRSessionResource.class);
+    resource.setOpalRSession(opalRSessionManager.getSubjectCurrentRSession());
+    return resource;
   }
 
 }

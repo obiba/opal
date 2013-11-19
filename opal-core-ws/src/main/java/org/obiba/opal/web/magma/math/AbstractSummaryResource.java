@@ -15,44 +15,50 @@ import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.opal.core.service.VariableStatsService;
-import org.springframework.util.Assert;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class AbstractSummaryResource {
-
-  protected final VariableStatsService variableStatsService;
+public abstract class AbstractSummaryResource implements SummaryResource {
 
   @NotNull
-  private final ValueTable valueTable;
+  private ValueTable valueTable;
 
   @NotNull
-  private final Variable variable;
+  private Variable variable;
 
   @NotNull
-  private final ValueSource variableValueSource;
+  private ValueSource variableValueSource;
 
-  protected AbstractSummaryResource(@NotNull VariableStatsService variableStatsService, @NotNull ValueTable valueTable,
-      @NotNull Variable variable, @NotNull ValueSource variableValueSource) {
-    Assert.notNull(variableStatsService);
-    Assert.notNull(valueTable);
-    Assert.notNull(variable);
-    Assert.notNull(variableValueSource);
+  @Autowired
+  protected VariableStatsService variableStatsService;
 
-    this.variableValueSource = variableValueSource;
-    this.variableStatsService = variableStatsService;
+  @Override
+  public void setValueTable(@NotNull ValueTable valueTable) {
     this.valueTable = valueTable;
+  }
+
+  @Override
+  public void setVariable(@NotNull Variable variable) {
     this.variable = variable;
   }
 
+  @Override
+  public void setVariableValueSource(@NotNull ValueSource variableValueSource) {
+    this.variableValueSource = variableValueSource;
+  }
+
+  @Override
   @NotNull
   public ValueTable getValueTable() {
     return valueTable;
   }
 
+  @Override
   @NotNull
   public Variable getVariable() {
     return variable;
   }
 
+  @Override
   @NotNull
   public ValueSource getVariableValueSource() {
     return variableValueSource;

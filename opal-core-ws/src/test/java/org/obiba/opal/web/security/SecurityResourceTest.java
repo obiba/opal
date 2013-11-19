@@ -9,8 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.security;
 
-import java.net.URISyntaxException;
-
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -37,23 +36,24 @@ import static org.easymock.EasyMock.verify;
 
 public class SecurityResourceTest {
 
+  private final static String TEST_SESSION_ID = "test-session-id";
+
   private DefaultSecurityManager mockSecurityManager;
 
   private SimpleAccountRealm mockRealm;
 
   private AuthenticationResource securityResource;
 
-  String testSessionId = "test-session-id";
-
   @Before
-  public void setUp() throws URISyntaxException {
+  public void setUp() {
     mockSecurityManager = new DefaultSecurityManager();
     mockRealm = new SimpleAccountRealm();
     mockSecurityManager.setRealm(mockRealm);
 
     SecurityUtils.setSecurityManager(mockSecurityManager);
 
-    securityResource = new AuthenticationResource(mockSecurityManager);
+    securityResource = new AuthenticationResource();
+    securityResource.setSecurityManager(mockSecurityManager);
   }
 
   @Ignore
@@ -72,13 +72,13 @@ public class SecurityResourceTest {
 
   @Test
   public void testCheckSession() {
-    Session mockSession = EasyMock.createMock(Session.class);
+    Session mockSession = createMock(Session.class);
 
     SessionManager sessionManager = mockSessionManager();
-    expect(sessionManager.getSession(expectSession(testSessionId))).andReturn(mockSession).atLeastOnce();
+    expect(sessionManager.getSession(expectSession(TEST_SESSION_ID))).andReturn(mockSession).atLeastOnce();
     replay(sessionManager);
 
-    Response response = securityResource.checkSession(testSessionId);
+    Response response = securityResource.checkSession(TEST_SESSION_ID);
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
     verify(sessionManager);
@@ -87,10 +87,10 @@ public class SecurityResourceTest {
   @Test
   public void testCheckSessionThrowsSessionException() {
     SessionManager sessionManager = mockSessionManager();
-    expect(sessionManager.getSession(expectSession(testSessionId))).andThrow(new SessionException()).atLeastOnce();
+    expect(sessionManager.getSession(expectSession(TEST_SESSION_ID))).andThrow(new SessionException()).atLeastOnce();
     replay(sessionManager);
 
-    Response response = securityResource.checkSession(testSessionId);
+    Response response = securityResource.checkSession(TEST_SESSION_ID);
     Assert.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
 
     verify(sessionManager);
@@ -99,10 +99,10 @@ public class SecurityResourceTest {
   @Test
   public void testCheckSessionReturnsNull() {
     SessionManager sessionManager = mockSessionManager();
-    expect(sessionManager.getSession(expectSession(testSessionId))).andReturn(null).atLeastOnce();
+    expect(sessionManager.getSession(expectSession(TEST_SESSION_ID))).andReturn(null).atLeastOnce();
     replay(sessionManager);
 
-    Response response = securityResource.checkSession(testSessionId);
+    Response response = securityResource.checkSession(TEST_SESSION_ID);
     Assert.assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
 
     verify(sessionManager);
@@ -110,11 +110,11 @@ public class SecurityResourceTest {
 
   @Test
   public void testDeleteSession() {
-    Response response = securityResource.deleteSession(testSessionId);
+    Response response = securityResource.deleteSession();
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
   }
 
-  private HttpServletRequest mockHttpServletRequest() {
+  private ServletRequest mockHttpServletRequest() {
     HttpServletRequest httpServletRequestMock = createMock(HttpServletRequest.class);
     expect(httpServletRequestMock.getRemoteAddr()).andReturn("127.0.0.1").anyTimes();
 
@@ -123,7 +123,7 @@ public class SecurityResourceTest {
 
   private SessionManager mockSessionManager() {
     SessionManager mockSessionManager = createMock(SessionManager.class);
-    this.mockSecurityManager.setSessionManager(mockSessionManager);
+    mockSecurityManager.setSessionManager(mockSessionManager);
     return mockSessionManager;
   }
 
@@ -136,7 +136,7 @@ public class SecurityResourceTest {
 
     private final String sessionId;
 
-    public SessionKeyMatcher(String sessionId) {
+    private SessionKeyMatcher(String sessionId) {
       this.sessionId = sessionId;
     }
 
@@ -147,7 +147,7 @@ public class SecurityResourceTest {
 
     @Override
     public boolean matches(Object argument) {
-      return ((SessionKey) argument).getSessionId().equals(this.sessionId);
+      return ((SessionKey) argument).getSessionId().equals(sessionId);
     }
   }
 }

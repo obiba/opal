@@ -22,8 +22,6 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.web.model.Opal;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,12 +30,10 @@ import org.springframework.stereotype.Component;
 // TODO We should delete this once the new FileSelection dialog has been integrated in the DataImport UI.
 public class FileSystemResource {
 
-  private static final Logger log = LoggerFactory.getLogger(FileSystemResource.class);
-
-  private final OpalRuntime opalRuntime;
+  private OpalRuntime opalRuntime;
 
   @Autowired
-  public FileSystemResource(OpalRuntime opalRuntime) {
+  public void setOpalRuntime(OpalRuntime opalRuntime) {
     this.opalRuntime = opalRuntime;
   }
 

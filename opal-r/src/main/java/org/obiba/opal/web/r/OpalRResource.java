@@ -20,7 +20,6 @@ import javax.ws.rs.core.Response.Status;
 import org.obiba.opal.r.ROperationWithResult;
 import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.service.OpalRService;
-import org.obiba.opal.r.service.OpalRSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,32 +43,32 @@ public class OpalRResource {
   private OpalRService opalRService;
 
   @Autowired
-  private OpalRSessionManager opalRSessionManager;
+  private OpalRSessionsResource opalRSessionsResource;
 
   @POST
   @Path("/execute")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   public Response query(@QueryParam("script") String script, String body) {
-    String rscript = script;
-    if(Strings.isNullOrEmpty(rscript)) {
-      rscript = body;
+    String rScript = script;
+    if(Strings.isNullOrEmpty(rScript)) {
+      rScript = body;
     }
 
-    if(Strings.isNullOrEmpty(rscript)) return Response.status(Status.BAD_REQUEST).build();
+    if(Strings.isNullOrEmpty(rScript)) return Response.status(Status.BAD_REQUEST).build();
 
-    ROperationWithResult rop = new RScriptROperation(rscript);
+    ROperationWithResult rop = new RScriptROperation(rScript);
     opalRService.execute(rop);
     if(rop.hasResult() && rop.hasRawResult()) {
       return Response.ok().entity(rop.getRawResult().asBytes()).build();
     } else {
-      log.error("R Script '{}' has result: {}, has raw result: {}", rscript, rop.hasResult(), rop.hasRawResult());
+      log.error("R Script '{}' has result: {}, has raw result: {}", rScript, rop.hasResult(), rop.hasRawResult());
       return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
   }
 
   @Path("/sessions")
   public OpalRSessionsResource getSessionsResource() {
-    return new OpalRSessionsResource(opalRSessionManager);
+    return opalRSessionsResource;
   }
 
 }

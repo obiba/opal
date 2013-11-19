@@ -162,7 +162,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
             boolean limeSurvey = false;
             boolean jdbc = false;
             for(int i = 0; i < resource.length(); i++) {
-              SqlSettingsDto sqlSettingsDto = (SqlSettingsDto) resource.get(i).getSqlSettings();
+              SqlSettingsDto sqlSettingsDto = resource.get(i).getSqlSettings();
               if(sqlSettingsDto.getSqlSchema().getName().equals(SqlSettingsDto.SqlSchema.LIMESURVEY.getName())) {
                 limeSurvey = true;
               } else if(sqlSettingsDto.getSqlSchema().getName().equals(SqlSettingsDto.SqlSchema.JDBC.getName()) &&
@@ -281,7 +281,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     }
   }
 
-  @SuppressWarnings("OverlyLongMethod")
+  @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
   private void launchImport(@SuppressWarnings("ParameterHidesMemberVariable") ImportConfig importConfig) {
     this.importConfig = importConfig;
     switch(importConfig.getImportFormat()) {

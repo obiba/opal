@@ -16,12 +16,11 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
-import org.obiba.opal.core.service.ImportService;
-import org.obiba.opal.core.service.VariableStatsService;
 import org.obiba.opal.web.magma.view.JavaScriptViewDtoExtension;
 import org.obiba.opal.web.magma.view.VariableListViewDtoExtension;
 import org.obiba.opal.web.magma.view.ViewDtoExtension;
 import org.obiba.opal.web.magma.view.ViewDtos;
+import org.springframework.context.ApplicationContext;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -31,7 +30,7 @@ import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Unit tests for {@link ViewResource}.
+ * Unit tests for {@link ViewResourceImpl}.
  */
 public class ViewResourceTest {
 
@@ -48,14 +47,13 @@ public class ViewResourceTest {
   @Test
   public void testConstructor_CallsSuperConstructorWithViewArgument() {
     // Setup
-    View view = new View();
-    ViewManager mockViewManager = createMock(ViewManager.class);
-    ImportService importService = createMock(ImportService.class);
-
-    VariableStatsService variableStatsService = createMock(VariableStatsService.class);
+    ValueTable view = new View();
 
     // Exercise
-    ViewResource sut = new ViewResource(mockViewManager, view, newViewDtos(), importService, variableStatsService);
+    ViewResourceImpl sut = new ViewResourceImpl();
+    sut.setValueTable(view);
+    sut.setViewManager(createMock(ViewManager.class));
+    sut.setViewDtos(newViewDtos());
 
     // Verify
     assertEquals(view, sut.getValueTable());
@@ -64,28 +62,32 @@ public class ViewResourceTest {
   @Test
   public void testGetFrom_ReturnsTableResourceForWrappedTable() {
     // Setup
-    ViewManager mockViewManager = createMock(ViewManager.class);
-    ImportService importService = createMock(ImportService.class);
-
-    VariableStatsService variableStatsService = createMock(VariableStatsService.class);
-
     ValueTable fromTableMock = createMock(ValueTable.class);
     expect(fromTableMock.getName()).andReturn("fromTable").atLeastOnce();
 
-    View view = new View("testView", fromTableMock);
-    ViewResource sut = new ViewResource(mockViewManager, view, newViewDtos(), importService, variableStatsService);
+    ApplicationContext mockContext = createMock(ApplicationContext.class);
+    expect(mockContext.getBean(TableResource.class)).andReturn(new TableResourceImpl()).atLeastOnce();
 
-    replay(fromTableMock);
+    ValueTable view = new View("testView", fromTableMock);
+    ViewResourceImpl viewResource = new ViewResourceImpl();
+    viewResource.setValueTable(view);
+    viewResource.setViewManager(createMock(ViewManager.class));
+    viewResource.setViewDtos(newViewDtos());
+    viewResource.setApplicationContext(mockContext);
+
+    replay(fromTableMock, mockContext);
 
     // Exercise
-    TableResource fromTableResource = sut.getFrom();
+    TableResource fromTableResource = viewResource.getFrom();
 
     // Verify state
     assertEquals("fromTable", fromTableResource.getValueTable().getName());
   }
 
   private ViewDtos newViewDtos() {
-    return new ViewDtos(
+    ViewDtos viewDtos = new ViewDtos();
+    viewDtos.setExtensions(
         ImmutableSet.<ViewDtoExtension>of(new JavaScriptViewDtoExtension(), new VariableListViewDtoExtension()));
+    return viewDtos;
   }
 }

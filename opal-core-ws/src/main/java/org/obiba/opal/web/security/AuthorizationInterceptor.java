@@ -21,7 +21,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.HttpStatus;
-import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.jboss.resteasy.core.ResourceInvoker;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
@@ -55,17 +54,11 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
 
   public static final String ALT_PERMISSIONS = "X-Alt-Permissions";
 
-  private final SubjectAclService subjectAclService;
-
-  private final RequestAttributesProvider requestAttributeProvider;
+  @Autowired
+  private SubjectAclService subjectAclService;
 
   @Autowired
-  public AuthorizationInterceptor(SessionsSecurityManager securityManager, SubjectAclService subjectAclService,
-      RequestAttributesProvider requestAttributeProvider) {
-    super(securityManager);
-    this.subjectAclService = subjectAclService;
-    this.requestAttributeProvider = requestAttributeProvider;
-  }
+  private RequestAttributesProvider requestAttributeProvider;
 
   @Override
   public Response preProcess(HttpRequest request, ResourceMethodInvoker resourceMethod) {

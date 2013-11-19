@@ -9,13 +9,12 @@
  */
 package org.obiba.opal.web;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -53,6 +52,7 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertThat;
 
+@SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
 public class FilesResourceTest {
 
   private OpalRuntime opalRuntimeMock;
@@ -70,10 +70,10 @@ public class FilesResourceTest {
   /**
    * Delete these files in tearDown().
    */
-  private final List<String> filesCreatedByTest = new ArrayList<String>();
+  private final Collection<String> filesCreatedByTest = new ArrayList<String>();
 
   @Before
-  public void setUp() throws URISyntaxException, FileSystemException {
+  public void setUp() throws URISyntaxException {
     opalRuntimeMock = createMock(OpalRuntime.class);
 
     String rootDir = getClass().getResource("/test-file-system").toURI().toString();
@@ -82,7 +82,8 @@ public class FilesResourceTest {
       Assert.assertEquals(true, emptyDir.mkdirs());
     }
     fileSystem = new DefaultOpalFileSystem(rootDir);
-    filesResource = new FilesResource(opalRuntimeMock);
+    filesResource = new FilesResource();
+    filesResource.setOpalRuntime(opalRuntimeMock);
 
     fileItemMock = createMock(FileItem.class);
     fileObjectMock = createMock(FileObject.class);
@@ -108,8 +109,9 @@ public class FilesResourceTest {
 
     replay(opalRuntimeMock);
 
-    FileSystemResource filesResource = new FileSystemResource(opalRuntimeMock);
-    FileDto rootFileDto = filesResource.getFileSystem();
+    FileSystemResource fsResource = new FileSystemResource();
+    fsResource.setOpalRuntime(opalRuntimeMock);
+    FileDto rootFileDto = fsResource.getFileSystem();
 
     Assert.assertEquals("root", rootFileDto.getName());
     Assert.assertEquals(FileDto.FileType.FOLDER, rootFileDto.getType());
@@ -124,8 +126,10 @@ public class FilesResourceTest {
 
     replay(opalRuntimeMock);
 
-    FileSystemResource filesResource = new FileSystemResource(opalRuntimeMock);
-    FileDto rootFileDto = filesResource.getFileSystem();
+    FileSystemResource fsResource = new FileSystemResource();
+    fsResource.setOpalRuntime(opalRuntimeMock);
+
+    FileDto rootFileDto = fsResource.getFileSystem();
 
     int childrenCounter = 0;
     childrenCounter = verifyThatChildrenExistInFileSystem(rootFileDto, childrenCounter);
@@ -138,15 +142,16 @@ public class FilesResourceTest {
 
   private int verifyThatChildrenExistInFileSystem(FileDto folder, int childrenCounter) throws FileSystemException {
     FileObject correspondingFileObj;
+    int counter = childrenCounter;
     for(FileDto child : folder.getChildrenList()) {
-      childrenCounter++;
+      counter++;
       correspondingFileObj = fileSystem.getRoot().resolveFile(child.getPath());
       Assert.assertTrue(correspondingFileObj.exists());
       if(child.getType() == FileDto.FileType.FOLDER) {
-        childrenCounter = verifyThatChildrenExistInFileSystem(child, childrenCounter);
+        counter = verifyThatChildrenExistInFileSystem(child, childrenCounter);
       }
     }
-    return childrenCounter;
+    return counter;
   }
 
   @Ignore("SecurityManager dependency not satisfied")
@@ -156,16 +161,14 @@ public class FilesResourceTest {
 
     replay(opalRuntimeMock);
 
-    checkGetFileDetailsResponse("/",
-        new String[] { "folder1", "folder2", "folder3", "folder4", "folder5", "file2.txt", "folder11", "file11.txt",
-            "file21.txt", "folder31", "folder41", "file41.txt", "file42.txt", "file43.txt", "file51.txt" });
-    checkGetFileDetailsResponse("/folder1/folder11",
-        new String[] { "folder111", "file111.txt", "file1111.txt", "file1112.txt" });
-    checkGetFileDetailsResponse("/folder1/folder11/folder111", new String[] { "file1111.txt", "file1112.txt" });
-    checkGetFileDetailsResponse("/folder2", new String[] { "file21.txt" });
-    checkGetFileDetailsResponse("/folder3", new String[] { "folder31", "file311.txt" });
-    checkGetFileDetailsResponse("/folder4", new String[] { "folder41", "file41.txt", "file42.txt", "file43.txt" });
-    checkGetFileDetailsResponse("/folder5", new String[] { "file51.txt" });
+    checkGetFileDetailsResponse("/", "folder1", "folder2", "folder3", "folder4", "folder5", "file2.txt", "folder11",
+        "file11.txt", "file21.txt", "folder31", "folder41", "file41.txt", "file42.txt", "file43.txt", "file51.txt");
+    checkGetFileDetailsResponse("/folder1/folder11", "folder111", "file111.txt", "file1111.txt", "file1112.txt");
+    checkGetFileDetailsResponse("/folder1/folder11/folder111", "file1111.txt", "file1112.txt");
+    checkGetFileDetailsResponse("/folder2", "file21.txt");
+    checkGetFileDetailsResponse("/folder3", "folder31", "file311.txt");
+    checkGetFileDetailsResponse("/folder4", "folder41", "file41.txt", "file42.txt", "file43.txt");
+    checkGetFileDetailsResponse("/folder5", "file51.txt");
 
     verify(opalRuntimeMock);
 
@@ -207,27 +210,25 @@ public class FilesResourceTest {
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).atLeastOnce();
     replay(opalRuntimeMock);
 
-    checkCompressedFolder("/folder1",
-        new String[] { "folder1", "folder1/folder11", "folder1/file11.txt", "folder1/folder11/folder111",
-            "folder1/folder11/file111.txt", "folder1/folder11/folder111/file1111.txt",
-            "folder1/folder11/folder111/file1112.txt" });
-    checkCompressedFolder("/folder2", new String[] { "folder2", "folder2/file21.txt" });
-    checkCompressedFolder("/folder3", new String[] { "folder3", "folder3/folder31", "folder3/folder31/file311.txt" });
-    checkCompressedFolder("/folder4",
-        new String[] { "folder4", "folder4/folder41", "folder4/file41.txt", "folder4/file42.txt",
-            "folder4/file43.txt" });
-    checkCompressedFolder("/folder5", new String[] { "folder5", "folder5/file51.txt" });
-    checkCompressedFolder("/",
-        new String[] { "/", "folder1", "folder1/folder11", "folder1/file11.txt", "folder1/folder11/folder111",
-            "folder1/folder11/file111.txt", "folder1/folder11/folder111/file1111.txt",
-            "folder1/folder11/folder111/file1112.txt", "folder2", "folder2/file21.txt", "folder3", "folder3/folder31",
-            "folder3/folder31/file311.txt", "folder4", "folder4/folder41", "folder4/file41.txt", "folder4/file42.txt",
-            "folder4/file43.txt", "folder5", "folder5/file51.txt", "file2.txt" });
+    checkCompressedFolder("/folder1", "folder1", "folder1/folder11", "folder1/file11.txt", "folder1/folder11/folder111",
+        "folder1/folder11/file111.txt", "folder1/folder11/folder111/file1111.txt",
+        "folder1/folder11/folder111/file1112.txt");
+    checkCompressedFolder("/folder2", "folder2", "folder2/file21.txt");
+    checkCompressedFolder("/folder3", "folder3", "folder3/folder31", "folder3/folder31/file311.txt");
+    checkCompressedFolder("/folder4", "folder4", "folder4/folder41", "folder4/file41.txt", "folder4/file42.txt",
+        "folder4/file43.txt");
+    checkCompressedFolder("/folder5", "folder5", "folder5/file51.txt");
+    checkCompressedFolder("/", "/", "folder1", "folder1/folder11", "folder1/file11.txt", "folder1/folder11/folder111",
+        "folder1/folder11/file111.txt", "folder1/folder11/folder111/file1111.txt",
+        "folder1/folder11/folder111/file1112.txt", "folder2", "folder2/file21.txt", "folder3", "folder3/folder31",
+        "folder3/folder31/file311.txt", "folder4", "folder4/folder41", "folder4/file41.txt", "folder4/file42.txt",
+        "folder4/file43.txt", "folder5", "folder5/file51.txt", "file2.txt");
 
     verify(opalRuntimeMock);
 
   }
 
+  @SuppressWarnings("unchecked")
   private void checkCompressedFolder(String folderPath, String... expectedFolderContentArray) throws IOException {
     Response response = filesResource.getFile(folderPath, null);
     ZipFile zipfile = new ZipFile(((File) response.getEntity()).getPath());
@@ -253,34 +254,6 @@ public class FilesResourceTest {
     zipfile.close();
   }
 
-  public void testGetFilesInFileSystem() throws IOException {
-    expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).atLeastOnce();
-
-    replay(opalRuntimeMock);
-
-    checkGetFileDetailsResponse("/file2.txt", "testing file2.txt content");
-    checkGetFileDetailsResponse("/folder1/folder11/folder111/file1112.txt", "testing file1112.txt content");
-    checkGetFileDetailsResponse("/folder4/file41.txt", "testing file41.txt content");
-
-    verify(opalRuntimeMock);
-
-  }
-
-  private void checkGetFileDetailsResponse(String path, String expectedFileContent) throws IOException {
-    Response response = filesResource.getFile(path, null);
-
-    // Make sure response is OK
-    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
-
-    File file = (File) response.getEntity();
-    BufferedReader reader = new BufferedReader(new FileReader(file));
-    String textFirstLine = reader.readLine();
-
-    // Make sure that the downloaded file content is the one expected.
-    Assert.assertEquals(expectedFileContent, textFirstLine);
-
-  }
-
   @Test
   public void testGetPathThatDoesNotExist() throws FileSystemException {
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
@@ -303,12 +276,13 @@ public class FilesResourceTest {
         .once();
     expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilder.fromPath("/"));
 
-    FilesResource fileResource = new FilesResource(opalRuntimeMock) {
+    FilesResource fileResource = new FilesResource() {
       @Override
       protected FileItem getUploadedFile(HttpServletRequest request) throws FileUploadException {
         return fileItemMock;
       }
     };
+    fileResource.setOpalRuntime(opalRuntimeMock);
 
     replay(opalRuntimeMock, fileItemMock, uriInfoMock);
 
@@ -335,12 +309,13 @@ public class FilesResourceTest {
 
     replay(opalRuntimeMock);
 
-    FilesResource fileResource = new FilesResource(opalRuntimeMock) {
+    FilesResource fileResource = new FilesResource() {
       @Override
       protected FileItem getUploadedFile(HttpServletRequest request) throws FileUploadException {
         return null;
       }
     };
+    fileResource.setOpalRuntime(opalRuntimeMock);
 
     Response response = fileResource.uploadFile("/", uriInfoMock, null);
     Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -354,12 +329,13 @@ public class FilesResourceTest {
       throws IOException, FileUploadException, URISyntaxException {
     expect(opalRuntimeMock.getFileSystem()).andReturn(fileSystem).once();
 
-    FilesResource fileResource = new FilesResource(opalRuntimeMock) {
+    FilesResource fileResource = new FilesResource() {
       @Override
       protected FileItem getUploadedFile(HttpServletRequest request) throws FileUploadException {
         return fileItemMock;
       }
     };
+    fileResource.setOpalRuntime(opalRuntimeMock);
 
     replay(opalRuntimeMock, fileItemMock, uriInfoMock);
 
@@ -451,12 +427,14 @@ public class FilesResourceTest {
   }
 
   private FilesResource getFileResource() {
-    return new FilesResource(opalRuntimeMock) {
+    FilesResource resource = new FilesResource() {
       @Override
       protected FileObject resolveFileInFileSystem(String path) throws FileSystemException {
         return fileObjectMock;
       }
     };
+    resource.setOpalRuntime(opalRuntimeMock);
+    return resource;
   }
 
   @Test

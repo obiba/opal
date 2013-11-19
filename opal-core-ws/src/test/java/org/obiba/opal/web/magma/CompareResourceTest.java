@@ -39,7 +39,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Unit tests for {@link CompareResource}.
+ * Unit tests for {@link CompareResourceImpl}.
  */
 public class CompareResourceTest extends AbstractMagmaResourceTest {
   //
@@ -242,7 +242,7 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
   // Test Methods (for datasource comparisons)
   //
 
-  @SuppressWarnings("OverlyLongMethod")
+  @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
   @Test
   public void testCompare_ReportsNoDifferencesForIdenticalDatasources() {
     // Setup
@@ -312,17 +312,21 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
   //
 
   private CompareResource createCompareResource(Datasource compared) {
-    return new CompareResource(compared);
+    CompareResource resource = new CompareResourceImpl();
+    resource.setComparedDatasource(compared);
+    return resource;
   }
 
-  private CompareResource createCompareResource(final ValueTable compared, final ValueTable with) {
-    return new CompareResource(compared) {
+  private CompareResource createCompareResource(ValueTable compared, final ValueTable with) {
+    CompareResource resource = new CompareResourceImpl() {
 
       @Override
       ValueTable getValueTable(String fqTableName) {
         return with;
       }
     };
+    resource.setComparedTable(compared);
+    return resource;
   }
 
   private ValueTable createTable(Datasource datasource, String name, String entityType, Variable... variables) {

@@ -10,6 +10,7 @@
 package org.obiba.opal.web.magma.view;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -32,10 +33,10 @@ import com.google.common.collect.ImmutableSet;
 @Component
 public final class ViewDtos {
 
-  private final Set<ViewDtoExtension> extensions;
+  private Set<ViewDtoExtension> extensions;
 
   @Autowired
-  public ViewDtos(Set<ViewDtoExtension> extensions) {
+  public void setExtensions(Collection<ViewDtoExtension> extensions) {
     this.extensions = ImmutableSet.copyOf(extensions);
   }
 

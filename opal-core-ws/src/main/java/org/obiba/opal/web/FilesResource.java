@@ -21,6 +21,7 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -52,11 +53,7 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.vfs2.AllFileSelector;
-import org.apache.commons.vfs2.FileFilter;
-import org.apache.commons.vfs2.FileFilterSelector;
 import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSelectInfo;
 import org.apache.commons.vfs2.FileSelector;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
@@ -83,24 +80,17 @@ public class FilesResource {
 
   private static final Logger log = LoggerFactory.getLogger(FilesResource.class);
 
-  private final OpalRuntime opalRuntime;
+  private OpalRuntime opalRuntime;
 
-  private MimetypesFileTypeMap mimeTypes;
+  private final MimetypesFileTypeMap mimeTypes = new MimetypesFileTypeMap();
 
-  @Autowired
   @Value("${org.obiba.opal.charset.default}")
   private String defaultCharset;
 
   @Autowired
-  public FilesResource(OpalRuntime opalRuntime) {
-
+  public void setOpalRuntime(OpalRuntime opalRuntime) {
     this.opalRuntime = opalRuntime;
-    mimeTypes = new MimetypesFileTypeMap();
   }
-
-  //
-  // files
-  //
 
   @GET
   @Path("/_meta")
@@ -177,7 +167,7 @@ public class FilesResource {
     return Response.status(Status.BAD_REQUEST).entity("Unexpected file action: " + action).build();
   }
 
-  private Response moveTo(FileObject destinationFolder, List<String> sourcesPath) throws IOException {
+  private Response moveTo(FileObject destinationFolder, Iterable<String> sourcesPath) throws IOException {
     // destination check
     String destinationPath = destinationFolder.getName().getPath();
     if(destinationFolder.getType() != FileType.FOLDER)
@@ -203,7 +193,7 @@ public class FilesResource {
     return Response.ok().build();
   }
 
-  private Response copyFrom(FileObject destinationFolder, List<String> sourcesPath) throws IOException {
+  private Response copyFrom(FileObject destinationFolder, Iterable<String> sourcesPath) throws IOException {
     // destination check
     String destinationPath = destinationFolder.getName().getPath();
     if(destinationFolder.getType() != FileType.FOLDER)
@@ -260,7 +250,7 @@ public class FilesResource {
     FileItem uploadedFile = getUploadedFile(request);
     if(uploadedFile == null) {
       return Response.status(Status.BAD_REQUEST)
-          .entity("No file has been submitted. Please make sure that you are submitting a file with your resquest.")
+          .entity("No file has been submitted. Please make sure that you are submitting a file with your request.")
           .build();
     }
 
@@ -303,12 +293,12 @@ public class FilesResource {
 
     String folderPath = getPathOfFileToWrite(path);
     FileObject folder = resolveFileInFileSystem(folderPath);
-    Response response = validateFolder(folder, path);
-    if(response != null) return response;
+    Response folderResponse = validateFolder(folder, path);
+    if(folderResponse != null) return folderResponse;
 
     FileObject file = folder.resolveFile(folderName);
-    response = validateFile(file);
-    if(response != null) return response;
+    Response fileResponse = validateFile(file);
+    if(fileResponse != null) return fileResponse;
 
     try {
       file.createFolder();
@@ -405,7 +395,7 @@ public class FilesResource {
   // private methods
   //
 
-  protected FileObject resolveFileInFileSystem(String path) throws FileSystemException {
+  FileObject resolveFileInFileSystem(String path) throws FileSystemException {
     return opalRuntime.getFileSystem().getRoot().resolveFile(path);
   }
 
@@ -417,7 +407,7 @@ public class FilesResource {
         .header("Content-Disposition", getContentDispositionOfAttachment(localFile.getName())).build();
   }
 
-  private Response getFolder(FileObject folder, List<String> children) throws IOException {
+  private Response getFolder(FileObject folder, Collection<String> children) throws IOException {
     SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
     String folderName = folder.getName().getBaseName();
     File compressedFolder = new File(System.getProperty("java.io.tmpdir"),
@@ -521,18 +511,17 @@ public class FilesResource {
   }
 
   /**
-   * Returns the first {@code FileItem} that is reprensents a file upload field. If no such field exists, this method
+   * Returns the first {@code FileItem} that is represents a file upload field. If no such field exists, this method
    * returns null
    *
    * @param request
    * @return
    * @throws FileUploadException
    */
-  @SuppressWarnings("unchecked")
-  protected FileItem getUploadedFile(HttpServletRequest request) throws FileUploadException {
+  FileItem getUploadedFile(HttpServletRequest request) throws FileUploadException {
     FileItemFactory factory = new DiskFileItemFactory();
     ServletFileUpload upload = new ServletFileUpload(factory);
-    for(FileItem fileItem : (List<FileItem>) upload.parseRequest(request)) {
+    for(FileItem fileItem : upload.parseRequest(request)) {
       if(!fileItem.isFormField()) {
         return fileItem;
       }
@@ -568,19 +557,20 @@ public class FilesResource {
 
   }
 
-  private void compressFolder(File compressedFile, FileObject folder, List<String> children) throws IOException {
+  private void compressFolder(File compressedFile, FileObject folder, Collection<String> children) throws IOException {
     ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(compressedFile));
     addFolder(folder, outputStream, children);
     outputStream.close();
   }
 
-  private void addFolder(FileObject folder, ZipOutputStream outputStream, List<String> children) throws IOException {
+  private void addFolder(FileObject folder, ZipOutputStream outputStream, Collection<String> children)
+      throws IOException {
     addFolder(folder.getParent().getName().getPath(), folder, outputStream, children);
   }
 
-  private void addFolder(String basePath, FileObject folder, ZipOutputStream outputStream, List<String> children)
+  private void addFolder(String basePath, FileObject folder, ZipOutputStream outputStream, Collection<String> children)
       throws IOException {
-    int baseLength = basePath.equals("/") ? 1 : basePath.length() + 1;
+    int baseLength = "/".equals(basePath) ? 1 : basePath.length() + 1;
 
     // Add the folder.
     outputStream.putNextEntry(new ZipEntry(folder.getName().getPath().substring(baseLength) + "/"));

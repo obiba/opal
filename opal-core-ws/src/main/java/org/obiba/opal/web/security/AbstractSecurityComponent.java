@@ -20,25 +20,23 @@ import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
+import org.springframework.beans.factory.annotation.Autowired;
 
 abstract class AbstractSecurityComponent {
 
-  private final SessionsSecurityManager securityManager;
+  @Autowired
+  protected SessionsSecurityManager securityManager;
 
-  protected AbstractSecurityComponent(SessionsSecurityManager securityManager) {
-    if(securityManager == null) throw new IllegalArgumentException("securityManager cannot be null");
+  @Autowired
+  void setSecurityManager(SessionsSecurityManager securityManager) {
     this.securityManager = securityManager;
-  }
-
-  protected SessionsSecurityManager getSecurityManager() {
-    return securityManager;
   }
 
   static Subject getSubject() {
     return SecurityUtils.getSubject();
   }
 
-  protected boolean isUserAuthenticated() {
+  boolean isUserAuthenticated() {
     return SecurityUtils.getSubject().isAuthenticated();
   }
 
@@ -48,7 +46,7 @@ abstract class AbstractSecurityComponent {
    * @param method
    * @return
    */
-  protected boolean isWebServicePublic(ResourceMethodInvoker method) {
+  boolean isWebServicePublic(ResourceMethodInvoker method) {
     return method.getMethod().isAnnotationPresent(NotAuthenticated.class) ||
         method.getResourceClass().isAnnotationPresent(NotAuthenticated.class);
   }
@@ -59,7 +57,7 @@ abstract class AbstractSecurityComponent {
    * @param method
    * @return
    */
-  protected boolean isWebServiceWithoutAuthorization(ResourceMethodInvoker method) {
+  boolean isWebServiceWithoutAuthorization(ResourceMethodInvoker method) {
     return method.getMethod().isAnnotationPresent(NoAuthorization.class) ||
         method.getResourceClass().isAnnotationPresent(NoAuthorization.class);
   }
@@ -70,16 +68,16 @@ abstract class AbstractSecurityComponent {
    * @param method
    * @return
    */
-  protected boolean isWebServiceAuthenticatedByCookie(ResourceMethodInvoker method) {
+  boolean isWebServiceAuthenticatedByCookie(ResourceMethodInvoker method) {
     return method.getMethod().isAnnotationPresent(AuthenticatedByCookie.class) ||
         method.getResourceClass().isAnnotationPresent(AuthenticatedByCookie.class);
   }
 
-  protected boolean isValidSessionId(String sessionId) {
+  boolean isValidSessionId(String sessionId) {
     return getSession(sessionId) != null;
   }
 
-  protected Session getSession(String sessionId) {
+  Session getSession(String sessionId) {
     if(sessionId != null) {
       SessionKey key = new DefaultSessionKey(sessionId);
       try {

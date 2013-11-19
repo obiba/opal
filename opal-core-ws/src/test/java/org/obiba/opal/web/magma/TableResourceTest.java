@@ -32,11 +32,10 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.type.TextType;
-import org.obiba.opal.core.service.ImportService;
-import org.obiba.opal.core.service.VariableStatsService;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Opal.LocaleDto;
+import org.springframework.context.ApplicationContext;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -54,8 +53,10 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-@SuppressWarnings({ "OverlyLongMethod", "OverlyCoupledClass" })
+@SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
 public class TableResourceTest extends AbstractMagmaResourceTest {
+
+  private static final String PARTICIPANT = "Participant";
 
 //  private static final Logger log = LoggerFactory.getLogger(TableResourceTest.class);
 
@@ -79,20 +80,22 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     checkWeightTableDto(dtos.get(1));
   }
 
-  private TableResource createResource(ValueTable table) {
-    return createResource(table, Collections.<Locale>emptySet());
+  private TableResource createResource(ValueTable table, ApplicationContext applicationContext) {
+    return createResource(table, Collections.<Locale>emptySet(), applicationContext);
   }
 
-  private TableResource createResource(ValueTable table, Set<Locale> locales) {
-    ImportService importService = createMock(ImportService.class);
-    VariableStatsService variableStatsService = createMock(VariableStatsService.class);
-    return new TableResource(table, locales, importService, variableStatsService);
+  private TableResource createResource(ValueTable table, Set<Locale> locales, ApplicationContext applicationContext) {
+    TableResource tableResource = new TableResourceImpl();
+    ((AbstractValueTableResource) tableResource).setApplicationContext(applicationContext);
+    tableResource.setLocales(locales);
+    tableResource.setValueTable(table);
+    return tableResource;
   }
 
   @Test
   public void testTableGET() {
     Datasource datasource = MagmaEngine.get().getDatasource(DATASOURCE2);
-    TableResource resource = createResource(datasource.getValueTable("Weight"));
+    TableResource resource = createResource(datasource.getValueTable("Weight"), null);
 
     UriInfo uriInfoMock = createMock(UriInfo.class);
     expect(uriInfoMock.getPath(false)).andReturn("/datasource/" + DATASOURCE2 + "/table/Weight");
@@ -105,7 +108,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testTableGETVariables() {
     Datasource datasource = MagmaEngine.get().getDatasource(DATASOURCE2);
-    createResource(datasource.getValueTable("Weight"));
+    createResource(datasource.getValueTable("Weight"), null);
 
     List<PathSegment> segments = new ArrayList<PathSegment>();
     segments.add(createMock(PathSegment.class));
@@ -125,8 +128,9 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     replay(uriInfoMock);
     replay(segments.toArray());
 
-    Response r = new VariablesResource(datasource.getValueTable("Weight"), Collections.<Locale>emptySet())
-        .getVariables(null, uriInfoMock, null, 0, null);
+    VariablesResource variablesResource = new VariablesResourceImpl();
+    variablesResource.setValueTable(datasource.getValueTable("Weight"));
+    Response r = variablesResource.getVariables(null, uriInfoMock, null, 0, null);
     @SuppressWarnings("unchecked")
     List<VariableDto> dtos = ImmutableList.copyOf((Iterable<? extends VariableDto>) r.getEntity());
 
@@ -163,7 +167,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   private void checkWeightTableDto(Magma.TableDto dto) {
     assertNotNull(dto);
     assertEquals("Weight", dto.getName());
-    assertEquals("Participant", dto.getEntityType());
+    assertEquals(PARTICIPANT, dto.getEntityType());
     assertEquals(9, dto.getVariableCount());
     assertEquals(0, dto.getValueSetCount());
     assertEquals(DATASOURCE2, dto.getDatasourceName());
@@ -198,7 +202,9 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
           .setIsRepeatable(false).build());
     }
 
-    new VariablesResource(valueTableMock, Collections.<Locale>emptySet()).addOrUpdateVariables(variablesDto, null);
+    VariablesResource variablesResource = new VariablesResourceImpl();
+    variablesResource.setValueTable(valueTableMock);
+    variablesResource.addOrUpdateVariables(variablesDto, null);
 
     verify(valueTableMock, datasourceMock, valueTableWriterMock, variableWriterMock);
 
@@ -206,21 +212,26 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
 
   @Test
   public void testAddOrUpdateVariables_InternalServerError() {
-    Response response = new VariablesResource(null, Collections.<Locale>emptySet()).addOrUpdateVariables(null, null);
+    Response response = new VariablesResourceImpl().addOrUpdateVariables(null, null);
     assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
   }
 
   @Test
   public void testGetLocales_WhenNoDisplayLocaleSpecifiedReturnsLocaleDtosWithDisplayFieldUnset() {
     // Setup
-    TableResource sut = createResource(null, ImmutableSet.of(new Locale("en"), new Locale("fr")));
+    ApplicationContext mockContext = createMock(ApplicationContext.class);
+    expect(mockContext.getBean(LocalesResource.class)).andReturn(new LocalesResource()).atLeastOnce();
+    replay(mockContext);
+    TableResource tableResource = createResource(null, ImmutableSet.of(new Locale("en"), new Locale("fr")),
+        mockContext);
 
     // Exercise
-    Iterable<LocaleDto> localeDtos = sut.getLocalesResource().getLocales(null);
+    Iterable<LocaleDto> localeDtos = tableResource.getLocalesResource().getLocales(null);
 
     // Verify
+    verify(mockContext);
     assertNotNull(localeDtos);
-    assertEquals(sut.getLocales().size(), ImmutableSet.copyOf(localeDtos).size());
+    assertEquals(tableResource.getLocales().size(), ImmutableSet.copyOf(localeDtos).size());
     for(LocaleDto localeDto : localeDtos) {
       assertFalse(localeDto.hasDisplay());
     }
@@ -229,14 +240,20 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testGetLocales_WhenDisplayLocaleIsEnglishReturnsLocaleDtosWithDisplayFieldInEnglish() {
     // Setup
-    TableResource sut = createResource(null, ImmutableSet.of(new Locale("en"), new Locale("fr")));
+    ApplicationContext mockContext = createMock(ApplicationContext.class);
+    expect(mockContext.getBean(LocalesResource.class)).andReturn(new LocalesResource()).atLeastOnce();
+    replay(mockContext);
+
+    TableResource tableResource = createResource(null, ImmutableSet.of(new Locale("en"), new Locale("fr")),
+        mockContext);
 
     // Exercise
-    Iterable<LocaleDto> localeDtos = sut.getLocalesResource().getLocales("en");
+    Iterable<LocaleDto> localeDtos = tableResource.getLocalesResource().getLocales("en");
 
     // Verify
+    verify(mockContext);
     assertNotNull(localeDtos);
-    assertEquals(sut.getLocales().size(), ImmutableSet.copyOf(localeDtos).size());
+    assertEquals(tableResource.getLocales().size(), ImmutableSet.copyOf(localeDtos).size());
     for(LocaleDto localeDto : localeDtos) {
       assertTrue(localeDto.hasDisplay());
       if("en".equals(localeDto.getName())) {
@@ -250,14 +267,20 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   @Test
   public void testGetLocales_WhenDisplayLocaleIsFrenchReturnsLocaleDtosWithDisplayFieldInFrench() {
     // Setup
-    TableResource sut = createResource(null, ImmutableSet.of(new Locale("en"), new Locale("fr")));
+    ApplicationContext mockContext = createMock(ApplicationContext.class);
+    expect(mockContext.getBean(LocalesResource.class)).andReturn(new LocalesResource()).atLeastOnce();
+    replay(mockContext);
+
+    TableResource tableResource = createResource(null, ImmutableSet.of(new Locale("en"), new Locale("fr")),
+        mockContext);
 
     // Exercise
-    Iterable<LocaleDto> localeDtos = sut.getLocalesResource().getLocales("fr");
+    Iterable<LocaleDto> localeDtos = tableResource.getLocalesResource().getLocales("fr");
 
     // Verify
+    verify(mockContext);
     assertNotNull(localeDtos);
-    assertEquals(sut.getLocales().size(), ImmutableSet.copyOf(localeDtos).size());
+    assertEquals(tableResource.getLocales().size(), ImmutableSet.copyOf(localeDtos).size());
     for(LocaleDto localeDto : localeDtos) {
       assertTrue(localeDto.hasDisplay());
       if("en".equals(localeDto.getName())) {
@@ -272,25 +295,29 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
   public void testBuildTransientVariable_BuildsVariableAsSpecified() {
     // Setup
     ValueTable mockTable = createMock(ValueTable.class);
-    expect(mockTable.getEntityType()).andReturn("Participant").atLeastOnce();
-    TableResource sut = createResource(mockTable);
+    expect(mockTable.getEntityType()).andReturn(PARTICIPANT).atLeastOnce();
+
+    ApplicationContext mockContext = createMock(ApplicationContext.class);
+    expect(mockContext.getBean(VariableResource.class)).andReturn(new VariableResourceImpl()).atLeastOnce();
+
+    replay(mockTable, mockContext);
+
+    TableResource tableResource = createResource(mockTable, mockContext);
     String script = "$('someVar')";
 
-    replay(mockTable);
-
     // Exercise
-    VariableResource variableResource = sut
+    VariableResource variableResource = tableResource
         .getTransientVariable(TextType.get().getName(), false, script, ImmutableList.<String>of("CAT1", "CAT2"), script,
             ImmutableList.<String>of("CAT1", "CAT2"));
 
     // Verify behaviour
-    verify(mockTable);
+    verify(mockTable, mockContext);
 
     Variable variable = variableResource.getVariableValueSource().getVariable();
 
     // Verify state
     assertNotNull(variable);
-    assertEquals("Participant", variable.getEntityType());
+    assertEquals(PARTICIPANT, variable.getEntityType());
     assertEquals(TextType.get(), variable.getValueType());
     assertEquals(false, variable.isRepeatable());
     assertEquals(script, variable.getAttributeStringValue("script"));

@@ -22,11 +22,11 @@ import org.obiba.opal.datashield.cfg.DatashieldConfiguration.Environment;
 import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
 import org.obiba.opal.r.service.OpalRSession;
 import org.obiba.opal.r.service.OpalRSessionManager;
-import org.obiba.opal.web.datashield.support.DataShieldMethodConverterRegistry;
 import org.obiba.opal.web.model.DataShield.DataShieldConfigDto;
 import org.obiba.opal.web.r.OpalRSessionResource;
 import org.obiba.opal.web.r.OpalRSessionsResource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,22 +42,21 @@ public class DataShieldResource {
   private OpalRSessionManager opalRSessionManager;
 
   @Autowired
-  private DataShieldMethodConverterRegistry methodConverterRegistry;
+  private OpalRSessionsResource opalRSessionsResource;
+
+  @Autowired
+  private ApplicationContext applicationContext;
 
   @Path("/sessions")
   public OpalRSessionsResource getSessions() {
-    return new OpalRSessionsResource(opalRSessionManager) {
-      @Override
-      protected void onNewSession(OpalRSession rSession) {
-        onNewDataShieldSession(rSession);
-      }
-    };
+    return opalRSessionsResource;
   }
 
   @Path("/session/{id}")
   public OpalRSessionResource getSession(@PathParam("id") String id) {
-    return new OpalDataShieldSessionResource(configurationSupplier, opalRSessionManager,
-        opalRSessionManager.getSubjectRSession(id));
+    OpalDataShieldSessionResource resource = applicationContext.getBean(OpalDataShieldSessionResource.class);
+    resource.setOpalRSession(opalRSessionManager.getSubjectRSession(id));
+    return resource;
   }
 
   @Path("/session/current")
@@ -66,14 +65,16 @@ public class DataShieldResource {
       OpalRSession session = opalRSessionManager.newSubjectCurrentRSession();
       onNewDataShieldSession(session);
     }
-    return new OpalDataShieldSessionResource(configurationSupplier, opalRSessionManager,
-        opalRSessionManager.getSubjectCurrentRSession());
+    OpalDataShieldSessionResource resource = applicationContext.getBean(OpalDataShieldSessionResource.class);
+    resource.setOpalRSession(opalRSessionManager.getSubjectCurrentRSession());
+    return resource;
   }
 
   @Path("/env/{name}")
   public DataShieldEnvironmentResource getEnvironment(@PathParam("name") String env) {
-    return new DataShieldEnvironmentResource(Environment.valueOf(env.toUpperCase()), configurationSupplier,
-        methodConverterRegistry);
+    DataShieldEnvironmentResource resource = applicationContext.getBean(DataShieldEnvironmentResource.class);
+    resource.setEnvironment(Environment.valueOf(env.toUpperCase()));
+    return resource;
   }
 
   @GET

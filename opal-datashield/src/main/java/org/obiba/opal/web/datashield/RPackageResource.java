@@ -52,16 +52,8 @@ public abstract class RPackageResource {
   private static final String[] defaultRepos = new String[] { "http://cran.obiba.org", //"http://cran.datashield.org",
       "http://cran.rstudio.com" };
 
-  protected OpalRService opalRService;
-
   @Autowired
-  public void setOpalRService(OpalRService opalRService) {
-    this.opalRService = opalRService;
-  }
-
-  protected OpalRService getOpalRService() {
-    return opalRService;
-  }
+  protected OpalRService opalRService;
 
   protected RScriptROperation getInstalledPackages() {
     return getInstalledPackages(new ArrayList<String>());

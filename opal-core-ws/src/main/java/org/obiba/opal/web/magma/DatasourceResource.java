@@ -32,7 +32,6 @@ import javax.ws.rs.core.UriInfo;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueTableUpdateListener;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
@@ -40,9 +39,7 @@ import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.runtime.security.support.OpalPermissions;
-import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
-import org.obiba.opal.core.service.VariableStatsService;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.Schedule;
 import org.obiba.opal.web.TimestampedResponses;
@@ -53,8 +50,6 @@ import org.obiba.opal.web.model.Opal.AclAction;
 import org.obiba.opal.web.model.Opal.LocaleDto;
 import org.obiba.opal.web.security.AuthorizationInterceptor;
 import org.obiba.opal.web.ws.security.NoAuthorization;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
@@ -67,14 +62,11 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
-@SuppressWarnings("OverlyCoupledClass")
 @Component
 @Transactional
 @Scope("request")
 @Path("/datasource/{name}")
 public class DatasourceResource {
-
-  private static final Logger log = LoggerFactory.getLogger(DatasourceResource.class);
 
   @PathParam("name")
   private String name;
@@ -85,27 +77,19 @@ public class DatasourceResource {
 
   private ViewManager viewManager;
 
-  private ImportService importService;
-
   private IndexManagerConfigurationService indexManagerConfigService;
-
-  private VariableStatsService variableStatsService;
 
   private ViewDtos viewDtos;
 
-  private Set<ValueTableUpdateListener> tableListeners;
-
-  @Autowired
   private ApplicationContext applicationContext;
+
+  public void setName(String name) {
+    this.name = name;
+  }
 
   @Autowired
   public void setConfigService(OpalConfigurationService configService) {
     this.configService = configService;
-  }
-
-  @Autowired
-  public void setImportService(ImportService importService) {
-    this.importService = importService;
   }
 
   @Autowired
@@ -119,16 +103,6 @@ public class DatasourceResource {
   }
 
   @Autowired
-  public void setTableListeners(Set<ValueTableUpdateListener> tableListeners) {
-    this.tableListeners = tableListeners;
-  }
-
-  @Autowired
-  public void setVariableStatsService(VariableStatsService variableStatsService) {
-    this.variableStatsService = variableStatsService;
-  }
-
-  @Autowired
   public void setViewDtos(ViewDtos viewDtos) {
     this.viewDtos = viewDtos;
   }
@@ -138,8 +112,9 @@ public class DatasourceResource {
     this.viewManager = viewManager;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  @Autowired
+  public void setApplicationContext(ApplicationContext applicationContext) {
+    this.applicationContext = applicationContext;
   }
 
   @GET
@@ -183,24 +158,31 @@ public class DatasourceResource {
 
   @Path("/tables")
   public DatasourceTablesResource getTables() {
-    DatasourceTablesResource datasourceTablesResource = applicationContext.getBean(DatasourceTablesResource.class);
-    datasourceTablesResource.setDatasource(getDatasource());
-    return datasourceTablesResource;
+    DatasourceTablesResource resource = applicationContext.getBean(DatasourceTablesResource.class);
+    resource.setDatasource(getDatasource());
+    return resource;
   }
 
   public TableResource getTableResource(ValueTable table) {
-    return getDatasource().canDropTable(table.getName()) //
-        ? new DroppableTableResource(table, getLocales(), importService, variableStatsService, tableListeners) //
-        : new TableResource(table, getLocales(), importService, variableStatsService);
+    TableResource resource = applicationContext
+        .getBean(getDatasource().canDropTable(table.getName()) ? DroppableTableResource.class : TableResource.class);
+    resource.setValueTable(table);
+    resource.setLocales(getLocales());
+    return resource;
   }
 
-  public ViewResource getViewResource(View view) {
-    return new ViewResource(viewManager, view, viewDtos, getLocales(), importService, variableStatsService);
+  public ViewResource getViewResource(ValueTable view) {
+    ViewResource resource = applicationContext.getBean(ViewResource.class);
+    resource.setLocales(getLocales());
+    resource.setValueTable(view);
+    return resource;
   }
 
   @Path("/compare")
   public CompareResource getTableCompare() {
-    return new CompareResource(getDatasource());
+    CompareResource resource = applicationContext.getBean(CompareResource.class);
+    resource.setComparedDatasource(getDatasource());
+    return resource;
   }
 
   @POST
@@ -231,8 +213,7 @@ public class DatasourceResource {
 
   @Path("/view/{viewName}")
   public ViewResource getView(@PathParam("viewName") String viewName) {
-    View view = viewManager.getView(getDatasource().getName(), viewName);
-    return getViewResource(view);
+    return getViewResource(viewManager.getView(getDatasource().getName(), viewName));
   }
 
   @GET

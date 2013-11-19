@@ -26,7 +26,7 @@ public class NoSuchRSessionException extends RuntimeException {
     this.rSessionId = rSessionId;
   }
 
-  public String getrSessionId() {
+  public String getRSessionId() {
     return rSessionId;
   }
 

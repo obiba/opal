@@ -2,64 +2,65 @@ package org.obiba.opal.web.magma;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.SortedSet;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 
-import org.mozilla.javascript.Scriptable;
 import org.obiba.magma.Datasource;
-import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
-import org.obiba.magma.js.JavascriptValueSource;
-import org.obiba.magma.js.MagmaContext;
 import org.obiba.magma.js.views.JavascriptClause;
-import org.obiba.magma.support.ValueTableWrapper;
-import org.obiba.magma.type.BooleanType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 abstract class AbstractValueTableResource {
 
-  private final ValueTable valueTable;
+  private ValueTable valueTable;
 
-  private final Set<Locale> locales;
+  private Set<Locale> locales = new HashSet<Locale>();
 
-  AbstractValueTableResource(ValueTable valueTable, Set<Locale> locales) {
-    this.valueTable = valueTable;
-    this.locales = new LinkedHashSet<Locale>(locales);
+  ApplicationContext applicationContext;
+
+  @Autowired
+  void setApplicationContext(ApplicationContext applicationContext) {
+    this.applicationContext = applicationContext;
   }
 
-  protected ValueTable getValueTable() {
+  public void setLocales(Set<Locale> locales) {
+    this.locales = locales;
+  }
+
+  public void setValueTable(ValueTable valueTable) {
+    this.valueTable = valueTable;
+  }
+
+  public ValueTable getValueTable() {
     return valueTable;
   }
 
-  protected Datasource getDatasource() {
+  Datasource getDatasource() {
     return valueTable.getDatasource();
   }
 
-  protected Set<Locale> getLocales() {
+  public Set<Locale> getLocales() {
     return Collections.unmodifiableSet(locales);
   }
 
-  protected LocalesResource getLocalesResource() {
-    return new LocalesResource(locales);
+  LocalesResource getLocalesResource() {
+    LocalesResource resource = applicationContext.getBean(LocalesResource.class);
+    resource.setLocales(locales);
+    return resource;
   }
 
-  protected Iterable<Variable> filterVariables(String script, Integer offset, @Nullable Integer limit) {
+  Iterable<Variable> filterVariables(String script, Integer offset, @Nullable Integer limit) {
     List<Variable> filteredVariables = null;
 
     if(script != null) {
@@ -84,8 +85,7 @@ abstract class AbstractValueTableResource {
     return filteredVariables.subList(fromIndex, toIndex);
   }
 
-  protected Iterable<VariableEntity> filterEntities(@Nullable Integer offset,
-      @Nullable Integer limit) {
+  Iterable<VariableEntity> filterEntities(@Nullable Integer offset, @Nullable Integer limit) {
     Iterable<VariableEntity> entities;
     entities = Sets.newTreeSet(valueTable.getVariableEntities());
     // Apply offset then limit (in that order)

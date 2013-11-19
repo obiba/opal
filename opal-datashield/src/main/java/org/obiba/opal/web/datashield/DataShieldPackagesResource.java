@@ -20,14 +20,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.obiba.opal.datashield.cfg.DatashieldConfigurationSupplier;
 import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.RStringMatrix;
-import org.obiba.opal.web.datashield.support.DataShieldMethodConverterRegistry;
 import org.obiba.opal.web.model.OpalR;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,13 +41,8 @@ import com.google.common.collect.Lists;
 @Path("/datashield/packages")
 public class DataShieldPackagesResource extends RPackageResource {
 
-//  private static final Logger log = LoggerFactory.getLogger(DataShieldPackagesResource.class);
-
   @Autowired
-  private DatashieldConfigurationSupplier configurationSupplier;
-
-  @Autowired
-  private DataShieldMethodConverterRegistry methodConverterRegistry;
+  private ApplicationContext applicationContext;
 
   @GET
   public List<OpalR.RPackageDto> getPackages() throws REXPMismatchException {
@@ -58,7 +52,6 @@ public class DataShieldPackagesResource extends RPackageResource {
     Iterable<OpalR.RPackageDto> dtos = Iterables
         .filter(Iterables.transform(matrix.iterateRows(), new StringsToRPackageDto(matrix)),
             new DataShieldPackagePredicate());
-
     return Lists.newArrayList(dtos);
   }
 
@@ -69,12 +62,9 @@ public class DataShieldPackagesResource extends RPackageResource {
 
     // install or re-install all known datashield package methods
     for(OpalR.RPackageDto pkg : getPackages()) {
-      DataShieldPackageResource pkgRes = new DataShieldPackageResource();
-      pkgRes.setName(pkg.getName());
-      pkgRes.setOpalRService(getOpalRService());
-      pkgRes.setConfigurationSupplier(configurationSupplier);
-      pkgRes.setMethodConverterRegistry(methodConverterRegistry);
-      pkgRes.publishPackageMethods();
+      DataShieldPackageResource resource = applicationContext.getBean(DataShieldPackageResource.class);
+      resource.setName(pkg.getName());
+      resource.publishPackageMethods();
     }
 
     UriBuilder ub = uriInfo.getBaseUriBuilder().path(DataShieldPackageResource.class);
