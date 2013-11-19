@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.ui.VariableSearchListItem;
 import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.UIObjectAuthorizer;
+import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -124,17 +125,7 @@ public class ApplicationView extends ViewWithUiHandlers<ApplicationUiHandlers> i
 
   @Override
   public HasAuthorization getAdministrationAuthorizer() {
-    return new UIObjectAuthorizer(administrationItem) {
-      @Override
-      public void authorized() {
-        super.authorized();
-      }
-
-      @Override
-      public void unauthorized() {
-        super.unauthorized();
-      }
-    };
+    return new WidgetAuthorizer(administrationItem);
   }
 
   @Override
