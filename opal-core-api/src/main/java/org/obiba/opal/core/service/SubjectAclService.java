@@ -13,6 +13,10 @@ import javax.validation.constraints.NotNull;
 
 public interface SubjectAclService extends SystemService {
 
+  /**
+   * Add permission change callback.
+   * @param callback
+   */
   void addListener(SubjectAclChangeCallback callback);
 
   /**
@@ -30,20 +34,90 @@ public interface SubjectAclService extends SystemService {
    */
   void deleteNodePermissions(String domain, String node);
 
+  /**
+   * Delete all node permissions of a subject in a domain.
+   * @param domain
+   * @param node
+   * @param subject
+   */
   void deleteSubjectPermissions(String domain, String node, Subject subject);
 
+  /**
+   * Delete a node permissions of a subject in a domain.
+   * @param domain
+   * @param node
+   * @param subject
+   * @param permission
+   */
   void deleteSubjectPermissions(String domain, String node, Subject subject, String permission);
 
+  /**
+   * Add some node permissions for a subject in a domain.
+   * @param domain
+   * @param node
+   * @param subject
+   * @param permissions
+   */
   void addSubjectPermissions(String domain, String node, Subject subject, Iterable<String> permissions);
 
+  /**
+   * A a node permission for a subject in a domain.
+   * @param domain
+   * @param node
+   * @param subject
+   * @param permission
+   */
   void addSubjectPermission(String domain, String node, @NotNull Subject subject, @NotNull String permission);
 
+  /**
+   * Get all permissions of a subject.
+   * @param subject
+   * @return
+   */
   Iterable<Permissions> getSubjectPermissions(Subject subject);
 
-  Permissions getSubjectPermissions(@NotNull String domain, @NotNull String node, @NotNull Subject subject);
+  /**
+   * Get node permissions of a subject.
+   * @param domain
+   * @param node
+   * @param subject
+   * @return
+   */
+  Permissions getSubjectNodePermissions(@NotNull String domain, @NotNull String node, @NotNull Subject subject);
 
+  /**
+   * Get permissions of a subject on a node and its children.
+   * @param domain
+   * @param node
+   * @param subject
+   * @return
+   */
+  Iterable<Permissions> getSubjectNodeHierarchyPermissions(@NotNull String domain, @NotNull String node, @NotNull Subject subject);
+
+  /**
+   * Get the permissions for a node.
+   * @param domain
+   * @param node
+   * @param type
+   * @return
+   */
   Iterable<Permissions> getNodePermissions(String domain, String node, SubjectType type);
 
+  /**
+   * Get the permissions for a node and its children.
+   * @param domain
+   * @param node
+   * @param type
+   * @return
+   */
+  Iterable<Permissions> getNodeHierarchyPermissions(String domain, String node, SubjectType type);
+
+  /**
+   * Get all subjects of a given type and having permissions in a domain.
+   * @param domain
+   * @param type
+   * @return
+   */
   Iterable<Subject> getSubjects(String domain, SubjectType type);
 
   class Subject implements Comparable<Subject> {

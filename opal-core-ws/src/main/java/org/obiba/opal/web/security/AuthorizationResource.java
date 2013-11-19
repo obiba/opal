@@ -53,7 +53,7 @@ public class AuthorizationResource {
       @QueryParam("type") SubjectAclService.SubjectType type, @QueryParam("perm") String permission) {
     subjectAclService.addSubjectPermission(domain, getNode(), type.subjectFor(subject), permission);
     return PermissionsToAclFunction.INSTANCE
-        .apply(subjectAclService.getSubjectPermissions(domain, getNode(), type.subjectFor(subject)));
+        .apply(subjectAclService.getSubjectNodePermissions(domain, getNode(), type.subjectFor(subject)));
   }
 
   @DELETE
@@ -66,7 +66,7 @@ public class AuthorizationResource {
       subjectAclService.deleteSubjectPermissions(domain, getNode(), type.subjectFor(subject), permission);
     }
     return PermissionsToAclFunction.INSTANCE
-        .apply(subjectAclService.getSubjectPermissions(domain, getNode(), type.subjectFor(subject)));
+        .apply(subjectAclService.getSubjectNodePermissions(domain, getNode(), type.subjectFor(subject)));
   }
 
   private String getNode() {
