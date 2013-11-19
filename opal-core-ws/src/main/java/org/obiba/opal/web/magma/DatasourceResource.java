@@ -172,13 +172,6 @@ public class DatasourceResource {
     return resource;
   }
 
-  public ViewResource getViewResource(ValueTable view) {
-    ViewResource resource = applicationContext.getBean(ViewResource.class);
-    resource.setLocales(getLocales());
-    resource.setValueTable(view);
-    return resource;
-  }
-
   @Path("/compare")
   public CompareResource getTableCompare() {
     CompareResource resource = applicationContext.getBean(CompareResource.class);
@@ -232,6 +225,13 @@ public class DatasourceResource {
     return MagmaEngine.get().hasDatasource(name)
         ? MagmaEngine.get().getDatasource(name)
         : MagmaEngine.get().getTransientDatasourceInstance(name);
+  }
+
+  private ViewResource getViewResource(ValueTable view) {
+    ViewResource resource = applicationContext.getBean(ViewResource.class);
+    resource.setLocales(getLocales());
+    resource.setValueTable(view);
+    return resource;
   }
 
   private boolean datasourceHasTable(String viewName) {

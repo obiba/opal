@@ -96,8 +96,7 @@ public class DtosTest {
     builder.setUnit("unit");
     builder.addCategories(buildCategoryDto());
     builder.addAttributes(buildAttributeDto());
-    VariableDto variableDto = builder.build();
-    return variableDto;
+    return builder.build();
   }
 
   private CategoryDto buildCategoryDto() {
@@ -105,8 +104,7 @@ public class DtosTest {
     builder.setName("name");
     builder.setIsMissing(true);
     builder.addAttributes(buildAttributeDto());
-    CategoryDto categoryDto = builder.build();
-    return categoryDto;
+    return builder.build();
   }
 
   private AttributeDto buildAttributeDto() {
@@ -114,8 +112,7 @@ public class DtosTest {
     builder.setName("name");
     builder.setLocale(Locale.ENGLISH.toString());
     builder.setValue("value");
-    AttributeDto attributesDto = builder.build();
-    return attributesDto;
+    return builder.build();
   }
 
   @Test
