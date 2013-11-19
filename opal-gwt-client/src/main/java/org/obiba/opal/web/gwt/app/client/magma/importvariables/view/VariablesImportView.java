@@ -236,9 +236,7 @@ public class VariablesImportView extends ModalPopupViewWithUiHandlers<VariablesI
 
   @Override
   public void clearErrors() {
-    dialog.clearAlert(fileSelectionGroup);
-    dialog.clearAlert(localeGroup);
-    dialog.clearAlert(charsetGroup);
+    dialog.closeAlerts();
   }
 
   @Override

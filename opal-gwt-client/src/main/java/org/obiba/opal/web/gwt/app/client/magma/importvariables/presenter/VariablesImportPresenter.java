@@ -203,6 +203,8 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
   }
 
   private void createTransientDatasource() {
+    if (!Strings.isNullOrEmpty(transientDatasourceName)) deleteTransientDatasource();
+
     DatasourceFactoryDto factory = createDatasourceFactoryDto(getView().getSelectedFile());
     ResponseCodeCallback errorCallback = new TransientDatasourceFailureCallback();
 
@@ -225,6 +227,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
           @Override
           public void onResponseCode(Request request, Response response) {}
         }).delete().send();
+    transientDatasourceName = null;
   }
 
   private DatasourceFactoryDto createDatasourceFactoryDto(String tmpFilePath) {
