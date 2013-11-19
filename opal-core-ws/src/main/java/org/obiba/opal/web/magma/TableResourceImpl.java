@@ -97,7 +97,7 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
 
   @Override
   public VariablesResource getVariables() {
-    VariablesResource resource = applicationContext.getBean(VariablesResource.class);
+    VariablesResource resource = applicationContext.getBean("variablesResource", VariablesResource.class);
     resource.setValueTable(getValueTable());
     resource.setLocales(getLocales());
     return resource;

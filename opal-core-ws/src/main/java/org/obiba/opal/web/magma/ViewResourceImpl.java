@@ -65,7 +65,7 @@ public class ViewResourceImpl extends AbstractValueTableResource implements View
 
   @Override
   public VariablesViewResource getVariables() {
-    VariablesViewResource resource = applicationContext.getBean(VariablesViewResource.class);
+    VariablesViewResource resource = applicationContext.getBean("variablesViewResource", VariablesViewResource.class);
     resource.setLocales(getLocales());
     resource.setValueTable(getValueTable());
     return resource;

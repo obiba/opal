@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 
-@Component
+@Component("variablesViewResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Transactional
 public class VariablesViewResourceImpl extends VariablesResourceImpl implements VariablesViewResource {

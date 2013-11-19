@@ -17,7 +17,6 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
@@ -49,13 +48,17 @@ import com.google.common.collect.Lists;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 
-@Component
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
+
+@Component("variablesResource")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Transactional
 public class VariablesResourceImpl extends AbstractValueTableResource implements VariablesResource {
 
   @Override
-  public Response getVariables(Request request, UriInfo uriInfo, String script, Integer offset, Integer limit) {
+  public Response getVariables(Request request, UriInfo uriInfo, String script, Integer offset,
+      @Nullable Integer limit) {
     TimestampedResponses.evaluate(request, getValueTable());
 
     if(offset < 0) {
@@ -111,19 +114,18 @@ public class VariablesResourceImpl extends AbstractValueTableResource implements
   public Response addOrUpdateVariables(List<VariableDto> variables, @Nullable String comment) {
     try {
 
-      // @TODO Check if table can be modified and respond with "IllegalTableModification" (it seems like this cannot be
-      // done with the current Magma implementation).
+      // @TODO Check if table can be modified and respond with "IllegalTableModification"
+      // (it seems like this cannot be done with the current Magma implementation).
 
       if(getValueTable().isView()) {
-        return Response.status(Status.BAD_REQUEST).entity(getErrorMessage(Status.BAD_REQUEST, "CannotWriteToView"))
-            .build();
+        return Response.status(BAD_REQUEST).entity(getErrorMessage(BAD_REQUEST, "CannotWriteToView")).build();
       }
       addOrUpdateTableVariables(variables);
 
       return Response.ok().build();
     } catch(Exception e) {
-      return Response.status(Status.INTERNAL_SERVER_ERROR)
-          .entity(getErrorMessage(Status.INTERNAL_SERVER_ERROR, e.toString())).build();
+      return Response.status(INTERNAL_SERVER_ERROR).entity(getErrorMessage(INTERNAL_SERVER_ERROR, e.toString()))
+          .build();
     }
   }
 

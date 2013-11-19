@@ -42,7 +42,7 @@ public interface VariablesResource {
    */
   @GET
   Response getVariables(@Context Request request, @Context UriInfo uriInfo, @QueryParam("script") String script,
-      @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("limit") Integer limit);
+      @QueryParam("offset") @DefaultValue("0") Integer offset, @Nullable @QueryParam("limit") Integer limit);
 
   @GET
   @Path("/excel")
