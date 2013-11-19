@@ -10,6 +10,8 @@
 package org.obiba.opal.core.service.impl;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -30,6 +32,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 
@@ -237,42 +241,18 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
   @Override
   public Iterable<Permissions> getNodePermissions(String domain, String node, SubjectType type) {
+    Map<Subject, Permissions> entries = Maps.newHashMap();
 
-    return Iterables.transform(find(domain, node, type), new Function<SubjectAcl, Permissions>() {
-
-      @Override
-      public Permissions apply(final SubjectAcl from) {
-        return new Permissions() {
-
-          @Override
-          public String getNode() {
-            return from.getNode();
-          }
-
-          @Override
-          public String getDomain() {
-            return from.getDomain();
-          }
-
-          @Override
-          public Subject getSubject() {
-            return from.getSubject();
-          }
-
-          @Override
-          public Iterable<String> getPermissions() {
-            return Iterables
-                .transform(find(from.getDomain(), getNode(), from.getSubject()), new Function<SubjectAcl, String>() {
-                  @Override
-                  public String apply(SubjectAcl from) {
-                    return from.getPermission();
-                  }
-                });
-          }
-        };
+    for (SubjectAcl acl : find(domain, node, type)) {
+      PermissionsImpl perms = (PermissionsImpl)entries.get(acl.getSubject());
+      if (perms == null) {
+        perms = new PermissionsImpl(domain,node,acl.getSubject());
+        entries.put(acl.getSubject(), perms);
       }
+      perms.addPermission(acl.getPermission());
+    }
 
-    });
+    return entries.values();
   }
 
   @Override
@@ -312,6 +292,49 @@ public class DefaultSubjectAclService implements SubjectAclService {
         c.onSubjectAclChanged(subject);
       } catch(Exception e) {
         log.warn("Ignoring exception during ACL callback", e);
+      }
+    }
+  }
+
+  private class PermissionsImpl implements Permissions {
+
+    private final String domain;
+
+    private final String node;
+
+    private final Subject subject;
+
+    private List<String> permissions = Lists.newArrayList();
+
+    private PermissionsImpl(String domain, String node, Subject subject) {
+      this.domain = domain;
+      this.node = node;
+      this.subject = subject;
+    }
+
+    @Override
+    public String getDomain() {
+      return domain;
+    }
+
+    @Override
+    public String getNode() {
+      return node;
+    }
+
+    @Override
+    public Subject getSubject() {
+      return subject;
+    }
+
+    @Override
+    public Iterable<String> getPermissions() {
+      return permissions;
+    }
+
+    public void addPermission(String permission) {
+      if (!permissions.contains(permission)) {
+        permissions.add(permission);
       }
     }
   }
