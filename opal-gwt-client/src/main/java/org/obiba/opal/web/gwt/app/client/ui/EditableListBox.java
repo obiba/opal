@@ -85,8 +85,7 @@ public class EditableListBox extends Composite implements HasText, HasValue<Stri
 
   @Override
   public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
-    return null;
-    //return textBox.addValueChangeHandler(handler);
+    return textBox.addValueChangeHandler(handler);
   }
 
   @Override

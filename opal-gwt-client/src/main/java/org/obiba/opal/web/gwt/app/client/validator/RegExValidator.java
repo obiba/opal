@@ -30,11 +30,15 @@ public class RegExValidator extends AbstractFieldValidator {
   //
 
   public RegExValidator(HasText textField, String regex, String errorMessageKey) {
-    this(textField, regex, "", errorMessageKey);
+    this(textField, regex, errorMessageKey, "");
   }
 
-  public RegExValidator(HasText textField, String regex, String modifiers, String errorMessageKey) {
-    super(errorMessageKey);
+  public RegExValidator(HasText textField, String regex, String errorMessageKey, String id) {
+    this(textField, regex, "", errorMessageKey, id);
+  }
+
+  public RegExValidator(HasText textField, String regex, String modifiers, String errorMessageKey, String id) {
+    super(errorMessageKey, id);
 
     this.textField = textField;
     this.regex = regex;

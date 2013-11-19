@@ -26,6 +26,9 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.model.client.magma.DatasourceParsingErrorDto.ClientErrorDtoExtensions;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.github.gwtbootstrap.client.ui.base.HasType;
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -152,21 +155,6 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
           }
         }).title(translations.dataImportFileStep())//
 
-        .append(destinationSelectionStep, new Skippable() {
-          @Override
-          public boolean skip() {
-            return !ImportFormat.CSV.name().equals(formatChooser.getSelectedValue());
-          }
-        })//
-        .title(translations.dataImportDestinationStep())//
-        .onValidate(new ValidationHandler() {
-
-          @Override
-          public boolean validate() {
-            return importDataInputsHandler.validateDestination();
-          }
-        })//
-
         .append(unitSelectionStep)//
         .title(translations.configureDataImport())//
         .onStepIn(new StepInHandler() {
@@ -237,6 +225,16 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
         break;
       }
     }
+  }
+
+  @Override
+  public void showError(String errorMessage, HasType<ControlGroupType> errorType) {
+    dialog.addAlert(errorMessage, AlertType.ERROR, errorType);
+  }
+
+  @Override
+  public void clearError() {
+    dialog.closeAlerts();
   }
 
   @Override

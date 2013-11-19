@@ -1,22 +1,26 @@
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Stack;
 
 import javax.annotation.Nullable;
 
 import com.github.gwtbootstrap.client.ui.Alert;
-import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.ModalFooter;
+import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.BackdropType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
-import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
-import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
+import com.github.gwtbootstrap.client.ui.event.CloseEvent;
+import com.github.gwtbootstrap.client.ui.event.CloseHandler;
 import com.github.gwtbootstrap.client.ui.event.ShowEvent;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.History;
@@ -406,13 +410,29 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     return false;
   }
 
+  /**
+   * Closes the alerts along with the highlighted groups
+   */
+  public void closeAlerts() {
+
+    Collection<Alert> alerts = new ArrayList<Alert>();
+
+    for (Iterator<Widget> iterator = alertPlace.iterator(); iterator.hasNext();) {
+      alerts.add((Alert)iterator.next());
+    }
+    for (Alert alert : alerts) {
+      // automatically removes the alert from the alertPlace children list, hence the two loops
+      alert.close();
+    }
+  }
+
   public void clearAlert() {
     alertPlace.clear();
   }
 
-  public void clearAlert(ControlGroup group) {
+  public void clearAlert(HasType<ControlGroupType> group) {
     clearAlert();
-    group.removeStyle(ControlGroupType.ERROR);
+    group.setType(ControlGroupType.NONE);
   }
 
   public void addAlert(Alert alert) {
@@ -420,29 +440,29 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   }
 
   public void addAlert(String message, AlertType type) {
-    addAlert(message, type, (ClosedHandler) null);
+    addAlert(message, type, (CloseHandler) null);
   }
 
-  public void addAlert(String message, AlertType type, final ControlGroup group) {
+  public void addAlert(String message, AlertType type, final HasType<ControlGroupType> group) {
     group.setType(ControlGroupType.ERROR);
-    addAlert(message, type, new ClosedHandler() {
+    addAlert(message, type, new CloseHandler() {
       @Override
-      public void onClosed(ClosedEvent closedEvent) {
+      public void onClose(CloseEvent closeEvent) {
         group.setType(ControlGroupType.NONE);
       }
     });
   }
 
-  public void addAlert(String message, AlertType type, @Nullable ClosedHandler handler) {
+  public void addAlert(String message, AlertType type, @Nullable final CloseHandler groupCloseHandler) {
     final Alert alert = new Alert(message);
     alert.setType(type);
     alert.setAnimation(true);
     alert.setClose(true);
-    if(handler != null) alert.addClosedHandler(handler);
-    alert.addClosedHandler(new ClosedHandler() {
+    final HandlerRegistration handler = alert.addCloseHandler(new CloseHandler() {
       @Override
-      public void onClosed(ClosedEvent closedEvent) {
+      public void onClose(CloseEvent closeEvent) {
         alert.removeFromParent();
+        if(groupCloseHandler != null) groupCloseHandler.onClose(closeEvent);
       }
     });
     addAlert(alert);

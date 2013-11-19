@@ -120,8 +120,8 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
       extensionDto.setFirstRow(Integer.parseInt(getView().getRowText().getText()));
     }
 
-    extensionDto.setSeparator(getView().getFieldSeparator());
-    extensionDto.setQuote(getView().getQuote());
+    extensionDto.setSeparator(getView().getFieldSeparator().getText());
+    extensionDto.setQuote(getView().getQuote().getText());
 
     String charset = getCharset();
     if(charset != null) {
@@ -208,9 +208,9 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
 
     void setDefaultCharset(String charset);
 
-    String getQuote();
+    HasText getQuote();
 
-    String getFieldSeparator();
+    HasText getFieldSeparator();
 
     void resetQuote();
 

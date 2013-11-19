@@ -1,17 +1,16 @@
-/*******************************************************************************
- * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
+/*
+ * Copyright (c) 2013 OBiBa. All rights reserved.
  *
  * This program and the accompanying materials
  * are made available under the terms of the GNU Public License v3.0.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ */
 package org.obiba.opal.web.gwt.app.client.magma.datasource.view;
 
-import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.CsvOptionsDisplay;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.magma.datasource.view.CsvOptionsView;
+import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.CsvOptionsDisplay;
 
 import com.google.gwt.user.client.ui.HasText;
 import com.gwtplatform.mvp.client.ViewImpl;
@@ -21,6 +20,11 @@ public abstract class AbstractCsvOptionsView extends ViewImpl implements CsvOpti
   @Override
   public void setCsvFileSelectorWidgetDisplay(Display display) {
     getCsvOptions().setCsvFileSelectorWidgetDisplay(display);
+  }
+
+  @Override
+  public void setCsvFileSelectorVisible(boolean value) {
+    getCsvOptions().setVisible(value);
   }
 
   @Override
@@ -34,12 +38,12 @@ public abstract class AbstractCsvOptionsView extends ViewImpl implements CsvOpti
   }
 
   @Override
-  public String getFieldSeparator() {
+  public HasText getFieldSeparator() {
     return getCsvOptions().getFieldSeparator();
   }
 
   @Override
-  public String getQuote() {
+  public HasText getQuote() {
     return getCsvOptions().getQuote();
   }
 

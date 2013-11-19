@@ -1,9 +1,22 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:w="urn:import:org.obiba.opal.web.gwt.app.client.magma.datasource.view"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui" xmlns:g="urn:import:com.google.gwt.user.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <w:CsvOptionsView ui:field="csvOptions"/>
+  <g:FlowPanel>
+    <b:ControlGroup ui:field="selectCsvFileGroup">
+      <b:ControlLabel>
+        <ui:msg description="Data File label">Data File</ui:msg>
+      </b:ControlLabel>
+      <o:OpalSimplePanel ui:field="selectCsvFilePanel"/>
+      <b:HelpBlock>
+        <ui:msg description="CSV File Description label">Data in CSV format are in a text file (.csv)</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+    <w:CsvOptionsView ui:field="csvOptions"/>
+  </g:FlowPanel>
 
 </ui:UiBinder>

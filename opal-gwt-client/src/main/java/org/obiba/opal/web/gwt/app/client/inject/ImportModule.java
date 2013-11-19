@@ -13,7 +13,6 @@ import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.ArchiveStepP
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.CsvFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DatasourceValuesStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DestinationSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.JdbcStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.LimesurveyStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.NoFormatStepPresenter;
@@ -25,7 +24,6 @@ import org.obiba.opal.web.gwt.app.client.magma.importdata.view.ArchiveStepView;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.view.CsvFormatStepView;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.view.DataImportView;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.view.DatasourceValuesStepView;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.view.DestinationSelectionStepView;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.view.JdbcStepView;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.view.LimesurveyStepView;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.view.NoFormatStepView;
@@ -44,8 +42,6 @@ public class ImportModule extends AbstractOpalModule {
   protected void configure() {
     bindWizardPresenterWidget(DataImportPresenter.class, DataImportPresenter.Display.class, DataImportView.class,
         DataImportPresenter.Wizard.class);
-    bindPresenterWidget(DestinationSelectionStepPresenter.class, DestinationSelectionStepPresenter.Display.class,
-        DestinationSelectionStepView.class);
     bindPresenterWidget(UnitSelectionStepPresenter.class, UnitSelectionStepPresenter.Display.class,
         UnitSelectionStepView.class);
     bindPresenterWidget(DatasourceValuesStepPresenter.class, DatasourceValuesStepPresenter.Display.class,
