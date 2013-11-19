@@ -3,6 +3,7 @@ package org.obiba.opal.web.system.database;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -33,9 +34,9 @@ public class DatabasesResource {
 
   @GET
   @NoAuthorization
-  public List<DatabaseDto> getDatabases(@QueryParam("usage") String usage) {
+  public List<DatabaseDto> getDatabases(@QueryParam("usage") String usage, @QueryParam("settings") @DefaultValue("false") Boolean settings) {
     try {
-      return asDto(databaseRegistry.list(usage == null ? null : Database.Usage.valueOf(usage.toUpperCase())));
+      return asDto(databaseRegistry.list(usage == null ? null : Database.Usage.valueOf(usage.toUpperCase())), settings);
     } catch(IllegalArgumentException e) {
       throw new InvalidRequestException("Not a valid database usage: " + usage);
     }
@@ -45,14 +46,14 @@ public class DatabasesResource {
   @Path("/sql")
   @NoAuthorization
   public List<DatabaseDto> getSqlDatabases() {
-    return asDto(databaseRegistry.listSqlDatabases());
+    return asDto(databaseRegistry.listSqlDatabases(), true);
   }
 
   @GET
   @Path("/mongodb")
   @NoAuthorization
   public List<DatabaseDto> getMongoDbDatabases() {
-    return asDto(databaseRegistry.listMongoDatabases());
+    return asDto(databaseRegistry.listMongoDatabases(), true);
   }
 
   @GET
@@ -61,10 +62,10 @@ public class DatabasesResource {
     return Dtos.asDto(databaseRegistry.getIdentifiersDatabase());
   }
 
-  private List<DatabaseDto> asDto(Iterable<? extends Database> databases) {
+  private List<DatabaseDto> asDto(Iterable<? extends Database> databases, boolean withSettings) {
     List<DatabaseDto> dtos = new ArrayList<DatabaseDto>();
     for(Database database : databases) {
-      dtos.add(Dtos.asDto(database, false));
+      dtos.add(Dtos.asDto(database, withSettings));
     }
     return dtos;
   }
