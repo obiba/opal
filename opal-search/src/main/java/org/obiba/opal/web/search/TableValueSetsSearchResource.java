@@ -34,10 +34,10 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.VariableEntityBean;
-import org.obiba.opal.web.magma.VariableEntityValueSetDtoFunction;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.QuerySearchJsonBuilder;
+import org.obiba.opal.web.search.support.VariableEntityValueSetDtoFunction;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
