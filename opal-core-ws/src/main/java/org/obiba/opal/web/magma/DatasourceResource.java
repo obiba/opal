@@ -30,6 +30,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.obiba.magma.Datasource;
+import org.obiba.magma.DatasourceUpdateListener;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.Disposables;
@@ -79,6 +80,8 @@ public class DatasourceResource {
 
   private IndexManagerConfigurationService indexManagerConfigService;
 
+  private Set<DatasourceUpdateListener> datasourceUpdateListeners;
+
   private ViewDtos viewDtos;
 
   private ApplicationContext applicationContext;
@@ -100,6 +103,11 @@ public class DatasourceResource {
   @Autowired
   public void setServerService(OpalGeneralConfigService serverService) {
     this.serverService = serverService;
+  }
+
+  @Autowired
+  public void setDatasourceUpdateListeners(Set<DatasourceUpdateListener> datasourceUpdateListeners) {
+    this.datasourceUpdateListeners = datasourceUpdateListeners;
   }
 
   @Autowired
@@ -127,11 +135,13 @@ public class DatasourceResource {
   @DELETE
   public Response removeDatasource() {
     ResponseBuilder response;
+    Datasource ds = null;
     if(MagmaEngine.get().hasTransientDatasource(name)) {
+      ds = MagmaEngine.get().getTransientDatasourceInstance(name);
       MagmaEngine.get().removeTransientDatasource(name);
       response = Response.ok();
     } else if(MagmaEngine.get().hasDatasource(name)) {
-      MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource(name));
+      MagmaEngine.get().removeDatasource(ds = MagmaEngine.get().getDatasource(name));
       configService.modifyConfiguration(new ConfigModificationTask() {
 
         @Override
@@ -146,6 +156,12 @@ public class DatasourceResource {
     } else {
       response = Response.status(Status.NOT_FOUND)
           .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound"));
+    }
+
+    if(ds != null) {
+      for(DatasourceUpdateListener listener : datasourceUpdateListeners) {
+        listener.onDelete(ds);
+      }
     }
 
     return response.build();

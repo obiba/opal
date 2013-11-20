@@ -161,8 +161,8 @@ public class OpalRSessionManager implements SessionListener {
   //
 
   private synchronized void clearRSessions(String sessionId) {
-    log.info("clearRSessions({})", sessionId);
     if(rSessionMap.containsKey(sessionId)) {
+      log.debug("clearRSessions({})", sessionId);
       doClearRSessions(sessionId);
       rSessionMap.remove(sessionId);
     }
