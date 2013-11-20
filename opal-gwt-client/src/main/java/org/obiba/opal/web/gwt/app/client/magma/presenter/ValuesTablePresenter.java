@@ -109,7 +109,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     variables.push(variable);
     getView().setVariables(variables);
 
-    fetchIndexSchema(table);
+    fetchIndexSchema();
   }
 
   public void setTable(final TableDto table, String select) {
@@ -125,8 +125,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
             .revealPlace(ProjectPlacesHelper.getVariablePlace(table.getDatasourceName(), table.getName(), value));
       }
     });
-    fetcher.updateVariables("");
-    fetchIndexSchema(table);
+    fetcher.updateVariables(select);
+    fetchIndexSchema();
   }
 
   public void setFilter(String filter) {
@@ -173,85 +173,11 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   @Override
-  public void onVariableFilter(final String variableName) {
+  public void onVariableFilter(String variableName) {
     // Fetch variable and show its filter
     ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(
         UriBuilders.DATASOURCE_TABLE_VARIABLE.create().build(table.getDatasourceName(), table.getName(), variableName))
-        .withCallback(new ResourceCallback<VariableDto>() {
-          @Override
-          public void onResource(Response response, final VariableDto resource) {
-
-            // Fetch facets
-            if(response.getStatusCode() == Response.SC_OK) {
-
-              List<String> s = JsArrays.toList(opalMap.getKeysArray());
-              final String fieldName = opalMap.getValues(s.indexOf(resource.getName()));
-
-              if(resource.getCategoriesArray().length() > 0 || "integer".equals(resource.getValueType())) {
-
-                // Filter for Categorical variable OR Numerical variable
-                ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(
-                    UriBuilders.DATASOURCE_TABLE_FACET_VARIABLE_SEARCH.create()
-                        .build(table.getDatasourceName(), table.getName(), variableName))
-                    .withCallback(new ResourceCallback<QueryResultDto>() {
-                      @Override
-                      public void onResource(Response response, QueryResultDto term) {
-                        if("integer".equals(resource.getValueType())) {
-                          // Numerical variable
-                          NumericalCriterionDropdown criterion = new NumericalCriterionDropdown(resource, fieldName,
-                              term) {
-                            @Override
-                            public void doFilterValueSets() {
-                              applyAllValueSetsFilter();
-                            }
-                          };
-                          criterion.addChangeHandler(new EmptyNotEmptyFilterRequest());
-                          getView().addVariableFilter(criterion);
-                        } else {
-                          // Categorical variable
-                          CategoricalCriterionDropdown criterion = new CategoricalCriterionDropdown(resource, fieldName,
-                              term) {
-                            @Override
-                            public void doFilterValueSets() {
-                              applyAllValueSetsFilter();
-
-                              // Maybe call fetcher.updateVariables and let it call applyValueSetsFilter...
-//                              fetcher.updateVariables(getView().getFilterText());
-                            }
-                          };
-                          criterion.addChangeHandler(new EmptyNotEmptyFilterRequest());
-                          getView().addVariableFilter(criterion);
-                        }
-                      }
-                    }).get().send();
-
-              } else {
-                if("date".equals(resource.getValueType())) {
-                  // DataTime filter
-                  DateTimeCriterionDropdown criterion = new DateTimeCriterionDropdown(resource, fieldName) {
-                    @Override
-                    public void doFilterValueSets() {
-                      applyAllValueSetsFilter();
-                    }
-                  };
-                  criterion.addChangeHandler(new EmptyNotEmptyFilterRequest());
-                  getView().addVariableFilter(criterion);
-
-                } else {
-                  // Default filter variable
-                  DefaultCriterionDropdown criterion = new DefaultCriterionDropdown(resource, fieldName) {
-                    @Override
-                    public void doFilterValueSets() {
-                      applyAllValueSetsFilter();
-                    }
-                  };
-                  criterion.addChangeHandler(new EmptyNotEmptyFilterRequest());
-                  getView().addVariableFilter(criterion);
-                }
-              }
-            }
-          }
-        }).get().send();
+        .withCallback(new VariableFilterResourceCallback(variableName)).get().send();
   }
 
   private void applyAllValueSetsFilter() {
@@ -283,7 +209,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     }
   }
 
-  private void fetchIndexSchema(final TableDto table) {
+  private void fetchIndexSchema() {
     // Show Values Filter when ES is enabled
     ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()
         .forResource(UriBuilders.DATASOURCE_TABLE_INDEX.create().build(table.getDatasourceName(), table.getName()))
@@ -632,5 +558,111 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       // Maybe call fetcher.updateVariables and let it call applyFilterVariables
 //      fetcher.updateVariables(getView().getFilterText());
     }
+  }
+
+  private class VariableFilterResourceCallback implements ResourceCallback<VariableDto> {
+
+    private final String variableName;
+
+    VariableFilterResourceCallback(String variableName) {
+      this.variableName = variableName;
+    }
+
+    @Override
+    public void onResource(Response response, VariableDto resource) {
+      // Fetch facets
+      if(response.getStatusCode() == Response.SC_OK) {
+
+        List<String> keys = JsArrays.toList(opalMap.getKeysArray());
+        String indexedFieldName = opalMap.getValues(keys.indexOf(resource.getName()));
+
+        if(resource.getCategoriesArray().length() > 0 || "integer".equals(resource.getValueType())) {
+
+          // Filter for Categorical variable OR Numerical variable
+          ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(
+              UriBuilders.DATASOURCE_TABLE_FACET_VARIABLE_SEARCH.create()
+                  .build(table.getDatasourceName(), table.getName(), variableName))
+              .withCallback(new FacetVariableResourceCallback(resource, indexedFieldName)).get().send();
+
+        } else {
+          if("date".equals(resource.getValueType())) {
+            addDateFilter(resource, indexedFieldName);
+          } else {
+            // Default filter variable
+            addDefaultFilter(resource, indexedFieldName);
+          }
+        }
+      }
+    }
+
+    private void addDefaultFilter(final VariableDto resource, final String indexedFieldName) {
+      DefaultCriterionDropdown criterion = new DefaultCriterionDropdown(resource, indexedFieldName) {
+        @Override
+        public void doFilterValueSets() {
+          applyAllValueSetsFilter();
+        }
+      };
+      criterion.addChangeHandler(new EmptyNotEmptyFilterRequest());
+      getView().addVariableFilter(criterion);
+    }
+
+    private void addDateFilter(final VariableDto resource, final String indexedFieldName) {// DataTime filter
+      DateTimeCriterionDropdown criterion = new DateTimeCriterionDropdown(resource, indexedFieldName) {
+        @Override
+        public void doFilterValueSets() {
+          applyAllValueSetsFilter();
+        }
+      };
+      criterion.addChangeHandler(new EmptyNotEmptyFilterRequest());
+      getView().addVariableFilter(criterion);
+    }
+  }
+
+  private class FacetVariableResourceCallback implements ResourceCallback<QueryResultDto> {
+
+    private final VariableDto variableDto;
+
+    private final String fieldName;
+
+    FacetVariableResourceCallback(VariableDto variableDto, String indexedFieldName) {
+      this.variableDto = variableDto;
+      fieldName = indexedFieldName;
+    }
+
+    @Override
+    public void onResource(Response response, QueryResultDto resource) {
+      if("integer".equals(variableDto.getValueType())) {
+        addNumericalFilter(resource);
+
+      } else {
+        addCategoricalFilter(resource);
+      }
+    }
+
+    private void addCategoricalFilter(final QueryResultDto resource) {// Categorical variable
+      CategoricalCriterionDropdown criterion = new CategoricalCriterionDropdown(variableDto, fieldName, resource) {
+        @Override
+        public void doFilterValueSets() {
+          applyAllValueSetsFilter();
+
+          // Maybe call fetcher.updateVariables and let it call applyValueSetsFilter...
+//                              fetcher.updateVariables(getView().getFilterText());
+        }
+      };
+      criterion.addChangeHandler(new EmptyNotEmptyFilterRequest());
+      getView().addVariableFilter(criterion);
+    }
+
+    private void addNumericalFilter(final QueryResultDto resource) {// Numerical variable
+      NumericalCriterionDropdown criterion = new NumericalCriterionDropdown(variableDto, fieldName, resource) {
+        @Override
+        public void doFilterValueSets() {
+          applyAllValueSetsFilter();
+        }
+      };
+      criterion.addChangeHandler(new EmptyNotEmptyFilterRequest());
+      getView().addVariableFilter(criterion);
+    }
+
   }
 }
