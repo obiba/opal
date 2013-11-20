@@ -33,6 +33,11 @@
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-core-ws</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.wordnik</groupId>
+      <artifactId>swagger-jaxrs_2.10</artifactId>
+    </dependency>
+
   </dependencies>
 
 </project>

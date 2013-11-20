@@ -20,11 +20,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
+
 import static org.obiba.opal.web.model.Database.DatabaseDto;
 
 @Component
 @Transactional
 @Path("/system/databases")
+@Api(value = "Databases", description = "Operations about databases")
 public class DatabasesResource {
 
   @Autowired
@@ -32,7 +39,13 @@ public class DatabasesResource {
 
   @GET
   @NoAuthorization
-  public List<DatabaseDto> getDatabases(@QueryParam("usage") String usage, @QueryParam("settings") @DefaultValue("false") Boolean settings) {
+  @ApiOperation(value = "Returns all data databases",
+      notes = "The Identifiers database will not be returned here", response = List.class)
+  public List<DatabaseDto> getDatabases(
+      @ApiParam(value = "database usage", allowableValues = "import, storage, export") @QueryParam("usage")
+      String usage,
+      @ApiParam(value = "should response contains database settings", defaultValue = "false") @QueryParam("settings")
+      @DefaultValue("false") Boolean settings) {
     try {
       return asDto(databaseRegistry.list(usage == null ? null : Database.Usage.valueOf(usage.toUpperCase())), settings);
     } catch(IllegalArgumentException e) {
@@ -43,6 +56,8 @@ public class DatabasesResource {
   @GET
   @Path("/sql")
   @NoAuthorization
+  @ApiOperation(value = "Returns all SQL data databases",
+      notes = "The Identifiers database will not be returned here", response = List.class)
   public List<DatabaseDto> getSqlDatabases() {
     return asDto(databaseRegistry.listSqlDatabases(), true);
   }
@@ -50,12 +65,16 @@ public class DatabasesResource {
   @GET
   @Path("/mongodb")
   @NoAuthorization
+  @ApiOperation(value = "Returns all MongoDB data databases",
+      notes = "The Identifiers database will not be returned here", response = List.class)
   public List<DatabaseDto> getMongoDbDatabases() {
     return asDto(databaseRegistry.listMongoDatabases(), true);
   }
 
   @GET
   @Path("/identifiers")
+  @ApiOperation(value = "Returns the Identifiers database", response = DatabaseDto.class)
+  @ApiResponses(@ApiResponse(code = 404, message = "Identifiers database not found"))
   public DatabaseDto getIdentifiersDatabase() {
     return Dtos.asDto(databaseRegistry.getIdentifiersDatabase());
   }
@@ -69,6 +88,8 @@ public class DatabasesResource {
   }
 
   @POST
+  @ApiOperation("Create a new database")
+  @ApiResponses(@ApiResponse(code = 400, message = "Database for identifiers already exists"))
   public Response addDatabase(DatabaseDto database) throws MultipleIdentifiersDatabaseException {
     databaseRegistry.save(Dtos.fromDto(database));
     return Response.ok().build();

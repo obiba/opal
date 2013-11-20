@@ -16,6 +16,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.NewCookie;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.shiro.SecurityUtils;
@@ -42,10 +43,10 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
 
   @Nullable
   @Override
-  public ServerResponse preProcess(HttpRequest request, ResourceMethodInvoker method)
+  public Response preProcess(HttpRequest request, ResourceMethodInvoker method)
       throws Failure, WebApplicationException {
-    // Check authentication before processing. If resource requires authentication and user is not authenticated, return
-    // "401: Unauthorized"
+    // Check authentication before processing.
+    // If resource requires authentication and user is not authenticated, return "401: Unauthorized"
 
     // If we have an authenticated user, let method through
     if(isUserAuthenticated()) {
@@ -64,7 +65,7 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
     }
 
     // Not authorized: method requires proper authentication, and no user is authenticated
-    return (ServerResponse) ServerResponse.status(Status.UNAUTHORIZED)
+    return ServerResponse.status(Status.UNAUTHORIZED)
         .header(HttpHeaders.WWW_AUTHENTICATE, OpalAuth.CREDENTIALS_HEADER + " realm=\"Opal\"").build();
   }
 
