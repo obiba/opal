@@ -2473,6 +2473,8 @@ public interface Translations extends Constants {
       "range", "Range", "values", "Values", //
       "custom_match_query", "Custom match query",//
       "like", "Like", //
+      "not_like", "Not like",//
+      "wildcards_help", "use the * wildcard character to replace one or more characters",//
       "from", "From",//
       "to", "To",//
       "date", "Date",//
