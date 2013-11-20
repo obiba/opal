@@ -182,8 +182,24 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
 
   private void authorize() {
     // Edit system config
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/system/conf/general").put()
-        .authorize(getView().getAdministrationAuthorizer()).send();
+//    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/system/conf/general").put()
+//        .authorize(getView().getAdministrationAuthorizer()).send();
+    fireEvent(new RequestAdministrationPermissionEvent(new HasAuthorization() {
+
+      @Override
+      public void unauthorized() {
+      }
+
+      @Override
+      public void beforeAuthorization() {
+        getView().getAdministrationAuthorizer().beforeAuthorization();
+      }
+
+      @Override
+      public void authorized() {
+        getView().getAdministrationAuthorizer().authorized();
+      }
+    }));
   }
 
   private void registerUserMessageEventHandler() {
