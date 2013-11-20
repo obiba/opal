@@ -582,7 +582,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         String indexedFieldName = opalMap.getValues(keys.indexOf(resource.getName()));
 
         if(JsArrays.toSafeArray(resource.getCategoriesArray()).length() > 0 ||
-            "integer".equals(resource.getValueType())) {
+            "integer".equals(resource.getValueType()) || "decimal".equals(resource.getValueType())) {
           // Filter for Categorical variable OR Numerical variable
           ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(
               UriBuilders.DATASOURCE_TABLE_FACET_VARIABLE_SEARCH.create()
@@ -637,7 +637,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     @Override
     public void onResource(Response response, QueryResultDto resource) {
-      if("integer".equals(variableDto.getValueType())) {
+      if("integer".equals(variableDto.getValueType()) || "decimal".equals(variableDto.getValueType())) {
         addNumericalFilter(resource);
       } else {
         addCategoricalFilter(resource);
