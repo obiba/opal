@@ -196,13 +196,17 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
     }
 
     // VALUES
-    // Parse numbers
-    String[] numbers = values.getText().split(",");
-    String valuesQuery = fieldName + ":(" + Joiner.on(" OR ").join(numbers) + ")";
-    if(operatorChooser.isItemSelected(2)) {
-      return "NOT " + valuesQuery;
+    if(rangeValueChooser.isItemSelected(2) && values.getText().length() > 0) {
+      // Parse numbers
+      String[] numbers = values.getText().split(",");
+      String valuesQuery = fieldName + ":(" + Joiner.on(" OR ").join(numbers) + ")";
+      if(operatorChooser.isItemSelected(2)) {
+        return "NOT " + valuesQuery;
+      }
+      return valuesQuery;
     }
-    return valuesQuery;
+
+    return "";
   }
 
   private void updateRangeValuesCriterionFilter() {
