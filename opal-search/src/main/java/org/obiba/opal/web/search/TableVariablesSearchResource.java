@@ -55,10 +55,10 @@ public class TableVariablesSearchResource extends AbstractVariablesSearchResourc
 
     try {
       if(!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-      if(!indexManager.hasIndex(getValueTable())) return Response.status(Response.Status.NOT_FOUND).build();
-      QuerySearchJsonBuilder jsonBuiler = //
-          buildQuerySearch(query, offset, limit, fields, sortField, sortDir);
-      Search.QueryResultDto dtoResponse = convertResonse(executeQuery(jsonBuiler.build()), addVariableDto);
+      if(!variablesIndexManager.hasIndex(getValueTable())) return Response.status(Response.Status.NOT_FOUND).build();
+      QuerySearchJsonBuilder jsonBuiler = buildQuerySearch(query, offset, limit, fields, sortField, sortDir);
+      JSONObject jsonResponse = executeQuery(jsonBuiler.build());
+      Search.QueryResultDto dtoResponse = convertResonse(jsonResponse, addVariableDto);
       return Response.ok().entity(dtoResponse).build();
     } catch(NoSuchValueSetException e) {
       return Response.status(Response.Status.NOT_FOUND).build();
@@ -71,7 +71,7 @@ public class TableVariablesSearchResource extends AbstractVariablesSearchResourc
 
   @Override
   protected String getSearchPath() {
-    return indexManager.getIndex(getValueTable()).getRequestPath();
+    return variablesIndexManager.getIndex(getValueTable()).getRequestPath();
   }
 
   protected Search.QueryResultDto convertResonse(JSONObject jsonResponse, boolean addVariableDto) throws JSONException {
@@ -81,7 +81,7 @@ public class TableVariablesSearchResource extends AbstractVariablesSearchResourc
   }
 
   private boolean canQueryEsIndex() {
-    return searchServiceAvailable() && indexManager.isIndexUpToDate(getValueTable());
+    return searchServiceAvailable() && variablesIndexManager.isIndexUpToDate(getValueTable());
   }
 
   private ValueTable getValueTable() {
