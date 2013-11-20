@@ -28,7 +28,6 @@ import org.obiba.magma.VectorSource;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Magma.ValueSetsDto;
 import org.obiba.opal.web.model.Magma.ValueSetsDto.ValueSetDto;
-import org.obiba.opal.web.search.support.VariableEntityValueSetDtoFunction;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
