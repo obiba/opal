@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFac
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.ReportCommandOptionsDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
@@ -95,8 +96,11 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
       @Override
       public void run() {
         String reportTemplateName = reportTemplate.getName();
-        UriBuilder ub = UriBuilder.create().segment("report-template", reportTemplateName);
-        ResourceRequestBuilderFactory.newBuilder().forResource(ub.build()).delete()
+        String uri = UriBuilder.create().segment("report-template", reportTemplateName).build();
+        if (reportTemplate.hasProject()) {
+          uri = UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplate.getProject(), reportTemplateName);
+        }
+        ResourceRequestBuilderFactory.newBuilder().forResource(uri).delete()
             .withCallback(Response.SC_OK, new RemoveReportTemplateResponseCallBack())
             .withCallback(Response.SC_NOT_FOUND, new ReportTemplateNotFoundCallBack(reportTemplateName)).send();
       }

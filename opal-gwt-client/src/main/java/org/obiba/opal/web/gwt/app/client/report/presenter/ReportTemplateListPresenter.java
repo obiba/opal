@@ -102,6 +102,7 @@ public class ReportTemplateListPresenter extends PresenterWidget<ReportTemplateL
 
   public void showProject(String project) {
     this.project = project;
+    refreshReportTemplates(null);
   }
 
   public interface Display extends View, HasUiHandlers<ReportTemplateListUiHandlers> {

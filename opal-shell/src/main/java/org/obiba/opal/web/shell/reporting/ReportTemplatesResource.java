@@ -92,10 +92,14 @@ public class ReportTemplatesResource extends AbstractReportTemplateResource {
           ClientErrorDto.newBuilder().setCode(Status.BAD_REQUEST.getStatusCode())
               .setStatus("CouldNotCreateReportTemplate").build()).build();
     }
-    URI reportUri = UriBuilder.fromResource(ReportTemplateResource.class).build(reportTemplateDto.getName());
+    URI reportUri = getReportTemplateURI(reportTemplateDto);
     return Response.created(reportUri) //
         .header("X-Alt-Permissions", new ReportPermissions(reportUri, AclAction.REPORT_TEMPLATE_ALL)) //
         .build();
+  }
+
+  protected URI getReportTemplateURI(ReportTemplateDto reportTemplateDto) {
+    return UriBuilder.fromResource(ReportTemplateResource.class).build(reportTemplateDto.getName());
   }
 
   private void addCommand(final String name) {

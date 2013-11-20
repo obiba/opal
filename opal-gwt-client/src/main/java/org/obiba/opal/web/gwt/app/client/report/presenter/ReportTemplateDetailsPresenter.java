@@ -27,6 +27,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -126,8 +127,14 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
   private void authorize() {
     // display reports
-    UriBuilder ub = UriBuilder.create().segment("files", "meta", "reports", reportTemplate.getName());
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build()).get()
+    String uri;
+    if (reportTemplate.hasProject()) {
+      uri= UriBuilder.create().segment("files", "meta", "projects", reportTemplate.getProject(), "reports", reportTemplate.getName()).build();
+    } else {
+      uri= UriBuilder.create().segment("files", "meta", "reports", reportTemplate.getName()).build();
+    }
+
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(uri).get()
         .authorize(getView().getListReportsAuthorizer()).send();
 
     // set permissions
@@ -192,16 +199,23 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
   }
 
   private void refreshProducedReports(ReportTemplateDto reportTemplate) {
-    UriBuilder ub = UriBuilder.create().segment("report-template", reportTemplate.getName(), "reports");
-    ResourceRequestBuilderFactory.<JsArray<ReportDto>>newBuilder().forResource(ub.build()).get()
-        .withCallback(new ProducedReportsResourceCallback()).withCallback(404, new NoProducedReportsResourceCallback())
+    String uri = UriBuilder.create().segment("report-template", reportTemplate.getName(), "reports").build();
+    if (reportTemplate.hasProject()) {
+      uri = UriBuilders.PROJECT_REPORT_TEMPLATE_REPORTS.create().build(reportTemplate.getProject(), reportTemplate.getName());
+    }
+    ResourceRequestBuilderFactory.<JsArray<ReportDto>>newBuilder().forResource(uri).get()
+        .withCallback(new ProducedReportsResourceCallback()).withCallback(Response.SC_NOT_FOUND, new NoProducedReportsResourceCallback())
         .send();
   }
 
   private void refreshReportTemplateDetails(ReportTemplateDto reportTemplate) {
     String reportTemplateName = reportTemplate.getName();
-    UriBuilder ub = UriBuilder.create().segment("report-template", reportTemplateName);
-    ResourceRequestBuilderFactory.<ReportTemplateDto>newBuilder().forResource(ub.build()).get()
+    String uri = UriBuilder.create().segment("report-template", reportTemplateName).build();
+    if (reportTemplate.hasProject()) {
+      uri = UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplate.getProject(), reportTemplateName);
+    }
+
+    ResourceRequestBuilderFactory.<ReportTemplateDto>newBuilder().forResource(uri).get()
         .withCallback(new ReportTemplateFoundCallBack())
         .withCallback(Response.SC_NOT_FOUND, new ReportTemplateNotFoundCallBack(reportTemplateName)).send();
   }
@@ -298,6 +312,9 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
     public void authorized() {
       AuthorizationPresenter authz = authorizationPresenter.get();
       String node = UriBuilder.create().segment("report-template", reportTemplate.getName()).build();
+      if (reportTemplate.hasProject()) {
+        node = UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplate.getProject(), reportTemplate.getName());
+      }
       authz.setAclRequest("report-template", new AclRequest(AclAction.REPORT_TEMPLATE_READ, node), //
           new AclRequest(AclAction.REPORT_TEMPLATE_ALL, node));
       setInSlot(null, authz);

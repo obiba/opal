@@ -10,10 +10,14 @@
 
 package org.obiba.opal.web.shell.reporting;
 
+import java.net.URI;
+
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.opal.core.cfg.ReportTemplate;
+import org.obiba.opal.web.model.Opal;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,4 +37,8 @@ public class ProjectReportTemplatesResource extends ReportTemplatesResource {
         getAuthorizer().isPermitted("magma:/project/" + name + "/report-template/" + template.getName() + ":GET");
   }
 
+  @Override
+  protected URI getReportTemplateURI(Opal.ReportTemplateDto reportTemplateDto) {
+    return UriBuilder.fromResource(ProjectReportTemplateResource.class).build(name, reportTemplateDto.getName());
+  }
 }

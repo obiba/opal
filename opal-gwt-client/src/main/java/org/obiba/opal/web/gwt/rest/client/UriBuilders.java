@@ -39,6 +39,20 @@ public enum UriBuilders {
     }
   },
 
+  PROJECT_REPORT_TEMPLATE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "report-template", "{}");
+    }
+  },
+
+  PROJECT_REPORT_TEMPLATE_REPORTS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "report-template", "{}", "reports");
+    }
+  },
+
   PROJECT_COMMANDS_IMPORT {
     @Override
     public UriBuilder create() {
