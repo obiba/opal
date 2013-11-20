@@ -45,6 +45,15 @@ public class TableVariableSuggestOracle extends VariableSuggestOracle {
     accum.appendEscaped(attributes.get("name"));
     accum.appendHtmlConstant("</strong>");
 
+    if(attributes.containsKey("label")) {
+      accum.appendHtmlConstant("<br>");
+
+      String label = attributes.get("label");
+      if(label.length() > LABEL_MAX_SIZE) {
+        label = label.substring(0, LABEL_MAX_SIZE) + " ...";
+      }
+      accum.appendEscaped(label);
+    }
     accum.appendHtmlConstant("</span>");
 
     return createSuggestion(query, accum.toSafeHtml().asString(), attributes.get("datasource"), attributes.get("table"),
