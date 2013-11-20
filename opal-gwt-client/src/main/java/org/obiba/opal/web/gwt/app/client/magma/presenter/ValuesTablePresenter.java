@@ -642,14 +642,12 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       }
     }
 
-    private void addCategoricalFilter(final QueryResultDto resource) {// Categorical variable
+    private void addCategoricalFilter(final QueryResultDto resource) {
+      // Categorical variable
       CategoricalCriterionDropdown criterion = new CategoricalCriterionDropdown(variableDto, fieldName, resource) {
         @Override
         public void doFilterValueSets() {
           applyAllValueSetsFilter();
-
-          // Maybe call fetcher.updateVariables and let it call applyValueSetsFilter...
-//                              fetcher.updateVariables(getView().getFilterText());
         }
       };
       criterion.addChangeHandler(new EmptyNotEmptyFilterRequest());

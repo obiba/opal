@@ -138,7 +138,7 @@ public abstract class CriterionDropdown extends DropdownButton {
   public String getQueryString() {
     if(((CheckBox) radioControls.getWidget(0)).getValue()) {
       // Empty
-      return "*";
+      return fieldName + ":*";
     }
     if(((CheckBox) radioControls.getWidget(1)).getValue()) {
       // Not empty
