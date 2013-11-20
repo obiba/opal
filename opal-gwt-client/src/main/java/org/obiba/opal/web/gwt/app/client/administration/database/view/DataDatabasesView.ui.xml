@@ -17,16 +17,16 @@
 
   <g:FlowPanel>
     <b:Heading size="4" addStyleNames="inline-block">
-      <ui:msg description="SQL Databases label">Data Databases</ui:msg>
+      <ui:msg description="Databases label">Databases</ui:msg>
     </b:Heading>
     <b:Paragraph>
-      Data databases can have different purposes: storage, import, export.
+      Databases can have different purposes: storage, import, export.
     </b:Paragraph>
     <g:FlowPanel ui:field="createPanel">
       <b:Paragraph>
-        At least one data storage database is required for importing data.
+        At least one storage database is required for importing data.
       </b:Paragraph>
-      <b:DropdownButton text="Create data storage database" icon="PLUS" type="INFO">
+      <b:DropdownButton text="Create storage database" icon="PLUS" type="INFO">
         <b:NavLink ui:field="createSql">
           <ui:msg description="Create SQL database label">SQL</ui:msg>
         </b:NavLink>
@@ -37,7 +37,7 @@
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="databasesPanel">
-      <b:DropdownButton text="Add data database" icon="PLUS" type="INFO">
+      <b:DropdownButton text="Add database" icon="PLUS" type="INFO">
         <b:NavLink ui:field="addSQL">
           <ui:msg description="Create SQL database label">SQL</ui:msg>
         </b:NavLink>
