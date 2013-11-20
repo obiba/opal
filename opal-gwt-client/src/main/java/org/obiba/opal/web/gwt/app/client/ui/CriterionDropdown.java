@@ -17,6 +17,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
+import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.Divider;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.NavLink;
@@ -31,17 +32,17 @@ import com.google.gwt.user.client.ui.Widget;
 
 public abstract class CriterionDropdown extends DropdownButton {
 
-  protected static final Translations translations = GWT.create(Translations.class);
+  static final Translations translations = GWT.create(Translations.class);
 
-  protected VariableDto variable;
+  VariableDto variable;
 
-  protected QueryResultDto queryResult;
+  QueryResultDto queryResult;
 
-  protected String fieldName;
+  String fieldName;
 
-  protected final ListItem radioControls = new ListItem();
+  private final ListItem radioControls = new ListItem();
 
-  public CriterionDropdown(VariableDto variableDto, @Nonnull String fieldName, @Nullable QueryResultDto termDto) {
+  CriterionDropdown(VariableDto variableDto, @Nonnull String fieldName, @Nullable QueryResultDto termDto) {
     variable = variableDto;
     this.fieldName = fieldName;
     queryResult = termDto;
@@ -118,36 +119,38 @@ public abstract class CriterionDropdown extends DropdownButton {
     return radio;
   }
 
-  public void resetRadioControls() {
+  void resetRadioControls() {
     for(int i = 0; i < radioControls.getWidgetCount(); i++) {
       ((RadioButton) radioControls.getWidget(i)).setValue(null);
     }
   }
 
-  public void updateCriterionFilter(String filter) {
+  void updateCriterionFilter(String filter) {
     setText(filter.isEmpty() ? variable.getName() : variable.getName() + ": " + filter);
   }
 
-  public abstract Widget getSpecificControls();
+  protected abstract Widget getSpecificControls();
 
-  public abstract void resetSpecificControls();
+  protected abstract void resetSpecificControls();
 
   public abstract void doFilterValueSets();
 
   public String getQueryString() {
-    if(((RadioButton) radioControls.getWidget(1)).getValue()) {
+    if(((CheckBox) radioControls.getWidget(0)).getValue()) {
+      // Empty
+      return "*";
+    }
+    if(((CheckBox) radioControls.getWidget(1)).getValue()) {
       // Not empty
       return "_missing_:" + fieldName;
     }
-    if(((RadioButton) radioControls.getWidget(2)).getValue()) {
+    if(((CheckBox) radioControls.getWidget(2)).getValue()) {
       // Empty
       return "_exists_:" + fieldName;
     }
 
     return null;
   }
-
-  public abstract String getSpecificQueryString();
 
   @Override
   protected void onLoad() {

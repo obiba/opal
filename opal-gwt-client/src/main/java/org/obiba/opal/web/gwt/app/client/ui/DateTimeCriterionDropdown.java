@@ -13,7 +13,6 @@ package org.obiba.opal.web.gwt.app.client.ui;
 import java.util.Date;
 
 import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.ControlLabel;
@@ -46,8 +45,8 @@ public abstract class DateTimeCriterionDropdown extends CriterionDropdown {
 
   DateBoxAppended date;
 
-  public DateTimeCriterionDropdown(VariableDto variableDto, String fieldName, QueryResultDto termDto) {
-    super(variableDto, fieldName, termDto);
+  public DateTimeCriterionDropdown(VariableDto variableDto, String fieldName) {
+    super(variableDto, fieldName, null);
   }
 
   @Override
@@ -178,7 +177,10 @@ public abstract class DateTimeCriterionDropdown extends CriterionDropdown {
   }
 
   @Override
-  public String getSpecificQueryString() {
+  public String getQueryString() {
+    String emptyNotEmpty = super.getQueryString();
+    if(emptyNotEmpty != null) return emptyNotEmpty;
+
     DateTimeFormat df = DateTimeFormat.getFormat("yyyy/MM/dd");
     if(rangeValueChooser.isItemSelected(1)) {
       // RANGE
@@ -207,12 +209,10 @@ public abstract class DateTimeCriterionDropdown extends CriterionDropdown {
       filter += " " + rangeValueChooser.getItemText(rangeValueChooser.getSelectedIndex()).toLowerCase();
 
       DateTimeFormat df = DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_MEDIUM);
-      if(rangeValueChooser.isItemSelected(1)) {
-        filter += "[" + (from.getValue() == null ? "" : df.format(from.getValue())) + ", " +
-            (to.getValue() == null ? "" : df.format(to.getValue())) + "]";
-      } else {
-        filter += "(" + (date.getValue() == null ? "" : df.format(date.getValue())) + ")";
-      }
+      filter += rangeValueChooser.isItemSelected(1)
+          ? "[" + (from.getValue() == null ? "" : df.format(from.getValue())) + ", " +
+          (to.getValue() == null ? "" : df.format(to.getValue())) + "]"
+          : "(" + (date.getValue() == null ? "" : df.format(date.getValue())) + ")";
     }
 
     updateCriterionFilter(filter);

@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.app.client.ui;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.core.client.GWT;
@@ -31,8 +30,8 @@ public abstract class DefaultCriterionDropdown extends CriterionDropdown {
 
   private TextBox matches;
 
-  public DefaultCriterionDropdown(VariableDto variableDto, String fieldName, QueryResultDto termDto) {
-    super(variableDto, fieldName, termDto);
+  public DefaultCriterionDropdown(VariableDto variableDto, String fieldName) {
+    super(variableDto, fieldName, null);
   }
 
   @Override
@@ -81,11 +80,13 @@ public abstract class DefaultCriterionDropdown extends CriterionDropdown {
   @Override
   public void resetSpecificControls() {
     operatorChooser.setItemSelected(0, true);
-//    matches.setVisible(false);
   }
 
   @Override
-  public String getSpecificQueryString() {
+  public String getQueryString() {
+    String emptyNotEmpty = super.getQueryString();
+    if(emptyNotEmpty != null) return emptyNotEmpty;
+
     return "";
   }
 

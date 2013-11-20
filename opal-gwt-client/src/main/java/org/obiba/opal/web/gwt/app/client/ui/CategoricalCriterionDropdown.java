@@ -121,9 +121,12 @@ public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
   }
 
   @Override
-  public String getSpecificQueryString() {
+  public String getQueryString() {
+    String emptyNotEmpty = super.getQueryString();
+    if(emptyNotEmpty != null) return emptyNotEmpty;
+
     if(operatorChooser.isItemSelected(3)) {
-      return fieldName;
+      return fieldName + ":/" + matches.getText() + "/";
     }
 
     Collection<String> selected = new ArrayList<String>();

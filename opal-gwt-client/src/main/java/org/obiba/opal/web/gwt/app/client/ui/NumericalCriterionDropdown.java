@@ -177,7 +177,10 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
   }
 
   @Override
-  public String getSpecificQueryString() {
+  public String getQueryString() {
+    String emptyNotEmpty = super.getQueryString();
+    if(emptyNotEmpty != null) return emptyNotEmpty;
+
     // RANGE
     if(rangeValueChooser.isItemSelected(1)) {
       String rangeQuery = fieldName + ":[" + (min.getText().isEmpty() ? "*" : min.getText()) + " TO " +
@@ -205,12 +208,8 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
     if(rangeValueChooser.getSelectedIndex() > 0) {
       filter += " " + rangeValueChooser.getItemText(rangeValueChooser.getSelectedIndex()).toLowerCase();
 
-      if(rangeValueChooser.isItemSelected(1)) {
-        filter += "[" + (min.getText().isEmpty() ? "" : min.getText()) + ", " +
-            (max.getText().isEmpty() ? "" : max.getText()) + "]";
-      } else {
-        filter += "(" + values.getText() + ")";
-      }
+      filter += rangeValueChooser.isItemSelected(1) ? "[" + (min.getText().isEmpty() ? "" : min.getText()) + ", " +
+          (max.getText().isEmpty() ? "" : max.getText()) + "]" : "(" + values.getText() + ")";
     }
 
     updateCriterionFilter(filter);
