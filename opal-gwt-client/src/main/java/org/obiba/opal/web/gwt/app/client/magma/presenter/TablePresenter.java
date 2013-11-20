@@ -906,11 +906,11 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
       if(table.hasViewLink()) {
         String node = nodeBuilder.segment("view", table.getName()).build();
-        authz.setAclRequest("view", new AclRequest(AclAction.VIEW_READ, node), //
-            new AclRequest(AclAction.VIEW_VALUES, node), //
-            new AclRequest(AclAction.VIEW_EDIT, node), //
-            new AclRequest(AclAction.VIEW_VALUES_EDIT, node), //
-            new AclRequest(AclAction.VIEW_ALL, node));
+        authz.setAclRequest("view", new AclRequest(AclAction.TABLE_READ, node), //
+            new AclRequest(AclAction.TABLE_VALUES, node), //
+            new AclRequest(AclAction.TABLE_EDIT, node), //
+            new AclRequest(AclAction.TABLE_VALUES_EDIT, node), //
+            new AclRequest(AclAction.TABLE_ALL, node));
       } else {
         String node = nodeBuilder.segment("table", table.getName()).build();
         authz.setAclRequest("table", new AclRequest(AclAction.TABLE_READ, node), //

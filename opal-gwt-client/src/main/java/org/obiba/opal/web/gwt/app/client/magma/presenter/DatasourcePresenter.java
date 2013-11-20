@@ -388,7 +388,6 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       AuthorizationPresenter authz = authorizationPresenter.get();
       String node = UriBuilder.create().segment("datasource", datasourceName).build();
       authz.setAclRequest("datasource", new AclRequest(AclAction.CREATE_TABLE, node), //
-          new AclRequest(AclAction.CREATE_VIEW, node), //
           new AclRequest(AclAction.DATASOURCE_ALL, node));
       setInSlot(null, authz);
     }

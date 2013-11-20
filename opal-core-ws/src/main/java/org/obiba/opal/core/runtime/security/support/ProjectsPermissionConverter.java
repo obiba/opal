@@ -72,18 +72,6 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
         String[] args = args(node, "/datasource/(.+)");
         return Lists.newArrayList(magmaConvert("/datasource/{0}/tables", "GET:GET", args), //
             magmaConvert("/datasource/{0}/tables", "POST:GET", args),//
-            magmaConvert("/project/{0}", "GET:GET", args),//
-            magmaConvert("/project/{0}/summary", "GET:GET", args),//
-            magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "POST:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "PUT:GET/*", args));
-      }
-    },
-    CREATE_VIEW {
-      @Override
-      public Iterable<String> convert(String node) {
-        String[] args = args(node, "/datasource/(.+)");
-        return Lists.newArrayList(magmaConvert("/datasource/{0}/tables", "GET:GET", args), //
             magmaConvert("/datasource/{0}/views", "POST:GET", args),//
             magmaConvert("/project/{0}", "GET:GET", args),//
             magmaConvert("/project/{0}/summary", "GET:GET", args),//

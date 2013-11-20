@@ -202,7 +202,7 @@ public class DatasourceResource {
     indexManagerConfigService.update(vt, schedule);
 
     return Response.created(viewUri)
-        .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(viewUri, AclAction.VIEW_ALL)).build();
+        .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(viewUri, AclAction.TABLE_ALL)).build();
   }
 
   @Path("/view/{viewName}")

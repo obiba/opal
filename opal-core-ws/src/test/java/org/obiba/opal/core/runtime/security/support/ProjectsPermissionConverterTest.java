@@ -55,21 +55,10 @@ public class ProjectsPermissionConverterTest
     testConversion("/datasource/patate", ProjectsPermissionConverter.Permission.CREATE_TABLE, //
         "magma:/datasource/patate/tables:GET:GET", //
         "magma:/datasource/patate/tables:POST:GET", //
+        "magma:/datasource/patate/views:POST:GET", //
         "magma:/project/patate:GET:GET", //
         "magma:/project/patate/summary:GET:GET", //
         "magma:/files/projects/patate:GET:GET/*", //
-        "magma:/files/projects/patate:POST:GET/*",//
-        "magma:/files/projects/patate:PUT:GET/*");
-  }
-
-  @Test
-  public void testCreateView() {
-    testConversion("/datasource/patate", ProjectsPermissionConverter.Permission.CREATE_VIEW, //
-        "magma:/datasource/patate/tables:GET:GET", //
-        "magma:/datasource/patate/views:POST:GET", //
-        "magma:/project/patate:GET:GET", //
-        "magma:/project/patate/summary:GET:GET",//
-        "magma:/files/projects/patate:GET:GET/*",//
         "magma:/files/projects/patate:POST:GET/*",//
         "magma:/files/projects/patate:PUT:GET/*");
   }
