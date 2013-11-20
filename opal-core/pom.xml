@@ -107,16 +107,20 @@
       <artifactId>hibernate-ehcache</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.atomikos</groupId>
-      <artifactId>transactions-jta</artifactId>
+      <groupId>org.ow2.jotm</groupId>
+      <artifactId>jotm-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.atomikos</groupId>
-      <artifactId>transactions-jdbc</artifactId>
+      <groupId>org.ow2.spec.ee</groupId>
+      <artifactId>ow2-connector-1.5-spec</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.atomikos</groupId>
-      <artifactId>transactions-hibernate3</artifactId>
+      <groupId>org.ow2.spec.ee</groupId>
+      <artifactId>ow2-jta-1.1-spec</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.mchange</groupId>
+      <artifactId>c3p0</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-codec</groupId>

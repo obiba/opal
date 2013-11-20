@@ -75,7 +75,6 @@
 
   <!--hide verbose dependencies-->
   <logger name="jetty.util.log" level="error"/>
-  <logger name="com.atomikos" level="warn"/>
   <logger name="org.hibernate.stat.Statistics" level="warn"/>
 
   <!--Uncomment this to enable SQL statement logging-->

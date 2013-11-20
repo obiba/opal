@@ -21,8 +21,6 @@ public class DataSourceFactory {
 
   public DataSource createDataSource(@NotNull Database database) {
     DataSourceFactoryBean factoryBean = new DataSourceFactoryBean();
-    factoryBean.setName(database.getName());
-
     SqlSettings sqlSettings = database.getSqlSettings();
     if(sqlSettings == null) {
       throw new IllegalArgumentException("Cannot create a JDBC DataSource without SqlSettings");

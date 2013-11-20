@@ -3,7 +3,6 @@
 
   <!-- configure a JTA-aware datasource for Opal internal configuration database -->
   <bean id="dataSource" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactoryBean">
-    <property name="name" value="opal-config"/>
     <property name="driverClass" value="${org.obiba.opal.datasource.driver}"/>
     <property name="url" value="${org.obiba.opal.datasource.url}"/>
     <property name="username" value="${org.obiba.opal.datasource.username}"/>

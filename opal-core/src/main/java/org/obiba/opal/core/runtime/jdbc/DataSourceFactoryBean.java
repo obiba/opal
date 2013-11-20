@@ -10,11 +10,13 @@
 
 package org.obiba.opal.core.runtime.jdbc;
 
+import java.beans.PropertyVetoException;
+
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.FactoryBean;
 
-import com.atomikos.jdbc.nonxa.AtomikosNonXADataSourceBean;
+import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 public class DataSourceFactoryBean implements FactoryBean<DataSource> {
 
@@ -23,8 +25,6 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
   private static final int MAX_POOL_SIZE = 20;
 
   private static final int MAX_IDLE = 10;
-
-  private String name;
 
   private String driverClass;
 
@@ -36,25 +36,30 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
 
   @Override
   public DataSource getObject() {
-    AtomikosNonXADataSourceBean dataSource = new AtomikosNonXADataSourceBean();
-    dataSource.setUniqueResourceName(name);
-    dataSource.setDriverClassName(driverClass);
-    dataSource.setUrl(url);
-    dataSource.setUser(username);
-    dataSource.setPassword(password);
-    dataSource.setMinPoolSize(MIN_POOL_SIZE);
-    dataSource.setMaxPoolSize(MAX_POOL_SIZE);
-    dataSource.setMaxIdleTime(MAX_IDLE);
+    try {
+      ComboPooledDataSource dataSource = new ComboPooledDataSource();
+      dataSource.setDriverClass(driverClass);
+      dataSource.setJdbcUrl(url);
+      dataSource.setUser(username);
+      dataSource.setPassword(password);
+      dataSource.setMinPoolSize(MIN_POOL_SIZE);
+      dataSource.setMaxPoolSize(MAX_POOL_SIZE);
+      dataSource.setMaxIdleTime(MAX_IDLE);
+      dataSource.setAutoCommitOnClose(false);
 
-    if("com.mysql.jdbc.Driver".equals(driverClass)) {
-      dataSource.setTestQuery("select 1");
-    } else if("org.hsqldb.jdbcDriver".equals(driverClass)) {
-      dataSource.setTestQuery("select 1 from INFORMATION_SCHEMA.SYSTEM_USERS");
-    } else {
-      throw new IllegalArgumentException("Unsupported JDBC driver: " + driverClass);
+      if("com.mysql.jdbc.Driver".equals(driverClass)) {
+        dataSource.setPreferredTestQuery("select 1");
+      } else if("org.hsqldb.jdbcDriver".equals(driverClass)) {
+        dataSource.setPreferredTestQuery("select 1 from INFORMATION_SCHEMA.SYSTEM_USERS");
+      } else {
+        throw new IllegalArgumentException("Unsupported JDBC driver: " + driverClass);
+      }
+      //TODO validation query for PostgreSQL
+
+      return dataSource;
+    } catch(PropertyVetoException e) {
+      throw new RuntimeException("Cannot create JDBC dataSource", e);
     }
-    //TODO validation query for PostgreSQL
-    return dataSource;
   }
 
   @Override
@@ -65,10 +70,6 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
   @Override
   public boolean isSingleton() {
     return false;
-  }
-
-  public void setName(String name) {
-    this.name = name;
   }
 
   public void setDriverClass(String driverClass) {

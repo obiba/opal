@@ -5,19 +5,14 @@
 
   <tx:annotation-driven/>
 
-  <bean id="jtaTransactionManager" class="com.atomikos.icatch.jta.UserTransactionManager" init-method="init"
-      destroy-method="close">
-    <property name="forceShutdown" value="false"/>
-  </bean>
-
-  <bean id="userTransaction" class="com.atomikos.icatch.jta.UserTransactionImp"/>
+  <bean id="jtaTransactionManager" class="org.obiba.opal.core.tx.JotmFactoryBean"/>
 
   <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
     <property name="transactionManager" ref="jtaTransactionManager"/>
-    <property name="userTransaction" ref="userTransaction"/>
-    <property name="allowCustomIsolationLevels" value="true"/>
-    <!-- Set a very high timeout: 10 days (864000s) -->
+    <property name="userTransaction" ref="jtaTransactionManager"/>
+    <!-- Set a very high timeout (10 days) -->
     <property name="defaultTimeout" value="864000"/>
+    <property name="allowCustomIsolationLevels" value="true"/>
   </bean>
 
   <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">

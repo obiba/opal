@@ -33,6 +33,10 @@
       <groupId>org.obiba.opal</groupId>
       <artifactId>opal-project</artifactId>
     </dependency>
+    <dependency>
+      <groupId>commons-configuration</groupId>
+      <artifactId>commons-configuration</artifactId>
+    </dependency>
   </dependencies>
 
 </project>

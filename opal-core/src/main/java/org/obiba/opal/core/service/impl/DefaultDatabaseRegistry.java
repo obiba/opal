@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.atomikos.jdbc.AbstractDataSourceBean;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -46,6 +45,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
+import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 @Component
 public class DefaultDatabaseRegistry implements DatabaseRegistry {
@@ -282,7 +282,8 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
       log.info("Destroying DataSource {}", notification.getKey());
       DataSource dataSource = notification.getValue();
       if(dataSource != null) {
-        ((AbstractDataSourceBean) dataSource).close();
+        //noinspection OverlyStrongTypeCast
+        ((ComboPooledDataSource) dataSource).close();
       }
     }
   }
