@@ -39,15 +39,27 @@ public class MoveSubjectAclToOrientUpgradeStep extends AbstractUpgradeStep {
         SubjectAcl acl = new SubjectAcl();
         acl.setDomain(rs.getString("domain"));
         acl.setNode(rs.getString("node"));
-        acl.setPermission(rs.getString("permission"));
+        acl.setPermission(upgradePermission(rs.getString("permission")));
         acl.setPrincipal(rs.getString("principal"));
         acl.setType(rs.getString("type"));
         return acl;
       }
     });
     for(SubjectAcl acl : list) {
-      orientDbService.save(null, acl);
+      if(!acl.getNode().startsWith("/auth/session/") && !"FILES_META".equals(acl.getPermission())) {
+        orientDbService.save(null, acl);
+      }
     }
     dataJdbcTemplate.execute("drop table subject_acl");
+  }
+
+  private String upgradePermission(String permission) {
+    if("CREATE_VIEW".equals(permission)) return "CREATE_TABLE";
+    if("VIEW_ALL".equals(permission)) return "TABLE_ALL";
+    if("VIEW_READ".equals(permission)) return "TABLE_READ";
+    if("VIEW_VALUES".equals(permission)) return "TABLE_VALUES";
+    if("VIEW_EDIT".equals(permission)) return "TABLE_EDIT";
+    if("VIEW_VALUES_EDIT".equals(permission)) return "TABLE_VALUES_EDIT";
+    return permission;
   }
 }
