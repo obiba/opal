@@ -373,3 +373,10 @@ td.row-actions span {
 .alert.select {
   margin-bottom: 0.4em;
 }
+
+/*
+ * ValuesTablePresenter
+ */
+.min-height-350 {
+  min-height: 350px;
+}
