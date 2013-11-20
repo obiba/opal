@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadFactory;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
@@ -79,16 +78,6 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
   @Override
   public String getName() {
     return esIndexName() + "-values";
-  }
-
-  @Override
-  public void onRename(@Nonnull ValueTable valueTable, String s) {
-    // TODO: Implement
-  }
-
-  @Override
-  public void onRename(@Nonnull ValueTable valueTable, Variable variable, String s) {
-    // TODO: Implement
   }
 
   private class Indexer extends EsIndexer {
