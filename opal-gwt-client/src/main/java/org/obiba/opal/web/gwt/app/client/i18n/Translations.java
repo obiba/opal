@@ -929,7 +929,8 @@ public interface Translations extends Constants {
       "SpssDuplicateEntity",
       "Duplicate entity identifier '{0}' at row '{1}'. Please make sure that the variable '{2}' representing entities has unique values.",
 //
-      "FailedToOpenFile", "Failed to open file '{0}'. Please make sure you have chosen the correct character set." })
+      "FailedToOpenFile", "Failed to open file '{0}'. Please make sure you have chosen the correct character set.",
+      "LimeUnknownQuestionType", "Unknown type for Limesurvey question '{0}'. Contact your administrator to find out whether this question type is handled by Opal."})
   Map<String, String> datasourceParsingErrorMap();
 
   @Description("Datasource comparison error map")

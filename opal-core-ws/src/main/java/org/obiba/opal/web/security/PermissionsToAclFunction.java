@@ -16,9 +16,9 @@ import org.obiba.opal.web.model.Opal.Acl;
 
 import com.google.common.base.Function;
 
-class PermissionsToAclFunction implements Function<Permissions, Opal.Acl> {
+public class PermissionsToAclFunction implements Function<Permissions, Opal.Acl> {
 
-  static final PermissionsToAclFunction INSTANCE = new PermissionsToAclFunction();
+  public static final PermissionsToAclFunction INSTANCE = new PermissionsToAclFunction();
 
   @Override
   public Acl apply(Permissions from) {

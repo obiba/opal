@@ -24,6 +24,7 @@ import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.taxonomy.Dtos;
+import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.obiba.runtime.upgrade.VersionProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -100,6 +101,7 @@ public class SystemResource {
 
   @GET
   @Path("/status/databases")
+  @NoAuthorization
   public DatabasesStatusDto getDatabasesStatus() {
     DatabasesStatusDto.Builder db = DatabasesStatusDto.newBuilder();
     db.setHasIdentifiers(databaseRegistry.hasIdentifiersDatabase());
@@ -145,6 +147,7 @@ public class SystemResource {
 
   @GET
   @Path("/conf/general")
+  @NoAuthorization
   public Opal.GeneralConf getOpalGeneralConfiguration() {
     OpalGeneralConfig conf = serverService.getConfig();
 

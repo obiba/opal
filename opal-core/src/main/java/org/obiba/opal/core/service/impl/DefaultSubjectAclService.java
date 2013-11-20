@@ -133,7 +133,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public Permissions getSubjectPermissions(@NotNull final String domain, @NotNull final String node,
+  public Permissions getSubjectNodePermissions(@NotNull final String domain, @NotNull final String node,
       @NotNull final SubjectAclService.Subject subject) {
     Assert.notNull(node, "node cannot be null");
     Assert.notNull(subject, "subject cannot be null");
@@ -167,6 +167,24 @@ public class DefaultSubjectAclService implements SubjectAclService {
     };
   }
 
+  @Override
+  public Iterable<Permissions> getSubjectNodeHierarchyPermissions(@NotNull String domain, @NotNull String node,
+      @NotNull Subject subject) {
+    Map<String, Permissions> entries = Maps.newHashMap();
+
+    for(SubjectAcl acl : Iterables.concat(find(domain, node, subject), findLike(domain, node + "/", subject))) {
+      String key = acl.getSubject() + ":" + acl.getNode();
+      PermissionsImpl perms = (PermissionsImpl) entries.get(key);
+      if(perms == null) {
+        perms = new PermissionsImpl(domain, acl.getNode(), acl.getSubject());
+        entries.put(key, perms);
+      }
+      perms.addPermission(acl.getPermission());
+    }
+
+    return entries.values();
+  }
+
   private Iterable<SubjectAcl> find(SubjectAclService.Subject subject) {
     return orientDbService
         .list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() + " where principal = ? and type = ?",
@@ -179,6 +197,12 @@ public class DefaultSubjectAclService implements SubjectAclService {
         type.toString());
   }
 
+  private Iterable<SubjectAcl> findLike(String domain, String node, SubjectType type) {
+    return orientDbService.list(SubjectAcl.class,
+        "select from " + SubjectAcl.class.getSimpleName() + " where domain = ? and node like ? and type = ?", domain,
+        node + "%", type.toString());
+  }
+
   private Iterable<SubjectAcl> find(String domain, SubjectType type) {
     return orientDbService
         .list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() + " where domain = ? and type = ?",
@@ -188,6 +212,12 @@ public class DefaultSubjectAclService implements SubjectAclService {
   private Iterable<SubjectAcl> find(String domain, String node, SubjectAclService.Subject subject) {
     return orientDbService.list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() +
         " where domain = ? and node = ? and principal = ? and type = ?", domain, node, subject.getPrincipal(),
+        subject.getType().toString());
+  }
+
+  private Iterable<SubjectAcl> findLike(String domain, String node, SubjectAclService.Subject subject) {
+    return orientDbService.list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() +
+        " where domain = ? and node like ? and principal = ? and type = ?", domain, node + "%", subject.getPrincipal(),
         subject.getType().toString());
   }
 
@@ -243,11 +273,28 @@ public class DefaultSubjectAclService implements SubjectAclService {
   public Iterable<Permissions> getNodePermissions(String domain, String node, SubjectType type) {
     Map<Subject, Permissions> entries = Maps.newHashMap();
 
-    for (SubjectAcl acl : find(domain, node, type)) {
-      PermissionsImpl perms = (PermissionsImpl)entries.get(acl.getSubject());
-      if (perms == null) {
-        perms = new PermissionsImpl(domain,node,acl.getSubject());
+    for(SubjectAcl acl : find(domain, node, type)) {
+      PermissionsImpl perms = (PermissionsImpl) entries.get(acl.getSubject());
+      if(perms == null) {
+        perms = new PermissionsImpl(domain, node, acl.getSubject());
         entries.put(acl.getSubject(), perms);
+      }
+      perms.addPermission(acl.getPermission());
+    }
+
+    return entries.values();
+  }
+
+  @Override
+  public Iterable<Permissions> getNodeHierarchyPermissions(String domain, String node, SubjectType type) {
+    Map<String, Permissions> entries = Maps.newHashMap();
+
+    for(SubjectAcl acl : Iterables.concat(find(domain, node, type), findLike(domain, node + "/", type))) {
+      String key = acl.getSubject() + ":" + acl.getNode();
+      PermissionsImpl perms = (PermissionsImpl) entries.get(key);
+      if(perms == null) {
+        perms = new PermissionsImpl(domain, acl.getNode(), acl.getSubject());
+        entries.put(key, perms);
       }
       perms.addPermission(acl.getPermission());
     }
@@ -333,7 +380,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
     }
 
     public void addPermission(String permission) {
-      if (!permissions.contains(permission)) {
+      if(!permissions.contains(permission)) {
         permissions.add(permission);
       }
     }
