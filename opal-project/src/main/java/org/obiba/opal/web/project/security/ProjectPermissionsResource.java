@@ -55,6 +55,7 @@ public class ProjectPermissionsResource {
    * @return
    */
   @GET
+  @Path("/all")
   public Iterable<Opal.Acl> getPermissions(@QueryParam("domain") @DefaultValue("opal") String domain,
       @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type) {
 
