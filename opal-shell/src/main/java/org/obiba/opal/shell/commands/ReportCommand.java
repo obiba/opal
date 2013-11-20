@@ -84,7 +84,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
 
     Date reportDate = getCurrentTime();
     try {
-      FileObject reportOutput = getReportOutput(reportTemplateName, reportTemplate.getFormat(), reportDate);
+      FileObject reportOutput = getReportOutput(reportTemplate, reportDate);
       return renderAndSendEmail(reportTemplate, reportOutput);
     } catch(FileSystemException e) {
       getShell().printf("Cannot create report output: '/reports/%s/%s'", reportTemplateName,
@@ -140,11 +140,14 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     return getFile(reportDesign);
   }
 
-  private FileObject getReportOutput(String reportTemplateName, String reportFormat, Date reportDate)
-      throws FileSystemException {
+  private FileObject getReportOutput(ReportTemplate reportTemplate, Date reportDate) throws FileSystemException {
+    String reportTemplateName = reportTemplate.getName();
+    String reportFormat = reportTemplate.getFormat();
     String reportFileName = getReportFileName(reportTemplateName, reportFormat, reportDate);
 
-    FileObject reportDir = getFile("/reports/" + reportTemplateName);
+    FileObject reportDir = getFile(
+        (reportTemplate.hasProject() ? "/projects/" + reportTemplate.getProject() : "") + "/reports/" +
+            reportTemplateName);
     reportDir.createFolder();
 
     return reportDir.resolveFile(reportFileName);
