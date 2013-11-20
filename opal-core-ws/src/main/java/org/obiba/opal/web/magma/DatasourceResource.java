@@ -158,7 +158,7 @@ public class DatasourceResource {
           .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound"));
     }
 
-    if(ds != null) {
+    if(ds != null && datasourceUpdateListeners != null) {
       for(DatasourceUpdateListener listener : datasourceUpdateListeners) {
         listener.onDelete(ds);
       }
