@@ -123,7 +123,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     if(subject != null) {
       Session session = subject.getSession();
-      log.debug("Binding subject {} session {} to executing thread {}", subject.getPrincipal(), session.getId(),
+      log.trace("Binding subject {} session {} to executing thread {}", subject.getPrincipal(), session.getId(),
           Thread.currentThread().getId());
       session.touch();
       String username = subject.getPrincipal().toString();
@@ -220,11 +220,11 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
   private void unbind() {
     try {
-      if(log.isDebugEnabled()) {
+      if(log.isTraceEnabled()) {
         Subject s = ThreadContext.getSubject();
         if(s != null) {
           Session session = s.getSession(false);
-          log.debug("Unbinding subject {} session {} from executing thread {}", s.getPrincipal(),
+          log.trace("Unbinding subject {} session {} from executing thread {}", s.getPrincipal(),
               session != null ? session.getId() : "null", Thread.currentThread().getId());
         }
       }
