@@ -69,6 +69,7 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
     pager.setDisplay(table);
     table.addColumn(columns.name, translations.nameLabel());
     table.addColumn(columns.url, translations.urlLabel());
+    table.addColumn(columns.type, translations.typeLabel());
     table.addColumn(columns.usage, translations.usageLabel());
     table.addColumn(columns.schema, translations.schemaLabel());
     table.addColumn(columns.username, translations.usernameLabel());
@@ -132,6 +133,15 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
       public String getValue(DatabaseDto dto) {
         if(dto.hasSqlSettings()) return dto.getSqlSettings().getUrl();
         return dto.getMongoDbSettings().getUrl();
+      }
+    };
+
+    final Column<DatabaseDto, String> type = new TextColumn<DatabaseDto>() {
+
+      @Override
+      public String getValue(DatabaseDto dto) {
+        if(dto.hasSqlSettings()) return translations.sqlLabel();
+        return translations.mongoDbLabel();
       }
     };
 
