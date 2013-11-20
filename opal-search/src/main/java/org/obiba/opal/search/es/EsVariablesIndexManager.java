@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
@@ -66,6 +67,16 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
   @Override
   public String getName() {
     return esIndexName() + "-variables";
+  }
+
+  @Override
+  public void onRename(@Nonnull ValueTable valueTable, String s) {
+    // TODO: Implement
+  }
+
+  @Override
+  public void onRename(@Nonnull ValueTable valueTable, Variable variable, String s) {
+    // TODO: Implement
   }
 
   private class Indexer extends EsIndexer {

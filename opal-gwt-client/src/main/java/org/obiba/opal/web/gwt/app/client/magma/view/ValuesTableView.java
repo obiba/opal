@@ -35,6 +35,7 @@ import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto.ValueSetDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.Typeahead;
@@ -97,6 +98,9 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
   @UiField
   CollapsiblePanel addPanel;
+
+  @UiField
+  ControlGroup valuesFilterGroup;
 
   @UiField
   SimplePager pager;
@@ -513,6 +517,16 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     filters.add(criterion);
   }
 
+  @Override
+  public FlowPanel getFiltersPanel() {
+    return filters;
+  }
+
+  @Override
+  public ControlGroup getValuesFilterGroup() {
+    return valuesFilterGroup;
+  }
+
   //
   // Inner classes
   //
@@ -712,9 +726,8 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
       listValueSetVariable = JsArrays.toList(JsArrays.toSafeArray(valueSets.getVariablesArray()));
       updateRowData(offset, JsArrays.toList(JsArrays.toSafeArray(valueSets.getValueSetsArray())));
-
       valuesTable.setRowData(JsArrays.toList(JsArrays.toSafeArray(valueSets.getValueSetsArray())));
-      valuesTable.redraw();
+//      valuesTable.redraw();
     }
   }
 
