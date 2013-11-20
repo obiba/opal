@@ -35,6 +35,13 @@ public interface SubjectAclService extends SystemService {
   void deleteNodePermissions(String domain, String node);
 
   /**
+   * Delete all permissions on node and its children in a domain.
+   * @param domain
+   * @param node
+   */
+  void deleteNodeHierarchyPermissions(String domain, String node);
+
+  /**
    * Delete all node permissions of a subject in a domain.
    * @param domain
    * @param node

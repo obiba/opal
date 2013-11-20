@@ -10,6 +10,7 @@
 package org.obiba.opal.web.project;
 
 import java.util.Arrays;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.ws.rs.DELETE;
@@ -23,6 +24,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
+import org.obiba.magma.DatasourceUpdateListener;
 import org.obiba.magma.Timestamped;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.support.UnionTimestamps;
@@ -44,6 +46,9 @@ public class ProjectResource {
 
   @Autowired
   private ProjectService projectService;
+
+  @Autowired
+  private Set<DatasourceUpdateListener> datasourceUpdateListeners;
 
   @PathParam("name")
   private String name;
@@ -81,7 +86,11 @@ public class ProjectResource {
   @DELETE
   public Response delete() throws FileSystemException {
     try {
+      Datasource ds = getProject().getDatasource();
       projectService.delete(name);
+      for (DatasourceUpdateListener listener : datasourceUpdateListeners) {
+        listener.onDelete(ds);
+      }
     } catch(NoSuchProjectException e) {
       // silently ignore project not found
     }

@@ -97,6 +97,17 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
+  public void deleteNodeHierarchyPermissions(String domain, String node) {
+    deleteNodePermissions(domain, node);
+    Set<SubjectAclService.Subject> subjects = Sets.newTreeSet();
+    for(SubjectAcl acl : findLike(domain, node + "/")) {
+      subjects.add(acl.getSubject());
+      delete(acl);
+    }
+    notifyListeners(subjects);
+  }
+
+  @Override
   public void deleteSubjectPermissions(String domain, String node, SubjectAclService.Subject subject) {
     for(SubjectAcl acl : find(domain, node, subject)) {
       delete(acl);
@@ -224,6 +235,11 @@ public class DefaultSubjectAclService implements SubjectAclService {
   private Iterable<SubjectAcl> find(String domain, String node) {
     return orientDbService.list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() +
         " where domain = ? and node = ?", domain, node);
+  }
+
+  private Iterable<SubjectAcl> findLike(String domain, String node) {
+    return orientDbService.list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() +
+        " where domain = ? and node like ?", domain, node + "%");
   }
 
   private SubjectAcl find(String domain, String node, SubjectAclService.Subject subject, String permission) {
