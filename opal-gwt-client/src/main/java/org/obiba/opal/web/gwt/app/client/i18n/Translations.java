@@ -1631,12 +1631,12 @@ public interface Translations extends Constants {
   @DefaultStringValue("Edit SQL Database")
   String editSQLDatabase();
 
-  @Description("Add Mongo Database")
-  @DefaultStringValue("Add Mongo Database")
+  @Description("Add MongoDB Database")
+  @DefaultStringValue("Add MongoDB Database")
   String addMongoDatabase();
 
-  @Description("Edit Mongo Database")
-  @DefaultStringValue("Edit Mongo Database")
+  @Description("Edit MongoDB Database")
+  @DefaultStringValue("Edit MongoDB Database")
   String editMongoDatabase();
 
   @Description("Username label")
