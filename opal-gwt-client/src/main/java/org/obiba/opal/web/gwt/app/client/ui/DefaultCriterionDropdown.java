@@ -72,6 +72,8 @@ public abstract class DefaultCriterionDropdown extends CriterionDropdown {
   @Override
   public void resetSpecificControls() {
     operatorChooser.setItemSelected(0, true);
+    matches.setVisible(false);
+    matchesHelp.setVisible(false);
   }
 
   @Override
@@ -81,7 +83,9 @@ public abstract class DefaultCriterionDropdown extends CriterionDropdown {
 
     if(operatorChooser.isItemSelected(1)) {
       return fieldName + ":" + matches.getText();
-    } else if(operatorChooser.isItemSelected(2)) {
+    }
+
+    if(operatorChooser.isItemSelected(2)) {
       return "NOT " + fieldName + ":" + matches.getText();
     }
 
