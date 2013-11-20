@@ -49,8 +49,6 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
 
   @Override
   public Widget getSpecificControls() {
-    ListItem specificControls = new ListItem();
-
     operatorChooser = new Chooser();
     rangeValueChooser = new Chooser();
     min = new TextBox();
@@ -58,9 +56,31 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
     valuesLabel = new ControlLabel();
     values = new TextBox();
 
+    initMinMaxControls();
+    initValuesControls();
+
+    ListItem specificControls = new ListItem();
+    specificControls.addStyleName("controls");
+    specificControls.add(getOperatorsChooserPanel());
+    specificControls.add(getRangeValuePanel());
+
+    resetSpecificControls();
+    return specificControls;
+  }
+
+  private void initValuesControls() {
+    valuesLabel = new ControlLabel(translations.criterionFiltersMap().get("values"));
+    values.addKeyUpHandler(new KeyUpHandler() {
+      @Override
+      public void onKeyUp(KeyUpEvent event) {
+        updateRangeValuesCriterionFilter();
+      }
+    });
+  }
+
+  private void initMinMaxControls() {
     minLabel = new ControlLabel(translations.criterionFiltersMap().get("min"));
     minLabel.setFor(min.getId());
-
     min.addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent event) {
@@ -70,29 +90,12 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
 
     maxLabel = new ControlLabel(translations.criterionFiltersMap().get("max"));
     maxLabel.setFor(max.getId());
-
     max.addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent event) {
         updateRangeValuesCriterionFilter();
       }
     });
-
-    valuesLabel = new ControlLabel(translations.criterionFiltersMap().get("values"));
-
-    values.addKeyUpHandler(new KeyUpHandler() {
-      @Override
-      public void onKeyUp(KeyUpEvent event) {
-        updateRangeValuesCriterionFilter();
-      }
-    });
-
-    specificControls.addStyleName("controls");
-    specificControls.add(getOperatorsChooserPanel());
-    specificControls.add(getRangeValuePanel());
-
-    resetSpecificControls();
-    return specificControls;
   }
 
   private Widget getRangeValuePanel() {

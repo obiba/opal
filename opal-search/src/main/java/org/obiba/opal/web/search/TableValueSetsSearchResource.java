@@ -26,6 +26,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
@@ -81,22 +82,8 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
           buildQuerySearch(query, offset, limit, null, null, null);
       JSONObject jsonResponse = executeQuery(jsonBuiler.build());
 
-      Search.ValueSetsResultDto.Builder dtoResponseBuilder = Search.ValueSetsResultDto.newBuilder();
-      JSONObject jsonHits = jsonResponse.getJSONObject("hits");
-
-      dtoResponseBuilder.setTotalHits(jsonHits.getInt("total"));
-      Collection<VariableEntity> entities = new ArrayList<VariableEntity>();
-      String entityType = getValueTable().getEntityType();
-
-      JSONArray hits = jsonHits.getJSONArray("hits");
-      for(int i = 0; i < hits.length(); i++) {
-        JSONObject jsonHit = hits.getJSONObject(i);
-        entities.add(new VariableEntityBean(entityType, jsonHit.getString("_id")));
-      }
-
-      String path = uriInfo.getPath();
-      path = path.substring(0, path.indexOf("/_search"));
-      dtoResponseBuilder.setValueSets(getValueSetsDto(path, select, entities, offset, limit));
+      Search.ValueSetsResultDto.Builder dtoResponseBuilder = getvalueSetsDtoBuilder(uriInfo, offset, limit, select,
+          jsonResponse);
 
       // filter entities
       return Response.ok().entity(dtoResponseBuilder.build()).build();
@@ -107,6 +94,27 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
     } catch(Exception e) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
+  }
+
+  private Search.ValueSetsResultDto.Builder getvalueSetsDtoBuilder(UriInfo uriInfo, int offset, int limit,
+      String select, JSONObject jsonResponse) throws JSONException {
+    Search.ValueSetsResultDto.Builder dtoResponseBuilder = Search.ValueSetsResultDto.newBuilder();
+    JSONObject jsonHits = jsonResponse.getJSONObject("hits");
+
+    dtoResponseBuilder.setTotalHits(jsonHits.getInt("total"));
+    Collection<VariableEntity> entities = new ArrayList<VariableEntity>();
+    String entityType = getValueTable().getEntityType();
+
+    JSONArray hits = jsonHits.getJSONArray("hits");
+    for(int i = 0; i < hits.length(); i++) {
+      JSONObject jsonHit = hits.getJSONObject(i);
+      entities.add(new VariableEntityBean(entityType, jsonHit.getString("_id")));
+    }
+
+    String path = uriInfo.getPath();
+    path = path.substring(0, path.indexOf("/_search"));
+    dtoResponseBuilder.setValueSets(getValueSetsDto(path, select, entities, offset, limit));
+    return dtoResponseBuilder;
   }
 
   //
