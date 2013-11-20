@@ -54,11 +54,11 @@ public class MongoDatabaseModalPresenter extends AbstractDatabaseModalPresenter<
     getView().getUsage().setValue(Usage.valueOf(dto.getUsage().getName()));
     getView().getDefaultStorage().setValue(dto.getDefaultStorage());
 
-    MongoDbSettingsDto mongoDto = MongoDbSettingsDto.create();
-    getView().getUrl().setText(mongoDto.getUrl());
-    getView().getUsername().setText(mongoDto.getUsername());
-    getView().getPassword().setText(mongoDto.getPassword());
-    getView().getProperties().setText(mongoDto.getProperties());
+    MongoDbSettingsDto mongoSettings = dto.getMongoDbSettings();
+    getView().getUrl().setText(mongoSettings.getUrl());
+    getView().getUsername().setText(mongoSettings.getUsername());
+    getView().getPassword().setText(mongoSettings.getPassword());
+    getView().getProperties().setText(mongoSettings.getProperties());
   }
 
   @Override
