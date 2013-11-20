@@ -10,14 +10,13 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.ControlLabel;
 import com.github.gwtbootstrap.client.ui.TextBox;
-import com.google.gwt.core.client.GWT;
+import com.google.common.base.Joiner;
 import com.google.gwt.event.dom.client.FocusEvent;
 import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
@@ -26,33 +25,38 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 
-public class NumericalCriterionDropdown extends CriterionDropdown {
+public abstract class NumericalCriterionDropdown extends CriterionDropdown {
 
-  private static final Translations translations = GWT.create(Translations.class);
+  private Chooser operatorChooser;
 
-  private final Chooser operatorChooser = new Chooser();
-
-  private final Chooser rangeValueChooser = new Chooser();
+  private Chooser rangeValueChooser;
 
   private ControlLabel minLabel;
 
-  private final TextBox min = new TextBox();
+  private TextBox min;
 
   private ControlLabel maxLabel;
 
-  private final TextBox max = new TextBox();
+  private TextBox max;
 
-  private ControlLabel valuesLabel = new ControlLabel();
+  private ControlLabel valuesLabel;
 
-  private final TextBox values = new TextBox();
+  private TextBox values;
 
-  public NumericalCriterionDropdown(VariableDto variableDto, QueryResultDto termDto) {
-    super(variableDto, termDto);
+  public NumericalCriterionDropdown(VariableDto variableDto, String fieldName, QueryResultDto termDto) {
+    super(variableDto, fieldName, termDto);
   }
 
   @Override
   public Widget getSpecificControls() {
     ListItem specificControls = new ListItem();
+
+    operatorChooser = new Chooser();
+    rangeValueChooser = new Chooser();
+    min = new TextBox();
+    max = new TextBox();
+    valuesLabel = new ControlLabel();
+    values = new TextBox();
 
     minLabel = new ControlLabel(translations.criterionFiltersMap().get("min"));
     minLabel.setFor(min.getId());
@@ -173,8 +177,26 @@ public class NumericalCriterionDropdown extends CriterionDropdown {
   }
 
   @Override
-  public String getQueryString() {
-    return "";
+  public String getSpecificQueryString() {
+    // RANGE
+    if(rangeValueChooser.isItemSelected(1)) {
+      String rangeQuery = fieldName + ":[" + (min.getText().isEmpty() ? "*" : min.getText()) + " TO " +
+          (max.getText().isEmpty() ? "*" : max.getText()) + "]";
+
+      if(operatorChooser.isItemSelected(2)) {
+        return "NOT " + rangeQuery;
+      }
+      return rangeQuery;
+    }
+
+    // VALUES
+    // Parse numbers
+    String[] numbers = values.getText().split(",");
+    String valuesQuery = fieldName + ":(" + Joiner.on(" OR ").join(numbers) + ")";
+    if(operatorChooser.isItemSelected(2)) {
+      return "NOT " + valuesQuery;
+    }
+    return valuesQuery;
   }
 
   private void updateRangeValuesCriterionFilter() {
@@ -192,6 +214,7 @@ public class NumericalCriterionDropdown extends CriterionDropdown {
     }
 
     updateCriterionFilter(filter);
+    doFilterValueSets();
   }
 
   private class UpdateFilterChosenHandler implements ChosenChangeEvent.ChosenChangeHandler {

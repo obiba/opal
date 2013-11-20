@@ -10,8 +10,10 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
@@ -20,6 +22,7 @@ import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -28,17 +31,22 @@ import com.google.gwt.user.client.ui.Widget;
 
 public abstract class CriterionDropdown extends DropdownButton {
 
+  protected static final Translations translations = GWT.create(Translations.class);
+
   protected VariableDto variable;
 
   protected QueryResultDto queryResult;
 
-  private final ListItem radioControls = new ListItem();
+  protected String fieldName;
 
-  public CriterionDropdown(VariableDto variableDto, @Nullable QueryResultDto termDto) {
+  protected final ListItem radioControls = new ListItem();
+
+  public CriterionDropdown(VariableDto variableDto, @Nonnull String fieldName, @Nullable QueryResultDto termDto) {
     variable = variableDto;
+    this.fieldName = fieldName;
     queryResult = termDto;
 
-    updateCriterionFilter("All");
+    updateCriterionFilter(translations.criterionFiltersMap().get("all"));
 
     radioControls.addStyleName("controls");
 
@@ -60,11 +68,14 @@ public abstract class CriterionDropdown extends DropdownButton {
     }
 
     // All, Empty, Not Empty radio buttons
-    RadioButton radioAll = getRadioButton("All", queryResult == null ? null : queryResult.getTotalHits());
+    RadioButton radioAll = getRadioButton(translations.criterionFiltersMap().get("all"),
+        queryResult == null ? null : queryResult.getTotalHits());
     radioAll.setValue(true);
     radioControls.add(radioAll);
-    radioControls.add(getRadioButton("Empty", queryResult == null ? null : queryResult.getTotalHits() - noEmpty));
-    radioControls.add(getRadioButton("Not Empty", queryResult == null ? null : noEmpty));
+    radioControls.add(getRadioButton(translations.criterionFiltersMap().get("empty"),
+        queryResult == null ? null : queryResult.getTotalHits() - noEmpty));
+    radioControls
+        .add(getRadioButton(translations.criterionFiltersMap().get("not_empty"), queryResult == null ? null : noEmpty));
     add(radioControls);
 
     Widget specificControls = getSpecificControls();
@@ -75,7 +86,7 @@ public abstract class CriterionDropdown extends DropdownButton {
 
     add(new Divider());
 
-    NavLink remove = new NavLink("Remove");
+    NavLink remove = new NavLink(translations.removeLabel());
     remove.setIcon(IconType.REMOVE);
     remove.addClickHandler(new ClickHandler() {
       @Override
@@ -84,9 +95,6 @@ public abstract class CriterionDropdown extends DropdownButton {
       }
     });
     add(remove);
-
-    // TODO:Remove clickHandler that closes the popup
-
   }
 
   private RadioButton getRadioButton(final String label, Integer count) {
@@ -124,7 +132,22 @@ public abstract class CriterionDropdown extends DropdownButton {
 
   public abstract void resetSpecificControls();
 
-  public abstract String getQueryString();
+  public abstract void doFilterValueSets();
+
+  public String getQueryString() {
+    if(((RadioButton) radioControls.getWidget(1)).getValue()) {
+      // Not empty
+      return "_missing_:" + fieldName;
+    }
+    if(((RadioButton) radioControls.getWidget(2)).getValue()) {
+      // Empty
+      return "_exists_:" + fieldName;
+    }
+
+    return null;
+  }
+
+  public abstract String getSpecificQueryString();
 
   @Override
   protected void onLoad() {

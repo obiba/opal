@@ -28,7 +28,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 
-public class DateTimeCriterionDropdown extends CriterionDropdown {
+public abstract class DateTimeCriterionDropdown extends CriterionDropdown {
 
   Chooser operatorChooser;
 
@@ -46,8 +46,8 @@ public class DateTimeCriterionDropdown extends CriterionDropdown {
 
   DateBoxAppended date;
 
-  public DateTimeCriterionDropdown(VariableDto variableDto, QueryResultDto termDto) {
-    super(variableDto, termDto);
+  public DateTimeCriterionDropdown(VariableDto variableDto, String fieldName, QueryResultDto termDto) {
+    super(variableDto, fieldName, termDto);
   }
 
   @Override
@@ -56,13 +56,13 @@ public class DateTimeCriterionDropdown extends CriterionDropdown {
     operatorChooser = new Chooser();
     rangeValueChooser = new Chooser();
 
-    fromLabel = new ControlLabel("From");
+    fromLabel = new ControlLabel(translations.criterionFiltersMap().get("from"));
     from = createDateBoxAppended();
 
-    toLabel = new ControlLabel("To");
+    toLabel = new ControlLabel(translations.criterionFiltersMap().get("to"));
     to = createDateBoxAppended();
 
-    dateLabel = new ControlLabel("Date");
+    dateLabel = new ControlLabel(translations.criterionFiltersMap().get("date"));
     date = createDateBoxAppended();
 
     specificControls.addStyleName("controls");
@@ -126,9 +126,9 @@ public class DateTimeCriterionDropdown extends CriterionDropdown {
     FlowPanel inPanel = new FlowPanel();
 
     operatorChooser.addStyleName("inline-block");
-    operatorChooser.addItem("Select an operator", "SELECT_OPERATOR");
-    operatorChooser.addItem("In", "IN");
-    operatorChooser.addItem("Not in", "NOT_IN");
+    operatorChooser.addItem(translations.criterionFiltersMap().get("select_operator"));
+    operatorChooser.addItem(translations.criterionFiltersMap().get("in"));
+    operatorChooser.addItem(translations.criterionFiltersMap().get("not_in"));
     operatorChooser.addFocusHandler(new FocusHandler() {
       @Override
       public void onFocus(FocusEvent event) {
@@ -148,9 +148,9 @@ public class DateTimeCriterionDropdown extends CriterionDropdown {
     });
 
     rangeValueChooser.addStyleName("small-dual-indent");
-    rangeValueChooser.addItem("Select...", "SELECT");
-    rangeValueChooser.addItem("Range", "RANGE");
-    rangeValueChooser.addItem("Date", "DATE");
+    rangeValueChooser.addItem(translations.criterionFiltersMap().get("select"));
+    rangeValueChooser.addItem(translations.criterionFiltersMap().get("range"));
+    rangeValueChooser.addItem(translations.criterionFiltersMap().get("date"));
     rangeValueChooser.addFocusHandler(new FocusHandler() {
       @Override
       public void onFocus(FocusEvent event) {
@@ -178,8 +178,26 @@ public class DateTimeCriterionDropdown extends CriterionDropdown {
   }
 
   @Override
-  public String getQueryString() {
-    return "";
+  public String getSpecificQueryString() {
+    DateTimeFormat df = DateTimeFormat.getFormat("yyyy/MM/dd");
+    if(rangeValueChooser.isItemSelected(1)) {
+      // RANGE
+      String rangeQuery = fieldName + ":[" + (from.getValue() == null ? "*" : df.format(from.getValue())) + " TO " +
+          (to.getValue() == null ? "*" : df.format(to.getValue())) + "]";
+
+      if(operatorChooser.isItemSelected(2)) {
+        return "NOT " + rangeQuery;
+      }
+      return rangeQuery;
+    }
+
+    // VALUES
+    String valuesQuery = fieldName + ":(" + df.format(date.getValue()) + ")";
+    if(operatorChooser.isItemSelected(2)) {
+      return "NOT " + valuesQuery;
+    }
+    return valuesQuery;
+
   }
 
   private void updateDateCriterionFilter() {
@@ -189,7 +207,7 @@ public class DateTimeCriterionDropdown extends CriterionDropdown {
       filter += " " + rangeValueChooser.getItemText(rangeValueChooser.getSelectedIndex()).toLowerCase();
 
       DateTimeFormat df = DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_MEDIUM);
-      if("RANGE".equals(rangeValueChooser.getSelectedValue())) {
+      if(rangeValueChooser.isItemSelected(1)) {
         filter += "[" + (from.getValue() == null ? "" : df.format(from.getValue())) + ", " +
             (to.getValue() == null ? "" : df.format(to.getValue())) + "]";
       } else {
@@ -198,6 +216,7 @@ public class DateTimeCriterionDropdown extends CriterionDropdown {
     }
 
     updateCriterionFilter(filter);
+    doFilterValueSets();
   }
 
   private class UpdateFilterChosenHandler implements ChosenChangeEvent.ChosenChangeHandler {
@@ -206,14 +225,14 @@ public class DateTimeCriterionDropdown extends CriterionDropdown {
       resetRadioControls();
 
       // Show/Hide Range-value textbox
-      if("RANGE".equals(rangeValueChooser.getSelectedValue())) {
+      if(rangeValueChooser.isItemSelected(1)) {
         fromLabel.setVisible(true);
         from.setVisible(true);
         toLabel.setVisible(true);
         to.setVisible(true);
         dateLabel.setVisible(false);
         date.setVisible(false);
-      } else if("DATE".equals(rangeValueChooser.getSelectedValue())) {
+      } else if(rangeValueChooser.isItemSelected(2)) {
         fromLabel.setVisible(false);
         from.setVisible(false);
         toLabel.setVisible(false);

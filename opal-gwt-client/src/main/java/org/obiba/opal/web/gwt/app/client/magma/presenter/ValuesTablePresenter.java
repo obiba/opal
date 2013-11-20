@@ -34,13 +34,18 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
+import org.obiba.opal.web.model.client.opal.OpalMap;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
+import org.obiba.opal.web.model.client.search.ValueSetsResultDto;
 import org.obiba.opal.web.model.client.search.VariableItemDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.cell.client.ValueUpdater;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.http.client.Request;
@@ -68,6 +73,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private final ModalProvider<EntityModalPresenter> entityModalProvider;
 
+  private OpalMap opalMap;
+
   @Inject
   public ValuesTablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
       ModalProvider<ValueSequencePopupPresenter> valueSequencePopupProvider,
@@ -91,6 +98,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     JsArray<VariableDto> variables = JsArray.createArray().cast();
     variables.push(variable);
     getView().setVariables(variables);
+
+    fetchIndexSchema(table);
   }
 
   public void setTable(final TableDto table, String select) {
@@ -106,6 +115,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       }
     });
     fetcher.updateVariables(select);
+
+    fetchIndexSchema(table);
   }
 
   public void setFilter(String filter) {
@@ -162,16 +173,12 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
             // Fetch facets
             if(response.getStatusCode() == Response.SC_OK) {
-              if(resource.getCategoriesArray().length() == 0) {
 
-                if(resource.getValueType().equals("datetime")) {
-                  // DataTime filter
-                  getView().addVariableFilter(new DateTimeCriterionDropdown(resource, null));
-                } else {
-                  // Default filter variable
-                  getView().addVariableFilter(new DefaultCriterionDropdown(resource, null));
-                }
-              } else {
+              List<String> s = JsArrays.toList(opalMap.getKeysArray());
+              final String fieldName = opalMap.getValues(s.indexOf(resource.getName()));
+
+              if(resource.getCategoriesArray().length() > 0 || resource.getValueType().equals("integer")) {
+
                 // Filter for Categorical variable OR Numerical variable
                 ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(
                     UriBuilders.DATASOURCE_TABLE_FACET_VARIABLE_SEARCH.create()
@@ -181,14 +188,82 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
                       public void onResource(Response response, QueryResultDto term) {
                         if(resource.getValueType().equals("integer")) {
                           // Numerical variable
-                          getView().addVariableFilter(new NumericalCriterionDropdown(resource, term));
+                          NumericalCriterionDropdown criterion = new NumericalCriterionDropdown(resource, fieldName,
+                              term) {
+                            @Override
+                            public void doFilterValueSets() {
+                              GWT.log(getSpecificQueryString());
+                            }
+                          };
+                          criterion.addChangeHandler(new EmptyNotEmptyFilterRequest(criterion));
+                          getView().addVariableFilter(criterion);
                         } else {
                           // Categorical variable
-                          getView().addVariableFilter(new CategoricalCriterionDropdown(resource, term));
+                          CategoricalCriterionDropdown criterion = new CategoricalCriterionDropdown(resource, fieldName,
+                              term) {
+                            @Override
+                            public void doFilterValueSets() {
+                              getView().setRefreshing(true);
+                              ResourceRequestBuilderFactory.<ValueSetsResultDto>newBuilder().forResource(
+                                  // TODO: do not forget to send the select query argument
+                                  UriBuilders.DATASOURCE_TABLE_VALUESETS_SEARCH.create()
+                                      .query("query", getSpecificQueryString())//
+                                      .build(table.getDatasourceName(), table.getName()))
+                                  .withCallback(new ResourceCallback<ValueSetsResultDto>() {
+                                    @Override
+                                    public void onResource(Response response, ValueSetsResultDto resource) {
+                                      getView().populateValues(0, resource.getValueSets());
+
+//                                      for(int i = 0; i < resource.getHitsArray().length(); i++) {
+//                                        ValueSetsItemDto valueSet = (ValueSetsItemDto) resource.getHitsArray().get(i)
+//                                            .getExtension("Search.ValueSetsItemDto");
+//                                        valueSet.getValueSet().getVariablesArray();
+//                                      }
+                                    }
+                                  }).get().send();
+                            }
+                          };
+                          criterion.addChangeHandler(new EmptyNotEmptyFilterRequest(criterion));
+                          getView().addVariableFilter(criterion);
                         }
                       }
                     }).get().send();
+
+              } else {
+                if(resource.getValueType().equals("date")) {
+                  // DataTime filter
+                  DateTimeCriterionDropdown criterion = new DateTimeCriterionDropdown(resource, fieldName, null) {
+                    @Override
+                    public void doFilterValueSets() {
+                      GWT.log(getSpecificQueryString());
+                    }
+                  };
+                  criterion.addChangeHandler(new EmptyNotEmptyFilterRequest(criterion));
+                  getView().addVariableFilter(criterion);
+
+                } else {
+                  // Default filter variable
+                  getView().addVariableFilter(new DefaultCriterionDropdown(resource, fieldName, null) {
+                    @Override
+                    public void doFilterValueSets() {
+                      GWT.log(getSpecificQueryString());
+                    }
+                  });
+                }
               }
+            }
+          }
+        }).get().send();
+  }
+
+  private void fetchIndexSchema(TableDto table) {// Fetch variable-field mapping for ES queries
+    ResourceRequestBuilderFactory.<OpalMap>newBuilder().forResource(
+        UriBuilders.DATASOURCE_TABLE_INDEX_SCHEMA.create().build(table.getDatasourceName(), table.getName()))
+        .withCallback(new ResourceCallback<OpalMap>() {
+          @Override
+          public void onResource(Response response, OpalMap resource) {
+            if(response.getStatusCode() == Response.SC_OK) {
+              opalMap = resource;
             }
           }
         }).get().send();
@@ -458,6 +533,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     void populateValues(int offset, ValueSetsDto resource);
 
     void addVariableFilter(CriterionDropdown criterion);
+
+    void setRefreshing(boolean refreshing);
   }
 
   public enum ViewMode {
@@ -491,4 +568,17 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   }
 
+  private class EmptyNotEmptyFilterRequest implements ChangeHandler {
+
+    CriterionDropdown criterion;
+
+    EmptyNotEmptyFilterRequest(CriterionDropdown criterion) {
+      this.criterion = criterion;
+    }
+
+    @Override
+    public void onChange(ChangeEvent event) {
+      GWT.log("EmptyNotEmptyFilterRequest: " + (criterion == null ? "" : criterion.getQueryString()));
+    }
+  }
 }

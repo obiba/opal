@@ -24,21 +24,23 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 
-public class DefaultCriterionDropdown extends CriterionDropdown {
+public abstract class DefaultCriterionDropdown extends CriterionDropdown {
   private static final Translations translations = GWT.create(Translations.class);
 
-  private final Chooser operatorChooser = new Chooser();
+  private Chooser operatorChooser;
 
-  private final TextBox matches = new TextBox();
+  private TextBox matches;
 
-  public DefaultCriterionDropdown(VariableDto variableDto, QueryResultDto termDto) {
-    super(variableDto, termDto);
+  public DefaultCriterionDropdown(VariableDto variableDto, String fieldName, QueryResultDto termDto) {
+    super(variableDto, fieldName, termDto);
   }
 
   @Override
   public Widget getSpecificControls() {
     ListItem specificControls = new ListItem();
 
+    operatorChooser = new Chooser();
+    matches = new TextBox();
     specificControls.addStyleName("controls");
 
     specificControls.add(getOperatorsChooserPanel());
@@ -83,7 +85,7 @@ public class DefaultCriterionDropdown extends CriterionDropdown {
   }
 
   @Override
-  public String getQueryString() {
+  public String getSpecificQueryString() {
     return "";
   }
 
@@ -100,6 +102,7 @@ public class DefaultCriterionDropdown extends CriterionDropdown {
       updateCriterionFilter("");
     } else {
       updateCriterionFilter(translations.criterionFiltersMap().get("like") + " " + matches.getText());
+      doFilterValueSets();
     }
   }
 }

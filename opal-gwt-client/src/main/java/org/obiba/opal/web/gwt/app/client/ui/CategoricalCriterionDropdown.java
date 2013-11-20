@@ -13,13 +13,11 @@ package org.obiba.opal.web.gwt.app.client.ui;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.common.base.Joiner;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.FocusEvent;
 import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
@@ -28,23 +26,25 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 
-public class CategoricalCriterionDropdown extends CriterionDropdown {
+public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
 
-  private static final Translations translations = GWT.create(Translations.class);
+  private Chooser operatorChooser;
 
-  private final Chooser operatorChooser = new Chooser();
+  private Chooser categories;
 
-  private final Chooser categories = new Chooser(true);
+  private TextBox matches;
 
-  private final TextBox matches = new TextBox();
-
-  public CategoricalCriterionDropdown(VariableDto variableDto, QueryResultDto termDto) {
-    super(variableDto, termDto);
+  public CategoricalCriterionDropdown(VariableDto variableDto, String fieldName, QueryResultDto termDto) {
+    super(variableDto, fieldName, termDto);
   }
 
   @Override
   public Widget getSpecificControls() {
     ListItem specificControls = new ListItem();
+
+    operatorChooser = new Chooser();
+    categories = new Chooser(true);
+    matches = new TextBox();
 
     specificControls.addStyleName("controls");
 
@@ -118,12 +118,27 @@ public class CategoricalCriterionDropdown extends CriterionDropdown {
     }
 
     return name;
-
   }
 
   @Override
-  public String getQueryString() {
-    return "";
+  public String getSpecificQueryString() {
+    if(operatorChooser.isItemSelected(3)) {
+      return fieldName;
+    }
+
+    Collection<String> selected = new ArrayList<String>();
+    for(int i = 0; i < categories.getItemCount(); i++) {
+      if(categories.isItemSelected(i)) {
+        selected.add(categories.getValue(i));
+      }
+    }
+
+    // Not in
+    if(operatorChooser.isItemSelected(1)) {
+      return fieldName + ":(" + Joiner.on(" OR ").join(selected) + ")";
+    }
+
+    return "NOT " + fieldName + ":(" + Joiner.on(" OR ").join(selected) + ")";
   }
 
   private class UpdateFilterChosenHandler implements ChosenChangeEvent.ChosenChangeHandler {
@@ -153,6 +168,8 @@ public class CategoricalCriterionDropdown extends CriterionDropdown {
           updateCriterionFilter(
               operatorChooser.getItemText(operatorChooser.getSelectedIndex()) + " (" + Joiner.on(", ").join(filter) +
                   ")");
+
+          doFilterValueSets();
         } else {
           updateCriterionFilter("");
         }

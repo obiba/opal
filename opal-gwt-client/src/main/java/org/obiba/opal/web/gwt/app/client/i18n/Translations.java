@@ -2423,15 +2423,23 @@ public interface Translations extends Constants {
 
   @Description("Criterion Filters Labels")
   @DefaultStringMapValue({//
+      "all", "All",//
+      "empty", "Empty",//
+      "not_empty", "Not empty",//
       "min", "Min",//
       "max", "Max", //
       "values", "Values", //
-      "select_operator", "Select an operator...", "in", "In", //
+      "select_operator", "Select an operator...",//
+      "in", "In", //
       "not_in", "Not in",//
       "select", "Select",//
       "range", "Range", "values", "Values", //
       "custom_match_query", "Custom match query",//
       "like", "Like", //
+      "from", "From",//
+      "to", "To",//
+      "date", "Date",//
+      "select", "Select..."//
   })
   Map<String, String> criterionFiltersMap();
 
