@@ -11,6 +11,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory;
+import org.obiba.magma.support.EntitiesPredicate;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbSettings;
@@ -18,6 +19,7 @@ import org.obiba.opal.core.domain.database.SqlSettings;
 import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
 import org.obiba.opal.core.runtime.jdbc.DatabaseSessionFactoryProvider;
 import org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory;
+import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.database.CannotDeleteDatabaseWithDataException;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
@@ -58,6 +60,9 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   @Autowired
   private OrientDbService orientDbService;
+
+  @Autowired
+  private IdentifiersTableService identifiersTableService;
 
   private final LoadingCache<String, DataSource> dataSourceCache = CacheBuilder.newBuilder()
       .removalListener(new DataSourceRemovalListener()) //
@@ -119,7 +124,11 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   @NotNull
   @Override
   public Database getDatabase(@NotNull String name) throws NoSuchDatabaseException {
-    return orientDbService.findUnique(Database.Builder.create().name(name).build());
+    Database database = orientDbService.findUnique(Database.Builder.create().name(name).build());
+    if(database == null) {
+      throw new NoSuchDatabaseException(name);
+    }
+    return database;
   }
 
   @Override
@@ -178,11 +187,14 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   @Override
   public void delete(@NotNull Database database) throws CannotDeleteDatabaseWithDataException {
-    if(!database.isEditable()) {
+    if(database.isUsedForIdentifiers()) {
+      if(identifiersTableService.hasEntities(new EntitiesPredicate.NonViewEntitiesPredicate())) {
+        throw new IllegalArgumentException("Cannot delete identifiers database with entities");
+      }
+      unregister(database.getName(), identifiersTableService.getDatasourceName());
+    } else if(!database.isEditable()) {
       throw new IllegalArgumentException("Cannot delete non editable database");
     }
-
-    //TODO check if this database has data
     orientDbService.delete(database);
     destroyDataSource(database.getName());
   }
@@ -269,7 +281,9 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     public void onRemoval(RemovalNotification<String, DataSource> notification) {
       log.info("Destroying DataSource {}", notification.getKey());
       DataSource dataSource = notification.getValue();
-      if(dataSource != null) ((AbstractDataSourceBean) dataSource).close();
+      if(dataSource != null) {
+        ((AbstractDataSourceBean) dataSource).close();
+      }
     }
   }
 
@@ -287,8 +301,10 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
     public void onRemoval(RemovalNotification<String, SessionFactory> notification) {
       try {
         log.info("Destroying SessionFactory {}", notification.getKey());
-        SessionFactory sf = notification.getValue();
-        if(sf != null) sf.close();
+        SessionFactory sessionFactory = notification.getValue();
+        if(sessionFactory != null) {
+          sessionFactory.close();
+        }
       } catch(HibernateException e) {
         log.warn("Ignoring exception during SessionFactory shutdown: ", e);
       }

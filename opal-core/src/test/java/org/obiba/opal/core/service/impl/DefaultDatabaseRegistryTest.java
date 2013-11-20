@@ -15,6 +15,7 @@ import org.obiba.opal.core.domain.database.MongoDbSettings;
 import org.obiba.opal.core.domain.database.SqlSettings;
 import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
 import org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory;
+import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.database.IdentifiersDatabaseNotFoundException;
@@ -368,6 +369,11 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     @Bean
     public DatabaseRegistry databaseRegistry() {
       return new DefaultDatabaseRegistry();
+    }
+
+    @Bean
+    public IdentifiersTableService identifiersTableService() {
+      return EasyMock.createMock(IdentifiersTableService.class);
     }
 
   }

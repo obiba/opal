@@ -13,10 +13,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.magma.datasource.mongodb.MongoDBDatasourceFactory;
-import org.obiba.magma.support.EntitiesPredicate;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbSettings;
-import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.database.MultipleIdentifiersDatabaseException;
 import org.obiba.opal.web.database.Dtos;
@@ -34,17 +32,16 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 import static org.obiba.opal.web.model.Database.DatabaseDto;
 
+/**
+ * Class is not transactional because of delete method
+ */
 @Component
-@Transactional
 @Scope("request")
 @Path("/system/database/{name}")
 public class DatabaseResource {
 
   @Autowired
   private DatabaseRegistry databaseRegistry;
-
-  @Autowired
-  private IdentifiersTableService identifiersTableService;
 
   @PathParam("name")
   private String name;
@@ -54,43 +51,27 @@ public class DatabaseResource {
     return Dtos.asDto(getDatabase());
   }
 
-  private Database getDatabase() {
-    return databaseRegistry.getDatabase(name);
-  }
-
   @DELETE
   public Response delete() {
     Database database = getDatabase();
-    if(database.isUsedForIdentifiers()) {
-      if(identifiersTableService.hasEntities(new EntitiesPredicate.NonViewEntitiesPredicate())) {
-        return Response.status(BAD_REQUEST)
-            .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatabaseHasEntities").build()).build();
-      }
-      identifiersTableService.unregisterDatabase();
-    } else if(!database.isEditable()) {
-      return Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatabaseIsNotEditable").build()).build();
-    }
     databaseRegistry.delete(database);
     return Response.ok().build();
   }
 
   @PUT
   public Response update(DatabaseDto dto) throws MultipleIdentifiersDatabaseException {
-
     Database database = Dtos.fromDto(dto);
     if(!database.isEditable()) {
       return Response.status(BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatabaseIsNotEditable").build()).build();
     }
-
     databaseRegistry.save(database);
-
     return Response.ok().build();
   }
 
   @POST
   @Path("/connections")
+  @Transactional(readOnly = true)
   public Response testConnection() {
     Database database = getDatabase();
     if(database.hasSqlSettings()) {
@@ -100,6 +81,10 @@ public class DatabaseResource {
       return testMongoConnection(database.getMongoDbSettings());
     }
     throw new RuntimeException("Connection test not yet implemented for database " + database.getClass());
+  }
+
+  private Database getDatabase() {
+    return databaseRegistry.getDatabase(name);
   }
 
   private Response testSqlConnection() {

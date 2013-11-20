@@ -31,9 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Predicate;
 
@@ -41,15 +39,13 @@ import com.google.common.base.Predicate;
  *
  */
 @Component
+@Transactional
 public class DefaultIdentifiersTableService implements IdentifiersTableService {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultIdentifiersTableService.class);
 
   @Autowired
   private DatabaseRegistry databaseRegistry;
-
-  @Autowired
-  private TransactionTemplate transactionTemplate;
 
   @NotNull
   @Value("${org.obiba.opal.keys.tableReference}")
@@ -108,12 +104,7 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
 
   @Override
   public void unregisterDatabase() {
-    transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-      @Override
-      protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
-        destroy();
-      }
-    });
+    destroy();
     databaseRegistry.unregister(databaseRegistry.getIdentifiersDatabase().getName(), getDatasourceName());
   }
 

@@ -30,6 +30,8 @@
 
   <bean id="databaseRegistry" class="org.obiba.opal.core.service.impl.DefaultDatabaseRegistry"/>
 
+  <bean id="identifiersTableService" class="org.obiba.opal.core.service.impl.DefaultIdentifiersTableService"/>
+
   <bean id="generalConfigService" class="org.obiba.opal.core.service.impl.OpalGeneralConfigServiceImpl"/>
 
   <bean id="upgradeOpalConfigurationService" class="org.obiba.opal.core.cfg.DefaultOpalConfigurationService">
