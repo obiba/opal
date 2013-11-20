@@ -12,15 +12,14 @@ package org.obiba.opal.web.shell.reporting;
 import java.io.File;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -36,8 +35,6 @@ import org.obiba.opal.web.model.Opal.ReportDto;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.reporting.Dtos;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -51,9 +48,6 @@ import com.google.common.collect.Lists;
 @Scope("request")
 @Path("/report-template/{name}")
 public class ReportTemplateResource extends AbstractReportTemplateResource {
-
-  @SuppressWarnings("unused")
-  private static final Logger log = LoggerFactory.getLogger(ReportTemplateResource.class);
 
   @PathParam("name")
   protected String name;
@@ -84,34 +78,40 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   }
 
   @GET
-  public Response getReportTemplate() {
-    ReportTemplate reportTemplate = getOpalConfigurationService().getOpalConfiguration().getReportTemplate(name);
-    return reportTemplate == null || !authzReadReportTemplate(reportTemplate) ? Response.status(Status.NOT_FOUND)
-        .build() : Response.ok(Dtos.asDto(reportTemplate)).build();
+  public Response get() {
+    ReportTemplate reportTemplate = getReportTemplate();
+    return reportTemplate == null || !authzReadReportTemplate(reportTemplate) //
+        ? Response.status(Status.NOT_FOUND).build() //
+        : Response.ok(Dtos.asDto(reportTemplate)).build();
+  }
+
+  @Nullable
+  private ReportTemplate getReportTemplate() {
+    return getOpalConfigurationService().getOpalConfiguration().getReportTemplate(name);
   }
 
   @DELETE
   public Response deleteReportTemplate() {
-    ReportTemplate reportTemplateToRemove = getOpalConfigurationService().getOpalConfiguration()
-        .getReportTemplate(name);
+    ReportTemplate reportTemplateToRemove = getReportTemplate();
     if(reportTemplateToRemove == null || !authzReadReportTemplate(reportTemplateToRemove)) {
       return Response.status(Status.NOT_FOUND).build();
-    } else {
-      getOpalConfigurationService().modifyConfiguration(new ConfigModificationTask() {
-
-        @Override
-        public void doWithConfig(OpalConfiguration config) {
-          config.removeReportTemplate(name);
-        }
-      });
-      commandSchedulerService.deleteCommand(name, REPORT_SCHEDULING_GROUP);
-      return Response.ok().build();
     }
+    getOpalConfigurationService().modifyConfiguration(new ConfigModificationTask() {
+
+      @Override
+      public void doWithConfig(OpalConfiguration config) {
+        config.removeReportTemplate(name);
+      }
+    });
+    commandSchedulerService.deleteCommand(name, REPORT_SCHEDULING_GROUP);
+    return Response.ok().build();
   }
 
   @PUT
-  public Response updateReportTemplate(@Context UriInfo uriInfo, ReportTemplateDto reportTemplateDto) {
-    if(!reportTemplateExists()) return Response.status(Status.NOT_FOUND).build();
+  public Response updateReportTemplate(ReportTemplateDto reportTemplateDto) {
+    if(!reportTemplateExists()) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
 
     try {
       Assert.isTrue(reportTemplateDto.getName().equals(name),

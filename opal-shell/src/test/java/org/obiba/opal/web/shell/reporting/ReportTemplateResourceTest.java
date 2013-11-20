@@ -89,7 +89,7 @@ public class ReportTemplateResourceTest {
     reportTemplateResource.setName("template3");
     reportTemplateResource.setConfigService(opalConfigurationServiceMock);
 
-    Response response = reportTemplateResource.getReportTemplate();
+    Response response = reportTemplateResource.get();
     ThreadContext.unbindSubject();
 
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -110,7 +110,7 @@ public class ReportTemplateResourceTest {
     reportTemplateResource.setName("template9");
     reportTemplateResource.setConfigService(opalConfigurationServiceMock);
 
-    Response response = reportTemplateResource.getReportTemplate();
+    Response response = reportTemplateResource.get();
     assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
 
     verify(opalRuntimeMock, opalConfigurationServiceMock);
@@ -186,8 +186,7 @@ public class ReportTemplateResourceTest {
     reportTemplateResource.setConfigService(opalConfigurationServiceMock);
     reportTemplateResource.setCommandSchedulerService(commandSchedulerServiceMock);
 
-    Response response = reportTemplateResource
-        .updateReportTemplate(uriInfoMock, Dtos.asDto(getReportTemplate("template9")));
+    Response response = reportTemplateResource.updateReportTemplate(Dtos.asDto(getReportTemplate("template9")));
 
     assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
     assertEquals(BASE_URI, response.getMetadata().get("location").get(0).toString());
@@ -211,8 +210,7 @@ public class ReportTemplateResourceTest {
     reportTemplateResource.setConfigService(opalConfigurationServiceMock);
     reportTemplateResource.setCommandSchedulerService(commandSchedulerServiceMock);
 
-    Response response = reportTemplateResource
-        .updateReportTemplate(createMock(UriInfo.class), Dtos.asDto(getReportTemplate("template1")));
+    Response response = reportTemplateResource.updateReportTemplate(Dtos.asDto(getReportTemplate("template1")));
 
     assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
@@ -222,7 +220,6 @@ public class ReportTemplateResourceTest {
 
   @Test
   public void testUpdateReportTemplate_ErrorEncountered() {
-    UriInfo uriInfoMock = createMock(UriInfo.class);
 
     replay(opalRuntimeMock, opalConfigurationServiceMock);
 
@@ -230,8 +227,7 @@ public class ReportTemplateResourceTest {
     reportTemplateResource.setName("template1");
     reportTemplateResource.setConfigService(opalConfigurationServiceMock);
 
-    Response response = reportTemplateResource
-        .updateReportTemplate(uriInfoMock, Dtos.asDto(getReportTemplate("template2")));
+    Response response = reportTemplateResource.updateReportTemplate(Dtos.asDto(getReportTemplate("template2")));
 
     assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     assertEquals("CouldNotUpdateTheReportTemplate", ((ClientErrorDto) response.getEntity()).getStatus());

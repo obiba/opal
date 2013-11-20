@@ -36,10 +36,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Transactional
 @Scope("request")
-@Path("/datasource/{ds}/table/{table}/variables")
+@Path("/datasource/{ds}/table/{table}/variables/_search")
 public class TableVariablesSearchResource extends AbstractVariablesSearchResource {
-
-//  private static final Logger log = LoggerFactory.getLogger(TableVariablesSearchResource.class);
 
   @PathParam("ds")
   private String datasource;
@@ -47,10 +45,9 @@ public class TableVariablesSearchResource extends AbstractVariablesSearchResourc
   @PathParam("table")
   private String table;
 
-  @SuppressWarnings("PMD.ExcessiveParameterList")
   @GET
   @POST
-  @Path("_search")
+  @SuppressWarnings("PMD.ExcessiveParameterList")
   public Response search(@QueryParam("query") String query, @QueryParam("offset") @DefaultValue("0") int offset,
       @QueryParam("limit") @DefaultValue("10") int limit,
       @QueryParam("variable") @DefaultValue("false") boolean addVariableDto, @QueryParam("field") List<String> fields,
@@ -72,10 +69,6 @@ public class TableVariablesSearchResource extends AbstractVariablesSearchResourc
     }
   }
 
-  //
-  // Protected methods
-  //
-
   @Override
   protected String getSearchPath() {
     return indexManager.getIndex(getValueTable()).getRequestPath();
@@ -86,10 +79,6 @@ public class TableVariablesSearchResource extends AbstractVariablesSearchResourc
     if(addVariableDto) converter.setStrategy(new ItemResultDtoStrategy(getValueTable()));
     return converter.convert(jsonResponse);
   }
-
-  //
-  // Private methods
-  //
 
   private boolean canQueryEsIndex() {
     return searchServiceAvailable() && indexManager.isIndexUpToDate(getValueTable());

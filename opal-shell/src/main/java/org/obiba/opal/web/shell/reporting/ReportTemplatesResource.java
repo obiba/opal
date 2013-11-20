@@ -22,8 +22,6 @@ import org.obiba.opal.web.model.Opal.AclAction;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.reporting.Dtos;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
@@ -40,9 +38,6 @@ import com.google.common.collect.Lists;
 @Scope("request")
 @Path("/report-templates")
 public class ReportTemplatesResource extends AbstractReportTemplateResource {
-
-  @SuppressWarnings("unused")
-  private static final Logger log = LoggerFactory.getLogger(ReportTemplatesResource.class);
 
   private OpalConfigurationService configService;
 
@@ -97,8 +92,8 @@ public class ReportTemplatesResource extends AbstractReportTemplateResource {
               .setStatus("CouldNotCreateReportTemplate").build()).build();
     }
     URI reportUri = UriBuilder.fromResource(ReportTemplateResource.class).build(reportTemplateDto.getName());
-    return Response.created(reportUri)//
-        .header("X-Alt-Permissions", new ReportPermissions(reportUri, AclAction.REPORT_TEMPLATE_ALL))//
+    return Response.created(reportUri) //
+        .header("X-Alt-Permissions", new ReportPermissions(reportUri, AclAction.REPORT_TEMPLATE_ALL)) //
         .build();
   }
 

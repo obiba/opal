@@ -20,7 +20,6 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.easymock.EasyMock;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.magma.MagmaEngine;
@@ -41,6 +40,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
 
 public class ReportTemplatesResourceTest {
 
@@ -82,12 +82,7 @@ public class ReportTemplatesResourceTest {
   public void testGetReportTemplates_RetrieveSetOfTemplates() {
     Subject mockSubject = createMock(Subject.class);
     ThreadContext.bind(mockSubject);
-    expect(mockSubject.getPrincipal()).andReturn(createMock(Principal.class)).anyTimes();
-    expect(mockSubject.isPermitted("magma:/report-template/template1:GET")).andReturn(true).anyTimes();
-    expect(mockSubject.isPermitted("magma:/report-template/template2:GET")).andReturn(true).anyTimes();
-    expect(mockSubject.isPermitted("magma:/report-template/template3:GET")).andReturn(true).anyTimes();
-    expect(mockSubject.isPermitted("magma:/report-template/template4:GET")).andReturn(true).anyTimes();
-
+    configureMock(mockSubject);
     replay(opalConfigurationServiceMock, mockSubject);
 
     ReportTemplatesResource reportTemplateResource = new ReportTemplatesResource();
@@ -98,17 +93,25 @@ public class ReportTemplatesResourceTest {
     Set<ReportTemplateDto> reportTemplatesDtos = reportTemplateResource.getReportTemplates();
     ThreadContext.unbindSubject();
 
-    Assert.assertEquals(4, reportTemplates.size());
-    Assert.assertEquals(4, reportTemplatesDtos.size());
+    assertEquals(4, reportTemplates.size());
+    assertEquals(4, reportTemplatesDtos.size());
 
     ReportTemplateDto reportTemplateDto = (ReportTemplateDto) reportTemplatesDtos.toArray()[0];
-    Assert.assertEquals("template1", reportTemplateDto.getName());
-    Assert.assertEquals("design", reportTemplateDto.getDesign());
-    Assert.assertEquals("format", reportTemplateDto.getFormat());
-    Assert.assertEquals("schedule", reportTemplateDto.getCron());
-    Assert.assertEquals(2, reportTemplateDto.getParametersList().size());
+    assertEquals("template1", reportTemplateDto.getName());
+    assertEquals("design", reportTemplateDto.getDesign());
+    assertEquals("format", reportTemplateDto.getFormat());
+    assertEquals("schedule", reportTemplateDto.getCron());
+    assertEquals(2, reportTemplateDto.getParametersList().size());
 
     verify(opalConfigurationServiceMock, mockSubject);
+  }
+
+  private void configureMock(Subject mockSubject) {
+    expect(mockSubject.getPrincipal()).andReturn(createMock(Principal.class)).anyTimes();
+    expect(mockSubject.isPermitted("magma:/report-template/template1:GET")).andReturn(true).anyTimes();
+    expect(mockSubject.isPermitted("magma:/report-template/template2:GET")).andReturn(true).anyTimes();
+    expect(mockSubject.isPermitted("magma:/report-template/template3:GET")).andReturn(true).anyTimes();
+    expect(mockSubject.isPermitted("magma:/report-template/template4:GET")).andReturn(true).anyTimes();
   }
 
   @Test
@@ -117,7 +120,7 @@ public class ReportTemplatesResourceTest {
     opalConfigurationServiceMock.modifyConfiguration((ConfigModificationTask) EasyMock.anyObject());
     expectLastCall().once();
 
-    CommandSchedulerService commandSchedulerServiceMock = createMock(CommandSchedulerService.class);
+    commandSchedulerServiceMock = createMock(CommandSchedulerService.class);
     commandSchedulerServiceMock.unscheduleCommand("template9", "reports");
     commandSchedulerServiceMock.scheduleCommand("template9", "reports", "schedule");
 
@@ -136,8 +139,8 @@ public class ReportTemplatesResourceTest {
 
     Response response = reportTemplatesResource.createReportTemplate(Dtos.asDto(getReportTemplate("template9")));
 
-    Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-    Assert.assertEquals("/report-template/template9", response.getMetadata().get("location").get(0).toString());
+    assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+    assertEquals("/report-template/template9", response.getMetadata().get("location").get(0).toString());
 
     verify(opalConfigurationServiceMock, commandSchedulerServiceMock, commandRegistry);
   }

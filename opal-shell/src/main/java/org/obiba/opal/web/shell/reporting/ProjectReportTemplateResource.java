@@ -27,17 +27,10 @@ public class ProjectReportTemplateResource extends ReportTemplateResource {
   @PathParam("project")
   private String project;
 
-  @PathParam("name")
-  private String name;
-
-  public ProjectReportTemplateResource() {
-    setName(name);
-  }
-
   @Override
   protected boolean authzReadReportTemplate(ReportTemplate template) {
-    return template.hasProject() && template.getProject().equals(name) &&
-        getAuthorizer().isPermitted("magma:/project/" + name + "/report-template/" + template.getName() + ":GET");
+    return template.hasProject() && template.getProject().equals(project) &&
+        getAuthorizer().isPermitted("magma:/project/" + project + "/report-template/" + template.getName() + ":GET");
   }
 
 }
