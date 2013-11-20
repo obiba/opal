@@ -181,7 +181,7 @@ public abstract class DateTimeCriterionDropdown extends CriterionDropdown {
     String emptyNotEmpty = super.getQueryString();
     if(emptyNotEmpty != null) return emptyNotEmpty;
 
-    DateTimeFormat df = DateTimeFormat.getFormat("yyyy/MM/dd");
+    DateTimeFormat df = DateTimeFormat.getFormat("yyyy-MM-dd");
     if(rangeValueChooser.isItemSelected(1)) {
       // RANGE
       String rangeQuery = fieldName + ":[" + (from.getValue() == null ? "*" : df.format(from.getValue())) + " TO " +
@@ -194,7 +194,7 @@ public abstract class DateTimeCriterionDropdown extends CriterionDropdown {
     }
 
     // VALUES
-    String valuesQuery = fieldName + ":(" + df.format(date.getValue()) + ")";
+    String valuesQuery = fieldName + ":(>=" + df.format(date.getValue()) + " AND <=" + df.format(date.getValue()) + ")";
     if(operatorChooser.isItemSelected(2)) {
       return "NOT " + valuesQuery;
     }

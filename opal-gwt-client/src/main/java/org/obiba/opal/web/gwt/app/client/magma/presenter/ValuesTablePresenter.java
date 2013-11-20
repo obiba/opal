@@ -588,7 +588,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
               .withCallback(new FacetVariableResourceCallback(resource, indexedFieldName)).get().send();
 
         } else {
-          if("date".equals(resource.getValueType())) {
+          if("date".equals(resource.getValueType()) || "datetime".equals(resource.getValueType())) {
             addDateFilter(resource, indexedFieldName);
           } else {
             // Default filter variable
@@ -609,7 +609,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       getView().addVariableFilter(criterion);
     }
 
-    private void addDateFilter(final VariableDto resource, final String indexedFieldName) {// DataTime filter
+    private void addDateFilter(final VariableDto resource, final String indexedFieldName) {
+      // DataTime filter
       DateTimeCriterionDropdown criterion = new DateTimeCriterionDropdown(resource, indexedFieldName) {
         @Override
         public void doFilterValueSets() {
