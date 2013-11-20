@@ -14,6 +14,7 @@ import java.net.URI;
 import javax.ws.rs.core.UriInfo;
 
 import org.jboss.resteasy.plugins.server.servlet.ServletUtil;
+import org.obiba.opal.web.ws.cfg.OpalWsConfig;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -33,13 +34,13 @@ public class SpringRequestAttributesProvider implements RequestAttributesProvide
 
   @Override
   public UriInfo getUriInfo() {
-    return ServletUtil.extractUriInfo(currentRequestAttributes().getRequest(), "/ws");
+    return ServletUtil.extractUriInfo(currentRequestAttributes().getRequest(), OpalWsConfig.WS_ROOT);
   }
 
   @Override
   public String getResourcePath(URI uri) {
     String path = uri.getPath();
-    return path.replaceFirst("/ws", "");
+    return path.replaceFirst(OpalWsConfig.WS_ROOT, "");
   }
 
 }

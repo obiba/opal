@@ -22,6 +22,7 @@ import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.obiba.opal.audit.OpalUserProvider;
+import org.obiba.opal.web.ws.cfg.OpalWsConfig;
 import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +78,7 @@ public class AuditInterceptor implements RequestCyclePostProcess {
     if(response.getStatus() == HttpStatus.SC_CREATED) {
       URI resourceUri = (URI) response.getMetadata().getFirst(HttpHeaders.LOCATION);
       if(resourceUri != null) {
-        String path = resourceUri.getPath().substring("/ws".length());
+        String path = resourceUri.getPath().substring(OpalWsConfig.WS_ROOT.length());
         List<Object> args = Lists.newArrayList(getArguments(request, response));
         args.add(path);
         log.info(LOG_FORMAT + " - {}", args.toArray());

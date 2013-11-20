@@ -22,6 +22,7 @@ import org.obiba.opal.web.model.Opal.AclAction;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
 import org.obiba.opal.web.reporting.Dtos;
+import org.obiba.opal.web.ws.cfg.OpalWsConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
@@ -143,7 +144,7 @@ public class ReportTemplatesResource extends AbstractReportTemplateResource {
 
     @Override
     public String getNode() {
-      return reportUri.getPath().replaceFirst("/ws", "");
+      return reportUri.getPath().replaceFirst(OpalWsConfig.WS_ROOT, "");
     }
 
     @Override

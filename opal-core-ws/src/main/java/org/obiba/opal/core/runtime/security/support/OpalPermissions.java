@@ -14,6 +14,7 @@ import java.net.URI;
 import org.obiba.opal.core.service.SubjectAclService;
 import org.obiba.opal.core.service.SubjectAclService.Subject;
 import org.obiba.opal.web.model.Opal.AclAction;
+import org.obiba.opal.web.ws.cfg.OpalWsConfig;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
@@ -48,7 +49,7 @@ public class OpalPermissions implements SubjectAclService.Permissions {
 
   @Override
   public String getNode() {
-    return uri.getPath().replaceFirst("/ws", "");
+    return uri.getPath().replaceFirst(OpalWsConfig.WS_ROOT, "");
   }
 
   @Override
