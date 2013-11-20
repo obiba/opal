@@ -283,8 +283,11 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     @Override
     public void onResource(Response response, ValueSetsDto resource) {
       if(table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
-//        getView().populateValues(offset, resource == null ? ValueSetsDto.create() : resource);
-        applyAllValueSetsFilter(offset);
+        if(getView().getValuesFilterGroup().isVisible()) {
+          applyAllValueSetsFilter(offset);
+        } else {
+          getView().populateValues(offset, resource == null ? ValueSetsDto.create() : resource);
+        }
       }
     }
   }

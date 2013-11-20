@@ -726,8 +726,10 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
       listValueSetVariable = JsArrays.toList(JsArrays.toSafeArray(valueSets.getVariablesArray()));
       updateRowData(offset, JsArrays.toList(JsArrays.toSafeArray(valueSets.getValueSetsArray())));
-      valuesTable.setRowData(JsArrays.toList(JsArrays.toSafeArray(valueSets.getValueSetsArray())));
-//      valuesTable.redraw();
+
+      //TODO: How to refresh the table... The following line will refresh the results but launches a onRangeChanged
+      // which triggers another fetch...
+//      valuesTable.setRowData(JsArrays.toList(JsArrays.toSafeArray(valueSets.getValueSetsArray())));
     }
   }
 
