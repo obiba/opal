@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.importdata.view;
 
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter.ImportDataInputsHandler;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
@@ -229,7 +229,12 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
 
   @Override
   public void showError(String errorMessage, HasType<ControlGroupType> errorType) {
-    dialog.addAlert(errorMessage, AlertType.ERROR, errorType);
+    if (errorType == null) {
+      dialog.addAlert(errorMessage, AlertType.ERROR);
+
+    } else {
+      dialog.addAlert(errorMessage, AlertType.ERROR, errorType);
+    }
   }
 
   @Override
@@ -350,8 +355,9 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
         parsingErrors.setErrors(errorDto);
         parsingErrors.setVisible(true);
       } else {
-        eventBus.fireEvent(
-            NotificationEvent.newBuilder().error(errorDto.getStatus()).args(errorDto.getArgumentsArray()).build());
+        showError(TranslationsUtils
+            .replaceArguments(translations.userMessageMap().get(errorDto.getStatus()), errorDto.getArgumentsArray()),
+            null);
       }
     }
     datasourceErrors.setVisible(true);
