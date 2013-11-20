@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
 import org.obiba.opal.web.gwt.app.client.ui.CriterionDropdown;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.TableVariableSuggestOracle;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ClickableColumn;
@@ -173,7 +174,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   @Inject
   public ValuesTableView(EventBus eventBus) {
     // populate Typeahead
-    oracle = new VariableSuggestOracle(eventBus);
+    oracle = new TableVariableSuggestOracle(eventBus);
     variableTypeahead = new Typeahead(oracle);
     variableTypeahead.setMinLength(1);
     variableTypeahead.setUpdaterCallback(new Typeahead.UpdaterCallback() {

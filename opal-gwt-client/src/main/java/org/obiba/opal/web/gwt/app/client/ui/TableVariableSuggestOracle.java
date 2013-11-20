@@ -20,17 +20,9 @@ public class TableVariableSuggestOracle extends VariableSuggestOracle {
   private static final int LABEL_MAX_SIZE = 75;
 
   /**
-   * Constructor for <code>MultiWordSuggestOracle</code> which takes in a set of
-   * whitespace chars that filter its input.
-   * <p>
-   * Example: If <code>".,"</code> is passed in as whitespace, then the string
-   * "foo.bar" would match the queries "foo", "bar", "foo.bar", "foo...bar", and
-   * "foo, bar". If the empty string is used, then all characters are used in
-   * matching. For example, the query "bar" would match "bar", but not "foo
-   * bar".
-   * </p>
+   * Same behavior as VariableSuggestOracle but the list of results do not display the datasource and table name
    *
-   * @param whitespaceChars the characters to treat as word separators
+   * @param eventBus
    */
   public TableVariableSuggestOracle(EventBus eventBus) {
     super(eventBus);

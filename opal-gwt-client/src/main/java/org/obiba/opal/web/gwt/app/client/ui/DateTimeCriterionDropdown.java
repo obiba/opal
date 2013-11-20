@@ -66,6 +66,7 @@ public abstract class DateTimeCriterionDropdown extends CriterionDropdown {
 
     specificControls.addStyleName("controls");
     specificControls.add(getOperatorsChooserPanel());
+    specificControls.add(getRangeDateChooserPanel());
     specificControls.add(getRangeValuePanel());
 
     resetSpecificControls();
@@ -77,7 +78,9 @@ public abstract class DateTimeCriterionDropdown extends CriterionDropdown {
     dateBox.setValue(null);
     dateBox.setIcon(IconType.CALENDAR);
     dateBox.setAutoClose(true);
-    dateBox.setFormat("yyyy/mm/dd");
+    dateBox.setFormat("yyyy-mm-dd");
+    dateBox.setWidth("100px");
+    dateBox.addStyleName("small-input");
     dateBox.addValueChangeHandler(new ValueChangeHandler<Date>() {
       @Override
       public void onValueChange(ValueChangeEvent<Date> event) {
@@ -91,14 +94,6 @@ public abstract class DateTimeCriterionDropdown extends CriterionDropdown {
   private Widget getRangeValuePanel() {
     FlowPanel panel = new FlowPanel();
 
-    // TODO: Round digit
-//    from.setPlaceholder(">= " + queryResult.getFacetsArray().get(0).getStatistics().getMin());
-//    from.setWidth("100px");
-
-    // TODO: Round digit
-//    to.setPlaceholder("<= " + queryResult.getFacetsArray().get(0).getStatistics().getMax());
-//    to.setWidth("100px");
-
     ControlGroup c = new ControlGroup();
     c.addStyleName("inline-block");
     c.add(fromLabel);
@@ -106,6 +101,7 @@ public abstract class DateTimeCriterionDropdown extends CriterionDropdown {
 
     ControlGroup c2 = new ControlGroup();
     c2.addStyleName("inline-block");
+    c2.addStyleName("dual-indent");
     c2.add(toLabel);
     c2.add(to);
 
@@ -122,9 +118,7 @@ public abstract class DateTimeCriterionDropdown extends CriterionDropdown {
   }
 
   private FlowPanel getOperatorsChooserPanel() {
-    FlowPanel inPanel = new FlowPanel();
-
-    operatorChooser.addStyleName("inline-block");
+    FlowPanel panel = new FlowPanel();
     operatorChooser.addItem(translations.criterionFiltersMap().get("select_operator"));
     operatorChooser.addItem(translations.criterionFiltersMap().get("in"));
     operatorChooser.addItem(translations.criterionFiltersMap().get("not_in"));
@@ -146,7 +140,12 @@ public abstract class DateTimeCriterionDropdown extends CriterionDropdown {
       }
     });
 
-    rangeValueChooser.addStyleName("small-dual-indent");
+    panel.add(operatorChooser);
+    return panel;
+  }
+
+  private FlowPanel getRangeDateChooserPanel() {
+    FlowPanel panel = new FlowPanel();
     rangeValueChooser.addItem(translations.criterionFiltersMap().get("select"));
     rangeValueChooser.addItem(translations.criterionFiltersMap().get("range"));
     rangeValueChooser.addItem(translations.criterionFiltersMap().get("date"));
@@ -159,15 +158,15 @@ public abstract class DateTimeCriterionDropdown extends CriterionDropdown {
     rangeValueChooser.addChosenChangeHandler(new UpdateFilterChosenHandler());
     rangeValueChooser.setEnabled(false);
 
-    inPanel.add(operatorChooser);
-    inPanel.add(rangeValueChooser);
-    return inPanel;
+    panel.add(rangeValueChooser);
+    return panel;
   }
 
   @Override
   public void resetSpecificControls() {
     operatorChooser.setItemSelected(0, true);
     rangeValueChooser.setItemSelected(0, true);
+    rangeValueChooser.setEnabled(false);
     fromLabel.setVisible(false);
     from.setVisible(false);
     toLabel.setVisible(false);
