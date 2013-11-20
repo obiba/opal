@@ -95,25 +95,34 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
     TABLE_ALL {
       @Override
       public Iterable<String> convert(String node) {
-        String[] args = args(node, "/datasource/(.+)/table/(.+)");
-        return Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}", "*:GET/*", args),//
+        boolean isView = node.contains("/view/");
+        String[] args = isView ? args(node, "/datasource/(.+)/view/(.+)") : args(node, "/datasource/(.+)/table/(.+)");
+
+        List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}", "*:GET/*", args),//
             magmaConvert("/project/{0}/commands/_export", "POST:GET", args),//
             magmaConvert("/project/{0}/commands/_copy", "POST:GET", args),//
             magmaConvert("/project/{0}/report-templates", "GET:GET", args),//
             magmaConvert("/project/{0}/report-templates", "POST:GET", args),//
             magmaConvert("/project/{0}", "GET:GET", args),//
             magmaConvert("/project/{0}/summary", "GET:GET", args),//
+            magmaConvert("/project/{0}/permissions/table/{1}", "*:GET/*", args),//
             magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
             magmaConvert("/files/projects/{0}", "POST:GET/*", args), //
             magmaConvert("/files/projects/{0}", "PUT:GET/*", args));
+
+        if(isView) perms.add(magmaConvert("/datasource/{0}/view/{1}", "*:GET/*", args));
+
+        return perms;
       }
 
     },
     TABLE_READ {
       @Override
       public Iterable<String> convert(String node) {
-        String[] args = args(node, "/datasource/(.+)/table/(.+)");
-        return Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}", "GET:GET", args),//
+        boolean isView = node.contains("/view/");
+        String[] args = isView ? args(node, "/datasource/(.+)/view/(.+)") : args(node, "/datasource/(.+)/table/(.+)");
+
+        List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}", "GET:GET", args),//
             magmaConvert("/datasource/{0}/table/{1}/variable", "GET:GET/GET", args),//
             magmaConvert("/datasource/{0}/table/{1}/variables", "GET:GET/GET", args),//
             magmaConvert("/datasource/{0}/table/{1}/facet", "GET:GET/GET", args),//
@@ -121,13 +130,19 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
             magmaConvert("/datasource/{0}/table/{1}/variable/_transient/summary", "POST", args),//
             magmaConvert("/project/{0}", "GET:GET", args),//
             magmaConvert("/project/{0}/summary", "GET:GET", args));
+
+        if(isView) perms.add(magmaConvert("/datasource/{0}/view/{1}/xml", "GET:GET", args));
+
+        return perms;
       }
 
     },
     TABLE_VALUES {
       @Override
       public Iterable<String> convert(String node) {
-        String[] args = args(node, "/datasource/(.+)/table/(.+)");
+        boolean isView = node.contains("/view/");
+        String[] args = isView ? args(node, "/datasource/(.+)/view/(.+)") : args(node, "/datasource/(.+)/table/(.+)");
+
         List<String> perms = Lists
             .newArrayList(magmaConvert("/datasource/{0}/table/{1}/valueSet", "GET:GET/GET", args),//
                 magmaConvert("/datasource/{0}/table/{1}/entities", "GET", args),//
@@ -149,15 +164,30 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
     TABLE_EDIT {
       @Override
       public Iterable<String> convert(String node) {
-        String[] args = args(node, "/datasource/(.+)/table/(.+)");
-        List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}", "PUT:GET", args),//
-            magmaConvert("/datasource/{0}/table/{1}/variables", "POST:GET/*", args),//
-            magmaConvert("/datasource/{0}/table/{1}/variables", "DELETE:GET", args),//
-            magmaConvert("/datasource/{0}/table/{1}/index", "GET:GET", args),//
+        boolean isView = node.contains("/view/");
+        String[] args = isView ? args(node, "/datasource/(.+)/view/(.+)") : args(node, "/datasource/(.+)/table/(.+)");
+
+        List<String> perms;
+
+        if(isView) {
+          perms = Lists.newArrayList(magmaConvert("/datasource/{0}/view/{1}", "PUT:GET", args),//
+              magmaConvert("/datasource/{0}/view/{1}/variables", "POST:GET/*", args),//
+              magmaConvert("/datasource/{0}/view/{1}/variables", "DELETE:GET/*", args),//
+              magmaConvert("/datasource/{0}/view/{1}/from/variable/_transient/summary", "GET:GET", args),//
+              magmaConvert("/datasource/{0}/view/{1}/from/variable/_transient/summary", "POST:GET", args),//
+              magmaConvert("/datasource/{0}/view/{1}/from/variable/_transient/_compile", "POST:GET", args));
+        } else {
+          perms = Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}", "PUT:GET", args),//
+              magmaConvert("/datasource/{0}/table/{1}/variables", "POST:GET/*", args),//
+              magmaConvert("/datasource/{0}/table/{1}/variables", "DELETE:GET", args));
+        }
+
+        perms.addAll(Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}/index", "GET:GET", args),//
             magmaConvert("/datasource/{0}/table/{1}/index/schedule", "GET:GET", args),//
             magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
             magmaConvert("/files/projects/{0}", "POST:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "PUT:GET/*", args));
+            magmaConvert("/files/projects/{0}", "PUT:GET/*", args)));
+
         Iterables.addAll(perms, TABLE_READ.convert(node));
         return perms;
       }
@@ -166,81 +196,13 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
     TABLE_VALUES_EDIT {
       @Override
       public Iterable<String> convert(String node) {
+        boolean isView = node.contains("/view/");
+        String[] args = isView ? args(node, "/datasource/(.+)/view/(.+)") : args(node, "/datasource/(.+)/table/(.+)");
+
         List<String> perms = Lists.newArrayList();
+        if (isView) perms.add(magmaConvert("/datasource/{0}/view/{1}/from/valueSets/variable/_transient", "POST", args));
         Iterables.addAll(perms, TABLE_VALUES.convert(node));
         Iterables.addAll(perms, TABLE_EDIT.convert(node));
-        return perms;
-      }
-
-    },
-    VIEW_ALL {
-      @Override
-      public Iterable<String> convert(String node) {
-        String[] args = args(node, "/datasource/(.+)/view/(.+)");
-        List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/view/{1}", "*:GET/*", args),//
-            magmaConvert("/project/{0}", "GET:GET", args),//
-            magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "POST:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "PUT:GET/*", args));
-        Iterables.addAll(perms, TABLE_ALL.convert(node.replace("/view/", "/table/")));
-        return perms;
-      }
-
-    },
-    VIEW_READ {
-      @Override
-      public Iterable<String> convert(String node) {
-        String[] args = args(node, "/datasource/(.+)/view/(.+)");
-        List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/view/{1}/xml", "GET:GET", args));
-        Iterables.addAll(perms, TABLE_READ.convert(node.replace("/view/", "/table/")));
-        return perms;
-      }
-
-    },
-    VIEW_VALUES {
-      @Override
-      public Iterable<String> convert(String node) {
-        String[] args = args(node, "/datasource/(.+)/view/(.+)");
-        List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/view/{1}/xml", "GET:GET", args),//
-            magmaConvert("/project/{0}", "GET:GET", args));
-        Iterables.addAll(perms, TABLE_VALUES.convert(node.replace("/view/", "/table/")));
-        return perms;
-      }
-
-    },
-    VIEW_EDIT {
-      @Override
-      public Iterable<String> convert(String node) {
-        String[] args = args(node, "/datasource/(.+)/view/(.+)");
-        List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/view/{1}", "PUT:GET", args),//
-            magmaConvert("/datasource/{0}/view/{1}/variables", "POST:GET/*", args),//
-            magmaConvert("/datasource/{0}/view/{1}/variables", "DELETE:GET/*", args),//
-            magmaConvert("/datasource/{0}/view/{1}/from/variable/_transient/summary", "GET:GET", args),//
-            magmaConvert("/datasource/{0}/view/{1}/from/variable/_transient/summary", "POST:GET", args),//
-            magmaConvert("/datasource/{0}/view/{1}/from/variable/_transient/_compile", "POST:GET", args),//
-            magmaConvert("/project/{0}", "GET:GET", args),//
-            magmaConvert("/project/{0}/summary", "GET:GET", args),//
-            magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "POST:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "PUT:GET/*", args));
-        Iterables.addAll(perms, VIEW_READ.convert(node));
-        return perms;
-      }
-
-    },
-    VIEW_VALUES_EDIT {
-      @Override
-      public Iterable<String> convert(String node) {
-        String[] args = args(node, "/datasource/(.+)/view/(.+)");
-        List<String> perms = Lists
-            .newArrayList(magmaConvert("/datasource/{0}/view/{1}/from/valueSets/variable/_transient", "POST", args),//
-                magmaConvert("/project/{0}", "GET:GET", args),//
-                magmaConvert("/project/{0}/summary", "GET:GET", args),//
-                magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
-                magmaConvert("/files/projects/{0}", "POST:GET/*", args), //
-                magmaConvert("/files/projects/{0}", "PUT:GET/*", args));
-        Iterables.addAll(perms, VIEW_VALUES.convert(node));
-        Iterables.addAll(perms, VIEW_EDIT.convert(node));
         return perms;
       }
 
