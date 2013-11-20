@@ -48,16 +48,10 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
   Panel databasesPanel;
 
   @UiField
-  SimplePager sqlPager;
+  SimplePager pager;
 
   @UiField
-  Table<DatabaseDto> sqlTable;
-
-  @UiField
-  SimplePager mongoPager;
-
-  @UiField
-  Table<DatabaseDto> mongoTable;
+  Table<DatabaseDto> table;
 
   private final Translations translations;
 
@@ -68,27 +62,17 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
     databasesPanel.setVisible(false);
-    initSqlTable();
-    initMongoTable();
+    initTable();
   }
 
-  private void initSqlTable() {
-    sqlPager.setDisplay(sqlTable);
-    sqlTable.addColumn(columns.name, translations.nameLabel());
-    sqlTable.addColumn(columns.sqlUrl, translations.urlLabel());
-    sqlTable.addColumn(columns.usage, translations.usageLabel());
-    sqlTable.addColumn(columns.sqlSchema, translations.sqlSchemaLabel());
-    sqlTable.addColumn(columns.sqlUsername, translations.usernameLabel());
-    sqlTable.addColumn(columns.actions, translations.actionsLabel());
-  }
-
-  private void initMongoTable() {
-    mongoPager.setDisplay(mongoTable);
-    mongoTable.addColumn(columns.name, translations.nameLabel());
-    mongoTable.addColumn(columns.mongoUrl, translations.urlLabel());
-    mongoTable.addColumn(columns.usage, translations.usageLabel());
-    mongoTable.addColumn(columns.mongoUsername, translations.usernameLabel());
-    mongoTable.addColumn(columns.actions, translations.actionsLabel());
+  private void initTable() {
+    pager.setDisplay(table);
+    table.addColumn(columns.name, translations.nameLabel());
+    table.addColumn(columns.url, translations.urlLabel());
+    table.addColumn(columns.usage, translations.usageLabel());
+    table.addColumn(columns.schema, translations.schemaLabel());
+    table.addColumn(columns.username, translations.usernameLabel());
+    table.addColumn(columns.actions, translations.actionsLabel());
   }
 
   @UiHandler("addSQL")
@@ -111,20 +95,14 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
     getUiHandlers().createMongo(true);
   }
 
-  @UiHandler("sqlTable")
-  public void onSqlTableChange(RowCountChangeEvent event) {
-    createPanel.setVisible(!isDatabasesVisible());
-    databasesPanel.setVisible(isDatabasesVisible());
-  }
-
-  @UiHandler("mongoTable")
-  public void onMongoTableChange(RowCountChangeEvent event) {
+  @UiHandler("table")
+  public void ontableChange(RowCountChangeEvent event) {
     createPanel.setVisible(!isDatabasesVisible());
     databasesPanel.setVisible(isDatabasesVisible());
   }
 
   private boolean isDatabasesVisible() {
-    return sqlTable.getRowCount() > 0 || mongoTable.getRowCount() > 0;
+    return table.getRowCount() > 0;
   }
 
   @Override
@@ -133,13 +111,8 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
   }
 
   @Override
-  public HasData<DatabaseDto> getSqlTable() {
-    return sqlTable;
-  }
-
-  @Override
-  public HasData<DatabaseDto> getMongoTable() {
-    return mongoTable;
+  public HasData<DatabaseDto> getTable() {
+    return table;
   }
 
   private final class Columns {
@@ -153,18 +126,11 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
       }
     };
 
-    final Column<DatabaseDto, String> sqlUrl = new TextColumn<DatabaseDto>() {
+    final Column<DatabaseDto, String> url = new TextColumn<DatabaseDto>() {
 
       @Override
       public String getValue(DatabaseDto dto) {
-        return dto.getSqlSettings().getUrl();
-      }
-    };
-
-    final Column<DatabaseDto, String> mongoUrl = new TextColumn<DatabaseDto>() {
-
-      @Override
-      public String getValue(DatabaseDto dto) {
+        if(dto.hasSqlSettings()) return dto.getSqlSettings().getUrl();
         return dto.getMongoDbSettings().getUrl();
       }
     };
@@ -176,23 +142,19 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
       }
     };
 
-    final Column<DatabaseDto, String> sqlSchema = new TextColumn<DatabaseDto>() {
+    final Column<DatabaseDto, String> schema = new TextColumn<DatabaseDto>() {
       @Override
       public String getValue(DatabaseDto dto) {
-        return SqlDatabaseModalPresenter.SqlSchema.valueOf(dto.getSqlSettings().getSqlSchema().getName()).getLabel();
+        if(dto.hasSqlSettings())
+          return SqlDatabaseModalPresenter.SqlSchema.valueOf(dto.getSqlSettings().getSqlSchema().getName()).getLabel();
+        return translations.opalMongoLabel();
       }
     };
 
-    final Column<DatabaseDto, String> sqlUsername = new TextColumn<DatabaseDto>() {
+    final Column<DatabaseDto, String> username = new TextColumn<DatabaseDto>() {
       @Override
       public String getValue(DatabaseDto dto) {
-        return dto.getSqlSettings().getUsername();
-      }
-    };
-
-    final Column<DatabaseDto, String> mongoUsername = new TextColumn<DatabaseDto>() {
-      @Override
-      public String getValue(DatabaseDto dto) {
+        if(dto.hasSqlSettings()) return dto.getSqlSettings().getUsername();
         return dto.getMongoDbSettings().getUsername();
       }
     };

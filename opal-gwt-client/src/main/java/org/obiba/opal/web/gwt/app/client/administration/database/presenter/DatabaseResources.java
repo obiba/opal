@@ -20,6 +20,10 @@ public final class DatabaseResources {
     return "/system/databases";
   }
 
+  public static String databasesWithSettings() {
+    return databases() + "?settings=true";
+  }
+
   public static String sqlDatabases() {
     return databases() + "/sql";
   }

@@ -48,21 +48,12 @@
 
       <g:FlowPanel addStyleNames="top-margin">
         <b:Heading size="5" addStyleNames="inline-block">
-          <ui:msg description="SQL Databases label">SQL Databases</ui:msg>
+          <ui:msg description="Databases label">Databases</ui:msg>
         </b:Heading>
-        <b:SimplePager ui:field="sqlPager" location="RIGHT" addStyleNames="pull-right"/>
+        <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
       </g:FlowPanel>
-      <o:Table ui:field="sqlTable" width="100%"/>
-
-      <g:FlowPanel>
-        <b:Heading size="5" addStyleNames="inline-block">
-          <ui:msg description="MongoDB Databases label">MongoDB Databases</ui:msg>
-        </b:Heading>
-        <b:SimplePager ui:field="mongoPager" location="RIGHT" addStyleNames="pull-right"/>
-      </g:FlowPanel>
-      <o:Table ui:field="mongoTable" width="100%"/>
+      <o:Table ui:field="table" width="100%"/>
     </g:FlowPanel>
 
   </g:FlowPanel>
-
 </ui:UiBinder>

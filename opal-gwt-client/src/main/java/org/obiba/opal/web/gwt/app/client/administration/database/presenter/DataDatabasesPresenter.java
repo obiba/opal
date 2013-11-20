@@ -53,11 +53,8 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
 
   private final AuthorizationPresenter authorizationPresenter;
 
-  private final ResourceDataProvider<DatabaseDto> resourceSqlDatabasesProvider = new ResourceDataProvider<DatabaseDto>(
-      DatabaseResources.sqlDatabases());
-
-  private final ResourceDataProvider<DatabaseDto> resourceMongoDbProvider = new ResourceDataProvider<DatabaseDto>(
-      DatabaseResources.mongoDatabases());
+  private final ResourceDataProvider<DatabaseDto> resourceDatabasesProvider = new ResourceDataProvider<DatabaseDto>(
+      DatabaseResources.databasesWithSettings());
 
   private Command confirmedCommand;
 
@@ -76,17 +73,10 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
   @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
     ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-        .forResource(DatabaseResources.sqlDatabases()) //
+        .forResource(DatabaseResources.databases()) //
         .authorize(event == null
-            ? new ListSqlDatabasesAuthorization()
-            : new CompositeAuthorizer(event.getHasAuthorization(), new ListSqlDatabasesAuthorization())) //
-        .get().send();
-
-    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-        .forResource(DatabaseResources.mongoDatabases()) //
-        .authorize(event == null
-            ? new ListMongoDbAuthorization()
-            : new CompositeAuthorizer(event.getHasAuthorization(), new ListMongoDbAuthorization())) //
+            ? new ListDatabasesAuthorization()
+            : new CompositeAuthorizer(event.getHasAuthorization(), new ListDatabasesAuthorization())) //
         .get().send();
   }
 
@@ -97,12 +87,7 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
 
   public void authorize(HasAuthorization authorizer) {
     ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-        .forResource(DatabaseResources.sqlDatabases()) //
-        .authorize(authorizer) //
-        .get().send();
-
-    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-        .forResource(DatabaseResources.mongoDatabases()) //
+        .forResource(DatabaseResources.databases()) //
         .authorize(authorizer) //
         .get().send();
   }
@@ -167,8 +152,7 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
   }
 
   private void refresh() {
-    getView().getSqlTable().setVisibleRangeAndClearData(new Range(0, 10), true);
-    getView().getMongoTable().setVisibleRangeAndClearData(new Range(0, 10), true);
+    getView().getTable().setVisibleRangeAndClearData(new Range(0, 10), true);
   }
 
   @Override
@@ -187,10 +171,7 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
 
     HasActionHandler<DatabaseDto> getActions();
 
-    HasData<DatabaseDto> getSqlTable();
-
-    HasData<DatabaseDto> getMongoTable();
-
+    HasData<DatabaseDto> getTable();
   }
 
   private class DeleteDatabaseCommand implements Command {
@@ -217,7 +198,7 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
     }
   }
 
-  private final class ListSqlDatabasesAuthorization implements HasAuthorization {
+  private final class ListDatabasesAuthorization implements HasAuthorization {
 
     @Override
     public void beforeAuthorization() {
@@ -226,8 +207,8 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
     @Override
     public void authorized() {
       // Only bind the table to its data provider if we're authorized
-      if(resourceSqlDatabasesProvider.getDataDisplays().isEmpty()) {
-        resourceSqlDatabasesProvider.addDataDisplay(getView().getSqlTable());
+      if(resourceDatabasesProvider.getDataDisplays().isEmpty()) {
+        resourceDatabasesProvider.addDataDisplay(getView().getTable());
       }
     }
 
@@ -236,25 +217,4 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
     }
 
   }
-
-  private final class ListMongoDbAuthorization implements HasAuthorization {
-
-    @Override
-    public void beforeAuthorization() {
-    }
-
-    @Override
-    public void authorized() {
-      // Only bind the table to its data provider if we're authorized
-      if(resourceMongoDbProvider.getDataDisplays().isEmpty()) {
-        resourceMongoDbProvider.addDataDisplay(getView().getMongoTable());
-      }
-    }
-
-    @Override
-    public void unauthorized() {
-    }
-
-  }
-
 }
