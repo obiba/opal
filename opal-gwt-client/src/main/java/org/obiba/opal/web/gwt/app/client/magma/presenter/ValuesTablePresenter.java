@@ -17,7 +17,6 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.event.GeoValueDisplayEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.ui.CategoricalCriterionDropdown;
@@ -107,14 +106,14 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     getView().clearTable();
     getView().setTable(table);
-    getView().setVariableLabelFieldUpdater(new ValueUpdater<String>() {
-      @Override
-      public void update(String value) {
-        placeManager
-            .revealPlace(ProjectPlacesHelper.getVariablePlace(table.getDatasourceName(), table.getName(), value));
-      }
-    });
-    fetcher.updateVariables(select);
+//    getView().setVariableLabelFieldUpdater(new ValueUpdater<String>() {
+//      @Override
+//      public void update(String value) {
+//        placeManager
+//            .revealPlace(ProjectPlacesHelper.getVariablePlace(table.getDatasourceName(), table.getName(), value));
+//      }
+//    });
+//    fetcher.updateVariables(select);
 
     fetchIndexSchema(table);
   }
@@ -203,7 +202,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
                               term) {
                             @Override
                             public void doFilterValueSets() {
-                              getView().setRefreshing(true);
                               ResourceRequestBuilderFactory.<ValueSetsResultDto>newBuilder().forResource(
                                   // TODO: do not forget to send the select query argument
                                   UriBuilders.DATASOURCE_TABLE_VALUESETS_SEARCH.create()
@@ -256,7 +254,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         }).get().send();
   }
 
-  private void fetchIndexSchema(TableDto table) {// Fetch variable-field mapping for ES queries
+  private void fetchIndexSchema(TableDto table) {
+    // Fetch variable-field mapping for ES queries
     ResourceRequestBuilderFactory.<OpalMap>newBuilder().forResource(
         UriBuilders.DATASOURCE_TABLE_INDEX_SCHEMA.create().build(table.getDatasourceName(), table.getName()))
         .withCallback(new ResourceCallback<OpalMap>() {
@@ -533,8 +532,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     void populateValues(int offset, ValueSetsDto resource);
 
     void addVariableFilter(CriterionDropdown criterion);
-
-    void setRefreshing(boolean refreshing);
   }
 
   public enum ViewMode {

@@ -713,15 +713,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
       listValueSetVariable = JsArrays.toList(JsArrays.toSafeArray(valueSets.getVariablesArray()));
       updateRowData(offset, JsArrays.toList(JsArrays.toSafeArray(valueSets.getValueSetsArray())));
 
-      dataProvider.removeDataDisplay(valuesTable);
-
-//      List<VariableDto> v = new ArrayList<VariableDto>();
-//      for (int i = 0; i < valueSets.getValueSetsArray().length(); i++){
-//        v.add(valueSets.getValueSetsArray().get(0).get)
-//      }
-//      setVariables();
-      dataProvider.addDataDisplay(valuesTable);
-
+      valuesTable.setRowData(JsArrays.toList(JsArrays.toSafeArray(valueSets.getValueSetsArray())));
       valuesTable.redraw();
     }
   }
