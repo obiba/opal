@@ -45,6 +45,7 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
@@ -191,7 +192,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
       Collection<String> filters = new ArrayList<String>();
       for(int i = 0; i < filtersPanel.getWidgetCount(); i++) {
-        filters.add(((CriterionDropdown) filtersPanel.getWidget(i)).getQueryString());
+        String queryString = ((CriterionDropdown) filtersPanel.getWidget(i)).getQueryString();
+        if(!Strings.isNullOrEmpty(queryString)) filters.add(queryString);
       }
 
       ResourceRequestBuilderFactory.<ValueSetsResultDto>newBuilder()
@@ -579,8 +581,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         List<String> keys = JsArrays.toList(opalMap.getKeysArray());
         String indexedFieldName = opalMap.getValues(keys.indexOf(resource.getName()));
 
-        if(resource.getCategoriesArray().length() > 0 || "integer".equals(resource.getValueType())) {
-
+        if(JsArrays.toSafeArray(resource.getCategoriesArray()).length() > 0 ||
+            "integer".equals(resource.getValueType())) {
           // Filter for Categorical variable OR Numerical variable
           ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(
               UriBuilders.DATASOURCE_TABLE_FACET_VARIABLE_SEARCH.create()
@@ -637,7 +639,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     public void onResource(Response response, QueryResultDto resource) {
       if("integer".equals(variableDto.getValueType())) {
         addNumericalFilter(resource);
-
       } else {
         addCategoricalFilter(resource);
       }
@@ -655,13 +656,15 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       getView().addVariableFilter(criterion);
     }
 
-    private void addNumericalFilter(final QueryResultDto resource) {// Numerical variable
+    private void addNumericalFilter(final QueryResultDto resource) {
+      // Numerical variable
       NumericalCriterionDropdown criterion = new NumericalCriterionDropdown(variableDto, fieldName, resource) {
         @Override
         public void doFilterValueSets() {
           applyAllValueSetsFilter();
         }
       };
+
       criterion.addChangeHandler(new EmptyNotEmptyFilterRequest());
       getView().addVariableFilter(criterion);
     }
