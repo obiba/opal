@@ -42,7 +42,7 @@ public class ValueTypeMappings {
         .put(DecimalType.get(), forType("double")) //
         .put(BooleanType.get(), forType("boolean")) //
         .put(DateType.get(), forTypeWithFormat("date", "date")) //
-        .put(DateTimeType.get(), forTypeWithFormat("date", "date_time")) //
+        .put(DateTimeType.get(), forType("date")) //
         .put(LocaleType.get(), forType("string")) //
         .put(BinaryType.get(), forType("binary")) //
         .put(PointType.get(), forType("string")) // point, multipoint
