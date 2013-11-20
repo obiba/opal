@@ -23,9 +23,9 @@ public class ProjectPermissionsUpdateListener implements DatasourceUpdateListene
   @Override
   public void onDelete(@Nonnull Datasource datasource) {
     // remove all permissions related to the project and the datasource
-    subjectAclService.deleteNodeHierarchyPermissions("opal", "/datasource/" + datasource.getName());
-    subjectAclService.deleteNodeHierarchyPermissions("opal", "/project/" + datasource.getName());
-    subjectAclService.deleteNodeHierarchyPermissions("opal", "/files/projects/" + datasource.getName());
+    subjectAclService.deleteNodePermissions("/datasource/" + datasource.getName());
+    subjectAclService.deleteNodePermissions("/project/" + datasource.getName());
+    subjectAclService.deleteNodePermissions("/files/projects/" + datasource.getName());
   }
 
   @Override
@@ -33,7 +33,7 @@ public class ProjectPermissionsUpdateListener implements DatasourceUpdateListene
     // remove all permissions related to the table
     String node = "/datasource/" + vt.getDatasource().getName() +
         (vt.isView() ? "/view/" + vt.getName() : "/table/" + vt.getName());
-    subjectAclService.deleteNodeHierarchyPermissions("opal", node);
+    subjectAclService.deleteNodePermissions(node);
   }
 
 }

@@ -42,6 +42,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.SubjectAclService;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.web.model.Opal.FileDto;
@@ -56,6 +57,8 @@ import static org.junit.Assert.assertThat;
 public class FilesResourceTest {
 
   private OpalRuntime opalRuntimeMock;
+
+  private SubjectAclService subjectAclServiceMock;
 
   private OpalFileSystem fileSystem;
 
@@ -75,6 +78,7 @@ public class FilesResourceTest {
   @Before
   public void setUp() throws URISyntaxException {
     opalRuntimeMock = createMock(OpalRuntime.class);
+    subjectAclServiceMock = createMock(SubjectAclService.class);
 
     String rootDir = getClass().getResource("/test-file-system").toURI().toString();
     File emptyDir = new File(rootDir.replace("file:", ""), "folder4/folder41");
@@ -84,6 +88,7 @@ public class FilesResourceTest {
     fileSystem = new DefaultOpalFileSystem(rootDir);
     filesResource = new FilesResource();
     filesResource.setOpalRuntime(opalRuntimeMock);
+    filesResource.setSubjectAclService(subjectAclServiceMock);
 
     fileItemMock = createMock(FileItem.class);
     fileObjectMock = createMock(FileObject.class);
@@ -283,6 +288,7 @@ public class FilesResourceTest {
       }
     };
     fileResource.setOpalRuntime(opalRuntimeMock);
+    fileResource.setSubjectAclService(subjectAclServiceMock);
 
     replay(opalRuntimeMock, fileItemMock, uriInfoMock);
 
@@ -316,6 +322,7 @@ public class FilesResourceTest {
       }
     };
     fileResource.setOpalRuntime(opalRuntimeMock);
+    fileResource.setSubjectAclService(subjectAclServiceMock);
 
     Response response = fileResource.uploadFile("/", uriInfoMock, null);
     Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -336,6 +343,7 @@ public class FilesResourceTest {
       }
     };
     fileResource.setOpalRuntime(opalRuntimeMock);
+    filesResource.setSubjectAclService(subjectAclServiceMock);
 
     replay(opalRuntimeMock, fileItemMock, uriInfoMock);
 
@@ -434,6 +442,7 @@ public class FilesResourceTest {
       }
     };
     resource.setOpalRuntime(opalRuntimeMock);
+    resource.setSubjectAclService(subjectAclServiceMock);
     return resource;
   }
 

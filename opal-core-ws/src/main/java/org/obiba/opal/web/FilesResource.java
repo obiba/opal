@@ -63,6 +63,7 @@ import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.security.support.OpalPermissions;
+import org.obiba.opal.core.service.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.AclAction;
 import org.obiba.opal.web.security.AuthorizationInterceptor;
@@ -82,6 +83,8 @@ public class FilesResource {
 
   private OpalRuntime opalRuntime;
 
+  private SubjectAclService subjectAclService;
+
   private final MimetypesFileTypeMap mimeTypes = new MimetypesFileTypeMap();
 
   @Value("${org.obiba.opal.charset.default}")
@@ -90,6 +93,11 @@ public class FilesResource {
   @Autowired
   public void setOpalRuntime(OpalRuntime opalRuntime) {
     this.opalRuntime = opalRuntime;
+  }
+
+  @Autowired
+  public void setSubjectAclService(SubjectAclService subjectAclService) {
+    this.subjectAclService = subjectAclService;
   }
 
   @GET
@@ -359,6 +367,7 @@ public class FilesResource {
       } else {
         file.delete();
       }
+      subjectAclService.deleteNodePermissions("/files/" + path);
       return Response.ok("The following file or folder has been deleted : " + path).build();
     } catch(FileSystemException couldNotDeleteFile) {
       return Response.status(Status.INTERNAL_SERVER_ERROR).entity("couldNotDeleteFileError").build();

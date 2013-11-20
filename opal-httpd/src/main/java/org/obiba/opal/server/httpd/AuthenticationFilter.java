@@ -157,8 +157,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     if(!found) {
       getSubjectAclService()
           .addSubjectPermission("opal", folderNode, SubjectAclService.SubjectType.USER.subjectFor(username), homePerm);
-      getSubjectAclService().addSubjectPermission("opal", folderNode.replace("/files/", "/files/meta/"),
-          SubjectAclService.SubjectType.USER.subjectFor(username), "FILES_META");
     }
   }
 

@@ -38,18 +38,14 @@ import com.google.common.collect.Iterables;
 @Path("/project/{name}/permissions")
 public class ProjectPermissionsResource {
 
-  private final SubjectAclService subjectAclService;
+  @Autowired
+  private SubjectAclService subjectAclService;
 
-  private final ProjectService projectService;
+  @Autowired
+  private ProjectService projectService;
 
   @PathParam("name")
   private String name;
-
-  @Autowired
-  public ProjectPermissionsResource(SubjectAclService subjectAclService, ProjectService projectService) {
-    this.subjectAclService = subjectAclService;
-    this.projectService = projectService;
-  }
 
   /**
    * Get all permissions in the project.
@@ -194,6 +190,7 @@ public class ProjectPermissionsResource {
 
   /**
    * Delete all permissions of a subject in the project.
+   *
    * @param principal
    * @param domain
    * @param type
