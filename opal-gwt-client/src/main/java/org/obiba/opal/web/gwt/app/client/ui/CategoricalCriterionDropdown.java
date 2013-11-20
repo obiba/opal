@@ -16,12 +16,9 @@ import java.util.Collection;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
-import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.common.base.Joiner;
 import com.google.gwt.event.dom.client.FocusEvent;
 import com.google.gwt.event.dom.client.FocusHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
@@ -31,8 +28,6 @@ public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
   private Chooser operatorChooser;
 
   private Chooser categories;
-
-  private TextBox matches;
 
   public CategoricalCriterionDropdown(VariableDto variableDto, String fieldName, QueryResultDto termDto) {
     super(variableDto, fieldName, termDto);
@@ -44,29 +39,12 @@ public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
 
     operatorChooser = new Chooser();
     categories = new Chooser(true);
-    matches = new TextBox();
 
     specificControls.addStyleName("controls");
 
     specificControls.add(getOperatorsChooserPanel());
     specificControls.add(getCategoriesChooserPanel());
 
-    matches.setPlaceholder(translations.criterionFiltersMap().get("custom_match_query"));
-    matches.setVisible(false);
-    matches.addFocusHandler(new FocusHandler() {
-      @Override
-      public void onFocus(FocusEvent event) {
-        resetRadioControls();
-      }
-    });
-    matches.addKeyUpHandler(new KeyUpHandler() {
-      @Override
-      public void onKeyUp(KeyUpEvent event) {
-        updateMatchCriteriaFilter();
-      }
-    });
-
-    specificControls.add(matches);
     return specificControls;
   }
 
@@ -94,7 +72,6 @@ public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
     operatorChooser.addItem(translations.criterionFiltersMap().get("select_operator"));
     operatorChooser.addItem(translations.criterionFiltersMap().get("in"));
     operatorChooser.addItem(translations.criterionFiltersMap().get("not_in"));
-    operatorChooser.addItem(translations.criterionFiltersMap().get("like"));
     operatorChooser.addChosenChangeHandler(new UpdateFilterChosenHandler());
 
     inPanel.add(operatorChooser);
@@ -104,13 +81,11 @@ public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
   @Override
   public void resetSpecificControls() {
     operatorChooser.setItemSelected(0, true);
-    matches.setVisible(false);
     categories.setVisible(false);
   }
 
   private String getCategoryItem(String name) {
     // Get the frequency of this category
-    // TODO: Validate that for 1 variable there is only 1 facet
     for(int i = 0; i < queryResult.getFacetsArray().get(0).getFrequenciesArray().length(); i++) {
       if(queryResult.getFacetsArray().get(0).getFrequenciesArray().get(i).getTerm().equals(name)) {
         return name + " (" + queryResult.getFacetsArray().get(0).getFrequenciesArray().get(i).getCount() + ")";
@@ -124,10 +99,6 @@ public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
   public String getQueryString() {
     String emptyNotEmpty = super.getQueryString();
     if(emptyNotEmpty != null) return emptyNotEmpty;
-
-    if(operatorChooser.isItemSelected(3)) {
-      return fieldName + ":/" + matches.getText() + "/";
-    }
 
     Collection<String> selected = new ArrayList<String>();
     for(int i = 0; i < categories.getItemCount(); i++) {
@@ -151,40 +122,26 @@ public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
 
       resetRadioControls();
 
-      matches.setVisible(operatorChooser.isItemSelected(3));
-      categories.setVisible(operatorChooser.getSelectedIndex() > 0 && !operatorChooser.isItemSelected(3));
+      categories.setVisible(operatorChooser.getSelectedIndex() > 0);
 
-      // If MATCHES is selected, hide chooser of categories and show a simple textbox
-      if(operatorChooser.isItemSelected(3)) {
-        updateMatchCriteriaFilter();
-
-      } else {
-        boolean update = false;
-        for(int i = 0; i < categories.getItemCount(); i++) {
-          if(categories.isItemSelected(i)) {
-            filter.add(categories.getValue(i));
-            update = true;
-          }
-        }
-
-        if(update) {
-          updateCriterionFilter(
-              operatorChooser.getItemText(operatorChooser.getSelectedIndex()) + " (" + Joiner.on(", ").join(filter) +
-                  ")");
-
-          doFilterValueSets();
-        } else {
-          updateCriterionFilter("");
+      boolean update = false;
+      for(int i = 0; i < categories.getItemCount(); i++) {
+        if(categories.isItemSelected(i)) {
+          filter.add(categories.getValue(i));
+          update = true;
         }
       }
-    }
-  }
 
-  private void updateMatchCriteriaFilter() {
-    if(matches.getText().isEmpty()) {
-      updateCriterionFilter("");
-    } else {
-      updateCriterionFilter(translations.criterionFiltersMap().get("like") + " " + matches.getText());
+      if(update) {
+        updateCriterionFilter(
+            operatorChooser.getItemText(operatorChooser.getSelectedIndex()) + " (" + Joiner.on(", ").join(filter) +
+                ")");
+
+        doFilterValueSets();
+      } else {
+        updateCriterionFilter("");
+      }
     }
+
   }
 }
