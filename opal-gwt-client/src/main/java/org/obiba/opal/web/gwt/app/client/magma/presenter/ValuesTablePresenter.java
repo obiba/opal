@@ -109,7 +109,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     JsArray<VariableDto> variables = JsArray.createArray().cast();
     variables.push(variable);
     getView().setVariables(variables);
-
+    currentVariablesFilterSelect = "";
     fetchIndexSchema();
   }
 
@@ -127,6 +127,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       }
     });
     fetcher.updateVariables(select);
+    currentVariablesFilterSelect = "";
     fetchIndexSchema();
   }
 
@@ -207,7 +208,14 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
             public void onResource(Response response, ValueSetsResultDto resource) {
               getView().populateValues(offset, resource.getValueSets());
             }
-          }).get().send();
+          })//
+          .withCallback(new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              getEventBus().fireEvent(NotificationEvent.newBuilder().error("ESQueryBadRequest").build());
+            }
+          }, Response.SC_BAD_REQUEST)//
+          .get().send();
     }
   }
 
