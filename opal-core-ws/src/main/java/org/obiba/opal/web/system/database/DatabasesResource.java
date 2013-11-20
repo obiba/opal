@@ -31,7 +31,7 @@ import static org.obiba.opal.web.model.Database.DatabaseDto;
 @Component
 @Transactional
 @Path("/system/databases")
-@Api(value = "Databases", description = "Operations about databases")
+@Api(value = "/system/databases", description = "Operations about databases")
 public class DatabasesResource {
 
   @Autowired

@@ -1189,6 +1189,12 @@
         <groupId>com.wordnik</groupId>
         <artifactId>swagger-jaxrs_2.10</artifactId>
         <version>${swagger.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>jsr311-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
     </dependencies>
