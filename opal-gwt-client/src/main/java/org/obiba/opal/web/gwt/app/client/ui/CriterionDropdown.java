@@ -51,33 +51,7 @@ public abstract class CriterionDropdown extends DropdownButton {
 
     radioControls.addStyleName("controls");
 
-    int noEmpty = 0;
-    if(queryResult != null) {
-
-      // TODO: FacetArray for 1 variable always return only 1 facetArray ?
-      if(queryResult.getFacetsArray().length() > 0) {
-        if(queryResult.getFacetsArray().get(0).hasStatistics()) {
-          // Statistics facet
-          noEmpty += queryResult.getFacetsArray().get(0).getStatistics().getCount();
-        } else {
-          // Categories frequency facet
-          for(int i = 0; i < queryResult.getFacetsArray().get(0).getFrequenciesArray().length(); i++) {
-            noEmpty += queryResult.getFacetsArray().get(0).getFrequenciesArray().get(i).getCount();
-          }
-        }
-      }
-    }
-
-    // All, Empty, Not Empty radio buttons
-    RadioButton radioAll = getRadioButton(translations.criterionFiltersMap().get("all"),
-        queryResult == null ? null : queryResult.getTotalHits());
-    radioAll.setValue(true);
-    radioControls.add(radioAll);
-    radioControls.add(getRadioButton(translations.criterionFiltersMap().get("empty"),
-        queryResult == null ? null : queryResult.getTotalHits() - noEmpty));
-    radioControls
-        .add(getRadioButton(translations.criterionFiltersMap().get("not_empty"), queryResult == null ? null : noEmpty));
-    add(radioControls);
+    addRadioButtons(getNoEmptyCount());
 
     Widget specificControls = getSpecificControls();
     if(specificControls != null) {
@@ -96,6 +70,39 @@ public abstract class CriterionDropdown extends DropdownButton {
       }
     });
     add(remove);
+  }
+
+  private int getNoEmptyCount() {
+    int nb = 0;
+    if(queryResult != null) {
+
+      // TODO: FacetArray for 1 variable always return only 1 facetArray ?
+      if(queryResult.getFacetsArray().length() > 0) {
+        if(queryResult.getFacetsArray().get(0).hasStatistics()) {
+          // Statistics facet
+          nb += queryResult.getFacetsArray().get(0).getStatistics().getCount();
+        } else {
+          // Categories frequency facet
+          for(int i = 0; i < queryResult.getFacetsArray().get(0).getFrequenciesArray().length(); i++) {
+            nb += queryResult.getFacetsArray().get(0).getFrequenciesArray().get(i).getCount();
+          }
+        }
+      }
+    }
+    return nb;
+  }
+
+  private void addRadioButtons(int noEmpty) {
+    // All, Empty, Not Empty radio buttons
+    RadioButton radioAll = getRadioButton(translations.criterionFiltersMap().get("all"),
+        queryResult == null ? null : queryResult.getTotalHits());
+    radioAll.setValue(true);
+    radioControls.add(radioAll);
+    radioControls.add(getRadioButton(translations.criterionFiltersMap().get("empty"),
+        queryResult == null ? null : queryResult.getTotalHits() - noEmpty));
+    radioControls
+        .add(getRadioButton(translations.criterionFiltersMap().get("not_empty"), queryResult == null ? null : noEmpty));
+    add(radioControls);
   }
 
   private RadioButton getRadioButton(final String label, Integer count) {
