@@ -216,8 +216,13 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     updateVariableDisplay(variableDto);
     updateMenuDisplay(previous, next);
     updateDerivedVariableDisplay();
+    updateValuesDisplay();
 
     authorize();
+  }
+
+  private void updateValuesDisplay() {
+    valuesTablePresenter.setTable(table, variable);
   }
 
   private void updateVariableDisplay(VariableDto variableDto) {
@@ -397,7 +402,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   @Override
   public void onShowValues() {
-    valuesTablePresenter.setTable(table, variable);
+    updateValuesDisplay();
   }
 
   @Override
