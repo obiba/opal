@@ -20,8 +20,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
 import org.obiba.opal.core.service.SubjectAclService;
@@ -48,10 +46,6 @@ public class ProjectPermissionsResource {
 
   private enum ProjectPermission {
     PROJECT_ALL
-  }
-
-  public enum VariablePermission {
-    VARIABLE_READ
   }
 
   @Autowired
@@ -106,10 +100,6 @@ public class ProjectPermissionsResource {
 
     return Iterables.transform(permissions, PermissionsToAclFunction.INSTANCE);
   }
-
-  //
-  // PROJECT_ALL permission
-  //
 
   /**
    * Get all permissions with PROJECT_ALL.
@@ -172,76 +162,12 @@ public class ProjectPermissionsResource {
     return Response.ok().build();
   }
 
-  //
-  // Permissions by Subject
-  //
-
-  /**
-   * Get all permissions of a subject in the project.
-   *
-   * @param principal
-   * @param domain
-   * @param type
-   * @return
-   */
-  @GET
-  @Path("/subject/{principal}")
-  public Iterable<Opal.Acl> getSubjectPermissions(@PathParam("principal") String principal,
-      @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type) {
-
-    // make sure project exists
-    projectService.getProject(name);
-
-    Iterable<SubjectAclService.Permissions> permissions = Iterables.concat(
-        subjectAclService.getSubjectNodeHierarchyPermissions(DOMAIN, getProjectNode(), type.subjectFor(principal)),
-        Iterables.filter(subjectAclService
-            .getSubjectNodeHierarchyPermissions(DOMAIN, "/datasource/" + name, type.subjectFor(principal)),
-            new MagmaPermissionsPredicate()));
-
-    return Iterables.transform(permissions, PermissionsToAclFunction.INSTANCE);
-  }
-
-  /**
-   * Delete all permissions of a subject in the project.
-   *
-   * @param principal
-   * @param domain
-   * @param type
-   * @return
-   */
-  @DELETE
-  @Path("/subject/{principal}")
-  public Response deleteSubjectPermissions(@PathParam("principal") String principal,
-
-      @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type) {
-
-    // make sure project exists
-    projectService.getProject(name);
-
-    SubjectAclService.Subject subject = type.subjectFor(principal);
-    for(SubjectAclService.Permissions permissions : Iterables
-        .concat(subjectAclService.getSubjectNodeHierarchyPermissions(DOMAIN, getProjectNode(), subject),
-            subjectAclService.getSubjectNodeHierarchyPermissions(DOMAIN, "/datasource/" + name, subject))) {
-      subjectAclService.deleteSubjectPermissions(DOMAIN, permissions.getNode(), subject);
-    }
-
-    return Response.ok().build();
-  }
-
   private void validatePrincipal(String principal) {
     if(Strings.isNullOrEmpty(principal)) throw new InvalidRequestException("Principal is required.");
   }
 
   private String getProjectNode() {
     return "/project/" + name;
-  }
-
-  private String getDatasourceNode() {
-    return "/datasource/" + name;
-  }
-
-  private String getTableNode(String table, boolean isView) {
-    return getDatasourceNode() + (isView ? "/view/" : "/table/") + table;
   }
 
   /**
