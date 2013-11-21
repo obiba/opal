@@ -25,6 +25,7 @@ import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.taxonomy.Dtos;
 import org.obiba.opal.web.ws.security.NoAuthorization;
+import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.obiba.runtime.upgrade.VersionProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -147,7 +148,7 @@ public class SystemResource {
 
   @GET
   @Path("/conf/general")
-  @NoAuthorization
+  @NotAuthenticated
   public Opal.GeneralConf getOpalGeneralConfiguration() {
     OpalGeneralConfig conf = serverService.getConfig();
 

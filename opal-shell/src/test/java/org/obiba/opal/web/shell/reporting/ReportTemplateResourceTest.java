@@ -12,6 +12,7 @@ package org.obiba.opal.web.shell.reporting;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.ws.rs.core.Response;
@@ -25,6 +26,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
@@ -101,7 +103,7 @@ public class ReportTemplateResourceTest {
 
   }
 
-  @Test
+  @Test(expected = NoSuchElementException.class)
   public void testGetReportTemplate_ReportTemplateNotFound() {
 
     replay(opalRuntimeMock, opalConfigurationServiceMock);
@@ -147,7 +149,7 @@ public class ReportTemplateResourceTest {
 
   }
 
-  @Test
+  @Test(expected = NoSuchElementException.class)
   public void testDeleteReportTemplate_ReportTemplateNotFound() {
 
     replay(opalRuntimeMock, opalConfigurationServiceMock);
