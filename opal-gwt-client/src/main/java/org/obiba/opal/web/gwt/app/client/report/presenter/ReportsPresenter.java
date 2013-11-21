@@ -85,7 +85,11 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
     ResponseCodeCallback callbackHandler = new CommandResponseCallBack();
     ReportCommandOptionsDto reportCommandOptions = ReportCommandOptionsDto.create();
     reportCommandOptions.setName(reportTemplate.getName());
-    ResourceRequestBuilderFactory.newBuilder().forResource("/shell/report").post()
+    String uri = "/shell/report";
+    if (reportTemplate.hasProject()) {
+      uri = "/project/" + reportTemplate.getProject() + "/commands/_report";
+    }
+    ResourceRequestBuilderFactory.newBuilder().forResource(uri).post()
         .withResourceBody(ReportCommandOptionsDto.stringify(reportCommandOptions))
         .withCallback(Response.SC_CREATED, callbackHandler).send();
   }
@@ -193,7 +197,11 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
         .authorize(getView().getAddReportTemplateAuthorizer()).send();
 
     // run report
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/shell/report").post()
+    String uri = "/shell/report";
+    if (reportTemplate.hasProject()) {
+      uri = "/project/" + reportTemplate.getProject() + "/commands/_report";
+    }
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(uri).post()
         .authorize(getView().getExecuteReportAuthorizer()).send();
 
     // download report design
@@ -201,13 +209,16 @@ public class ReportsPresenter extends PresenterWidget<ReportsPresenter.Display> 
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build()).get()
         .authorize(getView().getDownloadReportDesignAuthorizer()).send();
 
-    ub = UriBuilder.create().segment("report-template", reportTemplate.getName());
+    uri = UriBuilder.create().segment("report-template", reportTemplate.getName()).build();
+    if (reportTemplate.hasProject()) {
+      uri = UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplate.getProject(), reportTemplate.getName());
+    }
     // remove
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build()).delete()
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(uri).delete()
         .authorize(getView().getRemoveReportTemplateAuthorizer()).send();
 
     // edit
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(ub.build()).put()
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(uri).put()
         .authorize(getView().getUpdateReportTemplateAuthorizer()).send();
   }
 
