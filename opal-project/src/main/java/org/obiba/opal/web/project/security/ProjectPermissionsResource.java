@@ -67,14 +67,14 @@ public class ProjectPermissionsResource {
   @GET
   @Path("/_all")
   public Iterable<Opal.Acl> getPermissions(@QueryParam("domain") @DefaultValue("opal") String domain,
-      @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type) {
+      @QueryParam("type") SubjectAclService.SubjectType type) {
 
     // make sure project exists
     projectService.getProject(name);
 
     Iterable<SubjectAclService.Permissions> permissions = Iterables
-        .concat(subjectAclService.getNodeHierarchyPermissions(DOMAIN, getProjectNode(), type), Iterables
-            .filter(subjectAclService.getNodeHierarchyPermissions(DOMAIN, "/datasource/" + name, type),
+        .concat(subjectAclService.getNodeHierarchyPermissions(domain, getProjectNode(), type), Iterables
+            .filter(subjectAclService.getNodeHierarchyPermissions(domain, "/datasource/" + name, type),
                 new MagmaPermissionsPredicate()));
 
     return Iterables.transform(permissions, PermissionsToAclFunction.INSTANCE);
@@ -89,28 +89,8 @@ public class ProjectPermissionsResource {
    */
   @GET
   @Path("/project")
-  public Iterable<Opal.Acl> getProjectPermissions(
-      @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type) {
+  public Iterable<Opal.Acl> getProjectPermissions(@QueryParam("type") SubjectAclService.SubjectType type) {
 
-    // make sure project exists
-    projectService.getProject(name);
-
-    Iterable<SubjectAclService.Permissions> permissions = subjectAclService
-        .getNodeHierarchyPermissions(DOMAIN, getProjectNode(), type);
-
-    return Iterables.transform(permissions, PermissionsToAclFunction.INSTANCE);
-  }
-
-  /**
-   * Get all permissions with PROJECT_ALL.
-   *
-   * @param type
-   * @return
-   */
-  @GET
-  @Path("/project/owners")
-  public Iterable<Opal.Acl> getProjectOwners(
-      @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type) {
     // make sure project exists
     projectService.getProject(name);
 
@@ -121,40 +101,42 @@ public class ProjectPermissionsResource {
   }
 
   /**
-   * Add a subject with PROJECT_ALL permission.
+   * Set a project-level permission for a subject in the project.
    *
    * @param type
    * @param principal
    * @return
    */
   @POST
-  @Path("/project/owners")
-  public Response addProjectOwner(@QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
-      @QueryParam("principal") String principal) {
+  @Path("/project")
+  public Response addProjectPermission(@QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
+      @QueryParam("principal") String principal,
+      @QueryParam("permission") @DefaultValue("PROJECT_ALL") ProjectPermission permission) {
     // make sure project exists
     projectService.getProject(name);
     validatePrincipal(principal);
 
     SubjectAclService.Subject subject = type.subjectFor(principal);
     subjectAclService.deleteSubjectPermissions(DOMAIN, getProjectNode(), subject);
-    subjectAclService.addSubjectPermission(DOMAIN, getProjectNode(), subject, ProjectPermission.PROJECT_ALL.name());
+    subjectAclService.addSubjectPermission(DOMAIN, getProjectNode(), subject, permission.name());
 
     return Response.ok().build();
   }
 
   /**
-   * Remove PROJECT_ALL permission from a subject.
+   * Remove project-level permissions from a subject.
    *
    * @param principal
    * @param type
    * @return
    */
   @DELETE
-  @Path("/project/owner/{principal}")
-  public Response deleteProjectOwner(@PathParam("principal") String principal,
-      @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type) {
+  @Path("/project")
+  public Response deleteProjectPermissions(@QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
+      @QueryParam("principal") String principal) {
     // make sure project exists
     projectService.getProject(name);
+    validatePrincipal(principal);
 
     SubjectAclService.Subject subject = type.subjectFor(principal);
     subjectAclService.deleteSubjectPermissions(DOMAIN, getProjectNode(), subject);

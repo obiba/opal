@@ -33,7 +33,7 @@ import static org.obiba.opal.web.project.security.ProjectPermissionsResource.Mag
 
 @Component
 @Scope("request")
-@Path("/project/{name}/permissions")
+@Path("/project/{name}/permissions/subject/{principal}")
 public class ProjectSubjectPermissionsResource {
 
   @Autowired
@@ -45,6 +45,9 @@ public class ProjectSubjectPermissionsResource {
   @PathParam("name")
   private String name;
 
+  @PathParam("principal")
+  private String principal;
+
   //
   // Permissions by Subject
   //
@@ -52,14 +55,12 @@ public class ProjectSubjectPermissionsResource {
   /**
    * Get all permissions of a subject in the project.
    *
-   * @param principal
    * @param domain
    * @param type
    * @return
    */
   @GET
-  @Path("/subject/{principal}")
-  public Iterable<Opal.Acl> getSubjectPermissions(@PathParam("principal") String principal,
+  public Iterable<Opal.Acl> getSubjectPermissions(
       @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type) {
 
     // make sure project exists
@@ -77,15 +78,12 @@ public class ProjectSubjectPermissionsResource {
   /**
    * Delete all permissions of a subject in the project.
    *
-   * @param principal
    * @param domain
    * @param type
    * @return
    */
   @DELETE
-  @Path("/subject/{principal}")
-  public Response deleteSubjectPermissions(@PathParam("principal") String principal,
-
+  public Response deleteSubjectPermissions(
       @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type) {
 
     // make sure project exists

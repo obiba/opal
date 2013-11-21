@@ -66,17 +66,18 @@ public class ProjectVariablePermissionsResource {
    * @return
    */
   @GET
-  public Iterable<Opal.Acl> getTableVariablesPermissions(
-      @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type) {
+  public Iterable<Opal.Acl> getTableVariablesPermissions(@QueryParam("type") SubjectAclService.SubjectType type) {
 
     // make sure datasource, table and variable exists
     MagmaEngine.get().getDatasource(name).getValueTable(table).getVariable(variable);
 
     Iterable<SubjectAclService.Permissions> permissions = Iterables
         .concat(subjectAclService.getNodePermissions(DOMAIN, getNode(false), type),
-            subjectAclService.getNodeHierarchyPermissions(DOMAIN, getNode(true), type));
+            subjectAclService.getNodePermissions(DOMAIN, getNode(true), type));
 
-    return Iterables.transform(permissions, PermissionsToAclFunction.INSTANCE);
+    return Iterables
+        .transform(Iterables.filter(permissions, new ProjectPermissionsResource.MagmaPermissionsPredicate()),
+            PermissionsToAclFunction.INSTANCE);
   }
 
   /**

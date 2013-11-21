@@ -10,6 +10,8 @@
 
 package org.obiba.opal.web.project.security;
 
+import java.util.NoSuchElementException;
+
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -20,7 +22,11 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.ValueTable;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.cfg.ReportTemplate;
 import org.obiba.opal.core.service.SubjectAclService;
+import org.obiba.opal.project.ProjectService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.PermissionsToAclFunction;
 import org.obiba.opal.web.support.InvalidRequestException;
@@ -32,46 +38,56 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 
 import static org.obiba.opal.web.project.security.ProjectPermissionsResource.DOMAIN;
+import static org.obiba.opal.web.project.security.ProjectPermissionsResource.MagmaPermissionsPredicate;
 
 @Component
 @Scope("request")
-@Path("/project/{name}/permissions/datasource")
-public class ProjectDatasourcePermissionsResource {
+@Path("/project/{name}/permissions/report-template/{template}")
+public class ProjectReportTemplatePermissionsResource {
 
-  public enum DatasourcePermission {
-    CREATE_TABLE,
-    DATASOURCE_ALL
+  // ugly: duplicate of ReportTemplatePermissionConverter.Permission
+
+  public enum ReportTemplatePermission {
+    REPORT_TEMPLATE_READ,
+    REPORT_TEMPLATE_ALL
   }
 
   @Autowired
   private SubjectAclService subjectAclService;
 
+  @Autowired
+  private ProjectService projectService;
+
+  @Autowired
+  private OpalConfigurationService configService;
+
   @PathParam("name")
   private String name;
 
-  //
-  // Datasource
-  //
+  @PathParam("template")
+  private String template;
 
   /**
-   * Get all datasource-level permissions in the project.
+   * Get all table-level permissions of a table in the project.
    *
    * @param domain
    * @param type
    * @return
    */
   @GET
-  public Iterable<Opal.Acl> getDatasourcePermissions(@QueryParam("type") SubjectAclService.SubjectType type) {
-    // make sure datasource exists
-    MagmaEngine.get().getDatasource(name);
+  public Iterable<Opal.Acl> getTablePermissions(@QueryParam("type") SubjectAclService.SubjectType type) {
+
+    // make sure project exists
+    validateTemplate();
 
     Iterable<SubjectAclService.Permissions> permissions = subjectAclService.getNodePermissions(DOMAIN, getNode(), type);
 
-    return Iterables.transform(permissions, PermissionsToAclFunction.INSTANCE);
+    return Iterables
+        .transform(Iterables.filter(permissions, new MagmaPermissionsPredicate()), PermissionsToAclFunction.INSTANCE);
   }
 
   /**
-   * Set a datasource-level permission for a subject in the project.
+   * Set a table-level permission for a subject in the project.
    *
    * @param type
    * @param principal
@@ -79,14 +95,14 @@ public class ProjectDatasourcePermissionsResource {
    * @return
    */
   @POST
-  public Response setDatasourcePermission(@QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
-      @QueryParam("principal") String principal, @QueryParam("permission") DatasourcePermission permission) {
+  public Response setTablePermission(@QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
+      @QueryParam("principal") String principal, @QueryParam("permission") ReportTemplatePermission permission) {
 
-    // make sure datasource exists
-    MagmaEngine.get().getDatasource(name);
-    validatePrincipal(principal);
+    // make sure project exists
+    validateTemplate();
 
     SubjectAclService.Subject subject = type.subjectFor(principal);
+    subjectAclService.deleteSubjectPermissions(DOMAIN, getNode(), subject);
     subjectAclService.deleteSubjectPermissions(DOMAIN, getNode(), subject);
     subjectAclService.addSubjectPermission(DOMAIN, getNode(), subject, permission.name());
 
@@ -94,25 +110,30 @@ public class ProjectDatasourcePermissionsResource {
   }
 
   /**
-   * Remove any datasource-level permission of a subject in the project.
+   * Remove any table-level permission of a subject in the project.
    *
    * @param type
    * @param principal
    * @return
    */
   @DELETE
-  public Response deleteDatasourcePermissions(
-      @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
+  public Response deleteTablePermissions(@QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
       @QueryParam("principal") String principal) {
 
-    // make sure datasource exists
-    MagmaEngine.get().getDatasource(name);
+    // make sure project exists
+    validateTemplate();
     validatePrincipal(principal);
 
     SubjectAclService.Subject subject = type.subjectFor(principal);
     subjectAclService.deleteSubjectPermissions(DOMAIN, getNode(), subject);
+    subjectAclService.deleteSubjectPermissions(DOMAIN, getNode(), subject);
 
     return Response.ok().build();
+  }
+
+  private void validateTemplate() {
+    ReportTemplate rt = configService.getOpalConfiguration().getReportTemplate(template);
+    if(rt == null || !rt.hasProject() || !name.equals(rt.getProject())) throw new NoSuchElementException();
   }
 
   private void validatePrincipal(String principal) {
@@ -120,7 +141,6 @@ public class ProjectDatasourcePermissionsResource {
   }
 
   private String getNode() {
-    return "/datasource/" + name;
+    return "/project/" + name + "/report-template/" + template;
   }
-
 }

@@ -289,7 +289,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
   public Iterable<Permissions> getNodePermissions(String domain, String node, SubjectType type) {
     Map<Subject, Permissions> entries = Maps.newHashMap();
 
-    for(SubjectAcl acl : find(domain, node, type)) {
+    for(SubjectAcl acl : type == null ? find(domain, node) : find(domain, node, type)) {
       PermissionsImpl perms = (PermissionsImpl) entries.get(acl.getSubject());
       if(perms == null) {
         perms = new PermissionsImpl(domain, node, acl.getSubject());
@@ -305,7 +305,11 @@ public class DefaultSubjectAclService implements SubjectAclService {
   public Iterable<Permissions> getNodeHierarchyPermissions(String domain, String node, SubjectType type) {
     Map<String, Permissions> entries = Maps.newHashMap();
 
-    for(SubjectAcl acl : Iterables.concat(find(domain, node, type), findLike(domain, node + "/", type))) {
+    Iterable<SubjectAcl> acls = type == null
+        ? Iterables.concat(find(domain, node), findLike(domain, node + "/"))
+        : Iterables.concat(find(domain, node, type), findLike(domain, node + "/", type));
+
+    for(SubjectAcl acl : acls) {
       String key = acl.getSubject() + ":" + acl.getNode();
       PermissionsImpl perms = (PermissionsImpl) entries.get(key);
       if(perms == null) {
