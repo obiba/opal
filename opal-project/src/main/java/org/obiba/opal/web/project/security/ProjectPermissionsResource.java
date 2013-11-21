@@ -14,29 +14,45 @@ import javax.annotation.Nullable;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
 import org.obiba.opal.core.service.SubjectAclService;
 import org.obiba.opal.project.ProjectService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.PermissionsToAclFunction;
+import org.obiba.opal.web.support.InvalidRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 
 @Component
 @Scope("request")
 @Path("/project/{name}/permissions")
 public class ProjectPermissionsResource {
+
+  public static final String DOMAIN = "opal";
+
+  // ugly: duplicate of ProjectsPermissionConverter.Permission
+
+  private enum ProjectPermission {
+    PROJECT_ALL
+  }
+
+  public enum VariablePermission {
+    VARIABLE_READ
+  }
 
   @Autowired
   private SubjectAclService subjectAclService;
@@ -55,7 +71,7 @@ public class ProjectPermissionsResource {
    * @return
    */
   @GET
-  @Path("/all")
+  @Path("/_all")
   public Iterable<Opal.Acl> getPermissions(@QueryParam("domain") @DefaultValue("opal") String domain,
       @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type) {
 
@@ -63,8 +79,8 @@ public class ProjectPermissionsResource {
     projectService.getProject(name);
 
     Iterable<SubjectAclService.Permissions> permissions = Iterables
-        .concat(subjectAclService.getNodeHierarchyPermissions(domain, "/project/" + name, type), Iterables
-            .filter(subjectAclService.getNodeHierarchyPermissions(domain, "/datasource/" + name, type),
+        .concat(subjectAclService.getNodeHierarchyPermissions(DOMAIN, getProjectNode(), type), Iterables
+            .filter(subjectAclService.getNodeHierarchyPermissions(DOMAIN, "/datasource/" + name, type),
                 new MagmaPermissionsPredicate()));
 
     return Iterables.transform(permissions, PermissionsToAclFunction.INSTANCE);
@@ -79,89 +95,86 @@ public class ProjectPermissionsResource {
    */
   @GET
   @Path("/project")
-  public Iterable<Opal.Acl> getProjectPermissions(@QueryParam("domain") @DefaultValue("opal") String domain,
+  public Iterable<Opal.Acl> getProjectPermissions(
       @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type) {
 
     // make sure project exists
     projectService.getProject(name);
 
     Iterable<SubjectAclService.Permissions> permissions = subjectAclService
-        .getNodeHierarchyPermissions(domain, "/project/" + name, type);
+        .getNodeHierarchyPermissions(DOMAIN, getProjectNode(), type);
 
     return Iterables.transform(permissions, PermissionsToAclFunction.INSTANCE);
   }
 
+  //
+  // PROJECT_ALL permission
+  //
+
   /**
-   * Get all datasource-level permissions in the project.
+   * Get all permissions with PROJECT_ALL.
    *
-   * @param domain
    * @param type
    * @return
    */
   @GET
-  @Path("/datasource")
-  public Iterable<Opal.Acl> getDatasourcePermissions(@QueryParam("domain") @DefaultValue("opal") String domain,
+  @Path("/project/owners")
+  public Iterable<Opal.Acl> getProjectOwners(
       @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type) {
-
-    // make sure datasource exists
-    MagmaEngine.get().getDatasource(name);
+    // make sure project exists
+    projectService.getProject(name);
 
     Iterable<SubjectAclService.Permissions> permissions = subjectAclService
-        .getNodePermissions(domain, "/datasource/" + name, type);
+        .getNodePermissions(DOMAIN, getProjectNode(), type);
 
     return Iterables.transform(permissions, PermissionsToAclFunction.INSTANCE);
   }
 
   /**
-   * Get all table-level permissions of a table in the project.
+   * Add a subject with PROJECT_ALL permission.
    *
-   * @param table
-   * @param domain
    * @param type
+   * @param principal
    * @return
    */
-  @GET
-  @Path("/table/{table}")
-  public Iterable<Opal.Acl> getTablePermissions(@PathParam("table") String table,
-      @QueryParam("domain") @DefaultValue("opal") String domain,
-      @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type) {
+  @POST
+  @Path("/project/owners")
+  public Response addProjectOwner(@QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
+      @QueryParam("principal") String principal) {
+    // make sure project exists
+    projectService.getProject(name);
+    validatePrincipal(principal);
 
-    // make sure datasource and table exists
-    MagmaEngine.get().getDatasource(name).getValueTable(table);
+    SubjectAclService.Subject subject = type.subjectFor(principal);
+    subjectAclService.deleteSubjectPermissions(DOMAIN, getProjectNode(), subject);
+    subjectAclService.addSubjectPermission(DOMAIN, getProjectNode(), subject, ProjectPermission.PROJECT_ALL.name());
 
-    Iterable<SubjectAclService.Permissions> permissions = Iterables.filter(Iterables
-        .concat(subjectAclService.getNodePermissions(domain, "/datasource/" + name + "/table/" + table, type),
-            subjectAclService.getNodePermissions(domain, "/datasource/" + name + "/view/" + table, type)),
-        new MagmaPermissionsPredicate());
-
-    return Iterables.transform(permissions, PermissionsToAclFunction.INSTANCE);
+    return Response.ok().build();
   }
 
   /**
-   * Get all variable-level permissions of a table in the project.
+   * Remove PROJECT_ALL permission from a subject.
    *
-   * @param table
-   * @param domain
+   * @param principal
    * @param type
    * @return
    */
-  @GET
-  @Path("/table/{table}/variables")
-  public Iterable<Opal.Acl> getTableVariablesPermissions(@PathParam("table") String table,
-      @QueryParam("domain") @DefaultValue("opal") String domain,
+  @DELETE
+  @Path("/project/owner/{principal}")
+  public Response deleteProjectOwner(@PathParam("principal") String principal,
       @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type) {
+    // make sure project exists
+    projectService.getProject(name);
 
-    // make sure datasource and table exists
-    MagmaEngine.get().getDatasource(name).getValueTable(table);
+    SubjectAclService.Subject subject = type.subjectFor(principal);
+    subjectAclService.deleteSubjectPermissions(DOMAIN, getProjectNode(), subject);
 
-    Iterable<SubjectAclService.Permissions> permissions = Iterables.filter(Iterables.concat(subjectAclService
-        .getNodeHierarchyPermissions(domain, "/datasource/" + name + "/table/" + table + "/variable", type),
-        subjectAclService
-            .getNodeHierarchyPermissions(domain, "/datasource/" + name + "/view/" + table + "/variable", type)),
-        new MagmaPermissionsPredicate());
-
-    return Iterables.transform(permissions, PermissionsToAclFunction.INSTANCE);
+    return Response.ok().build();
   }
+
+  //
+  // Permissions by Subject
+  //
 
   /**
    * Get all permissions of a subject in the project.
@@ -174,16 +187,15 @@ public class ProjectPermissionsResource {
   @GET
   @Path("/subject/{principal}")
   public Iterable<Opal.Acl> getSubjectPermissions(@PathParam("principal") String principal,
-      @QueryParam("domain") @DefaultValue("opal") String domain,
       @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type) {
 
     // make sure project exists
     projectService.getProject(name);
 
     Iterable<SubjectAclService.Permissions> permissions = Iterables.concat(
-        subjectAclService.getSubjectNodeHierarchyPermissions(domain, "/project/" + name, type.subjectFor(principal)),
+        subjectAclService.getSubjectNodeHierarchyPermissions(DOMAIN, getProjectNode(), type.subjectFor(principal)),
         Iterables.filter(subjectAclService
-            .getSubjectNodeHierarchyPermissions(domain, "/datasource/" + name, type.subjectFor(principal)),
+            .getSubjectNodeHierarchyPermissions(DOMAIN, "/datasource/" + name, type.subjectFor(principal)),
             new MagmaPermissionsPredicate()));
 
     return Iterables.transform(permissions, PermissionsToAclFunction.INSTANCE);
@@ -200,7 +212,7 @@ public class ProjectPermissionsResource {
   @DELETE
   @Path("/subject/{principal}")
   public Response deleteSubjectPermissions(@PathParam("principal") String principal,
-      @QueryParam("domain") @DefaultValue("opal") String domain,
+
       @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type) {
 
     // make sure project exists
@@ -208,18 +220,34 @@ public class ProjectPermissionsResource {
 
     SubjectAclService.Subject subject = type.subjectFor(principal);
     for(SubjectAclService.Permissions permissions : Iterables
-        .concat(subjectAclService.getSubjectNodeHierarchyPermissions(domain, "/project/" + name, subject),
-            subjectAclService.getSubjectNodeHierarchyPermissions(domain, "/datasource/" + name, subject))) {
-      subjectAclService.deleteSubjectPermissions(domain, permissions.getNode(), subject);
+        .concat(subjectAclService.getSubjectNodeHierarchyPermissions(DOMAIN, getProjectNode(), subject),
+            subjectAclService.getSubjectNodeHierarchyPermissions(DOMAIN, "/datasource/" + name, subject))) {
+      subjectAclService.deleteSubjectPermissions(DOMAIN, permissions.getNode(), subject);
     }
 
     return Response.ok().build();
   }
 
+  private void validatePrincipal(String principal) {
+    if(Strings.isNullOrEmpty(principal)) throw new InvalidRequestException("Principal is required.");
+  }
+
+  private String getProjectNode() {
+    return "/project/" + name;
+  }
+
+  private String getDatasourceNode() {
+    return "/datasource/" + name;
+  }
+
+  private String getTableNode(String table, boolean isView) {
+    return getDatasourceNode() + (isView ? "/view/" : "/table/") + table;
+  }
+
   /**
    * Filter the accessible Magma objects.
    */
-  private static class MagmaPermissionsPredicate implements Predicate<SubjectAclService.Permissions> {
+  static class MagmaPermissionsPredicate implements Predicate<SubjectAclService.Permissions> {
     @Override
     public boolean apply(@Nullable SubjectAclService.Permissions input) {
       try {
