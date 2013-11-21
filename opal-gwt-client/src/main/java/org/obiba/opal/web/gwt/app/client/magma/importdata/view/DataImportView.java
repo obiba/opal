@@ -228,6 +228,11 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
   }
 
   @Override
+  public void showError(String messageKey) {
+    dialog.addAlert(TranslationsUtils.replaceArguments(translations.userMessageMap().get(messageKey)), AlertType.ERROR);
+  }
+
+  @Override
   public void showError(String errorMessage, HasType<ControlGroupType> errorType) {
     if (errorType == null) {
       dialog.addAlert(errorMessage, AlertType.ERROR);

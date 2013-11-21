@@ -364,7 +364,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
         getEventBus()
             .fireEvent(NotificationEvent.newBuilder().info("DataImportationProcessLaunched").args(jobId).build());
       } else {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+        getView().showError(response.getText());
       }
     }
   }
@@ -387,7 +387,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     @Override
     public boolean validateComparedDatasourcesReport() {
       if(comparedDatasourcesReportPresenter.getSelectedTables().isEmpty()) {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error("TableSelectionIsRequired").build());
+        getView().showError("TableSelectionIsRequired");
         return false;
       }
       ImportConfig localImportConfig = transientDatasourceHandler.getImportConfig();
@@ -562,6 +562,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     void setFormatStepDisplay(WizardStepDisplay display);
 
     void removeFormat(ImportFormat format);
+
+    void showError(String messageKey);
 
     void showError(String errorMessage, HasType<ControlGroupType> errorType);
 
