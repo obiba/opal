@@ -20,6 +20,7 @@ import javax.ws.rs.core.UriInfo;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
+import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
@@ -95,8 +96,9 @@ public class ValueSetsResourceImpl extends AbstractValueTableResource implements
     }));
 
     ImmutableList.Builder<ValueSetDto> valueSetDtoBuilder = ImmutableList.builder();
-    for(ValueSetDto dto : Iterables
-        .transform(variableEntities, new VariableEntityValueSetDtoFunction(variables, uriInfo, filterBinary))) {
+    ValueTable valueTable = getValueTable();
+    for(ValueSetDto dto : Iterables.transform(variableEntities,
+        new VariableEntityValueSetDtoFunction(valueTable, variables, uriInfo.getPath(), filterBinary))) {
       valueSetDtoBuilder.add(dto);
     }
 
@@ -155,46 +157,4 @@ public class ValueSetsResourceImpl extends AbstractValueTableResource implements
         .addValues(Dtos.asDto(link, value, filterBinary)).build();
   }
 
-  private class VariableEntityValueSetDtoFunction implements Function<VariableEntity, ValueSetDto> {
-
-    private final Iterable<Variable> variables;
-
-    private final UriInfo uriInfo;
-
-    private final boolean filterBinary;
-
-    private VariableEntityValueSetDtoFunction(Iterable<Variable> variables, UriInfo uriInfo, boolean filterBinary) {
-      this.variables = variables;
-      this.uriInfo = uriInfo;
-      this.filterBinary = filterBinary;
-    }
-
-    @Override
-    public ValueSetDto apply(final VariableEntity fromEntity) {
-      final ValueSet valueSet = getValueTable().getValueSet(fromEntity);
-
-      Iterable<ValueSetsDto.ValueDto> valueDtosIter = Iterables
-          .transform(variables, new Function<Variable, ValueSetsDto.ValueDto>() {
-
-            @Override
-            public ValueSetsDto.ValueDto apply(Variable fromVariable) {
-              String link = uriInfo.getPath().replace("valueSets",
-                  "valueSet/entity/" + fromEntity.getIdentifier() + "/variable/" + fromVariable.getName() +
-                      "/value");
-              Value value = getValueTable().getVariableValueSource(fromVariable.getName()).getValue(valueSet);
-              return Dtos.asDto(link, value, filterBinary).build();
-            }
-          });
-
-      // Do not add iterable directly otherwise the values will be fetched as many times it is iterated
-      // (i.e. 2 times, see AbstractMessageLite.addAll()).
-      ImmutableList.Builder<ValueSetsDto.ValueDto> valueDtos = ImmutableList.builder();
-      for(ValueSetsDto.ValueDto dto : valueDtosIter) {
-        valueDtos.add(dto);
-      }
-
-      return Dtos.asDto(valueSet).addAllValues(valueDtos.build()) //
-          .setTimestamps(Dtos.asDto(valueSet.getTimestamps())).build();
-    }
-  }
 }

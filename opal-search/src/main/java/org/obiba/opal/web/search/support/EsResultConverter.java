@@ -50,11 +50,10 @@ public class EsResultConverter {
     Search.QueryResultDto.Builder dtoResultsBuilder = Search.QueryResultDto.newBuilder()
         .setTotalHits(jsonHits.getInt("total"));
 
-    if (json.has("facets")) {
+    if(json.has("facets")) {
       FacetsConverter facetsConverter = new FacetsConverter();
       dtoResultsBuilder.addAllFacets(facetsConverter.convert(json.getJSONObject("facets")));
-    }
-    else if (jsonHits.has("hits")) {
+    } else if(jsonHits.has("hits")) {
       HitsConverter hitsConverter = new HitsConverter();
       hitsConverter.setStrategy(itemResultStrategy);
       dtoResultsBuilder.addAllHits(hitsConverter.convert(jsonHits.getJSONArray("hits")));
@@ -95,7 +94,6 @@ public class EsResultConverter {
       return facetsDtoList;
     }
 
-
     private void convertFiltered(JSONObject jsonFacet, Search.FacetResultDto.Builder dtoResultBuilder)
         throws JSONException {
 
@@ -107,7 +105,8 @@ public class EsResultConverter {
       }
     }
 
-    private void convertTerms(JSONArray terms, Search.FacetResultDto.Builder dtoFacetResultBuilder) throws JSONException {
+    private void convertTerms(JSONArray terms, Search.FacetResultDto.Builder dtoFacetResultBuilder)
+        throws JSONException {
 
       for(int i = 0; i < terms.length(); i++) {
         JSONObject term = terms.getJSONObject(i);
@@ -142,7 +141,6 @@ public class EsResultConverter {
     }
   }
 
-
   /**
    * Class used to convert hits JSON query result into DTO format
    */
@@ -165,9 +163,9 @@ public class EsResultConverter {
 
         int tableIndex = fields.getInt("index");
         fields.remove("index"); // no longer needed
-        if (fields.length() > 0) convertFields(dtoItemResultBuilder, fields);
+        if(fields.length() > 0) convertFields(dtoItemResultBuilder, fields);
+        if(itemResultStrategy != null) itemResultStrategy.process(dtoItemResultBuilder, tableIndex);
 
-        if (itemResultStrategy != null) itemResultStrategy.process(dtoItemResultBuilder, tableIndex);
         itemsDtoList.add(dtoItemResultBuilder.build());
       }
 
@@ -178,7 +176,7 @@ public class EsResultConverter {
     private void convertFields(Search.ItemResultDto.Builder dtoItemResultBuilder, JSONObject jsonFields)
         throws JSONException {
 
-      Search.ItemFieldsDto.Builder  dtoItemFieldsBuilder = Search.ItemFieldsDto.newBuilder();
+      Search.ItemFieldsDto.Builder dtoItemFieldsBuilder = Search.ItemFieldsDto.newBuilder();
 
       for(Iterator<String> iterator = jsonFields.keys(); iterator.hasNext(); ) {
 
@@ -192,6 +190,5 @@ public class EsResultConverter {
       dtoItemResultBuilder.setExtension(Search.ItemFieldsDto.item, dtoItemFieldsBuilder.build());
     }
   }
-
 
 }

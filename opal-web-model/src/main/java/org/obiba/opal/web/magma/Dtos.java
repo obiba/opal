@@ -68,13 +68,6 @@ public final class Dtos {
 
   };
 
-//  public static final Function<VariableDto, Variable> variableFromDtoFunc = new Function<VariableDto, Variable>() {
-//    @Override
-//    public Variable apply(VariableDto from) {
-//      return fromDto(from);
-//    }
-//  };
-
   private Dtos() {}
 
   public static Function<Variable, VariableDto.Builder> asDtoFunc(final LinkDto tableLink) {
