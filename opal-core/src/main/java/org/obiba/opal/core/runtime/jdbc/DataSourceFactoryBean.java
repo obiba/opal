@@ -10,19 +10,21 @@
 
 package org.obiba.opal.core.runtime.jdbc;
 
-import java.beans.PropertyVetoException;
-
 import javax.sql.DataSource;
 
+import org.apache.tomcat.jdbc.pool.PoolConfiguration;
+import org.apache.tomcat.jdbc.pool.PoolProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
-
-import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 public class DataSourceFactoryBean implements FactoryBean<DataSource> {
 
+  private static final Logger log = LoggerFactory.getLogger(DataSourceFactoryBean.class);
+
   private static final int MIN_POOL_SIZE = 3;
 
-  private static final int MAX_POOL_SIZE = 20;
+  private static final int MAX_POOL_SIZE = 30;
 
   private static final int MAX_IDLE = 10;
 
@@ -36,30 +38,30 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
 
   @Override
   public DataSource getObject() {
-    try {
-      ComboPooledDataSource dataSource = new ComboPooledDataSource();
-      dataSource.setDriverClass(driverClass);
-      dataSource.setJdbcUrl(url);
-      dataSource.setUser(username);
-      dataSource.setPassword(password);
-      dataSource.setMinPoolSize(MIN_POOL_SIZE);
-      dataSource.setMaxPoolSize(MAX_POOL_SIZE);
-      dataSource.setMaxIdleTime(MAX_IDLE);
-      dataSource.setAutoCommitOnClose(false);
+    log.debug("Configure DataSource for {}", url);
+    PoolConfiguration config = new PoolProperties();
+    config.setDriverClassName(driverClass);
+    config.setUrl(url);
+    config.setUsername(username);
+    config.setPassword(password);
+//    config.setInitialSize(MIN_POOL_SIZE);
+//    config.setMaxActive(MAX_POOL_SIZE);
+    config.setMaxIdle(MAX_IDLE);
+    config.setTestOnBorrow(true);
+    config.setTestWhileIdle(false);
+    config.setTestOnReturn(false);
+    config.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer;" +
+        "org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport");
 
-      if("com.mysql.jdbc.Driver".equals(driverClass)) {
-        dataSource.setPreferredTestQuery("select 1");
-      } else if("org.hsqldb.jdbcDriver".equals(driverClass)) {
-        dataSource.setPreferredTestQuery("select 1 from INFORMATION_SCHEMA.SYSTEM_USERS");
-      } else {
-        throw new IllegalArgumentException("Unsupported JDBC driver: " + driverClass);
-      }
+    if("com.mysql.jdbc.Driver".equals(driverClass)) {
+      config.setValidationQuery("select 1");
+    } else if("org.hsqldb.jdbcDriver".equals(driverClass)) {
+      config.setValidationQuery("select 1 from INFORMATION_SCHEMA.SYSTEM_USERS");
+    } else {
       //TODO validation query for PostgreSQL
-
-      return dataSource;
-    } catch(PropertyVetoException e) {
-      throw new RuntimeException("Cannot create JDBC dataSource", e);
+      throw new IllegalArgumentException("Unsupported JDBC driver: " + driverClass);
     }
+    return new org.apache.tomcat.jdbc.pool.DataSource(config);
   }
 
   @Override

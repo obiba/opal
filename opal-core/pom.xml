@@ -119,8 +119,8 @@
       <artifactId>ow2-jta-1.1-spec</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.mchange</groupId>
-      <artifactId>c3p0</artifactId>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-jdbc</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-codec</groupId>

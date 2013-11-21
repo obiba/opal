@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
 
+import org.apache.tomcat.jdbc.pool.DataSourceProxy;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.obiba.magma.DatasourceFactory;
@@ -30,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
@@ -45,7 +47,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
-import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 @Component
 public class DefaultDatabaseRegistry implements DatabaseRegistry {
@@ -132,12 +133,14 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   }
 
   @Override
+  @Transactional
   public DataSource getDataSource(@NotNull String name, @Nullable String usedByDatasource) {
     register(name, usedByDatasource);
     return dataSourceCache.getUnchecked(name);
   }
 
   @Override
+  @Transactional
   public SessionFactory getSessionFactory(@NotNull String name, @Nullable String usedByDatasource) {
     register(name, usedByDatasource);
     return sessionFactoryCache.getUnchecked(name);
@@ -282,8 +285,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
       log.info("Destroying DataSource {}", notification.getKey());
       DataSource dataSource = notification.getValue();
       if(dataSource != null) {
-        //noinspection OverlyStrongTypeCast
-        ((ComboPooledDataSource) dataSource).close();
+        ((DataSourceProxy) dataSource).close();
       }
     }
   }

@@ -32,10 +32,12 @@ import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.hibernate.cfg.AvailableSettings.*;
 
 @Component
+@Transactional
 public class SessionFactoryFactory {
 
   @Autowired
