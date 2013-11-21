@@ -48,7 +48,7 @@ public class ReportResource {
   @NotAuthenticated
   public Response getReport(@PathParam("obfuscated-file") String obfuscatedFile, @QueryParam("project") String project) throws FileSystemException {
     OpalFileSystem fileSystem = opalRuntime.getFileSystem();
-    FileObject reportFolder = fileSystem.getRoot().resolveFile(project == null ? "/reports" : "/projects/" + project + "/reports");
+    FileObject reportFolder = fileSystem.getRoot().resolveFile(project == null ? "/reports" : "/reports/" + project);
     FileObject reportFile = fileSystem.resolveFileFromObfuscatedPath(reportFolder, obfuscatedFile);
     if(reportFile == null) {
       return Response.status(Status.NOT_FOUND).build();

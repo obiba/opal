@@ -88,9 +88,9 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   }
 
   private ReportTemplate loadReportTemplate() {
-    if (reportTemplate == null) {
+    if(reportTemplate == null) {
       reportTemplate = getOpalConfigurationService().getOpalConfiguration().getReportTemplate(name);
-      if (reportTemplate == null) {
+      if(reportTemplate == null) {
         throw new NoSuchElementException();
       }
     }
@@ -143,7 +143,8 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
 
     if(reportFolder.exists()) {
       for(FileObject reportFile : reportFolder.getChildren()) {
-        if(reportFile.getType() == FileType.FILE && reportFile.getName().getBaseName().startsWith(name + "-")) {
+        if(reportFile.getType() == FileType.FILE && reportFile.getName().getBaseName().startsWith(name + "-") &&
+            reportFile.isReadable()) {
           reports.add(getReportDto(reportFile));
         }
       }
@@ -165,7 +166,8 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
     FileObject lastReportFile = null;
     File lastReport = null;
     for(FileObject reportFile : reportFolder.getChildren()) {
-      if(reportFile.getType() == FileType.FILE && reportFile.getName().getBaseName().startsWith(name + "-")) {
+      if(reportFile.getType() == FileType.FILE && reportFile.getName().getBaseName().startsWith(name + "-") &&
+          reportFile.isReadable()) {
         File report = opalRuntime.getFileSystem().getLocalFile(reportFile);
         if(lastReport == null || report.lastModified() > lastReport.lastModified()) {
           lastReport = report;
@@ -181,7 +183,7 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
 
   private ReportDto getReportDto(FileObject reportFile) throws FileSystemException {
     String publicLink = "/report/public/" + opalRuntime.getFileSystem().getObfuscatedPath(reportFile);
-    if (reportTemplate.hasProject()) {
+    if(reportTemplate.hasProject()) {
       publicLink += "?project=" + reportTemplate.getProject();
     }
     return ReportDto.newBuilder()//
@@ -194,8 +196,8 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
 
   private FileObject getReportFolder() throws FileSystemException {
     String folder = "/reports/" + name;
-    if (reportTemplate.hasProject()) {
-      folder = "/projects/" + reportTemplate.getProject() + folder;
+    if(reportTemplate.hasProject()) {
+      folder = "/reports/" + reportTemplate.getProject() + "/" + name;
     }
     OpalFileSystem fileSystem = opalRuntime.getFileSystem();
     return fileSystem.getRoot().resolveFile(folder);

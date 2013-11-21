@@ -129,7 +129,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
     // display reports
     String uri;
     if (reportTemplate.hasProject()) {
-      uri= UriBuilder.create().segment("files", "meta", "projects", reportTemplate.getProject(), "reports", reportTemplate.getName()).build();
+      uri= UriBuilder.create().segment("files", "meta", "reports", reportTemplate.getProject(), reportTemplate.getName()).build();
     } else {
       uri= UriBuilder.create().segment("files", "meta", "reports", reportTemplate.getName()).build();
     }

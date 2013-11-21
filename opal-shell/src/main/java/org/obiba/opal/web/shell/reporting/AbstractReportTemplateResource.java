@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.shell.reporting;
 
+import org.apache.commons.vfs2.FileObject;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.MagmaSecurityExtension;

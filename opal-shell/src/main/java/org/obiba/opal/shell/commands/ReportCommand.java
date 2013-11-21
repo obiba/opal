@@ -146,8 +146,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     String reportFileName = getReportFileName(reportTemplateName, reportFormat, reportDate);
 
     FileObject reportDir = getFile(
-        (reportTemplate.hasProject() ? "/projects/" + reportTemplate.getProject() : "") + "/reports/" +
-            reportTemplateName);
+        "/reports/" + (reportTemplate.hasProject() ? reportTemplate.getProject() + "/" : "") + reportTemplateName);
     reportDir.createFolder();
 
     return reportDir.resolveFile(reportFileName);
@@ -193,7 +192,8 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     Map<String, Object> model = new HashMap<String, Object>();
     model.put("report_template", reportTemplate.getName());
     model.put("report_public_link",
-        opalPublicUrl + "/ws/report/public/" + getOpalRuntime().getFileSystem().getObfuscatedPath(reportOutput) + (reportTemplate.hasProject() ? "?project=" + reportTemplate.getProject() : ""));
+        opalPublicUrl + "/ws/report/public/" + getOpalRuntime().getFileSystem().getObfuscatedPath(reportOutput) +
+            (reportTemplate.hasProject() ? "?project=" + reportTemplate.getProject() : ""));
     return getMergedVelocityTemplate(model);
   }
 
