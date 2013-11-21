@@ -93,10 +93,12 @@ public class AuthenticationInterceptor extends AbstractSecurityComponent
     return cookie != null && isValidSessionId(cookie.getValue());
   }
 
-  private boolean isWebServiceAuthenticated(Annotation... annotations) {
-    for(Annotation annotation : annotations) {
-      if(annotation instanceof NotAuthenticated) return false;
-      if(annotation instanceof AuthenticatedByCookie) return false;
+  private boolean isWebServiceAuthenticated(@Nullable Annotation... annotations) {
+    if(annotations != null) {
+      for(Annotation annotation : annotations) {
+        if(annotation instanceof NotAuthenticated) return false;
+        if(annotation instanceof AuthenticatedByCookie) return false;
+      }
     }
     return true;
   }
