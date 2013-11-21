@@ -9,11 +9,13 @@
  */
 package org.obiba.opal.web.search;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.elasticsearch.rest.RestRequest;
+import org.obiba.opal.search.ValuesIndexManager;
 import org.obiba.opal.search.VariablesIndexManager;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.obiba.opal.search.service.OpalSearchService;
@@ -39,7 +41,10 @@ public abstract class AbstractVariablesSearchResource {
   protected ElasticSearchProvider esProvider;
 
   @Autowired
-  protected VariablesIndexManager indexManager;
+  protected ValuesIndexManager valuesIndexManager;
+
+  @Autowired
+  protected VariablesIndexManager variablesIndexManager;
 
   //
   // Protected members
@@ -53,6 +58,8 @@ public abstract class AbstractVariablesSearchResource {
 
   protected QuerySearchJsonBuilder buildQuerySearch(String query, int offset, int limit, Collection<String> fields,
       String sortField, String sortDir) {
+    if(fields == null) fields = new ArrayList<String>();
+
     addDefaultFields(fields);
     QuerySearchJsonBuilder jsonBuilder = new QuerySearchJsonBuilder();
     jsonBuilder.setQuery(query).setFields(fields).setFrom(offset).setSize(limit) //

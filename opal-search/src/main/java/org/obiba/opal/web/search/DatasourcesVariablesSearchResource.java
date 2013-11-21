@@ -58,7 +58,7 @@ public class DatasourcesVariablesSearchResource extends AbstractVariablesSearchR
 
   @Override
   protected String getSearchPath() {
-    return indexManager.getName();
+    return variablesIndexManager.getName();
   }
 
   @Override
@@ -76,7 +76,7 @@ public class DatasourcesVariablesSearchResource extends AbstractVariablesSearchR
 
     for(Datasource datasource : MagmaEngine.get().getDatasources()) {
       for(ValueTable valueTable : datasource.getValueTables()) {
-        types.add(indexManager.getIndex(valueTable).getIndexName());
+        types.add(variablesIndexManager.getIndex(valueTable).getIndexName());
       }
     }
 

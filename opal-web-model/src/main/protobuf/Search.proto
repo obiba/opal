@@ -127,3 +127,8 @@ message VariableItemDto {
     optional VariableItemDto item = 1001;
   }
 }
+
+message ValueSetsResultDto {
+  required int32 totalHits = 1;
+  optional Magma.ValueSetsDto valueSets = 2;
+}
