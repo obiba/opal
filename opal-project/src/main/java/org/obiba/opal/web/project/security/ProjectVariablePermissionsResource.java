@@ -10,6 +10,8 @@
 
 package org.obiba.opal.web.project.security;
 
+import java.util.List;
+
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -22,15 +24,12 @@ import javax.ws.rs.core.Response;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.service.SubjectAclService;
-import org.obiba.opal.project.ProjectService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.PermissionsToAclFunction;
-import org.obiba.opal.web.support.InvalidRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 
 import static org.obiba.opal.web.project.security.ProjectPermissionsResource.DOMAIN;
@@ -38,7 +37,7 @@ import static org.obiba.opal.web.project.security.ProjectPermissionsResource.DOM
 @Component
 @Scope("request")
 @Path("/project/{name}/permissions/table/{table}/variable/{variable}")
-public class ProjectVariablePermissionsResource {
+public class ProjectVariablePermissionsResource extends AbstractPermissionsResource {
 
   // ugly: duplicate of ProjectsPermissionConverter.Permission
 
@@ -58,6 +57,8 @@ public class ProjectVariablePermissionsResource {
   @PathParam("variable")
   private String variable;
 
+  private ValueTable valueTable;
+
   /**
    * Get variable-level permissions of a variable in the project.
    *
@@ -71,9 +72,7 @@ public class ProjectVariablePermissionsResource {
     // make sure datasource, table and variable exists
     MagmaEngine.get().getDatasource(name).getValueTable(table).getVariable(variable);
 
-    Iterable<SubjectAclService.Permissions> permissions = Iterables
-        .concat(subjectAclService.getNodePermissions(DOMAIN, getNode(false), type),
-            subjectAclService.getNodePermissions(DOMAIN, getNode(true), type));
+    Iterable<SubjectAclService.Permissions> permissions = subjectAclService.getNodePermissions(DOMAIN, getNode(), type);
 
     return Iterables
         .transform(Iterables.filter(permissions, new ProjectPermissionsResource.MagmaPermissionsPredicate()),
@@ -84,25 +83,18 @@ public class ProjectVariablePermissionsResource {
    * Set a variable-level permission for a subject in the project.
    *
    * @param type
-   * @param principal
+   * @param principals
    * @param permission
    * @return
    */
   @POST
   public Response setTableVariablePermission(
       @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
-      @QueryParam("principal") String principal, @QueryParam("permission") VariablePermission permission) {
+      @QueryParam("principal") List<String> principals, @QueryParam("permission") VariablePermission permission) {
 
     // make sure datasource, table and variable exists
-    ValueTable vt = MagmaEngine.get().getDatasource(name).getValueTable(table);
-    vt.getVariable(variable);
-    validatePrincipal(principal);
-
-    SubjectAclService.Subject subject = type.subjectFor(principal);
-    subjectAclService.deleteSubjectPermissions(DOMAIN, getNode(true), subject);
-    subjectAclService.deleteSubjectPermissions(DOMAIN, getNode(false), subject);
-    subjectAclService.addSubjectPermission(DOMAIN, getNode(vt.isView()), subject, permission.name());
-
+    getValueTable().getVariable(variable);
+    setPermission(principals, type, permission.name());
     return Response.ok().build();
   }
 
@@ -110,31 +102,33 @@ public class ProjectVariablePermissionsResource {
    * Remove any variable-level permission of a subject in the project.
    *
    * @param type
-   * @param principal
+   * @param principals
    * @return
    */
   @DELETE
   public Response setTableVariablePermission(
       @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
-      @QueryParam("principal") String principal) {
-
+      @QueryParam("principal") List<String> principals) {
     // make sure datasource, table and variable exists
-    MagmaEngine.get().getDatasource(name).getValueTable(table).getVariable(variable);
-    validatePrincipal(principal);
-
-    SubjectAclService.Subject subject = type.subjectFor(principal);
-    subjectAclService.deleteSubjectPermissions(DOMAIN, getNode(true), subject);
-    subjectAclService.deleteSubjectPermissions(DOMAIN, getNode(false), subject);
-
+    getValueTable().getVariable(variable);
+    deletePermissions(principals, type);
     return Response.ok().build();
   }
 
-  private void validatePrincipal(String principal) {
-    if(Strings.isNullOrEmpty(principal)) throw new InvalidRequestException("Principal is required.");
+  private ValueTable getValueTable() {
+    if(valueTable == null) {
+      valueTable = MagmaEngine.get().getDatasource(name).getValueTable(table);
+    }
+    return valueTable;
   }
 
-  private String getNode(boolean isView) {
-    return "/datasource/" + name + (isView ? "/view/" : "/table/") + table + "/variable/" + variable;
+  @Override
+  protected String getNode() {
+    return "/datasource/" + name + (getValueTable().isView() ? "/view/" : "/table/") + table + "/variable/" + variable;
   }
 
+  @Override
+  protected SubjectAclService getSubjectAclService() {
+    return subjectAclService;
+  }
 }

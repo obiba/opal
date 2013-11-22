@@ -10,6 +10,8 @@
 
 package org.obiba.opal.web.project.security;
 
+import java.util.List;
+
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -22,15 +24,12 @@ import javax.ws.rs.core.Response;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.service.SubjectAclService;
-import org.obiba.opal.project.ProjectService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.PermissionsToAclFunction;
-import org.obiba.opal.web.support.InvalidRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 
 import static org.obiba.opal.web.project.security.ProjectPermissionsResource.DOMAIN;
@@ -39,7 +38,7 @@ import static org.obiba.opal.web.project.security.ProjectPermissionsResource.Mag
 @Component
 @Scope("request")
 @Path("/project/{name}/permissions/table/{table}")
-public class ProjectTablePermissionsResource {
+public class ProjectTablePermissionsResource extends AbstractPermissionsResource {
 
   // ugly: duplicate of ProjectsPermissionConverter.Permission
 
@@ -60,6 +59,8 @@ public class ProjectTablePermissionsResource {
   @PathParam("table")
   private String table;
 
+  private ValueTable valueTable;
+
   /**
    * Get all table-level permissions of a table in the project.
    *
@@ -71,11 +72,9 @@ public class ProjectTablePermissionsResource {
   public Iterable<Opal.Acl> getTablePermissions(@QueryParam("type") SubjectAclService.SubjectType type) {
 
     // make sure datasource and table exists
-    MagmaEngine.get().getDatasource(name).getValueTable(table);
+    getValueTable();
 
-    Iterable<SubjectAclService.Permissions> permissions = Iterables
-        .concat(subjectAclService.getNodePermissions(DOMAIN, getNode(false), type),
-            subjectAclService.getNodePermissions(DOMAIN, getNode(true), type));
+    Iterable<SubjectAclService.Permissions> permissions = subjectAclService.getNodePermissions(DOMAIN, getNode(), type);
 
     return Iterables
         .transform(Iterables.filter(permissions, new MagmaPermissionsPredicate()), PermissionsToAclFunction.INSTANCE);
@@ -85,23 +84,17 @@ public class ProjectTablePermissionsResource {
    * Set a table-level permission for a subject in the project.
    *
    * @param type
-   * @param principal
+   * @param principals
    * @param permission
    * @return
    */
   @POST
   public Response setTablePermission(@QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
-      @QueryParam("principal") String principal, @QueryParam("permission") TablePermission permission) {
+      @QueryParam("principal") List<String> principals, @QueryParam("permission") TablePermission permission) {
 
     // make sure datasource and table exists
-    ValueTable vt = MagmaEngine.get().getDatasource(name).getValueTable(table);
-    validatePrincipal(principal);
-
-    SubjectAclService.Subject subject = type.subjectFor(principal);
-    subjectAclService.deleteSubjectPermissions(DOMAIN, getNode(true), subject);
-    subjectAclService.deleteSubjectPermissions(DOMAIN, getNode(false), subject);
-    subjectAclService.addSubjectPermission(DOMAIN, getNode(vt.isView()), subject, permission.name());
-
+    getValueTable();
+    setPermission(principals,type,permission.name());
     return Response.ok().build();
   }
 
@@ -109,21 +102,16 @@ public class ProjectTablePermissionsResource {
    * Remove any table-level permission of a subject in the project.
    *
    * @param type
-   * @param principal
+   * @param principals
    * @return
    */
   @DELETE
   public Response deleteTablePermissions(@QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
-      @QueryParam("principal") String principal) {
+      @QueryParam("principal") List<String> principals) {
 
     // make sure datasource and table exists
-    MagmaEngine.get().getDatasource(name).getValueTable(table);
-    validatePrincipal(principal);
-
-    SubjectAclService.Subject subject = type.subjectFor(principal);
-    subjectAclService.deleteSubjectPermissions(DOMAIN, getNode(true), subject);
-    subjectAclService.deleteSubjectPermissions(DOMAIN, getNode(false), subject);
-
+    getValueTable();
+    deletePermissions(principals, type);
     return Response.ok().build();
   }
 
@@ -140,25 +128,32 @@ public class ProjectTablePermissionsResource {
    */
   @GET
   @Path("/variables")
-  public Iterable<Opal.Acl> getTableVariablesPermissions(
-      @QueryParam("type") SubjectAclService.SubjectType type) {
+  public Iterable<Opal.Acl> getTableVariablesPermissions(@QueryParam("type") SubjectAclService.SubjectType type) {
 
     // make sure datasource and table exists
-    MagmaEngine.get().getDatasource(name).getValueTable(table);
+    getValueTable();
 
-    Iterable<SubjectAclService.Permissions> permissions = Iterables.filter(Iterables
-        .concat(subjectAclService.getNodeHierarchyPermissions(DOMAIN, getNode(false) + "/variable", type),
-            subjectAclService.getNodeHierarchyPermissions(DOMAIN, getNode(true) + "/variable", type)),
-        new MagmaPermissionsPredicate());
+    Iterable<SubjectAclService.Permissions> permissions = Iterables
+        .filter(subjectAclService.getNodeHierarchyPermissions(DOMAIN, getNode() + "/variable", type),
+            new MagmaPermissionsPredicate());
 
     return Iterables.transform(permissions, PermissionsToAclFunction.INSTANCE);
   }
 
-  private void validatePrincipal(String principal) {
-    if(Strings.isNullOrEmpty(principal)) throw new InvalidRequestException("Principal is required.");
+  private ValueTable getValueTable() {
+    if(valueTable == null) {
+      valueTable = MagmaEngine.get().getDatasource(name).getValueTable(table);
+    }
+    return valueTable;
   }
 
-  private String getNode(boolean isView) {
-    return "/datasource/" + name + (isView ? "/view/" : "/table/") + table;
+  @Override
+  protected String getNode() {
+    return "/datasource/" + name + (getValueTable().isView() ? "/view/" : "/table/") + table;
+  }
+
+  @Override
+  protected SubjectAclService getSubjectAclService() {
+    return subjectAclService;
   }
 }

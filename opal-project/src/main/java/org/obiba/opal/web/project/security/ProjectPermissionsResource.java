@@ -10,6 +10,8 @@
 
 package org.obiba.opal.web.project.security;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -38,7 +40,7 @@ import com.google.common.collect.Iterables;
 @Component
 @Scope("request")
 @Path("/project/{name}/permissions")
-public class ProjectPermissionsResource {
+public class ProjectPermissionsResource extends AbstractPermissionsResource {
 
   public static final String DOMAIN = "opal";
 
@@ -73,7 +75,7 @@ public class ProjectPermissionsResource {
     projectService.getProject(name);
 
     Iterable<SubjectAclService.Permissions> permissions = Iterables
-        .concat(subjectAclService.getNodeHierarchyPermissions(domain, getProjectNode(), type), Iterables
+        .concat(subjectAclService.getNodeHierarchyPermissions(domain, getNode(), type), Iterables
             .filter(subjectAclService.getNodeHierarchyPermissions(domain, "/datasource/" + name, type),
                 new MagmaPermissionsPredicate()));
 
@@ -94,8 +96,7 @@ public class ProjectPermissionsResource {
     // make sure project exists
     projectService.getProject(name);
 
-    Iterable<SubjectAclService.Permissions> permissions = subjectAclService
-        .getNodePermissions(DOMAIN, getProjectNode(), type);
+    Iterable<SubjectAclService.Permissions> permissions = subjectAclService.getNodePermissions(DOMAIN, getNode(), type);
 
     return Iterables.transform(permissions, PermissionsToAclFunction.INSTANCE);
   }
@@ -104,52 +105,45 @@ public class ProjectPermissionsResource {
    * Set a project-level permission for a subject in the project.
    *
    * @param type
-   * @param principal
+   * @param principals
    * @return
    */
   @POST
   @Path("/project")
   public Response addProjectPermission(@QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
-      @QueryParam("principal") String principal,
+      @QueryParam("principal") List<String> principals,
       @QueryParam("permission") @DefaultValue("PROJECT_ALL") ProjectPermission permission) {
     // make sure project exists
     projectService.getProject(name);
-    validatePrincipal(principal);
-
-    SubjectAclService.Subject subject = type.subjectFor(principal);
-    subjectAclService.deleteSubjectPermissions(DOMAIN, getProjectNode(), subject);
-    subjectAclService.addSubjectPermission(DOMAIN, getProjectNode(), subject, permission.name());
-
+    setPermission(principals, type, permission.name());
     return Response.ok().build();
   }
 
   /**
    * Remove project-level permissions from a subject.
    *
-   * @param principal
+   * @param principals
    * @param type
    * @return
    */
   @DELETE
   @Path("/project")
   public Response deleteProjectPermissions(@QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
-      @QueryParam("principal") String principal) {
+      @QueryParam("principal") List<String> principals) {
     // make sure project exists
     projectService.getProject(name);
-    validatePrincipal(principal);
-
-    SubjectAclService.Subject subject = type.subjectFor(principal);
-    subjectAclService.deleteSubjectPermissions(DOMAIN, getProjectNode(), subject);
-
+    deletePermissions(principals, type);
     return Response.ok().build();
   }
 
-  private void validatePrincipal(String principal) {
-    if(Strings.isNullOrEmpty(principal)) throw new InvalidRequestException("Principal is required.");
+  @Override
+  protected String getNode() {
+    return "/project/" + name;
   }
 
-  private String getProjectNode() {
-    return "/project/" + name;
+  @Override
+  protected SubjectAclService getSubjectAclService() {
+    return subjectAclService;
   }
 
   /**

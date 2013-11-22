@@ -10,6 +10,8 @@
 
 package org.obiba.opal.web.project.security;
 
+import java.util.List;
+
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -23,12 +25,10 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.opal.core.service.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.PermissionsToAclFunction;
-import org.obiba.opal.web.support.InvalidRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 
 import static org.obiba.opal.web.project.security.ProjectPermissionsResource.DOMAIN;
@@ -36,7 +36,7 @@ import static org.obiba.opal.web.project.security.ProjectPermissionsResource.DOM
 @Component
 @Scope("request")
 @Path("/project/{name}/permissions/datasource")
-public class ProjectDatasourcePermissionsResource {
+public class ProjectDatasourcePermissionsResource extends AbstractPermissionsResource {
 
   public enum DatasourcePermission {
     CREATE_TABLE,
@@ -74,22 +74,16 @@ public class ProjectDatasourcePermissionsResource {
    * Set a datasource-level permission for a subject in the project.
    *
    * @param type
-   * @param principal
+   * @param principals
    * @param permission
    * @return
    */
   @POST
   public Response setDatasourcePermission(@QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
-      @QueryParam("principal") String principal, @QueryParam("permission") DatasourcePermission permission) {
-
+      @QueryParam("principal") List<String> principals, @QueryParam("permission") DatasourcePermission permission) {
     // make sure datasource exists
     MagmaEngine.get().getDatasource(name);
-    validatePrincipal(principal);
-
-    SubjectAclService.Subject subject = type.subjectFor(principal);
-    subjectAclService.deleteSubjectPermissions(DOMAIN, getNode(), subject);
-    subjectAclService.addSubjectPermission(DOMAIN, getNode(), subject, permission.name());
-
+    setPermission(principals,type,permission.name());
     return Response.ok().build();
   }
 
@@ -97,30 +91,26 @@ public class ProjectDatasourcePermissionsResource {
    * Remove any datasource-level permission of a subject in the project.
    *
    * @param type
-   * @param principal
+   * @param principals
    * @return
    */
   @DELETE
   public Response deleteDatasourcePermissions(
       @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
-      @QueryParam("principal") String principal) {
-
+      @QueryParam("principal") List<String> principals) {
     // make sure datasource exists
     MagmaEngine.get().getDatasource(name);
-    validatePrincipal(principal);
-
-    SubjectAclService.Subject subject = type.subjectFor(principal);
-    subjectAclService.deleteSubjectPermissions(DOMAIN, getNode(), subject);
-
+    deletePermissions(principals, type);
     return Response.ok().build();
   }
 
-  private void validatePrincipal(String principal) {
-    if(Strings.isNullOrEmpty(principal)) throw new InvalidRequestException("Principal is required.");
-  }
-
-  private String getNode() {
+  @Override
+  protected String getNode() {
     return "/datasource/" + name;
   }
 
+  @Override
+  protected SubjectAclService getSubjectAclService() {
+    return subjectAclService;
+  }
 }

@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.project.security;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import javax.ws.rs.DELETE;
@@ -21,20 +22,15 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.ReportTemplate;
 import org.obiba.opal.core.service.SubjectAclService;
-import org.obiba.opal.project.ProjectService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.PermissionsToAclFunction;
-import org.obiba.opal.web.support.InvalidRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 
 import static org.obiba.opal.web.project.security.ProjectPermissionsResource.DOMAIN;
@@ -43,7 +39,7 @@ import static org.obiba.opal.web.project.security.ProjectPermissionsResource.Mag
 @Component
 @Scope("request")
 @Path("/project/{name}/permissions/report-template/{template}")
-public class ProjectReportTemplatePermissionsResource {
+public class ProjectReportTemplatePermissionsResource extends AbstractPermissionsResource {
 
   // ugly: duplicate of ReportTemplatePermissionConverter.Permission
 
@@ -54,9 +50,6 @@ public class ProjectReportTemplatePermissionsResource {
 
   @Autowired
   private SubjectAclService subjectAclService;
-
-  @Autowired
-  private ProjectService projectService;
 
   @Autowired
   private OpalConfigurationService configService;
@@ -90,22 +83,16 @@ public class ProjectReportTemplatePermissionsResource {
    * Set a table-level permission for a subject in the project.
    *
    * @param type
-   * @param principal
+   * @param principals
    * @param permission
    * @return
    */
   @POST
   public Response setTablePermission(@QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
-      @QueryParam("principal") String principal, @QueryParam("permission") ReportTemplatePermission permission) {
-
-    // make sure project exists
+      @QueryParam("principal") List<String> principals, @QueryParam("permission") ReportTemplatePermission permission) {
+    // make sure template exists
     validateTemplate();
-
-    SubjectAclService.Subject subject = type.subjectFor(principal);
-    subjectAclService.deleteSubjectPermissions(DOMAIN, getNode(), subject);
-    subjectAclService.deleteSubjectPermissions(DOMAIN, getNode(), subject);
-    subjectAclService.addSubjectPermission(DOMAIN, getNode(), subject, permission.name());
-
+    setPermission(principals, type, permission.name());
     return Response.ok().build();
   }
 
@@ -113,21 +100,16 @@ public class ProjectReportTemplatePermissionsResource {
    * Remove any table-level permission of a subject in the project.
    *
    * @param type
-   * @param principal
+   * @param principals
    * @return
    */
   @DELETE
   public Response deleteTablePermissions(@QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
-      @QueryParam("principal") String principal) {
+      @QueryParam("principal") List<String> principals) {
 
-    // make sure project exists
+    // make sure template exists
     validateTemplate();
-    validatePrincipal(principal);
-
-    SubjectAclService.Subject subject = type.subjectFor(principal);
-    subjectAclService.deleteSubjectPermissions(DOMAIN, getNode(), subject);
-    subjectAclService.deleteSubjectPermissions(DOMAIN, getNode(), subject);
-
+    deletePermissions(principals, type);
     return Response.ok().build();
   }
 
@@ -136,11 +118,13 @@ public class ProjectReportTemplatePermissionsResource {
     if(rt == null || !rt.hasProject() || !name.equals(rt.getProject())) throw new NoSuchElementException();
   }
 
-  private void validatePrincipal(String principal) {
-    if(Strings.isNullOrEmpty(principal)) throw new InvalidRequestException("Principal is required.");
+  @Override
+  protected String getNode() {
+    return "/project/" + name + "/report-template/" + template;
   }
 
-  private String getNode() {
-    return "/project/" + name + "/report-template/" + template;
+  @Override
+  protected SubjectAclService getSubjectAclService() {
+    return subjectAclService;
   }
 }
