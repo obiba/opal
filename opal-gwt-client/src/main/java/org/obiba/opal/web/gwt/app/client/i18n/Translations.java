@@ -829,7 +829,7 @@ public interface Translations extends Constants {
   String excelLabel();
 
   @Description("Opal XML label")
-  @DefaultStringValue("Opal XML")
+  @DefaultStringValue("Opal Archive")
   String opalXmlLabel();
 
   @Description("SPSS label")
