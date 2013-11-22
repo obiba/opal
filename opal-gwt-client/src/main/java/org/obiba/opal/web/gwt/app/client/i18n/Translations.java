@@ -930,7 +930,8 @@ public interface Translations extends Constants {
       "Duplicate entity identifier '{0}' at row '{1}'. Please make sure that the variable '{2}' representing entities has unique values.",
 //
       "FailedToOpenFile", "Failed to open file '{0}'. Please make sure you have chosen the correct character set.",
-      "LimeUnknownQuestionType", "Unknown type for Limesurvey question '{0}'. Contact your administrator to find out whether this question type is handled by Opal."})
+      "LimeUnknownQuestionType",
+      "Unknown type for Limesurvey question '{0}'. Contact your administrator to find out whether this question type is handled by Opal." })
   Map<String, String> datasourceParsingErrorMap();
 
   @Description("Datasource comparison error map")
@@ -1622,13 +1623,21 @@ public interface Translations extends Constants {
   @DefaultStringValue("Hide")
   String hideLabel();
 
-  @Description("Add Database")
-  @DefaultStringValue("Add Database")
-  String addDatabase();
+  @Description("Add SQL Database")
+  @DefaultStringValue("Add SQL Database")
+  String addSQLDatabase();
 
-  @Description("Edit Database")
-  @DefaultStringValue("Edit Database")
-  String editDatabase();
+  @Description("Edit SQL Database")
+  @DefaultStringValue("Edit SQL Database")
+  String editSQLDatabase();
+
+  @Description("Add MongoDB Database")
+  @DefaultStringValue("Add MongoDB Database")
+  String addMongoDatabase();
+
+  @Description("Edit MongoDB Database")
+  @DefaultStringValue("Edit MongoDB Database")
+  String editMongoDatabase();
 
   @Description("Username label")
   @DefaultStringValue("Username")

@@ -126,7 +126,7 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
   @Override
   public void setDialogMode(AbstractDatabaseModalPresenter.Mode dialogMode) {
     name.setEnabled(dialogMode == CREATE);
-    modal.setTitle(dialogMode == CREATE ? translations.addDatabase() : translations.editDatabase());
+    modal.setTitle(dialogMode == CREATE ? translations.addMongoDatabase() : translations.editMongoDatabase());
   }
 
   @Override
