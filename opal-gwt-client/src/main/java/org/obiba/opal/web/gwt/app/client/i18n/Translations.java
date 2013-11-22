@@ -1663,6 +1663,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("SQL Schema")
   String sqlSchemaLabel();
 
+  @Description("Schema label")
+  @DefaultStringValue("Schema")
+  String schemaLabel();
+
   @Description("SQL label")
   @DefaultStringValue("SQL")
   String sqlLabel();
@@ -1670,6 +1674,10 @@ public interface Translations extends Constants {
   @Description("MongoDB label")
   @DefaultStringValue("MongoDB")
   String mongoDbLabel();
+
+  @Description("Opal Mongo label")
+  @DefaultStringValue("Opal Mongo")
+  String opalMongoLabel();
 
   @Description("Default Entity Type label")
   @DefaultStringValue("Default Entity Type")
