@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter.DataExportUiHandlers;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
@@ -75,8 +76,14 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
     super(eventBus);
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
-
     modal.setTitle(translations.exportData());
+    initWigits();
+  }
+
+  private void initWigits() {
+    fileFormat.addItemToGroup(translations.csvLabel(), ImportConfig.ImportFormat.CSV.name());
+    fileFormat.addItemToGroup(translations.opalXmlLabel(), ImportConfig.ImportFormat.XML.name());
+
   }
 
   @UiHandler("cancelButton")
