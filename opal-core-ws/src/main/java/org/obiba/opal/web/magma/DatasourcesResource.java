@@ -117,8 +117,7 @@ public class DatasourcesResource {
   public List<Magma.TableDto> getTables(@Nullable @QueryParam("entityType") String entityType) {
     List<Magma.TableDto> tables = Lists.newArrayList();
     for(Datasource datasource : MagmaEngine.get().getDatasources()) {
-      tables.addAll(
-          ((DatasourceTablesResourceImpl) getDatasourceTablesResource(datasource)).getTables(false, entityType));
+      tables.addAll(getDatasourceTablesResource(datasource).getTables(false, entityType));
     }
     return tables;
   }

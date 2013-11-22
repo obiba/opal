@@ -104,7 +104,8 @@ public class DatasourceTablesResourceImpl implements AbstractTablesResource, Dat
     }).build();
   }
 
-  List<TableDto> getTables(boolean counts, String entityType) {
+  @Override
+  public List<TableDto> getTables(boolean counts, String entityType) {
     List<Magma.TableDto> tables = Lists.newArrayList();
     UriBuilder tableLink = UriBuilder.fromPath("/").path(DatasourceResource.class)
         .path(DatasourceResource.class, "getTable");
