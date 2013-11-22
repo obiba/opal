@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.administration.database.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
@@ -210,6 +211,7 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
             @Override
             public void onResponseCode(Request request, Response response) {
               refresh();
+              getEventBus().fireEvent(new DatabaseDeletedEvent(dto));
             }
 
           }) //

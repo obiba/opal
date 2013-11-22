@@ -24,9 +24,16 @@
     </b:Paragraph>
     <b:Row ui:field="databasePanel">
       <b:Column size="6">
-        <b:Button ui:field="testConnection">
-          <ui:msg description="Test connection label">Test connection</ui:msg>
-        </b:Button>
+        <b:ControlGroup>
+          <b:Controls>
+            <b:Button ui:field="testConnection">
+              <ui:msg description="Test connection label">Test connection</ui:msg>
+            </b:Button>
+            <b:Button ui:field="deleteDatabase" type="DANGER">
+              <ui:msg description="Test connection label">Delete Database</ui:msg>
+            </b:Button>
+          </b:Controls>
+        </b:ControlGroup>
         <o:PropertiesTable ui:field="properties" addStyleNames="top-margin"/>
       </b:Column>
     </b:Row>

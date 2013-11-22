@@ -40,6 +40,9 @@ public class PostInstallView extends ViewWithUiHandlers<PostInstallUiHandlers> i
   @UiField
   Panel dataPanel;
 
+  @UiField
+  Panel gotoMain;
+
   @Inject
   public PostInstallView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
@@ -62,6 +65,11 @@ public class PostInstallView extends ViewWithUiHandlers<PostInstallUiHandlers> i
   @Override
   public void setUsername(String username) {
     this.username.setText(username);
+  }
+
+  @Override
+  public void enablePageExit(boolean value) {
+    gotoMain.setVisible(value);
   }
 
   @UiHandler("helpItem")

@@ -9,6 +9,9 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.presenter;
 
+import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseDeletedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DataDatabasesPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.IdentifiersDatabasePresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -17,9 +20,11 @@ import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.database.DatabasesStatusDto;
 
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -37,6 +42,8 @@ public class PostInstallPresenter extends Presenter<PostInstallPresenter.Display
   public interface Display extends View, HasUiHandlers<PostInstallUiHandlers> {
 
     void setUsername(String username);
+
+    void enablePageExit(boolean value);
   }
 
   @ProxyStandard
@@ -87,11 +94,46 @@ public class PostInstallPresenter extends Presenter<PostInstallPresenter.Display
         }
       }
     });
+
+    addRegisteredHandler(DatabaseCreatedEvent.getType(), new DatabaseCreatedEvent.DatabaseCreatedHandler() {
+      @Override
+      public void onDatabaseCreated(DatabaseCreatedEvent event) {
+        updateView();
+      }
+    });
+
+    addRegisteredHandler(DatabaseUpdatedEvent.getType(), new DatabaseUpdatedEvent.DatabaseUpdatedHandler() {
+      @Override
+      public void onDatabaseUpdated(DatabaseUpdatedEvent event) {
+        updateView();
+      }
+    });
+
+    addRegisteredHandler(DatabaseDeletedEvent.getType(), new DatabaseDeletedEvent.DatabaseDeletedHandler() {
+      @Override
+      public void onDatabaseDeleted(DatabaseDeletedEvent event) {
+        updateView();
+      }
+    });
   }
 
   @Override
   protected void onReveal() {
     getView().setUsername(credentials.getUsername());
+    updateView();
+  }
+
+  private void updateView() {
+    ResourceRequestBuilderFactory.<DatabasesStatusDto>newBuilder()
+        .forResource(UriBuilder.create().segment("system", "status", "databases").build()).get()
+        .withCallback(new DatabasesStatusResourceCallback()).withCallback(new ResponseCodeCallback() {
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        placeManager.revealCurrentPlace();
+      }
+    }, Response.SC_FORBIDDEN)//
+        .send();
+
   }
 
   @Override
@@ -119,4 +161,12 @@ public class PostInstallPresenter extends Presenter<PostInstallPresenter.Display
           }
         }).send();
   }
+
+  private class DatabasesStatusResourceCallback implements ResourceCallback<DatabasesStatusDto> {
+    @Override
+    public void onResource(Response response, DatabasesStatusDto resource) {
+      getView().enablePageExit(resource.getHasIdentifiers() && resource.getHasStorage());
+    }
+  }
+
 }
