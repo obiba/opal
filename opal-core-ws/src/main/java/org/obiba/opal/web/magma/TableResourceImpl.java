@@ -10,6 +10,7 @@
 package org.obiba.opal.web.magma;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -20,6 +21,7 @@ import javax.ws.rs.core.UriInfo;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableUpdateListener;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
 import org.obiba.magma.ValueType;
@@ -61,6 +63,10 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
   private ImportService importService;
 
   @Autowired
+  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+  private Collection<ValueTableUpdateListener> tableListeners;
+
+  @Autowired
   public void setImportService(ImportService importService) {
     this.importService = importService;
   }
@@ -90,6 +96,11 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
     if(getDatasource().hasValueTable(table.getName())) return Response.status(BAD_REQUEST)
         .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "TableAlreadyExists").build()).build();
 
+    if(tableListeners != null && !tableListeners.isEmpty()) {
+      for(ValueTableUpdateListener listener : tableListeners) {
+        listener.onRename(getValueTable(), table.getName());
+      }
+    }
     getDatasource().renameTable(valueTable.getName(), table.getName());
 
     return Response.ok().build();

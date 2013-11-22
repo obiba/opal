@@ -100,7 +100,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
   public void deleteNodeHierarchyPermissions(String domain, String node) {
     deleteNodePermissions(domain, node);
     Set<SubjectAclService.Subject> subjects = Sets.newTreeSet();
-    for(SubjectAcl acl : findLike(domain, node + "/")) {
+    for(SubjectAcl acl : Iterables.concat(find(domain, node), findLike(domain, node + "/"))) {
       subjects.add(acl.getSubject());
       delete(acl);
     }

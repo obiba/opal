@@ -1,6 +1,7 @@
 package org.obiba.opal.project.security;
 
 import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceUpdateListener;
@@ -29,11 +30,29 @@ public class ProjectPermissionsUpdateListener implements DatasourceUpdateListene
   }
 
   @Override
+  public void onRename(@NotNull ValueTable vt, String newName) {
+    Iterable<SubjectAclService.Permissions> perms = subjectAclService
+        .getNodeHierarchyPermissions("opal", getNode(vt), null);
+    onDelete(vt);
+    String prefix = vt.isView() ? "/view/" : "/table/";
+    String originalStr = prefix + vt.getName();
+    String newStr = prefix + newName;
+    for(SubjectAclService.Permissions perm : perms) {
+      subjectAclService
+          .addSubjectPermissions(perm.getDomain(), perm.getNode().replace(originalStr, newStr), perm.getSubject(),
+              perm.getPermissions());
+    }
+  }
+
+  @Override
   public void onDelete(@Nonnull ValueTable vt) {
     // remove all permissions related to the table
-    String node = "/datasource/" + vt.getDatasource().getName() +
+    subjectAclService.deleteNodePermissions(getNode(vt));
+  }
+
+  private String getNode(ValueTable vt) {
+    return "/datasource/" + vt.getDatasource().getName() +
         (vt.isView() ? "/view/" + vt.getName() : "/table/" + vt.getName());
-    subjectAclService.deleteNodePermissions(node);
   }
 
 }

@@ -139,6 +139,11 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
   }
 
   @Override
+  public void onRename(@NotNull ValueTable vt, String newName) {
+    onDelete(vt);
+  }
+
+  @Override
   public void onDelete(@NotNull ValueTable vt) {
     // Delete index
     getIndex(vt).delete();
