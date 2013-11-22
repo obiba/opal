@@ -74,6 +74,27 @@ public enum UriBuilders {
     }
   },
 
+  PROJECT_PERMISSIONS_DATASOURCE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "permissions", "datasource");
+    }
+  },
+
+  PROJECT_PERMISSIONS_TABLE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "permissions", "table", "{}");
+    }
+  },
+
+  PROJECT_PERMISSIONS_VARIABLE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "permissions", "table", "{}", "variable", "{}");
+    }
+  },
+
   DATASOURCES {
     @Override
     public UriBuilder create() {
@@ -99,6 +120,13 @@ public enum UriBuilders {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("datasource", "{}", "tables");
+    }
+  },
+
+  DATASOURCE_VIEWS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasource", "{}", "views");
     }
   },
 

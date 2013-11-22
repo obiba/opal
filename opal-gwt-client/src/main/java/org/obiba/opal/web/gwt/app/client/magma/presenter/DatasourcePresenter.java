@@ -240,25 +240,26 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       authorizeProject();
 
       // set permissions
-      AclRequest.newResourceAuthorizationRequestBuilder()
-          .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+      ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+          .forResource(UriBuilders.PROJECT_PERMISSIONS_DATASOURCE.create().build(datasourceName)) //
+          .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())) //
+          .post().send();
     }
 
     private void authorizeDatasource() {
-      String datasourceUri = UriBuilder.create().segment("datasource", datasourceName).build();
       // create tables
       ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-          .forResource(datasourceUri + "/tables") //
+          .forResource(UriBuilders.DATASOURCE_TABLES.create().build(datasourceName)) //
           .authorize(getView().getAddUpdateTablesAuthorizer()) //
           .post().send();
       // create views
       ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-          .forResource(datasourceUri + "/views") //
+          .forResource(UriBuilders.DATASOURCE_VIEWS.create().build(datasourceName)) //
           .authorize(getView().getAddViewAuthorizer()) //
           .post().send();
       // export variables in excel
       ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-          .forResource(datasourceUri + "/tables/excel") //
+          .forResource(UriBuilders.DATASOURCE_TABLES.create().build(datasourceName) + "/excel") //
           .authorize(getView().getExcelDownloadAuthorizer()) //
           .get().send();
     }

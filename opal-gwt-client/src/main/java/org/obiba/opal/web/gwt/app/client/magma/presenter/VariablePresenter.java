@@ -286,8 +286,11 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     }
 
     // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder()
-        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(UriBuilders.PROJECT_PERMISSIONS_VARIABLE.create()
+            .build(table.getDatasourceName(), table.getName(), variable.getName())) //
+        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())) //
+        .post().send();
   }
 
   private String getViewLink() {
