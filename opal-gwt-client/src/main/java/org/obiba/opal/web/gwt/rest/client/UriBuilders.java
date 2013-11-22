@@ -172,6 +172,27 @@ public enum UriBuilders {
     }
   },
 
+  DATASOURCE_TABLE_VARIABLES_SEARCH {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasource", "{}", "table", "{}", "variables", "_search");
+    }
+  },
+
+  DATASOURCE_TABLE_VALUESETS_SEARCH {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasource", "{}", "table", "{}", "valueSets", "_search");
+    }
+  },
+
+  DATASOURCE_TABLE_INDEX_SCHEMA {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("datasource", "{}", "table", "{}", "index", "_schema");
+    }
+  },
+
   DATASOURCE_VIEW_VARIABLES {
     @Override
     public UriBuilder create() {
