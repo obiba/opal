@@ -265,10 +265,9 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     }
 
     private void authorizeProject() {
-      String projectUri = UriBuilder.create().segment("project", datasourceName).build();
       // export data
       ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-          .forResource(projectUri + "/commands/_copy") //
+          .forResource(UriBuilders.PROJECT_COMMANDS_EXPORT.create().build(datasourceName)) //
           .authorize(CascadingAuthorizer.newBuilder() //
               .and("/functional-units", HttpMethod.GET) //
               .and("/functional-units/entities/table", HttpMethod.GET) //
@@ -276,12 +275,12 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
           .post().send();
       // copy data
       ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-          .forResource(projectUri + "/commands/_copy") //
+          .forResource(UriBuilders.PROJECT_COMMANDS_COPY.create().build(datasourceName)) //
           .authorize(getView().getCopyDataAuthorizer()) //
           .post().send();
       // import data
       ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-          .forResource(projectUri + "/commands/_import") //
+          .forResource(UriBuilders.PROJECT_COMMANDS_IMPORT.create().build(datasourceName)) //
           .authorize(CascadingAuthorizer.newBuilder() //
               .and("/functional-units", HttpMethod.GET) //
               .and("/functional-units/entities/table", HttpMethod.GET) //

@@ -70,7 +70,7 @@ public class AddViewModalView extends ModalPopupViewWithUiHandlers<AddViewModalU
     this.translations = translations;
     tables = new TableChooser(true);
     initWidget(uiBinder.createAndBindUi(this));
-    modal.setTitle(translations.addViewLabel());
+    modal.setTitle(translations.addViewTitle());
   }
 
   @Override

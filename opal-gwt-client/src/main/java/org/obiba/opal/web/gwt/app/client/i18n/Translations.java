@@ -993,17 +993,29 @@ public interface Translations extends Constants {
   @DefaultStringValue("View")
   String viewLabel();
 
-  @Description("Add View label")
+  @Description("Add View title")
   @DefaultStringValue("Add View")
-  String addViewLabel();
+  String addViewTitle();
+
+  @Description("Add Table title")
+  @DefaultStringValue("Add Table")
+  String addTableTitle();
 
   @Description("Add Table label")
-  @DefaultStringValue("Add Table")
+  @DefaultStringValue("Add table...")
   String addTableLabel();
 
+  @Description("Add Table no storage label")
+  @DefaultStringValue("Add table (no storage)")
+  String addTableNoStorageLabel();
+
   @Description("Add Update Tables label")
-  @DefaultStringValue("Add/Update Tables")
+  @DefaultStringValue("Add/update tables from dictionary...")
   String addUpdateTablesLabel();
+
+  @Description("Add Update Tables no storage label")
+  @DefaultStringValue("Add/update tables from dictionary (no storage)")
+  String addUpdateTablesNoStorageLabel();
 
   @Description("Create Datasource Completed summary")
   @DefaultStringValue("The datasource was successfully created.")
@@ -1012,10 +1024,6 @@ public interface Translations extends Constants {
   @Description("Create Datasource Failed summary")
   @DefaultStringValue("The datasource creation has failed.")
   String datasourceCreationFailed();
-
-  @Description("Item label")
-  @DefaultStringValue("Item")
-  String itemLabel();
 
   @Description("Script label")
   @DefaultStringValue("Script")
@@ -1201,6 +1209,14 @@ public interface Translations extends Constants {
   @Description("Paste Public Key PEM label")
   @DefaultStringValue("(paste public certificate in PEM format)")
   String pastePublicKeyPEM();
+
+  @Description("Import data label")
+  @DefaultStringValue("Import Data...")
+  String importDataLabel();
+
+  @Description("Import data no storage label")
+  @DefaultStringValue("Import Data (no storage)")
+  String importDataNoStorageLabel();
 
   @Description("Data import title")
   @DefaultStringValue("Import Data")
