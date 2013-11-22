@@ -83,7 +83,7 @@ public class ReportTemplateResourceTest {
     Subject mockSubject = createMock(Subject.class);
     ThreadContext.bind(mockSubject);
     expect(mockSubject.getPrincipal()).andReturn(createMock(Principal.class)).anyTimes();
-    expect(mockSubject.isPermitted("magma:/report-template/template3:GET")).andReturn(true).anyTimes();
+    expect(mockSubject.isPermitted("rest:/report-template/template3:GET")).andReturn(true).anyTimes();
 
     replay(opalRuntimeMock, opalConfigurationServiceMock, mockSubject);
 
@@ -123,7 +123,7 @@ public class ReportTemplateResourceTest {
     Subject mockSubject = createMock(Subject.class);
     ThreadContext.bind(mockSubject);
     expect(mockSubject.getPrincipal()).andReturn(createMock(Principal.class)).anyTimes();
-    expect(mockSubject.isPermitted("magma:/report-template/template2:GET")).andReturn(true).anyTimes();
+    expect(mockSubject.isPermitted("rest:/report-template/template2:GET")).andReturn(true).anyTimes();
 
     CommandSchedulerService commandSchedulerServiceMock = createMock(CommandSchedulerService.class);
     commandSchedulerServiceMock.deleteCommand("template2", "reports");

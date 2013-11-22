@@ -30,7 +30,7 @@ public class ProjectReportTemplateResource extends ReportTemplateResource {
   @Override
   protected boolean authzReadReportTemplate(ReportTemplate template) {
     return template.hasProject() && template.getProject().equals(project) &&
-        getAuthorizer().isPermitted("magma:/project/" + project + "/report-template/" + template.getName() + ":GET");
+        getAuthorizer().isPermitted("rest:/project/" + project + "/report-template/" + template.getName() + ":GET");
   }
 
 }

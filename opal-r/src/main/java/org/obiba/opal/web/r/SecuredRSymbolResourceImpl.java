@@ -65,7 +65,7 @@ public class SecuredRSymbolResourceImpl extends AbstractRSymbolResourceImpl impl
   }
 
   private boolean areValueSetReadable(ValueTable valueTable) {
-    return SecurityUtils.getSubject().isPermitted("magma:/datasource/" + valueTable.getDatasource().getName() +
+    return SecurityUtils.getSubject().isPermitted("rest:/datasource/" + valueTable.getDatasource().getName() +
         "/table/" + valueTable.getName() + "/valueSet:GET");
   }
 }

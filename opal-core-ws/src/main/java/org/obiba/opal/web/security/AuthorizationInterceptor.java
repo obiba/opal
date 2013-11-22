@@ -67,7 +67,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
       return Response.ok().build();
     }
     if(!isWebServicePublic(resourceMethod) && !isWebServiceWithoutAuthorization(resourceMethod) &&
-        !getSubject().isPermitted("magma:" + getResourceMethodUri(request) + ":" + request.getHttpMethod())) {
+        !getSubject().isPermitted("rest:" + getResourceMethodUri(request) + ":" + request.getHttpMethod())) {
       return Response.status(Status.FORBIDDEN).build();
     }
     return null;
@@ -137,8 +137,8 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
   private void addPermissionUris(Iterable<URI> resourceUris) {
     for(URI resourceUri : resourceUris) {
       String resource = requestAttributeProvider.getResourcePath(resourceUri);
-      if(!getSubject().isPermitted("magma:" + resource + ":*")) {
-        subjectAclService.addSubjectPermission("magma", resource,
+      if(!getSubject().isPermitted("rest:" + resource + ":*")) {
+        subjectAclService.addSubjectPermission("rest", resource,
             SubjectType.USER.subjectFor(getSubject().getPrincipal().toString()), "*:GET/*");
       }
     }
@@ -157,7 +157,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
 
       @Override
       public boolean apply(String from) {
-        String perm = "magma:" + uri + ":" + from;
+        String perm = "rest:" + uri + ":" + from;
         boolean permitted = getSubject().isPermitted(perm);
         log.debug("isPermitted({}, {})=={}", getSubject().getPrincipal(), perm, permitted);
         return permitted;

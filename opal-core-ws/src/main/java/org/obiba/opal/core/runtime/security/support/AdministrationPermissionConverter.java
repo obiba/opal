@@ -39,29 +39,29 @@ public class AdministrationPermissionConverter extends OpalPermissionConverter {
     DATABASES_ALL {
       @Override
       public Iterable<String> convert(String node) {
-        return Lists.newArrayList(magmaConvert("/jdbc/databases", "*:POST/*"));
+        return Lists.newArrayList(toRest("/jdbc/databases", "*:POST/*"));
       }
 
     },
     R_SESSION_ALL {
       @Override
       public Iterable<String> convert(String node) {
-        return Lists.newArrayList(magmaConvert("/r/session", "*:GET/*"));
+        return Lists.newArrayList(toRest("/r/session", "*:GET/*"));
       }
 
     },
     DATASHIELD_ALL {
       @Override
       public Iterable<String> convert(String node) {
-        return Lists.newArrayList(magmaConvert("/datashield", "*:GET/*"));
+        return Lists.newArrayList(toRest("/datashield", "*:GET/*"));
       }
 
     },
     DATASHIELD_SESSION_ALL {
       @Override
       public Iterable<String> convert(String node) {
-        return Lists.newArrayList(magmaConvert("/datashield/session", "*:GET/*"), //
-            magmaConvert("/datashield/env", "GET:GET/GET"));
+        return Lists.newArrayList(toRest("/datashield/session", "*:GET/*"), //
+            toRest("/datashield/env", "GET:GET/GET"));
       }
 
     };

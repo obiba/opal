@@ -67,7 +67,7 @@ public abstract class AbstractReportTemplateResource {
   }
 
   protected boolean authzReadReportTemplate(ReportTemplate template) {
-    return authorizer.isPermitted("magma:/report-template/" + template.getName() + ":GET");
+    return authorizer.isPermitted("rest:/report-template/" + template.getName() + ":GET");
   }
 
 }

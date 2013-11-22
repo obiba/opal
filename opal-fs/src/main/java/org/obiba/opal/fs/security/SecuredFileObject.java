@@ -133,7 +133,7 @@ class SecuredFileObject extends DecoratedFileObject {
   }
 
   private boolean isPermitted(FileObject file, String method) {
-    String permission = "magma:/files" + file.getName().getPath() + ":" + method;
+    String permission = "rest:/files" + file.getName().getPath() + ":" + method;
     log.trace("checking permission {}", permission);
     return authorizer.isPermitted(permission);
   }

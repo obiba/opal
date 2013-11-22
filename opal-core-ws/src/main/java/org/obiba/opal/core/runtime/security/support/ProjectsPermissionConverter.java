@@ -43,11 +43,11 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/project/(.+)");
-        return Lists.newArrayList(magmaConvert("/datasource/{0}", "*:GET/*", args), //
-            magmaConvert("/functional-units/unit", "GET:GET/GET"), //
-            magmaConvert("/functional-units/entities/table", "GET"),//
-            magmaConvert("/project/{0}", "*:GET/*", args),//
-            magmaConvert("/files/projects/{0}", "*:GET/*", args));
+        return Lists.newArrayList(toRest("/datasource/{0}", "*:GET/*", args), //
+            toRest("/functional-units/unit", "GET:GET/GET"), //
+            toRest("/functional-units/entities/table", "GET"),//
+            toRest("/project/{0}", "*:GET/*", args),//
+            toRest("/files/projects/{0}", "*:GET/*", args));
       }
 
     },
@@ -56,13 +56,13 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)");
-        return Lists.newArrayList(magmaConvert("/datasource/{0}", "*:GET/*", args), //
-            magmaConvert("/functional-units/unit", "GET:GET/GET"), //
-            magmaConvert("/functional-units/entities/table", "GET"),//
-            magmaConvert("/project/{0}", "GET:GET/*", args),//
-            magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "POST:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "PUT:GET/*", args));
+        return Lists.newArrayList(toRest("/datasource/{0}", "*:GET/*", args), //
+            toRest("/functional-units/unit", "GET:GET/GET"), //
+            toRest("/functional-units/entities/table", "GET"),//
+            toRest("/project/{0}", "GET:GET/*", args),//
+            toRest("/files/projects/{0}", "GET:GET/*", args), //
+            toRest("/files/projects/{0}", "POST:GET/*", args), //
+            toRest("/files/projects/{0}", "PUT:GET/*", args));
       }
 
     },
@@ -70,14 +70,14 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)");
-        return Lists.newArrayList(magmaConvert("/datasource/{0}/tables", "GET:GET", args), //
-            magmaConvert("/datasource/{0}/tables", "POST:GET", args),//
-            magmaConvert("/datasource/{0}/views", "POST:GET", args),//
-            magmaConvert("/project/{0}", "GET:GET", args),//
-            magmaConvert("/project/{0}/summary", "GET:GET", args),//
-            magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "POST:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "PUT:GET/*", args));
+        return Lists.newArrayList(toRest("/datasource/{0}/tables", "GET:GET", args), //
+            toRest("/datasource/{0}/tables", "POST:GET", args),//
+            toRest("/datasource/{0}/views", "POST:GET", args),//
+            toRest("/project/{0}", "GET:GET", args),//
+            toRest("/project/{0}/summary", "GET:GET", args),//
+            toRest("/files/projects/{0}", "GET:GET/*", args), //
+            toRest("/files/projects/{0}", "POST:GET/*", args), //
+            toRest("/files/projects/{0}", "PUT:GET/*", args));
       }
     },
     TABLE_ALL {
@@ -86,19 +86,19 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
         boolean isView = node.contains("/view/");
         String[] args = isView ? args(node, "/datasource/(.+)/view/(.+)") : args(node, "/datasource/(.+)/table/(.+)");
 
-        List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}", "*:GET/*", args),//
-            magmaConvert("/project/{0}/commands/_export", "POST:GET", args),//
-            magmaConvert("/project/{0}/commands/_copy", "POST:GET", args),//
-            magmaConvert("/project/{0}/report-templates", "GET:GET", args),//
-            magmaConvert("/project/{0}/report-templates", "POST:GET", args),//
-            magmaConvert("/project/{0}", "GET:GET", args),//
-            magmaConvert("/project/{0}/summary", "GET:GET", args),//
-            magmaConvert("/project/{0}/permissions/table/{1}", "*:GET/*", args),//
-            magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "POST:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "PUT:GET/*", args));
+        List<String> perms = Lists.newArrayList(toRest("/datasource/{0}/table/{1}", "*:GET/*", args),//
+            toRest("/project/{0}/commands/_export", "POST:GET", args),//
+            toRest("/project/{0}/commands/_copy", "POST:GET", args),//
+            toRest("/project/{0}/report-templates", "GET:GET", args),//
+            toRest("/project/{0}/report-templates", "POST:GET", args),//
+            toRest("/project/{0}", "GET:GET", args),//
+            toRest("/project/{0}/summary", "GET:GET", args),//
+            toRest("/project/{0}/permissions/table/{1}", "*:GET/*", args),//
+            toRest("/files/projects/{0}", "GET:GET/*", args), //
+            toRest("/files/projects/{0}", "POST:GET/*", args), //
+            toRest("/files/projects/{0}", "PUT:GET/*", args));
 
-        if(isView) perms.add(magmaConvert("/datasource/{0}/view/{1}", "*:GET/*", args));
+        if(isView) perms.add(toRest("/datasource/{0}/view/{1}", "*:GET/*", args));
 
         return perms;
       }
@@ -110,16 +110,16 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
         boolean isView = node.contains("/view/");
         String[] args = isView ? args(node, "/datasource/(.+)/view/(.+)") : args(node, "/datasource/(.+)/table/(.+)");
 
-        List<String> perms = Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}", "GET:GET", args),//
-            magmaConvert("/datasource/{0}/table/{1}/variable", "GET:GET/GET", args),//
-            magmaConvert("/datasource/{0}/table/{1}/variables", "GET:GET/GET", args),//
-            magmaConvert("/datasource/{0}/table/{1}/facet", "GET:GET/GET", args),//
-            magmaConvert("/datasource/{0}/table/{1}/facets/_search", "POST:GET", args),//
-            magmaConvert("/datasource/{0}/table/{1}/variable/_transient/summary", "POST", args),//
-            magmaConvert("/project/{0}", "GET:GET", args),//
-            magmaConvert("/project/{0}/summary", "GET:GET", args));
+        List<String> perms = Lists.newArrayList(toRest("/datasource/{0}/table/{1}", "GET:GET", args),//
+            toRest("/datasource/{0}/table/{1}/variable", "GET:GET/GET", args),//
+            toRest("/datasource/{0}/table/{1}/variables", "GET:GET/GET", args),//
+            toRest("/datasource/{0}/table/{1}/facet", "GET:GET/GET", args),//
+            toRest("/datasource/{0}/table/{1}/facets/_search", "POST:GET", args),//
+            toRest("/datasource/{0}/table/{1}/variable/_transient/summary", "POST", args),//
+            toRest("/project/{0}", "GET:GET", args),//
+            toRest("/project/{0}/summary", "GET:GET", args));
 
-        if(isView) perms.add(magmaConvert("/datasource/{0}/view/{1}/xml", "GET:GET", args));
+        if(isView) perms.add(toRest("/datasource/{0}/view/{1}/xml", "GET:GET", args));
 
         return perms;
       }
@@ -132,18 +132,18 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
         String[] args = isView ? args(node, "/datasource/(.+)/view/(.+)") : args(node, "/datasource/(.+)/table/(.+)");
 
         List<String> perms = Lists
-            .newArrayList(magmaConvert("/datasource/{0}/table/{1}/valueSet", "GET:GET/GET", args),//
-                magmaConvert("/datasource/{0}/table/{1}/entities", "GET", args),//
-                magmaConvert("/datasource/{0}/table/{1}/index", "GET:GET/GET", args), //
-                magmaConvert("/datasource/{0}/table/{1}/index/_search", "GET", args),//
-                magmaConvert("/datasource/{0}/table/{1}/index/_search", "POST", args),//
-                magmaConvert("/datasource/{0}/table/{1}/index/_schema", "GET", args),//
-                magmaConvert("/project/{0}/commands/_export", "POST:GET", args),//
-                magmaConvert("/project/{0}/commands/_copy", "POST:GET", args),//
-                magmaConvert("/project/{0}/report-templates", "GET:GET", args),//
-                magmaConvert("/project/{0}/report-templates", "POST:GET", args),//
-                magmaConvert("/project/{0}", "GET:GET", args),//
-                magmaConvert("/project/{0}/summary", "GET:GET", args));
+            .newArrayList(toRest("/datasource/{0}/table/{1}/valueSet", "GET:GET/GET", args),//
+                toRest("/datasource/{0}/table/{1}/entities", "GET", args),//
+                toRest("/datasource/{0}/table/{1}/index", "GET:GET/GET", args), //
+                toRest("/datasource/{0}/table/{1}/index/_search", "GET", args),//
+                toRest("/datasource/{0}/table/{1}/index/_search", "POST", args),//
+                toRest("/datasource/{0}/table/{1}/index/_schema", "GET", args),//
+                toRest("/project/{0}/commands/_export", "POST:GET", args),//
+                toRest("/project/{0}/commands/_copy", "POST:GET", args),//
+                toRest("/project/{0}/report-templates", "GET:GET", args),//
+                toRest("/project/{0}/report-templates", "POST:GET", args),//
+                toRest("/project/{0}", "GET:GET", args),//
+                toRest("/project/{0}/summary", "GET:GET", args));
         Iterables.addAll(perms, TABLE_READ.convert(node));
         return perms;
       }
@@ -158,23 +158,23 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
         List<String> perms;
 
         if(isView) {
-          perms = Lists.newArrayList(magmaConvert("/datasource/{0}/view/{1}", "PUT:GET", args),//
-              magmaConvert("/datasource/{0}/view/{1}/variables", "POST:GET/*", args),//
-              magmaConvert("/datasource/{0}/view/{1}/variables", "DELETE:GET/*", args),//
-              magmaConvert("/datasource/{0}/view/{1}/from/variable/_transient/summary", "GET:GET", args),//
-              magmaConvert("/datasource/{0}/view/{1}/from/variable/_transient/summary", "POST:GET", args),//
-              magmaConvert("/datasource/{0}/view/{1}/from/variable/_transient/_compile", "POST:GET", args));
+          perms = Lists.newArrayList(toRest("/datasource/{0}/view/{1}", "PUT:GET", args),//
+              toRest("/datasource/{0}/view/{1}/variables", "POST:GET/*", args),//
+              toRest("/datasource/{0}/view/{1}/variables", "DELETE:GET/*", args),//
+              toRest("/datasource/{0}/view/{1}/from/variable/_transient/summary", "GET:GET", args),//
+              toRest("/datasource/{0}/view/{1}/from/variable/_transient/summary", "POST:GET", args),//
+              toRest("/datasource/{0}/view/{1}/from/variable/_transient/_compile", "POST:GET", args));
         } else {
-          perms = Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}", "PUT:GET", args),//
-              magmaConvert("/datasource/{0}/table/{1}/variables", "POST:GET/*", args),//
-              magmaConvert("/datasource/{0}/table/{1}/variables", "DELETE:GET", args));
+          perms = Lists.newArrayList(toRest("/datasource/{0}/table/{1}", "PUT:GET", args),//
+              toRest("/datasource/{0}/table/{1}/variables", "POST:GET/*", args),//
+              toRest("/datasource/{0}/table/{1}/variables", "DELETE:GET", args));
         }
 
-        perms.addAll(Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}/index", "GET:GET", args),//
-            magmaConvert("/datasource/{0}/table/{1}/index/schedule", "GET:GET", args),//
-            magmaConvert("/files/projects/{0}", "GET:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "POST:GET/*", args), //
-            magmaConvert("/files/projects/{0}", "PUT:GET/*", args)));
+        perms.addAll(Lists.newArrayList(toRest("/datasource/{0}/table/{1}/index", "GET:GET", args),//
+            toRest("/datasource/{0}/table/{1}/index/schedule", "GET:GET", args),//
+            toRest("/files/projects/{0}", "GET:GET/*", args), //
+            toRest("/files/projects/{0}", "POST:GET/*", args), //
+            toRest("/files/projects/{0}", "PUT:GET/*", args)));
 
         Iterables.addAll(perms, TABLE_READ.convert(node));
         return perms;
@@ -188,7 +188,7 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
         String[] args = isView ? args(node, "/datasource/(.+)/view/(.+)") : args(node, "/datasource/(.+)/table/(.+)");
 
         List<String> perms = Lists.newArrayList();
-        if (isView) perms.add(magmaConvert("/datasource/{0}/view/{1}/from/valueSets/variable/_transient", "POST", args));
+        if (isView) perms.add(toRest("/datasource/{0}/view/{1}/from/valueSets/variable/_transient", "POST", args));
         Iterables.addAll(perms, TABLE_VALUES.convert(node));
         Iterables.addAll(perms, TABLE_EDIT.convert(node));
         return perms;
@@ -199,10 +199,10 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
       @Override
       public Iterable<String> convert(String node) {
         String[] args = args(node, "/datasource/(.+)/table/(.+)/variable/(.+)");
-        return Lists.newArrayList(magmaConvert("/datasource/{0}/table/{1}/variable/{2}", "GET:GET/GET", args),//
-            magmaConvert("/datasource/{0}/table/{1}/variable/_transient/summary", "POST:GET", args),//
-            magmaConvert("/project/{0}", "GET:GET", args),//
-            magmaConvert("/project/{0}/summary", "GET:GET", args));
+        return Lists.newArrayList(toRest("/datasource/{0}/table/{1}/variable/{2}", "GET:GET/GET", args),//
+            toRest("/datasource/{0}/table/{1}/variable/_transient/summary", "POST:GET", args),//
+            toRest("/project/{0}", "GET:GET", args),//
+            toRest("/project/{0}/summary", "GET:GET", args));
       }
     };
 

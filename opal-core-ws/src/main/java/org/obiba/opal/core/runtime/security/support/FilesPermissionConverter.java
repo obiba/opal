@@ -44,8 +44,8 @@ public class FilesPermissionConverter extends OpalPermissionConverter {
       Iterable<String> convert(String node) {
         String[] args = args(node, "/files/(.+)");
         return args.length == 0
-            ? Lists.newArrayList(magmaConvert("/files", "*:GET/*"))
-            : Lists.newArrayList(magmaConvert("/files/{0}", "*:GET/*", args));
+            ? Lists.newArrayList(toRest("/files", "*:GET/*"))
+            : Lists.newArrayList(toRest("/files/{0}", "*:GET/*", args));
       }
     },
     /**
@@ -56,9 +56,9 @@ public class FilesPermissionConverter extends OpalPermissionConverter {
       Iterable<String> convert(String node) {
         String[] args = args(node, "/files/(.+)");
         return args.length == 0
-            ? Lists.newArrayList(magmaConvert("/files", "GET:GET/*"), magmaConvert("/files", "POST:GET/*"))
-            : Lists.newArrayList(magmaConvert("/files/{0}", "GET:GET/*", args),
-                magmaConvert("/files/{0}", "POST:GET/*", args));
+            ? Lists.newArrayList(toRest("/files", "GET:GET/*"), toRest("/files", "POST:GET/*"))
+            : Lists.newArrayList(toRest("/files/{0}", "GET:GET/*", args),
+                toRest("/files/{0}", "POST:GET/*", args));
       }
     },
     /**
@@ -69,8 +69,8 @@ public class FilesPermissionConverter extends OpalPermissionConverter {
       Iterable<String> convert(String node) {
         String[] args = args(node, "/files/(.+)");
         return args.length == 0
-            ? Lists.newArrayList(magmaConvert("/files", "GET:GET/GET"))
-            : Lists.newArrayList(magmaConvert("/files/{0}", "GET:GET/GET", args));
+            ? Lists.newArrayList(toRest("/files", "GET:GET/GET"))
+            : Lists.newArrayList(toRest("/files/{0}", "GET:GET/GET", args));
       }
 
     };

@@ -20,19 +20,19 @@ public class FilesPermissionConverterTest extends OpalPermissionConverterTest<Fi
   @Test
   public void testFilesAll() {
     testConversion("/files", FilesPermissionConverter.Permission.FILES_ALL, //
-        "magma:/files:*:GET/*");
+        "rest:/files:*:GET/*");
     testConversion("/files/patate", FilesPermissionConverter.Permission.FILES_ALL, //
-        "magma:/files/patate:*:GET/*");
+        "rest:/files/patate:*:GET/*");
   }
 
   @Test
   public void testFilesShare() {
     testConversion("/files", FilesPermissionConverter.Permission.FILES_SHARE, //
-        "magma:/files:GET:GET/*", //
-        "magma:/files:POST:GET/*");
+        "rest:/files:GET:GET/*", //
+        "rest:/files:POST:GET/*");
     testConversion("/files/patate", FilesPermissionConverter.Permission.FILES_SHARE, //
-        "magma:/files/patate:GET:GET/*", //
-        "magma:/files/patate:POST:GET/*");
+        "rest:/files/patate:GET:GET/*", //
+        "rest:/files/patate:POST:GET/*");
   }
 
   @Override

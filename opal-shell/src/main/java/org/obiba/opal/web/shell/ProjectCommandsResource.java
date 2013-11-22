@@ -139,20 +139,20 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
 
   private void ensureTableValuesAccess(String table) {
     MagmaEngineReferenceResolver resolver = MagmaEngineTableResolver.valueOf(table);
-    if(!SecurityUtils.getSubject().isPermitted("magma:/datasource/" + resolver.getDatasourceName() + "/table/" +
+    if(!SecurityUtils.getSubject().isPermitted("rest:/datasource/" + resolver.getDatasourceName() + "/table/" +
         resolver.getTableName() + "/valueSet:GET:GET/GET")) {
       throw new InvalidRequestException("AccessDeniedToTableValues", table);
     }
   }
 
   private void ensureDatasourceWriteAccess(String datasource) {
-    if(!SecurityUtils.getSubject().isPermitted("magma:/datasource/" + datasource + "/commands/_import:POST")) {
+    if(!SecurityUtils.getSubject().isPermitted("rest:/datasource/" + datasource + "/commands/_import:POST")) {
       throw new InvalidRequestException("DataWriteNotAuthorized", datasource);
     }
   }
 
   private void ensureFileWriteAccess(String path) {
-    if(!SecurityUtils.getSubject().isPermitted("magma:/file" + path + ":POST")) {
+    if(!SecurityUtils.getSubject().isPermitted("rest:/file" + path + ":POST")) {
       throw new InvalidRequestException("FileWriteNotAuthorized", path);
     }
   }
