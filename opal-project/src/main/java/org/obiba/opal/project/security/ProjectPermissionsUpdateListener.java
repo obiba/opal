@@ -7,6 +7,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceUpdateListener;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableUpdateListener;
+import org.obiba.magma.Variable;
 import org.obiba.opal.core.service.SubjectAclService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -45,6 +46,21 @@ public class ProjectPermissionsUpdateListener implements DatasourceUpdateListene
   }
 
   @Override
+  public void onRename(@Nonnull ValueTable vt, Variable v, String newName) {
+    Iterable<SubjectAclService.Permissions> perms = subjectAclService
+        .getNodeHierarchyPermissions("opal", getNode(vt, v), null);
+    onDelete(vt);
+    String prefix = "/variable/";
+    String originalStr = prefix + v.getName();
+    String newStr = prefix + newName;
+    for(SubjectAclService.Permissions perm : perms) {
+      subjectAclService
+          .addSubjectPermissions(perm.getDomain(), perm.getNode().replace(originalStr, newStr), perm.getSubject(),
+              perm.getPermissions());
+    }
+  }
+
+  @Override
   public void onDelete(@Nonnull ValueTable vt) {
     // remove all permissions related to the table
     subjectAclService.deleteNodePermissions(getNode(vt));
@@ -53,6 +69,10 @@ public class ProjectPermissionsUpdateListener implements DatasourceUpdateListene
   private String getNode(ValueTable vt) {
     return "/datasource/" + vt.getDatasource().getName() +
         (vt.isView() ? "/view/" + vt.getName() : "/table/" + vt.getName());
+  }
+
+  private String getNode(ValueTable vt, Variable v) {
+    return getNode(vt) + "/variable/" + v;
   }
 
 }
