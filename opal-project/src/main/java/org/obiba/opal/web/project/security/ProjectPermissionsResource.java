@@ -33,9 +33,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 @Component
 @Scope("request")
@@ -80,6 +82,34 @@ public class ProjectPermissionsResource extends AbstractPermissionsResource {
                 new MagmaPermissionsPredicate()));
 
     return Iterables.transform(permissions, PermissionsToAclFunction.INSTANCE);
+  }
+
+  @GET
+  @Path("/subjects")
+  public Iterable<Opal.Subject> getSubjects(@QueryParam("type") SubjectAclService.SubjectType type) {
+
+    // make sure project exists
+    projectService.getProject(name);
+
+    Iterable<SubjectAclService.Permissions> permissions = Iterables
+        .concat(subjectAclService.getNodeHierarchyPermissions(DOMAIN, getNode(), type), Iterables
+            .filter(subjectAclService.getNodeHierarchyPermissions(DOMAIN, "/datasource/" + name, type),
+                new MagmaPermissionsPredicate()));
+
+    List<SubjectAclService.Subject> subjects = Lists.newArrayList();
+    for (SubjectAclService.Permissions perms : permissions) {
+      SubjectAclService.Subject subject = perms.getSubject();
+      if (!subjects.contains(subject)) subjects.add(subject);
+    }
+
+    return Iterables.transform(subjects, new Function<SubjectAclService.Subject, Opal.Subject>() {
+      @Nullable
+      @Override
+      public Opal.Subject apply(@Nullable SubjectAclService.Subject input) {
+        return Opal.Subject.newBuilder().setPrincipal(input.getPrincipal())
+            .setType(Opal.Subject.SubjectType.valueOf(input.getType().name())).build();
+      }
+    });
   }
 
   /**
