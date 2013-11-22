@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.administration.database.presenter;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
@@ -21,7 +22,9 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.database.MongoDbSettingsDto;
 import org.obiba.opal.web.model.client.database.SqlSettingsDto;
+import org.obiba.opal.web.model.client.magma.VariableEntityDto;
 
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -72,6 +75,7 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
         if(dto.getUsedForIdentifiers()) {
           databaseDto = dto;
           getView().setDatabase(dto);
+          getView().enableDeletion(true);
         }
       }
     });
@@ -82,6 +86,7 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
         if(dto.getUsedForIdentifiers()) {
           databaseDto = dto;
           getView().setDatabase(dto);
+          refreshDeletionCapability();
         }
       }
     });
@@ -117,6 +122,22 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
     DatabaseAdministrationPresenter.testConnection(getEventBus(), IDENTIFIERS_DATABASE_NAME);
   }
 
+  @Override
+  public void deleteDatabase() {
+    ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
+        .forResource(DatabaseResources.database(databaseDto.getName())) //
+        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            refresh();
+            getEventBus().fireEvent(new DatabaseDeletedEvent(databaseDto));
+          }
+
+        }) //
+        .delete().send();
+  }
+
   private DatabaseDto createDefaultIdentifiersDatabaseDto() {
     DatabaseDto dto = DatabaseDto.create();
     dto.setUsedForIdentifiers(true);
@@ -143,11 +164,31 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
             getView().setDatabase(null);
           }
         }).get().send();
+
+    refreshDeletionCapability();
+  }
+
+  private void refreshDeletionCapability() {
+    ResourceRequestBuilderFactory.<JsArray<VariableEntityDto>>newBuilder() //
+        .forResource("/functional-units/entities/table/entities") //
+        .withCallback(new ResourceCallback<JsArray<VariableEntityDto>>() {
+          @Override
+          public void onResource(Response response, @Nullable JsArray<VariableEntityDto> entities) {
+            getView().enableDeletion(entities == null || entities.length() == 0);
+          }
+        }) //
+        .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().enableDeletion(false);
+          }
+        }).get().send();
   }
 
   public interface Display extends View, HasUiHandlers<IdentifiersDatabaseUiHandlers> {
 
     void setDatabase(@Nullable DatabaseDto database);
+    void enableDeletion(boolean value);
   }
 
 }

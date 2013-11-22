@@ -12,4 +12,5 @@ public interface IdentifiersDatabaseUiHandlers extends UiHandlers {
 
   void testConnection();
 
+  void deleteDatabase();
 }

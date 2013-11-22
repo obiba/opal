@@ -4,7 +4,6 @@ import org.obiba.opal.web.gwt.app.client.event.SessionCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.event.SessionEndedEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ConfirmationPresenter;
-import org.obiba.opal.web.gwt.app.client.presenter.UnhandledResponseNotificationPresenter;
 import org.obiba.opal.web.gwt.rest.client.DefaultResourceAuthorizationRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.DefaultResourceRequestBuilder;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
@@ -16,7 +15,6 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.event.RequestCredentialsExpiredEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestErrorEvent;
 import org.obiba.opal.web.gwt.rest.client.event.RequestEventBus;
-import org.obiba.opal.web.gwt.rest.client.event.UnhandledResponseEvent;
 import org.obiba.opal.web.model.client.database.DatabasesStatusDto;
 import org.obiba.opal.web.model.client.opal.Subject;
 
@@ -33,7 +31,6 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Bootstrapper;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
-import com.gwtplatform.mvp.client.proxy.RevealRootPopupContentEvent;
 
 public class OpalBootstrapperImpl implements Bootstrapper {
 
@@ -91,7 +88,7 @@ public class OpalBootstrapperImpl implements Bootstrapper {
       ResourceRequestBuilderFactory.<Subject>newBuilder().forResource(builder.build()).get() //
           .withCallback(new SubjectResourceCallback()).send();
     } else {
-      placeManager.revealCurrentPlace();
+      revealCurrentPlace();
     }
   }
 
@@ -116,15 +113,7 @@ public class OpalBootstrapperImpl implements Bootstrapper {
     eventBus.addHandler(SessionCreatedEvent.getType(), new SessionCreatedEvent.Handler() {
       @Override
       public void onSessionCreated(SessionCreatedEvent event) {
-        ResourceRequestBuilderFactory.<DatabasesStatusDto>newBuilder()
-            .forResource(UriBuilder.create().segment("system", "status", "databases").build()).get()
-            .withCallback(new DatabasesStatusResourceCallback()).withCallback(new ResponseCodeCallback() {
-          @Override
-          public void onResponseCode(Request request, Response response) {
-            placeManager.revealCurrentPlace();
-          }
-        }, Response.SC_FORBIDDEN)//
-            .send();
+        revealCurrentPlace();
       }
     });
 
@@ -155,12 +144,24 @@ public class OpalBootstrapperImpl implements Bootstrapper {
 
   }
 
+  private void revealCurrentPlace() {
+    ResourceRequestBuilderFactory.<DatabasesStatusDto>newBuilder()
+        .forResource(UriBuilder.create().segment("system", "status", "databases").build()).get()
+        .withCallback(new DatabasesStatusResourceCallback()).withCallback(new ResponseCodeCallback() {
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        placeManager.revealCurrentPlace();
+      }
+    }, Response.SC_FORBIDDEN)//
+        .send();
+  }
+
   private class SubjectResourceCallback implements ResourceCallback<Subject> {
     @Override
     public void onResource(Response response, Subject subject) {
       if(response.getStatusCode() == Response.SC_OK) {
         requestCredentials.setUsername(subject.getPrincipal());
-        placeManager.revealCurrentPlace();
+        revealCurrentPlace();
       } else {
         eventBus.fireEvent(new SessionEndedEvent());
       }
