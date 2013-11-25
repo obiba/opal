@@ -5,13 +5,18 @@ import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.github.gwtbootstrap.client.ui.HelpBlock;
 import com.github.gwtbootstrap.client.ui.PasswordTextBox;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
 import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.dom.client.HasKeyUpHandlers;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Timer;
@@ -37,6 +42,12 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
   @UiField
   Button login;
 
+  @UiField
+  ControlGroup passwordGroup;
+
+  @UiField
+  HelpBlock passwordHelp;
+
   private final Translations translations;
 
   @Inject
@@ -44,6 +55,7 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
     userName.setFocus(true);
+    password.addKeyPressHandler(new CapsLockTestKeyPressesHandler());
   }
 
   @Override
@@ -105,6 +117,21 @@ public class LoginView extends ViewImpl implements LoginPresenter.Display {
 
   private void clearPassword() {
     getPassword().setValue("");
+  }
+
+  private final class CapsLockTestKeyPressesHandler implements KeyPressHandler {
+
+    @Override
+    public void onKeyPress(KeyPressEvent event) {
+      int code = event.getUnicodeCharCode();
+      if ((!event.isShiftKeyDown() && (code >= 65 && code <= 90)) ||
+          (event.isShiftKeyDown() && (code >= 97 && code <= 122))) {
+        passwordGroup.setType(ControlGroupType.WARNING);
+        passwordHelp.setVisible(true);
+      } else {
+        passwordGroup.setType(ControlGroupType.NONE);
+        passwordHelp.setVisible(false);
+      }    }
   }
 
 }

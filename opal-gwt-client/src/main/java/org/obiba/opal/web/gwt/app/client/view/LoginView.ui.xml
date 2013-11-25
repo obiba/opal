@@ -19,11 +19,14 @@
               </b:ControlLabel>
               <b:TextBox ui:field="userName"/>
             </b:ControlGroup>
-            <b:ControlGroup>
+            <b:ControlGroup ui:field="passwordGroup">
               <b:ControlLabel>
                 <ui:msg description="Password field label">Password</ui:msg>
               </b:ControlLabel>
               <b:PasswordTextBox ui:field="password"/>
+              <b:HelpBlock ui:field="passwordHelp" visible="false">
+                <ui:msg description="Password Caps-Lock label">Caps lock is on</ui:msg>
+              </b:HelpBlock>
             </b:ControlGroup>
             <b:Button ui:field="login" type="INFO">
               <ui:msg description="Sign in button label">Sign In</ui:msg>
