@@ -1883,6 +1883,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Title")
   String titleLabel();
 
+  @Description("Package label")
+  @DefaultStringValue("Package")
+  String packageLabel();
+
   @Description("Version label")
   @DefaultStringValue("Version")
   String versionLabel();
