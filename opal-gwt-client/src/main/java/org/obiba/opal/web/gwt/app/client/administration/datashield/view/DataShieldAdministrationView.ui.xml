@@ -82,7 +82,7 @@
     </g:FlowPanel>
 
     <g:VerticalPanel width="100%" addStyleNames="content">
-      <b:Button ui:field="addMethodButton" icon="PLUS">
+      <b:Button ui:field="addMethodButton" icon="PLUS" type="INFO">
         <ui:msg description="Add DataShield method label">Add Method</ui:msg>
       </b:Button>
       <b:SimplePager ui:field="methodsTablePager" location="RIGHT" addStyleNames="pull-right" visible="false"/>

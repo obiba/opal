@@ -17,7 +17,7 @@
     ui:generateLocales="default">
 
   <g:FlowPanel ui:field="packagesPanel">
-    <b:Button ui:field="addPackageButton" icon="PLUS" styleName="btn" addStyleNames="bottom-margin">
+    <b:Button ui:field="addPackageButton" icon="PLUS" type="INFO" styleName="btn" addStyleNames="bottom-margin">
       <ui:msg description="Add DataShield Package label">Add Package</ui:msg>
     </b:Button>
     <o:Table ui:field="packagesTable" visible="false"/>
