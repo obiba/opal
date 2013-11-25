@@ -29,8 +29,9 @@ public class RFunctionDataShieldMethodConverter extends AbstractDataShieldMethod
 
   @Override
   public DataShieldMethod parse(DataShieldMethodDto dto) {
-    return new RFunctionDataShieldMethod(dto.getName(),
-        dto.getExtension(RFunctionDataShieldMethodDto.method).getFunc());
+    DataShield.RFunctionDataShieldMethodDto funcDto = dto.getExtension(RFunctionDataShieldMethodDto.method);
+    return funcDto.hasRPackage() ? new RFunctionDataShieldMethod(dto.getName(), funcDto.getFunc(),
+        funcDto.getRPackage(), funcDto.getVersion()) : new RFunctionDataShieldMethod(dto.getName(), funcDto.getFunc());
   }
 
   @Override
@@ -41,10 +42,13 @@ public class RFunctionDataShieldMethodConverter extends AbstractDataShieldMethod
   @Override
   public DataShieldMethodDto asDto(DataShieldMethod method) {
     RFunctionDataShieldMethod rFunctionMethod = (RFunctionDataShieldMethod) method;
-    DataShield.RFunctionDataShieldMethodDto methodDto = DataShield.RFunctionDataShieldMethodDto.newBuilder()
-        .setFunc(rFunctionMethod.getFunction()).build();
-    return getDataShieldMethodDtoBuilder(method).setExtension(DataShield.RFunctionDataShieldMethodDto.method, methodDto)
-        .build();
+    RFunctionDataShieldMethodDto.Builder builder = DataShield.RFunctionDataShieldMethodDto.newBuilder()
+        .setFunc(rFunctionMethod.getFunction());
+    if(rFunctionMethod.hasRPackage()) {
+      builder.setRPackage(rFunctionMethod.getRPackage());
+      builder.setVersion(rFunctionMethod.getVersion());
+    }
+    return getDataShieldMethodDtoBuilder(method).setExtension(DataShield.RFunctionDataShieldMethodDto.method, builder.build()).build();
   }
 
 }

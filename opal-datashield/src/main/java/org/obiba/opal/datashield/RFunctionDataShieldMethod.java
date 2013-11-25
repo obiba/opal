@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.datashield;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.datashield.cfg.DatashieldConfiguration.Environment;
 import org.obiba.opal.r.ROperation;
 import org.obiba.opal.r.ROperations;
@@ -19,13 +21,28 @@ public class RFunctionDataShieldMethod implements DataShieldMethod {
 
   private String function;
 
-  public RFunctionDataShieldMethod() {
+  /**
+   * R package that defined this method.
+   */
+  private String rPackage;
 
+  /**
+   * Version of the R package.
+   */
+  private String version;
+
+  public RFunctionDataShieldMethod() {
   }
 
   public RFunctionDataShieldMethod(String name, String function) {
+    this(name, function, null, null);
+  }
+
+  public RFunctionDataShieldMethod(String name, String function, String rPackage, String version) {
     this.name = name;
     this.function = function;
+    this.rPackage = rPackage;
+    this.version = version;
   }
 
   @Override
@@ -35,6 +52,20 @@ public class RFunctionDataShieldMethod implements DataShieldMethod {
 
   public String getFunction() {
     return function;
+  }
+
+  public boolean hasRPackage() {
+    return rPackage != null;
+  }
+
+  @Nullable
+  public String getRPackage() {
+    return rPackage;
+  }
+
+  @Nullable
+  public String getVersion() {
+    return version;
   }
 
   @Override

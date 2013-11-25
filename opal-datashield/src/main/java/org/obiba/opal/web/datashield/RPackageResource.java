@@ -42,6 +42,8 @@ public abstract class RPackageResource {
 
   private static final Logger log = LoggerFactory.getLogger(RPackageResource.class);
 
+  protected static final String VERSION = "Version";
+
   protected static final String AGGREGATE_METHODS = "AggregateMethods";
 
   protected static final String ASSIGN_METHODS = "AssignMethods";
