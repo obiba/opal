@@ -216,8 +216,13 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     updateVariableDisplay(variableDto);
     updateMenuDisplay(previous, next);
     updateDerivedVariableDisplay();
+    updateValuesDisplay();
 
     authorize();
+  }
+
+  private void updateValuesDisplay() {
+    valuesTablePresenter.setTable(table, variable);
   }
 
   private void updateVariableDisplay(VariableDto variableDto) {
@@ -281,8 +286,11 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     }
 
     // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder()
-        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(UriBuilders.PROJECT_PERMISSIONS_VARIABLE.create()
+            .build(table.getDatasourceName(), table.getName(), variable.getName())) //
+        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())) //
+        .post().send();
   }
 
   private String getViewLink() {
@@ -397,7 +405,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   @Override
   public void onShowValues() {
-    valuesTablePresenter.setTable(table, variable);
+    updateValuesDisplay();
   }
 
   @Override

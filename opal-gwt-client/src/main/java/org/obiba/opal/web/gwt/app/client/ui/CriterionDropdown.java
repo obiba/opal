@@ -10,14 +10,20 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
+import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.Divider;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -26,39 +32,54 @@ import com.google.gwt.user.client.ui.Widget;
 
 public abstract class CriterionDropdown extends DropdownButton {
 
-  protected VariableDto variable;
+  static final Translations translations = GWT.create(Translations.class);
 
-  protected QueryResultDto queryResult;
+  VariableDto variable;
 
-  private ListItem radioControls;
+  QueryResultDto queryResult;
 
-  protected Widget specificControls;
+  String fieldName;
 
-  public CriterionDropdown(VariableDto variableDto, QueryResultDto termDto) {
+  private final ListItem radioControls = new ListItem();
+
+  CriterionDropdown(VariableDto variableDto, @Nonnull String fieldName, @Nullable QueryResultDto termDto) {
     variable = variableDto;
+    this.fieldName = fieldName;
     queryResult = termDto;
 
-    updateCriterionFilter("All");
+    updateCriterionFilter(translations.criterionFiltersMap().get("all"));
 
-    radioControls = new ListItem();
     radioControls.addStyleName("controls");
 
     int noEmpty = 0;
-    for(int i = 0; i < queryResult.getFacetsArray().length(); i++) {
-      for(int j = 0; j < queryResult.getFacetsArray().get(i).getFrequenciesArray().length(); j++) {
-        noEmpty += queryResult.getFacetsArray().get(0).getFrequenciesArray().get(j).getCount();
+    if(queryResult != null) {
+
+      // TODO: FacetArray for 1 variable always return only 1 facetArray ?
+      if(queryResult.getFacetsArray().length() > 0) {
+        if(queryResult.getFacetsArray().get(0).hasStatistics()) {
+          // Statistics facet
+          noEmpty += queryResult.getFacetsArray().get(0).getStatistics().getCount();
+        } else {
+          // Categories frequency facet
+          for(int i = 0; i < queryResult.getFacetsArray().get(0).getFrequenciesArray().length(); i++) {
+            noEmpty += queryResult.getFacetsArray().get(0).getFrequenciesArray().get(i).getCount();
+          }
+        }
       }
     }
 
     // All, Empty, Not Empty radio buttons
-    RadioButton radioAll = getRadioButton("All", queryResult.getTotalHits());
+    RadioButton radioAll = getRadioButton(translations.criterionFiltersMap().get("all"),
+        queryResult == null ? null : queryResult.getTotalHits());
     radioAll.setValue(true);
     radioControls.add(radioAll);
-    radioControls.add(getRadioButton("Empty", queryResult.getTotalHits() - noEmpty));
-    radioControls.add(getRadioButton("Not Empty", noEmpty));
+    radioControls.add(getRadioButton(translations.criterionFiltersMap().get("empty"),
+        queryResult == null ? null : queryResult.getTotalHits() - noEmpty));
+    radioControls
+        .add(getRadioButton(translations.criterionFiltersMap().get("not_empty"), queryResult == null ? null : noEmpty));
     add(radioControls);
 
-    specificControls = getSpecificControls();
+    Widget specificControls = getSpecificControls();
     if(specificControls != null) {
       add(new Divider());
       add(specificControls);
@@ -66,7 +87,7 @@ public abstract class CriterionDropdown extends DropdownButton {
 
     add(new Divider());
 
-    NavLink remove = new NavLink("Remove");
+    NavLink remove = new NavLink(translations.removeLabel());
     remove.setIcon(IconType.REMOVE);
     remove.addClickHandler(new ClickHandler() {
       @Override
@@ -75,15 +96,17 @@ public abstract class CriterionDropdown extends DropdownButton {
       }
     });
     add(remove);
-
-    // TODO:Remove clickHandler that closes the popup
-
   }
 
-  private RadioButton getRadioButton(final String label, int count) {
-    RadioButton radio = new RadioButton("radio",
-        new SafeHtmlBuilder().appendEscaped(label + " ").appendHtmlConstant("<span style=\"font-size:x-small\">(")
-            .append(count).appendEscaped(")").appendHtmlConstant("</span>").toSafeHtml());
+  private RadioButton getRadioButton(final String label, Integer count) {
+    SafeHtmlBuilder builder = new SafeHtmlBuilder().appendEscaped(label);
+
+    if(count != null) {
+      builder.appendHtmlConstant("<span style=\"font-size:x-small\"> (").append(count).appendEscaped(")")
+          .appendHtmlConstant("</span>");
+    }
+
+    RadioButton radio = new RadioButton("radio", builder.toSafeHtml());
 
     radio.addClickHandler(new ClickHandler() {
       @Override
@@ -96,20 +119,38 @@ public abstract class CriterionDropdown extends DropdownButton {
     return radio;
   }
 
-  public void resetRadioControls() {
+  void resetRadioControls() {
     for(int i = 0; i < radioControls.getWidgetCount(); i++) {
       ((RadioButton) radioControls.getWidget(i)).setValue(null);
     }
   }
 
-  public void updateCriterionFilter(String filter) {
+  void updateCriterionFilter(String filter) {
     setText(filter.isEmpty() ? variable.getName() : variable.getName() + ": " + filter);
-
   }
 
-  public abstract Widget getSpecificControls();
+  protected abstract Widget getSpecificControls();
 
-  public abstract void resetSpecificControls();
+  protected abstract void resetSpecificControls();
+
+  public abstract void doFilterValueSets();
+
+  public String getQueryString() {
+    if(((CheckBox) radioControls.getWidget(0)).getValue()) {
+      // Empty
+      return "*";
+    }
+    if(((CheckBox) radioControls.getWidget(1)).getValue()) {
+      // Not empty
+      return "_missing_:" + fieldName;
+    }
+    if(((CheckBox) radioControls.getWidget(2)).getValue()) {
+      // Empty
+      return "_exists_:" + fieldName;
+    }
+
+    return null;
+  }
 
   @Override
   protected void onLoad() {
@@ -119,7 +160,7 @@ public abstract class CriterionDropdown extends DropdownButton {
     }
   }
 
-  // TODO: Find the selector that  allows to skip the selection of the first input after the li of chosen options...
+  // TODO: Find the selector that allows to skip the selection of the first input after the li of chosen options...
   private static native void bind(Element e) /*-{
     $wnd.jQuery(e).next().find('label, li').click(function(w) {
         w.stopPropagation();

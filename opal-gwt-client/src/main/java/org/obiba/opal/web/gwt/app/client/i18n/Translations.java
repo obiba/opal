@@ -829,7 +829,7 @@ public interface Translations extends Constants {
   String excelLabel();
 
   @Description("Opal XML label")
-  @DefaultStringValue("Opal XML")
+  @DefaultStringValue("Opal Archive")
   String opalXmlLabel();
 
   @Description("SPSS label")
@@ -930,7 +930,8 @@ public interface Translations extends Constants {
       "Duplicate entity identifier '{0}' at row '{1}'. Please make sure that the variable '{2}' representing entities has unique values.",
 //
       "FailedToOpenFile", "Failed to open file '{0}'. Please make sure you have chosen the correct character set.",
-      "LimeUnknownQuestionType", "Unknown type for Limesurvey question '{0}'. Contact your administrator to find out whether this question type is handled by Opal."})
+      "LimeUnknownQuestionType",
+      "Unknown type for Limesurvey question '{0}'. Contact your administrator to find out whether this question type is handled by Opal." })
   Map<String, String> datasourceParsingErrorMap();
 
   @Description("Datasource comparison error map")
@@ -992,17 +993,29 @@ public interface Translations extends Constants {
   @DefaultStringValue("View")
   String viewLabel();
 
-  @Description("Add View label")
+  @Description("Add View title")
   @DefaultStringValue("Add View")
-  String addViewLabel();
+  String addViewTitle();
+
+  @Description("Add Table title")
+  @DefaultStringValue("Add Table")
+  String addTableTitle();
 
   @Description("Add Table label")
-  @DefaultStringValue("Add Table")
+  @DefaultStringValue("Add table...")
   String addTableLabel();
 
+  @Description("Add Table no storage label")
+  @DefaultStringValue("Add table (no storage)")
+  String addTableNoStorageLabel();
+
   @Description("Add Update Tables label")
-  @DefaultStringValue("Add/Update Tables")
+  @DefaultStringValue("Add/update tables from dictionary...")
   String addUpdateTablesLabel();
+
+  @Description("Add Update Tables no storage label")
+  @DefaultStringValue("Add/update tables from dictionary (no storage)")
+  String addUpdateTablesNoStorageLabel();
 
   @Description("Create Datasource Completed summary")
   @DefaultStringValue("The datasource was successfully created.")
@@ -1011,10 +1024,6 @@ public interface Translations extends Constants {
   @Description("Create Datasource Failed summary")
   @DefaultStringValue("The datasource creation has failed.")
   String datasourceCreationFailed();
-
-  @Description("Item label")
-  @DefaultStringValue("Item")
-  String itemLabel();
 
   @Description("Script label")
   @DefaultStringValue("Script")
@@ -1200,6 +1209,14 @@ public interface Translations extends Constants {
   @Description("Paste Public Key PEM label")
   @DefaultStringValue("(paste public certificate in PEM format)")
   String pastePublicKeyPEM();
+
+  @Description("Import data label")
+  @DefaultStringValue("Import Data...")
+  String importDataLabel();
+
+  @Description("Import data no storage label")
+  @DefaultStringValue("Import Data (no storage)")
+  String importDataNoStorageLabel();
 
   @Description("Data import title")
   @DefaultStringValue("Import Data")
@@ -1622,13 +1639,21 @@ public interface Translations extends Constants {
   @DefaultStringValue("Hide")
   String hideLabel();
 
-  @Description("Add Database")
-  @DefaultStringValue("Add Database")
-  String addDatabase();
+  @Description("Add SQL Database")
+  @DefaultStringValue("Add SQL Database")
+  String addSQLDatabase();
 
-  @Description("Edit Database")
-  @DefaultStringValue("Edit Database")
-  String editDatabase();
+  @Description("Edit SQL Database")
+  @DefaultStringValue("Edit SQL Database")
+  String editSQLDatabase();
+
+  @Description("Add MongoDB Database")
+  @DefaultStringValue("Add MongoDB Database")
+  String addMongoDatabase();
+
+  @Description("Edit MongoDB Database")
+  @DefaultStringValue("Edit MongoDB Database")
+  String editMongoDatabase();
 
   @Description("Username label")
   @DefaultStringValue("Username")
@@ -1654,6 +1679,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("SQL Schema")
   String sqlSchemaLabel();
 
+  @Description("Schema label")
+  @DefaultStringValue("Schema")
+  String schemaLabel();
+
   @Description("SQL label")
   @DefaultStringValue("SQL")
   String sqlLabel();
@@ -1661,6 +1690,10 @@ public interface Translations extends Constants {
   @Description("MongoDB label")
   @DefaultStringValue("MongoDB")
   String mongoDbLabel();
+
+  @Description("Opal Mongo label")
+  @DefaultStringValue("Opal Mongo")
+  String opalMongoLabel();
 
   @Description("Default Entity Type label")
   @DefaultStringValue("Default Entity Type")
@@ -1849,6 +1882,10 @@ public interface Translations extends Constants {
   @Description("Title label")
   @DefaultStringValue("Title")
   String titleLabel();
+
+  @Description("Package label")
+  @DefaultStringValue("Package")
+  String packageLabel();
 
   @Description("Version label")
   @DefaultStringValue("Version")
@@ -2420,5 +2457,27 @@ public interface Translations extends Constants {
   @Description("Opal identifiers label")
   @DefaultStringValue("[None]")
   String opalDefaultIdentifiersLabel();
+
+  @Description("Criterion Filters Labels")
+  @DefaultStringMapValue({//
+      "all", "All",//
+      "empty", "Empty",//
+      "not_empty", "Not empty",//
+      "min", "Min",//
+      "max", "Max", //
+      "values", "Values", //
+      "select_operator", "Select an operator...",//
+      "in", "In", //
+      "not_in", "Not in",//
+      "select", "Select",//
+      "range", "Range", "values", "Values", //
+      "custom_match_query", "Custom match query",//
+      "like", "Like", //
+      "from", "From",//
+      "to", "To",//
+      "date", "Date",//
+      "select", "Select..."//
+  })
+  Map<String, String> criterionFiltersMap();
 
 }

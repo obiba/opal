@@ -9,10 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
+import java.util.Collection;
+
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableUpdateListener;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.web.magma.view.ViewDtos;
@@ -37,6 +40,10 @@ public class ViewResourceImpl extends AbstractValueTableResource implements View
   private ViewDtos viewDtos;
 
   @Autowired
+  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+  private Collection<ValueTableUpdateListener> tableListeners;
+
+  @Autowired
   public void setViewDtos(ViewDtos viewDtos) {
     this.viewDtos = viewDtos;
   }
@@ -55,10 +62,16 @@ public class ViewResourceImpl extends AbstractValueTableResource implements View
   public Response updateView(ViewDto viewDto, @Nullable String comment) {
     if(!viewDto.hasName()) return Response.status(Status.BAD_REQUEST).build();
 
-    viewManager.addView(getDatasource().getName(), viewDtos.fromDto(viewDto), comment);
-    if(!viewDto.getName().equals(getValueTable().getName())) {
+    ValueTable table = getValueTable();
+    if(!viewDto.getName().equals(table.getName())) {
+      if(tableListeners != null && !tableListeners.isEmpty()) {
+        for(ValueTableUpdateListener listener : tableListeners) {
+          listener.onRename(table, viewDto.getName());
+        }
+      }
       viewManager.removeView(getDatasource().getName(), getValueTable().getName());
     }
+    viewManager.addView(getDatasource().getName(), viewDtos.fromDto(viewDto), comment);
 
     return Response.ok().build();
   }

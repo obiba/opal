@@ -20,6 +20,7 @@ import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.database.MongoDbSettingsDto;
 import org.obiba.opal.web.model.client.database.SqlSettingsDto;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -47,6 +48,9 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
   @UiField
   IconAnchor edit;
 
+  @UiField
+  Button deleteDatabase;
+
   private final Translations translations;
 
   @Inject
@@ -54,7 +58,7 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
     edit.setTitle(translations.editLabel());
-    databasePanel.setVisible(false);
+    databasePanel.setVisible(true);
   }
 
   @UiHandler("createSql")
@@ -77,6 +81,11 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
     getUiHandlers().testConnection();
   }
 
+  @UiHandler("deleteDatabase")
+  public void delete(ClickEvent event) {
+    getUiHandlers().deleteDatabase();
+  }
+
   @Override
   public void setDatabase(@Nullable DatabaseDto database) {
     properties.clearProperties();
@@ -88,6 +97,11 @@ public class IdentifiersDatabaseView extends ViewWithUiHandlers<IdentifiersDatab
       showSqlProperties(database.getSqlSettings());
       showMongoProperties(database.getMongoDbSettings());
     }
+  }
+
+  @Override
+  public void enableDeletion(boolean value) {
+    deleteDatabase.setVisible(value);
   }
 
   private void showSqlProperties(@Nullable SqlSettingsDto sqlDatabase) {

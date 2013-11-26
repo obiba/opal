@@ -37,12 +37,26 @@ public class MoveSubjectAclToOrientUpgradeStep extends AbstractUpgradeStep {
       @Override
       public SubjectAcl mapRow(ResultSet rs, int rowNum) throws SQLException {
         SubjectAcl acl = new SubjectAcl();
-        acl.setDomain(rs.getString("domain"));
+        acl.setDomain(upgradeDomain(rs.getString("domain")));
         acl.setNode(rs.getString("node"));
         acl.setPermission(upgradePermission(rs.getString("permission")));
         acl.setPrincipal(rs.getString("principal"));
         acl.setType(rs.getString("type"));
         return acl;
+      }
+
+      private String upgradePermission(String permission) {
+        if("CREATE_VIEW".equals(permission)) return "CREATE_TABLE";
+        if("VIEW_ALL".equals(permission)) return "TABLE_ALL";
+        if("VIEW_READ".equals(permission)) return "TABLE_READ";
+        if("VIEW_VALUES".equals(permission)) return "TABLE_VALUES";
+        if("VIEW_EDIT".equals(permission)) return "TABLE_EDIT";
+        if("VIEW_VALUES_EDIT".equals(permission)) return "TABLE_VALUES_EDIT";
+        return permission;
+      }
+
+      private String upgradeDomain(String domain) {
+        return "magma".equals(domain) ? "rest" : domain;
       }
     });
     for(SubjectAcl acl : list) {
@@ -53,13 +67,4 @@ public class MoveSubjectAclToOrientUpgradeStep extends AbstractUpgradeStep {
     dataJdbcTemplate.execute("drop table subject_acl");
   }
 
-  private String upgradePermission(String permission) {
-    if("CREATE_VIEW".equals(permission)) return "CREATE_TABLE";
-    if("VIEW_ALL".equals(permission)) return "TABLE_ALL";
-    if("VIEW_READ".equals(permission)) return "TABLE_READ";
-    if("VIEW_VALUES".equals(permission)) return "TABLE_VALUES";
-    if("VIEW_EDIT".equals(permission)) return "TABLE_EDIT";
-    if("VIEW_VALUES_EDIT".equals(permission)) return "TABLE_VALUES_EDIT";
-    return permission;
-  }
 }

@@ -108,10 +108,10 @@ public class ReportTemplatesResourceTest {
 
   private void configureMock(Subject mockSubject) {
     expect(mockSubject.getPrincipal()).andReturn(createMock(Principal.class)).anyTimes();
-    expect(mockSubject.isPermitted("magma:/report-template/template1:GET")).andReturn(true).anyTimes();
-    expect(mockSubject.isPermitted("magma:/report-template/template2:GET")).andReturn(true).anyTimes();
-    expect(mockSubject.isPermitted("magma:/report-template/template3:GET")).andReturn(true).anyTimes();
-    expect(mockSubject.isPermitted("magma:/report-template/template4:GET")).andReturn(true).anyTimes();
+    expect(mockSubject.isPermitted("rest:/report-template/template1:GET")).andReturn(true).anyTimes();
+    expect(mockSubject.isPermitted("rest:/report-template/template2:GET")).andReturn(true).anyTimes();
+    expect(mockSubject.isPermitted("rest:/report-template/template3:GET")).andReturn(true).anyTimes();
+    expect(mockSubject.isPermitted("rest:/report-template/template4:GET")).andReturn(true).anyTimes();
   }
 
   @Test

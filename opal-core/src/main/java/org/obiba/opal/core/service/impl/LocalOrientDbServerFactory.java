@@ -18,7 +18,9 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
 
   private static final Logger log = LoggerFactory.getLogger(LocalOrientDbServerFactory.class);
 
-  public static final String URL = "local:${OPAL_HOME}/data/orientdb/opal-config";
+  private static final String ORIENTDB_HOME = "${OPAL_HOME}/data/orientdb/opal-config";
+
+  public static final String URL = "local:" + ORIENTDB_HOME;
 
   private String url;
 
@@ -39,7 +41,7 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
   //  @PostConstruct
   public static void start(String url) {
     log.info("Start OrientDB server ({})", url);
-    System.setProperty("ORIENTDB_HOME", url);
+    System.setProperty("ORIENTDB_HOME", ORIENTDB_HOME);
     try {
       server = new OServer() //
           .startup(LocalOrientDbServerFactory.class.getResourceAsStream("/orientdb-server-config.xml")) //

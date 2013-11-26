@@ -14,6 +14,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
@@ -33,6 +34,7 @@ import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableUpdateListener;
+import org.obiba.magma.Variable;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.Timestampeds;
 import org.obiba.magma.type.DateTimeType;
@@ -136,6 +138,16 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
     }
     return opalSearchService.getClient().admin().cluster().prepareState().setFilterIndices(getName()).execute()
         .actionGet().getState().getMetaData().index(getName());
+  }
+
+  @Override
+  public void onRename(@NotNull ValueTable vt, String newName) {
+    onDelete(vt);
+  }
+
+  @Override
+  public void onRename(@Nonnull ValueTable vt, Variable v, String newName) {
+    onDelete(vt);
   }
 
   @Override

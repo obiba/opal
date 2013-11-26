@@ -12,6 +12,7 @@ package org.obiba.opal.web.shell.reporting;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.ws.rs.core.Response;
@@ -25,6 +26,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
@@ -81,7 +83,7 @@ public class ReportTemplateResourceTest {
     Subject mockSubject = createMock(Subject.class);
     ThreadContext.bind(mockSubject);
     expect(mockSubject.getPrincipal()).andReturn(createMock(Principal.class)).anyTimes();
-    expect(mockSubject.isPermitted("magma:/report-template/template3:GET")).andReturn(true).anyTimes();
+    expect(mockSubject.isPermitted("rest:/report-template/template3:GET")).andReturn(true).anyTimes();
 
     replay(opalRuntimeMock, opalConfigurationServiceMock, mockSubject);
 
@@ -101,7 +103,7 @@ public class ReportTemplateResourceTest {
 
   }
 
-  @Test
+  @Test(expected = NoSuchElementException.class)
   public void testGetReportTemplate_ReportTemplateNotFound() {
 
     replay(opalRuntimeMock, opalConfigurationServiceMock);
@@ -121,7 +123,7 @@ public class ReportTemplateResourceTest {
     Subject mockSubject = createMock(Subject.class);
     ThreadContext.bind(mockSubject);
     expect(mockSubject.getPrincipal()).andReturn(createMock(Principal.class)).anyTimes();
-    expect(mockSubject.isPermitted("magma:/report-template/template2:GET")).andReturn(true).anyTimes();
+    expect(mockSubject.isPermitted("rest:/report-template/template2:GET")).andReturn(true).anyTimes();
 
     CommandSchedulerService commandSchedulerServiceMock = createMock(CommandSchedulerService.class);
     commandSchedulerServiceMock.deleteCommand("template2", "reports");
@@ -147,7 +149,7 @@ public class ReportTemplateResourceTest {
 
   }
 
-  @Test
+  @Test(expected = NoSuchElementException.class)
   public void testDeleteReportTemplate_ReportTemplateNotFound() {
 
     replay(opalRuntimeMock, opalConfigurationServiceMock);

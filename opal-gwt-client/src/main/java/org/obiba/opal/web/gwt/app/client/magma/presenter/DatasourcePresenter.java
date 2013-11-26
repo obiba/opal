@@ -240,34 +240,34 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       authorizeProject();
 
       // set permissions
-      AclRequest.newResourceAuthorizationRequestBuilder()
-          .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+      ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+          .forResource(UriBuilders.PROJECT_PERMISSIONS_DATASOURCE.create().build(datasourceName)) //
+          .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())) //
+          .post().send();
     }
 
     private void authorizeDatasource() {
-      String datasourceUri = UriBuilder.create().segment("datasource", datasourceName).build();
       // create tables
       ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-          .forResource(datasourceUri + "/tables") //
+          .forResource(UriBuilders.DATASOURCE_TABLES.create().build(datasourceName)) //
           .authorize(getView().getAddUpdateTablesAuthorizer()) //
           .post().send();
       // create views
       ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-          .forResource(datasourceUri + "/views") //
+          .forResource(UriBuilders.DATASOURCE_VIEWS.create().build(datasourceName)) //
           .authorize(getView().getAddViewAuthorizer()) //
           .post().send();
       // export variables in excel
       ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-          .forResource(datasourceUri + "/tables/excel") //
+          .forResource(UriBuilders.DATASOURCE_TABLES.create().build(datasourceName) + "/excel") //
           .authorize(getView().getExcelDownloadAuthorizer()) //
           .get().send();
     }
 
     private void authorizeProject() {
-      String projectUri = UriBuilder.create().segment("project", datasourceName).build();
       // export data
       ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-          .forResource(projectUri + "/commands/_copy") //
+          .forResource(UriBuilders.PROJECT_COMMANDS_EXPORT.create().build(datasourceName)) //
           .authorize(CascadingAuthorizer.newBuilder() //
               .and("/functional-units", HttpMethod.GET) //
               .and("/functional-units/entities/table", HttpMethod.GET) //
@@ -275,12 +275,12 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
           .post().send();
       // copy data
       ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-          .forResource(projectUri + "/commands/_copy") //
+          .forResource(UriBuilders.PROJECT_COMMANDS_COPY.create().build(datasourceName)) //
           .authorize(getView().getCopyDataAuthorizer()) //
           .post().send();
       // import data
       ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-          .forResource(projectUri + "/commands/_import") //
+          .forResource(UriBuilders.PROJECT_COMMANDS_IMPORT.create().build(datasourceName)) //
           .authorize(CascadingAuthorizer.newBuilder() //
               .and("/functional-units", HttpMethod.GET) //
               .and("/functional-units/entities/table", HttpMethod.GET) //

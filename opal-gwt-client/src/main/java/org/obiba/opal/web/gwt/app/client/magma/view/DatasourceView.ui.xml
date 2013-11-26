@@ -36,10 +36,10 @@
         <b:DropdownButton text="Add Table" type="INFO" icon="PLUS" ui:field="addBtn"
             addStyleNames="pull-right small-top-margin">
           <b:NavLink icon="TABLE" ui:field="addTable">
-            <ui:msg description="Add table label">Add table...</ui:msg>
+            <ui:msg description="Add Table label">Add table...</ui:msg>
           </b:NavLink>
           <b:NavLink icon="TABLE" ui:field="addUpdateTables">
-            <ui:msg description="Add tables label">Add/update tables from template...</ui:msg>
+            <ui:msg description="Add Update Tables label">Add/update tables from dictionary...</ui:msg>
           </b:NavLink>
           <b:NavLink icon="COG" ui:field="addView">
             <ui:msg description="Add view label">Add view...</ui:msg>

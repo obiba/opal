@@ -146,8 +146,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     String reportFileName = getReportFileName(reportTemplateName, reportFormat, reportDate);
 
     FileObject reportDir = getFile(
-        (reportTemplate.hasProject() ? "/projects/" + reportTemplate.getProject() : "") + "/reports/" +
-            reportTemplateName);
+        "/reports/" + (reportTemplate.hasProject() ? reportTemplate.getProject() + "/" : "") + reportTemplateName);
     reportDir.createFolder();
 
     return reportDir.resolveFile(reportFileName);
@@ -176,7 +175,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     SimpleMailMessage message = new SimpleMailMessage();
     message.setFrom(fromAddress);
     message.setSubject("[Opal] Report: " + reportTemplateName);
-    message.setText(getEmailNotificationText(reportTemplateName, reportOutput));
+    message.setText(getEmailNotificationText(reportTemplate, reportOutput));
 
     for(String emailAddress : reportTemplate.getEmailNotificationAddresses()) {
       message.setTo(emailAddress);
@@ -189,11 +188,12 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
     }
   }
 
-  private String getEmailNotificationText(String reportTemplateName, FileObject reportOutput) {
+  private String getEmailNotificationText(ReportTemplate reportTemplate, FileObject reportOutput) {
     Map<String, Object> model = new HashMap<String, Object>();
-    model.put("report_template", reportTemplateName);
+    model.put("report_template", reportTemplate.getName());
     model.put("report_public_link",
-        opalPublicUrl + "/ws/report/public/" + getOpalRuntime().getFileSystem().getObfuscatedPath(reportOutput));
+        opalPublicUrl + "/ws/report/public/" + getOpalRuntime().getFileSystem().getObfuscatedPath(reportOutput) +
+            (reportTemplate.hasProject() ? "?project=" + reportTemplate.getProject() : ""));
     return getMergedVelocityTemplate(model);
   }
 

@@ -24,12 +24,12 @@
 
     <g:FlowPanel ui:field="searchPanel">
       <b:ControlGroup>
-        <b:InputAddOn prependIcon="SEARCH" addStyleNames="inline-block">
+        <b:InputAddOn prependIcon="SEARCH">
           <b:TextBox ui:field="searchBox" placeholder="search for an identifier..."/>
         </b:InputAddOn>
       </b:ControlGroup>
 
-      <b:ControlGroup>
+      <b:ControlGroup ui:field="valuesFilterGroup" visible="false">
         <b:ControlLabel>
           <ui:msg description="Values Filter label">Values Filter</ui:msg>
         </b:ControlLabel>

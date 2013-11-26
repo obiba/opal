@@ -119,7 +119,7 @@ public class QuerySearchJsonBuilder {
 
   private JSONObject buildQueryStringJson() throws JSONException {
     JSONObject json = new JSONObject();
-    json.put("fields", new JSONArray(defaultQueryFields));
+    if(!"*".equals(query)) json.put("fields", new JSONArray(defaultQueryFields));
     json.put("query", query);
     json.put("default_operator", DEFAULT_QUERY_OPERATOR);
 

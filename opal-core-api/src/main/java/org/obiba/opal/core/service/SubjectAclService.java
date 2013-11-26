@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.core.service;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 public interface SubjectAclService extends SystemService {
@@ -108,7 +109,7 @@ public interface SubjectAclService extends SystemService {
    * @param type
    * @return
    */
-  Iterable<Permissions> getNodePermissions(String domain, String node, SubjectType type);
+  Iterable<Permissions> getNodePermissions(String domain, String node, @Nullable SubjectType type);
 
   /**
    * Get the permissions for a node and its children.
@@ -117,7 +118,7 @@ public interface SubjectAclService extends SystemService {
    * @param type
    * @return
    */
-  Iterable<Permissions> getNodeHierarchyPermissions(String domain, String node, SubjectType type);
+  Iterable<Permissions> getNodeHierarchyPermissions(String domain, String node, @Nullable SubjectType type);
 
   /**
    * Get all subjects of a given type and having permissions in a domain.

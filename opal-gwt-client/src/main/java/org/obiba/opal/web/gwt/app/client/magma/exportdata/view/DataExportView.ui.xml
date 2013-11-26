@@ -26,10 +26,7 @@
         <o:RequiredIcon/>
       </b:ControlLabel>
       <b:Controls>
-        <o:Chooser ui:field="fileFormat">
-          <g:item value="csv">CSV</g:item>
-          <g:item value="xml">Opal XML</g:item>
-        </o:Chooser>
+        <o:Chooser ui:field="fileFormat"></o:Chooser>
       </b:Controls>
       <b:HelpBlock>
         <ui:msg description="Export Format help">File format under which the data will be exported.</ui:msg>

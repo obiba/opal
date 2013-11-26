@@ -44,14 +44,14 @@ public class ReportTemplatePermissionConverter extends DomainPermissionConverter
       public Iterable<String> convert(String node) {
         if (node.startsWith("/project/")) {
           String[] args = args(node, "/project/(.+)/report-template/(.+)");
-          return Lists.newArrayList(magmaConvert("/project/{0}/report-template/{1}", "*:GET/*", args),//
-              magmaConvert("/files/meta/projects/{0}/reports/{1}", "GET:GET/GET", args),//
-              magmaConvert("/files/projects/{0}/reports/{1}", "*:GET/*", args));
+          return Lists.newArrayList(toRest("/project/{0}/report-template/{1}", "*:GET/*", args),//
+              toRest("/files/meta/reports/{0}/{1}", "GET:GET/GET", args),//
+              toRest("/files/reports/{0}/{1}", "*:GET/*", args));
         } else {
           String[] args = args(node, "/report-template/(.+)");
-          return Lists.newArrayList(magmaConvert("/report-template/{0}", "*:GET/*", args),//
-              magmaConvert("/files/meta/reports/{0}", "GET:GET/GET", args),//
-              magmaConvert("/files/reports/{0}", "*:GET/*", args));
+          return Lists.newArrayList(toRest("/report-template/{0}", "*:GET/*", args),//
+              toRest("/files/meta/reports/{0}", "GET:GET/GET", args),//
+              toRest("/files/reports/{0}", "*:GET/*", args));
         }
       }
 
@@ -61,14 +61,14 @@ public class ReportTemplatePermissionConverter extends DomainPermissionConverter
       public Iterable<String> convert(String node) {
         if (node.startsWith("/project/")) {
           String[] args = args(node, "/project/(.+)/report-template/(.+)");
-          return Lists.newArrayList(magmaConvert("/project/{0}/report-template/{1}", "GET:GET/GET", args),//
-              magmaConvert("/files/meta/projects/{0}/reports/{1}", "GET:GET/GET", args),//
-              magmaConvert("/files/projects/{0}/reports/{1}", "GET:GET/GET", args));
+          return Lists.newArrayList(toRest("/project/{0}/report-template/{1}", "GET:GET/GET", args),//
+              toRest("/files/meta/reports/{0}/{1}", "GET:GET/GET", args),//
+              toRest("/files/reports/{0}/{1}", "GET:GET/GET", args));
         } else {
         String[] args = args(node, "/report-template/(.+)");
-        return Lists.newArrayList(magmaConvert("/report-template/{0}", "GET:GET/GET", args),//
-            magmaConvert("/files/meta/reports/{0}", "GET:GET/GET", args),//
-            magmaConvert("/files/reports/{0}", "GET:GET/GET", args));
+        return Lists.newArrayList(toRest("/report-template/{0}", "GET:GET/GET", args),//
+            toRest("/files/meta/reports/{0}", "GET:GET/GET", args),//
+            toRest("/files/reports/{0}", "GET:GET/GET", args));
         }
       }
 

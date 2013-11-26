@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.shell.reporting;
 
+import org.apache.commons.vfs2.FileObject;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.security.Authorizer;
 import org.obiba.magma.security.MagmaSecurityExtension;
@@ -66,7 +67,7 @@ public abstract class AbstractReportTemplateResource {
   }
 
   protected boolean authzReadReportTemplate(ReportTemplate template) {
-    return authorizer.isPermitted("magma:/report-template/" + template.getName() + ":GET");
+    return authorizer.isPermitted("rest:/report-template/" + template.getName() + ":GET");
   }
 
 }

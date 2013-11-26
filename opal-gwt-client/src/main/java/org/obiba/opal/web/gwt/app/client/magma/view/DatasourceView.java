@@ -272,6 +272,16 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     importData.setDisabled(isNull);
     addTable.setDisabled(isNull);
     addUpdateTables.setDisabled(isNull);
+
+    if(isNull) importData.setText(translations.importDataNoStorageLabel());
+    else importData.setText(translations.importDataLabel());
+
+    if(isNull) addTable.setText(translations.addTableNoStorageLabel());
+    else addTable.setText(translations.addTableLabel());
+
+    if(isNull) addUpdateTables.setText(translations.addUpdateTablesNoStorageLabel());
+    else addUpdateTables.setText(translations.addUpdateTablesLabel());
+
     checkColumn.clearSelection();
   }
 

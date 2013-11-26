@@ -41,4 +41,6 @@ public interface DatasourceTablesResource {
   Response deleteTables(@QueryParam("table") List<String> tables);
 
   void setDatasource(Datasource datasource);
+
+  List<Magma.TableDto> getTables(boolean counts, String entityType);
 }

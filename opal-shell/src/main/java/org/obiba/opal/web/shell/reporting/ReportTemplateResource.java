@@ -11,8 +11,8 @@ package org.obiba.opal.web.shell.reporting;
 
 import java.io.File;
 import java.util.List;
+import java.util.NoSuchElementException;
 
-import javax.annotation.Nullable;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -52,6 +52,8 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   @PathParam("name")
   protected String name;
 
+  private ReportTemplate reportTemplate;
+
   private OpalConfigurationService configService;
 
   private CommandSchedulerService commandSchedulerService;
@@ -79,21 +81,26 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
 
   @GET
   public Response get() {
-    ReportTemplate reportTemplate = getReportTemplate();
-    return reportTemplate == null || !authzReadReportTemplate(reportTemplate) //
-        ? Response.status(Status.NOT_FOUND).build() //
-        : Response.ok(Dtos.asDto(reportTemplate)).build();
+    loadReportTemplate();
+    return authzReadReportTemplate(reportTemplate)
+        ? Response.ok(Dtos.asDto(reportTemplate)).build()
+        : Response.status(Status.NOT_FOUND).build();
   }
 
-  @Nullable
-  private ReportTemplate getReportTemplate() {
-    return getOpalConfigurationService().getOpalConfiguration().getReportTemplate(name);
+  private ReportTemplate loadReportTemplate() {
+    if(reportTemplate == null) {
+      reportTemplate = getOpalConfigurationService().getOpalConfiguration().getReportTemplate(name);
+      if(reportTemplate == null) {
+        throw new NoSuchElementException();
+      }
+    }
+    return reportTemplate;
   }
 
   @DELETE
   public Response deleteReportTemplate() {
-    ReportTemplate reportTemplateToRemove = getReportTemplate();
-    if(reportTemplateToRemove == null || !authzReadReportTemplate(reportTemplateToRemove)) {
+    ReportTemplate reportTemplateToRemove = loadReportTemplate();
+    if(!authzReadReportTemplate(reportTemplateToRemove)) {
       return Response.status(Status.NOT_FOUND).build();
     }
     getOpalConfigurationService().modifyConfiguration(new ConfigModificationTask() {
@@ -109,9 +116,7 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
 
   @PUT
   public Response updateReportTemplate(ReportTemplateDto reportTemplateDto) {
-    if(!reportTemplateExists()) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
+    loadReportTemplate();
 
     try {
       Assert.isTrue(reportTemplateDto.getName().equals(name),
@@ -131,12 +136,15 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   @GET
   @Path("/reports")
   public List<ReportDto> getReports() throws FileSystemException {
+    loadReportTemplate();
+
     FileObject reportFolder = getReportFolder();
     List<ReportDto> reports = Lists.newArrayList();
 
     if(reportFolder.exists()) {
       for(FileObject reportFile : reportFolder.getChildren()) {
-        if(reportFile.getType() == FileType.FILE && reportFile.getName().getBaseName().startsWith(name + "-")) {
+        if(reportFile.getType() == FileType.FILE && reportFile.getName().getBaseName().startsWith(name + "-") &&
+            reportFile.isReadable()) {
           reports.add(getReportDto(reportFile));
         }
       }
@@ -148,6 +156,8 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   @GET
   @Path("/reports/latest")
   public Response getReport() throws FileSystemException {
+    loadReportTemplate();
+
     FileObject reportFolder = getReportFolder();
     if(!reportFolder.exists()) {
       return Response.status(Status.NOT_FOUND).build();
@@ -156,7 +166,8 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
     FileObject lastReportFile = null;
     File lastReport = null;
     for(FileObject reportFile : reportFolder.getChildren()) {
-      if(reportFile.getType() == FileType.FILE && reportFile.getName().getBaseName().startsWith(name + "-")) {
+      if(reportFile.getType() == FileType.FILE && reportFile.getName().getBaseName().startsWith(name + "-") &&
+          reportFile.isReadable()) {
         File report = opalRuntime.getFileSystem().getLocalFile(reportFile);
         if(lastReport == null || report.lastModified() > lastReport.lastModified()) {
           lastReport = report;
@@ -171,21 +182,25 @@ public class ReportTemplateResource extends AbstractReportTemplateResource {
   }
 
   private ReportDto getReportDto(FileObject reportFile) throws FileSystemException {
+    String publicLink = "/report/public/" + opalRuntime.getFileSystem().getObfuscatedPath(reportFile);
+    if(reportTemplate.hasProject()) {
+      publicLink += "?project=" + reportTemplate.getProject();
+    }
     return ReportDto.newBuilder()//
         .setName(reportFile.getName().getBaseName())//
         .setLink("/files" + reportFile.getName().getPath())//
         .setSize(reportFile.getContent().getSize())//
         .setLastModifiedTime(reportFile.getContent().getLastModifiedTime())//
-        .setPublicLink("/report/public/" + opalRuntime.getFileSystem().getObfuscatedPath(reportFile)).build();
+        .setPublicLink(publicLink).build();
   }
 
   private FileObject getReportFolder() throws FileSystemException {
+    String folder = "/reports/" + name;
+    if(reportTemplate.hasProject()) {
+      folder = "/reports/" + reportTemplate.getProject() + "/" + name;
+    }
     OpalFileSystem fileSystem = opalRuntime.getFileSystem();
-    return fileSystem.getRoot().resolveFile("/reports/" + name);
-  }
-
-  private boolean reportTemplateExists() {
-    return getOpalConfigurationService().getOpalConfiguration().hasReportTemplate(name);
+    return fileSystem.getRoot().resolveFile(folder);
   }
 
   @Override

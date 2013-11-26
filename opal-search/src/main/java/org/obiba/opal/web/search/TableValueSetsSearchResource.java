@@ -11,6 +11,7 @@
 package org.obiba.opal.web.search;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -25,6 +26,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
@@ -34,21 +36,27 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.VariableEntityBean;
-import org.obiba.opal.web.magma.VariableEntityValueSetDtoFunction;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Search;
 import org.obiba.opal.web.search.support.QuerySearchJsonBuilder;
+import org.obiba.opal.web.search.support.VariableEntityValueSetDtoFunction;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 
 @Component
+@Transactional
 @Scope("request")
 @Path("/datasource/{ds}/table/{table}/valueSets/_search")
+@Api(value = "/datasource/{ds}/table/{table}/valueSets/_search",
+    description = "Executes a query on an Elastic Search values index")
 public class TableValueSetsSearchResource extends AbstractVariablesSearchResource {
 
 //  private static final Logger log = LoggerFactory.getLogger(TableVariablesSearchResource.class);
@@ -62,6 +70,7 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
   @SuppressWarnings("PMD.ExcessiveParameterList")
   @GET
   @POST
+  @ApiOperation("Returns a list of valueSets corresponding to specified query")
   public Response search(@Context UriInfo uriInfo, @QueryParam("query") String query,
       @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("10") int limit,
       @QueryParam("select") String select) {
@@ -73,22 +82,8 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
           buildQuerySearch(query, offset, limit, null, null, null);
       JSONObject jsonResponse = executeQuery(jsonBuiler.build());
 
-      Search.ValueSetsResultDto.Builder dtoResponseBuilder = Search.ValueSetsResultDto.newBuilder();
-      JSONObject jsonHits = jsonResponse.getJSONObject("hits");
-
-      dtoResponseBuilder.setTotalHits(jsonHits.getInt("total"));
-      List<VariableEntity> entities = new ArrayList<VariableEntity>();
-      String entityType = getValueTable().getEntityType();
-
-      JSONArray hits = jsonHits.getJSONArray("hits");
-      for(int i = 0; i < hits.length(); i++) {
-        JSONObject jsonHit = hits.getJSONObject(i);
-        entities.add(new VariableEntityBean(entityType, jsonHit.getString("_id")));
-      }
-
-      String path = uriInfo.getPath();
-      path = path.substring(0, path.indexOf("/_search"));
-      dtoResponseBuilder.setValueSets(getValueSetsDto(path, select, entities, false));
+      Search.ValueSetsResultDto.Builder dtoResponseBuilder = getvalueSetsDtoBuilder(uriInfo, offset, limit, select,
+          jsonResponse);
 
       // filter entities
       return Response.ok().entity(dtoResponseBuilder.build()).build();
@@ -99,6 +94,27 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
     } catch(Exception e) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
+  }
+
+  private Search.ValueSetsResultDto.Builder getvalueSetsDtoBuilder(UriInfo uriInfo, int offset, int limit,
+      String select, JSONObject jsonResponse) throws JSONException {
+    Search.ValueSetsResultDto.Builder dtoResponseBuilder = Search.ValueSetsResultDto.newBuilder();
+    JSONObject jsonHits = jsonResponse.getJSONObject("hits");
+
+    dtoResponseBuilder.setTotalHits(jsonHits.getInt("total"));
+    Collection<VariableEntity> entities = new ArrayList<VariableEntity>();
+    String entityType = getValueTable().getEntityType();
+
+    JSONArray hits = jsonHits.getJSONArray("hits");
+    for(int i = 0; i < hits.length(); i++) {
+      JSONObject jsonHit = hits.getJSONObject(i);
+      entities.add(new VariableEntityBean(entityType, jsonHit.getString("_id")));
+    }
+
+    String path = uriInfo.getPath();
+    path = path.substring(0, path.indexOf("/_search"));
+    dtoResponseBuilder.setValueSets(getValueSetsDto(path, select, entities, offset, limit));
+    return dtoResponseBuilder;
   }
 
   //
@@ -123,8 +139,8 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
   }
 
   private Magma.ValueSetsDto getValueSetsDto(String uriInfoPath, String select,
-      Iterable<VariableEntity> variableEntities, boolean filterBinary) {
-    Iterable<Variable> variables = filterVariables(select, 0, null);
+      Iterable<VariableEntity> variableEntities, int offset, int limit) {
+    Iterable<Variable> variables = filterVariables(select, offset, limit);
 
     Magma.ValueSetsDto.Builder builder = Magma.ValueSetsDto.newBuilder().setEntityType(getValueTable().getEntityType());
 
@@ -139,7 +155,7 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
 
     ImmutableList.Builder<Magma.ValueSetsDto.ValueSetDto> valueSetDtoBuilder = ImmutableList.builder();
     Iterable<Magma.ValueSetsDto.ValueSetDto> transform = Iterables.transform(variableEntities,
-        new VariableEntityValueSetDtoFunction(getValueTable(), variables, uriInfoPath, filterBinary));
+        new VariableEntityValueSetDtoFunction(getValueTable(), variables, uriInfoPath, false));
 
     for(Magma.ValueSetsDto.ValueSetDto dto : transform) {
       valueSetDtoBuilder.add(dto);

@@ -21,6 +21,8 @@ message DataShieldMethodDto {
 
 message RFunctionDataShieldMethodDto {
   required string func = 1;
+  optional string rPackage = 2;
+  optional string version = 3;
   extend DataShieldMethodDto {
     optional RFunctionDataShieldMethodDto method = 1000;
   }

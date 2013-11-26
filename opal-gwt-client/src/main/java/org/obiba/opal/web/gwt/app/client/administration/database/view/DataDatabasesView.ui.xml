@@ -17,16 +17,16 @@
 
   <g:FlowPanel>
     <b:Heading size="4" addStyleNames="inline-block">
-      <ui:msg description="SQL Databases label">Data Databases</ui:msg>
+      <ui:msg description="Databases label">Databases</ui:msg>
     </b:Heading>
     <b:Paragraph>
-      Data databases can have different purposes: storage, import, export.
+      Databases can have different purposes: storage, import, export.
     </b:Paragraph>
     <g:FlowPanel ui:field="createPanel">
       <b:Paragraph>
-        At least one data storage database is required for importing data.
+        At least one storage database is required for importing data.
       </b:Paragraph>
-      <b:DropdownButton text="Create data storage database" icon="PLUS" type="INFO">
+      <b:DropdownButton text="Create storage database" icon="PLUS" type="INFO">
         <b:NavLink ui:field="createSql">
           <ui:msg description="Create SQL database label">SQL</ui:msg>
         </b:NavLink>
@@ -37,7 +37,7 @@
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="databasesPanel">
-      <b:DropdownButton text="Add data database" icon="PLUS" type="INFO">
+      <b:DropdownButton text="Add database" icon="PLUS" type="INFO">
         <b:NavLink ui:field="addSQL">
           <ui:msg description="Create SQL database label">SQL</ui:msg>
         </b:NavLink>
@@ -48,21 +48,12 @@
 
       <g:FlowPanel addStyleNames="top-margin">
         <b:Heading size="5" addStyleNames="inline-block">
-          <ui:msg description="SQL Databases label">SQL Databases</ui:msg>
+          <ui:msg description="Databases label">Databases</ui:msg>
         </b:Heading>
-        <b:SimplePager ui:field="sqlPager" location="RIGHT" addStyleNames="pull-right"/>
+        <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
       </g:FlowPanel>
-      <o:Table ui:field="sqlTable" width="100%"/>
-
-      <g:FlowPanel>
-        <b:Heading size="5" addStyleNames="inline-block">
-          <ui:msg description="MongoDB Databases label">MongoDB Databases</ui:msg>
-        </b:Heading>
-        <b:SimplePager ui:field="mongoPager" location="RIGHT" addStyleNames="pull-right"/>
-      </g:FlowPanel>
-      <o:Table ui:field="mongoTable" width="100%"/>
+      <o:Table ui:field="table" width="100%"/>
     </g:FlowPanel>
 
   </g:FlowPanel>
-
 </ui:UiBinder>

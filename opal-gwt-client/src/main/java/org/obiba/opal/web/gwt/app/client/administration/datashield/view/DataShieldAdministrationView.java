@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 import org.obiba.opal.web.model.client.datashield.DataShieldMethodDto;
+import org.obiba.opal.web.model.client.datashield.RFunctionDataShieldMethodDto;
 import org.obiba.opal.web.model.client.datashield.RScriptDataShieldMethodDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
@@ -130,6 +131,24 @@ public class DataShieldAdministrationView extends ViewImpl implements DataShield
             : translations.rFunctionLabel();
       }
     }, translations.typeLabel());
+
+    methodsTable.addColumn(new TextColumn<DataShieldMethodDto>() {
+      @Override
+      public String getValue(DataShieldMethodDto object) {
+        RFunctionDataShieldMethodDto dto = (RFunctionDataShieldMethodDto) object
+            .getExtension(RFunctionDataShieldMethodDto.DataShieldMethodDtoExtensions.method);
+        return dto == null ? "" : dto.getRPackage();
+      }
+    }, translations.packageLabel());
+
+    methodsTable.addColumn(new TextColumn<DataShieldMethodDto>() {
+      @Override
+      public String getValue(DataShieldMethodDto object) {
+        RFunctionDataShieldMethodDto dto = (RFunctionDataShieldMethodDto) object
+            .getExtension(RFunctionDataShieldMethodDto.DataShieldMethodDtoExtensions.method);
+        return dto == null ? "" : dto.getVersion();
+      }
+    }, translations.versionLabel());
 
     actionsColumn = new ActionsColumn<DataShieldMethodDto>(
         new ConstantActionsProvider<DataShieldMethodDto>(EDIT_ACTION, DELETE_ACTION));

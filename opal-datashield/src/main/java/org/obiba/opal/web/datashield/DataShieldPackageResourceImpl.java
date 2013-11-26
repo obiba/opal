@@ -70,25 +70,16 @@ public class DataShieldPackageResourceImpl extends RPackageResource implements D
   @GET
   @Path("/methods")
   public DataShield.DataShieldPackageMethodsDto getPackageMethods() throws REXPMismatchException {
-    OpalR.RPackageDto packageDto = getPackage();
-    List<DataShield.DataShieldMethodDto> aggregateMethodDtos = Lists.newArrayList();
-    List<DataShield.DataShieldMethodDto> assignMethodDtos = Lists.newArrayList();
-    for(Opal.EntryDto entry : packageDto.getDescriptionList()) {
-      if(entry.getKey().equals(AGGREGATE_METHODS)) {
-        aggregateMethodDtos.addAll(parsePackageMethods(entry.getValue()));
-      } else if(entry.getKey().equals(ASSIGN_METHODS)) {
-        assignMethodDtos.addAll(parsePackageMethods(entry.getValue()));
-      }
-    }
-    return DataShield.DataShieldPackageMethodsDto.newBuilder().setName(name).addAllAggregate(aggregateMethodDtos)
-        .addAllAssign(assignMethodDtos).build();
+    return getPackageMethods(getPackage());
   }
 
   @Override
   @PUT
   @Path("methods")
   public DataShield.DataShieldPackageMethodsDto publishPackageMethods() throws REXPMismatchException {
-    final DataShield.DataShieldPackageMethodsDto methods = getPackageMethods();
+    OpalR.RPackageDto packageDto = getPackage();
+
+    final DataShield.DataShieldPackageMethodsDto methods = getPackageMethods(packageDto);
 
     configurationSupplier
         .modify(new ExtensionConfigurationSupplier.ExtensionConfigModificationTask<DatashieldConfiguration>() {
@@ -112,19 +103,45 @@ public class DataShieldPackageResourceImpl extends RPackageResource implements D
     return methods;
   }
 
-  private Collection<DataShield.DataShieldMethodDto> parsePackageMethods(String value) {
+  private String getPackageVersion(OpalR.RPackageDto packageDto) {
+    for(Opal.EntryDto entry : packageDto.getDescriptionList()) {
+      if(entry.getKey().equals(VERSION)) {
+        return entry.getValue();
+      }
+    }
+    // will not happen in R
+    return null;
+  }
+
+  private DataShield.DataShieldPackageMethodsDto getPackageMethods(OpalR.RPackageDto packageDto)
+      throws REXPMismatchException {
+    String version = getPackageVersion(packageDto);
+
+    List<DataShield.DataShieldMethodDto> aggregateMethodDtos = Lists.newArrayList();
+    List<DataShield.DataShieldMethodDto> assignMethodDtos = Lists.newArrayList();
+    for(Opal.EntryDto entry : packageDto.getDescriptionList()) {
+      if(entry.getKey().equals(AGGREGATE_METHODS)) {
+        aggregateMethodDtos.addAll(parsePackageMethods(packageDto.getName(), version, entry.getValue()));
+      } else if(entry.getKey().equals(ASSIGN_METHODS)) {
+        assignMethodDtos.addAll(parsePackageMethods(packageDto.getName(), version, entry.getValue()));
+      }
+    }
+    return DataShield.DataShieldPackageMethodsDto.newBuilder().setName(name).addAllAggregate(aggregateMethodDtos)
+        .addAllAssign(assignMethodDtos).build();
+  }
+
+  private Collection<DataShield.DataShieldMethodDto> parsePackageMethods(String packageName, String packageVersion, String value) {
     String normalized = value.replaceAll("[\n\r\t ]", "");
     List<DataShield.DataShieldMethodDto> methodDtos = Lists.newArrayList();
     for(String map : normalized.split(",")) {
       String[] entry = map.split("=");
       DataShield.RFunctionDataShieldMethodDto methodDto = DataShield.RFunctionDataShieldMethodDto.newBuilder()
-          .setFunc(entry.length == 1 ? name + "::" + entry[0] : entry[1]).build();
+          .setFunc(entry.length == 1 ? name + "::" + entry[0] : entry[1]).setRPackage(packageName).setVersion(packageVersion).build();
       DataShield.DataShieldMethodDto.Builder builder = DataShield.DataShieldMethodDto.newBuilder();
       builder.setName(entry[0]);
       builder.setExtension(DataShield.RFunctionDataShieldMethodDto.method, methodDto);
       methodDtos.add(builder.build());
-    }
-    return methodDtos;
+    } return methodDtos;
   }
 
   @Override

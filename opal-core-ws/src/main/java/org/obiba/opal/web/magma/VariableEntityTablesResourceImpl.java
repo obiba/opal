@@ -112,7 +112,7 @@ public class VariableEntityTablesResourceImpl implements AbstractTablesResource,
     }
 
     private boolean areEntitiesReadable(ValueTable valueTable) {
-      return SecurityUtils.getSubject().isPermitted("magma:/datasource/" + valueTable.getDatasource().getName() +
+      return SecurityUtils.getSubject().isPermitted("rest:/datasource/" + valueTable.getDatasource().getName() +
           "/table/" + valueTable.getName() + "/entities:GET");
     }
   }

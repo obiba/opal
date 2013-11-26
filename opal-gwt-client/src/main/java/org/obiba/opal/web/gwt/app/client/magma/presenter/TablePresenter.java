@@ -268,8 +268,11 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
         .authorize(getView().getValuesAuthorizer()).send();
 
     // set permissions
-    AclRequest.newResourceAuthorizationRequestBuilder()
-        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(
+            UriBuilders.PROJECT_PERMISSIONS_TABLE.create().build(table.getDatasourceName(), table.getName())) //
+        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())) //
+        .post().send();
   }
 
   private void updateDisplay(String datasourceName, String tableName) {

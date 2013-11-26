@@ -30,6 +30,7 @@ public class TextBoxClearable extends FlowPanel implements HasKeyUpHandlers, Has
 
   public TextBoxClearable() {
     addStyleName("texbox-clearable-wrapper");
+    addStyleName("inline");
 
     textBox = new TextBox();
     clear = new Anchor();

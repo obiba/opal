@@ -32,14 +32,14 @@ public abstract class DomainPermissionConverter implements SubjectPermissionConv
 
   protected abstract boolean hasPermission(String permission);
 
-  protected static String magmaConvert(String magmaNode, String permission, String... args) {
+  protected static String toRest(String magmaNode, String permission, String... args) {
     String node = magmaNode;
     if(args != null) {
       for(int i = 0; i < args.length; i++) {
         node = node.replace("{" + i + "}", args[i]);
       }
     }
-    return "magma:" + node + ":" + permission;
+    return "rest:" + node + ":" + permission;
   }
 
   protected static String[] args(String node, String patternStr) {

@@ -9,10 +9,12 @@
  */
 package org.obiba.opal.search;
 
+import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableUpdateListener;
+import org.obiba.magma.Variable;
 import org.obiba.opal.core.cfg.ExtensionConfigurationSupplier;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +56,16 @@ public class IndexManagerConfigurationService implements ValueTableUpdateListene
     IndexManagerConfiguration config = getConfig();
     config.removeSchedule(vt);
     configSupplier.addExtension(config);
+  }
+
+  @Override
+  public void onRename(@NotNull ValueTable vt, String newName) {
+    onDelete(vt);
+  }
+
+  @Override
+  public void onRename(@Nonnull ValueTable vt, Variable v, String newName) {
+    onDelete(vt);
   }
 
   @Override

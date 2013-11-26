@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.ws.rs.core.PathSegment;
@@ -17,6 +18,8 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.obiba.magma.NoSuchVariableException;
+import org.obiba.magma.ValueTable;
+import org.obiba.magma.ValueTableUpdateListener;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableValueSource;
@@ -40,6 +43,10 @@ public class VariableViewResourceImpl extends AbstractValueTableResource impleme
 
   @Autowired
   private ViewManager viewManager;
+
+  @Autowired
+  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+  private Collection<ValueTableUpdateListener> tableListeners;
 
   private String name;
 
@@ -66,7 +73,8 @@ public class VariableViewResourceImpl extends AbstractValueTableResource impleme
     ValueTableWriter.VariableWriter vw = null;
     try {
       // The variable must exist
-      Variable v = getValueTable().getVariable(name);
+      ValueTable table = getValueTable();
+      Variable v = table.getVariable(name);
 
       if(!v.getEntityType().equals(variable.getEntityType())) {
         return Response.status(Response.Status.BAD_REQUEST).build();
@@ -77,6 +85,11 @@ public class VariableViewResourceImpl extends AbstractValueTableResource impleme
 
       // Rename existing variable
       if(!variable.getName().equals(v.getName())) {
+        if(tableListeners != null && !tableListeners.isEmpty()) {
+          for(ValueTableUpdateListener listener : tableListeners) {
+            listener.onRename(table, v, variable.getName());
+          }
+        }
         vw.removeVariable(v);
       }
       vw.writeVariable(Dtos.fromDto(variable));
