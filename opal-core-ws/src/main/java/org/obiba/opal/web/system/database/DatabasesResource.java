@@ -42,7 +42,7 @@ public class DatabasesResource {
   @ApiOperation(value = "Returns all data databases",
       notes = "The Identifiers database will not be returned here", response = List.class)
   public List<DatabaseDto> getDatabases(
-      @ApiParam(value = "database usage", allowableValues = "import, storage, export") @QueryParam("usage")
+      @ApiParam(value = "database usage", allowableValues = "import,storage,export") @QueryParam("usage")
       String usage,
       @ApiParam(value = "should response contains database settings", defaultValue = "false") @QueryParam("settings")
       @DefaultValue("false") Boolean settings) {
