@@ -22,11 +22,11 @@ import javax.ws.rs.core.UriInfo;
 
 import org.obiba.opal.r.RScriptROperation;
 import org.obiba.opal.r.RStringMatrix;
+import org.obiba.opal.web.datashield.support.DataShieldPackageMethodImpl;
 import org.obiba.opal.web.model.OpalR;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +42,7 @@ import com.google.common.collect.Lists;
 public class DataShieldPackagesResource extends RPackageResource {
 
   @Autowired
-  private ApplicationContext applicationContext;
+  private DataShieldPackageMethodImpl dataShieldPackageMethodPublisher;
 
   @GET
   public List<OpalR.RPackageDto> getPackages() throws REXPMismatchException {
@@ -62,12 +62,10 @@ public class DataShieldPackagesResource extends RPackageResource {
 
     // install or re-install all known datashield package methods
     for(OpalR.RPackageDto pkg : getPackages()) {
-      DataShieldPackageResource resource = applicationContext.getBean(DataShieldPackageResource.class);
-      resource.setName(pkg.getName());
-      resource.publishPackageMethods();
+      dataShieldPackageMethodPublisher.publish(pkg.getName());
     }
 
-    UriBuilder ub = uriInfo.getBaseUriBuilder().path(DataShieldPackageResource.class);
+    UriBuilder ub = uriInfo.getBaseUriBuilder().path(DataShieldPackageResourceRestImpl.class);
     return Response.created(ub.build(name)).build();
   }
 
