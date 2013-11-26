@@ -91,3 +91,7 @@ a:hover {
 .dropdown-menu > li.controls {
   padding: 3px 20px;
 }
+
+.dropdown-menu > li.active > a, .dropdown-menu > li.active > a:hover {
+  color: #FFFFFF;
+}

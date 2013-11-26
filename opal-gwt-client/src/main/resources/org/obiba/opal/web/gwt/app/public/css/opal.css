@@ -373,3 +373,18 @@ td.row-actions span {
 .alert.select {
   margin-bottom: 0.4em;
 }
+
+/*
+ * ValuesTablePresenter
+ */
+.min-height-450 {
+  min-height: 450px;
+}
+
+.small-input input {
+  width: 80px;
+}
+
+.control-group .xlarge-indent {
+  margin-left: 50px;
+}

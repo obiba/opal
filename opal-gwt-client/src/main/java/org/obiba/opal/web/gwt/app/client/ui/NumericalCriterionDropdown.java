@@ -61,7 +61,9 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
 
     ListItem specificControls = new ListItem();
     specificControls.addStyleName("controls");
+
     specificControls.add(getOperatorsChooserPanel());
+    specificControls.add(getRangeValuesChooserPanel());
     specificControls.add(getRangeValuePanel());
 
     resetSpecificControls();
@@ -125,9 +127,8 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
   }
 
   private FlowPanel getOperatorsChooserPanel() {
-    FlowPanel inPanel = new FlowPanel();
+    FlowPanel panel = new FlowPanel();
 
-    operatorChooser.addStyleName("inline-block");
     operatorChooser.addItem(translations.criterionFiltersMap().get("select_operator"));
     operatorChooser.addItem(translations.criterionFiltersMap().get("in"));
     operatorChooser.addItem(translations.criterionFiltersMap().get("not_in"));
@@ -149,7 +150,13 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
       }
     });
 
-    rangeValueChooser.addStyleName("small-dual-indent");
+    panel.add(operatorChooser);
+    return panel;
+  }
+
+  private FlowPanel getRangeValuesChooserPanel() {
+    FlowPanel panel = new FlowPanel();
+
     rangeValueChooser.addItem(translations.criterionFiltersMap().get("select"));
     rangeValueChooser.addItem(translations.criterionFiltersMap().get("range"));
     rangeValueChooser.addItem(translations.criterionFiltersMap().get("values"));
@@ -162,15 +169,15 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
     rangeValueChooser.addChosenChangeHandler(new UpdateFilterChosenHandler());
     rangeValueChooser.setEnabled(false);
 
-    inPanel.add(operatorChooser);
-    inPanel.add(rangeValueChooser);
-    return inPanel;
+    panel.add(rangeValueChooser);
+    return panel;
   }
 
   @Override
   public void resetSpecificControls() {
     operatorChooser.setItemSelected(0, true);
     rangeValueChooser.setItemSelected(0, true);
+    rangeValueChooser.setEnabled(false);
     minLabel.setVisible(false);
     min.setVisible(false);
     maxLabel.setVisible(false);
@@ -196,27 +203,33 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
     }
 
     // VALUES
-    // Parse numbers
-    String[] numbers = values.getText().split(",");
-    String valuesQuery = fieldName + ":(" + Joiner.on(" OR ").join(numbers) + ")";
-    if(operatorChooser.isItemSelected(2)) {
-      return "NOT " + valuesQuery;
+    if(rangeValueChooser.isItemSelected(2) && values.getText().length() > 0) {
+      // Parse numbers
+      String[] numbers = values.getText().split(",");
+      String valuesQuery = fieldName + ":(" + Joiner.on(" OR ").join(numbers) + ")";
+      if(operatorChooser.isItemSelected(2)) {
+        return "NOT " + valuesQuery;
+      }
+      return valuesQuery;
     }
-    return valuesQuery;
+
+    return "";
   }
 
   private void updateRangeValuesCriterionFilter() {
-    String filter = operatorChooser.getItemText(operatorChooser.getSelectedIndex());
+    if(operatorChooser.getSelectedIndex() > 0) {
+      String filter = operatorChooser.getItemText(operatorChooser.getSelectedIndex());
 
-    if(rangeValueChooser.getSelectedIndex() > 0) {
-      filter += " " + rangeValueChooser.getItemText(rangeValueChooser.getSelectedIndex()).toLowerCase();
+      if(rangeValueChooser.getSelectedIndex() > 0) {
+        filter += " " + rangeValueChooser.getItemText(rangeValueChooser.getSelectedIndex()).toLowerCase();
 
-      filter += rangeValueChooser.isItemSelected(1) ? "[" + (min.getText().isEmpty() ? "" : min.getText()) + ", " +
-          (max.getText().isEmpty() ? "" : max.getText()) + "]" : "(" + values.getText() + ")";
+        filter += rangeValueChooser.isItemSelected(1) ? "[" + (min.getText().isEmpty() ? "*" : min.getText()) + " TO " +
+            (max.getText().isEmpty() ? "*" : max.getText()) + "]" : "(" + values.getText() + ")";
+      }
+
+      updateCriterionFilter(filter);
+      doFilterValueSets();
     }
-
-    updateCriterionFilter(filter);
-    doFilterValueSets();
   }
 
   private class UpdateFilterChosenHandler implements ChosenChangeEvent.ChosenChangeHandler {
