@@ -50,7 +50,9 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
     config.setTestOnBorrow(true);
     config.setTestWhileIdle(false);
     config.setTestOnReturn(false);
-    config.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer;" +
+    config.setDefaultAutoCommit(false);
+    config.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;" +
+        "org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer;" +
         "org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport");
 
     if("com.mysql.jdbc.Driver".equals(driverClass)) {
