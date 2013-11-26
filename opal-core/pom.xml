@@ -107,16 +107,12 @@
       <artifactId>hibernate-ehcache</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.ow2.jotm</groupId>
-      <artifactId>jotm-core</artifactId>
+      <groupId>org.jboss.narayana.jta</groupId>
+      <artifactId>narayana-jta</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.ow2.spec.ee</groupId>
-      <artifactId>ow2-connector-1.5-spec</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.ow2.spec.ee</groupId>
-      <artifactId>ow2-jta-1.1-spec</artifactId>
+      <groupId>org.jboss</groupId>
+      <artifactId>jboss-transaction-spi</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.tomcat</groupId>
