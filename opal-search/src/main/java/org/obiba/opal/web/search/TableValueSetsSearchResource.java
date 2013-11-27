@@ -156,7 +156,7 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
 
     ImmutableList.Builder<Magma.ValueSetsDto.ValueSetDto> valueSetDtoBuilder = ImmutableList.builder();
     Iterable<Magma.ValueSetsDto.ValueSetDto> transform = Iterables.transform(variableEntities,
-        new VariableEntityValueSetDtoFunction(getValueTable(), variables, uriInfoPath, false));
+        new VariableEntityValueSetDtoFunction(getValueTable(), variables, uriInfoPath, true));
 
     for(Magma.ValueSetsDto.ValueSetDto dto : transform) {
       valueSetDtoBuilder.add(dto);
