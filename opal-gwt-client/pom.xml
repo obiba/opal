@@ -91,6 +91,11 @@
       <artifactId>gwt-dnd</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>com.allen-sauer.gwt.log</groupId>
+      <artifactId>gwt-log</artifactId>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -143,7 +148,7 @@
           <hostedWebapp>war</hostedWebapp>
           <extraParam>true</extraParam>
           <includes>**/*Gwt*Suite.java</includes>
-          <!--<style>DETAILED</style>-->
+          <style>DETAILED</style>
         </configuration>
       </plugin>
 

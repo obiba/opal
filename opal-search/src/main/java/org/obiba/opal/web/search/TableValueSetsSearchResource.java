@@ -43,6 +43,7 @@ import org.obiba.opal.web.search.support.VariableEntityValueSetDtoFunction;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
@@ -169,7 +170,9 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
   protected Iterable<Variable> filterVariables(String script, Integer offset, @Nullable Integer limit) {
     List<Variable> filteredVariables = null;
 
-    if(script != null) {
+    if(StringUtils.isEmpty(script)) {
+      filteredVariables = Lists.newArrayList(getValueTable().getVariables());
+    } else {
       JavascriptClause jsClause = new JavascriptClause(script);
       jsClause.initialise();
 
@@ -179,8 +182,6 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
           filteredVariables.add(variable);
         }
       }
-    } else {
-      filteredVariables = Lists.newArrayList(getValueTable().getVariables());
     }
 
     int fromIndex = offset < filteredVariables.size() ? offset : filteredVariables.size();

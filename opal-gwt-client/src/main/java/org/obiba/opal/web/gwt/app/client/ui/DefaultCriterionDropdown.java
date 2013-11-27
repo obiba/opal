@@ -10,13 +10,10 @@
 
 package org.obiba.opal.web.gwt.app.client.ui;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.github.gwtbootstrap.client.ui.HelpBlock;
 import com.github.gwtbootstrap.client.ui.TextBox;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.FocusEvent;
-import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -24,11 +21,12 @@ import com.google.gwt.user.client.ui.Widget;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 
 public abstract class DefaultCriterionDropdown extends CriterionDropdown {
-  private static final Translations translations = GWT.create(Translations.class);
 
   private Chooser operatorChooser;
 
   private TextBox matches;
+
+  private HelpBlock matchesHelp;
 
   public DefaultCriterionDropdown(VariableDto variableDto, String fieldName) {
     super(variableDto, fieldName, null);
@@ -40,37 +38,31 @@ public abstract class DefaultCriterionDropdown extends CriterionDropdown {
 
     operatorChooser = new Chooser();
     matches = new TextBox();
+    matchesHelp = new HelpBlock(translations.criterionFiltersMap().get("wildcards_help"));
     specificControls.addStyleName("controls");
 
     specificControls.add(getOperatorsChooserPanel());
 
     matches.setPlaceholder(translations.criterionFiltersMap().get("custom_match_query"));
-    matches.addFocusHandler(new FocusHandler() {
-      @Override
-      public void onFocus(FocusEvent event) {
-        resetRadioControls();
-      }
-    });
     matches.addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent event) {
         updateMatchCriteriaFilter();
       }
     });
+    matches.setVisible(false);
+    matchesHelp.setVisible(false);
 
     specificControls.add(matches);
+    specificControls.add(matchesHelp);
     return specificControls;
   }
 
   private SimplePanel getOperatorsChooserPanel() {
     SimplePanel inPanel = new SimplePanel();
+    operatorChooser.addItem(translations.criterionFiltersMap().get("select_operator"));
     operatorChooser.addItem(translations.criterionFiltersMap().get("like"));
-    operatorChooser.addFocusHandler(new FocusHandler() {
-      @Override
-      public void onFocus(FocusEvent event) {
-        resetRadioControls();
-      }
-    });
+    operatorChooser.addItem(translations.criterionFiltersMap().get("not_like"));
     operatorChooser.addChosenChangeHandler(new UpdateFilterChosenHandler());
 
     inPanel.add(operatorChooser);
@@ -80,6 +72,8 @@ public abstract class DefaultCriterionDropdown extends CriterionDropdown {
   @Override
   public void resetSpecificControls() {
     operatorChooser.setItemSelected(0, true);
+    matches.setVisible(false);
+    matchesHelp.setVisible(false);
   }
 
   @Override
@@ -87,7 +81,15 @@ public abstract class DefaultCriterionDropdown extends CriterionDropdown {
     String emptyNotEmpty = super.getQueryString();
     if(emptyNotEmpty != null) return emptyNotEmpty;
 
-    return "";
+    if(operatorChooser.isItemSelected(1)) {
+      return fieldName + ":" + matches.getText();
+    }
+
+    if(operatorChooser.isItemSelected(2)) {
+      return "NOT " + fieldName + ":" + matches.getText();
+    }
+
+    return fieldName + ":*";
   }
 
   private class UpdateFilterChosenHandler implements ChosenChangeEvent.ChosenChangeHandler {
@@ -99,11 +101,22 @@ public abstract class DefaultCriterionDropdown extends CriterionDropdown {
   }
 
   private void updateMatchCriteriaFilter() {
-    if(matches.getText().isEmpty()) {
-      updateCriterionFilter("");
-    } else {
-      updateCriterionFilter(translations.criterionFiltersMap().get("like") + " " + matches.getText());
-      doFilterValueSets();
+    boolean isOperatorSelected = operatorChooser.getSelectedIndex() > 0;
+
+    matches.setVisible(isOperatorSelected);
+    matchesHelp.setVisible(isOperatorSelected);
+
+    if(isOperatorSelected) {
+      if(matches.getText().isEmpty()) {
+        updateCriterionFilter("");
+      } else {
+
+        String prefix = operatorChooser.isItemSelected(1)
+            ? translations.criterionFiltersMap().get("like") + " "
+            : translations.criterionFiltersMap().get("not_like") + " ";
+        updateCriterionFilter(prefix + matches.getText());
+        doFilterValueSets();
+      }
     }
   }
 }

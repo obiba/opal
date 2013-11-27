@@ -506,7 +506,8 @@ public interface Translations extends Constants {
       "DeleteTableSelectAtLeastOne", "Select at least one table to delete",//
       "XMLOrExcelFileRequired", "An Excel or a XML file is required.",//
       "CreateViewFailed", "Failed to create view. Make sure the view file is valid.",//
-      "SPSSOrExcelFileRequired", "An Excel or a SPSS file is required."//
+      "SPSSOrExcelFileRequired", "An Excel or a SPSS file is required.",//
+      "ESQueryBadRequest", "Not a valid search query."//
   })
   Map<String, String> userMessageMap();
 
@@ -2473,6 +2474,8 @@ public interface Translations extends Constants {
       "range", "Range", "values", "Values", //
       "custom_match_query", "Custom match query",//
       "like", "Like", //
+      "not_like", "Not like",//
+      "wildcards_help", "use the * wildcard character to replace one or more characters",//
       "from", "From",//
       "to", "To",//
       "date", "Date",//

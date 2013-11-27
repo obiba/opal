@@ -695,6 +695,8 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   private final class ValueSetsDataProvider extends AbstractDataProvider<ValueSetsDto.ValueSetDto>
       implements ValuesTablePresenter.ValueSetsProvider {
 
+    Range range;
+
     boolean exactMatch = false;
 
     private ValueSetsDataProvider(boolean exactMatch) {
@@ -704,19 +706,23 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     @Override
     protected void onRangeChanged(HasData<ValueSetDto> display) {
       // Get the new range.
-      Range range = display.getVisibleRange();
+      if(range == null || display.getVisibleRange().getStart() != range.getStart()) {
+        range = display.getVisibleRange();
 
-      // query the valueSets
-      int start = range.getStart();
+        // Range has changed
 
-      if(start > table.getValueSetCount()) return;
+        // query the valueSets
+        int start = range.getStart();
 
-      if(filter.getTextBox().getText().isEmpty()) {
-        setRefreshing(true);
-        fetcher.request(visibleListVariable, start, pager.getPageSize());
-      } else {
-        setRefreshing(true);
-        fetcher.request(filter.getTextBox().getText(), start, pager.getPageSize(), exactMatch);
+        if(start > table.getValueSetCount()) return;
+
+        if(filter.getTextBox().getText().isEmpty()) {
+          setRefreshing(true);
+          fetcher.request(visibleListVariable, start, pager.getPageSize());
+        } else {
+          setRefreshing(true);
+          fetcher.request(filter.getTextBox().getText(), start, pager.getPageSize(), exactMatch);
+        }
       }
     }
 
@@ -727,9 +733,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
       listValueSetVariable = JsArrays.toList(JsArrays.toSafeArray(valueSets.getVariablesArray()));
       updateRowData(offset, JsArrays.toList(JsArrays.toSafeArray(valueSets.getValueSetsArray())));
 
-      //TODO: How to refresh the table... The following line will refresh the results but launches a onRangeChanged
-      // which triggers another fetch...
-//      valuesTable.setRowData(JsArrays.toList(JsArrays.toSafeArray(valueSets.getValueSetsArray())));
+      valuesTable.setRowData(JsArrays.toList(JsArrays.toSafeArray(valueSets.getValueSetsArray())));
     }
   }
 

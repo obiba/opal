@@ -929,6 +929,13 @@
         <version>${gwt-dnd.version}</version>
       </dependency>
 
+      <!--GWT Log-->
+      <dependency>
+        <groupId>com.allen-sauer.gwt.log</groupId>
+        <artifactId>gwt-log</artifactId>
+        <version>${gwt-log.version}</version>
+      </dependency>
+
       <!-- BIRT dependencies -->
       <dependency>
         <groupId>org.obiba.opal.oda</groupId>
@@ -1652,6 +1659,7 @@
     <gwt-dnd.version>3.2.3</gwt-dnd.version>
     <gwt-chosen.version>1.2.0</gwt-chosen.version>
     <gwt-highcharts.version>1.5.0</gwt-highcharts.version>
+    <gwt-log.version>3.2.1</gwt-log.version>
     <gwt-visualization.version>1.0.2</gwt-visualization.version>
     <gwtopenlayers.version>0.9</gwtopenlayers.version>
     <gwtp.version>1.0.2</gwtp.version>
