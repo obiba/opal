@@ -17,11 +17,17 @@ import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.validation.ConstraintViolationException;
 
+import org.apache.shiro.subject.Subject;
 import org.obiba.opal.core.domain.HasUniqueProperties;
+import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.User;
+import org.obiba.opal.core.runtime.security.OrientDbRealm;
+import org.obiba.opal.core.service.DuplicateSubjectProfileException;
+import org.obiba.opal.core.service.DuplicateUserNameException;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SubjectAclService;
+import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -40,7 +46,10 @@ public class UserServiceImpl implements UserService {
   private static final String OPAL_DOMAIN = "opal";
 
   @Autowired
-  private SubjectAclService aclService;
+  private SubjectAclService subjectAclService;
+
+  @Autowired
+  private SubjectProfileService subjectProfileService;
 
   @Autowired
   private OrientDbService orientDbService;
@@ -78,6 +87,14 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public void save(User user) throws ConstraintViolationException {
+    boolean newUser = (getUser(user.getName()) == null);
+    if (newUser) {
+      SubjectProfile profile = subjectProfileService.getProfile(user.getName());
+      if(profile != null && !OrientDbRealm.OPAL_REALM.equals(profile.getRealm())) {
+        throw new DuplicateSubjectProfileException(profile);
+      }
+    }
+
     Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
     // Copy current password if password is empty
     if(user.getPassword() == null) {
@@ -89,6 +106,10 @@ public class UserServiceImpl implements UserService {
       toSave.put(group, group);
     }
     orientDbService.save(toSave);
+
+    if (newUser) {
+      subjectProfileService.ensureProfile(user.getName(), OrientDbRealm.OPAL_REALM);
+    }
   }
 
   private Iterable<Group> findImpactedGroups(final User user) {
@@ -144,9 +165,9 @@ public class UserServiceImpl implements UserService {
     // TODO we should execute these steps in a single transaction
     orientDbService.delete(user);
     if(!toSave.isEmpty()) orientDbService.save(toSave);
-    aclService.deleteSubjectPermissions(OPAL_DOMAIN, null,
-        SubjectAclService.SubjectType.valueOf(SubjectAclService.SubjectType.USER.name())
-            .subjectFor(user.getName())); // Delete user's permissions
+    subjectAclService.deleteSubjectPermissions(OPAL_DOMAIN, null,
+        SubjectAclService.SubjectType.USER.subjectFor(user.getName())); // Delete user's permissions
+    subjectProfileService.deleteProfile(user.getName());
   }
 
   @Override
@@ -176,7 +197,7 @@ public class UserServiceImpl implements UserService {
     // TODO we should execute these steps in a single transaction
     orientDbService.delete(group);
     if(!toSave.isEmpty()) orientDbService.save(toSave);
-    aclService.deleteSubjectPermissions(OPAL_DOMAIN, null,
+    subjectAclService.deleteSubjectPermissions(OPAL_DOMAIN, null,
         SubjectAclService.SubjectType.valueOf(SubjectAclService.SubjectType.GROUP.name())
             .subjectFor(group.getName())); // Delete group's permissions
   }

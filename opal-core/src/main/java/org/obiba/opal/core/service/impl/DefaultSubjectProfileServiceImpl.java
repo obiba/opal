@@ -10,11 +10,12 @@
 
 package org.obiba.opal.core.service.impl;
 
+import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
+import javax.validation.constraints.NotNull;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.Subject;
-import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SubjectProfileService;
@@ -43,9 +44,7 @@ public class DefaultSubjectProfileServiceImpl implements SubjectProfileService {
   }
 
   @Override
-  public void ensureProfile(Subject subject) {
-    String principal = subject.getPrincipal().toString();
-    String realm = subject.getPrincipals().getRealmNames().iterator().next();
+  public void ensureProfile(@NotNull String principal, @NotNull String realm) {
     log.info("ensure profile of user {} from realm: {}", principal, realm);
 
     SubjectProfile profile = getProfile(principal);
@@ -60,12 +59,23 @@ public class DefaultSubjectProfileServiceImpl implements SubjectProfileService {
   }
 
   @Override
-  public void deleteProfile(String name) {
-
+  public void ensureProfile(@NotNull Subject subject) {
+    String principal = subject.getPrincipal().toString();
+    String realm = subject.getPrincipals().getRealmNames().iterator().next();
+    ensureProfile(principal, realm);
   }
 
-  public SubjectProfile getProfile(String principal) {
-    SubjectProfile profile = orientDbService.findUnique(SubjectProfile.Builder.create(principal).build());
-    return profile;
+  @Override
+  public void deleteProfile(@NotNull String principal) {
+    SubjectProfile profile = getProfile(principal);
+    if(profile != null) {
+      orientDbService.delete(profile);
+    }
+  }
+
+  @Nullable
+  @Override
+  public SubjectProfile getProfile(@NotNull String principal) {
+    return orientDbService.findUnique(SubjectProfile.Builder.create(principal).build());
   }
 }

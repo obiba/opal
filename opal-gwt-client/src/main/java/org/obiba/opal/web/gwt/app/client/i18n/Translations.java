@@ -507,7 +507,9 @@ public interface Translations extends Constants {
       "XMLOrExcelFileRequired", "An Excel or a XML file is required.",//
       "CreateViewFailed", "Failed to create view. Make sure the view file is valid.",//
       "SPSSOrExcelFileRequired", "An Excel or a SPSS file is required.",//
-      "ESQueryBadRequest", "Not a valid search query."//
+      "ESQueryBadRequest", "Not a valid search query.",
+      "DuplicateUserName", "A user with same name already exists.",
+      "DuplicateSubjectProfile", "A user or organization profile already registered with the same name."//
   })
   Map<String, String> userMessageMap();
 

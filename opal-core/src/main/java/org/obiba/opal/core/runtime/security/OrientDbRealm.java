@@ -35,13 +35,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class OrientDbRealm extends AuthorizingRealm {
 
+  public static final String OPAL_REALM = "opal-realm";
+
   @Autowired
   private UserService userService;
 
   public OrientDbRealm() {
     setCacheManager(new MemoryConstrainedCacheManager());
     setCredentialsMatcher(new HashedCredentialsMatcher("SHA"));
-    setName("opal-realm");
+    setName(OPAL_REALM);
   }
 
   @Override

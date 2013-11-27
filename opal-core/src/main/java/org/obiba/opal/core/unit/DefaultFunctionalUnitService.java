@@ -19,8 +19,12 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
+import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.DuplicateSubjectProfileException;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.service.SubjectProfileService;
+import org.obiba.opal.core.unit.security.FunctionalUnitRealm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -33,15 +37,14 @@ import com.google.common.base.Objects;
  */
 public class DefaultFunctionalUnitService implements FunctionalUnitService {
 
-  private final OpalConfigurationService configService;
-
-  private final ApplicationContext applicationContext;
+  @Autowired
+  private OpalConfigurationService configService;
 
   @Autowired
-  public DefaultFunctionalUnitService(ApplicationContext applicationContext, OpalConfigurationService configService) {
-    this.configService = configService;
-    this.applicationContext = applicationContext;
-  }
+  private ApplicationContext applicationContext;
+
+  @Autowired
+  private SubjectProfileService subjectProfileService;
 
   @Override
   public boolean hasFunctionalUnit(String unitName) {
@@ -60,6 +63,7 @@ public class DefaultFunctionalUnitService implements FunctionalUnitService {
         }
       }
     });
+    subjectProfileService.deleteProfile(unitName);
   }
 
   @Override
@@ -80,13 +84,23 @@ public class DefaultFunctionalUnitService implements FunctionalUnitService {
 
   @Override
   public void addOrReplaceFunctionalUnit(final FunctionalUnit functionalUnit) {
+    final boolean newUnit = !hasFunctionalUnit(functionalUnit.getName());
+    if(newUnit) {
+      // check for subject profile
+      SubjectProfile found = subjectProfileService.getProfile(functionalUnit.getName());
+      if(found != null && !FunctionalUnitRealm.FUNCTIONAL_UNIT_REALM.equals(found.getRealm())) {
+        throw new DuplicateSubjectProfileException(found);
+      }
+    }
     configService.modifyConfiguration(new ConfigModificationTask() {
 
       @Override
       public void doWithConfig(OpalConfiguration config) {
         FunctionalUnit unit = getFunctionalUnit(functionalUnit.getName());
-        if(unit != null) config.getFunctionalUnits().remove(unit);
+        if(!newUnit) config.getFunctionalUnits().remove(unit);
         config.getFunctionalUnits().add(functionalUnit);
+        if(newUnit)
+          subjectProfileService.ensureProfile(functionalUnit.getName(), FunctionalUnitRealm.FUNCTIONAL_UNIT_REALM);
       }
     });
   }

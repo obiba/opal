@@ -17,6 +17,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.user.User;
+import org.obiba.opal.core.service.DuplicateUserNameException;
 import org.obiba.opal.core.service.UserService;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,10 @@ public class UsersResource {
   @POST
   public Response createUser(Opal.UserDto dto) {
     User user = Dtos.fromDto(dto);
+    User found = userService.getUser(user.getName());
+    if (found != null) {
+      throw new DuplicateUserNameException(found, user);
+    }
     user.setPassword(User.digest(dto.getPassword()));
     userService.save(user);
     return Response.ok().build();

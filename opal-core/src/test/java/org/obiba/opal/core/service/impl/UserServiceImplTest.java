@@ -9,6 +9,7 @@ import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.User;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SubjectAclService;
+import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +22,8 @@ import com.google.common.collect.Sets;
 
 import static com.google.common.collect.Iterables.size;
 import static com.google.common.collect.Lists.newArrayList;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -189,6 +192,8 @@ public class UserServiceImplTest extends AbstractJUnit4SpringContextTests {
   @Configuration
   public static class Config extends AbstractOrientDbTestConfig {
 
+    SubjectProfileService subjectProfileService;
+
     @Bean
     public UserService userService() {
       return new UserServiceImpl();
@@ -197,6 +202,26 @@ public class UserServiceImplTest extends AbstractJUnit4SpringContextTests {
     @Bean
     public SubjectAclService subjectAclService() {
       return EasyMock.createMock(SubjectAclService.class);
+    }
+
+    @Bean
+    public SubjectProfileService subjectProfileService() {
+      if(subjectProfileService == null) {
+        subjectProfileService = EasyMock.createMock(SubjectProfileService.class);
+        expect(subjectProfileService.getProfile("user1")) //
+            .andReturn(null) //
+            .anyTimes();
+        subjectProfileService.ensureProfile("user1", "opal-realm");
+        subjectProfileService.ensureProfile("user1", "opal-realm");
+        subjectProfileService.ensureProfile("user1", "opal-realm");
+        subjectProfileService.ensureProfile("user1", "opal-realm");
+        subjectProfileService.ensureProfile("user1", "opal-realm");
+        subjectProfileService.ensureProfile("user1", "opal-realm");
+        subjectProfileService.deleteProfile("user1");
+        subjectProfileService.deleteProfile("user1");
+        replay(subjectProfileService);
+      }
+      return subjectProfileService;
     }
 
   }

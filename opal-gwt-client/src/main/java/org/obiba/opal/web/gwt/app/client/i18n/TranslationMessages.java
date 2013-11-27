@@ -37,7 +37,7 @@ public interface TranslationMessages extends Messages {
   String confirmDeleteAttribute(String name);
 
   @Description("Unknown Response")
-  @DefaultMessage("Unknown response {0}: {1}")
+  @DefaultMessage("[{0}] {1}")
   String unknownResponse(String statusText, String text);
 
 }

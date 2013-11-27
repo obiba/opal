@@ -35,12 +35,14 @@ public class FunctionalUnitRealm extends AuthorizingRealm {
 
   private static final Logger log = LoggerFactory.getLogger(FunctionalUnitRealm.class);
 
+  public static final String FUNCTIONAL_UNIT_REALM = "functional-unit-realm";
+
   @Autowired
   private FunctionalUnitService functionalUnitService;
 
   @Override
   public String getName() {
-    return "functional-unit-realm";
+    return FUNCTIONAL_UNIT_REALM;
   }
 
   @Override
