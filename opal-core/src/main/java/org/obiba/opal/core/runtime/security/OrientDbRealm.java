@@ -41,6 +41,7 @@ public class OrientDbRealm extends AuthorizingRealm {
   public OrientDbRealm() {
     setCacheManager(new MemoryConstrainedCacheManager());
     setCredentialsMatcher(new HashedCredentialsMatcher("SHA"));
+    setName("opal-realm");
   }
 
   @Override

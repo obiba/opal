@@ -26,10 +26,13 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.session.InvalidSessionException;
+import org.apache.shiro.subject.Subject;
+import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -38,16 +41,27 @@ public class AuthenticationResource extends AbstractSecurityComponent {
 
   private static final Logger log = LoggerFactory.getLogger(AuthenticationResource.class);
 
+  @Autowired
+  private SubjectProfileService subjectProfileService;
+
   @POST
   @Path("/sessions")
   @NotAuthenticated
   public Response createSession(@Context ServletRequest servletRequest, @FormParam("username") String username,
       @FormParam("password") String password) {
     try {
-      SecurityUtils.getSubject().login(new UsernamePasswordToken(username, password));
+      Subject subject = SecurityUtils.getSubject();
+      subject.login(new UsernamePasswordToken(username, password));
+      subjectProfileService.ensureProfile(subject);
     } catch(AuthenticationException e) {
-      log.info("Authentication failure of user '{}' at ip: '{}': {}", username, servletRequest.getRemoteAddr(),
-          e.getMessage());
+      String remoteAddr;
+      try {
+        remoteAddr = servletRequest.getRemoteAddr();
+      } catch(Exception ex) {
+        log.warn("Unable to get remote address: {}", ex.getMessage(), ex);
+        remoteAddr = "?";
+      }
+      log.info("Authentication failure of user '{}' at ip: '{}': {}", username, remoteAddr, e.getMessage());
       // When a request contains credentials and they are invalid, the a 403 (Forbidden) should be returned.
       return Response.status(Status.FORBIDDEN).build();
     }

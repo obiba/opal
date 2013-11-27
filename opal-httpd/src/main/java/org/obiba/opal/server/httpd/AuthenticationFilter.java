@@ -33,6 +33,7 @@ import org.eclipse.jetty.http.HttpHeaders;
 import org.eclipse.jetty.http.HttpStatus;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.SubjectAclService;
+import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.unit.security.X509CertificateAuthenticationToken;
 import org.obiba.opal.web.security.HttpAuthorizationToken;
 import org.obiba.opal.web.security.HttpCookieAuthenticationToken;
@@ -56,6 +57,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
   private OpalRuntime opalRuntime;
 
   private SubjectAclService subjectAclService;
+
+  private SubjectProfileService subjectProfileService;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -88,6 +91,11 @@ public class AuthenticationFilter extends OncePerRequestFilter {
   private SubjectAclService getSubjectAclService() {
     if(subjectAclService == null) subjectAclService = getSpringBean(SubjectAclService.class);
     return subjectAclService;
+  }
+
+  private SubjectProfileService getSubjectProfileService() {
+    if(subjectProfileService == null) subjectProfileService = getSpringBean(SubjectProfileService.class);
+    return subjectProfileService;
   }
 
   private <T> T getSpringBean(Class<T> clazz) {
@@ -127,6 +135,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
           Thread.currentThread().getId());
       session.touch();
       String username = subject.getPrincipal().toString();
+      getSubjectProfileService().ensureProfile(subject);
       ensureUserHomeExists(username);
       ensureFolderPermissions(username, "/home/" + username);
       ensureFolderPermissions(username, "/tmp");
