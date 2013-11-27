@@ -527,6 +527,11 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     return valuesFilterGroup;
   }
 
+  @Override
+  public int getPageSize() {
+    return pager.getPageSize();
+  }
+
   //
   // Inner classes
   //

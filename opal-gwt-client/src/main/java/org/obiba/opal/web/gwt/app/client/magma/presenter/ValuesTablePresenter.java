@@ -202,6 +202,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
               .query("query", filters.isEmpty() ? "*" : Joiner.on(" AND ").join(filters))//
               .query("select", currentVariablesFilterSelect)//
               .query("offset", String.valueOf(offset))//
+              .query("limit", String.valueOf(getView().getPageSize()))//
               .build(table.getDatasourceName(), table.getName()))
           .withCallback(new ResourceCallback<ValueSetsResultDto>() {
             @Override
@@ -530,6 +531,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     FlowPanel getFiltersPanel();
 
     ControlGroup getValuesFilterGroup();
+
+    int getPageSize();
   }
 
   public enum ViewMode {
