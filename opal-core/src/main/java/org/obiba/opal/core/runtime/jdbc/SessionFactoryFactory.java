@@ -57,10 +57,8 @@ public class SessionFactoryFactory {
   // need to run outside the transaction so HBM2DDL_AUTO can change auto-commit to update schema
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
   public SessionFactory getSessionFactory(DataSource dataSource) {
-
     Set<Class<?>> annotatedTypes = HibernateConfigurationHelper.getAnnotatedTypes();
-
-    final LocalSessionFactoryBean factory = new LocalSessionFactoryBean();
+    LocalSessionFactoryBean factory = new LocalSessionFactoryBean();
     factory.setDataSource(dataSource);
     factory.setAnnotatedClasses(annotatedTypes.toArray(new Class[annotatedTypes.size()]));
     factory.setJtaTransactionManager(jtaTransactionManager);
@@ -74,18 +72,19 @@ public class SessionFactoryFactory {
     factory.getHibernateProperties().setProperty(CURRENT_SESSION_CONTEXT_CLASS, "jta");
     factory.getHibernateProperties().setProperty(AUTO_CLOSE_SESSION, "true");
     factory.getHibernateProperties().setProperty(FLUSH_BEFORE_COMPLETION, "true");
+    factory.getHibernateProperties().setProperty(DIALECT, guessDialect(dataSource, factory));
+    return ((LocalSessionFactoryBean) applicationContext.getAutowireCapableBeanFactory()
+        .initializeBean(factory, dataSource.hashCode() + "-sessionFactory")).getObject();
+  }
+
+  private String guessDialect(DataSource dataSource, final LocalSessionFactoryBean factory) {
     Dialect dialect = new JdbcTemplate(dataSource).execute(new ConnectionCallback<Dialect>() {
       @Override
       public Dialect doInConnection(Connection connection) throws SQLException, DataAccessException {
         return dialectFactory.buildDialect(factory.getHibernateProperties(), connection);
       }
     });
-    factory.getHibernateProperties().setProperty(DIALECT,
-        dialect instanceof HSQLDialect ? MagmaHSQLDialect.class.getName() : dialect.getClass().getName());
-
-    // Inject dependencies
-    return ((LocalSessionFactoryBean) applicationContext.getAutowireCapableBeanFactory()
-        .initializeBean(factory, dataSource.hashCode() + "-sessionFactory")).getObject();
+    return dialect instanceof HSQLDialect ? MagmaHSQLDialect.class.getName() : dialect.getClass().getName();
   }
 
 }
