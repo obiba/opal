@@ -72,7 +72,7 @@ import static com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE;
 public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.Display>
     implements ValuesTableUiHandlers {
 
-  private TableDto table;
+  private TableDto originalTable;
 
   private DataFetcher fetcher;
 
@@ -103,7 +103,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   public void setTable(TableDto table, VariableDto variable) {
-    this.table = table;
+    originalTable = table;
 
     getView().setTable(table);
     JsArray<VariableDto> variables = JsArray.createArray().cast();
@@ -114,7 +114,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   public void setTable(final TableDto table, String select) {
-    this.table = table;
+    originalTable = table;
 
     getView().clearTable();
     getView().getFiltersPanel().clear();
@@ -156,15 +156,15 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   // Filter with Match instead of Es query
   private class VariablesDtoResourceCallback implements ResourceCallback<JsArray<VariableDto>> {
 
-    private final TableDto table;
+    private final String link;
 
-    private VariablesDtoResourceCallback(TableDto table) {
-      this.table = table;
+    private VariablesDtoResourceCallback(String link) {
+      this.link = link;
     }
 
     @Override
     public void onResource(Response response, JsArray<VariableDto> resource) {
-      if(table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
+      if(link.equals(originalTable.getLink())) {
         JsArray<VariableDto> variables = resource == null
             ? JsArray.createArray().<JsArray<VariableDto>>cast()
             : resource;
@@ -177,8 +177,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   @Override
   public void onVariableFilter(String variableName) {
     // Fetch variable and show its filter
-    ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(
-        UriBuilders.DATASOURCE_TABLE_VARIABLE.create().build(table.getDatasourceName(), table.getName(), variableName))
+    ResourceRequestBuilderFactory.<VariableDto>newBuilder().forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
+        .build(originalTable.getDatasourceName(), originalTable.getName(), variableName))
         .withCallback(new VariableFilterResourceCallback(variableName)).get().send();
   }
 
@@ -202,8 +202,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
               .query("query", filters.isEmpty() ? "*" : Joiner.on(" AND ").join(filters))//
               .query("select", currentVariablesFilterSelect)//
               .query("offset", String.valueOf(offset))//
-              .query("limit", String.valueOf(getView().getPageSize()))//
-              .build(table.getDatasourceName(), table.getName()))
+              .query("limit", String.valueOf(originalTable.getValueSetCount()))//
+              .build(originalTable.getDatasourceName(), originalTable.getName()))
           .withCallback(new ResourceCallback<ValueSetsResultDto>() {
             @Override
             public void onResource(Response response, ValueSetsResultDto resource) {
@@ -222,8 +222,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private void fetchIndexSchema() {
     // Show Values Filter when ES is enabled
-    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()
-        .forResource(UriBuilders.DATASOURCE_TABLE_INDEX.create().build(table.getDatasourceName(), table.getName()))
+    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder().forResource(
+        UriBuilders.DATASOURCE_TABLE_INDEX.create().build(originalTable.getDatasourceName(), originalTable.getName()))
         .get().withCallback(new ResponseCodeCallback() {
       @Override
       public void onResponseCode(Request request, Response response) {
@@ -241,7 +241,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
             if(isIndexed) {
               // Fetch variable-field mapping for ES queries
               ResourceRequestBuilderFactory.<OpalMap>newBuilder().forResource(
-                  UriBuilders.DATASOURCE_TABLE_INDEX_SCHEMA.create().build(table.getDatasourceName(), table.getName()))
+                  UriBuilders.DATASOURCE_TABLE_INDEX_SCHEMA.create()
+                      .build(originalTable.getDatasourceName(), originalTable.getName()))
                   .withCallback(new ResourceCallback<OpalMap>() {
                     @Override
                     public void onResource(Response response, OpalMap resource) {
@@ -257,16 +258,16 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private class VariablesResourceCallback implements ResourceCallback<QueryResultDto> {
 
-    private final TableDto table;
+    private final String link;
 
-    private VariablesResourceCallback(TableDto table) {
-      this.table = table;
+    private VariablesResourceCallback(String link) {
+      this.link = link;
     }
 
     @Override
     public void onResource(Response response, QueryResultDto resource) {
 
-      if(table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
+      if(link.equals(originalTable.getLink())) {
 
         JsArray<VariableDto> variables = JsArrays.create();
         QueryResultDto resultDto = JsonUtils.unsafeEval(response.getText());
@@ -284,16 +285,16 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     private final int offset;
 
-    private final TableDto table;
+    private final String link;
 
-    private ValueSetsResourceCallback(int offset, TableDto table) {
+    private ValueSetsResourceCallback(int offset, String link) {
       this.offset = offset;
-      this.table = table;
+      this.link = link;
     }
 
     @Override
     public void onResource(Response response, ValueSetsDto resource) {
-      if(table.getLink().equals(ValuesTablePresenter.this.table.getLink())) {
+      if(link.equals(originalTable.getLink())) {
         if(getView().getValuesFilterGroup().isVisible()) {
           applyAllValueSetsFilter(offset);
         } else {
@@ -325,18 +326,18 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     @Override
     public void onSearch(final String identifier) {
-      UriBuilder uriBuilder = UriBuilder.create().segment("entity", identifier, "type", table.getEntityType());
+      UriBuilder uriBuilder = UriBuilder.create().segment("entity", identifier, "type", originalTable.getEntityType());
       ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder().forResource(uriBuilder.build()).get()
           .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
               fireEvent(NotificationEvent.newBuilder().error("EntityIdentifierNotFound")
-                  .args(table.getEntityType(), identifier, table.getName()).build());
+                  .args(originalTable.getEntityType(), identifier, originalTable.getName()).build());
             }
           }).withCallback(Response.SC_OK, new ResponseCodeCallback() {
         @Override
         public void onResponseCode(Request request, Response response) {
-          fetcher.requestEntityDialog(table.getEntityType(), identifier);
+          fetcher.requestEntityDialog(originalTable.getEntityType(), identifier);
         }
       }).send();
     }
@@ -351,7 +352,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     @Override
     public void request(List<VariableDto> variables, int offset, int limit) {
       StringBuilder link = getLinkBuilder(offset, limit);
-      if(table.getVariableCount() > variables.size()) {
+      if(originalTable.getVariableCount() > variables.size()) {
         link.append("&select=");
         StringBuilder script = new StringBuilder("name().lowerCase().matches(/");
         if(variables.isEmpty()) {
@@ -392,7 +393,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
           .withVariable(true)//
           .withLimit(limit)//
           .withOffset(offset)//
-          .isExactMatch(exactMatch).filter(getEventBus(), table);
+          .isExactMatch(exactMatch).filter(getEventBus(), originalTable);
     }
 
     private String escape(String filter) {
@@ -406,18 +407,18 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       }
       valuesRequest = ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder().forResource(link) //
           .get() //
-          .withCallback(new ValueSetsResourceCallback(offset, table)) //
+          .withCallback(new ValueSetsResourceCallback(offset, originalTable.getLink())) //
           .withCallback(SC_BAD_REQUEST, new BadRequestCallback()).send();
     }
 
     private StringBuilder getLinkBuilder(int offset, int limit) {
-      return new StringBuilder(table.getLink()).append("/valueSets").append("?offset=").append(offset).append("&limit=")
-          .append(limit);
+      return new StringBuilder(originalTable.getLink()).append("/valueSets").append("?offset=").append(offset)
+          .append("&limit=").append(limit);
     }
 
     @Override
     public void requestBinaryValue(VariableDto variable, String entityIdentifier) {
-      StringBuilder link = new StringBuilder(table.getLink());
+      StringBuilder link = new StringBuilder(originalTable.getLink());
       link.append("/valueSet/").append(entityIdentifier).append("/variable/").append(variable.getName())
           .append("/value");
       getEventBus().fireEvent(new FileDownloadRequestEvent(link.toString()));
@@ -431,13 +432,13 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     @Override
     public void requestValueSequence(VariableDto variable, String entityIdentifier) {
       ValueSequencePopupPresenter valueSequencePopupPresenter = valueSequencePopupProvider.get();
-      valueSequencePopupPresenter.initialize(table, variable, entityIdentifier, false);
+      valueSequencePopupPresenter.initialize(originalTable, variable, entityIdentifier, false);
     }
 
     @Override
     public void requestEntityDialog(String entityType, String entityId) {
       EntityModalPresenter entityModalPresenter = entityModalProvider.get();
-      entityModalPresenter.initialize(table, entityType, entityId, getView().getFilterText());
+      entityModalPresenter.initialize(originalTable, entityType, entityId, getView().getFilterText());
     }
 
     @Override
@@ -446,9 +447,9 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
       String resource = UriBuilders.DATASOURCE_TABLE_VARIABLES_SEARCH.create()//
           .query("query", query)//
-          .query("limit", String.valueOf(table.getVariableCount()))//
+          .query("limit", String.valueOf(originalTable.getVariableCount()))//
           .query("variable", "true")//
-          .build(table.getDatasourceName(), table.getName());
+          .build(originalTable.getDatasourceName(), originalTable.getName());
 
       if(variablesRequest != null) {
         variablesRequest.cancel();
@@ -457,19 +458,19 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       getView().clearTable();
 
       variablesRequest = ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(resource).get()//
-          .withCallback(new VariablesResourceCallback(table))
+          .withCallback(new VariablesResourceCallback(originalTable.getLink()))
           .withCallback(Response.SC_BAD_REQUEST, new BadRequestCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
               notifyError(response);
-              setTable(table);
+              setTable(originalTable);
             }
           }).withCallback(new ResponseCodeCallback() {
 
             @Override
             public void onResponseCode(Request request, Response response) {
               // Use the previous way of filtering variables
-              String link = table.getLink() + "/variables";
+              String link = originalTable.getLink() + "/variables";
 
               if(!"*".equals(query)) {
                 currentVariablesFilterSelect = getVariablesFilterSelect(query);
@@ -482,12 +483,12 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
               getView().clearTable();
               variablesRequest = ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(link)
                   .get()//
-                  .withCallback(new VariablesDtoResourceCallback(table))
+                  .withCallback(new VariablesDtoResourceCallback(originalTable.getLink()))
                   .withCallback(Response.SC_BAD_REQUEST, new BadRequestCallback() {
                     @Override
                     public void onResponseCode(Request request, Response response) {
                       notifyError(response);
-                      setTable(table);
+                      setTable(originalTable);
                     }
                   }).send();
             }
@@ -532,7 +533,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     ControlGroup getValuesFilterGroup();
 
-    int getPageSize();
+    String getPageSize();
   }
 
   public enum ViewMode {
@@ -597,7 +598,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
           // Filter for Categorical variable OR Numerical variable
           ResourceRequestBuilderFactory.<QueryResultDto>newBuilder().forResource(
               UriBuilders.DATASOURCE_TABLE_FACET_VARIABLE_SEARCH.create()
-                  .build(table.getDatasourceName(), table.getName(), variableName))
+                  .build(originalTable.getDatasourceName(), originalTable.getName(), variableName))
               .withCallback(new FacetVariableResourceCallback(resource, indexedFieldName)).get().send();
 
         } else {
