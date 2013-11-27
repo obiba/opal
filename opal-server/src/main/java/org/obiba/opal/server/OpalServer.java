@@ -41,11 +41,6 @@ public class OpalServer {
     // http://martijndashorst.com/blog/2011/02/21/ehcache-and-quartz-phone-home-during-startup
     System.setProperty("net.sf.ehcache.skipUpdateCheck", "true");
     System.setProperty("org.terracotta.quartz.skipUpdateCheck", "true");
-
-    // JBossTS storage
-    String jBossTsStorageDir = System.getenv().get("OPAL_HOME") + "/work/jbossts";
-    System.setProperty("com.arjuna.ats.arjuna.objectstore.objectStoreDir", jBossTsStorageDir);
-    System.setProperty("ObjectStoreEnvironmentBean.objectStoreDir", jBossTsStorageDir);
   }
 
   private void upgrade() {

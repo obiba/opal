@@ -1,5 +1,7 @@
 package org.obiba.opal.core.service.impl;
 
+import java.sql.SQLException;
+
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -7,7 +9,7 @@ import javax.sql.DataSource;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
 
-import org.apache.tomcat.jdbc.pool.DataSourceProxy;
+import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.obiba.magma.DatasourceFactory;
@@ -285,7 +287,10 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
       log.info("Destroying DataSource {}", notification.getKey());
       DataSource dataSource = notification.getValue();
       if(dataSource != null) {
-        ((DataSourceProxy) dataSource).close();
+        try {
+          ((BasicDataSource) dataSource).close();
+        } catch(SQLException ignored) {
+        }
       }
     }
   }

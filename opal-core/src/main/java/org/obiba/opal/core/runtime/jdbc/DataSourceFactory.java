@@ -14,13 +14,19 @@ import javax.validation.constraints.NotNull;
 
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.SqlSettings;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DataSourceFactory {
 
+  @Autowired
+  private ApplicationContext applicationContext;
+
   public DataSource createDataSource(@NotNull Database database) {
-    DataSourceFactoryBean factoryBean = new DataSourceFactoryBean();
+    DataSourceFactoryBean factoryBean = applicationContext.getAutowireCapableBeanFactory()
+        .createBean(DataSourceFactoryBean.class);
     SqlSettings sqlSettings = database.getSqlSettings();
     if(sqlSettings == null) {
       throw new IllegalArgumentException("Cannot create a JDBC DataSource without SqlSettings");

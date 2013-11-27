@@ -7,16 +7,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.obiba.opal.core.runtime.jdbc;
 
 import javax.sql.DataSource;
+import javax.transaction.TransactionManager;
 
-import org.apache.tomcat.jdbc.pool.PoolConfiguration;
-import org.apache.tomcat.jdbc.pool.PoolProperties;
+import org.apache.commons.dbcp.managed.BasicManagedDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class DataSourceFactoryBean implements FactoryBean<DataSource> {
 
@@ -36,34 +36,39 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
 
   private String password;
 
+  private TransactionManager jtaTransactionManager;
+
+  @Autowired
+  public void setJtaTransactionManager(TransactionManager jtaTransactionManager) {
+    this.jtaTransactionManager = jtaTransactionManager;
+  }
+
   @Override
   public DataSource getObject() {
     log.debug("Configure DataSource for {}", url);
-    PoolConfiguration config = new PoolProperties();
-    config.setDriverClassName(driverClass);
-    config.setUrl(url);
-    config.setUsername(username);
-    config.setPassword(password);
-//    config.setInitialSize(MIN_POOL_SIZE);
-//    config.setMaxActive(MAX_POOL_SIZE);
-    config.setMaxIdle(MAX_IDLE);
-    config.setTestOnBorrow(true);
-    config.setTestWhileIdle(false);
-    config.setTestOnReturn(false);
-    config.setDefaultAutoCommit(false);
-    config.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;" +
-        "org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer;" +
-        "org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport");
+    BasicManagedDataSource dataSource = new BasicManagedDataSource();
+    dataSource.setTransactionManager(jtaTransactionManager);
+    dataSource.setDriverClassName(driverClass);
+    dataSource.setUrl(url);
+    dataSource.setUsername(username);
+    dataSource.setPassword(password);
+    dataSource.setInitialSize(MIN_POOL_SIZE);
+    dataSource.setMaxActive(MAX_POOL_SIZE);
+    dataSource.setMaxIdle(MAX_IDLE);
+    dataSource.setTestOnBorrow(true);
+    dataSource.setTestWhileIdle(false);
+    dataSource.setTestOnReturn(false);
+    dataSource.setDefaultAutoCommit(false);
 
     if("com.mysql.jdbc.Driver".equals(driverClass)) {
-      config.setValidationQuery("select 1");
+      dataSource.setValidationQuery("select 1");
     } else if("org.hsqldb.jdbcDriver".equals(driverClass)) {
-      config.setValidationQuery("select 1 from INFORMATION_SCHEMA.SYSTEM_USERS");
+      dataSource.setValidationQuery("select 1 from INFORMATION_SCHEMA.SYSTEM_USERS");
     } else {
       //TODO validation query for PostgreSQL
       throw new IllegalArgumentException("Unsupported JDBC driver: " + driverClass);
     }
-    return new org.apache.tomcat.jdbc.pool.DataSource(config);
+    return dataSource;
   }
 
   @Override

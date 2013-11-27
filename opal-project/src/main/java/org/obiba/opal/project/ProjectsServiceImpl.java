@@ -35,6 +35,7 @@ import org.obiba.opal.project.domain.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -135,6 +136,7 @@ public class ProjectsServiceImpl implements ProjectService {
   }
 
   @Override
+  @Transactional
   public void save(@NotNull Project project) throws ConstraintViolationException {
     try {
       Project original = getProject(project.getName());
