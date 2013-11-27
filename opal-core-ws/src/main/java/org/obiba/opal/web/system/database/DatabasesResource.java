@@ -42,8 +42,7 @@ public class DatabasesResource {
   @ApiOperation(value = "Returns all data databases",
       notes = "The Identifiers database will not be returned here", response = List.class)
   public List<DatabaseDto> getDatabases(
-      @ApiParam(value = "database usage", allowableValues = "import,storage,export") @QueryParam("usage")
-      String usage,
+      @ApiParam(value = "database usage", allowableValues = "import,storage,export") @QueryParam("usage") String usage,
       @ApiParam(value = "should response contains database settings", defaultValue = "false") @QueryParam("settings")
       @DefaultValue("false") Boolean settings) {
     try {
@@ -76,13 +75,15 @@ public class DatabasesResource {
   @ApiOperation(value = "Returns the Identifiers database", response = DatabaseDto.class)
   @ApiResponses(@ApiResponse(code = 404, message = "Identifiers database not found"))
   public DatabaseDto getIdentifiersDatabase() {
-    return Dtos.asDto(databaseRegistry.getIdentifiersDatabase());
+    Database database = databaseRegistry.getIdentifiersDatabase();
+    return Dtos.asDto(database, databaseRegistry.hasDatasource(database), databaseRegistry.hasEntities(database));
   }
 
   private List<DatabaseDto> asDto(Iterable<? extends Database> databases, boolean withSettings) {
     List<DatabaseDto> dtos = new ArrayList<DatabaseDto>();
     for(Database database : databases) {
-      dtos.add(Dtos.asDto(database, withSettings));
+      dtos.add(Dtos.asDto(database, databaseRegistry.hasDatasource(database), databaseRegistry.hasEntities(database),
+          withSettings));
     }
     return dtos;
   }

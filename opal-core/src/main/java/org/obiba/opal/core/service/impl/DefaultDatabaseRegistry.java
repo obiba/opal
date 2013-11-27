@@ -12,7 +12,9 @@ import javax.validation.constraints.NotNull;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
+import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory;
 import org.obiba.magma.support.EntitiesPredicate;
 import org.obiba.opal.core.domain.HasUniqueProperties;
@@ -24,6 +26,7 @@ import org.obiba.opal.core.runtime.jdbc.DatabaseSessionFactoryProvider;
 import org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.OrientDbService;
+import org.obiba.opal.core.service.database.CannotDeleteDatabaseLinkedToDatasourceException;
 import org.obiba.opal.core.service.database.CannotDeleteDatabaseWithDataException;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.database.IdentifiersDatabaseNotFoundException;
@@ -191,14 +194,36 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   }
 
   @Override
-  public void delete(@NotNull Database database) throws CannotDeleteDatabaseWithDataException {
+  public boolean hasDatasource(@NotNull Database database) {
+    return registrations.containsKey(database.getName());
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  @SuppressWarnings("TypeMayBeWeakened")
+  public boolean hasEntities(@NotNull Database database) {
+    if(!hasDatasource(database)) return false;
+    EntitiesPredicate.NonViewEntitiesPredicate predicate = new EntitiesPredicate.NonViewEntitiesPredicate();
+    for(String datasourceName : registrations.get(database.getName())) {
+      Datasource datasource = MagmaEngine.get().getDatasource(datasourceName);
+      if(datasource.hasEntities(predicate)) return true;
+    }
+    return false;
+  }
+
+  @Override
+  public void delete(@NotNull Database database)
+      throws CannotDeleteDatabaseLinkedToDatasourceException, CannotDeleteDatabaseWithDataException {
     if(database.isUsedForIdentifiers()) {
-      if(identifiersTableService.hasEntities(new EntitiesPredicate.NonViewEntitiesPredicate())) {
-        throw new IllegalArgumentException("Cannot delete identifiers database with entities");
+      if(hasEntities(database)) {
+        throw new CannotDeleteDatabaseWithDataException(database.getName());
       }
       unregister(database.getName(), identifiersTableService.getDatasourceName());
-    } else if(!database.isEditable()) {
-      throw new IllegalArgumentException("Cannot delete non editable database");
+    } else {
+      if(hasDatasource(database)) {
+        throw new CannotDeleteDatabaseLinkedToDatasourceException(database.getName());
+      }
+      unregister(database.getName(), identifiersTableService.getDatasourceName());
     }
     orientDbService.delete(database);
     destroyDataSource(database.getName());
@@ -211,19 +236,11 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
 
   private void register(String databaseName, @Nullable String usedByDatasource) {
     if(Strings.isNullOrEmpty(usedByDatasource)) return;
-    Database database = getDatabase(databaseName);
-    if(database.isEditable()) {
-      database.setEditable(false);
-      orientDbService.save(database, database);
-    }
     registrations.put(databaseName, usedByDatasource);
   }
 
   @Override
   public void unregister(@NotNull String databaseName, String usedByDatasource) {
-    Database database = getDatabase(databaseName);
-    database.setEditable(true);
-    orientDbService.save(database, database);
     // close SessionFactory or JDBC dataSource
     destroyDataSource(databaseName);
     registrations.remove(databaseName, usedByDatasource);

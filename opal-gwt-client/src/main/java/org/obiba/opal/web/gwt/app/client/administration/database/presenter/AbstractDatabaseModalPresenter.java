@@ -18,6 +18,7 @@ import com.google.gwt.event.dom.client.HasChangeHandlers;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.TakesValue;
+import com.google.gwt.user.client.ui.HasEnabled;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.HasVisibility;
@@ -147,7 +148,16 @@ public abstract class AbstractDatabaseModalPresenter<TView extends AbstractDatab
     usedForIdentifiers = dto.getUsedForIdentifiers();
     displayDatabase(dto);
     if(usedForIdentifiers) hideNonEditableIdentifiersDatabaseFields();
+    if(dto.getHasDatasource()) disableFieldsForDatabaseWithDatasource();
+  }
 
+  protected void disableFieldsForDatabaseWithDatasource() {
+    getView().getNameEnabled().setEnabled(false);
+    getView().getUsageEnabled().setEnabled(false);
+    getView().getUrlEnabled().setEnabled(false);
+    getView().getUsernameEnabled().setEnabled(false);
+    getView().getPasswordEnabled().setEnabled(false);
+    getView().getPropertiesEnabled().setEnabled(false);
   }
 
   void setDialogMode(Mode dialogMode) {
@@ -216,7 +226,11 @@ public abstract class AbstractDatabaseModalPresenter<TView extends AbstractDatab
 
     HasText getName();
 
+    HasEnabled getNameEnabled();
+
     TakesValue<Usage> getUsage();
+
+    HasEnabled getUsageEnabled();
 
     HasChangeHandlers getUsageChangeHandlers();
 
@@ -224,11 +238,19 @@ public abstract class AbstractDatabaseModalPresenter<TView extends AbstractDatab
 
     HasText getUrl();
 
+    HasEnabled getUrlEnabled();
+
     HasText getUsername();
+
+    HasEnabled getUsernameEnabled();
 
     HasText getPassword();
 
+    HasEnabled getPasswordEnabled();
+
     HasText getProperties();
+
+    HasEnabled getPropertiesEnabled();
 
     HasValue<Boolean> getDefaultStorage();
 

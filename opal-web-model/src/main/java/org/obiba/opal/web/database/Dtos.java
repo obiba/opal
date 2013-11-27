@@ -21,9 +21,7 @@ public class Dtos {
 
   public static Database fromDto(DatabaseDto dto) {
     Database db = new Database();
-    db.setEditable(dto.getEditable());
     db.setDefaultStorage(dto.getDefaultStorage());
-    db.setDescription(dto.getDescription());
     db.setName(dto.getName());
     db.setUsage(Database.Usage.valueOf(dto.getUsage().name()));
     db.setUsedForIdentifiers(dto.getUsedForIdentifiers());
@@ -76,16 +74,16 @@ public class Dtos {
     return settings;
   }
 
-  public static DatabaseDto asDto(Database db) {
-    return asDto(db, true);
+  public static DatabaseDto asDto(Database db, boolean hasDatasource, boolean hasEntities) {
+    return asDto(db, hasDatasource, hasEntities, true);
   }
 
-  public static DatabaseDto asDto(Database db, boolean withSettings) {
+  public static DatabaseDto asDto(Database db, boolean hasDatasource, boolean hasEntities, boolean withSettings) {
     DatabaseDto.Builder builder = DatabaseDto.newBuilder();
     builder.setName(db.getName());
-    if(!Strings.isNullOrEmpty(db.getDescription())) builder.setDescription(db.getDescription());
     builder.setDefaultStorage(db.isDefaultStorage());
-    builder.setEditable(db.isEditable());
+    builder.setHasDatasource(hasDatasource);
+    builder.setHasEntities(hasEntities);
     builder.setUsedForIdentifiers(db.isUsedForIdentifiers());
     builder.setUsage(DatabaseDto.Usage.valueOf(db.getUsage().name()));
 

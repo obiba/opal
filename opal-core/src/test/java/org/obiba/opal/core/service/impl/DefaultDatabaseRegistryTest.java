@@ -8,8 +8,12 @@ import javax.transaction.TransactionManager;
 
 import org.easymock.EasyMock;
 import org.hibernate.SessionFactory;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.obiba.magma.Datasource;
+import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbSettings;
 import org.obiba.opal.core.domain.database.SqlSettings;
@@ -17,6 +21,7 @@ import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
 import org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.OrientDbService;
+import org.obiba.opal.core.service.database.CannotDeleteDatabaseWithDataException;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.database.IdentifiersDatabaseNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +29,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
+
+import com.google.common.base.Predicate;
 
 import static com.google.common.collect.Iterables.size;
 import static com.google.common.collect.Lists.newArrayList;
@@ -56,6 +63,11 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   public void clear() throws Exception {
     ((DefaultDatabaseRegistry) databaseRegistry).clearCaches();
     orientDbService.deleteAll(Database.class);
+  }
+
+  @After
+  public void shutdown() throws Exception {
+    MagmaEngine.get().shutdown();
   }
 
   @Test
@@ -174,11 +186,27 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     assertEquals(0, size(databaseRegistry.list()));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void test_delete_database_non_editable() {
+  @Test(expected = CannotDeleteDatabaseWithDataException.class)
+  public void test_delete_database_with_entities() {
     Database database = createSqlDatabase();
-    database.setEditable(false);
     databaseRegistry.save(database);
+
+    DataSource mockDataSource = EasyMock.createMock(DataSource.class);
+    reset(dataSourceFactory);
+    expect(dataSourceFactory.createDataSource(database)).andReturn(mockDataSource).once();
+    replay(dataSourceFactory);
+
+    Datasource mockDatasource = EasyMock.createMock(Datasource.class);
+    expect(mockDatasource.getName()).andReturn("jdbc-datasource").atLeastOnce();
+    expect(mockDatasource.hasEntities(EasyMock.<Predicate<ValueTable>>anyObject())).andReturn(true).once();
+    mockDatasource.initialise();
+    EasyMock.expectLastCall().once();
+    mockDatasource.dispose();
+    EasyMock.expectLastCall().once();
+    replay(mockDatasource);
+    MagmaEngine.get().addDatasource(mockDatasource);
+
+    databaseRegistry.getDataSource(database.getName(), "jdbc-datasource");
     databaseRegistry.delete(database);
   }
 
@@ -228,7 +256,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     verify(dataSourceFactory);
 
     assertEquals(mockDatasource, datasource);
-    assertFalse(databaseRegistry.getDatabase(database.getName()).isEditable());
+    assertTrue(databaseRegistry.hasDatasource(database));
   }
 
   @Test
@@ -248,7 +276,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     verify(sessionFactoryFactory, dataSourceFactory);
 
     assertEquals(mockSessionFactory, sessionFactory);
-    assertFalse(databaseRegistry.getDatabase(database.getName()).isEditable());
+    assertTrue(databaseRegistry.hasDatasource(database));
   }
 
   @Test
@@ -267,7 +295,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
 
     databaseRegistry.unregister(database.getName(), "jdbc-datasource");
 
-    assertTrue(databaseRegistry.getDatabase(database.getName()).isEditable());
+    assertFalse(databaseRegistry.hasDatasource(database));
   }
 
   private Database createSqlDatabase() {
@@ -294,8 +322,6 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     return Database.Builder.create() //
         .name("sql database") //
         .usedForIdentifiers(false) //
-        .editable(true) //
-        .description("description") //
         .defaultStorage(true) //
         .usage(Usage.IMPORT);
   }
@@ -305,9 +331,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     assertEquals(expected, found);
     assertEquals(expected.getName(), found.getName());
     assertEquals(expected.getUsage(), found.getUsage());
-    assertEquals(expected.getDescription(), found.getDescription());
     assertEquals(expected.isDefaultStorage(), found.isDefaultStorage());
-    assertEquals(expected.isEditable(), found.isEditable());
     assertEquals(expected.isUsedForIdentifiers(), found.isUsedForIdentifiers());
     if(expected.hasSqlSettings()) {
       assertSqlSettingsEquals(expected.getSqlSettings(), found.getSqlSettings());

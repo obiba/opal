@@ -127,13 +127,14 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
 
       @Override
       public void doAction(DatabaseDto dto, String actionName) {
-        if(dto.getEditable() && actionName.equalsIgnoreCase(DELETE_ACTION)) {
+
+        if(actionName.equalsIgnoreCase(DELETE_ACTION)) {
 
           getEventBus().fireEvent(ConfirmationRequiredEvent
               .createWithKeys(confirmedCommand = new DeleteDatabaseCommand(dto), "deleteDatabase",
                   "confirmDeleteDatabase"));
 
-        } else if(dto.getEditable() && actionName.equalsIgnoreCase(EDIT_ACTION)) {
+        } else if(actionName.equalsIgnoreCase(EDIT_ACTION)) {
 
           if(dto.hasSqlSettings()) {
             sqlDatabaseModalProvider.get().editDatabase(dto);

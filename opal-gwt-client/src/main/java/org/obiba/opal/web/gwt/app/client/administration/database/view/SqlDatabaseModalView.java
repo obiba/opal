@@ -38,6 +38,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.TakesValue;
+import com.google.gwt.user.client.ui.HasEnabled;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.HasVisibility;
@@ -268,6 +269,11 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   }
 
   @Override
+  public HasEnabled getNameEnabled() {
+    return name;
+  }
+
+  @Override
   public HasVisibility getNameGroupVisibility() {
     return nameGroup;
   }
@@ -296,6 +302,11 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
         return selectedIndex < 0 ? null : SqlSchema.valueOf(sqlSchema.getValue(selectedIndex));
       }
     };
+  }
+
+  @Override
+  public HasEnabled getSqlSchemaEnabled() {
+    return sqlSchema;
   }
 
   @Override
@@ -352,6 +363,11 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   }
 
   @Override
+  public HasEnabled getUsageEnabled() {
+    return usage;
+  }
+
+  @Override
   public HasVisibility getUsageGroupVisibility() {
     return usageGroup;
   }
@@ -363,6 +379,11 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
 
   @Override
   public HasText getUrl() {
+    return url;
+  }
+
+  @Override
+  public HasEnabled getUrlEnabled() {
     return url;
   }
 
@@ -391,12 +412,27 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   }
 
   @Override
+  public HasEnabled getDriverEnabled() {
+    return driver;
+  }
+
+  @Override
   public HasText getUsername() {
     return username;
   }
 
   @Override
+  public HasEnabled getUsernameEnabled() {
+    return username;
+  }
+
+  @Override
   public HasText getPassword() {
+    return password;
+  }
+
+  @Override
+  public HasEnabled getPasswordEnabled() {
     return password;
   }
 
@@ -419,7 +455,17 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   }
 
   @Override
+  public HasEnabled getPropertiesEnabled() {
+    return properties;
+  }
+
+  @Override
   public HasText getTablePrefix() {
+    return tablePrefix;
+  }
+
+  @Override
+  public HasEnabled getTablePrefixEnabled() {
     return tablePrefix;
   }
 
@@ -429,12 +475,27 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   }
 
   @Override
+  public HasEnabled getDefaultEntityTypeEnabled() {
+    return defaultEntityType;
+  }
+
+  @Override
   public HasText getDefaultCreatedTimestampColumn() {
     return defaultCreatedTimestampColumn;
   }
 
   @Override
+  public HasEnabled getDefaultCreatedTimestampColumnEnabled() {
+    return defaultCreatedTimestampColumn;
+  }
+
+  @Override
   public HasText getDefaultUpdatedTimestampColumn() {
+    return defaultUpdatedTimestampColumn;
+  }
+
+  @Override
+  public HasEnabled getDefaultUpdatedTimestampColumnEnabled() {
     return defaultUpdatedTimestampColumn;
   }
 
@@ -450,6 +511,11 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
 
   @Override
   public HasValue<Boolean> getUseMetadataTables() {
+    return useMetadataTables;
+  }
+
+  @Override
+  public HasEnabled getUseMetadataTablesEnabled() {
     return useMetadataTables;
   }
 

@@ -17,6 +17,7 @@ import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.MongoDbSettings;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.database.MultipleIdentifiersDatabaseException;
+import org.obiba.opal.core.service.database.NoSuchDatabaseException;
 import org.obiba.opal.web.database.Dtos;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.model.Ws;
@@ -28,7 +29,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 import static org.obiba.opal.web.model.Database.DatabaseDto;
 
@@ -48,7 +48,8 @@ public class DatabaseResource {
 
   @GET
   public DatabaseDto get() {
-    return Dtos.asDto(getDatabase());
+    Database database = getDatabase();
+    return Dtos.asDto(database, databaseRegistry.hasDatasource(database), databaseRegistry.hasEntities(database));
   }
 
   @DELETE
@@ -60,10 +61,18 @@ public class DatabaseResource {
 
   @PUT
   public Response update(DatabaseDto dto) throws MultipleIdentifiersDatabaseException {
-    Database database = Dtos.fromDto(dto);
-    if(!database.isEditable()) {
-      return Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatabaseIsNotEditable").build()).build();
+    Database database = null;
+    try {
+      Database existing = databaseRegistry.getDatabase(name);
+      if(databaseRegistry.hasDatasource(existing)) {
+        // restrict edition to certain fields when database has datasource
+        database = existing;
+        database.setDefaultStorage(dto.getDefaultStorage());
+      } else {
+        database = Dtos.fromDto(dto);
+      }
+    } catch(NoSuchDatabaseException ignored) {
+      database = Dtos.fromDto(dto);
     }
     databaseRegistry.save(database);
     return Response.ok().build();

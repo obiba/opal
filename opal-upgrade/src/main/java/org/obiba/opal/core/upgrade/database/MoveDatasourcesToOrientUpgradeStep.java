@@ -105,7 +105,6 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
               .username(prop.getProperty(OPAL_USERNAME)) //
               .password(prop.getProperty(OPAL_PASSWORD)) //
               .sqlSchema(SqlSettings.SqlSchema.HIBERNATE)) //
-          .editable(false) //
           .usage(Database.Usage.STORAGE) //
 
           .build();
@@ -122,7 +121,6 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
               .username(prop.getProperty(KEY_USERNAME)) //
               .password(prop.getProperty(KEY_PASSWORD)) //
               .sqlSchema(SqlSettings.SqlSchema.HIBERNATE)) //
-          .editable(false) //
           .usedForIdentifiers(true) //
           .usage(Database.Usage.STORAGE) //
           .build();
@@ -256,7 +254,6 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
               .username(getChildTextContent(element, "username")) //
               .password(getChildTextContent(element, "password")) //
               .sqlSchema(SqlSettings.SqlSchema.HIBERNATE)) //
-          .editable(Boolean.valueOf(getChildTextContent(element, "editable"))) //
           .usage(Database.Usage.STORAGE) //
           .build();
       log.debug("Import database: {}", sqlDatabase);

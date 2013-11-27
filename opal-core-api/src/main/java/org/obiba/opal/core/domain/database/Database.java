@@ -25,14 +25,6 @@ public class Database extends AbstractTimestamped implements HasUniqueProperties
   @NotNull
   private Usage usage;
 
-  private String description;
-
-  /**
-   * Flag to indicate if this database configuration can be modified:
-   * if it has a Magma Datasource plugged on it, it won't be editable.
-   */
-  private boolean editable = true;
-
   private boolean defaultStorage;
 
   private boolean usedForIdentifiers;
@@ -59,22 +51,6 @@ public class Database extends AbstractTimestamped implements HasUniqueProperties
 
   public void setDefaultStorage(boolean defaultStorage) {
     this.defaultStorage = defaultStorage;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  public boolean isEditable() {
-    return editable;
-  }
-
-  public void setEditable(boolean editable) {
-    this.editable = editable;
   }
 
   @NotNull
@@ -145,8 +121,7 @@ public class Database extends AbstractTimestamped implements HasUniqueProperties
   @Override
   public String toString() {
     return Objects.toStringHelper(this).add("defaultStorage", defaultStorage).add("name", name).add("usage", usage)
-        .add("description", description).add("editable", editable).add("usedForIdentifiers", usedForIdentifiers)
-        .toString();
+        .add("usedForIdentifiers", usedForIdentifiers).toString();
   }
 
   @SuppressWarnings("ParameterHidesMemberVariable")
@@ -169,16 +144,6 @@ public class Database extends AbstractTimestamped implements HasUniqueProperties
 
     public Builder defaultStorage(boolean defaultStorage) {
       database.defaultStorage = defaultStorage;
-      return this;
-    }
-
-    public Builder description(String description) {
-      database.description = description;
-      return this;
-    }
-
-    public Builder editable(boolean editable) {
-      database.editable = editable;
       return this;
     }
 

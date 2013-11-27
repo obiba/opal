@@ -27,7 +27,12 @@ public interface DatabaseRegistry extends SystemService {
 
   void save(@NotNull Database database) throws ConstraintViolationException, MultipleIdentifiersDatabaseException;
 
-  void delete(@NotNull Database database) throws CannotDeleteDatabaseWithDataException;
+  boolean hasDatasource(@NotNull Database database);
+
+  boolean hasEntities(@NotNull Database database);
+
+  void delete(@NotNull Database database)
+      throws CannotDeleteDatabaseLinkedToDatasourceException, CannotDeleteDatabaseWithDataException;
 
   DataSource getDataSource(@NotNull String name, @Nullable String usedByDatasource);
 

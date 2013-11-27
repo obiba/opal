@@ -34,6 +34,7 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.HasChangeHandlers;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.TakesValue;
+import com.google.gwt.user.client.ui.HasEnabled;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.HasVisibility;
@@ -116,6 +117,18 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
     getView().getUsageGroupVisibility().setVisible(false);
     getView().getDefaultStorageGroupVisibility().setVisible(false);
     getView().getSqlSchemaGroupVisibility().setVisible(false);
+  }
+
+  @Override
+  protected void disableFieldsForDatabaseWithDatasource() {
+    super.disableFieldsForDatabaseWithDatasource();
+    getView().getSqlSchemaEnabled().setEnabled(false);
+    getView().getDriverEnabled().setEnabled(false);
+    getView().getTablePrefixEnabled().setEnabled(false);
+    getView().getDefaultEntityTypeEnabled().setEnabled(false);
+    getView().getDefaultCreatedTimestampColumnEnabled().setEnabled(false);
+    getView().getDefaultUpdatedTimestampColumnEnabled().setEnabled(false);
+    getView().getUseMetadataTablesEnabled().setEnabled(false);
   }
 
   @Override
@@ -244,17 +257,31 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
 
     TakesValue<SqlSchema> getSqlSchema();
 
+    HasEnabled getSqlSchemaEnabled();
+
     HasText getDriver();
+
+    HasEnabled getDriverEnabled();
 
     HasText getTablePrefix();
 
+    HasEnabled getTablePrefixEnabled();
+
     HasText getDefaultEntityType();
+
+    HasEnabled getDefaultEntityTypeEnabled();
 
     HasText getDefaultCreatedTimestampColumn();
 
+    HasEnabled getDefaultCreatedTimestampColumnEnabled();
+
     HasText getDefaultUpdatedTimestampColumn();
 
+    HasEnabled getDefaultUpdatedTimestampColumnEnabled();
+
     HasValue<Boolean> getUseMetadataTables();
+
+    HasEnabled getUseMetadataTablesEnabled();
 
     HasChangeHandlers getSqlSchemaChangeHandlers();
 

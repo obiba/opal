@@ -33,6 +33,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.TakesValue;
+import com.google.gwt.user.client.ui.HasEnabled;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.HasVisibility;
@@ -140,7 +141,6 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
   }
 
   @Override
-  @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
   public void showError(@Nullable FormField formField, String message) {
     ControlGroup group = null;
     if(formField != null) {
@@ -175,6 +175,11 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
 
   @Override
   public HasText getName() {
+    return name;
+  }
+
+  @Override
+  public HasEnabled getNameEnabled() {
     return name;
   }
 
@@ -215,6 +220,11 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
   }
 
   @Override
+  public HasEnabled getUsageEnabled() {
+    return usage;
+  }
+
+  @Override
   public HasChangeHandlers getUsageChangeHandlers() {
     return usage;
   }
@@ -230,12 +240,27 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
   }
 
   @Override
+  public HasEnabled getUrlEnabled() {
+    return url;
+  }
+
+  @Override
   public HasText getUsername() {
     return username;
   }
 
   @Override
+  public HasEnabled getUsernameEnabled() {
+    return username;
+  }
+
+  @Override
   public HasText getPassword() {
+    return password;
+  }
+
+  @Override
+  public HasEnabled getPasswordEnabled() {
     return password;
   }
 
@@ -255,6 +280,11 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
         }
       }
     };
+  }
+
+  @Override
+  public HasEnabled getPropertiesEnabled() {
+    return properties;
   }
 
   @Override

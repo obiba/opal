@@ -38,15 +38,15 @@ import static org.junit.Assert.assertThat;
  */
 public class FunctionalUnitViewTest {
 
-  StaticValueTable opalDataTable;
+  private StaticValueTable opalDataTable;
 
-  StaticValueTable unitDataTable;
+  private StaticValueTable unitDataTable;
 
-  StaticValueTable keysTable;
+  private StaticValueTable keysTable;
 
   @Before
   public void setupDataAndKeysTable() {
-    new MagmaEngine();
+    MagmaEngine.get();
 
     // Create the following table:
     // id,Var1,Var2

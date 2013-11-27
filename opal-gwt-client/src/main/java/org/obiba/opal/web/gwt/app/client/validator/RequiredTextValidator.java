@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.validator;
 
+import com.google.gwt.user.client.ui.HasEnabled;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 
@@ -58,6 +59,8 @@ public class RequiredTextValidator extends AbstractFieldValidator {
 
   @Override
   protected boolean hasError() {
-    return textField.getText() == null || textField.getText().trim().isEmpty();
+    //noinspection SimplifiableConditionalExpression
+    boolean enabled = textField instanceof HasEnabled ? ((HasEnabled) textField).isEnabled() : true;
+    return enabled && (textField.getText() == null || textField.getText().trim().isEmpty());
   }
 }

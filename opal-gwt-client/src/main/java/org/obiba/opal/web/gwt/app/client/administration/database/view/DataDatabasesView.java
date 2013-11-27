@@ -97,7 +97,7 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
   }
 
   @UiHandler("table")
-  public void ontableChange(RowCountChangeEvent event) {
+  public void onTableChange(RowCountChangeEvent event) {
     createPanel.setVisible(!isDatabasesVisible());
     databasesPanel.setVisible(isDatabasesVisible());
   }
@@ -178,7 +178,10 @@ public class DataDatabasesView extends ViewWithUiHandlers<DataDatabasesUiHandler
 
       @Override
       public String[] getActions(DatabaseDto dto) {
-        return dto.getEditable() ? allActions() : new String[] { TEST_ACTION };
+        if(dto.getUsedForIdentifiers()) {
+          return dto.getHasEntities() ? new String[] { EDIT_ACTION, TEST_ACTION } : allActions();
+        }
+        return dto.getHasDatasource() ? new String[] { EDIT_ACTION, TEST_ACTION } : allActions();
       }
     });
   }

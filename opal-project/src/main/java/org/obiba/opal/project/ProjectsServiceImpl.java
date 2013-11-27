@@ -148,6 +148,7 @@ public class ProjectsServiceImpl implements ProjectService {
         if(datasource.canDrop()) {
           datasource.drop();
         }
+        databaseRegistry.unregister(originalDb, project.getName());
         registerDatasource(project);
       }
     } catch(NoSuchProjectException e) {

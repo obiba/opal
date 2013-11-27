@@ -25,8 +25,8 @@ message DatabaseDto {
     EXPORT = 2;
   }
   required string name = 1;
-  optional string description = 2;
-  optional bool editable = 3 [default = true];
+  optional bool hasDatasource = 2 [default = false];
+  optional bool hasEntities = 3 [default = false];
   required bool defaultStorage = 4 [default = false];
   required Usage usage = 5;
   optional bool usedForIdentifiers = 6;
