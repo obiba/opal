@@ -29,6 +29,12 @@ public class TableVariableSuggestOracle extends VariableSuggestOracle {
   }
 
   @Override
+  public String getOriginalQuery() {
+    // Filter query for valuetypes: integer, text, decimal, date, datetime
+    return originalQuery + " valueType:(integer OR text OR decimal OR date OR datetime)";
+  }
+
+  @Override
   protected VariableSuggestion convertToFormattedSuggestions(String query, Map<String, String> attributes) {
     SafeHtmlBuilder accum = new SafeHtmlBuilder();
 

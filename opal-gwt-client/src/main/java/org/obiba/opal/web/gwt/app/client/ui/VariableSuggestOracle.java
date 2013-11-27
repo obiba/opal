@@ -153,6 +153,8 @@ public class VariableSuggestOracle extends SuggestOracle {
   @Override
   public void requestSuggestions(final Request request, final Callback callback) {
     String prefix = "";
+    originalQuery = request.getQuery();
+
     if(datasource != null) {
       prefix = "datasource:" + datasource + " ";
     }
@@ -160,10 +162,9 @@ public class VariableSuggestOracle extends SuggestOracle {
       prefix += "table:" + table + " ";
     }
 
-    originalQuery = request.getQuery();
     if(originalQuery == null || originalQuery.trim().isEmpty()) return;
 
-    final String query = prefix + originalQuery;
+    final String query = prefix + getOriginalQuery();
 
     UriBuilder ub = UriBuilder.create().segment("datasources", "variables", "_search")//
         .query("query", query)//

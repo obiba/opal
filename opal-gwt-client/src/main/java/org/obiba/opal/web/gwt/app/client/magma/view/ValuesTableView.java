@@ -261,8 +261,8 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     filter.getTextBox().setValue(lastFilter, false);
     setRefreshing(false);
 
-    oracle.setTable(table.getName());
-    oracle.setDatasource(table.getDatasourceName());
+    oracle.setTable("\"" + table.getName() + "\"");
+    oracle.setDatasource("\"" + table.getDatasourceName() + "\"");
   }
 
   @Override
@@ -525,6 +525,11 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   @Override
   public ControlGroup getValuesFilterGroup() {
     return valuesFilterGroup;
+  }
+
+  @Override
+  public String getPageSize() {
+    return pageSize.getText();
   }
 
   //

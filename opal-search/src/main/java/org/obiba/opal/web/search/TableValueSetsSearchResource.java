@@ -79,8 +79,8 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
     try {
       if(!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
       if(!valuesIndexManager.hasIndex(getValueTable())) return Response.status(Response.Status.NOT_FOUND).build();
-      QuerySearchJsonBuilder jsonBuiler = //
-          buildQuerySearch(query, offset, limit, null, null, null);
+
+      QuerySearchJsonBuilder jsonBuiler = buildQuerySearch(query, offset, limit, null, null, null);
       JSONObject jsonResponse = executeQuery(jsonBuiler.build());
 
       Search.ValueSetsResultDto.Builder dtoResponseBuilder = getvalueSetsDtoBuilder(uriInfo, offset, limit, select,
@@ -156,7 +156,7 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
 
     ImmutableList.Builder<Magma.ValueSetsDto.ValueSetDto> valueSetDtoBuilder = ImmutableList.builder();
     Iterable<Magma.ValueSetsDto.ValueSetDto> transform = Iterables.transform(variableEntities,
-        new VariableEntityValueSetDtoFunction(getValueTable(), variables, uriInfoPath, false));
+        new VariableEntityValueSetDtoFunction(getValueTable(), variables, uriInfoPath, true));
 
     for(Magma.ValueSetsDto.ValueSetDto dto : transform) {
       valueSetDtoBuilder.add(dto);
