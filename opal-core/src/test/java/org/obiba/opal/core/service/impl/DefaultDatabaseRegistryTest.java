@@ -21,7 +21,7 @@ import org.obiba.opal.core.runtime.jdbc.DataSourceFactory;
 import org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.OrientDbService;
-import org.obiba.opal.core.service.database.CannotDeleteDatabaseWithDataException;
+import org.obiba.opal.core.service.database.CannotDeleteDatabaseLinkedToDatasourceException;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.database.IdentifiersDatabaseNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -186,7 +186,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
     assertEquals(0, size(databaseRegistry.list()));
   }
 
-  @Test(expected = CannotDeleteDatabaseWithDataException.class)
+  @Test(expected = CannotDeleteDatabaseLinkedToDatasourceException.class)
   public void test_delete_database_with_entities() {
     Database database = createSqlDatabase();
     databaseRegistry.save(database);
