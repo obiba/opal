@@ -45,7 +45,7 @@ public class DefaultSubjectProfileServiceImpl implements SubjectProfileService {
 
   @Override
   public void ensureProfile(@NotNull String principal, @NotNull String realm) {
-    log.info("ensure profile of user {} from realm: {}", principal, realm);
+    log.debug("ensure profile of user {} from realm: {}", principal, realm);
 
     SubjectProfile profile = getProfile(principal);
     if(profile == null) {
