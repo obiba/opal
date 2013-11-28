@@ -188,26 +188,21 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
   private void applyAllValueSetsFilter(final int offset) {
     if(getView().getValuesFilterGroup().isVisible()) {
-      // Get all Filters
-      FlowPanel filtersPanel = getView().getFiltersPanel();
-
-      Collection<String> filters = new ArrayList<String>();
-      for(int i = 0; i < filtersPanel.getWidgetCount(); i++) {
-        String queryString = ((CriterionDropdown) filtersPanel.getWidget(i)).getQueryString();
-        if(!Strings.isNullOrEmpty(queryString)) filters.add(queryString);
-      }
+      String filters = getQueryString();
 
       ResourceRequestBuilderFactory.<ValueSetsResultDto>newBuilder()
           .forResource(UriBuilders.DATASOURCE_TABLE_VALUESETS_SEARCH.create()//
-              .query("query", filters.isEmpty() ? "*" : Joiner.on(" AND ").join(filters))//
+              .query("query", filters)//
               .query("select", currentVariablesFilterSelect)//
               .query("offset", String.valueOf(offset))//
-              .query("limit", String.valueOf(originalTable.getValueSetCount()))//
+              .query("limit", String.valueOf(getView().getPageSize()))//
               .build(originalTable.getDatasourceName(), originalTable.getName()))
           .withCallback(new ResourceCallback<ValueSetsResultDto>() {
             @Override
             public void onResource(Response response, ValueSetsResultDto resource) {
+
               getView().populateValues(offset, resource.getValueSets());
+              getView().setRowCount(resource.getTotalHits());
             }
           })//
           .withCallback(new ResponseCodeCallback() {
@@ -218,6 +213,21 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
           }, Response.SC_BAD_REQUEST)//
           .get().send();
     }
+  }
+
+  private String getQueryString() {
+    // Get all Filters
+    FlowPanel filtersPanel = getView().getFiltersPanel();
+
+    Collection<String> filters = new ArrayList<String>();
+    for(int i = 0; i < filtersPanel.getWidgetCount(); i++) {
+      if(filtersPanel.getWidget(i) instanceof CriterionDropdown) {
+        String queryString = ((CriterionDropdown) filtersPanel.getWidget(i)).getQueryString();
+        if(!Strings.isNullOrEmpty(queryString)) filters.add(queryString);
+      }
+    }
+
+    return filters.isEmpty() ? "*" : Joiner.on(" AND ").join(filters);
   }
 
   private void fetchIndexSchema() {
@@ -533,7 +543,9 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     ControlGroup getValuesFilterGroup();
 
-    String getPageSize();
+    int getPageSize();
+
+    void setRowCount(int totalHits);
   }
 
   public enum ViewMode {

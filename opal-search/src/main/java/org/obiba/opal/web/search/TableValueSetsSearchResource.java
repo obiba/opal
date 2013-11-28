@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.Nullable;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -83,8 +82,7 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
       QuerySearchJsonBuilder jsonBuiler = buildQuerySearch(query, offset, limit, null, null, null);
       JSONObject jsonResponse = executeQuery(jsonBuiler.build());
 
-      Search.ValueSetsResultDto.Builder dtoResponseBuilder = getvalueSetsDtoBuilder(uriInfo, offset, limit, select,
-          jsonResponse);
+      Search.ValueSetsResultDto.Builder dtoResponseBuilder = getvalueSetsDtoBuilder(uriInfo, select, jsonResponse);
 
       // filter entities
       return Response.ok().entity(dtoResponseBuilder.build()).build();
@@ -97,8 +95,8 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
     }
   }
 
-  private Search.ValueSetsResultDto.Builder getvalueSetsDtoBuilder(UriInfo uriInfo, int offset, int limit,
-      String select, JSONObject jsonResponse) throws JSONException {
+  private Search.ValueSetsResultDto.Builder getvalueSetsDtoBuilder(UriInfo uriInfo, String select,
+      JSONObject jsonResponse) throws JSONException {
     Search.ValueSetsResultDto.Builder dtoResponseBuilder = Search.ValueSetsResultDto.newBuilder();
     JSONObject jsonHits = jsonResponse.getJSONObject("hits");
 
@@ -114,7 +112,7 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
 
     String path = uriInfo.getPath();
     path = path.substring(0, path.indexOf("/_search"));
-    dtoResponseBuilder.setValueSets(getValueSetsDto(path, select, entities, offset, limit));
+    dtoResponseBuilder.setValueSets(getValueSetsDto(path, select, entities));
     return dtoResponseBuilder;
   }
 
@@ -140,8 +138,8 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
   }
 
   private Magma.ValueSetsDto getValueSetsDto(String uriInfoPath, String select,
-      Iterable<VariableEntity> variableEntities, int offset, int limit) {
-    Iterable<Variable> variables = filterVariables(select, offset, limit);
+      Iterable<VariableEntity> variableEntities) {
+    Iterable<Variable> variables = filterVariables(select);
 
     Magma.ValueSetsDto.Builder builder = Magma.ValueSetsDto.newBuilder().setEntityType(getValueTable().getEntityType());
 
@@ -158,8 +156,8 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
     Iterable<Magma.ValueSetsDto.ValueSetDto> transform = Iterables.transform(variableEntities,
         new VariableEntityValueSetDtoFunction(getValueTable(), variables, uriInfoPath, true));
 
-    for(Magma.ValueSetsDto.ValueSetDto dto : transform) {
-      valueSetDtoBuilder.add(dto);
+    for(Magma.ValueSetsDto.ValueSetDto valueSetDto : transform) {
+      valueSetDtoBuilder.add(valueSetDto);
     }
 
     builder.addAllValueSets(valueSetDtoBuilder.build());
@@ -167,7 +165,7 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
     return builder.build();
   }
 
-  protected Iterable<Variable> filterVariables(String script, Integer offset, @Nullable Integer limit) {
+  protected Iterable<Variable> filterVariables(String script) {
     List<Variable> filteredVariables = null;
 
     if(StringUtils.isEmpty(script)) {
@@ -184,12 +182,7 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
       }
     }
 
-    int fromIndex = offset < filteredVariables.size() ? offset : filteredVariables.size();
-    int toIndex = limit != null && limit >= 0 //
-        ? Math.min(fromIndex + limit, filteredVariables.size()) //
-        : filteredVariables.size();
-
-    return filteredVariables.subList(fromIndex, toIndex);
+    return filteredVariables;
   }
 
 }

@@ -89,6 +89,8 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
   private static final int DEFAULT_PAGE_SIZE = 20;
 
+  private int page = DEFAULT_PAGE_SIZE;
+
   @UiTemplate("ValuesTableView.ui.xml")
   interface ValuesTableViewUiBinder extends UiBinder<Widget, ValuesTableView> {}
 
@@ -528,8 +530,13 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   }
 
   @Override
-  public String getPageSize() {
-    return pageSize.getText();
+  public int getPageSize() {
+    return page;
+  }
+
+  @Override
+  public void setRowCount(int totalHits) {
+    valuesTable.setRowCount(totalHits);
   }
 
   //
@@ -738,7 +745,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
       listValueSetVariable = JsArrays.toList(JsArrays.toSafeArray(valueSets.getVariablesArray()));
       updateRowData(offset, JsArrays.toList(JsArrays.toSafeArray(valueSets.getValueSetsArray())));
 
-      valuesTable.setRowData(JsArrays.toList(JsArrays.toSafeArray(valueSets.getValueSetsArray())));
+      valuesTable.setVisibleRange(offset, getPageSize());
     }
   }
 
@@ -806,7 +813,6 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
     public void onKeyUp(KeyUpEvent event) {
       if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
 
-        int page = DEFAULT_PAGE_SIZE;
         int columns = DEFAULT_MAX_VISIBLE_COLUMNS;
 
         if(!pageSize.getText().isEmpty()) {
@@ -821,12 +827,15 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
           lastFilter = filter.getTextBox().getText();
           maxVisibleColumns = columns;
           setRefreshing(true);
+          valuesTable.setPageSize(page);
           fetcher.updateVariables(filter.getTextBox().getText());
         } else if(valuesTable.getPageSize() != page) {
           // page size only has changed
           setRefreshing(true);
           valuesTable.setPageSize(page);
+          fetcher.updateVariables(filter.getTextBox().getText());
         }
+        setRefreshing(false);
         // else nothing to refresh
       }
     }
