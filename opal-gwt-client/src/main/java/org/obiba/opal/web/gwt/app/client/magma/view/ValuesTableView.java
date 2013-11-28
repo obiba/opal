@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.app.client.magma.view;
 import java.util.AbstractList;
 import java.util.List;
 
-import org.eclipse.jgit.util.StringUtils;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter;
@@ -490,7 +489,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
   @Override
   public void setFilterText(String text) {
-    if(!StringUtils.isEmptyOrNull(text)) {
+    if(text != null && !text.isEmpty()) {
       filter.setText(text);
 
       fetcher.updateVariables(filter.getTextBox().getText());
