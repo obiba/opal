@@ -489,11 +489,13 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
 
   @Override
   public void setFilterText(String text) {
-    filter.setText(text);
+    if(text != null && !text.isEmpty()) {
+      filter.setText(text);
 
-    fetcher.updateVariables(filter.getTextBox().getText());
-    if(!text.isEmpty()) {
-      addPanel.setOpen(true);
+      fetcher.updateVariables(filter.getTextBox().getText());
+      if(!text.isEmpty()) {
+        addPanel.setOpen(true);
+      }
     }
   }
 
