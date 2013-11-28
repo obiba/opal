@@ -25,13 +25,16 @@ import org.obiba.opal.web.model.client.opal.KeyDto;
 
 import com.github.gwtbootstrap.client.ui.Breadcrumbs;
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.ButtonGroup;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.Tab;
+import com.github.gwtbootstrap.client.ui.constants.Constants;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -43,6 +46,7 @@ import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 import static org.obiba.opal.web.gwt.app.client.unit.presenter.FunctionalUnitDetailsPresenter.DELETE_ACTION;
@@ -57,10 +61,6 @@ public class FunctionalUnitDetailsView extends ViewWithUiHandlers<FunctionalUnit
   private static final int MAX_PAGE_SIZE = 100;
 
   private static final FunctionalUnitDetailsViewUiBinder uiBinder = GWT.create(FunctionalUnitDetailsViewUiBinder.class);
-
-  private static final Translations translations = GWT.create(Translations.class);
-
-  private final Widget widget;
 
   @UiField
   Label noUnit;
@@ -122,14 +122,22 @@ public class FunctionalUnitDetailsView extends ViewWithUiHandlers<FunctionalUnit
   @UiField
   Tab tabKeystore;
 
+  @UiField
+  ButtonGroup identifiersGroup;
+
+  private final Translations translations;
+
   JsArrayDataProvider<KeyDto> dataProvider = new JsArrayDataProvider<KeyDto>();
 
   private ActionsColumn<KeyDto> actionsColumn;
 
   private FunctionalUnitDto functionalUnit;
 
-  public FunctionalUnitDetailsView() {
-    widget = uiBinder.createAndBindUi(this);
+  @Inject
+  public FunctionalUnitDetailsView(Translations translations) {
+    initWidget(uiBinder.createAndBindUi(this));
+    this.translations = translations;
+    identifiersDropDown.setText(translations.identifiersLabel());
     addTableColumns();
     initializeTabs();
   }
@@ -159,11 +167,6 @@ public class FunctionalUnitDetailsView extends ViewWithUiHandlers<FunctionalUnit
     actionsColumn = new ActionsColumn<KeyDto>(new ConstantActionsProvider<KeyDto>(DOWNLOAD_ACTION, DELETE_ACTION));
     propertiesTable.addColumn(actionsColumn, translations.actionsLabel());
     dataProvider.addDataDisplay(propertiesTable);
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
   }
 
   @Override
@@ -218,6 +221,11 @@ public class FunctionalUnitDetailsView extends ViewWithUiHandlers<FunctionalUnit
   public void setAvailable(boolean available) {
     noUnit.setVisible(!available);
     propertiesTable.setVisible(available);
+  }
+
+  @Override
+  public void enableIdentifierOperations(boolean value) {
+    identifiersGroup.setVisible(value);
   }
 
   @Override
