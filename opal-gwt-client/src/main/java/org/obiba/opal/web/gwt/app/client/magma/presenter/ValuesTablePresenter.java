@@ -182,6 +182,10 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         .withCallback(new VariableFilterResourceCallback(variableName)).get().send();
   }
 
+  private boolean hasValueSetsFilter() {
+    return getView().getValuesFilterGroup().isVisible() && getView().getFiltersPanel().getWidgetCount() > 0;
+  }
+
   private void applyAllValueSetsFilter() {
     applyAllValueSetsFilter(0);
   }
@@ -305,7 +309,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     @Override
     public void onResource(Response response, ValueSetsDto resource) {
       if(link.equals(originalTable.getLink())) {
-        if(getView().getValuesFilterGroup().isVisible()) {
+        if(hasValueSetsFilter()) {
           applyAllValueSetsFilter(offset);
         } else {
           getView().populateValues(offset, resource == null ? ValueSetsDto.create() : resource);
