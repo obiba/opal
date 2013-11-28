@@ -13,6 +13,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.unit.event.KeyPairCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
@@ -33,21 +35,21 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.PresenterWidget;
 
-public class AddKeyPairModalPresenter extends PresenterWidget<AddKeyPairModalPresenter.Display> {
+public class AddKeyPairModalPresenter extends ModalPresenterWidget<AddKeyPairModalPresenter.Display> {
 
   private FunctionalUnitDto functionalUnit;
 
-  public interface Display extends PopupView {
+  public interface Display extends PopupView, HasUiHandlers<ModalUiHandlers> {
 
     void hideDialog();
 
@@ -115,6 +117,7 @@ public class AddKeyPairModalPresenter extends PresenterWidget<AddKeyPairModalPre
   @Inject
   public AddKeyPairModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
+    getView().setUiHandlers(this);
   }
 
   @Override

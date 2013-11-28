@@ -10,6 +10,8 @@
 package org.obiba.opal.web.gwt.app.client.unit.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.WizardModalBox;
 import org.obiba.opal.web.gwt.app.client.unit.presenter.AddKeyPairModalPresenter;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
@@ -44,7 +46,7 @@ import com.google.inject.Inject;
 /**
  *
  */
-public class AddCryptoKeyModalView extends ModalViewImpl implements AddKeyPairModalPresenter.Display {
+public class AddCryptoKeyModalView extends ModalPopupViewWithUiHandlers<ModalUiHandlers> implements AddKeyPairModalPresenter.Display {
 
   interface ViewUiBinder extends UiBinder<WizardModalBox, AddCryptoKeyModalView> {}
 
