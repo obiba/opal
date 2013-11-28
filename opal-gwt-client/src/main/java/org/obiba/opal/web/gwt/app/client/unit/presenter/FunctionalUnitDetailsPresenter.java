@@ -50,7 +50,6 @@ import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.Presenter;
@@ -77,7 +76,7 @@ public class FunctionalUnitDetailsPresenter
 
   private final ModalProvider<FunctionalUnitUpdateModalPresenter> functionalUnitModalProvider;
 
-  private final Provider<AddKeyPairModalPresenter> addKeyPairModalPresenter;
+  private final ModalProvider<AddKeyPairModalPresenter> addKeyPairModalProvider;
 
   private final ModalProvider<GenerateIdentifiersModalPresenter> generateIdentifiersModalProvider;
 
@@ -126,12 +125,12 @@ public class FunctionalUnitDetailsPresenter
   @Inject
   public FunctionalUnitDetailsPresenter(EventBus eventBus, Display display, Proxy proxy,
       ModalProvider<FunctionalUnitUpdateModalPresenter> functionalUnitModalProvider,
-      Provider<AddKeyPairModalPresenter> addKeyPairModalPresenter, DefaultBreadcrumbsBuilder breadcrumbsHelper,
+      ModalProvider<AddKeyPairModalPresenter> addKeyPairModalProvider, DefaultBreadcrumbsBuilder breadcrumbsHelper,
       ModalProvider<GenerateIdentifiersModalPresenter> generateIdentifiersModalProvider) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     this.generateIdentifiersModalProvider = generateIdentifiersModalProvider.setContainer(this);
     this.functionalUnitModalProvider = functionalUnitModalProvider.setContainer(this);
-    this.addKeyPairModalPresenter = addKeyPairModalPresenter;
+    this.addKeyPairModalProvider = addKeyPairModalProvider.setContainer(this);
     this.breadcrumbsHelper = breadcrumbsHelper;
     getView().setUiHandlers(this);
   }
@@ -229,9 +228,7 @@ public class FunctionalUnitDetailsPresenter
 
   @Override
   public void addCryptographicKey() {
-    AddKeyPairModalPresenter popup = addKeyPairModalPresenter.get();
-    popup.setFunctionalUnit(functionalUnit);
-    addToPopupSlot(popup);
+    addKeyPairModalProvider.get().setFunctionalUnit(functionalUnit);
   }
 
   @Override
