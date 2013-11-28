@@ -57,7 +57,7 @@ public class OrientDbRealm extends AuthorizingRealm {
     }
 
     User user = userService.getUser(username);
-    if(user == null) {
+    if(user == null || !user.isEnabled()) {
       throw new UnknownAccountException("No account found for user [" + username + "]");
     }
     return new SimpleAuthenticationInfo(username, user.getPassword(), getName());
