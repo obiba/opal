@@ -41,7 +41,6 @@ import com.google.common.collect.Lists;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
-@Transactional
 @Path("/projects")
 @NoAuthorization
 public class ProjectsResource {
@@ -50,6 +49,7 @@ public class ProjectsResource {
   private ProjectService projectService;
 
   @GET
+  @Transactional(readOnly = true)
   public List<Projects.ProjectDto> getProjects() {
     List<Projects.ProjectDto> projects = Lists.newArrayList();
     for(Project project : projectService.getProjects()) {

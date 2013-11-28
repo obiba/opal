@@ -39,7 +39,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@Transactional
 @Scope("request")
 @Path("/project/{name}")
 public class ProjectResource {
@@ -54,6 +53,7 @@ public class ProjectResource {
   private String name;
 
   @GET
+  @Transactional(readOnly = true)
   public Response get(@Context Request request) {
     Project project = getProject();
     Timestamped projectTimestamps = new ProjectTimestamps(project);
@@ -64,6 +64,7 @@ public class ProjectResource {
 
   @GET
   @Path("/summary")
+  @Transactional(readOnly = true)
   public Response getSummary(@Context Request request) {
     Project project = getProject();
     Datasource ds = project.getDatasource();
@@ -84,11 +85,12 @@ public class ProjectResource {
   }
 
   @DELETE
+  @Transactional
   public Response delete() throws FileSystemException {
     try {
       Datasource ds = getProject().getDatasource();
       projectService.delete(name);
-      for (DatasourceUpdateListener listener : datasourceUpdateListeners) {
+      for(DatasourceUpdateListener listener : datasourceUpdateListeners) {
         listener.onDelete(ds);
       }
     } catch(NoSuchProjectException e) {

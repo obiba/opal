@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -204,6 +205,11 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   public boolean hasEntities(@NotNull Database database) {
     if(!hasDatasource(database)) return false;
     EntitiesPredicate.NonViewEntitiesPredicate predicate = new EntitiesPredicate.NonViewEntitiesPredicate();
+
+    if(database.isUsedForIdentifiers()) {
+      return identifiersTableService.hasEntities(predicate);
+    }
+
     for(String datasourceName : registrations.get(database.getName())) {
       Datasource datasource = MagmaEngine.get().getDatasource(datasourceName);
       if(datasource.hasEntities(predicate)) return true;
@@ -212,6 +218,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   }
 
   @Override
+  @Transactional(propagation = Propagation.NEVER)
   public void delete(@NotNull Database database)
       throws CannotDeleteDatabaseLinkedToDatasourceException, CannotDeleteDatabaseWithDataException {
     if(database.isUsedForIdentifiers()) {
@@ -240,6 +247,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
   }
 
   @Override
+  @Transactional(propagation = Propagation.NEVER)
   public void unregister(@NotNull String databaseName, String usedByDatasource) {
     // close SessionFactory or JDBC dataSource
     destroyDataSource(databaseName);

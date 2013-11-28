@@ -15,6 +15,8 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.opal.core.service.database.IdentifiersDatabaseNotFoundException;
 
+import com.google.common.base.Predicate;
+
 /**
  *
  */
@@ -72,4 +74,6 @@ public interface IdentifiersTableService {
   String getTableName();
 
   void unregisterDatabase();
+
+  boolean hasEntities(Predicate<ValueTable> predicate);
 }

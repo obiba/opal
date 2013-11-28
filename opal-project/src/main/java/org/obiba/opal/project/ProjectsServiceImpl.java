@@ -35,7 +35,9 @@ import org.obiba.opal.project.domain.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -70,13 +72,7 @@ public class ProjectsServiceImpl implements ProjectService {
     // In the @PostConstruct there is no way to ensure that all the post processing is already done,
     // so (indeed) there can be no Transactions.
     // The only way to ensure that that is working is by using a TransactionTemplate.
-    transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-      @Override
-      protected void doInTransactionWithoutResult(TransactionStatus status) {
-        // add all project datasources to MagmaEngine
-        registerAllProjects();
-      }
-    });
+    registerAllProjects(); // add all project datasources to MagmaEngine
   }
 
   @SuppressWarnings("MethodOnlyUsedFromInnerClass")
@@ -136,18 +132,23 @@ public class ProjectsServiceImpl implements ProjectService {
   }
 
   @Override
-  @Transactional
-  public void save(@NotNull Project project) throws ConstraintViolationException {
+  @Transactional(propagation = Propagation.NEVER)
+  public void save(@NotNull final Project project) throws ConstraintViolationException {
     try {
       Project original = getProject(project.getName());
       String originalDb = original.getDatabase() == null ? "" : original.getDatabase();
       String newDb = project.getDatabase() == null ? "" : project.getDatabase();
       if(!newDb.equals(originalDb)) {
-        Datasource datasource = MagmaEngine.get().getDatasource(project.getName());
-        MagmaEngine.get().removeDatasource(datasource);
-        if(datasource.canDrop()) {
-          datasource.drop();
-        }
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+          @Override
+          protected void doInTransactionWithoutResult(TransactionStatus status) {
+            Datasource datasource = MagmaEngine.get().getDatasource(project.getName());
+            MagmaEngine.get().removeDatasource(datasource);
+            if(datasource.canDrop()) {
+              datasource.drop();
+            }
+          }
+        });
         databaseRegistry.unregister(originalDb, project.getName());
         registerDatasource(project);
       }
@@ -193,17 +194,22 @@ public class ProjectsServiceImpl implements ProjectService {
    * @return
    */
   @NotNull
-  private DatasourceFactory registerDatasource(@NotNull Project project) {
-    DatasourceFactory dataSourceFactory = null;
-    if(project.hasDatabase()) {
-      Database database = databaseRegistry.getDatabase(project.getDatabase());
-      dataSourceFactory = databaseRegistry.createDataSourceFactory(project.getName(), database);
-    } else {
-      dataSourceFactory = new NullDatasourceFactory();
-      dataSourceFactory.setName(project.getName());
-    }
-    MagmaEngine.get().addDatasource(dataSourceFactory);
-    return dataSourceFactory;
+  private DatasourceFactory registerDatasource(@NotNull final Project project) {
+    return transactionTemplate.execute(new TransactionCallback<DatasourceFactory>() {
+      @Override
+      public DatasourceFactory doInTransaction(TransactionStatus status) {
+        DatasourceFactory dataSourceFactory = null;
+        if(project.hasDatabase()) {
+          Database database = databaseRegistry.getDatabase(project.getDatabase());
+          dataSourceFactory = databaseRegistry.createDataSourceFactory(project.getName(), database);
+        } else {
+          dataSourceFactory = new NullDatasourceFactory();
+          dataSourceFactory.setName(project.getName());
+        }
+        MagmaEngine.get().addDatasource(dataSourceFactory);
+        return dataSourceFactory;
+      }
+    });
   }
 
   private void deleteFolder(FileObject folder) throws FileSystemException {

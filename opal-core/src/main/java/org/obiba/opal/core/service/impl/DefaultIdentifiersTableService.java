@@ -33,6 +33,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Predicate;
+
 /**
  *
  */
@@ -93,6 +95,11 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   @Override
   public String getTableReference() {
     return tableReference;
+  }
+
+  @Override
+  public boolean hasEntities(Predicate<ValueTable> predicate) {
+    return getDatasource().hasEntities(predicate);
   }
 
   @Override
