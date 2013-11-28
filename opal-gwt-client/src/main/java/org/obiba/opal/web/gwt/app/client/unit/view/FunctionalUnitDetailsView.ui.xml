@@ -28,8 +28,8 @@
           </b:NavLink>
         </b:DropdownButton>
       </b:ButtonGroup>
-      <b:ButtonGroup>
-        <b:DropdownButton text="identifiersDropdown" size="SMALL" icon="COG" ui:field="identifiersDropDown">
+      <b:ButtonGroup ui:field="identifiersGroup">
+        <b:DropdownButton size="SMALL" icon="COG" ui:field="identifiersDropDown">
           <b:NavLink icon="UPLOAD" ui:field="exportIdentifiers">
             <ui:msg description="Functional Unit Export identifiers">Export indentifiers...</ui:msg>
           </b:NavLink>

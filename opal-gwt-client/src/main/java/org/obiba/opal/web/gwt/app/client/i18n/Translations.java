@@ -1171,6 +1171,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Keystore")
   String keystoreLabel();
 
+  @Description("Identifiers label")
+  @DefaultStringValue("Identifiers")
+  String identifiersLabel();
+
   @Description("Properties label")
   @DefaultStringValue("Properties")
   String propertiesLabel();

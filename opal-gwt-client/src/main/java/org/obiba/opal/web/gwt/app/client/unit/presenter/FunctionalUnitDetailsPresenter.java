@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.unit.presenter;
 
+import javax.annotation.Nullable;
+
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -38,6 +40,7 @@ import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.VariableEntityDto;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.client.opal.KeyDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -101,6 +104,8 @@ public class FunctionalUnitDetailsPresenter
 
     void setAvailable(boolean available);
 
+    void enableIdentifierOperations(boolean b);
+
     HasAuthorization getRemoveFunctionalUnitAuthorizer();
 
     HasAuthorization getDownloadIdentifiersAuthorizer();
@@ -116,7 +121,6 @@ public class FunctionalUnitDetailsPresenter
     HasAuthorization getListKeyPairsAuthorizer();
 
     HasAuthorization getUpdateFunctionalUnitAuthorizer();
-
   }
 
   @Inject
@@ -142,6 +146,25 @@ public class FunctionalUnitDetailsPresenter
     super.prepareFromRequest(request);
     String unitName = request.getParameter("name", "");
     if(!unitName.isEmpty()) retrieveFunctioanUnit(unitName);
+    retrieveEntitiesCount();
+
+  }
+
+  private void retrieveEntitiesCount() {
+    ResourceRequestBuilderFactory.<JsArray<VariableEntityDto>>newBuilder() //
+        .forResource("/functional-units/entities/table/entities") //
+        .withCallback(new ResourceCallback<JsArray<VariableEntityDto>>() {
+          @Override
+          public void onResource(Response response, @Nullable JsArray<VariableEntityDto> entities) {
+            getView().enableIdentifierOperations(entities != null && entities.length() > 0);
+          }
+        }) //
+        .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().enableIdentifierOperations(false);
+          }
+        }).get().send();
   }
 
   @Override
