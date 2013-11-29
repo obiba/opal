@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.security;
 
-import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -47,21 +47,15 @@ public class AuthenticationResource extends AbstractSecurityComponent {
   @POST
   @Path("/sessions")
   @NotAuthenticated
-  public Response createSession(@Context ServletRequest servletRequest, @FormParam("username") String username,
-      @FormParam("password") String password) {
+  public Response createSession(@SuppressWarnings("TypeMayBeWeakened") @Context HttpServletRequest servletRequest,
+      @FormParam("username") String username, @FormParam("password") String password) {
     try {
       Subject subject = SecurityUtils.getSubject();
       subject.login(new UsernamePasswordToken(username, password));
       subjectProfileService.ensureProfile(subject);
     } catch(AuthenticationException e) {
-      String remoteAddr;
-      try {
-        remoteAddr = servletRequest.getRemoteAddr();
-      } catch(Exception ex) {
-        log.warn("Unable to get remote address: {}", ex.getMessage(), ex);
-        remoteAddr = "?";
-      }
-      log.info("Authentication failure of user '{}' at ip: '{}': {}", username, remoteAddr, e.getMessage());
+      log.info("Authentication failure of user '{}' at ip: '{}': {}", username, servletRequest.getRemoteAddr(),
+          e.getMessage());
       // When a request contains credentials and they are invalid, the a 403 (Forbidden) should be returned.
       return Response.status(Status.FORBIDDEN).build();
     }
