@@ -32,18 +32,25 @@ import org.obiba.opal.core.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * Realm for users defined in opal's own users database.
+ */
 @Component
-public class OrientDbRealm extends AuthorizingRealm {
+public class OpalUserRealm extends AuthorizingRealm {
 
   public static final String OPAL_REALM = "opal-realm";
 
   @Autowired
   private UserService userService;
 
-  public OrientDbRealm() {
+  public OpalUserRealm() {
     setCacheManager(new MemoryConstrainedCacheManager());
     setCredentialsMatcher(new HashedCredentialsMatcher("SHA"));
-    setName(OPAL_REALM);
+  }
+
+  @Override
+  public String getName() {
+    return OPAL_REALM;
   }
 
   @Override

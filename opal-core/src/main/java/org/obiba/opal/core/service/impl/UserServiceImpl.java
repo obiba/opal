@@ -17,14 +17,12 @@ import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.validation.ConstraintViolationException;
 
-import org.apache.shiro.subject.Subject;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.User;
-import org.obiba.opal.core.runtime.security.OrientDbRealm;
+import org.obiba.opal.core.runtime.security.OpalUserRealm;
 import org.obiba.opal.core.service.DuplicateSubjectProfileException;
-import org.obiba.opal.core.service.DuplicateUserNameException;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SubjectAclService;
 import org.obiba.opal.core.service.SubjectProfileService;
@@ -90,7 +88,7 @@ public class UserServiceImpl implements UserService {
     boolean newUser = (getUser(user.getName()) == null);
     if (newUser) {
       SubjectProfile profile = subjectProfileService.getProfile(user.getName());
-      if(profile != null && !OrientDbRealm.OPAL_REALM.equals(profile.getRealm())) {
+      if(profile != null && !OpalUserRealm.OPAL_REALM.equals(profile.getRealm())) {
         throw new DuplicateSubjectProfileException(profile);
       }
     }
@@ -108,7 +106,7 @@ public class UserServiceImpl implements UserService {
     orientDbService.save(toSave);
 
     if (newUser) {
-      subjectProfileService.ensureProfile(user.getName(), OrientDbRealm.OPAL_REALM);
+      subjectProfileService.ensureProfile(user.getName(), OpalUserRealm.OPAL_REALM);
     }
   }
 

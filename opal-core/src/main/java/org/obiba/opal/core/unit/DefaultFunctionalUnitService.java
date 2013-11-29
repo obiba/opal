@@ -24,7 +24,7 @@ import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.DuplicateSubjectProfileException;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.SubjectProfileService;
-import org.obiba.opal.core.unit.security.FunctionalUnitRealm;
+import org.obiba.opal.core.unit.security.ApplicationRealm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -88,7 +88,7 @@ public class DefaultFunctionalUnitService implements FunctionalUnitService {
     if(newUnit) {
       // check for subject profile
       SubjectProfile found = subjectProfileService.getProfile(functionalUnit.getName());
-      if(found != null && !FunctionalUnitRealm.FUNCTIONAL_UNIT_REALM.equals(found.getRealm())) {
+      if(found != null && !ApplicationRealm.APPLICATION_REALM.equals(found.getRealm())) {
         throw new DuplicateSubjectProfileException(found);
       }
     }
@@ -100,7 +100,7 @@ public class DefaultFunctionalUnitService implements FunctionalUnitService {
         if(!newUnit) config.getFunctionalUnits().remove(unit);
         config.getFunctionalUnits().add(functionalUnit);
         if(newUnit)
-          subjectProfileService.ensureProfile(functionalUnit.getName(), FunctionalUnitRealm.FUNCTIONAL_UNIT_REALM);
+          subjectProfileService.ensureProfile(functionalUnit.getName(), ApplicationRealm.APPLICATION_REALM);
       }
     });
   }

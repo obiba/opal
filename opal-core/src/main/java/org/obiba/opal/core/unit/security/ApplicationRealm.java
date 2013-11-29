@@ -30,19 +30,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * Realm for applications authenticated by SSL certificate.
+ */
 @Component
-public class FunctionalUnitRealm extends AuthorizingRealm {
+public class ApplicationRealm extends AuthorizingRealm {
 
-  private static final Logger log = LoggerFactory.getLogger(FunctionalUnitRealm.class);
+  private static final Logger log = LoggerFactory.getLogger(ApplicationRealm.class);
 
-  public static final String FUNCTIONAL_UNIT_REALM = "functional-unit-realm";
+  public static final String APPLICATION_REALM = "application-realm";
 
   @Autowired
   private FunctionalUnitService functionalUnitService;
 
   @Override
   public String getName() {
-    return FUNCTIONAL_UNIT_REALM;
+    return APPLICATION_REALM;
   }
 
   @Override
