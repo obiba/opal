@@ -209,7 +209,7 @@ public abstract class DateTimeCriterionDropdown extends CriterionDropdown {
 
       DateTimeFormat df = DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_MEDIUM);
       filter += rangeValueChooser.isItemSelected(1)
-          ? "[" + (from.getValue() == null ? "" : df.format(from.getValue())) + ", " +
+          ? "[" + (from.getValue() == null ? "" : df.format(from.getValue())) + " TO " +
           (to.getValue() == null ? "" : df.format(to.getValue())) + "]"
           : "(" + (date.getValue() == null ? "" : df.format(date.getValue())) + ")";
     }
