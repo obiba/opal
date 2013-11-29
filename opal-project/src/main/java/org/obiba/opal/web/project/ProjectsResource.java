@@ -42,7 +42,6 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
 @Path("/projects")
-@NoAuthorization
 public class ProjectsResource {
 
   @Autowired
