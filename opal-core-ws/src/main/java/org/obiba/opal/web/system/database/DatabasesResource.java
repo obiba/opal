@@ -38,7 +38,6 @@ public class DatabasesResource {
   private DatabaseRegistry databaseRegistry;
 
   @GET
-  @NoAuthorization
   @ApiOperation(value = "Returns all data databases",
       notes = "The Identifiers database will not be returned here", response = List.class)
   public List<DatabaseDto> getDatabases(
@@ -54,7 +53,6 @@ public class DatabasesResource {
 
   @GET
   @Path("/sql")
-  @NoAuthorization
   @ApiOperation(value = "Returns all SQL data databases",
       notes = "The Identifiers database will not be returned here", response = List.class)
   public List<DatabaseDto> getSqlDatabases() {
@@ -63,7 +61,6 @@ public class DatabasesResource {
 
   @GET
   @Path("/mongodb")
-  @NoAuthorization
   @ApiOperation(value = "Returns all MongoDB data databases",
       notes = "The Identifiers database will not be returned here", response = List.class)
   public List<DatabaseDto> getMongoDbDatabases() {

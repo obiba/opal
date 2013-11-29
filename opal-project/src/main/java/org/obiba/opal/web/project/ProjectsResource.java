@@ -50,6 +50,7 @@ public class ProjectsResource {
 
   @GET
   @Transactional(readOnly = true)
+  @NoAuthorization
   public List<Projects.ProjectDto> getProjects() {
     List<Projects.ProjectDto> projects = Lists.newArrayList();
     for(Project project : projectService.getProjects()) {

@@ -52,6 +52,16 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
 
     },
 
+    CREATE_PROJECT {
+      @Override
+      public Iterable<String> convert(String node) {
+        return Lists.newArrayList(toRest("/projects", "POST"),//
+            toRest("/files/projects", "GET"), //
+            toRest("/system/databases", "GET:GET/GET"));
+      }
+
+    },
+
     DATASOURCE_ALL {
       @Override
       public Iterable<String> convert(String node) {
@@ -131,19 +141,18 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
         boolean isView = node.contains("/view/");
         String[] args = isView ? args(node, "/datasource/(.+)/view/(.+)") : args(node, "/datasource/(.+)/table/(.+)");
 
-        List<String> perms = Lists
-            .newArrayList(toRest("/datasource/{0}/table/{1}/valueSet", "GET:GET/GET", args),//
-                toRest("/datasource/{0}/table/{1}/entities", "GET", args),//
-                toRest("/datasource/{0}/table/{1}/index", "GET:GET/GET", args), //
-                toRest("/datasource/{0}/table/{1}/index/_search", "GET", args),//
-                toRest("/datasource/{0}/table/{1}/index/_search", "POST", args),//
-                toRest("/datasource/{0}/table/{1}/index/_schema", "GET", args),//
-                toRest("/project/{0}/commands/_export", "POST:GET", args),//
-                toRest("/project/{0}/commands/_copy", "POST:GET", args),//
-                toRest("/project/{0}/report-templates", "GET:GET", args),//
-                toRest("/project/{0}/report-templates", "POST:GET", args),//
-                toRest("/project/{0}", "GET:GET", args),//
-                toRest("/project/{0}/summary", "GET:GET", args));
+        List<String> perms = Lists.newArrayList(toRest("/datasource/{0}/table/{1}/valueSet", "GET:GET/GET", args),//
+            toRest("/datasource/{0}/table/{1}/entities", "GET", args),//
+            toRest("/datasource/{0}/table/{1}/index", "GET:GET/GET", args), //
+            toRest("/datasource/{0}/table/{1}/index/_search", "GET", args),//
+            toRest("/datasource/{0}/table/{1}/index/_search", "POST", args),//
+            toRest("/datasource/{0}/table/{1}/index/_schema", "GET", args),//
+            toRest("/project/{0}/commands/_export", "POST:GET", args),//
+            toRest("/project/{0}/commands/_copy", "POST:GET", args),//
+            toRest("/project/{0}/report-templates", "GET:GET", args),//
+            toRest("/project/{0}/report-templates", "POST:GET", args),//
+            toRest("/project/{0}", "GET:GET", args),//
+            toRest("/project/{0}/summary", "GET:GET", args));
         Iterables.addAll(perms, TABLE_READ.convert(node));
         return perms;
       }
@@ -188,7 +197,7 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
         String[] args = isView ? args(node, "/datasource/(.+)/view/(.+)") : args(node, "/datasource/(.+)/table/(.+)");
 
         List<String> perms = Lists.newArrayList();
-        if (isView) perms.add(toRest("/datasource/{0}/view/{1}/from/valueSets/variable/_transient", "POST", args));
+        if(isView) perms.add(toRest("/datasource/{0}/view/{1}/from/valueSets/variable/_transient", "POST", args));
         Iterables.addAll(perms, TABLE_VALUES.convert(node));
         Iterables.addAll(perms, TABLE_EDIT.convert(node));
         return perms;
