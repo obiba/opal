@@ -39,6 +39,8 @@ import com.google.common.collect.ImmutableList;
 @Component
 public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> {
 
+  public static final String INI_REALM = "ini-realm";
+
   @Autowired
   private Set<Realm> realms;
 
@@ -123,7 +125,7 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
           super.onInit();
         }
       };
-      realm.setName("ini-realm");
+      realm.setName(INI_REALM);
       return realm;
     }
   }
