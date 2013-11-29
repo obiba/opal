@@ -163,14 +163,17 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
       Database previousDefaultStorageDatabase = getDefaultStorageDatabase();
       if(previousDefaultStorageDatabase == null || previousDefaultStorageDatabase.equals(database)) {
         orientDbService.save(database, database);
+        destroyDataSource(database.getName());
       } else {
         previousDefaultStorageDatabase.setDefaultStorage(false);
         orientDbService.save(ImmutableMap
             .<HasUniqueProperties, HasUniqueProperties>of(database, database, previousDefaultStorageDatabase,
                 previousDefaultStorageDatabase));
+        destroyDataSource(database.getName());
       }
     } else {
       orientDbService.save(database, database);
+      destroyDataSource(database.getName());
     }
   }
 
