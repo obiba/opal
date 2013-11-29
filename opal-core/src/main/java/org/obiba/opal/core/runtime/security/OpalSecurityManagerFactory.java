@@ -123,7 +123,7 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
           super.onInit();
         }
       };
-      realm.setName(INI_REALM_NAME);
+      realm.setName("ini-realm");
       return realm;
     }
   }
