@@ -51,6 +51,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimaps;
@@ -306,7 +307,8 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
   @Override
   public void onDelete(@Nonnull Datasource datasource) {
     //Remove from registrations
-    for(String key : registrations.keySet()) {
+    ImmutableList<String> keys = ImmutableList.copyOf(registrations.keySet());
+    for(String key : keys) {
       registrations.remove(key, datasource.getName());
     }
   }
