@@ -45,7 +45,7 @@ public class OpalSslContextFactory implements SslContextFactory {
     try {
       SSLContext ctx = SSLContext.getInstance("TLSv1");
       ctx.init(new KeyManager[] { new UnitKeyManager(opalKeystore) },
-          new TrustManager[] { new UnitTrustManager(functionalUnitService) }, null);
+          new TrustManager[] { new UnitTrustManager(functionalUnitService, unitKeystoreService) }, null);
       return ctx;
     } catch(Exception e) {
       throw new RuntimeException(e);

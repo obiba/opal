@@ -342,7 +342,7 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
     UnitKeyStore unitKeyStore = null;
     if(options.isUnit()) {
       FunctionalUnit unit = getFunctionalUnitService().getFunctionalUnit(options.getUnit());
-      unitKeyStore = unit.getKeyStore();
+      unitKeyStore = unitKeyStoreService.getKeyStore(unit.getName());
     } else {
       unitKeyStore = unitKeyStoreService.getUnitKeyStore(FunctionalUnit.OPAL_INSTANCE);
     }

@@ -28,6 +28,7 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
+import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.DatasourceCopier;
@@ -40,6 +41,7 @@ import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.NonExistentVariableEntitiesException;
+import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.support.OnyxDatasource;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers;
@@ -85,6 +87,9 @@ public class DefaultImportService implements ImportService {
 
   @Autowired
   private IdentifierService identifierService;
+
+  @Autowired
+  private UnitKeyStoreService unitKeyStoreService;
 
   @Override
   public void importData(@Nullable String unitName, @NotNull FileObject sourceFile,
@@ -304,6 +309,13 @@ public class DefaultImportService implements ImportService {
   private void copyToDestinationDatasource(FileObject file, Datasource destinationDatasource,
       @Nullable FunctionalUnit unit, boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
       throws IOException, InterruptedException {
+
+    if(unit != null && unit.getDatasourceEncryptionStrategy() == null) {
+      DatasourceEncryptionStrategy encryptionStrategy = new EncryptedSecretKeyDatasourceEncryptionStrategy();
+      encryptionStrategy.setKeyProvider(unitKeyStoreService.getKeyStore(unit.getName()));
+      unit.setDatasourceEncryptionStrategy(encryptionStrategy);
+    }
+
     DatasourceEncryptionStrategy datasourceEncryptionStrategy = unit == null
         ? null
         : unit.getDatasourceEncryptionStrategy();

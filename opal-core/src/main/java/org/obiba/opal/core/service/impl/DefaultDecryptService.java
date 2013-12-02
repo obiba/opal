@@ -100,20 +100,19 @@ public class DefaultDecryptService implements DecryptService {
   //
 
   private DatasourceEncryptionStrategy getDatasourceEncryptionStrategy(FunctionalUnit unit) {
-    DatasourceEncryptionStrategy dsEncryptionStrategy = unit.getDatasourceEncryptionStrategy();
-    if(dsEncryptionStrategy == null) {
-      dsEncryptionStrategy = getDefaultEncryptionStrategy();
+    DatasourceEncryptionStrategy encryptionStrategy = unit.getDatasourceEncryptionStrategy();
+    if(encryptionStrategy == null) {
+      encryptionStrategy = new EncryptedSecretKeyDatasourceEncryptionStrategy();
+      UnitKeyStore keyStore = unitKeyStoreService.getKeyStore(unit.getName());
+      encryptionStrategy.setKeyProvider(keyStore == null ? new NullKeyProvider() : keyStore);
+      unit.setDatasourceEncryptionStrategy(encryptionStrategy);
     }
-    UnitKeyStore unitKeyStore = unit.getKeyStore(false);
-    dsEncryptionStrategy.setKeyProvider(unitKeyStore != null ? unitKeyStore : new NullKeyProvider());
-
-    return dsEncryptionStrategy;
+    return encryptionStrategy;
   }
 
   private DatasourceEncryptionStrategy getOpalInstanceEncryptionStrategy() {
     DatasourceEncryptionStrategy dsEncryptionStrategy = getDefaultEncryptionStrategy();
     dsEncryptionStrategy.setKeyProvider(unitKeyStoreService.getOrCreateUnitKeyStore(FunctionalUnit.OPAL_INSTANCE));
-
     return dsEncryptionStrategy;
   }
 

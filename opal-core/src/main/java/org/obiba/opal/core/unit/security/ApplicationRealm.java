@@ -22,6 +22,7 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.obiba.opal.core.unit.UnitKeyStore;
@@ -43,6 +44,9 @@ public class ApplicationRealm extends AuthorizingRealm {
   @Autowired
   private FunctionalUnitService functionalUnitService;
 
+  @Autowired
+  private UnitKeyStoreService unitKeystoreService;
+
   @Override
   public String getName() {
     return APPLICATION_REALM;
@@ -58,7 +62,7 @@ public class ApplicationRealm extends AuthorizingRealm {
     X509CertificateAuthenticationToken x509Token = (X509CertificateAuthenticationToken) token;
     X509Certificate x509Cert = x509Token.getCredentials();
     for(FunctionalUnit unit : functionalUnitService.getFunctionalUnits()) {
-      UnitKeyStore keyStore = unit.getKeyStore();
+      UnitKeyStore keyStore = unitKeystoreService.getKeyStore(unit.getName());
       for(Certificate cert : keyStore.getCertificateEntries()) {
         try {
           x509Cert.verify(cert.getPublicKey());

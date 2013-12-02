@@ -154,12 +154,10 @@ public class KeyCommandTest {
     EasyMock.expectLastCall().anyTimes();
 
     UnitKeyStoreService mockUnitKeyStoreService = createMock(UnitKeyStoreService.class);
-    expect(mockUnitKeyStoreService.aliasExists("my-unit", "my-alias")).andReturn(false).atLeastOnce();
-    expect(mockUnitKeyStoreService.getOrCreateUnitKeyStore("my-unit"))
-        .andReturn(new UnitKeyStore("my-unit", getKeyStore())).atLeastOnce();
+    expect(mockUnitKeyStoreService.getKeyStore("my-unit")).andReturn(new UnitKeyStore("my-unit", getKeyStore()))
+        .atLeastOnce();
 
     FunctionalUnit unit = new FunctionalUnit("my-unit", null);
-    unit.setUnitKeyStoreService(mockUnitKeyStoreService);
     FunctionalUnitService mockUnitService = createMockUnitService(unit);
 
     OpalRuntime mockRuntime = createMockRuntime();

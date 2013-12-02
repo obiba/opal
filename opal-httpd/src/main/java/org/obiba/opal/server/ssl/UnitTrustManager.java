@@ -17,6 +17,7 @@ import java.util.List;
 
 import javax.net.ssl.X509TrustManager;
 
+import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.obiba.opal.core.unit.UnitKeyStore;
@@ -31,8 +32,11 @@ public class UnitTrustManager implements X509TrustManager {
 
   private final FunctionalUnitService functionalUnitService;
 
-  public UnitTrustManager(FunctionalUnitService functionalUnitService) {
+  private final UnitKeyStoreService unitKeyStoreService;
+
+  public UnitTrustManager(FunctionalUnitService functionalUnitService, UnitKeyStoreService unitKeyStoreService) {
     this.functionalUnitService = functionalUnitService;
+    this.unitKeyStoreService = unitKeyStoreService;
   }
 
   @Override
@@ -76,7 +80,7 @@ public class UnitTrustManager implements X509TrustManager {
   private Iterable<UnitKeyStore> getUnitKeystores() {
     List<UnitKeyStore> trustedKeyStores = Lists.newArrayList();
     for(FunctionalUnit unit : functionalUnitService.getFunctionalUnits()) {
-      UnitKeyStore unitKeyStore = unit.getKeyStore(false);
+      UnitKeyStore unitKeyStore = unitKeyStoreService.getKeyStore(unit.getName(), false);
       if(unitKeyStore != null) {
         trustedKeyStores.add(unitKeyStore);
       }

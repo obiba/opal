@@ -73,6 +73,18 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
     return state == null ? null : loadUnitKeyStore(unitName, state);
   }
 
+  @Nullable
+  @Override
+  public UnitKeyStore getKeyStore(@NotNull String unitName, boolean create) {
+    return create ? getOrCreateUnitKeyStore(unitName) : getUnitKeyStore(unitName);
+  }
+
+  @Nullable
+  @Override
+  public UnitKeyStore getKeyStore(@NotNull String unitName) {
+    return getKeyStore(unitName, true);
+  }
+
   private UnitKeyStoreState findByUnit(String unitName) {
     return orientDbService.findUnique(new UnitKeyStoreState(unitName));
   }

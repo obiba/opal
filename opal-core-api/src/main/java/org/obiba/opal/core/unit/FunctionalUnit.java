@@ -10,11 +10,7 @@
 package org.obiba.opal.core.unit;
 
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
-import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy;
 import org.obiba.magma.views.SelectClause;
-import org.obiba.opal.core.service.UnitKeyStoreService;
-
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 /**
  * Represents an organization that fulfils the role of a "functional unit" of a Biobank.
@@ -35,9 +31,6 @@ public class FunctionalUnit {
 
   private SelectClause select;
 
-  @XStreamOmitField
-  private UnitKeyStoreService unitKeyStoreService;
-
   public FunctionalUnit() {
   }
 
@@ -48,10 +41,6 @@ public class FunctionalUnit {
 
   boolean isOpal() {
     return getName().equals(OPAL_INSTANCE);
-  }
-
-  public void setUnitKeyStoreService(UnitKeyStoreService unitKeyStoreService) {
-    this.unitKeyStoreService = unitKeyStoreService;
   }
 
   public String getName() {
@@ -78,32 +67,16 @@ public class FunctionalUnit {
     return keyVariableName;
   }
 
-  @SuppressWarnings("unused")
   public void setKeyVariableName(String keyVariableName) {
     this.keyVariableName = keyVariableName;
   }
 
   public DatasourceEncryptionStrategy getDatasourceEncryptionStrategy() {
-    if(datasourceEncryptionStrategy == null) {
-      datasourceEncryptionStrategy = new EncryptedSecretKeyDatasourceEncryptionStrategy();
-      datasourceEncryptionStrategy.setKeyProvider(getKeyStore(true));
-    }
     return datasourceEncryptionStrategy;
   }
 
-  @SuppressWarnings("unused")
   public void setDatasourceEncryptionStrategy(DatasourceEncryptionStrategy datasourceEncryptionStrategy) {
     this.datasourceEncryptionStrategy = datasourceEncryptionStrategy;
-  }
-
-  public UnitKeyStore getKeyStore() {
-    return getKeyStore(true);
-  }
-
-  public UnitKeyStore getKeyStore(boolean create) {
-    return create
-        ? unitKeyStoreService.getOrCreateUnitKeyStore(getName())
-        : unitKeyStoreService.getUnitKeyStore(getName());
   }
 
   public SelectClause getSelect() {

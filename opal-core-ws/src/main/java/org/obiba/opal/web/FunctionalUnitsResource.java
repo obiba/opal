@@ -452,7 +452,6 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
     if(unit.hasSelect()) {
       functionalUnit.setSelect(new JavascriptClause(unit.getSelect()));
     }
-    functionalUnit.setUnitKeyStoreService(unitKeyStoreService);
     return functionalUnit;
   }
 

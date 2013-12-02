@@ -23,8 +23,11 @@ import org.obiba.magma.ValueSet;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.ValueSetWriter;
+import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
+import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
+import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.obiba.opal.shell.commands.options.SplitCommandOptions;
@@ -38,7 +41,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class SplitCommand extends AbstractOpalRuntimeDependentCommand<SplitCommandOptions> {
 
   @Autowired
-  FunctionalUnitService functionalUnitService;
+  private FunctionalUnitService functionalUnitService;
+
+  @Autowired
+  private UnitKeyStoreService unitKeyStoreService;
 
   @Override
   public int execute() {
@@ -142,6 +148,13 @@ public class SplitCommand extends AbstractOpalRuntimeDependentCommand<SplitComma
       dataCopier = DatasourceCopier.Builder.newCopier().dontCopyMetadata().dontCopyNullValues().withLoggingListener()
           .withThroughtputListener().build();
       File localInputFile = getOpalRuntime().getFileSystem().getLocalFile(bigFile);
+
+      if(unit.getDatasourceEncryptionStrategy() == null) {
+        DatasourceEncryptionStrategy encryptionStrategy = new EncryptedSecretKeyDatasourceEncryptionStrategy();
+        encryptionStrategy.setKeyProvider(unitKeyStoreService.getKeyStore(unit.getName()));
+        unit.setDatasourceEncryptionStrategy(encryptionStrategy);
+      }
+
       inputDatasource = new FsDatasource(bigFile.getName().getBaseName(), localInputFile,
           unit.getDatasourceEncryptionStrategy());
     }

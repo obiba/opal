@@ -12,12 +12,16 @@ package org.obiba.opal.web.magma.support;
 import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
+import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.support.FsDatasourceFactory;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.support.OnyxDatasourceFactory;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.FsDatasourceFactoryDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,6 +29,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class FsDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoParser {
+
+  @Autowired
+  private UnitKeyStoreService unitKeyStoreService;
 
   @NotNull
   @Override
@@ -38,6 +45,12 @@ public class FsDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoPa
       if(unit == null) {
         throw new NoSuchFunctionalUnitException(unitName);
       }
+      if(unit.getDatasourceEncryptionStrategy() == null) {
+        DatasourceEncryptionStrategy encryptionStrategy = new EncryptedSecretKeyDatasourceEncryptionStrategy();
+        encryptionStrategy.setKeyProvider(unitKeyStoreService.getKeyStore(unit.getName()));
+        unit.setDatasourceEncryptionStrategy(encryptionStrategy);
+      }
+
       fsFactory.setEncryptionStrategy(unit.getDatasourceEncryptionStrategy());
     }
 

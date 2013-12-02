@@ -32,6 +32,12 @@ public interface UnitKeyStoreService extends SystemService {
   @Nullable
   UnitKeyStore getUnitKeyStore(@NotNull String unitName);
 
+  @Nullable
+  UnitKeyStore getKeyStore(@NotNull String unitName, boolean create);
+
+  @Nullable
+  UnitKeyStore getKeyStore(@NotNull String unitName);
+
   /**
    * Gets the {@link UnitKeyStore} for the specified {@link FunctionalUnit} or if it doesn't exist, create, persist and
    * return a new {@link UnitKeyStore} for the unit.
