@@ -174,6 +174,11 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
     } else {
       orientDbService.save(database, database);
     }
+
+    // Destroy if has no datasource
+    if(!hasDatasource(database)) {
+      destroyDataSource(database.getName());
+    }
   }
 
   private void validUniqueIdentifiersDatabase(Database database) throws MultipleIdentifiersDatabaseException {
