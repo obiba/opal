@@ -50,6 +50,9 @@ public class ProjectPropertiesModalView extends ModalPopupViewWithUiHandlers<Pro
   HasText title;
 
   @UiField
+  ControlGroup databaseGroup;
+
+  @UiField
   Chooser database;
 
   @UiField
@@ -150,7 +153,7 @@ public class ProjectPropertiesModalView extends ModalPopupViewWithUiHandlers<Pro
 
   @Override
   public void setBusy(boolean busy) {
-    if (busy) {
+    if(busy) {
       modal.setBusy(busy);
       modal.setCloseVisible(false);
       saveButton.setEnabled(false);
@@ -165,7 +168,14 @@ public class ProjectPropertiesModalView extends ModalPopupViewWithUiHandlers<Pro
 
   @Override
   public void showError(@Nullable FormField formField, String message) {
-    ControlGroup group = formField == FormField.NAME ? nameGroup : null;
+    ControlGroup group = null;
+
+    if(formField == FormField.NAME) {
+      group = nameGroup;
+    } else if(formField == FormField.DATABASE) {
+      group = databaseGroup;
+    }
+
     if(group == null) {
       modal.addAlert(message, AlertType.ERROR);
     } else {

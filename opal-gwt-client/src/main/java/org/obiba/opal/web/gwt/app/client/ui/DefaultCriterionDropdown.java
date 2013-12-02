@@ -89,7 +89,7 @@ public abstract class DefaultCriterionDropdown extends CriterionDropdown {
       return "NOT " + fieldName + ":" + matches.getText();
     }
 
-    return fieldName + ":*";
+    return "";
   }
 
   private class UpdateFilterChosenHandler implements ChosenChangeEvent.ChosenChangeHandler {

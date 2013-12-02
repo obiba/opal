@@ -14,6 +14,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.DatasourceUpdateListener;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory;
 import org.obiba.magma.support.EntitiesPredicate;
@@ -49,13 +50,14 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
 
 @Component
-public class DefaultDatabaseRegistry implements DatabaseRegistry {
+public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpdateListener {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultDatabaseRegistry.class);
 
@@ -171,6 +173,11 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
       }
     } else {
       orientDbService.save(database, database);
+    }
+
+    // Destroy if has no datasource
+    if(!hasDatasource(database)) {
+      destroyDataSource(database.getName());
     }
   }
 
@@ -294,6 +301,15 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
       return mongoDbSettings.createMongoDBDatasourceFactory(datasourceName);
     }
     throw new IllegalArgumentException("Unknown datasource config for database " + database.getClass());
+  }
+
+  @Override
+  public void onDelete(@NotNull Datasource datasource) {
+    //Remove from registrations
+    ImmutableList<String> keys = ImmutableList.copyOf(registrations.keySet());
+    for(String key : keys) {
+      registrations.remove(key, datasource.getName());
+    }
   }
 
   private class DataSourceCacheLoader extends CacheLoader<String, DataSource> {

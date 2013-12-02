@@ -6,6 +6,8 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseResources;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectCreatedEvent;
@@ -26,7 +28,6 @@ import org.obiba.opal.web.model.client.opal.ProjectFactoryDto;
 
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -35,8 +36,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
-public class ProjectPropertiesModalPresenter
-    extends ModalPresenterWidget<ProjectPropertiesModalPresenter.Display>
+public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<ProjectPropertiesModalPresenter.Display>
     implements ProjectPropertiesUiHandlers {
 
   private ProjectDto project;
@@ -45,9 +45,12 @@ public class ProjectPropertiesModalPresenter
 
   private ValidationHandler validationHandler;
 
+  private final Translations translations;
+
   @Inject
-  public ProjectPropertiesModalPresenter(EventBus eventBus, Display display) {
+  public ProjectPropertiesModalPresenter(EventBus eventBus, Display display, Translations translations) {
     super(eventBus, display);
+    this.translations = translations;
     getView().setUiHandlers(this);
   }
 
@@ -76,7 +79,7 @@ public class ProjectPropertiesModalPresenter
   public void save() {
     getView().setBusy(true);
     getView().clearErrors();
-    if (project == null) {
+    if(project == null) {
       create();
     } else {
       update();
@@ -85,23 +88,19 @@ public class ProjectPropertiesModalPresenter
 
   private void create() {
     if(validationHandler.validate()) {
-      ResourceRequestBuilderFactory.<ProjectFactoryDto>newBuilder() //
-          .forResource("/projects")  //
-          .withResourceBody(ProjectFactoryDto.stringify(getProjectFactoryDto())) //
-          .withCallback(Response.SC_CREATED, new ResponseCodeCallback() {
+      // Validate database connection
+      final String name = getView().getDatabase().getText();
+      ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
+          .forResource(DatabaseResources.database(name, "connections")) //
+          .withCallback(Response.SC_OK, new CreateProjectCallback()) //
+          .withCallback(new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
-              getView().hideDialog();
-              fireEvent(new ProjectCreatedEvent.Builder().build());
-            }
-          }) //
-          .withCallback(Response.SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget()) {
-            @Override
-            public void onResponseCode(Request request, Response response) {
+              getView().showError(Display.FormField.DATABASE, TranslationsUtils
+                  .replaceArguments(translations.userMessageMap().get("FailedToConnectToDatabase"), name));
               getView().setBusy(false);
-              super.onResponseCode(request, response);
             }
-          }) //
+          }, Response.SC_SERVICE_UNAVAILABLE, Response.SC_NOT_FOUND, Response.SC_BAD_REQUEST) //
           .post().send();
     }
   }
@@ -121,21 +120,10 @@ public class ProjectPropertiesModalPresenter
           @Override
           public void onResponseCode(Request request, Response response) {
             getView().setBusy(false);
-            super.onResponseCode(request,
-                response);
+            super.onResponseCode(request, response);
           }
         }) //
         .put().send();
-  }
-
-  private ProjectFactoryDto getProjectFactoryDto() {
-    ProjectFactoryDto dto = ProjectFactoryDto.create();
-    dto.setName(getView().getName().getText());
-    String title = getView().getTitle().getText();
-    dto.setTitle(Strings.isNullOrEmpty(title) ? dto.getName() : title);
-    dto.setDescription(getView().getDescription().getText());
-    dto.setDatabase(getView().getDatabase().getText());
-    return dto;
   }
 
   private ProjectDto getProjectDto() {
@@ -202,6 +190,7 @@ public class ProjectPropertiesModalPresenter
 
     enum FormField {
       NAME,
+      DATABASE
     }
 
     void setProject(ProjectDto project);
@@ -223,5 +212,39 @@ public class ProjectPropertiesModalPresenter
     void setAvailableDatabases(JsArray<DatabaseDto> availableDatabases);
 
     void setBusy(boolean busy);
+  }
+
+  private class CreateProjectCallback implements ResponseCodeCallback {
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      ResourceRequestBuilderFactory.<ProjectFactoryDto>newBuilder() //
+          .forResource("/projects")  //
+          .withResourceBody(ProjectFactoryDto.stringify(getProjectFactoryDto())) //
+          .withCallback(Response.SC_CREATED, new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              getView().hideDialog();
+              fireEvent(new ProjectCreatedEvent.Builder().build());
+            }
+          }) //
+          .withCallback(Response.SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget()) {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              getView().setBusy(false);
+              super.onResponseCode(request, response);
+            }
+          }) //
+          .post().send();
+    }
+
+    private ProjectFactoryDto getProjectFactoryDto() {
+      ProjectFactoryDto dto = ProjectFactoryDto.create();
+      dto.setName(getView().getName().getText());
+      String title = getView().getTitle().getText();
+      dto.setTitle(Strings.isNullOrEmpty(title) ? dto.getName() : title);
+      dto.setDescription(getView().getDescription().getText());
+      dto.setDatabase(getView().getDatabase().getText());
+      return dto;
+    }
   }
 }

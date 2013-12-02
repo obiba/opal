@@ -223,7 +223,8 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
       if(rangeValueChooser.getSelectedIndex() > 0) {
         filter += " " + rangeValueChooser.getItemText(rangeValueChooser.getSelectedIndex()).toLowerCase();
 
-        filter += rangeValueChooser.isItemSelected(1) ? "[" + (min.getText().isEmpty() ? "*" : min.getText()) + " TO " +
+        filter += rangeValueChooser.isItemSelected(1) ? "[" + (min.getText().isEmpty() ? "*" : min.getText()) + " " +
+            translations.criterionFiltersMap().get("to") + " " +
             (max.getText().isEmpty() ? "*" : max.getText()) + "]" : "(" + values.getText() + ")";
       }
 

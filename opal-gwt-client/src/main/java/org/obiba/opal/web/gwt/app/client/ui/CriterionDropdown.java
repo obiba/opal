@@ -113,7 +113,7 @@ public abstract class CriterionDropdown extends DropdownButton {
           .appendHtmlConstant("</span>");
     }
 
-    RadioButton radio = new RadioButton("radio", builder.toSafeHtml());
+    RadioButton radio = new RadioButton(fieldName + "-radio", builder.toSafeHtml());
 
     radio.addClickHandler(new ClickHandler() {
       @Override
@@ -144,8 +144,8 @@ public abstract class CriterionDropdown extends DropdownButton {
 
   public String getQueryString() {
     if(((CheckBox) radioControls.getWidget(0)).getValue()) {
-      // Empty
-      return fieldName + ":*";
+      // All: No filter is necessary
+      return "";
     }
     if(((CheckBox) radioControls.getWidget(1)).getValue()) {
       // Not empty
