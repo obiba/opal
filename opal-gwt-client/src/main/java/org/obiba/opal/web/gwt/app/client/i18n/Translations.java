@@ -434,7 +434,7 @@ public interface Translations extends Constants {
       "The data exportation process can be followed using the Job ID: {0}. Files will be exported to: {1}",//
       "DataCopyProcessLaunched", "The data copy process can be followed using the Job ID: {0}",//
       "DatabaseAlreadyExists", "A database with this name already exists.",//
-      "DatabaseConnectionOk", "Connection successful.",//
+      "DatabaseConnectionOk", "{0}: Connection successful.",//
       "DatabaseConnectionFailed", "Failed to connect: {0}.",//
       "FailedToConnectToDatabase", "Failed to connect to database '{0}'.",//
       "DatabaseIsNotEditable", "Database is used by a Datasource and is not editable",//
@@ -507,8 +507,7 @@ public interface Translations extends Constants {
       "XMLOrExcelFileRequired", "An Excel or a XML file is required.",//
       "CreateViewFailed", "Failed to create view. Make sure the view file is valid.",//
       "SPSSOrExcelFileRequired", "An Excel or a SPSS file is required.",//
-      "ESQueryBadRequest", "Not a valid search query.",
-      "DuplicateUserName", "A user with same name already exists.",
+      "ESQueryBadRequest", "Not a valid search query.", "DuplicateUserName", "A user with same name already exists.",
       "DuplicateSubjectProfile", "A user or organization profile already registered with the same name."//
   })
   Map<String, String> userMessageMap();

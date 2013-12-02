@@ -61,8 +61,7 @@ public class DatabaseAdministrationPresenter extends
 
   @Inject
   public DatabaseAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
-      IdentifiersDatabasePresenter identifiersDatabasePresenter,
-      DataDatabasesPresenter dataDatabasesPresenter,
+      IdentifiersDatabasePresenter identifiersDatabasePresenter, DataDatabasesPresenter dataDatabasesPresenter,
       Provider<AuthorizationPresenter> authorizationPresenter, BreadcrumbsBuilder breadcrumbsBuilder) {
     super(eventBus, display, proxy);
     this.identifiersDatabasePresenter = identifiersDatabasePresenter;
@@ -118,7 +117,7 @@ public class DatabaseAdministrationPresenter extends
   }
 
   static void testConnection(EventBus eventBus, String database) {
-    ResponseCodeCallback testConnectionCallback = new TestConnectionCallback(eventBus);
+    ResponseCodeCallback testConnectionCallback = new TestConnectionCallback(eventBus, database);
     ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
         .forResource(DatabaseResources.database(database, "connections")) //
         .withCallback(Response.SC_OK, testConnectionCallback) //
@@ -134,19 +133,21 @@ public class DatabaseAdministrationPresenter extends
 
     private final EventBus eventBus;
 
-    TestConnectionCallback(EventBus eventBus) {
+    private String database;
+
+    TestConnectionCallback(EventBus eventBus, String database) {
       this.eventBus = eventBus;
+      this.database = database;
     }
 
     @Override
     public void onResponseCode(Request request, Response response) {
       Event<?> event = null;
       if(response.getStatusCode() == Response.SC_OK) {
-        event = NotificationEvent.newBuilder().info("DatabaseConnectionOk").build();
+        event = NotificationEvent.newBuilder().info("DatabaseConnectionOk").args(database).build();
       } else {
         ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-        event = NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray())
-            .build();
+        event = NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray()).build();
       }
       eventBus.fireEvent(event);
     }
