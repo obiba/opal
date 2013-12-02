@@ -13,43 +13,17 @@ import java.util.concurrent.ThreadFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 @Component
 public class TransactionalThreadFactory implements ThreadFactory {
 
-  private final TransactionTemplate txTemplate;
-
   @Autowired
-  public TransactionalThreadFactory(PlatformTransactionManager txManager) {
-    if(txManager == null) throw new IllegalArgumentException("txManager cannot be null");
-    txTemplate = new TransactionTemplate(txManager);
-  }
+  private TransactionTemplate transactionTemplate;
 
   @Override
-  public Thread newThread(Runnable r) {
-    return new TransactionalThread(r);
+  public Thread newThread(Runnable runnable) {
+    return new TransactionalThread(transactionTemplate, runnable);
   }
 
-  private class TransactionalThread extends Thread {
-
-    private final Runnable runnable;
-
-    private TransactionalThread(Runnable runnable) {
-      this.runnable = runnable;
-    }
-
-    @Override
-    public void run() {
-      txTemplate.execute(new TransactionCallbackWithoutResult() {
-        @Override
-        protected void doInTransactionWithoutResult(TransactionStatus status) {
-          runnable.run();
-        }
-      });
-    }
-  }
 }

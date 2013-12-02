@@ -24,6 +24,7 @@ import org.obiba.magma.MagmaEngineExtension;
 import org.obiba.magma.support.MagmaEngineFactory;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.tx.TransactionalThread;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.fs.security.SecuredOpalFileSystem;
@@ -198,32 +199,6 @@ public class DefaultOpalRuntime implements OpalRuntime {
         log.error("Error creating functional unit's directory in the Opal File System.", e);
       }
       syncFs.notifyAll();
-    }
-  }
-
-  //
-  // Inner Classes
-  //
-
-  private static class TransactionalThread extends Thread {
-
-    private final TransactionTemplate transactionTemplate;
-
-    private final Runnable runnable;
-
-    TransactionalThread(TransactionTemplate transactionTemplate, Runnable runnable) {
-      this.transactionTemplate = transactionTemplate;
-      this.runnable = runnable;
-    }
-
-    @Override
-    public void run() {
-      transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-        @Override
-        protected void doInTransactionWithoutResult(TransactionStatus status) {
-          runnable.run();
-        }
-      });
     }
   }
 

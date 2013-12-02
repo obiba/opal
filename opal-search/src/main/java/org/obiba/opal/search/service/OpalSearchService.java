@@ -25,7 +25,6 @@ import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 @Component
 public class OpalSearchService implements Service, ElasticSearchProvider {
@@ -38,21 +37,15 @@ public class OpalSearchService implements Service, ElasticSearchProvider {
 
   public static final String PATH_WORK = "${OPAL_HOME}/work/elasticsearch/work";
 
-  private final ElasticSearchConfigurationService configService;
+  @Autowired
+  private ElasticSearchConfigurationService configService;
 
-  private final ApplicationContext applicationContext;
+  @Autowired
+  private ApplicationContext applicationContext;
 
   private Node esNode;
 
   private Client client;
-
-  @Autowired
-  public OpalSearchService(ElasticSearchConfigurationService configService, ApplicationContext applicationContext) {
-    Assert.notNull(configService, "configService cannot be null");
-    Assert.notNull(applicationContext, "applicationContext cannot be null");
-    this.configService = configService;
-    this.applicationContext = applicationContext;
-  }
 
   @Override
   public boolean isEnabled() {

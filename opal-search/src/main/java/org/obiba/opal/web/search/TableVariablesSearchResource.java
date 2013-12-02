@@ -34,7 +34,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@Transactional
 @Scope("request")
 @Path("/datasource/{ds}/table/{table}/variables/_search")
 public class TableVariablesSearchResource extends AbstractVariablesSearchResource {
@@ -47,6 +46,7 @@ public class TableVariablesSearchResource extends AbstractVariablesSearchResourc
 
   @GET
   @POST
+  @Transactional(readOnly = true)
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public Response search(@QueryParam("query") String query, @QueryParam("offset") @DefaultValue("0") int offset,
       @QueryParam("limit") @DefaultValue("10") int limit,

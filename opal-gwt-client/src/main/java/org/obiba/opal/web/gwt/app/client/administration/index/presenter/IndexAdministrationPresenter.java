@@ -21,8 +21,6 @@ import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
-import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -34,15 +32,8 @@ import org.obiba.opal.web.model.client.opal.ServiceStatus;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Timer;
@@ -129,19 +120,18 @@ public class IndexAdministrationPresenter
   protected void onReveal() {
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
     // stop start search service
-    ResourceRequestBuilderFactory.<ServiceDto>newBuilder().forResource(Resources.searchService()).get()
+    ResourceRequestBuilderFactory.<ServiceDto>newBuilder().forResource(Resources.searchService()) //
         .withCallback(new ResourceCallback<ServiceDto>() {
           @Override
           public void onResource(Response response, ServiceDto resource) {
             if(response.getStatusCode() == Response.SC_OK) {
-              if(resource.getStatus().isServiceStatus(ServiceStatus.RUNNING)) {
-                getView().setServiceStatus(Display.Status.Stoppable);
-              } else {
-                getView().setServiceStatus(Display.Status.Startable);
-              }
+              getView().setServiceStatus(resource.getStatus().isServiceStatus(ServiceStatus.RUNNING)
+                  ? Display.Status.Stoppable
+                  : Display.Status.Startable);
             }
           }
-        }).send();
+        }) //
+        .get().send();
 
     getView().getIndexTable().setVisibleRange(0, 10);
     refresh();
@@ -173,57 +163,53 @@ public class IndexAdministrationPresenter
 
   @Override
   public void start() {
-    ResponseCodeCallback callback = new ResponseCodeCallback() {
-
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == Response.SC_OK) {
-          getView().setServiceStatus(Display.Status.Stoppable);
-          refresh();
-          getEventBus().fireEvent(new TableIndexStatusRefreshEvent());
-        } else {
-          getView().setServiceStatus(Display.Status.Startable);
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-        }
-      }
-
-    };
-
     // Start service
     getView().setServiceStatus(Display.Status.Pending);
-    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-        .forResource(Resources.searchServiceEnabled()).accept("application/json")//
-        .withCallback(callback, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR).put().send();
+    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder() //
+        .forResource(Resources.searchServiceEnabled()).accept("application/json") //
+        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().setServiceStatus(Display.Status.Stoppable);
+            refresh();
+            getEventBus().fireEvent(new TableIndexStatusRefreshEvent());
+          }
+        }) //
+        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().setServiceStatus(Display.Status.Startable);
+            getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+          }
+        }) //
+        .put().send();
   }
 
   @Override
   public void stop() {
-    ResponseCodeCallback callback = new ResponseCodeCallback() {
-
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == Response.SC_OK) {
-          getView().setServiceStatus(Display.Status.Startable);
-          getView().clear();
-          getEventBus().fireEvent(new TableIndexStatusRefreshEvent());
-        } else {
-          getView().clear();
-          getView().setServiceStatus(Display.Status.Stoppable);
-          ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-          getEventBus().fireEvent(
-              NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray())
-                  .build());
-        }
-      }
-
-    };
-
     // Stop service
     getView().setServiceStatus(Display.Status.Pending);
-    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-        .forResource(Resources.searchServiceEnabled()).accept("application/json")//
-        .withCallback(Response.SC_OK, callback)//
-        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callback).delete().send();
+    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder() //
+        .forResource(Resources.searchServiceEnabled()).accept("application/json") //
+        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().setServiceStatus(Display.Status.Startable);
+            getView().clear();
+            getEventBus().fireEvent(new TableIndexStatusRefreshEvent());
+          }
+        }) //
+        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().clear();
+            getView().setServiceStatus(Display.Status.Stoppable);
+            ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+            getEventBus().fireEvent(
+                NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray()).build());
+          }
+        }) //
+        .delete().send();
   }
 
   @Override
@@ -251,10 +237,11 @@ public class IndexAdministrationPresenter
 
         };
         ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-            .forResource(Resources.index(object.getDatasource(), object.getTable())).accept("application/json")//
-            .withCallback(Response.SC_OK, callback)//
-            .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).delete().send();
-
+            .forResource(Resources.index(object.getDatasource(), object.getTable())) //
+            .accept("application/json") //
+            .withCallback(Response.SC_OK, callback) //
+            .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback) //
+            .delete().send();
         getView().unselectIndex(object);
       }
     }
@@ -262,25 +249,24 @@ public class IndexAdministrationPresenter
 
   @Override
   public void clear(TableIndexStatusDto table) {
-    ResponseCodeCallback callback = new ResponseCodeCallback() {
-
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == Response.SC_OK) {
-          refresh();
-        } else {
-          ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-          getEventBus().fireEvent(
-              NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray())
-                  .build());
-        }
-      }
-
-    };
-    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-        .forResource(Resources.index(table.getDatasource(), table.getTable())).accept("application/json")//
-        .withCallback(Response.SC_OK, callback)//
-        .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).delete().send();
+    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder() //
+        .forResource(Resources.index(table.getDatasource(), table.getTable())) //
+        .accept("application/json") //
+        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            refresh();
+          }
+        }) //
+        .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+            getEventBus().fireEvent(
+                NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray()).build());
+          }
+        }) //
+        .delete().send();
   }
 
   @Override
@@ -300,33 +286,33 @@ public class IndexAdministrationPresenter
 
   @Override
   public void indexNow(TableIndexStatusDto table) {
-    ResponseCodeCallback callback = new ResponseCodeCallback() {
 
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() == Response.SC_OK) {
-          // Wait a few seconds for the task to launch before checking its status
-          Timer t = new Timer() {
-            @Override
-            public void run() {
-              refresh(false);
-            }
-          };
-          // Schedule the timer to run once in X seconds.
-          t.schedule(DELAY_MILLIS);
-        } else {
-          ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-          getEventBus().fireEvent(
-              NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray())
-                  .build());
-        }
-      }
-
-    };
-    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-        .forResource(Resources.index(table.getDatasource(), table.getTable())).accept("application/json")//
-        .withCallback(Response.SC_OK, callback) //
-        .withCallback(Response.SC_SERVICE_UNAVAILABLE, callback).put().send();
+    ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder() //
+        .forResource(Resources.index(table.getDatasource(), table.getTable())) //
+        .accept("application/json") //
+        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            // Wait a few seconds for the task to launch before checking its status
+            Timer t = new Timer() {
+              @Override
+              public void run() {
+                refresh(false);
+              }
+            };
+            // Schedule the timer to run once in X seconds.
+            t.schedule(DELAY_MILLIS);
+          }
+        }) //
+        .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+            getEventBus().fireEvent(
+                NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray()).build());
+          }
+        }) //
+        .put().send();
   }
 
   private void refresh(boolean clearIndices) {
@@ -339,7 +325,7 @@ public class IndexAdministrationPresenter
           public void onResponseCode(Request request, Response response) {
             // nothing
           }
-        })//
+        }) //
         .get().send();
   }
 
@@ -357,7 +343,6 @@ public class IndexAdministrationPresenter
     public void onResource(Response response, JsArray<TableIndexStatusDto> resource) {
       getView().renderRows(resource);
       getView().getIndexTable().setVisibleRangeAndClearData(r, true);
-
       if(clearIndices) getView().getSelectedIndices().clear();
     }
   }
@@ -372,19 +357,21 @@ public class IndexAdministrationPresenter
     public void authorized() {
 
       // Fetch all indices
-      ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder()//
-          .forResource(Resources.indices()).withCallback(new ResourceCallback<JsArray<TableIndexStatusDto>>() {
-        @Override
-        public void onResource(Response response, JsArray<TableIndexStatusDto> resource) {
-          getView().renderRows(resource);
-        }
-      })//
+      ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder() //
+          .forResource(Resources.indices()) //
+          .withCallback(new ResourceCallback<JsArray<TableIndexStatusDto>>() {
+            @Override
+            public void onResource(Response response, JsArray<TableIndexStatusDto> resource) {
+              getView().renderRows(resource);
+            }
+          }) //
           .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
               // nothing
             }
-          }).get().send();
+          }) //
+          .get().send();
 
     }
 

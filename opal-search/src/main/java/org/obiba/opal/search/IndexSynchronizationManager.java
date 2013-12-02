@@ -39,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
  * index is determined to be out of date, a {@code IndexSynchronization} task is created and run.
  */
 @Component
-@Transactional
+@Transactional(readOnly = true)
 public class IndexSynchronizationManager {
 
   private static final Logger log = LoggerFactory.getLogger(IndexSynchronizationManager.class);
@@ -47,8 +47,8 @@ public class IndexSynchronizationManager {
   // Grace period before reindexing (in seconds)
   private static final int GRACE_PERIOD = 300;
 
-  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
   @Autowired
+  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
   private Set<IndexManager> indexManagers;
 
   @Autowired

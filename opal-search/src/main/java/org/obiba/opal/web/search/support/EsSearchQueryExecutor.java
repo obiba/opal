@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.Response;
 
 import org.codehaus.jettison.json.JSONException;
@@ -41,7 +42,7 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
 
   private final ElasticSearchProvider esProvider;
 
-  public EsSearchQueryExecutor(ElasticSearchProvider esProvider) {
+  public EsSearchQueryExecutor(@NotNull ElasticSearchProvider esProvider) {
     Assert.notNull(esProvider, "Elastic Search provider is null!");
     this.esProvider = esProvider;
   }
@@ -55,8 +56,8 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
    * @throws JSONException
    */
   @Override
-  public Search.QueryResultDto execute(IndexManagerHelper indexManagerHelper, Search.QueryTermsDto dtoQueries)
-      throws JSONException {
+  public Search.QueryResultDto execute(@NotNull IndexManagerHelper indexManagerHelper,
+      @NotNull Search.QueryTermsDto dtoQueries) throws JSONException {
 
     Assert.notNull(indexManagerHelper, "Index Manager Helper is null!");
     Assert.notNull(dtoQueries, "Query dto request is null!");
@@ -111,8 +112,8 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
    * @throws JSONException
    */
   @Override
-  public Search.QueryResultDto execute(IndexManagerHelper indexManagerHelper, Search.QueryTermDto dtoQuery)
-      throws JSONException {
+  public Search.QueryResultDto execute(@NotNull IndexManagerHelper indexManagerHelper,
+      @NotNull Search.QueryTermDto dtoQuery) throws JSONException {
 
     Assert.notNull(indexManagerHelper, "Index Manager Helper is null!");
     Assert.notNull(dtoQuery, "Query dto request is null!");

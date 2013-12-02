@@ -36,26 +36,23 @@ public abstract class IndexResource {
   protected IndexSynchronizationManager synchroManager;
 
   protected Opal.ScheduleDto getScheduleDto(String datasource, String table) {
-    // Set schedule
-    Schedule schedule = configService.getConfig().getSchedule(getValueTable(datasource, table));
 
+    Schedule schedule = configService.getConfig().getSchedule(getValueTable(datasource, table));
     if(schedule == null) {
       return Opal.ScheduleDto.newBuilder().setType(Opal.ScheduleType.MINUTES_15).build();
     }
 
-    Opal.ScheduleDto dto = Opal.ScheduleDto.newBuilder().setType(schedule.getType()).build();
-
+    Opal.ScheduleDto.Builder dtoBuilder = Opal.ScheduleDto.newBuilder().setType(schedule.getType());
     if(schedule.getDay() != null) {
-      dto = dto.toBuilder().setDay(schedule.getDay()).build();
+      dtoBuilder.setDay(schedule.getDay());
     }
     if(schedule.getHours() != null) {
-      dto = dto.toBuilder().setHours(schedule.getHours()).build();
+      dtoBuilder.setHours(schedule.getHours());
     }
     if(schedule.getMinutes() != null) {
-      dto = dto.toBuilder().setMinutes(schedule.getMinutes()).build();
+      dtoBuilder.setMinutes(schedule.getMinutes());
     }
-
-    return dto;
+    return dtoBuilder.build();
   }
 
   protected ValueTable getValueTable(String datasource, String table) {
@@ -67,7 +64,6 @@ public abstract class IndexResource {
     IndexSynchronization currentTask = synchroManager.getCurrentTask();
     if(currentTask != null && currentTask.getValueTable().getName().equals(table) &&
         currentTask.getValueTable().getDatasource().getName().equals(datasource)) {
-
       progress = synchroManager.getCurrentTask().getProgress();
     }
     return progress;

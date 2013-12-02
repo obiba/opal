@@ -62,6 +62,7 @@ public class ProjectsServiceImpl implements ProjectService {
   private TransactionTemplate transactionTemplate;
 
   @Autowired
+  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
   private Set<ValueTableUpdateListener> tableListeners;
 
   @Override

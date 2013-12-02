@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.app.client.administration.index.presenter;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.event.TableIndicesRefreshEvent;
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexStatusRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -21,9 +20,7 @@ import org.obiba.opal.web.model.client.opal.Day;
 import org.obiba.opal.web.model.client.opal.ScheduleDto;
 import org.obiba.opal.web.model.client.opal.ScheduleType;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
-import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -32,7 +29,6 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
 public class IndexPresenter extends ModalPresenterWidget<IndexPresenter.Display> implements IndexUiHandlers {
-
 
   public interface Display extends PopupView, HasUiHandlers<IndexUiHandlers> {
 
@@ -180,32 +176,18 @@ public class IndexPresenter extends ModalPresenterWidget<IndexPresenter.Display>
   }
 
   private void putSchedule(String datasource, String table, ScheduleDto dto) {
-    ResourceRequestBuilderFactory.newBuilder().forResource(Resources.updateSchedule(datasource, table)).put()//
-        .withResourceBody(ScheduleDto.stringify(dto))//
-        .withCallback(Response.SC_OK, new CreateOrUpdateMethodCallBack(dto)).send();
-  }
-
-  private class CreateOrUpdateMethodCallBack implements ResponseCodeCallback {
-
-    ScheduleDto dto;
-
-    private CreateOrUpdateMethodCallBack(ScheduleDto dto) {
-      this.dto = dto;
-    }
-
-    @Override
-    public void onResponseCode(Request request, Response response) {
-      getView().hideDialog();
-      if(response.getStatusCode() == Response.SC_OK) {
-        if(refreshIndices) getEventBus().fireEvent(new TableIndicesRefreshEvent());
-        if(refreshTable) getEventBus().fireEvent(new TableIndexStatusRefreshEvent());
-      } else {
-        ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-        getEventBus().fireEvent(
-            NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray())
-                .build());
-      }
-    }
+    ResourceRequestBuilderFactory.newBuilder() //
+        .forResource(Resources.updateSchedule(datasource, table)) //
+        .withResourceBody(ScheduleDto.stringify(dto)) //
+        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().hideDialog();
+            if(refreshIndices) getEventBus().fireEvent(new TableIndicesRefreshEvent());
+            if(refreshTable) getEventBus().fireEvent(new TableIndexStatusRefreshEvent());
+          }
+        }) //
+        .put().send();
   }
 
   public void setUpdateMethodCallbackRefreshIndices(boolean b) {

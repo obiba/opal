@@ -46,10 +46,6 @@ public abstract class AbstractVariablesSearchResource {
   @Autowired
   protected VariablesIndexManager variablesIndexManager;
 
-  //
-  // Protected members
-  //
-
   abstract protected String getSearchPath();
 
   protected Search.QueryResultDto convertResponse(JSONObject jsonResponse) throws JSONException {
@@ -58,11 +54,11 @@ public abstract class AbstractVariablesSearchResource {
 
   protected QuerySearchJsonBuilder buildQuerySearch(String query, int offset, int limit, Collection<String> fields,
       String sortField, String sortDir) {
-    if(fields == null) fields = new ArrayList<String>();
 
-    addDefaultFields(fields);
+    Collection<String> safeFields = fields == null ? new ArrayList<String>() : fields;
+    addDefaultFields(safeFields);
     QuerySearchJsonBuilder jsonBuilder = new QuerySearchJsonBuilder();
-    jsonBuilder.setQuery(query).setFields(fields).setFrom(offset).setSize(limit) //
+    jsonBuilder.setQuery(query).setFields(safeFields).setFrom(offset).setSize(limit) //
         .setSortField(Strings.isNullOrEmpty(sortField) ? DEFAULT_SORT_FIELD : sortField) //
         .setSortDir(Strings.isNullOrEmpty(sortDir) ? SortDir.DESC.toString() : sortDir);
 

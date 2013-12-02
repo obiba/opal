@@ -31,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
  * individual data,
  */
 @Component
-@Transactional
 @Scope("request")
 @Path("/datasource/{ds}/table/{table}/facets")
 public class ValueTableFacetsResource {
@@ -50,6 +49,7 @@ public class ValueTableFacetsResource {
 
   @POST
   @Path("/_search")
+  @Transactional(readOnly = true)
   public Response search(@Context HttpServletRequest servletRequest, Search.QueryTermsDto dtoQueries) {
     Search.QueryResultDto dtoResult = Search.QueryResultDto.newBuilder().setTotalHits(0).build();
 

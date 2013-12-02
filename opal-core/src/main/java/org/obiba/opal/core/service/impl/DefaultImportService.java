@@ -330,6 +330,7 @@ public class DefaultImportService implements ImportService {
    * @throws IOException
    * @throws InterruptedException
    */
+  @SuppressWarnings("ChainOfInstanceofChecks")
   private void copyValueTables(Set<ValueTable> sourceTables, Datasource destination, boolean allowIdentifierGeneration,
       boolean ignoreUnknownIdentifier) throws IOException, InterruptedException {
     try {

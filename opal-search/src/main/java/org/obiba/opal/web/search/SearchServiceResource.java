@@ -30,12 +30,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.collect.Lists;
 
 @Component
-@Transactional
 @Scope("request")
 @Path("/service/search/indices")
 public class SearchServiceResource extends IndexResource {
 
   @GET
+  @Transactional(readOnly = true)
   public List<Opal.TableIndexStatusDto> getIndices() {
     List<Opal.TableIndexStatusDto> tableStatusDtos = Lists.newArrayList();
 
@@ -66,7 +66,6 @@ public class SearchServiceResource extends IndexResource {
     });
   }
 
-  @SuppressWarnings("ConstantConditions")
   private Opal.TableIndexStatusDto getTableStatusDto(Datasource datasource, ValueTable valueTable) {
     float progress = 0f;
     if(synchroManager.getCurrentTask() != null &&

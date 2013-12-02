@@ -37,7 +37,6 @@ import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Search;
-import org.obiba.opal.web.search.support.QuerySearchJsonBuilder;
 import org.obiba.opal.web.search.support.VariableEntityValueSetDtoFunction;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -52,7 +51,6 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 @Component
-@Transactional
 @Scope("request")
 @Path("/datasource/{ds}/table/{table}/valueSets/_search")
 @Api(value = "/datasource/{ds}/table/{table}/valueSets/_search",
@@ -70,6 +68,7 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
   @SuppressWarnings("PMD.ExcessiveParameterList")
   @GET
   @POST
+  @Transactional(readOnly = true)
   @ApiOperation("Returns a list of valueSets corresponding to specified query")
   public Response search(@Context UriInfo uriInfo, @QueryParam("query") String query,
       @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("10") int limit,
@@ -79,8 +78,7 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
       if(!canQueryEsIndex()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
       if(!valuesIndexManager.hasIndex(getValueTable())) return Response.status(Response.Status.NOT_FOUND).build();
 
-      QuerySearchJsonBuilder jsonBuiler = buildQuerySearch(query, offset, limit, null, null, null);
-      JSONObject jsonResponse = executeQuery(jsonBuiler.build());
+      JSONObject jsonResponse = executeQuery(buildQuerySearch(query, offset, limit, null, null, null).build());
 
       Search.ValueSetsResultDto.Builder dtoResponseBuilder = getvalueSetsDtoBuilder(uriInfo, select, jsonResponse);
 

@@ -10,7 +10,6 @@
 package org.obiba.opal.web.search;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
@@ -34,11 +33,11 @@ import org.elasticsearch.rest.RestChannel;
 import org.elasticsearch.rest.RestResponse;
 import org.elasticsearch.rest.support.AbstractRestRequest;
 import org.elasticsearch.rest.support.RestUtils;
+import org.obiba.magma.Timestamps;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.opal.search.IndexSynchronization;
 import org.obiba.opal.search.Schedule;
-import org.obiba.opal.search.SearchServiceException;
 import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.ValueTableValuesIndex;
 import org.obiba.opal.web.model.Opal;
@@ -48,7 +47,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@Transactional
+@Transactional(readOnly = true)
 @Scope("request")
 @Path("/datasource/{ds}/table/{table}/index")
 public class ValueTableIndexResource extends IndexResource {
@@ -61,89 +60,77 @@ public class ValueTableIndexResource extends IndexResource {
 
   @GET
   @OPTIONS
-  @Path("/")
   public Response getTableStatus() {
-    if(esProvider.isEnabled()) {
-      ValueTable valueTable = getValueTable(datasource, table);
-
-      URI link = UriBuilder.fromPath("/").path(ValueTableIndexResource.class).build(datasource, table);
-      Opal.TableIndexStatusDto tableStatusDto = Opal.TableIndexStatusDto.newBuilder().setDatasource(datasource)
-          .setTable(table).setSchedule(getScheduleDto(datasource, table))
-          .setStatus(getTableIndexationStatus(datasource, table))
-          .setProgress(getValueTableIndexationProgress(datasource, table)).setLink(link.getPath()).build();
-
-      if(!valueTable.getTimestamps().getCreated().isNull()) {
-        tableStatusDto = tableStatusDto.toBuilder()
-            .setTableLastUpdate(valueTable.getTimestamps().getLastUpdate().toString()).build();
-      }
-
-      if(!indexManager.getIndex(valueTable).getTimestamps().getCreated().isNull()) {
-        tableStatusDto = tableStatusDto.toBuilder()
-            .setIndexCreated(indexManager.getIndex(valueTable).getTimestamps().getCreated().toString()).build();
-      }
-      if(!indexManager.getIndex(valueTable).getTimestamps().getLastUpdate().isNull()) {
-        tableStatusDto = tableStatusDto.toBuilder()
-            .setIndexLastUpdate(indexManager.getIndex(valueTable).getTimestamps().getLastUpdate().toString()).build();
-      }
-
-      return Response.ok().entity(tableStatusDto).build();
+    if(!esProvider.isEnabled()) {
+      return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
     }
 
-    return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+    ValueTable valueTable = getValueTable(datasource, table);
+
+    Opal.TableIndexStatusDto.Builder dtoBuilder = Opal.TableIndexStatusDto.newBuilder() //
+        .setDatasource(datasource) //
+        .setTable(table) //
+        .setSchedule(getScheduleDto(datasource, table)) //
+        .setStatus(getTableIndexationStatus(datasource, table)) //
+        .setProgress(getValueTableIndexationProgress(datasource, table)) //
+        .setLink(UriBuilder.fromPath("/").path(ValueTableIndexResource.class).build(datasource, table).getPath());
+
+    if(!valueTable.getTimestamps().getCreated().isNull()) {
+      dtoBuilder.setTableLastUpdate(valueTable.getTimestamps().getLastUpdate().toString());
+    }
+
+    Timestamps indexTimestamps = indexManager.getIndex(valueTable).getTimestamps();
+    if(!indexTimestamps.getCreated().isNull()) {
+      dtoBuilder.setIndexCreated(indexTimestamps.getCreated().toString());
+    }
+    if(!indexTimestamps.getLastUpdate().isNull()) {
+      dtoBuilder.setIndexLastUpdate(indexTimestamps.getLastUpdate().toString());
+    }
+
+    return Response.ok().entity(dtoBuilder.build()).build();
   }
 
   @PUT
   public Response updateIndex() {
-    if(esProvider.isEnabled()) {
-
-      ValueTable valueTable = getValueTable(datasource, table);
-
-      if(!isInProgress(datasource, table)) {
-
-        synchroManager.synchronizeIndex(indexManager, valueTable, 0);
-      }
-
-      return Response.ok().build();
+    if(!esProvider.isEnabled()) {
+      return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
     }
 
-    return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
+    ValueTable valueTable = getValueTable(datasource, table);
+    if(!isInProgress(datasource, table)) {
+      synchroManager.synchronizeIndex(indexManager, valueTable, 0);
+    }
+    return Response.ok().build();
   }
 
   @DELETE
-  @Path("/")
   public Response deleteIndex() {
-    if(esProvider.isEnabled()) {
-
-      // cancel indexation if in progress
-      IndexSynchronization currentTask = synchroManager.getCurrentTask();
-      if(currentTask != null &&
-          currentTask.getValueTable().getName().equals(table) &&
-          currentTask.getValueTable().getDatasource().getName().equals(datasource)) {
-        // Stop task
-        synchroManager.stopTask();
-      }
-
-      getValueTableIndex(datasource, table).delete();
-
-      return Response.ok().build();
+    if(!esProvider.isEnabled()) {
+      return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("SearchServiceUnavailable").build();
     }
 
-    throw new SearchServiceException();
+    // cancel indexation if in progress
+    IndexSynchronization currentTask = synchroManager.getCurrentTask();
+    if(currentTask != null &&
+        currentTask.getValueTable().getName().equals(table) &&
+        currentTask.getValueTable().getDatasource().getName().equals(datasource)) {
+      // Stop task
+      synchroManager.stopTask();
+    }
+    getValueTableIndex(datasource, table).delete();
+    return Response.ok().build();
   }
 
   @GET
   @Path("schedule")
   public Opal.ScheduleDto getSchedule() {
-
     return getScheduleDto(datasource, table);
   }
 
   @DELETE
   @Path("schedule")
   public Response deleteSchedule() {
-
     configService.getConfig().removeSchedule(getValueTable(datasource, table));
-
     return Response.ok().build();
   }
 

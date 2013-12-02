@@ -31,7 +31,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@Transactional
 @Scope("request")
 @Path("/datasources/variables")
 public class DatasourcesVariablesSearchResource extends AbstractVariablesSearchResource {
@@ -41,8 +40,10 @@ public class DatasourcesVariablesSearchResource extends AbstractVariablesSearchR
   @GET
   @POST
   @Path("_search")
+  @Transactional(readOnly = true)
   public Response search(@QueryParam("query") String query, @QueryParam("offset") @DefaultValue("0") int offset,
-      @QueryParam("limit") @DefaultValue("10") int limit, @QueryParam("field") List<String> fields) {
+      @QueryParam("limit") @DefaultValue("10") int limit,
+      @SuppressWarnings("TypeMayBeWeakened") @QueryParam("field") List<String> fields) {
 
     try {
       if(!searchServiceAvailable()) return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();

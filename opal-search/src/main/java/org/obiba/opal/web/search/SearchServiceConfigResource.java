@@ -21,10 +21,8 @@ import org.obiba.opal.web.services.ServiceConfigurationHandlerRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@Transactional
 @Scope("request")
 @Path("/service/search/cfg/enabled")
 public class SearchServiceConfigResource {

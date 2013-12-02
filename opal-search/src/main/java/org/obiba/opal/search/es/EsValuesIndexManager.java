@@ -91,8 +91,14 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
 
     @Override
     protected void index() {
-      ConcurrentValueTableReader.Builder.newReader().withThreads(threadFactory).ignoreReadErrors().from(valueTable)
-          .variables(index.getVariables()).to(new ValuesReaderCallback()).build().read();
+      ConcurrentValueTableReader.Builder.newReader() //
+          .withThreads(threadFactory) //
+          .ignoreReadErrors() //
+          .from(valueTable) //
+          .variables(index.getVariables()) //
+          .to(new ValuesReaderCallback()) //
+          .build() //
+          .read();
     }
 
     private class ValuesReaderCallback implements ConcurrentReaderCallback {

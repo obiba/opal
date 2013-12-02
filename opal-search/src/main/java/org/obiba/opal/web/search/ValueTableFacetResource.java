@@ -30,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
  * individual data,
  */
 @Component
-@Transactional
 @Scope("request")
 @Path("/datasource/{ds}/table/{table}/facet")
 public class ValueTableFacetResource {
@@ -57,6 +56,7 @@ public class ValueTableFacetResource {
    */
   @GET
   @Path("/variable/{variable}/_search")
+  @Transactional(readOnly = true)
   public Response search(@PathParam("variable") String variable) {
     Search.QueryResultDto dtoResult = Search.QueryResultDto.newBuilder().setTotalHits(0).build();
 

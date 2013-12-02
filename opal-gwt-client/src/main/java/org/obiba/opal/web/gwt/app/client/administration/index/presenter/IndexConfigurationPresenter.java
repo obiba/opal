@@ -18,13 +18,8 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.ESCfgDto;
 import org.obiba.opal.web.model.client.opal.ServiceCfgDto;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -59,7 +54,6 @@ public class IndexConfigurationPresenter extends ModalPresenterWidget<IndexConfi
 
     void setNbReplicas(int nb);
   }
-
 
   private Mode dialogMode;
 
@@ -136,28 +130,24 @@ public class IndexConfigurationPresenter extends ModalPresenterWidget<IndexConfi
   }
 
   private void putESCfg(ServiceCfgDto dto) {
-    ResponseCodeCallback callbackHandler = new CreateOrUpdateMethodCallBack(dto);
-    ResourceRequestBuilderFactory.newBuilder().forResource("/service/search/cfg").put()//
-        .withResourceBody(ServiceCfgDto.stringify(dto))//
-        .withCallback(callbackHandler, Response.SC_OK, Response.SC_INTERNAL_SERVER_ERROR).send();
-  }
-
-  private class CreateOrUpdateMethodCallBack implements ResponseCodeCallback {
-
-    ServiceCfgDto dto;
-
-    private CreateOrUpdateMethodCallBack(ServiceCfgDto dto) {
-      this.dto = dto;
-    }
-
-    @Override
-    public void onResponseCode(Request request, Response response) {
-      getView().hideDialog();
-      getEventBus().fireEvent(new TableIndicesRefreshEvent());
-      if(response.getStatusCode() != Response.SC_OK) {
-        getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-      }
-    }
+    ResourceRequestBuilderFactory.newBuilder().forResource("/service/search/cfg") //
+        .withResourceBody(ServiceCfgDto.stringify(dto)) //
+        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().hideDialog();
+            getEventBus().fireEvent(new TableIndicesRefreshEvent());
+          }
+        }) //
+        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().hideDialog();
+            getEventBus().fireEvent(new TableIndicesRefreshEvent());
+            getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
+          }
+        }) //
+        .put().send();
   }
 
 }

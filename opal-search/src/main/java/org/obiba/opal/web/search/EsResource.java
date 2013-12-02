@@ -34,10 +34,8 @@ import org.elasticsearch.rest.support.RestUtils;
 import org.obiba.opal.search.es.ElasticSearchProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@Transactional
 @Path("/es")
 public class EsResource {
 
