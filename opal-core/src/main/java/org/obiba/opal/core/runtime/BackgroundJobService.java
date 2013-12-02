@@ -84,6 +84,7 @@ public class BackgroundJobService implements Service {
   private Thread startJob(BackgroundJob job) {
     Thread background = new Thread(getSubject().associateWith(job));
     log.info("Starting task [{}]: {}", job.getName(), job.getDescription());
+    background.setName("Background job " + job.getName());
     background.setPriority(job.getPriority());
     background.start();
     return background;

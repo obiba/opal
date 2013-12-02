@@ -186,6 +186,7 @@ public class OpalSshServer implements Service {
       });
       opalShellHolder.bind(shell);
       thread = new Thread(shell);
+      thread.setName("Opal Shell");
       thread.setDaemon(true);
       thread.start();
     }
