@@ -2,6 +2,7 @@ package org.obiba.opal.core.service.impl;
 
 import java.sql.SQLException;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -14,6 +15,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.DatasourceUpdateListener;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory;
 import org.obiba.magma.support.EntitiesPredicate;
@@ -55,7 +57,7 @@ import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
 
 @Component
-public class DefaultDatabaseRegistry implements DatabaseRegistry {
+public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpdateListener {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultDatabaseRegistry.class);
 
@@ -294,6 +296,14 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry {
       return mongoDbSettings.createMongoDBDatasourceFactory(datasourceName);
     }
     throw new IllegalArgumentException("Unknown datasource config for database " + database.getClass());
+  }
+
+  @Override
+  public void onDelete(@Nonnull Datasource datasource) {
+    //Remove from registrations
+    for(String key : registrations.keySet()) {
+      registrations.remove(key, datasource.getName());
+    }
   }
 
   private class DataSourceCacheLoader extends CacheLoader<String, DataSource> {
