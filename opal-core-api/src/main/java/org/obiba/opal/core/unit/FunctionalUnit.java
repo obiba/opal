@@ -14,21 +14,16 @@ import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionSt
 import org.obiba.magma.views.SelectClause;
 import org.obiba.opal.core.service.UnitKeyStoreService;
 
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
+
 /**
  * Represents an organization that fulfils the role of a "functional unit" of a Biobank.
  */
 public class FunctionalUnit {
-  //
-  // Constants
-  //
 
   public static final String OPAL_INSTANCE = "OpalInstance";
 
   public static final FunctionalUnit OPAL = new FunctionalUnit(OPAL_INSTANCE, OPAL_INSTANCE);
-
-  //
-  // Instance Variables
-  //
 
   private String name;
 
@@ -40,11 +35,8 @@ public class FunctionalUnit {
 
   private SelectClause select;
 
-  private transient UnitKeyStoreService unitKeyStoreService;
-
-  //
-  // Constructors
-  //
+  @XStreamOmitField
+  private UnitKeyStoreService unitKeyStoreService;
 
   public FunctionalUnit() {
   }
@@ -57,10 +49,6 @@ public class FunctionalUnit {
   boolean isOpal() {
     return getName().equals(OPAL_INSTANCE);
   }
-
-  //
-  // Methods
-  //
 
   public void setUnitKeyStoreService(UnitKeyStoreService unitKeyStoreService) {
     this.unitKeyStoreService = unitKeyStoreService;
