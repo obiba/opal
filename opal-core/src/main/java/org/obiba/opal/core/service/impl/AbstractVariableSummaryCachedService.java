@@ -64,6 +64,7 @@ public abstract class AbstractVariableSummaryCachedService< //
   protected void computeAndCacheSummaries(ValueTable table) {
     Cache cache = getCache();
     for(TVariableSummaryBuilder summaryBuilder : getSummaryBuilders(table)) {
+      log.debug("Compute {} summary", summaryBuilder.getVariable());
       TVariableSummary summary = summaryBuilder.build();
       String key = summary.getCacheKey(table);
       log.debug("Add to cache {}", key);

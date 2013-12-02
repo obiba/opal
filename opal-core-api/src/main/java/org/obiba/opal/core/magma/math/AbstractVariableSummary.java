@@ -82,6 +82,9 @@ public abstract class AbstractVariableSummary implements VariableSummary {
   public interface VariableSummaryBuilder<TVariableSummary extends VariableSummary> {
 
     TVariableSummary build();
+
+    @NotNull
+    Variable getVariable();
   }
 
 }

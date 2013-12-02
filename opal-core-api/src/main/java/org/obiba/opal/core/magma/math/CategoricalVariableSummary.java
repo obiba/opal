@@ -23,6 +23,8 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VectorSource;
 import org.obiba.magma.type.BooleanType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import com.google.common.base.Function;
@@ -37,9 +39,11 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
 
   private static final long serialVersionUID = 203198842420473154L;
 
+  private static final Logger log = LoggerFactory.getLogger(CategoricalVariableSummary.class);
+
   public static final String NULL_NAME = "N/A";
 
-  private final org.apache.commons.math.stat.Frequency frequencyDist = new org.apache.commons.math.stat.Frequency();
+  private final org.apache.commons.math3.stat.Frequency frequencyDist = new org.apache.commons.math3.stat.Frequency();
 
   /**
    * Mode is the most frequent value
@@ -186,7 +190,7 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
     /**
      * Returns an iterator of frequencyDist names
      */
-    private Iterator<String> freqNames(org.apache.commons.math.stat.Frequency freq) {
+    private Iterator<String> freqNames(org.apache.commons.math3.stat.Frequency freq) {
       return Iterators.transform(freq.valuesIterator(), new Function<Comparable<?>, String>() {
 
         @Override
@@ -217,6 +221,7 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
     }
 
     private void compute() {
+      log.trace("Start compute categorical {}", summary.variable);
       long max = 0;
       Iterator<String> concat = summary.distinct //
           ? freqNames(summary.frequencyDist)  // category names, null values and distinct values
@@ -253,6 +258,12 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
     public CategoricalVariableSummary build() {
       compute();
       return summary;
+    }
+
+    @NotNull
+    @Override
+    public Variable getVariable() {
+      return variable;
     }
 
   }

@@ -12,7 +12,7 @@ package org.obiba.opal.core.magma.math;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.easymock.EasyMock;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

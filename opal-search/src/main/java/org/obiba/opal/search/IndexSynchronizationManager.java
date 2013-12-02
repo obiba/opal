@@ -96,7 +96,7 @@ public class IndexSynchronizationManager {
 
   private void startConsumerThread() {
     consumer = new Thread(getSubject().associateWith(syncConsumer));
-    consumer.setName("Index Synchronization Consumer Thread");
+    consumer.setName("Index Synchronization Consumer " + syncConsumer);
     consumer.setPriority(Thread.MIN_PRIORITY);
     consumer.start();
   }

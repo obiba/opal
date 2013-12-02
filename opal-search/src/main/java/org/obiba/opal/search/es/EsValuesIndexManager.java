@@ -37,24 +37,27 @@ import org.obiba.opal.search.ValueTableIndex;
 import org.obiba.opal.search.ValueTableValuesIndex;
 import org.obiba.opal.search.ValuesIndexManager;
 import org.obiba.opal.search.es.mapping.ValueTableMapping;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Predicate;
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 @Component
+@Transactional(readOnly = true)
 public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexManager {
 
-//  private static final Logger log = LoggerFactory.getLogger(EsValuesIndexManager.class);
+  private static final Logger log = LoggerFactory.getLogger(EsValuesIndexManager.class);
 
   @Autowired
-  @NotNull
   private ThreadFactory threadFactory;
 
   @Autowired
-  @NotNull
   private VariableStatsService variableStatsService;
 
   @NotNull
@@ -95,7 +98,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
           .withThreads(threadFactory) //
           .ignoreReadErrors() //
           .from(valueTable) //
-          .variables(index.getVariables()) //
+          .variablesFilter(index.getVariables()) //
           .to(new ValuesReaderCallback()) //
           .build() //
           .read();
@@ -107,8 +110,11 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
 
       private final Map<Variable, VariableNature> natures = new HashMap<Variable, VariableNature>();
 
+      private final Stopwatch stopwatch = Stopwatch.createUnstarted();
+
       @Override
       public void onBegin(List<VariableEntity> entitiesToCopy, Variable... variables) {
+        stopwatch.start();
         for(Variable variable : variables) {
           natures.put(variable, VariableNature.getNature(variable));
         }
@@ -121,7 +127,8 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
         }
 
         String identifier = entity.getIdentifier();
-        bulkRequest.add(opalSearchService.getClient().prepareIndex(getName(), valueTable.getEntityType(), identifier)
+        bulkRequest.add(opalSearchService.getClient() //
+            .prepareIndex(getName(), valueTable.getEntityType(), identifier) //
             .setSource("{\"identifier\":\"" + identifier + "\"}"));
         try {
           XContentBuilder builder = XContentFactory.jsonBuilder().startObject();
@@ -145,12 +152,12 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
       private void indexValue(XContentBuilder xcb, Variable variable, Value value) throws IOException {
         String fieldName = index.getFieldName(variable.getName());
         if(value.isSequence() && !value.isNull()) {
-          List<Object> vals = Lists.newArrayList();
+          List<Object> values = Lists.newArrayList();
           //noinspection ConstantConditions
           for(Value v : value.asSequence().getValue()) {
-            vals.add(esValue(variable, v));
+            values.add(esValue(variable, v));
           }
-          xcb.field(fieldName, vals);
+          xcb.field(fieldName, values);
         } else {
           xcb.field(fieldName, esValue(variable, value));
         }
@@ -159,13 +166,16 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
 
       @Override
       public void onComplete() {
+        stopwatch.stop();
         if(stop) {
           index.delete();
           variableStatsService.clearComputingSummaries(getValueTable());
         } else {
           sendAndCheck(bulkRequest);
-          variableStatsService.computeSummaries(getValueTable());
           index.updateTimestamps();
+          log.info("Indexed table {} in {}", getValueTable().getTableReference(), stopwatch);
+
+          variableStatsService.computeSummaries(getValueTable());
         }
       }
 

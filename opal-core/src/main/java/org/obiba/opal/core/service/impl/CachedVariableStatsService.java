@@ -5,7 +5,6 @@ import javax.validation.constraints.NotNull;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 
-import org.obiba.core.util.TimedExecution;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
@@ -21,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Stopwatch;
 import com.google.common.io.Resources;
 
 @Component
@@ -64,12 +64,11 @@ public class CachedVariableStatsService implements VariableStatsService {
       log.info("Variable summaries cache disabled!");
       return;
     }
-    TimedExecution timedExecution = new TimedExecution().start();
+    Stopwatch stopwatch = Stopwatch.createStarted();
     continuousSummaryService.computeAndCacheSummaries(table);
     categoricalSummaryService.computeAndCacheSummaries(table);
     clearComputingSummaries(table);
-    log.info("Variables summaries for {} computed in {}", table.getTableReference(),
-        timedExecution.end().formatExecutionTime());
+    log.info("Variables summaries for {} computed in {}", table.getTableReference(), stopwatch.stop());
   }
 
   @Override

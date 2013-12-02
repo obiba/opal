@@ -17,11 +17,10 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.math.MathException;
-import org.apache.commons.math.distribution.ContinuousDistribution;
-import org.apache.commons.math.distribution.ExponentialDistributionImpl;
-import org.apache.commons.math.distribution.NormalDistributionImpl;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.distribution.ExponentialDistribution;
+import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.distribution.RealDistribution;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.obiba.magma.Category;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSource;
@@ -30,6 +29,8 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VectorSource;
 import org.obiba.magma.math.stat.IntervalFrequency;
 import org.obiba.magma.type.IntegerType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import com.google.common.collect.ImmutableList;
@@ -42,6 +43,8 @@ import com.google.common.collect.Sets;
 public class ContinuousVariableSummary extends AbstractVariableSummary implements Serializable {
 
   private static final long serialVersionUID = -8679001175321206239L;
+
+  private static final Logger log = LoggerFactory.getLogger(ContinuousVariableSummary.class);
 
   public static final int DEFAULT_INTERVALS = 10;
 
@@ -135,22 +138,20 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
     normal {
       @Nullable
       @Override
-      public ContinuousDistribution getDistribution(DescriptiveStatistics ds) {
-        return ds.getStandardDeviation() > 0
-            ? new NormalDistributionImpl(ds.getMean(), ds.getStandardDeviation())
-            : null;
+      public RealDistribution getDistribution(DescriptiveStatistics ds) {
+        return ds.getStandardDeviation() > 0 ? new NormalDistribution(ds.getMean(), ds.getStandardDeviation()) : null;
       }
     },
     exponential {
       @NotNull
       @Override
-      public ContinuousDistribution getDistribution(DescriptiveStatistics ds) {
-        return new ExponentialDistributionImpl(ds.getMean());
+      public RealDistribution getDistribution(DescriptiveStatistics ds) {
+        return new ExponentialDistribution(ds.getMean());
       }
     };
 
     @Nullable
-    abstract ContinuousDistribution getDistribution(DescriptiveStatistics ds);
+    abstract RealDistribution getDistribution(DescriptiveStatistics ds);
 
   }
 
@@ -237,6 +238,7 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
 
     @SuppressWarnings("MagicNumber")
     private void compute() {
+      log.trace("Start compute continuous {}", summary.variable);
       double variance = summary.descriptiveStats.getVariance();
       if(Double.isNaN(variance) || Double.isInfinite(variance) || variance <= 0) return;
 
@@ -251,14 +253,19 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
         summary.intervalFrequencies.add(interval);
       }
 
-      ContinuousDistribution cd = summary.distribution.getDistribution(summary.descriptiveStats);
+      RealDistribution realDistribution = summary.distribution.getDistribution(summary.descriptiveStats);
       for(Double p : summary.defaultPercentiles) {
         summary.percentiles.add(summary.descriptiveStats.getPercentile(p));
-        try {
-          if(cd != null) summary.distributionPercentiles.add(cd.inverseCumulativeProbability(p / 100d));
-        } catch(MathException ignored) {
+        if(realDistribution != null) {
+          summary.distributionPercentiles.add(realDistribution.inverseCumulativeProbability(p / 100d));
         }
       }
+    }
+
+    @NotNull
+    @Override
+    public Variable getVariable() {
+      return variable;
     }
 
     @Override
