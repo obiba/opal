@@ -31,7 +31,6 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.web.bindery.event.shared.Event;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
@@ -117,11 +116,10 @@ public class DatabaseAdministrationPresenter extends
   }
 
   static void testConnection(EventBus eventBus, String database) {
-    ResponseCodeCallback testConnectionCallback = new TestConnectionCallback(eventBus, database);
     ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
         .forResource(DatabaseResources.database(database, "connections")) //
-        .withCallback(Response.SC_OK, testConnectionCallback) //
-        .withCallback(Response.SC_SERVICE_UNAVAILABLE, testConnectionCallback) //
+        .withCallback(Response.SC_OK, new TestConnectionSuccessCallback(eventBus, database)) //
+        .withCallback(Response.SC_SERVICE_UNAVAILABLE, new TestConnectionFailCallback(eventBus)) //
         .post().send();
   }
 
@@ -129,27 +127,36 @@ public class DatabaseAdministrationPresenter extends
 
   }
 
-  static class TestConnectionCallback implements ResponseCodeCallback {
+  static class TestConnectionSuccessCallback implements ResponseCodeCallback {
 
-    private final EventBus eventBus;
+    private EventBus eventBus;
 
     private String database;
 
-    TestConnectionCallback(EventBus eventBus, String database) {
+    TestConnectionSuccessCallback(EventBus eventBus, String database) {
       this.eventBus = eventBus;
       this.database = database;
     }
 
     @Override
     public void onResponseCode(Request request, Response response) {
-      Event<?> event = null;
-      if(response.getStatusCode() == Response.SC_OK) {
-        event = NotificationEvent.newBuilder().info("DatabaseConnectionOk").args(database).build();
-      } else {
-        ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
-        event = NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray()).build();
-      }
-      eventBus.fireEvent(event);
+      eventBus.fireEvent(NotificationEvent.newBuilder().info("DatabaseConnectionOk").args(database).build());
+    }
+  }
+
+  static class TestConnectionFailCallback implements ResponseCodeCallback {
+
+    private EventBus eventBus;
+
+    TestConnectionFailCallback(EventBus eventBus) {
+      this.eventBus = eventBus;
+    }
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      ClientErrorDto error = JsonUtils.unsafeEval(response.getText());
+      eventBus
+          .fireEvent(NotificationEvent.newBuilder().error(error.getStatus()).args(error.getArgumentsArray()).build());
     }
   }
 
