@@ -22,7 +22,6 @@ import org.apache.commons.vfs2.FileSelectInfo;
 import org.apache.commons.vfs2.FileSelector;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
-import org.obiba.core.util.TimedExecution;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.opal.core.crypt.KeyProviderException;
@@ -36,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Stopwatch;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -67,7 +67,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       return CRITICAL_ERROR;
     }
 
-    TimedExecution timedExecution = new TimedExecution().start();
+    Stopwatch stopwatch = Stopwatch.createStarted();
 
     List<FileObject> filesToImport = getFilesToImport();
     errorCode = executeImports(filesToImport);
@@ -78,10 +78,10 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       errorCode = CRITICAL_ERROR;
     } else if(errorCode != SUCCESS) {
       getShell().printf("Import failed.\n");
-      log.info("Import failed in {}", timedExecution.end().formatExecutionTime());
+      log.info("Import failed in {}", stopwatch.stop());
     } else {
       getShell().printf("Import done.\n");
-      log.info("Import succeed in {}", timedExecution.end().formatExecutionTime());
+      log.info("Import succeed in {}", stopwatch.stop());
     }
     return errorCode;
   }
@@ -161,7 +161,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
    *
    * @param file file to import
    * @return error code (<code>0</code> on success, <code>1</code> on critical errors, <code>2</code> on errors handled
-   *         by continuing with the next file)
+   * by continuing with the next file)
    */
   @SuppressWarnings("PMD.NcssMethodCount")
   private int importFile(FileObject file) {
