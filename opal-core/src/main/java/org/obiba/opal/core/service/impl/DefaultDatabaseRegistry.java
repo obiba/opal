@@ -2,7 +2,6 @@ package org.obiba.opal.core.service.impl;
 
 import java.sql.SQLException;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -305,7 +304,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
   }
 
   @Override
-  public void onDelete(@Nonnull Datasource datasource) {
+  public void onDelete(@NotNull Datasource datasource) {
     //Remove from registrations
     ImmutableList<String> keys = ImmutableList.copyOf(registrations.keySet());
     for(String key : keys) {
