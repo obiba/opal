@@ -59,8 +59,8 @@ public abstract class IndexResource {
     return MagmaEngine.get().getDatasource(datasource).getValueTable(table);
   }
 
-  protected float getValueTableIndexationProgress(String datasource, String table) {
-    float progress = 0f;
+  protected Float getValueTableIndexationProgress(String datasource, String table) {
+    Float progress = null;
     IndexSynchronization currentTask = synchroManager.getCurrentTask();
     if(currentTask != null && currentTask.getValueTable().getName().equals(table) &&
         currentTask.getValueTable().getDatasource().getName().equals(datasource)) {
@@ -70,7 +70,8 @@ public abstract class IndexResource {
   }
 
   protected boolean isInProgress(String datasource, String table) {
-    return Float.compare(getValueTableIndexationProgress(datasource, table), 0f) > 0;
+    Float progress = getValueTableIndexationProgress(datasource, table);
+    return progress != null && Float.compare(progress, 0f) >= 0f;
   }
 
   protected ValueTableValuesIndex getValueTableIndex(String datasource, String table) {
