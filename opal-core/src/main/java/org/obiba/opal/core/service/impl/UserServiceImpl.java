@@ -69,11 +69,6 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public long countUsers() {
-    return orientDbService.count(User.class);
-  }
-
-  @Override
   public long countGroups() {
     return orientDbService.count(Group.class);
   }

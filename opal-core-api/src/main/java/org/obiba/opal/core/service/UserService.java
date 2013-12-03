@@ -24,13 +24,6 @@ public interface UserService extends SystemService {
   Iterable<User> getUsers();
 
   /**
-   * Returns the count of users that match the specified template
-   *
-   * @return the number of users that match the template
-   */
-  long countUsers();
-
-  /**
    * Returns the user with the specified login
    *
    * @param login the unique login to match
