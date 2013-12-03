@@ -39,5 +39,4 @@ public class DefaultBeanValidator {
       throw new ConstraintViolationException(violations);
     }
   }
-
 }

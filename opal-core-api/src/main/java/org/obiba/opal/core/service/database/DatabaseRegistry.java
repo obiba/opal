@@ -25,7 +25,9 @@ public interface DatabaseRegistry extends SystemService {
   @NotNull
   Database getDatabase(@NotNull String name) throws NoSuchDatabaseException;
 
-  void save(@NotNull Database database) throws ConstraintViolationException, MultipleIdentifiersDatabaseException;
+  void create(@NotNull Database database) throws ConstraintViolationException, MultipleIdentifiersDatabaseException;
+
+  void update(@NotNull Database database) throws ConstraintViolationException, MultipleIdentifiersDatabaseException;
 
   boolean hasDatasource(@NotNull Database database);
 

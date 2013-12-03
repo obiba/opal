@@ -109,7 +109,7 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
 
           .build();
       log.debug("Import opalData: {}", opalData);
-      databaseRegistry.save(opalData);
+      databaseRegistry.create(opalData);
       orientDbService
           .save(null, Project.Builder.create().name("opal-data").title("opal-data").database("opal-data").build());
 
@@ -126,7 +126,7 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
           .build();
       log.debug("Import opalKey: {}", opalKey);
 
-      databaseRegistry.save(opalKey);
+      databaseRegistry.create(opalKey);
 
     } catch(IOException e) {
       throw new RuntimeException(e);
@@ -257,7 +257,7 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
           .usage(Database.Usage.STORAGE) //
           .build();
       log.debug("Import database: {}", sqlDatabase);
-      databaseRegistry.save(sqlDatabase);
+      databaseRegistry.create(sqlDatabase);
     }
   }
 
@@ -324,7 +324,7 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
       settings.setDefaultEntityType(getChildTextContent(settingsElement, "defaultEntityType"));
       settings.setUseMetadataTables(Boolean.valueOf(getChildTextContent(settingsElement, "useMetadataTables")));
       database.getSqlSettings().setJdbcDatasourceSettings(settings);
-      databaseRegistry.save(database);
+      databaseRegistry.create(database);
 
       if(database.getUsage() == Database.Usage.STORAGE) {
         orientDbService.save(null, Project.Builder.create().name(name).title(name).database(databaseName).build());

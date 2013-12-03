@@ -6,12 +6,15 @@ import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
+import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
+import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.DatasourceUpdateListener;
@@ -55,8 +58,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
+import com.google.common.collect.Sets;
 
 @Component
+@SuppressWarnings("OverlyCoupledClass")
 public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpdateListener {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultDatabaseRegistry.class);
@@ -72,6 +77,9 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
 
   @Autowired
   private IdentifiersTableService identifiersTableService;
+
+  @Autowired
+  private DefaultBeanValidator defaultBeanValidator;
 
   private final LoadingCache<String, DataSource> dataSourceCache = CacheBuilder.newBuilder()
       .removalListener(new DataSourceRemovalListener()) //
@@ -155,9 +163,35 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
   }
 
   @Override
-  public void save(@NotNull Database database)
+  @SuppressWarnings("unchecked")
+  public void create(@NotNull Database database)
+      throws ConstraintViolationException, MultipleIdentifiersDatabaseException {
+    if(orientDbService.findUnique(database) == null) {
+      persist(database);
+    } else {
+      ConstraintViolation<Database> violation = ConstraintViolationImpl
+          .forBeanValidation("{org.obiba.opal.core.validator.Unique.message}", "must be unique", Database.class,
+              database, database, database, PathImpl.createPathFromString("name"), null, null);
+      throw new ConstraintViolationException(Sets.newHashSet(violation));
+    }
+  }
+
+  @Override
+  public void update(@NotNull Database database)
       throws ConstraintViolationException, MultipleIdentifiersDatabaseException {
 
+    Preconditions.checkArgument(orientDbService.findUnique(database) != null,
+        "Cannot update non existing Database " + database.getName());
+
+    persist(database);
+
+    // Destroy if has no datasource
+    if(!hasDatasource(database)) {
+      destroyDataSource(database.getName());
+    }
+  }
+
+  private void persist(Database database) {
     validUniqueIdentifiersDatabase(database);
 
     if(database.isDefaultStorage()) {
@@ -172,11 +206,6 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
       }
     } else {
       orientDbService.save(database, database);
-    }
-
-    // Destroy if has no datasource
-    if(!hasDatasource(database)) {
-      destroyDataSource(database.getName());
     }
   }
 

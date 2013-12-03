@@ -15,7 +15,6 @@ import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.core.service.database.MultipleIdentifiersDatabaseException;
 import org.obiba.opal.web.database.Dtos;
 import org.obiba.opal.web.support.InvalidRequestException;
-import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,7 +88,7 @@ public class DatabasesResource {
   @ApiOperation("Create a new database")
   @ApiResponses(@ApiResponse(code = 400, message = "Database for identifiers already exists"))
   public Response addDatabase(DatabaseDto database) throws MultipleIdentifiersDatabaseException {
-    databaseRegistry.save(Dtos.fromDto(database));
+    databaseRegistry.create(Dtos.fromDto(database));
     return Response.ok().build();
   }
 

@@ -79,7 +79,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   @Test
   public void test_new_sql_database() {
     Database database = createSqlDatabase();
-    databaseRegistry.save(database);
+    databaseRegistry.create(database);
 
     List<Database> databases = newArrayList(databaseRegistry.list());
     assertEquals(1, databases.size());
@@ -98,7 +98,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   @Test
   public void test_new_mongo_database() {
     Database database = createMongoDatabase();
-    databaseRegistry.save(database);
+    databaseRegistry.create(database);
 
     List<Database> databases = newArrayList(databaseRegistry.list());
     assertEquals(1, databases.size());
@@ -114,13 +114,13 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   @Test
   public void test_update_sql_database() {
     Database database = createSqlDatabase();
-    databaseRegistry.save(database);
+    databaseRegistry.create(database);
 
     database.setUsage(Usage.STORAGE);
     assertNotNull(database.getSqlSettings());
     database.getSqlSettings().setUsername("user2");
     database.getSqlSettings().setUrl("url2");
-    databaseRegistry.save(database);
+    databaseRegistry.update(database);
 
     List<Database> databases = newArrayList(databaseRegistry.list());
     assertEquals(1, databases.size());
@@ -136,13 +136,13 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   @Test
   public void test_update_mongo_database() {
     Database database = createMongoDatabase();
-    databaseRegistry.save(database);
+    databaseRegistry.create(database);
 
     database.setUsage(Usage.STORAGE);
     assertNotNull(database.getMongoDbSettings());
     database.getMongoDbSettings().setUsername("user2");
     database.getMongoDbSettings().setUrl("url2");
-    databaseRegistry.save(database);
+    databaseRegistry.update(database);
 
     List<Database> databases = newArrayList(databaseRegistry.list());
     assertEquals(1, databases.size());
@@ -157,18 +157,31 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
 
   @Test
   public void test_create_database_with_same_name() {
+    Database database = createSqlDatabase();
+    databaseRegistry.create(database);
 
+    try {
+      databaseRegistry.create(database);
+      fail("Should throw ConstraintViolationException");
+    } catch(ConstraintViolationException e) {
+      Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
+      assertThat(violations.size(), is(1));
+      ConstraintViolation<?> violation = violations.iterator().next();
+      assertThat(violation.getMessage(), is("must be unique"));
+      assertThat(violation.getMessageTemplate(), is("{org.obiba.opal.core.validator.Unique.message}"));
+      assertThat(violation.getPropertyPath().toString(), is("name"));
+    }
   }
 
   @Test
   public void test_create_database_with_same_url() {
     Database database = createSqlDatabase();
-    databaseRegistry.save(database);
+    databaseRegistry.create(database);
 
     Database database2 = createSqlDatabase();
     database2.setName("new database");
     try {
-      databaseRegistry.save(database2);
+      databaseRegistry.create(database2);
       fail("Should throw ConstraintViolationException");
     } catch(ConstraintViolationException e) {
       Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
@@ -184,16 +197,16 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   @SuppressWarnings("ConstantConditions")
   public void test_update_database_with_same_url() {
     Database database = createSqlDatabase();
-    databaseRegistry.save(database);
+    databaseRegistry.create(database);
 
     Database database2 = createSqlDatabase();
     database2.setName("new database");
     database2.getSqlSettings().setUrl("new url");
-    databaseRegistry.save(database2);
+    databaseRegistry.create(database2);
 
     database2.getSqlSettings().setUrl(database.getSqlSettings().getUrl());
     try {
-      databaseRegistry.save(database2);
+      databaseRegistry.update(database2);
       fail("Should throw ConstraintViolationException");
     } catch(ConstraintViolationException e) {
       Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
@@ -209,7 +222,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   public void test_get_identifiers_database() {
     Database database = Database.Builder.create().name("sql database").usage(Usage.STORAGE).usedForIdentifiers(true)
         .build();
-    databaseRegistry.save(database);
+    databaseRegistry.create(database);
     Database found = databaseRegistry.getIdentifiersDatabase();
     assertThat(found.isUsedForIdentifiers(), is(true));
     assertThat(databaseRegistry.hasIdentifiersDatabase(), is(true));
@@ -234,7 +247,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   @Test
   public void test_delete_database() {
     Database database = createSqlDatabase();
-    databaseRegistry.save(database);
+    databaseRegistry.create(database);
     databaseRegistry.delete(database);
 
     assertEquals(0, size(databaseRegistry.list()));
@@ -243,7 +256,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   @Test(expected = CannotDeleteDatabaseLinkedToDatasourceException.class)
   public void test_delete_database_with_entities() {
     Database database = createSqlDatabase();
-    databaseRegistry.save(database);
+    databaseRegistry.create(database);
 
     DataSource mockDataSource = EasyMock.createMock(DataSource.class);
     reset(dataSourceFactory);
@@ -266,7 +279,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
 
   @Test
   public void test_list_sql_databases() {
-    databaseRegistry.save(createSqlDatabase());
+    databaseRegistry.create(createSqlDatabase());
     assertEquals(1, size(databaseRegistry.list()));
     assertEquals(1, size(databaseRegistry.listSqlDatabases()));
     assertEquals(0, size(databaseRegistry.listMongoDatabases()));
@@ -274,20 +287,22 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
 
   @Test
   public void test_list_mongo_databases() {
-    databaseRegistry.save(createMongoDatabase());
+    databaseRegistry.create(createMongoDatabase());
     assertEquals(1, size(databaseRegistry.list()));
     assertEquals(0, size(databaseRegistry.listSqlDatabases()));
     assertEquals(1, size(databaseRegistry.listMongoDatabases()));
   }
 
   @Test
+  @SuppressWarnings("ConstantConditions")
   public void test_change_default_storage() {
     Database database = createSqlDatabase();
-    databaseRegistry.save(database);
+    databaseRegistry.create(database);
 
     Database database2 = createSqlDatabase();
     database2.setName("default storage");
-    databaseRegistry.save(database2);
+    database2.getSqlSettings().setUrl("new url");
+    databaseRegistry.create(database2);
 
     assertEquals(2, size(databaseRegistry.list()));
 
@@ -298,7 +313,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   @Test
   public void test_get_datasource() {
     Database database = createSqlDatabase();
-    databaseRegistry.save(database);
+    databaseRegistry.create(database);
 
     DataSource mockDatasource = EasyMock.createMock(DataSource.class);
 
@@ -316,7 +331,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   @Test
   public void test_get_session_factory() {
     Database database = createSqlDatabase();
-    databaseRegistry.save(database);
+    databaseRegistry.create(database);
 
     DataSource mockDatasource = EasyMock.createMock(DataSource.class);
     SessionFactory mockSessionFactory = EasyMock.createMock(SessionFactory.class);
@@ -336,7 +351,7 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   @Test
   public void test_unregister() {
     Database database = createSqlDatabase();
-    databaseRegistry.save(database);
+    databaseRegistry.create(database);
 
     DataSource mockDatasource = EasyMock.createMock(DataSource.class);
 

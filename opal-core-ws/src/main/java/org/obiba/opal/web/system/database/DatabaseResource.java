@@ -71,10 +71,10 @@ public class DatabaseResource {
       } else {
         database = Dtos.fromDto(dto);
       }
-    } catch(NoSuchDatabaseException ignored) {
+    } catch(NoSuchDatabaseException e) {
       database = Dtos.fromDto(dto);
     }
-    databaseRegistry.save(database);
+    databaseRegistry.update(database);
     return Response.ok().build();
   }
 
