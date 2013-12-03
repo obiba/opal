@@ -21,8 +21,6 @@ import javax.validation.ValidatorFactory;
 import org.easymock.EasyMock;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.junit.Test;
-import org.obiba.opal.core.domain.database.Database;
-import org.obiba.opal.core.domain.database.SqlSettings;
 import org.obiba.opal.core.service.OrientDbService;
 
 import static org.easymock.EasyMock.expect;
@@ -32,84 +30,29 @@ import static org.junit.Assert.assertEquals;
 
 public class UniqueValidatorTest {
 
-  @Unique(compoundProperties = @CompoundProperty(name = "unique prop",
-      properties = { "sub1.prop1", "sub2.prop2" }))
-  private static class UniqueCompoundStub {
-
-    private Sub1 sub1;
-
-    private Sub2 sub2;
-
-    public Sub1 getSub1() {
-      return sub1;
-    }
-
-    public void setSub1(Sub1 sub1) {
-      this.sub1 = sub1;
-    }
-
-    public Sub2 getSub2() {
-      return sub2;
-    }
-
-    public void setSub2(Sub2 sub2) {
-      this.sub2 = sub2;
-    }
-
-    private static class Sub1 {
-      private String prop1;
-
-      public String getProp1() {
-        return prop1;
-      }
-
-      public void setProp1(String prop1) {
-        this.prop1 = prop1;
-      }
-    }
-
-    private static class Sub2 {
-      private String prop2;
-
-      public String getProp2() {
-        return prop2;
-      }
-
-      public void setProp2(String prop2) {
-        this.prop2 = prop2;
-      }
-    }
-
-  }
-
-//  @Test
-//  public void testFindAnnotatedClass() {
-//    assertEquals(null, UniqueValidator.findAnnotatedClass(HasUniqueProperties.class, null, null));
-//    assertEquals(UniqueCompoundStub.class,
-//        UniqueValidator.findAnnotatedClass(UniqueCompoundStub.class, null, new CompoundProperty[] { });
-//  }
-
   @Test
-  public void testUnique() {
+  public void test_unique_compound() {
 
-    Database existing = createSqlDatabase("existing database", "url");
+    UniqueCompoundStub existing = createUniqueCompoundStub("existing");
+
     OrientDbService mockOrientDbService = EasyMock.createMock(OrientDbService.class);
-    expect(mockOrientDbService.uniqueResult(Database.class, "select from Database where url = ?", "url"))
-        .andReturn(existing).once();
+    expect(mockOrientDbService
+        .uniqueResult(UniqueCompoundStub.class, "select from UniqueCompoundStub where sub1.prop1 = ? or sub2.prop2 = ?",
+            "should be unique", "should be unique")).andReturn(existing).once();
     replay(mockOrientDbService);
 
     Validator validator = getValidator(mockOrientDbService);
 
-    Database database = createSqlDatabase("new database", "url");
+    UniqueCompoundStub stub = createUniqueCompoundStub("new stub");
 
-    Set<ConstraintViolation<Database>> constraintViolations = validator.validate(database);
+    Set<ConstraintViolation<UniqueCompoundStub>> constraintViolations = validator.validate(stub);
     verify(mockOrientDbService);
 
     assertEquals(1, constraintViolations.size());
-    ConstraintViolation<Database> constraintViolation = constraintViolations.iterator().next();
+    ConstraintViolation<UniqueCompoundStub> constraintViolation = constraintViolations.iterator().next();
     assertEquals("must be unique", constraintViolation.getMessage());
     assertEquals("{org.obiba.opal.core.validator.Unique.message}", constraintViolation.getMessageTemplate());
-    assertEquals("url", constraintViolation.getPropertyPath().toString());
+    assertEquals("unique prop", constraintViolation.getPropertyPath().toString());
   }
 
   private Validator getValidator(final OrientDbService orientDbService) {
@@ -133,20 +76,15 @@ public class UniqueValidatorTest {
     return validatorFactory.getValidator();
   }
 
-  private Database createSqlDatabase(String name, String url) {
-    return Database.Builder.create() //
-        .name(name) //
-        .usedForIdentifiers(false) //
-        .defaultStorage(true) //
-        .usage(Database.Usage.IMPORT) //
-        .sqlSettings(SqlSettings.Builder.create() //
-            .sqlSchema(SqlSettings.SqlSchema.HIBERNATE) //
-            .driverClass("mysql") //
-            .url(url) //
-            .username("root") //
-            .password("password") //
-            .properties("props")) //
-        .build();
+  private UniqueCompoundStub createUniqueCompoundStub(String name) {
+    UniqueCompoundStub.Sub1 sub1 = new UniqueCompoundStub.Sub1();
+    sub1.setProp1("should be unique");
+    UniqueCompoundStub.Sub2 sub2 = new UniqueCompoundStub.Sub2();
+    sub2.setProp2("should be unique");
+    UniqueCompoundStub stub = new UniqueCompoundStub();
+    stub.setName(name);
+    stub.setSub1(sub1);
+    stub.setSub2(sub2);
+    return stub;
   }
-
 }
