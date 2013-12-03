@@ -25,6 +25,7 @@ import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -47,9 +48,6 @@ import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_
 public class UserAdministrationView extends ViewWithUiHandlers<UserAdministrationUiHandlers> implements Display {
 
   interface Binder extends UiBinder<Widget, UserAdministrationView> {}
-
-  @UiField
-  Button addUser;
 
   @UiField
   SimplePager indexTablePager;
@@ -91,13 +89,9 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
     groupDataProvider.addDataDisplay(groupsTable);
   }
 
-  @UiHandler("userGroupPanel")
-  public void onUserGroupSelection(SelectionEvent<Integer> event) {
-    if(event.getSelectedItem() == 0) {
-      getUiHandlers().onUsersSelected();
-    } else {
-      getUiHandlers().onGroupsSelected();
-    }
+  @UiHandler("addUser")
+  public void onAddUser(ClickEvent event) {
+    getUiHandlers().onAddUser();
   }
 
   @Override
@@ -131,11 +125,6 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
   @Override
   public HasWidgets getBreadcrumbs() {
     return breadcrumbs;
-  }
-
-  @Override
-  public HasClickHandlers getAddUserButton() {
-    return addUser;
   }
 
   @Override
@@ -182,15 +171,15 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
 
       @Override
       public String[] allActions() {
-        return new String[] { EDIT_ACTION, DELETE_ACTION, ENABLE_ACTION, DISABLE_ACTION, PERMISSIONS_ACTION };
+        return new String[] { EDIT_ACTION, DELETE_ACTION, ENABLE_ACTION, DISABLE_ACTION };
       }
 
       @Override
       public String[] getActions(UserDto value) {
         if(value.getEnabled()) {
-          return new String[] { EDIT_ACTION, DELETE_ACTION, DISABLE_ACTION, PERMISSIONS_ACTION };
+          return new String[] { EDIT_ACTION, DELETE_ACTION, DISABLE_ACTION };
         }
-        return new String[] { EDIT_ACTION, DELETE_ACTION, ENABLE_ACTION, PERMISSIONS_ACTION };
+        return new String[] { EDIT_ACTION, DELETE_ACTION, ENABLE_ACTION };
       }
     });
 
@@ -218,7 +207,7 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
 
       @Override
       public String[] allActions() {
-        return new String[] { DELETE_ACTION, PERMISSIONS_ACTION };
+        return new String[] { DELETE_ACTION };
       }
 
       @Override

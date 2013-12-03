@@ -15,7 +15,6 @@ import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface UserAdministrationUiHandlers extends UiHandlers {
 
-  void onUsersSelected();
+  void onAddUser();
 
-  void onGroupsSelected();
 }

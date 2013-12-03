@@ -33,9 +33,6 @@ import org.obiba.opal.web.model.client.opal.GroupDto;
 import org.obiba.opal.web.model.client.opal.UserDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.view.client.HasData;
@@ -83,7 +80,7 @@ public class UserAdministrationPresenter
 
   @Override
   public String getName() {
-    return translations.indicesLabel();
+    return getTitle();
   }
 
   @Override
@@ -102,36 +99,12 @@ public class UserAdministrationPresenter
   @Override
   @TitleFunction
   public String getTitle() {
-    return translations.pageUsersAndGroupsTitle();
+    return translations.pageUsersAndApplicationsTitle();
   }
 
   @Override
-  public void onUsersSelected() {
-    ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder() //
-        .forResource(UriBuilders.USERS.create().build()) //
-        .withCallback(new ResourceCallback<JsArray<UserDto>>() {
-
-          @Override
-          public void onResource(Response response, JsArray<UserDto> resource) {
-            getView().renderUserRows(resource);
-          }
-        }) //
-        .get().send();
-  }
-
-  @Override
-  public void onGroupsSelected() {
-    // Fetch all groups
-    ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder() //
-        .forResource(UriBuilders.GROUPS.create().build()) //
-        .withCallback(new ResourceCallback<JsArray<GroupDto>>() {
-
-          @Override
-          public void onResource(Response response, JsArray<GroupDto> resource) {
-            getView().renderGroupRows(resource);
-          }
-        }) //
-        .get().send();
+  public void onAddUser() {
+    userModalProvider.get().setDialogMode(UserPresenter.Mode.CREATE);
   }
 
   @Override
@@ -146,7 +119,8 @@ public class UserAdministrationPresenter
         getEventBus().addHandler(UsersRefreshedEvent.getType(), new UsersRefreshedEvent.UsersRefreshedHandler() {
           @Override
           public void onUsersRefreshed(UsersRefreshedEvent event) {
-            onUsersSelected();
+            refreshUsers();
+            refreshGroups();
           }
         }));
 
@@ -155,17 +129,10 @@ public class UserAdministrationPresenter
         getEventBus().addHandler(GroupsRefreshedEvent.getType(), new GroupsRefreshedEvent.GroupsRefreshedHandler() {
           @Override
           public void onGroupsRefreshed(GroupsRefreshedEvent event) {
-            onGroupsSelected();
+            refreshUsers();
+            refreshGroups();
           }
         }));
-
-    // Add user
-    getView().getAddUserButton().addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        userModalProvider.get().setDialogMode(UserPresenter.Mode.CREATE);
-      }
-    });
 
     // User Actions
     getView().getUsersActions().setActionHandler(new ActionHandler<UserDto>() {
@@ -219,6 +186,33 @@ public class UserAdministrationPresenter
     });
   }
 
+  private void refreshUsers() {
+    ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder() //
+        .forResource(UriBuilders.USERS.create().build()) //
+        .withCallback(new ResourceCallback<JsArray<UserDto>>() {
+
+          @Override
+          public void onResource(Response response, JsArray<UserDto> resource) {
+            getView().renderUserRows(resource);
+          }
+        }) //
+        .get().send();
+  }
+
+  private void refreshGroups() {
+    // Fetch all groups
+    ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder() //
+        .forResource(UriBuilders.GROUPS.create().build()) //
+        .withCallback(new ResourceCallback<JsArray<GroupDto>>() {
+
+          @Override
+          public void onResource(Response response, JsArray<GroupDto> resource) {
+            getView().renderGroupRows(resource);
+          }
+        }) //
+        .get().send();
+  }
+
   private final class ListUsersAuthorization implements HasAuthorization {
 
     @Override
@@ -227,17 +221,8 @@ public class UserAdministrationPresenter
 
     @Override
     public void authorized() {
-      // Fetch all users
-      ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder() //
-          .forResource(UriBuilders.USERS.create().build()) //
-          .withCallback(new ResourceCallback<JsArray<UserDto>>() {
-
-            @Override
-            public void onResource(Response response, JsArray<UserDto> resource) {
-              getView().renderUserRows(resource);
-            }
-          }) //
-          .get().send();
+      refreshUsers();
+      refreshGroups();
     }
 
     @Override
@@ -283,8 +268,6 @@ public class UserAdministrationPresenter
 
   public interface Display extends View, HasBreadcrumbs, HasUiHandlers<UserAdministrationUiHandlers> {
 
-    String PERMISSIONS_ACTION = "Permissions";
-
     String ENABLE_ACTION = "Enable";
 
     String DISABLE_ACTION = "Disable";
@@ -294,8 +277,6 @@ public class UserAdministrationPresenter
     void renderGroupRows(JsArray<GroupDto> rows);
 
     void clear();
-
-    HasClickHandlers getAddUserButton();
 
     HasData<UserDto> getUsersTable();
 

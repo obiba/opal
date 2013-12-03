@@ -508,7 +508,7 @@ public interface Translations extends Constants {
       "CreateViewFailed", "Failed to create view. Make sure the view file is valid.",//
       "SPSSOrExcelFileRequired", "An Excel or a SPSS file is required.",//
       "ESQueryBadRequest", "Not a valid search query.", "DuplicateUserName", "A user with same name already exists.",
-      "DuplicateSubjectProfile", "A user or organization profile already registered with the same name."//
+      "DuplicateSubjectProfile", "A user or application profile is already registered with the same name."//
   })
   Map<String, String> userMessageMap();
 
@@ -2005,9 +2005,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("Tasks")
   String pageJobsTitle();
 
-  @Description("Page Users and Groups title")
-  @DefaultStringValue("Users and Groups")
-  String pageUsersAndGroupsTitle();
+  @Description("Page Users and Applications title")
+  @DefaultStringValue("Users and Applications")
+  String pageUsersAndApplicationsTitle();
 
   @Description("Page Projects title")
   @DefaultStringValue("Projects")

@@ -11,33 +11,30 @@
       <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
 
-    <o:NavPillsPanel ui:field="userGroupPanel">
 
-      <b:NavLink icon="USER">
-        <ui:msg description="Users label">Users</ui:msg>
-      </b:NavLink>
-      <g:FlowPanel>
-        <g:Label>
-          <ui:msg description="Manage users label">Manage locally defined users.</ui:msg>
-        </g:Label>
-        <b:Button icon="PLUS" type="INFO" ui:field="addUser" addStyleNames="top-margin">
-          <ui:msg description="Add user button label">Add User</ui:msg>
-        </b:Button>
-        <b:SimplePager ui:field="indexTablePager" location="RIGHT" addStyleNames="pull-right"/>
-        <o:Table ui:field="usersTable" addStyleNames="small-top-margin"/>
-      </g:FlowPanel>
+    <b:Heading size="4">
+      <ui:msg description="Users and Applications label">Users and Applications</ui:msg>
+    </b:Heading>
+    <g:FlowPanel>
+      <g:Label>
+        <ui:msg description="Manage users and applications label">Manage locally defined users.</ui:msg>
+      </g:Label>
+      <b:Button icon="PLUS" type="INFO" ui:field="addUser" addStyleNames="top-margin">
+        <ui:msg description="Add user button label">Add User</ui:msg>
+      </b:Button>
+      <b:SimplePager ui:field="indexTablePager" location="RIGHT" addStyleNames="pull-right"/>
+      <o:Table ui:field="usersTable" addStyleNames="small-top-margin"/>
+    </g:FlowPanel>
 
-      <b:NavLink icon="GROUP">
-        <ui:msg description="Groups label">Groups</ui:msg>
-      </b:NavLink>
-      <g:FlowPanel>
-        <g:Label>
-          <ui:msg description="Manage groups label">Manage locally defined groups.</ui:msg>
-        </g:Label>
-        <o:Table ui:field="groupsTable" addStyleNames="small-top-margin"/>
-      </g:FlowPanel>
-
-    </o:NavPillsPanel>
+    <b:Heading size="4">
+      <ui:msg description="Groups label">Groups</ui:msg>
+    </b:Heading>
+    <g:FlowPanel>
+      <g:Label>
+        <ui:msg description="Manage groups label">Manage locally defined groups.</ui:msg>
+      </g:Label>
+      <o:Table ui:field="groupsTable" addStyleNames="small-top-margin"/>
+    </g:FlowPanel>
 
   </g:FlowPanel>
 </ui:UiBinder>
