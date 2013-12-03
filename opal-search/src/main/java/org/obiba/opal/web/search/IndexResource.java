@@ -70,8 +70,7 @@ public abstract class IndexResource {
   }
 
   protected boolean isInProgress(String datasource, String table) {
-    Float progress = getValueTableIndexationProgress(datasource, table);
-    return progress != null && Float.compare(progress, 0f) >= 0f;
+    return getValueTableIndexationProgress(datasource, table) != null;
   }
 
   protected ValueTableValuesIndex getValueTableIndex(String datasource, String table) {
