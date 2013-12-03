@@ -17,21 +17,31 @@
               </b:NavHeader>
               <b:Divider/>
               <o:OpalNavLink ui:field="usersGroupsPlace" icon="COG">
-                <ui:msg description="Main Administration Users and Groups title">Users and Groups</ui:msg>
+                <ui:msg description="Main Administration Users and Applications title">Users and Applications</ui:msg>
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Users and Groups help">Add, update, remove users and groups
+                  <ui:msg description="Main Administration Users and Applications help">Add, update, remove users and applications
+                  </ui:msg>
+                </g:Label>
+              </g:FlowPanel>
+              <b:Divider/>
+              <o:OpalNavLink ui:field="profilesPlace" icon="COG">
+                <ui:msg description="Main Administration Profiles title">Profiles</ui:msg>
+              </o:OpalNavLink>
+              <g:FlowPanel>
+                <g:Label styleName="help-block">
+                  <ui:msg description="Main Administration Profiles help">Manage user and application profiles
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>
               <b:Divider/>
               <o:OpalNavLink ui:field="unitsPlace" icon="COG">
-                <ui:msg description="Main Administration Organizations title">Organizations</ui:msg>
+                <ui:msg description="Main Administration Units title">Functional Units (deprecated)</ui:msg>
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Organizations title">Manage organizations identification
+                  <ui:msg description="Main Administration Units title">Manage identifiers and key stores in terms of functional units
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>
@@ -66,6 +76,26 @@
               <g:FlowPanel>
                 <g:Label styleName="help-block">
                   <ui:msg description="Main Administration Reports help">Configure and schedule reports</ui:msg>
+                </g:Label>
+              </g:FlowPanel>
+              <b:Divider/>
+              <o:OpalNavLink ui:field="identifiersPlace" icon="COG">
+                <ui:msg description="Main Administration Identifiers title">Identifiers Mappings</ui:msg>
+              </o:OpalNavLink>
+              <g:FlowPanel>
+                <g:Label styleName="help-block">
+                  <ui:msg description="Main Administration Identifiers title">Manage identifiers mappings
+                  </ui:msg>
+                </g:Label>
+              </g:FlowPanel>
+              <b:Divider/>
+              <o:OpalNavLink ui:field="keystorePlace" icon="COG">
+                <ui:msg description="Main Administration Keystore title">Keystore</ui:msg>
+              </o:OpalNavLink>
+              <g:FlowPanel>
+                <g:Label styleName="help-block">
+                  <ui:msg description="Main Administration Keystore title">Manage certificates and private keys for encryption and decryption of data
+                  </ui:msg>
                 </g:Label>
               </g:FlowPanel>
             </b:WellNavList>
