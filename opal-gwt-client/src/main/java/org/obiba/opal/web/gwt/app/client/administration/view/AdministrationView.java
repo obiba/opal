@@ -33,9 +33,6 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   OpalNavLink dataShieldPlace;
 
   @UiField
-  OpalNavLink pluginsPlace;
-
-  @UiField
   OpalNavLink reportsPlace;
 
   @UiField
@@ -87,11 +84,6 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   @Override
   public void setDataShieldHistoryToken(String historyToken) {
     dataShieldPlace.setHistoryToken(historyToken);
-  }
-
-  @Override
-  public void setPluginsHistoryToken(String historyToken) {
-    pluginsPlace.setHistoryToken(historyToken);
   }
 
   @Override

@@ -7,7 +7,7 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <g:FlowPanel addStyleNames="main">
+    <g:FlowPanel>
       <b:FluidRow>
         <b:Column size="6">
           <g:FlowPanel addStyleNames="extra-large-bottom-margin">
@@ -163,18 +163,6 @@
                 <g:Label styleName="help-block">
                   <ui:msg description="Main Administration Databases help">
                     Manage identifiers database and data databases for storage, import and export
-                  </ui:msg>
-                </g:Label>
-              </g:FlowPanel>
-              <b:Divider/>
-
-              <o:OpalNavLink ui:field="pluginsPlace" icon="COG">
-                <ui:msg description="Main Administration Plugins title">Plugins</ui:msg>
-              </o:OpalNavLink>
-              <g:FlowPanel>
-                <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Plugins help">Add, remove plugins for data visualization or
-                    system monitoring
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>

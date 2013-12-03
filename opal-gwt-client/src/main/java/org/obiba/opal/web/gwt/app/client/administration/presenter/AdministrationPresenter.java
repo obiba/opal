@@ -37,8 +37,6 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
 
     void setDataShieldHistoryToken(String historyToken);
 
-    void setPluginsHistoryToken(String historyToken);
-
     void setReportsHistoryToken(String historyToken);
 
     void setFilesHistoryToken(String historyToken);
