@@ -179,15 +179,7 @@ public class IndexSynchronizationManager {
       ValueTableIndex index = indexManager.getIndex(vt);
       if(currentTask != null && currentTask.getValueTableIndex().getIndexName().equals(index.getIndexName())) return;
 
-      boolean alreadyQueued = false;
-      for(IndexSynchronization s : indexSyncQueue) {
-        if(s.getValueTableIndex().getIndexName().equals(index.getIndexName()) &&
-            s.getIndexManager().getName().equals(indexManager.getName())) {
-          alreadyQueued = true;
-          break;
-        }
-      }
-      if(!alreadyQueued) {
+      if(!isAlreadyQueued(indexManager, index)) {
         log.trace("Queueing for indexing {} in {}", index.getIndexName(), indexManager.getName());
         indexSyncQueue.offer(indexManager.createSyncTask(vt, index));
       }
@@ -197,6 +189,18 @@ public class IndexSynchronizationManager {
       log.trace("Deleting current task from queue : {}", currentTask.getValueTable().getName());
       indexSyncQueue.remove(currentTask);
     }
+  }
+
+  public boolean isAlreadyQueued(IndexManager indexManager, ValueTableIndex index) {
+    boolean alreadyQueued = false;
+    for(IndexSynchronization s : indexSyncQueue) {
+      if(s.getValueTableIndex().getIndexName().equals(index.getIndexName()) &&
+          s.getIndexManager().getName().equals(indexManager.getName())) {
+        alreadyQueued = true;
+        break;
+      }
+    }
+    return alreadyQueued;
   }
 
   private class SyncConsumer implements Runnable {

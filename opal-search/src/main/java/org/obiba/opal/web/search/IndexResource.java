@@ -60,13 +60,13 @@ public abstract class IndexResource {
   }
 
   protected Float getValueTableIndexationProgress(String datasource, String table) {
-    Float progress = null;
     IndexSynchronization currentTask = synchroManager.getCurrentTask();
     if(currentTask != null && currentTask.getValueTable().getName().equals(table) &&
         currentTask.getValueTable().getDatasource().getName().equals(datasource)) {
-      progress = synchroManager.getCurrentTask().getProgress();
+      return synchroManager.getCurrentTask().getProgress();
     }
-    return progress;
+
+    return synchroManager.isAlreadyQueued(indexManager, getValueTableIndex(datasource, table)) ? 0f : null;
   }
 
   protected boolean isInProgress(String datasource, String table) {

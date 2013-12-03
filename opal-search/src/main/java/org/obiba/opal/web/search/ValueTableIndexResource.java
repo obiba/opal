@@ -76,7 +76,7 @@ public class ValueTableIndexResource extends IndexResource {
 
     Float progress = getValueTableIndexationProgress(datasource, table);
     if(progress != null) {
-      dtoBuilder.setProgress(progress).build();
+      dtoBuilder.setProgress(progress);
     }
 
     if(!valueTable.getTimestamps().getCreated().isNull()) {
