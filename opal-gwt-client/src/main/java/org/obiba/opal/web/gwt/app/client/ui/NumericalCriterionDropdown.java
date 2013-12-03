@@ -13,12 +13,14 @@ package org.obiba.opal.web.gwt.app.client.ui;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
+import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.ControlLabel;
+import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.common.base.Joiner;
-import com.google.gwt.event.dom.client.FocusEvent;
-import com.google.gwt.event.dom.client.FocusHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -26,8 +28,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 
 public abstract class NumericalCriterionDropdown extends CriterionDropdown {
-
-  private Chooser operatorChooser;
 
   private Chooser rangeValueChooser;
 
@@ -49,7 +49,15 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
 
   @Override
   public Widget getSpecificControls() {
-    operatorChooser = new Chooser();
+    // Update radio controls
+    RadioButton in = getRadioButton(translations.criterionFiltersMap().get("in"), null);
+    in.addClickHandler(new OperatorClickHandler());
+    radioControls.add(in);
+
+    RadioButton not_in = getRadioButton(translations.criterionFiltersMap().get("not_in"), null);
+    not_in.addClickHandler(new OperatorClickHandler());
+    radioControls.add(not_in);
+
     rangeValueChooser = new Chooser();
     min = new TextBox();
     max = new TextBox();
@@ -62,7 +70,6 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
     ListItem specificControls = new ListItem();
     specificControls.addStyleName("controls");
 
-    specificControls.add(getOperatorsChooserPanel());
     specificControls.add(getRangeValuesChooserPanel());
     specificControls.add(getRangeValuePanel());
 
@@ -126,48 +133,13 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
     return c;
   }
 
-  private FlowPanel getOperatorsChooserPanel() {
-    FlowPanel panel = new FlowPanel();
-
-    operatorChooser.addItem(translations.criterionFiltersMap().get("select_operator"));
-    operatorChooser.addItem(translations.criterionFiltersMap().get("in"));
-    operatorChooser.addItem(translations.criterionFiltersMap().get("not_in"));
-    operatorChooser.addFocusHandler(new FocusHandler() {
-      @Override
-      public void onFocus(FocusEvent event) {
-        resetRadioControls();
-      }
-    });
-    operatorChooser.addChosenChangeHandler(new ChosenChangeEvent.ChosenChangeHandler() {
-      @Override
-      public void onChange(ChosenChangeEvent event) {
-        rangeValueChooser.setEnabled(operatorChooser.getSelectedIndex() > 0);
-
-        if(operatorChooser.getSelectedIndex() > 0) {
-          resetRadioControls();
-          updateRangeValuesCriterionFilter();
-        }
-      }
-    });
-
-    panel.add(operatorChooser);
-    return panel;
-  }
-
   private FlowPanel getRangeValuesChooserPanel() {
     FlowPanel panel = new FlowPanel();
 
-    rangeValueChooser.addItem(translations.criterionFiltersMap().get("select"));
     rangeValueChooser.addItem(translations.criterionFiltersMap().get("range"));
     rangeValueChooser.addItem(translations.criterionFiltersMap().get("values"));
-    rangeValueChooser.addFocusHandler(new FocusHandler() {
-      @Override
-      public void onFocus(FocusEvent event) {
-        resetRadioControls();
-      }
-    });
     rangeValueChooser.addChosenChangeHandler(new UpdateFilterChosenHandler());
-    rangeValueChooser.setEnabled(false);
+    rangeValueChooser.setVisible(false);
 
     panel.add(rangeValueChooser);
     return panel;
@@ -175,9 +147,7 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
 
   @Override
   public void resetSpecificControls() {
-    operatorChooser.setItemSelected(0, true);
-    rangeValueChooser.setItemSelected(0, true);
-    rangeValueChooser.setEnabled(false);
+    rangeValueChooser.setVisible(false);
     minLabel.setVisible(false);
     min.setVisible(false);
     maxLabel.setVisible(false);
@@ -192,24 +162,27 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
     if(emptyNotEmpty != null) return emptyNotEmpty;
 
     // RANGE
-    if(rangeValueChooser.isItemSelected(1)) {
+    if(rangeValueChooser.isItemSelected(0)) {
       String rangeQuery = fieldName + ":[" + (min.getText().isEmpty() ? "*" : min.getText()) + " TO " +
           (max.getText().isEmpty() ? "*" : max.getText()) + "]";
 
-      if(operatorChooser.isItemSelected(2)) {
+      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
         return "NOT " + rangeQuery;
       }
+
       return rangeQuery;
     }
 
     // VALUES
-    if(rangeValueChooser.isItemSelected(2) && values.getText().length() > 0) {
+    if(rangeValueChooser.isItemSelected(1) && values.getText().length() > 0) {
       // Parse numbers
-      String[] numbers = values.getText().split(",");
+      String[] numbers = values.getText().trim().split(",");
       String valuesQuery = fieldName + ":(" + Joiner.on(" OR ").join(numbers) + ")";
-      if(operatorChooser.isItemSelected(2)) {
+
+      if(((CheckBox) radioControls.getWidget(4)).getValue()) {
         return "NOT " + valuesQuery;
       }
+
       return valuesQuery;
     }
 
@@ -217,46 +190,55 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
   }
 
   private void updateRangeValuesCriterionFilter() {
-    if(operatorChooser.getSelectedIndex() > 0) {
-      String filter = operatorChooser.getItemText(operatorChooser.getSelectedIndex());
+    setFilterText();
+    doFilterValueSets();
+  }
 
-      if(rangeValueChooser.getSelectedIndex() > 0) {
-        filter += " " + rangeValueChooser.getItemText(rangeValueChooser.getSelectedIndex()).toLowerCase();
+  private void setFilterText() {
+    String filter = variable.getName() + ": ";
+    filter += ((CheckBox) radioControls.getWidget(3)).getValue()
+        ? translations.criterionFiltersMap().get("in")
+        : translations.criterionFiltersMap().get("not_in");
 
-        filter += rangeValueChooser.isItemSelected(1) ? "[" + (min.getText().isEmpty() ? "*" : min.getText()) + " " +
-            translations.criterionFiltersMap().get("to") + " " +
-            (max.getText().isEmpty() ? "*" : max.getText()) + "]" : "(" + values.getText() + ")";
-      }
+//    if(rangeValueChooser.getSelectedIndex() > 0) {
+    filter += " " + rangeValueChooser.getItemText(rangeValueChooser.getSelectedIndex()).toLowerCase();
 
-      updateCriterionFilter(filter);
-      doFilterValueSets();
-    }
+    filter += rangeValueChooser.isItemSelected(0) ? "[" + (min.getText().isEmpty() ? "*" : min.getText()) + " " +
+        translations.criterionFiltersMap().get("to") + " " +
+        (max.getText().isEmpty() ? "*" : max.getText()) + "]" : "(" + values.getText() + ")";
+//    }
+
+    setText(filter);
   }
 
   private class UpdateFilterChosenHandler implements ChosenChangeEvent.ChosenChangeHandler {
     @Override
     public void onChange(ChosenChangeEvent chosenChangeEvent) {
-      resetRadioControls();
-
-      // Show/Hide Range-value textbox
-      if(rangeValueChooser.isItemSelected(1)) {
-        minLabel.setVisible(true);
-        min.setVisible(true);
-        maxLabel.setVisible(true);
-        max.setVisible(true);
-        valuesLabel.setVisible(false);
-        values.setVisible(false);
-      } else if(rangeValueChooser.isItemSelected(2)) {
-        minLabel.setVisible(false);
-        min.setVisible(false);
-        maxLabel.setVisible(false);
-        max.setVisible(false);
-        valuesLabel.setVisible(true);
-        values.setVisible(true);
-      }
-
+      updateRangeValuesFields();
       updateRangeValuesCriterionFilter();
     }
   }
 
+  private class OperatorClickHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent event) {
+      rangeValueChooser.setVisible(true);
+
+      updateRangeValuesFields();
+
+      setFilterText();
+    }
+  }
+
+  private void updateRangeValuesFields() {
+    boolean rangeSelected = rangeValueChooser.isItemSelected(0);
+    minLabel.setVisible(rangeSelected);
+    min.setVisible(rangeSelected);
+    maxLabel.setVisible(rangeSelected);
+    max.setVisible(rangeSelected);
+    valuesLabel.setVisible(!rangeSelected);
+    values.setVisible(!rangeSelected);
+  }
 }
+
