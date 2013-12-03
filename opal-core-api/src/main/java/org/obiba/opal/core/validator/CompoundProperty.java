@@ -8,15 +8,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.core.domain.database;
+package org.obiba.opal.core.validator;
 
-import javax.validation.constraints.NotNull;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-public interface DatabaseSettings {
+@Retention(RetentionPolicy.RUNTIME)
+public @interface CompoundProperty {
 
-  @NotNull
-  String getUrl();
+  String name();
 
-  void setUrl(@NotNull String url);
+  String[] properties();
 
 }

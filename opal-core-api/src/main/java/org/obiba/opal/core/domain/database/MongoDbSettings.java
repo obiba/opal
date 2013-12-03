@@ -5,14 +5,13 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasourceFactory;
 
-public class MongoDbSettings implements DatabaseSettings {
+public class MongoDbSettings {
 
   /**
    * mongodb://{hostname}:{port}/{databaseName}
    */
   @NotNull
   @NotBlank
-  //TODO url should be unique
   private String url;
 
   private String username;
@@ -41,13 +40,11 @@ public class MongoDbSettings implements DatabaseSettings {
     this.properties = properties;
   }
 
-  @Override
   @NotNull
   public String getUrl() {
     return url;
   }
 
-  @Override
   public void setUrl(@NotNull String url) {
     this.url = url;
   }

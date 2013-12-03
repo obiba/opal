@@ -21,7 +21,6 @@ import javax.validation.ValidatorFactory;
 import org.easymock.EasyMock;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.junit.Test;
-import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.database.SqlSettings;
 import org.obiba.opal.core.service.OrientDbService;
@@ -33,18 +32,69 @@ import static org.junit.Assert.assertEquals;
 
 public class UniqueValidatorTest {
 
-  @Test
-  public void testFindAnnotatedClass() {
-    assertEquals(null, UniqueValidator.findAnnotatedClass(HasUniqueProperties.class));
-    assertEquals(Database.class, UniqueValidator.findAnnotatedClass(Database.class, "settings.url"));
+  @Unique(compoundProperties = @CompoundProperty(name = "unique prop",
+      properties = { "sub1.prop1", "sub2.prop2" }))
+  private static class UniqueCompoundStub {
+
+    private Sub1 sub1;
+
+    private Sub2 sub2;
+
+    public Sub1 getSub1() {
+      return sub1;
+    }
+
+    public void setSub1(Sub1 sub1) {
+      this.sub1 = sub1;
+    }
+
+    public Sub2 getSub2() {
+      return sub2;
+    }
+
+    public void setSub2(Sub2 sub2) {
+      this.sub2 = sub2;
+    }
+
+    private static class Sub1 {
+      private String prop1;
+
+      public String getProp1() {
+        return prop1;
+      }
+
+      public void setProp1(String prop1) {
+        this.prop1 = prop1;
+      }
+    }
+
+    private static class Sub2 {
+      private String prop2;
+
+      public String getProp2() {
+        return prop2;
+      }
+
+      public void setProp2(String prop2) {
+        this.prop2 = prop2;
+      }
+    }
+
   }
+
+//  @Test
+//  public void testFindAnnotatedClass() {
+//    assertEquals(null, UniqueValidator.findAnnotatedClass(HasUniqueProperties.class, null, null));
+//    assertEquals(UniqueCompoundStub.class,
+//        UniqueValidator.findAnnotatedClass(UniqueCompoundStub.class, null, new CompoundProperty[] { });
+//  }
 
   @Test
   public void testUnique() {
 
     Database existing = createSqlDatabase("existing database", "url");
     OrientDbService mockOrientDbService = EasyMock.createMock(OrientDbService.class);
-    expect(mockOrientDbService.uniqueResult(Database.class, "select from Database where settings.url = ?", "url"))
+    expect(mockOrientDbService.uniqueResult(Database.class, "select from Database where url = ?", "url"))
         .andReturn(existing).once();
     replay(mockOrientDbService);
 
@@ -59,7 +109,7 @@ public class UniqueValidatorTest {
     ConstraintViolation<Database> constraintViolation = constraintViolations.iterator().next();
     assertEquals("must be unique", constraintViolation.getMessage());
     assertEquals("{org.obiba.opal.core.validator.Unique.message}", constraintViolation.getMessageTemplate());
-    assertEquals("settings.url", constraintViolation.getPropertyPath().toString());
+    assertEquals("url", constraintViolation.getPropertyPath().toString());
   }
 
   private Validator getValidator(final OrientDbService orientDbService) {

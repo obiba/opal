@@ -5,7 +5,6 @@ import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
 import org.obiba.opal.core.domain.database.Database;
-import org.obiba.opal.core.domain.database.DatabaseSettings;
 import org.obiba.opal.core.domain.database.MongoDbSettings;
 import org.obiba.opal.core.domain.database.SqlSettings;
 import org.obiba.opal.web.model.Magma;
@@ -16,24 +15,23 @@ import static org.obiba.opal.web.model.Database.DatabaseDto;
 import static org.obiba.opal.web.model.Database.MongoDbSettingsDto;
 import static org.obiba.opal.web.model.Database.SqlSettingsDto;
 
-@SuppressWarnings("OverlyCoupledClass")
 public class Dtos {
 
   private Dtos() {}
 
   public static Database fromDto(DatabaseDto dto) {
-    Database.Builder builder = Database.Builder.create() //
-        .defaultStorage(dto.getDefaultStorage()) //
-        .name(dto.getName()) //
-        .usage(Database.Usage.valueOf(dto.getUsage().name())) //
-        .usedForIdentifiers(dto.getUsedForIdentifiers());
-    if(dto.hasSqlSettings()) builder.settings(fromDto(dto.getSqlSettings()));
-    if(dto.hasMongoDbSettings()) builder.settings(fromDto(dto.getMongoDbSettings()));
-    return builder.build();
+    Database db = new Database();
+    db.setDefaultStorage(dto.getDefaultStorage());
+    db.setName(dto.getName());
+    db.setUsage(Database.Usage.valueOf(dto.getUsage().name()));
+    db.setUsedForIdentifiers(dto.getUsedForIdentifiers());
+    if(dto.hasSqlSettings()) db.setSqlSettings(fromDto(dto.getSqlSettings()));
+    if(dto.hasMongoDbSettings()) db.setMongoDbSettings(fromDto(dto.getMongoDbSettings()));
+    return db;
   }
 
   @Nullable
-  private static DatabaseSettings fromDto(@NotNull SqlSettingsDto dto) {
+  private static SqlSettings fromDto(@NotNull SqlSettingsDto dto) {
     SqlSettings settings = new SqlSettings();
     settings.setDriverClass(dto.getDriverClass());
     settings.setSqlSchema(SqlSettings.SqlSchema.valueOf(dto.getSqlSchema().name()));
@@ -67,7 +65,7 @@ public class Dtos {
   }
 
   @Nullable
-  private static DatabaseSettings fromDto(@NotNull MongoDbSettingsDto dto) {
+  private static MongoDbSettings fromDto(@NotNull MongoDbSettingsDto dto) {
     MongoDbSettings settings = new MongoDbSettings();
     settings.setUrl(dto.getUrl());
     settings.setUsername(dto.getUsername());
@@ -90,10 +88,13 @@ public class Dtos {
     builder.setUsage(DatabaseDto.Usage.valueOf(db.getUsage().name()));
 
     if(withSettings) {
-      if(db.hasSqlSettings()) {
-        builder.setSqlSettings(asDto(db.getSqlSettings()));
-      } else if(db.hasMongoDbSettings()) {
-        builder.setMongoDbSettings(asDto(db.getMongoDbSettings()));
+      SqlSettings sqlSettings = db.getSqlSettings();
+      if(sqlSettings != null) {
+        builder.setSqlSettings(asDto(sqlSettings));
+      }
+      MongoDbSettings mongoDbSettings = db.getMongoDbSettings();
+      if(mongoDbSettings != null) {
+        builder.setMongoDbSettings(asDto(mongoDbSettings));
       }
     }
     return builder.build();

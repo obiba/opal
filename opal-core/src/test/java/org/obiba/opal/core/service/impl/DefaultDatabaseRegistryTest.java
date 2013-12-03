@@ -2,9 +2,12 @@ package org.obiba.opal.core.service.impl;
 
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.sql.DataSource;
 import javax.transaction.TransactionManager;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 
 import org.easymock.EasyMock;
 import org.hibernate.SessionFactory;
@@ -38,10 +41,13 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
 import static org.easymock.EasyMock.verify;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.obiba.opal.core.domain.database.Database.Usage;
 
 @ContextConfiguration(classes = DefaultDatabaseRegistryTest.Config.class)
@@ -150,21 +156,69 @@ public class DefaultDatabaseRegistryTest extends AbstractJUnit4SpringContextTest
   }
 
   @Test
+  public void test_create_database_with_same_name() {
+
+  }
+
+  @Test
+  public void test_create_database_with_same_url() {
+    Database database = createSqlDatabase();
+    databaseRegistry.save(database);
+
+    Database database2 = createSqlDatabase();
+    database2.setName("new database");
+    try {
+      databaseRegistry.save(database2);
+      fail("Should throw ConstraintViolationException");
+    } catch(ConstraintViolationException e) {
+      Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
+      assertThat(violations.size(), is(1));
+      ConstraintViolation<?> violation = violations.iterator().next();
+      assertThat(violation.getMessage(), is("must be unique"));
+      assertThat(violation.getMessageTemplate(), is("{org.obiba.opal.core.validator.Unique.message}"));
+      assertThat(violation.getPropertyPath().toString(), is("url"));
+    }
+  }
+
+  @Test
+  @SuppressWarnings("ConstantConditions")
+  public void test_update_database_with_same_url() {
+    Database database = createSqlDatabase();
+    databaseRegistry.save(database);
+
+    Database database2 = createSqlDatabase();
+    database2.setName("new database");
+    database2.getSqlSettings().setUrl("new url");
+    databaseRegistry.save(database2);
+
+    database2.getSqlSettings().setUrl(database.getSqlSettings().getUrl());
+    try {
+      databaseRegistry.save(database2);
+      fail("Should throw ConstraintViolationException");
+    } catch(ConstraintViolationException e) {
+      Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
+      assertThat(violations.size(), is(1));
+      ConstraintViolation<?> violation = violations.iterator().next();
+      assertThat(violation.getMessage(), is("must be unique"));
+      assertThat(violation.getMessageTemplate(), is("{org.obiba.opal.core.validator.Unique.message}"));
+      assertThat(violation.getPropertyPath().toString(), is("url"));
+    }
+  }
+
+  @Test
   public void test_get_identifiers_database() {
     Database database = Database.Builder.create().name("sql database").usage(Usage.STORAGE).usedForIdentifiers(true)
         .build();
     databaseRegistry.save(database);
     Database found = databaseRegistry.getIdentifiersDatabase();
-    assertTrue(found.isUsedForIdentifiers());
-
-    assertTrue(databaseRegistry.hasIdentifiersDatabase());
-
-    assertEquals(0, size(databaseRegistry.list()));
-    assertEquals(0, size(databaseRegistry.list(Usage.IMPORT)));
-    assertEquals(0, size(databaseRegistry.list(Usage.STORAGE)));
-    assertEquals(0, size(databaseRegistry.list(Usage.EXPORT)));
-    assertEquals(0, size(databaseRegistry.listMongoDatabases()));
-    assertEquals(0, size(databaseRegistry.listSqlDatabases()));
+    assertThat(found.isUsedForIdentifiers(), is(true));
+    assertThat(databaseRegistry.hasIdentifiersDatabase(), is(true));
+    assertThat(size(databaseRegistry.list()), is(0));
+    assertThat(size(databaseRegistry.list(Usage.IMPORT)), is(0));
+    assertThat(size(databaseRegistry.list(Usage.STORAGE)), is(0));
+    assertThat(size(databaseRegistry.list(Usage.EXPORT)), is(0));
+    assertThat(size(databaseRegistry.listMongoDatabases()), is(0));
+    assertThat(size(databaseRegistry.listSqlDatabases()), is(0));
   }
 
   @Test(expected = IdentifiersDatabaseNotFoundException.class)

@@ -158,7 +158,6 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
   public void save(@NotNull Database database)
       throws ConstraintViolationException, MultipleIdentifiersDatabaseException {
 
-    //TODO valid unique url
     validUniqueIdentifiersDatabase(database);
 
     if(database.isDefaultStorage()) {
