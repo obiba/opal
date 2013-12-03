@@ -200,13 +200,11 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
         ? translations.criterionFiltersMap().get("in")
         : translations.criterionFiltersMap().get("not_in");
 
-//    if(rangeValueChooser.getSelectedIndex() > 0) {
     filter += " " + rangeValueChooser.getItemText(rangeValueChooser.getSelectedIndex()).toLowerCase();
 
     filter += rangeValueChooser.isItemSelected(0) ? "[" + (min.getText().isEmpty() ? "*" : min.getText()) + " " +
         translations.criterionFiltersMap().get("to") + " " +
         (max.getText().isEmpty() ? "*" : max.getText()) + "]" : "(" + values.getText() + ")";
-//    }
 
     setText(filter);
   }
@@ -219,18 +217,6 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
     }
   }
 
-  private class OperatorClickHandler implements ClickHandler {
-
-    @Override
-    public void onClick(ClickEvent event) {
-      rangeValueChooser.setVisible(true);
-
-      updateRangeValuesFields();
-
-      setFilterText();
-    }
-  }
-
   private void updateRangeValuesFields() {
     boolean rangeSelected = rangeValueChooser.isItemSelected(0);
     minLabel.setVisible(rangeSelected);
@@ -239,6 +225,16 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
     max.setVisible(rangeSelected);
     valuesLabel.setVisible(!rangeSelected);
     values.setVisible(!rangeSelected);
+  }
+
+  private class OperatorClickHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent event) {
+      rangeValueChooser.setVisible(true);
+      updateRangeValuesFields();
+      setFilterText();
+    }
   }
 }
 

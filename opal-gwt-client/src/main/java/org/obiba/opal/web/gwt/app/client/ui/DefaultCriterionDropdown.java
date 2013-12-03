@@ -12,17 +12,17 @@ package org.obiba.opal.web.gwt.app.client.ui;
 
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
+import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.HelpBlock;
+import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.watopi.chosen.client.event.ChosenChangeEvent;
 
 public abstract class DefaultCriterionDropdown extends CriterionDropdown {
-
-  private Chooser operatorChooser;
 
   private TextBox matches;
 
@@ -34,14 +34,19 @@ public abstract class DefaultCriterionDropdown extends CriterionDropdown {
 
   @Override
   public Widget getSpecificControls() {
-    ListItem specificControls = new ListItem();
+    // Update radio controls
+    RadioButton like = getRadioButton(translations.criterionFiltersMap().get("like"), null);
+    like.addClickHandler(new OperatorClickHandler());
+    radioControls.add(like);
 
-    operatorChooser = new Chooser();
+    RadioButton not_like = getRadioButton(translations.criterionFiltersMap().get("not_like"), null);
+    not_like.addClickHandler(new OperatorClickHandler());
+    radioControls.add(not_like);
+
+    ListItem specificControls = new ListItem();
     matches = new TextBox();
     matchesHelp = new HelpBlock(translations.criterionFiltersMap().get("wildcards_help"));
     specificControls.addStyleName("controls");
-
-    specificControls.add(getOperatorsChooserPanel());
 
     matches.setPlaceholder(translations.criterionFiltersMap().get("custom_match_query"));
     matches.addKeyUpHandler(new KeyUpHandler() {
@@ -58,20 +63,8 @@ public abstract class DefaultCriterionDropdown extends CriterionDropdown {
     return specificControls;
   }
 
-  private SimplePanel getOperatorsChooserPanel() {
-    SimplePanel inPanel = new SimplePanel();
-    operatorChooser.addItem(translations.criterionFiltersMap().get("select_operator"));
-    operatorChooser.addItem(translations.criterionFiltersMap().get("like"));
-    operatorChooser.addItem(translations.criterionFiltersMap().get("not_like"));
-    operatorChooser.addChosenChangeHandler(new UpdateFilterChosenHandler());
-
-    inPanel.add(operatorChooser);
-    return inPanel;
-  }
-
   @Override
   public void resetSpecificControls() {
-    operatorChooser.setItemSelected(0, true);
     matches.setVisible(false);
     matchesHelp.setVisible(false);
   }
@@ -81,42 +74,43 @@ public abstract class DefaultCriterionDropdown extends CriterionDropdown {
     String emptyNotEmpty = super.getQueryString();
     if(emptyNotEmpty != null) return emptyNotEmpty;
 
-    if(operatorChooser.isItemSelected(1)) {
+    if(((CheckBox) radioControls.getWidget(3)).getValue() && !matches.getText().isEmpty()) {
       return fieldName + ":" + matches.getText();
     }
 
-    if(operatorChooser.isItemSelected(2)) {
+    if(((CheckBox) radioControls.getWidget(4)).getValue() && !matches.getText().isEmpty()) {
       return "NOT " + fieldName + ":" + matches.getText();
     }
 
-    return "";
-  }
-
-  private class UpdateFilterChosenHandler implements ChosenChangeEvent.ChosenChangeHandler {
-    @Override
-    public void onChange(ChosenChangeEvent chosenChangeEvent) {
-      resetRadioControls();
-      updateMatchCriteriaFilter();
-    }
+    return null;
   }
 
   private void updateMatchCriteriaFilter() {
-    boolean isOperatorSelected = operatorChooser.getSelectedIndex() > 0;
+    setFilterText();
+    doFilterValueSets();
 
-    matches.setVisible(isOperatorSelected);
-    matchesHelp.setVisible(isOperatorSelected);
+  }
 
-    if(isOperatorSelected) {
-      if(matches.getText().isEmpty()) {
-        updateCriterionFilter("");
-      } else {
+  private void setFilterText() {
+    if(matches.getText().isEmpty()) {
+      updateCriterionFilter("");
+    } else {
 
-        String prefix = operatorChooser.isItemSelected(1)
-            ? translations.criterionFiltersMap().get("like") + " "
-            : translations.criterionFiltersMap().get("not_like") + " ";
-        updateCriterionFilter(prefix + matches.getText());
-        doFilterValueSets();
-      }
+      String prefix = ((CheckBox) radioControls.getWidget(3)).getValue()
+          ? translations.criterionFiltersMap().get("like") + " "
+          : translations.criterionFiltersMap().get("not_like") + " ";
+
+      updateCriterionFilter(prefix + matches.getText());
+    }
+  }
+
+  private class OperatorClickHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent event) {
+      matches.setVisible(true);
+      matchesHelp.setVisible(true);
+      setFilterText();
     }
   }
 }
