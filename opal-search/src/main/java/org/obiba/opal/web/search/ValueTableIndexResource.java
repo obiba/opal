@@ -72,7 +72,6 @@ public class ValueTableIndexResource extends IndexResource {
         .setTable(table) //
         .setSchedule(getScheduleDto(datasource, table)) //
         .setStatus(getTableIndexationStatus(datasource, table)) //
-        .setProgress(getValueTableIndexationProgress(datasource, table)) //
         .setLink(UriBuilder.fromPath("/").path(ValueTableIndexResource.class).build(datasource, table).getPath());
 
     Float progress = getValueTableIndexationProgress(datasource, table);
