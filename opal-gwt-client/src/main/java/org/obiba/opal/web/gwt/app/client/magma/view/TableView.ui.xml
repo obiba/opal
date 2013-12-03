@@ -138,7 +138,7 @@
                 </g:customCell>
                 <g:customCell styleName="top-aligned">
 
-                  <b:ProgressBar ui:field="progress" addStyleNames="xsmall-indent progress"/>
+                  <b:ProgressBar ui:field="progress" addStyleNames="xsmall-indent progress no-bottom-margin"/>
                 </g:customCell>
                 <g:customCell styleName="top-aligned">
 

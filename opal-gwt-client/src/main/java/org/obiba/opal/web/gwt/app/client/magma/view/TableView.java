@@ -195,6 +195,8 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     addTableColumns();
     initializeAnchorTexts();
     initializeFilter();
+
+    progress.setWidth("150px");
   }
 
   @Override

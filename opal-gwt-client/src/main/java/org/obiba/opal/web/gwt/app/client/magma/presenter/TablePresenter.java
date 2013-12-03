@@ -86,7 +86,7 @@ import static com.google.gwt.http.client.Response.SC_SERVICE_UNAVAILABLE;
 public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     implements TableUiHandlers, TableSelectionChangeEvent.Handler {
 
-  private static final int DELAY_MILLIS = 1000;
+  private static final int DELAY_MILLIS = 2000;
 
   private JsArray<VariableDto> variables;
 
@@ -128,6 +128,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   private Runnable deleteVariablesConfirmation;
 
   private Boolean sortAscending;
+
+  private Timer indexProgressTimer;
 
   /**
    * @param display
@@ -176,6 +178,14 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     setInSlot(Display.Slots.Values, valuesTablePresenter);
 
     addEventHandlers();
+  }
+
+  @Override
+  protected void onHide() {
+    super.onHide();
+    if(indexProgressTimer != null) {
+      indexProgressTimer.cancel();
+    }
   }
 
   private void updateTableIndexStatus() {
@@ -497,14 +507,15 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
       public void onResponseCode(Request request, Response response) {
         if(response.getStatusCode() == SC_OK) {
           // Wait a few seconds for the task to launch before checking its status
-          Timer t = new Timer() {
+          indexProgressTimer = new Timer() {
             @Override
             public void run() {
               updateIndexStatus();
             }
           };
           // Schedule the timer to run once in X seconds.
-          t.schedule(DELAY_MILLIS);
+          indexProgressTimer.schedule(DELAY_MILLIS);
+
         } else {
           fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         }
@@ -680,7 +691,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           // Hide the Cancel button if progress is 100%
           getView().setCancelVisible(Double.compare(statusDto.getProgress(), 1d) < 0);
 
-          Timer t = new Timer() {
+          indexProgressTimer = new Timer() {
             @Override
             public void run() {
               updateIndexStatus();
@@ -688,7 +699,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
           };
 
           // Schedule the timer to run once in X seconds.
-          t.schedule(DELAY_MILLIS);
+          indexProgressTimer.schedule(DELAY_MILLIS);
         }
       }
     }
