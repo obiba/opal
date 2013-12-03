@@ -21,7 +21,6 @@ import org.springframework.beans.PropertyAccessor;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Objects;
 
 public class UniqueValidator implements ConstraintValidator<Unique, HasUniqueProperties> {
 
@@ -42,13 +41,10 @@ public class UniqueValidator implements ConstraintValidator<Unique, HasUniquePro
     Class<? extends HasUniqueProperties> annotatedClass = findAnnotatedClass(value.getClass(), properties);
     PropertyAccessor beanWrapper = new BeanWrapperImpl(value);
     for(String property : properties) {
-
-      HasUniqueProperties unique = orientDbService.findUnique(value);
-
       String query = String.format("select from %s where %s = ?", annotatedClass.getSimpleName(), property);
       Object propertyValue = beanWrapper.getPropertyValue(property);
-      HasUniqueProperties existing = orientDbService.uniqueResult(query, propertyValue);
-      if(existing != null && !Objects.equal(existing.getId(), value.getId())) {
+      HasUniqueProperties existing = orientDbService.uniqueResult(value.getClass(), query, propertyValue);
+      if(existing != null && !existing.equals(value)) {
         context.disableDefaultConstraintViolation();
         context.buildConstraintViolationWithTemplate("{org.obiba.opal.core.validator.Unique.message}") //
             .addPropertyNode(property) //
@@ -60,6 +56,7 @@ public class UniqueValidator implements ConstraintValidator<Unique, HasUniquePro
   }
 
   @VisibleForTesting
+  @SuppressWarnings("unchecked")
   static Class<? extends HasUniqueProperties> findAnnotatedClass(Class<? extends HasUniqueProperties> clazz,
       String... properties) {
     if(clazz == null || !HasUniqueProperties.class.isAssignableFrom(clazz)) return null;
