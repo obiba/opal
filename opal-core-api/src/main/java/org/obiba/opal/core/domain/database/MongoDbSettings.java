@@ -5,7 +5,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasourceFactory;
 
-public class MongoDbSettings {
+public class MongoDbSettings implements DatabaseSettings {
 
   /**
    * mongodb://{hostname}:{port}/{databaseName}
@@ -41,11 +41,13 @@ public class MongoDbSettings {
     this.properties = properties;
   }
 
+  @Override
   @NotNull
   public String getUrl() {
     return url;
   }
 
+  @Override
   public void setUrl(@NotNull String url) {
     this.url = url;
   }

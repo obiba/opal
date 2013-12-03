@@ -8,7 +8,7 @@ import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
 
 import com.google.common.base.Objects;
 
-public class SqlSettings {
+public class SqlSettings implements DatabaseSettings {
 
   public enum SqlSchema {
     HIBERNATE, JDBC, LIMESURVEY
@@ -68,11 +68,13 @@ public class SqlSettings {
     this.properties = properties;
   }
 
+  @Override
   @NotNull
   public String getUrl() {
     return url;
   }
 
+  @Override
   public void setUrl(@NotNull String url) {
     this.url = url;
   }
