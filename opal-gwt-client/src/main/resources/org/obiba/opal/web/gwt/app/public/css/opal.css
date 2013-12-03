@@ -388,3 +388,24 @@ td.row-actions span {
 .control-group .xlarge-indent {
   margin-left: 50px;
 }
+
+/*
+ * Dropdown with InputAppend
+ */
+.input-append > .btn-group > .btn:last-child, .input-append > .btn-group > .dropdown-toggle {
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.small-addon .add-on:last-child {
+  padding-bottom: 2px;
+  padding-top: 2px;
+}
+
+/*
+ * Dropdown close icon
+ */
+.close-right-aligned {
+  float: right;
+  margin-right: 10px;
+}

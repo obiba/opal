@@ -62,7 +62,6 @@ import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -140,7 +139,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   Table<VariableDto> table;
 
   @UiField
-  SimplePanel valuesPanel;
+  Panel valuesPanel;
 
   @UiField
   SimplePager pager;
