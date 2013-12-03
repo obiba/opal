@@ -117,7 +117,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     originalTable = table;
 
     getView().clearTable();
-    getView().getFiltersPanel().clear();
     getView().setTable(table);
     getView().setVariableLabelFieldUpdater(new ValueUpdater<String>() {
       @Override
