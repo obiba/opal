@@ -49,14 +49,7 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
 
   @Override
   public Widget getSpecificControls() {
-    // Update radio controls
-    RadioButton in = getRadioButton(translations.criterionFiltersMap().get("in"), null);
-    in.addClickHandler(new OperatorClickHandler());
-    radioControls.add(in);
-
-    RadioButton not_in = getRadioButton(translations.criterionFiltersMap().get("not_in"), null);
-    not_in.addClickHandler(new OperatorClickHandler());
-    radioControls.add(not_in);
+    updateRadioButtons();
 
     rangeValueChooser = new Chooser();
     min = new TextBox();
@@ -75,6 +68,17 @@ public abstract class NumericalCriterionDropdown extends CriterionDropdown {
 
     resetSpecificControls();
     return specificControls;
+  }
+
+  private void updateRadioButtons() {
+    // Update radio controls
+    RadioButton in = getRadioButton(translations.criterionFiltersMap().get("in"), null);
+    in.addClickHandler(new OperatorClickHandler());
+    radioControls.add(in);
+
+    RadioButton not_in = getRadioButton(translations.criterionFiltersMap().get("not_in"), null);
+    not_in.addClickHandler(new OperatorClickHandler());
+    radioControls.add(not_in);
   }
 
   private void initValuesControls() {
