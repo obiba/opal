@@ -186,10 +186,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         .withCallback(new VariableFilterResourceCallback(variableName)).get().send();
   }
 
-  private boolean hasValueSetsFilter() {
-    return getView().getValuesFilterGroup().isVisible() && getView().getFiltersPanel().getWidgetCount() > 0;
-  }
-
   private void applyAllValueSetsFilter() {
     applyAllValueSetsFilter(0);
   }
@@ -319,6 +315,10 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
           getView().populateValues(offset, resource == null ? ValueSetsDto.create() : resource);
         }
       }
+    }
+
+    private boolean hasValueSetsFilter() {
+      return getView().getValuesFilterGroup().isVisible() && getView().getFiltersPanel().getWidgetCount() > 0;
     }
   }
 
