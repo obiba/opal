@@ -16,6 +16,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import org.apache.shiro.util.ByteSource;
+import org.apache.shiro.util.SimpleByteSource;
 import org.obiba.opal.core.domain.user.User;
 import org.obiba.opal.core.service.UserService;
 import org.obiba.opal.web.model.Opal;
@@ -51,7 +53,7 @@ public class UserResource {
     }
     User user = Dtos.fromDto(dto);
     if(dto.hasPassword() && !dto.getPassword().isEmpty()) {
-      user.setPassword(User.digest(dto.getPassword()));
+      user.setPassword(User.digest(dto.getPassword(), new SimpleByteSource(user.getName()).getBytes()));
     }
     userService.save(user);
     return Response.ok().build();

@@ -24,13 +24,17 @@ import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.cache.MemoryConstrainedCacheManager;
+import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.apache.shiro.util.ByteSource;
+import org.apache.shiro.util.SimpleByteSource;
 import org.obiba.opal.core.domain.user.User;
 import org.obiba.opal.core.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 
 /**
  * Realm for users defined in opal's own users database.
@@ -45,7 +49,7 @@ public class OpalUserRealm extends AuthorizingRealm {
 
   public OpalUserRealm() {
     setCacheManager(new MemoryConstrainedCacheManager());
-    setCredentialsMatcher(new HashedCredentialsMatcher("SHA"));
+    setCredentialsMatcher(new HashedCredentialsMatcher(Sha256Hash.ALGORITHM_NAME));
   }
 
   @Override
@@ -67,7 +71,9 @@ public class OpalUserRealm extends AuthorizingRealm {
     if(user == null || !user.isEnabled()) {
       throw new UnknownAccountException("No account found for user [" + username + "]");
     }
-    return new SimpleAuthenticationInfo(username, user.getPassword(), getName());
+    SimpleAuthenticationInfo authInfo = new SimpleAuthenticationInfo(username, user.getPassword(), getName());
+    authInfo.setCredentialsSalt(new SimpleByteSource(username));
+    return authInfo;
   }
 
   @Override

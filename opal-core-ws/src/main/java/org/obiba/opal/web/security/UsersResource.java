@@ -16,6 +16,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
+import org.apache.shiro.util.ByteSource;
+import org.apache.shiro.util.SimpleByteSource;
 import org.obiba.opal.core.domain.user.User;
 import org.obiba.opal.core.service.DuplicateUserNameException;
 import org.obiba.opal.core.service.UserService;
@@ -53,7 +55,7 @@ public class UsersResource {
     if (found != null) {
       throw new DuplicateUserNameException(found, user);
     }
-    user.setPassword(User.digest(dto.getPassword()));
+    user.setPassword(User.digest(dto.getPassword(), new SimpleByteSource(user.getName()).getBytes()));
     userService.save(user);
     return Response.ok().build();
   }

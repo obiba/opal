@@ -17,6 +17,7 @@ import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 
+import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.core.util.HexUtil;
 import org.obiba.opal.core.domain.AbstractTimestamped;
@@ -112,9 +113,12 @@ public class User extends AbstractTimestamped implements Comparable<User>, HasUn
    * @param password
    * @return
    */
-  public static String digest(String password) {
+  public static String digest(String password, byte[] salt) {
     try {
-      return HexUtil.bytesToHex(MessageDigest.getInstance("SHA").digest(password.getBytes()));
+      MessageDigest digest = MessageDigest.getInstance(Sha256Hash.ALGORITHM_NAME);
+      digest.reset();
+      digest.update(salt);
+      return HexUtil.bytesToHex(digest.digest(password.getBytes()));
     } catch(NoSuchAlgorithmException e) {
       throw new RuntimeException(e);
     }
