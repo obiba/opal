@@ -2,6 +2,8 @@
 
   <secretKey>this will be generated during install</secretKey>
 
+  <databasePassword>admin</databasePassword>
+
   <fileSystemRoot>file://${OPAL_HOME}/fs</fileSystemRoot>
 
   <functionalUnits>

@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DefaultOpalConfigurationService implements OpalConfigurationService {
 
-  private final OpalConfigurationIo opalConfigIo;
+  private OpalConfigurationIo opalConfigIo;
 
   private final Lock opalConfigurationLock = new ReentrantLock();
 
@@ -39,7 +39,7 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
   private OpalConfiguration opalConfiguration;
 
   @Autowired
-  public DefaultOpalConfigurationService(OpalConfigurationIo opalConfigIo) {
+  public void setOpalConfigIo(OpalConfigurationIo opalConfigIo) {
     this.opalConfigIo = opalConfigIo;
   }
 

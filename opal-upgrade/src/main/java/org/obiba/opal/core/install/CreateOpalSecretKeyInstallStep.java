@@ -15,11 +15,16 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 import org.obiba.core.util.HexUtil;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.obiba.opal.core.cfg.OpalConfiguration;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.runtime.Version;
+import org.obiba.runtime.upgrade.InstallStep;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class CreateOpalSecretKeyInstallStep extends AbstractConfigurationInstallStep {
+public class CreateOpalSecretKeyInstallStep implements InstallStep {
+
+  @Autowired
+  private OpalConfigurationService configurationService;
 
   @Override
   public String getDescription() {
@@ -27,26 +32,26 @@ public class CreateOpalSecretKeyInstallStep extends AbstractConfigurationInstall
   }
 
   @Override
-  protected void doWithConfig(Document opalConfig) {
-    NodeList list = opalConfig.getElementsByTagName("secretKey");
-    if(list.getLength() != 1) {
-      throw new IllegalStateException("missing secretKey node");
-    }
-    Node secretKey = list.item(0);
-    // Replace any content with a TextNode
-    secretKey.setTextContent(generateSecretKey());
-  }
+  public void execute(Version currentVersion) {
+    configurationService.modifyConfiguration(new OpalConfigurationService.ConfigModificationTask() {
+      @Override
+      public void doWithConfig(OpalConfiguration config) {
+        config.setSecretKey(generateSecretKey());
+      }
 
-  private String generateSecretKey() {
-    KeyGenerator keyGenerator;
-    try {
-      keyGenerator = KeyGenerator.getInstance("AES");
-    } catch(NoSuchAlgorithmException e) {
-      throw new RuntimeException("Cannot generate AES key. Your JVM is non-standard.", e);
-    }
-    keyGenerator.init(128);
-    SecretKey key = keyGenerator.generateKey();
-    return HexUtil.bytesToHex(key.getEncoded());
+      @SuppressWarnings("MagicNumber")
+      private String generateSecretKey() {
+        KeyGenerator keyGenerator;
+        try {
+          keyGenerator = KeyGenerator.getInstance("AES");
+        } catch(NoSuchAlgorithmException e) {
+          throw new RuntimeException("Cannot generate AES key. Your JVM is non-standard.", e);
+        }
+        keyGenerator.init(128);
+        SecretKey key = keyGenerator.generateKey();
+        return HexUtil.bytesToHex(key.getEncoded());
+      }
+    });
   }
 
 }

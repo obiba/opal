@@ -40,7 +40,6 @@ public class OpalGeneralConfigServiceImpl implements OpalGeneralConfigService {
 
   @Override
   public void start() {
-
   }
 
   @Override

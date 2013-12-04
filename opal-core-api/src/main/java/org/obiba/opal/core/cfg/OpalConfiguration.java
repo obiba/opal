@@ -31,6 +31,8 @@ public class OpalConfiguration {
 
   private String secretKey;
 
+  private String databasePassword;
+
   private String fileSystemRoot;
 
   private MagmaEngineFactory magmaEngineFactory;
@@ -151,4 +153,11 @@ public class OpalConfiguration {
     this.migratedToOpal2 = migratedToOpal2;
   }
 
+  public String getDatabasePassword() {
+    return databasePassword;
+  }
+
+  public void setDatabasePassword(String databasePassword) {
+    this.databasePassword = databasePassword;
+  }
 }

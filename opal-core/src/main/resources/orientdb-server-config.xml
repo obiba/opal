@@ -41,8 +41,10 @@
       </parameters>
     </handler>
 
-    <!-- SERVER SIDE SCRIPT INTERPRETER. WARNING! THIS CAN BE A SECURITY HOLE: ENABLE IT ONLY IF CLIENTS ARE TRUSTED, TO TURN ON SET THE 'ENABLED' PARAMETER
-      TO 'true' -->
+    <!-- SERVER SIDE SCRIPT INTERPRETER.
+        WARNING! THIS CAN BE A SECURITY HOLE: ENABLE IT ONLY IF CLIENTS ARE TRUSTED,
+        TO TURN ON SET THE 'ENABLED' PARAMETER TO 'true'
+    -->
     <handler class="com.orientechnologies.orient.server.handler.OServerSideScriptInterpreter">
       <parameters>
         <parameter name="enabled" value="false"/>
@@ -87,15 +89,6 @@
     <cluster>
     </cluster>
   </network>
-
-  <storages>
-    <!--<storage name="opal-config" path="local:${OPAL_HOME}/data/orientdb/opal-config" userName="admin" userPassword="admin" loaded-at-startup="true"/>-->
-  </storages>
-
-  <users>
-    <!-- TODO change password on Opal installation or first start -->
-    <!--<user name="opal" password="opal" resources="*"/>-->
-  </users>
 
   <hooks>
     <hook class="org.obiba.opal.core.cfg.TimestampedHook"/>

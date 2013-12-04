@@ -33,11 +33,9 @@
 
   <bean id="generalConfigService" class="org.obiba.opal.core.service.impl.OpalGeneralConfigServiceImpl"/>
 
-  <bean id="upgradeOpalConfigurationService" class="org.obiba.opal.core.cfg.DefaultOpalConfigurationService">
-    <constructor-arg>
-      <bean class="org.obiba.opal.core.cfg.OpalConfigurationIo"/>
-    </constructor-arg>
-  </bean>
+  <bean id="opalConfigurationIo" class="org.obiba.opal.core.cfg.OpalConfigurationIo"/>
+
+  <bean id="upgradeOpalConfigurationService" class="org.obiba.opal.core.cfg.DefaultOpalConfigurationService"/>
 
   <bean id="opalVersionModifier" class="org.obiba.opal.core.upgrade.support.OpalVersionModifier"/>
 
@@ -66,6 +64,7 @@
           </property>
         </bean>
         <bean class="org.obiba.opal.core.install.CreateOpalSecretKeyInstallStep"/>
+        <bean class="org.obiba.opal.core.install.CreateDatabasePasswordInstallStep"/>
         <bean class="org.obiba.opal.core.install.CreateOpalGeneralConfigInstallStep"/>
       </list>
     </property>

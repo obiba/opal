@@ -1,14 +1,17 @@
 package org.obiba.opal.core.service.impl;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.validation.constraints.NotNull;
 
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.service.OrientDbServerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.orientechnologies.orient.core.db.ODatabase;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.server.OServer;
@@ -22,15 +25,20 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
 
   public static final String URL = "local:" + ORIENTDB_HOME;
 
+  public static final String USERNAME = "admin";
+
   private String url;
 
-  //  @Value("${org.obiba.opal.config.username}")
-  private String username = "admin";
+  private OServer server;
 
-  //  @Value("${org.obiba.opal.config.password}")
-  private String password = "admin";
+  private OpalConfigurationService opalConfigurationService;
 
-  private static OServer server;
+  private String password;
+
+  @Autowired
+  public void setOpalConfigurationService(OpalConfigurationService opalConfigurationService) {
+    this.opalConfigurationService = opalConfigurationService;
+  }
 
   @Value(URL)
   @Override
@@ -38,31 +46,25 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
     this.url = url;
   }
 
-  //  @PostConstruct
-  public static void start(String url) {
+  @PostConstruct
+  public void start() throws Exception {
     log.info("Start OrientDB server ({})", url);
     System.setProperty("ORIENTDB_HOME", ORIENTDB_HOME);
-    try {
-      server = new OServer() //
-          .startup(LocalOrientDbServerFactory.class.getResourceAsStream("/orientdb-server-config.xml")) //
-          .activate();
 
-      // create database if does not exist
-      ODatabase database = new ODatabaseDocumentTx(url);
-      if(!database.exists()) {
-        database.create();
-      }
-      database.close();
+    server = new OServer() //
+        .startup(LocalOrientDbServerFactory.class.getResourceAsStream("/orientdb-server-config.xml")) //
+        .activate();
 
-    } catch(Exception e) {
-      log.error("Cannot start OrientDB server", e);
-      throw new RuntimeException("Cannot start OrientDB server", e);
+    ODatabaseDocumentTx database = new ODatabaseDocumentTx(url);
+    if(!database.exists()) {
+      database.create();
     }
+    database.close();
   }
 
-  //  @PreDestroy
-  public static void stop() {
-//    log.info("Stop OrientDB server ({})", url);
+  @PreDestroy
+  public void stop() {
+    log.info("Stop OrientDB server ({})", url);
     if(server != null) server.shutdown();
   }
 
@@ -75,7 +77,15 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
   @NotNull
   @Override
   public ODatabaseDocumentTx getDocumentTx() {
-    return ODatabaseDocumentPool.global().acquire(url, username, password);
+    log.info("Open connection with {} / {}", USERNAME, getPassword());
+    return ODatabaseDocumentPool.global().acquire(url, USERNAME, getPassword());
+  }
+
+  private String getPassword() {
+    if(password == null) {
+      password = opalConfigurationService.getOpalConfiguration().getDatabasePassword();
+    }
+    return password;
   }
 
 }

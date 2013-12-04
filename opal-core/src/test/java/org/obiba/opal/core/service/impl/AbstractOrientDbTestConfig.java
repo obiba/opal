@@ -14,6 +14,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.easymock.EasyMock;
+import org.obiba.opal.core.cfg.OpalConfiguration;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.service.OrientDbServerFactory;
 import org.obiba.opal.core.service.OrientDbService;
 import org.springframework.context.annotation.Bean;
@@ -53,14 +56,24 @@ public abstract class AbstractOrientDbTestConfig {
 
   @Bean
   public OrientDbServerFactory orientDbServerFactory() {
-    String url = LocalOrientDbServerFactory.URL.replace("${OPAL_HOME}", TEMP_FILE.getAbsolutePath());
-    LocalOrientDbServerFactory.start(url);
-    return new LocalOrientDbServerFactory();
+    OrientDbServerFactory factory = new LocalOrientDbServerFactory();
+    factory.setUrl(LocalOrientDbServerFactory.URL.replace("${OPAL_HOME}", TEMP_FILE.getAbsolutePath()));
+    return factory;
   }
 
   @Bean
   public OrientDbService orientDbService() {
     return new OrientDbServiceImpl();
+  }
+
+  @Bean
+  public OpalConfigurationService opalConfigurationService() {
+    OpalConfiguration configuration = new OpalConfiguration();
+    configuration.setDatabasePassword("admin");
+    OpalConfigurationService mock = EasyMock.createMock(OpalConfigurationService.class);
+    EasyMock.expect(mock.getOpalConfiguration()).andReturn(configuration).anyTimes();
+    EasyMock.replay(mock);
+    return mock;
   }
 
 }
