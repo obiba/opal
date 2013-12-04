@@ -21,37 +21,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Strings;
+
 @Component
 public class OpalSecretKeyPasswordCallbackHandler implements CallbackHandler {
 
-  private final OpalConfigurationService configService;
-
-  private final String customPassword;
-
   @Autowired
-  public OpalSecretKeyPasswordCallbackHandler(OpalConfigurationService configService,
-      @Value("${org.obiba.opal.keystore.password}") String customPassword) {
-    this.configService = configService;
-    this.customPassword = customPassword;
-  }
+  private OpalConfigurationService configService;
+
+  @Value("${org.obiba.opal.keystore.password}")
+  private String customPassword;
 
   private char[] getPassword() {
-    return
-        customPassword == null || customPassword.isEmpty() || "KEYSTORE_PASSWORD_NOT_SPECIFIED".equals(customPassword)
-            ? configService.getOpalConfiguration().getSecretKey().toCharArray()
-            : customPassword.toCharArray();
+    return Strings.isNullOrEmpty(customPassword) || "KEYSTORE_PASSWORD_NOT_SPECIFIED".equals(customPassword)
+        ? configService.getOpalConfiguration().getSecretKey().toCharArray()
+        : customPassword.toCharArray();
   }
 
   @Override
   public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-    for(int i = 0; i < callbacks.length; ) {
-      if(callbacks[i] instanceof PasswordCallback) {
-        PasswordCallback callback = (PasswordCallback) callbacks[i];
-        callback.setPassword(getPassword());
-        return;
-      }
-      throw new UnsupportedCallbackException(callbacks[i]);
+    if(callbacks == null || callbacks.length < 1) return;
+    Callback callback = callbacks[0];
+    if(callback instanceof PasswordCallback) {
+      ((PasswordCallback) callback).setPassword(getPassword());
+      return;
     }
+    throw new UnsupportedCallbackException(callback);
   }
 
 }
