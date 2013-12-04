@@ -31,7 +31,7 @@ public class CriterionPanel extends FlowPanel {
     criterion.addStyleName("open");
 
     IconAnchor remove = new IconAnchor();
-    remove.setIcon(IconType.TRASH);
+    remove.setIcon(IconType.REMOVE);
     remove.setTitle(translations.removeLabel());
     remove.addClickHandler(new ClickHandler() {
       @Override

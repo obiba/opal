@@ -20,8 +20,6 @@ import org.obiba.opal.web.model.client.search.QueryResultDto;
 import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.RadioButton;
-import com.github.gwtbootstrap.client.ui.base.IconAnchor;
-import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.github.gwtbootstrap.client.ui.resources.ButtonSize;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
@@ -47,11 +45,6 @@ public abstract class CriterionDropdown extends DropdownButton {
     this.fieldName = fieldName;
     queryResult = termDto;
 
-    // add close icon
-    IconAnchor close = new IconAnchor();
-    close.setIcon(IconType.REMOVE);
-    close.addStyleName("close-right-aligned");
-    add(close);
     setSize(ButtonSize.SMALL);
     updateCriterionFilter(translations.criterionFiltersMap().get("all"));
 
