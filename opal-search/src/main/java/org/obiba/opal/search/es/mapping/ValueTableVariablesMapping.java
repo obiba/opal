@@ -42,6 +42,8 @@ public class ValueTableVariablesMapping {
       mapString("datasource", mapping);
       mapString("table", mapping);
       mapAnalyzedString("name", mapping);
+      mapAnalyzedString("label", mapping);
+      mapAnalyzedString("label-en", mapping);
       mapString("fullName", mapping);
       mapString("entityType", mapping);
       mapString("valueType", mapping);
@@ -58,7 +60,10 @@ public class ValueTableVariablesMapping {
       for(Variable variable : valueTable.getVariables()) {
         if(variable.hasAttributes()) {
           for(Attribute attribute : variable.getAttributes()) {
-            attributeMapping.map(attribute, mapping);
+//            Different analyzer for label and label-en
+            if(!"label".equals(attribute.getName())) {
+              attributeMapping.map(attribute, mapping);
+            }
           }
         }
       }
