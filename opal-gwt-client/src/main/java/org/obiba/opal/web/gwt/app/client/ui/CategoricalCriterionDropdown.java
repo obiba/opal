@@ -16,16 +16,16 @@ import java.util.Collection;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.search.QueryResultDto;
 
+import com.github.gwtbootstrap.client.ui.CheckBox;
+import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.google.common.base.Joiner;
-import com.google.gwt.event.dom.client.FocusEvent;
-import com.google.gwt.event.dom.client.FocusHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 
 public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
-
-  private Chooser operatorChooser;
 
   private Chooser categories;
 
@@ -35,14 +35,18 @@ public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
 
   @Override
   public Widget getSpecificControls() {
-    ListItem specificControls = new ListItem();
+    // Update radio controls
+    RadioButton in = getRadioButton(translations.criterionFiltersMap().get("in"), null);
+    in.addClickHandler(new OperatorClickHandler());
+    radioControls.add(in);
 
-    operatorChooser = new Chooser();
+    RadioButton not_in = getRadioButton(translations.criterionFiltersMap().get("not_in"), null);
+    not_in.addClickHandler(new OperatorClickHandler());
+    radioControls.add(not_in);
+
     categories = new Chooser(true);
-
+    ListItem specificControls = new ListItem();
     specificControls.addStyleName("controls");
-
-    specificControls.add(getOperatorsChooserPanel());
     specificControls.add(getCategoriesChooserPanel());
 
     return specificControls;
@@ -54,12 +58,7 @@ public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
       categories.addItem(getCategoryItem(variable.getCategoriesArray().get(i).getName()),
           variable.getCategoriesArray().get(i).getName());
     }
-    categories.addFocusHandler(new FocusHandler() {
-      @Override
-      public void onFocus(FocusEvent event) {
-        resetRadioControls();
-      }
-    });
+
     categories.addChosenChangeHandler(new UpdateFilterChosenHandler());
     categories.setVisible(false);
 
@@ -67,20 +66,8 @@ public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
     return categoriesPanel;
   }
 
-  private SimplePanel getOperatorsChooserPanel() {
-    SimplePanel inPanel = new SimplePanel();
-    operatorChooser.addItem(translations.criterionFiltersMap().get("select_operator"));
-    operatorChooser.addItem(translations.criterionFiltersMap().get("in"));
-    operatorChooser.addItem(translations.criterionFiltersMap().get("not_in"));
-    operatorChooser.addChosenChangeHandler(new UpdateFilterChosenHandler());
-
-    inPanel.add(operatorChooser);
-    return inPanel;
-  }
-
   @Override
   public void resetSpecificControls() {
-    operatorChooser.setItemSelected(0, true);
     categories.setVisible(false);
   }
 
@@ -100,48 +87,59 @@ public abstract class CategoricalCriterionDropdown extends CriterionDropdown {
     String emptyNotEmpty = super.getQueryString();
     if(emptyNotEmpty != null) return emptyNotEmpty;
 
-    Collection<String> selected = new ArrayList<String>();
-    for(int i = 0; i < categories.getItemCount(); i++) {
-      if(categories.isItemSelected(i)) {
-        selected.add(categories.getValue(i));
-      }
-    }
+    Collection<String> selected = getSelectedCategories();
 
-    // Not in
-    if(operatorChooser.isItemSelected(1)) {
+    // in
+    if(((CheckBox) radioControls.getWidget(3)).getValue() && !selected.isEmpty()) {
       return fieldName + ":(" + Joiner.on(" OR ").join(selected) + ")";
     }
 
-    return "NOT " + fieldName + ":(" + Joiner.on(" OR ").join(selected) + ")";
+    // not in
+    if(((CheckBox) radioControls.getWidget(4)).getValue() && !selected.isEmpty()) {
+      return "NOT " + fieldName + ":(" + Joiner.on(" OR ").join(selected) + ")";
+    }
+
+    return null;
   }
 
   private class UpdateFilterChosenHandler implements ChosenChangeEvent.ChosenChangeHandler {
     @Override
     public void onChange(ChosenChangeEvent chosenChangeEvent) {
-      Collection<String> filter = new ArrayList<String>();
+      setFilterText();
+      doFilterValueSets();
+    }
+  }
 
-      resetRadioControls();
+  private void setFilterText() {
+    Collection<String> selected = getSelectedCategories();
 
-      categories.setVisible(operatorChooser.getSelectedIndex() > 0);
+    if(selected.isEmpty()) {
+      setText(variable.getName());
+    } else if(((CheckBox) radioControls.getWidget(3)).getValue()) {
+      setText(variable.getName() + ": " + translations.criterionFiltersMap().get("in") + " (" +
+          Joiner.on(", ").join(selected) + ")");
+    } else {
+      setText(variable.getName() + ": " + translations.criterionFiltersMap().get("not_in") + " (" +
+          Joiner.on(", ").join(selected) + ")");
+    }
+  }
 
-      boolean update = false;
-      for(int i = 0; i < categories.getItemCount(); i++) {
-        if(categories.isItemSelected(i)) {
-          filter.add(categories.getValue(i));
-          update = true;
-        }
-      }
-
-      if(update) {
-        updateCriterionFilter(
-            operatorChooser.getItemText(operatorChooser.getSelectedIndex()) + " (" + Joiner.on(", ").join(filter) +
-                ")");
-
-        doFilterValueSets();
-      } else {
-        updateCriterionFilter("");
+  private Collection<String> getSelectedCategories() {
+    Collection<String> selectedCategories = new ArrayList<String>();
+    for(int i = 0; i < categories.getItemCount(); i++) {
+      if(categories.isItemSelected(i)) {
+        selectedCategories.add(categories.getValue(i));
       }
     }
+    return selectedCategories;
+  }
 
+  private class OperatorClickHandler implements ClickHandler {
+
+    @Override
+    public void onClick(ClickEvent event) {
+      categories.setVisible(true);
+      setFilterText();
+    }
   }
 }

@@ -22,7 +22,7 @@ import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
 import org.obiba.opal.web.gwt.app.client.ui.CategoricalCriterionDropdown;
-import org.obiba.opal.web.gwt.app.client.ui.CriterionDropdown;
+import org.obiba.opal.web.gwt.app.client.ui.CriterionPanel;
 import org.obiba.opal.web.gwt.app.client.ui.DateTimeCriterionDropdown;
 import org.obiba.opal.web.gwt.app.client.ui.DefaultCriterionDropdown;
 import org.obiba.opal.web.gwt.app.client.ui.NumericalCriterionDropdown;
@@ -114,10 +114,14 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
   }
 
   public void setTable(final TableDto table, String select) {
+    // Clear filters when table has changed
+    if(originalTable == null || !originalTable.getLink().equals(table.getLink())) {
+      getView().getFiltersPanel().clear();
+    }
+
     originalTable = table;
 
     getView().clearTable();
-    getView().getFiltersPanel().clear();
     getView().setTable(table);
     getView().setVariableLabelFieldUpdater(new ValueUpdater<String>() {
       @Override
@@ -182,10 +186,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         .withCallback(new VariableFilterResourceCallback(variableName)).get().send();
   }
 
-  private boolean hasValueSetsFilter() {
-    return getView().getValuesFilterGroup().isVisible() && getView().getFiltersPanel().getWidgetCount() > 0;
-  }
-
   private void applyAllValueSetsFilter() {
     applyAllValueSetsFilter(0);
   }
@@ -225,8 +225,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     Collection<String> filters = new ArrayList<String>();
     for(int i = 0; i < filtersPanel.getWidgetCount(); i++) {
-      if(filtersPanel.getWidget(i) instanceof CriterionDropdown) {
-        String queryString = ((CriterionDropdown) filtersPanel.getWidget(i)).getQueryString();
+      if(filtersPanel.getWidget(i) instanceof CriterionPanel) {
+        String queryString = ((CriterionPanel) filtersPanel.getWidget(i)).getQueryString();
         if(!Strings.isNullOrEmpty(queryString)) filters.add(queryString);
       }
     }
@@ -315,6 +315,10 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
           getView().populateValues(offset, resource == null ? ValueSetsDto.create() : resource);
         }
       }
+    }
+
+    private boolean hasValueSetsFilter() {
+      return getView().getValuesFilterGroup().isVisible() && getView().getFiltersPanel().getWidgetCount() > 0;
     }
   }
 
@@ -541,7 +545,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     void populateValues(int offset, ValueSetsDto resource);
 
-    void addVariableFilter(CriterionDropdown criterion);
+    void addVariableFilter(CriterionPanel criterion);
 
     FlowPanel getFiltersPanel();
 
@@ -636,7 +640,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         }
       };
       criterion.addChangeHandler(new EmptyNotEmptyFilterRequest());
-      getView().addVariableFilter(criterion);
+      getView().addVariableFilter(new CriterionPanel(criterion));
     }
 
     private void addDateFilter(final VariableDto resource, final String indexedFieldName) {
@@ -648,7 +652,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         }
       };
       criterion.addChangeHandler(new EmptyNotEmptyFilterRequest());
-      getView().addVariableFilter(criterion);
+      getView().addVariableFilter(new CriterionPanel(criterion));
     }
   }
 
@@ -681,7 +685,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
         }
       };
       criterion.addChangeHandler(new EmptyNotEmptyFilterRequest());
-      getView().addVariableFilter(criterion);
+      getView().addVariableFilter(new CriterionPanel(criterion));
     }
 
     private void addNumericalFilter(final QueryResultDto resource) {
@@ -694,7 +698,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       };
 
       criterion.addChangeHandler(new EmptyNotEmptyFilterRequest());
-      getView().addVariableFilter(criterion);
+      getView().addVariableFilter(new CriterionPanel(criterion));
     }
 
   }

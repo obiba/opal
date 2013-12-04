@@ -19,7 +19,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter.Da
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTablePresenter.EntitySelectionHandler;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.ValuesTableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.CollapsiblePanel;
-import org.obiba.opal.web.gwt.app.client.ui.CriterionDropdown;
+import org.obiba.opal.web.gwt.app.client.ui.CriterionPanel;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.TableVariableSuggestOracle;
@@ -517,7 +517,7 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   }
 
   @Override
-  public void addVariableFilter(CriterionDropdown criterion) {
+  public void addVariableFilter(CriterionPanel criterion) {
     filters.add(criterion);
   }
 
