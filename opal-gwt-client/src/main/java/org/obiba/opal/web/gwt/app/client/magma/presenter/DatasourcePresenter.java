@@ -29,6 +29,9 @@ import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPr
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.AddViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.presenter.PermissionResources;
+import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResourceType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
@@ -74,6 +77,8 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   private final Provider<AuthorizationPresenter> authorizationPresenter;
 
+  private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
+
   private final Translations translations;
 
   private String datasourceName;
@@ -90,7 +95,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       ModalProvider<DataExportPresenter> dataExportModalProvider,
       ModalProvider<AddViewModalPresenter> createViewModalProvider,
       ModalProvider<DataCopyPresenter> dataCopyModalProvider, Provider<AuthorizationPresenter> authorizationPresenter,
-      Translations translations) {
+      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, Translations translations) {
     super(eventBus, display);
     this.translations = translations;
     this.tablePropertiesModalProvider = tablePropertiesModalProvider.setContainer(this);
@@ -98,6 +103,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     this.createViewModalProvider = createViewModalProvider.setContainer(this);
     this.dataCopyModalProvider = dataCopyModalProvider.setContainer(this);
     this.authorizationPresenter = authorizationPresenter;
+    this.resourcePermissionsProvider = resourcePermissionsProvider;
     getView().setUiHandlers(this);
   }
 
@@ -385,11 +391,15 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
     @Override
     public void authorized() {
-      AuthorizationPresenter authz = authorizationPresenter.get();
-      String node = UriBuilder.create().segment("datasource", datasourceName).build();
-      authz.setAclRequest("datasource", new AclRequest(AclAction.CREATE_TABLE, node), //
-          new AclRequest(AclAction.DATASOURCE_ALL, node));
-      setInSlot(null, authz);
+      ResourcePermissionsPresenter permissions = resourcePermissionsProvider.get();
+      permissions
+          .initialize(PermissionResourceType.DATASOURCE, PermissionResources.datasourcePermissions(datasourceName));
+      setInSlot(null, permissions);
+//      AuthorizationPresenter authz = authorizationPresenter.get();
+//      String node = UriBuilder.create().segment("datasource", datasourceName).build();
+//      authz.setAclRequest("datasource", new AclRequest(AclAction.CREATE_TABLE, node), //
+//          new AclRequest(AclAction.DATASOURCE_ALL, node));
+//      setInSlot(null, authz);
     }
   }
 
