@@ -26,7 +26,7 @@ public class CriterionPanel extends FlowPanel {
 
   private final CriterionDropdown criterion;
 
-  public CriterionPanel(CriterionDropdown criterion) {
+  public CriterionPanel(final CriterionDropdown criterion) {
     this.criterion = criterion;
     criterion.addStyleName("open");
 
@@ -37,6 +37,7 @@ public class CriterionPanel extends FlowPanel {
       @Override
       public void onClick(ClickEvent event) {
         removeFromParent();
+        criterion.doFilterValueSets();
       }
     });
 
