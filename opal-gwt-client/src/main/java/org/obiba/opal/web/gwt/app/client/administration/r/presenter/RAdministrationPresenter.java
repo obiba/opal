@@ -9,19 +9,20 @@ import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.AclAction;
+import org.obiba.opal.web.model.client.opal.ServiceDto;
+import org.obiba.opal.web.model.client.opal.ServiceStatus;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyEvent;
@@ -30,7 +31,8 @@ import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
 public class RAdministrationPresenter
-    extends ItemAdministrationPresenter<RAdministrationPresenter.Display, RAdministrationPresenter.Proxy> {
+    extends ItemAdministrationPresenter<RAdministrationPresenter.Display, RAdministrationPresenter.Proxy>
+    implements RAdministrationUiHandlers {
 
   public static final Object PermissionSlot = new Object();
 
@@ -44,6 +46,7 @@ public class RAdministrationPresenter
     super(eventBus, display, proxy);
     this.authorizationPresenter = authorizationPresenter;
     this.breadcrumbsHelper = breadcrumbsHelper;
+    getView().setUiHandlers(this);
   }
 
   @ProxyEvent
@@ -67,7 +70,6 @@ public class RAdministrationPresenter
   protected void onBind() {
     super.onBind();
     authorizationPresenter.setAclRequest("r", new AclRequest(AclAction.R_SESSION_ALL, "/r/session"));
-    addEventHandlers();
   }
 
   @Override
@@ -77,18 +79,53 @@ public class RAdministrationPresenter
     // set permissions
     AclRequest.newResourceAuthorizationRequestBuilder()
         .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())).send();
+
+    // stop start R service
+    ResourceRequestBuilderFactory.<ServiceDto>newBuilder().forResource("/service/r") //
+        .withCallback(new ResourceCallback<ServiceDto>() {
+          @Override
+          public void onResource(Response response, ServiceDto resource) {
+            if(response.getStatusCode() == Response.SC_OK) {
+              getView().setServiceStatus(resource.getStatus().isServiceStatus(ServiceStatus.RUNNING)
+                  ? Display.Status.Stoppable
+                  : Display.Status.Startable);
+            }
+          }
+        }) //
+        .get().send();
   }
 
-  private void addEventHandlers() {
-    registerHandler(getView().addTestRServerHandler(new ClickHandler() {
-
+  @Override
+  public void start() {
+    // Start service
+    getView().setServiceStatus(Display.Status.Pending);
+    ResourceRequestBuilderFactory.newBuilder().forResource("/service/r").put().withCallback(new ResponseCodeCallback() {
       @Override
-      public void onClick(ClickEvent event) {
-        ResourceRequestBuilderFactory.newBuilder().forResource("/r/sessions").post()//
-            .withCallback(Response.SC_CREATED, new RSessionCreatedCallback())//
-            .withCallback(Response.SC_INTERNAL_SERVER_ERROR, new RConnectionFailedCallback()).send();
+      public void onResponseCode(Request request, Response response) {
+        getView().setServiceStatus(response.getStatusCode() == Response.SC_OK ? Display.Status.Stoppable : Display.Status.Startable);
       }
-    }));
+    }, Response.SC_OK).send();
+  }
+
+  @Override
+  public void stop() {
+    // Stop service
+    getView().setServiceStatus(Display.Status.Pending);
+    ResourceRequestBuilderFactory.newBuilder().forResource("/service/r").delete().withCallback(
+        new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().setServiceStatus(
+                response.getStatusCode() == Response.SC_OK ? Display.Status.Startable : Display.Status.Stoppable);
+          }
+        }, Response.SC_OK).send();
+  }
+
+  @Override
+  public void test() {
+    ResourceRequestBuilderFactory.newBuilder().forResource("/r/sessions").post()//
+        .withCallback(Response.SC_CREATED, new RSessionCreatedCallback())//
+        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, new RConnectionFailedCallback()).send();
   }
 
   @Override
@@ -118,7 +155,7 @@ public class RAdministrationPresenter
   private final class RSessionCreatedCallback implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().info("RIsAlive").nonSticky().build());
+      fireEvent(NotificationEvent.newBuilder().info("RIsAlive").nonSticky().build());
       // clean up
       ResponseCodeCallback ignore = new ResponseCodeCallback() {
 
@@ -143,9 +180,13 @@ public class RAdministrationPresenter
   @NameToken(Places.R)
   public interface Proxy extends ProxyPlace<RAdministrationPresenter> {}
 
-  public interface Display extends View, HasBreadcrumbs {
+  public interface Display extends View, HasBreadcrumbs, HasUiHandlers<RAdministrationUiHandlers> {
 
-    HandlerRegistration addTestRServerHandler(ClickHandler handler);
+    enum Status {
+      Startable, Stoppable, Pending
+    }
+
+    void setServiceStatus(Status status);
 
     HasAuthorization getPermissionsAuthorizer();
 

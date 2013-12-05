@@ -17,16 +17,23 @@
 
   <g:FlowPanel>
     <g:FlowPanel addStyleNames="page-header">
-      <b:Breadcrumbs ui:field="breadcrumbs" />
+      <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
 
     <g:FlowPanel>
       <b:Heading size="4">
         <ui:msg description="R server admin label">R Server</ui:msg>
       </b:Heading>
-      <g:Button ui:field="rTestButton" styleName="content btn">
-        <ui:msg description="R server test label">Test connection with R</ui:msg>
-      </g:Button>
+      <b:ButtonGroup>
+        <b:Button ui:field="startStopButton">
+          Start/Stop
+        </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:Button ui:field="rTestButton" styleName="content btn">
+          <ui:msg description="R server test label">Test connection with R</ui:msg>
+        </b:Button>
+      </b:ButtonGroup>
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="permissionsPanel">

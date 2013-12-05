@@ -118,7 +118,7 @@ public class OpalRService implements Service, ROperationTemplate {
 
   @Override
   public boolean isRunning() {
-    return rserveStatus == 0;
+    return !isEnabled() || rserveStatus == 0;
   }
 
   @Override

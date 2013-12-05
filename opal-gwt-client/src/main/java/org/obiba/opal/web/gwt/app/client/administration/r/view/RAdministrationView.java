@@ -10,41 +10,35 @@
 package org.obiba.opal.web.gwt.app.client.administration.r.view;
 
 import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationUiHandlers;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickHandler;
+import com.github.gwtbootstrap.client.ui.Button;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.web.bindery.event.shared.HandlerRegistration;
-import com.gwtplatform.mvp.client.ViewImpl;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 /**
  *
  */
-public class RAdministrationView extends ViewImpl implements RAdministrationPresenter.Display {
+public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHandlers>
+    implements RAdministrationPresenter.Display {
 
-  @UiTemplate("RAdministrationView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, RAdministrationView> {}
+  interface Binder extends UiBinder<Widget, RAdministrationView> {}
 
-  //
-  // Constants
-  //
+  private final Translations translations;
 
-  //
-  // Static Variables
-  //
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  private final Widget widget;
+  @UiField
+  Button startStopButton;
 
   @UiField
   Button rTestButton;
@@ -58,13 +52,48 @@ public class RAdministrationView extends ViewImpl implements RAdministrationPres
   @UiField
   Panel breadcrumbs;
 
+  private Status status;
 
   //
   // Constructors
   //
 
-  public RAdministrationView() {
-    widget = uiBinder.createAndBindUi(this);
+  @Inject
+  public RAdministrationView(Binder uiBinder, Translations translations) {
+    this.translations = translations;
+    initWidget(uiBinder.createAndBindUi(this));
+  }
+
+  @UiHandler("startStopButton")
+  public void onStartStop(ClickEvent event) {
+    if(Status.Startable.equals(status)) {
+      getUiHandlers().start();
+    } else {
+      getUiHandlers().stop();
+    }
+  }
+
+  @UiHandler("rTestButton")
+  public void onTest(ClickEvent event) {
+    getUiHandlers().test();
+  }
+
+  @Override
+  public void setServiceStatus(Status status) {
+    this.status = status;
+    switch(status) {
+      case Startable:
+        startStopButton.setText(translations.startLabel());
+        startStopButton.setEnabled(true);
+        break;
+      case Stoppable:
+        startStopButton.setText(translations.stopLabel());
+        startStopButton.setEnabled(true);
+        break;
+      case Pending:
+        startStopButton.setEnabled(false);
+        break;
+    }
   }
 
   @Override
@@ -73,16 +102,6 @@ public class RAdministrationView extends ViewImpl implements RAdministrationPres
       permissions.clear();
       permissions.add(content);
     }
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
-  }
-
-  @Override
-  public HandlerRegistration addTestRServerHandler(ClickHandler handler) {
-    return rTestButton.addClickHandler(handler);
   }
 
   @Override
