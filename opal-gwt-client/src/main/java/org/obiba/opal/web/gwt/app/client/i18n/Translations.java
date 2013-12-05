@@ -146,9 +146,38 @@ public interface Translations extends Constants {
       "CREATE_VIEW", "Add View", //
 
       "TABLE_ALL", "Administrate", //
-      "TABLE_READ", "View dictionary and summaries", //
-      "TABLE_VALUES", "View dictionary and values", //
-      "TABLE_EDIT", "Edit dictionary and view summaries", //
+      "TABLE_READ", "View Dictionary + Summary", //
+      "TABLE_VALUES", "View Dictionary + Values", //
+      "TABLE_EDIT", "Edit Dictionary + View Summary", //
+      "TABLE_VALUES_EDIT", "Edit Dictionary + view Values", //
+
+      "VIEW_ALL", "Administrate", //
+      "VIEW_READ", "View Dictionary + Summary", //
+      "VIEW_VALUES", "View Dictionary + Values", //
+      "VIEW_EDIT", "Edit Dictionary + View Summary", //
+      "VIEW_VALUES_EDIT", "Edit Dictionary + View Values", //
+
+      "VARIABLE_READ", "View Dictionary + Summary", //
+      "DATABASES_ALL", "Administrate", //
+      "R_SESSION_ALL", "Use", //
+      "DATASHIELD_ALL", "Administrate", //
+      "DATASHIELD_SESSION_ALL", "Use", //
+      "REPORT_TEMPLATE_ALL", "Administrate", //
+      "REPORT_TEMPLATE_READ", "View Reports" })
+  Map<String, String> permissionMap();
+
+  @Description("Permission explanation map")
+  @DefaultStringMapValue({ //
+      "PROJECT_ALL", "Can edit and delete project.", //
+
+      "DATASOURCE_ALL", "Can edit and delete tables.", //
+      "CREATE_TABLE", "Can add tables.", //
+      "CREATE_VIEW", "Can add views", //
+
+      "TABLE_ALL", "Can edit/delete tables", //
+      "TABLE_READ", "Can view dictionary and summary without access to individual data", //
+      "TABLE_VALUES", "Can view dictionary with access to individual data", //
+      "TABLE_EDIT", "Can edit dictionary and view summaries", //
       "TABLE_VALUES_EDIT", "Edit dictionary and view values", //
 
       "VIEW_ALL", "Administrate", //
@@ -159,14 +188,18 @@ public interface Translations extends Constants {
 
       "VARIABLE_READ", "View with summary", //
       "DATABASES_ALL", "Administrate", //
-      "R_SESSION_ALL", "Use", //
+      "R_SESSION_ALL", "Can use R services", //
       "DATASHIELD_ALL", "Administrate", //
-      "DATASHIELD_SESSION_ALL", "Use", //
+      "DATASHIELD_SESSION_ALL", "Can use datashield services", //
       "REPORT_TEMPLATE_ALL", "Administrate", //
       "REPORT_TEMPLATE_READ", "View reports" })
-  Map<String, String> permissionMap();
+  Map<String, String> permissionExplanationMap();
 
-  @Description("Permission explanation map")
+  @Description("Update Resource Permission User label")
+  @DefaultStringValue("Permission of user: ")
+  String userResourcePermissionLabel();
+
+  @Description("Authorization explanation map")
   @DefaultStringMapValue({ //
       "datasource", "Specify the access rights to the datasource and its content.", //
       "table",
@@ -179,7 +212,7 @@ public interface Translations extends Constants {
       "datashield", "Specify the access rights to the DataShield services.",//
       "r", "Specify the access rights to the R services."//
   })
-  Map<String, String> permissionExplanationMap();
+  Map<String, String> authorizationExplanationMap();
 
   @Description("Table Comparison Result map")
   @DefaultStringMapValue({ "CREATION", "Table to be created", //
@@ -2115,6 +2148,14 @@ public interface Translations extends Constants {
   @Description("Vcs Commit History Modal title")
   @DefaultStringValue("Commit Details")
   String vcsCommitHistoryModalTitle();
+
+  @Description("Update Resource Permissions Modal title")
+  @DefaultStringValue("Edit Permission")
+  String updateResourcePermissionsModalTile();
+
+  @Description("Add Resource Permissions Modal title")
+  @DefaultStringValue("Add Permission")
+  String addResourcePermissionsModalTile();
 
   @Description("Vcs Commit History Empty")
   @DefaultStringValue("No comment history available")

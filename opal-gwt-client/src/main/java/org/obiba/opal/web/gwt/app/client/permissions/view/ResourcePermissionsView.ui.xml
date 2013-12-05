@@ -25,18 +25,12 @@
               addStyleNames="small-right-indent small-top-margin">
             <ui:msg description="Add Resource Permissions label">Add Permission</ui:msg>
           </b:Button>
-          <g:FlowPanel addStyleNames="no-bottom-margin pull-right top-margin">
-            <o:Chooser ui:field="displayMode"/>
-          </g:FlowPanel>
+          <b:SimplePager ui:field="tablePager" location="RIGHT" addStyleNames="no-bottom-margin pull-right"/>
         </b:Controls>
       </b:ControlGroup>
     </g:FlowPanel>
-    <g:FlowPanel ui:field="permissionTablePanel" visible="false">
+    <g:FlowPanel>
       <o:Table ui:field="permissionsTable" addStyleNames="small-top-margin"/>
-    </g:FlowPanel>
-
-    <g:FlowPanel ui:field="subjectsPermissionTablePanel">
-      <o:Table ui:field="subjectsPermissionsTable" addStyleNames="small-top-margin"/>
     </g:FlowPanel>
 
   </g:FlowPanel>

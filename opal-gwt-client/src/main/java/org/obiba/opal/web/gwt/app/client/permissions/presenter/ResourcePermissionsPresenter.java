@@ -16,16 +16,20 @@ import javax.annotation.Nonnull;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResourceType;
+import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResources;
+import org.obiba.opal.web.gwt.app.client.permissions.support.events.UpdateResourcePermissionEvent;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.opal.Acl;
-import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -36,13 +40,20 @@ import com.gwtplatform.mvp.client.View;
 public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermissionsPresenter.Display>
     implements ResourcePermissionsUiHandlers {
 
+  private final ModalProvider<AddResourcePermissionModalPresenter> addModalProvider;
+  private final ModalProvider<UpdateResourcePermissionModalPresenter> updateModalProvider;
   private PermissionResourceType resourceType;
   private String resourcePath;
 
   @Inject
-  public ResourcePermissionsPresenter(Display display, EventBus eventBus) {
+  public ResourcePermissionsPresenter(Display display, EventBus eventBus,
+      ModalProvider<AddResourcePermissionModalPresenter> addModalProvider,
+      ModalProvider<UpdateResourcePermissionModalPresenter> updateModalProvider) {
     super(eventBus, display);
+    this.addModalProvider = addModalProvider.setContainer(this);
+    this.updateModalProvider = updateModalProvider.setContainer(this);
     getView().setUiHandlers(this);
+    eventBus.addHandler(UpdateResourcePermissionEvent.getType(), new UpdateResourcePermissionHandler());
   }
 
   public void initialize(@Nonnull PermissionResourceType type, @Nonnull String resource) {
@@ -60,14 +71,13 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
       @Override
       public void doAction(Acl acl, String actionName) {
         if (ActionsColumn.EDIT_ACTION.equals(actionName)) {
-
+          editPersmission(acl);
         }
         else if (ActionsColumn.DELETE_ACTION.equals(actionName)) {
-
+          deletePersmission(acl);
         }
       }
     });
-
   }
 
   private void retrievePermissions() {
@@ -81,8 +91,61 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
         }).send();
   }
 
+  @Override
+  public void addPersmission() {
+    addModalProvider.get().initialize(resourceType);
+  }
+
+  @Override
+  public void editPersmission(Acl acl) {
+    updateModalProvider.get().initialize(resourceType, acl);
+  }
+
+  @Override
+  public void deletePersmission(Acl acl) {
+    String uri = UriBuilder.create().fromPath(resourcePath)
+        .query(PermissionResources.PRINCIPAL_QUERY_PARAM, acl.getSubject().getPrincipal())
+        .query(PermissionResources.TYPE_QUERY_PARAM, acl.getSubject().getType().getName()).build();
+    ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder()
+        .forResource(uri)
+        .delete()
+        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            retrievePermissions();
+          }
+        }).send();
+  }
+
   public interface Display extends View, HasUiHandlers<ResourcePermissionsUiHandlers> {
     void setData(PermissionResourceType resourceType, List<Acl> acls);
     HasActionHandler<Acl> getActions();
+  }
+
+  private class UpdateResourcePermissionHandler
+      implements UpdateResourcePermissionEvent.UpdateResourcePermissionHandler {
+
+    @Override
+    public void onUpdateResourcePermission(UpdateResourcePermissionEvent event) {
+
+      UriBuilder uriBuilder = UriBuilder.create().fromPath(resourcePath)
+          .query(PermissionResources.TYPE_QUERY_PARAM, event.getSubjectType())//
+          .query(PermissionResources.PERMISSION_QUERY_PARAM, event.getPermission());
+
+      for (String principal : event.getSubjectPrincipals()) {
+        uriBuilder.query(PermissionResources.PRINCIPAL_QUERY_PARAM, principal);
+      }
+
+
+      ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder()
+          .forResource(uriBuilder.build())
+          .post()
+          .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              retrievePermissions();
+            }
+          }).send();
+    }
   }
 }

@@ -10,12 +10,8 @@
 
 package org.obiba.opal.web.gwt.app.client.permissions.presenter;
 
-import org.obiba.opal.web.model.client.opal.Acl;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
-import com.gwtplatform.mvp.client.UiHandlers;
-
-public interface ResourcePermissionsUiHandlers extends UiHandlers {
-  void addPersmission();
-  void editPersmission(Acl acl);
-  void deletePersmission(Acl acl);
+public interface ResourcePermissionModalUiHandlers extends ModalUiHandlers {
+  void save();
 }

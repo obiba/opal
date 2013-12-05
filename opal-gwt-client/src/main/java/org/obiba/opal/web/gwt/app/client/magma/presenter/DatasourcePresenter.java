@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
@@ -29,7 +28,7 @@ import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPr
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.AddViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.presenter.PermissionResources;
+import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResources;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResourceType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
@@ -46,7 +45,6 @@ import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.opal.AclAction;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;

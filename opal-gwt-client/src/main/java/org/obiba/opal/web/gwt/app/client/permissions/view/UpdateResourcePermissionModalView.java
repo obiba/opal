@@ -1,0 +1,111 @@
+/*
+ * Copyright (c) 2013 OBiBa. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.obiba.opal.web.gwt.app.client.permissions.view;
+
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.permissions.presenter.UpdateResourcePermissionModalPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionModalUiHandlers;
+import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResourceType;
+import org.obiba.opal.web.model.client.opal.Acl;
+
+import com.github.gwtbootstrap.client.ui.Heading;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
+
+//public class UpdateResourcePermissionModalView extends ModalPopupViewWithUiHandlers<ResourcePermissionModalUiHandlers>
+public class UpdateResourcePermissionModalView extends AbstractResourcePermissionModalView<ResourcePermissionModalUiHandlers>
+    implements UpdateResourcePermissionModalPresenter.Display {
+
+  interface Binder extends UiBinder<Widget, UpdateResourcePermissionModalView> {}
+
+  @UiField
+  Heading subjectLabel;
+
+  private final Translations translations;
+
+  @Inject
+  public UpdateResourcePermissionModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
+    super(eventBus);
+    initWidget(uiBinder.createAndBindUi(this));
+    this.translations = translations;
+    dialog.setTitle(translations.addResourcePermissionsModalTile());
+    // TODO: fix the width of the dialog
+  }
+
+  @Override
+  public void setData(PermissionResourceType type, Acl acl) {
+    subjectLabel.setText(translations.userResourcePermissionLabel() + acl.getSubject().getPrincipal());
+    createPermissionRadios(type, acl.getActions(0));
+  }
+
+  @Override
+  public String getPermission() {
+    return getSelectedPermission();
+  }
+
+  @Override
+  public void close() {
+    dialog.hide();
+  }
+
+  @UiHandler("saveButton")
+  public void onSaveButton(ClickEvent event) {
+    getUiHandlers().save();
+  }
+
+  @UiHandler("cancelButton")
+  public void onCloseButton(ClickEvent event) {
+    close();
+  }
+
+//  private void createPermissionRadios(PermissionResourceType type, String permission) {
+//    permissions.addHandler(new ResourcePermissionsPanel.Handler() {
+//      @Override
+//      public void onSelected(String permission) {
+//        currentPermission = permission;
+//      }
+//    });
+
+//    permissions.initialize(type, permission);
+
+//    for (Iterator<AclAction> iterator = type.getPermissions().iterator(); iterator.hasNext();) {
+//      String permission = iterator.next().getName();
+//      boolean select = permission.equals(acl.getActions(0));
+//      if (select) currentPermission = permission;
+//      permissions.add(createPermissionPanel(permission, select));
+//    }
+//  }
+
+//  private Panel createPermissionPanel(final String permissionKey, boolean select) {
+//    Panel panel = new FlowPanel();
+//    RadioButton radio = new RadioButton("permission", translations.permissionMap().get(permissionKey));
+//    radio.addClickHandler(new ClickHandler() {
+//      @Override
+//      public void onClick(ClickEvent event) {
+//        currentPermission = permissionKey;
+//      }
+//    });
+//
+//    radio.setValue(select);
+//    HelpBlock help = new HelpBlock(translations.permissionMap().get(permissionKey));
+//    help.addStyleName("help-block");
+//
+//    panel.add(radio);
+//    panel.add(help);
+//
+//    return panel;
+//  }
+}

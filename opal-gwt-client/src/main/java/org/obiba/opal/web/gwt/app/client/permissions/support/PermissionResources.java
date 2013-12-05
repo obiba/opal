@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.permissions.presenter;
+package org.obiba.opal.web.gwt.app.client.permissions.support;
 
 import javax.annotation.Nonnull;
 
@@ -17,6 +17,10 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 public final class PermissionResources {
 
   private PermissionResources() {}
+
+  public static final String PRINCIPAL_QUERY_PARAM = "principal";
+  public static final String TYPE_QUERY_PARAM = "type";
+  public static final String PERMISSION_QUERY_PARAM = "permission";
 
   public static String projectPermissions(@Nonnull String project) {
     return baseUri(project).segment("project").build();
