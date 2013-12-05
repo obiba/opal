@@ -129,8 +129,15 @@ public class OpalRSession implements ROperationTemplate, VariableEntitiesHolder 
    * Close the R session.
    */
   public void close() {
-    newConnection().close();
-    rSession = null;
+    if(rSession == null) return;
+
+    try {
+      newConnection().close();
+    } catch (Exception e) {
+      // ignore
+    } finally {
+      rSession = null;
+    }
   }
 
   //
