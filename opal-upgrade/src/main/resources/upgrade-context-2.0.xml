@@ -16,13 +16,7 @@
     <property name="password" value="${org.obiba.opal.datasource.opal.password}"/>
   </bean>
 
-  <bean id="configDataSource" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactoryBean">
-    <property name="jtaTransactionManager" ref="jtaTransactionManager"/>
-    <property name="driverClass" value="${org.obiba.opal.datasource.driver}"/>
-    <property name="url" value="${org.obiba.opal.datasource.url}"/>
-    <property name="username" value="${org.obiba.opal.datasource.username}"/>
-    <property name="password" value="${org.obiba.opal.datasource.password}"/>
-  </bean>
+  <bean id="configDataSource" class="org.obiba.opal.core.cfg.QuartzDataSourceFactoryBean"/>
 
   <bean id="dataSourceFactory" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactory"/>
 
@@ -58,7 +52,7 @@
       <list>
 
         <!-- 2.0.0 / generate database password -->
-        <bean class="org.obiba.opal.core.install.CreateDatabasePasswordInstallStep"/>
+        <!--<bean class="org.obiba.opal.core.install.CreateDatabasePasswordStep"/>-->
 
         <!-- 2.0.0 / import database config from XML to OrientDB -->
         <bean class="org.obiba.opal.core.upgrade.database.MoveDatasourcesToOrientUpgradeStep">

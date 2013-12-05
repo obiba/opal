@@ -10,12 +10,7 @@
   <import resource="spring/opal-core/tx.xml"/>
   <import resource="spring/opal-core/version.xml"/>
 
-  <bean id="dataSource" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactoryBean">
-    <property name="driverClass" value="${org.obiba.opal.datasource.driver}"/>
-    <property name="url" value="${org.obiba.opal.datasource.url}"/>
-    <property name="username" value="${org.obiba.opal.datasource.username}"/>
-    <property name="password" value="${org.obiba.opal.datasource.password}"/>
-  </bean>
+  <bean id="configDataSource" class="org.obiba.opal.core.cfg.QuartzDataSourceFactoryBean"/>
 
   <bean id="dataSourceFactory" class="org.obiba.opal.core.runtime.jdbc.DataSourceFactory"/>
 
@@ -57,14 +52,14 @@
           <property name="upgradeStep">
             <bean class="org.obiba.runtime.upgrade.support.jdbc.SqlScriptUpgradeStep">
               <property name="description" value="Install Quartz Schema."/>
-              <property name="dataSource" ref="dataSource"/>
+              <property name="dataSource" ref="configDataSource"/>
               <property name="scriptPath" value="classpath:/META-INF/opal/install-scripts/quartz/"/>
               <property name="scriptBasename" value="tables"/>
             </bean>
           </property>
         </bean>
         <bean class="org.obiba.opal.core.install.CreateOpalSecretKeyInstallStep"/>
-        <bean class="org.obiba.opal.core.install.CreateDatabasePasswordInstallStep"/>
+        <!--<bean class="org.obiba.opal.core.install.CreateDatabasePasswordStep"/>-->
         <bean class="org.obiba.opal.core.install.CreateOpalGeneralConfigInstallStep"/>
       </list>
     </property>

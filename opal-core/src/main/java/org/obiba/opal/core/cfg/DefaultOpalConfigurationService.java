@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.core.cfg;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.locks.Condition;
@@ -26,6 +28,8 @@ import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.core.magma.js.OpalGlobalMethodProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.google.common.base.Strings;
 
 @Component
 public class DefaultOpalConfigurationService implements OpalConfigurationService {
@@ -46,6 +50,12 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
   @Override
   @PostConstruct
   public void start() {
+    configureMagma();
+    readOpalConfiguration();
+    configureDatabasePassword();
+  }
+
+  private void configureMagma() {
     // Add opal specific javascript methods
     Set<GlobalMethodProvider> providers = new HashSet<GlobalMethodProvider>();
     providers.add(new OpalGlobalMethodProvider());
@@ -57,8 +67,18 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
 
     // We need these two extensions to read the opal config file
     new MagmaEngine().extend(new MagmaXStreamExtension()).extend(jsExtension);
+  }
 
-    readOpalConfiguration();
+  private void configureDatabasePassword() {
+    if(Strings.isNullOrEmpty(opalConfiguration.getDatabasePassword())) {
+      modifyConfiguration(new ConfigModificationTask() {
+        @Override
+        @SuppressWarnings("MagicNumber")
+        public void doWithConfig(OpalConfiguration config) {
+          config.setDatabasePassword(new BigInteger(130, new SecureRandom()).toString(32));
+        }
+      });
+    }
   }
 
   @Override

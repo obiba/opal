@@ -28,13 +28,13 @@ public class DataSourceFactoryBean implements FactoryBean<DataSource> {
 
   private static final int MAX_IDLE = 10;
 
-  private String driverClass;
+  protected String driverClass;
 
-  private String url;
+  protected String url;
 
-  private String username;
+  protected String username;
 
-  private String password;
+  protected String password;
 
   private TransactionManager jtaTransactionManager;
 

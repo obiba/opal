@@ -2,7 +2,7 @@
 
   <secretKey>this will be generated during install</secretKey>
 
-  <databasePassword>admin</databasePassword>
+  <databasePassword/>
 
   <fileSystemRoot>file://${OPAL_HOME}/fs</fileSystemRoot>
 

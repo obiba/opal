@@ -33,8 +33,6 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
 
   private OpalConfigurationService opalConfigurationService;
 
-  private String password;
-
   @Autowired
   public void setOpalConfigurationService(OpalConfigurationService opalConfigurationService) {
     this.opalConfigurationService = opalConfigurationService;
@@ -77,15 +75,11 @@ public class LocalOrientDbServerFactory implements OrientDbServerFactory {
   @NotNull
   @Override
   public ODatabaseDocumentTx getDocumentTx() {
-    log.info("Open connection with {} / {}", USERNAME, getPassword());
-    return ODatabaseDocumentPool.global().acquire(url, USERNAME, getPassword());
-  }
-
-  private String getPassword() {
-    if(password == null) {
-      password = opalConfigurationService.getOpalConfiguration().getDatabasePassword();
-    }
-    return password;
+    //TODO cache password
+//    String password = opalConfigurationService.getOpalConfiguration().getDatabasePassword();
+//    log.info("Open OrientDB connection with {} / {}", USERNAME, password);
+    String password = "admin";
+    return ODatabaseDocumentPool.global().acquire(url, USERNAME, password);
   }
 
 }

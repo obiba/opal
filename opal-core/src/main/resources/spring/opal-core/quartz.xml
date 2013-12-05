@@ -3,7 +3,7 @@
 
   <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
     <property name="transactionManager" ref="transactionManager"/>
-    <property name="dataSource" ref="dataSource"/>
+    <property name="dataSource" ref="configDataSource"/>
     <property name="jobFactory">
       <bean class="org.springframework.scheduling.quartz.SpringBeanJobFactory"/>
     </property>

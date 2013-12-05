@@ -19,12 +19,18 @@ import org.obiba.opal.core.service.impl.LocalOrientDbServerFactory;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.InstallStep;
 import org.obiba.runtime.upgrade.UpgradeStep;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
 
-public class CreateDatabasePasswordInstallStep implements InstallStep, UpgradeStep {
+public class CreateDatabasePasswordStep implements InstallStep, UpgradeStep {
+
+  private static final Logger log = LoggerFactory.getLogger(CreateDatabasePasswordStep.class);
 
   @Autowired
   private OpalConfigurationService configurationService;
@@ -41,21 +47,30 @@ public class CreateDatabasePasswordInstallStep implements InstallStep, UpgradeSt
   @SuppressWarnings("MagicNumber")
   public void execute(Version currentVersion) {
     final String password = new BigInteger(130, new SecureRandom()).toString(32);
-    configurationService.modifyConfiguration(new OpalConfigurationService.ConfigModificationTask() {
-      @Override
-      public void doWithConfig(OpalConfiguration config) {
-        config.setDatabasePassword(password);
-      }
-    });
-
+//    final String password = "1234";
     ODatabaseDocumentTx database = orientDbServerFactory.getDocumentTx();
     try {
+      log.info(">>> BEFORE");
+      debug(database);
+      database.begin();
       database.command(new OCommandSQL(
           "update ouser set password = '" + password + "' where name = '" + LocalOrientDbServerFactory.USERNAME + "'"))
           .execute();
       database.command(new OCommandSQL(
           "update ouser set status= 'SUSPENDED' where name <> '" + LocalOrientDbServerFactory.USERNAME + "'"))
           .execute();
+      database.commit();
+      log.info(">>> AFTER");
+      debug(database);
+      configurationService.modifyConfiguration(new OpalConfigurationService.ConfigModificationTask() {
+        @Override
+        public void doWithConfig(OpalConfiguration config) {
+          config.setDatabasePassword(password);
+        }
+      });
+    } catch(Exception e) {
+      database.rollback();
+      throw new RuntimeException(e);
     } finally {
       database.close();
     }
@@ -64,5 +79,11 @@ public class CreateDatabasePasswordInstallStep implements InstallStep, UpgradeSt
   @Override
   public Version getAppliesTo() {
     return new Version(2, 0, 0);
+  }
+
+  private void debug(ODatabaseDocument database) {
+    for(ODocument ouser : database.browseClass("ouser")) {
+      log.info("ouser: {}", ouser.toJSON());
+    }
   }
 }
