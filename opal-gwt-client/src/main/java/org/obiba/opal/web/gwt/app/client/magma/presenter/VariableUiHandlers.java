@@ -32,7 +32,7 @@ public interface VariableUiHandlers extends UiHandlers {
 
   void onEditCategories();
 
-  void onEditAttributes();
-
   void onEditProperties();
+
+  void onAddAttribute();
 }

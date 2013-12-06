@@ -44,7 +44,6 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -72,6 +71,8 @@ import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
 import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_OK;
 
+//import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter;
+
 public class VariablePresenter extends PresenterWidget<VariablePresenter.Display>
     implements VariableUiHandlers, VariableSelectionChangeEvent.Handler {
 
@@ -93,6 +94,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private final ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider;
 
+//  private final ModalProvider<VariableAttributeModalPresenter> attributeModalProvider;
+
   private TableDto table;
 
   private VariableDto variable;
@@ -112,7 +115,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
       VariableVcsCommitHistoryPresenter variableVcsCommitHistoryPresenter,
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
       ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider,
-      ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider) {
+      ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider
+      /*ModalProvider<VariableAttributeModalPresenter> attributeModalProvider*/) {
     super(eventBus, display);
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
@@ -123,6 +127,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     this.variablesToViewProvider = variablesToViewProvider.setContainer(this);
     this.categoriesEditorModalProvider = categoriesEditorModalProvider.setContainer(this);
     this.propertiesEditorModalProvider = propertiesEditorModalProvider.setContainer(this);
+//    this.attributeModalProvider = attributeModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -233,7 +238,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     }
 
     getView().renderCategoryRows(variable.getCategoriesArray());
-    getView().renderAttributeRows(variable.getAttributesArray());
+    getView().renderAttributeRows(variable);
   }
 
   private void updateMenuDisplay(@Nullable VariableDto previous, @Nullable VariableDto next) {
@@ -415,8 +420,10 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   }
 
   @Override
-  public void onEditAttributes() {
+  public void onAddAttribute() {
     // TODO
+//    VariableAttributeModalPresenter attributeEditorPresenter = attributeModalProvider.get();
+//    attributeEditorPresenter.initialize(variable, table);
   }
 
   @Override
@@ -668,7 +675,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
     void renderCategoryRows(JsArray<CategoryDto> rows);
 
-    void renderAttributeRows(JsArray<AttributeDto> rows);
+    void renderAttributeRows(VariableDto variableDto);
 
     void goToEditScript();
 

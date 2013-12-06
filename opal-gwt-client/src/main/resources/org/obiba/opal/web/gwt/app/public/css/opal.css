@@ -182,7 +182,7 @@ ul.closeables li span {
   }
 }
 
-@media all and (min-width:1530px) {
+@media all and (min-width: 1530px) {
   ul.closeables li {
     max-width: 250px;
   }
@@ -200,7 +200,7 @@ ul.closeables li span {
   }
 }
 
-@media all and (min-width:1530px) {
+@media all and (min-width: 1530px) {
   ul.closeables li span {
     max-width: 234px;
   }
@@ -250,7 +250,7 @@ ul.closeables li a {
   }
 }
 
-@media all and (min-width:1530px) {
+@media all and (min-width: 1530px) {
   .obiba-SuggestListBox input {
     width: 475px;
   }
@@ -400,12 +400,4 @@ td.row-actions span {
 .small-addon > .add-on:last-child {
   padding-bottom: 2px;
   padding-top: 2px;
-}
-
-/*
- * Dropdown close icon
- */
-.close-right-aligned {
-  float: right;
-  margin-right: 10px;
 }

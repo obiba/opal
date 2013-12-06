@@ -14,13 +14,12 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
+import org.obiba.opal.web.gwt.app.client.ui.AttributesTablesPanel;
 import org.obiba.opal.web.gwt.app.client.ui.TabDeckPanel;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
-import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
-import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
@@ -32,7 +31,6 @@ import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TabPanel;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
-import com.github.gwtbootstrap.client.ui.base.InlineLabel;
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -117,13 +115,8 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   JsArrayDataProvider<CategoryDto> categoryProvider = new JsArrayDataProvider<CategoryDto>();
 
-  @UiField(provided = true)
-  AttributesTable attributeTable;
-
   @UiField
-  SimplePager attributeTablePager;
-
-  JsArrayDataProvider<AttributeDto> attributeProvider = new JsArrayDataProvider<AttributeDto>();
+  AttributesTablesPanel attributesTables;
 
   @UiField
   Panel summary;
@@ -168,7 +161,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   IconAnchor editCategories;
 
   @UiField
-  IconAnchor editAttributes;
+  Button addAttribute;
 
   @UiField
   IconAnchor editProperties;
@@ -187,11 +180,10 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   public VariableView(Binder uiBinder, Translations translations) {
     this.translations = translations;
     categoryTable = new CategoriesTable();
-    attributeTable = new AttributesTable();
+
     initWidget(uiBinder.createAndBindUi(this));
 
     initCategoryTable();
-    initAttributeTable();
     tabPanel.addShownHandler(new TabPanel.ShownEvent.Handler() {
       @Override
       public void onShow(TabPanel.ShownEvent event) {
@@ -306,9 +298,9 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     getUiHandlers().onEditCategories();
   }
 
-  @UiHandler("editAttributes")
-  void onEditAttributes(ClickEvent event) {
-    getUiHandlers().onEditAttributes();
+  @UiHandler("addAttribute")
+  void onAddAttribute(ClickEvent event) {
+    getUiHandlers().onAddAttribute();
   }
 
   @UiHandler("editProperties")
@@ -334,13 +326,8 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   }
 
   @Override
-  public void renderAttributeRows(JsArray<AttributeDto> rows) {
-    attributeProvider.setArray(rows);
-    int size = attributeProvider.getList().size();
-    attributeTablePager.firstPage();
-    attributeTablePager.setVisible(size > Table.DEFAULT_PAGESIZE);
-    attributeTable.setupSort(attributeProvider);
-    attributeProvider.refresh();
+  public void renderAttributeRows(VariableDto variableDto) {
+    attributesTables.renderRows(variableDto);
   }
 
   @Override
@@ -432,7 +419,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
 
   @Override
   public HasAuthorization getEditAuthorizer() {
-    return new WidgetAuthorizer(remove, scriptHeaderPanel, editProperties, editCategories, editAttributes);
+    return new WidgetAuthorizer(remove, scriptHeaderPanel, editProperties, editCategories, addAttribute);
   }
 
   @Override
@@ -444,12 +431,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     categoryTable.setPageSize(Table.DEFAULT_PAGESIZE);
     categoryTablePager.setDisplay(categoryTable);
     categoryProvider.addDataDisplay(categoryTable);
-  }
-
-  private void initAttributeTable() {
-    attributeTable.setPageSize(Table.DEFAULT_PAGESIZE);
-    attributeTablePager.setDisplay(attributeTable);
-    attributeProvider.addDataDisplay(attributeTable);
   }
 
   @Override
