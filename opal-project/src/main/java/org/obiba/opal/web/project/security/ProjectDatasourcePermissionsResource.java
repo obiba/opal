@@ -24,6 +24,7 @@ import javax.ws.rs.core.Response;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.opal.core.service.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.security.AbstractPermissionsResource;
 import org.obiba.opal.web.security.PermissionsToAclFunction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;

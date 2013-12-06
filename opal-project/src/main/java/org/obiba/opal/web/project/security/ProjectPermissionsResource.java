@@ -27,15 +27,14 @@ import org.obiba.magma.support.MagmaEngineVariableResolver;
 import org.obiba.opal.core.service.SubjectAclService;
 import org.obiba.opal.project.ProjectService;
 import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.security.AbstractPermissionsResource;
 import org.obiba.opal.web.security.PermissionsToAclFunction;
-import org.obiba.opal.web.support.InvalidRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
