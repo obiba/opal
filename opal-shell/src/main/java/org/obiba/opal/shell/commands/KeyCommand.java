@@ -25,10 +25,10 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.bouncycastle.openssl.PEMWriter;
 import org.obiba.opal.core.crypt.x509.X509PrettyPrinter;
+import org.obiba.opal.core.service.KeyStoreService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
-import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
-import org.obiba.opal.core.unit.UnitKeyStore;
+import org.obiba.opal.core.unit.OpalKeyStore;
 import org.obiba.opal.shell.commands.options.CertificateInfo;
 import org.obiba.opal.shell.commands.options.KeyCommandOptions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +56,7 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   //
 
   @Autowired
-  private UnitKeyStoreService unitKeyStoreService;
+  private KeyStoreService keyStoreService;
 
   //
   // AbstractOpalRuntimeDependentCommand Methods
@@ -78,8 +78,8 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   // Methods
   //
 
-  public void setUnitKeyStoreService(UnitKeyStoreService unitKeyStoreService) {
-    this.unitKeyStoreService = unitKeyStoreService;
+  public void setKeyStoreService(KeyStoreService keyStoreService) {
+    this.keyStoreService = keyStoreService;
   }
 
   private int executeAction(String action) {
@@ -114,7 +114,7 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
       try {
         if(keyDoesNotExistOrOverwriteConfirmed(unit)) {
           String certificateInfo = new CertificateInfo(getShell()).getCertificateInfoAsString();
-          unitKeyStoreService
+          keyStoreService
               .createOrUpdateKey(unit, options.getAlias(), options.getAlgorithm(), options.getSize(), certificateInfo);
           getShell().printf("Key generated with alias '%s'.\n", options.getAlias());
         }
@@ -136,8 +136,8 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
     String unit = options.isUnit() ? options.getUnit() : FunctionalUnit.OPAL_INSTANCE;
 
     try {
-      if(unitKeyStoreService.aliasExists(unit, options.getAlias())) {
-        unitKeyStoreService.deleteKey(unit, options.getAlias());
+      if(keyStoreService.aliasExists(unit, options.getAlias())) {
+        keyStoreService.deleteKey(unit, options.getAlias());
         getShell().printf("Deleted key with alias '%s' from keystore '%s'.\n", options.getAlias(), unit);
       } else {
         getShell()
@@ -195,16 +195,16 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
       getShell().printf("Certificate file '%s' does not exist. Cannot import certificate.\n", options.getCertificate());
       return;
     }
-    UnitKeyStore ks = unitKeyStoreService.getOrCreateUnitKeyStore(unit);
+    OpalKeyStore ks = keyStoreService.getOrCreateUnitKeyStore(unit);
     ks.importCertificate(options.getAlias(), getFile(options.getCertificate()));
-    unitKeyStoreService.saveUnitKeyStore(ks);
+    keyStoreService.saveUnitKeyStore(ks);
   }
 
   private void importKeyFromFileOrInteractively(String unit, String alias) throws FileSystemException {
     if(options.isCertificate()) {
-      unitKeyStoreService.importKey(unit, alias, getFile(options.getPrivate()), getFile(options.getCertificate()));
+      keyStoreService.importKey(unit, alias, getFile(options.getPrivate()), getFile(options.getCertificate()));
     } else {
-      unitKeyStoreService.importKey(unit, alias, getFile(options.getPrivate()),
+      keyStoreService.importKey(unit, alias, getFile(options.getPrivate()),
           new CertificateInfo(getShell()).getCertificateInfoAsString());
     }
     getShell().printf("Key imported with alias '%s'.\n", alias);
@@ -213,8 +213,8 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   private int exportCertificate() {
     int errorCode = 0;
 
-    UnitKeyStore unitKeyStore = getUnitKeyStore();
-    if(unitKeyStore == null) {
+    OpalKeyStore opalKeyStore = getUnitKeyStore();
+    if(opalKeyStore == null) {
       getShell().printf("Keystore doesn't exist\n");
       return 1;
     }
@@ -226,7 +226,7 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
     Writer certificateWriter = null;
     try {
       certificateWriter = getCertificateWriter();
-      writeCertificate(unitKeyStore, options.getAlias(), certificateWriter);
+      writeCertificate(opalKeyStore, options.getAlias(), certificateWriter);
     } catch(FileSystemException e) {
       getShell().printf("%s is an invalid output file.  Please make sure that you have specified a valid path.\n",
           options.getCertificate());
@@ -254,13 +254,13 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
     return certificateWriter;
   }
 
-  private void writeCertificate(UnitKeyStore unitKeyStore, String alias, Writer writer) throws IOException {
-    Assert.notNull(unitKeyStore, "unitKeyStore can not be null");
+  private void writeCertificate(OpalKeyStore opalKeyStore, String alias, Writer writer) throws IOException {
+    Assert.notNull(opalKeyStore, "opalKeyStore can not be null");
     Assert.notNull(writer, "writer can not be null");
 
     Certificate certificate;
     try {
-      certificate = unitKeyStore.getKeyStore().getCertificate(alias);
+      certificate = opalKeyStore.getKeyStore().getCertificate(alias);
       if(certificate == null) {
         getShell().printf("No certificate was found for alias '%s'.\n", alias);
       } else {
@@ -289,7 +289,7 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
 
   private int listKeystore() {
     String unit = options.isUnit() ? options.getUnit() : FunctionalUnit.OPAL_INSTANCE;
-    UnitKeyStore uks = unitKeyStoreService.getUnitKeyStore(unit);
+    OpalKeyStore uks = keyStoreService.getUnitKeyStore(unit);
     if(uks != null) {
       getShell().printf("Listing available keys (alias: <key type>) for '%s'\n", unit);
       for(String alias : uks.listAliases()) {
@@ -311,7 +311,7 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
 
   private boolean keyDoesNotExistOrOverwriteConfirmed(String unit) {
     boolean createKeyConfirmation = true;
-    if(unitKeyStoreService.aliasExists(unit, options.getAlias())) {
+    if(keyStoreService.aliasExists(unit, options.getAlias())) {
       createKeyConfirmation = confirmKeyOverWrite();
     }
     return createKeyConfirmation;
@@ -338,15 +338,15 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
     return "yes".equalsIgnoreCase(ans) || "y".equalsIgnoreCase(ans);
   }
 
-  private UnitKeyStore getUnitKeyStore() {
-    UnitKeyStore unitKeyStore = null;
+  private OpalKeyStore getUnitKeyStore() {
+    OpalKeyStore opalKeyStore = null;
     if(options.isUnit()) {
       FunctionalUnit unit = getFunctionalUnitService().getFunctionalUnit(options.getUnit());
-      unitKeyStore = unitKeyStoreService.getKeyStore(unit.getName());
+      opalKeyStore = keyStoreService.getKeyStore(unit.getName());
     } else {
-      unitKeyStore = unitKeyStoreService.getUnitKeyStore(FunctionalUnit.OPAL_INSTANCE);
+      opalKeyStore = keyStoreService.getUnitKeyStore(FunctionalUnit.OPAL_INSTANCE);
     }
-    return unitKeyStore;
+    return opalKeyStore;
   }
 
   private boolean unitDoesNotExist(String unitName) {

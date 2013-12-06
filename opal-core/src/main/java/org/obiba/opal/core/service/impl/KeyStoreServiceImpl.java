@@ -28,11 +28,11 @@ import org.apache.commons.vfs2.FileObject;
 import org.obiba.opal.core.crypt.CacheablePasswordCallback;
 import org.obiba.opal.core.crypt.CachingCallbackHandler;
 import org.obiba.opal.core.crypt.KeyProviderSecurityException;
-import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
+import org.obiba.opal.core.domain.unit.KeyStoreState;
+import org.obiba.opal.core.service.KeyStoreService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.OrientDbService;
-import org.obiba.opal.core.service.UnitKeyStoreService;
-import org.obiba.opal.core.unit.UnitKeyStore;
+import org.obiba.opal.core.unit.OpalKeyStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,25 +40,28 @@ import org.springframework.util.Assert;
 
 @Component
 @Transactional
-public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
+public class KeyStoreServiceImpl implements KeyStoreService {
 
   @NotNull
-  private final CallbackHandler callbackHandler;
+  private CallbackHandler callbackHandler;
 
   @NotNull
-  private final OrientDbService orientDbService;
+  private OrientDbService orientDbService;
 
   @Autowired
-  public DefaultUnitKeyStoreServiceImpl(@NotNull CallbackHandler callbackHandler,
-      @NotNull OrientDbService orientDbService) {
+  public void setCallbackHandler(@NotNull CallbackHandler callbackHandler) {
     this.callbackHandler = callbackHandler;
+  }
+
+  @Autowired
+  public void setOrientDbService(@NotNull OrientDbService orientDbService) {
     this.orientDbService = orientDbService;
   }
 
   @Override
   @PostConstruct
   public void start() {
-    orientDbService.createUniqueIndex(UnitKeyStoreState.class);
+    orientDbService.createUniqueIndex(KeyStoreState.class);
   }
 
   @Override
@@ -67,54 +70,54 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
 
   @Nullable
   @Override
-  public UnitKeyStore getUnitKeyStore(@NotNull String unitName) {
-    Assert.hasText(unitName, "unitName must not be null or empty");
-    UnitKeyStoreState state = findByUnit(unitName);
-    return state == null ? null : loadUnitKeyStore(unitName, state);
+  public OpalKeyStore getUnitKeyStore(@NotNull String name) {
+    Assert.hasText(name, "unitName must not be null or empty");
+    KeyStoreState state = findByUnit(name);
+    return state == null ? null : loadUnitKeyStore(name, state);
   }
 
   @Nullable
   @Override
-  public UnitKeyStore getKeyStore(@NotNull String unitName, boolean create) {
+  public OpalKeyStore getKeyStore(@NotNull String unitName, boolean create) {
     return create ? getOrCreateUnitKeyStore(unitName) : getUnitKeyStore(unitName);
   }
 
   @Nullable
   @Override
-  public UnitKeyStore getKeyStore(@NotNull String unitName) {
+  public OpalKeyStore getKeyStore(@NotNull String unitName) {
     return getKeyStore(unitName, true);
   }
 
-  private UnitKeyStoreState findByUnit(String unitName) {
-    return orientDbService.findUnique(new UnitKeyStoreState(unitName));
+  private KeyStoreState findByUnit(String unitName) {
+    return orientDbService.findUnique(new KeyStoreState(unitName));
   }
 
   @Override
-  public UnitKeyStore getOrCreateUnitKeyStore(@NotNull String unitName) {
+  public OpalKeyStore getOrCreateUnitKeyStore(@NotNull String unitName) {
     Assert.hasText(unitName, "unitName must not be null or empty");
 
-    UnitKeyStore unitKeyStore = getUnitKeyStore(unitName);
-    if(unitKeyStore == null) {
-      unitKeyStore = UnitKeyStore.Builder.newStore().unit(unitName).passwordPrompt(callbackHandler).build();
-      saveUnitKeyStore(unitKeyStore);
+    OpalKeyStore opalKeyStore = getUnitKeyStore(unitName);
+    if(opalKeyStore == null) {
+      opalKeyStore = OpalKeyStore.Builder.newStore().unit(unitName).passwordPrompt(callbackHandler).build();
+      saveUnitKeyStore(opalKeyStore);
     }
-    return unitKeyStore;
+    return opalKeyStore;
   }
 
   @Override
-  public void saveUnitKeyStore(@NotNull UnitKeyStore unitKeyStore) {
-    Assert.notNull(unitKeyStore, "unitKeyStore must not be null");
+  public void saveUnitKeyStore(@NotNull OpalKeyStore opalKeyStore) {
+    Assert.notNull(opalKeyStore, "opalKeyStore must not be null");
 
-    UnitKeyStoreState state;
-    String unitName = unitKeyStore.getUnitName();
-    UnitKeyStoreState existing = findByUnit(unitName);
+    KeyStoreState state;
+    String unitName = opalKeyStore.getUnitName();
+    KeyStoreState existing = findByUnit(unitName);
     if(existing == null) {
-      state = new UnitKeyStoreState();
-      state.setUnit(unitName);
+      state = new KeyStoreState();
+      state.setName(unitName);
     } else {
       state = existing;
     }
-    state.setKeyStore(getKeyStoreByteArray(unitKeyStore));
+    state.setKeyStore(getKeyStoreByteArray(opalKeyStore));
 
     orientDbService.save(state, state);
   }
@@ -128,24 +131,24 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
     Assert.notNull(size, "size must not be null");
     Assert.hasText(certificateInfo, "certificateInfo must not be null or empty");
 
-    UnitKeyStore unitKeyStore = getOrCreateUnitKeyStore(unitName);
+    OpalKeyStore opalKeyStore = getOrCreateUnitKeyStore(unitName);
     try {
-      if(unitKeyStore.getKeyStore().containsAlias(alias)) {
-        unitKeyStore.getKeyStore().deleteEntry(alias);
+      if(opalKeyStore.getKeyStore().containsAlias(alias)) {
+        opalKeyStore.getKeyStore().deleteEntry(alias);
       }
     } catch(KeyStoreException e) {
       throw new RuntimeException(e);
     }
-    unitKeyStore.createOrUpdateKey(alias, algorithm, size, certificateInfo);
+    opalKeyStore.createOrUpdateKey(alias, algorithm, size, certificateInfo);
 
-    saveUnitKeyStore(unitKeyStore);
+    saveUnitKeyStore(opalKeyStore);
   }
 
   @Override
   public boolean aliasExists(@NotNull String unitName, @NotNull String alias) {
     Assert.hasText(alias, "alias must not be null or empty");
-    UnitKeyStore unitKeyStore = getUnitKeyStore(unitName);
-    return unitKeyStore != null && unitKeyStore.aliasExists(alias);
+    OpalKeyStore opalKeyStore = getUnitKeyStore(unitName);
+    return opalKeyStore != null && opalKeyStore.aliasExists(alias);
   }
 
   @Override
@@ -153,13 +156,13 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
     Assert.hasText(unitName, "unitName must not be null or empty");
     Assert.hasText(alias, "alias must not be null or empty");
 
-    UnitKeyStore unitKeyStore = getUnitKeyStore(unitName);
-    if(unitKeyStore == null) {
+    OpalKeyStore opalKeyStore = getUnitKeyStore(unitName);
+    if(opalKeyStore == null) {
       throw new RuntimeException("The key store [" + unitName + "] does not exist. Nothing to delete.");
     }
-    unitKeyStore.deleteKey(alias);
+    opalKeyStore.deleteKey(alias);
 
-    saveUnitKeyStore(unitKeyStore);
+    saveUnitKeyStore(opalKeyStore);
   }
 
   @Override
@@ -170,10 +173,10 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
     Assert.notNull(privateKey, "privateKey must not be null");
     Assert.notNull(certificate, "certificate must not be null");
 
-    UnitKeyStore unitKeyStore = getOrCreateUnitKeyStore(unitName);
-    unitKeyStore.importKey(alias, privateKey, certificate);
+    OpalKeyStore opalKeyStore = getOrCreateUnitKeyStore(unitName);
+    opalKeyStore.importKey(alias, privateKey, certificate);
 
-    saveUnitKeyStore(unitKeyStore);
+    saveUnitKeyStore(opalKeyStore);
   }
 
   @Override
@@ -184,10 +187,10 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
     Assert.notNull(privateKey, "privateKey must not be null");
     Assert.notNull(certificate, "certificate must not be null");
 
-    UnitKeyStore unitKeyStore = getOrCreateUnitKeyStore(unitName);
-    unitKeyStore.importKey(alias, privateKey, certificate);
+    OpalKeyStore opalKeyStore = getOrCreateUnitKeyStore(unitName);
+    opalKeyStore.importKey(alias, privateKey, certificate);
 
-    saveUnitKeyStore(unitKeyStore);
+    saveUnitKeyStore(opalKeyStore);
   }
 
   @Override
@@ -198,10 +201,10 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
     Assert.notNull(privateKey, "privateKey must not be null");
     Assert.hasText(certificateInfo, "certificateInfo must not be null or empty");
 
-    UnitKeyStore unitKeyStore = getOrCreateUnitKeyStore(unitName);
-    unitKeyStore.importKey(alias, privateKey, certificateInfo);
+    OpalKeyStore opalKeyStore = getOrCreateUnitKeyStore(unitName);
+    opalKeyStore.importKey(alias, privateKey, certificateInfo);
 
-    saveUnitKeyStore(unitKeyStore);
+    saveUnitKeyStore(opalKeyStore);
   }
 
   @Override
@@ -212,10 +215,10 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
     Assert.notNull(privateKey, "privateKey must not be null");
     Assert.hasText(certificateInfo, "certificateInfo must not be null or empty");
 
-    UnitKeyStore unitKeyStore = getOrCreateUnitKeyStore(unitName);
-    unitKeyStore.importKey(alias, privateKey, certificateInfo);
+    OpalKeyStore opalKeyStore = getOrCreateUnitKeyStore(unitName);
+    opalKeyStore.importKey(alias, privateKey, certificateInfo);
 
-    saveUnitKeyStore(unitKeyStore);
+    saveUnitKeyStore(opalKeyStore);
   }
 
   @Override
@@ -224,59 +227,54 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
     Assert.hasText(alias, "alias must not be null or empty");
     Assert.notNull(certStream, "certStream must not be null");
 
-    UnitKeyStore unitKeyStore = getOrCreateUnitKeyStore(unitName);
-    unitKeyStore.importCertificate(alias, certStream);
+    OpalKeyStore opalKeyStore = getOrCreateUnitKeyStore(unitName);
+    opalKeyStore.importCertificate(alias, certStream);
 
-    saveUnitKeyStore(unitKeyStore);
+    saveUnitKeyStore(opalKeyStore);
   }
 
-  private UnitKeyStore loadUnitKeyStore(@NotNull String unitName, @NotNull UnitKeyStoreState state) {
+  private OpalKeyStore loadUnitKeyStore(@NotNull String unitName, @NotNull KeyStoreState state) {
     CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName)
         .prompt(getPasswordFor(unitName)).build();
 
-    UnitKeyStore unitKeyStore = null;
+    OpalKeyStore opalKeyStore = null;
     try {
-      unitKeyStore = new UnitKeyStore(unitName, loadKeyStore(state.getKeyStore(), passwordCallback));
-      unitKeyStore.setCallbackHandler(callbackHandler);
-      UnitKeyStore.loadBouncyCastle();
-    } catch(GeneralSecurityException ex) {
-      throw new RuntimeException(ex);
-    } catch(UnsupportedCallbackException ex) {
+      opalKeyStore = new OpalKeyStore(unitName, loadKeyStore(state.getKeyStore(), passwordCallback));
+      opalKeyStore.setCallbackHandler(callbackHandler);
+      OpalKeyStore.loadBouncyCastle();
+    } catch(GeneralSecurityException | UnsupportedCallbackException ex) {
       throw new RuntimeException(ex);
     } catch(IOException ex) {
       clearPasswordCache(callbackHandler, unitName);
       translateAndRethrowKeyStoreIOException(ex);
     }
 
-    return unitKeyStore;
+    return opalKeyStore;
   }
 
   private KeyStore loadKeyStore(byte[] keyStoreBytes, CacheablePasswordCallback passwordCallback)
       throws GeneralSecurityException, UnsupportedCallbackException, IOException {
     KeyStore ks = KeyStore.getInstance("JCEKS");
     ks.load(new ByteArrayInputStream(keyStoreBytes), getKeyPassword(passwordCallback));
-
     return ks;
   }
 
-  private byte[] getKeyStoreByteArray(UnitKeyStore unitKeyStore) {
-    String unitName = unitKeyStore.getUnitName();
+  private byte[] getKeyStoreByteArray(OpalKeyStore opalKeyStore) {
+    String unitName = opalKeyStore.getUnitName();
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try {
       CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName)
           .prompt(getPasswordFor(unitName)).build();
-      unitKeyStore.getKeyStore().store(baos, getKeyPassword(passwordCallback));
+      opalKeyStore.getKeyStore().store(baos, getKeyPassword(passwordCallback));
     } catch(KeyStoreException e) {
-      clearPasswordCache(callbackHandler, unitKeyStore.getUnitName());
+      clearPasswordCache(callbackHandler, opalKeyStore.getUnitName());
       throw new KeyProviderSecurityException("Wrong keystore password or keystore was tampered with");
-    } catch(GeneralSecurityException e) {
+    } catch(GeneralSecurityException | UnsupportedCallbackException e) {
       throw new RuntimeException(e);
     } catch(IOException ex) {
       clearPasswordCache(callbackHandler, unitName);
       translateAndRethrowKeyStoreIOException(ex);
-    } catch(UnsupportedCallbackException e) {
-      throw new RuntimeException(e);
     }
     return baos.toByteArray();
   }
@@ -291,7 +289,7 @@ public class DefaultUnitKeyStoreServiceImpl implements UnitKeyStoreService {
    * Returns "Password for 'name':  ".
    */
   private String getPasswordFor(String name) {
-    return UnitKeyStore.PASSWORD_FOR + " '" + name + "':  ";
+    return OpalKeyStore.PASSWORD_FOR + " '" + name + "':  ";
   }
 
   private static void clearPasswordCache(CallbackHandler callbackHandler, String passwordKey) {

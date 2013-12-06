@@ -16,10 +16,10 @@ import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 
-import org.obiba.opal.core.service.UnitKeyStoreService;
+import org.obiba.opal.core.service.KeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
-import org.obiba.opal.core.unit.UnitKeyStore;
+import org.obiba.opal.core.unit.OpalKeyStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -36,16 +36,16 @@ public class OpalSslContextFactory implements SslContextFactory {
   private FunctionalUnitService functionalUnitService;
 
   @Autowired
-  private UnitKeyStoreService unitKeystoreService;
+  private KeyStoreService keystoreService;
 
   @Override
   public SSLContext createSslContext() {
-    UnitKeyStore opalKeystore = prepareServerKeystore();
+    OpalKeyStore opalKeystore = prepareServerKeystore();
 
     try {
       SSLContext ctx = SSLContext.getInstance("TLSv1");
       ctx.init(new KeyManager[] { new UnitKeyManager(opalKeystore) },
-          new TrustManager[] { new UnitTrustManager(functionalUnitService, unitKeystoreService) }, null);
+          new TrustManager[] { new UnitTrustManager(functionalUnitService, keystoreService) }, null);
       return ctx;
     } catch(Exception e) {
       throw new RuntimeException(e);
@@ -58,12 +58,12 @@ public class OpalSslContextFactory implements SslContextFactory {
    *
    * @return a prepared keystore
    */
-  private UnitKeyStore prepareServerKeystore() {
-    UnitKeyStore keystore = unitKeystoreService.getUnitKeyStore(FunctionalUnit.OPAL_INSTANCE);
+  private OpalKeyStore prepareServerKeystore() {
+    OpalKeyStore keystore = keystoreService.getUnitKeyStore(FunctionalUnit.OPAL_INSTANCE);
     if(keystore == null) {
-      keystore = unitKeystoreService.getOrCreateUnitKeyStore(FunctionalUnit.OPAL_INSTANCE);
+      keystore = keystoreService.getOrCreateUnitKeyStore(FunctionalUnit.OPAL_INSTANCE);
       keystore.createOrUpdateKey(UnitKeyManager.HTTPS_ALIAS, "RSA", 2048, generateCertificateInfo());
-      unitKeystoreService.saveUnitKeyStore(keystore);
+      keystoreService.saveUnitKeyStore(keystore);
     }
     return keystore;
   }

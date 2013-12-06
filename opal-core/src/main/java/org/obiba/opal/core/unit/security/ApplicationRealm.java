@@ -22,12 +22,10 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.obiba.opal.core.service.UnitKeyStoreService;
+import org.obiba.opal.core.service.KeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
-import org.obiba.opal.core.unit.UnitKeyStore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.obiba.opal.core.unit.OpalKeyStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,7 +35,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ApplicationRealm extends AuthorizingRealm {
 
-  private static final Logger log = LoggerFactory.getLogger(ApplicationRealm.class);
+//  private static final Logger log = LoggerFactory.getLogger(ApplicationRealm.class);
 
   public static final String APPLICATION_REALM = "application-realm";
 
@@ -45,7 +43,7 @@ public class ApplicationRealm extends AuthorizingRealm {
   private FunctionalUnitService functionalUnitService;
 
   @Autowired
-  private UnitKeyStoreService unitKeystoreService;
+  private KeyStoreService keystoreService;
 
   @Override
   public String getName() {
@@ -62,7 +60,7 @@ public class ApplicationRealm extends AuthorizingRealm {
     X509CertificateAuthenticationToken x509Token = (X509CertificateAuthenticationToken) token;
     X509Certificate x509Cert = x509Token.getCredentials();
     for(FunctionalUnit unit : functionalUnitService.getFunctionalUnits()) {
-      UnitKeyStore keyStore = unitKeystoreService.getKeyStore(unit.getName());
+      OpalKeyStore keyStore = keystoreService.getKeyStore(unit.getName());
       for(Certificate cert : keyStore.getCertificateEntries()) {
         try {
           x509Cert.verify(cert.getPublicKey());

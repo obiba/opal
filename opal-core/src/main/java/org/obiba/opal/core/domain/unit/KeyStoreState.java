@@ -23,39 +23,39 @@ import com.google.common.collect.Lists;
 /**
  * Persisted keystore.
  */
-public class UnitKeyStoreState extends AbstractTimestamped implements HasUniqueProperties {
+public class KeyStoreState extends AbstractTimestamped implements HasUniqueProperties {
 
   @NotNull
   @NotBlank
-  private String unit;
+  private String name;
 
   @NotNull
   private byte[] keyStore;
 
-  public UnitKeyStoreState() {
+  public KeyStoreState() {
   }
 
-  public UnitKeyStoreState(@NotNull String unit) {
-    this.unit = unit;
+  public KeyStoreState(@NotNull String name) {
+    this.name = name;
   }
 
   @Override
   public List<String> getUniqueProperties() {
-    return Lists.newArrayList("unit");
+    return Lists.newArrayList("name");
   }
 
   @Override
   public List<Object> getUniqueValues() {
-    return Lists.<Object>newArrayList(unit);
+    return Lists.<Object>newArrayList(name);
   }
 
   @NotNull
-  public String getUnit() {
-    return unit;
+  public String getName() {
+    return name;
   }
 
-  public void setUnit(@NotNull String unit) {
-    this.unit = unit;
+  public void setName(@NotNull String name) {
+    this.name = name;
   }
 
   @NotNull
@@ -71,12 +71,12 @@ public class UnitKeyStoreState extends AbstractTimestamped implements HasUniqueP
   public boolean equals(Object o) {
     if(this == o) return true;
     //noinspection SimplifiableIfStatement
-    if(!(o instanceof UnitKeyStoreState)) return false;
-    return unit.equals(((UnitKeyStoreState) o).unit);
+    if(!(o instanceof KeyStoreState)) return false;
+    return name.equals(((KeyStoreState) o).name);
   }
 
   @Override
   public int hashCode() {
-    return unit.hashCode();
+    return name.hashCode();
   }
 }

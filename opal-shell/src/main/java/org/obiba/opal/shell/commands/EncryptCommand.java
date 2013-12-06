@@ -27,8 +27,8 @@ import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.Initialisables;
+import org.obiba.opal.core.service.KeyStoreService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
-import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.shell.commands.options.EncryptCommandOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -42,7 +42,7 @@ public class EncryptCommand extends AbstractOpalRuntimeDependentCommand<EncryptC
   public static final String DECRYPT_DATASOURCE_NAME = "decrypt-datasource";
 
   @Autowired
-  private UnitKeyStoreService keystoreService;
+  private KeyStoreService keystoreService;
 
   @Override
   public int execute() {
@@ -139,7 +139,7 @@ public class EncryptCommand extends AbstractOpalRuntimeDependentCommand<EncryptC
    *
    * @param outputDirPath the name/path of the directory.
    * @return the directory, as a <code>FileObject</code> object (or <code>null</code> if the directory could not be
-   *         created.
+   * created.
    */
   private FileObject getOutputDir(String outputDirPath) {
     FileObject outputDir = null;

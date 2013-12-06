@@ -53,8 +53,8 @@ import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ImportService;
+import org.obiba.opal.core.service.KeyStoreService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
-import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers.UnitIdentifier;
@@ -95,7 +95,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   private OpalRuntime opalRuntime;
 
-  private UnitKeyStoreService unitKeyStoreService;
+  private KeyStoreService keyStoreService;
 
   private ImportService importService;
 
@@ -132,8 +132,8 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
   }
 
   @Autowired
-  public void setUnitKeyStoreService(UnitKeyStoreService unitKeyStoreService) {
-    this.unitKeyStoreService = unitKeyStoreService;
+  public void setKeyStoreService(KeyStoreService keyStoreService) {
+    this.keyStoreService = keyStoreService;
   }
 
   @GET

@@ -27,7 +27,7 @@ import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
-import org.obiba.opal.core.service.UnitKeyStoreService;
+import org.obiba.opal.core.service.KeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.obiba.opal.shell.commands.options.SplitCommandOptions;
@@ -44,7 +44,7 @@ public class SplitCommand extends AbstractOpalRuntimeDependentCommand<SplitComma
   private FunctionalUnitService functionalUnitService;
 
   @Autowired
-  private UnitKeyStoreService unitKeyStoreService;
+  private KeyStoreService keyStoreService;
 
   @Override
   public int execute() {
@@ -151,7 +151,7 @@ public class SplitCommand extends AbstractOpalRuntimeDependentCommand<SplitComma
 
       if(unit.getDatasourceEncryptionStrategy() == null) {
         DatasourceEncryptionStrategy encryptionStrategy = new EncryptedSecretKeyDatasourceEncryptionStrategy();
-        encryptionStrategy.setKeyProvider(unitKeyStoreService.getKeyStore(unit.getName()));
+        encryptionStrategy.setKeyProvider(keyStoreService.getKeyStore(unit.getName()));
         unit.setDatasourceEncryptionStrategy(encryptionStrategy);
       }
 

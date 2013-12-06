@@ -17,10 +17,10 @@ import java.util.List;
 
 import javax.net.ssl.X509TrustManager;
 
-import org.obiba.opal.core.service.UnitKeyStoreService;
+import org.obiba.opal.core.service.KeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
-import org.obiba.opal.core.unit.UnitKeyStore;
+import org.obiba.opal.core.unit.OpalKeyStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,11 +32,11 @@ public class UnitTrustManager implements X509TrustManager {
 
   private final FunctionalUnitService functionalUnitService;
 
-  private final UnitKeyStoreService unitKeyStoreService;
+  private final KeyStoreService keyStoreService;
 
-  public UnitTrustManager(FunctionalUnitService functionalUnitService, UnitKeyStoreService unitKeyStoreService) {
+  public UnitTrustManager(FunctionalUnitService functionalUnitService, KeyStoreService keyStoreService) {
     this.functionalUnitService = functionalUnitService;
-    this.unitKeyStoreService = unitKeyStoreService;
+    this.keyStoreService = keyStoreService;
   }
 
   @Override
@@ -47,7 +47,7 @@ public class UnitTrustManager implements X509TrustManager {
         log.debug("chain[{}]={}", i, chain[i]);
       }
     }
-    for(UnitKeyStore keyStore : getUnitKeystores()) {
+    for(OpalKeyStore keyStore : getUnitKeyStores()) {
       for(Certificate cert : keyStore.getCertificateEntries()) {
         for(X509Certificate x509Cert : chain) {
           try {
@@ -77,12 +77,12 @@ public class UnitTrustManager implements X509TrustManager {
     return new X509Certificate[0];
   }
 
-  private Iterable<UnitKeyStore> getUnitKeystores() {
-    List<UnitKeyStore> trustedKeyStores = Lists.newArrayList();
+  private Iterable<OpalKeyStore> getUnitKeyStores() {
+    List<OpalKeyStore> trustedKeyStores = Lists.newArrayList();
     for(FunctionalUnit unit : functionalUnitService.getFunctionalUnits()) {
-      UnitKeyStore unitKeyStore = unitKeyStoreService.getKeyStore(unit.getName(), false);
-      if(unitKeyStore != null) {
-        trustedKeyStores.add(unitKeyStore);
+      OpalKeyStore opalKeyStore = keyStoreService.getKeyStore(unit.getName(), false);
+      if(opalKeyStore != null) {
+        trustedKeyStores.add(opalKeyStore);
       }
     }
     return trustedKeyStores;

@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
+import org.obiba.opal.core.domain.unit.KeyStoreState;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.runtime.Version;
@@ -25,20 +25,19 @@ public class MoveUnitKeyStoreToOrientUpgradeStep extends AbstractUpgradeStep {
   @Override
   public void execute(Version currentVersion) {
 
-    orientDbService.createUniqueIndex(UnitKeyStoreState.class);
+    orientDbService.createUniqueIndex(KeyStoreState.class);
 
     JdbcTemplate dataJdbcTemplate = new JdbcTemplate(databaseRegistry.getDataSource("opal-data", null));
-    List<UnitKeyStoreState> states = dataJdbcTemplate
-        .query("select * from unit_key_store", new RowMapper<UnitKeyStoreState>() {
-          @Override
-          public UnitKeyStoreState mapRow(ResultSet rs, int rowNum) throws SQLException {
-            UnitKeyStoreState state = new UnitKeyStoreState();
-            state.setUnit(rs.getString("unit"));
-            state.setKeyStore(rs.getBytes("key_store"));
-            return state;
-          }
-        });
-    for(UnitKeyStoreState state : states) {
+    List<KeyStoreState> states = dataJdbcTemplate.query("select * from unit_key_store", new RowMapper<KeyStoreState>() {
+      @Override
+      public KeyStoreState mapRow(ResultSet rs, int rowNum) throws SQLException {
+        KeyStoreState state = new KeyStoreState();
+        state.setName(rs.getString("unit"));
+        state.setKeyStore(rs.getBytes("key_store"));
+        return state;
+      }
+    });
+    for(KeyStoreState state : states) {
       orientDbService.save(null, state);
     }
     dataJdbcTemplate.execute("drop table unit_key_store");

@@ -23,11 +23,11 @@ import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.DecryptService;
+import org.obiba.opal.core.service.KeyStoreService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
-import org.obiba.opal.core.service.UnitKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
-import org.obiba.opal.core.unit.UnitKeyStore;
+import org.obiba.opal.core.unit.OpalKeyStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +58,7 @@ public class DefaultDecryptService implements DecryptService {
   private OpalRuntime opalRuntime;
 
   @Autowired
-  private UnitKeyStoreService unitKeyStoreService;
+  private KeyStoreService keyStoreService;
 
   //
   // DecryptService Methods
@@ -103,7 +103,7 @@ public class DefaultDecryptService implements DecryptService {
     DatasourceEncryptionStrategy encryptionStrategy = unit.getDatasourceEncryptionStrategy();
     if(encryptionStrategy == null) {
       encryptionStrategy = new EncryptedSecretKeyDatasourceEncryptionStrategy();
-      UnitKeyStore keyStore = unitKeyStoreService.getKeyStore(unit.getName());
+      OpalKeyStore keyStore = keyStoreService.getKeyStore(unit.getName());
       encryptionStrategy.setKeyProvider(keyStore == null ? new NullKeyProvider() : keyStore);
       unit.setDatasourceEncryptionStrategy(encryptionStrategy);
     }
@@ -112,7 +112,7 @@ public class DefaultDecryptService implements DecryptService {
 
   private DatasourceEncryptionStrategy getOpalInstanceEncryptionStrategy() {
     DatasourceEncryptionStrategy dsEncryptionStrategy = getDefaultEncryptionStrategy();
-    dsEncryptionStrategy.setKeyProvider(unitKeyStoreService.getOrCreateUnitKeyStore(FunctionalUnit.OPAL_INSTANCE));
+    dsEncryptionStrategy.setKeyProvider(keyStoreService.getOrCreateUnitKeyStore(FunctionalUnit.OPAL_INSTANCE));
     return dsEncryptionStrategy;
   }
 

@@ -24,9 +24,9 @@ import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.core.util.FileUtil;
-import org.obiba.opal.core.domain.unit.UnitKeyStoreState;
+import org.obiba.opal.core.domain.unit.KeyStoreState;
 import org.obiba.opal.core.service.OrientDbService;
-import org.obiba.opal.core.unit.UnitKeyStore;
+import org.obiba.opal.core.unit.OpalKeyStore;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
@@ -37,18 +37,20 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 /**
- * Unit tests for {@link DefaultUnitKeyStoreServiceImpl}.
+ * Unit tests for {@link KeyStoreServiceImpl}.
  */
-public class DefaultUnitKeyStoreServiceImplTest {
+public class KeyStoreServiceImplTest {
 
-  private DefaultUnitKeyStoreServiceImpl unitKeyStoreService;
+  private KeyStoreServiceImpl unitKeyStoreService;
 
   private OrientDbService mockOrientDbService;
 
   @Before
   public void setUp() {
     mockOrientDbService = createMock(OrientDbService.class);
-    unitKeyStoreService = new DefaultUnitKeyStoreServiceImpl(createPasswordCallbackHandler(), mockOrientDbService);
+    unitKeyStoreService = new KeyStoreServiceImpl();
+    unitKeyStoreService.setOrientDbService(mockOrientDbService);
+    unitKeyStoreService.setCallbackHandler(createPasswordCallbackHandler());
   }
 
   @SuppressWarnings("ConstantConditions")
@@ -69,10 +71,10 @@ public class DefaultUnitKeyStoreServiceImplTest {
 
   @Test
   public void testGetUnitKeyStore() throws IOException {
-    UnitKeyStoreState expectedUnitKeyStoreStateTemplate = new UnitKeyStoreState();
-    expectedUnitKeyStoreStateTemplate.setUnit("my-unit");
-    UnitKeyStoreState state = new UnitKeyStoreState();
-    state.setUnit("my-unit");
+    KeyStoreState expectedKeyStoreStateTemplate = new KeyStoreState();
+    expectedKeyStoreStateTemplate.setName("my-unit");
+    KeyStoreState state = new KeyStoreState();
+    state.setName("my-unit");
     state.setKeyStore(getTestKeyStoreByteArray());
 
     expect(mockOrientDbService.findUnique(state)) //
@@ -81,19 +83,19 @@ public class DefaultUnitKeyStoreServiceImplTest {
 
     replay(mockOrientDbService);
 
-    UnitKeyStore unitKeyStore = unitKeyStoreService.getUnitKeyStore("my-unit");
+    OpalKeyStore opalKeyStore = unitKeyStoreService.getUnitKeyStore("my-unit");
     verify(mockOrientDbService);
 
-    assertThat(unitKeyStore, IsNull.notNullValue());
+    assertThat(opalKeyStore, IsNull.notNullValue());
     //noinspection ConstantConditions
-    assertThat(unitKeyStore.getUnitName(), is(state.getUnit()));
+    assertThat(opalKeyStore.getUnitName(), is(state.getName()));
   }
 
   @Test
   public void testGetOrCreateUnitKeyStoreCreatesTheKeyStoreIfItDoesNotExist() throws Exception {
 
-    UnitKeyStoreState state = new UnitKeyStoreState();
-    state.setUnit("my-unit");
+    KeyStoreState state = new KeyStoreState();
+    state.setName("my-unit");
 
     expect(mockOrientDbService.findUnique(state)) //
         .andReturn(null) //
@@ -104,11 +106,11 @@ public class DefaultUnitKeyStoreServiceImplTest {
 
     replay(mockOrientDbService);
 
-    UnitKeyStore unitKeyStore = unitKeyStoreService.getOrCreateUnitKeyStore("my-unit");
+    OpalKeyStore opalKeyStore = unitKeyStoreService.getOrCreateUnitKeyStore("my-unit");
 
     verify(mockOrientDbService);
 
-    assertNotNull(unitKeyStore);
+    assertNotNull(opalKeyStore);
   }
 
   //

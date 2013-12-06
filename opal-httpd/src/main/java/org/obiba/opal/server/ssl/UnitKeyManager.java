@@ -23,12 +23,12 @@ import javax.annotation.Nullable;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.X509ExtendedKeyManager;
 
-import org.obiba.opal.core.unit.UnitKeyStore;
+import org.obiba.opal.core.unit.OpalKeyStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An implementation of {@code X509KeyManager} on {@code UnitKeyStore}. This implementation will list all available key
+ * An implementation of {@code X509KeyManager} on {@code OpalKeyStore}. This implementation will list all available key
  * pairs in the unit keystore and select the first one that matches the requested algorithm.
  */
 public class UnitKeyManager extends X509ExtendedKeyManager {
@@ -40,11 +40,11 @@ public class UnitKeyManager extends X509ExtendedKeyManager {
    */
   static final String HTTPS_ALIAS = "https";
 
-  private final UnitKeyStore unitKeyStore;
+  private final OpalKeyStore opalKeyStore;
 
-  public UnitKeyManager(UnitKeyStore unitKeyStore) {
-    if(unitKeyStore == null) throw new IllegalArgumentException("unitKeyStore cannot be null");
-    this.unitKeyStore = unitKeyStore;
+  public UnitKeyManager(OpalKeyStore opalKeyStore) {
+    if(opalKeyStore == null) throw new IllegalArgumentException("opalKeyStore cannot be null");
+    this.opalKeyStore = opalKeyStore;
   }
 
   @Override
@@ -69,8 +69,8 @@ public class UnitKeyManager extends X509ExtendedKeyManager {
       log.debug("Selecting key '{}'", HTTPS_ALIAS);
       return HTTPS_ALIAS;
     }
-    for(String alias : unitKeyStore.listKeyPairs()) {
-      KeyPair pair = unitKeyStore.getKeyPair(alias);
+    for(String alias : opalKeyStore.listKeyPairs()) {
+      KeyPair pair = opalKeyStore.getKeyPair(alias);
       if(pair.getPrivate().getAlgorithm().equals(keyType)) {
         log.debug("Selecting key '{}'", alias);
         return alias;
@@ -84,7 +84,7 @@ public class UnitKeyManager extends X509ExtendedKeyManager {
   public X509Certificate[] getCertificateChain(String alias) {
     log.debug("getCertificateChain({})", alias);
     try {
-      Certificate[] certs = unitKeyStore.getKeyStore().getCertificateChain(alias);
+      Certificate[] certs = opalKeyStore.getKeyStore().getCertificateChain(alias);
       // Convert Certificate[] to X509Certificate[]
       return Arrays.copyOf(certs, certs.length, X509Certificate[].class);
     } catch(KeyStoreException e) {
@@ -102,13 +102,13 @@ public class UnitKeyManager extends X509ExtendedKeyManager {
   @Override
   public PrivateKey getPrivateKey(String alias) {
     log.debug("getPrivateKey({})", alias);
-    return unitKeyStore.getKeyPair(alias).getPrivate();
+    return opalKeyStore.getKeyPair(alias).getPrivate();
   }
 
   @Override
   public String[] getServerAliases(String keyType, Principal[] issuers) {
     log.debug("getServerAliases({}, {})", keyType, issuers);
-    Set<String> keyPairs = unitKeyStore.listKeyPairs();
+    Set<String> keyPairs = opalKeyStore.listKeyPairs();
     return keyPairs.toArray(new String[keyPairs.size()]);
   }
 
@@ -132,7 +132,7 @@ public class UnitKeyManager extends X509ExtendedKeyManager {
    * @return
    */
   private boolean isKeyType(String alias, String keyType) {
-    return unitKeyStore.hasKeyPair(alias) && unitKeyStore.getKeyPair(alias).getPrivate().getAlgorithm().equals(keyType);
+    return opalKeyStore.hasKeyPair(alias) && opalKeyStore.getKeyPair(alias).getPrivate().getAlgorithm().equals(keyType);
   }
 
 }

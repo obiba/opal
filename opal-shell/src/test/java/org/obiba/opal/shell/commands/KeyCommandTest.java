@@ -24,10 +24,10 @@ import org.junit.Test;
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.core.service.UnitKeyStoreService;
+import org.obiba.opal.core.service.KeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
-import org.obiba.opal.core.unit.UnitKeyStore;
+import org.obiba.opal.core.unit.OpalKeyStore;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.shell.OpalShell;
 import org.obiba.opal.shell.commands.options.KeyCommandOptions;
@@ -61,17 +61,17 @@ public class KeyCommandTest {
 
     OpalShell mockShell = createMockShellForCreateAction("my-alias");
 
-    UnitKeyStoreService mockUnitKeyStoreService = createMock(UnitKeyStoreService.class);
-    expect(mockUnitKeyStoreService.aliasExists("my-unit", "my-alias")).andReturn(false).atLeastOnce();
-    mockUnitKeyStoreService.createOrUpdateKey("my-unit", "my-alias", "RSA", 2048, getCertificateInfoAsString());
+    KeyStoreService mockKeyStoreService = createMock(KeyStoreService.class);
+    expect(mockKeyStoreService.aliasExists("my-unit", "my-alias")).andReturn(false).atLeastOnce();
+    mockKeyStoreService.createOrUpdateKey("my-unit", "my-alias", "RSA", 2048, getCertificateInfoAsString());
     expectLastCall().atLeastOnce();
 
-    replay(mockOptions, mockRuntime, mockShell, mockUnitService, mockUnitKeyStoreService);
+    replay(mockOptions, mockRuntime, mockShell, mockUnitService, mockKeyStoreService);
 
     KeyCommand keyCommand = createKeyCommand(mockRuntime, mockUnitService);
     keyCommand.setOptions(mockOptions);
     keyCommand.setShell(mockShell);
-    keyCommand.setUnitKeyStoreService(mockUnitKeyStoreService);
+    keyCommand.setKeyStoreService(mockKeyStoreService);
     keyCommand.execute();
   }
 
@@ -84,17 +84,17 @@ public class KeyCommandTest {
 
     OpalShell mockShell = createMockShellForDeleteAction("my-unit", "my-alias");
 
-    UnitKeyStoreService mockUnitKeyStoreService = createMock(UnitKeyStoreService.class);
-    expect(mockUnitKeyStoreService.aliasExists("my-unit", "my-alias")).andReturn(true).atLeastOnce();
-    mockUnitKeyStoreService.deleteKey("my-unit", "my-alias");
+    KeyStoreService mockKeyStoreService = createMock(KeyStoreService.class);
+    expect(mockKeyStoreService.aliasExists("my-unit", "my-alias")).andReturn(true).atLeastOnce();
+    mockKeyStoreService.deleteKey("my-unit", "my-alias");
     expectLastCall().atLeastOnce();
 
-    replay(mockOptions, mockRuntime, mockShell, mockUnitKeyStoreService, mockUnitService);
+    replay(mockOptions, mockRuntime, mockShell, mockKeyStoreService, mockUnitService);
 
     KeyCommand keyCommand = createKeyCommand(mockRuntime, mockUnitService);
     keyCommand.setOptions(mockOptions);
     keyCommand.setShell(mockShell);
-    keyCommand.setUnitKeyStoreService(mockUnitKeyStoreService);
+    keyCommand.setKeyStoreService(mockKeyStoreService);
     keyCommand.execute();
   }
 
@@ -119,18 +119,18 @@ public class KeyCommandTest {
 
     OpalShell mockShell = createMockShellForImportAction("my-alias");
 
-    UnitKeyStoreService mockUnitKeyStoreService = createMock(UnitKeyStoreService.class);
-    expect(mockUnitKeyStoreService.aliasExists("my-unit", "my-alias")).andReturn(false).atLeastOnce();
-    mockUnitKeyStoreService.importKey("my-unit", "my-alias", privateFile, certificateFile);
+    KeyStoreService mockKeyStoreService = createMock(KeyStoreService.class);
+    expect(mockKeyStoreService.aliasExists("my-unit", "my-alias")).andReturn(false).atLeastOnce();
+    mockKeyStoreService.importKey("my-unit", "my-alias", privateFile, certificateFile);
     expectLastCall().atLeastOnce();
 
-    replay(mockOptions, mockFileSystemRoot, mockFileSystem, mockRuntime, mockShell, mockUnitKeyStoreService,
+    replay(mockOptions, mockFileSystemRoot, mockFileSystem, mockRuntime, mockShell, mockKeyStoreService,
         mockUnitService);
 
     KeyCommand keyCommand = createKeyCommand(mockRuntime, mockUnitService);
     keyCommand.setOptions(mockOptions);
     keyCommand.setShell(mockShell);
-    keyCommand.setUnitKeyStoreService(mockUnitKeyStoreService);
+    keyCommand.setKeyStoreService(mockKeyStoreService);
     keyCommand.execute();
   }
 
@@ -153,8 +153,8 @@ public class KeyCommandTest {
     mockShell.printf((String) EasyMock.anyObject(), (String) EasyMock.anyObject());
     EasyMock.expectLastCall().anyTimes();
 
-    UnitKeyStoreService mockUnitKeyStoreService = createMock(UnitKeyStoreService.class);
-    expect(mockUnitKeyStoreService.getKeyStore("my-unit")).andReturn(new UnitKeyStore("my-unit", getKeyStore()))
+    KeyStoreService mockKeyStoreService = createMock(KeyStoreService.class);
+    expect(mockKeyStoreService.getKeyStore("my-unit")).andReturn(new OpalKeyStore("my-unit", getKeyStore()))
         .atLeastOnce();
 
     FunctionalUnit unit = new FunctionalUnit("my-unit", null);
@@ -164,12 +164,12 @@ public class KeyCommandTest {
     expect(mockRuntime.getFileSystem()).andReturn(mockFileSystem).atLeastOnce();
 
     replay(mockOptions, mockFileSystemRoot, mockFileSystem, certificateFile, mockFileContent, mockRuntime, mockShell,
-        mockUnitKeyStoreService, mockUnitService);
+        mockKeyStoreService, mockUnitService);
 
     KeyCommand keyCommand = createKeyCommand(mockRuntime, mockUnitService);
     keyCommand.setOptions(mockOptions);
     keyCommand.setShell(mockShell);
-    keyCommand.setUnitKeyStoreService(mockUnitKeyStoreService);
+    keyCommand.setKeyStoreService(mockKeyStoreService);
     keyCommand.execute();
   }
 

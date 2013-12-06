@@ -42,7 +42,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Nullable;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
@@ -74,7 +73,7 @@ import com.google.common.collect.Lists;
 /**
  * A {@link FunctionalUnit}'s keystore.
  */
-public class UnitKeyStore implements KeyProvider {
+public class OpalKeyStore implements KeyProvider {
 
   public static final String PASSWORD_FOR = "Password for";
 
@@ -88,7 +87,7 @@ public class UnitKeyStore implements KeyProvider {
 
   private CallbackHandler callbackHandler;
 
-  public UnitKeyStore(String unitName, KeyStore store) {
+  public OpalKeyStore(String unitName, KeyStore store) {
     this.unitName = unitName;
     this.store = store;
   }
@@ -164,7 +163,7 @@ public class UnitKeyStore implements KeyProvider {
     try {
       CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName)
           .prompt("Password for '" + alias + "':  ").build();
-      keyPair = findKeyPairForPrivateKey(alias, store, keyPair, passwordCallback);
+      keyPair = findKeyPairForPrivateKey(alias, store, passwordCallback);
     } catch(KeyPairNotFoundException ex) {
       throw ex;
     } catch(UnrecoverableKeyException ex) {
@@ -182,27 +181,25 @@ public class UnitKeyStore implements KeyProvider {
   @Override
   public KeyPair getKeyPair(PublicKey publicKey)
       throws NoSuchKeyException, org.obiba.magma.crypt.KeyProviderSecurityException {
-    Enumeration<String> aliases = null;
     try {
-      aliases = store.aliases();
+      return findKeyPairForPublicKey(publicKey, store.aliases());
     } catch(KeyStoreException ex) {
       throw new RuntimeException(ex);
     }
-
-    return findKeyPairForPublicKey(publicKey, aliases);
   }
 
   @Override
   public PublicKey getPublicKey(Datasource datasource) throws NoSuchKeyException {
     try {
       Certificate cert = store.getCertificate(datasource.getName());
-      if(cert != null) {
-        return cert.getPublicKey();
+      if(cert == null) {
+        throw new NoSuchKeyException(datasource.getName(),
+            "No PublicKey for Datasource '" + datasource.getName() + "'");
       }
+      return cert.getPublicKey();
     } catch(KeyStoreException e) {
       throw new MagmaCryptRuntimeException(e);
     }
-    throw new NoSuchKeyException(datasource.getName(), "No PublicKey for Datasource '" + datasource.getName() + "'");
   }
 
   public X509Certificate importCertificate(String alias, FileObject certFile) {
@@ -230,16 +227,12 @@ public class UnitKeyStore implements KeyProvider {
     for(String alias : listAliases()) {
       Entry keyEntry = getEntry(alias);
       if(keyEntry instanceof TrustedCertificateEntry) {
-        TrustedCertificateEntry tce = (TrustedCertificateEntry) keyEntry;
-        certs.add(tce.getTrustedCertificate());
+        certs.add(((TrustedCertificateEntry) keyEntry).getTrustedCertificate());
       }
     }
     return certs;
   }
 
-  //
-  // Methods
-  //
 
   public void setCallbackHandler(CallbackHandler callbackHandler) {
     this.callbackHandler = callbackHandler;
@@ -259,9 +252,7 @@ public class UnitKeyStore implements KeyProvider {
     return passwordCallback.getPassword();
   }
 
-  private KeyPair findKeyPairForPrivateKey(String alias, KeyStore ks, @Nullable KeyPair keyPair,
-      CacheablePasswordCallback passwordCallback)
-      throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedCallbackException,
+  private KeyPair findKeyPairForPrivateKey(String alias, KeyStore ks, CacheablePasswordCallback passwordCallback) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedCallbackException,
       IOException {
     Key key = ks.getKey(alias, getKeyPassword(passwordCallback));
     if(key == null) {
@@ -277,9 +268,8 @@ public class UnitKeyStore implements KeyProvider {
 
       // Return a key pair
       return new KeyPair(publicKey, (PrivateKey) key);
-    } else {
-      throw new KeyPairNotFoundException("KeyPair not found for specified alias (" + alias + ")");
     }
+    throw new KeyPairNotFoundException("KeyPair not found for specified alias (" + alias + ")");
   }
 
   private KeyPair findKeyPairForPublicKey(Key publicKey, Enumeration<String> aliases) {
@@ -541,8 +531,7 @@ public class UnitKeyStore implements KeyProvider {
 
   private Key toPrivateKey(Object pemObject) {
     if(pemObject instanceof KeyPair) {
-      KeyPair keyPair = (KeyPair) pemObject;
-      return keyPair.getPrivate();
+      return ((KeyPair) pemObject).getPrivate();
     }
     if(pemObject instanceof Key) {
       return (Key) pemObject;
@@ -627,7 +616,7 @@ public class UnitKeyStore implements KeyProvider {
       return passwordCallback.getPassword();
     }
 
-    public UnitKeyStore build() {
+    public OpalKeyStore build() {
       Assert.hasText(unit, "unit must not be null or empty");
       Assert.notNull(callbackHandler, "callbackHandler must not be null");
 
@@ -674,10 +663,10 @@ public class UnitKeyStore implements KeyProvider {
       throw new RuntimeException(ex);
     }
 
-    private UnitKeyStore createUnitKeyStore(KeyStore keyStore) {
-      UnitKeyStore unitKeyStore = new UnitKeyStore(unit, keyStore);
-      unitKeyStore.setCallbackHandler(callbackHandler);
-      return unitKeyStore;
+    private OpalKeyStore createUnitKeyStore(KeyStore keyStore) {
+      OpalKeyStore opalKeyStore = new OpalKeyStore(unit, keyStore);
+      opalKeyStore.setCallbackHandler(callbackHandler);
+      return opalKeyStore;
     }
   }
 

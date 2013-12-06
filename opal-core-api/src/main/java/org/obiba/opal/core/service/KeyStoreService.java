@@ -16,44 +16,57 @@ import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;
 import org.obiba.opal.core.unit.FunctionalUnit;
-import org.obiba.opal.core.unit.UnitKeyStore;
+import org.obiba.opal.core.unit.OpalKeyStore;
 
 /**
  * Manage KeyStores.
  */
-public interface UnitKeyStoreService extends SystemService {
+public interface KeyStoreService extends SystemService {
+
+//  @NotNull
+//  OpalKeyStore getSystemKeyStore();
+//
+//  @NotNull
+//  OpalKeyStore getCredentialsKeyStore();
+//
+//  @NotNull
+//  OpalKeyStore getProjectsKeyStore(String projectName);
 
   /**
-   * Gets the {@link UnitKeyStore} for the specified {@link FunctionalUnit}.
+   * Gets the {@link org.obiba.opal.core.unit.OpalKeyStore} for the specified {@link FunctionalUnit}.
    *
    * @param unitName functional unit name
    * @return the unit's keystore (or <code>null</code> if no keystore exists for that unit)
    */
   @Nullable
-  UnitKeyStore getUnitKeyStore(@NotNull String unitName);
+  @Deprecated
+  OpalKeyStore getUnitKeyStore(@NotNull String unitName);
 
   @Nullable
-  UnitKeyStore getKeyStore(@NotNull String unitName, boolean create);
+  @Deprecated
+  OpalKeyStore getKeyStore(@NotNull String unitName, boolean create);
 
   @Nullable
-  UnitKeyStore getKeyStore(@NotNull String unitName);
+  @Deprecated
+  OpalKeyStore getKeyStore(@NotNull String unitName);
 
   /**
-   * Gets the {@link UnitKeyStore} for the specified {@link FunctionalUnit} or if it doesn't exist, create, persist and
-   * return a new {@link UnitKeyStore} for the unit.
+   * Gets the {@link org.obiba.opal.core.unit.OpalKeyStore} for the specified {@link FunctionalUnit} or if it doesn't exist, create, persist and
+   * return a new {@link org.obiba.opal.core.unit.OpalKeyStore} for the unit.
    *
    * @param unitName functional unit name
    * @return the unit's keystore
    * @throws NoSuchFunctionalUnitException if no unit exists with the specified name
    */
-  UnitKeyStore getOrCreateUnitKeyStore(@NotNull String unitName) throws NoSuchFunctionalUnitException;
+  @Deprecated
+  OpalKeyStore getOrCreateUnitKeyStore(@NotNull String unitName) throws NoSuchFunctionalUnitException;
 
   /**
    * Save a {@link FunctionalUnit}'s keystore. This will persist any keystore updates.
    *
-   * @param unitKeyStore functional unit keystore
+   * @param opalKeyStore functional unit keystore
    */
-  void saveUnitKeyStore(@NotNull UnitKeyStore unitKeyStore);
+  void saveUnitKeyStore(@NotNull OpalKeyStore opalKeyStore);
 
   /**
    * Creates a new key or updates an existing key. It is the responsibility of the client to ensure that the caller
