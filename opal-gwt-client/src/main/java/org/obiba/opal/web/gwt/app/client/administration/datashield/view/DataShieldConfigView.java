@@ -13,6 +13,7 @@ import java.util.Comparator;
 
 import org.obiba.opal.web.gwt.app.client.administration.datashield.presenter.DataShieldConfigPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.ui.NavPillsPanel;
 import org.obiba.opal.web.gwt.app.client.ui.NavTabsPanel;
 import org.obiba.opal.web.gwt.app.client.ui.RadioGroup;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -47,7 +48,7 @@ public class DataShieldConfigView extends ViewImpl implements DataShieldConfigPr
   Panel packages;
 
   @UiField
-  NavTabsPanel environments;
+  NavPillsPanel environments;
 
   @UiField
   Panel permissionsPanel;

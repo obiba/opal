@@ -10,9 +10,9 @@
     <g:FlowPanel ui:field="aggregateMethods">
       <b:Paragraph>
         <ui:msg description="Aggregation Methods information">
-          The aggregation methods are used by DataShield in order to compile individual data. The same aggregation
-          methods must be defined in each DataShield server that will be involved in a computation process. Each
-          aggregation method is identified by a name that will be used from the R-DataShield client.
+          The aggregation methods are used by DataSHIELD in order to compile individual data. The same aggregation
+          methods must be defined in each DataSHIELD server that will be involved in a computation process. Each
+          aggregation method is identified by a name that will be used from the R-DataSHIELD client.
         </ui:msg>
       </b:Paragraph>
       <o:CollapsiblePanel heading="DETAILS">
@@ -47,9 +47,9 @@
     <g:FlowPanel ui:field="assignMethods">
       <b:Paragraph>
         <ui:msg description="Assign Methods information">
-          The assign methods are used by DataShield in order to transform individual data on server side. The same
-          assign methods must be defined in each DataShield server that will be involved in a computation process.
-          Each assign method is identified by a name that will be used from the R-DataShield client.
+          The assign methods are used by DataSHIELD in order to transform individual data on server side. The same
+          assign methods must be defined in each DataSHIELD server that will be involved in a computation process.
+          Each assign method is identified by a name that will be used from the R-DataSHIELD client.
         </ui:msg>
       </b:Paragraph>
       <o:CollapsiblePanel heading="DETAILS">
@@ -80,12 +80,13 @@
       </o:CollapsiblePanel>
     </g:FlowPanel>
 
-    <g:VerticalPanel width="100%" addStyleNames="content">
+    <g:FlowPanel addStyleNames="small-bottom-margin">
       <b:Button ui:field="addMethodButton" icon="PLUS" type="INFO">
-        <ui:msg description="Add DataShield method label">Add Method</ui:msg>
+        <ui:msg description="Add DataSHIELD method label">Add Method</ui:msg>
       </b:Button>
       <b:SimplePager ui:field="methodsTablePager" location="RIGHT" addStyleNames="pull-right" visible="false"/>
-      <o:Table width="100%" ui:field="methodsTable" visible="false"/>
-    </g:VerticalPanel>
+    </g:FlowPanel>
+    <o:Table ui:field="methodsTable" visible="false"/>
+
   </g:FlowPanel>
 </ui:UiBinder>

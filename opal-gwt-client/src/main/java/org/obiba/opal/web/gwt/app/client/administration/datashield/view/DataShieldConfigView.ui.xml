@@ -37,7 +37,7 @@
       </b:Paragraph>
     </g:FlowPanel>
 
-    <o:NavTabsPanel ui:field="environments"/>
+    <o:NavPillsPanel ui:field="environments"/>
 
     <g:FlowPanel ui:field="permissionsPanel">
       <b:Heading size="4">

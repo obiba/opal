@@ -49,7 +49,7 @@ import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_
  */
 public class DataShieldAdministrationView extends ViewImpl implements DataShieldAdministrationPresenter.Display {
 
-  private static final int PAGE_SIZE = 50;
+  private static final int PAGE_SIZE = 10;
 
   interface Binder extends UiBinder<Widget, DataShieldAdministrationView> {}
 
