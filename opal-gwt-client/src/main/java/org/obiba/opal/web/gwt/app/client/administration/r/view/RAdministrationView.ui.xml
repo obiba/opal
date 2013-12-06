@@ -20,20 +20,20 @@
       <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
 
-    <g:FlowPanel>
+    <g:FlowPanel addStyleNames="extra-large-bottom-margin">
       <b:Heading size="4">
         <ui:msg description="R server admin label">R Server</ui:msg>
       </b:Heading>
-      <b:ButtonGroup>
-        <b:Button ui:field="startStopButton">
-          Start/Stop
-        </b:Button>
-      </b:ButtonGroup>
-      <b:ButtonGroup>
-        <b:Button ui:field="rTestButton" styleName="content btn">
-          <ui:msg description="R server test label">Test connection with R</ui:msg>
-        </b:Button>
-      </b:ButtonGroup>
+      <b:Button ui:field="rTestButton" type="SUCCESS" addStyleNames="bottom-margin">
+        <ui:msg description="R server test label">Test connection with R</ui:msg>
+      </b:Button>
+      <b:Paragraph>
+        Whether the R server can be started and stopped depends on the configuration of the system. Stopping the R
+        server will destroy all current client connections.
+      </b:Paragraph>
+      <b:Button ui:field="startStopButton" type="INVERSE">
+        Start/Stop
+      </b:Button>
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="permissionsPanel">
