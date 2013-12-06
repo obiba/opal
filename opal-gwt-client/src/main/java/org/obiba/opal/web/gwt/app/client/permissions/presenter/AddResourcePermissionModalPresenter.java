@@ -16,7 +16,7 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
-import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResourceType;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -45,7 +45,7 @@ public class AddResourcePermissionModalPresenter
     getView().getSubjectType().setValue(Subject.SubjectType.GROUP.getName());
   }
 
-  public void initialize(@Nonnull PermissionResourceType type, @Nonnull UpdateResourcePermissionHandler updateHandler) {
+  public void initialize(@Nonnull ResourcePermissionType type, @Nonnull UpdateResourcePermissionHandler updateHandler) {
     getView().setData(type);
     this.updateHandler = updateHandler;
   }
@@ -104,7 +104,7 @@ public class AddResourcePermissionModalPresenter
       PERMISSIONS
     }
 
-    void setData(PermissionResourceType type);
+    void setData(ResourcePermissionType type);
 
     String getPermission();
 

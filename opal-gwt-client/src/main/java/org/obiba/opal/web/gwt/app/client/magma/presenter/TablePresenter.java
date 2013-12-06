@@ -36,8 +36,8 @@ import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesMod
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResourceType;
-import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResources;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
@@ -941,8 +941,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
             new AclRequest(AclAction.TABLE_ALL, node));
       }
       ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
-      resourcePermissionsPresenter.initialize(PermissionResourceType.TABLE,
-          PermissionResources.tablePermissions(table.getDatasourceName(), table.getName()));
+      resourcePermissionsPresenter.initialize(ResourcePermissionType.TABLE,
+          ResourcePermissionRequestPaths.tablePermissions(table.getDatasourceName(), table.getName()));
 
       setInSlot(Display.Slots.Permissions, resourcePermissionsPresenter);
     }

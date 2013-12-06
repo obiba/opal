@@ -3,7 +3,7 @@ package org.obiba.opal.web.gwt.app.client.permissions.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.AddResourcePermissionModalPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionModalUiHandlers;
-import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResourceType;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 
@@ -54,7 +54,7 @@ public class AddResourcePermissionModalView extends AbstractResourcePermissionMo
   }
 
   @Override
-  public void setData(PermissionResourceType type) {
+  public void setData(ResourcePermissionType type) {
     createPermissionRadios(type, null);
   }
 

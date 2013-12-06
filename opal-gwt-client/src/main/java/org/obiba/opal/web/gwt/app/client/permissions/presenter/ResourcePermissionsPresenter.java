@@ -15,8 +15,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResourceType;
-import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResources;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
@@ -41,7 +41,7 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
 
   private final ModalProvider<AddResourcePermissionModalPresenter> addModalProvider;
   private final ModalProvider<UpdateResourcePermissionModalPresenter> updateModalProvider;
-  private PermissionResourceType resourceType;
+  private ResourcePermissionType resourceType;
   private String resourcePath;
 
   @Inject
@@ -54,7 +54,7 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
     getView().setUiHandlers(this);
   }
 
-  public void initialize(@Nonnull PermissionResourceType type, @Nonnull String resource) {
+  public void initialize(@Nonnull ResourcePermissionType type, @Nonnull String resource) {
     resourceType = type;
     resourcePath = resource;
     retrievePermissions();
@@ -102,8 +102,8 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
   @Override
   public void deletePersmission(Acl acl) {
     String uri = UriBuilder.create().fromPath(resourcePath)
-        .query(PermissionResources.PRINCIPAL_QUERY_PARAM, acl.getSubject().getPrincipal())
-        .query(PermissionResources.TYPE_QUERY_PARAM, acl.getSubject().getType().getName()).build();
+        .query(ResourcePermissionRequestPaths.PRINCIPAL_QUERY_PARAM, acl.getSubject().getPrincipal())
+        .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, acl.getSubject().getType().getName()).build();
     ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder()
         .forResource(uri)
         .delete()
@@ -118,11 +118,11 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
   @Override
   public void update(List<String> subjectPrincipals, String subjectType, String permission) {
     UriBuilder uriBuilder = UriBuilder.create().fromPath(resourcePath)
-        .query(PermissionResources.TYPE_QUERY_PARAM, subjectType)//
-        .query(PermissionResources.PERMISSION_QUERY_PARAM, permission);
+        .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, subjectType)//
+        .query(ResourcePermissionRequestPaths.PERMISSION_QUERY_PARAM, permission);
 
     for (String principal : subjectPrincipals) {
-      uriBuilder.query(PermissionResources.PRINCIPAL_QUERY_PARAM, principal);
+      uriBuilder.query(ResourcePermissionRequestPaths.PRINCIPAL_QUERY_PARAM, principal);
     }
 
 
@@ -138,7 +138,7 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
   }
 
   public interface Display extends View, HasUiHandlers<ResourcePermissionsUiHandlers> {
-    void setData(PermissionResourceType resourceType, List<Acl> acls);
+    void setData(@Nonnull ResourcePermissionType resourceType, @Nonnull List<Acl> acls);
     HasActionHandler<Acl> getActions();
   }
 

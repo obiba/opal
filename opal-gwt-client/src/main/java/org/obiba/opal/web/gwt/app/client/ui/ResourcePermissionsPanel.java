@@ -5,7 +5,7 @@ import java.util.Iterator;
 import javax.annotation.Nonnull;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResourceType;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.model.client.opal.AclAction;
 
 import com.github.gwtbootstrap.client.ui.HelpBlock;
@@ -27,7 +27,7 @@ public class ResourcePermissionsPanel extends Composite {
 
   private Panel permissions;
 
-  private PermissionResourceType type;
+  private ResourcePermissionType type;
 
   private String selectedPermission;
 
@@ -42,7 +42,7 @@ public class ResourcePermissionsPanel extends Composite {
     this.handler = handler;
   }
 
-  public void initialize(@Nonnull PermissionResourceType type, @Nullable String currentPermission) {
+  public void initialize(@Nonnull ResourcePermissionType type, @Nullable String currentPermission) {
     this.type = type;
     selectedPermission = currentPermission;
     createPermissionRadios();

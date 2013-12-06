@@ -10,7 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.permissions.view;
 
-import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResourceType;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
@@ -38,7 +38,7 @@ public abstract class AbstractResourcePermissionModalView<C extends ModalUiHandl
     return selecetdPermission;
   }
 
-  protected void createPermissionRadios(PermissionResourceType type, String permission) {
+  protected void createPermissionRadios(ResourcePermissionType type, String permission) {
     permissions.addHandler(new ResourcePermissionsPanel.Handler() {
       @Override
       public void onSelected(String permission) {

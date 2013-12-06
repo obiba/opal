@@ -32,6 +32,9 @@ import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CategoriesEdit
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
@@ -87,6 +90,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private final Provider<AuthorizationPresenter> authorizationPresenter;
 
+  private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
+
   private final ModalProvider<VariablesToViewPresenter> variablesToViewProvider;
 
   private final VariableVcsCommitHistoryPresenter variableVcsCommitHistoryPresenter;
@@ -114,6 +119,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   public VariablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
       ValuesTablePresenter valuesTablePresenter, SummaryTabPresenter summaryTabPresenter,
       ScriptEditorPresenter scriptEditorPresenter, Provider<AuthorizationPresenter> authorizationPresenter,
+      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
       VariableVcsCommitHistoryPresenter variableVcsCommitHistoryPresenter,
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
       ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider,
@@ -124,6 +130,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     this.valuesTablePresenter = valuesTablePresenter;
     this.summaryTabPresenter = summaryTabPresenter;
     this.authorizationPresenter = authorizationPresenter;
+    this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.variableVcsCommitHistoryPresenter = variableVcsCommitHistoryPresenter;
     this.scriptEditorPresenter = scriptEditorPresenter;
     this.variablesToViewProvider = variablesToViewProvider.setContainer(this);
@@ -654,7 +661,12 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
           .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variable", variable.getName())
           .build();
       authz.setAclRequest("variable", new AclRequest(AclAction.VARIABLE_READ, node));
-      setInSlot(Display.Slots.Permissions, authz);
+
+      ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
+      resourcePermissionsPresenter.initialize(ResourcePermissionType.VARIABLE,
+          ResourcePermissionRequestPaths
+              .variablePermissions(table.getDatasourceName(), table.getName(), variable.getName()));
+      setInSlot(Display.Slots.Permissions, resourcePermissionsPresenter);
     }
   }
 

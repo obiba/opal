@@ -13,7 +13,7 @@ package org.obiba.opal.web.gwt.app.client.permissions.view;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.UpdateResourcePermissionModalPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionModalUiHandlers;
-import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResourceType;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.model.client.opal.Acl;
 
 import com.github.gwtbootstrap.client.ui.Heading;
@@ -45,7 +45,7 @@ public class UpdateResourcePermissionModalView extends AbstractResourcePermissio
   }
 
   @Override
-  public void setData(PermissionResourceType type, Acl acl) {
+  public void setData(ResourcePermissionType type, Acl acl) {
     subjectLabel.setText(translations.userResourcePermissionLabel() + acl.getSubject().getPrincipal());
     createPermissionRadios(type, acl.getActions(0));
   }

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 import org.obiba.opal.web.model.client.opal.AclAction;
 
-public enum PermissionResourceType {
+public enum ResourcePermissionType {
   PROJECT(AclAction.PROJECT_ALL),
   DATASOURCE(AclAction.CREATE_TABLE, AclAction.DATASOURCE_ALL),
   TABLE(AclAction.TABLE_ALL, AclAction.TABLE_EDIT, AclAction.TABLE_READ, AclAction.TABLE_VALUES,
@@ -26,7 +26,7 @@ public enum PermissionResourceType {
     return (ArrayList<AclAction>) permissions.clone();
   }
 
-  PermissionResourceType(AclAction... permissions) {
+  ResourcePermissionType(AclAction... permissions) {
     for(AclAction permission : permissions) {
       this.permissions.add(permission);
     }

@@ -12,16 +12,17 @@ package org.obiba.opal.web.gwt.app.client.permissions.view;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsUiHandlers;
-import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResourceType;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.model.client.opal.Acl;
 
-import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CellTable;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.core.client.GWT;
@@ -51,6 +52,8 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
 
   private final ListDataProvider<Acl> permissionsDataProvider = new ListDataProvider<Acl>();
 
+  private ResourcePermissionType resourceType;
+
   @Inject
   public ResourcePermissionsView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
@@ -58,8 +61,9 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
   }
 
   @Override
-  public void setData(PermissionResourceType resourceType, List<Acl> acls) {
-    renderSubjectsPermissionTable(resourceType, acls);
+  public void setData(@Nonnull ResourcePermissionType resourceType, @Nonnull List<Acl> acls) {
+    this.resourceType = resourceType;
+    renderSubjectsPermissionTable(acls);
   }
 
   @Override
@@ -72,17 +76,19 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
     getUiHandlers().addPersmission();
   }
 
-  private void renderSubjectsPermissionTable(PermissionResourceType resourceType, List<Acl> acls) {
-    tablePager.firstPage();
+  private void renderSubjectsPermissionTable(List<Acl> acls) {
     permissionsDataProvider.setList(acls);
+    tablePager.firstPage();
     permissionsDataProvider.refresh();
     tablePager.setVisible(permissionsDataProvider.getList().size() > tablePager.getPageSize());
   }
 
   private void initSubjectsPermissionTable() {
+    tablePager.setDisplay(permissionsTable);
     permissionsTable.addColumn(SubjectsPermissionColumns.NAME, "Name");
     permissionsTable.addColumn(SubjectsPermissionColumns.TYPE, "Type");
     permissionsTable.addColumn(SubjectsPermissionColumns.PERMISSION, "Permission");
+    // TODO make sure to hide edit for one permission only
     permissionsTable.addColumn(SubjectsPermissionColumns.ACTIONS, translations.actionsLabel());
     permissionsDataProvider.addDataDisplay(permissionsTable);
 //    permissionsTable.setEmptyTableWidget(new Label(translations.noVcsCommitHistoryAvailable()));

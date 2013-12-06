@@ -28,9 +28,9 @@ import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPr
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.AddViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResources;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResourceType;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
@@ -390,7 +390,8 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     @Override
     public void authorized() {
       resourcePermissionsPresenter
-          .initialize(PermissionResourceType.DATASOURCE, PermissionResources.datasourcePermissions(datasourceName));
+          .initialize(ResourcePermissionType.DATASOURCE, ResourcePermissionRequestPaths
+              .datasourcePermissions(datasourceName));
       setInSlot(null, resourcePermissionsPresenter);
 //      AuthorizationPresenter authz = authorizationPresenter.get();
 //      String node = UriBuilder.create().segment("datasource", datasourceName).build();

@@ -14,9 +14,9 @@ import javax.annotation.Nonnull;
 
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 
-public final class PermissionResources {
+public final class ResourcePermissionRequestPaths {
 
-  private PermissionResources() {}
+  private ResourcePermissionRequestPaths() {}
 
   public static final String PRINCIPAL_QUERY_PARAM = "principal";
   public static final String TYPE_QUERY_PARAM = "type";
@@ -34,9 +34,9 @@ public final class PermissionResources {
     return baseUri(project).segment("table", table).build();
   }
 
-  public static UriBuilder variablePermissions(@Nonnull String project, @Nonnull String table,
+  public static String variablePermissions(@Nonnull String project, @Nonnull String table,
       @Nonnull String variable) {
-    return UriBuilder.create().fromPath(tablePermissions(project, table)).segment("variable", variable);
+    return UriBuilder.create().fromPath(tablePermissions(project, table)).segment("variable", variable).build();
   }
 
   public static String reportTemplatePermissions(@Nonnull String project, @Nonnull String report) {
