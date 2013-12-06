@@ -1051,6 +1051,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add New Attribute")
   String addNewAttribute();
 
+  @Description("Add attribute title")
+  @DefaultStringValue("Add Attribute")
+  String addAttribute();
+
   @Description("Edit attribute title")
   @DefaultStringValue("Edit Attribute")
   String editAttribute();
