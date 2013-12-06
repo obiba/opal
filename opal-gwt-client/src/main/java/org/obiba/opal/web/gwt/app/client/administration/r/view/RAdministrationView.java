@@ -85,13 +85,16 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
       case Startable:
         startStopButton.setText(translations.startLabel());
         startStopButton.setEnabled(true);
+        rTestButton.setEnabled(false);
         break;
       case Stoppable:
         startStopButton.setText(translations.stopLabel());
         startStopButton.setEnabled(true);
+        rTestButton.setEnabled(true);
         break;
       case Pending:
         startStopButton.setEnabled(false);
+        rTestButton.setEnabled(false);
         break;
     }
   }

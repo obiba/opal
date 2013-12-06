@@ -20,6 +20,7 @@ import javax.annotation.PreDestroy;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListener;
+import org.obiba.opal.core.runtime.ServiceListener;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +34,10 @@ import com.google.common.collect.ImmutableList;
  * R session created or a R session explicitly set.
  */
 @Component
-public class OpalRSessionManager implements SessionListener {
+public class OpalRSessionManager implements SessionListener, ServiceListener<OpalRService> {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRSessionManager.class);
 
-  @Autowired
   private OpalRService opalRService;
 
   private final Map<String, SubjectRSessions> rSessionMap = new HashMap<String, SubjectRSessions>();
@@ -48,6 +48,22 @@ public class OpalRSessionManager implements SessionListener {
       doClearRSessions(sessionId);
     }
     rSessionMap.clear();
+  }
+
+  @Autowired
+  public void setOpalRService(OpalRService opalRService) {
+    this.opalRService = opalRService;
+    opalRService.addListener(this);
+  }
+
+  @Override
+  public void onServiceStart(OpalRService service) {
+
+  }
+
+  @Override
+  public void onServiceStop(OpalRService service) {
+    stop();
   }
 
   /**

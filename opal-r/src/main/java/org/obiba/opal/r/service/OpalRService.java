@@ -10,13 +10,14 @@
 package org.obiba.opal.r.service;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import org.obiba.core.util.StringUtil;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.core.runtime.HasServiceListener;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.Service;
+import org.obiba.opal.core.runtime.ServiceListener;
 import org.obiba.opal.r.ROperation;
 import org.obiba.opal.r.ROperationTemplate;
 import org.obiba.opal.r.RRuntimeException;
@@ -35,7 +36,7 @@ import com.google.common.collect.Lists;
  * Gets connection to the R server.
  */
 @Component
-public class OpalRService implements Service, ROperationTemplate {
+public class OpalRService implements Service, ROperationTemplate, HasServiceListener<OpalRService> {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRService.class);
 
@@ -61,6 +62,25 @@ public class OpalRService implements Service, ROperationTemplate {
   private String encoding;
 
   private int rserveStatus = -1;
+
+  private final List<ServiceListener<OpalRService>> listeners = Lists.newArrayList();
+
+  @Override
+  public void addListener(ServiceListener<OpalRService> listener) {
+    listeners.add(listener);
+  }
+
+  private void notifyListenersOnStart() {
+    for (ServiceListener<OpalRService> listener : listeners) {
+      listener.onServiceStart(this);
+    }
+  }
+
+  private void notifyListenersOnStop() {
+    for (ServiceListener<OpalRService> listener : listeners) {
+      listener.onServiceStop(this);
+    }
+  }
 
   /**
    * Creates a new connection to R server.
@@ -125,25 +145,21 @@ public class OpalRService implements Service, ROperationTemplate {
   public void start() {
     if(!isEnabled() || rserveStatus == 0) return;
 
-    // fresh start, try to kill any remains
+    // fresh start, try to kill any remains of R server
     try {
+      notifyListenersOnStop();
       newRConnection().shutdown();
     } catch(Exception e) {
       // ignore
     }
 
-    List<String> args = getArguments();
-    log.info("Starting R server: {}", StringUtil.collectionToString(args, " "));
-    ProcessBuilder pb = new ProcessBuilder(args);
-    pb.directory(getWorkingDirectory());
-    pb.redirectErrorStream(true);
-    pb.redirectOutput(ProcessBuilder.Redirect.appendTo(getRserveLog()));
     try {
       // launch the Rserve daemon and wait for it to complete
-      Process rserve = pb.start();
+      Process rserve = buildRProcess().start();
       rserveStatus = rserve.waitFor();
       if(rserveStatus == 0) {
         log.info("R server started");
+        notifyListenersOnStart();
       } else {
         log.error("R server start failed with status: {}", rserveStatus);
         rserveStatus = -1;
@@ -154,11 +170,22 @@ public class OpalRService implements Service, ROperationTemplate {
     }
   }
 
+  private ProcessBuilder buildRProcess() {
+    List<String> args = getArguments();
+    log.info("Starting R server: {}", StringUtil.collectionToString(args, " "));
+    ProcessBuilder pb = new ProcessBuilder(args);
+    pb.directory(getWorkingDirectory());
+    pb.redirectErrorStream(true);
+    pb.redirectOutput(ProcessBuilder.Redirect.appendTo(getRserveLog()));
+    return pb;
+  }
+
   @Override
   public void stop() {
     if(rserveStatus != 0) return;
 
     try {
+      notifyListenersOnStop();
       log.info("Shutting down R server...");
       newConnection().shutdown();
       log.info("R server shut down");
@@ -213,25 +240,31 @@ public class OpalRService implements Service, ROperationTemplate {
   private File getWorkingDirectory() {
     File dir = new File(opalHomeFile, "work" + File.separator + "R");
     if(!dir.exists()) {
-      dir.mkdirs();
+      if (!dir.mkdirs()) {
+       log.error("Unable to create: {}", dir.getAbsolutePath());
+      }
     }
     return dir;
   }
 
   private File getLibDirectory() {
-    File dir = new File(opalHomeFile, "data" + File.separator + "R");
+    File dir = new File(opalHomeFile, "data" + File.separator + "R" + File.separator + "library");
     if(!dir.exists()) {
-      dir.mkdirs();
+      if (!dir.mkdirs()) {
+        log.error("Unable to create: {}", dir.getAbsolutePath());
+      }
     }
     return dir;
   }
 
   private File getRserveLog() {
-    File rserveLog = new File(opalHomeFile, "logs" + File.separator + "Rserve.log");
-    if(!rserveLog.getParentFile().exists()) {
-      rserveLog.getParentFile().mkdirs();
+    File logFile = new File(opalHomeFile, "logs" + File.separator + "Rserve.log");
+    if(!logFile.getParentFile().exists()) {
+      if (!logFile.getParentFile().mkdirs()) {
+        log.error("Unable to create: {}", logFile.getParentFile().getAbsolutePath());
+      }
     }
-    return rserveLog;
+    return logFile;
   }
 
   private File getRservConf() {
