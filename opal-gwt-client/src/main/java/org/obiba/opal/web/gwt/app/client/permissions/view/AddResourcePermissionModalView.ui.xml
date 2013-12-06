@@ -7,12 +7,12 @@
 
   <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false">
     <g:FlowPanel>
-      <b:ControlGroup ui:field="nameGroup">
-        <b:ControlLabel for="name">
+      <b:ControlGroup ui:field="principalGroup">
+        <b:ControlLabel for="principal">
           <ui:msg description="Add Resource Permission Name label">Name</ui:msg>
           <o:RequiredIcon/>
         </b:ControlLabel>
-        <b:TextBox ui:field="principal" b:id="name"/>
+        <b:TextBox ui:field="principal" b:id="principal"/>
       </b:ControlGroup>
       <b:ControlGroup ui:field="subjectTypeGroup">
         <b:ControlLabel for="subjectType">
@@ -20,7 +20,7 @@
         </b:ControlLabel>
         <o:Chooser ui:field="subjectType" name="subjectType"/>
       </b:ControlGroup>
-      <b:ControlGroup>
+      <b:ControlGroup ui:field="permissionsGroup">
         <b1:InlineLabel><ui:msg description="Add Resource Permission label">Permissions</ui:msg></b1:InlineLabel>
         <b:Controls>
           <o:ResourcePermissionsPanel ui:field="permissions" addStyleNames="large-top-margin"></o:ResourcePermissionsPanel>

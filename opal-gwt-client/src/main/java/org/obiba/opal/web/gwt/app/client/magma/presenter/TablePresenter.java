@@ -35,6 +35,9 @@ import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesMo
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResourceType;
+import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResources;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.VariablesFilter;
@@ -100,6 +103,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final Provider<AuthorizationPresenter> authorizationPresenter;
 
+  private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
+
   private final ModalProvider<ConfigureViewStepPresenter> configureViewStepProvider;
 
   private final ModalProvider<VariablesToViewPresenter> variablesToViewProvider;
@@ -139,7 +144,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @Inject
   public TablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
       ValuesTablePresenter valuesTablePresenter, Provider<AuthorizationPresenter> authorizationPresenter,
-      Provider<IndexPresenter> indexPresenter, ModalProvider<ConfigureViewStepPresenter> configureViewStepProvider,
+      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, Provider<IndexPresenter> indexPresenter,
+      ModalProvider<ConfigureViewStepPresenter> configureViewStepProvider,
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
       ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider,
       ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider,
@@ -151,6 +157,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
     this.authorizationPresenter = authorizationPresenter;
+    this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.indexPresenter = indexPresenter;
     this.translations = translations;
     this.configureViewStepProvider = configureViewStepProvider.setContainer(this);
@@ -933,7 +940,11 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
             new AclRequest(AclAction.TABLE_VALUES_EDIT, node),//
             new AclRequest(AclAction.TABLE_ALL, node));
       }
-      setInSlot(Display.Slots.Permissions, authz);
+      ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
+      resourcePermissionsPresenter.initialize(PermissionResourceType.TABLE,
+          PermissionResources.tablePermissions(table.getDatasourceName(), table.getName()));
+
+      setInSlot(Display.Slots.Permissions, resourcePermissionsPresenter);
     }
   }
 

@@ -25,7 +25,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-//public class UpdateResourcePermissionModalView extends ModalPopupViewWithUiHandlers<ResourcePermissionModalUiHandlers>
 public class UpdateResourcePermissionModalView extends AbstractResourcePermissionModalView<ResourcePermissionModalUiHandlers>
     implements UpdateResourcePermissionModalPresenter.Display {
 
@@ -71,41 +70,4 @@ public class UpdateResourcePermissionModalView extends AbstractResourcePermissio
     close();
   }
 
-//  private void createPermissionRadios(PermissionResourceType type, String permission) {
-//    permissions.addHandler(new ResourcePermissionsPanel.Handler() {
-//      @Override
-//      public void onSelected(String permission) {
-//        currentPermission = permission;
-//      }
-//    });
-
-//    permissions.initialize(type, permission);
-
-//    for (Iterator<AclAction> iterator = type.getPermissions().iterator(); iterator.hasNext();) {
-//      String permission = iterator.next().getName();
-//      boolean select = permission.equals(acl.getActions(0));
-//      if (select) currentPermission = permission;
-//      permissions.add(createPermissionPanel(permission, select));
-//    }
-//  }
-
-//  private Panel createPermissionPanel(final String permissionKey, boolean select) {
-//    Panel panel = new FlowPanel();
-//    RadioButton radio = new RadioButton("permission", translations.permissionMap().get(permissionKey));
-//    radio.addClickHandler(new ClickHandler() {
-//      @Override
-//      public void onClick(ClickEvent event) {
-//        currentPermission = permissionKey;
-//      }
-//    });
-//
-//    radio.setValue(select);
-//    HelpBlock help = new HelpBlock(translations.permissionMap().get(permissionKey));
-//    help.addStyleName("help-block");
-//
-//    panel.add(radio);
-//    panel.add(help);
-//
-//    return panel;
-//  }
 }

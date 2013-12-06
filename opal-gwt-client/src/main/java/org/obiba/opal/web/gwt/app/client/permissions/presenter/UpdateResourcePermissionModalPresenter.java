@@ -15,7 +15,6 @@ import java.util.Arrays;
 import javax.annotation.Nonnull;
 
 import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResourceType;
-import org.obiba.opal.web.gwt.app.client.permissions.support.events.UpdateResourcePermissionEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.model.client.opal.Acl;
 
@@ -30,27 +29,35 @@ public class UpdateResourcePermissionModalPresenter
 
   private Acl acl;
 
+  private UpdateResourcePermissionHandler updateHandler;
+
   @Inject
   public UpdateResourcePermissionModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
     getView().setUiHandlers(this);
   }
 
-  public void initialize(@Nonnull PermissionResourceType type, @Nonnull Acl acl) {
+  public void initialize(@Nonnull PermissionResourceType type, @Nonnull Acl acl,
+      @Nonnull UpdateResourcePermissionHandler updateHandler) {
     this.acl = acl;
+    this.updateHandler = updateHandler;
     getView().setData(type, acl);
   }
 
   @Override
   public void save() {
-    fireEvent(new UpdateResourcePermissionEvent(Arrays.asList(acl.getSubject().getPrincipal()),
-        acl.getSubject().getType().getName(), getView().getPermission()));
+    if(updateHandler != null) {
+      updateHandler.update(Arrays.asList(acl.getSubject().getPrincipal()), acl.getSubject().getType().getName(),
+          getView().getPermission());
+    }
     getView().close();
   }
 
   public interface Display extends PopupView, HasUiHandlers<ResourcePermissionModalUiHandlers> {
     void setData(PermissionResourceType type, Acl acl);
+
     String getPermission();
+
     void close();
   }
 

@@ -1,21 +1,21 @@
 package org.obiba.opal.web.gwt.app.client.permissions.view;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.AddResourcePermissionModalPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResourceType;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
-import org.obiba.opal.web.model.client.opal.Subject;
 
+import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.TakesValue;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -34,6 +34,15 @@ public class AddResourcePermissionModalView extends AbstractResourcePermissionMo
   @UiField
   Chooser subjectType;
 
+  @UiField
+  ControlGroup principalGroup;
+
+  @UiField
+  ControlGroup subjectTypeGroup;
+
+  @UiField
+  ControlGroup permissionsGroup;
+
   private final Translations translations;
 
   @Inject
@@ -42,8 +51,6 @@ public class AddResourcePermissionModalView extends AbstractResourcePermissionMo
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
     dialog.setTitle(translations.updateResourcePermissionsModalTile());
-    subjectType.addItem(Subject.SubjectType.GROUP.getName());
-    subjectType.addItem(Subject.SubjectType.USER.getName());
   }
 
   @Override
@@ -57,19 +64,57 @@ public class AddResourcePermissionModalView extends AbstractResourcePermissionMo
   }
 
   @Override
-  public List<String> getPrincipals() {
-    // TODO change component for a multiple input
-    return Arrays.asList(principal.getText());
+  public TakesValue<String> getSubjectType() {
+    return new TakesValue<String>() {
+
+      @Override
+      public void setValue(String type) {
+        subjectType.addItem(type);
+      }
+
+      @Override
+      public String getValue() {
+        return subjectType.getSelectedValue();
+      }
+    };
   }
 
   @Override
-  public String getSubjectType() {
-    return subjectType.getSelectedValue();
+  public HasText getPrincipal() {
+    return principal;
   }
 
   @Override
   public void close() {
     dialog.hide();
+  }
+
+  @Override
+  public void showError(String message, FormField field) {
+    ControlGroup group = null;
+    if(field != null) {
+      switch(field) {
+        case PRINCIPAL:
+          group = principalGroup;
+          break;
+        case SUBJECT_TYPE:
+          group = subjectTypeGroup;
+          break;
+        case PERMISSIONS:
+          group = permissionsGroup;
+          break;
+      }
+    }
+    if(group == null) {
+      dialog.addAlert(message, AlertType.ERROR);
+    } else {
+      dialog.addAlert(message, AlertType.ERROR, group);
+    }
+  }
+
+  @Override
+  public void clearErrors() {
+    dialog.closeAlerts();
   }
 
   @UiHandler("saveButton")

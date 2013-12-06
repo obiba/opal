@@ -542,7 +542,8 @@ public interface Translations extends Constants {
       "SPSSOrExcelFileRequired", "An Excel or a SPSS file is required.",//
       "ESQueryBadRequest", "Not a valid search query.", "DuplicateUserName", "A user with same name already exists.",
       "DuplicateSubjectProfile", "A user or application profile is already registered with the same name.",//
-      "AttributeNameIsRequired", "An attribute name is required"//
+      "AttributeNameIsRequired", "An attribute name is required",//
+      "PermissionRequired", "You must select a at most one permission type."//
   })
   Map<String, String> userMessageMap();
 
@@ -1610,7 +1611,6 @@ public interface Translations extends Constants {
       "REPORTS", "Reports", //
       "TASKS", "Tasks", //
       "PERMISSIONS", "Permissions", //
-      "DATA_EXCHANGE","Data Exchange", //
       "ADMINISTRATION", "Administration" //
   })
   Map<String, String> projectTabNameMap();
@@ -2442,6 +2442,10 @@ public interface Translations extends Constants {
   @Description("None label")
   @DefaultStringValue("None")
   String none();
+
+  @Description("General Settings label")
+  @DefaultStringValue("General settings")
+  String generalSettings();
 
   @Description("Project Database Name label")
   @DefaultStringValue("Project tables (dictionaries and data) are stored in the database:")

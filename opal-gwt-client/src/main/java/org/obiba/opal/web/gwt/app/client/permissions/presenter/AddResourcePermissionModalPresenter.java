@@ -10,14 +10,22 @@
 
 package org.obiba.opal.web.gwt.app.client.permissions.presenter;
 
-import java.util.List;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 
 import org.obiba.opal.web.gwt.app.client.permissions.support.PermissionResourceType;
-import org.obiba.opal.web.gwt.app.client.permissions.support.events.UpdateResourcePermissionEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
+import org.obiba.opal.web.model.client.opal.Subject;
 
+import com.google.gwt.user.client.TakesValue;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -27,27 +35,88 @@ public class AddResourcePermissionModalPresenter
     extends ModalPresenterWidget<AddResourcePermissionModalPresenter.Display>
     implements ResourcePermissionModalUiHandlers {
 
+  private UpdateResourcePermissionHandler updateHandler;
+
   @Inject
   public AddResourcePermissionModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
     getView().setUiHandlers(this);
+    getView().getSubjectType().setValue(Subject.SubjectType.USER.getName());
+    getView().getSubjectType().setValue(Subject.SubjectType.GROUP.getName());
   }
 
-  public void initialize(@Nonnull PermissionResourceType type) {
+  public void initialize(@Nonnull PermissionResourceType type, @Nonnull UpdateResourcePermissionHandler updateHandler) {
     getView().setData(type);
+    this.updateHandler = updateHandler;
   }
 
   @Override
   public void save() {
-    fireEvent(new UpdateResourcePermissionEvent(getView().getPrincipals(), getView().getSubjectType(), getView().getPermission()));
-    getView().close();
+    getView().clearErrors();
+    if(new ViewValidatorHandler().validate()) {
+      if (updateHandler != null) {
+        updateHandler.update(Arrays.asList(getView().getPrincipal().getText()), getView().getSubjectType().getValue(),
+            getView().getPermission());
+      }
+      getView().close();
+    }
+  }
+
+  private final class ViewValidatorHandler extends ViewValidationHandler {
+
+    private ViewValidatorHandler() {}
+
+    @Override
+    protected Set<FieldValidator> getValidators() {
+      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+      validators.add(
+          new RequiredTextValidator(getView().getPrincipal(), "NameIsRequired", Display.FormField.PRINCIPAL.name()));
+      validators.add(
+          new PermissionValidator(getView().getPermission(), "PermissionRequired", Display.FormField.PERMISSIONS.name()));
+      return validators;
+    }
+
+    @Override
+    protected void showMessage(String id, String message) {
+      getView().showError(message, Display.FormField.valueOf(id));
+    }
+  }
+
+  private final class PermissionValidator extends AbstractFieldValidator {
+
+    private final String permission;
+
+    public PermissionValidator(String permission, String errorMessageKey, String id) {
+      super(errorMessageKey, id);
+      this.permission = permission;
+    }
+
+    @Override
+    protected boolean hasError() {
+      return permission == null;
+    }
   }
 
   public interface Display extends PopupView, HasUiHandlers<ResourcePermissionModalUiHandlers> {
+    enum FormField {
+      PRINCIPAL,
+      SUBJECT_TYPE,
+      PERMISSIONS
+    }
+
     void setData(PermissionResourceType type);
+
     String getPermission();
-    List<String> getPrincipals();
-    String getSubjectType();
+
+    TakesValue<String> getSubjectType();
+
+    HasText getPrincipal();
+
     void close();
+
+    void showError(String message, FormField field);
+
+    void clearErrors();
   }
+
 }

@@ -75,7 +75,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   private final Provider<AuthorizationPresenter> authorizationPresenter;
 
-  private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
+  private final ResourcePermissionsPresenter resourcePermissionsPresenter;
 
   private final Translations translations;
 
@@ -101,7 +101,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     this.createViewModalProvider = createViewModalProvider.setContainer(this);
     this.dataCopyModalProvider = dataCopyModalProvider.setContainer(this);
     this.authorizationPresenter = authorizationPresenter;
-    this.resourcePermissionsProvider = resourcePermissionsProvider;
+    resourcePermissionsPresenter = resourcePermissionsProvider.get();
     getView().setUiHandlers(this);
   }
 
@@ -389,10 +389,9 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
     @Override
     public void authorized() {
-      ResourcePermissionsPresenter permissions = resourcePermissionsProvider.get();
-      permissions
+      resourcePermissionsPresenter
           .initialize(PermissionResourceType.DATASOURCE, PermissionResources.datasourcePermissions(datasourceName));
-      setInSlot(null, permissions);
+      setInSlot(null, resourcePermissionsPresenter);
 //      AuthorizationPresenter authz = authorizationPresenter.get();
 //      String node = UriBuilder.create().segment("datasource", datasourceName).build();
 //      authz.setAclRequest("datasource", new AclRequest(AclAction.CREATE_TABLE, node), //
