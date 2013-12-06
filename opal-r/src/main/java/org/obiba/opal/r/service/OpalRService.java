@@ -223,7 +223,7 @@ public class OpalRService implements Service, ROperationTemplate {
   }
 
   private File getLibDirectory() {
-    File dir = new File(opalHomeFile, "data" + File.separator + "R");
+    File dir = new File(opalHomeFile, "data" + File.separator + "R" + File.separator + "library");
     if(!dir.exists()) {
       dir.mkdirs();
     }
