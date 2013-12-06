@@ -14,8 +14,10 @@ import java.util.List;
 
 import org.obiba.core.util.StringUtil;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.core.runtime.HasServiceListener;
 import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
 import org.obiba.opal.core.runtime.Service;
+import org.obiba.opal.core.runtime.ServiceListener;
 import org.obiba.opal.r.ROperation;
 import org.obiba.opal.r.ROperationTemplate;
 import org.obiba.opal.r.RRuntimeException;
@@ -34,7 +36,7 @@ import com.google.common.collect.Lists;
  * Gets connection to the R server.
  */
 @Component
-public class OpalRService implements Service, ROperationTemplate {
+public class OpalRService implements Service, ROperationTemplate, HasServiceListener<OpalRService> {
 
   private static final Logger log = LoggerFactory.getLogger(OpalRService.class);
 
@@ -60,6 +62,25 @@ public class OpalRService implements Service, ROperationTemplate {
   private String encoding;
 
   private int rserveStatus = -1;
+
+  private final List<ServiceListener<OpalRService>> listeners = Lists.newArrayList();
+
+  @Override
+  public void addListener(ServiceListener<OpalRService> listener) {
+    listeners.add(listener);
+  }
+
+  private void notifyListenersOnStart() {
+    for (ServiceListener<OpalRService> listener : listeners) {
+      listener.onServiceStart(this);
+    }
+  }
+
+  private void notifyListenersOnStop() {
+    for (ServiceListener<OpalRService> listener : listeners) {
+      listener.onServiceStop(this);
+    }
+  }
 
   /**
    * Creates a new connection to R server.
@@ -126,6 +147,7 @@ public class OpalRService implements Service, ROperationTemplate {
 
     // fresh start, try to kill any remains of R server
     try {
+      notifyListenersOnStop();
       newRConnection().shutdown();
     } catch(Exception e) {
       // ignore
@@ -137,6 +159,7 @@ public class OpalRService implements Service, ROperationTemplate {
       rserveStatus = rserve.waitFor();
       if(rserveStatus == 0) {
         log.info("R server started");
+        notifyListenersOnStart();
       } else {
         log.error("R server start failed with status: {}", rserveStatus);
         rserveStatus = -1;
@@ -162,6 +185,7 @@ public class OpalRService implements Service, ROperationTemplate {
     if(rserveStatus != 0) return;
 
     try {
+      notifyListenersOnStop();
       log.info("Shutting down R server...");
       newConnection().shutdown();
       log.info("R server shut down");
