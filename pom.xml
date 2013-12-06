@@ -1506,7 +1506,7 @@
     <junit.version>4.7</junit.version>
     <liquibase.version>1.9.4</liquibase.version>
     <magma.version>1.7.6</magma.version>
-    <public-datasources.version>1.0</public-datasources.version>
+    <public-datasources.version>1.0.1</public-datasources.version>
     <mail.version>1.4</mail.version>
     <mockftpserver.version>2.1</mockftpserver.version>
     <mysql-connector-java.version>5.1.24</mysql-connector-java.version>
