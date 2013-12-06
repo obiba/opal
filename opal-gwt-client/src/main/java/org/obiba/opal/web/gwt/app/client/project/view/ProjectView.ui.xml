@@ -76,9 +76,7 @@
       </b:Tab>
       <b:Tab icon="LOCK">
         <b:Heading size="3">Permissions</b:Heading>
-        <b:Paragraph>
-          TODO
-        </b:Paragraph>
+        <g:FlowPanel ui:field="permissionsPanel"></g:FlowPanel>
       </b:Tab>
       <b:Tab icon="EXCHANGE">
         <b:Heading size="3">Data Exchange</b:Heading>

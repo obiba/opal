@@ -26,6 +26,18 @@ public final class ResourcePermissionRequestPaths {
     return baseUri(project).segment("project").build();
   }
 
+  public static String projectSubjects(@Nonnull String project) {
+    return baseUri(project).segment("subjects").build();
+  }
+
+  public static String projectSubject(@Nonnull String project, @Nonnull String subject) {
+    return baseUri(project).segment("subject", subject).build();
+  }
+
+  public static String projectNode(@Nonnull String project, @Nonnull String nodePath) {
+    return baseUri(project).fromPath(nodePath).build();
+  }
+
   public static String datasourcePermissions(@Nonnull String project) {
     return baseUri(project).segment("datasource").build();
   }

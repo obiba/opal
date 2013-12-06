@@ -88,10 +88,8 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
     permissionsTable.addColumn(SubjectsPermissionColumns.NAME, "Name");
     permissionsTable.addColumn(SubjectsPermissionColumns.TYPE, "Type");
     permissionsTable.addColumn(SubjectsPermissionColumns.PERMISSION, "Permission");
-    // TODO make sure to hide edit for one permission only
     permissionsTable.addColumn(SubjectsPermissionColumns.ACTIONS, translations.actionsLabel());
     permissionsDataProvider.addDataDisplay(permissionsTable);
-//    permissionsTable.setEmptyTableWidget(new Label(translations.noVcsCommitHistoryAvailable()));
   }
 
   private static final class SubjectsPermissionColumns {
@@ -133,9 +131,16 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
 
       @Override
       public String[] getActions(Acl value) {
+        String action = value.getActions(0);
+        if(ResourcePermissionType.PROJECT.hasPermission(action) ||
+            ResourcePermissionType.VARIABLE.hasPermission(action)) {
+          return new String[] {ActionsColumn.DELETE_ACTION };
+        }
+
         return allActions();
       }
     });
+
   }
 
 }

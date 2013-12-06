@@ -17,8 +17,7 @@
   <o:Modal ui:field="dialog" resizable="false" closeVisible="true" keyboard="true" animation="false">
     <g:FlowPanel>
       <b:ControlGroup>
-        <!--<b1:InlineLabel ui:field="subjectLabel"></b1:InlineLabel>-->
-        <b:Heading size="4" ui:field="subjectLabel"></b:Heading>
+        <b:Heading size="5" ui:field="subjectLabel"></b:Heading>
         <b:Controls>
           <o:ResourcePermissionsPanel ui:field="permissions" addStyleNames="large-top-margin"></o:ResourcePermissionsPanel>
         </b:Controls>

@@ -19,6 +19,9 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.event.MagmaPathSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.presenter.ProjectResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
@@ -91,6 +94,9 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   @ContentSlot
   public static final GwtEvent.Type<RevealContentHandler<?>> ADMIN_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
 
+  @ContentSlot
+  public static final GwtEvent.Type<RevealContentHandler<?>> PERMISSION_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
+
   private final Provider<MagmaPresenter> magmaPresenterProvider;
 
   private final Provider<FileExplorerPresenter> fileExplorerPresenterProvider;
@@ -98,6 +104,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   private final Provider<ReportsPresenter> reportsPresenterProvider;
 
   private final Provider<TasksPresenter> tasksPresenterProvider;
+
+  private final Provider<ProjectResourcePermissionsPresenter> projectResourcePermissionsProvider;
 
   private final Provider<ProjectAdministrationPresenter> projectAdministrationPresenterProvider;
 
@@ -117,6 +125,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private TasksPresenter tasksPresenter;
 
+  private ProjectResourcePermissionsPresenter projectResourcePermissionsPresenter;
+
   private ProjectAdministrationPresenter projectAdministrationPresenter;
 
   @Inject
@@ -124,7 +134,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       PlaceManager placeManager, Provider<MagmaPresenter> magmaPresenterProvider,
       Provider<FileExplorerPresenter> fileExplorerPresenterProvider,
       Provider<ReportsPresenter> reportsPresenterProvider, Provider<TasksPresenter> tasksPresenterProvider,
-      Provider<ProjectAdministrationPresenter> projectAdministrationPresenterProvider) {
+      Provider<ProjectAdministrationPresenter> projectAdministrationPresenterProvider,
+      Provider<ProjectResourcePermissionsPresenter> projectResourcePermissionsProvider) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
     this.placeManager = placeManager;
@@ -133,6 +144,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     this.reportsPresenterProvider = reportsPresenterProvider;
     this.tasksPresenterProvider = tasksPresenterProvider;
     this.projectAdministrationPresenterProvider = projectAdministrationPresenterProvider;
+    this.projectResourcePermissionsProvider = projectResourcePermissionsProvider;
   }
 
   @Override
@@ -221,6 +233,9 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       case TASKS:
         onTasksTabSelected(queryPathParam);
         break;
+      case PERMISSIONS:
+        onPermissionsTabSelected();
+        break;
       case ADMINISTRATION:
         onAdminTabSelected();
         break;
@@ -272,6 +287,15 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       setInSlot(TASKS_PANE, tasksPresenter);
     }
     tasksPresenter.showProject(name);
+  }
+
+  private void onPermissionsTabSelected() {
+    if(projectResourcePermissionsPresenter == null) {
+      projectResourcePermissionsPresenter = projectResourcePermissionsProvider.get();
+      setInSlot(PERMISSION_PANE, projectResourcePermissionsPresenter );
+    }
+    projectResourcePermissionsPresenter
+        .initialize(ResourcePermissionType.PROJECT, project);
   }
 
   private void onAdminTabSelected() {

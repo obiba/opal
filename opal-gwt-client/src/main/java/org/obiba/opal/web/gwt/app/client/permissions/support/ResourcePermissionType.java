@@ -11,19 +11,32 @@
 package org.obiba.opal.web.gwt.app.client.permissions.support;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.obiba.opal.web.model.client.opal.AclAction;
 
 public enum ResourcePermissionType {
   PROJECT(AclAction.PROJECT_ALL),
   DATASOURCE(AclAction.CREATE_TABLE, AclAction.DATASOURCE_ALL),
-  TABLE(AclAction.TABLE_ALL, AclAction.TABLE_EDIT, AclAction.TABLE_READ, AclAction.TABLE_VALUES,
-      AclAction.TABLE_VALUES_EDIT),
+  TABLE(AclAction.TABLE_READ, AclAction.TABLE_VALUES, AclAction.TABLE_EDIT, AclAction.TABLE_VALUES_EDIT,
+      AclAction.TABLE_ALL),
   VARIABLE(AclAction.VARIABLE_READ),
   REPORT_TEMPLATE(AclAction.REPORT_TEMPLATE_ALL, AclAction.REPORT_TEMPLATE_READ);
 
   public ArrayList<AclAction> getPermissions() {
     return (ArrayList<AclAction>) permissions.clone();
+  }
+
+  public boolean hasPermission(String name) {
+    for (Iterator<AclAction> iterator = permissions.iterator(); iterator.hasNext();) {
+      if (iterator.next().getName().equals(name)) return true;
+    }
+
+    return false;
+  }
+
+  public int count() {
+    return permissions.size();
   }
 
   ResourcePermissionType(AclAction... permissions) {

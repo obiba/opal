@@ -17,7 +17,6 @@ import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectUiHandlers;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
 import org.obiba.opal.web.gwt.app.client.ui.OpalTabPanel;
-import org.obiba.opal.web.gwt.datetime.client.FormatType;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.model.client.magma.TimestampsDto;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
@@ -89,6 +88,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
 
   @UiField
   Panel adminPanel;
+
+  @UiField
+  FlowPanel permissionsPanel;
 
   private ProjectDto project;
 
@@ -235,6 +237,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     } else if(slot == ProjectPresenter.TASKS_PANE) {
       tasksPanel.clear();
       tasksPanel.add(content);
+    } else if(slot == ProjectPresenter.PERMISSION_PANE) {
+      permissionsPanel.clear();
+      permissionsPanel.add(content);
     } else if(slot == ProjectPresenter.ADMIN_PANE) {
       adminPanel.clear();
       adminPanel.add(content);

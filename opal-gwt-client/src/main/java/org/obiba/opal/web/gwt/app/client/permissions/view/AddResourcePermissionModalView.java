@@ -50,7 +50,7 @@ public class AddResourcePermissionModalView extends AbstractResourcePermissionMo
     super(eventBus);
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
-    dialog.setTitle(translations.updateResourcePermissionsModalTile());
+    dialog.setTitle(translations.addResourcePermissionsModalTile());
   }
 
   @Override
