@@ -10,7 +10,6 @@
 package org.obiba.opal.r.service;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import org.obiba.core.util.StringUtil;
@@ -217,7 +216,9 @@ public class OpalRService implements Service, ROperationTemplate {
   private File getWorkingDirectory() {
     File dir = new File(opalHomeFile, "work" + File.separator + "R");
     if(!dir.exists()) {
-      dir.mkdirs();
+      if (!dir.mkdirs()) {
+       log.error("Unable to create: {}", dir.getAbsolutePath());
+      }
     }
     return dir;
   }
@@ -225,17 +226,21 @@ public class OpalRService implements Service, ROperationTemplate {
   private File getLibDirectory() {
     File dir = new File(opalHomeFile, "data" + File.separator + "R" + File.separator + "library");
     if(!dir.exists()) {
-      dir.mkdirs();
+      if (!dir.mkdirs()) {
+        log.error("Unable to create: {}", dir.getAbsolutePath());
+      }
     }
     return dir;
   }
 
   private File getRserveLog() {
-    File rserveLog = new File(opalHomeFile, "logs" + File.separator + "Rserve.log");
-    if(!rserveLog.getParentFile().exists()) {
-      rserveLog.getParentFile().mkdirs();
+    File logFile = new File(opalHomeFile, "logs" + File.separator + "Rserve.log");
+    if(!logFile.getParentFile().exists()) {
+      if (!logFile.getParentFile().mkdirs()) {
+        log.error("Unable to create: {}", logFile.getParentFile().getAbsolutePath());
+      }
     }
-    return rserveLog;
+    return logFile;
   }
 
   private File getRservConf() {
