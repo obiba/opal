@@ -4,11 +4,9 @@ import javax.sql.DataSource;
 
 import org.obiba.opal.core.runtime.jdbc.DataSourceFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-@Component
-@Qualifier("configDataSource")
+@Component("configDataSource")
 public class QuartzDataSourceFactoryBean extends DataSourceFactoryBean {
 
   public static final String DB_PATH = System.getProperty("OPAL_HOME") + "/data/hsql/opal_config";

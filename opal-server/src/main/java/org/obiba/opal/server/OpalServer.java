@@ -1,5 +1,6 @@
 package org.obiba.opal.server;
 
+import org.obiba.opal.core.service.impl.LocalOrientDbServerFactory;
 import org.obiba.opal.server.httpd.OpalJettyServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,11 @@ public class OpalServer {
   private OpalServer() {
     setProperties();
     configureSLF4JBridgeHandler();
+
+    //TODO remove this static access when restarting embedded server will work
+    LocalOrientDbServerFactory
+        .start(LocalOrientDbServerFactory.URL.replace("${OPAL_HOME}", System.getProperty("OPAL_HOME")));
+
     upgrade();
     start();
   }
@@ -69,6 +75,8 @@ public class OpalServer {
     } catch(Exception e) {
       log.warn("Exception during HTTPd server shutdown", e);
     }
+    //TODO remove this static access when restarting embedded server will work
+    LocalOrientDbServerFactory.stop();
   }
 
   private static void checkSystemProperty(String... properties) {
