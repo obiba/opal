@@ -125,22 +125,16 @@ public class OpalRService implements Service, ROperationTemplate {
   public void start() {
     if(!isEnabled() || rserveStatus == 0) return;
 
-    // fresh start, try to kill any remains
+    // fresh start, try to kill any remains of R server
     try {
       newRConnection().shutdown();
     } catch(Exception e) {
       // ignore
     }
 
-    List<String> args = getArguments();
-    log.info("Starting R server: {}", StringUtil.collectionToString(args, " "));
-    ProcessBuilder pb = new ProcessBuilder(args);
-    pb.directory(getWorkingDirectory());
-    pb.redirectErrorStream(true);
-    pb.redirectOutput(ProcessBuilder.Redirect.appendTo(getRserveLog()));
     try {
       // launch the Rserve daemon and wait for it to complete
-      Process rserve = pb.start();
+      Process rserve = buildRProcess().start();
       rserveStatus = rserve.waitFor();
       if(rserveStatus == 0) {
         log.info("R server started");
@@ -152,6 +146,16 @@ public class OpalRService implements Service, ROperationTemplate {
       log.error("R server start failed", e);
       rserveStatus = -1;
     }
+  }
+
+  private ProcessBuilder buildRProcess() {
+    List<String> args = getArguments();
+    log.info("Starting R server: {}", StringUtil.collectionToString(args, " "));
+    ProcessBuilder pb = new ProcessBuilder(args);
+    pb.directory(getWorkingDirectory());
+    pb.redirectErrorStream(true);
+    pb.redirectOutput(ProcessBuilder.Redirect.appendTo(getRserveLog()));
+    return pb;
   }
 
   @Override
