@@ -16,10 +16,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
-import org.apache.shiro.util.ByteSource;
 import org.apache.shiro.util.SimpleByteSource;
-import org.obiba.opal.core.domain.user.User;
-import org.obiba.opal.core.service.UserService;
+import org.obiba.opal.core.domain.user.SubjectCredentials;
+import org.obiba.opal.core.service.SubjectCredentialsService;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -34,16 +33,16 @@ public class UserResource {
   private String name;
 
   @Autowired
-  private UserService userService;
+  private SubjectCredentialsService subjectCredentialsService;
 
   @GET
   public Response getUser() {
     //TODO: Use TimestampedResponses.evaluate(request, ...); ?
-    User user = userService.getUser(name);
-    if(user == null) {
+    SubjectCredentials subjectCredentials = subjectCredentialsService.getSubjectCredentials(name);
+    if(subjectCredentials == null) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
-    return Response.ok().entity(Dtos.asDto(user)).build();
+    return Response.ok().entity(Dtos.asDto(subjectCredentials)).build();
   }
 
   @PUT
@@ -51,21 +50,22 @@ public class UserResource {
     if(!name.equals(dto.getName())) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
-    User user = Dtos.fromDto(dto);
+    SubjectCredentials subjectCredentials = Dtos.fromDto(dto);
     if(dto.hasPassword() && !dto.getPassword().isEmpty()) {
-      user.setPassword(User.digest(dto.getPassword(), new SimpleByteSource(user.getName()).getBytes()));
+      subjectCredentials.setPassword(
+          SubjectCredentials.digest(dto.getPassword(), new SimpleByteSource(subjectCredentials.getName()).getBytes()));
     }
-    userService.save(user);
+    subjectCredentialsService.save(subjectCredentials);
     return Response.ok().build();
   }
 
   @DELETE
   public Response deleteUser() {
-    User user = userService.getUser(name);
-    if(user == null) {
+    SubjectCredentials subjectCredentials = subjectCredentialsService.getSubjectCredentials(name);
+    if(subjectCredentials == null) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
-    userService.delete(user);
+    subjectCredentialsService.delete(subjectCredentials);
     return Response.ok().build();
   }
 }

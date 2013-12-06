@@ -1,27 +1,29 @@
 package org.obiba.opal.core.service;
 
-import org.obiba.opal.core.domain.user.User;
+import org.obiba.opal.core.domain.user.SubjectCredentials;
 
 /**
  * Thrown when attempting to add an already existing user.
  */
+//TODO replace this by ConstraintViolationException
+@Deprecated
 public class DuplicateUserNameException extends RuntimeException {
 
-  private final User existing;
+  private final SubjectCredentials existing;
 
-  private final User duplicate;
+  private final SubjectCredentials duplicate;
 
-  public DuplicateUserNameException(User existing, User duplicate) {
+  public DuplicateUserNameException(SubjectCredentials existing, SubjectCredentials duplicate) {
     super("A user with same name already exists: " + existing.getName());
     this.existing = existing;
     this.duplicate = duplicate;
   }
 
-  public User getExisting() {
+  public SubjectCredentials getExisting() {
     return existing;
   }
 
-  public User getDuplicate() {
+  public SubjectCredentials getDuplicate() {
     return duplicate;
   }
 }

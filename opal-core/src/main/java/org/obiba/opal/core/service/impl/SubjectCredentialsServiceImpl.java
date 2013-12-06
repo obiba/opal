@@ -20,13 +20,13 @@ import javax.validation.ConstraintViolationException;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.domain.user.Group;
-import org.obiba.opal.core.domain.user.User;
+import org.obiba.opal.core.domain.user.SubjectCredentials;
 import org.obiba.opal.core.runtime.security.OpalUserRealm;
 import org.obiba.opal.core.service.DuplicateSubjectProfileException;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SubjectAclService;
+import org.obiba.opal.core.service.SubjectCredentialsService;
 import org.obiba.opal.core.service.SubjectProfileService;
-import org.obiba.opal.core.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,11 +35,8 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
-/**
- * Default implementation of User Service
- */
 @Component
-public class UserServiceImpl implements UserService {
+public class SubjectCredentialsServiceImpl implements SubjectCredentialsService {
 
   private static final String OPAL_DOMAIN = "opal";
 
@@ -55,7 +52,7 @@ public class UserServiceImpl implements UserService {
   @Override
   @PostConstruct
   public void start() {
-    orientDbService.createUniqueIndex(User.class);
+    orientDbService.createUniqueIndex(SubjectCredentials.class);
     orientDbService.createUniqueIndex(Group.class);
   }
 
@@ -64,8 +61,8 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public Iterable<User> getUsers() {
-    return orientDbService.list(User.class);
+  public Iterable<SubjectCredentials> getSubjectCredentials() {
+    return orientDbService.list(SubjectCredentials.class);
   }
 
   @Override
@@ -74,15 +71,15 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public User getUser(String name) {
-    return orientDbService.findUnique(new User(name));
+  public SubjectCredentials getSubjectCredentials(String name) {
+    return orientDbService.findUnique(new SubjectCredentials(name));
   }
 
   @Override
-  public void save(User user) throws ConstraintViolationException {
-    boolean newUser = (getUser(user.getName()) == null);
-    if (newUser) {
-      SubjectProfile profile = subjectProfileService.getProfile(user.getName());
+  public void save(SubjectCredentials subjectCredentials) throws ConstraintViolationException {
+    boolean newUser = getSubjectCredentials(subjectCredentials.getName()) == null;
+    if(newUser) {
+      SubjectProfile profile = subjectProfileService.getProfile(subjectCredentials.getName());
       if(profile != null && !OpalUserRealm.OPAL_REALM.equals(profile.getRealm())) {
         throw new DuplicateSubjectProfileException(profile);
       }
@@ -90,53 +87,54 @@ public class UserServiceImpl implements UserService {
 
     Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
     // Copy current password if password is empty
-    if(user.getPassword() == null) {
-      user.setPassword(getUser(user.getName()).getPassword());
+    if(subjectCredentials.getPassword() == null) {
+      subjectCredentials.setPassword(getSubjectCredentials(subjectCredentials.getName()).getPassword());
     }
 
-    toSave.put(user, user);
-    for(Group group : findImpactedGroups(user)) {
+    toSave.put(subjectCredentials, subjectCredentials);
+    for(Group group : findImpactedGroups(subjectCredentials)) {
       toSave.put(group, group);
     }
     orientDbService.save(toSave);
 
-    if (newUser) {
-      subjectProfileService.ensureProfile(user.getName(), OpalUserRealm.OPAL_REALM);
+    if(newUser) {
+      subjectProfileService.ensureProfile(subjectCredentials.getName(), OpalUserRealm.OPAL_REALM);
     }
   }
 
-  private Iterable<Group> findImpactedGroups(final User user) {
+  private Iterable<Group> findImpactedGroups(final SubjectCredentials subjectCredentials) {
 
     Collection<Group> groups = new ArrayList<Group>();
 
     // check removed group
-    User previousUser = orientDbService.findUnique(user);
-    if(previousUser != null) {
-      Iterables.addAll(groups, Iterables.transform(previousUser.getGroups(), new Function<String, Group>() {
-        @Nullable
-        @Override
-        public Group apply(String groupName) {
-          if(user.hasGroup(groupName)) return null;
-          Group group = getGroup(groupName);
-          group.removeUser(user.getName());
-          return group;
-        }
-      }));
+    SubjectCredentials previousSubjectCredentials = orientDbService.findUnique(subjectCredentials);
+    if(previousSubjectCredentials != null) {
+      Iterables
+          .addAll(groups, Iterables.transform(previousSubjectCredentials.getGroups(), new Function<String, Group>() {
+            @Nullable
+            @Override
+            public Group apply(String groupName) {
+              if(subjectCredentials.hasGroup(groupName)) return null;
+              Group group = getGroup(groupName);
+              group.removeUser(subjectCredentials.getName());
+              return group;
+            }
+          }));
     }
 
     // check added group
-    Iterables.addAll(groups, Iterables.transform(user.getGroups(), new Function<String, Group>() {
+    Iterables.addAll(groups, Iterables.transform(subjectCredentials.getGroups(), new Function<String, Group>() {
       @Nullable
       @Override
       public Group apply(String groupName) {
         Group group = getGroup(groupName);
         if(group == null) {
           group = new Group(groupName);
-          group.addUser(user.getName());
+          group.addUser(subjectCredentials.getName());
           return group;
         }
-        if(!group.hasUser(user.getName())) {
-          group.addUser(user.getName());
+        if(!group.hasUser(subjectCredentials.getName())) {
+          group.addUser(subjectCredentials.getName());
           return group;
         }
         return null;
@@ -147,20 +145,20 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void delete(User user) {
+  public void delete(SubjectCredentials subjectCredentials) {
 
     Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
-    for(String groupName : user.getGroups()) {
+    for(String groupName : subjectCredentials.getGroups()) {
       Group group = getGroup(groupName);
-      group.removeUser(user.getName());
+      group.removeUser(subjectCredentials.getName());
       toSave.put(group, group);
     }
     // TODO we should execute these steps in a single transaction
-    orientDbService.delete(user);
+    orientDbService.delete(subjectCredentials);
     if(!toSave.isEmpty()) orientDbService.save(toSave);
-    subjectAclService.deleteSubjectPermissions(OPAL_DOMAIN, null,
-        SubjectAclService.SubjectType.USER.subjectFor(user.getName())); // Delete user's permissions
-    subjectProfileService.deleteProfile(user.getName());
+    subjectAclService.deleteSubjectPermissions(OPAL_DOMAIN, null, SubjectAclService.SubjectType.USER
+        .subjectFor(subjectCredentials.getName())); // Delete subjectCredentials's permissions
+    subjectProfileService.deleteProfile(subjectCredentials.getName());
   }
 
   @Override
@@ -182,9 +180,9 @@ public class UserServiceImpl implements UserService {
   public void delete(Group group) {
     Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
     for(String userName : group.getUsers()) {
-      User user = getUser(userName);
-      user.removeGroup(group.getName());
-      toSave.put(user, user);
+      SubjectCredentials subjectCredentials = getSubjectCredentials(userName);
+      subjectCredentials.removeGroup(group.getName());
+      toSave.put(subjectCredentials, subjectCredentials);
     }
 
     // TODO we should execute these steps in a single transaction

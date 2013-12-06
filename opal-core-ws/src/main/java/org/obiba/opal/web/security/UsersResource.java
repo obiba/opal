@@ -16,11 +16,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
-import org.apache.shiro.util.ByteSource;
 import org.apache.shiro.util.SimpleByteSource;
-import org.obiba.opal.core.domain.user.User;
+import org.obiba.opal.core.domain.user.SubjectCredentials;
 import org.obiba.opal.core.service.DuplicateUserNameException;
-import org.obiba.opal.core.service.UserService;
+import org.obiba.opal.core.service.SubjectCredentialsService;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -36,27 +35,29 @@ import com.google.common.collect.Lists;
 public class UsersResource {
 
   @Autowired
-  private UserService userService;
+  private SubjectCredentialsService subjectCredentialsService;
 
   @GET
   public List<Opal.UserDto> getUsers() {
-    return Lists.newArrayList(Iterables.transform(userService.getUsers(), new Function<User, Opal.UserDto>() {
-      @Override
-      public Opal.UserDto apply(User user) {
-        return Dtos.asDto(user);
-      }
-    }));
+    return Lists.newArrayList(Iterables
+        .transform(subjectCredentialsService.getSubjectCredentials(), new Function<SubjectCredentials, Opal.UserDto>() {
+          @Override
+          public Opal.UserDto apply(SubjectCredentials subjectCredentials) {
+            return Dtos.asDto(subjectCredentials);
+          }
+        }));
   }
 
   @POST
   public Response createUser(Opal.UserDto dto) {
-    User user = Dtos.fromDto(dto);
-    User found = userService.getUser(user.getName());
-    if (found != null) {
-      throw new DuplicateUserNameException(found, user);
+    SubjectCredentials subjectCredentials = Dtos.fromDto(dto);
+    SubjectCredentials found = subjectCredentialsService.getSubjectCredentials(subjectCredentials.getName());
+    if(found != null) {
+      throw new DuplicateUserNameException(found, subjectCredentials);
     }
-    user.setPassword(User.digest(dto.getPassword(), new SimpleByteSource(user.getName()).getBytes()));
-    userService.save(user);
+    subjectCredentials.setPassword(
+        SubjectCredentials.digest(dto.getPassword(), new SimpleByteSource(subjectCredentials.getName()).getBytes()));
+    subjectCredentialsService.save(subjectCredentials);
     return Response.ok().build();
   }
 }

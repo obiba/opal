@@ -16,7 +16,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.user.Group;
-import org.obiba.opal.core.service.UserService;
+import org.obiba.opal.core.service.SubjectCredentialsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -30,11 +30,11 @@ public class GroupResource {
   private String name;
 
   @Autowired
-  private UserService userService;
+  private SubjectCredentialsService subjectCredentialsService;
 
   @GET
   public Response getGroup() {
-    Group group = userService.getGroup(name);
+    Group group = subjectCredentialsService.getGroup(name);
     return group == null
         ? Response.status(Response.Status.NOT_FOUND).build()
         : Response.ok().entity(Dtos.asDto(group)).build();
@@ -42,8 +42,8 @@ public class GroupResource {
 
   @DELETE
   public Response deleteGroup() {
-    Group group = userService.getGroup(name);
-    userService.delete(group);
+    Group group = subjectCredentialsService.getGroup(name);
+    subjectCredentialsService.delete(group);
     return Response.ok().build();
   }
 }

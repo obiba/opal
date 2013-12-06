@@ -22,6 +22,8 @@ public class DataShieldLog {
 
   private static final Logger userLog = LoggerFactory.getLogger("datashield.user");
 
+  private DataShieldLog() {}
+
   public static final void adminLog(String format, Object... arguments) {
     log(adminLog, format, arguments);
   }
@@ -30,8 +32,9 @@ public class DataShieldLog {
     log(userLog, format, arguments);
   }
 
-  private static final void log(Logger log, String format, Object... arguments) {
-    log.info("User '" + SecurityUtils.getSubject().getPrincipal().toString() + "' " + format, arguments);
+  private static void log(Logger log, String format, Object... arguments) {
+    //noinspection StringConcatenationArgumentToLogCall
+    log.info("SubjectCredentials '" + SecurityUtils.getSubject().getPrincipal() + "' " + format, arguments);
   }
 
 }

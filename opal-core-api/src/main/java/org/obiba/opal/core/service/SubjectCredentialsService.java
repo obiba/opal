@@ -12,38 +12,38 @@ package org.obiba.opal.core.service;
 import javax.validation.ConstraintViolationException;
 
 import org.obiba.opal.core.domain.user.Group;
-import org.obiba.opal.core.domain.user.User;
+import org.obiba.opal.core.domain.user.SubjectCredentials;
 
-public interface UserService extends SystemService {
+public interface SubjectCredentialsService extends SystemService {
 
   /**
    * Returns the list of users
    *
-   * @return a list of user instances
+   * @return a list of subjectCredentials instances
    */
-  Iterable<User> getUsers();
+  Iterable<SubjectCredentials> getSubjectCredentials();
 
   /**
-   * Returns the user with the specified login
+   * Returns the subjectCredentials with the specified login
    *
    * @param login the unique login to match
-   * @return the user with the specified login or null if none exist
+   * @return the subjectCredentials with the specified login or null if none exist
    */
-  User getUser(String name);
+  SubjectCredentials getSubjectCredentials(String name);
 
   /**
-   * Create a user when id is not provided, otherwise, updates the changed fields
+   * Create a subjectCredentials when id is not provided, otherwise, updates the changed fields
    *
-   * @param user
+   * @param subjectCredentials
    */
-  void save(User user) throws ConstraintViolationException;
+  void save(SubjectCredentials subjectCredentials) throws ConstraintViolationException;
 
   /**
-   * Deletes a user from user table and from subject_acl
+   * Deletes a subjectCredentials from subjectCredentials table and from subject_acl
    *
-   * @param user
+   * @param subjectCredentials
    */
-  void delete(User user);
+  void delete(SubjectCredentials subjectCredentials);
 
   /**
    * Create the given group.

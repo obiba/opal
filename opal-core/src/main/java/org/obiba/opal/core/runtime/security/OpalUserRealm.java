@@ -28,13 +28,11 @@ import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.apache.shiro.util.ByteSource;
 import org.apache.shiro.util.SimpleByteSource;
-import org.obiba.opal.core.domain.user.User;
-import org.obiba.opal.core.service.UserService;
+import org.obiba.opal.core.domain.user.SubjectCredentials;
+import org.obiba.opal.core.service.SubjectCredentialsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 
 /**
  * Realm for users defined in opal's own users database.
@@ -45,7 +43,7 @@ public class OpalUserRealm extends AuthorizingRealm {
   public static final String OPAL_REALM = "opal-realm";
 
   @Autowired
-  private UserService userService;
+  private SubjectCredentialsService subjectCredentialsService;
 
   public OpalUserRealm() {
     setCacheManager(new MemoryConstrainedCacheManager());
@@ -67,11 +65,12 @@ public class OpalUserRealm extends AuthorizingRealm {
       throw new AccountException("Null usernames are not allowed by this realm.");
     }
 
-    User user = userService.getUser(username);
-    if(user == null || !user.isEnabled()) {
-      throw new UnknownAccountException("No account found for user [" + username + "]");
+    SubjectCredentials subjectCredentials = subjectCredentialsService.getSubjectCredentials(username);
+    if(subjectCredentials == null || !subjectCredentials.isEnabled()) {
+      throw new UnknownAccountException("No account found for subjectCredentials [" + username + "]");
     }
-    SimpleAuthenticationInfo authInfo = new SimpleAuthenticationInfo(username, user.getPassword(), getName());
+    SimpleAuthenticationInfo authInfo = new SimpleAuthenticationInfo(username, subjectCredentials.getPassword(),
+        getName());
     authInfo.setCredentialsSalt(new SimpleByteSource(username));
     return authInfo;
   }
@@ -85,9 +84,9 @@ public class OpalUserRealm extends AuthorizingRealm {
 
       Set<String> roleNames = new HashSet<String>();
       String username = (String) getAvailablePrincipal(simplePrincipals);
-      User user = userService.getUser(username);
-      if(user != null) {
-        for(String group : user.getGroups()) {
+      SubjectCredentials subjectCredentials = subjectCredentialsService.getSubjectCredentials(username);
+      if(subjectCredentials != null) {
+        for(String group : subjectCredentials.getGroups()) {
           roleNames.add(group);
         }
       }

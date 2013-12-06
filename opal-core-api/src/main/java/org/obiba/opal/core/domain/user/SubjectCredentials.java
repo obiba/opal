@@ -25,7 +25,8 @@ import org.obiba.opal.core.domain.HasUniqueProperties;
 
 import com.google.common.collect.Lists;
 
-public class User extends AbstractTimestamped implements Comparable<User>, HasUniqueProperties {
+public class SubjectCredentials extends AbstractTimestamped
+    implements Comparable<SubjectCredentials>, HasUniqueProperties {
 
   public enum Status {
     ACTIVE, INACTIVE
@@ -43,10 +44,10 @@ public class User extends AbstractTimestamped implements Comparable<User>, HasUn
 
   private Set<String> groups = new HashSet<String>();
 
-  public User() {
+  public SubjectCredentials() {
   }
 
-  public User(@NotNull String name) {
+  public SubjectCredentials(@NotNull String name) {
     this.name = name;
   }
 
@@ -132,9 +133,9 @@ public class User extends AbstractTimestamped implements Comparable<User>, HasUn
   @Override
   public boolean equals(Object o) {
     if(this == o) return true;
-    if(!(o instanceof User)) return false;
-    User user = (User) o;
-    return name.equals(user.name);
+    if(!(o instanceof SubjectCredentials)) return false;
+    SubjectCredentials subjectCredentials = (SubjectCredentials) o;
+    return name.equals(subjectCredentials.name);
   }
 
   @Override
@@ -143,51 +144,51 @@ public class User extends AbstractTimestamped implements Comparable<User>, HasUn
   }
 
   @Override
-  public int compareTo(User user) {
-    return name.compareTo(user.name);
+  public int compareTo(SubjectCredentials subjectCredentials) {
+    return name.compareTo(subjectCredentials.name);
   }
 
   @SuppressWarnings("ParameterHidesMemberVariable")
   public static class Builder {
 
-    private User user;
+    private SubjectCredentials subjectCredentials;
 
     private Builder() {
     }
 
     public static Builder create() {
       Builder builder = new Builder();
-      builder.user = new User();
+      builder.subjectCredentials = new SubjectCredentials();
       return builder;
     }
 
     public Builder name(String name) {
-      user.name = name;
+      subjectCredentials.name = name;
       return this;
     }
 
     public Builder password(String password) {
-      user.password = password;
+      subjectCredentials.password = password;
       return this;
     }
 
     public Builder enabled(boolean enabled) {
-      user.enabled = enabled;
+      subjectCredentials.enabled = enabled;
       return this;
     }
 
     public Builder groups(Set<String> groups) {
-      user.groups = groups;
+      subjectCredentials.groups = groups;
       return this;
     }
 
     public Builder group(String group) {
-      user.addGroup(group);
+      subjectCredentials.addGroup(group);
       return this;
     }
 
-    public User build() {
-      return user;
+    public SubjectCredentials build() {
+      return subjectCredentials;
     }
   }
 

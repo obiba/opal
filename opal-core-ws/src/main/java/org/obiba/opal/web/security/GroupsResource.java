@@ -17,7 +17,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.user.Group;
-import org.obiba.opal.core.service.UserService;
+import org.obiba.opal.core.service.SubjectCredentialsService;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -33,24 +33,25 @@ import com.google.common.collect.Lists;
 public class GroupsResource {
 
   @Autowired
-  private UserService userService;
+  private SubjectCredentialsService subjectCredentialsService;
 
   @GET
   public List<Opal.GroupDto> getGroups() {
-    return Lists.newArrayList(Iterables.transform(userService.getGroups(), new Function<Group, Opal.GroupDto>() {
-      @Override
-      public Opal.GroupDto apply(Group group) {
-        return Dtos.asDto(group);
-      }
-    }));
+    return Lists
+        .newArrayList(Iterables.transform(subjectCredentialsService.getGroups(), new Function<Group, Opal.GroupDto>() {
+          @Override
+          public Opal.GroupDto apply(Group group) {
+            return Dtos.asDto(group);
+          }
+        }));
   }
 
   @POST
   public Response createGroup(Opal.GroupDto groupDto) {
-    if(userService.getGroup(groupDto.getName()) != null) {
+    if(subjectCredentialsService.getGroup(groupDto.getName()) != null) {
       return Response.status(Response.Status.NOT_MODIFIED).build();
     }
-    userService.createGroup(groupDto.getName());
+    subjectCredentialsService.createGroup(groupDto.getName());
     return Response.ok().build();
   }
 
