@@ -62,6 +62,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       REPORTS,
       TASKS,
       PERMISSIONS,
+      DATA_EXCHANGE,
       ADMINISTRATION
     }
 

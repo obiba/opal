@@ -80,6 +80,19 @@
           TODO
         </b:Paragraph>
       </b:Tab>
+      <b:Tab icon="EXCHANGE">
+        <b:Heading size="3">Data Exchange</b:Heading>
+
+        <b:Heading size="4">Databases</b:Heading>
+        <b:Paragraph>
+          The SQL databases from which data will be imported can be registered.
+        </b:Paragraph>
+
+        <b:Heading size="4">Encryption Keys</b:Heading>
+        <b:Paragraph>
+          Encryption keys are used do decrypt data files in "Opal Archive" format at importation time.
+        </b:Paragraph>
+      </b:Tab>
       <b:Tab icon="BOOK">
         <b:Heading size="3">Administration</b:Heading>
         <g:SimplePanel ui:field="adminPanel"/>
