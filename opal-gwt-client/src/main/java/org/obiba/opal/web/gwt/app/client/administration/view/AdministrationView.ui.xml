@@ -156,6 +156,16 @@
                 </g:Label>
               </g:FlowPanel>
               <b:Divider/>
+              <o:OpalNavLink ui:field="taxonomiesPlace" icon="COG">
+                <ui:msg description="Main Administration Taxonomies title">Taxonomies</ui:msg>
+              </o:OpalNavLink>
+              <g:FlowPanel>
+                <g:Label styleName="help-block">
+                  <ui:msg description="Main Administration Taxonomies help">Manage pre-defined variable attributes
+                  </ui:msg>
+                </g:Label>
+              </g:FlowPanel>
+              <b:Divider/>
               <o:OpalNavLink ui:field="databasesPlace" icon="COG">
                 <ui:msg description="Main Administration Databases title">Databases</ui:msg>
               </o:OpalNavLink>

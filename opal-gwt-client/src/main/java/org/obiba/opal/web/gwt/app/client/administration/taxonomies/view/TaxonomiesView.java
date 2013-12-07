@@ -34,12 +34,6 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
   interface ViewUiBinder extends UiBinder<Widget, TaxonomiesView> {}
 
   @UiField
-  NavLink taxonomiesLink;
-
-  @UiField
-  OpalNavLink generalNavLink;
-
-  @UiField
   FlowPanel panel;
 
   @UiField
@@ -51,17 +45,11 @@ public class TaxonomiesView extends ViewWithUiHandlers<TaxonomiesUiHandlers> imp
   public TaxonomiesView(ViewUiBinder viewUiBinder, Translations translations) {
     this.translations = translations;
     initWidget(viewUiBinder.createAndBindUi(this));
-    taxonomiesLink.setActive(true);
   }
 
   @Override
   public HasWidgets getBreadcrumbs() {
     return breadcrumbs;
-  }
-
-  @Override
-  public void setGeneralConfigHistoryToken(String historyToken) {
-    generalNavLink.setHistoryToken(historyToken);
   }
 
   @Override

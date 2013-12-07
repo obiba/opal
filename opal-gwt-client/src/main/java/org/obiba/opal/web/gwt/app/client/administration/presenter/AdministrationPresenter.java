@@ -47,6 +47,8 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
 
     void setServerHistoryToken(String historyToken);
 
+    void setTaxonomiesHistoryToken(String historyToken);
+
   }
 
   //
@@ -93,6 +95,7 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
     getView().setReportsHistoryToken(getHistoryToken(Places.REPORT_TEMPLATES));
     getView().setJavaHistoryToken(getHistoryToken(Places.JVM));
     getView().setServerHistoryToken(getHistoryToken(Places.SERVER));
+    getView().setTaxonomiesHistoryToken(getHistoryToken(Places.TAXONOMIES));
   }
 
   private String getHistoryToken(String place) {

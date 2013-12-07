@@ -33,15 +33,6 @@ public class ConfigurationView extends ViewWithUiHandlers<ConfigurationUiHandler
   Breadcrumbs breadcrumbs;
 
   @UiField
-  OpalNavLink taxonomies;
-
-  @UiField
-  NavLink generalNavLink;
-
-  @UiField
-  Panel generalPanel;
-
-  @UiField
   PropertiesTable generalProperties;
 
   @UiField
@@ -54,21 +45,8 @@ public class ConfigurationView extends ViewWithUiHandlers<ConfigurationUiHandler
   }
 
   @Override
-  public void setInSlot(Object slot, IsWidget contentWidget) {
-    if(ConfigurationPresenter.CONTENT == slot) {
-      generalPanel.clear();
-      generalPanel.add(contentWidget.asWidget());
-    }
-  }
-
-  @Override
   public HasWidgets getBreadcrumbs() {
     return breadcrumbs;
-  }
-
-  @Override
-  public void setTaxonomiesHistoryToken(String historyToken) {
-    taxonomies.setHistoryToken(historyToken);
   }
 
   @Override
@@ -78,8 +56,6 @@ public class ConfigurationView extends ViewWithUiHandlers<ConfigurationUiHandler
     generalProperties.addProperty(translations.defaultCharsetLabel(), resource.getDefaultCharSet());
     generalProperties.addProperty(translations.publicUrl(), resource.getPublicURL());
     generalProperties.addProperty(new Label(translations.languageLabel()), getLanguages(resource));
-
-    generalNavLink.setActive(true);
   }
 
   @UiHandler("editGeneralSettings")

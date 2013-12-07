@@ -29,7 +29,7 @@
       </b:HelpBlock>
     </b:ControlGroup>
 
-    <b:ControlGroup>
+    <b:ControlGroup ui:field="defaultStorageGroup">
       <b:CheckBox ui:field="defaultStorage" b:id="defaultStorage">
         <ui:msg description="Default storage label">Project default storage</ui:msg>
       </b:CheckBox>

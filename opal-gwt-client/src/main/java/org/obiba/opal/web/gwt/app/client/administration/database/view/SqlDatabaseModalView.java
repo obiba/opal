@@ -44,6 +44,7 @@ import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.HasVisibility;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -109,6 +110,9 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
 
   @UiField
   TextArea properties;
+
+  @UiField
+  Panel defaultStorageGroup;
 
   @UiField
   CheckBox defaultStorage;
@@ -543,7 +547,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
   @Override
   public void toggleDefaultStorage(boolean show) {
     if(!show) defaultStorage.setValue(false);
-    defaultStorage.setVisible(show);
+    defaultStorageGroup.setVisible(show);
   }
 
   @Override

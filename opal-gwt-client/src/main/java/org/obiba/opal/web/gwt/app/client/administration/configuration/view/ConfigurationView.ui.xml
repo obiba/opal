@@ -12,24 +12,32 @@
       <b:Breadcrumbs ui:field="breadcrumbs"/>
     </g:FlowPanel>
 
+    <b:Heading size="4" addStyleNames="inline-block">
+      <ui:msg description="Properties label">Properties</ui:msg>
+    </b:Heading>
+    <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="editGeneralSettings">
+    </b2:IconAnchor>
+    <b:Row>
+      <b:Column size="6">
+        <o:PropertiesTable ui:field="generalProperties" keyStyleNames="span3"/>
+      </b:Column>
+    </b:Row>
 
-    <b:NavPills>
-      <b:NavLink ui:field="generalNavLink">General</b:NavLink>
-      <o:OpalNavLink ui:field="taxonomies">Taxonomies</o:OpalNavLink>
-    </b:NavPills>
-
-    <g:FlowPanel ui:field="generalPanel">
-      <b:Heading size="4" addStyleNames="inline-block">
-        <ui:msg description="General settings label">General Settings</ui:msg>
-      </b:Heading>
-      <b2:IconAnchor icon="EDIT" addStyleNames="small-indent" ui:field="editGeneralSettings">
-      </b2:IconAnchor>
-      <b:Row>
-        <b:Column size="6">
-          <o:PropertiesTable ui:field="generalProperties" keyStyleNames="span3"/>
-        </b:Column>
-      </b:Row>
-    </g:FlowPanel>
+    <b:Heading size="4">
+      <ui:msg description="Keystore label">Keystore</ui:msg>
+    </b:Heading>
+    <b:Paragraph>
+      HTTPS connection requires to have a private key and a public key (certificate) defined. A self-signed key-pair is
+      available by default. You can provide your own.
+    </b:Paragraph>
+    <b:DropdownButton text="Set Key Pair" type="INFO" icon="PLUS">
+      <b:NavLink ui:field="importKeyPair">
+        <ui:msg description="Import Key Pair label">Import key pair...</ui:msg>
+      </b:NavLink>
+      <b:NavLink ui:field="createKeyPair">
+        <ui:msg description="Create Key Pair label">Create key pair...</ui:msg>
+      </b:NavLink>
+    </b:DropdownButton>
 
   </g:FlowPanel>
 

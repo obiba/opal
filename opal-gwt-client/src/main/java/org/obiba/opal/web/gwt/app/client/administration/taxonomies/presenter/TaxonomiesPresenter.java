@@ -58,7 +58,6 @@ public class TaxonomiesPresenter extends Presenter<TaxonomiesPresenter.Display, 
     getView().setUiHandlers(this);
     this.translations = translations;
     this.taxonomyEditModalProvider = taxonomyEditModalProvider.setContainer(this);
-    setHistoryTokens();
   }
 
   @TitleFunction
@@ -121,14 +120,7 @@ public class TaxonomiesPresenter extends Presenter<TaxonomiesPresenter.Display, 
     placeManager.revealRelativePlace(request, 2);
   }
 
-  private void setHistoryTokens() {
-    getView().setGeneralConfigHistoryToken(
-        placeManager.buildRelativeHistoryToken(new PlaceRequest.Builder().nameToken(Places.SERVER).build(), 1));
-  }
-
   public interface Display extends View, HasUiHandlers<TaxonomiesUiHandlers> {
-
-    void setGeneralConfigHistoryToken(String historyToken);
 
     void setTaxonomies(JsArray<TaxonomyDto> taxonomies);
 

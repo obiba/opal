@@ -38,6 +38,7 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.HasVisibility;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -85,6 +86,9 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
 
   @UiField
   TextArea properties;
+
+  @UiField
+  Panel defaultStorageGroup;
 
   @UiField
   CheckBox defaultStorage;
@@ -300,7 +304,7 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
   @Override
   public void toggleDefaultStorage(boolean enabled) {
     if(!enabled) defaultStorage.setValue(false);
-    defaultStorage.setVisible(enabled);
+    defaultStorageGroup.setVisible(enabled);
   }
 
 }

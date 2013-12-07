@@ -2400,10 +2400,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("None")
   String none();
 
-  @Description("General Settings label")
-  @DefaultStringValue("General settings")
-  String generalSettings();
-
   @Description("Project Database Name label")
   @DefaultStringValue("Project tables (dictionaries and data) are stored in the database:")
   String projectDatabaseName();

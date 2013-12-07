@@ -47,6 +47,9 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   @UiField
   OpalNavLink serverPlace;
 
+  @UiField
+  OpalNavLink taxonomiesPlace;
+
   @Inject
   public AdministrationView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
@@ -109,6 +112,11 @@ public class AdministrationView extends ViewImpl implements AdministrationPresen
   @Override
   public void setServerHistoryToken(String historyToken) {
     serverPlace.setHistoryToken(historyToken);
+  }
+
+  @Override
+  public void setTaxonomiesHistoryToken(String historyToken) {
+    taxonomiesPlace.setHistoryToken(historyToken);
   }
 
 }

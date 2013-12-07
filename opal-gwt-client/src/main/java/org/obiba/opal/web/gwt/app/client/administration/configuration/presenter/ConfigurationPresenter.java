@@ -12,21 +12,17 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.opal.GeneralConf;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
-import com.gwtplatform.mvp.client.annotations.ContentSlot;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
-import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 
 public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Display, ConfigurationPresenter.Proxy>
     implements ConfigurationUiHandlers {
@@ -35,29 +31,22 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
 
   private GeneralConf conf = null;
 
-  @ContentSlot
-  public static final GwtEvent.Type<RevealContentHandler<?>> CONTENT = new GwtEvent.Type<RevealContentHandler<?>>();
-
   @ProxyStandard
   @NameToken(Places.SERVER)
   public interface Proxy extends ProxyPlace<ConfigurationPresenter> {}
 
   private static final Translations translations = GWT.create(Translations.class);
 
-  private final PlaceManager placeManager;
-
   private final BreadcrumbsBuilder breadcrumbsBuilder;
 
   @Inject
   public ConfigurationPresenter(Display display, EventBus eventBus, Proxy proxy,
-      ModalProvider<GeneralConfModalPresenter> generalConfModalProvider, PlaceManager placeManager,
+      ModalProvider<GeneralConfModalPresenter> generalConfModalProvider,
       BreadcrumbsBuilder breadcrumbsBuilder) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     this.generalConfModalProvider = generalConfModalProvider.setContainer(this);
-    this.placeManager = placeManager;
     this.breadcrumbsBuilder = breadcrumbsBuilder;
     getView().setUiHandlers(this);
-    setHistoryTokens();
   }
 
   @TitleFunction
@@ -103,14 +92,7 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
     dialog.setGeneralConf(conf);
   }
 
-  private void setHistoryTokens() {
-    getView().setTaxonomiesHistoryToken(
-        placeManager.buildRelativeHistoryToken(new PlaceRequest.Builder().nameToken(Places.TAXONOMIES).build(), 1));
-  }
-
   public interface Display extends View, HasUiHandlers<ConfigurationUiHandlers>, HasBreadcrumbs {
-    void setTaxonomiesHistoryToken(String historyToken);
-
     void renderGeneralProperties(GeneralConf resource);
   }
 }

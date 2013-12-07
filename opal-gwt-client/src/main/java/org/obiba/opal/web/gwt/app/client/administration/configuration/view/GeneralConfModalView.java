@@ -68,7 +68,7 @@ public class GeneralConfModalView extends ModalPopupViewWithUiHandlers<GeneralCo
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    modal.setTitle(translations.generalSettings());
+    modal.setTitle(translations.editProperties());
   }
 
   @UiHandler("saveButton")
