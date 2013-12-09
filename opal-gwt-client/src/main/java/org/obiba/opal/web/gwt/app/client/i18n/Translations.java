@@ -508,7 +508,8 @@ public interface Translations extends Constants {
       "CreateViewFailed", "Failed to create view. Make sure the view file is valid.",//
       "SPSSOrExcelFileRequired", "An Excel or a SPSS file is required.",//
       "ESQueryBadRequest", "Not a valid search query.", "DuplicateUserName", "A user with same name already exists.",
-      "DuplicateSubjectProfile", "A user or application profile is already registered with the same name."//
+      "DuplicateSubjectProfile", "A user or application profile is already registered with the same name.",//
+      "AttributeNameIsRequired", "An attribute name is required"//
   })
   Map<String, String> userMessageMap();
 

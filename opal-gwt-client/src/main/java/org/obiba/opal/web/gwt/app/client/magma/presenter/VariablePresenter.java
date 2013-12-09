@@ -29,6 +29,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEven
 import org.obiba.opal.web.gwt.app.client.magma.event.VcsCommitInfoReceivedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CategoriesEditorModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
@@ -70,9 +71,9 @@ import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
 import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_OK;
+import static org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter.Mode;
 
-//import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter;
-
+@SuppressWarnings("OverlyCoupledClass")
 public class VariablePresenter extends PresenterWidget<VariablePresenter.Display>
     implements VariableUiHandlers, VariableSelectionChangeEvent.Handler {
 
@@ -94,7 +95,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private final ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider;
 
-//  private final ModalProvider<VariableAttributeModalPresenter> attributeModalProvider;
+  private final ModalProvider<VariableAttributeModalPresenter> attributeModalProvider;
 
   private TableDto table;
 
@@ -108,6 +109,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private Runnable removeConfirmation;
 
+  @SuppressWarnings("ConstructorWithTooManyParameters")
   @Inject
   public VariablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
       ValuesTablePresenter valuesTablePresenter, SummaryTabPresenter summaryTabPresenter,
@@ -115,8 +117,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
       VariableVcsCommitHistoryPresenter variableVcsCommitHistoryPresenter,
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
       ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider,
-      ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider
-      /*ModalProvider<VariableAttributeModalPresenter> attributeModalProvider*/) {
+      ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider,
+      ModalProvider<VariableAttributeModalPresenter> attributeModalProvider) {
     super(eventBus, display);
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
@@ -127,7 +129,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     this.variablesToViewProvider = variablesToViewProvider.setContainer(this);
     this.categoriesEditorModalProvider = categoriesEditorModalProvider.setContainer(this);
     this.propertiesEditorModalProvider = propertiesEditorModalProvider.setContainer(this);
-//    this.attributeModalProvider = attributeModalProvider.setContainer(this);
+    this.attributeModalProvider = attributeModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -422,8 +424,9 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   @Override
   public void onAddAttribute() {
     // TODO
-//    VariableAttributeModalPresenter attributeEditorPresenter = attributeModalProvider.get();
-//    attributeEditorPresenter.initialize(variable, table);
+    VariableAttributeModalPresenter attributeEditorPresenter = attributeModalProvider.get();
+    attributeEditorPresenter.setDialogMode(Mode.CREATE);
+    attributeEditorPresenter.initialize(table, variable);
   }
 
   @Override
