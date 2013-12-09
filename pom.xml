@@ -1680,7 +1680,7 @@
     <liquibase.version>1.9.4</liquibase.version>
     <logback.version>1.0.13</logback.version>
     <magma.version>1.8-SNAPSHOT</magma.version>
-    <public-datasources.version>1.1-SNAPSHOT</public-datasources.version>
+    <public-datasources.version>1.0.1</public-datasources.version>
     <mail.version>1.5.0-b01</mail.version>
     <mockftpserver.version>2.4</mockftpserver.version>
     <mongodb-driver.version>2.11.3</mongodb-driver.version>
