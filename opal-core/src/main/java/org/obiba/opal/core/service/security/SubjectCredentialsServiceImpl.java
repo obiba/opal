@@ -85,6 +85,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
     Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
     // Copy current password if password is empty
+    //noinspection ConstantConditions
     if(subjectCredentials.getPassword() == null) {
       subjectCredentials.setPassword(getSubjectCredentials(subjectCredentials.getName()).getPassword());
     }

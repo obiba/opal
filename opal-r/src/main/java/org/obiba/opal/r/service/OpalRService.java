@@ -165,7 +165,7 @@ public class OpalRService implements Service, ROperationTemplate, HasServiceList
         rserveStatus = -1;
       }
     } catch(Exception e) {
-      log.error("R server start failed", e);
+      log.warn("R server start failed", e);
       rserveStatus = -1;
     }
   }
