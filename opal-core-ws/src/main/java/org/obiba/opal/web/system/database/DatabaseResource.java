@@ -29,6 +29,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.mongodb.DBCollection;
+import com.mongodb.MongoClient;
+
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 import static org.obiba.opal.web.model.Database.DatabaseDto;
 
@@ -123,8 +126,11 @@ public class DatabaseResource {
       List<String> dbs = datasourceFactory.getMongoDBFactory().getMongoClient().getDatabaseNames();
       if(dbs.contains(datasourceFactory.getMongoDbDatabaseName())) {
         return Response.ok().build();
+      } else {
+        DBCollection collTest = datasourceFactory.getMongoDBFactory().getDB().getCollection("_coll_test");
+        collTest.drop();
+        return Response.ok().build();
       }
-      error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "FailedToConnectToDatabase", name).build();
     } catch(RuntimeException e) {
       error = ClientErrorDtos.getErrorMessage(SERVICE_UNAVAILABLE, "DatabaseConnectionFailed", e);
     }
