@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableVcsCommitHistoryPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CategoriesEditorModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
@@ -67,10 +68,11 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
     ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider = createMock(ModalProvider.class);
     ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider = createMock(ModalProvider.class);
 
+    ModalProvider<VariableAttributeModalPresenter> varAttributeModalProvider = createMock(ModalProvider.class);
     variablePresenter = new VariablePresenter(displayMock, new CountingEventBus(), null, null,
         new SummaryTabPresenter(eventBusMock, summaryTabMock), null, mockProvider,
         variableVcsCommitHistoryPresenterMock, variablesToViewProvider, categoriesEditorModalProvider,
-        propertiesEditorModalProvider);
+        propertiesEditorModalProvider, varAttributeModalProvider);
   }
 
   @SuppressWarnings("unchecked")

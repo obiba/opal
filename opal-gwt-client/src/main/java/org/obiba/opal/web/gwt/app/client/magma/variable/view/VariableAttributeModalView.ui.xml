@@ -1,0 +1,59 @@
+<!--
+  ~ Copyright (c) 2013 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+
+  <o:Modal ui:field="modal" resizable="false" closeVisible="true" keyboard="true" animation="false">
+
+    <g:FlowPanel addStyleNames="clearfix">
+      <b:Form type="INLINE">
+        <b:ControlGroup ui:field="nameGroup">
+          <b:ControlLabel for="name">
+            <ui:msg description="Attribute Name label">Name</ui:msg>
+            <o:RequiredIcon/>
+          </b:ControlLabel>
+          <b:Controls>
+            <o:SuggestListBox ui:field="namespace"/>
+            <b:HelpBlock>
+              <ui:msg description="Namespace help">Namespace, if applicable</ui:msg>
+            </b:HelpBlock>
+            <b:TextBox ui:field="name" addStyleNames="inline-block"/>
+          </b:Controls>
+        </b:ControlGroup>
+
+        <b:ControlGroup ui:field="valueGroup">
+          <b:ControlLabel for="value">
+            <ui:msg description="Value label">Values</ui:msg>
+          </b:ControlLabel>
+          <b:Controls>
+            <g:FlowPanel ui:field="valuesPanel"/>
+          </b:Controls>
+        </b:ControlGroup>
+      </b:Form>
+
+    </g:FlowPanel>
+
+    <b:ModalFooter>
+      <b:Button ui:field="saveButton" type="PRIMARY">
+        <ui:msg description="Save button label">Save</ui:msg>
+      </b:Button>
+      <b:Button ui:field="cancelButton">
+        <ui:msg description="Cancel button label">Cancel</ui:msg>
+      </b:Button>
+    </b:ModalFooter>
+
+  </o:Modal>
+
+</ui:UiBinder>
