@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.service.impl;
+package org.obiba.opal.core.service.security;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,7 +21,6 @@ import javax.validation.constraints.NotNull;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.OrientDbService;
-import org.obiba.opal.core.service.SubjectAclService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -363,7 +362,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
     }
   }
 
-  private class PermissionsImpl implements Permissions {
+  private static class PermissionsImpl implements Permissions {
 
     private final String domain;
 
@@ -371,7 +370,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
     private final Subject subject;
 
-    private List<String> permissions = Lists.newArrayList();
+    private final List<String> permissions = Lists.newArrayList();
 
     private PermissionsImpl(String domain, String node, Subject subject) {
       this.domain = domain;

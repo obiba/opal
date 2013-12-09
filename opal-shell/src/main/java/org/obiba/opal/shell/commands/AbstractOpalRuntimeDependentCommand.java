@@ -23,22 +23,27 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 public abstract class AbstractOpalRuntimeDependentCommand<T> extends AbstractCommand<T> {
-  //
-  // AbstractContextLoadingCommand Methods
-  //
 
-  @Autowired
   private OpalRuntime opalRuntime;
 
-  @Autowired
   private OpalConfigurationService configService;
 
-  @Autowired
   private FunctionalUnitService functionalUnitService;
 
-  //
-  // Methods
-  //
+  @Autowired
+  public void setOpalRuntime(OpalRuntime opalRuntime) {
+    this.opalRuntime = opalRuntime;
+  }
+
+  @Autowired
+  public void setConfigService(OpalConfigurationService configService) {
+    this.configService = configService;
+  }
+
+  @Autowired
+  public void setFunctionalUnitService(FunctionalUnitService functionalUnitService) {
+    this.functionalUnitService = functionalUnitService;
+  }
 
   protected OpalRuntime getOpalRuntime() {
     return opalRuntime;

@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.obiba.magma.test.AbstractMagmaTest;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.core.service.DecryptService;
+import org.obiba.opal.core.service.security.DecryptService;
 import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.shell.OpalShell;
@@ -107,6 +107,7 @@ public class DecryptCommandTest extends AbstractMagmaTest {
   }
 
   @Test
+  @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
   public void testOutputDirectoryDefaultsToOpalFileSystemRoot() throws IOException {
     String unitName = "my-unit";
     DecryptCommandOptions mockOptions = createMockOptionsForDefaultOutputDirectory(unitName);

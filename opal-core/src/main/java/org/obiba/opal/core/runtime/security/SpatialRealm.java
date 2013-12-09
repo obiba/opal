@@ -25,10 +25,10 @@ import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.obiba.opal.core.runtime.security.support.SubjectPermissionsConverterRegistry;
-import org.obiba.opal.core.service.SubjectAclService;
-import org.obiba.opal.core.service.SubjectAclService.Subject;
-import org.obiba.opal.core.service.SubjectAclService.SubjectAclChangeCallback;
-import org.obiba.opal.core.service.SubjectAclService.SubjectType;
+import org.obiba.opal.core.service.security.SubjectAclService;
+import org.obiba.opal.core.service.security.SubjectAclService.Subject;
+import org.obiba.opal.core.service.security.SubjectAclService.SubjectAclChangeCallback;
+import org.obiba.opal.core.service.security.SubjectAclService.SubjectType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -20,7 +20,7 @@ import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.VariableEntity;
-import org.obiba.opal.project.domain.Project;
+import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.web.magma.DatasourceResource;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Projects;

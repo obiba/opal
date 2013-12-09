@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.core.service.impl;
+package org.obiba.opal.core.service.security;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,8 +24,6 @@ import org.obiba.opal.core.domain.user.SubjectCredentials;
 import org.obiba.opal.core.runtime.security.OpalUserRealm;
 import org.obiba.opal.core.service.DuplicateSubjectProfileException;
 import org.obiba.opal.core.service.OrientDbService;
-import org.obiba.opal.core.service.SubjectAclService;
-import org.obiba.opal.core.service.SubjectCredentialsService;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

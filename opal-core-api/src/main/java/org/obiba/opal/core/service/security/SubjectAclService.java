@@ -7,15 +7,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.service;
+package org.obiba.opal.core.service.security;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
+
+import org.obiba.opal.core.service.SystemService;
 
 public interface SubjectAclService extends SystemService {
 
   /**
    * Add permission change callback.
+   *
    * @param callback
    */
   void addListener(SubjectAclChangeCallback callback);
@@ -37,6 +40,7 @@ public interface SubjectAclService extends SystemService {
 
   /**
    * Delete all permissions on node and its children in a domain.
+   *
    * @param domain
    * @param node
    */
@@ -44,6 +48,7 @@ public interface SubjectAclService extends SystemService {
 
   /**
    * Delete all node permissions of a subject in a domain.
+   *
    * @param domain
    * @param node
    * @param subject
@@ -52,6 +57,7 @@ public interface SubjectAclService extends SystemService {
 
   /**
    * Delete a node permissions of a subject in a domain.
+   *
    * @param domain
    * @param node
    * @param subject
@@ -61,6 +67,7 @@ public interface SubjectAclService extends SystemService {
 
   /**
    * Add some node permissions for a subject in a domain.
+   *
    * @param domain
    * @param node
    * @param subject
@@ -70,6 +77,7 @@ public interface SubjectAclService extends SystemService {
 
   /**
    * A a node permission for a subject in a domain.
+   *
    * @param domain
    * @param node
    * @param subject
@@ -79,6 +87,7 @@ public interface SubjectAclService extends SystemService {
 
   /**
    * Get all permissions of a subject.
+   *
    * @param subject
    * @return
    */
@@ -86,6 +95,7 @@ public interface SubjectAclService extends SystemService {
 
   /**
    * Get node permissions of a subject.
+   *
    * @param domain
    * @param node
    * @param subject
@@ -95,15 +105,18 @@ public interface SubjectAclService extends SystemService {
 
   /**
    * Get permissions of a subject on a node and its children.
+   *
    * @param domain
    * @param node
    * @param subject
    * @return
    */
-  Iterable<Permissions> getSubjectNodeHierarchyPermissions(@NotNull String domain, @NotNull String node, @NotNull Subject subject);
+  Iterable<Permissions> getSubjectNodeHierarchyPermissions(@NotNull String domain, @NotNull String node,
+      @NotNull Subject subject);
 
   /**
    * Get the permissions for a node.
+   *
    * @param domain
    * @param node
    * @param type
@@ -113,6 +126,7 @@ public interface SubjectAclService extends SystemService {
 
   /**
    * Get the permissions for a node and its children.
+   *
    * @param domain
    * @param node
    * @param type
@@ -122,6 +136,7 @@ public interface SubjectAclService extends SystemService {
 
   /**
    * Get all subjects of a given type and having permissions in a domain.
+   *
    * @param domain
    * @param type
    * @return

@@ -135,7 +135,7 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   private Iterable<ODocument> getDocuments(ODatabaseComplex<?> db,
       Map<HasUniqueProperties, HasUniqueProperties> beansByTemplate) {
-    Collection<ODocument> documents = new ArrayList<ODocument>(beansByTemplate.size());
+    Collection<ODocument> documents = new ArrayList<>(beansByTemplate.size());
     for(Map.Entry<HasUniqueProperties, HasUniqueProperties> entry : beansByTemplate.entrySet()) {
       ODocument document = findUniqueDocument(db, entry.getKey());
       if(document == null) {
@@ -151,12 +151,9 @@ public class OrientDbServiceImpl implements OrientDbService {
   @SuppressWarnings("unchecked")
   @Override
   public <T extends HasUniqueProperties> T findUnique(@NotNull HasUniqueProperties template) {
-    ODatabaseDocumentTx db = serverFactory.getDocumentTx();
-    try {
+    try(ODatabaseDocumentTx db = serverFactory.getDocumentTx()) {
       ODocument document = findUniqueDocument(db, template);
       return document == null ? null : (T) fromDocument(template.getClass(), document);
-    } finally {
-      db.close();
     }
   }
 
@@ -199,21 +196,15 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   @Override
   public <T> Iterable<T> list(Class<T> clazz) {
-    ODatabaseDocumentTx db = serverFactory.getDocumentTx();
-    try {
+    try(ODatabaseDocumentTx db = serverFactory.getDocumentTx()) {
       return fromDocuments(db.browseClass(clazz.getSimpleName()), clazz);
-    } finally {
-      db.close();
     }
   }
 
   @Override
   public <T> Iterable<T> list(Class<T> clazz, String sql, Object... params) {
-    ODatabaseDocumentTx db = serverFactory.getDocumentTx();
-    try {
+    try(ODatabaseDocumentTx db = serverFactory.getDocumentTx()) {
       return fromDocuments(db.<List<ODocument>>query(new OSQLSynchQuery<ODocument>(sql), params), clazz);
-    } finally {
-      db.close();
     }
   }
 
@@ -239,11 +230,8 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   @Override
   public <T> long count(Class<T> clazz) {
-    ODatabaseDocumentTx db = serverFactory.getDocumentTx();
-    try {
+    try(ODatabaseDocumentTx db = serverFactory.getDocumentTx()) {
       return db.countClass(clazz.getSimpleName());
-    } finally {
-      db.close();
     }
   }
 
@@ -252,7 +240,7 @@ public class OrientDbServiceImpl implements OrientDbService {
     ODatabaseDocumentTx db = serverFactory.getDocumentTx();
     try {
 
-      Collection<ODocument> documents = new ArrayList<ODocument>(templates.length);
+      Collection<ODocument> documents = new ArrayList<>(templates.length);
       for(HasUniqueProperties template : templates) {
         documents.add(findUniqueDocument(db, template));
       }
@@ -296,8 +284,7 @@ public class OrientDbServiceImpl implements OrientDbService {
 
   @Override
   public void createUniqueIndex(@NotNull Class<? extends HasUniqueProperties> clazz) {
-    ODatabaseDocumentTx db = serverFactory.getDocumentTx();
-    try {
+    try(ODatabaseDocumentTx db = serverFactory.getDocumentTx()) {
       String className = clazz.getSimpleName();
 
       OClass indexClass;
@@ -323,8 +310,6 @@ public class OrientDbServiceImpl implements OrientDbService {
       indexClass.createIndex(getIndexName(bean), OClass.INDEX_TYPE.UNIQUE,
           uniqueProperties.toArray(new String[uniqueProperties.size()]));
 
-    } finally {
-      db.close();
     }
   }
 
@@ -332,8 +317,7 @@ public class OrientDbServiceImpl implements OrientDbService {
   public void createIndex(Class<?> clazz, OClass.INDEX_TYPE indexType, OType type, @NotNull String... propertyPath) {
     //noinspection ConstantConditions
     Preconditions.checkArgument(propertyPath != null, "PropertyPath cannot be null");
-    ODatabaseDocumentTx db = serverFactory.getDocumentTx();
-    try {
+    try(ODatabaseDocumentTx db = serverFactory.getDocumentTx()) {
       String className = clazz.getSimpleName();
 
       OClass indexClass;
@@ -354,8 +338,6 @@ public class OrientDbServiceImpl implements OrientDbService {
       }
       indexClass.createIndex(getIndexName(clazz, Lists.newArrayList(propertyPath)), indexType, propertyPath);
 
-    } finally {
-      db.close();
     }
   }
 

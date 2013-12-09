@@ -22,7 +22,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.magma.MagmaEngine;
-import org.obiba.opal.core.service.SubjectAclService;
+import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.AbstractPermissionsResource;
 import org.obiba.opal.web.security.PermissionsToAclFunction;
@@ -84,7 +84,7 @@ public class ProjectDatasourcePermissionsResource extends AbstractPermissionsRes
       @QueryParam("principal") List<String> principals, @QueryParam("permission") DatasourcePermission permission) {
     // make sure datasource exists
     MagmaEngine.get().getDatasource(name);
-    setPermission(principals,type,permission.name());
+    setPermission(principals, type, permission.name());
     return Response.ok().build();
   }
 

@@ -24,8 +24,8 @@ import javax.ws.rs.core.Response;
 
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
-import org.obiba.opal.core.service.SubjectAclService;
-import org.obiba.opal.project.ProjectService;
+import org.obiba.opal.core.service.ProjectService;
+import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.AbstractPermissionsResource;
 import org.obiba.opal.web.security.PermissionsToAclFunction;
@@ -96,9 +96,9 @@ public class ProjectPermissionsResource extends AbstractPermissionsResource {
                 new MagmaPermissionsPredicate()));
 
     List<SubjectAclService.Subject> subjects = Lists.newArrayList();
-    for (SubjectAclService.Permissions perms : permissions) {
+    for(SubjectAclService.Permissions perms : permissions) {
       SubjectAclService.Subject subject = perms.getSubject();
-      if (!subjects.contains(subject)) subjects.add(subject);
+      if(!subjects.contains(subject)) subjects.add(subject);
     }
 
     return Iterables.transform(subjects, new Function<SubjectAclService.Subject, Opal.Subject>() {

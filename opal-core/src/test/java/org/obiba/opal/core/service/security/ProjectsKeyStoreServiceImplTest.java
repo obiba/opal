@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.service.impl;
+package org.obiba.opal.core.service.security;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -21,52 +21,43 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.easymock.EasyMock;
 import org.hamcrest.core.IsNull;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.core.util.FileUtil;
+import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.domain.unit.KeyStoreState;
+import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.OrientDbService;
-import org.obiba.opal.core.unit.OpalKeyStore;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 /**
  * Unit tests for {@link KeyStoreServiceImpl}.
  */
-public class KeyStoreServiceImplTest {
+public class ProjectsKeyStoreServiceImplTest {
 
-  private KeyStoreServiceImpl unitKeyStoreService;
+  private ProjectsKeyStoreServiceImpl projectsKeyStoreService;
 
   private OrientDbService mockOrientDbService;
 
   @Before
   public void setUp() {
     mockOrientDbService = createMock(OrientDbService.class);
-    unitKeyStoreService = new KeyStoreServiceImpl();
-    unitKeyStoreService.setOrientDbService(mockOrientDbService);
-    unitKeyStoreService.setCallbackHandler(createPasswordCallbackHandler());
+    projectsKeyStoreService = new ProjectsKeyStoreServiceImpl();
+    projectsKeyStoreService.setOrientDbService(mockOrientDbService);
+    projectsKeyStoreService.setCallbackHandler(createPasswordCallbackHandler());
   }
 
   @SuppressWarnings("ConstantConditions")
   @Test(expected = IllegalArgumentException.class)
   public void testGetUnitKeyStoreThrowsExceptionOnNullUnitName() {
-    unitKeyStoreService.getUnitKeyStore(null);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testGetUnitKeyStoreThrowsExceptionOnZeroLengthUnitName() {
-    unitKeyStoreService.getUnitKeyStore("");
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testGetUnitKeyStoreThrowsExceptionOnWhitespaceOnlyUnitName() {
-    unitKeyStoreService.getUnitKeyStore(" \t \n \r\n");
+    projectsKeyStoreService.getKeyStore(null);
   }
 
   @Test
@@ -74,43 +65,40 @@ public class KeyStoreServiceImplTest {
     KeyStoreState expectedKeyStoreStateTemplate = new KeyStoreState();
     expectedKeyStoreStateTemplate.setName("my-unit");
     KeyStoreState state = new KeyStoreState();
-    state.setName("my-unit");
+    state.setName("projects:my-unit");
     state.setKeyStore(getTestKeyStoreByteArray());
+    expect(mockOrientDbService.findUnique(state)).andReturn(state).once();
 
-    expect(mockOrientDbService.findUnique(state)) //
-        .andReturn(state) //
-        .once();
+    Project project = new Project("my-unit");
 
     replay(mockOrientDbService);
 
-    OpalKeyStore opalKeyStore = unitKeyStoreService.getUnitKeyStore("my-unit");
+    OpalKeyStore opalKeyStore = projectsKeyStoreService.getKeyStore(project);
     verify(mockOrientDbService);
 
     assertThat(opalKeyStore, IsNull.notNullValue());
-    //noinspection ConstantConditions
-    assertThat(opalKeyStore.getUnitName(), is(state.getName()));
+    assertThat(opalKeyStore.getName(), is(state.getName()));
   }
 
   @Test
   public void testGetOrCreateUnitKeyStoreCreatesTheKeyStoreIfItDoesNotExist() throws Exception {
 
     KeyStoreState state = new KeyStoreState();
-    state.setName("my-unit");
-
-    expect(mockOrientDbService.findUnique(state)) //
-        .andReturn(null) //
-        .times(2);
+    state.setName("projects:my-unit");
+    expect(mockOrientDbService.findUnique(state)).andReturn(null).times(2);
 
     mockOrientDbService.save(state, state);
     EasyMock.expectLastCall().once();
 
+    Project project = new Project("my-unit");
+
     replay(mockOrientDbService);
 
-    OpalKeyStore opalKeyStore = unitKeyStoreService.getOrCreateUnitKeyStore("my-unit");
+    OpalKeyStore opalKeyStore = projectsKeyStoreService.getKeyStore(project);
 
     verify(mockOrientDbService);
 
-    assertNotNull(opalKeyStore);
+    Assert.assertNotNull(opalKeyStore);
   }
 
   //

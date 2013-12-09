@@ -55,19 +55,21 @@ import org.obiba.magma.js.views.JavascriptClause;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.StaticDatasource;
 import org.obiba.magma.support.StaticValueTable;
+import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ImportService;
-import org.obiba.opal.core.service.KeyStoreService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.service.ProjectService;
+import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifierMapper;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers.UnitIdentifier;
 import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.obiba.opal.core.unit.IllegalIdentifierAssociationException;
-import org.obiba.opal.core.unit.OpalKeyStore;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
@@ -106,7 +108,10 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   private OpalRuntime opalRuntime;
 
   @Autowired
-  private KeyStoreService keyStoreService;
+  private ProjectsKeyStoreService projectsKeyStoreService;
+
+  @Autowired
+  private ProjectService projectService;
 
   @Autowired
   private ImportService importService;
@@ -119,10 +124,6 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
 
   @PathParam("unit")
   private String unit;
-
-  //
-  // Functional Unit
-  //
 
   @GET
   public Opal.FunctionalUnitDto getFunctionalUnit() {
@@ -397,26 +398,22 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   public List<Opal.KeyDto> getFunctionalUnitKeyPairs() throws KeyStoreException, IOException {
     List<Opal.KeyDto> keyPairs = Lists.newArrayList();
 
-    OpalKeyStore keystore = keyStoreService.getUnitKeyStore(unit);
-    if(keystore != null) {
-      for(String alias : keystore.listAliases()) {
-        Opal.KeyType type = Opal.KeyType.valueOf(keystore.getKeyType(alias).toString());
-        Opal.KeyDto.Builder kpBuilder = Opal.KeyDto.newBuilder().setAlias(alias).setKeyType(type);
+    OpalKeyStore keyStore = projectsKeyStoreService.getKeyStore(getProject());
+    for(String alias : keyStore.listAliases()) {
+      Opal.KeyType type = Opal.KeyType.valueOf(keyStore.getKeyType(alias).toString());
+      Opal.KeyDto.Builder kpBuilder = Opal.KeyDto.newBuilder().setAlias(alias).setKeyType(type);
 
-        kpBuilder.setCertificate(getPEMCertificate(keystore, alias));
-        keyPairs.add(kpBuilder.build());
-      }
-
-      sortByName(keyPairs);
+      kpBuilder.setCertificate(getPEMCertificate(keyStore, alias));
+      keyPairs.add(kpBuilder.build());
     }
-
+    sortByName(keyPairs);
     return keyPairs;
   }
 
   @POST
   @Path("/keys")
   public Response createFunctionalUnitKeyPair(Opal.KeyForm kpForm) {
-    if(keyStoreService.aliasExists(unit, kpForm.getAlias())) {
+    if(projectsKeyStoreService.aliasExists(getProject(), kpForm.getAlias())) {
       return Response.status(Status.BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "KeyPairAlreadyExists").build()).build();
     }
@@ -441,13 +438,13 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   @DELETE
   @Path("/key/{alias}")
   public Response deleteFunctionalUnitKeyPair(@PathParam("alias") String alias) {
-    if(!keyStoreService.aliasExists(unit, alias)) {
+    if(!projectsKeyStoreService.aliasExists(getProject(), alias)) {
       return Response.status(Status.NOT_FOUND).build();
     }
 
     ResponseBuilder response = null;
     try {
-      keyStoreService.deleteKey(unit, alias);
+      projectsKeyStoreService.deleteKeyStore(getProject(), alias);
       response = Response.ok();
     } catch(RuntimeException e) {
       response = Response.status(Status.INTERNAL_SERVER_ERROR)
@@ -462,15 +459,10 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   @AuthenticatedByCookie
   public Response getFunctionalUnitKeyPairCertificate(@PathParam("alias") String alias)
       throws KeyStoreException, IOException {
-    OpalKeyStore keystore = keyStoreService.getUnitKeyStore(unit);
-
-    return Response.ok(getPEMCertificate(keystore, alias), MediaType.TEXT_PLAIN_TYPE)
+    OpalKeyStore keyStore = projectsKeyStoreService.getKeyStore(getProject());
+    return Response.ok(getPEMCertificate(keyStore, alias), MediaType.TEXT_PLAIN_TYPE)
         .header("Content-disposition", "attachment; filename=\"" + unit + "-" + alias + "-certificate.pem\"").build();
   }
-
-  //
-  // Private methods
-  //
 
   private void importIdentifiers(FunctionalUnit drivingUnit, Set<String> ids)
       throws NoSuchValueTableException, IOException {
@@ -488,8 +480,8 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   @Nullable
   private ResponseBuilder doImportCertificate(Opal.KeyForm kpForm) {
     try {
-      keyStoreService
-          .importCertificate(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPublicImport().getBytes()));
+      projectsKeyStoreService.importCertificate(getProject(), kpForm.getAlias(),
+          new ByteArrayInputStream(kpForm.getPublicImport().getBytes()));
     } catch(MagmaCryptRuntimeException e) {
       return Response.status(Status.BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "InvalidCertificate").build());
@@ -501,7 +493,7 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   private ResponseBuilder doCreateOrImportKeyPair(Opal.KeyForm kpForm) {
     ResponseBuilder response = null;
     if(kpForm.hasPrivateForm() && kpForm.hasPublicForm()) {
-      keyStoreService.createOrUpdateKey(unit, kpForm.getAlias(), kpForm.getPrivateForm().getAlgo(),
+      projectsKeyStoreService.createOrUpdateKey(getProject(), kpForm.getAlias(), kpForm.getPrivateForm().getAlgo(),
           kpForm.getPrivateForm().getSize(), getCertificateInfo(kpForm.getPublicForm()));
     } else {
       response = kpForm.hasPrivateImport()
@@ -516,11 +508,13 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
   private ResponseBuilder doImportKeyPair(Opal.KeyForm kpForm) {
     ResponseBuilder response = null;
     if(kpForm.hasPublicForm()) {
-      keyStoreService.importKey(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()),
-          getCertificateInfo(kpForm.getPublicForm()));
+      projectsKeyStoreService
+          .importKey(getProject(), kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()),
+              getCertificateInfo(kpForm.getPublicForm()));
     } else if(kpForm.hasPublicImport()) {
-      keyStoreService.importKey(unit, kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()),
-          new ByteArrayInputStream(kpForm.getPublicImport().getBytes()));
+      projectsKeyStoreService
+          .importKey(getProject(), kpForm.getAlias(), new ByteArrayInputStream(kpForm.getPrivateImport().getBytes()),
+              new ByteArrayInputStream(kpForm.getPublicImport().getBytes()));
     } else {
       response = Response.status(Status.BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "MissingPublicKeyArgument").build());
@@ -596,6 +590,10 @@ public class FunctionalUnitResource extends AbstractFunctionalUnitResource {
       }
     }
     return drivingUnit;
+  }
+
+  private Project getProject() {
+    return projectService.getProject(unit);
   }
 
   private interface VectorCallback {

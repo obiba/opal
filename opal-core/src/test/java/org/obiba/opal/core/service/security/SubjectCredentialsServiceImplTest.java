@@ -1,4 +1,4 @@
-package org.obiba.opal.core.service.impl;
+package org.obiba.opal.core.service.security;
 
 import java.util.List;
 
@@ -8,9 +8,9 @@ import org.junit.Test;
 import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.SubjectCredentials;
 import org.obiba.opal.core.service.OrientDbService;
-import org.obiba.opal.core.service.SubjectAclService;
-import org.obiba.opal.core.service.SubjectCredentialsService;
 import org.obiba.opal.core.service.SubjectProfileService;
+import org.obiba.opal.core.service.impl.AbstractOrientDbTestConfig;
+import org.obiba.opal.core.service.impl.Asserts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

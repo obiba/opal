@@ -19,7 +19,6 @@ import org.junit.Test;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ImportService;
-import org.obiba.opal.core.service.KeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.obiba.opal.web.model.Opal;
@@ -38,8 +37,6 @@ public class FunctionalUnitsResourceTest {
 
   private FunctionalUnitService functionalUnitServiceMock;
 
-  private KeyStoreService keyStoreServiceMock;
-
   private Set<FunctionalUnit> functionalUnits;
 
   @Before
@@ -47,7 +44,6 @@ public class FunctionalUnitsResourceTest {
     opalRuntimeMock = createMock(OpalRuntime.class);
     functionalUnitServiceMock = createMock(FunctionalUnitService.class);
     identifiersTableResolverMock = createMock(IdentifiersTableService.class);
-    keyStoreServiceMock = createMock(KeyStoreService.class);
 
     functionalUnits = new HashSet<FunctionalUnit>();
     functionalUnits.add(new FunctionalUnit("unit1", "key1"));
@@ -68,7 +64,6 @@ public class FunctionalUnitsResourceTest {
     FunctionalUnitsResource functionalUnitsResource = new FunctionalUnitsResource();
     functionalUnitsResource.setFunctionalUnitService(functionalUnitServiceMock);
     functionalUnitsResource.setOpalRuntime(opalRuntimeMock);
-    functionalUnitsResource.setKeyStoreService(keyStoreServiceMock);
     functionalUnitsResource.setImportService(importService);
     functionalUnitsResource.setIdentifiersTableService(identifiersTableResolverMock);
 

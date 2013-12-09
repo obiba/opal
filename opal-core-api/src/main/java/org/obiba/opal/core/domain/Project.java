@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.project.domain;
+package org.obiba.opal.core.domain;
 
 import java.util.HashSet;
 import java.util.List;
@@ -25,8 +25,6 @@ import org.obiba.magma.Timestamped;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
 import org.obiba.magma.type.DateTimeType;
-import org.obiba.opal.core.domain.AbstractTimestamped;
-import org.obiba.opal.core.domain.HasUniqueProperties;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;

@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.service.impl;
+package org.obiba.opal.core.service.security;
 
 import java.io.IOException;
 
@@ -16,20 +16,15 @@ import org.apache.commons.vfs2.FileType;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
-import org.obiba.magma.crypt.support.NullKeyProvider;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.core.service.DecryptService;
-import org.obiba.opal.core.service.KeyStoreService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
-import org.obiba.opal.core.unit.OpalKeyStore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,16 +36,9 @@ import org.springframework.util.Assert;
 @Transactional
 @Component
 public class DefaultDecryptService implements DecryptService {
-  //
-  // Constants
-  //
 
-  @SuppressWarnings("unused")
-  private static final Logger log = LoggerFactory.getLogger(DefaultDecryptService.class);
+//  private static final Logger log = LoggerFactory.getLogger(DefaultDecryptService.class);
 
-  //
-  // Instance Variables
-  //
   @Autowired
   private FunctionalUnitService functionalUnitService;
 
@@ -58,11 +46,13 @@ public class DefaultDecryptService implements DecryptService {
   private OpalRuntime opalRuntime;
 
   @Autowired
-  private KeyStoreService keyStoreService;
+  private ProjectsKeyStoreService projectsKeyStoreService;
 
-  //
-  // DecryptService Methods
-  //
+  @Autowired
+  private SystemKeyStoreService systemKeyStoreService;
+
+  @Autowired
+  private ProjectService projectService;
 
   @Override
   public void decryptData(String unitName, String datasourceName, FileObject file)
@@ -95,16 +85,11 @@ public class DefaultDecryptService implements DecryptService {
     decryptData(FunctionalUnit.OPAL_INSTANCE, datasourceName, file);
   }
 
-  //
-  // Methods
-  //
-
   private DatasourceEncryptionStrategy getDatasourceEncryptionStrategy(FunctionalUnit unit) {
     DatasourceEncryptionStrategy encryptionStrategy = unit.getDatasourceEncryptionStrategy();
     if(encryptionStrategy == null) {
       encryptionStrategy = new EncryptedSecretKeyDatasourceEncryptionStrategy();
-      OpalKeyStore keyStore = keyStoreService.getKeyStore(unit.getName());
-      encryptionStrategy.setKeyProvider(keyStore == null ? new NullKeyProvider() : keyStore);
+      encryptionStrategy.setKeyProvider(projectsKeyStoreService.getKeyStore(projectService.getProject(unit.getName())));
       unit.setDatasourceEncryptionStrategy(encryptionStrategy);
     }
     return encryptionStrategy;
@@ -112,7 +97,7 @@ public class DefaultDecryptService implements DecryptService {
 
   private DatasourceEncryptionStrategy getOpalInstanceEncryptionStrategy() {
     DatasourceEncryptionStrategy dsEncryptionStrategy = getDefaultEncryptionStrategy();
-    dsEncryptionStrategy.setKeyProvider(keyStoreService.getOrCreateUnitKeyStore(FunctionalUnit.OPAL_INSTANCE));
+    dsEncryptionStrategy.setKeyProvider(systemKeyStoreService.getKeyStore());
     return dsEncryptionStrategy;
   }
 

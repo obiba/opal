@@ -17,27 +17,31 @@ import java.util.List;
 
 import javax.net.ssl.X509TrustManager;
 
-import org.obiba.opal.core.service.KeyStoreService;
+import org.obiba.opal.core.security.OpalKeyStore;
+import org.obiba.opal.core.service.ProjectService;
+import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
-import org.obiba.opal.core.unit.OpalKeyStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
 
+@Component
 public class UnitTrustManager implements X509TrustManager {
 
   private static final Logger log = LoggerFactory.getLogger(UnitTrustManager.class);
 
-  private final FunctionalUnitService functionalUnitService;
+  @Autowired
+  private FunctionalUnitService functionalUnitService;
 
-  private final KeyStoreService keyStoreService;
+  @Autowired
+  private ProjectsKeyStoreService projectsKeyStoreService;
 
-  public UnitTrustManager(FunctionalUnitService functionalUnitService, KeyStoreService keyStoreService) {
-    this.functionalUnitService = functionalUnitService;
-    this.keyStoreService = keyStoreService;
-  }
+  @Autowired
+  private ProjectService projectService;
 
   @Override
   public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
@@ -80,10 +84,7 @@ public class UnitTrustManager implements X509TrustManager {
   private Iterable<OpalKeyStore> getUnitKeyStores() {
     List<OpalKeyStore> trustedKeyStores = Lists.newArrayList();
     for(FunctionalUnit unit : functionalUnitService.getFunctionalUnits()) {
-      OpalKeyStore opalKeyStore = keyStoreService.getKeyStore(unit.getName(), false);
-      if(opalKeyStore != null) {
-        trustedKeyStores.add(opalKeyStore);
-      }
+      trustedKeyStores.add(projectsKeyStoreService.getKeyStore(projectService.getProject(unit.getName())));
     }
     return trustedKeyStores;
   }

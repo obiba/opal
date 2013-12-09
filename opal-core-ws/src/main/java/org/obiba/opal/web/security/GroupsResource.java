@@ -17,7 +17,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.domain.user.Group;
-import org.obiba.opal.core.service.SubjectCredentialsService;
+import org.obiba.opal.core.service.security.SubjectCredentialsService;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;

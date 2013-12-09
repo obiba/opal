@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.security;
 
-import org.obiba.opal.core.service.SubjectAclService;
-import org.obiba.opal.core.service.SubjectAclService.Permissions;
+import org.obiba.opal.core.service.security.SubjectAclService;
+import org.obiba.opal.core.service.security.SubjectAclService.Permissions;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.Acl;
 
@@ -24,7 +24,7 @@ public class PermissionsToAclFunction implements Function<Permissions, Opal.Acl>
   public Acl apply(Permissions from) {
     Acl.Builder builder = Acl.newBuilder().setDomain(from.getDomain()).setSubject(valueOf(from.getSubject()))
         .setResource(from.getNode());//.addAllActions(from.getPermissions());
-    for (String p : from.getPermissions()) {
+    for(String p : from.getPermissions()) {
       builder.addActions(p);
     }
     return builder.build();

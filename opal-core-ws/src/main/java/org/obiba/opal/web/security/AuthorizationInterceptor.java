@@ -26,8 +26,8 @@ import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.resteasy.util.IsHttpMethod;
-import org.obiba.opal.core.service.SubjectAclService;
-import org.obiba.opal.core.service.SubjectAclService.SubjectType;
+import org.obiba.opal.core.service.security.SubjectAclService;
+import org.obiba.opal.core.service.security.SubjectAclService.SubjectType;
 import org.obiba.opal.web.ws.inject.RequestAttributesProvider;
 import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
 import org.obiba.opal.web.ws.intercept.RequestCyclePreProcess;
@@ -138,8 +138,9 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
     for(URI resourceUri : resourceUris) {
       String resource = requestAttributeProvider.getResourcePath(resourceUri);
       if(!getSubject().isPermitted("rest:" + resource + ":*")) {
-        subjectAclService.addSubjectPermission("rest", resource,
-            SubjectType.USER.subjectFor(getSubject().getPrincipal().toString()), "*:GET/*");
+        subjectAclService
+            .addSubjectPermission("rest", resource, SubjectType.USER.subjectFor(getSubject().getPrincipal().toString()),
+                "*:GET/*");
       }
     }
   }

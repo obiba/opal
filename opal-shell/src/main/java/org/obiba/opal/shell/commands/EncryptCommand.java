@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyStoreException;
 import java.security.PublicKey;
-import java.util.List;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -27,14 +26,16 @@ import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.Initialisables;
-import org.obiba.opal.core.service.KeyStoreService;
-import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.service.NoSuchProjectException;
+import org.obiba.opal.core.service.ProjectService;
+import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
 import org.obiba.opal.shell.commands.options.EncryptCommandOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Command to decrypt an Onyx data file.
  */
+@SuppressWarnings("UseOfSystemOutOrSystemErr")
 @CommandUsage(description = "Decrypts one or more Onyx data files.",
     syntax = "Syntax: decrypt [--unit NAME] [--out FILE] _FILE_...")
 public class EncryptCommand extends AbstractOpalRuntimeDependentCommand<EncryptCommandOptions> {
@@ -42,7 +43,10 @@ public class EncryptCommand extends AbstractOpalRuntimeDependentCommand<EncryptC
   public static final String DECRYPT_DATASOURCE_NAME = "decrypt-datasource";
 
   @Autowired
-  private KeyStoreService keystoreService;
+  private ProjectService projectService;
+
+  @Autowired
+  private ProjectsKeyStoreService projectsKeyStoreService;
 
   @Override
   public int execute() {
@@ -51,7 +55,7 @@ public class EncryptCommand extends AbstractOpalRuntimeDependentCommand<EncryptC
       outputDir = getOutputDir(options.getOutput());
     }
 
-    if(!validOutputDir(outputDir) || !validUnit()) {
+    if(!validOutputDir(outputDir) || !validProject()) {
       return 1; // error!
     }
 
@@ -68,15 +72,17 @@ public class EncryptCommand extends AbstractOpalRuntimeDependentCommand<EncryptC
     return true;
   }
 
-  private boolean validUnit() {
-    if(!getFunctionalUnitService().hasFunctionalUnit(options.getUnit())) {
-      getShell().printf("Functional unit '%s' does not exist. Cannot decrypt.\n", options.getUnit());
+  private boolean validProject() {
+    try {
+      projectService.getProject(options.getUnit());
+    } catch(NoSuchProjectException e) {
+      getShell().printf("Project '%s' does not exist. Cannot decrypt.\n", options.getUnit());
       return false;
     }
     return true;
   }
 
-  private void encryptFiles(List<String> decryptedFilePaths, FileObject outputDir) {
+  private void encryptFiles(Iterable<String> decryptedFilePaths, FileObject outputDir) {
     for(String path : decryptedFilePaths) {
       try {
         FileObject decryptedFile = getDecryptedFile(path);
@@ -102,11 +108,9 @@ public class EncryptCommand extends AbstractOpalRuntimeDependentCommand<EncryptC
       @Override
       public PublicKey getPublicKey(Datasource datasource) throws NoSuchKeyException {
         try {
-          return keystoreService.getUnitKeyStore(options.getUnit()).getKeyStore().getCertificate(options.getAlias())
-              .getPublicKey();
+          return projectsKeyStoreService.getKeyStore(projectService.getProject(options.getUnit())).getKeyStore()
+              .getCertificate(options.getAlias()).getPublicKey();
         } catch(KeyStoreException e) {
-          throw new MagmaCryptRuntimeException(e);
-        } catch(NoSuchFunctionalUnitException e) {
           throw new MagmaCryptRuntimeException(e);
         }
       }
@@ -142,15 +146,14 @@ public class EncryptCommand extends AbstractOpalRuntimeDependentCommand<EncryptC
    * created.
    */
   private FileObject getOutputDir(String outputDirPath) {
-    FileObject outputDir = null;
     try {
-      outputDir = getFileInUnitDirectory(outputDirPath);
-      outputDir = getFile(outputDirPath);
+      getFileInUnitDirectory(outputDirPath);
+      FileObject outputDir = getFile(outputDirPath);
       outputDir.createFolder();
+      return outputDir;
     } catch(FileSystemException e) {
-      outputDir = null;
+      return null;
     }
-    return outputDir;
   }
 
   private String getOutputFileName(FileObject inputFile) {
@@ -158,9 +161,7 @@ public class EncryptCommand extends AbstractOpalRuntimeDependentCommand<EncryptC
   }
 
   private FileObject getDecryptedFile(String path) throws FileSystemException {
-    FileObject encryptedFile = null;
-    encryptedFile = getFileInUnitDirectory(path);
-    return encryptedFile;
+    return getFileInUnitDirectory(path);
   }
 
   private FileObject getFileInUnitDirectory(String filePath) throws FileSystemException {

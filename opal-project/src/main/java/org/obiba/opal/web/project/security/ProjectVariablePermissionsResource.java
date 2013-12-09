@@ -23,7 +23,7 @@ import javax.ws.rs.core.Response;
 
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.core.service.SubjectAclService;
+import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.AbstractPermissionsResource;
 import org.obiba.opal.web.security.PermissionsToAclFunction;

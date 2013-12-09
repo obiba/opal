@@ -19,7 +19,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
-import org.obiba.opal.core.service.SubjectAclService;
+import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.Acl;
 import org.obiba.opal.web.model.Opal.Acls;

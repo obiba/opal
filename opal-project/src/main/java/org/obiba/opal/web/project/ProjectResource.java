@@ -28,9 +28,9 @@ import org.obiba.magma.DatasourceUpdateListener;
 import org.obiba.magma.Timestamped;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.support.UnionTimestamps;
-import org.obiba.opal.project.NoSuchProjectException;
-import org.obiba.opal.project.ProjectService;
-import org.obiba.opal.project.domain.Project;
+import org.obiba.opal.core.domain.Project;
+import org.obiba.opal.core.service.NoSuchProjectException;
+import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Projects;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,8 +75,7 @@ public class ProjectResource {
   @PUT
   public Response update(Projects.ProjectDto projectDto) {
     // will throw a no such project exception
-    //noinspection UnusedDeclaration
-    Project project = projectService.getProject(name);
+    projectService.getProject(name);
     if(!name.equals(projectDto.getName())) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }

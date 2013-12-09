@@ -7,12 +7,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.core.service;
+package org.obiba.opal.core.service.security;
 
 import javax.validation.ConstraintViolationException;
 
 import org.obiba.opal.core.domain.user.Group;
 import org.obiba.opal.core.domain.user.SubjectCredentials;
+import org.obiba.opal.core.service.SystemService;
 
 public interface SubjectCredentialsService extends SystemService {
 

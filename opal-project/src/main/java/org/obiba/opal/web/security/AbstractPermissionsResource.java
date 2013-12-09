@@ -12,7 +12,7 @@ package org.obiba.opal.web.security;
 
 import java.util.List;
 
-import org.obiba.opal.core.service.SubjectAclService;
+import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.support.InvalidRequestException;
 
 import static org.obiba.opal.web.project.security.ProjectPermissionsResource.DOMAIN;

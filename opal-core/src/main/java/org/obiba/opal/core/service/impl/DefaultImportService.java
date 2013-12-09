@@ -39,9 +39,10 @@ import org.obiba.opal.core.magma.PrivateVariableEntityMap;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.ImportService;
-import org.obiba.opal.core.service.KeyStoreService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.NonExistentVariableEntitiesException;
+import org.obiba.opal.core.service.ProjectService;
+import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
 import org.obiba.opal.core.support.OnyxDatasource;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers;
@@ -89,7 +90,10 @@ public class DefaultImportService implements ImportService {
   private IdentifierService identifierService;
 
   @Autowired
-  private KeyStoreService keyStoreService;
+  private ProjectsKeyStoreService projectskeyStoreService;
+
+  @Autowired
+  private ProjectService projectService;
 
   @Override
   public void importData(@Nullable String unitName, @NotNull FileObject sourceFile,
@@ -312,7 +316,7 @@ public class DefaultImportService implements ImportService {
 
     if(unit != null && unit.getDatasourceEncryptionStrategy() == null) {
       DatasourceEncryptionStrategy encryptionStrategy = new EncryptedSecretKeyDatasourceEncryptionStrategy();
-      encryptionStrategy.setKeyProvider(keyStoreService.getKeyStore(unit.getName()));
+      encryptionStrategy.setKeyProvider(projectskeyStoreService.getKeyStore(projectService.getProject(unit.getName())));
       unit.setDatasourceEncryptionStrategy(encryptionStrategy);
     }
 

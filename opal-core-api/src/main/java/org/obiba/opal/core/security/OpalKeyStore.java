@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.unit;
+package org.obiba.opal.core.security;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -70,9 +70,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 
-/**
- * A {@link FunctionalUnit}'s keystore.
- */
 public class OpalKeyStore implements KeyProvider {
 
   public static final String PASSWORD_FOR = "Password for";
@@ -81,14 +78,14 @@ public class OpalKeyStore implements KeyProvider {
     KEY_PAIR, CERTIFICATE
   }
 
-  private final String unitName;
+  private final String name;
 
   private final KeyStore store;
 
   private CallbackHandler callbackHandler;
 
-  public OpalKeyStore(String unitName, KeyStore store) {
-    this.unitName = unitName;
+  public OpalKeyStore(String name, KeyStore store) {
+    this.name = name;
     this.store = store;
   }
 
@@ -103,8 +100,7 @@ public class OpalKeyStore implements KeyProvider {
   public Entry getEntry(String alias) {
     try {
       if(store.isKeyEntry(alias)) {
-        CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName)
-            .prompt("Password for '" + alias + "':  ").build();
+        CacheablePasswordCallback passwordCallback = createPasswordCallback("Password for '" + alias + "':  ");
         return store.getEntry(alias, new PasswordProtection(getKeyPassword(passwordCallback)));
       } else if(store.isCertificateEntry(alias)) {
         return store.getEntry(alias, null);
@@ -122,6 +118,10 @@ public class OpalKeyStore implements KeyProvider {
     } catch(IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private CacheablePasswordCallback createPasswordCallback(String prompt) {
+    return CacheablePasswordCallback.Builder.newCallback().key(name).prompt(prompt).build();
   }
 
   public Set<String> listKeyPairs() {
@@ -161,14 +161,13 @@ public class OpalKeyStore implements KeyProvider {
       throws NoSuchKeyException, org.obiba.magma.crypt.KeyProviderSecurityException {
     KeyPair keyPair = null;
     try {
-      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName)
-          .prompt("Password for '" + alias + "':  ").build();
+      CacheablePasswordCallback passwordCallback = createPasswordCallback("Password for '" + alias + "':  ");
       keyPair = findKeyPairForPrivateKey(alias, store, passwordCallback);
     } catch(KeyPairNotFoundException ex) {
       throw ex;
     } catch(UnrecoverableKeyException ex) {
       if(callbackHandler instanceof CachingCallbackHandler) {
-        ((CachingCallbackHandler) callbackHandler).clearPasswordCache(unitName);
+        ((CachingCallbackHandler) callbackHandler).clearPasswordCache(name);
       }
       throw new KeyProviderSecurityException("Wrong key password");
     } catch(Exception ex) {
@@ -233,13 +232,12 @@ public class OpalKeyStore implements KeyProvider {
     return certs;
   }
 
-
   public void setCallbackHandler(CallbackHandler callbackHandler) {
     this.callbackHandler = callbackHandler;
   }
 
-  public String getUnitName() {
-    return unitName;
+  public String getName() {
+    return name;
   }
 
   public KeyStore getKeyStore() {
@@ -252,7 +250,8 @@ public class OpalKeyStore implements KeyProvider {
     return passwordCallback.getPassword();
   }
 
-  private KeyPair findKeyPairForPrivateKey(String alias, KeyStore ks, CacheablePasswordCallback passwordCallback) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedCallbackException,
+  private KeyPair findKeyPairForPrivateKey(String alias, KeyStore ks, CacheablePasswordCallback passwordCallback)
+      throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, UnsupportedCallbackException,
       IOException {
     Key key = ks.getKey(alias, getKeyPassword(passwordCallback));
     if(key == null) {
@@ -317,8 +316,7 @@ public class OpalKeyStore implements KeyProvider {
     try {
       KeyPair keyPair = generateKeyPair(algorithm, size);
       X509Certificate cert = makeCertificate(algorithm, certificateInfo, keyPair);
-      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName)
-          .prompt(getPasswordFor(unitName)).build();
+      CacheablePasswordCallback passwordCallback = createPasswordCallback(getPasswordFor(name));
       store.setKeyEntry(alias, keyPair.getPrivate(), getKeyPassword(passwordCallback), new X509Certificate[] { cert });
     } catch(GeneralSecurityException e) {
       throw new RuntimeException(e);
@@ -387,8 +385,7 @@ public class OpalKeyStore implements KeyProvider {
   }
 
   private void storeKeyEntry(String alias, Key key, X509Certificate cert) {
-    CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName)
-        .prompt(getPasswordFor(alias)).build();
+    CacheablePasswordCallback passwordCallback = createPasswordCallback(getPasswordFor(alias));
     try {
       store.setKeyEntry(alias, key, getKeyPassword(passwordCallback), new X509Certificate[] { cert });
     } catch(KeyStoreException e) {
@@ -422,8 +419,7 @@ public class OpalKeyStore implements KeyProvider {
     try {
       cert = makeCertificate(keyPair.getPrivate(), keyPair.getPublic(), certificateInfo,
           chooseSignatureAlgorithm(keyPair.getPrivate().getAlgorithm()));
-      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName)
-          .prompt(getPasswordFor(alias)).build();
+      CacheablePasswordCallback passwordCallback = createPasswordCallback(getPasswordFor(alias));
       store.setKeyEntry(alias, keyPair.getPrivate(), getKeyPassword(passwordCallback), new X509Certificate[] { cert });
     } catch(GeneralSecurityException e) {
       throw new RuntimeException(e);
@@ -529,6 +525,7 @@ public class OpalKeyStore implements KeyProvider {
     }
   }
 
+  @SuppressWarnings("ChainOfInstanceofChecks")
   private Key toPrivateKey(Object pemObject) {
     if(pemObject instanceof KeyPair) {
       return ((KeyPair) pemObject).getPrivate();
@@ -582,8 +579,8 @@ public class OpalKeyStore implements KeyProvider {
   /**
    * Returns "Password for 'name':  ".
    */
-  private String getPasswordFor(String name) {
-    return PASSWORD_FOR + " '" + name + "':  ";
+  private String getPasswordFor(String target) {
+    return PASSWORD_FOR + " '" + target + "':  ";
   }
 
   //

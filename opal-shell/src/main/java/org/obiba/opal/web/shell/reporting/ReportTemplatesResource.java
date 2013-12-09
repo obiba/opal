@@ -12,8 +12,8 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.ReportTemplate;
-import org.obiba.opal.core.service.SubjectAclService;
-import org.obiba.opal.core.service.SubjectAclService.Subject;
+import org.obiba.opal.core.service.security.SubjectAclService;
+import org.obiba.opal.core.service.security.SubjectAclService.Subject;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.options.ReportCommandOptions;

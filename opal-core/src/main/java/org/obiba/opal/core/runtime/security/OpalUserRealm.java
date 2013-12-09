@@ -30,7 +30,7 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.util.SimpleByteSource;
 import org.obiba.opal.core.domain.user.SubjectCredentials;
-import org.obiba.opal.core.service.SubjectCredentialsService;
+import org.obiba.opal.core.service.security.SubjectCredentialsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

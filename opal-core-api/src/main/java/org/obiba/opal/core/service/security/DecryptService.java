@@ -7,11 +7,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.service;
+package org.obiba.opal.core.service.security;
 
 import java.io.IOException;
 
 import org.apache.commons.vfs2.FileObject;
+import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 
 /**
  * Service for decrypt operations.
@@ -23,7 +24,7 @@ public interface DecryptService {
    * @param unitName name of the functional unit (this determines this keystore should be used)
    * @param datasourceName name of the destination datasource
    * @param file data file to be decrypted
-   * @throws NoSuchFunctionalUnitException if the specified unit does not exist
+   * @throws org.obiba.opal.core.service.NoSuchFunctionalUnitException if the specified unit does not exist
    * @throws IllegalArgumentException if the specified datasource does not exist
    * @throws IOException if the specified file does not exist or is not a normal file
    */

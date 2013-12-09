@@ -7,16 +7,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.project;
+package org.obiba.opal.core.service;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
-import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
-import org.obiba.opal.core.service.SystemService;
-import org.obiba.opal.project.domain.Project;
+import org.obiba.opal.core.domain.Project;
 
 /**
  * Service to manage projects.

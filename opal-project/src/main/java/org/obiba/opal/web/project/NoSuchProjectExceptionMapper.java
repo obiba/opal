@@ -13,7 +13,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import org.obiba.opal.project.NoSuchProjectException;
+import org.obiba.opal.core.service.NoSuchProjectException;
 import org.springframework.stereotype.Component;
 
 @Component

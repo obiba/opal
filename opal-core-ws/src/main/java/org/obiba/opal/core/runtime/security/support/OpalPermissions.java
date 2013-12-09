@@ -11,8 +11,8 @@ package org.obiba.opal.core.runtime.security.support;
 
 import java.net.URI;
 
-import org.obiba.opal.core.service.SubjectAclService;
-import org.obiba.opal.core.service.SubjectAclService.Subject;
+import org.obiba.opal.core.service.security.SubjectAclService;
+import org.obiba.opal.core.service.security.SubjectAclService.Subject;
 import org.obiba.opal.web.model.Opal.AclAction;
 import org.obiba.opal.web.ws.cfg.OpalWsConfig;
 

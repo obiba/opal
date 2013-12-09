@@ -14,9 +14,10 @@ import java.util.List;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
+import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.datasource.fs.FsDatasource;
-import org.obiba.opal.core.service.DecryptService;
+import org.obiba.opal.core.service.security.DecryptService;
 import org.obiba.opal.shell.commands.options.DecryptCommandOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Command to decrypt an Onyx data file.
  */
+@SuppressWarnings("UseOfSystemOutOrSystemErr")
 @CommandUsage(description = "Decrypts one or more Onyx data files.",
     syntax = "Syntax: decrypt [--unit NAME] [--out FILE] _FILE_...")
 public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptCommandOptions> {
@@ -117,7 +119,7 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
   private void decryptFile(FileObject inputFile, FileObject outputDir) throws IOException {
     FileObject outputFile = getFile(outputDir, getOutputFileName(inputFile));
 
-    FsDatasource outputDatasource = new FsDatasource(DECRYPT_DATASOURCE_NAME, getLocalFile(outputFile));
+    Datasource outputDatasource = new FsDatasource(DECRYPT_DATASOURCE_NAME, getLocalFile(outputFile));
     MagmaEngine.get().addDatasource(outputDatasource);
     try {
       if(options.isUnit()) {
@@ -139,20 +141,18 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
    *
    * @param outputDirPath the name/path of the directory.
    * @return the directory, as a <code>FileObject</code> object (or <code>null</code> if the directory could not be
-   *         created.
+   * created.
    */
   private FileObject getOutputDir(String outputDirPath) {
-    FileObject outputDir = null;
     try {
-      outputDir = isRelativeFilePath(outputDirPath) && options.isUnit()
-          ? getFileInUnitDirectory(outputDirPath)
-          : getFile(outputDirPath);
+      FileObject outputDir = isRelativeFilePath(outputDirPath) && options.isUnit() ? getFileInUnitDirectory(
+          outputDirPath) : getFile(outputDirPath);
       outputDir = getFile(outputDirPath);
       outputDir.createFolder();
+      return outputDir;
     } catch(FileSystemException e) {
-      outputDir = null;
+      return null;
     }
-    return outputDir;
   }
 
   private String getOutputFileName(FileObject inputFile) {

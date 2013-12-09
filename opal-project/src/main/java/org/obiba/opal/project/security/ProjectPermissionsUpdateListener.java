@@ -8,7 +8,7 @@ import org.obiba.magma.DatasourceUpdateListener;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableUpdateListener;
 import org.obiba.magma.Variable;
-import org.obiba.opal.core.service.SubjectAclService;
+import org.obiba.opal.core.service.security.SubjectAclService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

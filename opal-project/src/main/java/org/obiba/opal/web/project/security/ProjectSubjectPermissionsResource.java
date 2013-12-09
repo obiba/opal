@@ -18,8 +18,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.obiba.opal.core.service.SubjectAclService;
-import org.obiba.opal.project.ProjectService;
+import org.obiba.opal.core.service.ProjectService;
+import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.security.PermissionsToAclFunction;
 import org.springframework.beans.factory.annotation.Autowired;

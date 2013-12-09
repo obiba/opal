@@ -22,12 +22,11 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.obiba.core.util.FileUtil;
-import org.obiba.opal.core.cfg.OpalConfiguration;
+import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.core.service.KeyStoreService;
-import org.obiba.opal.core.unit.FunctionalUnit;
-import org.obiba.opal.core.unit.FunctionalUnitService;
-import org.obiba.opal.core.unit.OpalKeyStore;
+import org.obiba.opal.core.security.OpalKeyStore;
+import org.obiba.opal.core.service.ProjectService;
+import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.shell.OpalShell;
 import org.obiba.opal.shell.commands.options.KeyCommandOptions;
@@ -41,37 +40,33 @@ import static org.easymock.EasyMock.replay;
  * Unit tests for {@link KeyCommand}.
  */
 public class KeyCommandTest {
-  //
-  // Constants
-  //
 
   private static final String[] CERTIFICATE_INFO = { "Bob Friendly", "Department of Bob", "Bob Inc.", "Montreal",
       "Quebec", "CA" };
 
-  //
-  // Test Methods
-  //
-
   @Test
   public void testCreateActionCreatesOrUpdatesKey() {
-    KeyCommandOptions mockOptions = createMockOptionsForCreateAction("my-unit", "my-alias");
+    KeyCommandOptions options = createMockOptionsForCreateAction("my-unit", "my-alias");
 
     OpalRuntime mockRuntime = createMockRuntime();
-    FunctionalUnitService mockUnitService = createMockUnitService("my-unit");
 
     OpalShell mockShell = createMockShellForCreateAction("my-alias");
+    Project project = new Project("my-unit");
+    ProjectService projectService = createMock(ProjectService.class);
+    expect(projectService.getProject("my-unit")).andReturn(project).atLeastOnce();
 
-    KeyStoreService mockKeyStoreService = createMock(KeyStoreService.class);
-    expect(mockKeyStoreService.aliasExists("my-unit", "my-alias")).andReturn(false).atLeastOnce();
-    mockKeyStoreService.createOrUpdateKey("my-unit", "my-alias", "RSA", 2048, getCertificateInfoAsString());
+    ProjectsKeyStoreService projectsKeyStoreService = createMock(ProjectsKeyStoreService.class);
+
+    expect(projectsKeyStoreService.aliasExists(project, "my-alias")).andReturn(false).atLeastOnce();
+    projectsKeyStoreService.createOrUpdateKey(project, "my-alias", "RSA", 2048, getCertificateInfoAsString());
     expectLastCall().atLeastOnce();
 
-    replay(mockOptions, mockRuntime, mockShell, mockUnitService, mockKeyStoreService);
+    replay(options, mockRuntime, mockShell, projectsKeyStoreService, projectService);
 
-    KeyCommand keyCommand = createKeyCommand(mockRuntime, mockUnitService);
-    keyCommand.setOptions(mockOptions);
+    KeyCommand keyCommand = createKeyCommand(mockRuntime, projectsKeyStoreService, projectService);
+    keyCommand.setOptions(options);
     keyCommand.setShell(mockShell);
-    keyCommand.setKeyStoreService(mockKeyStoreService);
+    keyCommand.setProjectsKeyStoreService(projectsKeyStoreService);
     keyCommand.execute();
   }
 
@@ -80,25 +75,29 @@ public class KeyCommandTest {
     KeyCommandOptions mockOptions = createMockOptionsForDeleteAction("my-unit", "my-alias");
 
     OpalRuntime mockRuntime = createMockRuntime();
-    FunctionalUnitService mockUnitService = createMockUnitService("my-unit");
+
+    Project project = new Project("my-unit");
+    ProjectService projectService = createMock(ProjectService.class);
+    expect(projectService.getProject("my-unit")).andReturn(project).atLeastOnce();
 
     OpalShell mockShell = createMockShellForDeleteAction("my-unit", "my-alias");
 
-    KeyStoreService mockKeyStoreService = createMock(KeyStoreService.class);
-    expect(mockKeyStoreService.aliasExists("my-unit", "my-alias")).andReturn(true).atLeastOnce();
-    mockKeyStoreService.deleteKey("my-unit", "my-alias");
+    ProjectsKeyStoreService projectsKeyStoreService = createMock(ProjectsKeyStoreService.class);
+    expect(projectsKeyStoreService.aliasExists(project, "my-alias")).andReturn(true).atLeastOnce();
+    projectsKeyStoreService.deleteKeyStore(project, "my-alias");
     expectLastCall().atLeastOnce();
 
-    replay(mockOptions, mockRuntime, mockShell, mockKeyStoreService, mockUnitService);
+    replay(mockOptions, mockRuntime, mockShell, projectsKeyStoreService, projectService);
 
-    KeyCommand keyCommand = createKeyCommand(mockRuntime, mockUnitService);
+    KeyCommand keyCommand = createKeyCommand(mockRuntime, projectsKeyStoreService, projectService);
     keyCommand.setOptions(mockOptions);
     keyCommand.setShell(mockShell);
-    keyCommand.setKeyStoreService(mockKeyStoreService);
+    keyCommand.setProjectsKeyStoreService(projectsKeyStoreService);
     keyCommand.execute();
   }
 
   @Test
+  @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
   public void testImportActionImportsKey() throws FileSystemException {
     KeyCommandOptions mockOptions = createMockOptionsForImportAction("my-unit", "my-alias", "private.pem",
         "certificate.pem");
@@ -112,29 +111,32 @@ public class KeyCommandTest {
 
     OpalFileSystem mockFileSystem = createMockFileSystem(mockFileSystemRoot);
 
-    FunctionalUnitService mockUnitService = createMockUnitService("my-unit");
-
     OpalRuntime mockRuntime = createMockRuntime();
     expect(mockRuntime.getFileSystem()).andReturn(mockFileSystem).atLeastOnce();
 
+    Project project = new Project("my-unit");
+    ProjectService projectService = createMock(ProjectService.class);
+    expect(projectService.getProject("my-unit")).andReturn(project).atLeastOnce();
+
     OpalShell mockShell = createMockShellForImportAction("my-alias");
 
-    KeyStoreService mockKeyStoreService = createMock(KeyStoreService.class);
-    expect(mockKeyStoreService.aliasExists("my-unit", "my-alias")).andReturn(false).atLeastOnce();
-    mockKeyStoreService.importKey("my-unit", "my-alias", privateFile, certificateFile);
+    ProjectsKeyStoreService projectsKeyStoreService = createMock(ProjectsKeyStoreService.class);
+    expect(projectsKeyStoreService.aliasExists(project, "my-alias")).andReturn(false).atLeastOnce();
+    projectsKeyStoreService.importKey(project, "my-alias", privateFile, certificateFile);
     expectLastCall().atLeastOnce();
 
-    replay(mockOptions, mockFileSystemRoot, mockFileSystem, mockRuntime, mockShell, mockKeyStoreService,
-        mockUnitService);
+    replay(mockOptions, mockFileSystemRoot, mockFileSystem, mockRuntime, mockShell, projectsKeyStoreService,
+        projectService);
 
-    KeyCommand keyCommand = createKeyCommand(mockRuntime, mockUnitService);
+    KeyCommand keyCommand = createKeyCommand(mockRuntime, projectsKeyStoreService, projectService);
     keyCommand.setOptions(mockOptions);
     keyCommand.setShell(mockShell);
-    keyCommand.setKeyStoreService(mockKeyStoreService);
+    keyCommand.setProjectsKeyStoreService(projectsKeyStoreService);
     keyCommand.execute();
   }
 
   @Test
+  @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
   public void testExportActionExportsKey() throws IOException, GeneralSecurityException {
     KeyCommandOptions mockOptions = createMockOptionsForExportAction("my-unit", "my-alias", "certificate.pem");
 
@@ -153,47 +155,34 @@ public class KeyCommandTest {
     mockShell.printf((String) EasyMock.anyObject(), (String) EasyMock.anyObject());
     EasyMock.expectLastCall().anyTimes();
 
-    KeyStoreService mockKeyStoreService = createMock(KeyStoreService.class);
-    expect(mockKeyStoreService.getKeyStore("my-unit")).andReturn(new OpalKeyStore("my-unit", getKeyStore()))
-        .atLeastOnce();
+    Project project = new Project("my-unit");
+    ProjectService projectService = createMock(ProjectService.class);
+    expect(projectService.getProject("my-unit")).andReturn(project).atLeastOnce();
 
-    FunctionalUnit unit = new FunctionalUnit("my-unit", null);
-    FunctionalUnitService mockUnitService = createMockUnitService(unit);
+    ProjectsKeyStoreService projectsKeyStoreService = createMock(ProjectsKeyStoreService.class);
+    expect(projectsKeyStoreService.getKeyStore(project)).andReturn(new OpalKeyStore("my-unit", getKeyStore()))
+        .atLeastOnce();
 
     OpalRuntime mockRuntime = createMockRuntime();
     expect(mockRuntime.getFileSystem()).andReturn(mockFileSystem).atLeastOnce();
 
     replay(mockOptions, mockFileSystemRoot, mockFileSystem, certificateFile, mockFileContent, mockRuntime, mockShell,
-        mockKeyStoreService, mockUnitService);
+        projectsKeyStoreService, projectService);
 
-    KeyCommand keyCommand = createKeyCommand(mockRuntime, mockUnitService);
+    KeyCommand keyCommand = createKeyCommand(mockRuntime, projectsKeyStoreService, projectService);
     keyCommand.setOptions(mockOptions);
     keyCommand.setShell(mockShell);
-    keyCommand.setKeyStoreService(mockKeyStoreService);
+    keyCommand.setProjectsKeyStoreService(projectsKeyStoreService);
     keyCommand.execute();
   }
 
-  //
-  // Helper Methods
-  //
-
-  private KeyCommand createKeyCommand(final OpalRuntime mockRuntime, final FunctionalUnitService service) {
-    return new KeyCommand() {
-      @Override
-      protected OpalRuntime getOpalRuntime() {
-        return mockRuntime;
-      }
-
-      @Override
-      protected FunctionalUnitService getFunctionalUnitService() {
-        return service;
-      }
-
-      @Override
-      protected OpalConfiguration getOpalConfiguration() {
-        return null;
-      }
-    };
+  private KeyCommand createKeyCommand(OpalRuntime mockRuntime, ProjectsKeyStoreService projectsKeyStoreService,
+      ProjectService projectService) {
+    KeyCommand keyCommand = new KeyCommand();
+    keyCommand.setOpalRuntime(mockRuntime);
+    keyCommand.setProjectsKeyStoreService(projectsKeyStoreService);
+    keyCommand.setProjectService(projectService);
+    return keyCommand;
   }
 
   private KeyCommandOptions createMockOptionsForCreateAction(String unitName, String alias) {
@@ -207,24 +196,11 @@ public class KeyCommandTest {
     expect(mockOptions.getAlgorithm()).andReturn("RSA").atLeastOnce();
     expect(mockOptions.isSize()).andReturn(true).atLeastOnce();
     expect(mockOptions.getSize()).andReturn(2048).atLeastOnce();
-
     return mockOptions;
   }
 
   private OpalRuntime createMockRuntime() {
-
     return createMock(OpalRuntime.class);
-  }
-
-  private FunctionalUnitService createMockUnitService(String unitName) {
-    return createMockUnitService(new FunctionalUnit(unitName, null));
-  }
-
-  private FunctionalUnitService createMockUnitService(FunctionalUnit unit) {
-    FunctionalUnitService mockService = createMock(FunctionalUnitService.class);
-    expect(mockService.hasFunctionalUnit(unit.getName())).andReturn(true).atLeastOnce();
-    expect(mockService.getFunctionalUnit(unit.getName())).andReturn(unit).anyTimes();
-    return mockService;
   }
 
   private OpalShell createMockShellForCreateAction(String alias) {
@@ -251,20 +227,8 @@ public class KeyCommandTest {
   }
 
   private String getCertificateInfoAsString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("CN=");
-    sb.append(CERTIFICATE_INFO[0]);
-    sb.append(", OU=");
-    sb.append(CERTIFICATE_INFO[1]);
-    sb.append(", O=");
-    sb.append(CERTIFICATE_INFO[2]);
-    sb.append(", L=");
-    sb.append(CERTIFICATE_INFO[3]);
-    sb.append(", ST=");
-    sb.append(CERTIFICATE_INFO[4]);
-    sb.append(", C=");
-    sb.append(CERTIFICATE_INFO[5]);
-    return sb.toString();
+    return "CN=" + CERTIFICATE_INFO[0] + ", OU=" + CERTIFICATE_INFO[1] + ", O=" + CERTIFICATE_INFO[2] + ", L=" +
+        CERTIFICATE_INFO[3] + ", ST=" + CERTIFICATE_INFO[4] + ", C=" + CERTIFICATE_INFO[5];
   }
 
   private KeyCommandOptions createMockOptionsForDeleteAction(String unitName, String alias) {
@@ -337,8 +301,7 @@ public class KeyCommandTest {
   }
 
   private FileObject createMockFileSystemRoot() {
-    FileObject mockFileSystemRoot = createMock(FileObject.class);
-    return mockFileSystemRoot;
+    return createMock(FileObject.class);
   }
 
   private FileObject createMockFile(String baseName, boolean exists, boolean withReplay) throws FileSystemException {

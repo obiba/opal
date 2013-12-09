@@ -42,7 +42,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.core.service.SubjectAclService;
+import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.fs.OpalFileSystem;
 import org.obiba.opal.fs.impl.DefaultOpalFileSystem;
 import org.obiba.opal.web.model.Opal.FileDto;

@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.X509ExtendedKeyManager;
 
-import org.obiba.opal.core.unit.OpalKeyStore;
+import org.obiba.opal.core.security.OpalKeyStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
