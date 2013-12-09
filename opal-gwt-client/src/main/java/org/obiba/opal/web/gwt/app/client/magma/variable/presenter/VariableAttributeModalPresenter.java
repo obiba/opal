@@ -100,14 +100,6 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
               .withCallback(Response.SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
               .put().send();
           break;
-        case UPDATE:
-          ResourceRequestBuilderFactory.newBuilder() //
-              .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create().build()) //
-//              .withResourceBody(UserDto.stringify(userDto)) //
-//              .withCallback(SC_OK, successCallback) //
-//              .withCallback(SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
-              .put().send();
-          break;
       }
     }
   }
@@ -197,10 +189,8 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
       if(validators == null) {
         validators = new LinkedHashSet<FieldValidator>();
 
-//        if(dialogMode == Mode.CREATE) {
         validators.add(
             new RequiredTextValidator(getView().getName(), "AttributeNameIsRequired", Display.FormField.NAME.name()));
-//        }
       }
       return validators;
     }
@@ -209,59 +199,6 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     protected void showMessage(String id, String message) {
       getView().showError(Display.FormField.valueOf(id), message);
     }
-//
-//    private Set<FieldValidator> validators;
-//
-//    @Override
-//    protected Set<FieldValidator> getValidators() {
-//      if(validators == null) {
-//        validators = new LinkedHashSet<FieldValidator>();
-//
-//        if(dialogMode == Mode.CREATE) {
-//          validators.add(
-//              new RequiredTextValidator(getView().getName(), "UsernameIsRequired", Display.FormField.USERNAME.name()));
-//          validators.add(new RequiredTextValidator(getView().getPassword(), "PasswordIsRequired",
-//              Display.FormField.PASSWORD.name()));
-//
-//        }
-//
-//        ConditionValidator minLength = new ConditionValidator(minLengthCondition(getView().getPassword()),
-//            "PasswordLengthMin", Display.FormField.PASSWORD.name());
-//        minLength.setArgs(Arrays.asList(String.valueOf(MIN_PASSWORD_LENGTH)));
-//        validators.add(minLength);
-//
-//        validators.add(
-//            new ConditionValidator(passwordsMatchCondition(getView().getPassword(), getView().getConfirmPassword()),
-//                "PasswordsMustMatch", Display.FormField.PASSWORD.name()));
-//      }
-//      return validators;
-//    }
-//
-//    private HasValue<Boolean> minLengthCondition(final HasText password) {
-//      return new HasBooleanValue() {
-//        @Override
-//        public Boolean getValue() {
-//          return password.getText().isEmpty() || password.getText().length() >= MIN_PASSWORD_LENGTH;
-//        }
-//      };
-//    }
-//
-//    private HasValue<Boolean> passwordsMatchCondition(final HasText password, final HasText confirmPassword) {
-//      return new HasBooleanValue() {
-//        @Override
-//        public Boolean getValue() {
-//
-//          return password.getText().isEmpty() && confirmPassword.getText().isEmpty() ||
-//              password.getText().equals(confirmPassword.getText());
-//
-//        }
-//      };
-//    }
-//
-//    @Override
-//    protected void showMessage(String id, String message) {
-//      getView().showError(Display.FormField.valueOf(id), message);
-//    }
   }
 
   public interface Display extends PopupView, HasUiHandlers<VariableAttributeModalUiHandlers> {
@@ -280,16 +217,6 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     HasText getName();
 
     void setNamespaceSuggestions(VariableDto variableDto);
-
-//    void addLocaleText(List<LocaleDto> locales);
-
-//    TakesValue<List<String>> getGroups();
-
-//    void setNamedEnabled(boolean enabled);
-//
-//    HasText getPassword();
-//
-//    HasText getConfirmPassword();
 
     void showError(@Nullable FormField formField, String message);
 
