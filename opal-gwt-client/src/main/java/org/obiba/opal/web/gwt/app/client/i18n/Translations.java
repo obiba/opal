@@ -914,6 +914,7 @@ public interface Translations extends Constants {
       "CsvVariablesHeaderMustContainName", "The variables.csv header must contain 'name'", //
       "CsvVariablesHeaderMustContainValueType", "The variables.csv header must contain 'valueType'.", //
       "CsvVariablesHeaderMustContainEntityType", "The variables.csv header must contain 'entityType'.", //
+      "CsvUnableToGetVariableValueForEntity", "Unable to get value for entity {0} and variable {1}", //
       "CsvCannotCreateWriter", "Cannot create writer", //
       "CsvCannotSetVariableHeader", "Cannot set variables header", //
       "CsvCannotObtainWriter", "Cannot get csv writer", //
