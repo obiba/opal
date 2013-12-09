@@ -11,6 +11,7 @@ package org.obiba.opal.core.service;
 
 import javax.validation.constraints.NotNull;
 
+import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.opal.core.service.database.IdentifiersDatabaseNotFoundException;
@@ -21,6 +22,8 @@ import com.google.common.base.Predicate;
  *
  */
 public interface IdentifiersTableService {
+
+  Datasource getDatasource();
 
   /**
    * Get the identifiers value table.

@@ -12,14 +12,17 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.web.model.Magma;
+import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 
 public interface TableResource {
 
@@ -152,6 +155,32 @@ public interface TableResource {
       @QueryParam("category") List<String> categoriesQP, //
       @FormParam("script") String scriptFP, //
       @FormParam("category") List<String> categoriesFP);
+
+  /**
+   * Get the non-null values of a variable's vector in CSV format.
+   * @param variableName
+   * @return
+   * @throws MagmaRuntimeException
+   * @throws IOException
+   */
+  @GET
+  @Path("/vector/{variable}/csv")
+  @Produces("text/csv")
+  @AuthenticatedByCookie
+  Response getVectorCSVValues(@PathParam("variable") String variableName) throws MagmaRuntimeException, IOException;
+
+  /**
+   * Get the non-null values of a variable's vector in plain format.
+   * @param variableName
+   * @return
+   * @throws MagmaRuntimeException
+   * @throws IOException
+   */
+  @GET
+  @Path("/vector/{variable}")
+  @Produces("text/plain")
+  @AuthenticatedByCookie
+  Response getVectorValues(@PathParam("variable") String variableName) throws MagmaRuntimeException, IOException;
 
   @Path("/compare")
   CompareResource getTableCompare();

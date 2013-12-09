@@ -121,6 +121,7 @@ public class ProjectsPermissionConverterTest
   public void testTableValuesEdit() {
     testConversion("/datasource/patate/table/pwel", ProjectsPermissionConverter.Permission.TABLE_VALUES_EDIT, //
         "rest:/datasource/patate/table/pwel/valueSet:GET:GET/GET", //
+        "rest:/datasource/patate/table/pwel/vector:GET:GET/GET", //
         "rest:/datasource/patate/table/pwel/entities:GET", //
         "rest:/datasource/patate/table/pwel/index:GET:GET/GET", //
         "rest:/datasource/patate/table/pwel/index/_search:GET", //
@@ -176,6 +177,7 @@ public class ProjectsPermissionConverterTest
   public void testTableValuesOnView() {
     testConversion("/datasource/patate/view/pwel", ProjectsPermissionConverter.Permission.TABLE_VALUES, //
         "rest:/datasource/patate/table/pwel/valueSet:GET:GET/GET", //
+        "rest:/datasource/patate/table/pwel/vector:GET:GET/GET", //
         "rest:/datasource/patate/table/pwel/entities:GET", //
         "rest:/datasource/patate/table/pwel/index:GET:GET/GET", //
         "rest:/datasource/patate/table/pwel/index/_search:GET", //

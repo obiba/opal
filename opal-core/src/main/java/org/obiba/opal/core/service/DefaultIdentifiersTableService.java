@@ -125,8 +125,9 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
     }
   }
 
+  @Override
   @NotNull
-  private Datasource getDatasource() throws IdentifiersDatabaseNotFoundException {
+  public Datasource getDatasource() throws IdentifiersDatabaseNotFoundException {
     if(datasource == null) {
       DatasourceFactory datasourceFactory = databaseRegistry
           .createDataSourceFactory(getDatasourceName(), databaseRegistry.getIdentifiersDatabase());

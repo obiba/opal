@@ -9,16 +9,24 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.obiba.magma.Datasource;
+import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableUpdateListener;
@@ -28,6 +36,7 @@ import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
+import org.obiba.magma.VectorSource;
 import org.obiba.magma.js.JavascriptVariableBuilder;
 import org.obiba.magma.js.JavascriptVariableValueSource;
 import org.obiba.magma.lang.Closeables;
@@ -52,6 +61,8 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+
+import au.com.bytecode.opencsv.CSVWriter;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
@@ -261,9 +272,82 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
     return super.getLocalesResource();
   }
 
+  @Override
+  public Response getVectorCSVValues(@PathParam("variable") String variableName)
+      throws MagmaRuntimeException, IOException {
+
+    ValueTable table = getValueTable();
+    Variable variable = table.getVariable(variableName);
+
+    ByteArrayOutputStream values = new ByteArrayOutputStream();
+    CSVWriter writer = null;
+    try {
+      writer = new CSVWriter(new PrintWriter(values));
+      writeCSVValues(writer, table, variable);
+    } finally {
+      if(writer != null) writer.close();
+    }
+
+    return Response.ok(values.toByteArray(), "text/csv").header("Content-Disposition",
+        "attachment; filename=\"" + table.getName() + "-" + variable.getName() + ".csv\"").build();
+  }
+
+  @Override
+  public Response getVectorValues(@PathParam("variable") String variableName)
+      throws MagmaRuntimeException, IOException {
+    ValueTable table = getValueTable();
+    Variable variable = table.getVariable(variableName);
+
+    ByteArrayOutputStream values = new ByteArrayOutputStream();
+    Writer writer = null;
+    try {
+      writer = new PrintWriter(values);
+      writePlainValues(writer, table, variable);
+    } finally {
+      if(writer != null) writer.close();
+    }
+
+    return Response.ok(values.toByteArray(), "text/plain").header("Content-Disposition",
+        "attachment; filename=\"" + table.getName() + "-" + variable.getName() + ".txt\"").build();
+  }
+
   //
   // private methods
   //
+
+  private void writeCSVValues(CSVWriter writer, ValueTable table, Variable variable) {
+    // header
+    writer.writeNext(new String[] { table.getEntityType(), variable.getName() });
+
+    Set<VariableEntity> entities = table.getVariableEntities();
+    if(entities == null || entities.isEmpty()) return;
+    SortedSet<VariableEntity> sortedEntities = new TreeSet<>(entities);
+    VectorSource vector = table.getVariableValueSource(variable.getName()).asVectorSource();
+    Iterator<Value> values = vector.getValues(sortedEntities).iterator();
+
+    for(VariableEntity entity : entities) {
+      Value value = values.next();
+      if(!value.isNull()) {
+        writer.writeNext(new String[] { entity.getIdentifier(), value.toString() });
+      }
+    }
+  }
+
+  private void writePlainValues(Writer writer, ValueTable table, Variable variable) throws IOException {
+    Set<VariableEntity> entities = table.getVariableEntities();
+    if(entities == null || entities.isEmpty()) return;
+    SortedSet<VariableEntity> sortedEntities = new TreeSet<>(entities);
+    VectorSource vector = table.getVariableValueSource(variable.getName()).asVectorSource();
+    Iterator<Value> values = vector.getValues(sortedEntities).iterator();
+
+    for(VariableEntity entity : entities) {
+      Value value = values.next();
+      if(!value.isNull()) {
+        writer.write(value.toString() + "\n");
+      }
+    }
+  }
+
   private void writeValueSets(ValueTableWriter tableWriter, ValueSetsDto valueSetsDto) {
     try {
       for(ValueSetsDto.ValueSetDto valueSetDto : valueSetsDto.getValueSetsList()) {
