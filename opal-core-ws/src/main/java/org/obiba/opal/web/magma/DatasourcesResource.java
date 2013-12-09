@@ -44,32 +44,23 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Lists;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
 @Transactional
 @Path("/datasources")
+@Api(value = "/datasources", description = "Operations about datasources")
 public class DatasourcesResource {
-
-  private DatasourceFactoryRegistry datasourceFactoryRegistry;
-
-  private OpalConfigurationService configService;
 
   @Autowired
   private ApplicationContext applicationContext;
 
-  @Autowired
-  public void setConfigService(OpalConfigurationService configService) {
-    this.configService = configService;
-  }
-
-  @Autowired
-  public void setDatasourceFactoryRegistry(DatasourceFactoryRegistry datasourceFactoryRegistry) {
-    this.datasourceFactoryRegistry = datasourceFactoryRegistry;
-  }
-
   @GET
+  @ApiOperation(value = "Get all datasources",
+      notes = "The Identifiers datasource will not be returned here", response = List.class)
   public List<Magma.DatasourceDto> getDatasources() {
     List<Magma.DatasourceDto> datasources = Lists.newArrayList();
     for(Datasource from : MagmaEngine.get().getDatasources()) {
@@ -81,39 +72,10 @@ public class DatasourcesResource {
     return datasources;
   }
 
-  @POST
-  public Response createDatasource(@Context UriInfo uriInfo, Magma.DatasourceFactoryDto factoryDto) {
-    ResponseBuilder response;
-    try {
-      final DatasourceFactory factory = datasourceFactoryRegistry.parse(factoryDto);
-      Datasource ds = MagmaEngine.get().addDatasource(factory);
-      configService.modifyConfiguration(new ConfigModificationTask() {
-
-        @Override
-        public void doWithConfig(OpalConfiguration config) {
-          config.getMagmaEngineFactory().withFactory(factory);
-        }
-      });
-      UriBuilder ub = uriInfo.getBaseUriBuilder().path("datasource").path(ds.getName());
-      response = Response.created(ub.build()).entity(Dtos.asDto(ds).build());
-    } catch(NoSuchDatasourceFactoryException noSuchDatasourceFactoryEx) {
-      response = Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "UnidentifiedDatasourceFactory").build());
-    } catch(DuplicateDatasourceNameException duplicateDsNameEx) {
-      response = Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DuplicateDatasourceName").build());
-    } catch(DatasourceParsingException dsParsingEx) {
-      response = Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", dsParsingEx));
-    } catch(MagmaRuntimeException dsCreationFailedEx) {
-      response = Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", dsCreationFailedEx));
-    }
-    return response.build();
-  }
-
   @GET
   @Path("/tables")
+  @ApiOperation(value = "Get all tables of all datasources",
+      notes = "The Identifiers datasource will not be returned here", response = List.class)
   public List<Magma.TableDto> getTables(@Nullable @QueryParam("entityType") String entityType) {
     List<Magma.TableDto> tables = Lists.newArrayList();
     for(Datasource datasource : MagmaEngine.get().getDatasources()) {

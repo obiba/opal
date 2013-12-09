@@ -24,6 +24,8 @@ import org.obiba.magma.ValueTable;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 
+import com.wordnik.swagger.annotations.ApiOperation;
+
 public interface TableResource {
 
   void setLocales(Set<Locale> locales);
@@ -35,6 +37,7 @@ public interface TableResource {
   ValueTable getValueTable();
 
   @GET
+  @ApiOperation(value = "Get the Table", response = Magma.TableDto.class)
   Response get(@Context Request request, @Context UriInfo uriInfo,
       @QueryParam("counts") @DefaultValue("false") Boolean counts);
 
@@ -158,6 +161,7 @@ public interface TableResource {
 
   /**
    * Get the non-null values of a variable's vector in CSV format.
+   *
    * @param variableName
    * @return
    * @throws MagmaRuntimeException
@@ -171,6 +175,7 @@ public interface TableResource {
 
   /**
    * Get the non-null values of a variable's vector in plain format.
+   *
    * @param variableName
    * @return
    * @throws MagmaRuntimeException

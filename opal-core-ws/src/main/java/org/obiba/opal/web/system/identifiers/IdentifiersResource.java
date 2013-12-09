@@ -38,11 +38,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Sets;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 
 @Component
 @Transactional
 @Scope("request")
 @Path("/system/identifiers")
+@Api(value = "/system/identifiers", description = "Operations about identifiers")
 public class IdentifiersResource {
 
   private OpalGeneralConfigService serverService;
@@ -77,6 +80,10 @@ public class IdentifiersResource {
   public TableResource getTable(@PathParam("table") String table) {
     return getTableResource(getDatasource().getValueTable(table));
   }
+
+  //
+  // Private methods
+  //
 
   private TableResource getTableResource(ValueTable table) {
     TableResource resource = getDatasource().canDropTable(table.getName())

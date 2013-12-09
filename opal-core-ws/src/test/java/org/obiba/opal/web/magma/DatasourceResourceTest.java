@@ -97,125 +97,12 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
   @Test
   public void testDatasourcesGET() {
-    OpalConfigurationService opalRuntimeMock = createMock(OpalConfigurationService.class);
     DatasourcesResource resource = new DatasourcesResource();
-    resource.setDatasourceFactoryRegistry(newDatasourceFactoryRegistry());
-    resource.setConfigService(opalRuntimeMock);
 
     List<Magma.DatasourceDto> dtos = resource.getDatasources();
     assertEquals(2, dtos.size());
     assertEquals(DATASOURCE1, dtos.get(0).getName());
     assertEquals(DATASOURCE2, dtos.get(1).getName());
-  }
-
-  @Test
-  public void testCreateDatasource_DatasourceCreatedSuccessfully() {
-    Response response = createNewDatasource("newDatasourceCreated");
-    assertTrue(MagmaEngine.get().hasDatasource("newDatasourceCreated"));
-    assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
-    MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource("newDatasourceCreated"));
-  }
-
-  @Test
-  public void testCreateDatasource_SpssDatasourceCreatedSuccessfully() {
-    Response response = createNewSpssDatasource("newSpssDatasourceCreated");
-    assertTrue(MagmaEngine.get().hasDatasource("newSpssDatasourceCreated"));
-    assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
-    MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource("newSpssDatasourceCreated"));
-  }
-
-  private Response createNewDatasource(String name) {
-    OpalConfigurationService opalRuntimeMock = createMock(OpalConfigurationService.class);
-    UriInfo uriInfoMock = createMock(UriInfo.class);
-
-    opalRuntimeMock.modifyConfiguration((ConfigModificationTask) EasyMock.anyObject());
-    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilder.fromPath("/"));
-
-    replay(uriInfoMock, opalRuntimeMock);
-
-    DatasourcesResource resource = new DatasourcesResource();
-    resource.setDatasourceFactoryRegistry(newDatasourceFactoryRegistry());
-    resource.setConfigService(opalRuntimeMock);
-    Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder().setName(name)
-        .setExtension(ExcelDatasourceFactoryDto.params,
-            Magma.ExcelDatasourceFactoryDto.newBuilder().setFile(getDatasourcePath(DATASOURCE1)).setReadOnly(true)
-                .build()).build();
-
-    Response response = resource.createDatasource(uriInfoMock, factoryDto);
-
-    verify(uriInfoMock, opalRuntimeMock);
-    return response;
-  }
-
-  private Response createNewSpssDatasource(String name) {
-    OpalConfigurationService opalRuntimeMock = createMock(OpalConfigurationService.class);
-    UriInfo uriInfoMock = createMock(UriInfo.class);
-
-    opalRuntimeMock.modifyConfiguration((ConfigModificationTask) EasyMock.anyObject());
-    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilder.fromPath("/"));
-
-    replay(uriInfoMock, opalRuntimeMock);
-
-    DatasourcesResource resource = new DatasourcesResource();
-    resource.setDatasourceFactoryRegistry(newSpssDatasourceFactoryRegistry());
-    resource.setConfigService(opalRuntimeMock);
-
-    Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder().setName(name)
-        .setExtension(Magma.SpssDatasourceFactoryDto.params, Magma.SpssDatasourceFactoryDto.newBuilder()
-            .setFile(FileUtil.getFileFromResource("spss/DatabaseTest.sav").getAbsolutePath()).build()).build();
-
-    Response response = resource.createDatasource(uriInfoMock, factoryDto);
-
-    verify(uriInfoMock, opalRuntimeMock);
-    return response;
-  }
-
-  @Test
-  public void testCreateDatasource_DuplicateDatasourceName() {
-    createNewDatasource("newDatasourceDuplicate");
-
-    OpalConfigurationService opalRuntimeMock = createMock(OpalConfigurationService.class);
-    UriInfo uriInfoMock = createMock(UriInfo.class);
-
-    DatasourcesResource resource = new DatasourcesResource();
-    resource.setDatasourceFactoryRegistry(newDatasourceFactoryRegistry());
-    resource.setConfigService(opalRuntimeMock);
-
-    Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder().setName("newDatasourceDuplicate")
-        .setExtension(ExcelDatasourceFactoryDto.params,
-            Magma.ExcelDatasourceFactoryDto.newBuilder().setFile(getDatasourcePath(DATASOURCE1)).setReadOnly(true)
-                .build()).build();
-    Response response = resource.createDatasource(uriInfoMock, factoryDto);
-
-    assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-    assertEquals(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "DuplicateDatasourceName").build(),
-        response.getEntity());
-    MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource("newDatasourceDuplicate"));
-  }
-
-  @Test
-  public void testRemoveDatasource_RemoveNonTransientDatasource() {
-
-    createNewDatasource("datasourceToRemove");
-
-    OpalConfigurationService opalRuntimeMock = createMock(OpalConfigurationService.class);
-    OpalConfiguration opalConfig = new OpalConfiguration();
-
-    MagmaEngineFactory factory = new MagmaEngineFactory();
-    DatasourceFactory excelFactory = new ExcelDatasourceFactory();
-    excelFactory.setName("datasourceToRemove");
-    factory.withFactory(excelFactory);
-    opalConfig.setMagmaEngineFactory(factory);
-
-    expect(opalRuntimeMock.getOpalConfiguration()).andReturn(opalConfig);
-    opalRuntimeMock.modifyConfiguration((ConfigModificationTask) EasyMock.anyObject());
-
-    replay(opalRuntimeMock);
-
-    DatasourceResource resource = createDatasource("datasourceToRemove", null, opalRuntimeMock);
-    Response response = resource.removeDatasource();
-
-    assertEquals(Status.OK.getStatusCode(), response.getStatus());
   }
 
   private DatasourceResource createDatasource(String name, ApplicationContext mockContext) {
@@ -303,43 +190,6 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
   }
 
   @Test
-  public void testDatasourcesPOST() {
-    OpalConfigurationService opalRuntimeMock = createMock(OpalConfigurationService.class);
-
-    DatasourcesResource resource = new DatasourcesResource();
-    resource.setDatasourceFactoryRegistry(newDatasourceFactoryRegistry());
-    resource.setConfigService(opalRuntimeMock);
-
-    UriInfo uriInfoMock = createMock(UriInfo.class);
-    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilder.fromPath("/"));
-
-    Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder().setName("patate")
-        .setExtension(ExcelDatasourceFactoryDto.params,
-            Magma.ExcelDatasourceFactoryDto.newBuilder().setFile(getDatasourcePath(DATASOURCE1)).setReadOnly(true)
-                .build()).build();
-
-    opalRuntimeMock.modifyConfiguration((ConfigModificationTask) EasyMock.anyObject());
-
-    replay(uriInfoMock, opalRuntimeMock);
-    Response response = resource.createDatasource(uriInfoMock, factoryDto);
-    assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
-
-    Object entity = response.getEntity();
-    assertNotNull(entity);
-    try {
-      Magma.DatasourceDto dto = (Magma.DatasourceDto) entity;
-      assertTrue(MagmaEngine.get().hasDatasource(dto.getName()));
-      assertNotNull(response.getMetadata().get("Location"));
-      assertEquals("[" + "/datasource/" + dto.getName() + "]", response.getMetadata().get("Location").toString());
-    } catch(Exception e) {
-      assertFalse(true);
-    }
-
-    verify(uriInfoMock, opalRuntimeMock);
-    MagmaEngine.get().removeDatasource(MagmaEngine.get().getDatasource("patate"));
-  }
-
-  @Test
   public void testTransientDatasourcesPOST() {
     TransientDatasourcesResource resource = new TransientDatasourcesResource();
     resource.setDatasourceFactoryRegistry(newDatasourceFactoryRegistry());
@@ -367,35 +217,6 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     }
 
     verify(uriInfoMock);
-  }
-
-  @Test
-  public void testDatasourcesPOSTUserDefinedBogus() {
-    OpalConfigurationService opalRuntimeMock = createMock(OpalConfigurationService.class);
-
-    DatasourcesResource resource = new DatasourcesResource();
-    resource.setDatasourceFactoryRegistry(newDatasourceFactoryRegistry());
-    resource.setConfigService(opalRuntimeMock);
-
-    UriInfo uriInfoMock = createMock(UriInfo.class);
-    expect(uriInfoMock.getBaseUriBuilder()).andReturn(UriBuilder.fromPath("/"));
-
-    File file = new File(getFileFromResource(DATASOURCES_FOLDER), "user-defined-bogus.xls");
-    Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder()
-        .setExtension(ExcelDatasourceFactoryDto.params,
-            Magma.ExcelDatasourceFactoryDto.newBuilder().setFile(file.getAbsolutePath()).setReadOnly(true).build())
-        .build();
-
-    replay(uriInfoMock);
-    Response response = resource.createDatasource(uriInfoMock, factoryDto);
-    assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-    ClientErrorDto error = (ClientErrorDto) response.getEntity();
-    assertEquals("DatasourceCreationFailed", error.getStatus());
-    assertEquals(Status.BAD_REQUEST.getStatusCode(), error.getCode());
-    assertEquals(15, error.getExtensionCount(Magma.DatasourceParsingErrorDto.errors));
-    Magma.DatasourceParsingErrorDto parsingError = error.getExtension(Magma.DatasourceParsingErrorDto.errors, 0);
-    assertEquals("DuplicateCategoryName", parsingError.getKey());
-    assertEquals("[Categories, 4, Table1, Var1, C2]", parsingError.getArgumentsList().toString());
   }
 
   @Test
@@ -745,16 +566,6 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
   private DatasourceFactoryRegistry newDatasourceFactoryRegistry() {
     return new DatasourceFactoryRegistry(
         ImmutableSet.<DatasourceFactoryDtoParser>of(new ExcelDatasourceFactoryDtoParser() {
-          @Override
-          protected File resolveLocalFile(String path) {
-            return new File(path);
-          }
-        }));
-  }
-
-  private DatasourceFactoryRegistry newSpssDatasourceFactoryRegistry() {
-    return new DatasourceFactoryRegistry(
-        ImmutableSet.<DatasourceFactoryDtoParser>of(new SpssDatasourceFactoryDtoParser() {
           @Override
           protected File resolveLocalFile(String path) {
             return new File(path);

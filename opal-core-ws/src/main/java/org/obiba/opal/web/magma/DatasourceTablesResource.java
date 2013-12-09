@@ -21,9 +21,12 @@ import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.obiba.opal.web.ws.security.AuthorizeResource;
 
+import com.wordnik.swagger.annotations.ApiOperation;
+
 public interface DatasourceTablesResource {
 
   @GET
+  @ApiOperation(value = "Returns all tables of all datasources", response = List.class)
   Response getTables(@Context Request request, @QueryParam("counts") @DefaultValue("false") Boolean counts,
       @Nullable @QueryParam("entityType") String entityType);
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Swagger UI</title>
+  <title>Opal REST API</title>
   <link href='//fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'/>
   <link href='css/highlight.default.css' media='screen' rel='stylesheet' type='text/css'/>
   <link href='css/screen.css' media='screen' rel='stylesheet' type='text/css'/>
@@ -16,6 +16,19 @@
   <script src='lib/swagger.js' type='text/javascript'></script>
   <script src='swagger-ui.js' type='text/javascript'></script>
   <script src='lib/highlight.7.3.pack.js' type='text/javascript'></script>
+  <script type="text/javascript">
+      opal = {};
+      opal.credentials = function(){
+          var name = "opalsid=";
+          var carray = document.cookie.split(';');
+          for(var i=0;i < carray.length;i++) {
+              var c = carray[i];
+              while (c.charAt(0)==' ') c = c.substring(1,c.length);
+              if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+          }
+          return null;
+      }
+  </script>
   <script type="text/javascript">
     $(function () {
       window.swaggerUi = new SwaggerUi({
@@ -44,6 +57,10 @@
         window.authorizations.add("key", new ApiKeyAuthorization("Authorization", "X-Opal-Auth " + credentials, "header"));
       }
     })
+    var opalsid = opal.credentials();
+    if (opalsid) {
+        window.authorizations.add("key", new ApiKeyAuthorization("X-Opal-Auth", opalsid, "header"));
+    }
     window.swaggerUi.load();
   });
 
