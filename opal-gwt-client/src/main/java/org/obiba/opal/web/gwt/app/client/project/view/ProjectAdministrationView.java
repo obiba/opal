@@ -23,6 +23,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
@@ -64,6 +65,9 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   Panel noDatabasePanel;
 
   @UiField
+  Panel permissionsPanel;
+
+  @UiField
   Panel deletePanel;
 
   private ProjectDto project;
@@ -92,6 +96,15 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
     }
   }
 
+
+  @Override
+  public void setInSlot(Object slot, IsWidget content) {
+    permissionsPanel.clear();
+    if(content != null) {
+      permissionsPanel.add(content);
+    }
+  }
+
   @Override
   public ProjectDto getProject() {
     return project;
@@ -100,6 +113,11 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   @Override
   public HasAuthorization getEditAuthorizer() {
     return new WidgetAuthorizer(editProperties);
+  }
+
+  @Override
+  public HasAuthorization getPermissionsAuthorizer() {
+    return new WidgetAuthorizer(permissionsPanel);
   }
 
   @Override

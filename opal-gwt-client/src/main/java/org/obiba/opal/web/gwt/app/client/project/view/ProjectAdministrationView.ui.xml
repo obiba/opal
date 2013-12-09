@@ -72,13 +72,20 @@
       </g:FlowPanel>
     </g:FlowPanel>
 
+    <g:FlowPanel>
+      <b:Heading size="4">
+        <ui:msg description="Danger Zone label">Permissions</ui:msg>
+      </b:Heading>
+      <g:FlowPanel ui:field="permissionsPanel"></g:FlowPanel>
+    </g:FlowPanel>
+
     <g:FlowPanel ui:field="deletePanel">
       <b:Heading size="4">
         <ui:msg description="Danger Zone label">Danger zone</ui:msg>
       </b:Heading>
       <b:Form>
         <b:Paragraph>
-          Deleting a project destroy all associated data and files. It can be a long running task and there is no
+          Deleting a project destroys all associated data and files. It can be a long running task and there is no
           going back.
         </b:Paragraph>
         <b:Button type="DANGER" ui:field="deleteProject">Delete Project</b:Button>

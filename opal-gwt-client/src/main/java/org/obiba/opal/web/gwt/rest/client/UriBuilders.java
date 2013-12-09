@@ -74,6 +74,13 @@ public enum UriBuilders {
     }
   },
 
+  PROJECT_PERMISSIONS_PROJECT {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "permissions", "project");
+    }
+  },
+
   PROJECT_PERMISSIONS_DATASOURCE {
     @Override
     public UriBuilder create() {
