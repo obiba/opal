@@ -163,34 +163,36 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
   }
 
   private int importKey() {
-    int errorCode = 0;
-
     try {
-      if(options.isUnit()) {
-        Project project = projectService.getProject(options.getUnit());
-        if(options.isPrivate()) {
-          importProjectPrivateKey(project);
-        } else if(options.isCertificate()) {
-          importProjectCertificate(project);
-        } else {
-          unrecognizedOptionsHelp();
-          errorCode = 1;
-        }
-      } else {
-        if(options.isPrivate()) {
-          importSystemPrivateKey();
-        } else if(options.isCertificate()) {
-          importSystemCertificate();
-        } else {
-          unrecognizedOptionsHelp();
-          errorCode = 1;
-        }
-      }
+      return options.isUnit() ? importProjectKey() : importSystemKey();
     } catch(FileSystemException e) {
       throw new RuntimeException("An error occurred while reading the encryption key files.", e);
     }
+  }
 
-    return errorCode;
+  private int importSystemKey() throws FileSystemException {
+    if(options.isPrivate()) {
+      importSystemPrivateKey();
+    } else if(options.isCertificate()) {
+      importSystemCertificate();
+    } else {
+      unrecognizedOptionsHelp();
+      return 1;
+    }
+    return 0;
+  }
+
+  private int importProjectKey() throws FileSystemException {
+    Project project = projectService.getProject(options.getUnit());
+    if(options.isPrivate()) {
+      importProjectPrivateKey(project);
+    } else if(options.isCertificate()) {
+      importProjectCertificate(project);
+    } else {
+      unrecognizedOptionsHelp();
+      return 1;
+    }
+    return 0;
   }
 
   private void importProjectPrivateKey(Project project) throws FileSystemException {
@@ -262,6 +264,7 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
     getShell().printf("Key imported with alias '%s'.\n", alias);
   }
 
+  @SuppressWarnings("PMD.NcssMethodCount")
   private int exportCertificate() {
     int errorCode = 0;
 
@@ -291,7 +294,6 @@ public class KeyCommand extends AbstractOpalRuntimeDependentCommand<KeyCommandOp
       } catch(IOException ignored) {
       }
     }
-
     return errorCode;
   }
 
