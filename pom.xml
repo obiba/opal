@@ -42,7 +42,6 @@
     <module>opal-php-client</module>
     <module>opal-datashield</module>
     <module>opal-search</module>
-    <module>opal-project</module>
     <module>opal-upgrade</module>
   </modules>
 
@@ -147,11 +146,6 @@
       <dependency>
         <groupId>org.obiba.opal</groupId>
         <artifactId>opal-search</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.obiba.opal</groupId>
-        <artifactId>opal-project</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

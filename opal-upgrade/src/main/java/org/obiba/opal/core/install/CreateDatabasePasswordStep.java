@@ -14,8 +14,8 @@ import java.security.SecureRandom;
 
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
+import org.obiba.opal.core.service.LocalOrientDbServerFactory;
 import org.obiba.opal.core.service.OrientDbServerFactory;
-import org.obiba.opal.core.service.impl.LocalOrientDbServerFactory;
 import org.obiba.runtime.Version;
 import org.obiba.runtime.upgrade.InstallStep;
 import org.obiba.runtime.upgrade.UpgradeStep;

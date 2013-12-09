@@ -22,17 +22,17 @@
 
   <bean id="sessionFactoryFactory" class="org.obiba.opal.core.runtime.jdbc.SessionFactoryFactory"/>
 
-  <bean id="defaultBeanValidator" class="org.obiba.opal.core.service.impl.DefaultBeanValidator"/>
+  <bean id="defaultBeanValidator" class="org.obiba.opal.core.service.DefaultBeanValidator"/>
 
-  <bean id="orientDbService" class="org.obiba.opal.core.service.impl.OrientDbServiceImpl"/>
+  <bean id="orientDbService" class="org.obiba.opal.core.service.OrientDbServiceImpl"/>
 
-  <bean id="localOrientDbServerFactory" class="org.obiba.opal.core.service.impl.LocalOrientDbServerFactory"/>
+  <bean id="localOrientDbServerFactory" class="org.obiba.opal.core.service.LocalOrientDbServerFactory"/>
 
-  <bean id="databaseRegistry" class="org.obiba.opal.core.service.impl.DefaultDatabaseRegistry"/>
+  <bean id="databaseRegistry" class="org.obiba.opal.core.service.DefaultDatabaseRegistry"/>
 
-  <bean id="identifiersTableService" class="org.obiba.opal.core.service.impl.DefaultIdentifiersTableService"/>
+  <bean id="identifiersTableService" class="org.obiba.opal.core.service.DefaultIdentifiersTableService"/>
 
-  <bean id="generalConfigService" class="org.obiba.opal.core.service.impl.OpalGeneralConfigServiceImpl"/>
+  <bean id="generalConfigService" class="org.obiba.opal.core.service.OpalGeneralConfigServiceImpl"/>
 
   <bean id="versionProvider" class="org.obiba.runtime.upgrade.support.JdbcVersionModifier">
     <property name="datasource" ref="dataSource"/>

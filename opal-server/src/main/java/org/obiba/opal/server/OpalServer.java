@@ -1,6 +1,6 @@
 package org.obiba.opal.server;
 
-import org.obiba.opal.core.service.impl.LocalOrientDbServerFactory;
+import org.obiba.opal.core.service.LocalOrientDbServerFactory;
 import org.obiba.opal.server.httpd.OpalJettyServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

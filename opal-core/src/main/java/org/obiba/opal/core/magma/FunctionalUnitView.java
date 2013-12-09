@@ -19,7 +19,7 @@ import org.obiba.magma.transform.BijectiveFunction;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.domain.participant.identifier.impl.ParticipantIdentifiers;
-import org.obiba.opal.core.service.impl.OpalPrivateVariableEntityMap;
+import org.obiba.opal.core.service.OpalPrivateVariableEntityMap;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
