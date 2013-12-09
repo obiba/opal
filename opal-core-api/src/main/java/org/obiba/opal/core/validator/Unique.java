@@ -37,4 +37,13 @@ public @interface Unique {
 
   Class<? extends Payload>[] payload() default { };
 
+  @Retention(RetentionPolicy.RUNTIME)
+  @interface CompoundProperty {
+
+    String name();
+
+    String[] properties();
+
+  }
+
 }

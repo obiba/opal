@@ -14,7 +14,6 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.obiba.opal.core.service.DuplicateSubjectProfileException;
-import org.obiba.opal.core.service.DuplicateUserNameException;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.springframework.stereotype.Component;
 

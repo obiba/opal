@@ -18,9 +18,9 @@ import javax.annotation.PostConstruct;
 import javax.validation.ConstraintViolationException;
 
 import org.obiba.opal.core.domain.HasUniqueProperties;
+import org.obiba.opal.core.domain.security.Group;
+import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.domain.security.SubjectProfile;
-import org.obiba.opal.core.domain.user.Group;
-import org.obiba.opal.core.domain.user.SubjectCredentials;
 import org.obiba.opal.core.runtime.security.OpalUserRealm;
 import org.obiba.opal.core.service.DuplicateSubjectProfileException;
 import org.obiba.opal.core.service.OrientDbService;
@@ -59,8 +59,10 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
   }
 
   @Override
-  public Iterable<SubjectCredentials> getSubjectCredentials() {
-    return orientDbService.list(SubjectCredentials.class);
+  public Iterable<SubjectCredentials> getSubjectCredentials(SubjectCredentials.Type type) {
+    return orientDbService
+        .list(SubjectCredentials.class, "select from " + SubjectCredentials.class.getSimpleName() + " where type = ?",
+            type);
   }
 
   @Override
@@ -75,8 +77,8 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
   @Override
   public void save(SubjectCredentials subjectCredentials) throws ConstraintViolationException {
-    boolean newUser = getSubjectCredentials(subjectCredentials.getName()) == null;
-    if(newUser) {
+    boolean newSubject = getSubjectCredentials(subjectCredentials.getName()) == null;
+    if(newSubject) {
       SubjectProfile profile = subjectProfileService.getProfile(subjectCredentials.getName());
       if(profile != null && !OpalUserRealm.OPAL_REALM.equals(profile.getRealm())) {
         throw new DuplicateSubjectProfileException(profile);
@@ -86,7 +88,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
     // Copy current password if password is empty
     //noinspection ConstantConditions
-    if(subjectCredentials.getPassword() == null) {
+    if(subjectCredentials.getType() == SubjectCredentials.Type.USER && subjectCredentials.getPassword() == null) {
       subjectCredentials.setPassword(getSubjectCredentials(subjectCredentials.getName()).getPassword());
     }
 
@@ -96,7 +98,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     }
     orientDbService.save(toSave);
 
-    if(newUser) {
+    if(newSubject) {
       subjectProfileService.ensureProfile(subjectCredentials.getName(), OpalUserRealm.OPAL_REALM);
     }
   }

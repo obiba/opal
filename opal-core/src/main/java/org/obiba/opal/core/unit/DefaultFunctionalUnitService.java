@@ -21,10 +21,10 @@ import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.runtime.security.ApplicationRealm;
 import org.obiba.opal.core.service.DuplicateSubjectProfileException;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.SubjectProfileService;
-import org.obiba.opal.core.unit.security.ApplicationRealm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -99,8 +99,7 @@ public class DefaultFunctionalUnitService implements FunctionalUnitService {
         FunctionalUnit unit = getFunctionalUnit(functionalUnit.getName());
         if(!newUnit) config.getFunctionalUnits().remove(unit);
         config.getFunctionalUnits().add(functionalUnit);
-        if(newUnit)
-          subjectProfileService.ensureProfile(functionalUnit.getName(), ApplicationRealm.APPLICATION_REALM);
+        if(newUnit) subjectProfileService.ensureProfile(functionalUnit.getName(), ApplicationRealm.APPLICATION_REALM);
       }
     });
   }

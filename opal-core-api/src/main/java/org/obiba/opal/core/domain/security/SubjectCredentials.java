@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.core.domain.user;
+package org.obiba.opal.core.domain.security;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -22,9 +22,13 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.core.util.HexUtil;
 import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.domain.HasUniqueProperties;
+import org.obiba.opal.core.validator.NotNullIfAnotherFieldHasValue;
 
 import com.google.common.collect.Lists;
 
+@NotNullIfAnotherFieldHasValue.List({ //
+    @NotNullIfAnotherFieldHasValue(fieldName = "type", fieldValue = "USER", dependFieldName = "password"), //
+    @NotNullIfAnotherFieldHasValue(fieldName = "type", fieldValue = "APPLICATION", dependFieldName = "certificate") })
 public class SubjectCredentials extends AbstractTimestamped
     implements Comparable<SubjectCredentials>, HasUniqueProperties {
 
@@ -32,13 +36,22 @@ public class SubjectCredentials extends AbstractTimestamped
     ACTIVE, INACTIVE
   }
 
+  public enum Type {
+    USER, APPLICATION
+  }
+
   @NotNull
   @NotBlank
   private String name;
 
   @NotNull
-  @NotBlank
+  private Type type;
+
+  // user password
   private String password;
+
+  // application certificate
+  private byte[] certificate;
 
   private boolean enabled;
 
@@ -71,12 +84,28 @@ public class SubjectCredentials extends AbstractTimestamped
   }
 
   @NotNull
+  public Type getType() {
+    return type;
+  }
+
+  public void setType(@NotNull Type type) {
+    this.type = type;
+  }
+
   public String getPassword() {
     return password;
   }
 
-  public void setPassword(@NotNull String password) {
+  public void setPassword(String password) {
     this.password = password;
+  }
+
+  public byte[] getCertificate() {
+    return certificate;
+  }
+
+  public void setCertificate(byte... certificate) {
+    this.certificate = certificate;
   }
 
   public Set<String> getGroups() {
@@ -108,13 +137,8 @@ public class SubjectCredentials extends AbstractTimestamped
     this.enabled = enabled;
   }
 
-  /**
-   * Digest the password into a predefined algorithm.
-   *
-   * @param password
-   * @return
-   */
-  public static String digest(String password, byte[] salt) {
+  // TODO use Shiro to digest password
+  public static String digest(String password, byte... salt) {
     try {
       MessageDigest digest = MessageDigest.getInstance(Sha256Hash.ALGORITHM_NAME);
       digest.reset();
@@ -144,7 +168,7 @@ public class SubjectCredentials extends AbstractTimestamped
   }
 
   @Override
-  public int compareTo(SubjectCredentials subjectCredentials) {
+  public int compareTo(@NotNull SubjectCredentials subjectCredentials) {
     return name.compareTo(subjectCredentials.name);
   }
 
@@ -167,8 +191,18 @@ public class SubjectCredentials extends AbstractTimestamped
       return this;
     }
 
+    public Builder type(Type type) {
+      subjectCredentials.type = type;
+      return this;
+    }
+
     public Builder password(String password) {
       subjectCredentials.password = password;
+      return this;
+    }
+
+    public Builder certificate(byte... certificate) {
+      subjectCredentials.certificate = certificate;
       return this;
     }
 

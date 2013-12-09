@@ -17,7 +17,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.apache.shiro.util.SimpleByteSource;
-import org.obiba.opal.core.domain.user.SubjectCredentials;
+import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.service.security.SubjectCredentialsService;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,12 +37,9 @@ public class UserResource {
 
   @GET
   public Response getUser() {
-    //TODO: Use TimestampedResponses.evaluate(request, ...); ?
     SubjectCredentials subjectCredentials = subjectCredentialsService.getSubjectCredentials(name);
-    if(subjectCredentials == null) {
-      return Response.status(Response.Status.NOT_FOUND).build();
-    }
-    return Response.ok().entity(Dtos.asDto(subjectCredentials)).build();
+    return subjectCredentials == null || subjectCredentials.getType() != SubjectCredentials.Type.USER ? Response
+        .status(Response.Status.NOT_FOUND).build() : Response.ok().entity(Dtos.asDto(subjectCredentials)).build();
   }
 
   @PUT

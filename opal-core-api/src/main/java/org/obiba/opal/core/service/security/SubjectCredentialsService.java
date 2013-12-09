@@ -11,8 +11,8 @@ package org.obiba.opal.core.service.security;
 
 import javax.validation.ConstraintViolationException;
 
-import org.obiba.opal.core.domain.user.Group;
-import org.obiba.opal.core.domain.user.SubjectCredentials;
+import org.obiba.opal.core.domain.security.Group;
+import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.service.SystemService;
 
 public interface SubjectCredentialsService extends SystemService {
@@ -22,7 +22,7 @@ public interface SubjectCredentialsService extends SystemService {
    *
    * @return a list of subjectCredentials instances
    */
-  Iterable<SubjectCredentials> getSubjectCredentials();
+  Iterable<SubjectCredentials> getSubjectCredentials(SubjectCredentials.Type type);
 
   /**
    * Returns the subjectCredentials with the specified login

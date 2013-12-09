@@ -8,13 +8,13 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.domain.HasUniqueProperties;
-import org.obiba.opal.core.validator.CompoundProperty;
 import org.obiba.opal.core.validator.Unique;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 
-@Unique(compoundProperties = @CompoundProperty(name = "url", properties = { "sqlSettings.url", "mongoDbSettings.url" }))
+@Unique(compoundProperties = @Unique.CompoundProperty(name = "url",
+    properties = { "sqlSettings.url", "mongoDbSettings.url" }))
 public class Database extends AbstractTimestamped implements HasUniqueProperties {
 
   public enum Usage {

@@ -52,7 +52,7 @@ public class UnitTrustManager implements X509TrustManager {
       }
     }
     for(OpalKeyStore keyStore : getUnitKeyStores()) {
-      for(Certificate cert : keyStore.getCertificateEntries()) {
+      for(Certificate cert : keyStore.getCertificates().values()) {
         for(X509Certificate x509Cert : chain) {
           try {
             x509Cert.verify(cert.getPublicKey());

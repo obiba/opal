@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.core.security;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -39,7 +38,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -68,7 +67,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class OpalKeyStore implements KeyProvider {
 
@@ -107,15 +106,7 @@ public class OpalKeyStore implements KeyProvider {
       } else {
         throw new UnsupportedOperationException("unsupported key type");
       }
-    } catch(KeyStoreException e) {
-      throw new RuntimeException(e);
-    } catch(NoSuchAlgorithmException e) {
-      throw new RuntimeException(e);
-    } catch(UnrecoverableEntryException e) {
-      throw new RuntimeException(e);
-    } catch(UnsupportedCallbackException e) {
-      throw new RuntimeException(e);
-    } catch(IOException e) {
+    } catch(KeyStoreException | IOException | UnsupportedCallbackException | UnrecoverableEntryException | NoSuchAlgorithmException e) {
       throw new RuntimeException(e);
     }
   }
@@ -221,15 +212,15 @@ public class OpalKeyStore implements KeyProvider {
     return cert;
   }
 
-  public List<Certificate> getCertificateEntries() {
-    List<Certificate> certs = Lists.newArrayList();
+  public Map<String, Certificate> getCertificates() {
+    Map<String, Certificate> map = Maps.newHashMap();
     for(String alias : listAliases()) {
       Entry keyEntry = getEntry(alias);
       if(keyEntry instanceof TrustedCertificateEntry) {
-        certs.add(((TrustedCertificateEntry) keyEntry).getTrustedCertificate());
+        map.put(alias, ((TrustedCertificateEntry) keyEntry).getTrustedCertificate());
       }
     }
-    return certs;
+    return map;
   }
 
   public void setCallbackHandler(CallbackHandler callbackHandler) {
@@ -318,11 +309,7 @@ public class OpalKeyStore implements KeyProvider {
       X509Certificate cert = makeCertificate(algorithm, certificateInfo, keyPair);
       CacheablePasswordCallback passwordCallback = createPasswordCallback(getPasswordFor(name));
       store.setKeyEntry(alias, keyPair.getPrivate(), getKeyPassword(passwordCallback), new X509Certificate[] { cert });
-    } catch(GeneralSecurityException e) {
-      throw new RuntimeException(e);
-    } catch(UnsupportedCallbackException e) {
-      throw new RuntimeException(e);
-    } catch(IOException e) {
+    } catch(GeneralSecurityException | IOException | UnsupportedCallbackException e) {
       throw new RuntimeException(e);
     }
   }
@@ -388,11 +375,7 @@ public class OpalKeyStore implements KeyProvider {
     CacheablePasswordCallback passwordCallback = createPasswordCallback(getPasswordFor(alias));
     try {
       store.setKeyEntry(alias, key, getKeyPassword(passwordCallback), new X509Certificate[] { cert });
-    } catch(KeyStoreException e) {
-      throw new RuntimeException(e);
-    } catch(UnsupportedCallbackException e) {
-      throw new RuntimeException(e);
-    } catch(IOException e) {
+    } catch(KeyStoreException | IOException | UnsupportedCallbackException e) {
       throw new RuntimeException(e);
     }
   }
@@ -421,11 +404,7 @@ public class OpalKeyStore implements KeyProvider {
           chooseSignatureAlgorithm(keyPair.getPrivate().getAlgorithm()));
       CacheablePasswordCallback passwordCallback = createPasswordCallback(getPasswordFor(alias));
       store.setKeyEntry(alias, keyPair.getPrivate(), getKeyPassword(passwordCallback), new X509Certificate[] { cert });
-    } catch(GeneralSecurityException e) {
-      throw new RuntimeException(e);
-    } catch(UnsupportedCallbackException e) {
-      throw new RuntimeException(e);
-    } catch(IOException e) {
+    } catch(GeneralSecurityException | IOException | UnsupportedCallbackException e) {
       throw new RuntimeException(e);
     }
   }
@@ -478,8 +457,6 @@ public class OpalKeyStore implements KeyProvider {
         return (KeyPair) object;
       }
       throw new RuntimeException("Unexpected type [" + object + "]. Expected KeyPair.");
-    } catch(FileNotFoundException e) {
-      throw new RuntimeException(e);
     } catch(IOException e) {
       throw new RuntimeException(e);
     } finally {
@@ -564,8 +541,6 @@ public class OpalKeyStore implements KeyProvider {
         return (X509Certificate) object;
       }
       throw new RuntimeException("Unexpected type [" + object + "]. Expected X509Certificate.");
-    } catch(FileNotFoundException e) {
-      throw new RuntimeException(e);
     } catch(IOException e) {
       throw new RuntimeException(e);
     } finally {
@@ -636,13 +611,11 @@ public class OpalKeyStore implements KeyProvider {
       } catch(KeyStoreException e) {
         clearPasswordCache(callbackHandler, unit);
         throw new KeyProviderSecurityException("Wrong keystore password or keystore was tampered with");
-      } catch(GeneralSecurityException e) {
+      } catch(GeneralSecurityException | UnsupportedCallbackException e) {
         throw new RuntimeException(e);
       } catch(IOException ex) {
         clearPasswordCache(callbackHandler, unit);
         translateAndRethrowKeyStoreIOException(ex);
-      } catch(UnsupportedCallbackException e) {
-        throw new RuntimeException(e);
       }
       return keyStore;
     }

@@ -7,11 +7,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.unit.security;
+package org.obiba.opal.core.runtime.security;
 
 import java.security.GeneralSecurityException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.Map;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -23,10 +24,8 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.obiba.opal.core.security.OpalKeyStore;
-import org.obiba.opal.core.service.ProjectService;
-import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
-import org.obiba.opal.core.unit.FunctionalUnit;
-import org.obiba.opal.core.unit.FunctionalUnitService;
+import org.obiba.opal.core.service.security.CredentialsKeyStoreService;
+import org.obiba.opal.core.unit.security.X509CertificateAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -38,16 +37,10 @@ public class ApplicationRealm extends AuthorizingRealm {
 
 //  private static final Logger log = LoggerFactory.getLogger(ApplicationRealm.class);
 
-  public static final String APPLICATION_REALM = "application-realm";
+  public static final String APPLICATION_REALM = "opal-application-realm";
 
   @Autowired
-  private FunctionalUnitService functionalUnitService;
-
-  @Autowired
-  private ProjectsKeyStoreService projectskeyStoreService;
-
-  @Autowired
-  private ProjectService projectService;
+  private CredentialsKeyStoreService credentialsKeyStoreService;
 
   @Override
   public String getName() {
@@ -62,21 +55,20 @@ public class ApplicationRealm extends AuthorizingRealm {
   @Override
   protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
     X509CertificateAuthenticationToken x509Token = (X509CertificateAuthenticationToken) token;
-    X509Certificate x509Cert = x509Token.getCredentials();
-    for(FunctionalUnit unit : functionalUnitService.getFunctionalUnits()) {
-      OpalKeyStore keyStore = projectskeyStoreService.getKeyStore(projectService.getProject(unit.getName()));
-      for(Certificate cert : keyStore.getCertificateEntries()) {
-        try {
-          x509Cert.verify(cert.getPublicKey());
-          SimplePrincipalCollection principals = new SimplePrincipalCollection();
-          principals.add(unit.getName(), getName());
-          principals.add(x509Token.getPrincipal(), getName());
-          return new SimpleAuthenticationInfo(principals, x509Token.getCredentials());
-        } catch(GeneralSecurityException e) {
-          // Ignore
-        }
+    OpalKeyStore keyStore = credentialsKeyStoreService.getKeyStore();
+    for(Map.Entry<String, Certificate> entry : keyStore.getCertificates().entrySet()) {
+      String alias = entry.getKey();
+      Certificate certificate = entry.getValue();
+      try {
+        X509Certificate x509Cert = x509Token.getCredentials();
+        x509Cert.verify(certificate.getPublicKey());
+        SimplePrincipalCollection principals = new SimplePrincipalCollection();
+        principals.add(alias, getName());
+        principals.add(x509Token.getPrincipal(), getName());
+        return new SimpleAuthenticationInfo(principals, x509Token.getCredentials());
+      } catch(GeneralSecurityException e) {
+        // Ignore
       }
-
     }
     throw new IncorrectCredentialsException();
   }

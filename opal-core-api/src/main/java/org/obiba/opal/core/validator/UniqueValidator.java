@@ -67,7 +67,7 @@ public class UniqueValidator implements ConstraintValidator<Unique, HasUniquePro
   private boolean isValidCompoundProperties(HasUniqueProperties value, ConstraintValidatorContext context) {
     Class<? extends HasUniqueProperties> annotatedClass = findAnnotatedClass(value.getClass());
     PropertyAccessor beanWrapper = new BeanWrapperImpl(value);
-    for(CompoundProperty compoundProperty : unique.compoundProperties()) {
+    for(Unique.CompoundProperty compoundProperty : unique.compoundProperties()) {
       HasUniqueProperties existing = findExisting(value, annotatedClass, beanWrapper, compoundProperty);
       if(existing != null && !existing.equals(value)) {
         buildConstraintViolation(context, compoundProperty.name());
@@ -79,7 +79,7 @@ public class UniqueValidator implements ConstraintValidator<Unique, HasUniquePro
 
   private HasUniqueProperties findExisting(HasUniqueProperties value,
       Class<? extends HasUniqueProperties> annotatedClass, PropertyAccessor beanWrapper,
-      CompoundProperty compoundProperty) {
+      Unique.CompoundProperty compoundProperty) {
     StringBuilder query = new StringBuilder("select from " + annotatedClass.getSimpleName() + " where ");
     Object propertyValue = null;
     int length = compoundProperty.properties().length;
@@ -100,7 +100,7 @@ public class UniqueValidator implements ConstraintValidator<Unique, HasUniquePro
 
   private void buildConstraintViolation(ConstraintValidatorContext context, String property) {
     context.disableDefaultConstraintViolation();
-    context.buildConstraintViolationWithTemplate("{org.obiba.opal.core.validator.Unique.message}") //
+    context.buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate())
         .addPropertyNode(property) //
         .addConstraintViolation();
   }

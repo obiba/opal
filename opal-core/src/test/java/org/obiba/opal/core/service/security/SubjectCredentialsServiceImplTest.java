@@ -5,8 +5,9 @@ import java.util.List;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
-import org.obiba.opal.core.domain.user.Group;
-import org.obiba.opal.core.domain.user.SubjectCredentials;
+import org.obiba.opal.core.domain.security.Group;
+import org.obiba.opal.core.domain.security.SubjectCredentials;
+import org.obiba.opal.core.runtime.security.OpalUserRealm;
 import org.obiba.opal.core.service.AbstractOrientDbTestConfig;
 import org.obiba.opal.core.service.Asserts;
 import org.obiba.opal.core.service.OrientDbService;
@@ -23,9 +24,13 @@ import com.google.common.collect.Sets;
 import static com.google.common.collect.Iterables.size;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 @ContextConfiguration(classes = SubjectCredentialsServiceImplTest.Config.class)
@@ -47,34 +52,73 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
 
   @Test
   public void test_create_new_user() {
-    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().name("user1").password("password")
-        .enabled(true).build();
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().type(SubjectCredentials.Type.USER)
+        .name("user1").password("password").enabled(true).build();
     subjectCredentialsService.save(subjectCredentials);
 
-    List<SubjectCredentials> subjectCredentialses = newArrayList(subjectCredentialsService.getSubjectCredentials());
-    assertEquals(1, subjectCredentialses.size());
-    assertUserEquals(subjectCredentials, subjectCredentialses.get(0));
+    List<SubjectCredentials> list = newArrayList(
+        subjectCredentialsService.getSubjectCredentials(SubjectCredentials.Type.USER));
+    assertEquals(1, list.size());
+    assertSubjectEquals(subjectCredentials, list.get(0));
 
     SubjectCredentials found = subjectCredentialsService.getSubjectCredentials(subjectCredentials.getName());
-    assertUserEquals(subjectCredentials, found);
+    assertSubjectEquals(subjectCredentials, found);
+  }
+
+  @Test
+  public void test_create_new_application() {
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
+        .type(SubjectCredentials.Type.APPLICATION).name("app1").certificate("certificate".getBytes()).enabled(true)
+        .build();
+    subjectCredentialsService.save(subjectCredentials);
+
+    List<SubjectCredentials> list = newArrayList(
+        subjectCredentialsService.getSubjectCredentials(SubjectCredentials.Type.APPLICATION));
+    assertEquals(1, list.size());
+    assertSubjectEquals(subjectCredentials, list.get(0));
+
+    SubjectCredentials found = subjectCredentialsService.getSubjectCredentials(subjectCredentials.getName());
+    assertSubjectEquals(subjectCredentials, found);
   }
 
   @Test
   public void test_update_user() {
 
-    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().name("user1").password("password")
-        .enabled(true).build();
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().type(SubjectCredentials.Type.USER)
+        .name("user1").password("password").enabled(true).build();
     subjectCredentialsService.save(subjectCredentials);
 
     subjectCredentials.setPassword("new password");
     subjectCredentialsService.save(subjectCredentials);
 
-    List<SubjectCredentials> subjectCredentialses = newArrayList(subjectCredentialsService.getSubjectCredentials());
-    assertEquals(1, subjectCredentialses.size());
-    assertUserEquals(subjectCredentials, subjectCredentialses.get(0));
+    List<SubjectCredentials> list = newArrayList(
+        subjectCredentialsService.getSubjectCredentials(SubjectCredentials.Type.USER));
+    assertEquals(1, list.size());
+    assertSubjectEquals(subjectCredentials, list.get(0));
 
     SubjectCredentials found = subjectCredentialsService.getSubjectCredentials(subjectCredentials.getName());
-    assertUserEquals(subjectCredentials, found);
+    assertSubjectEquals(subjectCredentials, found);
+    Asserts.assertUpdatedTimestamps(subjectCredentials, found);
+  }
+
+  @Test
+  public void test_update_application() {
+
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
+        .type(SubjectCredentials.Type.APPLICATION).name("app1").certificate("certificate".getBytes()).enabled(true)
+        .build();
+    subjectCredentialsService.save(subjectCredentials);
+
+    subjectCredentials.setCertificate("new certificate".getBytes());
+    subjectCredentialsService.save(subjectCredentials);
+
+    List<SubjectCredentials> list = newArrayList(
+        subjectCredentialsService.getSubjectCredentials(SubjectCredentials.Type.APPLICATION));
+    assertEquals(1, list.size());
+    assertSubjectEquals(subjectCredentials, list.get(0));
+
+    SubjectCredentials found = subjectCredentialsService.getSubjectCredentials(subjectCredentials.getName());
+    assertSubjectEquals(subjectCredentials, found);
     Asserts.assertUpdatedTimestamps(subjectCredentials, found);
   }
 
@@ -94,8 +138,8 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
   @Test
   public void test_create_groups_from_user() {
 
-    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().name("user1").password("password")
-        .groups(Sets.newHashSet("group1", "group2")).build();
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().type(SubjectCredentials.Type.USER)
+        .name("user1").password("password").groups(Sets.newHashSet("group1", "group2")).build();
     subjectCredentialsService.save(subjectCredentials);
 
     assertEquals(2, size(subjectCredentialsService.getGroups()));
@@ -113,15 +157,15 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
 
   @Test
   public void test_remove_groups_from_user() {
-    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().name("user1").password("password")
-        .groups(Sets.newHashSet("group1", "group2")).build();
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().type(SubjectCredentials.Type.USER)
+        .name("user1").password("password").groups(Sets.newHashSet("group1", "group2")).build();
     subjectCredentialsService.save(subjectCredentials);
 
     subjectCredentials.removeGroup("group1");
     subjectCredentialsService.save(subjectCredentials);
 
     SubjectCredentials found = subjectCredentialsService.getSubjectCredentials(subjectCredentials.getName());
-    assertUserEquals(subjectCredentials, found);
+    assertSubjectEquals(subjectCredentials, found);
 
     assertEquals(2, size(subjectCredentialsService.getGroups()));
 
@@ -137,22 +181,22 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
 
   @Test
   public void test_delete_user() {
-    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().name("user1").password("password")
-        .build();
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().type(SubjectCredentials.Type.USER)
+        .name("user1").password("password").build();
     subjectCredentialsService.save(subjectCredentials);
     subjectCredentialsService.delete(subjectCredentials);
-    assertEquals(0, size(subjectCredentialsService.getSubjectCredentials()));
+    assertEquals(0, size(subjectCredentialsService.getSubjectCredentials(SubjectCredentials.Type.USER)));
   }
 
   @Test
   public void test_delete_user_with_groups() {
-    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().name("user1").password("password")
-        .groups(Sets.newHashSet("group1", "group2")).build();
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().type(SubjectCredentials.Type.USER)
+        .name("user1").password("password").groups(Sets.newHashSet("group1", "group2")).build();
     subjectCredentialsService.save(subjectCredentials);
 
     subjectCredentialsService.delete(subjectCredentials);
 
-    assertEquals(0, size(subjectCredentialsService.getSubjectCredentials()));
+    assertEquals(0, size(subjectCredentialsService.getSubjectCredentials(SubjectCredentials.Type.USER)));
 
     Group group1 = subjectCredentialsService.getGroup("group1");
     assertEquals(0, group1.getUsers().size());
@@ -174,28 +218,29 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
     // TODO
   }
 
-  private void assertUserEquals(SubjectCredentials expected, SubjectCredentials found) {
-    assertNotNull(found);
-    assertEquals(expected, found);
-    assertEquals(expected.getName(), found.getName());
-    assertEquals(expected.getPassword(), found.getPassword());
-    assertEquals(expected.isEnabled(), found.isEnabled());
+  private void assertSubjectEquals(SubjectCredentials expected, SubjectCredentials found) {
+    assertThat(found, notNullValue());
+    assertThat(found, is(expected));
+    assertThat(found.getName(), is(expected.getName()));
+    assertThat(found.getType(), is(expected.getType()));
+    assertThat(found.getPassword(), is(expected.getPassword()));
+    assertThat(found.getCertificate(), is(expected.getCertificate()));
+    assertThat(found.isEnabled(), is(expected.isEnabled()));
+
     assertTrue(Iterables.elementsEqual(expected.getGroups(), found.getGroups()));
     Asserts.assertCreatedTimestamps(expected, found);
   }
 
   private void assertGroupEquals(Group expected, Group found) {
-    assertNotNull(found);
-    assertEquals(expected, found);
-    assertEquals(expected.getName(), found.getName());
+    assertThat(found, notNullValue());
+    assertThat(found, is(expected));
+    assertThat(found.getName(), is(expected.getName()));
     assertTrue(Iterables.elementsEqual(expected.getUsers(), found.getUsers()));
     Asserts.assertCreatedTimestamps(expected, found);
   }
 
   @Configuration
   public static class Config extends AbstractOrientDbTestConfig {
-
-    SubjectProfileService subjectProfileService;
 
     @Bean
     public SubjectCredentialsService userService() {
@@ -209,24 +254,20 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
 
     @Bean
     public SubjectProfileService subjectProfileService() {
-      if(subjectProfileService == null) {
-        subjectProfileService = EasyMock.createMock(SubjectProfileService.class);
-        expect(subjectProfileService.getProfile("user1")) //
-            .andReturn(null) //
-            .anyTimes();
-        subjectProfileService.ensureProfile("user1", "opal-realm");
-        subjectProfileService.ensureProfile("user1", "opal-realm");
-        subjectProfileService.ensureProfile("user1", "opal-realm");
-        subjectProfileService.ensureProfile("user1", "opal-realm");
-        subjectProfileService.ensureProfile("user1", "opal-realm");
-        subjectProfileService.ensureProfile("user1", "opal-realm");
-        subjectProfileService.deleteProfile("user1");
-        subjectProfileService.deleteProfile("user1");
-        replay(subjectProfileService);
-      }
+      SubjectProfileService subjectProfileService = EasyMock.createMock(SubjectProfileService.class);
+      expect(subjectProfileService.getProfile("user1")).andReturn(null).anyTimes();
+      expect(subjectProfileService.getProfile("app1")).andReturn(null).anyTimes();
+      subjectProfileService.ensureProfile("user1", OpalUserRealm.OPAL_REALM);
+      expectLastCall().anyTimes();
+      subjectProfileService.ensureProfile("app1", OpalUserRealm.OPAL_REALM);
+      expectLastCall().anyTimes();
+      subjectProfileService.deleteProfile("user1");
+      expectLastCall().anyTimes();
+      subjectProfileService.deleteProfile("app1");
+      expectLastCall().anyTimes();
+      replay(subjectProfileService);
       return subjectProfileService;
     }
-
   }
 
 }

@@ -17,7 +17,7 @@ import org.obiba.opal.core.domain.HasUniqueProperties;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 
-@Unique(compoundProperties = @CompoundProperty(name = "unique prop",
+@Unique(compoundProperties = @Unique.CompoundProperty(name = "unique prop",
     properties = { "sub1.prop1", "sub2.prop2" }))
 public class UniqueCompoundStub implements HasUniqueProperties {
 
