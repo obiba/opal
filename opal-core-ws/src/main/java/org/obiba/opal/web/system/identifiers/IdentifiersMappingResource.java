@@ -18,15 +18,17 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.magma.MagmaRuntimeException;
-import org.obiba.magma.NoSuchVariableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
@@ -52,18 +54,15 @@ import au.com.bytecode.opencsv.CSVWriter;
 @Component
 @Transactional
 @Scope("request")
-@Path("/system/identifiers/mapping/{entityType}/unit/{unit}")
-@Api(value = "/system/identifiers/mapping/{entityType}/unit/{unit}",
+@Path("/system/identifiers/mapping/{name}")
+@Api(value = "/system/identifiers/mapping/{name}",
     description = "Operations about a specific identifiers mapping")
-public class IdentifiersMappingUnitResource extends AbstractIdentifiersResource {
+public class IdentifiersMappingResource extends AbstractIdentifiersResource {
 
   private IdentifiersTableService identifiersTableService;
 
-  @PathParam("entityType")
-  private String entityType;
-
-  @PathParam("unit")
-  private String unit;
+  @PathParam("name")
+  private String name;
 
   @Autowired
   public void setIdentifiersTableService(IdentifiersTableService identifiersTableService) {
@@ -77,22 +76,22 @@ public class IdentifiersMappingUnitResource extends AbstractIdentifiersResource 
 
   @GET
   @ApiOperation(value = "Get a specific identifiers mapping for an entity type")
-  public Magma.VariableDto get() {
-    ValueTable table = getValueTable();
-    Variable variable = table.getVariable(unit);
+  public Magma.VariableDto get(@QueryParam("type") @DefaultValue("Participant") String entityType) {
+    ValueTable table = getValueTable(entityType);
+    Variable variable = table.getVariable(name);
 
     return Dtos.asDto(variable).build();
   }
 
   @DELETE
   @ApiOperation(value = "Delete a specific identifiers mapping for an entity type")
-  public Response delete() {
+  public Response delete(@QueryParam("type") @DefaultValue("Participant") String entityType) {
     ValueTableWriter vtw = null;
     ValueTableWriter.VariableWriter vw = null;
     try {
-      ValueTable table = getValueTable();
+      ValueTable table = getValueTable(entityType);
       // The variable must exist
-      Variable v = table.getVariable(unit);
+      Variable v = table.getVariable(name);
       vtw = table.getDatasource().createWriter(table.getName(), table.getEntityType());
 
       vw = vtw.writeVariables();
@@ -109,15 +108,17 @@ public class IdentifiersMappingUnitResource extends AbstractIdentifiersResource 
   @GET
   @Path("/entities")
   @ApiOperation(value = "Get identifiers as entities")
-  public List<Magma.VariableEntityDto> getUnitEntities() {
-    return Lists.newArrayList(Iterables.transform(new FunctionalUnitIdentifiers(getValueTable(), unit).getUnitEntities(),
-        Dtos.variableEntityAsDtoFunc));
+  public List<Magma.VariableEntityDto> getUnitEntities(
+      @QueryParam("type") @DefaultValue("Participant") String entityType) {
+    return Lists.newArrayList(Iterables
+        .transform(new FunctionalUnitIdentifiers(getValueTable(entityType), name).getUnitEntities(),
+            Dtos.variableEntityAsDtoFunc));
   }
 
   @GET
   @Path("/entities/_count")
-  public String getEntitiesCount() {
-    return String.valueOf(Iterables.size(getUnitIdentifiers()));
+  public String getEntitiesCount(@QueryParam("type") @DefaultValue("Participant") String entityType) {
+    return String.valueOf(Iterables.size(getUnitIdentifiers(entityType)));
   }
 
   /**
@@ -132,9 +133,10 @@ public class IdentifiersMappingUnitResource extends AbstractIdentifiersResource 
   @Produces("text/csv")
   @AuthenticatedByCookie
   @ApiOperation(value = "Get identifiers mapping in CSV", produces = "text/csv")
-  public Response getVectorCSVValues() throws MagmaRuntimeException, IOException {
-    ValueTable table = getValueTable();
-    Variable variable = table.getVariable(unit);
+  public Response getVectorCSVValues(@QueryParam("type") @DefaultValue("Participant") String entityType)
+      throws MagmaRuntimeException, IOException {
+    ValueTable table = getValueTable(entityType);
+    Variable variable = table.getVariable(name);
 
     ByteArrayOutputStream values = new ByteArrayOutputStream();
     CSVWriter writer = null;
@@ -161,15 +163,16 @@ public class IdentifiersMappingUnitResource extends AbstractIdentifiersResource 
   @Produces("text/plain")
   @AuthenticatedByCookie
   @ApiOperation(value = "Get identifiers in plain text", produces = "text/plain")
-  public Response getVectorValues() throws MagmaRuntimeException, IOException {
-    ValueTable table = getValueTable();
-    Variable variable = table.getVariable(unit);
+  public Response getVectorValues(@QueryParam("type") @DefaultValue("Participant") String entityType)
+      throws MagmaRuntimeException, IOException {
+    ValueTable table = getValueTable(entityType);
+    Variable variable = table.getVariable(name);
 
     ByteArrayOutputStream values = new ByteArrayOutputStream();
     Writer writer = null;
     try {
       writer = new PrintWriter(values);
-      writePlainValues(writer);
+      writePlainValues(writer, table);
     } finally {
       if(writer != null) writer.close();
     }
@@ -182,17 +185,20 @@ public class IdentifiersMappingUnitResource extends AbstractIdentifiersResource 
   // Private methods
   //
 
-  private Iterable<FunctionalUnitIdentifiers.UnitIdentifier> getUnitIdentifiers() {
-    return Iterables.filter(new FunctionalUnitIdentifiers(getValueTable(),unit), new Predicate<FunctionalUnitIdentifiers.UnitIdentifier>() {
-      @Override
-      public boolean apply(@Nullable FunctionalUnitIdentifiers.UnitIdentifier input) {
-        return input.hasUnitIdentifier();
-      }
-    });
+  private Iterable<FunctionalUnitIdentifiers.UnitIdentifier> getUnitIdentifiers(String entityType) {
+    return Iterables.filter(new FunctionalUnitIdentifiers(getValueTable(entityType), name),
+        new Predicate<FunctionalUnitIdentifiers.UnitIdentifier>() {
+          @Override
+          public boolean apply(@Nullable FunctionalUnitIdentifiers.UnitIdentifier input) {
+            return input.hasUnitIdentifier();
+          }
+        });
   }
 
-  private ValueTable getValueTable() {
-    ValueTable table = getValueTable(entityType);
+  @Override
+  @NotNull
+  protected ValueTable getValueTable(String entityType) {
+    ValueTable table = super.getValueTable(entityType);
     if(table == null) throw new NoSuchElementException("No identifiers mapping found for entity type: " + entityType);
     return table;
   }
@@ -200,13 +206,13 @@ public class IdentifiersMappingUnitResource extends AbstractIdentifiersResource 
   private void writeCSVValues(CSVWriter writer, ValueTable table, Variable variable) {
     // header
     writer.writeNext(new String[] { table.getEntityType(), variable.getName() });
-    for (FunctionalUnitIdentifiers.UnitIdentifier unitId : getUnitIdentifiers()) {
+    for(FunctionalUnitIdentifiers.UnitIdentifier unitId : getUnitIdentifiers(table.getEntityType())) {
       writer.writeNext(new String[] { unitId.getOpalIdentifier(), unitId.getUnitIdentifier() });
     }
   }
 
-  private void writePlainValues(Writer writer) throws IOException {
-    for (FunctionalUnitIdentifiers.UnitIdentifier unitId : getUnitIdentifiers()) {
+  private void writePlainValues(Writer writer, ValueTable table) throws IOException {
+    for(FunctionalUnitIdentifiers.UnitIdentifier unitId : getUnitIdentifiers(table.getEntityType())) {
       writer.write(unitId.getUnitIdentifier() + "\n");
     }
   }

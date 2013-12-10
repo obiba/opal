@@ -27,9 +27,8 @@ public abstract class AbstractIdentifiersResource {
    * @param entityType
    * @return
    */
-  protected
   @Nullable
-  ValueTable getValueTable(@NotNull String entityType) {
+  protected ValueTable getValueTable(@NotNull String entityType) {
     for(ValueTable table : getDatasource().getValueTables()) {
       if(table.getEntityType().toLowerCase().equals(entityType.toLowerCase())) {
         return table;
