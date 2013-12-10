@@ -13,7 +13,6 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseResources;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.magma.createdatasource.presenter.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
@@ -31,6 +30,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallbacks;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.database.SqlSettingsDto;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
@@ -154,7 +154,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   private void updateFormatChooser() {
     // Remove LimeSurvey and/or JDBC formats if no database of those types exists
-    ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder().forResource(DatabaseResources.sqlDatabases())
+    ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder()
+        .forResource(UriBuilders.DATABASES_SQL.create().build())
         .withCallback(new ResourceCallback<JsArray<DatabaseDto>>() {
 
           @Override
@@ -376,7 +377,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       if(formatStepPresenter.validate()) {
         return true;
       } else {
-        for (Map.Entry<HasType<ControlGroupType>, String> entry : csvFormatStepPresenter.getErrors().entrySet()) {
+        for(Map.Entry<HasType<ControlGroupType>, String> entry : csvFormatStepPresenter.getErrors().entrySet()) {
           getView().showError(entry.getValue(), entry.getKey());
         }
       }

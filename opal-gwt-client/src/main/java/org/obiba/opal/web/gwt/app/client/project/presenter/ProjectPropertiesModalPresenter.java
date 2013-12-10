@@ -5,7 +5,6 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.administration.database.presenter.DatabaseResources;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -64,7 +63,7 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
     super.onBind();
     validationHandler = new ProjectValidationHandler();
     ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
-        .forResource(DatabaseResources.storageDatabases()) //
+        .forResource(UriBuilders.DATABASES_FOR_STORAGE.create().build()) //
         .withCallback(new ResourceCallback<JsArray<DatabaseDto>>() {
           @Override
           public void onResource(Response response, JsArray<DatabaseDto> databases) {
@@ -91,7 +90,7 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
       // Validate database connection
       final String name = getView().getDatabase().getText();
       ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
-          .forResource(DatabaseResources.database(name, "connections")) //
+          .forResource(UriBuilders.DATABASE_CONNECTIONS.create().build(name)) //
           .withCallback(Response.SC_OK, new CreateProjectCallback()) //
           .withCallback(new ResponseCodeCallback() {
             @Override

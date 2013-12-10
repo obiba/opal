@@ -24,6 +24,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFac
 import org.obiba.opal.web.gwt.rest.client.ResourceDataProvider;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
@@ -55,7 +56,7 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
   private final AuthorizationPresenter authorizationPresenter;
 
   private final ResourceDataProvider<DatabaseDto> resourceDatabasesProvider = new ResourceDataProvider<DatabaseDto>(
-      DatabaseResources.databasesWithSettings());
+      UriBuilders.DATABASES_WITH_SETTINGS.create().build());
 
   private Command confirmedCommand;
 
@@ -74,7 +75,7 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
   @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
     ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-        .forResource(DatabaseResources.databases()) //
+        .forResource(UriBuilders.DATABASES.create().build()) //
         .authorize(event == null
             ? new ListDatabasesAuthorization()
             : new CompositeAuthorizer(event.getHasAuthorization(), new ListDatabasesAuthorization())) //
@@ -88,7 +89,7 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
 
   public void authorize(HasAuthorization authorizer) {
     ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-        .forResource(DatabaseResources.databases()) //
+        .forResource(UriBuilders.DATABASES.create().build()) //
         .authorize(authorizer) //
         .get().send();
   }
@@ -150,7 +151,7 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
     });
 
     authorizationPresenter
-        .setAclRequest("databases", new AclRequest(AclAction.DATABASES_ALL, DatabaseResources.databases()));
+        .setAclRequest("databases", new AclRequest(AclAction.DATABASES_ALL, UriBuilders.DATABASES.create().build()));
   }
 
   private void refresh() {
@@ -187,7 +188,7 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
     @Override
     public void execute() {
       ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
-          .forResource(DatabaseResources.database(dto.getName())) //
+          .forResource(UriBuilders.DATABASE.create().build(dto.getName())) //
           .withCallback(Response.SC_OK, new ResponseCodeCallback() {
 
             @Override

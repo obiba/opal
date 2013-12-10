@@ -19,6 +19,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.database.MongoDbSettingsDto;
 import org.obiba.opal.web.model.client.database.SqlSettingsDto;
@@ -125,7 +126,7 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
   @Override
   public void deleteDatabase() {
     ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
-        .forResource(DatabaseResources.database(databaseDto.getName())) //
+        .forResource(UriBuilders.DATABASE.create().build(databaseDto.getName())) //
         .withCallback(Response.SC_OK, new ResponseCodeCallback() {
 
           @Override
@@ -149,7 +150,7 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
 
   private void refresh() {
     ResourceRequestBuilderFactory.<DatabaseDto>newBuilder() //
-        .forResource(DatabaseResources.identifiersDatabase()) //
+        .forResource(UriBuilders.DATABASE_IDENTIFIERS.create().build()) //
         .withCallback(new ResourceCallback<DatabaseDto>() {
           @Override
           public void onResource(Response response, @Nullable DatabaseDto dto) {
@@ -188,6 +189,7 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
   public interface Display extends View, HasUiHandlers<IdentifiersDatabaseUiHandlers> {
 
     void setDatabase(@Nullable DatabaseDto database);
+
     void enableDeletion(boolean value);
   }
 

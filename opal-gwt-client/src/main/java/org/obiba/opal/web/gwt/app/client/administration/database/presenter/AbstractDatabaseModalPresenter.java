@@ -11,6 +11,7 @@ import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
 
 import com.google.gwt.core.client.GWT;
@@ -183,7 +184,7 @@ public abstract class AbstractDatabaseModalPresenter<TView extends AbstractDatab
     if(validationHandler.validate()) {
       final DatabaseDto dto = getDto();
       ResourceRequestBuilderFactory.newBuilder() //
-          .forResource(DatabaseResources.database(dto.getName())) //
+          .forResource(UriBuilders.DATABASE.create().build(dto.getName())) //
           .withResourceBody(DatabaseDto.stringify(dto)) //
           .withCallback(SC_OK, new ResponseCodeCallback() {
             @Override
@@ -201,7 +202,7 @@ public abstract class AbstractDatabaseModalPresenter<TView extends AbstractDatab
     if(validationHandler.validate()) {
       final DatabaseDto dto = getDto();
       ResourceRequestBuilderFactory.newBuilder() //
-          .forResource(DatabaseResources.databases()) //
+          .forResource(UriBuilders.DATABASES.create().build()) //
           .withResourceBody(DatabaseDto.stringify(dto)) //
           .withCallback(SC_OK, new ResponseCodeCallback() {
             @Override

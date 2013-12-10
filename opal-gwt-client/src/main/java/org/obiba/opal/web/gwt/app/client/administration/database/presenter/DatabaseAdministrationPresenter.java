@@ -20,6 +20,7 @@ import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.opal.AclAction;
@@ -89,12 +90,12 @@ public class DatabaseAdministrationPresenter extends
   @Override
   public void authorize(HasAuthorization authorizer) {
     ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-        .forResource(DatabaseResources.sqlDatabases()) //
+        .forResource(UriBuilders.DATABASES_SQL.create().build()) //
         .authorize(authorizer) //
         .get().send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder() //
-        .forResource(DatabaseResources.mongoDatabases()) //
+        .forResource(UriBuilders.DATABASES_MONGO_DB.create().build()) //
         .authorize(authorizer) //
         .get().send();
   }
@@ -112,12 +113,12 @@ public class DatabaseAdministrationPresenter extends
     setInSlot(Slot.IDENTIFIERS, identifiersDatabasePresenter);
     setInSlot(Slot.DATA, dataDatabasesPresenter);
     authorizationPresenter
-        .setAclRequest("databases", new AclRequest(AclAction.DATABASES_ALL, DatabaseResources.databases()));
+        .setAclRequest("databases", new AclRequest(AclAction.DATABASES_ALL, UriBuilders.DATABASES.create().build()));
   }
 
   static void testConnection(EventBus eventBus, String database) {
     ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
-        .forResource(DatabaseResources.database(database, "connections")) //
+        .forResource(UriBuilders.DATABASE_CONNECTIONS.create().build(database)) //
         .withCallback(Response.SC_OK, new TestConnectionSuccessCallback(eventBus, database)) //
         .withCallback(Response.SC_SERVICE_UNAVAILABLE, new TestConnectionFailCallback(eventBus)) //
         .post().send();
