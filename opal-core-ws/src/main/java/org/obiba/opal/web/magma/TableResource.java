@@ -159,34 +159,6 @@ public interface TableResource {
       @FormParam("script") String scriptFP, //
       @FormParam("category") List<String> categoriesFP);
 
-  /**
-   * Get the non-null values of a variable's vector in CSV format.
-   *
-   * @param variableName
-   * @return
-   * @throws MagmaRuntimeException
-   * @throws IOException
-   */
-  @GET
-  @Path("/vector/{variable}/csv")
-  @Produces("text/csv")
-  @AuthenticatedByCookie
-  Response getVectorCSVValues(@PathParam("variable") String variableName) throws MagmaRuntimeException, IOException;
-
-  /**
-   * Get the non-null values of a variable's vector in plain format.
-   *
-   * @param variableName
-   * @return
-   * @throws MagmaRuntimeException
-   * @throws IOException
-   */
-  @GET
-  @Path("/vector/{variable}")
-  @Produces("text/plain")
-  @AuthenticatedByCookie
-  Response getVectorValues(@PathParam("variable") String variableName) throws MagmaRuntimeException, IOException;
-
   @Path("/compare")
   CompareResource getTableCompare();
 

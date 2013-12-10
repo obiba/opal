@@ -76,11 +76,16 @@ public class FunctionalUnitIdentifiers implements Iterable<FunctionalUnitIdentif
 
   private final ValueTable identifiersTable;
 
-  private final FunctionalUnit unit;
+  private final String variableName;
 
   public FunctionalUnitIdentifiers(ValueTable identifiers, FunctionalUnit unit) {
     identifiersTable = identifiers;
-    this.unit = unit;
+    variableName = unit.getKeyVariableName();
+  }
+
+  public FunctionalUnitIdentifiers(ValueTable identifiers, String variableName) {
+    identifiersTable = identifiers;
+    this.variableName = variableName;
   }
 
   public Iterable<VariableEntity> getUnitEntities() {
@@ -103,10 +108,9 @@ public class FunctionalUnitIdentifiers implements Iterable<FunctionalUnitIdentif
       private final Iterator<Value> unitIdentifiers;
 
       {
-        TreeSet<VariableEntity> entities = new TreeSet<>(identifiersTable.getVariableEntities());
-        unitIdentifiers = identifiersTable.hasVariable(unit.getKeyVariableName())
-            ? identifiersTable.getVariableValueSource(unit.getKeyVariableName()).asVectorSource().getValues(entities)
-            .iterator()
+        TreeSet<VariableEntity> entities = new TreeSet<VariableEntity>(identifiersTable.getVariableEntities());
+        unitIdentifiers = identifiersTable.hasVariable(variableName)
+            ? identifiersTable.getVariableValueSource(variableName).asVectorSource().getValues(entities).iterator()
             : Iterables.cycle(TextType.get().nullValue()).iterator();
         opalEntities = entities.iterator();
       }

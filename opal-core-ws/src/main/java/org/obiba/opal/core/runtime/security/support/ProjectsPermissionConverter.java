@@ -142,7 +142,6 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
         String[] args = isView ? args(node, "/datasource/(.+)/view/(.+)") : args(node, "/datasource/(.+)/table/(.+)");
 
         List<String> perms = Lists.newArrayList(toRest("/datasource/{0}/table/{1}/valueSet", "GET:GET/GET", args),//
-            toRest("/datasource/{0}/table/{1}/vector", "GET:GET/GET", args),//
             toRest("/datasource/{0}/table/{1}/entities", "GET", args),//
             toRest("/datasource/{0}/table/{1}/index", "GET:GET/GET", args), //
             toRest("/datasource/{0}/table/{1}/index/_search", "GET", args),//
