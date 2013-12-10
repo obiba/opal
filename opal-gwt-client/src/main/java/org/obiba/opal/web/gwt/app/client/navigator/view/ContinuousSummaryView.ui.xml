@@ -85,11 +85,6 @@
         <td>
           <g:Label addStyleNames="small-indent {style.title}" ui:field="sum">Sum</g:Label>
         </td>
-        <td class="{style.title-light}"><ui:msg description="Sum of squares">Sum of squares</ui:msg>:
-        </td>
-        <td>
-          <g:Label addStyleNames="small-indent {style.title}" ui:field="sumsq">sumsq</g:Label>
-        </td>
       </tr>
     </table>
     <div id="plot-container">

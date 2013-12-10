@@ -67,9 +67,6 @@ public class ContinuousSummaryView extends Composite {
   Label sum;
 
   @UiField
-  Label sumsq;
-
-  @UiField
   DivElement histogramElement;
 
   @UiField
@@ -99,7 +96,6 @@ public class ContinuousSummaryView extends Composite {
     skewness.setText("" + descriptiveStats.getSkewness());
     kurtosis.setText("" + descriptiveStats.getKurtosis());
     sum.setText("" + descriptiveStats.getSum());
-    sumsq.setText("" + descriptiveStats.getSumsq());
 
     if(descriptiveStats.getVariance() > 0) {
       histogram = new HistogramPlot(histogramElement.getId(), descriptiveStats.getMin(), descriptiveStats.getMax());
