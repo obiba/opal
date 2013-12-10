@@ -39,7 +39,7 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
 
   public static final String NULL_NAME = "N/A";
 
-  private final org.apache.commons.math.stat.Frequency frequencyDist = new org.apache.commons.math.stat.Frequency();
+  private final org.apache.commons.math3.stat.Frequency frequencyDist = new org.apache.commons.math3.stat.Frequency();
 
   @Nonnull
   private final Variable variable;
@@ -120,7 +120,7 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
   /**
    * Returns an iterator of frequencyDist names
    */
-  private Iterator<String> freqNames(org.apache.commons.math.stat.Frequency freq) {
+  private Iterator<String> freqNames(org.apache.commons.math3.stat.Frequency freq) {
     return Iterators.transform(freq.valuesIterator(), new Function<Comparable<?>, String>() {
 
       @Override

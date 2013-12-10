@@ -17,11 +17,10 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.apache.commons.math.MathException;
-import org.apache.commons.math.distribution.ContinuousDistribution;
-import org.apache.commons.math.distribution.ExponentialDistributionImpl;
-import org.apache.commons.math.distribution.NormalDistributionImpl;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.distribution.ExponentialDistribution;
+import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.distribution.RealDistribution;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.obiba.magma.Category;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSource;
@@ -142,13 +141,10 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
       intervalFrequencies.add(interval);
     }
 
-    ContinuousDistribution cd = distribution.getDistribution(descriptiveStats);
+    RealDistribution cd = distribution.getDistribution(descriptiveStats);
     for(Double p : defaultPercentiles) {
       percentiles.add(descriptiveStats.getPercentile(p));
-      try {
-        if(cd != null) distributionPercentiles.add(cd.inverseCumulativeProbability(p / 100d));
-      } catch(MathException ignored) {
-      }
+      if(cd != null) distributionPercentiles.add(cd.inverseCumulativeProbability(p / 100d));
     }
   }
 
@@ -195,22 +191,20 @@ public class ContinuousVariableSummary extends AbstractVariableSummary implement
     normal {
       @Nullable
       @Override
-      public ContinuousDistribution getDistribution(DescriptiveStatistics ds) {
-        return ds.getStandardDeviation() > 0
-            ? new NormalDistributionImpl(ds.getMean(), ds.getStandardDeviation())
-            : null;
+      public RealDistribution getDistribution(DescriptiveStatistics ds) {
+        return ds.getStandardDeviation() > 0 ? new NormalDistribution(ds.getMean(), ds.getStandardDeviation()) : null;
       }
     },
     exponential {
       @Nonnull
       @Override
-      public ContinuousDistribution getDistribution(DescriptiveStatistics ds) {
-        return new ExponentialDistributionImpl(ds.getMean());
+      public RealDistribution getDistribution(DescriptiveStatistics ds) {
+        return new ExponentialDistribution(ds.getMean());
       }
     };
 
     @Nullable
-    abstract ContinuousDistribution getDistribution(DescriptiveStatistics ds);
+    abstract RealDistribution getDistribution(DescriptiveStatistics ds);
 
   }
 
