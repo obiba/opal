@@ -38,14 +38,20 @@
       <b:Column size="9">
         <b:ControlGroup>
           <b:Controls>
-            <b:Heading size="4" ui:field="principal"></b:Heading>
-            <b:Button type="DANGER" ui:field="deleteAll" addStyleNames="pull-right">
-              <ui:msg description="Delete All label">Delete All</ui:msg>
-            </b:Button>
-            <b:SimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right small-top-margin"/>
+            <b:FluidRow addStyleNames="no-bottom-margin">
+              <b:Column size="3">
+                <b:Heading size="4" ui:field="principal"></b:Heading>
+              </b:Column>
+              <b:Column size="9">
+                <b:Button type="DANGER" ui:field="deleteAll" addStyleNames="pull-right">
+                  <ui:msg description="Delete All label">Delete All</ui:msg>
+                </b:Button>
+                <b:SimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
+              </b:Column>
+            </b:FluidRow>
           </b:Controls>
         </b:ControlGroup>
-        <o:Table ui:field="permissionsTable" addStyleNames="large-top-margin"/>
+        <o:Table ui:field="permissionsTable"/>
       </b:Column>
     </b:FluidRow>
 

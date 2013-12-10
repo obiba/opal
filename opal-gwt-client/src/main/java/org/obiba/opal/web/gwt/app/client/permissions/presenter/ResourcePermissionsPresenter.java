@@ -91,7 +91,7 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
 
   @Override
   public void addPersmission() {
-    addModalProvider.get().initialize(resourceType, this);
+    addModalProvider.get().initialize(resourceType, this, getView().getAclList());
   }
 
   @Override
@@ -140,6 +140,8 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
   public interface Display extends View, HasUiHandlers<ResourcePermissionsUiHandlers> {
     void setData(@Nonnull ResourcePermissionType resourceType, @Nonnull List<Acl> acls);
     HasActionHandler<Acl> getActions();
+
+    List<Acl> getAclList();
   }
 
 }

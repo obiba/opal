@@ -77,6 +77,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Type")
   String typeLabel();
 
+  @Description("Permission label")
+  @DefaultStringValue("Permission")
+  String permissionLabel();
+
+  @Description("Resource label")
+  @DefaultStringValue("Resource")
+  String resourceLabel();
+
   @Description("User label")
   @DefaultStringValue("User")
   String userLabel();
@@ -543,7 +551,9 @@ public interface Translations extends Constants {
       "ESQueryBadRequest", "Not a valid search query.", "DuplicateUserName", "A user with same name already exists.",
       "DuplicateSubjectProfile", "A user or application profile is already registered with the same name.",//
       "AttributeNameIsRequired", "An attribute name is required",//
-      "PermissionRequired", "You must select a at most one permission type."//
+      "PermissionRequired", "You must select a at most one permission type.",//
+      "DuplicateAclSubjectUser", "User '{0}' already exists, please choose a unique name.",//
+      "DuplicateAclSubjectGroup", "Group '{0}' already exists, please choose a unique name."//
   })
   Map<String, String> userMessageMap();
 

@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.permissions.presenter;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -22,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
+import org.obiba.opal.web.model.client.opal.Acl;
 import org.obiba.opal.web.model.client.opal.Subject;
 
 import com.google.gwt.user.client.TakesValue;
@@ -37,6 +39,8 @@ public class AddResourcePermissionModalPresenter
 
   private UpdateResourcePermissionHandler updateHandler;
 
+  private List<Acl> currentAclList;
+
   @Inject
   public AddResourcePermissionModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
@@ -45,9 +49,11 @@ public class AddResourcePermissionModalPresenter
     getView().getSubjectType().setValue(Subject.SubjectType.GROUP.getName());
   }
 
-  public void initialize(@Nonnull ResourcePermissionType type, @Nonnull UpdateResourcePermissionHandler updateHandler) {
+  public void initialize(@Nonnull ResourcePermissionType type, @Nonnull UpdateResourcePermissionHandler updateHandler,
+      List<Acl> currentAclList) {
     getView().setData(type);
     this.updateHandler = updateHandler;
+    this.currentAclList = currentAclList;
   }
 
   @Override
@@ -73,6 +79,9 @@ public class AddResourcePermissionModalPresenter
           new RequiredTextValidator(getView().getPrincipal(), "NameIsRequired", Display.FormField.PRINCIPAL.name()));
       validators.add(
           new PermissionValidator(getView().getPermission(), "PermissionRequired", Display.FormField.PERMISSIONS.name()));
+      validators.add(
+          new DuplicateSubjectValidator(getView().getPrincipal().getText(), getView().getSubjectType().getValue(),
+              Display.FormField.PERMISSIONS.name()));
       return validators;
     }
 
@@ -94,6 +103,34 @@ public class AddResourcePermissionModalPresenter
     @Override
     protected boolean hasError() {
       return permission == null;
+    }
+  }
+
+  private final class DuplicateSubjectValidator extends AbstractFieldValidator {
+
+    private final String principal;
+    private final Subject.SubjectType type;
+
+    public DuplicateSubjectValidator(String principal, String typeName, String id) {
+      super("", id);
+      this.principal = principal;
+      type = Subject.SubjectType.USER.getName().equals(typeName) ? Subject.SubjectType.USER : Subject.SubjectType.GROUP;
+      setErrorMessageKey(
+          Subject.SubjectType.USER.isSubjectType(type) ? "DuplicateAclSubjectUser" : "DuplicateAclSubjectGroup");
+      setArgs(Arrays.asList(principal));
+    }
+
+    @Override
+    protected boolean hasError() {
+
+      for (Acl acl : currentAclList) {
+        Subject subject = acl.getSubject();
+        if (subject.getPrincipal().equals(principal) && subject.getType().isSubjectType(type)) {
+          return true;
+        }
+      }
+
+      return false;
     }
   }
 

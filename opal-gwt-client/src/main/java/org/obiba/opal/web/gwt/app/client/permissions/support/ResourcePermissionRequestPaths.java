@@ -14,6 +14,9 @@ import javax.annotation.Nonnull;
 
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 
+import com.google.gwt.regexp.shared.MatchResult;
+import com.google.gwt.regexp.shared.RegExp;
+
 public final class ResourcePermissionRequestPaths {
 
   private ResourcePermissionRequestPaths() {}
@@ -34,8 +37,8 @@ public final class ResourcePermissionRequestPaths {
     return baseUri(project).segment("subject", subject).build();
   }
 
-  public static String projectNode(@Nonnull String project, @Nonnull String nodePath) {
-    return baseUri(project).fromPath(nodePath).build();
+  public static String projectNode(ResourcePermissionType type, @Nonnull String project, @Nonnull String nodePath) {
+    return baseUri(project).fromPath(normalizeNodePath(type, nodePath)).build();
   }
 
   public static String datasourcePermissions(@Nonnull String project) {
@@ -57,6 +60,37 @@ public final class ResourcePermissionRequestPaths {
 
   private static UriBuilder baseUri(String project) {
     return UriBuilder.create().segment("project", project, "permissions");
+  }
+
+  private static String normalizeNodePath(ResourcePermissionType type, String nodePath) {
+    RegExp re = null;
+
+    switch(type) {
+      case PROJECT:
+        re = RegExp.compile("(\\/project)\\/\\w+$");
+        break;
+      case DATASOURCE:
+        re = RegExp.compile("(\\/datasource)\\/\\w+$");
+        break;
+      case TABLE:
+        re = RegExp.compile("(\\/table\\/\\w+)$");
+        break;
+      case VARIABLE:
+        re = RegExp.compile("(\\/table\\/\\w+\\/variable\\/\\w+[\\.]*\\w*)$");
+        break;
+      case REPORT_TEMPLATE:
+        re = RegExp.compile("(\\/report-template)\\/\\w+$");
+        break;
+    }
+
+    if (re != null) {
+      MatchResult result = re.exec(nodePath);
+      if (result != null && result.getGroupCount() > 1) {
+         return result.getGroup(1);
+      }
+    }
+
+    return nodePath;
   }
 
 }

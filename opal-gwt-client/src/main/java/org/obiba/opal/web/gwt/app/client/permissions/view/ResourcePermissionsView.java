@@ -71,6 +71,11 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
     return SubjectsPermissionColumns.ACTIONS;
   }
 
+  @Override
+  public List<Acl> getAclList() {
+    return permissionsDataProvider.getList();
+  }
+
   @UiHandler("addPermission")
   public void onAddPermissionClickec(ClickEvent event) {
     getUiHandlers().addPersmission();
@@ -85,9 +90,9 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
 
   private void initSubjectsPermissionTable() {
     tablePager.setDisplay(permissionsTable);
-    permissionsTable.addColumn(SubjectsPermissionColumns.NAME, "Name");
-    permissionsTable.addColumn(SubjectsPermissionColumns.TYPE, "Type");
-    permissionsTable.addColumn(SubjectsPermissionColumns.PERMISSION, "Permission");
+    permissionsTable.addColumn(SubjectsPermissionColumns.NAME, translations.nameLabel());
+    permissionsTable.addColumn(SubjectsPermissionColumns.TYPE, translations.typeLabel());
+    permissionsTable.addColumn(SubjectsPermissionColumns.PERMISSION, translations.permissionLabel());
     permissionsTable.addColumn(SubjectsPermissionColumns.ACTIONS, translations.actionsLabel());
     permissionsDataProvider.addDataDisplay(permissionsTable);
   }
@@ -115,10 +120,11 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
       @Override
       public String getValue(Acl acl) {
         String permissionKey = acl.getActions(0);
-        StringBuilder builder = new StringBuilder();
-        return builder.append(translations.permissionMap().get(permissionKey))//
-          .append("\n")//
-          .append(translations.permissionExplanationMap().get(permissionKey)).toString();
+        return permissionKey;
+//        StringBuilder builder = new StringBuilder();
+//        return builder.append(translations.permissionMap().get(permissionKey))//
+//          .append("\n")//
+//          .append(translations.permissionExplanationMap().get(permissionKey)).toString();
       }
     };
 

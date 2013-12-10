@@ -35,6 +35,18 @@ public enum ResourcePermissionType {
     return false;
   }
 
+  public static ResourcePermissionType getTypeByPermission(String permission) {
+    for (ResourcePermissionType type : ResourcePermissionType.values()) {
+      for (AclAction action : type.permissions) {
+        if (action.getName().equals(permission)) {
+          return type;
+        }
+      }
+    }
+
+    throw new IllegalArgumentException("AclAction is invalid");
+  }
+
   public int count() {
     return permissions.size();
   }

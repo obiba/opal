@@ -88,7 +88,9 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
   public void deletePersmission(Acl acl) {
     final Subject subject = acl.getSubject();
     String principal = subject.getPrincipal();
-    String requestPath = ResourcePermissionRequestPaths.projectNode(project.getName(), acl.getResource());
+    String requestPath = ResourcePermissionRequestPaths
+        .projectNode(ResourcePermissionType.getTypeByPermission(acl.getActions(0)), project.getName(),
+            acl.getResource());
     String uri = UriBuilder.create().fromPath(requestPath)
         .query(ResourcePermissionRequestPaths.PRINCIPAL_QUERY_PARAM, principal)
         .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, subject.getType().getName()).build();
@@ -104,7 +106,7 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
   }
 
   @Override
-  public void deleteAllPermissions(Subject subject) {
+  public void deleteAllPermissions(final Subject subject) {
     String requestPath = ResourcePermissionRequestPaths.projectSubject(project.getName(), subject.getPrincipal());
     String uri = UriBuilder.create().fromPath(requestPath)
         .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, subject.getType().getName()).build();
@@ -114,7 +116,7 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
         .withCallback(Response.SC_OK, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
-            retrievePermissions();
+            selectSubject(subject);
           }
         }).send();
   }

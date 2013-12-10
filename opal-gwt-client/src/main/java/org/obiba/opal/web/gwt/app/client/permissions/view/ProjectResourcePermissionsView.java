@@ -105,8 +105,8 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
 
   private void initPermissionTable() {
     tablePager.setDisplay(permissionsTable);
-    permissionsTable.addColumn(ProjectPermissionColumns.RESOURCE, "Name");
-    permissionsTable.addColumn(ProjectPermissionColumns.PERMISSION, "Permission");
+    permissionsTable.addColumn(ProjectPermissionColumns.RESOURCE, translations.resourceLabel());
+    permissionsTable.addColumn(ProjectPermissionColumns.PERMISSION, translations.permissionLabel());
     permissionsTable.addColumn(ProjectPermissionColumns.ACTIONS, translations.actionsLabel());
     permissionsDataProvider.addDataDisplay(permissionsTable);
   }
@@ -156,10 +156,11 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
       @Override
       public String getValue(Acl acl) {
         String permissionKey = acl.getActions(0);
-        StringBuilder builder = new StringBuilder();
-        return builder.append(translations.permissionMap().get(permissionKey))//
-            .append("\n")//
-            .append(translations.permissionExplanationMap().get(permissionKey)).toString();
+        return permissionKey;
+//        StringBuilder builder = new StringBuilder();
+//        return builder.append(translations.permissionMap().get(permissionKey))//
+//            .append("\n")//
+//            .append(translations.permissionExplanationMap().get(permissionKey)).toString();
       }
     };
 
