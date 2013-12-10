@@ -114,7 +114,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private Runnable removeConfirmation;
 
-  @SuppressWarnings("ConstructorWithTooManyParameters")
+  @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
   @Inject
   public VariablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
       ValuesTablePresenter valuesTablePresenter, SummaryTabPresenter summaryTabPresenter,
@@ -663,9 +663,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
       authz.setAclRequest("variable", new AclRequest(AclAction.VARIABLE_READ, node));
 
       ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
-      resourcePermissionsPresenter.initialize(ResourcePermissionType.VARIABLE,
-          ResourcePermissionRequestPaths
-              .variablePermissions(table.getDatasourceName(), table.getName(), variable.getName()));
+      resourcePermissionsPresenter.initialize(ResourcePermissionType.VARIABLE, ResourcePermissionRequestPaths
+          .variablePermissions(table.getDatasourceName(), table.getName(), variable.getName()));
       setInSlot(Display.Slots.Permissions, resourcePermissionsPresenter);
     }
   }
