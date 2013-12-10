@@ -9,6 +9,11 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.ui.celltable;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 
@@ -22,6 +27,19 @@ public class CategoryAttributeColumn extends AttributeColumn<CategoryDto> {
 
   @Override
   protected JsArray<AttributeDto> getAttributes(CategoryDto object) {
-    return object.getAttributesArray();
+    List<AttributeDto> attributeDtos = JsArrays.toList(object.getAttributesArray());
+    Collections.sort(attributeDtos, new Comparator<AttributeDto>() {
+      @Override
+      public int compare(AttributeDto attributeDto, AttributeDto attributeDto2) {
+        return attributeDto.getLocale().compareTo(attributeDto2.getLocale());
+      }
+    });
+
+    JsArray<AttributeDto> sorted = JsArrays.create().cast();
+
+    for(AttributeDto attributeDto : attributeDtos) {
+      sorted.push(attributeDto);
+    }
+    return sorted;
   }
 }

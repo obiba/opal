@@ -9,20 +9,25 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariableUiHandlers;
+import org.obiba.opal.web.gwt.app.client.magma.variable.view.NamespacedAttributesTable;
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
-import org.obiba.opal.web.gwt.app.client.ui.AttributesTablesPanel;
 import org.obiba.opal.web.gwt.app.client.ui.TabDeckPanel;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
+import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
-import org.obiba.opal.web.model.client.opal.LocaleDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CodeBlock;
@@ -116,7 +121,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   JsArrayDataProvider<CategoryDto> categoryProvider = new JsArrayDataProvider<CategoryDto>();
 
   @UiField
-  AttributesTablesPanel attributesTables;
+  Panel attributesPanel;
 
   @UiField
   Panel summary;
@@ -172,8 +177,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   @UiField
   Panel permissionsPanel;
 
-  private JsArray<LocaleDto> languages;
-
   private final Translations translations;
 
   @Inject
@@ -182,8 +185,8 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     categoryTable = new CategoriesTable();
 
     initWidget(uiBinder.createAndBindUi(this));
-
     initCategoryTable();
+
     tabPanel.addShownHandler(new TabPanel.ShownEvent.Handler() {
       @Override
       public void onShow(TabPanel.ShownEvent event) {
@@ -326,11 +329,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   }
 
   @Override
-  public void renderAttributeRows(VariableDto variableDto) {
-    attributesTables.renderRows(variableDto);
-  }
-
-  @Override
   public String getComment() {
     String commentText = comment.getText();
     String placeholder = comment.getPlaceholder();
@@ -352,8 +350,24 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   //
 
   @Override
-  public void setLanguages(JsArray<LocaleDto> languages) {
-    this.languages = languages;
+  public void renderAttributeRows(VariableDto variableDto) {
+    attributesPanel.clear();
+
+    List<String> namespaces = new ArrayList<String>();
+    JsArray<AttributeDto> attributesArray = JsArrays.toSafeArray(variableDto.getAttributesArray());
+    for(int i = 0; i < attributesArray.length(); i++) {
+      String namespace = attributesArray.get(i).getNamespace();
+      if(!namespaces.contains(namespace)) {
+        namespaces.add(namespace);
+      }
+    }
+
+    Collections.sort(namespaces);
+    for(String namespace : namespaces) {
+      NamespacedAttributesTable child = new NamespacedAttributesTable(attributesArray, namespace);
+      child.setUiHandlers(getUiHandlers());
+      attributesPanel.add(child);
+    }
   }
 
   @Override

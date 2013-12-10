@@ -29,6 +29,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEven
 import org.obiba.opal.web.gwt.app.client.magma.event.VcsCommitInfoReceivedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CategoriesEditorModalPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.NamespacedAttributesTableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
@@ -37,6 +38,7 @@ import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionR
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
+import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
 import org.obiba.opal.web.gwt.app.client.support.JSErrorNotificationEventBuilder;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
@@ -48,13 +50,12 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
+import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.opal.AclAction;
-import org.obiba.opal.web.model.client.opal.LocaleDto;
-import org.obiba.opal.web.model.client.opal.VcsCommitInfoDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -78,7 +79,7 @@ import static org.obiba.opal.web.gwt.app.client.magma.variable.presenter.Variabl
 
 @SuppressWarnings("OverlyCoupledClass")
 public class VariablePresenter extends PresenterWidget<VariablePresenter.Display>
-    implements VariableUiHandlers, VariableSelectionChangeEvent.Handler {
+    implements VariableUiHandlers, NamespacedAttributesTableUiHandlers, VariableSelectionChangeEvent.Handler {
 
   private final PlaceManager placeManager;
 
@@ -137,21 +138,16 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   @Override
   public void onVariableSelectionChanged(VariableSelectionChangeEvent event) {
-    resetView(event.getTable());
+    // Prevent this event to be executed twice
+    if(variable == null || !variable.getLink().equals(event.getSelection().getLink())) {
+      resetView(event.getTable());
 
-    if(event.hasTable()) {
-      updateDisplay(event.getTable(), event.getSelection(), event.getPrevious(), event.getNext());
-    } else {
-      updateDisplay(event.getDatasourceName(), event.getTableName(), event.getVariableName());
+      if(event.hasTable()) {
+        updateDisplay(event.getTable(), event.getSelection(), event.getPrevious(), event.getNext());
+      } else {
+        updateDisplay(event.getDatasourceName(), event.getTableName(), event.getVariableName());
+      }
     }
-    ResourceRequestBuilderFactory.<JsArray<LocaleDto>>newBuilder()
-        .forResource(UriBuilders.DATASOURCE_LOCALES.create().build(event.getDatasourceName())).get()
-        .withCallback(new ResourceCallback<JsArray<LocaleDto>>() {
-          @Override
-          public void onResource(Response response, JsArray<LocaleDto> resource) {
-            getView().setLanguages(JsArrays.toSafeArray(resource));
-          }
-        }).send();
   }
 
   @Override
@@ -185,7 +181,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     addRegisteredHandler(VcsCommitInfoReceivedEvent.getType(), new VcsCommitInfoReceivedEvent.Handler() {
       @Override
       public void onVcsCommitInfoReceived(VcsCommitInfoReceivedEvent event) {
-        updateDerivedVariableByCommitInfo(event.getCommitInfoDto());
+        getView().goToEditScript();
+        scriptEditorPresenter.setScript(event.getCommitInfoDto().getBlob());
       }
     });
   }
@@ -265,12 +262,6 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     scriptEditorPresenter.setScript(script);
     scriptEditorPresenter.setRepeatable(variable.getIsRepeatable());
     scriptEditorPresenter.setValueEntityType(variable.getValueType());
-  }
-
-  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
-  private void updateDerivedVariableByCommitInfo(VcsCommitInfoDto commitInfo) {
-    getView().goToEditScript();
-    scriptEditorPresenter.setScript(commitInfo.getBlob());
   }
 
   private void authorize() {
@@ -425,7 +416,6 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   @Override
   public void onAddAttribute() {
-    // TODO
     VariableAttributeModalPresenter attributeEditorPresenter = attributeModalProvider.get();
     attributeEditorPresenter.setDialogMode(Mode.CREATE);
     attributeEditorPresenter.initialize(table, variable);
@@ -442,6 +432,66 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     if(tableChanged(tableDto)) {
       getView().resetTabs();
     }
+  }
+
+  @Override
+  public void onDeleteAttribute(List<JsArray<AttributeDto>> selectedItems) {
+    VariableDto dto = getVariableDto();
+
+    JsArray<AttributeDto> filteredAttributes = JsArrays.create().cast();
+    List<AttributeDto> allAttributes = JsArrays.toList(JsArrays.toSafeArray(dto.getAttributesArray()));
+
+    for(AttributeDto attribute : allAttributes) {
+      boolean keep = true;
+      for(JsArray<AttributeDto> toRemove : selectedItems) {
+        if(attribute.getName().equals(toRemove.get(0).getName())) {
+          keep = false;
+          break;
+        }
+      }
+
+      if(keep) {
+        filteredAttributes.push(attribute);
+      }
+    }
+
+    dto.setAttributesArray(filteredAttributes);
+
+    ResourceRequestBuilderFactory.newBuilder() //
+        .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
+            .build(table.getDatasourceName(), table.getName(), variable.getName())) //
+        .withResourceBody(VariableDto.stringify(dto)) //
+        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            fireEvent(new VariableRefreshEvent());
+          }
+        }) //
+        .withCallback(Response.SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
+        .put().send();
+  }
+
+  private VariableDto getVariableDto() {
+    VariableDto dto = VariableDto.create();
+    dto.setLink(variable.getLink());
+    dto.setIndex(variable.getIndex());
+    dto.setIsNewVariable(variable.getIsNewVariable());
+    dto.setParentLink(variable.getParentLink());
+    dto.setName(variable.getName());
+    dto.setEntityType(variable.getEntityType());
+    dto.setValueType(variable.getValueType());
+    dto.setIsRepeatable(variable.getIsRepeatable());
+    dto.setUnit(variable.getUnit());
+    dto.setReferencedEntityType(variable.getReferencedEntityType());
+    dto.setMimeType(variable.getMimeType());
+    dto.setOccurrenceGroup(variable.getOccurrenceGroup());
+    dto.setAttributesArray(variable.getAttributesArray());
+
+    if(variable.getCategoriesArray() != null) {
+      dto.setCategoriesArray(variable.getCategoriesArray());
+    }
+
+    return dto;
   }
 
   private boolean tableChanged(TableDto tableDto) {
@@ -660,7 +710,7 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   public interface Display extends View, HasUiHandlers<VariableUiHandlers> {
 
-    void setLanguages(JsArray<LocaleDto> languages);
+    void renderAttributeRows(VariableDto variableDto);
 
     enum Slots {
       Permissions, Values, ScriptEditor, History
@@ -677,8 +727,6 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     void setNextName(String name);
 
     void renderCategoryRows(JsArray<CategoryDto> rows);
-
-    void renderAttributeRows(VariableDto variableDto);
 
     void goToEditScript();
 

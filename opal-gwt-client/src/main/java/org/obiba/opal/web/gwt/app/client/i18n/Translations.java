@@ -553,6 +553,7 @@ public interface Translations extends Constants {
       "ESQueryBadRequest", "Not a valid search query.", "DuplicateUserName", "A user with same name already exists.",
       "DuplicateSubjectProfile", "A user or application profile is already registered with the same name.",//
       "AttributeNameIsRequired", "An attribute name is required",//
+      "AttributeAlreadyExists", "An attribute with this namespace and name already exists.",//
       "PermissionRequired", "You must select a at most one permission type.",//
       "DuplicateAclSubjectUser", "User '{0}' already exists, please choose a unique name.",//
       "DuplicateAclSubjectGroup", "Group '{0}' already exists, please choose a unique name."//
@@ -578,6 +579,10 @@ public interface Translations extends Constants {
   @Description("Attributes label")
   @DefaultStringValue("Attributes")
   String attributesLabel();
+
+  @Description("Attribute label")
+  @DefaultStringValue("Attribute")
+  String attributeLabel();
 
   @Description("No Attributes label")
   @DefaultStringValue("No Attributes")
@@ -650,6 +655,10 @@ public interface Translations extends Constants {
   @Description("Delete category label")
   @DefaultStringValue("Delete Category")
   String deleteCategory();
+
+  @Description("Delete label")
+  @DefaultStringValue("Delete")
+  String deleteLabel();
 
   @Description("Confirmation title map")
   @DefaultStringMapValue({ //

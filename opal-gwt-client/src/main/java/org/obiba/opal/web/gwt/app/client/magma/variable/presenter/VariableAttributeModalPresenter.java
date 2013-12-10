@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.VariableRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
 import org.obiba.opal.web.gwt.app.client.ui.LocalizedEditableText;
+import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
@@ -34,6 +35,7 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.opal.LocaleDto;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -100,6 +102,14 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
               .withCallback(Response.SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
               .put().send();
           break;
+        case UPDATE:
+          ResourceRequestBuilderFactory.newBuilder() //
+              .forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create().build()) //
+//              .withResourceBody(UserDto.stringify(userDto)) //
+//              .withCallback(SC_OK, successCallback) //
+//              .withCallback(SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
+              .put().send();
+          break;
       }
     }
   }
@@ -135,7 +145,10 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     dto.setReferencedEntityType(variable.getReferencedEntityType());
     dto.setMimeType(variable.getMimeType());
     dto.setOccurrenceGroup(variable.getOccurrenceGroup());
-    dto.setAttributesArray(variable.getAttributesArray());
+
+    if(variable.getAttributesArray() != null) {
+      dto.setAttributesArray(variable.getAttributesArray());
+    }
 
     if(variable.getCategoriesArray() != null) {
       dto.setCategoriesArray(variable.getCategoriesArray());
@@ -189,15 +202,19 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
       if(validators == null) {
         validators = new LinkedHashSet<FieldValidator>();
 
+//        if(dialogMode == Mode.CREATE) {
         validators.add(
             new RequiredTextValidator(getView().getName(), "AttributeNameIsRequired", Display.FormField.NAME.name()));
+//        }
+        // validate that namespace - name does not already exists
+        validators.add(new UniqueAttributeNameValidator("AttributeAlreadyExists"));
       }
       return validators;
     }
 
     @Override
     protected void showMessage(String id, String message) {
-      getView().showError(Display.FormField.valueOf(id), message);
+      getView().showError(id == null ? null : Display.FormField.valueOf(id), message);
     }
   }
 
@@ -221,6 +238,30 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
     void showError(@Nullable FormField formField, String message);
 
     void clearErrors();
+
+  }
+
+  public class UniqueAttributeNameValidator extends AbstractFieldValidator {
+
+    public UniqueAttributeNameValidator(String errorMessageKey) {
+      super(errorMessageKey, Display.FormField.NAME.name());
+    }
+
+    @Override
+    protected boolean hasError() {
+      String safeNamespace = Strings.nullToEmpty(getView().getNamespace());
+      String safeName = Strings.nullToEmpty(getView().getName().getText());
+
+      // Using the same safeNamespace/safeName as an existing attribute is not permitted.
+      JsArray<AttributeDto> attributesArray = JsArrays.toSafeArray(variable.getAttributesArray());
+      for(int i = 0; i < attributesArray.length(); i++) {
+        AttributeDto dto = attributesArray.get(i);
+        if(safeNamespace.equals(dto.getNamespace()) && safeName.equals(dto.getName())) {
+          return true;
+        }
+      }
+      return false;
+    }
 
   }
 
