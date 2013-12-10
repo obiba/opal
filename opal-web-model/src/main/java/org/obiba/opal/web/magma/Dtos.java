@@ -82,6 +82,7 @@ public final class Dtos {
     };
   }
 
+  @SuppressWarnings("PMD.NcssMethodCount")
   public static VariableDto.Builder asDto(@Nullable LinkDto tableLink, Variable from, @Nullable Integer index) {
     VariableDto.Builder var = VariableDto.newBuilder().setName(from.getName()).setEntityType(from.getEntityType())
         .setValueType(from.getValueType().getName()).setIsRepeatable(from.isRepeatable());
