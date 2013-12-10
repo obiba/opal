@@ -29,7 +29,7 @@ import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.model.client.opal.UserDto;
+import org.obiba.opal.web.model.client.opal.SubjectCredentialsDto;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -87,21 +87,21 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
         }
       };
 
-      UserDto userDto = getDto();
+      SubjectCredentialsDto dto = getDto();
 
       switch(dialogMode) {
         case CREATE:
           ResourceRequestBuilderFactory.newBuilder() //
-              .forResource(UriBuilders.USERS.create().build()) //
-              .withResourceBody(UserDto.stringify(userDto)) //
+              .forResource(UriBuilders.SUBJECT_CREDENTIALS.create().build()) //
+              .withResourceBody(SubjectCredentialsDto.stringify(dto)) //
               .withCallback(SC_OK, callback) //
               .withCallback(SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
               .post().send();
           break;
         case UPDATE:
           ResourceRequestBuilderFactory.newBuilder() //
-              .forResource(UriBuilders.USER.create().build(userDto.getName())) //
-              .withResourceBody(UserDto.stringify(userDto)) //
+              .forResource(UriBuilders.SUBJECT_CREDENTIAL.create().build(dto.getName())) //
+              .withResourceBody(SubjectCredentialsDto.stringify(dto)) //
               .withCallback(SC_OK, callback) //
               .withCallback(SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
               .put().send();
@@ -110,8 +110,8 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
     }
   }
 
-  private UserDto getDto() {
-    UserDto dto = UserDto.create();
+  private SubjectCredentialsDto getDto() {
+    SubjectCredentialsDto dto = SubjectCredentialsDto.create();
     dto.setName(getView().getName().getText());
     dto.setPassword(getView().getPassword().getText());
     dto.setEnabled(true);
@@ -119,9 +119,9 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
     return dto;
   }
 
-  public void setUser(UserDto userDto) {
-    getView().getName().setText(userDto.getName());
-    getView().getGroups().setValue(JsArrays.toList(userDto.getGroupsArray()));
+  public void setSubjectCredentials(SubjectCredentialsDto dto) {
+    getView().getName().setText(dto.getName());
+    getView().getGroups().setValue(JsArrays.toList(dto.getGroupsArray()));
     getView().setNamedEnabled(false);
   }
 
@@ -171,7 +171,6 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
       return new HasBooleanValue() {
         @Override
         public Boolean getValue() {
-
           return password.getText().isEmpty() && confirmPassword.getText().isEmpty() ||
               password.getText().equals(confirmPassword.getText());
 

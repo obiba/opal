@@ -11,25 +11,28 @@ package org.obiba.opal.web.security;
 
 import java.util.List;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
+import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
+import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.obiba.opal.core.domain.security.Group;
 import org.obiba.opal.core.service.security.SubjectCredentialsService;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 @Component
-@Scope("request")
-@Path("/groups")
+@Path("/system/groups")
 public class GroupsResource {
 
   @Autowired
@@ -47,11 +50,15 @@ public class GroupsResource {
   }
 
   @POST
-  public Response createGroup(Opal.GroupDto groupDto) {
-    if(subjectCredentialsService.getGroup(groupDto.getName()) != null) {
-      return Response.status(Response.Status.NOT_MODIFIED).build();
+  public Response createGroup(Opal.GroupDto dto) {
+    Group group = new Group(dto.getName());
+    if(subjectCredentialsService.getGroup(dto.getName()) != null) {
+      ConstraintViolation<Group> violation = ConstraintViolationImpl
+          .forBeanValidation("{org.obiba.opal.core.validator.Unique.message}", "must be unique", Group.class, group,
+              group, group, PathImpl.createPathFromString("name"), null, null);
+      throw new ConstraintViolationException(Sets.newHashSet(violation));
     }
-    subjectCredentialsService.createGroup(groupDto.getName());
+    subjectCredentialsService.createGroup(dto.getName());
     return Response.ok().build();
   }
 

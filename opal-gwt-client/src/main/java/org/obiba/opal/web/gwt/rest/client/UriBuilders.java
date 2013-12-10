@@ -11,6 +11,7 @@
 package org.obiba.opal.web.gwt.rest.client;
 
 public enum UriBuilders {
+
   REPORT_TEMPLATES {
     @Override
     public UriBuilder create() {
@@ -253,10 +254,10 @@ public enum UriBuilders {
     }
   },
 
-  USERS {
+  SUBJECT_CREDENTIALS {
     @Override
     public UriBuilder create() {
-      return UriBuilder.create().segment("users");
+      return UriBuilder.create().segment("system", "subject-credentials");
 
     }
   },
@@ -264,15 +265,15 @@ public enum UriBuilders {
   GROUPS {
     @Override
     public UriBuilder create() {
-      return UriBuilder.create().segment("groups");
+      return UriBuilder.create().segment("system", "groups");
 
     }
   },
 
-  USER {
+  SUBJECT_CREDENTIAL {
     @Override
     public UriBuilder create() {
-      return UriBuilder.create().segment("user", "{}");
+      return UriBuilder.create().segment("system", "subject-credential", "{}");
 
     }
   },
@@ -280,9 +281,98 @@ public enum UriBuilders {
   GROUP {
     @Override
     public UriBuilder create() {
-      return UriBuilder.create().segment("group", "{}");
+      return UriBuilder.create().segment("system", "group", "{}");
 
     }
+  },
+
+  DATABASES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "databases");
+
+    }
+  },
+
+  DATABASES_WITH_SETTINGS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "databases").query("settings", "true");
+
+    }
+  },
+
+  DATABASES_FOR_STORAGE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "databases").query("usage", "storage");
+
+    }
+  },
+
+  DATABASES_FOR_IMPORT {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "databases").query("usage", "import");
+
+    }
+  },
+
+  DATABASES_FOR_EXPORT {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "databases").query("usage", "export");
+
+    }
+  },
+
+  DATABASES_SQL {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "databases", "sql");
+
+    }
+  },
+
+  DATABASES_MONGO_DB {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "databases", "mongodb");
+
+    }
+  },
+
+  DATABASE_IDENTIFIERS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "databases", "identifiers");
+
+    }
+  },
+
+  DATABASE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "database", "{}");
+
+    }
+  },
+
+  DATABASE_CONNECTIONS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "database", "{}", "connections");
+
+    }
+  },
+
+  JDBC_DRIVERS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "databases", "jdbc-drivers");
+
+    }
+
   };
 
   public abstract UriBuilder create();

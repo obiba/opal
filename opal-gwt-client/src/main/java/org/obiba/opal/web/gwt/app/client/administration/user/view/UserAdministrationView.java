@@ -17,17 +17,14 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.IconCell;
 import org.obiba.opal.web.model.client.opal.GroupDto;
-import org.obiba.opal.web.model.client.opal.UserDto;
+import org.obiba.opal.web.model.client.opal.SubjectCredentialsDto;
 
-import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CellTable;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -53,7 +50,7 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
   SimplePager indexTablePager;
 
   @UiField
-  CellTable<UserDto> usersTable;
+  CellTable<SubjectCredentialsDto> usersTable;
 
   @UiField
   CellTable<GroupDto> groupsTable;
@@ -61,7 +58,8 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
   @UiField
   HasWidgets breadcrumbs;
 
-  private final ListDataProvider<UserDto> userDataProvider = new ListDataProvider<UserDto>();
+  private final ListDataProvider<SubjectCredentialsDto> userDataProvider
+      = new ListDataProvider<SubjectCredentialsDto>();
 
   private final ListDataProvider<GroupDto> groupDataProvider = new ListDataProvider<GroupDto>();
 
@@ -95,19 +93,19 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
   }
 
   @Override
-  public HasData<UserDto> getUsersTable() {
+  public HasData<SubjectCredentialsDto> getUsersTable() {
     return usersTable;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public void clear() {
-    renderUserRows((JsArray<UserDto>) JavaScriptObject.createArray());
+    renderUserRows((JsArray<SubjectCredentialsDto>) JavaScriptObject.createArray());
     renderGroupRows((JsArray<GroupDto>) JavaScriptObject.createArray());
   }
 
   @Override
-  public void renderUserRows(JsArray<UserDto> rows) {
+  public void renderUserRows(JsArray<SubjectCredentialsDto> rows) {
     userDataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
     indexTablePager.firstPage();
     userDataProvider.refresh();
@@ -128,7 +126,7 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
   }
 
   @Override
-  public HasActionHandler<UserDto> getUsersActions() {
+  public HasActionHandler<SubjectCredentialsDto> getUsersActions() {
     return UserColumns.ACTIONS;
   }
 
@@ -139,49 +137,51 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
 
   private static final class UserColumns {
 
-    static final Column<UserDto, String> NAME = new TextColumn<UserDto>() {
+    static final Column<SubjectCredentialsDto, String> NAME = new TextColumn<SubjectCredentialsDto>() {
 
       @Override
-      public String getValue(UserDto object) {
+      public String getValue(SubjectCredentialsDto object) {
         return object.getName();
       }
     };
 
-    static final Column<UserDto, String> GROUPS = new TextColumn<UserDto>() {
+    static final Column<SubjectCredentialsDto, String> GROUPS = new TextColumn<SubjectCredentialsDto>() {
 
       @Override
-      public String getValue(UserDto object) {
+      public String getValue(SubjectCredentialsDto object) {
         return object.getGroupsCount() > 0 ? object.getGroupsArray().join(", ") : "";
       }
     };
 
-    static final Column<UserDto, Boolean> STATUS = new Column<UserDto, Boolean>(new IconCell<Boolean>() {
+    static final Column<SubjectCredentialsDto, Boolean> STATUS = new Column<SubjectCredentialsDto, Boolean>(
+        new IconCell<Boolean>() {
+          @Override
+          public IconType getIconType(Boolean value) {
+            return value ? IconType.OK : IconType.REMOVE;
+          }
+        }) {
       @Override
-      public IconType getIconType(Boolean value) {
-        return value ? IconType.OK : IconType.REMOVE;
-      }
-    }) {
-      @Override
-      public Boolean getValue(UserDto object) {
+      public Boolean getValue(SubjectCredentialsDto object) {
         return object.getEnabled();
       }
     };
 
-    static final ActionsColumn<UserDto> ACTIONS = new ActionsColumn<UserDto>(new ActionsProvider<UserDto>() {
+    static final ActionsColumn<SubjectCredentialsDto> ACTIONS = new ActionsColumn<SubjectCredentialsDto>(
+        new ActionsProvider<SubjectCredentialsDto>() {
 
-      @Override
-      public String[] allActions() {
-        return new String[] { EDIT_ACTION, DELETE_ACTION, ENABLE_ACTION, DISABLE_ACTION };
-      }
+          @Override
+          public String[] allActions() {
+            return new String[] { EDIT_ACTION, DELETE_ACTION, ENABLE_ACTION, DISABLE_ACTION };
+          }
 
-      @Override
-      public String[] getActions(UserDto value) {
-        if(value.getEnabled()) {
-          return new String[] { EDIT_ACTION, DELETE_ACTION, DISABLE_ACTION };
-        }
-        return new String[] { EDIT_ACTION, DELETE_ACTION, ENABLE_ACTION };
-      }
-    });
+          @Override
+          public String[] getActions(SubjectCredentialsDto value) {
+            if(value.getEnabled()) {
+              return new String[] { EDIT_ACTION, DELETE_ACTION, DISABLE_ACTION };
+            }
+            return new String[] { EDIT_ACTION, DELETE_ACTION, ENABLE_ACTION };
+          }
+        });
 
   }
 

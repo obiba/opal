@@ -30,7 +30,7 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.GroupDto;
-import org.obiba.opal.web.model.client.opal.UserDto;
+import org.obiba.opal.web.model.client.opal.SubjectCredentialsDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
@@ -74,7 +74,8 @@ public class UserAdministrationPresenter
   @ProxyEvent
   @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(UriBuilders.USERS.create().build()).get()
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.SUBJECT_CREDENTIALS.create().build()).get()
         .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListUsersAuthorization())).send();
   }
 
@@ -92,8 +93,8 @@ public class UserAdministrationPresenter
 
   @Override
   public void authorize(HasAuthorization authorizer) {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(UriBuilders.USERS.create().build()).post()
-        .authorize(authorizer).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.SUBJECT_CREDENTIALS.create().build()).post().authorize(authorizer).send();
   }
 
   @Override
@@ -135,14 +136,14 @@ public class UserAdministrationPresenter
         }));
 
     // User Actions
-    getView().getUsersActions().setActionHandler(new ActionHandler<UserDto>() {
+    getView().getUsersActions().setActionHandler(new ActionHandler<SubjectCredentialsDto>() {
 
       @Override
-      public void doAction(UserDto object, String actionName) {
+      public void doAction(SubjectCredentialsDto object, String actionName) {
         if(ActionsColumn.EDIT_ACTION.equals(actionName)) {
           UserPresenter dialog = userModalProvider.get();
           dialog.setDialogMode(UserPresenter.Mode.UPDATE);
-          dialog.setUser(object);
+          dialog.setSubjectCredentials(object);
         } else if(ActionsColumn.DELETE_ACTION.equals(actionName)) {
           removeConfirmation = new RemoveRunnable(object.getName(), true);
           fireEvent(ConfirmationRequiredEvent
@@ -151,8 +152,8 @@ public class UserAdministrationPresenter
         } else if(Display.DISABLE_ACTION.equals(actionName) || Display.ENABLE_ACTION.equals(actionName)) {
           object.setEnabled(!object.getEnabled());
           ResourceRequestBuilderFactory.newBuilder() //
-              .forResource(UriBuilders.USER.create().build(object.getName())) //
-              .withResourceBody(UserDto.stringify(object)) //
+              .forResource(UriBuilders.SUBJECT_CREDENTIAL.create().build(object.getName())) //
+              .withResourceBody(SubjectCredentialsDto.stringify(object)) //
               .withCallback(new ResponseCodeCallback() {
                 @Override
                 public void onResponseCode(Request request, Response response) {
@@ -187,12 +188,12 @@ public class UserAdministrationPresenter
   }
 
   private void refreshUsers() {
-    ResourceRequestBuilderFactory.<JsArray<UserDto>>newBuilder() //
-        .forResource(UriBuilders.USERS.create().build()) //
-        .withCallback(new ResourceCallback<JsArray<UserDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<SubjectCredentialsDto>>newBuilder() //
+        .forResource(UriBuilders.SUBJECT_CREDENTIALS.create().build()) //
+        .withCallback(new ResourceCallback<JsArray<SubjectCredentialsDto>>() {
 
           @Override
-          public void onResource(Response response, JsArray<UserDto> resource) {
+          public void onResource(Response response, JsArray<SubjectCredentialsDto> resource) {
             getView().renderUserRows(resource);
           }
         }) //
@@ -245,7 +246,8 @@ public class UserAdministrationPresenter
     @Override
     public void run() {
       ResourceRequestBuilderFactory.newBuilder() //
-          .forResource(isUser ? UriBuilders.USER.create().build(name) : UriBuilders.GROUP.create().build(name)) //
+          .forResource(
+              isUser ? UriBuilders.SUBJECT_CREDENTIAL.create().build(name) : UriBuilders.GROUP.create().build(name)) //
           .withCallback(Response.SC_OK, new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
@@ -272,15 +274,15 @@ public class UserAdministrationPresenter
 
     String DISABLE_ACTION = "Disable";
 
-    void renderUserRows(JsArray<UserDto> rows);
+    void renderUserRows(JsArray<SubjectCredentialsDto> rows);
 
     void renderGroupRows(JsArray<GroupDto> rows);
 
     void clear();
 
-    HasData<UserDto> getUsersTable();
+    HasData<SubjectCredentialsDto> getUsersTable();
 
-    HasActionHandler<UserDto> getUsersActions();
+    HasActionHandler<SubjectCredentialsDto> getUsersActions();
 
     HasActionHandler<GroupDto> getGroupsActions();
   }

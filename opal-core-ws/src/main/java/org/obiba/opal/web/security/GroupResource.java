@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Scope("request")
-@Path("/group/{name}")
+@Path("/system/group/{name}")
 public class GroupResource {
 
   @PathParam("name")
