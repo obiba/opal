@@ -48,6 +48,10 @@ import org.obiba.opal.web.gwt.app.client.administration.jvm.view.JVMView;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.AdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.presenter.RAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.r.view.RAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.presenter.SubjectCredentialsAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.presenter.SubjectCredentialsPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.view.SubjectCredentialsAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.view.SubjectCredentialsView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomiesPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.TaxonomyEditModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.presenter.VocabularyEditPresenter;
@@ -56,10 +60,6 @@ import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.Taxonomi
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.TaxonomyEditModalView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.VocabularyEditView;
 import org.obiba.opal.web.gwt.app.client.administration.taxonomies.view.VocabularyView;
-import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserAdministrationPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.user.view.UserAdministrationView;
-import org.obiba.opal.web.gwt.app.client.administration.user.view.UserView;
 import org.obiba.opal.web.gwt.app.client.administration.view.AdministrationView;
 
 import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
@@ -107,9 +107,11 @@ public class AdministrationModule extends AbstractPresenterModule {
   }
 
   private void configureUserGroups() {
-    bindPresenter(UserAdministrationPresenter.class, UserAdministrationPresenter.Display.class,
-        UserAdministrationView.class, UserAdministrationPresenter.Proxy.class);
-    bindPresenterWidget(UserPresenter.class, UserPresenter.Display.class, UserView.class);
+    bindPresenter(SubjectCredentialsAdministrationPresenter.class,
+        SubjectCredentialsAdministrationPresenter.Display.class, SubjectCredentialsAdministrationView.class,
+        SubjectCredentialsAdministrationPresenter.Proxy.class);
+    bindPresenterWidget(SubjectCredentialsPresenter.class, SubjectCredentialsPresenter.Display.class,
+        SubjectCredentialsView.class);
   }
 
   private void configureDatashield() {
@@ -141,8 +143,10 @@ public class AdministrationModule extends AbstractPresenterModule {
     bindPresenterWidget(IdentifiersDatabasePresenter.class, IdentifiersDatabasePresenter.Display.class,
         IdentifiersDatabaseView.class);
     bindPresenterWidget(DataDatabasesPresenter.class, DataDatabasesPresenter.Display.class, DataDatabasesView.class);
-    bindPresenterWidget(SqlDatabaseModalPresenter.class, SqlDatabaseModalPresenter.Display.class, SqlDatabaseModalView.class);
-    bindPresenterWidget(MongoDatabaseModalPresenter.class, MongoDatabaseModalPresenter.Display.class, MongoDatabaseModalView.class);
+    bindPresenterWidget(SqlDatabaseModalPresenter.class, SqlDatabaseModalPresenter.Display.class,
+        SqlDatabaseModalView.class);
+    bindPresenterWidget(MongoDatabaseModalPresenter.class, MongoDatabaseModalPresenter.Display.class,
+        MongoDatabaseModalView.class);
   }
 
 }

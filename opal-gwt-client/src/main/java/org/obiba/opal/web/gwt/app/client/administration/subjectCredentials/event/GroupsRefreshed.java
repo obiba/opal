@@ -1,4 +1,4 @@
-package org.obiba.opal.web.gwt.app.client.administration.user.event;
+package org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.event;
 
 import com.gwtplatform.dispatch.annotation.GenEvent;
 

@@ -40,4 +40,12 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("[{0}] {1}")
   String unknownResponse(String statusText, String text);
 
+  @Description("Edit User label")
+  @DefaultMessage("Edit user {0}")
+  String editUserLabel(String name);
+
+  @Description("Edit Application label")
+  @DefaultMessage("Edit application {0}")
+  String editApplicationLabel(String name);
+
 }

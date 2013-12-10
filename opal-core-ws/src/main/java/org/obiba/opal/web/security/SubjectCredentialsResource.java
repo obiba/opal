@@ -39,19 +39,18 @@ public class SubjectCredentialsResource {
   private SubjectCredentialsService subjectCredentialsService;
 
   @GET
-  public List<Opal.SubjectCredentialsDto> getUsers() {
-    return Lists.newArrayList(Iterables
-        .transform(subjectCredentialsService.getSubjectCredentials(SubjectCredentials.Type.USER),
-            new Function<SubjectCredentials, Opal.SubjectCredentialsDto>() {
-              @Override
-              public Opal.SubjectCredentialsDto apply(SubjectCredentials subjectCredentials) {
-                return Dtos.asDto(subjectCredentials);
-              }
-            }));
+  public List<Opal.SubjectCredentialsDto> getAll() {
+    return Lists.newArrayList(Iterables.transform(subjectCredentialsService.getSubjectCredentials(),
+        new Function<SubjectCredentials, Opal.SubjectCredentialsDto>() {
+          @Override
+          public Opal.SubjectCredentialsDto apply(SubjectCredentials subjectCredentials) {
+            return Dtos.asDto(subjectCredentials);
+          }
+        }));
   }
 
   @POST
-  public Response createUser(Opal.SubjectCredentialsDto dto) {
+  public Response create(Opal.SubjectCredentialsDto dto) {
     SubjectCredentials subjectCredentials = Dtos.fromDto(dto);
     if(subjectCredentialsService.getSubjectCredentials(subjectCredentials.getName()) != null) {
       ConstraintViolation<SubjectCredentials> violation = ConstraintViolationImpl
@@ -60,8 +59,18 @@ public class SubjectCredentialsResource {
               PathImpl.createPathFromString("name"), null, null);
       throw new ConstraintViolationException(Sets.newHashSet(violation));
     }
-    if(subjectCredentials.getType() == SubjectCredentials.Type.USER) {
-      subjectCredentials.setPassword(subjectCredentialsService.hashPassword(dto.getPassword()));
+
+    switch(subjectCredentials.getType()) {
+      case USER:
+        if(dto.hasPassword()) {
+          subjectCredentials.setPassword(subjectCredentialsService.hashPassword(dto.getPassword()));
+        }
+        break;
+      case APPLICATION:
+        if(dto.hasCertificate()) {
+          subjectCredentials.setCertificate(dto.getCertificate().toByteArray());
+        }
+        break;
     }
     subjectCredentialsService.save(subjectCredentials);
     return Response.ok().build();

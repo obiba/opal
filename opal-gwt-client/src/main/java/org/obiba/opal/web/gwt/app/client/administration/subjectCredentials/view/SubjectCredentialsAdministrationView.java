@@ -7,11 +7,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.user.view;
+package org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.view;
 
-import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserAdministrationUiHandlers;
+import java.util.Collections;
+import java.util.List;
+
+import org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.presenter.SubjectCredentialsAdministrationUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -22,8 +24,6 @@ import org.obiba.opal.web.model.client.opal.SubjectCredentialsDto;
 import com.github.gwtbootstrap.client.ui.CellTable;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -33,24 +33,35 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-import static org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserAdministrationPresenter.Display;
+import static org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.presenter.SubjectCredentialsAdministrationPresenter.Display;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 
-public class UserAdministrationView extends ViewWithUiHandlers<UserAdministrationUiHandlers> implements Display {
+public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<SubjectCredentialsAdministrationUiHandlers>
+    implements Display {
 
-  interface Binder extends UiBinder<Widget, UserAdministrationView> {}
+  private final Translations translations;
+
+  interface Binder extends UiBinder<Widget, SubjectCredentialsAdministrationView> {}
 
   @UiField
-  SimplePager indexTablePager;
+  SimplePager usersTablePager;
 
   @UiField
   CellTable<SubjectCredentialsDto> usersTable;
+
+  @UiField
+  SimplePager applicationsTablePager;
+
+  @UiField
+  CellTable<SubjectCredentialsDto> applicationsTable;
+
+  @UiField
+  SimplePager groupsTablePager;
 
   @UiField
   CellTable<GroupDto> groupsTable;
@@ -61,26 +72,35 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
   private final ListDataProvider<SubjectCredentialsDto> userDataProvider
       = new ListDataProvider<SubjectCredentialsDto>();
 
+  private final ListDataProvider<SubjectCredentialsDto> applicationDataProvider
+      = new ListDataProvider<SubjectCredentialsDto>();
+
   private final ListDataProvider<GroupDto> groupDataProvider = new ListDataProvider<GroupDto>();
 
   @Inject
-  public UserAdministrationView(Binder uiBinder, Translations translations) {
+  public SubjectCredentialsAdministrationView(Binder uiBinder, Translations translations) {
+    this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
-    configUserTable(translations);
-    configGroupTable(translations);
+    usersTable.setVisibleRange(0, 10);
+    applicationsTable.setVisibleRange(0, 10);
+    groupsTable.setVisibleRange(0, 10);
+    configSubjectCredentialsTable(userDataProvider, usersTable, usersTablePager);
+    configSubjectCredentialsTable(applicationDataProvider, applicationsTable, applicationsTablePager);
+    configGroupTable();
   }
 
-  private void configUserTable(Translations translations) {
-    indexTablePager.setDisplay(usersTable);
-    usersTable.addColumn(UserColumns.NAME, translations.userNameLabel());
-    usersTable.addColumn(UserColumns.GROUPS, translations.userGroupsLabel());
-    usersTable.addColumn(UserColumns.STATUS, translations.userStatusLabel());
-    usersTable.addColumn(UserColumns.ACTIONS, translations.actionsLabel());
-    usersTable.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
-    userDataProvider.addDataDisplay(usersTable);
+  private void configSubjectCredentialsTable(ListDataProvider<SubjectCredentialsDto> dataProvider,
+      CellTable<SubjectCredentialsDto> table, SimplePager pager) {
+    pager.setDisplay(table);
+    table.addColumn(SubjectCredentialColumns.NAME, translations.userNameLabel());
+    table.addColumn(SubjectCredentialColumns.GROUPS, translations.userGroupsLabel());
+    table.addColumn(SubjectCredentialColumns.STATUS, translations.userStatusLabel());
+    table.addColumn(SubjectCredentialColumns.ACTIONS, translations.actionsLabel());
+    table.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
+    dataProvider.addDataDisplay(table);
   }
 
-  private void configGroupTable(Translations translations) {
+  private void configGroupTable() {
     groupsTable.addColumn(GroupColumns.NAME, translations.groupNameLabel());
     groupsTable.addColumn(GroupColumns.USERS, translations.groupUsersLabel());
     groupsTable.addColumn(GroupColumns.ACTIONS, translations.actionsLabel());
@@ -92,32 +112,41 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
     getUiHandlers().onAddUser();
   }
 
-  @Override
-  public HasData<SubjectCredentialsDto> getUsersTable() {
-    return usersTable;
+  @UiHandler("addApplication")
+  public void onAddApplication(ClickEvent event) {
+    getUiHandlers().onAddApplication();
   }
 
+  @Override
   @SuppressWarnings("unchecked")
-  @Override
   public void clear() {
-    renderUserRows((JsArray<SubjectCredentialsDto>) JavaScriptObject.createArray());
-    renderGroupRows((JsArray<GroupDto>) JavaScriptObject.createArray());
+    renderUserRows(Collections.<SubjectCredentialsDto>emptyList());
+    renderApplicationRows(Collections.<SubjectCredentialsDto>emptyList());
+    renderGroupRows(Collections.<GroupDto>emptyList());
   }
 
   @Override
-  public void renderUserRows(JsArray<SubjectCredentialsDto> rows) {
-    userDataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
-    indexTablePager.firstPage();
+  public void renderUserRows(List<SubjectCredentialsDto> rows) {
+    userDataProvider.setList(rows);
+    usersTablePager.firstPage();
     userDataProvider.refresh();
-    indexTablePager.setVisible(userDataProvider.getList().size() > indexTablePager.getPageSize());
+    usersTablePager.setVisible(userDataProvider.getList().size() > usersTablePager.getPageSize());
   }
 
   @Override
-  public void renderGroupRows(JsArray<GroupDto> rows) {
-    groupDataProvider.setList(JsArrays.toList(JsArrays.toSafeArray(rows)));
-    indexTablePager.firstPage();
+  public void renderApplicationRows(List<SubjectCredentialsDto> rows) {
+    applicationDataProvider.setList(rows);
+    applicationsTablePager.firstPage();
+    applicationDataProvider.refresh();
+    applicationsTablePager.setVisible(applicationDataProvider.getList().size() > applicationsTablePager.getPageSize());
+  }
+
+  @Override
+  public void renderGroupRows(List<GroupDto> rows) {
+    groupDataProvider.setList(rows);
+    groupsTablePager.firstPage();
     groupDataProvider.refresh();
-    indexTablePager.setVisible(groupDataProvider.getList().size() > indexTablePager.getPageSize());
+    groupsTablePager.setVisible(groupDataProvider.getList().size() > groupsTablePager.getPageSize());
   }
 
   @Override
@@ -126,8 +155,8 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
   }
 
   @Override
-  public HasActionHandler<SubjectCredentialsDto> getUsersActions() {
-    return UserColumns.ACTIONS;
+  public HasActionHandler<SubjectCredentialsDto> getSubjectCredentialActions() {
+    return SubjectCredentialColumns.ACTIONS;
   }
 
   @Override
@@ -135,7 +164,7 @@ public class UserAdministrationView extends ViewWithUiHandlers<UserAdministratio
     return GroupColumns.ACTIONS;
   }
 
-  private static final class UserColumns {
+  private static final class SubjectCredentialColumns {
 
     static final Column<SubjectCredentialsDto, String> NAME = new TextColumn<SubjectCredentialsDto>() {
 

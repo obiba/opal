@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.user.presenter;
+package org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.presenter;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -16,7 +16,9 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.administration.user.event.UsersRefreshedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.SubjectCredentialsDtos;
+import org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.event.SubjectCredentialsRefreshedEvent;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
@@ -30,12 +32,14 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.SubjectCredentialsDto;
+import org.obiba.opal.web.model.client.opal.SubjectCredentialsType;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.HasVisibility;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -44,27 +48,33 @@ import com.gwtplatform.mvp.client.PopupView;
 import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
 import static com.google.gwt.http.client.Response.SC_OK;
 
-public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> implements UserUiHandlers {
+public class SubjectCredentialsPresenter extends ModalPresenterWidget<SubjectCredentialsPresenter.Display>
+    implements SubjectCredentialsUiHandlers {
 
   private static final int MIN_PASSWORD_LENGTH = 6;
+
+  private final TranslationMessages translationMessages;
 
   protected ValidationHandler validationHandler;
 
   private Mode dialogMode;
+
+  private SubjectCredentialsType subjectCredentialsType;
 
   public enum Mode {
     UPDATE, CREATE
   }
 
   @Inject
-  public UserPresenter(Display display, EventBus eventBus) {
+  public SubjectCredentialsPresenter(Display display, EventBus eventBus, TranslationMessages translationMessages) {
     super(eventBus, display);
+    this.translationMessages = translationMessages;
     getView().setUiHandlers(this);
   }
 
   @Override
   public void onBind() {
-    validationHandler = new UserValidationHandler();
+    validationHandler = new SubjectCredentialsValidationHandler();
   }
 
   @Override
@@ -79,10 +89,10 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
 
     if(validationHandler.validate()) {
 
-      ResponseCodeCallback callback = new ResponseCodeCallback() {
+      ResponseCodeCallback successCallback = new ResponseCodeCallback() {
         @Override
         public void onResponseCode(Request request, Response response) {
-          getEventBus().fireEvent(new UsersRefreshedEvent());
+          getEventBus().fireEvent(new SubjectCredentialsRefreshedEvent());
           getView().hideDialog();
         }
       };
@@ -94,7 +104,7 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
           ResourceRequestBuilderFactory.newBuilder() //
               .forResource(UriBuilders.SUBJECT_CREDENTIALS.create().build()) //
               .withResourceBody(SubjectCredentialsDto.stringify(dto)) //
-              .withCallback(SC_OK, callback) //
+              .withCallback(SC_OK, successCallback) //
               .withCallback(SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
               .post().send();
           break;
@@ -102,7 +112,7 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
           ResourceRequestBuilderFactory.newBuilder() //
               .forResource(UriBuilders.SUBJECT_CREDENTIAL.create().build(dto.getName())) //
               .withResourceBody(SubjectCredentialsDto.stringify(dto)) //
-              .withCallback(SC_OK, callback) //
+              .withCallback(SC_OK, successCallback) //
               .withCallback(SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
               .put().send();
           break;
@@ -112,24 +122,43 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
 
   private SubjectCredentialsDto getDto() {
     SubjectCredentialsDto dto = SubjectCredentialsDto.create();
+    dto.setType(subjectCredentialsType);
     dto.setName(getView().getName().getText());
     dto.setPassword(getView().getPassword().getText());
+    dto.setCertificate(getView().getCertificate().getText());
     dto.setEnabled(true);
     dto.setGroupsArray(JsArrays.fromIterable(getView().getGroups().getValue()));
     return dto;
   }
 
   public void setSubjectCredentials(SubjectCredentialsDto dto) {
+    setSubjectCredentialsType(dto.getType());
     getView().getName().setText(dto.getName());
     getView().getGroups().setValue(JsArrays.toList(dto.getGroupsArray()));
     getView().setNamedEnabled(false);
+
+    if(SubjectCredentialsDtos.isUser(dto)) {
+      setTitle(translationMessages.editUserLabel(dto.getName()));
+    } else if(SubjectCredentialsDtos.isApplication(dto)) {
+      setTitle(translationMessages.editApplicationLabel(dto.getName()));
+    }
   }
 
   public void setDialogMode(Mode mode) {
     dialogMode = mode;
   }
 
-  private class UserValidationHandler extends ViewValidationHandler {
+  public void setSubjectCredentialsType(SubjectCredentialsType subjectCredentialsType) {
+    this.subjectCredentialsType = subjectCredentialsType;
+    getView().getPasswordGroupVisibility().setVisible(subjectCredentialsType == SubjectCredentialsType.USER);
+    getView().getCertificateGroupVisibility().setVisible(subjectCredentialsType == SubjectCredentialsType.APPLICATION);
+  }
+
+  public void setTitle(String title) {
+    getView().setTitle(title);
+  }
+
+  private class SubjectCredentialsValidationHandler extends ViewValidationHandler {
 
     private Set<FieldValidator> validators;
 
@@ -139,23 +168,29 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
         validators = new LinkedHashSet<FieldValidator>();
 
         if(dialogMode == Mode.CREATE) {
-          validators.add(
-              new RequiredTextValidator(getView().getName(), "UsernameIsRequired", Display.FormField.USERNAME.name()));
-          validators.add(new RequiredTextValidator(getView().getPassword(), "PasswordIsRequired",
-              Display.FormField.PASSWORD.name()));
-
+          validators.add(new RequiredTextValidator(getView().getName(), "SubjectCredentialNameIsRequired",
+              Display.FormField.NAME.name()));
+          if(subjectCredentialsType == SubjectCredentialsType.USER) {
+            addPasswordValidators();
+          } else if(subjectCredentialsType == SubjectCredentialsType.APPLICATION) {
+            validators.add(new RequiredTextValidator(getView().getCertificate(), "CertificateIsRequired",
+                Display.FormField.CERTIFICATE.name()));
+          }
         }
-
-        ConditionValidator minLength = new ConditionValidator(minLengthCondition(getView().getPassword()),
-            "PasswordLengthMin", Display.FormField.PASSWORD.name());
-        minLength.setArgs(Arrays.asList(String.valueOf(MIN_PASSWORD_LENGTH)));
-        validators.add(minLength);
-
-        validators.add(
-            new ConditionValidator(passwordsMatchCondition(getView().getPassword(), getView().getConfirmPassword()),
-                "PasswordsMustMatch", Display.FormField.PASSWORD.name()));
       }
       return validators;
+    }
+
+    private void addPasswordValidators() {
+      validators.add(
+          new RequiredTextValidator(getView().getPassword(), "PasswordIsRequired", Display.FormField.PASSWORD.name()));
+      ConditionValidator minLength = new ConditionValidator(minLengthCondition(getView().getPassword()),
+          "PasswordLengthMin", Display.FormField.PASSWORD.name());
+      minLength.setArgs(Arrays.asList(String.valueOf(MIN_PASSWORD_LENGTH)));
+      validators.add(minLength);
+      validators.add(
+          new ConditionValidator(passwordsMatchCondition(getView().getPassword(), getView().getConfirmPassword()),
+              "PasswordsMustMatch", Display.FormField.PASSWORD.name()));
     }
 
     private HasValue<Boolean> minLengthCondition(final HasText password) {
@@ -184,14 +219,15 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
     }
   }
 
-  public interface Display extends PopupView, HasUiHandlers<UserUiHandlers> {
+  public interface Display extends PopupView, HasUiHandlers<SubjectCredentialsUiHandlers> {
 
     enum FormField {
-      USERNAME,
-      PASSWORD
+      NAME, PASSWORD, CERTIFICATE
     }
 
     void hideDialog();
+
+    void setTitle(String title);
 
     HasText getName();
 
@@ -199,9 +235,15 @@ public class UserPresenter extends ModalPresenterWidget<UserPresenter.Display> i
 
     void setNamedEnabled(boolean enabled);
 
+    HasVisibility getPasswordGroupVisibility();
+
     HasText getPassword();
 
     HasText getConfirmPassword();
+
+    HasVisibility getCertificateGroupVisibility();
+
+    HasText getCertificate();
 
     void showError(@Nullable FormField formField, String message);
 

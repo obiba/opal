@@ -7,14 +7,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.user.presenter;
+package org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.presenter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
-import org.obiba.opal.web.gwt.app.client.administration.user.event.GroupsRefreshedEvent;
-import org.obiba.opal.web.gwt.app.client.administration.user.event.UsersRefreshedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.SubjectCredentialsDtos;
+import org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.event.GroupsRefreshedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.event.SubjectCredentialsRefreshedEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
@@ -31,11 +36,11 @@ import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.GroupDto;
 import org.obiba.opal.web.model.client.opal.SubjectCredentialsDto;
+import org.obiba.opal.web.model.client.opal.SubjectCredentialsType;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.view.client.HasData;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -48,35 +53,36 @@ import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
 import static com.google.gwt.http.client.Response.SC_OK;
 
-public class UserAdministrationPresenter
-    extends ItemAdministrationPresenter<UserAdministrationPresenter.Display, UserAdministrationPresenter.Proxy>
-    implements UserAdministrationUiHandlers {
+public class SubjectCredentialsAdministrationPresenter extends
+    ItemAdministrationPresenter<SubjectCredentialsAdministrationPresenter.Display, SubjectCredentialsAdministrationPresenter.Proxy>
+    implements SubjectCredentialsAdministrationUiHandlers {
 
   @ProxyStandard
-  @NameToken(Places.USERS_GROUPS)
-  public interface Proxy extends ProxyPlace<UserAdministrationPresenter> {}
+  @NameToken(Places.SUBJECT_CREDENTIALS)
+  public interface Proxy extends ProxyPlace<SubjectCredentialsAdministrationPresenter> {}
 
-  private final ModalProvider<UserPresenter> userModalProvider;
+  private final ModalProvider<SubjectCredentialsPresenter> modalProvider;
 
   private Runnable removeConfirmation;
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
   @Inject
-  public UserAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
-      ModalProvider<UserPresenter> userModalProvider, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
+  public SubjectCredentialsAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
+      ModalProvider<SubjectCredentialsPresenter> modalProvider, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     getView().setUiHandlers(this);
     this.breadcrumbsHelper = breadcrumbsHelper;
-    this.userModalProvider = userModalProvider.setContainer(this);
+    this.modalProvider = modalProvider.setContainer(this);
   }
 
   @ProxyEvent
   @Override
   public void onAdministrationPermissionRequest(RequestAdministrationPermissionEvent event) {
     ResourceAuthorizationRequestBuilderFactory.newBuilder()
-        .forResource(UriBuilders.SUBJECT_CREDENTIALS.create().build()).get()
-        .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListUsersAuthorization())).send();
+        .forResource(UriBuilders.SUBJECT_CREDENTIALS.create().build()) //
+        .authorize(new CompositeAuthorizer(event.getHasAuthorization(), new ListUsersAuthorization())) //
+        .get().send();
   }
 
   @Override
@@ -88,7 +94,6 @@ public class UserAdministrationPresenter
   protected void onReveal() {
     super.onReveal();
     breadcrumbsHelper.setBreadcrumbView(getView().getBreadcrumbs()).build();
-    getView().getUsersTable().setVisibleRange(0, 10);
   }
 
   @Override
@@ -100,12 +105,23 @@ public class UserAdministrationPresenter
   @Override
   @TitleFunction
   public String getTitle() {
-    return translations.pageUsersAndApplicationsTitle();
+    return translations.pageUsersGroupsAndApplicationsTitle();
   }
 
   @Override
   public void onAddUser() {
-    userModalProvider.get().setDialogMode(UserPresenter.Mode.CREATE);
+    SubjectCredentialsPresenter presenter = modalProvider.get();
+    presenter.setDialogMode(SubjectCredentialsPresenter.Mode.CREATE);
+    presenter.setSubjectCredentialsType(SubjectCredentialsType.USER);
+    presenter.setTitle(translations.addUserLabel());
+  }
+
+  @Override
+  public void onAddApplication() {
+    SubjectCredentialsPresenter presenter = modalProvider.get();
+    presenter.setDialogMode(SubjectCredentialsPresenter.Mode.CREATE);
+    presenter.setSubjectCredentialsType(SubjectCredentialsType.APPLICATION);
+    presenter.setTitle(translations.addApplicationLabel());
   }
 
   @Override
@@ -116,12 +132,11 @@ public class UserAdministrationPresenter
     registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler()));
 
     // Refresh user list
-    registerHandler(
-        getEventBus().addHandler(UsersRefreshedEvent.getType(), new UsersRefreshedEvent.UsersRefreshedHandler() {
+    registerHandler(getEventBus().addHandler(SubjectCredentialsRefreshedEvent.getType(),
+        new SubjectCredentialsRefreshedEvent.SubjectCredentialsRefreshedHandler() {
           @Override
-          public void onUsersRefreshed(UsersRefreshedEvent event) {
-            refreshUsers();
-            refreshGroups();
+          public void onSubjectCredentialsRefreshed(SubjectCredentialsRefreshedEvent event) {
+            refreshTables();
           }
         }));
 
@@ -130,34 +145,33 @@ public class UserAdministrationPresenter
         getEventBus().addHandler(GroupsRefreshedEvent.getType(), new GroupsRefreshedEvent.GroupsRefreshedHandler() {
           @Override
           public void onGroupsRefreshed(GroupsRefreshedEvent event) {
-            refreshUsers();
-            refreshGroups();
+            refreshTables();
           }
         }));
 
     // User Actions
-    getView().getUsersActions().setActionHandler(new ActionHandler<SubjectCredentialsDto>() {
+    getView().getSubjectCredentialActions().setActionHandler(new ActionHandler<SubjectCredentialsDto>() {
 
       @Override
-      public void doAction(SubjectCredentialsDto object, String actionName) {
+      public void doAction(SubjectCredentialsDto subjectDto, String actionName) {
         if(ActionsColumn.EDIT_ACTION.equals(actionName)) {
-          UserPresenter dialog = userModalProvider.get();
-          dialog.setDialogMode(UserPresenter.Mode.UPDATE);
-          dialog.setSubjectCredentials(object);
+          SubjectCredentialsPresenter dialog = modalProvider.get();
+          dialog.setDialogMode(SubjectCredentialsPresenter.Mode.UPDATE);
+          dialog.setSubjectCredentials(subjectDto);
         } else if(ActionsColumn.DELETE_ACTION.equals(actionName)) {
-          removeConfirmation = new RemoveRunnable(object.getName(), true);
+          removeConfirmation = new RemoveRunnable(subjectDto.getName(), true);
           fireEvent(ConfirmationRequiredEvent
               .createWithMessages(removeConfirmation, translations.confirmationTitleMap().get("removeUser"),
-                  translations.confirmationMessageMap().get("confirmRemoveUser").replace("{0}", object.getName())));
+                  translations.confirmationMessageMap().get("confirmRemoveUser").replace("{0}", subjectDto.getName())));
         } else if(Display.DISABLE_ACTION.equals(actionName) || Display.ENABLE_ACTION.equals(actionName)) {
-          object.setEnabled(!object.getEnabled());
+          subjectDto.setEnabled(!subjectDto.getEnabled());
           ResourceRequestBuilderFactory.newBuilder() //
-              .forResource(UriBuilders.SUBJECT_CREDENTIAL.create().build(object.getName())) //
-              .withResourceBody(SubjectCredentialsDto.stringify(object)) //
+              .forResource(UriBuilders.SUBJECT_CREDENTIAL.create().build(subjectDto.getName())) //
+              .withResourceBody(SubjectCredentialsDto.stringify(subjectDto)) //
               .withCallback(new ResponseCodeCallback() {
                 @Override
                 public void onResponseCode(Request request, Response response) {
-                  getEventBus().fireEvent(new UsersRefreshedEvent());
+                  getEventBus().fireEvent(new SubjectCredentialsRefreshedEvent());
                 }
               }, SC_OK).put().send();
         }
@@ -187,14 +201,32 @@ public class UserAdministrationPresenter
     });
   }
 
-  private void refreshUsers() {
+  private void refreshTables() {
+    refreshUsersAndApplications();
+    refreshGroups();
+  }
+
+  private void refreshUsersAndApplications() {
     ResourceRequestBuilderFactory.<JsArray<SubjectCredentialsDto>>newBuilder() //
         .forResource(UriBuilders.SUBJECT_CREDENTIALS.create().build()) //
         .withCallback(new ResourceCallback<JsArray<SubjectCredentialsDto>>() {
-
           @Override
           public void onResource(Response response, JsArray<SubjectCredentialsDto> resource) {
-            getView().renderUserRows(resource);
+            List<SubjectCredentialsDto> users = new ArrayList<SubjectCredentialsDto>();
+            List<SubjectCredentialsDto> applications = new ArrayList<SubjectCredentialsDto>();
+            if(resource != null) {
+              int length = resource.length();
+              for(int i = 0; i < length; i++) {
+                SubjectCredentialsDto dto = resource.get(i);
+                if(SubjectCredentialsDtos.isUser(dto)) {
+                  users.add(dto);
+                } else if(SubjectCredentialsDtos.isApplication(dto)) {
+                  applications.add(dto);
+                }
+              }
+            }
+            getView().renderUserRows(users);
+            getView().renderApplicationRows(applications);
           }
         }) //
         .get().send();
@@ -205,10 +237,9 @@ public class UserAdministrationPresenter
     ResourceRequestBuilderFactory.<JsArray<GroupDto>>newBuilder() //
         .forResource(UriBuilders.GROUPS.create().build()) //
         .withCallback(new ResourceCallback<JsArray<GroupDto>>() {
-
           @Override
           public void onResource(Response response, JsArray<GroupDto> resource) {
-            getView().renderGroupRows(resource);
+            getView().renderGroupRows(JsArrays.toList(JsArrays.toSafeArray(resource)));
           }
         }) //
         .get().send();
@@ -222,8 +253,7 @@ public class UserAdministrationPresenter
 
     @Override
     public void authorized() {
-      refreshUsers();
-      refreshGroups();
+      refreshTables();
     }
 
     @Override
@@ -236,22 +266,24 @@ public class UserAdministrationPresenter
 
     private final String name;
 
-    private final boolean isUser;
+    private final boolean isSubjectCredentials;
 
-    RemoveRunnable(String name, boolean isUser) {
+    RemoveRunnable(String name, boolean isSubjectCredentials) {
       this.name = name;
-      this.isUser = isUser;
+      this.isSubjectCredentials = isSubjectCredentials;
     }
 
     @Override
     public void run() {
       ResourceRequestBuilderFactory.newBuilder() //
-          .forResource(
-              isUser ? UriBuilders.SUBJECT_CREDENTIAL.create().build(name) : UriBuilders.GROUP.create().build(name)) //
+          .forResource(isSubjectCredentials
+              ? UriBuilders.SUBJECT_CREDENTIAL.create().build(name)
+              : UriBuilders.GROUP.create().build(name)) //
           .withCallback(Response.SC_OK, new ResponseCodeCallback() {
             @Override
             public void onResponseCode(Request request, Response response) {
-              getEventBus().fireEvent(isUser ? new UsersRefreshedEvent() : new GroupsRefreshedEvent());
+              getEventBus().fireEvent(
+                  isSubjectCredentials ? new SubjectCredentialsRefreshedEvent() : new GroupsRefreshedEvent());
             }
           }).delete().send();
     }
@@ -268,21 +300,21 @@ public class UserAdministrationPresenter
     }
   }
 
-  public interface Display extends View, HasBreadcrumbs, HasUiHandlers<UserAdministrationUiHandlers> {
+  public interface Display extends View, HasBreadcrumbs, HasUiHandlers<SubjectCredentialsAdministrationUiHandlers> {
 
     String ENABLE_ACTION = "Enable";
 
     String DISABLE_ACTION = "Disable";
 
-    void renderUserRows(JsArray<SubjectCredentialsDto> rows);
+    void renderUserRows(List<SubjectCredentialsDto> rows);
 
-    void renderGroupRows(JsArray<GroupDto> rows);
+    void renderApplicationRows(List<SubjectCredentialsDto> rows);
+
+    void renderGroupRows(List<GroupDto> rows);
 
     void clear();
 
-    HasData<SubjectCredentialsDto> getUsersTable();
-
-    HasActionHandler<SubjectCredentialsDto> getUsersActions();
+    HasActionHandler<SubjectCredentialsDto> getSubjectCredentialActions();
 
     HasActionHandler<GroupDto> getGroupsActions();
   }

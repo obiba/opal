@@ -7,15 +7,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.administration.user.view;
+package org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.view;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.user.presenter.UserUiHandlers;
+import org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.presenter.SubjectCredentialsPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.presenter.SubjectCredentialsUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.ui.GroupSuggestOracle;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
@@ -26,6 +26,7 @@ import org.obiba.opal.web.gwt.app.client.validator.ConstrainedModal;
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.PasswordTextBox;
+import com.github.gwtbootstrap.client.ui.TextArea;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -39,6 +40,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasVisibility;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -47,12 +49,13 @@ import com.google.web.bindery.event.shared.EventBus;
 /**
  *
  */
-public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> implements UserPresenter.Display {
+public class SubjectCredentialsView extends ModalPopupViewWithUiHandlers<SubjectCredentialsUiHandlers>
+    implements SubjectCredentialsPresenter.Display {
 
   public static final int COMMA_KEY = 188;
 
-  @UiTemplate("UserView.ui.xml")
-  interface Binder extends UiBinder<Widget, UserView> {}
+  @UiTemplate("SubjectCredentialsView.ui.xml")
+  interface Binder extends UiBinder<Widget, SubjectCredentialsView> {}
 
   @UiField
   Modal modal;
@@ -81,10 +84,16 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
   @UiField
   PasswordTextBox confirmPassword;
 
+  @UiField
+  ControlGroup certificateGroup;
+
+  @UiField
+  TextArea certificate;
+
   private final Translations translations;
 
   @Inject
-  public UserView(EventBus eventBus, Binder uiBinder, Translations translations) {
+  public SubjectCredentialsView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
     this.translations = translations;
 
@@ -92,6 +101,13 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
 
     initWidget(uiBinder.createAndBindUi(this));
 
+    certificate.setPlaceholder(translations.pasteCertificate());
+
+    initGroupSuggestBox();
+    initConstrainedModal(translations);
+  }
+
+  private void initGroupSuggestBox() {
     groups.getSuggestBox().addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
       @Override
       public void onSelection(SelectionEvent<SuggestOracle.Suggestion> event) {
@@ -99,38 +115,45 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
         groups.getSuggestBox().setText("");
       }
     });
-
-    modal.setTitle(translations.addUserLabel());
-
     groups.getSuggestBox().getValueBox().addKeyUpHandler(new KeyUpHandler() {
-
       @Override
       public void onKeyUp(KeyUpEvent event) {
-        // Keycode for comma
-        if(event.getNativeEvent().getKeyCode() == COMMA_KEY) {
+        if(event.getNativeEvent().getKeyCode() == COMMA_KEY) {         // Keycode for comma
           addGroup(groups.getSuggestBox().getText().replace(",", "").trim());
           groups.getSuggestBox().setText("");
         }
       }
     });
-
-    // used to support ConstraintViolation exceptions
-    ConstrainedModal constrainedModal = new ConstrainedModal(modal);
-    constrainedModal.registerWidget("name", translations.nameLabel(), nameGroup);
-    constrainedModal.registerWidget("password", translations.urlLabel(), passwordGroup);
-
   }
 
-  //
+  /**
+   * Used to support ConstraintViolation exceptions
+   */
+  private void initConstrainedModal(Translations translations) {
+    ConstrainedModal constrainedModal = new ConstrainedModal(modal);
+    constrainedModal.registerWidget("name", translations.nameLabel(), nameGroup);
+    constrainedModal.registerWidget("password", translations.passwordLabel(), passwordGroup);
+    constrainedModal.registerWidget("certificate", translations.certificateLabel(), certificateGroup);
+  }
+
   @Override
   public void setNamedEnabled(boolean enabled) {
     name.setEnabled(enabled);
-    modal.setTitle(enabled ? translations.addUserLabel() : translations.editUserLabel());
+  }
+
+  @Override
+  public void setTitle(String title) {
+    modal.setTitle(title);
   }
 
   @Override
   public HasText getName() {
     return name;
+  }
+
+  @Override
+  public HasVisibility getPasswordGroupVisibility() {
+    return passwordGroup;
   }
 
   @Override
@@ -141,6 +164,16 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
   @Override
   public HasText getConfirmPassword() {
     return confirmPassword;
+  }
+
+  @Override
+  public HasVisibility getCertificateGroupVisibility() {
+    return certificateGroup;
+  }
+
+  @Override
+  public HasText getCertificate() {
+    return certificate;
   }
 
   @Override
@@ -193,15 +226,18 @@ public class UserView extends ModalPopupViewWithUiHandlers<UserUiHandlers> imple
   }
 
   @Override
-  public void showError(@Nullable UserPresenter.Display.FormField formField, String message) {
+  public void showError(@Nullable SubjectCredentialsPresenter.Display.FormField formField, String message) {
     ControlGroup group = null;
     if(formField != null) {
       switch(formField) {
-        case USERNAME:
+        case NAME:
           group = nameGroup;
           break;
         case PASSWORD:
           group = passwordGroup;
+          break;
+        case CERTIFICATE:
+          group = certificateGroup;
           break;
       }
     }

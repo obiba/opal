@@ -8,13 +8,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.administration.user.presenter;
+package org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.presenter;
 
 import com.gwtplatform.mvp.client.UiHandlers;
 
-
-public interface UserAdministrationUiHandlers extends UiHandlers {
+public interface SubjectCredentialsAdministrationUiHandlers extends UiHandlers {
 
   void onAddUser();
+
+  void onAddApplication();
 
 }

@@ -66,6 +66,11 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
   }
 
   @Override
+  public Iterable<SubjectCredentials> getSubjectCredentials() {
+    return orientDbService.list(SubjectCredentials.class);
+  }
+
+  @Override
   public Iterable<SubjectCredentials> getSubjectCredentials(SubjectCredentials.Type type) {
     return orientDbService
         .list(SubjectCredentials.class, "select from " + SubjectCredentials.class.getSimpleName() + " where type = ?",
@@ -90,7 +95,8 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
   @Override
   public void save(SubjectCredentials subjectCredentials) throws ConstraintViolationException {
-    boolean newSubject = getSubjectCredentials(subjectCredentials.getName()) == null;
+    SubjectCredentials existing = getSubjectCredentials(subjectCredentials.getName());
+    boolean newSubject = existing == null;
     if(newSubject) {
       SubjectProfile profile = subjectProfileService.getProfile(subjectCredentials.getName());
       if(profile != null && !OpalUserRealm.OPAL_REALM.equals(profile.getRealm())) {
@@ -101,8 +107,9 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
     // Copy current password if password is empty
     //noinspection ConstantConditions
-    if(subjectCredentials.getType() == SubjectCredentials.Type.USER && subjectCredentials.getPassword() == null) {
-      subjectCredentials.setPassword(getSubjectCredentials(subjectCredentials.getName()).getPassword());
+    if(subjectCredentials.getType() == SubjectCredentials.Type.USER && subjectCredentials.getPassword() == null &&
+        !newSubject) {
+      subjectCredentials.setPassword(existing.getPassword());
     }
 
     toSave.put(subjectCredentials, subjectCredentials);

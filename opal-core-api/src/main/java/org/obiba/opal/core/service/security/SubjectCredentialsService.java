@@ -17,6 +17,8 @@ import org.obiba.opal.core.service.SystemService;
 
 public interface SubjectCredentialsService extends SystemService {
 
+  Iterable<SubjectCredentials> getSubjectCredentials();
+
   /**
    * Returns the list of users
    *

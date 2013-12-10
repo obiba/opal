@@ -490,12 +490,14 @@ public interface Translations extends Constants {
       "JdbcDatabaseIsRequired", "Jdbc database is required.",//
       "UrlIsRequired", "A url is required.",//
       "UsernameIsRequired", "A username is required.",//
+      "SubjectCredentialNameIsRequired", "A name is required.",//
       "TableSelectionIsRequired", "At least one table must be selected.",//
       "IdentifiersImportationCompleted", "Identifiers importation completed.",//
       "IdentifiersImportationFailed", "Identifiers importation failed: {0}.",//
       "IndexClearSelectAtLeastOne", "Select at least one index to clear.",//
       "IndexScheduleSelectAtLeastOne", "Select at least one index to schedule.",//
       "PasswordIsRequired", "A password is required.",//
+      "CertificateIsRequired", "A certificate is required.",//
       "UsageIsRequired", "Database usage is required.",//
       "SqlSchemaIsRequired", "Database SQL schema is required.",//
       "OpalURLIsRequired", "Opal address is required.",//
@@ -1724,6 +1726,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Password")
   String passwordLabel();
 
+  @Description("Certificate label")
+  @DefaultStringValue("Certificate")
+  String certificateLabel();
+
   @Description("Driver label")
   @DefaultStringValue("Driver")
   String driverLabel();
@@ -2060,9 +2066,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("Tasks")
   String pageJobsTitle();
 
-  @Description("Page Users and Applications title")
-  @DefaultStringValue("Users and Applications")
-  String pageUsersAndApplicationsTitle();
+  @Description("Page Users, Groups and Applications title")
+  @DefaultStringValue("Users, Groups and Applications")
+  String pageUsersGroupsAndApplicationsTitle();
 
   @Description("Page Projects title")
   @DefaultStringValue("Projects")
@@ -2128,9 +2134,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add User")
   String addUserLabel();
 
-  @Description("Edit User label")
-  @DefaultStringValue("Edit User")
-  String editUserLabel();
+  @Description("Add Application label")
+  @DefaultStringValue("Add Application")
+  String addApplicationLabel();
 
   @Description("Add Project label")
   @DefaultStringValue("Add Project")
@@ -2559,4 +2565,7 @@ public interface Translations extends Constants {
   })
   Map<String, String> criterionFiltersMap();
 
+  @Description("Paste certificate label")
+  @DefaultStringValue("(Paste certificate)")
+  String pasteCertificate();
 }
