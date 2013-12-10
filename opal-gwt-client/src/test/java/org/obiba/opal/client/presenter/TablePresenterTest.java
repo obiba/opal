@@ -31,6 +31,7 @@ import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesMo
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.ViewPropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
@@ -65,6 +66,7 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     usersAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     Provider<AuthorizationPresenter> mockProvider = createMock(Provider.class);
+    Provider<ResourcePermissionsPresenter> resourcePermissionsPresenterProvider = createMock(Provider.class);
     Provider<IndexPresenter> mockIndexProvider = createMock(Provider.class);
     ModalProvider<EntityModalPresenter> modalEntityModalPresenter = createMock(ModalProvider.class);
     ModalProvider<ValueSequencePopupPresenter> modalProviderValueSequence = createMock(ModalProvider.class);
@@ -78,9 +80,10 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
 
     ValuesTablePresenter values = new ValuesTablePresenter(null, null, null, modalProviderValueSequence,
         modalEntityModalPresenter);
-    presenter = new TablePresenter(displayMock, new CountingEventBus(), null, values, mockProvider, mockIndexProvider,
-        modalConfigureViewStepProvider, variablesToViewProvider, variablePropertiesModalProvider,
-        viewPropertiesModalProvider, tablePropertiesModalPresenterModalProvider, null, null, translations);
+    presenter = new TablePresenter(displayMock, new CountingEventBus(), null, values, mockProvider,
+        resourcePermissionsPresenterProvider, mockIndexProvider, modalConfigureViewStepProvider,
+        variablesToViewProvider, variablePropertiesModalProvider, viewPropertiesModalProvider,
+        tablePropertiesModalPresenterModalProvider, null, null, translations);
   }
 
   @SuppressWarnings({ "unchecked" })

@@ -15,7 +15,6 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
@@ -65,7 +64,7 @@ public class AuthorizationView extends ViewImpl implements AuthorizationPresente
 
   @Override
   public void setExplanation(String key) {
-    String text = translation.permissionExplanationMap().get(key);
+    String text = translation.authorizationExplanationMap().get(key);
     explanation.setText(text);
     explanation.setVisible(text != null && text.length() > 0);
   }

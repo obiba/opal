@@ -13,6 +13,9 @@ package org.obiba.opal.web.gwt.app.client.project.presenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.project.event.ProjectUpdatedEvent;
@@ -20,12 +23,15 @@ import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFac
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
@@ -45,16 +51,21 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
 
   private final ModalProvider<ProjectPropertiesModalPresenter> projectPropertiesModalProvider;
 
+  private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
+
   private ProjectDto project;
 
   private Runnable removeConfirmation;
 
   @Inject
-  public ProjectAdministrationPresenter(EventBus eventBus, Display view, PlaceManager placeManager, ModalProvider<ProjectPropertiesModalPresenter> projectPropertiesModalProvider) {
+  public ProjectAdministrationPresenter(EventBus eventBus, Display view, PlaceManager placeManager,
+      ModalProvider<ProjectPropertiesModalPresenter> projectPropertiesModalProvider,
+      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider) {
     super(eventBus, view);
     getView().setUiHandlers(this);
     this.placeManager = placeManager;
     this.projectPropertiesModalProvider = projectPropertiesModalProvider.setContainer(this);
+    this.resourcePermissionsProvider = resourcePermissionsProvider;
   }
 
   @Override
@@ -77,6 +88,12 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
   private void authorize() {
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(project.getLink()).put()
         .authorize(getView().getEditAuthorizer()).send();
+
+    // set permissions
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(UriBuilders.PROJECT_PERMISSIONS_PROJECT.create().build(project.getName())) //
+        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())) //
+        .post().send();
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(project.getLink()).delete()
         .authorize(getView().getDeleteAuthorizer()).send();
@@ -138,6 +155,30 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     }
   }
 
+  /**
+   * Update permissions on authorization.
+   */
+  private final class PermissionsUpdate implements HasAuthorization {
+    @Override
+    public void unauthorized() {
+
+    }
+
+    @Override
+    public void beforeAuthorization() {
+      clearSlot(null);
+    }
+
+    @Override
+    public void authorized() {
+      ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
+
+      resourcePermissionsPresenter.initialize(ResourcePermissionType.PROJECT, ResourcePermissionRequestPaths
+              .projectPermissions(project.getName()));
+      setInSlot(null, resourcePermissionsPresenter);
+    }
+  }
+
   public interface Display extends View, HasUiHandlers<ProjectAdministrationUiHandlers> {
 
     void setProject(ProjectDto project);
@@ -145,6 +186,8 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     ProjectDto getProject();
 
     HasAuthorization getEditAuthorizer();
+
+    HasAuthorization getPermissionsAuthorizer();
 
     HasAuthorization getDeleteAuthorizer();
   }

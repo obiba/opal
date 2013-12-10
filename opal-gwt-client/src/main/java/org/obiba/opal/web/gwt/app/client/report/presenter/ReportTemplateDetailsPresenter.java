@@ -18,6 +18,9 @@ import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateSelectedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
@@ -36,6 +39,7 @@ import org.obiba.opal.web.model.client.opal.ReportDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.http.client.Request;
@@ -57,13 +61,17 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
   private final Provider<AuthorizationPresenter> authorizationPresenter;
 
+  private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
+
   private ReportTemplateDto reportTemplate;
 
   @Inject
   public ReportTemplateDetailsPresenter(Display display, EventBus eventBus,
-      Provider<AuthorizationPresenter> authorizationPresenter) {
+      Provider<AuthorizationPresenter> authorizationPresenter,
+      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider) {
     super(eventBus, display);
     this.authorizationPresenter = authorizationPresenter;
+    this.resourcePermissionsProvider = resourcePermissionsProvider;
   }
 
   public void refresh() {
@@ -310,14 +318,22 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
     @Override
     public void authorized() {
-      AuthorizationPresenter authz = authorizationPresenter.get();
-      String node = UriBuilder.create().segment("report-template", reportTemplate.getName()).build();
+      ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
+      resourcePermissionsPresenter.initialize(ResourcePermissionType.REPORT_TEMPLATE, ResourcePermissionRequestPaths
+          .reportTemplatePermissions(reportTemplate.getProject(), reportTemplate.getName()));
+      setInSlot(null, resourcePermissionsPresenter);
       if (reportTemplate.hasProject()) {
-        node = UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplate.getProject(), reportTemplate.getName());
+        GWT.log("Report has project");
       }
-      authz.setAclRequest("report-template", new AclRequest(AclAction.REPORT_TEMPLATE_READ, node), //
-          new AclRequest(AclAction.REPORT_TEMPLATE_ALL, node));
-      setInSlot(null, authz);
+
+//      AuthorizationPresenter authz = authorizationPresenter.get();
+//      String node = UriBuilder.create().segment("report-template", reportTemplate.getName()).build();
+//      if (reportTemplate.hasProject()) {
+//        node = UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplate.getProject(), reportTemplate.getName());
+//      }
+//      authz.setAclRequest("report-template", new AclRequest(AclAction.REPORT_TEMPLATE_READ, node), //
+//          new AclRequest(AclAction.REPORT_TEMPLATE_ALL, node));
+//      setInSlot(null, authz);
     }
   }
 

@@ -24,6 +24,7 @@ import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.AddViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
@@ -56,13 +57,14 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
     displayMock = createMock(DatasourcePresenter.Display.class);
     eventBusMock = createMock(EventBus.class);
     Provider<AuthorizationPresenter> mockProvider = createMock(Provider.class);
+    Provider<ResourcePermissionsPresenter> mockPermissionsProvider = createMock(Provider.class);
     usersAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     ModalProvider<TablePropertiesModalPresenter> propertiesEditorModalProvider = createMock(ModalProvider.class);
     ModalProvider<AddViewModalPresenter> createViewModalProvider = createMock(ModalProvider.class);
 
     datasourcePresenter = new DatasourcePresenter(displayMock, new CountingEventBus(), propertiesEditorModalProvider,
-        null, createViewModalProvider, null, mockProvider, null);
+        null, createViewModalProvider, null, mockProvider, mockPermissionsProvider, null);
   }
 
   @Test

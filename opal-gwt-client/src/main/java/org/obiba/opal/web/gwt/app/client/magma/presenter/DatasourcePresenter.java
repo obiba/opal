@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
@@ -29,6 +28,9 @@ import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPr
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.AddViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
+import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.HttpMethod;
@@ -43,7 +45,6 @@ import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.opal.AclAction;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -74,6 +75,8 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   private final Provider<AuthorizationPresenter> authorizationPresenter;
 
+  private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
+
   private final Translations translations;
 
   private String datasourceName;
@@ -90,7 +93,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       ModalProvider<DataExportPresenter> dataExportModalProvider,
       ModalProvider<AddViewModalPresenter> createViewModalProvider,
       ModalProvider<DataCopyPresenter> dataCopyModalProvider, Provider<AuthorizationPresenter> authorizationPresenter,
-      Translations translations) {
+      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, Translations translations) {
     super(eventBus, display);
     this.translations = translations;
     this.tablePropertiesModalProvider = tablePropertiesModalProvider.setContainer(this);
@@ -98,6 +101,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     this.createViewModalProvider = createViewModalProvider.setContainer(this);
     this.dataCopyModalProvider = dataCopyModalProvider.setContainer(this);
     this.authorizationPresenter = authorizationPresenter;
+    this.resourcePermissionsProvider = resourcePermissionsProvider;
     getView().setUiHandlers(this);
   }
 
@@ -385,11 +389,15 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
     @Override
     public void authorized() {
-      AuthorizationPresenter authz = authorizationPresenter.get();
-      String node = UriBuilder.create().segment("datasource", datasourceName).build();
-      authz.setAclRequest("datasource", new AclRequest(AclAction.CREATE_TABLE, node), //
-          new AclRequest(AclAction.DATASOURCE_ALL, node));
-      setInSlot(null, authz);
+      ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
+      resourcePermissionsPresenter.initialize(ResourcePermissionType.DATASOURCE, ResourcePermissionRequestPaths
+              .datasourcePermissions(datasourceName));
+      setInSlot(null, resourcePermissionsPresenter);
+//      AuthorizationPresenter authz = authorizationPresenter.get();
+//      String node = UriBuilder.create().segment("datasource", datasourceName).build();
+//      authz.setAclRequest("datasource", new AclRequest(AclAction.CREATE_TABLE, node), //
+//          new AclRequest(AclAction.DATASOURCE_ALL, node));
+//      setInSlot(null, authz);
     }
   }
 

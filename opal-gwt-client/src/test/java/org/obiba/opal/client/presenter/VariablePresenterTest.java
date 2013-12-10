@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.CategoriesEdit
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variablestoview.presenter.VariablesToViewPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.test.AbstractGwtTestSetup;
 
@@ -64,13 +65,14 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
     variableVcsCommitHistoryPresenterMock = createMock(VariableVcsCommitHistoryPresenter.class);
     groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     Provider<AuthorizationPresenter> mockProvider = createMock(Provider.class);
+    Provider<ResourcePermissionsPresenter> mockResourcePermissionProvider = createMock(Provider.class);
     ModalProvider<VariablesToViewPresenter> variablesToViewProvider = createMock(ModalProvider.class);
     ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider = createMock(ModalProvider.class);
     ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider = createMock(ModalProvider.class);
 
     ModalProvider<VariableAttributeModalPresenter> varAttributeModalProvider = createMock(ModalProvider.class);
     variablePresenter = new VariablePresenter(displayMock, new CountingEventBus(), null, null,
-        new SummaryTabPresenter(eventBusMock, summaryTabMock), null, mockProvider,
+        new SummaryTabPresenter(eventBusMock, summaryTabMock), null, mockProvider, mockResourcePermissionProvider,
         variableVcsCommitHistoryPresenterMock, variablesToViewProvider, categoriesEditorModalProvider,
         propertiesEditorModalProvider, varAttributeModalProvider);
   }
