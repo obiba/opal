@@ -220,11 +220,18 @@ message ScheduleDto {
   optional int32 minutes = 4;
 }
 
-message UserDto {
+enum SubjectCredentialsType {
+  USER = 1;
+  APPLICATION = 2;
+}
+
+message SubjectCredentialsDto {
   required string name = 1;
-  optional string password = 2; // only set when the password is to be updated on POST or PUT
-  repeated string groups = 3; // only set when user is from the user table
-  optional bool enabled = 4 [default = true];
+  required SubjectCredentialsType type = 2;
+  optional string password = 3; // only set when the password is to be updated on POST or PUT
+  optional bytes certificate = 4;
+  repeated string groups = 5;
+  optional bool enabled = 6 [default = true];
 }
 
 message GroupDto {

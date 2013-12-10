@@ -32,6 +32,8 @@ public interface SubjectCredentialsService extends SystemService {
    */
   SubjectCredentials getSubjectCredentials(String name);
 
+  String hashPassword(String password);
+
   /**
    * Create a subjectCredentials when id is not provided, otherwise, updates the changed fields
    *

@@ -10,21 +10,38 @@ public class Dtos {
 
   private Dtos() {}
 
-  public static SubjectCredentials fromDto(Opal.UserDto dto) {
-    return SubjectCredentials.Builder.create() //
-        .type(SubjectCredentials.Type.USER) //
+  public static SubjectCredentials fromDto(Opal.SubjectCredentialsDto dto) {
+    SubjectCredentials.Builder builder = SubjectCredentials.Builder.create() //
         .name(dto.getName()) //
         .enabled(dto.getEnabled()) //
-        .groups(Sets.newHashSet(dto.getGroupsList())) //
-        .build();
+        .groups(Sets.newHashSet(dto.getGroupsList()));
+    switch(dto.getType()) {
+      case USER:
+        builder.type(SubjectCredentials.Type.USER);
+        break;
+      case APPLICATION:
+        builder.type(SubjectCredentials.Type.APPLICATION);
+        break;
+    }
+    // dont't copy password or certificate
+    return builder.build();
   }
 
-  public static Opal.UserDto asDto(SubjectCredentials subjectCredentials) {
-    return Opal.UserDto.newBuilder() //
+  public static Opal.SubjectCredentialsDto asDto(SubjectCredentials subjectCredentials) {
+    Opal.SubjectCredentialsDto.Builder builder = Opal.SubjectCredentialsDto.newBuilder() //
         .setName(subjectCredentials.getName()) //
         .setEnabled(subjectCredentials.isEnabled()) //
-        .addAllGroups(subjectCredentials.getGroups()) //
-        .build();
+        .addAllGroups(subjectCredentials.getGroups());
+    switch(subjectCredentials.getType()) {
+      case USER:
+        builder.setType(Opal.SubjectCredentialsType.USER);
+        break;
+      case APPLICATION:
+        builder.setType(Opal.SubjectCredentialsType.APPLICATION);
+        break;
+    }
+    // dont't copy password or certificate
+    return builder.build();
   }
 
   public static Opal.GroupDto asDto(Group group) {

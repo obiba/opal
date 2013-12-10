@@ -16,7 +16,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
-import org.apache.shiro.util.SimpleByteSource;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.service.security.SubjectCredentialsService;
 import org.obiba.opal.web.model.Opal;
@@ -26,8 +25,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Scope("request")
-@Path("/user/{name}")
-public class UserResource {
+@Path("/system/subject-credential/{name}")
+public class SubjectCredentialResource {
 
   @PathParam("name")
   private String name;
@@ -36,28 +35,38 @@ public class UserResource {
   private SubjectCredentialsService subjectCredentialsService;
 
   @GET
-  public Response getUser() {
+  public Response get() {
     SubjectCredentials subjectCredentials = subjectCredentialsService.getSubjectCredentials(name);
-    return subjectCredentials == null || subjectCredentials.getType() != SubjectCredentials.Type.USER ? Response
-        .status(Response.Status.NOT_FOUND).build() : Response.ok().entity(Dtos.asDto(subjectCredentials)).build();
+    return (subjectCredentials == null //
+        ? Response.status(Response.Status.NOT_FOUND) //
+        : Response.ok().entity(Dtos.asDto(subjectCredentials))).build();
   }
 
   @PUT
-  public Response updateUser(Opal.UserDto dto) {
+  public Response update(Opal.SubjectCredentialsDto dto) {
     if(!name.equals(dto.getName())) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
     SubjectCredentials subjectCredentials = Dtos.fromDto(dto);
-    if(dto.hasPassword() && !dto.getPassword().isEmpty()) {
-      subjectCredentials.setPassword(
-          SubjectCredentials.digest(dto.getPassword(), new SimpleByteSource(subjectCredentials.getName()).getBytes()));
+    switch(subjectCredentials.getType()) {
+      case USER:
+        if(dto.hasPassword() && !dto.getPassword().isEmpty()) {
+          subjectCredentials.setPassword(subjectCredentialsService.hashPassword(dto.getPassword()));
+        }
+        break;
+      case APPLICATION:
+        if(dto.hasCertificate()) {
+          subjectCredentials.setCertificate(dto.getCertificate().toByteArray());
+        }
+        break;
     }
+
     subjectCredentialsService.save(subjectCredentials);
     return Response.ok().build();
   }
 
   @DELETE
-  public Response deleteUser() {
+  public Response delete() {
     SubjectCredentials subjectCredentials = subjectCredentialsService.getSubjectCredentials(name);
     if(subjectCredentials == null) {
       return Response.status(Response.Status.NOT_FOUND).build();

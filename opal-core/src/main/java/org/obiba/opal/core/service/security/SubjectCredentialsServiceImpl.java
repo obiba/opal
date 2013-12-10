@@ -17,6 +17,8 @@ import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.validation.ConstraintViolationException;
 
+import org.apache.shiro.crypto.hash.Sha512Hash;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.security.Group;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
@@ -38,6 +40,8 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
   private static final String OPAL_DOMAIN = "opal";
 
+  private static final int HASH_ITERATIONS = 200000;
+
   @Autowired
   private SubjectAclService subjectAclService;
 
@@ -46,6 +50,9 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
   @Autowired
   private OrientDbService orientDbService;
+
+  @Autowired
+  private OpalConfigurationService opalConfigurationService;
 
   @Override
   @PostConstruct
@@ -73,6 +80,12 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
   @Override
   public SubjectCredentials getSubjectCredentials(String name) {
     return orientDbService.findUnique(new SubjectCredentials(name));
+  }
+
+  @Override
+  public String hashPassword(String password) {
+    return new Sha512Hash(password, opalConfigurationService.getOpalConfiguration().getSecretKey(), HASH_ITERATIONS)
+        .toString();
   }
 
   @Override

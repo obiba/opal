@@ -9,17 +9,13 @@
  */
 package org.obiba.opal.core.domain.security;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 
-import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.hibernate.validator.constraints.NotBlank;
-import org.obiba.core.util.HexUtil;
 import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.validator.NotNullIfAnotherFieldHasValue;
@@ -32,10 +28,6 @@ import com.google.common.collect.Lists;
 public class SubjectCredentials extends AbstractTimestamped
     implements Comparable<SubjectCredentials>, HasUniqueProperties {
 
-  public enum Status {
-    ACTIVE, INACTIVE
-  }
-
   public enum Type {
     USER, APPLICATION
   }
@@ -47,11 +39,9 @@ public class SubjectCredentials extends AbstractTimestamped
   @NotNull
   private Type type;
 
-  // user password
-  private String password;
+  private String password; // for user only
 
-  // application certificate
-  private byte[] certificate;
+  private byte[] certificate; // for application only
 
   private boolean enabled;
 
@@ -135,18 +125,6 @@ public class SubjectCredentials extends AbstractTimestamped
 
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
-  }
-
-  // TODO use Shiro to digest password
-  public static String digest(String password, byte... salt) {
-    try {
-      MessageDigest digest = MessageDigest.getInstance(Sha256Hash.ALGORITHM_NAME);
-      digest.reset();
-      digest.update(salt);
-      return HexUtil.bytesToHex(digest.digest(password.getBytes()));
-    } catch(NoSuchAlgorithmException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   @Override

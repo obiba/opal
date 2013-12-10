@@ -18,14 +18,12 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
-import org.apache.shiro.util.SimpleByteSource;
 import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.service.security.SubjectCredentialsService;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
@@ -34,28 +32,26 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 @Component
-@Scope("request")
-@Path("/users")
-public class UsersResource {
+@Path("/system/subject-credentials")
+public class SubjectCredentialsResource {
 
   @Autowired
   private SubjectCredentialsService subjectCredentialsService;
 
   @GET
-  public List<Opal.UserDto> getUsers() {
+  public List<Opal.SubjectCredentialsDto> getUsers() {
     return Lists.newArrayList(Iterables
         .transform(subjectCredentialsService.getSubjectCredentials(SubjectCredentials.Type.USER),
-            new Function<SubjectCredentials, Opal.UserDto>() {
+            new Function<SubjectCredentials, Opal.SubjectCredentialsDto>() {
               @Override
-              public Opal.UserDto apply(SubjectCredentials subjectCredentials) {
+              public Opal.SubjectCredentialsDto apply(SubjectCredentials subjectCredentials) {
                 return Dtos.asDto(subjectCredentials);
               }
             }));
   }
 
   @POST
-  @SuppressWarnings("unchecked")
-  public Response createUser(Opal.UserDto dto) {
+  public Response createUser(Opal.SubjectCredentialsDto dto) {
     SubjectCredentials subjectCredentials = Dtos.fromDto(dto);
     if(subjectCredentialsService.getSubjectCredentials(subjectCredentials.getName()) != null) {
       ConstraintViolation<SubjectCredentials> violation = ConstraintViolationImpl
@@ -64,8 +60,9 @@ public class UsersResource {
               PathImpl.createPathFromString("name"), null, null);
       throw new ConstraintViolationException(Sets.newHashSet(violation));
     }
-    subjectCredentials.setPassword(
-        SubjectCredentials.digest(dto.getPassword(), new SimpleByteSource(subjectCredentials.getName()).getBytes()));
+    if(subjectCredentials.getType() == SubjectCredentials.Type.USER) {
+      subjectCredentials.setPassword(subjectCredentialsService.hashPassword(dto.getPassword()));
+    }
     subjectCredentialsService.save(subjectCredentials);
     return Response.ok().build();
   }

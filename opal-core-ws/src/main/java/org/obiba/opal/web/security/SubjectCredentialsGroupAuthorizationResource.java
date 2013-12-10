@@ -29,7 +29,7 @@ import com.google.common.collect.Iterables;
 @Component
 @Scope("request")
 @Path("/authz-subject/{subject:.*}")
-public class UserGroupAuthorizationResource {
+public class SubjectCredentialsGroupAuthorizationResource {
 
   @Autowired
   private SubjectAclService subjectAclService;
