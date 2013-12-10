@@ -26,6 +26,7 @@ import org.obiba.magma.type.TextType;
 import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
+import org.obiba.opal.core.identifiers.IdentifiersMapping;
 import org.obiba.opal.core.magma.FunctionalUnitView;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
 import org.obiba.opal.core.unit.FunctionalUnit;
@@ -43,6 +44,44 @@ public class IdentifierServiceImpl implements IdentifierService {
 
   @Autowired
   private IParticipantIdentifier participantIdentifier;
+
+  @Override
+  public Variable createIdentifierVariable(@Nullable ValueTable privateView, @NotNull IdentifiersMapping idsMapping) {
+    Variable keyVariable = Variable.Builder
+        .newVariable(idsMapping.getName(), TextType.get(), idsMapping.getEntityType()).build();
+
+    ValueTableWriter identifiersTableWriter = identifiersTableService.createValueTableWriter();
+    try {
+      ValueTableWriter.VariableWriter variableWriter = identifiersTableWriter.writeVariables();
+      try {
+        // Create private variables
+        variableWriter.writeVariable(keyVariable);
+        if(privateView != null) {
+          DatasourceCopier.Builder.newCopier().dontCopyValues().build().copyMetadata(privateView, variableWriter);
+        }
+      } finally {
+        Closeables.closeQuietly(variableWriter);
+      }
+    } finally {
+      Closeables.closeQuietly(identifiersTableWriter);
+    }
+    return keyVariable;
+  }
+
+  @Override
+  public View createPrivateView(String viewName, ValueTable identifiersTable, @Nullable String select) {
+    if(select != null) {
+      View privateView = View.Builder.newView(viewName, identifiersTable).select(new JavascriptClause(select)).build();
+      privateView.initialise();
+      return privateView;
+    }
+    return View.Builder.newView(viewName, identifiersTable).select(new SelectClause() {
+      @Override
+      public boolean select(Variable variable) {
+        return isIdentifierVariable(variable);
+      }
+    }).build();
+  }
 
   /**
    * Creates a {@link org.obiba.magma.views.View} of the participant table's "private" variables (i.e., identifiers).

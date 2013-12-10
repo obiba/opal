@@ -9,11 +9,15 @@
  ******************************************************************************/
 package org.obiba.opal.core.service;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.Datasource;
+import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
+import org.obiba.magma.Variable;
+import org.obiba.opal.core.identifiers.IdentifiersMapping;
 import org.obiba.opal.core.service.database.IdentifiersDatabaseNotFoundException;
 
 import com.google.common.base.Predicate;
@@ -23,7 +27,25 @@ import com.google.common.base.Predicate;
  */
 public interface IdentifiersTableService {
 
+  @NotNull
   Datasource getDatasource();
+
+  boolean hasValueTable(@NotNull String entityType);
+
+  @NotNull
+  ValueTable getValueTable(@NotNull String entityType) throws NoSuchValueTableException;
+
+  /**
+   * Create value table for entity type if not found.
+   * @param entityType
+   */
+  @NotNull
+  ValueTable ensureValueTable(@NotNull String entityType);
+
+  @NotNull
+  Variable ensureVariable(@NotNull IdentifiersMapping idMapping);
+
+  ValueTableWriter createValueTableWriter(@NotNull String entityType);
 
   /**
    * Get the identifiers value table.

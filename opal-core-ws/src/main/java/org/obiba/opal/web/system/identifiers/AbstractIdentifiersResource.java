@@ -10,16 +10,36 @@
 
 package org.obiba.opal.web.system.identifiers;
 
+import java.io.File;
+
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
+import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersTableService;
 
 public abstract class AbstractIdentifiersResource {
 
   protected abstract IdentifiersTableService getIdentifiersTableService();
+
+  protected abstract OpalRuntime getOpalRuntime();
+
+  protected File resolveLocalFile(String path) {
+    try {
+      // note: does not ensure that file exists
+      return getOpalRuntime().getFileSystem().getLocalFile(resolveFileInFileSystem(path));
+    } catch(FileSystemException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
+  protected FileObject resolveFileInFileSystem(String path) throws FileSystemException {
+    return getOpalRuntime().getFileSystem().getRoot().resolveFile(path);
+  }
 
   /**
    * Get the identifiers value table of the given entity type, case insensitive.

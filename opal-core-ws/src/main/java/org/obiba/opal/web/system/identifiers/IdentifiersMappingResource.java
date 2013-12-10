@@ -11,6 +11,8 @@
 package org.obiba.opal.web.system.identifiers;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -22,20 +24,37 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.obiba.magma.Datasource;
+import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
+import org.obiba.magma.NoSuchDatasourceException;
+import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.lang.Closeables;
+import org.obiba.magma.support.Disposables;
+import org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl;
+import org.obiba.opal.core.identifiers.IdentifiersMapping;
+import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.service.IdentifiersImportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
+import org.obiba.opal.core.service.ImportService;
+import org.obiba.opal.core.unit.FunctionalUnit;
+import org.obiba.opal.core.unit.FunctionalUnitIdentifierMapper;
 import org.obiba.opal.core.unit.FunctionalUnitIdentifiers;
+import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.Dtos;
+import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.ws.security.AuthenticatedByCookie;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,11 +63,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 
+import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
 @Component
@@ -59,19 +80,29 @@ import au.com.bytecode.opencsv.CSVWriter;
     description = "Operations about a specific identifiers mapping")
 public class IdentifiersMappingResource extends AbstractIdentifiersResource {
 
+  @Autowired
+  private OpalRuntime opalRuntime;
+
+  @Autowired
   private IdentifiersTableService identifiersTableService;
+
+  @Autowired
+  private IdentifiersImportService identifiersImportService;
+
+  @Autowired
+  private DatasourceFactoryRegistry datasourceFactoryRegistry;
 
   @PathParam("name")
   private String name;
 
-  @Autowired
-  public void setIdentifiersTableService(IdentifiersTableService identifiersTableService) {
-    this.identifiersTableService = identifiersTableService;
-  }
-
   @Override
   protected IdentifiersTableService getIdentifiersTableService() {
     return identifiersTableService;
+  }
+
+  @Override
+  protected OpalRuntime getOpalRuntime() {
+    return opalRuntime;
   }
 
   @GET
@@ -116,10 +147,72 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
   }
 
   @GET
-  @Path("/entities/_count")
+  @Path("/_count")
   public String getEntitiesCount(@QueryParam("type") @DefaultValue("Participant") String entityType) {
     return String.valueOf(Iterables.size(getUnitIdentifiers(entityType)));
   }
+
+  @POST
+  @Path("/_import")
+  public Response importIdentifiers(Magma.DatasourceFactoryDto datasourceFactoryDto,
+      @QueryParam("type") @DefaultValue("Participant") String entityType, @QueryParam("select") String select) {
+    Response response = null;
+
+    Datasource sourceDatasource = createTransientDatasource(datasourceFactoryDto);
+
+    try {
+      identifiersImportService
+          .importIdentifiers(new IdentifiersMapping(name, entityType), sourceDatasource, select);
+      response = Response.ok().build();
+    } catch(NoSuchDatasourceException ex) {
+      response = Response.status(Response.Status.NOT_FOUND)
+          .entity(ClientErrorDtos.getErrorMessage(Response.Status.NOT_FOUND, "DatasourceNotFound", ex)).build();
+    } catch(NoSuchValueTableException ex) {
+      response = Response.status(Response.Status.NOT_FOUND)
+          .entity(ClientErrorDtos.getErrorMessage(Response.Status.NOT_FOUND, "ValueTableNotFound", ex)).build();
+    } catch(IOException ex) {
+      response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
+          ClientErrorDtos.getErrorMessage(Response.Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex))
+          .build();
+    } finally {
+      Disposables.silentlyDispose(sourceDatasource);
+    }
+
+    return response;
+  }
+
+  /**
+   * Generate identifiers.
+   * @param entityType
+   * @param size
+   * @param zeros
+   * @param prefix
+   * @return
+   */
+  @POST
+  @Path("/_generate")
+  public Response importIdentifiers(@QueryParam("type") @DefaultValue("Participant") String entityType,
+      @QueryParam("size") Integer size, @QueryParam("zeros") Boolean zeros, @QueryParam("prefix") String prefix) {
+    try {
+      DefaultParticipantIdentifierImpl pId = new DefaultParticipantIdentifierImpl();
+      if(size != null) pId.setKeySize(size);
+      if(zeros != null) pId.setAllowStartWithZero(zeros);
+      if(prefix != null) pId.setPrefix(prefix);
+      int count = identifiersImportService.importIdentifiers(new IdentifiersMapping(name, entityType), pId);
+      return Response.ok().entity(Integer.toString(count)).build();
+    } catch(NoSuchDatasourceException ex) {
+      return Response.status(Response.Status.NOT_FOUND)
+          .entity(ClientErrorDtos.getErrorMessage(Response.Status.NOT_FOUND, "DatasourceNotFound", ex)).build();
+    } catch(NoSuchValueTableException ex) {
+      return Response.status(Response.Status.NOT_FOUND)
+          .entity(ClientErrorDtos.getErrorMessage(Response.Status.NOT_FOUND, "ValueTableNotFound", ex)).build();
+    } catch(MagmaRuntimeException ex) {
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+          .entity(ClientErrorDtos.getErrorMessage(Response.Status.INTERNAL_SERVER_ERROR, "ImportIdentifiersError", ex))
+          .build();
+    }
+  }
+
 
   /**
    * Get the non-null values of a variable's vector in CSV format.
@@ -184,6 +277,13 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
   //
   // Private methods
   //
+
+  private Datasource createTransientDatasource(Magma.DatasourceFactoryDto datasourceFactoryDto) {
+    DatasourceFactory factory = datasourceFactoryRegistry.parse(datasourceFactoryDto);
+    String uid = MagmaEngine.get().addTransientDatasource(factory);
+
+    return MagmaEngine.get().getTransientDatasourceInstance(uid);
+  }
 
   private Iterable<FunctionalUnitIdentifiers.UnitIdentifier> getUnitIdentifiers(String entityType) {
     return Iterables.filter(new FunctionalUnitIdentifiers(getValueTable(entityType), name),

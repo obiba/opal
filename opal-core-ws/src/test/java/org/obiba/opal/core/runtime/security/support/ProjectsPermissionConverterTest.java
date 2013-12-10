@@ -32,8 +32,7 @@ public class ProjectsPermissionConverterTest
   public void testProjectAll() {
     testConversion("/project/patate", ProjectsPermissionConverter.Permission.PROJECT_ALL, //
         "rest:/datasource/patate:*:GET/*", //
-        "rest:/functional-units/unit:GET:GET/GET", //
-        "rest:/functional-units/entities/table:GET",//
+        "rest:/system/identifiers/mappings:GET", //
         "rest:/project/patate:*:GET/*",//
         "rest:/files/projects/patate:*:GET/*");
   }
@@ -42,8 +41,7 @@ public class ProjectsPermissionConverterTest
   public void testDatasourceAll() {
     testConversion("/datasource/patate", ProjectsPermissionConverter.Permission.DATASOURCE_ALL, //
         "rest:/datasource/patate:*:GET/*", //
-        "rest:/functional-units/unit:GET:GET/GET", //
-        "rest:/functional-units/entities/table:GET",//
+        "rest:/system/identifiers/mappings:GET", //
         "rest:/project/patate:GET:GET/*",//
         "rest:/files/projects/patate:GET:GET/*",//
         "rest:/files/projects/patate:POST:GET/*",//

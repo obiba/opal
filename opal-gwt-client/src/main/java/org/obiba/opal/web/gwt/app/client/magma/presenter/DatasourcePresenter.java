@@ -269,8 +269,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       ResourceAuthorizationRequestBuilderFactory.newBuilder() //
           .forResource(UriBuilders.PROJECT_COMMANDS_EXPORT.create().build(datasourceName)) //
           .authorize(CascadingAuthorizer.newBuilder() //
-              .and("/functional-units", HttpMethod.GET) //
-              .and("/functional-units/entities/table", HttpMethod.GET) //
+              .and("/system/identifiers/mappings", HttpMethod.GET) //
               .authorize(getView().getExportDataAuthorizer()).build()) //
           .post().send();
       // copy data
@@ -282,8 +281,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       ResourceAuthorizationRequestBuilderFactory.newBuilder() //
           .forResource(UriBuilders.PROJECT_COMMANDS_IMPORT.create().build(datasourceName)) //
           .authorize(CascadingAuthorizer.newBuilder() //
-              .and("/functional-units", HttpMethod.GET) //
-              .and("/functional-units/entities/table", HttpMethod.GET) //
+              .and("/system/identifiers/mappings", HttpMethod.GET) //
               .authorize(getView().getImportDataAuthorizer()).build()) //
           .post().send();
     }

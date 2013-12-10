@@ -22,6 +22,7 @@ import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
+import org.obiba.opal.core.identifiers.IdentifiersMapping;
 import org.obiba.opal.core.unit.FunctionalUnit;
 
 /**
@@ -95,71 +96,5 @@ public interface ImportService {
   void importData(Set<ValueTable> sourceValueTables, String destinationDatasourceName,
       boolean allowIdentifierGeneration, boolean ignoreUnknownIdentifier)
       throws NoSuchFunctionalUnitException, NonExistentVariableEntitiesException, IOException, InterruptedException;
-
-  /**
-   * Import identifiers using the given participant identifiers provider.
-   *
-   * @param unitName
-   * @param pIdentifier
-   * @return the number of identifiers added
-   */
-  int importIdentifiers(String unitName, IParticipantIdentifier pIdentifier);
-
-  /**
-   * Import identifiers of the provided datasource into Opal identifiers datasource, as values of the unit key variable
-   * name.
-   *
-   * @param unitName functional unit name
-   * @param sourceDatasourceName name of the source datasource
-   * @param select an option script for select variables representing identifiers. If not specified unit select clause
-   * is used if this one is defined.
-   * @throws NoSuchFunctionalUnitException if the specified functional unit does not exist
-   * @throws NoSuchDatasourceException if the specified source datasource does not exist
-   * @throws IOException on any I/O error
-   */
-  void importIdentifiers(String unitName, String sourceDatasourceName, String select)
-      throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IOException;
-
-  /**
-   * Import identifiers of the provided datasource into Opal identifiers datasource, as values of the unit key variable
-   * name.
-   *
-   * @param unit functional unit
-   * @param sourceDatasource source datasource
-   * @param select an option script for select variables representing identifiers. If not specified unit select clause
-   * is used if this one is defined.
-   * @throws IOException
-   */
-  void importIdentifiers(FunctionalUnit unit, Datasource sourceDatasource, @Nullable String select) throws IOException;
-
-  /**
-   * Import identifiers of the provided datasource into Opal identifiers datasource, as values of the key table.
-   *
-   * @param sourceDatasourceName name of the source datasource
-   * @throws NoSuchDatasourceException if the specified datasource does not exist
-   * @throws NoSuchValueTableException if the specified source datasource does not contain an identifiers table (i.e., a
-   * table with the same name as <code>org.obiba.opal.keys.tableReference</code>)
-   * @throws IOException on any I/O error
-   */
-  void importIdentifiers(String sourceDatasourceName)
-      throws NoSuchDatasourceException, NoSuchValueTableException, IOException;
-
-  /**
-   * Import identifiers of the provided datasource into Opal identifiers datasource, as values of the key table.
-   *
-   * @param sourceDatasource source datasource
-   * @throws NoSuchValueTableException if the specified source datasource does not contain an identifiers table (i.e., a
-   * table with the same name as <code>org.obiba.opal.keys.tableReference</code> or has no tables)
-   * @throws IOException on any I/O error
-   */
-  void importIdentifiers(Datasource sourceDatasource) throws NoSuchValueTableException, IOException;
-
-  /**
-   * Import identifiers of the entities of the given table.
-   *
-   * @param sourceValueTable
-   * @throws IOException
-   */
-  void importIdentifiers(ValueTable sourceValueTable) throws IOException;
 
 }

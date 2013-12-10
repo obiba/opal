@@ -17,6 +17,7 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.views.View;
+import org.obiba.opal.core.identifiers.IdentifiersMapping;
 import org.obiba.opal.core.magma.FunctionalUnitView;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
 import org.obiba.opal.core.unit.FunctionalUnit;
@@ -26,6 +27,17 @@ import org.obiba.opal.core.unit.FunctionalUnit;
  */
 public interface IdentifierService {
 
+  Variable createIdentifierVariable(@Nullable ValueTable privateView, @NotNull IdentifiersMapping idsMapping);
+
+  /**
+   * Make a view
+   * @param viewName
+   * @param identifiersTable
+   * @param select
+   * @return
+   */
+  View createPrivateView(String viewName, ValueTable identifiersTable, @Nullable String select);
+
   Variable createKeyVariable(@Nullable ValueTable privateView, @NotNull String keyVariableName);
 
   /**
@@ -33,6 +45,7 @@ public interface IdentifierService {
    */
   void copyParticipantIdentifiers(VariableEntity publicEntity, ValueTable privateView,
       PrivateVariableEntityMap entityMap, ValueTableWriter keysTableWriter);
+
 
   View createPrivateView(String viewName, ValueTable participantTable, FunctionalUnit unit, @Nullable String select);
 
