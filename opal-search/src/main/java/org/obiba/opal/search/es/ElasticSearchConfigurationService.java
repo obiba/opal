@@ -22,8 +22,7 @@ public class ElasticSearchConfigurationService {
   @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
   public ElasticSearchConfigurationService(OpalConfigurationService configService) {
-    configSupplier = new ExtensionConfigurationSupplier<ElasticSearchConfiguration>(configService,
-        ElasticSearchConfiguration.class);
+    configSupplier = new ExtensionConfigurationSupplier<>(configService, ElasticSearchConfiguration.class);
   }
 
   public ElasticSearchConfiguration getConfig() {

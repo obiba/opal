@@ -50,7 +50,7 @@ public class EsResource {
   @Path("/{uri:.*}")
   public Response proxy(@Context HttpServletRequest servletRequest, String body) {
     final CountDownLatch latch = new CountDownLatch(1);
-    final AtomicReference<Response> ref = new AtomicReference<Response>();
+    final AtomicReference<Response> ref = new AtomicReference<>();
 
     esProvider.getRest().dispatchRequest(new JaxRsRestRequest(servletRequest, body), new RestChannel() {
 

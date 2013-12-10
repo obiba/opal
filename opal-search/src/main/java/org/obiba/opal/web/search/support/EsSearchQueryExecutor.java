@@ -63,7 +63,7 @@ public class EsSearchQueryExecutor implements SearchQueryExecutor {
     Assert.notNull(dtoQueries, "Query dto request is null!");
 
     final CountDownLatch latch = new CountDownLatch(1);
-    final AtomicReference<Response> ref = new AtomicReference<Response>();
+    final AtomicReference<Response> ref = new AtomicReference<>();
 
     String body = build(dtoQueries, indexManagerHelper);
 

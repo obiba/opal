@@ -36,7 +36,7 @@ public class InvalidRequestException extends RuntimeException {
   public InvalidRequestException(String message, String... messageArgs) {
     super(message);
 
-    this.messageArgs = new ArrayList<String>();
+    this.messageArgs = new ArrayList<>();
 
     if(messageArgs != null) {
       Collections.addAll(this.messageArgs, messageArgs);

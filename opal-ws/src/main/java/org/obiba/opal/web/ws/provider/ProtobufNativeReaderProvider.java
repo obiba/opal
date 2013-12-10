@@ -57,7 +57,7 @@ public class ProtobufNativeReaderProvider extends AbstractProtobufProvider imple
     ExtensionRegistry extensionRegistry = protobuf().extensions().forMessage(messageType);
     Builder builder = protobuf().builders().forMessage(messageType);
     if(isWrapped(type, genericType, annotations, mediaType)) {
-      Collection<Message> msgs = new ArrayList<Message>();
+      Collection<Message> msgs = new ArrayList<>();
       Builder b = builder.clone();
       while(b.mergeDelimitedFrom(entityStream, extensionRegistry)) {
         msgs.add(b.build());

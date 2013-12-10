@@ -99,7 +99,7 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
     JSONObject jsonHits = jsonResponse.getJSONObject("hits");
 
     dtoResponseBuilder.setTotalHits(jsonHits.getInt("total"));
-    Collection<VariableEntity> entities = new ArrayList<VariableEntity>();
+    Collection<VariableEntity> entities = new ArrayList<>();
     String entityType = getValueTable().getEntityType();
 
     JSONArray hits = jsonHits.getJSONArray("hits");
@@ -172,7 +172,7 @@ public class TableValueSetsSearchResource extends AbstractVariablesSearchResourc
       JavascriptClause jsClause = new JavascriptClause(script);
       jsClause.initialise();
 
-      filteredVariables = new ArrayList<Variable>();
+      filteredVariables = new ArrayList<>();
       for(Variable variable : getValueTable().getVariables()) {
         if(jsClause.select(variable)) {
           filteredVariables.add(variable);

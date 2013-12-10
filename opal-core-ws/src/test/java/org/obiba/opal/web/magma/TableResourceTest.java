@@ -110,7 +110,7 @@ public class TableResourceTest extends AbstractMagmaResourceTest {
     Datasource datasource = MagmaEngine.get().getDatasource(DATASOURCE2);
     createResource(datasource.getValueTable("Weight"), null);
 
-    List<PathSegment> segments = new ArrayList<PathSegment>();
+    List<PathSegment> segments = new ArrayList<>();
     segments.add(createMock(PathSegment.class));
     segments.add(createMock(PathSegment.class));
     segments.add(createMock(PathSegment.class));

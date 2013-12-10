@@ -29,7 +29,7 @@ public class CertificateInfo {
 
   public CertificateInfo(OpalShell shell) {
     this.shell = shell;
-    infoList = new ArrayList<Attribute>();
+    infoList = new ArrayList<>();
     infoList.add(new Attribute("CN", DEFAULT_VALUE, "What is your first and last name?"));
     infoList.add(new Attribute("OU", DEFAULT_VALUE, "What is the name of your organizational unit?"));
     infoList.add(new Attribute("O", DEFAULT_VALUE, "What is the name of your organization?"));

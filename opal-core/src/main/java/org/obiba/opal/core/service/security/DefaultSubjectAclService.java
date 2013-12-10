@@ -331,7 +331,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
       }
 
     }).filter(new Predicate<SubjectAclService.Subject>() {
-      final Collection<Subject> set = new TreeSet<SubjectAclService.Subject>();
+      final Collection<Subject> set = new TreeSet<>();
 
       @Override
       public boolean apply(SubjectAclService.Subject input) {

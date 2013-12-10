@@ -73,7 +73,7 @@ public class FilesResourceTest {
   /**
    * Delete these files in tearDown().
    */
-  private final Collection<String> filesCreatedByTest = new ArrayList<String>();
+  private final Collection<String> filesCreatedByTest = new ArrayList<>();
 
   @Before
   public void setUp() throws URISyntaxException {
@@ -182,7 +182,7 @@ public class FilesResourceTest {
   private void checkGetFileDetailsResponse(String path, String... expectedFolderContentArray)
       throws FileSystemException {
 
-    Set<String> expectedFolderContent = new HashSet<String>(Arrays.asList(expectedFolderContentArray));
+    Set<String> expectedFolderContent = new HashSet<>(Arrays.asList(expectedFolderContentArray));
     Response response = filesResource.getFileDetails(path);
 
     // Make sure response is OK

@@ -97,13 +97,10 @@ public class FunctionalUnitIdentifierMapper {
   }
 
   public void write() throws IOException {
-    ValueTableWriter vtw = writeToKeysTable();
-    try {
+    try(ValueTableWriter vtw = writeToKeysTable()) {
       for(IdentifierAssociation map : associations.values()) {
         map.write(vtw);
       }
-    } finally {
-      vtw.close();
     }
   }
 

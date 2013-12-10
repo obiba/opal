@@ -9,7 +9,6 @@
  */
 package org.obiba.opal.core.vcs.git;
 
-import java.util.Date;
 import java.util.List;
 
 import org.hamcrest.BaseMatcher;
@@ -185,8 +184,8 @@ public class OpalGitDiffCommandTest {
   public void testDiffWithCurrent() {
     try {
       OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(vcs.getRepository(DATASOURCE_NAME), "HEAD")
-          .addPath("TestView/View.xml").addDatasourceName(DATASOURCE_NAME).addPreviousCommitId(
-              "be77432d15dec81b4c60ed858d5d678ceb247171").build();
+          .addPath("TestView/View.xml").addDatasourceName(DATASOURCE_NAME)
+          .addPreviousCommitId("be77432d15dec81b4c60ed858d5d678ceb247171").build();
       List<String> diffs = command.execute();
       assertThat(diffs, matches(DIFF_VIEW_WITH_HEAD));
     } catch(Exception e) {
@@ -197,7 +196,8 @@ public class OpalGitDiffCommandTest {
   @Test
   public void testDiffWithCurrentUsingGitVCS() {
     try {
-      List<String> diffs = vcs.getDiffEntries(DATASOURCE_NAME, "HEAD", "be77432d15dec81b4c60ed858d5d678ceb247171", "TestView/View.xml");
+      List<String> diffs = vcs
+          .getDiffEntries(DATASOURCE_NAME, "HEAD", "be77432d15dec81b4c60ed858d5d678ceb247171", "TestView/View.xml");
       assertThat(diffs, matches(DIFF_VIEW_WITH_HEAD));
     } catch(Exception e) {
       Assert.fail();
@@ -210,7 +210,7 @@ public class OpalGitDiffCommandTest {
    * @param expected
    * @return
    */
-  private static Matcher matches(final String expected) {
+  private static Matcher<List<String>> matches(final String expected) {
 
     return new BaseMatcher() {
 

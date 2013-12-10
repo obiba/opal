@@ -61,7 +61,7 @@ public class EsQueryExecutor {
     Assert.notNull(jsonBody, "Query json body is null!");
 
     final CountDownLatch latch = new CountDownLatch(1);
-    final AtomicReference<byte[]> ref = new AtomicReference<byte[]>();
+    final AtomicReference<byte[]> ref = new AtomicReference<>();
 
     elasticSearchProvider.getRest().dispatchRequest(esRestRequest, new RestChannel() {
 

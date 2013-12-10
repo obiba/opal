@@ -25,7 +25,7 @@ abstract class AbstractValueTableResource {
 
   private ValueTable valueTable;
 
-  private Set<Locale> locales = new HashSet<Locale>();
+  private Set<Locale> locales = new HashSet<>();
 
   ApplicationContext applicationContext;
 
@@ -67,7 +67,7 @@ abstract class AbstractValueTableResource {
       JavascriptClause jsClause = new JavascriptClause(script);
       jsClause.initialise();
 
-      filteredVariables = new ArrayList<Variable>();
+      filteredVariables = new ArrayList<>();
       for(Variable variable : getValueTable().getVariables()) {
         if(jsClause.select(variable)) {
           filteredVariables.add(variable);

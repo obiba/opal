@@ -19,7 +19,6 @@ import javax.validation.constraints.NotNull;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.util.EntityUtils;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.ValueTable;
@@ -114,8 +113,6 @@ public class RestDatasource extends AbstractDatasource {
         }
         addValueTable(tableName);
         EntityUtils.consume(response.getEntity());
-      } catch(ClientProtocolException e) {
-        throw new RuntimeException(e);
       } catch(IOException e) {
         throw new RuntimeException(e);
       }

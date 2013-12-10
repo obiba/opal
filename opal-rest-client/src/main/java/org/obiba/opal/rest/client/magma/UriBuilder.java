@@ -12,9 +12,9 @@ public class UriBuilder {
 
   private final URI root;
 
-  private final List<String> pathSegments = new LinkedList<String>();
+  private final List<String> pathSegments = new LinkedList<>();
 
-  private final Map<String, String> query = new LinkedHashMap<String, String>();
+  private final Map<String, String> query = new LinkedHashMap<>();
 
   UriBuilder(URI root) {
     this.root = root;

@@ -114,10 +114,7 @@ public class BirtReportServiceImpl implements ReportService {
     } catch(ClassNotFoundException e) {
       log.debug("Cannot find embedded service class", e);
       throw new RuntimeException(e);
-    } catch(InstantiationException e) {
-      log.debug("Cannot instantiate embedded service class", e);
-      throw new RuntimeException(e);
-    } catch(IllegalAccessException e) {
+    } catch(InstantiationException | IllegalAccessException e) {
       log.debug("Cannot instantiate embedded service class", e);
       throw new RuntimeException(e);
     }
@@ -132,7 +129,7 @@ public class BirtReportServiceImpl implements ReportService {
    *
    * @param libDir BIRT's /lib directory
    * @return a ClassLoader that will load classes from BIRT dependencies before looking for classes in the Opal
-   *         classpath.
+   * classpath.
    */
   private ClassLoader createClassLoader(File libDir) {
     File[] jars = libDir.listFiles(new FilenameFilter() {

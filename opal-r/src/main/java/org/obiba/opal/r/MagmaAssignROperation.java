@@ -234,7 +234,7 @@ public class MagmaAssignROperation extends AbstractROperation {
         JavascriptClause jsClause = new JavascriptClause(variableFilter);
         jsClause.initialise();
 
-        filteredVariables = new ArrayList<Variable>();
+        filteredVariables = new ArrayList<>();
         for(Variable variable : table.getVariables()) {
           if(jsClause.select(variable)) {
             filteredVariables.add(variable);

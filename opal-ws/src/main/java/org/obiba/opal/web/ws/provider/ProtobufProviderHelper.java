@@ -53,7 +53,7 @@ public class ProtobufProviderHelper {
 
   protected static final class DescriptorFactory {
 
-    private final Map<Class<?>, Method> methodCache = new HashMap<Class<?>, Method>();
+    private final Map<Class<?>, Method> methodCache = new HashMap<>();
 
     Descriptor forMessage(Class<Message> messageType) {
       if(messageType == null) throw new IllegalArgumentException("messageType cannot be null");
@@ -64,9 +64,9 @@ public class ProtobufProviderHelper {
 
   protected static final class ExtensionRegistryFactory {
 
-    private final Map<Class<?>, ExtensionRegistry> registryCache = new HashMap<Class<?>, ExtensionRegistry>();
+    private final Map<Class<?>, ExtensionRegistry> registryCache = new HashMap<>();
 
-    private final Map<Class<?>, Method> methodCache = new HashMap<Class<?>, Method>();
+    private final Map<Class<?>, Method> methodCache = new HashMap<>();
 
     ExtensionRegistry forMessage(Class<Message> messageType) {
       if(messageType == null) throw new IllegalArgumentException("messageType cannot be null");
@@ -84,7 +84,7 @@ public class ProtobufProviderHelper {
 
   protected static final class BuilderFactory {
 
-    private final Map<Class<?>, Method> methodCache = new HashMap<Class<?>, Method>();
+    private final Map<Class<?>, Method> methodCache = new HashMap<>();
 
     Builder forMessage(Class<Message> messageType) {
       if(messageType == null) throw new IllegalArgumentException("messageType cannot be null");
@@ -100,13 +100,7 @@ public class ProtobufProviderHelper {
       return method.invoke(null, arguments);
     } catch(WebApplicationException e) {
       throw e;
-    } catch(RuntimeException e) {
-      log.error("Error invoking '{}' method for type {}", method.getName(), method.getDeclaringClass().getName(), e);
-      throw new WebApplicationException(500);
-    } catch(IllegalAccessException e) {
-      log.error("Error invoking '{}' method for type {}", method.getName(), method.getDeclaringClass().getName(), e);
-      throw new WebApplicationException(500);
-    } catch(InvocationTargetException e) {
+    } catch(RuntimeException | InvocationTargetException | IllegalAccessException e) {
       log.error("Error invoking '{}' method for type {}", method.getName(), method.getDeclaringClass().getName(), e);
       throw new WebApplicationException(500);
     }

@@ -82,7 +82,7 @@ public class OpalUserRealm extends AuthorizingRealm {
       Object primary = thisPrincipals.iterator().next();
       PrincipalCollection simplePrincipals = new SimplePrincipalCollection(primary, getName());
 
-      Set<String> roleNames = new HashSet<String>();
+      Set<String> roleNames = new HashSet<>();
       String username = (String) getAvailablePrincipal(simplePrincipals);
       SubjectCredentials subjectCredentials = subjectCredentialsService.getSubjectCredentials(username);
       if(subjectCredentials != null) {

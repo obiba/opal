@@ -56,7 +56,7 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
 
   private boolean empty = true;
 
-  private final Collection<Frequency> frequencies = new ArrayList<Frequency>();
+  private final Collection<Frequency> frequencies = new ArrayList<>();
 
   private CategoricalVariableSummary(@NotNull Variable variable) {
     super(variable);

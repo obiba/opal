@@ -84,7 +84,7 @@ public class DefaultCommandJobService implements CommandJobService {
     lastJobId = new AtomicInteger();
     jobComparator = new CommandJobComparator();
 
-    jobsNotStarted = new LinkedBlockingQueue<Runnable>(); // thread-safe
+    jobsNotStarted = new LinkedBlockingQueue<>(); // thread-safe
     jobsStarted = Collections.synchronizedList(new ArrayList<FutureCommandJob>());
     jobsTerminated = Collections.synchronizedList(new ArrayList<FutureCommandJob>());
 
@@ -152,7 +152,7 @@ public class DefaultCommandJobService implements CommandJobService {
 
   @Override
   public List<CommandJob> getHistory() {
-    List<CommandJob> allJobs = new ArrayList<CommandJob>();
+    List<CommandJob> allJobs = new ArrayList<>();
 
     for(FutureCommandJob futureCommandJob : getFutureCommandJobs()) {
       allJobs.add(futureCommandJob.getCommandJob());
@@ -249,7 +249,7 @@ public class DefaultCommandJobService implements CommandJobService {
   }
 
   protected List<FutureCommandJob> getFutureCommandJobs() {
-    List<FutureCommandJob> allFutureCommandJobs = new ArrayList<FutureCommandJob>();
+    List<FutureCommandJob> allFutureCommandJobs = new ArrayList<>();
 
     synchronized(this) {
       for(Runnable runnable : getNotStartedJobs()) {

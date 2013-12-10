@@ -72,7 +72,7 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
   }
 
   private Set<String> getTablesToLock() {
-    Set<String> tablesToLock = new TreeSet<String>();
+    Set<String> tablesToLock = new TreeSet<>();
 
     boolean needToLockKeysTable = false;
 

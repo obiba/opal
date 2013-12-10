@@ -22,7 +22,7 @@ public class IndexManagerConfiguration implements OpalConfigurationExtension {
   private final Map<String, Schedule> indexConfigurations;
 
   public IndexManagerConfiguration() {
-    indexConfigurations = new HashMap<String, Schedule>();
+    indexConfigurations = new HashMap<>();
   }
 
   /**

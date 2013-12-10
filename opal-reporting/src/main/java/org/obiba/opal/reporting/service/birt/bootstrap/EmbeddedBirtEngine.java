@@ -156,7 +156,7 @@ public class EmbeddedBirtEngine implements BirtEngine {
     switch(task.getStatus()) {
       case IEngineTask.STATUS_FAILED:
         List<EngineException> errors = task.getErrors();
-        List<String> msgs = new ArrayList<String>();
+        List<String> msgs = new ArrayList<>();
         for(EngineException e : errors) {
           msgs.add(e.getLocalizedMessage());
         }
@@ -168,7 +168,7 @@ public class EmbeddedBirtEngine implements BirtEngine {
   private void configureOsgi(EngineConfig config) {
     osgiHome = Files.createTempDir();
 
-    Map<String, String> osgiConfig = new HashMap<String, String>();
+    Map<String, String> osgiConfig = new HashMap<>();
     osgiConfig.put(OSGI_CONFIGURATION_AREA_PROPERTY_NAME, osgiHome + "/configuration");
     osgiConfig.put(OSGI_INSTANCE_AREA_PROPERTY_NAME, osgiHome + "/workspace");
     config.setOSGiConfig(osgiConfig);

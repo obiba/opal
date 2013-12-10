@@ -52,7 +52,7 @@ public class ShellCallbackHandler implements CachingCallbackHandler {
 
   public ShellCallbackHandler(OpalShellHolder opalShellHolder) {
     this.opalShellHolder = opalShellHolder;
-    passwordCache = new HashMap<String, char[]>();
+    passwordCache = new HashMap<>();
   }
 
   //

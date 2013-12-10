@@ -75,7 +75,7 @@ public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
       AbstractTreeIterator previousCommitParser) throws IOException {
 
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    List<String> diffEntries = new ArrayList<String>();
+    List<String> diffEntries = new ArrayList<>();
     DiffFormatter df = new DiffFormatter(out);
     df.setRepository(repository);
     df.setDiffComparator(RawTextComparator.DEFAULT);

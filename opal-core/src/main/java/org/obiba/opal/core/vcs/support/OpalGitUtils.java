@@ -30,7 +30,7 @@ public final class OpalGitUtils {
 
   public static final String GIT_DIRECTORY_NAME = "data" + File.separator + "git";
 
-  public static final String GIT_EXTENSION= ".git";
+  public static final String GIT_EXTENSION = ".git";
 
   public static File buildOpalGitRootPath() {
     StringBuilder pathBuilder = new StringBuilder();
@@ -49,17 +49,17 @@ public final class OpalGitUtils {
   }
 
   public static String getVariableFilePath(String view, String variable) {
-    return new StringBuilder().append(view).append(File.separatorChar).append(variable)
-        .append(VARIABLE_FILE_EXTENSION).toString();
+    return new StringBuilder().append(view).append(File.separatorChar).append(variable).append(VARIABLE_FILE_EXTENSION)
+        .toString();
   }
 
   public static String getNthCommitId(String commitId, int nth) {
-    return commitId +"~" + String.valueOf(nth);
+    return commitId + "~" + String.valueOf(nth);
   }
 
   public static boolean isFilePath(String path) {
     // TODO find a safe check
-    return path.indexOf(File.separator) != -1;
+    return path.contains(File.separator);
   }
 
   /**
@@ -113,8 +113,8 @@ public final class OpalGitUtils {
   public static FetchResult fetchRepository(Repository repository, RefSpec... refSpecs) throws Exception {
     Git git = new Git(repository);
     FetchCommand fetch = git.fetch();
-    List<RefSpec> specs = new ArrayList<RefSpec>();
-    if (refSpecs == null || refSpecs.length == 0) {
+    List<RefSpec> specs = new ArrayList<>();
+    if(refSpecs == null || refSpecs.length == 0) {
       specs.add(new RefSpec("+refs/heads/*:refs/remotes/origin/*"));
       specs.add(new RefSpec("+refs/tags/*:refs/tags/*"));
       specs.add(new RefSpec("+refs/notes/*:refs/notes/*"));

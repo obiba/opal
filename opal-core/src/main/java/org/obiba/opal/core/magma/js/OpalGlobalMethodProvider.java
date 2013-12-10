@@ -31,8 +31,8 @@ public class OpalGlobalMethodProvider extends AbstractGlobalMethodProvider {
 
   public static void load(Context cx, Scriptable thisObj, Object[] args, Function funObj) {
 
-    for(int i = 0; i < args.length; i++) {
-      String fileName = Context.toString(args[i]);
+    for(Object arg : args) {
+      String fileName = Context.toString(arg);
       log.debug("Loading file {}", fileName);
       try {
         cx.evaluateReader(thisObj, new FileReader(OpalRuntime.MAGMA_JS_EXTENSION + "/" + fileName), fileName, 1, null);

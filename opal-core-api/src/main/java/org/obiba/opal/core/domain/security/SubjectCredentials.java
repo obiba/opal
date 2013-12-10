@@ -55,7 +55,7 @@ public class SubjectCredentials extends AbstractTimestamped
 
   private boolean enabled;
 
-  private Set<String> groups = new HashSet<String>();
+  private Set<String> groups = new HashSet<>();
 
   public SubjectCredentials() {
   }
@@ -117,7 +117,7 @@ public class SubjectCredentials extends AbstractTimestamped
   }
 
   public void addGroup(String group) {
-    if(groups == null) groups = new HashSet<String>();
+    if(groups == null) groups = new HashSet<>();
     groups.add(group);
   }
 

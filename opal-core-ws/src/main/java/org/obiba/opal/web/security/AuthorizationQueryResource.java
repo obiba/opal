@@ -58,7 +58,7 @@ public class AuthorizationQueryResource {
 
   private Iterable<Acls> getAclsGroupedBySubject(String domain, SubjectAclService.SubjectType type,
       Iterable<String> nodes) {
-    Map<Opal.Subject, Acls.Builder> aclMap = new HashMap<Opal.Subject, Acls.Builder>();
+    Map<Opal.Subject, Acls.Builder> aclMap = new HashMap<>();
 
     for(String node : nodes) {
       for(Acl acl : Iterables

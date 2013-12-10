@@ -61,8 +61,8 @@ public abstract class AbstractFunctionalUnitResource {
 
   protected List<FunctionalUnit> getUnitsFromName(@NotNull String... unitNames) {
     // find the units
-    List<FunctionalUnit> units = new ArrayList<FunctionalUnit>();
-    Collection<String> visitedUnitNames = new ArrayList<String>();
+    List<FunctionalUnit> units = new ArrayList<>();
+    Collection<String> visitedUnitNames = new ArrayList<>();
     for(String unit : unitNames) {
       if(visitedUnitNames.contains(unit)) {
         throw new InvalidRequestException("DuplicateFunctionalUnitNames");

@@ -115,17 +115,17 @@ public class ValueTableVariablesMapping {
   }
 
   private Map<String, Map<String, String>> mapFields(String field) {
-    Map<String, String> analyzed = new HashMap<String, String>();
+    Map<String, String> analyzed = new HashMap<>();
     analyzed.put("type", "string");
     analyzed.put("index", "analyzed");
     analyzed.put("index_analyzer", "opal_index_analyzer");
     analyzed.put("search_analyzer", "opal_search_analyzer");
 
-    Map<String, String> notAnalyzed = new HashMap<String, String>();
+    Map<String, String> notAnalyzed = new HashMap<>();
     notAnalyzed.put("type", "string");
     notAnalyzed.put("index", "not_analyzed");
 
-    Map<String, Map<String, String>> fields = new HashMap<String, Map<String, String>>();
+    Map<String, Map<String, String>> fields = new HashMap<>();
     fields.put(field + ANALYZED_FIELD_POSTFIX, analyzed);
     fields.put(field, notAnalyzed);
 

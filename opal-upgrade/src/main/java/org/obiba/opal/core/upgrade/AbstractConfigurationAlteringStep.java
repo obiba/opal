@@ -81,9 +81,7 @@ public abstract class AbstractConfigurationAlteringStep {
       transformer.transform(source, dest);
 
       FileUtil.moveFile(tmpFile, new File(opalConfigFile));
-    } catch(IOException e) {
-      throw new RuntimeException(e);
-    } catch(TransformerException e) {
+    } catch(IOException | TransformerException e) {
       throw new RuntimeException(e);
     } finally {
       StreamUtil.silentSafeClose(outputStream);
@@ -98,11 +96,7 @@ public abstract class AbstractConfigurationAlteringStep {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       DocumentBuilder builder = factory.newDocumentBuilder();
       return builder.parse(inputStream);
-    } catch(ParserConfigurationException e) {
-      throw new RuntimeException(error, e);
-    } catch(SAXException e) {
-      throw new RuntimeException(error, e);
-    } catch(IOException e) {
+    } catch(ParserConfigurationException | IOException | SAXException e) {
       throw new RuntimeException(error, e);
     } finally {
       StreamUtil.silentSafeClose(inputStream);

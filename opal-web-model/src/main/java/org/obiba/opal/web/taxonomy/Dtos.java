@@ -29,7 +29,7 @@ public class Dtos {
   }
 
   private static Iterable<? extends Opal.LocaleTextDto> toLocaleTextDtoList(Map<Locale, String> map) {
-    Collection<Opal.LocaleTextDto> localeTexts = new ArrayList<Opal.LocaleTextDto>();
+    Collection<Opal.LocaleTextDto> localeTexts = new ArrayList<>();
 
     for(Locale locale : map.keySet()) {
       localeTexts.add(Opal.LocaleTextDto.newBuilder().setText(map.get(locale)).setLocale(locale.getLanguage()).build());
@@ -60,7 +60,7 @@ public class Dtos {
   }
 
   private static Iterable<Opal.TermDto> asDto(Iterable<Term> terms) {
-    Collection<Opal.TermDto> termDto = new ArrayList<Opal.TermDto>();
+    Collection<Opal.TermDto> termDto = new ArrayList<>();
     for(Term t : terms) {
       termDto.add(asDto(t));
     }
@@ -68,7 +68,7 @@ public class Dtos {
   }
 
   private static List<Term> fromDto(Iterable<Opal.TermDto> termDtos) {
-    List<Term> termDto = new ArrayList<Term>();
+    List<Term> termDto = new ArrayList<>();
     for(Opal.TermDto t : termDtos) {
       termDto.add(fromDto(t));
     }
@@ -104,7 +104,7 @@ public class Dtos {
   }
 
   private static Map<Locale, String> fromLocaleTextDtoList(Iterable<Opal.LocaleTextDto> dtos) {
-    Map<Locale, String> localeTexts = new HashMap<Locale, String>();
+    Map<Locale, String> localeTexts = new HashMap<>();
 
     for(Opal.LocaleTextDto dto : dtos) {
       localeTexts.put(new Locale(dto.getLocale()), dto.getText());

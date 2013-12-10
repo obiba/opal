@@ -33,10 +33,10 @@ public abstract class AbstractCommandRegistry implements CommandRegistry {
   //
 
   @SuppressWarnings("unchecked")
-  private final Map<String, Class<? extends Command>> commandMap;
+  private final Map<String, Class<? extends Command<?>>> commandMap;
 
   @SuppressWarnings("unchecked")
-  private final Map<String, Class> optionsMap;
+  private final Map<String, Class<?>> optionsMap;
 
   @Autowired
   private ApplicationContext ctx;
@@ -47,8 +47,8 @@ public abstract class AbstractCommandRegistry implements CommandRegistry {
 
   @SuppressWarnings("unchecked")
   public AbstractCommandRegistry() {
-    commandMap = new HashMap<String, Class<? extends Command>>();
-    optionsMap = new HashMap<String, Class>();
+    commandMap = new HashMap<>();
+    optionsMap = new HashMap<>();
   }
 
   @Override

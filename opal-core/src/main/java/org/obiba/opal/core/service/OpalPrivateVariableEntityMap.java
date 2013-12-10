@@ -182,7 +182,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
   }
 
   private void constructCacheFromVector(@NotNull ValueTable keyTable, @NotNull VectorSource vs) {
-    SortedSet<VariableEntity> entities = new TreeSet<VariableEntity>(keyTable.getVariableEntities());
+    SortedSet<VariableEntity> entities = new TreeSet<>(keyTable.getVariableEntities());
     Iterator<Value> values = vs.getValues(entities).iterator();
     for(VariableEntity opalEntity : entities) {
       Value value = values.next();

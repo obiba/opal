@@ -315,8 +315,7 @@ abstract class EsIndexManager implements IndexManager, ValueTableUpdateListener 
         try {
           opalSearchService.getClient().admin().indices().prepareDeleteMapping(getName()).setType(getIndexName())
               .execute().actionGet();
-        } catch(TypeMissingException ignored) {
-        } catch(IndexMissingException ignored) {
+        } catch(TypeMissingException | IndexMissingException ignored) {
         } finally {
           mappingCreated = false;
         }

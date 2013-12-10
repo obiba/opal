@@ -43,7 +43,7 @@ public class UserGroupAuthorizationResource {
 
     SubjectAclService.Subject aclSubject = type.subjectFor(subject);
 
-    Collection<SubjectAclService.Permissions> permissions = new HashSet<SubjectAclService.Permissions>();
+    Collection<SubjectAclService.Permissions> permissions = new HashSet<>();
     for(SubjectAclService.Permissions p : subjectAclService.getSubjectPermissions(aclSubject)) {
       if(p.getDomain().equals(domain)) {
         permissions.add(p);

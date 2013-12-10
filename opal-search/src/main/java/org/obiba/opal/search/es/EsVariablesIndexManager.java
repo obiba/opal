@@ -147,7 +147,7 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
           for(Attribute attribute : category.getAttributes()) {
             String field = "category-" + AttributeMapping.getFieldName(attribute);
             if(!attributeFields.containsKey(field)) {
-              attributeFields.put(field, new ArrayList<Object>());
+              attributeFields.put(field, new ArrayList<>());
             }
             attributeFields.get(field).add(attribute.getValue().getValue());
           }

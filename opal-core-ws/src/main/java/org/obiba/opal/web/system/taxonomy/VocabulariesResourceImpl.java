@@ -41,7 +41,7 @@ public class VocabulariesResourceImpl implements VocabulariesResource {
 
   @Override
   public List<Opal.VocabularyDto> getVocabularies() {
-    List<Opal.VocabularyDto> vocabularies = new ArrayList<Opal.VocabularyDto>();
+    List<Opal.VocabularyDto> vocabularies = new ArrayList<>();
 
     for(Vocabulary v : taxonomyService.getVocabularies(taxonomyName)) {
       vocabularies.add(Dtos.asDto(v));

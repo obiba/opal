@@ -137,7 +137,7 @@ public class ValueSetsResourceImpl extends AbstractValueTableResource implements
         .addAll(variableEntities).build();
     Iterable<Value> values = vector.getValues(sortedEntities);
 
-    HashMap<VariableEntity, Value> results = new LinkedHashMap<VariableEntity, Value>();
+    HashMap<VariableEntity, Value> results = new LinkedHashMap<>();
     Iterator<VariableEntity> entitiesIterator = sortedEntities.iterator();
     for(Value value : values) {
       VariableEntity entity = entitiesIterator.next();

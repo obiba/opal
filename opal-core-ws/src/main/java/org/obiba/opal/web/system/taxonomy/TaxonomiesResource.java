@@ -34,7 +34,7 @@ public class TaxonomiesResource {
 
   @GET
   public List<TaxonomyDto> getTaxonomies() {
-    List<TaxonomyDto> taxonomies = new ArrayList<TaxonomyDto>();
+    List<TaxonomyDto> taxonomies = new ArrayList<>();
     for(Taxonomy taxonomy : taxonomyService.getTaxonomies()) {
       taxonomies.add(Dtos.asDto(taxonomy));
     }

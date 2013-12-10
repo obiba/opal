@@ -57,7 +57,7 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
 
   private void configureMagma() {
     // Add opal specific javascript methods
-    Set<GlobalMethodProvider> providers = new HashSet<GlobalMethodProvider>();
+    Set<GlobalMethodProvider> providers = new HashSet<>();
     providers.add(new OpalGlobalMethodProvider());
     MagmaContextFactory ctxFactory = new MagmaContextFactory();
     ctxFactory.setGlobalMethodProviders(providers);

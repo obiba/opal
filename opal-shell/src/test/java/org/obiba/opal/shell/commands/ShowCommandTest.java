@@ -145,7 +145,7 @@ public class ShowCommandTest extends AbstractMagmaTest {
   }
 
   private void recordExpectedOpalRuntimeExpectations(FunctionalUnitService mockUnitService, String... units) {
-    Set<FunctionalUnit> functionalUnits = new LinkedHashSet<FunctionalUnit>();
+    Set<FunctionalUnit> functionalUnits = new LinkedHashSet<>();
     if(units.length != 0) {
       for(String unitName : units) {
         functionalUnits.add(new FunctionalUnit(unitName, unitName + "KeyVariable"));
@@ -178,7 +178,7 @@ public class ShowCommandTest extends AbstractMagmaTest {
     Datasource mockDatasource = createMock(Datasource.class);
     expect(mockDatasource.getName()).andReturn(name).anyTimes();
 
-    ImmutableSet.Builder<ValueTable> builder = new ImmutableSet.Builder<ValueTable>();
+    ImmutableSet.Builder<ValueTable> builder = new ImmutableSet.Builder<>();
     for(String tableName : tables) {
       builder.add(createMockTable(tableName));
     }

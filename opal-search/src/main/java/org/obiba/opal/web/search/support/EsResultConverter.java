@@ -73,7 +73,7 @@ public class EsResultConverter {
 
     @SuppressWarnings("unchecked")
     public Collection<Search.FacetResultDto> convert(JSONObject jsonFacets) throws JSONException {
-      Collection<Search.FacetResultDto> facetsDtoList = new ArrayList<Search.FacetResultDto>();
+      Collection<Search.FacetResultDto> facetsDtoList = new ArrayList<>();
 
       for(Iterator<String> iterator = jsonFacets.keys(); iterator.hasNext(); ) {
         String facet = iterator.next();
@@ -153,7 +153,7 @@ public class EsResultConverter {
     }
 
     public Collection<Search.ItemResultDto> convert(JSONArray jsonHits) throws JSONException {
-      Collection<Search.ItemResultDto> itemsDtoList = new ArrayList<Search.ItemResultDto>();
+      Collection<Search.ItemResultDto> itemsDtoList = new ArrayList<>();
 
       for(int i = 0; i < jsonHits.length(); i++) {
         Search.ItemResultDto.Builder dtoItemResultBuilder = Search.ItemResultDto.newBuilder();

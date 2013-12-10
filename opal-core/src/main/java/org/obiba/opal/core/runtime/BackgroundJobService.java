@@ -33,7 +33,7 @@ public class BackgroundJobService implements Service {
 
   private boolean isRunning;
 
-  private final Map<String, Thread> jobThreads = new HashMap<String, Thread>();
+  private final Map<String, Thread> jobThreads = new HashMap<>();
 
   @Nullable
   @Autowired(required = false)

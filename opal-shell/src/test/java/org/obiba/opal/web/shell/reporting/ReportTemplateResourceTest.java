@@ -26,7 +26,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
@@ -63,7 +62,7 @@ public class ReportTemplateResourceTest {
     opalConfigurationServiceMock = createMock(OpalConfigurationService.class);
     OpalConfiguration opalConfiguration = new OpalConfiguration();
 
-    reportTemplates = new LinkedHashSet<ReportTemplate>();
+    reportTemplates = new LinkedHashSet<>();
     reportTemplates.add(getReportTemplate("template1"));
     reportTemplates.add(getReportTemplate("template2"));
     reportTemplates.add(getReportTemplate("template3"));

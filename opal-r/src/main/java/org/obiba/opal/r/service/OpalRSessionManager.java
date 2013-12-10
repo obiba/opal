@@ -40,7 +40,7 @@ public class OpalRSessionManager implements SessionListener, ServiceListener<Opa
 
   private OpalRService opalRService;
 
-  private final Map<String, SubjectRSessions> rSessionMap = new HashMap<String, SubjectRSessions>();
+  private final Map<String, SubjectRSessions> rSessionMap = new HashMap<>();
 
   @PreDestroy
   public void stop() {
@@ -228,7 +228,7 @@ public class OpalRSessionManager implements SessionListener, ServiceListener<Opa
 
   private static final class SubjectRSessions implements Iterable<OpalRSession> {
 
-    private final List<OpalRSession> rSessions = new ArrayList<OpalRSession>();
+    private final List<OpalRSession> rSessions = new ArrayList<>();
 
     private OpalRSession currentRSession;
 

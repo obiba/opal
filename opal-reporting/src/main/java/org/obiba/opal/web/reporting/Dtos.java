@@ -62,7 +62,7 @@ public class Dtos {
 
   public static Set<ReportTemplateDto> asDto(Iterable<ReportTemplate> reportTemplates) {
 
-    Set<Opal.ReportTemplateDto> reportTemplateDtos = new LinkedHashSet<ReportTemplateDto>();
+    Set<Opal.ReportTemplateDto> reportTemplateDtos = new LinkedHashSet<>();
     for(ReportTemplate reportTemplate : reportTemplates) {
       reportTemplateDtos.add(asDto(reportTemplate));
     }

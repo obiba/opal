@@ -185,7 +185,7 @@ public class IdentifierAssociations implements Iterable<IdentifierAssociations.I
     private final Map<String, Iterator<Value>> unitIdentifiers = Maps.newHashMap();
 
     {
-      TreeSet<VariableEntity> opalEntities = new TreeSet<VariableEntity>(identifiersTable.getVariableEntities());
+      TreeSet<VariableEntity> opalEntities = new TreeSet<>(identifiersTable.getVariableEntities());
 
       Iterator<Value> idIterator;
       for(FunctionalUnit unit : units) {

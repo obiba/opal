@@ -23,7 +23,7 @@ public final class Dtos {
   private Dtos() {}
 
   public static Opal.VcsCommitInfosDto asDto(Iterable<CommitInfo> commitInfos) {
-    Collection<Opal.VcsCommitInfoDto> commitInfoDtos = new ArrayList<Opal.VcsCommitInfoDto>();
+    Collection<Opal.VcsCommitInfoDto> commitInfoDtos = new ArrayList<>();
 
     for(CommitInfo commitInfo : commitInfos) {
       commitInfoDtos.add(asDto(commitInfo));

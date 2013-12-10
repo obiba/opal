@@ -74,9 +74,7 @@ public class QuartzCommandSchedulerServiceImpl implements CommandSchedulerServic
   public void scheduleCommand(String name, String group, String cronExpression) {
     try {
       scheduler.scheduleJob(new CronTrigger(name + "-trigger", group, name, group, cronExpression));
-    } catch(SchedulerException ex) {
-      throw new CommandSchedulerServiceException(ex);
-    } catch(ParseException ex) {
+    } catch(SchedulerException | ParseException ex) {
       throw new CommandSchedulerServiceException(ex);
     }
   }

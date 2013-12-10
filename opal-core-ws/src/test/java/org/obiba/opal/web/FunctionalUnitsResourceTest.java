@@ -45,7 +45,7 @@ public class FunctionalUnitsResourceTest {
     functionalUnitServiceMock = createMock(FunctionalUnitService.class);
     identifiersTableResolverMock = createMock(IdentifiersTableService.class);
 
-    functionalUnits = new HashSet<FunctionalUnit>();
+    functionalUnits = new HashSet<>();
     functionalUnits.add(new FunctionalUnit("unit1", "key1"));
     functionalUnits.add(new FunctionalUnit("unit2", "key2"));
     functionalUnits.add(new FunctionalUnit("unit3", "key3"));

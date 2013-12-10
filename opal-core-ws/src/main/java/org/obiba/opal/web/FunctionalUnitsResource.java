@@ -201,17 +201,12 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
       Variable keyVariable = Variable.Builder
           .newVariable(unit.getKeyVariableName(), TextType.get(), keysTable.getEntityType()).build();
 
-      ValueTableWriter writer = keysTable.getDatasource().createWriter(keysTable.getName(), keysTable.getEntityType());
-      try {
-        VariableWriter vw = writer.writeVariables();
-        try {
+      try(ValueTableWriter writer = keysTable.getDatasource()
+          .createWriter(keysTable.getName(), keysTable.getEntityType())) {
+        try(VariableWriter vw = writer.writeVariables()) {
           // Create private variables
           vw.writeVariable(keyVariable);
-        } finally {
-          vw.close();
         }
-      } finally {
-        writer.close();
       }
     }
   }
@@ -255,7 +250,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   private List<Iterator<UnitIdentifier>> writeIdentifiersHeader(PrintWriter writer) {
     ValueTable keysTable = identifiersTableService.getValueTable();
-    List<Iterator<UnitIdentifier>> unitIdIters = new ArrayList<Iterator<UnitIdentifier>>();
+    List<Iterator<UnitIdentifier>> unitIdIters = new ArrayList<>();
 
     // header
     writer.append('"').append(FunctionalUnit.OPAL_INSTANCE).append('"');
@@ -289,7 +284,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
 
   private void writeOpalIdentifiers(PrintWriter writer) {
     // no unit: list of opal ids
-    Iterable<VariableEntity> opalEntities = new TreeSet<VariableEntity>(
+    Iterable<VariableEntity> opalEntities = new TreeSet<>(
         identifiersTableService.getValueTable().getVariableEntities());
     for(VariableEntity entity : opalEntities) {
       writer.append('\"').append(entity.getIdentifier()).append("\"\n");
@@ -418,7 +413,7 @@ public class FunctionalUnitsResource extends AbstractFunctionalUnitResource {
     CSVReader reader = new CSVReader(new FileReader(mapFile.getPath()));
 
     // find the units
-    List<FunctionalUnitDto> unitDtos = new ArrayList<FunctionalUnitDto>();
+    List<FunctionalUnitDto> unitDtos = new ArrayList<>();
     for(FunctionalUnit functionalUnit : getUnitsFromIdentifiersMap(reader)) {
       Opal.FunctionalUnitDto.Builder fuBuilder = Opal.FunctionalUnitDto.newBuilder().//
           setName(functionalUnit.getName()). //

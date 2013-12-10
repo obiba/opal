@@ -62,7 +62,7 @@ public class SystemResource {
   @Path("/env")
   public Opal.OpalEnv getEnvironment() {
 
-    Collection<Opal.EntryDto> systemProperties = new ArrayList<Opal.EntryDto>();
+    Collection<Opal.EntryDto> systemProperties = new ArrayList<>();
     Collection<String> keys = ManagementFactory.getRuntimeMXBean().getSystemProperties().keySet();
     Map<String, String> properties = ManagementFactory.getRuntimeMXBean().getSystemProperties();
     for(String k : keys) {
@@ -84,8 +84,7 @@ public class SystemResource {
   @Path("/status")
   public Opal.OpalStatus getStatus() {
     List<GarbageCollectorMXBean> garbageCollectorMXBeanList = ManagementFactory.getGarbageCollectorMXBeans();
-    Collection<Opal.OpalStatus.GarbageCollectorUsage> garbageCollectorUsagesValues
-        = new ArrayList<Opal.OpalStatus.GarbageCollectorUsage>();
+    Collection<Opal.OpalStatus.GarbageCollectorUsage> garbageCollectorUsagesValues = new ArrayList<>();
     for(GarbageCollectorMXBean GC : garbageCollectorMXBeanList) {
       garbageCollectorUsagesValues.add(getGarbageCollector(GC));
     }
@@ -137,7 +136,7 @@ public class SystemResource {
   @GET
   @Path("/conf")
   public Opal.OpalConf getOpalConfiguration() {
-    Collection<Opal.TaxonomyDto> taxonomies = new ArrayList<Opal.TaxonomyDto>();
+    Collection<Opal.TaxonomyDto> taxonomies = new ArrayList<>();
     for(Taxonomy taxonomy : taxonomyService.getTaxonomies()) {
       taxonomies.add(Dtos.asDto(taxonomy));
     }

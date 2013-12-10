@@ -189,7 +189,7 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
   }
 
   private String getEmailNotificationText(ReportTemplate reportTemplate, FileObject reportOutput) {
-    Map<String, Object> model = new HashMap<String, Object>();
+    Map<String, Object> model = new HashMap<>();
     model.put("report_template", reportTemplate.getName());
     model.put("report_public_link",
         opalPublicUrl + "/ws/report/public/" + getOpalRuntime().getFileSystem().getObfuscatedPath(reportOutput) +

@@ -33,7 +33,7 @@ public class OpalGeneralConfig extends AbstractTimestamped {
   @NotBlank
   private String name = DEFAULT_NAME;
 
-  private List<Locale> locales = new ArrayList<Locale>();
+  private List<Locale> locales = new ArrayList<>();
 
   private String defaultCharacterSet = DEFAULT_CHARSET;
 

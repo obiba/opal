@@ -27,8 +27,7 @@ public class IndexManagerConfigurationService implements ValueTableUpdateListene
 
   @Autowired
   public IndexManagerConfigurationService(OpalConfigurationService configService) {
-    configSupplier = new ExtensionConfigurationSupplier<IndexManagerConfiguration>(configService,
-        IndexManagerConfiguration.class);
+    configSupplier = new ExtensionConfigurationSupplier<>(configService, IndexManagerConfiguration.class);
   }
 
   public IndexManagerConfiguration getConfig() {

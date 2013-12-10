@@ -76,7 +76,7 @@ public class DatabasesResource {
   }
 
   private List<DatabaseDto> asDto(Iterable<? extends Database> databases, boolean withSettings) {
-    List<DatabaseDto> dtos = new ArrayList<DatabaseDto>();
+    List<DatabaseDto> dtos = new ArrayList<>();
     for(Database database : databases) {
       dtos.add(Dtos.asDto(database, databaseRegistry.hasDatasource(database), databaseRegistry.hasEntities(database),
           withSettings));

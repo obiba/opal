@@ -496,7 +496,7 @@ public class WebShellResourceTest {
   }
 
   private List<CommandJob> createNonEmptyCommandJobList() {
-    List<CommandJob> history = new ArrayList<CommandJob>();
+    List<CommandJob> history = new ArrayList<>();
 
     history.add(0, createCommandJob(1, createImportCommand(), createTimestamp(2010, Calendar.JANUARY, 1, 12, 0)));
     history.add(0, createCommandJob(2, createCopyCommand(), createTimestamp(2010, Calendar.JANUARY, 1, 12, 10)));
@@ -505,7 +505,7 @@ public class WebShellResourceTest {
   }
 
   private List<CommandJob> createEmptyCommandJobList() {
-    return new ArrayList<CommandJob>();
+    return new ArrayList<>();
   }
 
   private ImportCommandOptionsDto createImportCommandOptionsDto(String unit, String destination, String archive,

@@ -40,7 +40,7 @@ public final class JsonIoUtil {
     if(extensionRegistry == null) throw new IllegalArgumentException("extensionRegistry cannot be null");
     if(builder == null) throw new IllegalArgumentException("builder cannot be null");
 
-    final ArrayList<T> messages = new ArrayList<T>();
+    final ArrayList<T> messages = new ArrayList<>();
     InnerJsonFormat.mergeCollection(reader, extensionRegistry, builder, new MergeCallback() {
 
       @Override

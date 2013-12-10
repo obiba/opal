@@ -75,7 +75,7 @@ public class StaticDatasourceFactoryDtoParser extends AbstractDatasourceFactoryD
         addValueTable(ds, staticDto.getTables(i));
       }
 
-      Set<View> views = new LinkedHashSet<View>();
+      Set<View> views = new LinkedHashSet<>();
       for(int i = 0; i < staticDto.getViewsCount(); i++) {
         ViewDto viewDto = staticDto.getViews(i);
         if(viewDto.getFromCount() == 0) {

@@ -119,7 +119,7 @@ public class TaxonomyServiceImpl implements TaxonomyService {
 
     Iterable<Vocabulary> vocabularies = getVocabularies(name);
 
-    List<HasUniqueProperties> toDelete = new ArrayList<HasUniqueProperties>();
+    List<HasUniqueProperties> toDelete = new ArrayList<>();
     toDelete.add(new Taxonomy(name));
     Iterables.addAll(toDelete, vocabularies);
     orientDbService.delete(toDelete.toArray(new HasUniqueProperties[toDelete.size()]));

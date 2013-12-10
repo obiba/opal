@@ -47,15 +47,12 @@ public class UpgradeCommand {
   }
 
   private void standardUpgrade() {
-    ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(CONTEXT_PATHS);
-    try {
+    try(ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(CONTEXT_PATHS)) {
       try {
         ctx.getBean("upgradeManager", UpgradeManager.class).executeUpgrade();
       } catch(UpgradeException upgradeFailed) {
         throw new RuntimeException("An error occurred while running the upgrade manager", upgradeFailed);
       }
-    } finally {
-      ctx.close();
     }
   }
 
@@ -69,11 +66,7 @@ public class UpgradeCommand {
       ConfigurationHandler handler = new ConfigurationHandler();
       saxParser.parse(new File(opalHome + "/conf/opal-config.xml"), handler);
       return handler.isMigrated();
-    } catch(SAXException e) {
-      throw new RuntimeException("An error occurred while reading opal-config.xml during upgrade", e);
-    } catch(IOException e) {
-      throw new RuntimeException("An error occurred while reading opal-config.xml during upgrade", e);
-    } catch(ParserConfigurationException e) {
+    } catch(SAXException | ParserConfigurationException | IOException e) {
       throw new RuntimeException("An error occurred while reading opal-config.xml during upgrade", e);
     }
   }
@@ -85,15 +78,12 @@ public class UpgradeCommand {
     new Opal2DatabaseConfigurator().configureDatabase();
     ConfigFolderUpgrade.cleanDirectories();
 
-    ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(OPAL2_CONTEXT_PATHS);
-    try {
+    try(ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(OPAL2_CONTEXT_PATHS)) {
       try {
         ctx.getBean("upgradeManager", UpgradeManager.class).executeUpgrade();
       } catch(UpgradeException upgradeFailed) {
         throw new RuntimeException("An error occurred while running the opal2 upgrade manager", upgradeFailed);
       }
-    } finally {
-      ctx.close();
     }
   }
 

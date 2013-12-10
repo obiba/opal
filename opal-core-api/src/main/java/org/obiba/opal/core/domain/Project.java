@@ -107,7 +107,7 @@ public class Project extends AbstractTimestamped implements HasUniqueProperties,
   }
 
   public void addTag(String tag) {
-    if(tags == null) tags = new HashSet<String>();
+    if(tags == null) tags = new HashSet<>();
     tags.add(tag);
   }
 

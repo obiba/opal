@@ -39,7 +39,7 @@ public class LocalesResource {
 
   @GET
   public Iterable<LocaleDto> getLocales(@QueryParam("locale") String displayLocale) {
-    Collection<LocaleDto> localeDtos = new ArrayList<LocaleDto>();
+    Collection<LocaleDto> localeDtos = new ArrayList<>();
     for(Locale locale : locales) {
       localeDtos.add(Dtos.asDto(locale, displayLocale != null ? new Locale(displayLocale) : null));
     }

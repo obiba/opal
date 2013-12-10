@@ -103,7 +103,7 @@ public class FunctionalUnitIdentifiers implements Iterable<FunctionalUnitIdentif
       private final Iterator<Value> unitIdentifiers;
 
       {
-        TreeSet<VariableEntity> entities = new TreeSet<VariableEntity>(identifiersTable.getVariableEntities());
+        TreeSet<VariableEntity> entities = new TreeSet<>(identifiersTable.getVariableEntities());
         unitIdentifiers = identifiersTable.hasVariable(unit.getKeyVariableName())
             ? identifiersTable.getVariableValueSource(unit.getKeyVariableName()).asVectorSource().getValues(entities)
             .iterator()

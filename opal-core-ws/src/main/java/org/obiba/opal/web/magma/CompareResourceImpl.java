@@ -119,13 +119,13 @@ public class CompareResourceImpl implements CompareResource {
     Set<Variable> variablesInCompared = asSet(compared.getVariables());
     Set<Variable> variablesInWith = asSet(with.getVariables());
 
-    Collection<Variable> newVariables = new LinkedHashSet<Variable>(variablesInCompared);
+    Collection<Variable> newVariables = new LinkedHashSet<>(variablesInCompared);
     newVariables.removeAll(variablesInWith);
 
-    Collection<Variable> missingVariables = new LinkedHashSet<Variable>(variablesInWith);
+    Collection<Variable> missingVariables = new LinkedHashSet<>(variablesInWith);
     missingVariables.removeAll(variablesInCompared);
 
-    Collection<Variable> existingVariables = new LinkedHashSet<Variable>(variablesInCompared);
+    Collection<Variable> existingVariables = new LinkedHashSet<>(variablesInCompared);
     existingVariables.retainAll(variablesInWith);
 
     return createTableCompareDto(compared, with, newVariables, missingVariables, existingVariables);
@@ -133,9 +133,9 @@ public class CompareResourceImpl implements CompareResource {
 
   private TableCompareDto createTableCompareDtoWhereSecondTableDoesNotExist(ValueTable compared) {
     Set<Variable> variablesInCompared = asSet(compared.getVariables());
-    Iterable<Variable> newVariables = new LinkedHashSet<Variable>(variablesInCompared);
-    Iterable<Variable> missingVariables = new LinkedHashSet<Variable>(INITIAL_CAPACITY);
-    Iterable<Variable> existingVariables = new LinkedHashSet<Variable>(INITIAL_CAPACITY);
+    Iterable<Variable> newVariables = new LinkedHashSet<>(variablesInCompared);
+    Iterable<Variable> missingVariables = new LinkedHashSet<>(INITIAL_CAPACITY);
+    Iterable<Variable> existingVariables = new LinkedHashSet<>(INITIAL_CAPACITY);
 
     return createTableCompareDto(compared, null, newVariables, missingVariables, existingVariables);
   }
@@ -149,7 +149,7 @@ public class CompareResourceImpl implements CompareResource {
       dtoBuilder.setWithTable(Dtos.asDto(with, true, false));
     }
 
-    Collection<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(INITIAL_CAPACITY);
+    Collection<ConflictDto> conflicts = new LinkedHashSet<>(INITIAL_CAPACITY);
     conflicts.addAll(getMissingCsvVariableConflicts(compared));
 
     conflicts.addAll(getConflicts(compared, with, existingVariables, false));
@@ -185,7 +185,7 @@ public class CompareResourceImpl implements CompareResource {
   }
 
   private Collection<ConflictDto> getMissingCsvVariableConflicts(ValueTable compared) {
-    Collection<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(INITIAL_CAPACITY);
+    Collection<ConflictDto> conflicts = new LinkedHashSet<>(INITIAL_CAPACITY);
     if(compared.getDatasource().getType().equals(CsvDatasource.TYPE)) {
       // support IncrementalView wrapping compared table
       CsvValueTable csvValueTable = (CsvValueTable) (compared instanceof ValueTableWrapper //
@@ -201,7 +201,7 @@ public class CompareResourceImpl implements CompareResource {
 
   private Collection<ConflictDto> getConflicts(ValueTable compared, ValueTable with, Iterable<Variable> variables,
       boolean newVariable) {
-    Collection<ConflictDto> conflicts = new LinkedHashSet<ConflictDto>(INITIAL_CAPACITY);
+    Collection<ConflictDto> conflicts = new LinkedHashSet<>(INITIAL_CAPACITY);
 
     String entityType = null;
     for(Variable v : variables) {
@@ -245,9 +245,9 @@ public class CompareResourceImpl implements CompareResource {
   }
 
   private Set<Variable> getUnconflicting(Iterable<Variable> variables, Iterable<ConflictDto> conflicts) {
-    Set<Variable> unconflicting = new LinkedHashSet<Variable>(INITIAL_CAPACITY);
+    Set<Variable> unconflicting = new LinkedHashSet<>(INITIAL_CAPACITY);
 
-    Collection<String> conflicting = new LinkedHashSet<String>(INITIAL_CAPACITY);
+    Collection<String> conflicting = new LinkedHashSet<>(INITIAL_CAPACITY);
     for(ConflictDto dto : conflicts) {
       conflicting.add(dto.getVariable().getName());
     }
@@ -262,7 +262,7 @@ public class CompareResourceImpl implements CompareResource {
   }
 
   private Set<Variable> getUnconflictingModified(ValueTable with, Iterable<Variable> variables) {
-    Set<Variable> modified = new LinkedHashSet<Variable>(INITIAL_CAPACITY);
+    Set<Variable> modified = new LinkedHashSet<>(INITIAL_CAPACITY);
 
     for(Variable v : variables) {
       Variable withVar = with.getVariable(v.getName());
@@ -368,7 +368,7 @@ public class CompareResourceImpl implements CompareResource {
   }
 
   private <T> Set<T> asSet(Iterable<T> iterable) {
-    Set<T> set = new LinkedHashSet<T>(INITIAL_CAPACITY);
+    Set<T> set = new LinkedHashSet<>(INITIAL_CAPACITY);
     for(T elem : iterable) {
       set.add(elem);
     }

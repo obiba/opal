@@ -60,7 +60,7 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
 
   @GET
   public List<Commands.CommandStateDto> getCommands() {
-    List<Commands.CommandStateDto> commandDtoList = new ArrayList<Commands.CommandStateDto>();
+    List<Commands.CommandStateDto> commandDtoList = new ArrayList<>();
 
     List<CommandJob> history = commandJobService.getHistory();
     for(CommandJob commandJob : history) {

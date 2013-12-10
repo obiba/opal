@@ -70,11 +70,11 @@ public class DefaultCommandJobServiceTest {
     cmd.setShell((OpalShell) EasyMock.anyObject());
     expectLastCall().once();
     //expect(cmd.getName()).andReturn("").anyTimes();
-    commandJob = new CommandJob("",cmd);
+    commandJob = new CommandJob("", cmd);
 
     mockSubject = createMock(Subject.class);
 
-    final Capture<Runnable> c = new Capture<Runnable>();
+    final Capture<Runnable> c = new Capture<>();
     expect(mockSubject.associateWith(EasyMock.capture(c))).andAnswer(new IAnswer<Runnable>() {
 
       @Override
@@ -209,7 +209,7 @@ public class DefaultCommandJobServiceTest {
   @Test
   public void testGetHistory_ReturnsAllJobsInReverseOrderOfSubmission() {
     // Test-specific setup
-    futureCommandJobs = new ArrayList<FutureCommandJob>();
+    futureCommandJobs = new ArrayList<>();
     futureCommandJobs.add(new FutureCommandJob(mockSubject, createCommandJob(1, new Date(1), null)));
     futureCommandJobs.add(new FutureCommandJob(mockSubject, createCommandJob(2, new Date(2), null)));
     futureCommandJobs.add(new FutureCommandJob(mockSubject, createCommandJob(3, new Date(3), null)));
@@ -291,14 +291,14 @@ public class DefaultCommandJobServiceTest {
         createCommandJob(1, new Date(1), Status.CANCELED));
 
     // Put them in the list of future command jobs.
-    futureCommandJobs = new ArrayList<FutureCommandJob>();
+    futureCommandJobs = new ArrayList<>();
     futureCommandJobs.add(succeededJob);
     futureCommandJobs.add(failedJob);
     futureCommandJobs.add(cancelledJob);
 
     // Put them in the sub-list of terminated jobs.
     // Note: These are normally put there by the executor's afterExecute callback.
-    jobsTerminated = new ArrayList<FutureCommandJob>();
+    jobsTerminated = new ArrayList<>();
     jobsTerminated.add(succeededJob);
     jobsTerminated.add(failedJob);
     jobsTerminated.add(cancelledJob);
@@ -387,7 +387,7 @@ public class DefaultCommandJobServiceTest {
   //
 
   private List<CommandJob> createJobHistory() {
-    List<CommandJob> jobHistory = new ArrayList<CommandJob>();
+    List<CommandJob> jobHistory = new ArrayList<>();
 
     jobHistory.add(createCommandJob(1, new Date(1l), null));
     jobHistory.add(createCommandJob(2, new Date(2l), null));
@@ -401,7 +401,7 @@ public class DefaultCommandJobServiceTest {
     cmd.setShell((OpalShell) EasyMock.anyObject());
     expectLastCall().once();
 
-    CommandJob aCommandJob = new CommandJob("foo",cmd);
+    CommandJob aCommandJob = new CommandJob("foo", cmd);
     aCommandJob.setId(id);
     aCommandJob.setSubmitTime(submitTime);
     aCommandJob.setStatus(status);
@@ -416,7 +416,7 @@ public class DefaultCommandJobServiceTest {
     commandJob.setSubmitTime(new Date());
     commandJob.setStatus(status);
 
-    futureCommandJobs = new ArrayList<FutureCommandJob>();
+    futureCommandJobs = new ArrayList<>();
     futureCommandJobs.add(new FutureCommandJob(mockSubject, commandJob));
   }
 

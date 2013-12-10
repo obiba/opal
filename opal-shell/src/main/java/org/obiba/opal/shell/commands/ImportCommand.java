@@ -224,9 +224,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       importService.importData(options.getTables(), options.getDestination(), options.isForce(), options.isIgnore());
       if(file != null) archive(file);
       errorCode = SUCCESS;
-    } catch(NoSuchDatasourceException ex) {
-      getShell().printf("'%s'. Cannot import.\n", ex.getMessage());
-    } catch(NoSuchValueTableException ex) {
+    } catch(NoSuchDatasourceException | NoSuchValueTableException ex) {
       getShell().printf("'%s'. Cannot import.\n", ex.getMessage());
     } catch(KeyProviderException ex) {
       getShell().printf("Decryption exception: %s\n", ex.getMessage());
@@ -346,7 +344,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   }
 
   private List<FileObject> resolveFiles(Iterable<String> filePaths) {
-    List<FileObject> files = new ArrayList<FileObject>();
+    List<FileObject> files = new ArrayList<>();
     FileObject file;
     for(String filePath : filePaths) {
       try {

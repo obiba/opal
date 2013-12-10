@@ -242,7 +242,7 @@ public class DatasourceResource {
   @Path("/locales")
   @NoAuthorization
   public Iterable<LocaleDto> getLocales(@QueryParam("locale") String displayLocale) {
-    Collection<LocaleDto> localeDtos = new ArrayList<LocaleDto>();
+    Collection<LocaleDto> localeDtos = new ArrayList<>();
     for(Locale locale : getLocales()) {
       localeDtos.add(Dtos.asDto(locale, displayLocale != null ? new Locale(displayLocale) : null));
     }

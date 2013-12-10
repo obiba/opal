@@ -23,7 +23,7 @@ public abstract class AbstractOpalShell implements OpalShell {
 
   private final CommandRegistry commandRegistry;
 
-  private final List<OpalShellExitCallback> exitCallbacks = new ArrayList<OpalShellExitCallback>();
+  private final List<OpalShellExitCallback> exitCallbacks = new ArrayList<>();
 
   private boolean quit = false;
 

@@ -73,7 +73,7 @@ public class DatasourcesVariablesSearchResource extends AbstractVariablesSearchR
   //
 
   private Collection<String> getFilterTypes() {
-    Collection<String> types = new ArrayList<String>();
+    Collection<String> types = new ArrayList<>();
 
     for(Datasource datasource : MagmaEngine.get().getDatasources()) {
       for(ValueTable valueTable : datasource.getValueTables()) {

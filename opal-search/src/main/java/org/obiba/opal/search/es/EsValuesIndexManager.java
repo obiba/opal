@@ -108,7 +108,7 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
 
       private BulkRequestBuilder bulkRequest = opalSearchService.getClient().prepareBulk();
 
-      private final Map<Variable, VariableNature> natures = new HashMap<Variable, VariableNature>();
+      private final Map<Variable, VariableNature> natures = new HashMap<>();
 
       private final Stopwatch stopwatch = Stopwatch.createUnstarted();
 

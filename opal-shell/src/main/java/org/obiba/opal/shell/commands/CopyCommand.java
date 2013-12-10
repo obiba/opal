@@ -174,7 +174,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   private Set<ValueTable> getValueTables() {
-    HashMap<String, ValueTable> names = new HashMap<String, ValueTable>();
+    HashMap<String, ValueTable> names = new HashMap<>();
 
     if(options.isSource()) {
       for(ValueTable table : getDatasourceByName(options.getSource()).getValueTables()) {

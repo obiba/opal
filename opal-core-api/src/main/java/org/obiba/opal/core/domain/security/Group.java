@@ -27,7 +27,7 @@ public class Group extends AbstractTimestamped implements HasUniqueProperties, C
   @NotBlank
   private String name;
 
-  private Set<String> users = new HashSet<String>();
+  private Set<String> users = new HashSet<>();
 
   public Group() {
   }
@@ -64,7 +64,7 @@ public class Group extends AbstractTimestamped implements HasUniqueProperties, C
   }
 
   public void addUser(String user) {
-    if(users == null) users = new HashSet<String>();
+    if(users == null) users = new HashSet<>();
     users.add(user);
   }
 

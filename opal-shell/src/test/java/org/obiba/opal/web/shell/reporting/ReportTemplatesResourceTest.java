@@ -63,7 +63,7 @@ public class ReportTemplatesResourceTest {
     commandSchedulerServiceMock.unscheduleCommand("template1", "reports");
     commandSchedulerServiceMock.scheduleCommand("template1", "reports", "schedule");
 
-    reportTemplates = new LinkedHashSet<ReportTemplate>();
+    reportTemplates = new LinkedHashSet<>();
     reportTemplates.add(getReportTemplate("template1"));
     reportTemplates.add(getReportTemplate("template2"));
     reportTemplates.add(getReportTemplate("template3"));

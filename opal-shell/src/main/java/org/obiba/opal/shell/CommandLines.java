@@ -44,7 +44,7 @@ public class CommandLines {
    * @return An array of arguments.
    */
   public static String[] parseArguments(String commandLine) {
-    List<String> arguments = new ArrayList<String>();
+    List<String> arguments = new ArrayList<>();
     String deliminator = WHITESPACE_AND_QUOTE;
     StringTokenizer parser = new StringTokenizer(commandLine, deliminator, true);
 

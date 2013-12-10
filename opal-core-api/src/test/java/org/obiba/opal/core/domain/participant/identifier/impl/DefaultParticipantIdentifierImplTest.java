@@ -53,7 +53,7 @@ public class DefaultParticipantIdentifierImplTest {
     // Allow start with zero to obtain a uniform distribution.
     participantIdentifier.setAllowStartWithZero(true);
 
-    Map<Character, Integer> distributionMap = new HashMap<Character, Integer>();
+    Map<Character, Integer> distributionMap = new HashMap<>();
     for(int i = 0; i < 10000; i++) { // Generate 10000 ids.
       String id = participantIdentifier.generateParticipantIdentifier();
       // Count occurrences of each of the 10 possible digits in each id.

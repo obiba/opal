@@ -59,16 +59,13 @@ public class Seed {
 
   private String readFully() throws IOException {
     StringBuilder builder = new StringBuilder();
-    BufferedReader br = new BufferedReader(new FileReader(seedFile));
-    try {
+    try(BufferedReader br = new BufferedReader(new FileReader(seedFile))) {
       String line = br.readLine();
       while(line != null) {
         builder.append(line).append('\n');
         line = br.readLine();
       }
       return builder.toString();
-    } finally {
-      br.close();
     }
   }
 
@@ -259,7 +256,7 @@ public class Seed {
         JSONObject json = seed.getJSONObject(i);
         String name = json.getString("name");
         String destination = json.getString("destination");
-        Iterable<String> from = new JSONArrayIterable<String>(json.getJSONArray("from"));
+        Iterable<String> from = new JSONArrayIterable<>(json.getJSONArray("from"));
         String file = json.optString("file");
 
         HttpResponse r = opalClient.get(opalClient.newUri().segment("datasource", destination, "view", name).build());

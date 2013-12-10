@@ -41,10 +41,10 @@ public class DefaultPagingVectorSourceImpl implements PagingVectorSource {
     // TODO: Refactor this code. We are creating a TreeSet (to sort the entities), then converting to a List
     // (to extract the desired sublist), then converting it back to a TreeSet (because VectorSource.getValues
     // expects a SortedSet of entities).
-    TreeSet<VariableEntity> sortedEntities = new TreeSet<VariableEntity>(vt.getVariableEntities());
+    TreeSet<VariableEntity> sortedEntities = new TreeSet<>(vt.getVariableEntities());
     int end = Math.min(offset + limit, sortedEntities.size());
-    List<VariableEntity> entitySubList = new ArrayList<VariableEntity>(sortedEntities).subList(offset, end);
+    List<VariableEntity> entitySubList = new ArrayList<>(sortedEntities).subList(offset, end);
 
-    return vectorSource.getValues(new TreeSet<VariableEntity>(entitySubList));
+    return vectorSource.getValues(new TreeSet<>(entitySubList));
   }
 }

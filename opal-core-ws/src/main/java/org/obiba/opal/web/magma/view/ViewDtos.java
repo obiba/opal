@@ -76,7 +76,7 @@ public final class ViewDtos {
 
   @NotNull
   private List<ValueTable> getFromTables(@NotNull ViewDto viewDto) {
-    List<ValueTable> fromTables = new ArrayList<ValueTable>();
+    List<ValueTable> fromTables = new ArrayList<>();
     for(int i = 0; i < viewDto.getFromCount(); i++) {
       String fromTable = viewDto.getFrom(i);
       fromTables.add(MagmaEngine.get().createReference(fromTable));

@@ -51,8 +51,8 @@ public class RequestCycleInterceptor implements PreProcessInterceptor, PostProce
   public RequestCycleInterceptor(RequestAttributesProvider provider, Set<RequestCyclePreProcess> preProcesses,
       Set<RequestCyclePostProcess> postProcesses) {
     requestAttributesProvider = provider;
-    this.preProcesses = new ArrayList<RequestCyclePreProcess>(preProcesses);
-    this.postProcesses = new ArrayList<RequestCyclePostProcess>(postProcesses);
+    this.preProcesses = new ArrayList<>(preProcesses);
+    this.postProcesses = new ArrayList<>(postProcesses);
     Collections.sort(this.preProcesses, new AnnotationAwareOrderComparator());
     Collections.sort(this.postProcesses, new AnnotationAwareOrderComparator());
   }

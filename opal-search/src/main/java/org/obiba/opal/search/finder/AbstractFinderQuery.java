@@ -22,7 +22,7 @@ public abstract class AbstractFinderQuery {
   /**
    * Tables to search within
    */
-  private final List<ValueTable> tableFilter = new ArrayList<ValueTable>();
+  private final List<ValueTable> tableFilter = new ArrayList<>();
 
   public List<ValueTable> getTableFilter() {
     return tableFilter;

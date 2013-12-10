@@ -33,9 +33,9 @@ public class Taxonomy extends AbstractTimestamped implements HasUniqueProperties
   @NotBlank
   private String name;
 
-  private Map<Locale, String> titles = new HashMap<Locale, String>();
+  private Map<Locale, String> titles = new HashMap<>();
 
-  private Map<Locale, String> descriptions = new HashMap<Locale, String>();
+  private Map<Locale, String> descriptions = new HashMap<>();
 
   private List<String> vocabularies;
 
@@ -74,7 +74,7 @@ public class Taxonomy extends AbstractTimestamped implements HasUniqueProperties
   }
 
   public Taxonomy addTitle(Locale locale, String title) {
-    if(titles == null) titles = new HashMap<Locale, String>();
+    if(titles == null) titles = new HashMap<>();
     titles.put(locale, title);
     return this;
   }
@@ -88,7 +88,7 @@ public class Taxonomy extends AbstractTimestamped implements HasUniqueProperties
   }
 
   public Taxonomy addDescription(Locale locale, String title) {
-    if(descriptions == null) descriptions = new HashMap<Locale, String>();
+    if(descriptions == null) descriptions = new HashMap<>();
     descriptions.put(locale, title);
     return this;
   }
@@ -106,7 +106,7 @@ public class Taxonomy extends AbstractTimestamped implements HasUniqueProperties
   }
 
   public Taxonomy addVocabulary(String vocabulary) {
-    if(vocabularies == null) vocabularies = new ArrayList<String>();
+    if(vocabularies == null) vocabularies = new ArrayList<>();
     if(!vocabularies.contains(vocabulary)) vocabularies.add(vocabulary);
     return this;
   }

@@ -37,7 +37,7 @@ public class OpalFileSystemMockBuilder {
 
   private final FileObject root;
 
-  private final Map<String, FileObject> fileMap = new HashMap<String, FileObject>();
+  private final Map<String, FileObject> fileMap = new HashMap<>();
 
   private IExpectationSetters<?> expectationSetters;
 

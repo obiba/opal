@@ -22,7 +22,7 @@ import com.google.common.base.Strings;
 
 public class QuerySearchJsonBuilder {
 
-  private static final Collection<String> defaultQueryFields = new ArrayList<String>();
+  private static final Collection<String> defaultQueryFields = new ArrayList<>();
 
   private final static int DEFAULT_FROM = 0;
 

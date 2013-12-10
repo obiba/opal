@@ -50,7 +50,7 @@ public class OpalGitCommitsLogCommand extends OpalGitCommand<List<CommitInfo>> {
       }
 
       Iterable<RevCommit> commitLog = logCommand.call();
-      List<CommitInfo> commits = new ArrayList<CommitInfo>();
+      List<CommitInfo> commits = new ArrayList<>();
       // for performance, get the id before looping thru all commits preventing resolving the id each time
       String headCommitId = getHeadCommitId();
       // TODO find an efficient way of finding the current commit of a given path
@@ -74,9 +74,7 @@ public class OpalGitCommitsLogCommand extends OpalGitCommand<List<CommitInfo>> {
       }
 
       return commits;
-    } catch(GitAPIException e) {
-      throw new OpalGitException(e.getMessage(), e);
-    } catch(IOException e) {
+    } catch(GitAPIException | IOException e) {
       throw new OpalGitException(e.getMessage(), e);
     }
   }

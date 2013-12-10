@@ -138,11 +138,8 @@ public class OpalJavaClient {
     try {
       httpClient.getConnectionManager().getSchemeRegistry()
           .register(new Scheme("https", HTTPS_PORT, getSocketFactory()));
-    } catch(NoSuchAlgorithmException e) {
+    } catch(NoSuchAlgorithmException | KeyManagementException e) {
       throw new RuntimeException(e);
-    } catch(KeyManagementException e) {
-      throw new RuntimeException(e);
-
     }
     client = enableCaching(httpClient);
 
@@ -202,7 +199,7 @@ public class OpalJavaClient {
 
   @SuppressWarnings("unchecked")
   public <T extends Message> List<T> getResources(Class<T> messageType, URI uri, Message.Builder builder) {
-    List<T> resources = new ArrayList<T>();
+    List<T> resources = new ArrayList<>();
     InputStream is = null;
     Message.Builder messageBuilder = builder;
 

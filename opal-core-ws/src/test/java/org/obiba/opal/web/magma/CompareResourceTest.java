@@ -46,7 +46,7 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
   // Instance Variables
   //
 
-  private final Collection<Datasource> datasourcesToRemoveAfterTest = new HashSet<Datasource>();
+  private final Collection<Datasource> datasourcesToRemoveAfterTest = new HashSet<>();
 
   //
   // Fixture Methods (setUp / tearDown)
@@ -368,7 +368,7 @@ public class CompareResourceTest extends AbstractMagmaResourceTest {
     private StaticDatasource(String name, ValueTable... tablePrototypes) {
       super(name, "static");
 
-      tableMap = new HashMap<String, ValueTable>();
+      tableMap = new HashMap<>();
       for(ValueTable vt : tablePrototypes) {
         tableMap.put(vt.getName(), vt);
       }

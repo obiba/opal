@@ -213,15 +213,7 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
       importJdbcDatasourceFactories(doc, xPath);
       importNullDatasourceFactories(doc, xPath);
       deleteDeprecatedNodes(doc, xPath);
-    } catch(SAXException e) {
-      throw new RuntimeException(e);
-    } catch(IOException e) {
-      throw new RuntimeException(e);
-    } catch(ParserConfigurationException e) {
-      throw new RuntimeException(e);
-    } catch(XPathExpressionException e) {
-      throw new RuntimeException(e);
-    } catch(TransformerException e) {
+    } catch(SAXException | TransformerException | XPathExpressionException | ParserConfigurationException | IOException e) {
       throw new RuntimeException(e);
     }
   }
@@ -290,14 +282,17 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
       Project.Builder projectBuilder = Project.Builder.create().name(name).title(name);
       Element sessionFactoryElement = (Element) factoryElement.getElementsByTagName("sessionFactoryProvider").item(0);
       String clazz = sessionFactoryElement.getAttribute("class");
-      if("org.obiba.magma.datasource.hibernate.support.SpringBeanSessionFactoryProvider".equals(clazz)) {
-        // based on main database opal-data
-        projectBuilder.database("opal-data");
-      } else if("org.obiba.opal.web.magma.support.DatabaseSessionFactoryProvider".equals(clazz)) {
-        String databaseName = getChildTextContent(sessionFactoryElement, "databaseName");
-        projectBuilder.database(databaseName);
-      } else {
-        throw new IllegalArgumentException("Unknown sessionFactoryProviderClass: " + clazz);
+      switch(clazz) {
+        case "org.obiba.magma.datasource.hibernate.support.SpringBeanSessionFactoryProvider":
+          // based on main database opal-data
+          projectBuilder.database("opal-data");
+          break;
+        case "org.obiba.opal.web.magma.support.DatabaseSessionFactoryProvider":
+          String databaseName = getChildTextContent(sessionFactoryElement, "databaseName");
+          projectBuilder.database(databaseName);
+          break;
+        default:
+          throw new IllegalArgumentException("Unknown sessionFactoryProviderClass: " + clazz);
       }
       orientDbService.save(null, projectBuilder.build());
     }

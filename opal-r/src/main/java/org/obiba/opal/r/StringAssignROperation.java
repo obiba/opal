@@ -28,7 +28,7 @@ public class StringAssignROperation extends AbstractROperation {
   }
 
   public StringAssignROperation(String symbol, String content) {
-    symbols = new MultivaluedMapImpl<String, String>();
+    symbols = new MultivaluedMapImpl<>();
     symbols.putSingle(symbol, content);
   }
 

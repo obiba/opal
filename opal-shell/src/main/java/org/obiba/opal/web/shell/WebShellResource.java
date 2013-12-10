@@ -63,7 +63,7 @@ public class WebShellResource extends AbstractCommandsResource {
   @GET
   @Path("/commands")
   public List<CommandStateDto> getCommands() {
-    List<CommandStateDto> commandDtoList = new ArrayList<CommandStateDto>();
+    List<CommandStateDto> commandDtoList = new ArrayList<>();
 
     List<CommandJob> history = commandJobService.getHistory();
     for(CommandJob commandJob : history) {

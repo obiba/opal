@@ -384,7 +384,7 @@ public class FilesResource {
   @NoAuthorization
   public Response getAvailableCharsets() {
     SortedMap<String, Charset> charsets = Charset.availableCharsets();
-    List<String> names = new ArrayList<String>();
+    List<String> names = new ArrayList<>();
     for(Charset charSet : charsets.values()) {
       names.add(charSet.name());
       names.addAll(charSet.aliases());

@@ -141,8 +141,7 @@ public class VariableEntityTablesResourceImpl implements AbstractTablesResource,
       }
 
       try {
-        JSONObject jsonResponse = executeEsQuery(query.getEntity().getIdentifier(),
-            new ArrayList<String>(map.keySet()));
+        JSONObject jsonResponse = executeEsQuery(query.getEntity().getIdentifier(), new ArrayList<>(map.keySet()));
         // parse the jsonResponse and by using the map, create the required TableDtos
         log.debug("JSON ES Response {}", jsonResponse);
         JSONObject jsonHitsInfo = jsonResponse.getJSONObject("hits");
@@ -186,7 +185,7 @@ public class VariableEntityTablesResourceImpl implements AbstractTablesResource,
 
     private Map<String, ValueTable> buildIndexValueTableMap(VariableEntityTablesQuery query,
         IndexManagerHelper indexManagerHelper) {
-      Map<String, ValueTable> map = new HashMap<String, ValueTable>();
+      Map<String, ValueTable> map = new HashMap<>();
       Iterator<ValueTable> iterator = query.getTableFilter().iterator();
 
       while(iterator.hasNext()) {

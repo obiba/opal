@@ -20,16 +20,13 @@ import java.util.Locale;
 import javax.annotation.Nullable;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.easymock.EasyMock;
 import org.easymock.IArgumentMatcher;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.obiba.core.util.FileUtil;
 import org.obiba.magma.Datasource;
-import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
@@ -37,7 +34,6 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.ValueTableWriter.VariableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.datasource.excel.support.ExcelDatasourceFactory;
-import org.obiba.magma.support.MagmaEngineFactory;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
 import org.obiba.opal.core.cfg.OpalConfiguration;
@@ -50,7 +46,6 @@ import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.web.magma.support.DatasourceFactoryDtoParser;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.magma.support.ExcelDatasourceFactoryDtoParser;
-import org.obiba.opal.web.magma.support.SpssDatasourceFactoryDtoParser;
 import org.obiba.opal.web.magma.view.JavaScriptViewDtoExtension;
 import org.obiba.opal.web.magma.view.VariableListViewDtoExtension;
 import org.obiba.opal.web.magma.view.ViewDtoExtension;
@@ -79,7 +74,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.obiba.core.util.FileUtil.getFileFromResource;
 
 /**
  *
@@ -114,7 +108,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     ViewManager viewManagerMock = createMock(ViewManager.class);
     OpalGeneralConfigService serverServiceMock = createMock(OpalGeneralConfigService.class);
     OpalGeneralConfig configMock = createMock(OpalGeneralConfig.class);
-    List<Locale> locales = new ArrayList<Locale>();
+    List<Locale> locales = new ArrayList<>();
     locales.add(Locale.ENGLISH);
     locales.add(Locale.FRENCH);
 

@@ -36,11 +36,11 @@ public class Vocabulary extends AbstractTimestamped implements HasUniqueProperti
 
   private boolean repeatable;
 
-  private Map<Locale, String> titles = new HashMap<Locale, String>();
+  private Map<Locale, String> titles = new HashMap<>();
 
-  private Map<Locale, String> descriptions = new HashMap<Locale, String>();
+  private Map<Locale, String> descriptions = new HashMap<>();
 
-  private List<Term> terms = new ArrayList<Term>();
+  private List<Term> terms = new ArrayList<>();
 
   public Vocabulary() {
   }
@@ -95,7 +95,7 @@ public class Vocabulary extends AbstractTimestamped implements HasUniqueProperti
   }
 
   public Vocabulary addTitle(Locale locale, String title) {
-    if(titles == null) titles = new HashMap<Locale, String>();
+    if(titles == null) titles = new HashMap<>();
     titles.put(locale, title);
     return this;
   }
@@ -109,7 +109,7 @@ public class Vocabulary extends AbstractTimestamped implements HasUniqueProperti
   }
 
   public Vocabulary addDescription(Locale locale, String title) {
-    if(descriptions == null) descriptions = new HashMap<Locale, String>();
+    if(descriptions == null) descriptions = new HashMap<>();
     descriptions.put(locale, title);
     return this;
   }
@@ -123,7 +123,7 @@ public class Vocabulary extends AbstractTimestamped implements HasUniqueProperti
   }
 
   public Vocabulary addTerm(Term term) {
-    if(terms == null) terms = new ArrayList<Term>();
+    if(terms == null) terms = new ArrayList<>();
     if(terms.contains(term)) terms.remove(term);
     terms.add(term);
     return this;

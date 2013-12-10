@@ -138,7 +138,7 @@ public class DefaultExportServiceImpl implements ExportService {
   @NotNull
   private Set<ValueTable> getValueTablesByName(@NotNull Iterable<String> tableNames)
       throws NoSuchDatasourceException, NoSuchValueTableException, ExportException {
-    Set<ValueTable> tables = new HashSet<ValueTable>();
+    Set<ValueTable> tables = new HashSet<>();
     for(String tableName : tableNames) {
       try {
         if(!tables.add(MagmaEngineTableResolver.valueOf(tableName).resolveTable())) {
@@ -200,7 +200,7 @@ public class DefaultExportServiceImpl implements ExportService {
     @NotNull
     @Override
     protected Set<String> getLockNames() {
-      Set<String> tablesToLock = new TreeSet<String>();
+      Set<String> tablesToLock = new TreeSet<>();
       for(ValueTable valueTable : sourceTables) {
         tablesToLock.add(destinationDatasource.getName() + "." + valueTable.getName());
       }

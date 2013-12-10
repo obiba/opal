@@ -60,7 +60,7 @@ public class VariableListViewDtoExtension implements ViewDtoExtension {
       viewBuilder.where(whereClause);
     }
 
-    Collection<Variable> variables = new LinkedHashSet<Variable>();
+    Collection<Variable> variables = new LinkedHashSet<>();
     for(VariableDto variableDto : listDto.getVariablesList()) {
       variables.add(Dtos.fromDto(variableDto));
     }

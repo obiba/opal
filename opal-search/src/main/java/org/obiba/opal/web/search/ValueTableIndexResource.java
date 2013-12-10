@@ -177,7 +177,7 @@ public class ValueTableIndexResource extends IndexResource {
   @Path("_search")
   public Response search(@Context HttpServletRequest servletRequest, String body) {
     final CountDownLatch latch = new CountDownLatch(1);
-    final AtomicReference<Response> ref = new AtomicReference<Response>();
+    final AtomicReference<Response> ref = new AtomicReference<>();
 
     esProvider.getRest()
         .dispatchRequest(new JaxRsRestRequest(getValueTableIndex(datasource, table), servletRequest, body, "_search"),

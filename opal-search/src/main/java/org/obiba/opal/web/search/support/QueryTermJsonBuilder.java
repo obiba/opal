@@ -24,7 +24,7 @@ public class QueryTermJsonBuilder {
 
   private static final int DEFAULT_MAX_FIELDS = 9999;
 
-  private final Collection<String> fieldNames = new ArrayList<String>();
+  private final Collection<String> fieldNames = new ArrayList<>();
 
   private String termFieldName;
 
@@ -74,7 +74,7 @@ public class QueryTermJsonBuilder {
   }
 
   public static class QueryTermsFiltersBuilder {
-    private List<String> filterValues = new ArrayList<String>();
+    private List<String> filterValues = new ArrayList<>();
 
     private String fieldName;
 
@@ -97,7 +97,7 @@ public class QueryTermJsonBuilder {
       JSONObject jsonTerms = new JSONObject();
       jsonTerms.put(fieldName, new JSONArray(filterValues));
 
-      Collection<JSONObject> filtersTerms = new ArrayList<JSONObject>();
+      Collection<JSONObject> filtersTerms = new ArrayList<>();
       filtersTerms.add(new JSONObject().put("terms", jsonTerms));
 
       JSONObject jsonFiltersTerms = new JSONObject().put("filters", filtersTerms);

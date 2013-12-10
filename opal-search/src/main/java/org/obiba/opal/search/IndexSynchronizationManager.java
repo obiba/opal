@@ -60,7 +60,7 @@ public class IndexSynchronizationManager {
 
   private IndexSynchronization currentTask;
 
-  private final BlockingQueue<IndexSynchronization> indexSyncQueue = new LinkedBlockingQueue<IndexSynchronization>();
+  private final BlockingQueue<IndexSynchronization> indexSyncQueue = new LinkedBlockingQueue<>();
 
   private Thread consumer;
 
@@ -227,9 +227,7 @@ public class IndexSynchronizationManager {
         if(sync.getIndexManager().isReady()) {
           getSubject().execute(sync);
         }
-      } catch(NoSuchDatasourceException e) {
-        log.trace("Cannot index: ", e.getMessage());
-      } catch(NoSuchValueTableException e) {
+      } catch(NoSuchDatasourceException | NoSuchValueTableException e) {
         log.trace("Cannot index: ", e.getMessage());
       } finally {
         currentTask = null;

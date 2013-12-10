@@ -18,9 +18,7 @@ public class TestOpalGitVersionControlSystem extends OpalGitVersionControlSystem
       File repo = OpalGitUtils.getGitDirectoryName(getGitFolder(), name);
       FileRepositoryBuilder builder = new FileRepositoryBuilder();
       return builder.setGitDir(repo).readEnvironment().findGitDir().build();
-    } catch(IOException e) {
-      throw new OpalGitException(e.getMessage(), e);
-    } catch(URISyntaxException e) {
+    } catch(IOException | URISyntaxException e) {
       throw new OpalGitException(e.getMessage(), e);
     }
   }
@@ -29,6 +27,5 @@ public class TestOpalGitVersionControlSystem extends OpalGitVersionControlSystem
     File f = new File(getClass().getClassLoader().getResource("OpalVersionControlSystemTest/git/views").toURI());
     return f;
   }
-
 
 }

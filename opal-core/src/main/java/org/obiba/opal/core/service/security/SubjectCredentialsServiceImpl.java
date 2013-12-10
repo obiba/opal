@@ -105,7 +105,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
   private Iterable<Group> findImpactedGroups(final SubjectCredentials subjectCredentials) {
 
-    Collection<Group> groups = new ArrayList<Group>();
+    Collection<Group> groups = new ArrayList<>();
 
     // check removed group
     SubjectCredentials previousSubjectCredentials = orientDbService.findUnique(subjectCredentials);
