@@ -24,7 +24,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -144,12 +143,10 @@ public class DatasourceResource {
   @ApiOperation(value = "Delete the datasource")
   @ApiResponses(@ApiResponse(code = 404, message = "If datasource is not found"))
   public Response removeDatasource() {
-    ResponseBuilder response;
     Datasource ds = null;
     if(MagmaEngine.get().hasTransientDatasource(name)) {
       ds = MagmaEngine.get().getTransientDatasourceInstance(name);
       MagmaEngine.get().removeTransientDatasource(name);
-      response = Response.ok();
     } else if(MagmaEngine.get().hasDatasource(name)) {
       MagmaEngine.get().removeDatasource(ds = MagmaEngine.get().getDatasource(name));
       configService.modifyConfiguration(new ConfigModificationTask() {
@@ -159,22 +156,19 @@ public class DatasourceResource {
           Disposables.dispose(config.getMagmaEngineFactory().removeFactory(name));
         }
       });
-
       viewManager.removeAllViews(name);
-
-      response = Response.ok();
     } else {
-      response = Response.status(Status.NOT_FOUND)
-          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound"));
+      return Response.status(Status.NOT_FOUND)
+          .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound")).build();
     }
 
-    if(ds != null && datasourceUpdateListeners != null) {
+    if(datasourceUpdateListeners != null) {
       for(DatasourceUpdateListener listener : datasourceUpdateListeners) {
         listener.onDelete(ds);
       }
     }
 
-    return response.build();
+    return Response.ok().build();
   }
 
   @Path("/table/{table}")

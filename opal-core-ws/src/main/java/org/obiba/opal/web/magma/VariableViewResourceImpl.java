@@ -69,38 +69,43 @@ public class VariableViewResourceImpl extends AbstractValueTableResource impleme
   }
 
   @Override
-  public Response createOrUpdateVariable(VariableDto variable, @Nullable String comment) {
-    ValueTableWriter.VariableWriter vw = null;
+  public Response createOrUpdateVariable(VariableDto variableDto, @Nullable String comment) {
+    ValueTableWriter.VariableWriter variableWriter = null;
     try {
       // The variable must exist
       ValueTable table = getValueTable();
-      Variable v = table.getVariable(name);
+      Variable variable = table.getVariable(name);
 
-      if(!v.getEntityType().equals(variable.getEntityType())) {
+      if(!variable.getEntityType().equals(variableDto.getEntityType())) {
         return Response.status(Response.Status.BAD_REQUEST).build();
       }
 
       View view = getValueTableAsView();
-      vw = view.getListClause().createWriter();
+      variableWriter = view.getListClause().createWriter();
 
       // Rename existing variable
-      if(!variable.getName().equals(v.getName())) {
-        if(tableListeners != null && !tableListeners.isEmpty()) {
-          for(ValueTableUpdateListener listener : tableListeners) {
-            listener.onRename(table, v, variable.getName());
-          }
-        }
-        vw.removeVariable(v);
+      if(!variableDto.getName().equals(variable.getName())) {
+        renameVariable(variable, variableDto.getName(), table, variableWriter);
       }
-      vw.writeVariable(Dtos.fromDto(variable));
+      variableWriter.writeVariable(Dtos.fromDto(variableDto));
       viewManager.addView(getDatasource().getName(), view, comment);
 
     } catch(NoSuchVariableException e) {
       return Response.status(Response.Status.NOT_FOUND).build();
     } finally {
-      Closeables.closeQuietly(vw);
+      Closeables.closeQuietly(variableWriter);
     }
     return Response.ok().build();
+  }
+
+  private void renameVariable(Variable variable, String newName, ValueTable table,
+      ValueTableWriter.VariableWriter variableWriter) {
+    if(tableListeners != null && !tableListeners.isEmpty()) {
+      for(ValueTableUpdateListener listener : tableListeners) {
+        listener.onRename(table, variable, newName);
+      }
+    }
+    variableWriter.removeVariable(variable);
   }
 
   @Override

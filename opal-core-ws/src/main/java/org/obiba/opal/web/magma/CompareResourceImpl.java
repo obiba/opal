@@ -168,17 +168,16 @@ public class CompareResourceImpl implements CompareResource {
 
   private TableCompareDto.Builder addTableCompareDtoModifications(TableCompareDto.Builder dtoBuilder, ValueTable with,
       Iterable<Variable> existingVariables, Iterable<ConflictDto> conflicts) {
-    Set<Variable> unconflictingExistingVariables = getUnconflicting(existingVariables, conflicts);
-    Set<Variable> unmodifiedVariables = unconflictingExistingVariables;
+    Set<Variable> unconflicting = getUnconflicting(existingVariables, conflicts);
     if(with != null) {
-      Set<Variable> modifiedVariables = getUnconflictingModified(with, unconflictingExistingVariables);
-      for(Variable v : modifiedVariables) {
-        dtoBuilder.addModifiedVariables(Dtos.asDto(v));
+      Set<Variable> modifiedVariables = getUnconflictingModified(with, unconflicting);
+      for(Variable variable : modifiedVariables) {
+        dtoBuilder.addModifiedVariables(Dtos.asDto(variable));
       }
-      unmodifiedVariables.removeAll(modifiedVariables);
+      unconflicting.removeAll(modifiedVariables);
     }
-    for(Variable v : unmodifiedVariables) {
-      dtoBuilder.addUnmodifiedVariables(Dtos.asDto(v));
+    for(Variable variable : unconflicting) {
+      dtoBuilder.addUnmodifiedVariables(Dtos.asDto(variable));
     }
 
     return dtoBuilder;
@@ -201,47 +200,46 @@ public class CompareResourceImpl implements CompareResource {
 
   private Collection<ConflictDto> getConflicts(ValueTable compared, ValueTable with, Iterable<Variable> variables,
       boolean newVariable) {
-    Collection<ConflictDto> conflicts = new LinkedHashSet<>(INITIAL_CAPACITY);
-
     String entityType = null;
-    for(Variable v : variables) {
-
+    Collection<ConflictDto> conflicts = new LinkedHashSet<>(INITIAL_CAPACITY);
+    for(Variable variable : variables) {
       if(entityType == null) {
-        entityType = v.getEntityType();
+        entityType = variable.getEntityType();
       }
+      getVariableConflicts(compared, with, newVariable, conflicts, entityType, variable);
+    }
+    return conflicts;
+  }
 
-      String name = v.getName();
-
+  private void getVariableConflicts(ValueTable compared, ValueTable with, boolean newVariable,
+      Collection<ConflictDto> conflicts, String entityType, Variable variable) {
+    if(with == null) {
+      // Target (with) will be created
+      if(!entityType.equals(variable.getEntityType())) {
+        conflicts.add(
+            createConflictDto(Dtos.asDto(variable).setIsNewVariable(true).build(), INCOMPATIBLE_ENTITY_TYPE, entityType,
+                variable.getEntityType()));
+      }
+    } else {
       // Target (with) table already exist
-      if(with != null) {
-        Variable variableInCompared = compared.getVariable(name);
-        if(!variableInCompared.getEntityType().equals(with.getEntityType())) {
-          conflicts.add(createConflictDto(Dtos.asDto(v).setIsNewVariable(newVariable).build(), INCOMPATIBLE_ENTITY_TYPE,
-              variableInCompared.getEntityType(), with.getEntityType()));
-        }
-
-        try {
-          Variable variableInWith = with.getVariable(name);
-          if(!variableInCompared.getValueType().equals(variableInWith.getValueType()) && !with.isView()) {
-            conflicts.add(
-                createConflictDto(Dtos.asDto(v).setIsNewVariable(newVariable).build(), INCOMPATIBLE_VALUE_TYPE,
-                    variableInCompared.getValueType().getName(), variableInWith.getValueType().getName()));
-          }
-        } catch(NoSuchVariableException variableDoesNotExist) {
-          // Case where the variable does not exist in Opal but its destination table already exist.
-        }
-
-        // Target (with) will be created
-      } else {
-        if(!entityType.equals(v.getEntityType())) {
+      String name = variable.getName();
+      Variable variableInCompared = compared.getVariable(name);
+      if(!variableInCompared.getEntityType().equals(with.getEntityType())) {
+        conflicts.add(
+            createConflictDto(Dtos.asDto(variable).setIsNewVariable(newVariable).build(), INCOMPATIBLE_ENTITY_TYPE,
+                variableInCompared.getEntityType(), with.getEntityType()));
+      }
+      try {
+        Variable variableInWith = with.getVariable(name);
+        if(!variableInCompared.getValueType().equals(variableInWith.getValueType()) && !with.isView()) {
           conflicts.add(
-              createConflictDto(Dtos.asDto(v).setIsNewVariable(true).build(), INCOMPATIBLE_ENTITY_TYPE, entityType,
-                  v.getEntityType()));
+              createConflictDto(Dtos.asDto(variable).setIsNewVariable(newVariable).build(), INCOMPATIBLE_VALUE_TYPE,
+                  variableInCompared.getValueType().getName(), variableInWith.getValueType().getName()));
         }
+      } catch(NoSuchVariableException variableDoesNotExist) {
+        // Case where the variable does not exist in Opal but its destination table already exist.
       }
     }
-
-    return conflicts;
   }
 
   private Set<Variable> getUnconflicting(Iterable<Variable> variables, Iterable<ConflictDto> conflicts) {
@@ -290,7 +288,7 @@ public class CompareResourceImpl implements CompareResource {
     return !(compared != null && compared.equals(with));
   }
 
-  @SuppressWarnings({ "PMD.NcssMethodCount", "ConstantConditions" })
+  @SuppressWarnings("PMD.NcssMethodCount")
   private boolean areCategoriesModified(Collection<Category> compared, Collection<Category> with) {
     if(compared == null && with == null) return false;
     if((compared == null || compared.isEmpty()) && (with == null || with.isEmpty())) return false;
@@ -309,7 +307,6 @@ public class CompareResourceImpl implements CompareResource {
         if(!found) return true;
       }
     }
-
     return false;
   }
 
@@ -318,6 +315,7 @@ public class CompareResourceImpl implements CompareResource {
         areAttributesModified(compared.getAttributes(), with.getAttributes());
   }
 
+  @SuppressWarnings("PMD.NcssMethodCount")
   private boolean areAttributesModified(Collection<Attribute> compared, Collection<Attribute> with) {
     if(compared == null && with == null) return false;
     if((compared == null || compared.isEmpty()) && (with == null || with.isEmpty())) return false;
@@ -334,7 +332,6 @@ public class CompareResourceImpl implements CompareResource {
       }
       if(!found) return true;
     }
-
     return false;
   }
 
@@ -346,11 +343,12 @@ public class CompareResourceImpl implements CompareResource {
     return isModified(comparedStr, withStr);
   }
 
-  @SuppressWarnings("ConstantConditions")
   private boolean isSameAttribute(Attribute compared, Attribute with) {
     if(!compared.getName().equals(with.getName())) return false;
     if((compared.getLocale() == null || compared.getLocale().toString().isEmpty()) &&
-        (with.getLocale() == null || with.getLocale().toString().isEmpty())) return true;
+        (with.getLocale() == null || with.getLocale().toString().isEmpty())) {
+      return true;
+    }
     if(compared.getLocale() != null) {
       return compared.getLocale().equals(with.getLocale());
     }
