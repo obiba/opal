@@ -56,7 +56,6 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
   public void setUp() {
     displayMock = createMock(DatasourcePresenter.Display.class);
     eventBusMock = createMock(EventBus.class);
-    Provider<AuthorizationPresenter> mockProvider = createMock(Provider.class);
     Provider<ResourcePermissionsPresenter> mockPermissionsProvider = createMock(Provider.class);
     usersAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
@@ -64,7 +63,7 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
     ModalProvider<AddViewModalPresenter> createViewModalProvider = createMock(ModalProvider.class);
 
     datasourcePresenter = new DatasourcePresenter(displayMock, new CountingEventBus(), propertiesEditorModalProvider,
-        null, createViewModalProvider, null, mockProvider, mockPermissionsProvider, null);
+        null, createViewModalProvider, null, mockPermissionsProvider, null);
   }
 
   @Test

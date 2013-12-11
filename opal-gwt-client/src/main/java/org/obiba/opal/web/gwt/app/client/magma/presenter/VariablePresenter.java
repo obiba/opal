@@ -88,8 +88,6 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   private final ScriptEditorPresenter scriptEditorPresenter;
 
-  private final Provider<AuthorizationPresenter> authorizationPresenter;
-
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
   private final ModalProvider<VariablesToViewPresenter> variablesToViewProvider;
@@ -118,18 +116,15 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
   @Inject
   public VariablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
       ValuesTablePresenter valuesTablePresenter, SummaryTabPresenter summaryTabPresenter,
-      ScriptEditorPresenter scriptEditorPresenter, Provider<AuthorizationPresenter> authorizationPresenter,
-      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
+      ScriptEditorPresenter scriptEditorPresenter, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
       VariableVcsCommitHistoryPresenter variableVcsCommitHistoryPresenter,
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
       ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider,
-      ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider,
-      ModalProvider<VariableAttributeModalPresenter> attributeModalProvider) {
+      ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider, ModalProvider<VariableAttributeModalPresenter> attributeModalProvider) {
     super(eventBus, display);
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
     this.summaryTabPresenter = summaryTabPresenter;
-    this.authorizationPresenter = authorizationPresenter;
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.variableVcsCommitHistoryPresenter = variableVcsCommitHistoryPresenter;
     this.scriptEditorPresenter = scriptEditorPresenter;
@@ -656,12 +651,6 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
     @Override
     public void authorized() {
-      AuthorizationPresenter authz = authorizationPresenter.get();
-      String node = UriBuilder.create()
-          .segment("datasource", table.getDatasourceName(), "table", table.getName(), "variable", variable.getName())
-          .build();
-      authz.setAclRequest("variable", new AclRequest(AclAction.VARIABLE_READ, node));
-
       ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
       resourcePermissionsPresenter.initialize(ResourcePermissionType.VARIABLE, ResourcePermissionRequestPaths
           .variablePermissions(table.getDatasourceName(), table.getName(), variable.getName()));

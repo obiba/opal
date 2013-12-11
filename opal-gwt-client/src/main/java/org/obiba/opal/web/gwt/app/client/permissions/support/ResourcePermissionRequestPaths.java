@@ -14,15 +14,15 @@ import javax.annotation.Nonnull;
 
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 
-import com.google.gwt.regexp.shared.MatchResult;
-import com.google.gwt.regexp.shared.RegExp;
-
+@SuppressWarnings("StaticMethodOnlyUsedInOneClass")
 public final class ResourcePermissionRequestPaths {
 
   private ResourcePermissionRequestPaths() {}
 
   public static final String PRINCIPAL_QUERY_PARAM = "principal";
+
   public static final String TYPE_QUERY_PARAM = "type";
+
   public static final String PERMISSION_QUERY_PARAM = "permission";
 
   public static String projectPermissions(@Nonnull String project) {
@@ -49,8 +49,7 @@ public final class ResourcePermissionRequestPaths {
     return baseUri(project).segment("table", table).build();
   }
 
-  public static String variablePermissions(@Nonnull String project, @Nonnull String table,
-      @Nonnull String variable) {
+  public static String variablePermissions(@Nonnull String project, @Nonnull String table, @Nonnull String variable) {
     return UriBuilder.create().fromPath(tablePermissions(project, table)).segment("variable", variable).build();
   }
 
@@ -63,34 +62,28 @@ public final class ResourcePermissionRequestPaths {
   }
 
   private static String normalizeNodePath(ResourcePermissionType type, String nodePath) {
-    RegExp re = null;
+    String path = nodePath;
 
     switch(type) {
       case PROJECT:
-        re = RegExp.compile("(\\/project)\\/\\w+$");
+        path = "/project";
         break;
       case DATASOURCE:
-        re = RegExp.compile("(\\/datasource)\\/\\w+$");
-        break;
-      case TABLE:
-        re = RegExp.compile("(\\/table\\/\\w+)$");
+        path = "/datasource";
         break;
       case VARIABLE:
-        re = RegExp.compile("(\\/table\\/\\w+\\/variable\\/\\w+[\\.]*\\w*)$");
+      case TABLE: {
+        int i = nodePath.indexOf("/table");
+        if(i != -1) path = path.substring(i);
         break;
-      case REPORT_TEMPLATE:
-        re = RegExp.compile("(\\/report-template)\\/\\w+$");
-        break;
-    }
-
-    if (re != null) {
-      MatchResult result = re.exec(nodePath);
-      if (result != null && result.getGroupCount() > 1) {
-         return result.getGroup(1);
       }
+      case REPORT_TEMPLATE:
+        int i = nodePath.indexOf("/report-template");
+        if(i != -1) path = path.substring(i);
+        break;
     }
 
-    return nodePath;
+    return path;
   }
 
 }

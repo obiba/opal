@@ -101,8 +101,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final PlaceManager placeManager;
 
-  private final Provider<AuthorizationPresenter> authorizationPresenter;
-
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
   private final ModalProvider<ConfigureViewStepPresenter> configureViewStepProvider;
@@ -143,20 +141,17 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @SuppressWarnings({ "ConstructorWithTooManyParameters", "PMD.ExcessiveParameterList" })
   @Inject
   public TablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
-      ValuesTablePresenter valuesTablePresenter, Provider<AuthorizationPresenter> authorizationPresenter,
-      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, Provider<IndexPresenter> indexPresenter,
-      ModalProvider<ConfigureViewStepPresenter> configureViewStepProvider,
+      ValuesTablePresenter valuesTablePresenter, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
+      Provider<IndexPresenter> indexPresenter, ModalProvider<ConfigureViewStepPresenter> configureViewStepProvider,
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
       ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider,
       ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider,
       ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider,
       ModalProvider<DataExportPresenter> dataExportModalProvider,
       ModalProvider<DataCopyPresenter> dataCopyModalProvider, Translations translations) {
-
     super(eventBus, display);
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
-    this.authorizationPresenter = authorizationPresenter;
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.indexPresenter = indexPresenter;
     this.translations = translations;
@@ -922,24 +917,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
     @Override
     public void authorized() {
-      AuthorizationPresenter authz = authorizationPresenter.get();
-      UriBuilder nodeBuilder = UriBuilder.create().segment("datasource", table.getDatasourceName());
-
-      if(table.hasViewLink()) {
-        String node = nodeBuilder.segment("view", table.getName()).build();
-        authz.setAclRequest("view", new AclRequest(AclAction.TABLE_READ, node), //
-            new AclRequest(AclAction.TABLE_VALUES, node), //
-            new AclRequest(AclAction.TABLE_EDIT, node), //
-            new AclRequest(AclAction.TABLE_VALUES_EDIT, node), //
-            new AclRequest(AclAction.TABLE_ALL, node));
-      } else {
-        String node = nodeBuilder.segment("table", table.getName()).build();
-        authz.setAclRequest("table", new AclRequest(AclAction.TABLE_READ, node), //
-            new AclRequest(AclAction.TABLE_VALUES, node), //
-            new AclRequest(AclAction.TABLE_EDIT, node),//
-            new AclRequest(AclAction.TABLE_VALUES_EDIT, node),//
-            new AclRequest(AclAction.TABLE_ALL, node));
-      }
       ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
       resourcePermissionsPresenter.initialize(ResourcePermissionType.TABLE,
           ResourcePermissionRequestPaths.tablePermissions(table.getDatasourceName(), table.getName()));

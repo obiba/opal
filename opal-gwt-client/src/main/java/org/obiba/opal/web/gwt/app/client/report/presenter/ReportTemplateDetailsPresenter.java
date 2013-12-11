@@ -59,18 +59,14 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
   private Runnable actionRequiringConfirmation;
 
-  private final Provider<AuthorizationPresenter> authorizationPresenter;
-
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
   private ReportTemplateDto reportTemplate;
 
   @Inject
   public ReportTemplateDetailsPresenter(Display display, EventBus eventBus,
-      Provider<AuthorizationPresenter> authorizationPresenter,
       Provider<ResourcePermissionsPresenter> resourcePermissionsProvider) {
     super(eventBus, display);
-    this.authorizationPresenter = authorizationPresenter;
     this.resourcePermissionsProvider = resourcePermissionsProvider;
   }
 
@@ -318,22 +314,15 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
     @Override
     public void authorized() {
-      ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
-      resourcePermissionsPresenter.initialize(ResourcePermissionType.REPORT_TEMPLATE, ResourcePermissionRequestPaths
-          .reportTemplatePermissions(reportTemplate.getProject(), reportTemplate.getName()));
-      setInSlot(null, resourcePermissionsPresenter);
       if (reportTemplate.hasProject()) {
-        GWT.log("Report has project");
+        getView().setVisiblePermissionsPanel(true);
+        ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
+        resourcePermissionsPresenter.initialize(ResourcePermissionType.REPORT_TEMPLATE, ResourcePermissionRequestPaths
+            .reportTemplatePermissions(reportTemplate.getProject(), reportTemplate.getName()));
+        setInSlot(null, resourcePermissionsPresenter);
+      } else {
+        getView().setVisiblePermissionsPanel(false);
       }
-
-//      AuthorizationPresenter authz = authorizationPresenter.get();
-//      String node = UriBuilder.create().segment("report-template", reportTemplate.getName()).build();
-//      if (reportTemplate.hasProject()) {
-//        node = UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplate.getProject(), reportTemplate.getName());
-//      }
-//      authz.setAclRequest("report-template", new AclRequest(AclAction.REPORT_TEMPLATE_READ, node), //
-//          new AclRequest(AclAction.REPORT_TEMPLATE_ALL, node));
-//      setInSlot(null, authz);
     }
   }
 
@@ -352,6 +341,8 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
     HasAuthorization getListReportsAuthorizer();
 
     HasAuthorization getPermissionsAuthorizer();
+
+    void setVisiblePermissionsPanel(boolean value);
   }
 
 }

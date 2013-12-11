@@ -1431,6 +1431,11 @@ public interface Translations extends Constants {
       "GROUP", "Group Name" })
   Map<String, String> subjectTypeMap();
 
+  @Description("Subject Type map")
+  @DefaultStringMapValue({ "USER", "User", //
+      "GROUP", "Group" })
+  Map<String, String> shortSubjectTypeMap();
+
   @Description("Derive label")
   @DefaultStringValue("Derive")
   String deriveLabel();
@@ -2166,6 +2171,14 @@ public interface Translations extends Constants {
   @Description("Add Resource Permissions Modal title")
   @DefaultStringValue("Add Permission")
   String addResourcePermissionsModalTile();
+
+  @Description("Delete All Subject Permissions Modal title")
+  @DefaultStringValue("Delete Permissions")
+  String deleteAllSubjectPermissionsModalTile();
+
+  @Description("Delete All Subject Permissions message label")
+  @DefaultStringValue("All permissions of {0} '{1}' will be permanently deleted, are you sure you want to continue?")
+  String deleteAllSubjectPermissionsModalMessage();
 
   @Description("Vcs Commit History Empty")
   @DefaultStringValue("No comment history available")

@@ -17,7 +17,6 @@ import javax.annotation.Nonnull;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ProjectResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ProjectResourcePermissionsUiHandlers;
-import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
@@ -70,8 +69,6 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
 
   private final ListDataProvider<Acl> permissionsDataProvider = new ListDataProvider<Acl>();
 
-  private ResourcePermissionType resourceType;
-
   private Subject subject;
 
   @Inject
@@ -81,8 +78,7 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
   }
 
   @Override
-  public void setData(@Nonnull ResourcePermissionType resourceType, @Nonnull List<Subject> subjects) {
-    this.resourceType = resourceType;
+  public void setData(@Nonnull List<Subject> subjects) {
     renderUsersAndGroups(subjects);
   }
 
@@ -123,8 +119,8 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
     users.clear();
     groups.clear();
 
-    for (Subject subject : subjects) {
-      createSubjectNavLink(subject);
+    for (Subject aSubject : subjects) {
+      createSubjectNavLink(aSubject);
     }
   }
 
@@ -155,12 +151,7 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
 
       @Override
       public String getValue(Acl acl) {
-        String permissionKey = acl.getActions(0);
-        return permissionKey;
-//        StringBuilder builder = new StringBuilder();
-//        return builder.append(translations.permissionMap().get(permissionKey))//
-//            .append("\n")//
-//            .append(translations.permissionExplanationMap().get(permissionKey)).toString();
+      return translations.permissionMap().get(acl.getActions(0));
       }
     };
 
