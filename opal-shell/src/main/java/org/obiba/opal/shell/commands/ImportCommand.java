@@ -25,7 +25,7 @@ import org.apache.commons.vfs2.FileType;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.opal.core.crypt.KeyProviderException;
-import org.obiba.opal.core.service.ImportService;
+import org.obiba.opal.core.service.DataImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.NonExistentVariableEntitiesException;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
@@ -56,7 +56,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   private static final Logger log = LoggerFactory.getLogger(ImportCommand.class);
 
   @Autowired
-  private ImportService importService;
+  private DataImportService dataImportService;
 
   @Override
   public int execute() {
@@ -103,8 +103,8 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   // Methods
   //
 
-  public void setImportService(ImportService importService) {
-    this.importService = importService;
+  public void setDataImportService(DataImportService dataImportService) {
+    this.dataImportService = dataImportService;
   }
 
   public String toString() {
@@ -168,7 +168,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     int errorCode = CRITICAL_ERROR;
     getShell().printf("  Importing file: %s ...\n", file.getName().getPath());
     try {
-      importService.importData(getUnitName(), file, options.getDestination(), options.isForce(), options.isIgnore());
+      dataImportService.importData(getUnitName(), file, options.getDestination(), options.isForce(), options.isIgnore());
       archive(file);
       errorCode = SUCCESS;
     } catch(NoSuchFunctionalUnitException ex) {
@@ -196,7 +196,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     int errorCode = CRITICAL_ERROR;
     getShell().printf("  Importing datasource: %s ...\n", options.getSource());
     try {
-      importService.importData(options.getSource(), options.getDestination(), options.isForce(), options.isIgnore());
+      dataImportService.importData(options.getSource(), options.getDestination(), options.isForce(), options.isIgnore());
       if(file != null) archive(file);
       errorCode = SUCCESS;
     } catch(NoSuchDatasourceException ex) {
@@ -221,7 +221,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     int errorCode = CRITICAL_ERROR;
     getShell().printf("  Importing tables: %s ...\n", getTableNames());
     try {
-      importService.importData(options.getTables(), options.getDestination(), options.isForce(), options.isIgnore());
+      dataImportService.importData(options.getTables(), options.getDestination(), options.isForce(), options.isIgnore());
       if(file != null) archive(file);
       errorCode = SUCCESS;
     } catch(NoSuchDatasourceException | NoSuchValueTableException ex) {

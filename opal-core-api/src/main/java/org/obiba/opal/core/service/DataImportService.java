@@ -28,7 +28,7 @@ import org.obiba.opal.core.unit.FunctionalUnit;
 /**
  * Service for import-related operations.
  */
-public interface ImportService {
+public interface DataImportService {
 
   /**
    * Imports data into an Opal datasource .

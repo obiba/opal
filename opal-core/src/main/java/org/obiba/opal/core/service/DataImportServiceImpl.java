@@ -45,13 +45,13 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 
 /**
- * Default implementation of {@link ImportService}.
+ * Default implementation of {@link DataImportService}.
  */
 @Component
-public class DefaultImportService implements ImportService {
+public class DataImportServiceImpl implements DataImportService {
 
   @SuppressWarnings("unused")
-  private static final Logger log = LoggerFactory.getLogger(DefaultImportService.class);
+  private static final Logger log = LoggerFactory.getLogger(DataImportServiceImpl.class);
 
   @Autowired
   private TransactionTemplate txTemplate;

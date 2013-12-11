@@ -9,24 +9,16 @@
  ******************************************************************************/
 package org.obiba.opal.web.magma;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.obiba.magma.Datasource;
-import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableUpdateListener;
@@ -36,13 +28,12 @@ import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.VariableValueSource;
-import org.obiba.magma.VectorSource;
 import org.obiba.magma.js.JavascriptVariableBuilder;
 import org.obiba.magma.js.JavascriptVariableValueSource;
 import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.StaticDatasource;
 import org.obiba.magma.support.VariableEntityBean;
-import org.obiba.opal.core.service.ImportService;
+import org.obiba.opal.core.service.DataImportService;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Magma;
@@ -62,8 +53,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
-import au.com.bytecode.opencsv.CSVWriter;
-
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component("tableResource")
@@ -71,15 +60,15 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 @Transactional
 public class TableResourceImpl extends AbstractValueTableResource implements TableResource {
 
-  private ImportService importService;
+  private DataImportService dataImportService;
 
   @Autowired
   @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
   private Collection<ValueTableUpdateListener> tableListeners;
 
   @Autowired
-  public void setImportService(ImportService importService) {
-    this.importService = importService;
+  public void setDataImportService(DataImportService dataImportService) {
+    this.dataImportService = dataImportService;
   }
 
   @Override
@@ -172,13 +161,13 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
       boolean ignoreUnknownIds) throws IOException, InterruptedException {
     ValueTable vt = getValueTable();
     try {
-      if(importService == null) {
+      if(dataImportService == null) {
         writeValueSets(vt.getDatasource().createWriter(vt.getName(), valueSetsDto.getEntityType()), valueSetsDto);
       } else {
         Datasource ds = new StaticDatasource("import");
         // static writers will add entities and variables while writing values
         writeValueSets(ds.createWriter(vt.getName(), valueSetsDto.getEntityType()), valueSetsDto);
-        importService.importData(ds.getValueTables(), vt.getDatasource().getName(), generateIds, ignoreUnknownIds);
+        dataImportService.importData(ds.getValueTables(), vt.getDatasource().getName(), generateIds, ignoreUnknownIds);
       }
     } catch(NoSuchFunctionalUnitException ex) {
       return Response.status(BAD_REQUEST)

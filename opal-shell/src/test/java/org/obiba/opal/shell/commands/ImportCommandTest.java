@@ -20,7 +20,7 @@ import org.apache.commons.vfs2.FileType;
 import org.junit.Test;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.core.service.ImportService;
+import org.obiba.opal.core.service.DataImportService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.obiba.opal.shell.OpalShell;
@@ -83,11 +83,11 @@ public class ImportCommandTest {
     FileObject mockUnitDir = createMockUnitDirectoryForRelativePathImport(mockFile, "test.zip");
     OpalRuntime mockRuntime = createMock(OpalRuntime.class);
     OpalShell mockShell = createMockShellForRelativePathImport("my-unit", "test.zip");
-    ImportService mockImportService = createMock(ImportService.class);
-    mockImportService.importData("my-unit", mockFile, "opal-data", true, false);
+    DataImportService mockDataImportService = createMock(DataImportService.class);
+    mockDataImportService.importData("my-unit", mockFile, "opal-data", true, false);
     FunctionalUnitService mockService = createMockUnitService(mockUnitDir, "my-unit");
 
-    test(mockOptions, mockShell, mockRuntime, mockService, mockImportService, mockUnitDir, mockFile);
+    test(mockOptions, mockShell, mockRuntime, mockService, mockDataImportService, mockUnitDir, mockFile);
   }
 
   /**
@@ -102,32 +102,32 @@ public class ImportCommandTest {
     OpalRuntime mockRuntime = createMock(OpalRuntime.class);
     OpalShell mockShell = createMockShellForImportWithNoFile("my-unit", "test1.zip", "test2.zip");
     FunctionalUnitService mockService = createMockUnitService(mockUnitDir, "my-unit");
-    ImportService mockImportService = createMock(ImportService.class);
+    DataImportService mockDataImportService = createMock(DataImportService.class);
     for(FileObject mockFile : mockFilesInUnitDir) {
-      mockImportService.importData("my-unit", mockFile, "opal-data", true, false);
+      mockDataImportService.importData("my-unit", mockFile, "opal-data", true, false);
     }
 
-    test(mockOptions, mockShell, mockRuntime, mockService, mockImportService, mockUnitDir);
+    test(mockOptions, mockShell, mockRuntime, mockService, mockDataImportService, mockUnitDir);
   }
 
   private void test(ImportCommandOptions mockOptions, OpalShell mockShell, OpalRuntime mockRuntime,
-      FunctionalUnitService mockUnitService, ImportService mockImportService, Object... otherMocks) {
+      FunctionalUnitService mockUnitService, DataImportService mockDataImportService, Object... otherMocks) {
 
     replay(mockOptions, mockShell, mockRuntime, mockUnitService);
-    if(mockImportService != null) replay(mockImportService);
+    if(mockDataImportService != null) replay(mockDataImportService);
     if(otherMocks != null) {
       for(Object mock : otherMocks)
         replay(mock);
     }
 
     ImportCommand importCommand = createImportCommand(mockRuntime, mockUnitService);
-    importCommand.setImportService(mockImportService);
+    importCommand.setDataImportService(mockDataImportService);
     importCommand.setOptions(mockOptions);
     importCommand.setShell(mockShell);
     importCommand.execute();
 
     verify(mockOptions, mockShell, mockRuntime, mockUnitService);
-    if(mockImportService != null) verify(mockImportService);
+    if(mockDataImportService != null) verify(mockDataImportService);
     if(otherMocks != null) verify(otherMocks);
   }
 
