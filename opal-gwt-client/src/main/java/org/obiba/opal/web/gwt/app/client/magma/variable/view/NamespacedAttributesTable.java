@@ -86,8 +86,6 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
   @UiField
   Table<JsArray<AttributeDto>> table;
 
-//  private HandlerRegistration registration;
-
   private final ListDataProvider<JsArray<AttributeDto>> provider = new ListDataProvider<JsArray<AttributeDto>>();
 
   private final Map<String, JsArray<AttributeDto>> attributesMap = new HashMap<String, JsArray<AttributeDto>>();

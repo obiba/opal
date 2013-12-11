@@ -1111,6 +1111,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Edit Attribute")
   String editAttribute();
 
+  @Description("Edit attributes title")
+  @DefaultStringValue("Edit Attributes")
+  String editAttributes();
+
   @Description("Report produced date")
   @DefaultStringValue("Produced Date")
   String producedDate();

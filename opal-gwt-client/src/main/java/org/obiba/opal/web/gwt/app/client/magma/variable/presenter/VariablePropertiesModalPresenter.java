@@ -85,16 +85,14 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
     tableDto = table;
 
     getView().renderProperties(dto, variable == null || table.hasViewLink(),
-        table.hasViewLink() || (table.hasValueSetCount() && table.getValueSetCount() == 0));
+        table.hasViewLink() || table.hasValueSetCount() && table.getValueSetCount() == 0);
   }
 
   @Override
-  public void onSave(String name, String valueType, boolean repeatable, String unit, String mimeType,
-      String occurrenceGroup, String referencedEntityType) {
+  public void onSave() {
     if(!validationHandler.validate()) return;
 
-    VariableDto newVariable = getVariableDto(name, valueType, repeatable, unit, mimeType, occurrenceGroup,
-        referencedEntityType);
+    VariableDto newVariable = getVariableDto();
 
     if(variable != null) {
       onUpdate(newVariable);
@@ -105,13 +103,10 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
 
   public void onUpdate(VariableDto updatedVariable) {
     UriBuilder uriBuilder;
-    if(Strings.isNullOrEmpty(tableDto.getViewLink())) {
-      uriBuilder = UriBuilders.DATASOURCE_TABLE_VARIABLE.create();
-    } else {
-      // variable from a view
-      uriBuilder = UriBuilders.DATASOURCE_VIEW_VARIABLE.create().query("comment",
-          TranslationsUtils.replaceArguments(translations.updateVariableProperties(), variable.getName()));
-    }
+    uriBuilder = Strings.isNullOrEmpty(tableDto.getViewLink())
+        ? UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
+        : UriBuilders.DATASOURCE_VIEW_VARIABLE.create().query("comment",
+            TranslationsUtils.replaceArguments(translations.updateVariableProperties(), variable.getName()));
 
     ResourceRequestBuilderFactory.newBuilder()
         .forResource(uriBuilder.build(tableDto.getDatasourceName(), tableDto.getName(), variable.getName())) //
@@ -141,13 +136,10 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
 
   public void doCreate(VariableDto newVariable) {
     UriBuilder uriBuilder;
-    if(Strings.isNullOrEmpty(tableDto.getViewLink())) {
-      uriBuilder = UriBuilders.DATASOURCE_TABLE_VARIABLES.create();
-    } else {
-      // variable from a view
-      uriBuilder = UriBuilders.DATASOURCE_VIEW_VARIABLES.create()
-          .query("comment", TranslationsUtils.replaceArguments(translations.createVariable(), newVariable.getName()));
-    }
+    uriBuilder = Strings.isNullOrEmpty(tableDto.getViewLink())
+        ? UriBuilders.DATASOURCE_TABLE_VARIABLES.create()
+        : UriBuilders.DATASOURCE_VIEW_VARIABLES.create()
+            .query("comment", TranslationsUtils.replaceArguments(translations.createVariable(), newVariable.getName()));
 
     ResourceRequestBuilderFactory.newBuilder()
         .forResource(uriBuilder.build(tableDto.getDatasourceName(), tableDto.getName())) //
@@ -157,8 +149,7 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
             Response.SC_INTERNAL_SERVER_ERROR, Response.SC_OK).send();
   }
 
-  private VariableDto getVariableDto(String name, String valueType, boolean repeatable, String unit, String mimeType,
-      String occurrenceGroup, String referencedEntityType) {
+  private VariableDto getVariableDto() {
     VariableDto v = VariableDto.create();
     v.setIsNewVariable(variable == null);
     v.setEntityType(tableDto.getEntityType());
@@ -180,17 +171,35 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
     }
 
     // Update info from view
-    v.setName(name);
-    v.setValueType(valueType);
-    v.setUnit(unit);
-    v.setIsRepeatable(repeatable);
-    v.setReferencedEntityType(referencedEntityType);
-    v.setMimeType(mimeType);
-    v.setOccurrenceGroup(repeatable ? occurrenceGroup : "");
+    updateInfoFromView(v);
     return v;
   }
 
+  private void updateInfoFromView(VariableDto v) {
+    v.setName(getView().getName());
+    v.setValueType(getView().getValueType());
+    v.setUnit(getView().getUnit());
+    v.setIsRepeatable(getView().getRepeatable());
+    v.setReferencedEntityType(getView().getReferencedEntityType());
+    v.setMimeType(getView().getMimeType());
+    v.setOccurrenceGroup(getView().getRepeatable() ? getView().getOccurrenceGroup() : "");
+  }
+
   public interface Display extends PopupView, HasUiHandlers<VariablePropertiesModalUiHandlers> {
+
+    String getValueType();
+
+    String getUnit();
+
+    boolean getRepeatable();
+
+    String getReferencedEntityType();
+
+    String getMimeType();
+
+    String getOccurrenceGroup();
+
+    String getName();
 
     enum FormField {
       NAME
