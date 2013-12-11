@@ -64,7 +64,6 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
     usersAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     variableVcsCommitHistoryPresenterMock = createMock(VariableVcsCommitHistoryPresenter.class);
     groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
-    Provider<AuthorizationPresenter> mockProvider = createMock(Provider.class);
     Provider<ResourcePermissionsPresenter> mockResourcePermissionProvider = createMock(Provider.class);
     ModalProvider<VariablesToViewPresenter> variablesToViewProvider = createMock(ModalProvider.class);
     ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider = createMock(ModalProvider.class);
@@ -72,7 +71,7 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
 
     ModalProvider<VariableAttributeModalPresenter> varAttributeModalProvider = createMock(ModalProvider.class);
     variablePresenter = new VariablePresenter(displayMock, new CountingEventBus(), null, null,
-        new SummaryTabPresenter(eventBusMock, summaryTabMock), null, mockProvider, mockResourcePermissionProvider,
+        new SummaryTabPresenter(eventBusMock, summaryTabMock), null, mockResourcePermissionProvider,
         variableVcsCommitHistoryPresenterMock, variablesToViewProvider, categoriesEditorModalProvider,
         propertiesEditorModalProvider, varAttributeModalProvider);
   }

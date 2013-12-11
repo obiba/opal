@@ -17,6 +17,7 @@ import javax.annotation.Nonnull;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -38,15 +39,19 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
 public class ProjectResourcePermissionsPresenter extends PresenterWidget<ProjectResourcePermissionsPresenter.Display>
-    implements ProjectResourcePermissionsUiHandlers {
+    implements ProjectResourcePermissionsUiHandlers, DeleteAllSubjectPermissionsHandler {
+
+  private final ModalProvider<DeleteAllConfirmationModalPresenter> deleteAllConfirmationModalProvider;
 
   private ResourcePermissionType resourceType;
 
   private ProjectDto project;
 
   @Inject
-  public ProjectResourcePermissionsPresenter(Display display, EventBus eventBus) {
+  public ProjectResourcePermissionsPresenter(Display display, EventBus eventBus,
+      ModalProvider<DeleteAllConfirmationModalPresenter> deleteAllConfirmationModalProvider) {
     super(eventBus, display);
+    this.deleteAllConfirmationModalProvider = deleteAllConfirmationModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -107,6 +112,28 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
 
   @Override
   public void deleteAllPermissions(final Subject subject) {
+    deleteAllConfirmationModalProvider.get().initialize(subject, this);
+  }
+
+  private void retrievePermissions() {
+    String resourcePath = ResourcePermissionRequestPaths.projectSubjects(project.getName());
+    ResourceRequestBuilderFactory.<JsArray<Subject>>newBuilder()
+        .forResource(UriBuilder.create().fromPath(resourcePath).build()).get()
+        .withCallback(new ResourceCallback<JsArray<Subject>>() {
+          @Override
+          public void onResource(Response response, JsArray<Subject> subjects) {
+            final List<Subject> subjectList = JsArrays.toList(subjects);
+            getView().setData(subjectList);
+
+            if(subjectList.size() > 0) {
+              selectSubject(subjectList.get(0));
+            }
+          }
+        }).send();
+  }
+
+  @Override
+  public void deleteAllSubjectPermissions(final Subject subject) {
     String requestPath = ResourcePermissionRequestPaths.projectSubject(project.getName(), subject.getPrincipal());
     String uri = UriBuilder.create().fromPath(requestPath)
         .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, subject.getType().getName()).build();
@@ -119,29 +146,11 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
             selectSubject(subject);
           }
         }).send();
+
   }
-
-  private void retrievePermissions() {
-    String resourcePath = ResourcePermissionRequestPaths.projectSubjects(project.getName());
-    ResourceRequestBuilderFactory.<JsArray<Subject>>newBuilder()
-        .forResource(UriBuilder.create().fromPath(resourcePath).build()).get()
-        .withCallback(new ResourceCallback<JsArray<Subject>>() {
-          @Override
-          public void onResource(Response response, JsArray<Subject> subjects) {
-            final List<Subject> subjectList = JsArrays.toList(subjects);
-            getView().setData(resourceType, subjectList);
-
-            if(subjectList.size() > 0) {
-              selectSubject(subjectList.get(0));
-            }
-          }
-        }).send();
-  }
-
-
 
   public interface Display extends View, HasUiHandlers<ProjectResourcePermissionsUiHandlers> {
-    void setData(@Nonnull ResourcePermissionType resourceType, @Nonnull List<Subject> subjects);
+    void setData(@Nonnull List<Subject> subjects);
 
     void setSubjectData(Subject subject, List<Acl> subjectAcls);
 

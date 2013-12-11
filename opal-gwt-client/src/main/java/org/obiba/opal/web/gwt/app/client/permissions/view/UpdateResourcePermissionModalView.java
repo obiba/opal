@@ -61,12 +61,12 @@ public class UpdateResourcePermissionModalView extends AbstractResourcePermissio
   }
 
   @UiHandler("saveButton")
-  public void onSaveButton(ClickEvent event) {
+  public void onSaveButtonClicked(ClickEvent event) {
     getUiHandlers().save();
   }
 
   @UiHandler("cancelButton")
-  public void onCloseButton(ClickEvent event) {
+  public void onCloseButtonClicked(ClickEvent event) {
     close();
   }
 

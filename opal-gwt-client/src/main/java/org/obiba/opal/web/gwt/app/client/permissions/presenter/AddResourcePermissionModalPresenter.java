@@ -49,11 +49,11 @@ public class AddResourcePermissionModalPresenter
     getView().getSubjectType().setValue(Subject.SubjectType.GROUP.getName());
   }
 
-  public void initialize(@Nonnull ResourcePermissionType type, @Nonnull UpdateResourcePermissionHandler updateHandler,
-      List<Acl> currentAclList) {
+  public void initialize(@Nonnull ResourcePermissionType type, @Nonnull UpdateResourcePermissionHandler handler,
+      List<Acl> aclList) {
     getView().setData(type);
-    this.updateHandler = updateHandler;
-    this.currentAclList = currentAclList;
+    updateHandler = handler;
+    currentAclList = aclList;
   }
 
   @Override
@@ -78,8 +78,6 @@ public class AddResourcePermissionModalPresenter
       validators.add(
           new RequiredTextValidator(getView().getPrincipal(), "NameIsRequired", Display.FormField.PRINCIPAL.name()));
       validators.add(
-          new PermissionValidator(getView().getPermission(), "PermissionRequired", Display.FormField.PERMISSIONS.name()));
-      validators.add(
           new DuplicateSubjectValidator(getView().getPrincipal().getText(), getView().getSubjectType().getValue(),
               Display.FormField.PERMISSIONS.name()));
       return validators;
@@ -88,21 +86,6 @@ public class AddResourcePermissionModalPresenter
     @Override
     protected void showMessage(String id, String message) {
       getView().showError(message, Display.FormField.valueOf(id));
-    }
-  }
-
-  private final class PermissionValidator extends AbstractFieldValidator {
-
-    private final String permission;
-
-    public PermissionValidator(String permission, String errorMessageKey, String id) {
-      super(errorMessageKey, id);
-      this.permission = permission;
-    }
-
-    @Override
-    protected boolean hasError() {
-      return permission == null;
     }
   }
 

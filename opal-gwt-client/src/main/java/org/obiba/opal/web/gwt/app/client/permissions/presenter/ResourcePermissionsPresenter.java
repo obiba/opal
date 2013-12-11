@@ -84,7 +84,7 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
         .withCallback(new ResourceCallback<JsArray<Acl>>() {
           @Override
           public void onResource(Response response, JsArray<Acl> acls) {
-            getView().setData(resourceType, JsArrays.toList(acls));
+            getView().setData(JsArrays.toList(acls));
           }
         }).send();
   }
@@ -138,7 +138,7 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
   }
 
   public interface Display extends View, HasUiHandlers<ResourcePermissionsUiHandlers> {
-    void setData(@Nonnull ResourcePermissionType resourceType, @Nonnull List<Acl> acls);
+    void setData(@Nonnull List<Acl> acls);
     HasActionHandler<Acl> getActions();
 
     List<Acl> getAclList();

@@ -28,24 +28,15 @@ public abstract class AbstractResourcePermissionModalView<C extends ModalUiHandl
   @UiField
   ResourcePermissionsPanel permissions;
 
-  private String selecetdPermission;
-
   public AbstractResourcePermissionModalView(EventBus eventBus) {
     super(eventBus);
   }
 
   protected String getSelectedPermission() {
-    return selecetdPermission;
+    return permissions.getSelectedPermission();
   }
 
   protected void createPermissionRadios(ResourcePermissionType type, String permission) {
-    permissions.addHandler(new ResourcePermissionsPanel.Handler() {
-      @Override
-      public void onSelected(String permission) {
-        selecetdPermission = permission;
-      }
-    });
-
     permissions.initialize(type, permission);
   }
 }

@@ -214,4 +214,9 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
     return new WidgetAuthorizer(permissionsPanel);
   }
 
+  @Override
+  public void setVisiblePermissionsPanel(boolean value) {
+    permissionsPanel.setVisible(value);
+  }
+
 }

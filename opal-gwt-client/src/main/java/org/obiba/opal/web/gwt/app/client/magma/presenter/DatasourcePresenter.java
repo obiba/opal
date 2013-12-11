@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -28,8 +27,8 @@ import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPr
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.VariablesImportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.AddViewModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
@@ -73,8 +72,6 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
 
   private final ModalProvider<DataCopyPresenter> dataCopyModalProvider;
 
-  private final Provider<AuthorizationPresenter> authorizationPresenter;
-
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
   private final Translations translations;
@@ -92,7 +89,7 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider,
       ModalProvider<DataExportPresenter> dataExportModalProvider,
       ModalProvider<AddViewModalPresenter> createViewModalProvider,
-      ModalProvider<DataCopyPresenter> dataCopyModalProvider, Provider<AuthorizationPresenter> authorizationPresenter,
+      ModalProvider<DataCopyPresenter> dataCopyModalProvider,
       Provider<ResourcePermissionsPresenter> resourcePermissionsProvider, Translations translations) {
     super(eventBus, display);
     this.translations = translations;
@@ -100,7 +97,6 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     this.dataExportModalProvider = dataExportModalProvider.setContainer(this);
     this.createViewModalProvider = createViewModalProvider.setContainer(this);
     this.dataCopyModalProvider = dataCopyModalProvider.setContainer(this);
-    this.authorizationPresenter = authorizationPresenter;
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     getView().setUiHandlers(this);
   }
@@ -393,11 +389,6 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
       resourcePermissionsPresenter.initialize(ResourcePermissionType.DATASOURCE, ResourcePermissionRequestPaths
               .datasourcePermissions(datasourceName));
       setInSlot(null, resourcePermissionsPresenter);
-//      AuthorizationPresenter authz = authorizationPresenter.get();
-//      String node = UriBuilder.create().segment("datasource", datasourceName).build();
-//      authz.setAclRequest("datasource", new AclRequest(AclAction.CREATE_TABLE, node), //
-//          new AclRequest(AclAction.DATASOURCE_ALL, node));
-//      setInSlot(null, authz);
     }
   }
 

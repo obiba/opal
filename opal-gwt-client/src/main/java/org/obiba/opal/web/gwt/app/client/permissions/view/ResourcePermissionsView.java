@@ -52,8 +52,6 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
 
   private final ListDataProvider<Acl> permissionsDataProvider = new ListDataProvider<Acl>();
 
-  private ResourcePermissionType resourceType;
-
   @Inject
   public ResourcePermissionsView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
@@ -61,8 +59,7 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
   }
 
   @Override
-  public void setData(@Nonnull ResourcePermissionType resourceType, @Nonnull List<Acl> acls) {
-    this.resourceType = resourceType;
+  public void setData(@Nonnull List<Acl> acls) {
     renderSubjectsPermissionTable(acls);
   }
 
@@ -77,7 +74,7 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
   }
 
   @UiHandler("addPermission")
-  public void onAddPermissionClickec(ClickEvent event) {
+  public void onAddPermissionClicked(ClickEvent event) {
     getUiHandlers().addPersmission();
   }
 
@@ -119,12 +116,7 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
 
       @Override
       public String getValue(Acl acl) {
-        String permissionKey = acl.getActions(0);
-        return permissionKey;
-//        StringBuilder builder = new StringBuilder();
-//        return builder.append(translations.permissionMap().get(permissionKey))//
-//          .append("\n")//
-//          .append(translations.permissionExplanationMap().get(permissionKey)).toString();
+        return translations.permissionMap().get(acl.getActions(0));
       }
     };
 

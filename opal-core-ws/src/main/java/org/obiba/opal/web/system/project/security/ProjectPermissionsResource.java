@@ -46,7 +46,7 @@ public class ProjectPermissionsResource extends AbstractProjectPermissionsResour
 
   // ugly: duplicate of ProjectsPermissionConverter.Permission
 
-  private enum ProjectPermission {
+  public enum ProjectPermission {
     PROJECT_ALL
   }
 
@@ -104,6 +104,7 @@ public class ProjectPermissionsResource extends AbstractProjectPermissionsResour
       @Nullable
       @Override
       public Opal.Subject apply(@Nullable SubjectAclService.Subject input) {
+        assert input != null;
         return Opal.Subject.newBuilder().setPrincipal(input.getPrincipal())
             .setType(Opal.Subject.SubjectType.valueOf(input.getType().name())).build();
       }
@@ -136,6 +137,7 @@ public class ProjectPermissionsResource extends AbstractProjectPermissionsResour
    * @param principals
    * @return
    */
+  @SuppressWarnings("TypeMayBeWeakened")
   @POST
   @Path("/project")
   public Response addProjectPermission(@QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
@@ -154,6 +156,7 @@ public class ProjectPermissionsResource extends AbstractProjectPermissionsResour
    * @param type
    * @return
    */
+  @SuppressWarnings("TypeMayBeWeakened")
   @DELETE
   @Path("/project")
   public Response deleteProjectPermissions(@QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
@@ -181,6 +184,7 @@ public class ProjectPermissionsResource extends AbstractProjectPermissionsResour
     @Override
     public boolean apply(@Nullable SubjectAclService.Permissions input) {
       try {
+        assert input != null;
         String fullName = input.getNode().replace("/datasource/", "").replace("/table/", ".").replace("/view/", ".")
             .replace("/variable/", ":");
         if(input.getNode().contains("/variable/")) MagmaEngineVariableResolver.valueOf(fullName).resolveSource();
