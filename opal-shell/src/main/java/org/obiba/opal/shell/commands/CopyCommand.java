@@ -78,6 +78,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   @Override
+  @SuppressWarnings("PMD.NcssMethodCount")
   public int execute() {
     int errorCode = CommandResultCode.CRITICAL_ERROR; // initialize as non-zero (error)
 
@@ -104,7 +105,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
         //noinspection UseOfSystemOutOrSystemErr
         e.printStackTrace(System.err);
       } finally {
-        if(options.isOut() && destinationDatasource != null) {
+        if(options.isOut()) {
           Disposables.silentlyDispose(destinationDatasource);
         }
       }

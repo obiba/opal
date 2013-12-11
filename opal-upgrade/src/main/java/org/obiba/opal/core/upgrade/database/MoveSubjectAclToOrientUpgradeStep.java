@@ -33,38 +33,40 @@ public class MoveSubjectAclToOrientUpgradeStep extends AbstractUpgradeStep {
     orientDbService.createIndex(SubjectAcl.class, OClass.INDEX_TYPE.NOTUNIQUE, OType.STRING, "type");
 
     JdbcTemplate dataJdbcTemplate = new JdbcTemplate(databaseRegistry.getDataSource("opal-data", null));
-    List<SubjectAcl> list = dataJdbcTemplate.query("select * from subject_acl", new RowMapper<SubjectAcl>() {
-      @Override
-      public SubjectAcl mapRow(ResultSet rs, int rowNum) throws SQLException {
-        SubjectAcl acl = new SubjectAcl();
-        acl.setDomain(upgradeDomain(rs.getString("domain")));
-        acl.setNode(rs.getString("node"));
-        acl.setPermission(upgradePermission(rs.getString("permission")));
-        acl.setPrincipal(rs.getString("principal"));
-        acl.setType(rs.getString("type"));
-        return acl;
-      }
-
-      private String upgradePermission(String permission) {
-        if("CREATE_VIEW".equals(permission)) return "CREATE_TABLE";
-        if("VIEW_ALL".equals(permission)) return "TABLE_ALL";
-        if("VIEW_READ".equals(permission)) return "TABLE_READ";
-        if("VIEW_VALUES".equals(permission)) return "TABLE_VALUES";
-        if("VIEW_EDIT".equals(permission)) return "TABLE_EDIT";
-        if("VIEW_VALUES_EDIT".equals(permission)) return "TABLE_VALUES_EDIT";
-        return permission;
-      }
-
-      private String upgradeDomain(String domain) {
-        return "magma".equals(domain) ? "rest" : domain;
-      }
-    });
+    List<SubjectAcl> list = dataJdbcTemplate.query("select * from subject_acl", new SubjectAclRowMapper());
     for(SubjectAcl acl : list) {
       if(!acl.getNode().startsWith("/auth/session/") && !"FILES_META".equals(acl.getPermission())) {
         orientDbService.save(null, acl);
       }
     }
     dataJdbcTemplate.execute("drop table subject_acl");
+  }
+
+  private static class SubjectAclRowMapper implements RowMapper<SubjectAcl> {
+    @Override
+    public SubjectAcl mapRow(ResultSet rs, int rowNum) throws SQLException {
+      SubjectAcl acl = new SubjectAcl();
+      acl.setDomain(upgradeDomain(rs.getString("domain")));
+      acl.setNode(rs.getString("node"));
+      acl.setPermission(upgradePermission(rs.getString("permission")));
+      acl.setPrincipal(rs.getString("principal"));
+      acl.setType(rs.getString("type"));
+      return acl;
+    }
+
+    private String upgradePermission(String permission) {
+      if("CREATE_VIEW".equals(permission)) return "CREATE_TABLE";
+      if("VIEW_ALL".equals(permission)) return "TABLE_ALL";
+      if("VIEW_READ".equals(permission)) return "TABLE_READ";
+      if("VIEW_VALUES".equals(permission)) return "TABLE_VALUES";
+      if("VIEW_EDIT".equals(permission)) return "TABLE_EDIT";
+      if("VIEW_VALUES_EDIT".equals(permission)) return "TABLE_VALUES_EDIT";
+      return permission;
+    }
+
+    private String upgradeDomain(String domain) {
+      return "magma".equals(domain) ? "rest" : domain;
+    }
   }
 
 }

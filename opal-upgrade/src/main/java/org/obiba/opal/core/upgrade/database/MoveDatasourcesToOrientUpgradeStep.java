@@ -133,6 +133,7 @@ public class MoveDatasourcesToOrientUpgradeStep extends AbstractUpgradeStep {
     }
   }
 
+  @SuppressWarnings("PMD.NcssMethodCount")
   private void commentDeprecatedProperties() {
     log.debug("Comment deprecated config");
 
