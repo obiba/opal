@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 public class RegisterSecurityManagerListener implements ApplicationListener<ContextStartedEvent> {
 
   @Autowired
+  @SuppressWarnings("PMD.UnusedPrivateField")
   private DefaultSecurityManager securityManager;
 
   @Override

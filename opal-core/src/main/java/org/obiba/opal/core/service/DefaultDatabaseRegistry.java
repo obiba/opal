@@ -76,9 +76,6 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
   @Autowired
   private IdentifiersTableService identifiersTableService;
 
-  @Autowired
-  private DefaultBeanValidator defaultBeanValidator;
-
   private final LoadingCache<String, DataSource> dataSourceCache = CacheBuilder.newBuilder()
       .removalListener(new DataSourceRemovalListener()) //
       .build(new DataSourceCacheLoader());

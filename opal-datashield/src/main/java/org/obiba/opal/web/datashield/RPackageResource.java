@@ -98,14 +98,14 @@ public abstract class RPackageResource {
     return "if (!require('devtools', character.only=TRUE)) { " + getInstallPackagesCommand("devtools") + " }";
   }
 
-  /**
-   * Install OpenMx package with default settings (multithreaded).
-   *
-   * @return
-   */
-  private String getInstallOpenMxPackageCommand() {
-    return "if (!require('OpenMx', character.only=TRUE)) { source('http://openmx.psyc.virginia.edu/getOpenMx.R') }";
-  }
+//  /**
+//   * Install OpenMx package with default settings (multithreaded).
+//   *
+//   * @return
+//   */
+//  private String getInstallOpenMxPackageCommand() {
+//    return "if (!require('OpenMx', character.only=TRUE)) { source('http://openmx.psyc.virginia.edu/getOpenMx.R') }";
+//  }
 
   private String getInstallGitHubCommand(String name, String username, String ref) {
     return "devtools::install_github('" + name + "', username='" + username + "', ref='" + ref + "')";

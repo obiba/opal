@@ -18,7 +18,6 @@ import javax.net.ssl.TrustManager;
 
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.security.SystemKeyStoreService;
-import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -30,9 +29,6 @@ public class OpalSslContextFactory implements SslContextFactory {
 
   @Value("${org.obiba.opal.public.url}")
   private String publicUrl;
-
-  @Autowired
-  private FunctionalUnitService functionalUnitService;
 
   @Autowired
   private SystemKeyStoreService systemKeyStoreService;
@@ -68,14 +64,11 @@ public class OpalSslContextFactory implements SslContextFactory {
   }
 
   private String generateCertificateInfo() {
-    URL url;
     try {
-      url = new URL(publicUrl);
+      String hostname = new URL(publicUrl).getHost();
+      return "CN=" + hostname + ", OU=Opal, O=" + hostname + ", L=, ST=, C=";
     } catch(MalformedURLException e) {
       throw new RuntimeException(e);
     }
-    String hostname = url.getHost();
-
-    return "CN=" + hostname + ", OU=Opal, O=" + hostname + ", L=, ST=, C=";
   }
 }
