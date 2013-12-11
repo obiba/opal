@@ -28,8 +28,6 @@ public abstract class AbstractOpalRuntimeDependentCommand<T> extends AbstractCom
 
   private OpalConfigurationService configService;
 
-  private FunctionalUnitService functionalUnitService;
-
   @Autowired
   public void setOpalRuntime(OpalRuntime opalRuntime) {
     this.opalRuntime = opalRuntime;
@@ -40,17 +38,8 @@ public abstract class AbstractOpalRuntimeDependentCommand<T> extends AbstractCom
     this.configService = configService;
   }
 
-  @Autowired
-  public void setFunctionalUnitService(FunctionalUnitService functionalUnitService) {
-    this.functionalUnitService = functionalUnitService;
-  }
-
   protected OpalRuntime getOpalRuntime() {
     return opalRuntime;
-  }
-
-  protected FunctionalUnitService getFunctionalUnitService() {
-    return functionalUnitService;
   }
 
   public FileObject getFileSystemRoot() {

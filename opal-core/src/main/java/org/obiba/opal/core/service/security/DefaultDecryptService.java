@@ -12,7 +12,6 @@ package org.obiba.opal.core.service.security;
 import java.io.IOException;
 
 import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileType;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.NoSuchDatasourceException;
@@ -20,15 +19,17 @@ import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
+import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.runtime.OpalRuntime;
+import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
+import org.obiba.opal.core.service.NoSuchProjectException;
 import org.obiba.opal.core.service.ProjectService;
-import org.obiba.opal.core.unit.FunctionalUnit;
-import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
+
+import com.google.common.collect.Iterables;
 
 /**
  * Default implementation of {@link DecryptService}.
@@ -36,11 +37,6 @@ import org.springframework.util.Assert;
 @Transactional
 @Component
 public class DefaultDecryptService implements DecryptService {
-
-//  private static final Logger log = LoggerFactory.getLogger(DefaultDecryptService.class);
-
-  @Autowired
-  private FunctionalUnitService functionalUnitService;
 
   @Autowired
   private OpalRuntime opalRuntime;
@@ -55,22 +51,15 @@ public class DefaultDecryptService implements DecryptService {
   private ProjectService projectService;
 
   @Override
-  public void decryptData(String unitName, String datasourceName, FileObject file)
-      throws NoSuchIdentifiersMappingException, NoSuchDatasourceException, IllegalArgumentException, IOException {
-    Assert.notNull(file, "file is null");
-    Assert.isTrue(file.getType() == FileType.FILE, "No such file (" + file.getName().getPath() + ")");
-
+  public void decryptData(String projectName, String datasourceName, FileObject file)
+      throws NoSuchIdentifiersMappingException, NoSuchProjectException, IllegalArgumentException, IOException {
     // Validate the datasource name.
     Datasource destinationDatasource = MagmaEngine.get().getDatasource(datasourceName);
 
-    FunctionalUnit unit = functionalUnitService.getFunctionalUnit(unitName);
-    if(!FunctionalUnit.OPAL_INSTANCE.equals(unitName) && unit == null) {
-      throw new NoSuchIdentifiersMappingException(unitName);
-    }
     // Create an FsDatasource for the specified file.
     Datasource sourceDatasource = new FsDatasource(file.getName().getBaseName(),
         opalRuntime.getFileSystem().getLocalFile(file),
-        unit != null ? getDatasourceEncryptionStrategy(unit) : getOpalInstanceEncryptionStrategy());
+        projectName != null ? getProjectEncryptionStrategy(projectName) : getSystemEncryptionStrategy());
     try {
       MagmaEngine.get().addDatasource(sourceDatasource);
       copyValueTables(sourceDatasource, destinationDatasource);
@@ -82,20 +71,23 @@ public class DefaultDecryptService implements DecryptService {
   @Override
   public void decryptData(String datasourceName, FileObject file)
       throws NoSuchDatasourceException, IllegalArgumentException, IOException {
-    decryptData(FunctionalUnit.OPAL_INSTANCE, datasourceName, file);
+    decryptData(null, datasourceName, file);
   }
 
-  private DatasourceEncryptionStrategy getDatasourceEncryptionStrategy(FunctionalUnit unit) {
-    DatasourceEncryptionStrategy encryptionStrategy = unit.getDatasourceEncryptionStrategy();
-    if(encryptionStrategy == null) {
-      encryptionStrategy = new EncryptedSecretKeyDatasourceEncryptionStrategy();
-      encryptionStrategy.setKeyProvider(projectsKeyStoreService.getKeyStore(projectService.getProject(unit.getName())));
-      unit.setDatasourceEncryptionStrategy(encryptionStrategy);
+  private DatasourceEncryptionStrategy getProjectEncryptionStrategy(String projectName) {
+    Project project = projectService.getProject(projectName);
+    OpalKeyStore keyStore = projectsKeyStoreService.getKeyStore(project);
+
+    DatasourceEncryptionStrategy encryptionStrategy = null;
+
+    if(!Iterables.isEmpty(keyStore.listKeyPairs())) {
+      encryptionStrategy = getDefaultEncryptionStrategy();
+      encryptionStrategy.setKeyProvider(keyStore);
     }
     return encryptionStrategy;
   }
 
-  private DatasourceEncryptionStrategy getOpalInstanceEncryptionStrategy() {
+  private DatasourceEncryptionStrategy getSystemEncryptionStrategy() {
     DatasourceEncryptionStrategy dsEncryptionStrategy = getDefaultEncryptionStrategy();
     dsEncryptionStrategy.setKeyProvider(systemKeyStoreService.getKeyStore());
     return dsEncryptionStrategy;

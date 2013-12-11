@@ -10,20 +10,14 @@
 package org.obiba.opal.core.service;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.vfs2.FileObject;
 import org.obiba.magma.Datasource;
-import org.obiba.magma.NoSuchDatasourceException;
-import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.identifiers.IdentifiersMapping;
-import org.obiba.opal.core.unit.FunctionalUnit;
 
 /**
  * Service for identifiers import-related operations.

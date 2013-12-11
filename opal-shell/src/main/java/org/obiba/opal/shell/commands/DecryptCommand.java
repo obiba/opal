@@ -56,7 +56,7 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
       outputDir = getOutputDir(options.getOutput());
     }
 
-    if(!validOutputDir(outputDir) || !validInputFiles() || !validUnit()) {
+    if(!validOutputDir(outputDir) || !validInputFiles()) {
       return 1; // error!
     }
 
@@ -77,16 +77,6 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
     if(outputDir == null) {
       getShell().printf("Invalid output directory");
       return false;
-    }
-    return true;
-  }
-
-  private boolean validUnit() {
-    if(options.isUnit()) {
-      if(!getFunctionalUnitService().hasFunctionalUnit(options.getUnit())) {
-        getShell().printf("Functional unit '%s' does not exist. Cannot decrypt.\n", options.getUnit());
-        return false;
-      }
     }
     return true;
   }
@@ -145,8 +135,7 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
    */
   private FileObject getOutputDir(String outputDirPath) {
     try {
-      FileObject outputDir = isRelativeFilePath(outputDirPath) && options.isUnit() ? getFileInUnitDirectory(
-          outputDirPath) : getFile(outputDirPath);
+      FileObject outputDir = getFile(outputDirPath);
       outputDir = getFile(outputDirPath);
       outputDir.createFolder();
       return outputDir;
@@ -169,12 +158,7 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
   }
 
   private FileObject getEncryptedFile(String path) throws FileSystemException {
-    return isRelativeFilePath(path) && options.isUnit() ? getFileInUnitDirectory(path) : getFile(path);
-  }
-
-  private FileObject getFileInUnitDirectory(String filePath) throws FileSystemException {
-    FileObject unitDir = getFunctionalUnitService().getUnitDirectory(options.getUnit());
-    return unitDir.resolveFile(filePath);
+    return getFile(path);
   }
 
   private boolean isRelativeFilePath(String filePath) {

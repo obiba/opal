@@ -61,11 +61,6 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   public int execute() {
     int errorCode;
 
-    if(options.isUnit() && !getFunctionalUnitService().hasFunctionalUnit(options.getUnit())) {
-      getShell().printf("Functional unit '%s' does not exist.\n", options.getUnit());
-      return CRITICAL_ERROR;
-    }
-
     Stopwatch stopwatch = Stopwatch.createStarted();
 
     List<FileObject> filesToImport = getFilesToImport();
@@ -240,9 +235,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
 
     String archivePath = options.getArchive();
     try {
-      FileObject archiveDir = isRelativeFilePath(archivePath)
-          ? getFileInUnitDirectory(archivePath)
-          : getFile(archivePath);
+      FileObject archiveDir = getFile(archivePath);
       if(archiveDir == null) {
         throw new IOException(
             "Cannot archive file " + file.getName().getPath() + ". Archive directory is null: " + archivePath);
@@ -270,15 +263,6 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     List<FileObject> filesToImport = null;
     if(options.isFiles()) {
       filesToImport = resolveFiles(options.getFiles());
-    } else {
-      if(options.isUnit() && !options.isSource()) {
-        // If we're importing from a datasource we don't want to read files from the unit directory.
-        try {
-          filesToImport = getFilesInFolder(getFunctionalUnitService().getUnitDirectory(options.getUnit()));
-        } catch(IOException ex) {
-          throw new RuntimeException(ex);
-        }
-      }
     }
     if(filesToImport == null) return Lists.newArrayList();
     return filesToImport;
@@ -305,7 +289,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
 
   @Nullable
   private FileObject getFileToImport(String filePath) throws FileSystemException {
-    return isRelativeFilePath(filePath) ? getFileInUnitDirectory(filePath) : getFile(filePath);
+    return getFile(filePath);
   }
 
   private void addFile(Collection<FileObject> files, FileObject file) throws FileSystemException {
@@ -331,15 +315,6 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       }
     });
     return Arrays.asList(filesInDir);
-  }
-
-  @Nullable
-  private FileObject getFileInUnitDirectory(String filePath) throws FileSystemException {
-    if(options.isUnit()) {
-      FileObject unitDir = getFunctionalUnitService().getUnitDirectory(options.getUnit());
-      return unitDir.resolveFile(filePath);
-    }
-    return null;
   }
 
   private boolean isRelativeFilePath(String filePath) {

@@ -13,16 +13,10 @@ import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
-import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.support.FsDatasourceFactory;
-import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
-import org.obiba.opal.core.service.ProjectService;
-import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
 import org.obiba.opal.core.support.OnyxDatasourceFactory;
-import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.FsDatasourceFactoryDto;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**

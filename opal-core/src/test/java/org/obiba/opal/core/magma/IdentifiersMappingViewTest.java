@@ -26,7 +26,6 @@ import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.type.IntegerType;
 import org.obiba.magma.type.TextType;
 import org.obiba.opal.core.magma.IdentifiersMappingView.Policy;
-import org.obiba.opal.core.unit.FunctionalUnit;
 
 import com.google.common.collect.ImmutableSet;
 

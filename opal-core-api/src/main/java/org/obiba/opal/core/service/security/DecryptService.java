@@ -21,14 +21,14 @@ public interface DecryptService {
   /**
    * Decrypts data into an Opal datasource.
    *
-   * @param unitName name of the functional unit (this determines this keystore should be used)
+   * @param projectName name of the project (this determines this keystore should be used)
    * @param datasourceName name of the destination datasource
    * @param file data file to be decrypted
    * @throws org.obiba.opal.core.service.NoSuchIdentifiersMappingException if the specified unit does not exist
    * @throws IllegalArgumentException if the specified datasource does not exist
    * @throws IOException if the specified file does not exist or is not a normal file
    */
-  void decryptData(String unitName, String datasourceName, FileObject file)
+  void decryptData(String projectName, String datasourceName, FileObject file)
       throws NoSuchIdentifiersMappingException, IllegalArgumentException, IOException;
 
   /**

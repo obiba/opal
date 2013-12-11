@@ -204,16 +204,8 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   }
 
   private boolean validateOptions() {
-    return validateUnit() && validateSourceOrTables() && validateSource() && validateDestination() &&
+    return validateSourceOrTables() && validateSource() && validateDestination() &&
         validateTables() && validateSwitches();
-  }
-
-  private boolean validateUnit() {
-    if(options.isUnit() && !getFunctionalUnitService().hasFunctionalUnit(options.getUnit())) {
-      getShell().printf("Functional unit '%s' does not exist.\n", options.getUnit());
-      return false;
-    }
-    return true;
   }
 
   private boolean validateSourceOrTables() {
@@ -307,9 +299,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
    */
   private FileObject resolveOutputFileAndCreateParentFolders() throws FileSystemException {
     FileObject outputFile;
-    outputFile = options.isUnit() && isRelativeFilePath(options.getOut())
-        ? getFileInUnitDirectory(options.getOut())
-        : getFile(options.getOut());
+    outputFile = getFile(options.getOut());
 
     // Create the parent directory, if it doesn't already exist.
     FileObject directory = outputFile.getParent();
@@ -324,11 +314,6 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
               "which supports 16K columns.\n");
     }
     return outputFile;
-  }
-
-  private FileObject getFileInUnitDirectory(String filePath) throws FileSystemException {
-    FileObject unitDir = getFunctionalUnitService().getUnitDirectory(options.getUnit());
-    return unitDir.resolveFile(filePath);
   }
 
   private boolean isRelativeFilePath(String filePath) {

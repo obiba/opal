@@ -30,7 +30,6 @@ public class ShowCommand extends AbstractOpalRuntimeDependentCommand<ShowCommand
     boolean showAll = !options.getDatasources() && !options.getTables() && !options.getUnits();
 
     showDatasourcesAndTables(options.getDatasources() || showAll, options.getTables() || showAll);
-    showUnits(options.getUnits() || showAll);
 
     return 0; // success!
   }
@@ -46,19 +45,6 @@ public class ShowCommand extends AbstractOpalRuntimeDependentCommand<ShowCommand
       if(displayTables) {
         for(ValueTable valueTable : tables) {
           getShell().printf("%s.%s\n", datasource.getName(), valueTable.getName());
-        }
-      }
-    }
-  }
-
-  private void showUnits(boolean displayUnits) {
-    if(displayUnits) {
-      if(getFunctionalUnitService().getFunctionalUnits().isEmpty()) {
-        getShell().printf("No functional units\n");
-      } else {
-        for(FunctionalUnit unit : getFunctionalUnitService().getFunctionalUnits()) {
-          getShell()
-              .printf("functional unit [%s], with key variable [%s]\n", unit.getName(), unit.getKeyVariableName());
         }
       }
     }

@@ -20,7 +20,6 @@ import org.obiba.magma.views.View;
 import org.obiba.opal.core.identifiers.IdentifiersMapping;
 import org.obiba.opal.core.magma.IdentifiersMappingView;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
-import org.obiba.opal.core.unit.FunctionalUnit;
 
 /**
  *

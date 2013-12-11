@@ -85,7 +85,7 @@ public class EncryptCommand extends AbstractOpalRuntimeDependentCommand<EncryptC
   private void encryptFiles(Iterable<String> decryptedFilePaths, FileObject outputDir) {
     for(String path : decryptedFilePaths) {
       try {
-        FileObject decryptedFile = getDecryptedFile(path);
+        FileObject decryptedFile = getFile(path);
         if(decryptedFile.exists()) {
           getShell().printf("Decrypting input file %s\n", path);
           encryptFile(decryptedFile, outputDir);
@@ -100,7 +100,7 @@ public class EncryptCommand extends AbstractOpalRuntimeDependentCommand<EncryptC
   }
 
   private void encryptFile(FileObject inputFile, FileObject outputDir) throws IOException {
-    FileObject outputFile = getFile(outputDir, getOutputFileName(inputFile));
+    FileObject outputFile = getFile(outputDir, inputFile.getName().getBaseName());
 
     GeneratedSecretKeyDatasourceEncryptionStrategy s = new GeneratedSecretKeyDatasourceEncryptionStrategy();
     s.setKeyProvider(new KeyProvider() {
@@ -147,7 +147,6 @@ public class EncryptCommand extends AbstractOpalRuntimeDependentCommand<EncryptC
    */
   private FileObject getOutputDir(String outputDirPath) {
     try {
-      getFileInUnitDirectory(outputDirPath);
       FileObject outputDir = getFile(outputDirPath);
       outputDir.createFolder();
       return outputDir;
@@ -156,16 +155,4 @@ public class EncryptCommand extends AbstractOpalRuntimeDependentCommand<EncryptC
     }
   }
 
-  private String getOutputFileName(FileObject inputFile) {
-    return inputFile.getName().getBaseName();
-  }
-
-  private FileObject getDecryptedFile(String path) throws FileSystemException {
-    return getFileInUnitDirectory(path);
-  }
-
-  private FileObject getFileInUnitDirectory(String filePath) throws FileSystemException {
-    FileObject unitDir = getFunctionalUnitService().getUnitDirectory(options.getUnit());
-    return unitDir.resolveFile(filePath);
-  }
 }
