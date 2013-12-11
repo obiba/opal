@@ -272,7 +272,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
           break;
         default:
           getView().setValuesVisible(true);
-          getEventBus().fireEvent(ScriptEvaluationFailedEvent.newBuilder().error(translations.scriptEvaluationFailed()).build());
+          getEventBus().fireEvent(new ScriptEvaluationFailedEvent(translations.scriptEvaluationFailed()));
           summaryTabPresenter.hideSummaryPreview();
           break;
       }
@@ -283,11 +283,12 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
       ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
       if(errorDto.getExtension(JavaScriptErrorDto.ClientErrorDtoExtensions.errors) != null) {
         List<JavaScriptErrorDto> errors = extractJavaScriptErrors(errorDto);
-        ScriptEvaluationFailedEvent.Builder builder = ScriptEvaluationFailedEvent.newBuilder();
+        StringBuilder messageBuilder = new StringBuilder();
         for(JavaScriptErrorDto error : errors) {
-          builder.error(translationMessages.errorAt(error.getLineNumber(), error.getColumnNumber(), error.getMessage()));
+          messageBuilder
+              .append(translationMessages.errorAt(error.getLineNumber(), error.getColumnNumber(), error.getMessage()));
         }
-        getEventBus().fireEvent(builder.build());
+        getEventBus().fireEvent(new ScriptEvaluationFailedEvent(messageBuilder.toString()));
       }
     }
 

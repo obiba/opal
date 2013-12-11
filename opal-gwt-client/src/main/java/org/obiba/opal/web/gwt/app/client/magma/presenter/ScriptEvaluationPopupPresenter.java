@@ -45,10 +45,10 @@ public class ScriptEvaluationPopupPresenter extends ModalPresenterWidget<ScriptE
   protected void onBind() {
     super.onBind();
     setInSlot(Display.Slots.Evaluation, scriptEvaluationPresenter);
-    registerHandler(
-        getEventBus().addHandler(ScriptEvaluationFailedEvent.getType(), new ScriptEvaluationFailedEvent.Handler() {
+    registerHandler(getEventBus().addHandler(ScriptEvaluationFailedEvent.getType(),
+        new ScriptEvaluationFailedEvent.ScriptEvaluationFailedHandler() {
           @Override
-          public void onEvaluationFailed(ScriptEvaluationFailedEvent event) {
+          public void onScriptEvaluationFailed(ScriptEvaluationFailedEvent event) {
             getView().showError(event.getErrorMessage());
           }
         }));
