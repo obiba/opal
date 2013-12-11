@@ -1,8 +1,8 @@
 package org.obiba.opal.web.gwt.app.client.magma.presenter;
 
-import com.gwtplatform.mvp.client.UiHandlers;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.NamespacedAttributesTableUiHandlers;
 
-public interface VariableUiHandlers extends UiHandlers {
+public interface VariableUiHandlers extends NamespacedAttributesTableUiHandlers {
 
   void onNextVariable();
 

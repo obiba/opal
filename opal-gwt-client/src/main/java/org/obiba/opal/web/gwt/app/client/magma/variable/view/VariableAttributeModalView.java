@@ -15,6 +15,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariableAttributeModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.LocalizedEditableText;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
@@ -34,6 +35,7 @@ import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
+import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -47,6 +49,8 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
     implements Display {
 
   private final MultiWordSuggestOracle oracle;
+
+  private final Translations translations;
 
   interface Binder extends UiBinder<Widget, VariableAttributeModalView> {}
 
@@ -71,9 +75,13 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
   @UiField
   FlowPanel valuesPanel;
 
+  @UiField
+  FlowPanel values;
+
   @Inject
   public VariableAttributeModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
     super(eventBus);
+    this.translations = translations;
     oracle = new MultiWordSuggestOracle();
     namespace = new SuggestListBox(oracle);
     namespace.getSuggestBox().setWidth("100px");
@@ -100,8 +108,8 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
   }
 
   @Override
-  public String getNamespace() {
-    return namespace.getSuggestBox().getText();
+  public SuggestBox getNamespaceSuggestBox() {
+    return namespace.getSuggestBox();
   }
 
   @Override
@@ -117,13 +125,25 @@ public class VariableAttributeModalView extends ModalPopupViewWithUiHandlers<Var
   }
 
   @Override
+  public void setDialogMode(VariableAttributeModalPresenter.Mode mode) {
+    if(mode == VariableAttributeModalPresenter.Mode.UPDATE_MULTIPLE) {
+      values.setVisible(false);
+      name.setVisible(false);
+
+      modal.setTitle(translations.editAttributes());
+    } else if(mode == VariableAttributeModalPresenter.Mode.UPDATE_SINGLE) {
+      modal.setTitle(translations.editAttribute());
+    }
+  }
+
+  @Override
   public TakesValue<List<LocalizedEditableText>> getLocalizedValues() {
     return new TakesValue<List<LocalizedEditableText>>() {
       @Override
-      public void setValue(List<LocalizedEditableText> value) {
-        if(value != null) {
-          for(LocalizedEditableText group : value) {
-            valuesPanel.add(group);
+      public void setValue(List<LocalizedEditableText> values) {
+        if(values != null) {
+          for(LocalizedEditableText value : values) {
+            valuesPanel.add(value);
           }
         }
       }

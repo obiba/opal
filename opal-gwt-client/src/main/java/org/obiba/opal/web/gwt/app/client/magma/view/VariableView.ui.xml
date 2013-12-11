@@ -141,7 +141,7 @@
             <ui:msg description="Add Attribute label">Add Attribute</ui:msg>
           </b:Button>
         </g:FlowPanel>
-        <o:AttributesTablesPanel ui:field="attributesTables"/>
+        <g:FlowPanel ui:field="attributesPanel"/>
 
       </b:Tab>
 

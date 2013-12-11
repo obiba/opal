@@ -100,8 +100,7 @@ public class VariablePropertiesModalView extends ModalPopupViewWithUiHandlers<Va
 
   @UiHandler("saveButton")
   void onSave(ClickEvent event) {
-    getUiHandlers().onSave(getName(), getValueType(), getRepeatable(), getUnit(), getMimeType(), getOccurenceGroup(),
-        getReferencedEntityType());
+    getUiHandlers().onSave();
   }
 
   @Override
@@ -146,31 +145,38 @@ public class VariablePropertiesModalView extends ModalPopupViewWithUiHandlers<Va
     return variableName;
   }
 
-  private String getName() {
+  @Override
+  public String getName() {
     return variableName.getText();
   }
 
-  private String getValueType() {
+  @Override
+  public String getValueType() {
     return valueType.getValue();
   }
 
-  private boolean getRepeatable() {
+  @Override
+  public boolean getRepeatable() {
     return repeatable.getValue();
   }
 
-  private String getUnit() {
+  @Override
+  public String getUnit() {
     return unit.getText();
   }
 
-  private String getReferencedEntityType() {
+  @Override
+  public String getReferencedEntityType() {
     return refEntityType.getText();
   }
 
-  private String getMimeType() {
+  @Override
+  public String getMimeType() {
     return mimeType.getText();
   }
 
-  private String getOccurenceGroup() {
+  @Override
+  public String getOccurrenceGroup() {
     return occurenceGroup.getText();
   }
 }

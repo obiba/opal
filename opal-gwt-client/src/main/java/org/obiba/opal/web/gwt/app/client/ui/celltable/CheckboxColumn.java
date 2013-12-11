@@ -237,7 +237,6 @@ public class CheckboxColumn<T> extends Column<T, Boolean> implements HasActionHa
     return checkHeader;
   }
 
-  @SuppressWarnings({ "OverlyLongMethod", "PMD.NcssMethodCount" })
   private void updateStatusAlert() {
 
     if(display.getClearSelection() == null || display.getSelectAll() == null || display.getSelectAllStatus() == null)
