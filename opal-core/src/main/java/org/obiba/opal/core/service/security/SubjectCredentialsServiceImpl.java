@@ -105,11 +105,19 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     }
 
     Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
-    // Copy current password if password is empty
-    //noinspection ConstantConditions
-    if(subjectCredentials.getType() == SubjectCredentials.Type.USER && subjectCredentials.getPassword() == null &&
-        !newSubject) {
-      subjectCredentials.setPassword(existing.getPassword());
+    switch(subjectCredentials.getType()) {
+      case USER:
+        // Copy current password if password is empty for existing user
+        if(subjectCredentials.getPassword() == null && !newSubject) {
+          subjectCredentials.setPassword(existing.getPassword());
+        }
+        break;
+      case APPLICATION:
+        // Copy current certificate if certificate is empty for existing application
+        if(subjectCredentials.getCertificate() == null && !newSubject) {
+          subjectCredentials.setCertificate(existing.getCertificate());
+        }
+        break;
     }
 
     toSave.put(subjectCredentials, subjectCredentials);

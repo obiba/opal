@@ -677,14 +677,13 @@ public interface Translations extends Constants {
       "deleteDataShieldPackage", "Delete Package",//
       "publishDataShieldMethods", "Publish Package Methods",//
       "deleteDatabase", "Delete Database",//
-      "removeGroup", "Remove Group",//
-      "removeUser", "Remove User",//
       "removeTaxonomy", "Remove Taxonomy",//
       "deleteVariables", "Delete Variables",//
       "deleteTables", "Delete Tables"//
   })
   Map<String, String> confirmationTitleMap();
 
+  //TODO move all these messages to translationMessages
   @Description("Confirmation message map")
   @DefaultStringMapValue({ //
       "confirmVariableDelete", "Delete the currently displayed variable?", //
@@ -731,11 +730,7 @@ public interface Translations extends Constants {
       "confirmDeleteDataShieldPackage", "Please confirm that you want to remove this package and all its methods.",//
       "confirmPublishDataShieldMethods", "Please confirm that you want to publish this package methods.",//
       "confirmDeleteDatabase", "Please confirm that you want to remove this database.",//
-      "confirmRemoveGroup", "Please confirm that you want to remove the group '{0}'.",//
-      "confirmRemoveGroupWithUsers",
-      "Please confirm that you want to remove the group '{0}'. The group '{0}' will be removed for users belonging to this group.",
 //
-      "confirmRemoveUser", "Please confirm that you want to remove the user '{0}'.",//
       "confirmRemoveTaxonomy", "Please confirm that you want to remove the taxonomy '{0}'.",//
       "confirmDeleteVariable", "Please confirm that you want to delete {0} variable",//
       "confirmDeleteVariables", "Please confirm that you want to delete {0} variables",//
@@ -2568,4 +2563,16 @@ public interface Translations extends Constants {
   @Description("Paste certificate label")
   @DefaultStringValue("(Paste certificate)")
   String pasteCertificate();
+
+  @Description("Remove Group label")
+  @DefaultStringValue("Remove Group")
+  String removeGroup();
+
+  @Description("Remove User label")
+  @DefaultStringValue("Remove User")
+  String removeUser();
+
+  @Description("Remove Application label")
+  @DefaultStringValue("Remove Application")
+  String removeApplication();
 }

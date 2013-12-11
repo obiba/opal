@@ -131,7 +131,6 @@ public class SubjectCredentialsAdministrationPresenter extends
     // Register event handlers
     registerHandler(getEventBus().addHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler()));
 
-    // Refresh user list
     registerHandler(getEventBus().addHandler(SubjectCredentialsRefreshedEvent.getType(),
         new SubjectCredentialsRefreshedEvent.SubjectCredentialsRefreshedHandler() {
           @Override
@@ -139,8 +138,6 @@ public class SubjectCredentialsAdministrationPresenter extends
             refreshTables();
           }
         }));
-
-    // Refresh group list
     registerHandler(
         getEventBus().addHandler(GroupsRefreshedEvent.getType(), new GroupsRefreshedEvent.GroupsRefreshedHandler() {
           @Override
@@ -149,31 +146,40 @@ public class SubjectCredentialsAdministrationPresenter extends
           }
         }));
 
-    // User Actions
+    // Users & applications Actions
     getView().getSubjectCredentialActions().setActionHandler(new ActionHandler<SubjectCredentialsDto>() {
 
       @Override
-      public void doAction(SubjectCredentialsDto subjectDto, String actionName) {
+      public void doAction(SubjectCredentialsDto dto, String actionName) {
         if(ActionsColumn.EDIT_ACTION.equals(actionName)) {
+
           SubjectCredentialsPresenter dialog = modalProvider.get();
           dialog.setDialogMode(SubjectCredentialsPresenter.Mode.UPDATE);
-          dialog.setSubjectCredentials(subjectDto);
+          dialog.setSubjectCredentials(dto);
+
         } else if(ActionsColumn.DELETE_ACTION.equals(actionName)) {
-          removeConfirmation = new RemoveRunnable(subjectDto.getName(), true);
-          fireEvent(ConfirmationRequiredEvent
-              .createWithMessages(removeConfirmation, translations.confirmationTitleMap().get("removeUser"),
-                  translations.confirmationMessageMap().get("confirmRemoveUser").replace("{0}", subjectDto.getName())));
+
+          removeConfirmation = new RemoveRunnable(dto.getName(), true);
+          boolean isUser = SubjectCredentialsDtos.isUser(dto);
+          String title = isUser ? translations.removeUser() : translations.removeApplication();
+          String message = isUser
+              ? translationMessages.confirmRemoveUser(dto.getName())
+              : translationMessages.confirmRemoveApplication(dto.getName());
+          fireEvent(ConfirmationRequiredEvent.createWithMessages(removeConfirmation, title, message));
+
         } else if(Display.DISABLE_ACTION.equals(actionName) || Display.ENABLE_ACTION.equals(actionName)) {
-          subjectDto.setEnabled(!subjectDto.getEnabled());
+
+          dto.setEnabled(!dto.getEnabled());
           ResourceRequestBuilderFactory.newBuilder() //
-              .forResource(UriBuilders.SUBJECT_CREDENTIAL.create().build(subjectDto.getName())) //
-              .withResourceBody(SubjectCredentialsDto.stringify(subjectDto)) //
+              .forResource(UriBuilders.SUBJECT_CREDENTIAL.create().build(dto.getName())) //
+              .withResourceBody(SubjectCredentialsDto.stringify(dto)) //
               .withCallback(new ResponseCodeCallback() {
                 @Override
                 public void onResponseCode(Request request, Response response) {
                   getEventBus().fireEvent(new SubjectCredentialsRefreshedEvent());
                 }
               }, SC_OK).put().send();
+
         }
       }
     });
@@ -182,20 +188,14 @@ public class SubjectCredentialsAdministrationPresenter extends
     getView().getGroupsActions().setActionHandler(new ActionHandler<GroupDto>() {
 
       @Override
-      public void doAction(GroupDto object, String actionName) {
+      public void doAction(GroupDto dto, String actionName) {
         if(ActionsColumn.DELETE_ACTION.equals(actionName)) {
-          removeConfirmation = new RemoveRunnable(object.getName(), false);
-
-          if(object.getUsersCount() > 0) {
-            fireEvent(ConfirmationRequiredEvent
-                .createWithMessages(removeConfirmation, translations.confirmationTitleMap().get("removeGroup"),
-                    translations.confirmationMessageMap().get("confirmRemoveGroupWithUsers")
-                        .replace("{0}", object.getName())));
-          } else {
-            fireEvent(ConfirmationRequiredEvent
-                .createWithMessages(removeConfirmation, translations.confirmationTitleMap().get("removeGroup"),
-                    translations.confirmationMessageMap().get("confirmRemoveGroup").replace("{0}", object.getName())));
-          }
+          String name = dto.getName();
+          removeConfirmation = new RemoveRunnable(name, false);
+          fireEvent(ConfirmationRequiredEvent.createWithMessages(removeConfirmation, translations.removeGroup(),
+              dto.getUsersCount() > 0
+                  ? translationMessages.confirmRemoveGroupWithUsersOrApps(name)
+                  : translationMessages.confirmRemoveGroup(name)));
         }
       }
     });

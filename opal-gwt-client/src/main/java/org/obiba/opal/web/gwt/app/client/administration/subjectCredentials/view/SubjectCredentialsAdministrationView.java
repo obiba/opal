@@ -91,12 +91,12 @@ public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<Sub
 
   private void configSubjectCredentialsTable(ListDataProvider<SubjectCredentialsDto> dataProvider,
       CellTable<SubjectCredentialsDto> table, SimplePager pager) {
-    pager.setDisplay(table);
     table.addColumn(SubjectCredentialColumns.NAME, translations.userNameLabel());
     table.addColumn(SubjectCredentialColumns.GROUPS, translations.userGroupsLabel());
     table.addColumn(SubjectCredentialColumns.STATUS, translations.userStatusLabel());
     table.addColumn(SubjectCredentialColumns.ACTIONS, translations.actionsLabel());
     table.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
+    pager.setDisplay(table);
     dataProvider.addDataDisplay(table);
   }
 
@@ -104,6 +104,8 @@ public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<Sub
     groupsTable.addColumn(GroupColumns.NAME, translations.groupNameLabel());
     groupsTable.addColumn(GroupColumns.USERS, translations.groupUsersLabel());
     groupsTable.addColumn(GroupColumns.ACTIONS, translations.actionsLabel());
+    groupsTable.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
+    groupsTablePager.setDisplay(groupsTable);
     groupDataProvider.addDataDisplay(groupsTable);
   }
 
@@ -118,7 +120,6 @@ public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<Sub
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public void clear() {
     renderUserRows(Collections.<SubjectCredentialsDto>emptyList());
     renderApplicationRows(Collections.<SubjectCredentialsDto>emptyList());
@@ -127,26 +128,24 @@ public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<Sub
 
   @Override
   public void renderUserRows(List<SubjectCredentialsDto> rows) {
-    userDataProvider.setList(rows);
-    usersTablePager.firstPage();
-    userDataProvider.refresh();
-    usersTablePager.setVisible(userDataProvider.getList().size() > usersTablePager.getPageSize());
+    renderRows(rows, userDataProvider, usersTablePager);
   }
 
   @Override
   public void renderApplicationRows(List<SubjectCredentialsDto> rows) {
-    applicationDataProvider.setList(rows);
-    applicationsTablePager.firstPage();
-    applicationDataProvider.refresh();
-    applicationsTablePager.setVisible(applicationDataProvider.getList().size() > applicationsTablePager.getPageSize());
+    renderRows(rows, applicationDataProvider, applicationsTablePager);
   }
 
   @Override
   public void renderGroupRows(List<GroupDto> rows) {
-    groupDataProvider.setList(rows);
-    groupsTablePager.firstPage();
-    groupDataProvider.refresh();
-    groupsTablePager.setVisible(groupDataProvider.getList().size() > groupsTablePager.getPageSize());
+    renderRows(rows, groupDataProvider, groupsTablePager);
+  }
+
+  private <T> void renderRows(List<T> rows, ListDataProvider<T> dataProvider, SimplePager pager) {
+    dataProvider.setList(rows);
+    pager.firstPage();
+    dataProvider.refresh();
+    pager.setVisible(dataProvider.getList().size() > pager.getPageSize());
   }
 
   @Override

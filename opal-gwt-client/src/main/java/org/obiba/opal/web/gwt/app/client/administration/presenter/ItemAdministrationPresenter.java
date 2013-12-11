@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.administration.presenter;
 
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasPageTitle;
@@ -27,6 +28,8 @@ public abstract class ItemAdministrationPresenter<D extends View, P extends Prox
     extends Presenter<D, P> implements RequestAdministrationPermissionEvent.Handler, HasPageTitle {
 
   protected static final Translations translations = GWT.create(Translations.class);
+
+  protected static final TranslationMessages translationMessages = GWT.create(TranslationMessages.class);
 
   public ItemAdministrationPresenter(EventBus eventBus, D display, P p) {
     super(eventBus, display, p, ApplicationPresenter.WORKBENCH);

@@ -150,8 +150,8 @@ public class SubjectCredentialsPresenter extends ModalPresenterWidget<SubjectCre
 
   public void setSubjectCredentialsType(SubjectCredentialsType subjectCredentialsType) {
     this.subjectCredentialsType = subjectCredentialsType;
-    getView().getPasswordGroupVisibility().setVisible(subjectCredentialsType == SubjectCredentialsType.USER);
-    getView().getCertificateGroupVisibility().setVisible(subjectCredentialsType == SubjectCredentialsType.APPLICATION);
+    getView().getPasswordGroupVisibility().setVisible(SubjectCredentialsDtos.isUser(subjectCredentialsType));
+    getView().getCertificateGroupVisibility().setVisible(SubjectCredentialsDtos.isApplication(subjectCredentialsType));
   }
 
   public void setTitle(String title) {
@@ -170,9 +170,9 @@ public class SubjectCredentialsPresenter extends ModalPresenterWidget<SubjectCre
         if(dialogMode == Mode.CREATE) {
           validators.add(new RequiredTextValidator(getView().getName(), "SubjectCredentialNameIsRequired",
               Display.FormField.NAME.name()));
-          if(subjectCredentialsType == SubjectCredentialsType.USER) {
+          if(SubjectCredentialsDtos.isUser(subjectCredentialsType)) {
             addPasswordValidators();
-          } else if(subjectCredentialsType == SubjectCredentialsType.APPLICATION) {
+          } else if(SubjectCredentialsDtos.isApplication(subjectCredentialsType)) {
             validators.add(new RequiredTextValidator(getView().getCertificate(), "CertificateIsRequired",
                 Display.FormField.CERTIFICATE.name()));
           }

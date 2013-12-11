@@ -15,12 +15,20 @@ import org.obiba.opal.web.model.client.opal.SubjectCredentialsType;
 
 public class SubjectCredentialsDtos {
 
+  public static boolean isUser(SubjectCredentialsType type) {
+    return type.getName().equals(SubjectCredentialsType.USER.getName());
+  }
+
+  public static boolean isApplication(SubjectCredentialsType type) {
+    return type.getName().equals(SubjectCredentialsType.APPLICATION.getName());
+  }
+
   public static boolean isUser(SubjectCredentialsDto dto) {
-    return dto.getType().getName().equals(SubjectCredentialsType.USER.getName());
+    return isUser(dto.getType());
   }
 
   public static boolean isApplication(SubjectCredentialsDto dto) {
-    return dto.getType().getName().equals(SubjectCredentialsType.APPLICATION.getName());
+    return isApplication(dto.getType());
   }
 
 }
