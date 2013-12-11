@@ -134,14 +134,6 @@ public class DataShieldPackageAdministrationPresenter
     return UriBuilder.create().segment("datashield", "package", "{package}", "methods").build(packageR);
   }
 
-  private String environmentMethod(String env, String name) {
-    return UriBuilder.create().segment("datashield", "env", "{env}", "method", "{method}").build(env, name);
-  }
-
-  private String environmentMethods(String env) {
-    return UriBuilder.create().segment("datashield", "env", "{env}", "methods").build(env);
-  }
-
   private void authorizePackagesR(HasAuthorization authorizer) {
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(packagesR()).get().authorize(authorizer).send();
   }

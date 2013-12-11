@@ -20,12 +20,11 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
-import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
 public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
-    implements MagmaPathSelectionEvent.Handler, DatasourceSelectionChangeEvent.Handler,
+    implements MagmaPathSelectionEvent.Handler, DatasourceSelectionChangeEvent.DatasourceSelectionChangeHandler,
     TableSelectionChangeEvent.Handler, VariableSelectionChangeEvent.Handler {
 
   private final DatasourcePresenter datasourcePresenter;
@@ -58,9 +57,9 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
   }
 
   @Override
-  public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
+  public void onDatasourceSelectionChange(DatasourceSelectionChangeEvent event) {
     if(!equals(event.getSource())) {
-      getView().selectDatasource(event.getSelection());
+      getView().selectDatasource(event.getDatasource());
     }
   }
 

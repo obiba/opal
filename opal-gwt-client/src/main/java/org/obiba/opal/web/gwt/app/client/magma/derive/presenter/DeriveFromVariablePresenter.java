@@ -19,11 +19,11 @@ import javax.annotation.Nullable;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.support.VariableDtos;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.BranchingWizardStepController;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardType;
+import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -37,10 +37,10 @@ import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.HasChangeHandlers;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.View;
 
 /**
@@ -49,12 +49,6 @@ import com.gwtplatform.mvp.client.View;
 public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromVariablePresenter.Display> {
 
   private WizardType wizardType;
-
-  @SuppressWarnings("UnusedDeclaration")
-  private String preSelectedDatasource;
-
-  @SuppressWarnings("UnusedDeclaration")
-  private String preSelectedTable;
 
   private TableDto table;
 
@@ -107,9 +101,7 @@ public class DeriveFromVariablePresenter extends DerivationPresenter<DeriveFromV
                   .withCallback(new ResourceCallback<TableDto>() {
                     @Override
                     public void onResource(Response response, TableDto tableDto) {
-                      preSelectedTable = tableDto.getName();
                       table = tableDto;
-                      preSelectedDatasource = tableDto.getDatasourceName();
                       loadTables();
                     }
                   }).send();

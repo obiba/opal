@@ -30,7 +30,6 @@ import org.obiba.opal.web.gwt.app.client.ui.VariableSearchListItem;
 import org.obiba.opal.web.gwt.app.client.ui.VariableSuggestOracle;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.RequestUrlBuilder;
-import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
@@ -144,13 +143,14 @@ public class ApplicationPresenter extends Presenter<ApplicationPresenter.Display
     });
 
     // Update search box on event
-    addRegisteredHandler(DatasourceSelectionChangeEvent.getType(), new DatasourceSelectionChangeEvent.Handler() {
-      @Override
-      public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
-        getView().clearSearch();
-        getView().addSearchItem(event.getSelection(), VariableSearchListItem.ItemType.DATASOURCE);
-      }
-    });
+    addRegisteredHandler(DatasourceSelectionChangeEvent.getType(),
+        new DatasourceSelectionChangeEvent.DatasourceSelectionChangeHandler() {
+          @Override
+          public void onDatasourceSelectionChange(DatasourceSelectionChangeEvent event) {
+            getView().clearSearch();
+            getView().addSearchItem(event.getDatasource(), VariableSearchListItem.ItemType.DATASOURCE);
+          }
+        });
 
     addRegisteredHandler(TableSelectionChangeEvent.getType(), new TableSelectionChangeEvent.Handler() {
       @Override

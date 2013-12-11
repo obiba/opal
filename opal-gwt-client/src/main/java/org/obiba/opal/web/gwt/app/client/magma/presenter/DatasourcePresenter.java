@@ -62,7 +62,7 @@ import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_OK;
 
 public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Display>
-    implements DatasourceUiHandlers, DatasourceSelectionChangeEvent.Handler {
+    implements DatasourceUiHandlers, DatasourceSelectionChangeEvent.DatasourceSelectionChangeHandler {
 
   private final ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider;
 
@@ -123,8 +123,8 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
   }
 
   @Override
-  public void onDatasourceSelectionChanged(DatasourceSelectionChangeEvent event) {
-    datasourceName = event.getSelection();
+  public void onDatasourceSelectionChange(DatasourceSelectionChangeEvent event) {
+    datasourceName = event.getDatasource();
     initDatasource();
   }
 

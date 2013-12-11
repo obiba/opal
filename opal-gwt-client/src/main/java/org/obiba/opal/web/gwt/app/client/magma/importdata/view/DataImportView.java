@@ -112,8 +112,6 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
   @UiField
   Chooser formatChooser;
 
-  private final EventBus eventBus;
-
   private WizardStepChain stepChain;
 
   private StepInHandler comparedDatasourcesReportStepInHandler;
@@ -127,7 +125,6 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
   @Inject
   public DataImportView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
-    this.eventBus = eventBus;
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
     initWidgets();
@@ -234,7 +231,7 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
 
   @Override
   public void showError(String errorMessage, HasType<ControlGroupType> errorType) {
-    if (errorType == null) {
+    if(errorType == null) {
       dialog.addAlert(errorMessage, AlertType.ERROR);
 
     } else {

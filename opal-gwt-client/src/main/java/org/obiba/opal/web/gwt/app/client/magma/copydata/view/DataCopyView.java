@@ -30,10 +30,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -44,9 +41,6 @@ import com.google.web.bindery.event.shared.EventBus;
 public class DataCopyView extends ModalPopupViewWithUiHandlers<DataCopyUiHandlers>
     implements DataCopyPresenter.Display {
 
-  private final Translations translations;
-
-  @UiTemplate("DataCopyView.ui.xml")
   interface Binder extends UiBinder<Widget, DataCopyView> {}
 
   @UiField
@@ -75,10 +69,7 @@ public class DataCopyView extends ModalPopupViewWithUiHandlers<DataCopyUiHandler
   @Inject
   public DataCopyView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
-    this.translations = translations;
-
     initWidget(uiBinder.createAndBindUi(this));
-
     modal.setTitle(translations.copyData());
   }
 

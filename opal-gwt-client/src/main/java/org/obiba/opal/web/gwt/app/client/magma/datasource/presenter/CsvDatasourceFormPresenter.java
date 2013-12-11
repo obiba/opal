@@ -12,11 +12,11 @@ package org.obiba.opal.web.gwt.app.client.magma.datasource.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
+import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.validator.RegExValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidatablePresenterWidget;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
-import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.model.client.magma.CsvDatasourceFactoryDto;
@@ -25,11 +25,10 @@ import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 
 public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDatasourceFormPresenter.Display>
@@ -46,21 +45,11 @@ public class CsvDatasourceFormPresenter extends ValidatablePresenterWidget<CsvDa
 
   private static final String DEFAULT_TABLE_NAME = "table";
 
-  //
-  // Instance Variables
-  //
-
   private final FileSelectionPresenter csvFileSelectionPresenter;
 
   private final List<String> availableCharsets = new ArrayList<String>();
 
   private HasText selectedFile;
-
-  private HasValue<Boolean> isSpecificCharsetAvailable;
-
-  //
-  // Constructors
-  //
 
   @Inject
   public CsvDatasourceFormPresenter(Display display, EventBus eventBus,

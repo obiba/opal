@@ -96,17 +96,6 @@ public class CsvFormatStepPresenter extends PresenterWidget<CsvFormatStepPresent
     return getView().getCharsetText().getText();
   }
 
-  private Collection<String> validateCharacterSet(String charset) {
-    Collection<String> errors = new ArrayList<String>();
-    if(charset == null || "".equals(charset)) {
-      errors.add(translations.charsetMustNotBeNullMessage());
-
-    } else if(!charsetExistsInAvailableCharsets(charset)) {
-      errors.add(translations.charsetDoesNotExistMessage());
-    }
-    return errors;
-  }
-
   private void refreshDatasource() {
     UriBuilder ub = UriBuilder.create().segment("datasource", destination);
     ResourceRequestBuilderFactory.<DatasourceDto>newBuilder().forResource(ub.build()).get()
@@ -293,8 +282,7 @@ public class CsvFormatStepPresenter extends PresenterWidget<CsvFormatStepPresent
           Display.FormField.ENTITY_TYPE.name()));
     }
 
-
-      @Override
+    @Override
     protected void showMessage(String id, String message) {
       errors.put(getView().getGroupType(id), message);
     }

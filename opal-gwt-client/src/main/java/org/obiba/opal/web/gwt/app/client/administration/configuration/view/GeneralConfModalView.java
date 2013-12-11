@@ -33,8 +33,6 @@ import com.google.web.bindery.event.shared.EventBus;
 public class GeneralConfModalView extends ModalPopupViewWithUiHandlers<GeneralConfModalUiHandlers>
     implements GeneralConfModalPresenter.Display {
 
-  private final Translations translations;
-
   @UiTemplate("GeneralConfModalView.ui.xml")
   interface Binder extends UiBinder<Widget, GeneralConfModalView> {}
 
@@ -56,18 +54,11 @@ public class GeneralConfModalView extends ModalPopupViewWithUiHandlers<GeneralCo
   @UiField
   CharacterSetView characterSet;
 
-//  @UiField
-//  FlowPanel taxonomiesPanel;
-
   @Inject
   public GeneralConfModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
-    this.translations = translations;
-
     locales = new LocaleChooser(true);
-
     initWidget(uiBinder.createAndBindUi(this));
-
     modal.setTitle(translations.editProperties());
   }
 
@@ -97,7 +88,6 @@ public class GeneralConfModalView extends ModalPopupViewWithUiHandlers<GeneralCo
     for(String locale : locales.getSelectedLocales()) {
       languages.push(locale);
     }
-
     return languages;
   }
 
@@ -108,10 +98,9 @@ public class GeneralConfModalView extends ModalPopupViewWithUiHandlers<GeneralCo
 
   @Override
   public void setSelectedLanguages(JsArrayString languages) {
-    if(languages.length() > 0) {
-      for(int i = 0; i < languages.length(); i++) {
-        locales.setSelectedValue(languages.get(i));
-      }
+    int length = languages.length();
+    for(int i = 0; i < length; i++) {
+      locales.setSelectedValue(languages.get(i));
     }
   }
 }

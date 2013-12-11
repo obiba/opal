@@ -43,8 +43,6 @@ public class MagmaView extends ViewImpl implements MagmaPresenter.Display {
 
   private String table;
 
-  private String variable;
-
   @Inject
   public MagmaView(Binder uiBinder, PlaceManager placeManager) {
     this.placeManager = placeManager;
@@ -54,10 +52,10 @@ public class MagmaView extends ViewImpl implements MagmaPresenter.Display {
       public void onSelection(SelectionEvent<Integer> event) {
         if(event.getSelectedItem() == 0) {
           //getUiHandlers().onDatasourceSelection(datasource);
-          setHeading(datasource, "Datasource");
+          setHeading("Datasource");
         } else if(event.getSelectedItem() == 1) {
           //getUiHandlers().onTableSelection(datasource, table);
-          setHeading(table, "Table");
+          setHeading("Table");
         }
       }
     });
@@ -84,7 +82,7 @@ public class MagmaView extends ViewImpl implements MagmaPresenter.Display {
     tabPanel.clear();
     tabPanel.addAndSelect(datasourceWidget, name);
     tabPanel.setMenuVisible(false);
-    setHeading(name, "Datasource");
+    setHeading("Datasource");
 
   }
 
@@ -96,25 +94,23 @@ public class MagmaView extends ViewImpl implements MagmaPresenter.Display {
     tabPanel.add(datasourceWidget, getDatasourceLink(datasource));
     tabPanel.addAndSelect(tableWidget, getTableLink(datasource, table));
     tabPanel.setMenuVisible(true);
-    setHeading(table, isView ? "View" : "Table");
+    setHeading(isView ? "View" : "Table");
   }
 
   @Override
   public void selectVariable(String datasource, String table, String variable) {
     this.datasource = datasource;
     this.table = table;
-    this.variable = variable;
     tabPanel.clear();
     tabPanel.add(datasourceWidget, getDatasourceLink(datasource));
     tabPanel.add(tableWidget, getTableLink(datasource, table));
     tabPanel.addAndSelect(variableWidget, variable);
     tabPanel.setMenuVisible(true);
-    setHeading(variable, "Variable");
+    setHeading("Variable");
   }
 
-  private void setHeading(String text, String subtext) {
+  private void setHeading(String subtext) {
     heading.setText(translations.tablesLabel());
-    //heading.setSubtext("[" + subtext + "]");
   }
 
   private NavLink getDatasourceLink(String name) {

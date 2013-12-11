@@ -156,10 +156,10 @@ public class ConclusionStepPresenter extends PresenterWidget<ConclusionStepPrese
 
     @Override
     public void onClick(ClickEvent event) {
-      fireTableSelectionChangeEvent(getResourceLink());
+      fireTableSelectionChangeEvent();
     }
 
-    private void fireTableSelectionChangeEvent(String tableName) {
+    private void fireTableSelectionChangeEvent() {
       ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource(getResourceLink()).get()
           .withCallback(new ResourceCallback<TableDto>() {
 

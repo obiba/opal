@@ -18,7 +18,6 @@ import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -31,17 +30,11 @@ import com.google.web.bindery.event.shared.EventBus;
 
 public class ScriptEvaluationPopupView extends ModalPopupViewWithUiHandlers<ModalUiHandlers> implements Display {
 
-  interface ViewUiBinder extends UiBinder<Widget, ScriptEvaluationPopupView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
+  interface Binder extends UiBinder<Widget, ScriptEvaluationPopupView> {}
 
   private static final int MINIMUM_WIDTH = 610;
 
   private static final int MINIMUM_HEIGHT = 585;
-
-  private final Translations translations;
-
-  private final Widget widget;
 
   @UiField
   Modal dialogBox;
@@ -50,18 +43,12 @@ public class ScriptEvaluationPopupView extends ModalPopupViewWithUiHandlers<Moda
   FlowPanel evaluation;
 
   @Inject
-  public ScriptEvaluationPopupView(EventBus eventBus, Translations translations) {
+  public ScriptEvaluationPopupView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
-    widget = uiBinder.createAndBindUi(this);
-    this.translations = translations;
+    initWidget(uiBinder.createAndBindUi(this));
     dialogBox.setTitle(translations.scriptEvaluationLabel());
     dialogBox.setMinWidth(MINIMUM_WIDTH);
     dialogBox.setMinHeight(MINIMUM_HEIGHT);
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
   }
 
   @UiHandler("closeButton")

@@ -16,19 +16,19 @@ import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.DatasourceFormPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.HasDatasourceForms;
+import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.RequestDatasourceFormsEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardPresenterWidget;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardProxy;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardType;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardView;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.DisallowedCharactersValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
-import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.DatasourceFormPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.HasDatasourceForms;
-import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.RequestDatasourceFormsEvent;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardProxy;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardType;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardView;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -40,13 +40,13 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 
 public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatasourcePresenter.Display>
     implements HasDatasourceForms {
@@ -199,7 +199,7 @@ public class CreateDatasourcePresenter extends WizardPresenterWidget<CreateDatas
     public void onResponseCode(Request request, Response response) {
       if(response.getStatusCode() == 201) {
         DatasourceDto datasourceDto = JsonUtils.unsafeEval(response.getText());
-        getEventBus().fireEvent(new DatasourceSelectionChangeEvent(datasourceDto));
+        getEventBus().fireEvent(new DatasourceSelectionChangeEvent(datasourceDto, null));
       } else if(response.getText() != null && response.getText().length() != 0) {
         ClientErrorDto errorDto = JsonUtils.unsafeEval(response.getText());
         getEventBus().fireEvent(

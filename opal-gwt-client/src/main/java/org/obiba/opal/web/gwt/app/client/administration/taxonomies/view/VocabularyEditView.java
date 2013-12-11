@@ -55,8 +55,6 @@ import static org.obiba.opal.web.gwt.app.client.administration.taxonomies.presen
 
 public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandlers> implements Display {
 
-  private final Translations translations;
-
   private JsArrayString locales;
 
   interface ViewUiBinder extends UiBinder<Widget, VocabularyEditView> {}
@@ -133,7 +131,6 @@ public class VocabularyEditView extends ViewWithUiHandlers<VocabularyEditUiHandl
   @Inject
   public VocabularyEditView(ViewUiBinder viewUiBinder, Translations translations) {
     initWidget(viewUiBinder.createAndBindUi(this));
-    this.translations = translations;
     newTermName.setPlaceholder(translations.newTermNameLabel());
   }
 

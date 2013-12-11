@@ -11,7 +11,6 @@
 package org.obiba.opal.web.gwt.app.client.fs.view;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -177,33 +176,6 @@ public class FolderDetailsView extends ViewWithUiHandlers<FolderDetailsUiHandler
       table.insertColumn(0, checkColumn, checkColumn.getTableListCheckColumnHeader());
     }
     table.setColumnWidth(checkColumn, 1, Style.Unit.PX);
-  }
-
-  /**
-   * Returns a sorted copy of the specified file list.
-   * <p/>
-   * This method simply puts folders ahead of regular files; no additional sorting is performed.
-   *
-   * @param fileList the list to be sorted
-   * @return the sorted list
-   */
-  private List<FileDto> sortFileList(Iterable<FileDto> fileList) {
-    List<FileDto> sortedList = new ArrayList<FileDto>();
-
-    Collection<FileDto> folderList = new ArrayList<FileDto>();
-    Collection<FileDto> regularList = new ArrayList<FileDto>();
-    for(FileDto file : fileList) {
-      if(file.getType().isFileType(FileDto.FileType.FOLDER)) {
-        folderList.add(file);
-      } else {
-        regularList.add(file);
-      }
-    }
-
-    sortedList.addAll(folderList);
-    sortedList.addAll(regularList);
-
-    return sortedList;
   }
 
   private class FileNameColumn extends Column<FileDto, String> {

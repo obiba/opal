@@ -17,11 +17,14 @@
               </b:NavHeader>
               <b:Divider/>
               <o:OpalNavLink ui:field="usersGroupsPlace" icon="COG">
-                <ui:msg description="Main Administration Users and Applications title">Users and Applications</ui:msg>
+                <ui:msg description="Main Administration Users, Groups and Applications title">
+                  Users, Groups and Applications
+                </ui:msg>
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Users and Applications help">Add, update, remove users and applications
+                  <ui:msg description="Main Administration Users, Groups and Applications help">
+                    Add, update, remove users, groups and applications
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>
@@ -31,7 +34,8 @@
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Profiles help">Manage user and application profiles
+                  <ui:msg description="Main Administration Profiles help">
+                    Manage user and application profiles
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>
@@ -41,7 +45,8 @@
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Units title">Manage identifiers and key stores in terms of functional units
+                  <ui:msg description="Main Administration Units title">
+                    Manage identifiers and key stores in terms of functional units
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>
@@ -80,11 +85,14 @@
               </g:FlowPanel>
               <b:Divider/>
               <o:OpalNavLink ui:field="identifiersPlace" icon="COG">
-                <ui:msg description="Main Administration Identifiers title">Identifiers Mappings</ui:msg>
+                <ui:msg description="Main Administration Identifiers title">
+                  Identifiers Mappings
+                </ui:msg>
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Identifiers title">Manage identifiers mappings
+                  <ui:msg description="Main Administration Identifiers title">
+                    Manage identifiers mappings
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>
@@ -94,7 +102,8 @@
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Keystore title">Manage certificates and private keys for encryption and decryption of data
+                  <ui:msg description="Main Administration Keystore title">
+                    Manage certificates and private keys for encryption and decryption of data
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>
@@ -115,7 +124,8 @@
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration R help">Configure R server, grant access to R service
+                  <ui:msg description="Main Administration R help">
+                    Configure R server, grant access to R service
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>
@@ -125,8 +135,8 @@
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration DataSHIELD help">Configure DataSHIELD, grant access to
-                    DataSHIELD service
+                  <ui:msg description="Main Administration DataSHIELD help">
+                    Configure DataSHIELD, grant access to DataSHIELD service
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>
@@ -136,7 +146,9 @@
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Index help">Configure Elastic Search server, schedule table indexing</ui:msg>
+                  <ui:msg description="Main Administration Index help">
+                    Configure Elastic Search server, schedule table indexing
+                  </ui:msg>
                 </g:Label>
               </g:FlowPanel>
             </b:WellNavList>
@@ -151,7 +163,8 @@
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration General Settings help">Manage general server configuration
+                  <ui:msg description="Main Administration General Settings help">
+                    Manage general server configuration
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>
@@ -161,7 +174,8 @@
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Taxonomies help">Manage pre-defined variable attributes
+                  <ui:msg description="Main Administration Taxonomies help">
+                    Manage pre-defined variable attributes
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>
@@ -190,8 +204,5 @@
         </b:Column>
       </b:FluidRow>
     </g:FlowPanel>
-    <!--<g:HTMLPanel addStyleNames="administration">-->
-    <!--<o:NavTabsPanel ui:field="administrationDisplays"/>-->
-    <!--</g:HTMLPanel>-->
   </g:FlowPanel>
 </ui:UiBinder>

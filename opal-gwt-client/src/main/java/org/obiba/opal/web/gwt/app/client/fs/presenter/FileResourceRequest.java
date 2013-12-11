@@ -15,14 +15,10 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
-import com.google.web.bindery.event.shared.EventBus;
-
 /**
  *
  */
 public class FileResourceRequest {
-
-  private EventBus eventBus;
 
   private String path;
 
@@ -37,9 +33,10 @@ public class FileResourceRequest {
 
   public void send() {
     String resource = "/files/_meta" + path + "/";
-    ResourceRequestBuilder<FileDto> builder = ResourceRequestBuilderFactory.<FileDto>newBuilder().forResource(resource).get()//
+    ResourceRequestBuilder<FileDto> builder = ResourceRequestBuilderFactory.<FileDto>newBuilder().forResource(resource)
+        .get()//
         .withCallback(callback);
-    if (codeCallback != null) {
+    if(codeCallback != null) {
       builder.withCallback(codeCallback, codes);
     }
 

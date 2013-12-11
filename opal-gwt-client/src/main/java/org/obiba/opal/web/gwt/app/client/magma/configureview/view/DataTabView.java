@@ -9,38 +9,27 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.configureview.view;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.DataTabPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.TableChooser;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtplatform.mvp.client.ViewImpl;
 import com.watopi.chosen.client.event.ChosenChangeEvent;
 
 public class DataTabView extends ViewImpl implements DataTabPresenter.Display {
 
-  @UiTemplate("DataTabView.ui.xml")
-  interface myUiBinder extends UiBinder<Widget, DataTabView> {}
-
-  private static final myUiBinder uiBinder = GWT.create(myUiBinder.class);
-
-  private final Widget uiWidget;
-
-  private static final Translations translations = GWT.create(Translations.class);
+  interface Binder extends UiBinder<Widget, DataTabView> {}
 
   @UiField
   Button saveChangesButton;
@@ -48,16 +37,10 @@ public class DataTabView extends ViewImpl implements DataTabPresenter.Display {
   @UiField(provided = true)
   TableChooser tableChooser;
 
-  private final Map<String, TableDto> tableDtoMap = new HashMap<String, TableDto>();
-
-  public DataTabView() {
+  @Inject
+  public DataTabView(Binder uiBinder) {
     tableChooser = new TableChooser(true);
-    uiWidget = uiBinder.createAndBindUi(this);
-  }
-
-  @Override
-  public Widget asWidget() {
-    return uiWidget;
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
   @Override
