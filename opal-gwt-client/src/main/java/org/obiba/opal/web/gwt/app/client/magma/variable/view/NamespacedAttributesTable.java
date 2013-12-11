@@ -20,7 +20,10 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.NamespacedAttributesTableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.CheckboxColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ListAttributeValueColumn;
 import org.obiba.opal.web.model.client.magma.AttributeDto;
 
@@ -28,8 +31,6 @@ import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
-import com.google.common.base.Function;
-import com.google.common.collect.Ordering;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style;
@@ -45,10 +46,15 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
+
 /**
  *
  */
 public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttributesTableUiHandlers> {
+
+  private ActionsColumn<JsArray<AttributeDto>> actionsColumn;
 
   interface NamespacedAttributesTableViewUiBinder extends UiBinder<Widget, NamespacedAttributesTable> {}
 
@@ -117,16 +123,15 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
     getUiHandlers().onDeleteAttribute(checkColumn.getSelectedItems());
   }
 
+  @UiHandler("editLink")
+
+  public void onEdit(ClickEvent event) {
+    getUiHandlers().onEditAttributes(checkColumn.getSelectedItems());
+  }
+
   public void initColumns() {
     table.setPageSize(Table.DEFAULT_PAGESIZE);
     table.setEmptyTableWidget(new InlineLabel(translations.noAttributesLabel()));
-
-    // Add checkcolumn
-    checkColumn = new CheckboxColumn<JsArray<AttributeDto>>(new CheckAttributesDisplay());
-
-    table.addColumn(checkColumn, checkColumn.getTableListCheckColumnHeader());
-    table.setColumnWidth(checkColumn, 1, Style.Unit.PX);
-
     table.addColumn(Columns.NAME, translations.nameLabel());
     table.addColumn(new ListAttributeValueColumn(), translations.valueLabel());
 
@@ -161,6 +166,32 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
     provider.refresh();
   }
 
+  public void addEditableColumns() {
+    // Add checkcolumn
+    checkColumn = new CheckboxColumn<JsArray<AttributeDto>>(new CheckAttributesDisplay());
+    table.insertColumn(0, checkColumn, checkColumn.getTableListCheckColumnHeader());
+    table.setColumnWidth(checkColumn, 1, Style.Unit.PX);
+
+    actionsColumn = new ActionsColumn<JsArray<AttributeDto>>(new ActionsProvider<JsArray<AttributeDto>>() {
+
+      @Override
+      public String[] allActions() {
+        return new String[] { EDIT_ACTION, DELETE_ACTION };
+      }
+
+      @Override
+      public String[] getActions(JsArray<AttributeDto> value) {
+        return allActions();
+      }
+    });
+
+    table.addColumn(actionsColumn, translations.actionsLabel());
+  }
+
+  public HasActionHandler<JsArray<AttributeDto>> getActions() {
+    return actionsColumn;
+  }
+
   private static class Columns {
 
     static final TextColumn<JsArray<AttributeDto>> NAME = new TextColumn<JsArray<AttributeDto>>() {
@@ -174,16 +205,6 @@ public class NamespacedAttributesTable extends ViewWithUiHandlers<NamespacedAttr
     static {
       NAME.setSortable(true);
     }
-
-    static final Comparator<JsArray<AttributeDto>> NAME_COMPARATOR = Ordering.from(String.CASE_INSENSITIVE_ORDER)
-        .nullsFirst().onResultOf(new Function<JsArray<AttributeDto>, String>() {
-
-          @Override
-          public String apply(JsArray<AttributeDto> input) {
-            return input.get(0).getName();
-          }
-        });
-
   }
 
   private class CheckAttributesDisplay implements CheckboxColumn.Display<JsArray<AttributeDto>> {

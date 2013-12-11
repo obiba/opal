@@ -33,14 +33,16 @@
           </b:Controls>
         </b:ControlGroup>
 
-        <b:ControlGroup ui:field="valueGroup">
-          <b:ControlLabel for="value">
-            <ui:msg description="Value label">Values</ui:msg>
-          </b:ControlLabel>
-          <b:Controls>
-            <g:FlowPanel ui:field="valuesPanel"/>
-          </b:Controls>
-        </b:ControlGroup>
+        <g:FlowPanel ui:field="values">
+          <b:ControlGroup ui:field="valueGroup">
+            <b:ControlLabel for="value">
+              <ui:msg description="Value label">Values</ui:msg>
+            </b:ControlLabel>
+            <b:Controls>
+              <g:FlowPanel ui:field="valuesPanel"/>
+            </b:Controls>
+          </b:ControlGroup>
+        </g:FlowPanel>
       </b:Form>
 
     </g:FlowPanel>

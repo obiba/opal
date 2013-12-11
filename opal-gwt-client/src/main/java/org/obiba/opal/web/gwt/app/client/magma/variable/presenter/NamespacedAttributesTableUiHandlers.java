@@ -20,4 +20,6 @@ import com.gwtplatform.mvp.client.UiHandlers;
 public interface NamespacedAttributesTableUiHandlers extends UiHandlers {
 
   void onDeleteAttribute(List<JsArray<AttributeDto>> selectedItems);
+
+  void onEditAttributes(List<JsArray<AttributeDto>> selectedItems);
 }

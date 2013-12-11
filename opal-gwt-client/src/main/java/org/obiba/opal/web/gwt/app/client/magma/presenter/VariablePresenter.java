@@ -239,7 +239,11 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     }
 
     getView().renderCategoryRows(variable.getCategoriesArray());
-    getView().renderAttributeRows(variable);
+
+    // Attributes editable depending on authorization
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(UriBuilders.DATASOURCE_TABLE_VARIABLE.create()
+        .build(table.getDatasourceName(), table.getName(), variable.getName())).put()
+        .authorize(getView().getVariableAttributesAuthorizer(variable)).send();
   }
 
   private void updateMenuDisplay(@Nullable VariableDto previous, @Nullable VariableDto next) {
@@ -469,6 +473,13 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
         }) //
         .withCallback(Response.SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget())) //
         .put().send();
+  }
+
+  @Override
+  public void onEditAttributes(List<JsArray<AttributeDto>> selectedItems) {
+    VariableAttributeModalPresenter attributeEditorPresenter = attributeModalProvider.get();
+    attributeEditorPresenter.setDialogMode(selectedItems.size() == 1 ? Mode.UPDATE_SINGLE : Mode.UPDATE_MULTIPLE);
+    attributeEditorPresenter.initialize(table, variable, selectedItems);
   }
 
   private VariableDto getVariableDto() {
@@ -710,8 +721,6 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
 
   public interface Display extends View, HasUiHandlers<VariableUiHandlers> {
 
-    void renderAttributeRows(VariableDto variableDto);
-
     enum Slots {
       Permissions, Values, ScriptEditor, History
     }
@@ -749,5 +758,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     void setDeriveFromMenuVisibility(boolean visible);
 
     void resetTabs();
+
+    HasAuthorization getVariableAttributesAuthorizer(VariableDto variableDto);
+
   }
 }

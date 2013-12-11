@@ -22,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.magma.variable.view.NamespacedAttribute
 import org.obiba.opal.web.gwt.app.client.support.TabPanelHelper;
 import org.obiba.opal.web.gwt.app.client.ui.TabDeckPanel;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.TabPanelAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
@@ -52,6 +53,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 
 /**
  *
@@ -121,7 +125,7 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
   JsArrayDataProvider<CategoryDto> categoryProvider = new JsArrayDataProvider<CategoryDto>();
 
   @UiField
-  Panel attributesPanel;
+  FlowPanel attributesPanel;
 
   @UiField
   Panel summary;
@@ -345,31 +349,6 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     summary.add(widget.asWidget());
   }
 
-  //
-  // Methods
-  //
-
-  @Override
-  public void renderAttributeRows(VariableDto variableDto) {
-    attributesPanel.clear();
-
-    List<String> namespaces = new ArrayList<String>();
-    JsArray<AttributeDto> attributesArray = JsArrays.toSafeArray(variableDto.getAttributesArray());
-    for(int i = 0; i < attributesArray.length(); i++) {
-      String namespace = attributesArray.get(i).getNamespace();
-      if(!namespaces.contains(namespace)) {
-        namespaces.add(namespace);
-      }
-    }
-
-    Collections.sort(namespaces);
-    for(String namespace : namespaces) {
-      NamespacedAttributesTable child = new NamespacedAttributesTable(attributesArray, namespace);
-      child.setUiHandlers(getUiHandlers());
-      attributesPanel.add(child);
-    }
-  }
-
   @Override
   public void setVariable(VariableDto variable) {
     name.setText(variable.getName());
@@ -384,6 +363,15 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     updateComment(variable.getName());
     updateScriptNavPanel(scriptNavPanel.getVisibleWidget());
   }
+
+  @Override
+  public HasAuthorization getVariableAttributesAuthorizer(VariableDto variableDto) {
+    return new NamespacedAttributesTableAuthorization(variableDto);
+  }
+
+  //
+  // Methods
+  //
 
   private void updateComment(String variableName) {
     comment.setPlaceholder(translations.scriptUpdateDefaultPrefixLabel() + " " + variableName);
@@ -476,5 +464,65 @@ public class VariableView extends ViewWithUiHandlers<VariableUiHandlers> impleme
     VIEW,
     EDIT,
     HISTORY
+  }
+
+  private class NamespacedAttributesTableAuthorization implements HasAuthorization {
+    private VariableDto variableDto;
+
+    private List<NamespacedAttributesTable> attributesTables = new ArrayList<NamespacedAttributesTable>();
+
+    private NamespacedAttributesTableAuthorization(VariableDto variableDto) {
+
+      this.variableDto = variableDto;
+    }
+
+    @Override
+    public void beforeAuthorization() {
+      attributesPanel.clear();
+
+      List<String> namespaces = new ArrayList<String>();
+      JsArray<AttributeDto> attributesArray = JsArrays.toSafeArray(variableDto.getAttributesArray());
+      for(int i = 0; i < attributesArray.length(); i++) {
+        String namespace = attributesArray.get(i).getNamespace();
+        if(!namespaces.contains(namespace)) {
+          namespaces.add(namespace);
+        }
+      }
+
+      Collections.sort(namespaces);
+      for(String namespace : namespaces) {
+        NamespacedAttributesTable child = new NamespacedAttributesTable(attributesArray, namespace);
+        child.setUiHandlers(getUiHandlers());
+        attributesTables.add(child);
+      }
+    }
+
+    @Override
+    public void authorized() {
+      for(NamespacedAttributesTable attributesTable : attributesTables) {
+        attributesTable.addEditableColumns();
+        attributesTable.getActions().setActionHandler(new ActionHandler<JsArray<AttributeDto>>() {
+          @Override
+          public void doAction(JsArray<AttributeDto> object, String actionName) {
+            ArrayList<JsArray<AttributeDto>> selectedItems = new ArrayList<JsArray<AttributeDto>>();
+            selectedItems.add(object);
+
+            if(actionName.equalsIgnoreCase(DELETE_ACTION)) {
+              getUiHandlers().onDeleteAttribute(selectedItems);
+            } else if(actionName.equalsIgnoreCase(EDIT_ACTION)) {
+              getUiHandlers().onEditAttributes(selectedItems);
+            }
+          }
+        });
+        attributesPanel.add(attributesTable);
+      }
+    }
+
+    @Override
+    public void unauthorized() {
+      for(NamespacedAttributesTable attributesTable : attributesTables) {
+        attributesPanel.add(attributesTable);
+      }
+    }
   }
 }
