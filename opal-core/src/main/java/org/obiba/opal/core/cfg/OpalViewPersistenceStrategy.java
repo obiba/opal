@@ -176,13 +176,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
       // Serialize all view files in the repo
       List<String> varFilesToRemove = Lists.newArrayList();
       StringBuilder message = new StringBuilder();
-      for(View view : views) {
-        doWriteGitView(localRepo, view, varFilesToRemove);
-        if(message.length() > 0) {
-          message.append(", ");
-        }
-        message.append(view.getName());
-      }
+      serializeAllViewFiles(views, localRepo, varFilesToRemove, message);
 
       // Push changes
       Git git = new Git(new FileRepository(new File(localRepo, ".git")));
@@ -196,6 +190,18 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
       throw new RuntimeException("Failed writing views in git for datasource: " + datasourceName, e);
     } finally {
       deleteLocalRepo(localRepo);
+    }
+  }
+
+  private void serializeAllViewFiles(Iterable<View> views, File localRepo, List<String> varFilesToRemove,
+      StringBuilder message)
+      throws IOException {
+    for(View view : views) {
+      doWriteGitView(localRepo, view, varFilesToRemove);
+      if(message.length() > 0) {
+        message.append(", ");
+      }
+      message.append(view.getName());
     }
   }
 

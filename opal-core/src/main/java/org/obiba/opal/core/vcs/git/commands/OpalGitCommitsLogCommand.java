@@ -49,24 +49,7 @@ public class OpalGitCommitsLogCommand extends OpalGitCommand<List<CommitInfo>> {
         logCommand.addPath(path);
       }
 
-      List<CommitInfo> commits = new ArrayList<>();
-      // for performance, get the id before looping thru all commits preventing resolving the id each time
-      String headCommitId = getHeadCommitId();
-      // TODO find an efficient way of finding the current commit of a given path
-      // One possible solution is implementing: 'git log  --ancestry-path <COMMIT_HAEH>^..HEAD'
-      // For now, the list is in order of 'current .. oldest'
-      boolean isCurrent = true;
-
-      for(RevCommit commit : logCommand.call()) {
-        String commitId = commit.getName();
-        boolean isHeadCommit = headCommitId.equals(commitId);
-        PersonIdent personIdent = commit.getAuthorIdent();
-        commits.add(new CommitInfo.Builder().setAuthor(personIdent.getName()).setDate(personIdent.getWhen())
-            .setComment(commit.getFullMessage()).setCommitId(commitId).setIsHead(isHeadCommit).setIsCurrent(isCurrent)
-            .build());
-
-        isCurrent = false;
-      }
+      List<CommitInfo> commits = getCommitInfos(logCommand);
 
       if(commits.isEmpty()) {
         throw new OpalGitException(getNoCommitsErrorMessage());
@@ -76,6 +59,28 @@ public class OpalGitCommitsLogCommand extends OpalGitCommand<List<CommitInfo>> {
     } catch(GitAPIException | IOException e) {
       throw new OpalGitException(e.getMessage(), e);
     }
+  }
+
+  private List<CommitInfo> getCommitInfos(LogCommand logCommand) throws IOException, GitAPIException {
+    List<CommitInfo> commits = new ArrayList<>();
+    // for performance, get the id before looping thru all commits preventing resolving the id each time
+    String headCommitId = getHeadCommitId();
+    // TODO find an efficient way of finding the current commit of a given path
+    // One possible solution is implementing: 'git log  --ancestry-path <COMMIT_HAEH>^..HEAD'
+    // For now, the list is in order of 'current .. oldest'
+    boolean isCurrent = true;
+
+    for(RevCommit commit : logCommand.call()) {
+      String commitId = commit.getName();
+      boolean isHeadCommit = headCommitId.equals(commitId);
+      PersonIdent personIdent = commit.getAuthorIdent();
+      commits.add(new CommitInfo.Builder().setAuthor(personIdent.getName()).setDate(personIdent.getWhen())
+          .setComment(commit.getFullMessage()).setCommitId(commitId).setIsHead(isHeadCommit).setIsCurrent(isCurrent)
+          .build());
+
+      isCurrent = false;
+    }
+    return commits;
   }
 
   private String getNoCommitsErrorMessage() {
