@@ -14,15 +14,15 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
 import org.springframework.stereotype.Component;
 
 @Component
 @Provider
-public class NoSuchFunctionalUnitExceptionMapper implements ExceptionMapper<NoSuchFunctionalUnitException> {
+public class NoSuchFunctionalUnitExceptionMapper implements ExceptionMapper<NoSuchIdentifiersMappingException> {
 
   @Override
-  public Response toResponse(NoSuchFunctionalUnitException exception) {
+  public Response toResponse(NoSuchIdentifiersMappingException exception) {
     return Response.status(Status.NOT_FOUND).build();
   }
 

@@ -234,12 +234,12 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
   @SuppressWarnings("TypeMayBeWeakened")
   public boolean hasEntities(@NotNull Database database) {
     if(!hasDatasource(database)) return false;
-    EntitiesPredicate.NonViewEntitiesPredicate predicate = new EntitiesPredicate.NonViewEntitiesPredicate();
 
     if(database.isUsedForIdentifiers()) {
-      return identifiersTableService.hasEntities(predicate);
+      return identifiersTableService.hasEntities();
     }
 
+    EntitiesPredicate.NonViewEntitiesPredicate predicate = new EntitiesPredicate.NonViewEntitiesPredicate();
     for(String datasourceName : registrations.get(database.getName())) {
       Datasource datasource = MagmaEngine.get().getDatasource(datasourceName);
       if(datasource.hasEntities(predicate)) return true;

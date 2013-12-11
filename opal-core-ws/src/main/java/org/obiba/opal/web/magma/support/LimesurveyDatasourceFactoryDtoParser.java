@@ -12,6 +12,7 @@ package org.obiba.opal.web.magma.support;
 import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.LimesurveyDatasourceFactoryDto;
@@ -30,7 +31,7 @@ public class LimesurveyDatasourceFactoryDtoParser extends AbstractDatasourceFact
 
   @NotNull
   @Override
-  protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
+  protected DatasourceFactory internalParse(DatasourceFactoryDto dto, DatasourceEncryptionStrategy encryptionStrategy) {
     LimesurveyDatasourceFactoryDto limesurveyDto = dto.getExtension(LimesurveyDatasourceFactoryDto.params);
     return new DatabaseLimesurveyDatasourceFactory(dto.getName(), //
         limesurveyDto.getDatabase(), //

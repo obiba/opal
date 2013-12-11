@@ -60,7 +60,7 @@ import org.obiba.opal.core.crypt.CachingCallbackHandler;
 import org.obiba.opal.core.crypt.KeyPairNotFoundException;
 import org.obiba.opal.core.crypt.KeyProviderException;
 import org.obiba.opal.core.crypt.KeyProviderSecurityException;
-import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
 import org.springframework.util.Assert;
 
 import com.google.common.base.Predicate;
@@ -367,7 +367,7 @@ public class OpalKeyStore implements KeyProvider {
   }
 
   public void importKey(String alias, InputStream privateKey, InputStream certificate)
-      throws NoSuchFunctionalUnitException {
+      throws NoSuchIdentifiersMappingException {
     storeKeyEntry(alias, getPrivateKey(privateKey), getCertificate(certificate));
   }
 
@@ -393,7 +393,7 @@ public class OpalKeyStore implements KeyProvider {
   }
 
   public void importKey(String alias, InputStream privateKey, String certificateInfo)
-      throws NoSuchFunctionalUnitException {
+      throws NoSuchIdentifiersMappingException {
     makeAndStoreKeyEntry(alias, getKeyPair(privateKey), certificateInfo);
   }
 

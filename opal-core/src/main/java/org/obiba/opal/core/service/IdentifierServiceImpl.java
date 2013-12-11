@@ -27,9 +27,8 @@ import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.identifiers.IdentifiersMapping;
-import org.obiba.opal.core.magma.FunctionalUnitView;
+import org.obiba.opal.core.magma.IdentifiersMappingView;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
-import org.obiba.opal.core.unit.FunctionalUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,15 +46,16 @@ public class IdentifierServiceImpl implements IdentifierService {
 
   @Override
   public Variable createIdentifierVariable(@Nullable ValueTable privateView, @NotNull IdentifiersMapping idsMapping) {
-    Variable keyVariable = Variable.Builder
+    Variable idVariable = Variable.Builder
         .newVariable(idsMapping.getName(), TextType.get(), idsMapping.getEntityType()).build();
 
-    ValueTableWriter identifiersTableWriter = identifiersTableService.createValueTableWriter();
+    ValueTableWriter identifiersTableWriter = identifiersTableService.createIdentifiersTableWriter(
+        idsMapping.getEntityType());
     try {
       ValueTableWriter.VariableWriter variableWriter = identifiersTableWriter.writeVariables();
       try {
         // Create private variables
-        variableWriter.writeVariable(keyVariable);
+        variableWriter.writeVariable(idVariable);
         if(privateView != null) {
           DatasourceCopier.Builder.newCopier().dontCopyValues().build().copyMetadata(privateView, variableWriter);
         }
@@ -65,17 +65,17 @@ public class IdentifierServiceImpl implements IdentifierService {
     } finally {
       Closeables.closeQuietly(identifiersTableWriter);
     }
-    return keyVariable;
+    return idVariable;
   }
 
   @Override
-  public View createPrivateView(String viewName, ValueTable identifiersTable, @Nullable String select) {
+  public View createPrivateView(String viewName, ValueTable dataTable, @Nullable String select) {
     if(select != null) {
-      View privateView = View.Builder.newView(viewName, identifiersTable).select(new JavascriptClause(select)).build();
+      View privateView = View.Builder.newView(viewName, dataTable).select(new JavascriptClause(select)).build();
       privateView.initialise();
       return privateView;
     }
-    return View.Builder.newView(viewName, identifiersTable).select(new SelectClause() {
+    return View.Builder.newView(viewName, dataTable).select(new SelectClause() {
       @Override
       public boolean select(Variable variable) {
         return isIdentifierVariable(variable);
@@ -83,53 +83,19 @@ public class IdentifierServiceImpl implements IdentifierService {
     }).build();
   }
 
-  /**
-   * Creates a {@link org.obiba.magma.views.View} of the participant table's "private" variables (i.e., identifiers).
-   *
-   * @param viewName
-   * @param participantTable
-   * @return
-   */
   @Override
-  public View createPrivateView(String viewName, ValueTable participantTable, FunctionalUnit unit,
-      @Nullable String select) {
-    if(select != null) {
-      View privateView = View.Builder.newView(viewName, participantTable).select(new JavascriptClause(select)).build();
-      privateView.initialise();
-      return privateView;
-    }
-    if(unit.getSelect() != null) {
-      View privateView = View.Builder.newView(viewName, participantTable).select(unit.getSelect()).build();
-      privateView.initialise();
-      return privateView;
-    }
-    return View.Builder.newView(viewName, participantTable).select(new SelectClause() {
-      @Override
-      public boolean select(Variable variable) {
-        return isIdentifierVariable(variable);
-      }
-    }).build();
-  }
-
-  /**
-   * Wraps the participant table in a {@link org.obiba.magma.views.View} that exposes public entities and non-identifier variables.
-   *
-   * @param participantTable
-   * @param unit
-   * @param allowIdentifierGeneration
-   * @return
-   */
-  @Override
-  public FunctionalUnitView createPublicView(FunctionalUnitView participantTable, boolean allowIdentifierGeneration,
+  public IdentifiersMappingView createPublicView(IdentifiersMappingView dataTable, boolean allowIdentifierGeneration,
       boolean ignoreUnknownIdentifier) {
 
-    final FunctionalUnit unit = participantTable.getUnit();
+    String idMapping = dataTable.getIdentifiersMapping();
+    ValueTable table = dataTable.getWrappedValueTable();
 
-    FunctionalUnitView publicTable = new FunctionalUnitView(unit,
-        FunctionalUnitView.Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, participantTable.getWrappedValueTable(),
-        identifiersTableService.getValueTable(), allowIdentifierGeneration ? participantIdentifier : null,
-        ignoreUnknownIdentifier);
-    publicTable.setSelectClause(new SelectClause() {
+    IdentifiersMappingView publicTable = new IdentifiersMappingView(idMapping,
+        IdentifiersMappingView.Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, table,
+        identifiersTableService.getIdentifiersTable(table.getEntityType()),
+        allowIdentifierGeneration ? participantIdentifier : null, ignoreUnknownIdentifier);
+    final String select = identifiersTableService.getSelectScript(table.getEntityType(), idMapping);
+    publicTable.setSelectClause(new JavascriptClause(select) {
 
       @Override
       public boolean select(Variable variable) {
@@ -137,44 +103,12 @@ public class IdentifierServiceImpl implements IdentifierService {
       }
 
       private boolean isIdentifierVariableForUnit(Variable variable) {
-        return unit.getSelect() != null && unit.getSelect().select(variable);
+        return select != null && super.select(variable);
       }
 
     });
     publicTable.initialise();
     return publicTable;
-  }
-
-  /**
-   * Write the key variable.
-   *
-   * @param privateView
-   * @param keyVariableName
-   * @return
-   * @throws java.io.IOException
-   */
-  @Override
-  public Variable createKeyVariable(@Nullable ValueTable privateView, @NotNull String keyVariableName) {
-
-    Variable keyVariable = Variable.Builder
-        .newVariable(keyVariableName, TextType.get(), identifiersTableService.getEntityType()).build();
-
-    ValueTableWriter identifiersTableWriter = identifiersTableService.createValueTableWriter();
-    try {
-      ValueTableWriter.VariableWriter variableWriter = identifiersTableWriter.writeVariables();
-      try {
-        // Create private variables
-        variableWriter.writeVariable(keyVariable);
-        if(privateView != null) {
-          DatasourceCopier.Builder.newCopier().dontCopyValues().build().copyMetadata(privateView, variableWriter);
-        }
-      } finally {
-        Closeables.closeQuietly(variableWriter);
-      }
-    } finally {
-      Closeables.closeQuietly(identifiersTableWriter);
-    }
-    return keyVariable;
   }
 
   private boolean isIdentifierVariable(@NotNull AttributeAware variable) {
@@ -193,7 +127,7 @@ public class IdentifierServiceImpl implements IdentifierService {
       // Copy all other private variable values
       DatasourceCopier datasourceCopier = DatasourceCopier.Builder.newCopier().dontCopyMetadata().build();
       datasourceCopier.copyValues(privateView, privateView.getValueSet(privateEntity),
-          identifiersTableService.getValueTable().getName(), valueSetWriter);
+          identifiersTableService.getIdentifiersTable(privateView.getEntityType()).getName(), valueSetWriter);
     } finally {
       Closeables.closeQuietly(valueSetWriter);
     }

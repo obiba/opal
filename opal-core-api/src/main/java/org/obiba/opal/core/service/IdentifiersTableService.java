@@ -27,46 +27,74 @@ import com.google.common.base.Predicate;
  */
 public interface IdentifiersTableService {
 
+  /**
+   * Get the identifiers datasource.
+   * @return
+   */
   @NotNull
   Datasource getDatasource();
 
-  boolean hasValueTable(@NotNull String entityType);
+  /**
+   * Check if any identifiers table exists for the given entity type.
+   * @param entityType
+   * @return
+   */
+  boolean hasIdentifiersTable(@NotNull String entityType);
 
+  /**
+   * Get the identifiers table for the given entity type.
+   * @param entityType
+   * @return
+   * @throws NoSuchValueTableException
+   */
   @NotNull
-  ValueTable getValueTable(@NotNull String entityType) throws NoSuchValueTableException;
+  ValueTable getIdentifiersTable(@NotNull String entityType) throws NoSuchValueTableException;
 
   /**
    * Create value table for entity type if not found.
    * @param entityType
    */
   @NotNull
-  ValueTable ensureValueTable(@NotNull String entityType);
+  ValueTable ensureIdentifiersTable(@NotNull String entityType);
 
+  /**
+   * Create value table for entity type and the variable with identifiers mapping name if not found.
+   * @param idMapping
+   * @return
+   */
   @NotNull
-  Variable ensureVariable(@NotNull IdentifiersMapping idMapping);
-
-  ValueTableWriter createValueTableWriter(@NotNull String entityType);
+  Variable ensureIdentifiersMapping(@NotNull IdentifiersMapping idMapping);
 
   /**
-   * Get the identifiers value table.
-   *
+   * Get a writer on the identifiers table.
+   * @param entityType
    * @return
    */
-  ValueTable getValueTable() throws IdentifiersDatabaseNotFoundException;
+  ValueTableWriter createIdentifiersTableWriter(@NotNull String entityType);
 
   /**
-   * Create a writer on the identifiers value table.
-   *
+   * Check if there is at least one identifiers table that has a variable with the given name.
+   * @param idMapping
    * @return
    */
-  ValueTableWriter createValueTableWriter() throws IdentifiersDatabaseNotFoundException;
+  boolean hasIdentifiersMapping(@NotNull String idMapping);
 
   /**
-   * Check if identifiers value table exists.
-   *
+   * Check if there is an identifiers table for the entity type that has a variable with the given name.
+   * @param entityType
+   * @param idMapping
    * @return
    */
-  boolean hasValueTable() throws IdentifiersDatabaseNotFoundException;
+  boolean hasIdentifiersMapping(@NotNull String entityType, @NotNull String idMapping);
+
+  /**
+   * Get the javascript select script from the variable matching entity type and identifiers mapping.
+   * @param entityType
+   * @param idMapping
+   * @return
+   */
+  @Nullable
+  String getSelectScript(@NotNull String entityType, @NotNull String idMapping);
 
   /**
    * Get the table reference as specified by property <code>org.obiba.opal.keys.tableReference</code>.
@@ -74,31 +102,19 @@ public interface IdentifiersTableService {
    * @return
    */
   @NotNull
-  String getTableReference();
+  String getTableReference(@NotNull String entityType);
 
   /**
-   * Get the entity type as specified by property <code>org.obiba.opal.keys.entityType</code>.
-   *
-   * @return
-   */
-  @NotNull
-  String getEntityType();
-
-  /**
-   * Extract the datasource name from the table reference.
+   * Get the identifiers datasource name.
    *
    * @return
    */
   String getDatasourceName();
 
   /**
-   * Extract the table name from the table reference.
-   *
+   * Check if there are any identifiers tables with entities.
    * @return
    */
-  String getTableName();
+  boolean hasEntities();
 
-  void unregisterDatabase();
-
-  boolean hasEntities(Predicate<ValueTable> predicate);
 }

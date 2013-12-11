@@ -26,7 +26,6 @@ import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.opal.core.crypt.KeyProviderException;
 import org.obiba.opal.core.service.DataImportService;
-import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.NonExistentVariableEntitiesException;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
 import org.slf4j.Logger;
@@ -94,7 +93,8 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       return importFromTables(filesToImport.isEmpty() ? null : filesToImport.get(0));
     }
     if(!filesToImport.isEmpty()) {
-      return importFiles(filesToImport);
+      getShell().printf("Import from files not supported any more.\n");
+      return CRITICAL_ERROR;
     }
     return SUCCESS;
   }
@@ -130,65 +130,6 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     }
 
     return sb.toString();
-  }
-
-  private int importFiles(Collection<FileObject> filesToImport) {
-    int errorCode = SUCCESS;
-
-    getShell().printf("Importing %d file%s :\n", filesToImport.size(), filesToImport.size() > 1 ? "s" : "");
-    for(FileObject file : filesToImport) {
-      if(Thread.interrupted()) {
-        errorCode = CRITICAL_ERROR;
-        break;
-      }
-
-      // If lastErrorCode == 0 (success), do NOT update errorCode since it might have
-      // been equal to 2 (non-critical error). We want to remember that there was an earlier error.
-      int lastErrorCode = importFile(file);
-      if(lastErrorCode == CRITICAL_ERROR) {
-        errorCode = lastErrorCode;
-        break;
-      } else if(lastErrorCode == NON_CRITICAL_ERROR) {
-        errorCode = lastErrorCode;
-      }
-    }
-
-    return errorCode;
-  }
-
-  /**
-   * Imports the specified file. Called by <code>importFiles</code>.
-   *
-   * @param file file to import
-   * @return error code (<code>0</code> on success, <code>1</code> on critical errors, <code>2</code> on errors handled
-   * by continuing with the next file)
-   */
-  @SuppressWarnings("PMD.NcssMethodCount")
-  private int importFile(FileObject file) {
-    int errorCode = CRITICAL_ERROR;
-    getShell().printf("  Importing file: %s ...\n", file.getName().getPath());
-    try {
-      dataImportService.importData(getUnitName(), file, options.getDestination(), options.isForce(), options.isIgnore());
-      archive(file);
-      errorCode = SUCCESS;
-    } catch(NoSuchFunctionalUnitException ex) {
-      getShell().printf("Functional unit '%s' does not exist. Cannot import.\n", ex.getUnitName());
-    } catch(NoSuchDatasourceException ex) {
-      getShell().printf("Destination datasource '%s' does not exist. Cannot import.\n", ex.getDatasourceName());
-    } catch(KeyProviderException ex) {
-      getShell().printf("Decryption exception: %s\n", ex.getMessage());
-    } catch(IOException ex) {
-      // Report an error and continue with the next file.
-      getShell().printf("Unrecoverable import exception: %s\n", ex.getMessage());
-      errorCode = NON_CRITICAL_ERROR;
-    } catch(InterruptedException ex) {
-      // Report the interrupted and continue; the test for interruption will detect this condition.
-      getShell().printf("Thread interrupted");
-    } catch(RuntimeException ex) {
-      runtimeExceptionHandler(ex);
-    }
-
-    return errorCode;
   }
 
   @SuppressWarnings("PMD.NcssMethodCount")

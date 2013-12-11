@@ -16,33 +16,31 @@ import org.obiba.magma.AbstractDatasourceFactory;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.Initialisable;
-import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
-import org.obiba.opal.core.unit.FunctionalUnit;
+import org.obiba.opal.core.service.IdentifiersTableService;
 
-public class FunctionalUnitDatasourceFactory extends AbstractDatasourceFactory implements Initialisable {
+public class IdentifiersMappingDatasourceFactory extends AbstractDatasourceFactory implements Initialisable {
 
   @NotNull
   private final DatasourceFactory wrappedFactory;
 
   @NotNull
-  private final FunctionalUnit unit;
+  private final String idMapping;
 
   @NotNull
-  private final ValueTable keysTable;
+  private final IdentifiersTableService identifiersTableService;
 
-  @Nullable
   private final IParticipantIdentifier identifierGenerator;
 
   private final boolean ignoreUnknownIdentifier;
 
-  public FunctionalUnitDatasourceFactory(@NotNull DatasourceFactory wrappedFactory, @NotNull FunctionalUnit unit,
-      @NotNull ValueTable keysTable, @Nullable IParticipantIdentifier identifierGenerator,
+  public IdentifiersMappingDatasourceFactory(@NotNull DatasourceFactory wrappedFactory, @NotNull String idMapping,
+      @NotNull IdentifiersTableService identifiersTableService, @Nullable IParticipantIdentifier identifierGenerator,
       boolean ignoreUnknownIdentifier) {
     this.wrappedFactory = wrappedFactory;
-    this.unit = unit;
-    this.keysTable = keysTable;
+    this.idMapping = idMapping;
+    this.identifiersTableService = identifiersTableService;
     this.identifierGenerator = identifierGenerator;
     this.ignoreUnknownIdentifier = ignoreUnknownIdentifier;
   }
@@ -60,8 +58,8 @@ public class FunctionalUnitDatasourceFactory extends AbstractDatasourceFactory i
   @NotNull
   @Override
   protected Datasource internalCreate() {
-    return new FunctionalUnitDatasource(wrappedFactory.create(), unit,
-        FunctionalUnitView.Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, keysTable, identifierGenerator,
+    return new IdentifiersMappingDatasource(wrappedFactory.create(), idMapping,
+        IdentifiersMappingView.Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, identifiersTableService, identifierGenerator,
         ignoreUnknownIdentifier);
   }
 

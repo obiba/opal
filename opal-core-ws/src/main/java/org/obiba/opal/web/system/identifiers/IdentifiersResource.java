@@ -1,19 +1,14 @@
 package org.obiba.opal.web.system.identifiers;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -21,8 +16,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.MagmaEngine;
@@ -36,7 +29,6 @@ import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersImportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
-import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.DatasourceTablesResource;
 import org.obiba.opal.web.magma.DroppableTableResource;
@@ -45,7 +37,6 @@ import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.IdentifiersMappingDto;
-import org.obiba.opal.web.support.InvalidRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
@@ -54,7 +45,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -62,8 +52,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
-
-import au.com.bytecode.opencsv.CSVReader;
 
 @Component
 @Transactional
@@ -215,12 +203,12 @@ public class IdentifiersResource extends AbstractIdentifiersResource {
 
       @Override
       public boolean apply(ValueTable input) {
-        return input.getEntityType().equals(identifiersTableService.getEntityType());
+        return identifiersTableService.hasIdentifiersTable(input.getEntityType());
       }
     });
 
-    Set<VariableEntity> entities = identifiersTableService.getValueTable().getVariableEntities();
     for(ValueTable vt : tables) {
+      Set<VariableEntity> entities = identifiersTableService.getIdentifiersTable(vt.getEntityType()).getVariableEntities();
       builder.add(getTableIdentifiersSync(entities, ds, vt));
     }
 
@@ -271,7 +259,7 @@ public class IdentifiersResource extends AbstractIdentifiersResource {
   }
 
   private void importIdentifiersFromTable(ValueTable sourceTable) throws IOException {
-    if(sourceTable.getEntityType().equals(identifiersTableService.getEntityType())) {
+    if(identifiersTableService.hasIdentifiersTable(sourceTable.getEntityType())) {
       identifiersImportService.importIdentifiers(sourceTable);
     }
   }

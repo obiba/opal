@@ -15,7 +15,7 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
-import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
 
 /**
  *
@@ -33,5 +33,5 @@ public interface FunctionalUnitService {
 
   void addOrReplaceFunctionalUnit(FunctionalUnit functionalUnit);
 
-  FileObject getUnitDirectory(String unitName) throws NoSuchFunctionalUnitException, FileSystemException;
+  FileObject getUnitDirectory(String unitName) throws NoSuchIdentifiersMappingException, FileSystemException;
 }

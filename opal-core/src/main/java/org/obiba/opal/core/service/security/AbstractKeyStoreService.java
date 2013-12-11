@@ -30,7 +30,7 @@ import org.obiba.opal.core.crypt.CachingCallbackHandler;
 import org.obiba.opal.core.crypt.KeyProviderSecurityException;
 import org.obiba.opal.core.domain.security.KeyStoreState;
 import org.obiba.opal.core.security.OpalKeyStore;
-import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
 import org.obiba.opal.core.service.OrientDbService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -140,7 +140,7 @@ public abstract class AbstractKeyStoreService {
   }
 
   void importKey(@NotNull String name, @NotNull String alias, @NotNull InputStream privateKey,
-      @NotNull InputStream certificate) throws NoSuchFunctionalUnitException {
+      @NotNull InputStream certificate) throws NoSuchIdentifiersMappingException {
     hasText(name, "name must not be null or empty");
     hasText(alias, "alias must not be null or empty");
     notNull(privateKey, "privateKey must not be null");
@@ -166,7 +166,7 @@ public abstract class AbstractKeyStoreService {
   }
 
   void importKey(@NotNull String name, @NotNull String alias, @NotNull InputStream privateKey,
-      @NotNull String certificateInfo) throws NoSuchFunctionalUnitException {
+      @NotNull String certificateInfo) throws NoSuchIdentifiersMappingException {
     hasText(name, "name must not be null or empty");
     hasText(alias, "alias must not be null or empty");
     notNull(privateKey, "privateKey must not be null");

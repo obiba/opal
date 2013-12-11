@@ -19,7 +19,7 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.test.AbstractMagmaTest;
-import org.obiba.opal.core.service.ExportService;
+import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.shell.OpalShell;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 
@@ -36,11 +36,11 @@ public class CopyCommandTest extends AbstractMagmaTest {
 
     OpalShell mockShell = EasyMock.createMock(OpalShell.class);
     CopyCommandOptions mockOptions = EasyMock.createMock(CopyCommandOptions.class);
-    ExportService mockService = EasyMock.createMock(ExportService.class);
+    DataExportService mockService = EasyMock.createMock(DataExportService.class);
 
     command.setShell(mockShell);
     command.setOptions(mockOptions);
-    command.setExportService(mockService);
+    command.setDataExportService(mockService);
 
     mockShell.printf((String) EasyMock.anyObject(), (String) EasyMock.anyObject());
     EasyMock.expectLastCall().anyTimes();

@@ -40,7 +40,11 @@ import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.domain.OpalGeneralConfig;
+import org.obiba.opal.core.domain.Project;
+import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
+import org.obiba.opal.core.service.ProjectService;
+import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
 import org.obiba.opal.search.IndexManagerConfiguration;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.web.magma.support.DatasourceFactoryDtoParser;
@@ -58,6 +62,7 @@ import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.obiba.opal.web.model.Opal.LocaleDto;
 import org.obiba.opal.web.model.Ws.ClientErrorDto;
+import org.obiba.opal.web.system.project.ProjectTransientDatasourcesResource;
 import org.springframework.context.ApplicationContext;
 
 import com.google.common.collect.ImmutableList;
@@ -185,8 +190,18 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
   @Test
   public void testTransientDatasourcesPOST() {
-    TransientDatasourcesResource resource = new TransientDatasourcesResource();
+    Project projectMock = createMock(Project.class);
+    ProjectService projectServiceMock = createMock(ProjectService.class);
+    ProjectsKeyStoreService projectKeyStoreServiceMock = createMock(ProjectsKeyStoreService.class);
+    ProjectTransientDatasourcesResource resource = new ProjectTransientDatasourcesResource();
+    resource.setName("patate");
+    resource.setProjectService(projectServiceMock);
+    resource.setProjectsKeyStoreService(projectKeyStoreServiceMock);
     resource.setDatasourceFactoryRegistry(newDatasourceFactoryRegistry());
+
+    expect(projectMock.getName()).andReturn("patate").atLeastOnce();
+    expect(projectServiceMock.getProject("patate")).andReturn(projectMock).atLeastOnce();
+    expect(projectKeyStoreServiceMock.getKeyStore(projectMock)).andReturn(null).atLeastOnce();
 
     UriInfo uriInfoMock = createMock(UriInfo.class);
 
@@ -195,7 +210,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
             Magma.ExcelDatasourceFactoryDto.newBuilder().setFile(getDatasourcePath(DATASOURCE1)).setReadOnly(true)
                 .build()).build();
 
-    replay(uriInfoMock);
+    replay(uriInfoMock, projectMock, projectServiceMock, projectKeyStoreServiceMock);
     Response response = resource.createDatasource(uriInfoMock, factoryDto);
     assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 

@@ -168,7 +168,7 @@ public class ProjectsServiceImpl implements ProjectService {
   @NotNull
   @Override
   public FileObject getProjectDirectory(@NotNull Project project)
-      throws NoSuchFunctionalUnitException, FileSystemException {
+      throws NoSuchIdentifiersMappingException, FileSystemException {
     FileObject projectDir = opalRuntime.getFileSystem().getRoot().resolveFile(PROJECTS_DIR)
         .resolveFile(project.getName());
     projectDir.createFolder();

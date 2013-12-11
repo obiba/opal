@@ -12,6 +12,7 @@ package org.obiba.opal.web.magma.support;
 import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.excel.support.ExcelDatasourceFactory;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.ExcelDatasourceFactoryDto;
@@ -25,7 +26,7 @@ public class ExcelDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDt
 
   @NotNull
   @Override
-  protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
+  protected DatasourceFactory internalParse(DatasourceFactoryDto dto, DatasourceEncryptionStrategy encryptionStrategy) {
     ExcelDatasourceFactory factory = new ExcelDatasourceFactory();
     ExcelDatasourceFactoryDto excelDto = dto.getExtension(ExcelDatasourceFactoryDto.params);
     factory.setFile(resolveLocalFile(excelDto.getFile()));

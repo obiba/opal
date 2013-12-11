@@ -37,11 +37,11 @@ public interface ProjectService extends SystemService {
    *
    * @param name
    * @return
-   * @throws NoSuchFunctionalUnitException
+   * @throws NoSuchIdentifiersMappingException
    * @throws FileSystemException
    */
   @NotNull
-  FileObject getProjectDirectory(@NotNull Project project) throws NoSuchFunctionalUnitException, FileSystemException;
+  FileObject getProjectDirectory(@NotNull Project project) throws NoSuchIdentifiersMappingException, FileSystemException;
 
   @NotNull
   String getProjectDirectoryPath(@NotNull Project project);

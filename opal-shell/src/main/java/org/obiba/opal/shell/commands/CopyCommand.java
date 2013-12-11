@@ -37,7 +37,7 @@ import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.support.MagmaEngineTableResolver;
-import org.obiba.opal.core.service.ExportService;
+import org.obiba.opal.core.service.DataExportService;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,13 +60,13 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   private static final Logger log = LoggerFactory.getLogger(CopyCommand.class);
 
   @Autowired
-  private ExportService exportService;
+  private DataExportService dataExportService;
 
   @NotNull
   private final FileDatasourceFactory fileDatasourceFactory;
 
-  public void setExportService(ExportService exportService) {
-    this.exportService = exportService;
+  public void setDataExportService(DataExportService dataExportService) {
+    this.dataExportService = dataExportService;
   }
 
   public CopyCommand() {
@@ -95,7 +95,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
           }
         }
         getShell().printf("Copying %d tables to %s.\n", tables.size(), destinationDatasource.getName());
-        exportService
+        dataExportService
             .exportTablesToDatasource(options.isUnit() ? options.getUnit() : null, tables, destinationDatasource,
                 buildDatasourceCopier(destinationDatasource), !options.getNonIncremental());
         getShell().printf("Successfully copied all tables.\n");
@@ -141,7 +141,7 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
     DatasourceCopier.Builder builder;
     builder = options.getNoValues()
         ? DatasourceCopier.Builder.newCopier().dontCopyValues()
-        : exportService.newCopier(destinationDatasource);
+        : dataExportService.newCopier(destinationDatasource);
 
     if(options.getNoVariables()) {
       builder.dontCopyMetadata();

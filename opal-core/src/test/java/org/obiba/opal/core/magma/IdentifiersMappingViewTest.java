@@ -25,7 +25,7 @@ import org.obiba.magma.support.StaticValueTable;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.type.IntegerType;
 import org.obiba.magma.type.TextType;
-import org.obiba.opal.core.magma.FunctionalUnitView.Policy;
+import org.obiba.opal.core.magma.IdentifiersMappingView.Policy;
 import org.obiba.opal.core.unit.FunctionalUnit;
 
 import com.google.common.collect.ImmutableSet;
@@ -36,7 +36,7 @@ import static org.junit.Assert.assertThat;
 /**
  *
  */
-public class FunctionalUnitViewTest {
+public class IdentifiersMappingViewTest {
 
   private StaticValueTable opalDataTable;
 
@@ -96,7 +96,7 @@ public class FunctionalUnitViewTest {
 
   @Test
   public void test_getVariableEntities_returnsPrivateIdentifiers() {
-    FunctionalUnitView fuv = createViewOnOpalDataTable();
+    IdentifiersMappingView fuv = createViewOnOpalDataTable();
     Set<VariableEntity> entities = fuv.getVariableEntities();
     for(VariableEntity entity : entities) {
       assertThat(entity.getIdentifier().contains("private"), is(true));
@@ -105,7 +105,7 @@ public class FunctionalUnitViewTest {
 
   @Test
   public void test_getVariableEntities_returnsPublicIdentifiers() {
-    FunctionalUnitView fuv = createViewOnUnitDataTable();
+    IdentifiersMappingView fuv = createViewOnUnitDataTable();
     Set<VariableEntity> entities = fuv.getVariableEntities();
     for(VariableEntity entity : entities) {
       assertThat(entity.getIdentifier().contains("private"), is(false));
@@ -114,7 +114,7 @@ public class FunctionalUnitViewTest {
 
   @Test
   public void test_hasValueSet_returnsTrueForPrivateIdentifier() {
-    FunctionalUnitView fuv = createViewOnOpalDataTable();
+    IdentifiersMappingView fuv = createViewOnOpalDataTable();
     assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-1")), is(true));
     assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-2")), is(true));
     assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-3")), is(true));
@@ -124,7 +124,7 @@ public class FunctionalUnitViewTest {
   @Test
   public void test_hasValueSet_returnsFalseForPrivateIdentifier() {
     // Make unit identifiers private
-    FunctionalUnitView fuv = createViewOnUnitDataTable();
+    IdentifiersMappingView fuv = createViewOnUnitDataTable();
     assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-1")), is(false));
     assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-2")), is(false));
     assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "private-3")), is(false));
@@ -133,7 +133,7 @@ public class FunctionalUnitViewTest {
 
   @Test
   public void test_hasValueSet_returnsFalseForPublicIdentifier() {
-    FunctionalUnitView fuv = createViewOnOpalDataTable();
+    IdentifiersMappingView fuv = createViewOnOpalDataTable();
     assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "1")), is(false));
     assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "2")), is(false));
     assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "3")), is(false));
@@ -143,7 +143,7 @@ public class FunctionalUnitViewTest {
   @Test
   public void test_hasValueSet_returnsTrueForPublicIdentifier() {
     // Make unit identifiers private
-    FunctionalUnitView fuv = createViewOnUnitDataTable();
+    IdentifiersMappingView fuv = createViewOnUnitDataTable();
     assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "1")), is(true));
     assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "2")), is(true));
     assertThat(fuv.hasValueSet(new VariableEntityBean("Participant", "3")), is(true));
@@ -152,7 +152,7 @@ public class FunctionalUnitViewTest {
 
   @Test
   public void test_getValueSet_returnsValueSetForPrivateIdentifier() {
-    FunctionalUnitView fuv = createViewOnOpalDataTable();
+    IdentifiersMappingView fuv = createViewOnOpalDataTable();
     for(int i = 1; i < 5; i++) {
       ValueSet vs = fuv.getValueSet(new VariableEntityBean("Participant", "private-" + i));
       assertThat(vs.getValueTable(), is((ValueTable) fuv));
@@ -163,7 +163,7 @@ public class FunctionalUnitViewTest {
   @Test
   public void test_getValueSet_returnsValueSetForPublicIdentifier() {
     // Make unit identifiers private
-    FunctionalUnitView fuv = createViewOnUnitDataTable();
+    IdentifiersMappingView fuv = createViewOnUnitDataTable();
     for(int i = 1; i < 5; i++) {
       ValueSet vs = fuv.getValueSet(new VariableEntityBean("Participant", "" + i));
       assertThat(vs.getValueTable(), is((ValueTable) fuv));
@@ -173,7 +173,7 @@ public class FunctionalUnitViewTest {
 
   @Test
   public void test_getValueSet_throwsNoSuchValueSetForPublicIdentifier() {
-    FunctionalUnitView fuv = createViewOnOpalDataTable();
+    IdentifiersMappingView fuv = createViewOnOpalDataTable();
     for(int i = 1; i < 5; i++) {
       try {
         fuv.getValueSet(new VariableEntityBean("", "" + i));
@@ -188,7 +188,7 @@ public class FunctionalUnitViewTest {
   @Test
   public void test_getValueSet_throwsNoSuchValueSetForPrivateIdentifier() {
     // Make unit identifiers private
-    FunctionalUnitView fuv = createViewOnUnitDataTable();
+    IdentifiersMappingView fuv = createViewOnUnitDataTable();
     for(int i = 1; i < 5; i++) {
       try {
         fuv.getValueSet(new VariableEntityBean("", "private-" + i));
@@ -200,14 +200,12 @@ public class FunctionalUnitViewTest {
     }
   }
 
-  private FunctionalUnitView createViewOnOpalDataTable() {
-    return new FunctionalUnitView(new FunctionalUnit("myUnit", "keys-variable"), Policy.UNIT_IDENTIFIERS_ARE_PUBLIC,
-        opalDataTable, keysTable);
+  private IdentifiersMappingView createViewOnOpalDataTable() {
+    return new IdentifiersMappingView("keys-variable", Policy.UNIT_IDENTIFIERS_ARE_PUBLIC, opalDataTable, keysTable);
   }
 
-  private FunctionalUnitView createViewOnUnitDataTable() {
-    return new FunctionalUnitView(new FunctionalUnit("myUnit", "keys-variable"), Policy.UNIT_IDENTIFIERS_ARE_PRIVATE,
-        unitDataTable, keysTable);
+  private IdentifiersMappingView createViewOnUnitDataTable() {
+    return new IdentifiersMappingView("keys-variable", Policy.UNIT_IDENTIFIERS_ARE_PRIVATE, unitDataTable, keysTable);
   }
 
 }

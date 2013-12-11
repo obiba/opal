@@ -12,6 +12,7 @@ package org.obiba.opal.web.magma.support;
 import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.jdbc.JdbcDatasourceSettings;
 import org.obiba.magma.datasource.jdbc.JdbcValueTableSettings;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
@@ -41,7 +42,7 @@ public class JdbcDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDto
 
   @NotNull
   @Override
-  protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
+  protected DatasourceFactory internalParse(DatasourceFactoryDto dto, DatasourceEncryptionStrategy encryptionStrategy) {
     JdbcDatasourceFactoryDto jdbcDto = dto.getExtension(JdbcDatasourceFactoryDto.params);
     return new DatabaseJdbcDatasourceFactory(dto.getName(), jdbcDto.getDatabase(), databaseRegistry);
   }

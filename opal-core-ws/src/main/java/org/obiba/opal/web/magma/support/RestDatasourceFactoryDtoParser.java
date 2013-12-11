@@ -12,6 +12,7 @@ package org.obiba.opal.web.magma.support;
 import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.opal.rest.client.magma.RestDatasourceFactory;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.RestDatasourceFactoryDto;
@@ -25,7 +26,7 @@ public class RestDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDto
 
   @NotNull
   @Override
-  protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
+  protected DatasourceFactory internalParse(DatasourceFactoryDto dto, DatasourceEncryptionStrategy encryptionStrategy) {
     RestDatasourceFactoryDto rDto = dto.getExtension(RestDatasourceFactoryDto.params);
     return new RestDatasourceFactory(dto.getName(), rDto.getUrl(), rDto.getUsername(), rDto.getPassword(),
         rDto.getRemoteDatasource());

@@ -18,7 +18,7 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.identifiers.IdentifiersMapping;
-import org.obiba.opal.core.magma.FunctionalUnitView;
+import org.obiba.opal.core.magma.IdentifiersMappingView;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
 import org.obiba.opal.core.unit.FunctionalUnit;
 
@@ -32,13 +32,11 @@ public interface IdentifierService {
   /**
    * Make a view
    * @param viewName
-   * @param identifiersTable
+   * @param dataTable
    * @param select
    * @return
    */
-  View createPrivateView(String viewName, ValueTable identifiersTable, @Nullable String select);
-
-  Variable createKeyVariable(@Nullable ValueTable privateView, @NotNull String keyVariableName);
+  View createPrivateView(String viewName, ValueTable dataTable, @Nullable String select);
 
   /**
    * Write the key variable and the identifier variables values; update the participant key private/public map.
@@ -46,9 +44,14 @@ public interface IdentifierService {
   void copyParticipantIdentifiers(VariableEntity publicEntity, ValueTable privateView,
       PrivateVariableEntityMap entityMap, ValueTableWriter keysTableWriter);
 
-
-  View createPrivateView(String viewName, ValueTable participantTable, FunctionalUnit unit, @Nullable String select);
-
-  FunctionalUnitView createPublicView(FunctionalUnitView participantTable, boolean allowIdentifierGeneration,
+  /**
+   * Wraps the data table in a {@link org.obiba.magma.views.View} that exposes public entities and non-identifier variables.
+   *
+   * @param dataTable
+   * @param unit
+   * @param allowIdentifierGeneration
+   * @return
+   */
+  IdentifiersMappingView createPublicView(IdentifiersMappingView dataTable, boolean allowIdentifierGeneration,
       boolean ignoreUnknownIdentifier);
 }

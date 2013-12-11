@@ -18,6 +18,7 @@ import javax.validation.constraints.NotNull;
 import org.obiba.magma.AbstractDatasourceFactory;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.support.StaticDatasource;
 import org.obiba.magma.support.StaticValueTable;
 import org.obiba.magma.views.View;
@@ -46,7 +47,7 @@ public class StaticDatasourceFactoryDtoParser extends AbstractDatasourceFactoryD
 
   @NotNull
   @Override
-  protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
+  protected DatasourceFactory internalParse(DatasourceFactoryDto dto, DatasourceEncryptionStrategy encryptionStrategy) {
     return new StaticDatasourceFactory(dto);
   }
 

@@ -37,7 +37,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 
 /**
  *
@@ -57,59 +57,39 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
 
   @NotNull
   @Value("${org.obiba.opal.keys.entityType}")
-  private String entityType;
+  private String participantEntityType;
 
   private MagmaEngineReferenceResolver tableResolver;
 
-  @Nullable
   private Datasource datasource;
-
-  @Override
-  public ValueTable getValueTable() throws IdentifiersDatabaseNotFoundException {
-    return getDatasource().getValueTable(getTableName());
-  }
-
-  @Override
-  public ValueTableWriter createValueTableWriter() throws IdentifiersDatabaseNotFoundException {
-    return getDatasource().createWriter(getTableName(), entityType);
-  }
-
-  @Override
-  public boolean hasValueTable() throws IdentifiersDatabaseNotFoundException {
-    return getDatasource().hasValueTable(getTableName());
-  }
 
   @Override
   public String getDatasourceName() {
     return getTableResolver().getDatasourceName();
   }
 
-  @Override
-  public String getTableName() {
+  private String getParticipantTableName() {
     return getTableResolver().getTableName();
   }
 
   @NotNull
-  @Override
-  public String getEntityType() {
-    return entityType;
+  private String getParticipantEntityType() {
+    return participantEntityType;
   }
 
   @NotNull
   @Override
-  public String getTableReference() {
-    return tableReference;
+  public String getTableReference(@NotNull String entityType) {
+    ValueTable table = getIdentifiersTable(entityType);
+    return table.getDatasource().getName() + "." + getIdentifiersTable(entityType).getName();
   }
 
   @Override
-  public boolean hasEntities(Predicate<ValueTable> predicate) {
-    return getDatasource().hasEntities(predicate);
-  }
-
-  @Override
-  public void unregisterDatabase() {
-    destroy();
-    databaseRegistry.unregister(databaseRegistry.getIdentifiersDatabase().getName(), getDatasourceName());
+  public boolean hasEntities() {
+    for (ValueTable table : getDatasource().getValueTables()) {
+      if (!Iterables.isEmpty(table.getVariableEntities())) return true;
+    }
+    return false;
   }
 
   private MagmaEngineReferenceResolver getTableResolver() {
@@ -139,9 +119,9 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
       Initialisables.initialise(datasourceFactory);
       datasource = datasourceFactory.create();
       Initialisables.initialise(datasource);
-      if(!datasource.hasValueTable(getTableName())) {
+      if(!datasource.hasValueTable(getParticipantTableName())) {
         try {
-          datasource.createWriter(getTableName(), getEntityType()).close();
+          datasource.createWriter(getParticipantTableName(), getParticipantEntityType()).close();
         } catch(IOException e) {
           throw new RuntimeException(e);
         }
@@ -151,7 +131,7 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   }
 
   @Override
-  public boolean hasValueTable(String entityType) {
+  public boolean hasIdentifiersTable(String entityType) {
     for(ValueTable table : getDatasource().getValueTables()) {
       if(table.getEntityType().toLowerCase().equals(entityType.toLowerCase())) {
         return true;
@@ -161,7 +141,7 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   }
 
   @Override
-  public ValueTable getValueTable(String entityType) {
+  public ValueTable getIdentifiersTable(String entityType) {
     for(ValueTable table : getDatasource().getValueTables()) {
       if(table.getEntityType().toLowerCase().equals(entityType.toLowerCase())) {
         return table;
@@ -171,8 +151,8 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   }
 
   @Override
-  public ValueTable ensureValueTable(String entityType) {
-    if(!hasValueTable(entityType)) {
+  public ValueTable ensureIdentifiersTable(String entityType) {
+    if(!hasIdentifiersTable(entityType)) {
       ValueTableWriter vtw = null;
       try {
         vtw = getDatasource().createWriter(entityType, entityType);
@@ -180,17 +160,17 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
         Closeables.closeQuietly(vtw);
       }
     }
-    return getValueTable(entityType);
+    return getIdentifiersTable(entityType);
   }
 
   @Override
-  public Variable ensureVariable(IdentifiersMapping idMapping) {
-    ValueTable table = ensureValueTable(idMapping.getEntityType());
+  public Variable ensureIdentifiersMapping(IdentifiersMapping idMapping) {
+    ValueTable table = ensureIdentifiersTable(idMapping.getEntityType());
     if(!table.hasVariable(idMapping.getName())) {
       ValueTableWriter vtw = null;
       ValueTableWriter.VariableWriter vw = null;
       try {
-        vtw = getDatasource().createWriter(entityType, entityType);
+        vtw = getDatasource().createWriter(idMapping.getEntityType(), idMapping.getEntityType());
         vw = vtw.writeVariables();
         vw.writeVariable(
             Variable.Builder.newVariable(idMapping.getName(), TextType.get(), idMapping.getEntityType()).build());
@@ -199,12 +179,40 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
         Closeables.closeQuietly(vtw);
       }
     }
-    return getValueTable(idMapping.getEntityType()).getVariable(idMapping.getName());
+    return getIdentifiersTable(idMapping.getEntityType()).getVariable(idMapping.getName());
   }
 
   @Override
-  public ValueTableWriter createValueTableWriter(@NotNull String entityType) {
-    ValueTable table = ensureValueTable(entityType);
+  public ValueTableWriter createIdentifiersTableWriter(@NotNull String entityType) {
+    ValueTable table = ensureIdentifiersTable(entityType);
     return getDatasource().createWriter(table.getName(), table.getEntityType());
+  }
+
+  @Nullable
+  @Override
+  public String getSelectScript(String entityType, String idMapping) {
+    if (!hasIdentifiersTable(entityType)) return null;
+    ValueTable table = getIdentifiersTable(entityType);
+    if (!table.hasVariable(idMapping)) return null;
+    Variable variable = table.getVariable(idMapping);
+    if (!variable.hasAttribute("select")) return null;
+
+    return variable.getAttributeStringValue("select");
+  }
+
+  @Override
+  public boolean hasIdentifiersMapping(String idMapping) {
+    for (ValueTable table : getDatasource().getValueTables()) {
+      if (table.hasVariable(idMapping)) return true;
+    }
+    return false;
+  }
+
+  @Override
+  public boolean hasIdentifiersMapping(String entityType, String idMapping) {
+    for (ValueTable table : getDatasource().getValueTables()) {
+      if (table.getEntityType().toLowerCase().equals(entityType.toLowerCase()) && table.hasVariable(idMapping)) return true;
+    }
+    return false;
   }
 }

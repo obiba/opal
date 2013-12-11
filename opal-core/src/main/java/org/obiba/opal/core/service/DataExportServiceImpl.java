@@ -11,8 +11,6 @@ package org.obiba.opal.core.service;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ThreadFactory;
@@ -21,35 +19,25 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.Datasource;
-import org.obiba.magma.MagmaEngine;
-import org.obiba.magma.NoSuchDatasourceException;
-import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.DatasourceCopier.Builder;
-import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
 import org.obiba.magma.views.IncrementalWhereClause;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.WhereClause;
-import org.obiba.opal.core.magma.FunctionalUnitView;
-import org.obiba.opal.core.magma.FunctionalUnitView.Policy;
+import org.obiba.opal.core.magma.IdentifiersMappingView;
+import org.obiba.opal.core.magma.IdentifiersMappingView.Policy;
 import org.obiba.opal.core.magma.concurrent.LockingActionTemplate;
-import org.obiba.opal.core.unit.FunctionalUnit;
-import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.util.Assert;
-
-import com.google.common.base.Function;
 
 /**
- * Default implementation of {@link ExportService}.
+ * Default implementation of {@link DataExportService}.
  */
 @Component
-public class DefaultExportServiceImpl implements ExportService {
+public class DataExportServiceImpl implements DataExportService {
 
   @NotNull
   private final ThreadFactory threadFactory;
@@ -58,72 +46,32 @@ public class DefaultExportServiceImpl implements ExportService {
   private final TransactionTemplate txTemplate;
 
   @NotNull
-  private final FunctionalUnitService functionalUnitService;
-
-  @NotNull
   private final IdentifiersTableService identifiersTableService;
 
-  @SuppressWarnings("ConstantConditions")
   @Autowired
-  public DefaultExportServiceImpl(@NotNull ThreadFactory threadFactory, @NotNull TransactionTemplate txTemplate,
-      @NotNull FunctionalUnitService functionalUnitService, @NotNull IdentifiersTableService identifiersTableService) {
-    if(threadFactory == null) throw new IllegalArgumentException("threadFactory cannot be null");
-    if(txTemplate == null) throw new IllegalArgumentException("txTemplate cannot be null");
-    if(functionalUnitService == null) throw new IllegalArgumentException("functionalUnitService cannot be null");
-    if(identifiersTableService == null) throw new IllegalArgumentException("identifiersTableService cannot be null");
-
+  public DataExportServiceImpl(@NotNull ThreadFactory threadFactory, @NotNull TransactionTemplate txTemplate,
+      @NotNull IdentifiersTableService identifiersTableService) {
     this.threadFactory = threadFactory;
     this.txTemplate = txTemplate;
-    this.functionalUnitService = functionalUnitService;
     this.identifiersTableService = identifiersTableService;
-  }
-
-  public Builder newCopier(Datasource destinationDatasource,
-      @Nullable Function<VariableEntity, VariableEntity> entityMapper) {
-    return DatasourceCopier.Builder.newCopier().withLoggingListener().withThroughtputListener();
   }
 
   @Override
   public Builder newCopier(Datasource destinationDatasource) {
-    return newCopier(destinationDatasource, null);
+    return DatasourceCopier.Builder.newCopier().withLoggingListener().withThroughtputListener();
   }
 
   @Override
-  public void exportTablesToDatasource(@Nullable String unitName, @NotNull List<String> sourceTableNames,
-      @NotNull String destinationDatasourceName, boolean incremental) throws InterruptedException {
-    Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
-    Assert.hasText(destinationDatasourceName, "destinationDatasourceName must not be null or empty");
-    Datasource destinationDatasource = MagmaEngine.get().getDatasource(destinationDatasourceName);
-    Set<ValueTable> sourceTables = getValueTablesByName(sourceTableNames);
-    exportTablesToDatasource(unitName, sourceTables, destinationDatasource, newCopier(destinationDatasource),
-        incremental);
-  }
-
-  @Override
-  public void exportTablesToDatasource(@Nullable String unitName, @NotNull List<String> sourceTableNames,
-      @NotNull String destinationDatasourceName, @NotNull DatasourceCopier.Builder datasourceCopier,
-      boolean incremental) throws InterruptedException {
-    Assert.notEmpty(sourceTableNames, "sourceTableNames must not be null or empty");
-    Assert.hasText(destinationDatasourceName, "destinationDatasourceName must not be null or empty");
-    Datasource destinationDatasource = MagmaEngine.get().getDatasource(destinationDatasourceName);
-    Set<ValueTable> sourceTables = getValueTablesByName(sourceTableNames);
-    exportTablesToDatasource(unitName, sourceTables, destinationDatasource, datasourceCopier, incremental);
-  }
-
-  @Override
-  public void exportTablesToDatasource(@Nullable String unitName, @NotNull Set<ValueTable> sourceTables,
+  public void exportTablesToDatasource(@Nullable String idMapping, @NotNull Set<ValueTable> sourceTables,
       @NotNull Datasource destinationDatasource, @NotNull DatasourceCopier.Builder datasourceCopier,
       boolean incremental) throws InterruptedException {
-    Assert.notEmpty(sourceTables, "sourceTables must not be null or empty");
-    Assert.notNull(destinationDatasource, "destinationDatasource must not be null");
-    Assert.notNull(datasourceCopier, "datasourceCopier must not be null");
-
-    FunctionalUnit unit = unitName == null ? null : validateFunctionalUnit(unitName);
+    if(!identifiersTableService.hasIdentifiersMapping(idMapping))
+      throw new NoSuchIdentifiersMappingException(idMapping);
 
     validateSourceDatasourceNotEqualDestinationDatasource(sourceTables, destinationDatasource);
 
     try {
-      new ExportActionTemplate(sourceTables, destinationDatasource, datasourceCopier, incremental, unit).execute();
+      new ExportActionTemplate(sourceTables, destinationDatasource, datasourceCopier, incremental, idMapping).execute();
     } catch(InvocationTargetException ex) {
       if(ex.getCause() instanceof ExportException) {
         throw (ExportException) ex.getCause();
@@ -133,31 +81,6 @@ public class DefaultExportServiceImpl implements ExportService {
       }
       throw new RuntimeException(ex.getCause());
     }
-  }
-
-  @NotNull
-  private Set<ValueTable> getValueTablesByName(@NotNull Iterable<String> tableNames)
-      throws NoSuchDatasourceException, NoSuchValueTableException, ExportException {
-    Set<ValueTable> tables = new HashSet<>();
-    for(String tableName : tableNames) {
-      try {
-        if(!tables.add(MagmaEngineTableResolver.valueOf(tableName).resolveTable())) {
-          throw new ExportException("Source tables include duplicate '" + tableName + "'.");
-        }
-      } catch(IllegalArgumentException e) {
-        throw new ExportException("Source table '" + tableName + "' does not exist.");
-      }
-    }
-    return tables;
-  }
-
-  @NotNull
-  private FunctionalUnit validateFunctionalUnit(String unitName) {
-    FunctionalUnit unit = functionalUnitService.getFunctionalUnit(unitName);
-    if(unit == null) {
-      throw new NoSuchFunctionalUnitException(unitName);
-    }
-    return unit;
   }
 
   private void validateSourceDatasourceNotEqualDestinationDatasource(@NotNull Iterable<ValueTable> sourceTables,
@@ -186,15 +109,15 @@ public class DefaultExportServiceImpl implements ExportService {
     private final boolean incremental;
 
     @Nullable
-    private final FunctionalUnit unit;
+    private final String idMapping;
 
     private ExportActionTemplate(@NotNull Set<ValueTable> sourceTables, @NotNull Datasource destinationDatasource,
-        @NotNull Builder datasourceCopier, boolean incremental, @Nullable FunctionalUnit unit) {
+        @NotNull Builder datasourceCopier, boolean incremental, @Nullable String idMapping) {
       this.sourceTables = sourceTables;
       this.destinationDatasource = destinationDatasource;
       this.datasourceCopier = datasourceCopier;
       this.incremental = incremental;
-      this.unit = unit;
+      this.idMapping = idMapping;
     }
 
     @NotNull
@@ -244,19 +167,15 @@ public class DefaultExportServiceImpl implements ExportService {
 
         // If the table contains an entity that requires key separation, create a "unit view" of the table (replace
         // public identifiers with private, unit-specific identifiers).
-        if(unit != null && tableToCopy.isForEntityType(identifiersTableService.getEntityType())) {
+        if(idMapping != null && identifiersTableService.hasIdentifiersMapping(tableToCopy.getEntityType(), idMapping)) {
           // Make a view that converts opal identifiers to unit identifiers
-          tableToCopy = new FunctionalUnitView(unit, Policy.UNIT_IDENTIFIERS_ARE_PUBLIC, tableToCopy,
-              getIdentifiersValueTable());
+          tableToCopy = new IdentifiersMappingView(idMapping, Policy.UNIT_IDENTIFIERS_ARE_PUBLIC, tableToCopy,
+              identifiersTableService.getIdentifiersTable(tableToCopy.getEntityType()));
         }
 
         // Go ahead and copy the result to the destination datasource.
         MultithreadedDatasourceCopier.Builder.newCopier().from(tableToCopy).to(destinationDatasource)
             .withCopier(datasourceCopier).withReaders(4).withThreads(threadFactory).build().copy();
-      }
-
-      private ValueTable getIdentifiersValueTable() {
-        return identifiersTableService.getValueTable();
       }
 
       @NotNull

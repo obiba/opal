@@ -34,7 +34,7 @@ import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.StaticDatasource;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.opal.core.service.DataImportService;
-import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;
@@ -169,7 +169,7 @@ public class TableResourceImpl extends AbstractValueTableResource implements Tab
         writeValueSets(ds.createWriter(vt.getName(), valueSetsDto.getEntityType()), valueSetsDto);
         dataImportService.importData(ds.getValueTables(), vt.getDatasource().getName(), generateIds, ignoreUnknownIds);
       }
-    } catch(NoSuchFunctionalUnitException ex) {
+    } catch(NoSuchIdentifiersMappingException ex) {
       return Response.status(BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "NoSuchFunctionalUnit", unitName).build()).build();
     } catch(RuntimeException ex) {

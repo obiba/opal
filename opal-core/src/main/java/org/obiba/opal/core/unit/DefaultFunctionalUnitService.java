@@ -23,7 +23,7 @@ import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.runtime.security.ApplicationRealm;
 import org.obiba.opal.core.service.DuplicateSubjectProfileException;
-import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -105,9 +105,9 @@ public class DefaultFunctionalUnitService implements FunctionalUnitService {
   }
 
   @Override
-  public FileObject getUnitDirectory(String unitName) throws NoSuchFunctionalUnitException, FileSystemException {
+  public FileObject getUnitDirectory(String unitName) throws NoSuchIdentifiersMappingException, FileSystemException {
     if(!hasFunctionalUnit(unitName)) {
-      throw new NoSuchFunctionalUnitException(unitName);
+      throw new NoSuchIdentifiersMappingException(unitName);
     }
 
     FileObject unitsDir = getOpalRuntime().getFileSystem().getRoot().resolveFile("units");

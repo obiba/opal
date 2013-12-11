@@ -12,6 +12,7 @@ package org.obiba.opal.web.magma.support;
 import java.util.Set;
 
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.nil.support.NullDatasourceFactory;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +42,14 @@ public class DatasourceFactoryRegistry {
    * {@code dto}
    */
   public DatasourceFactory parse(DatasourceFactoryDto dto) throws NoSuchDatasourceFactoryException {
+    return parse(dto, null);
+  }
+
+  public DatasourceFactory parse(DatasourceFactoryDto dto, DatasourceEncryptionStrategy encryptionStrategy) throws NoSuchDatasourceFactoryException {
     if(dto == null) throw new IllegalArgumentException("dto cannot be null");
     for(DatasourceFactoryDtoParser parser : parsers) {
       if(parser.canParse(dto)) {
-        return parser.parse(dto);
+        return parser.parse(dto, encryptionStrategy);
       }
     }
     DatasourceFactory factory = new NullDatasourceFactory();

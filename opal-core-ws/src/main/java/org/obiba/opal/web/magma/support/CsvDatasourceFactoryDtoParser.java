@@ -16,6 +16,7 @@ import javax.validation.constraints.NotNull;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
+import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.csv.support.CsvDatasourceFactory;
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.opal.web.model.Magma.CsvDatasourceFactoryDto;
@@ -31,7 +32,7 @@ public class CsvDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoP
 
   @NotNull
   @Override
-  protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
+  protected DatasourceFactory internalParse(DatasourceFactoryDto dto, DatasourceEncryptionStrategy encryptionStrategy) {
     CsvDatasourceFactory factory = new CsvDatasourceFactory();
     CsvDatasourceFactoryDto csvDto = dto.getExtension(CsvDatasourceFactoryDto.params);
     if(csvDto.hasBundle()) {

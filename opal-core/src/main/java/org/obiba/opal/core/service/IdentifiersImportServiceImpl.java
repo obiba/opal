@@ -62,8 +62,8 @@ public class IdentifiersImportServiceImpl implements IdentifiersImportService {
 
     int count = 0;
 
-    ValueTable identifiersTable = identifiersTableService.ensureValueTable(idMapping.getEntityType());
-    Variable variable = identifiersTableService.ensureVariable(idMapping);
+    ValueTable identifiersTable = identifiersTableService.ensureIdentifiersTable(idMapping.getEntityType());
+    Variable variable = identifiersTableService.ensureIdentifiersMapping(idMapping);
     PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(identifiersTable, variable,
         localParticipantIdentifier);
 
@@ -96,7 +96,7 @@ public class IdentifiersImportServiceImpl implements IdentifiersImportService {
   private void importIdentifiers(@NotNull IdentifiersMapping idMapping, ValueTable sourceTable,
       @Nullable String select) {
 
-    Variable variable = identifiersTableService.ensureVariable(idMapping);
+    Variable variable = identifiersTableService.ensureIdentifiersMapping(idMapping);
     String selectScript = select == null ? (variable.hasAttribute("select")
         ? variable.getAttributeStringValue("select")
         : null) : select;
@@ -106,8 +106,9 @@ public class IdentifiersImportServiceImpl implements IdentifiersImportService {
     Variable identifierVariable = identifierService.createIdentifierVariable(sourceIdentifiersTable, idMapping);
 
     PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(
-        identifiersTableService.getValueTable(idMapping.getEntityType()), identifierVariable, participantIdentifier);
-    ValueTableWriter identifiersTableWriter = identifiersTableService.createValueTableWriter(idMapping.getEntityType());
+        identifiersTableService.getIdentifiersTable(idMapping.getEntityType()), identifierVariable, participantIdentifier);
+    ValueTableWriter identifiersTableWriter = identifiersTableService.createIdentifiersTableWriter(
+        idMapping.getEntityType());
     try {
       for(VariableEntity privateEntity : sourceIdentifiersTable.getVariableEntities()) {
         if(entityMap.publicEntity(privateEntity) == null) {
@@ -124,7 +125,7 @@ public class IdentifiersImportServiceImpl implements IdentifiersImportService {
 
   @Override
   public void importIdentifiers(ValueTable sourceValueTable) throws IOException {
-    ValueTable identifiersTable = identifiersTableService.ensureValueTable(sourceValueTable.getEntityType());
+    ValueTable identifiersTable = identifiersTableService.ensureIdentifiersTable(sourceValueTable.getEntityType());
 
     ImmutableSet.Builder<String> builder = ImmutableSet.builder();
     builder.addAll(Iterables.transform(sourceValueTable.getVariableEntities(), new Function<VariableEntity, String>() {

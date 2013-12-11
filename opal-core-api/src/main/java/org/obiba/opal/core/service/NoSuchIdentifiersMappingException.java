@@ -11,24 +11,22 @@ package org.obiba.opal.core.service;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.core.unit.FunctionalUnit;
-
 /**
- * Thrown when a method argument refers to a non-existing {@link FunctionalUnit}.
+ * Thrown when a method argument refers to a non-existing identifiers mapping.
  */
-public class NoSuchFunctionalUnitException extends RuntimeException {
+public class NoSuchIdentifiersMappingException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
 
-  private final String unitName;
+  private final String idMapping;
 
-  public NoSuchFunctionalUnitException(@Nullable String unitName) {
-    super("No such functional unit (" + unitName + ")");
-    this.unitName = unitName;
+  public NoSuchIdentifiersMappingException(@Nullable String idMapping) {
+    super("No such identifiers mapping (" + idMapping + ")");
+    this.idMapping = idMapping;
   }
 
   @Nullable
-  public String getUnitName() {
-    return unitName;
+  public String getIdentifiersMapping() {
+    return idMapping;
   }
 }

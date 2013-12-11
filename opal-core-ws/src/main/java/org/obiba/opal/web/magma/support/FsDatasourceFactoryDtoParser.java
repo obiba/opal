@@ -15,7 +15,7 @@ import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.fs.support.FsDatasourceFactory;
-import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
 import org.obiba.opal.core.support.OnyxDatasourceFactory;
@@ -31,35 +31,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class FsDatasourceFactoryDtoParser extends AbstractDatasourceFactoryDtoParser {
 
-  @Autowired
-  private ProjectsKeyStoreService projectskeyStoreService;
-
-  @Autowired
-  private ProjectService projectService;
-
   @NotNull
   @Override
-  protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
+  protected DatasourceFactory internalParse(DatasourceFactoryDto dto, DatasourceEncryptionStrategy encryptionStrategy) {
     FsDatasourceFactory fsFactory = new FsDatasourceFactory();
     FsDatasourceFactoryDto fsDto = dto.getExtension(FsDatasourceFactoryDto.params);
     fsFactory.setFile(resolveLocalFile(fsDto.getFile()));
-    if(dto.hasUnitConfig() && dto.getUnitConfig().hasUnit()) {
-      String unitName = dto.getUnitConfig().getUnit();
-      FunctionalUnit unit = getFunctionalUnitService().getFunctionalUnit(unitName);
-      if(unit == null) {
-        throw new NoSuchFunctionalUnitException(unitName);
-      }
-      if(unit.getDatasourceEncryptionStrategy() == null) {
-        DatasourceEncryptionStrategy encryptionStrategy = new EncryptedSecretKeyDatasourceEncryptionStrategy();
-        encryptionStrategy
-            .setKeyProvider(projectskeyStoreService.getKeyStore(projectService.getProject(unit.getName())));
-        unit.setDatasourceEncryptionStrategy(encryptionStrategy);
-      }
-
-      fsFactory.setEncryptionStrategy(unit.getDatasourceEncryptionStrategy());
-    }
+    fsFactory.setEncryptionStrategy(encryptionStrategy);
 
     DatasourceFactory factory = fsDto.getOnyxWrapper() ? new OnyxDatasourceFactory(fsFactory) : fsFactory;
+
     factory.setName(dto.getName());
 
     return factory;

@@ -10,6 +10,7 @@
 package org.obiba.opal.web.magma.support;
 
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 
 /**
@@ -23,7 +24,7 @@ public interface DatasourceFactoryDtoParser {
    * @param dto
    * @return the factory
    */
-  DatasourceFactory parse(DatasourceFactoryDto dto);
+  DatasourceFactory parse(DatasourceFactoryDto dto, DatasourceEncryptionStrategy encryptionStrategy);
 
   /**
    * Returns true when this instance is capable of parsing {@code dto} and convert it into a {@code DatasourceFactory}

@@ -45,6 +45,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.ExcelDatasourceFactoryDto;
@@ -209,7 +210,7 @@ public class VariablesImportPresenter extends WizardPresenterWidget<VariablesImp
     ResponseCodeCallback errorCallback = new TransientDatasourceFailureCallback();
 
     ResourceRequestBuilderFactory.<DatasourceDto>newBuilder() //
-        .forResource("/transient-datasources") //
+        .forResource(UriBuilders.PROJECT_TRANSIENT_DATASOURCE.create().build(datasourceName)) //
         .post() //
         .withResourceBody(DatasourceFactoryDto.stringify(factory)) //
         .withCallback(new TransientDatasourceSuccessCallback(factory)) //

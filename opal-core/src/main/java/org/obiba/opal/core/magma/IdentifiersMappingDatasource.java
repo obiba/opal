@@ -16,48 +16,48 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.AbstractDatasourceWrapperWithCachedTables;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
-import org.obiba.opal.core.unit.FunctionalUnit;
-import org.springframework.util.Assert;
+import org.obiba.opal.core.service.IdentifiersTableService;
 
 /**
  *
  */
-public class FunctionalUnitDatasource extends AbstractDatasourceWrapperWithCachedTables {
+public class IdentifiersMappingDatasource extends AbstractDatasourceWrapperWithCachedTables {
 
   @NotNull
-  private final FunctionalUnit unit;
+  private final String idMapping;
 
   @NotNull
-  private final FunctionalUnitView.Policy policy;
+  private final IdentifiersMappingView.Policy policy;
 
   @NotNull
-  private final ValueTable keysTable;
+  private final IdentifiersTableService identifiersTableService;
 
-  @Nullable
   private final IParticipantIdentifier identifierGenerator;
 
   private final boolean ignoreUnknownIdentifier;
 
-  public FunctionalUnitDatasource(@NotNull Datasource wrapped, @NotNull FunctionalUnit unit,
-      @NotNull FunctionalUnitView.Policy policy, @NotNull ValueTable keysTable,
+  public IdentifiersMappingDatasource(@NotNull Datasource wrapped, @NotNull String idMapping,
+      @NotNull IdentifiersMappingView.Policy policy, @NotNull IdentifiersTableService identifiersTableService,
       @Nullable IParticipantIdentifier identifierGenerator, boolean ignoreUnknownIdentifier) {
     super(wrapped);
 
-    Assert.notNull(wrapped, "wrapped datasource cannot be null");
-    Assert.notNull(unit, "unit datasource cannot be null");
-    Assert.notNull(policy, "policy datasource cannot be null");
-    Assert.notNull(keysTable, "keysTable datasource cannot be null");
-
-    this.unit = unit;
+    this.idMapping = idMapping;
     this.policy = policy;
-    this.keysTable = keysTable;
+    this.identifiersTableService = identifiersTableService;
     this.identifierGenerator = identifierGenerator;
     this.ignoreUnknownIdentifier = ignoreUnknownIdentifier;
   }
 
   @Override
   protected ValueTable createValueTable(ValueTable table) {
-    return new FunctionalUnitView(unit, policy, table, keysTable, identifierGenerator, ignoreUnknownIdentifier);
+    // verify there is a identifiers mapping for the table's entity type
+    if (identifiersTableService.hasIdentifiersTable(table.getEntityType())) {
+      ValueTable identifiersTable = identifiersTableService.getIdentifiersTable(table.getEntityType());
+      if (identifiersTable.hasVariable(idMapping)) {
+        return new IdentifiersMappingView(idMapping, policy, table, identifiersTable, identifierGenerator, ignoreUnknownIdentifier);
+      }
+    }
+    return table;
   }
 
 }

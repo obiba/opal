@@ -72,44 +72,6 @@ public class ImportCommandTest {
     test(mockOptions, mockShell, mockRuntime, mockService, null);
   }
 
-  /**
-   * When the import command is executed with a relative file path, the path is treated as relative to the specified
-   * functional unit's directory.
-   */
-  @Test
-  public void testRelativePathIsRelativeToUnitDirectory() throws IOException, InterruptedException {
-    ImportCommandOptions mockOptions = createMockOptionsForRelativePathImport("my-unit", "opal-data", "test.zip");
-    FileObject mockFile = createMockFileForRelativePathImport("my-unit", "test.zip");
-    FileObject mockUnitDir = createMockUnitDirectoryForRelativePathImport(mockFile, "test.zip");
-    OpalRuntime mockRuntime = createMock(OpalRuntime.class);
-    OpalShell mockShell = createMockShellForRelativePathImport("my-unit", "test.zip");
-    DataImportService mockDataImportService = createMock(DataImportService.class);
-    mockDataImportService.importData("my-unit", mockFile, "opal-data", true, false);
-    FunctionalUnitService mockService = createMockUnitService(mockUnitDir, "my-unit");
-
-    test(mockOptions, mockShell, mockRuntime, mockService, mockDataImportService, mockUnitDir, mockFile);
-  }
-
-  /**
-   * When the import command is executed with no file specified, all files (*.zip) in the functional unit's directory
-   * are imported.
-   */
-  @Test
-  public void testWhenNoFileIsSpecifiedAllFilesInUnitDirectoryAreImported() throws IOException, InterruptedException {
-    ImportCommandOptions mockOptions = createMockOptionsForImportWithNoFile("my-unit", "opal-data");
-    FileObject[] mockFilesInUnitDir = createMockFilesInUnitDirectory("my-unit", "test1.zip", "test2.zip");
-    FileObject mockUnitDir = createMockUnitDirectoryForImportWithNoFile(mockFilesInUnitDir);
-    OpalRuntime mockRuntime = createMock(OpalRuntime.class);
-    OpalShell mockShell = createMockShellForImportWithNoFile("my-unit", "test1.zip", "test2.zip");
-    FunctionalUnitService mockService = createMockUnitService(mockUnitDir, "my-unit");
-    DataImportService mockDataImportService = createMock(DataImportService.class);
-    for(FileObject mockFile : mockFilesInUnitDir) {
-      mockDataImportService.importData("my-unit", mockFile, "opal-data", true, false);
-    }
-
-    test(mockOptions, mockShell, mockRuntime, mockService, mockDataImportService, mockUnitDir);
-  }
-
   private void test(ImportCommandOptions mockOptions, OpalShell mockShell, OpalRuntime mockRuntime,
       FunctionalUnitService mockUnitService, DataImportService mockDataImportService, Object... otherMocks) {
 

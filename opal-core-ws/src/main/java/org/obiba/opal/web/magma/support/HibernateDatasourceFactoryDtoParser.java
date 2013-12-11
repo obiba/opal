@@ -12,6 +12,7 @@ package org.obiba.opal.web.magma.support;
 import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.DatasourceFactory;
+import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.hibernate.support.HibernateDatasourceFactory;
 import org.obiba.opal.core.runtime.jdbc.DatabaseSessionFactoryProvider;
 import org.obiba.opal.core.service.IdentifiersTableService;
@@ -40,7 +41,7 @@ public class HibernateDatasourceFactoryDtoParser extends AbstractDatasourceFacto
 
   @NotNull
   @Override
-  protected DatasourceFactory internalParse(DatasourceFactoryDto dto) {
+  protected DatasourceFactory internalParse(DatasourceFactoryDto dto, DatasourceEncryptionStrategy encryptionStrategy) {
     DatabaseSessionFactoryProvider sessionFactoryProvider = null;
     HibernateDatasourceFactoryDto factoryDto = dto.getExtension(HibernateDatasourceFactoryDto.params);
     if(factoryDto.getKey()) {

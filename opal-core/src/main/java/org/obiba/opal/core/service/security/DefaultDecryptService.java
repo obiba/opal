@@ -21,7 +21,7 @@ import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionSt
 import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
+import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.core.unit.FunctionalUnitService;
@@ -56,7 +56,7 @@ public class DefaultDecryptService implements DecryptService {
 
   @Override
   public void decryptData(String unitName, String datasourceName, FileObject file)
-      throws NoSuchFunctionalUnitException, NoSuchDatasourceException, IllegalArgumentException, IOException {
+      throws NoSuchIdentifiersMappingException, NoSuchDatasourceException, IllegalArgumentException, IOException {
     Assert.notNull(file, "file is null");
     Assert.isTrue(file.getType() == FileType.FILE, "No such file (" + file.getName().getPath() + ")");
 
@@ -65,7 +65,7 @@ public class DefaultDecryptService implements DecryptService {
 
     FunctionalUnit unit = functionalUnitService.getFunctionalUnit(unitName);
     if(!FunctionalUnit.OPAL_INSTANCE.equals(unitName) && unit == null) {
-      throw new NoSuchFunctionalUnitException(unitName);
+      throw new NoSuchIdentifiersMappingException(unitName);
     }
     // Create an FsDatasource for the specified file.
     Datasource sourceDatasource = new FsDatasource(file.getName().getBaseName(),

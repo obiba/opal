@@ -25,7 +25,8 @@ import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.MultithreadedDatasourceCopier;
 import org.obiba.magma.views.View;
-import org.obiba.opal.core.magma.FunctionalUnitView;
+import org.obiba.opal.core.identifiers.IdentifiersMapping;
+import org.obiba.opal.core.magma.IdentifiersMappingView;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
 import org.obiba.opal.core.magma.concurrent.LockingActionTemplate;
 import org.springframework.transaction.TransactionStatus;
@@ -74,17 +75,12 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
   private Set<String> getTablesToLock() {
     Set<String> tablesToLock = new TreeSet<>();
 
-    boolean needToLockKeysTable = false;
-
     for(ValueTable valueTable : sourceTables) {
       tablesToLock.add(valueTable.getDatasource() + "." + valueTable.getName());
-      if(valueTable.getEntityType().equals(identifiersTableService.getEntityType())) {
-        needToLockKeysTable = true;
+      if(identifiersTableService.hasIdentifiersTable(valueTable.getEntityType())) {
+        String ref = identifiersTableService.getTableReference(valueTable.getEntityType());
+        if(!tablesToLock.contains(ref)) tablesToLock.add(ref);
       }
-    }
-
-    if(needToLockKeysTable) {
-      tablesToLock.add(identifiersTableService.getTableReference());
     }
 
     return tablesToLock;
@@ -108,10 +104,10 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
           throw new InterruptedException("Thread interrupted");
         }
 
-        if(valueTable.isForEntityType(identifiersTableService.getEntityType())) {
+        if(identifiersTableService.hasIdentifiersTable(valueTable.getEntityType())) {
 
-          if(valueTable instanceof FunctionalUnitView) {
-            importUnitData((FunctionalUnitView) valueTable);
+          if(valueTable instanceof IdentifiersMappingView) {
+            importUnitData((IdentifiersMappingView) valueTable);
           } else {
             addMissingEntitiesToKeysTable(valueTable);
             MultithreadedDatasourceCopier.Builder.newCopier() //
@@ -159,14 +155,17 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
     private Set<VariableEntity> addMissingEntitiesToKeysTable(ValueTable valueTable) {
       Set<VariableEntity> nonExistentVariableEntities = Sets.newHashSet(valueTable.getVariableEntities());
 
-      if(identifiersTableService.hasValueTable()) {
+      if(identifiersTableService.hasIdentifiersTable(valueTable.getEntityType())) {
         // Remove all entities that exist in the keys table. Whatever is left are the ones that don't exist...
-        Set<VariableEntity> entitiesInKeysTable = identifiersTableService.getValueTable().getVariableEntities();
+        Set<VariableEntity> entitiesInKeysTable = identifiersTableService.getIdentifiersTable(
+            valueTable.getEntityType())
+            .getVariableEntities();
         nonExistentVariableEntities.removeAll(entitiesInKeysTable);
       }
 
       if(nonExistentVariableEntities.size() > 0) {
-        ValueTableWriter keysTableWriter = identifiersTableService.createValueTableWriter();
+        ValueTableWriter keysTableWriter = identifiersTableService.createIdentifiersTableWriter(
+            valueTable.getEntityType());
         try {
           for(VariableEntity ve : nonExistentVariableEntities) {
             keysTableWriter.writeValueSet(ve).close();
@@ -181,20 +180,21 @@ class CopyValueTablesLockingAction extends LockingActionTemplate {
       return nonExistentVariableEntities;
     }
 
-    private void importUnitData(FunctionalUnitView functionalUnitView) throws IOException {
-      String keyVariableName = functionalUnitView.getUnit().getKeyVariableName();
+    private void importUnitData(IdentifiersMappingView identifiersMappingView) throws IOException {
+      String idMapping = identifiersMappingView.getIdentifiersMapping();
+      ValueTable table = identifiersMappingView.getWrappedValueTable();
 
-      View privateView = identifierService
-          .createPrivateView(functionalUnitView.getName(), functionalUnitView.getWrappedValueTable(),
-              functionalUnitView.getUnit(), null);
-      identifierService.createKeyVariable(privateView, keyVariableName);
+      identifiersTableService.ensureIdentifiersMapping(new IdentifiersMapping(idMapping, table.getEntityType()));
 
-      FunctionalUnitView publicView = identifierService
-          .createPublicView(functionalUnitView, allowIdentifierGeneration, ignoreUnknownIdentifier);
+      View privateView = identifierService.createPrivateView(identifiersMappingView.getName(), table,
+          identifiersTableService.getSelectScript(table.getEntityType(), idMapping));
+
+      IdentifiersMappingView publicView = identifierService
+          .createPublicView(identifiersMappingView, allowIdentifierGeneration, ignoreUnknownIdentifier);
       PrivateVariableEntityMap entityMap = publicView.getPrivateVariableEntityMap();
 
       // prepare for copying participant data
-      ValueTableWriter keysTableWriter = identifiersTableService.createValueTableWriter();
+      ValueTableWriter keysTableWriter = identifiersTableService.createIdentifiersTableWriter(table.getEntityType());
       try {
         DatasourceCopier.DatasourceCopyEventListener keysListener = createKeysListener(privateView, entityMap,
             keysTableWriter);
