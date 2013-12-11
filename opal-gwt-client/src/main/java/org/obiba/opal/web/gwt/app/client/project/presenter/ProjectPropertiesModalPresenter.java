@@ -53,8 +53,8 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
     getView().setUiHandlers(this);
   }
 
-  public void initialize(ProjectDto project) {
-    this.project = project;
+  public void initialize(ProjectDto projectDto) {
+    project = projectDto;
     getView().setProject(project);
   }
 
@@ -88,19 +88,33 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
   private void create() {
     if(validationHandler.validate()) {
       // Validate database connection
-      final String name = getView().getDatabase().getText();
-      ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
-          .forResource(UriBuilders.DATABASE_CONNECTIONS.create().build(name)) //
-          .withCallback(Response.SC_OK, new CreateProjectCallback()) //
-          .withCallback(new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              getView().showError(Display.FormField.DATABASE, TranslationsUtils
-                  .replaceArguments(translations.userMessageMap().get("FailedToConnectToDatabase"), name));
-              getView().setBusy(false);
-            }
-          }, Response.SC_SERVICE_UNAVAILABLE, Response.SC_NOT_FOUND, Response.SC_BAD_REQUEST) //
-          .post().send();
+      final String databaseName = getView().getDatabase().getText();
+
+      if (Strings.isNullOrEmpty(databaseName)) {
+        createProject();
+        return;
+      }
+
+      if(validationHandler.validate()) {
+        // Validate database connection
+        final String name = getView().getDatabase().getText();
+        ResourceRequestBuilderFactory.<JsArray<DatabaseDto>>newBuilder() //
+            .forResource(UriBuilders.DATABASE_CONNECTIONS.create().build(name)) //
+            .withCallback(Response.SC_OK, new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                createProject();
+              }
+            }).withCallback(new ResponseCodeCallback() {
+              @Override
+              public void onResponseCode(Request request, Response response) {
+                getView().showError(Display.FormField.DATABASE, TranslationsUtils
+                    .replaceArguments(translations.userMessageMap().get("FailedToConnectToDatabase"), name));
+                getView().setBusy(false);
+              }
+            }, Response.SC_SERVICE_UNAVAILABLE, Response.SC_NOT_FOUND, Response.SC_BAD_REQUEST) //
+            .post().send();
+      }
     }
   }
 
@@ -143,6 +157,37 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
 
   public void setProjects(JsArray<ProjectDto> projects) {
     this.projects = projects;
+  }
+
+  private void createProject() {
+    ResourceRequestBuilderFactory.<ProjectFactoryDto>newBuilder() //
+        .forResource("/projects")  //
+        .withResourceBody(ProjectFactoryDto.stringify(getProjectFactoryDto())) //
+        .withCallback(Response.SC_CREATED, new ResponseCodeCallback() {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().hideDialog();
+            fireEvent(new ProjectCreatedEvent.Builder().build());
+          }
+        }) //
+        .withCallback(Response.SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget()) {
+          @Override
+          public void onResponseCode(Request request, Response response) {
+            getView().setBusy(false);
+            super.onResponseCode(request, response);
+          }
+        }) //
+        .post().send();
+  }
+
+  private ProjectFactoryDto getProjectFactoryDto() {
+    ProjectFactoryDto dto = ProjectFactoryDto.create();
+    dto.setName(getView().getName().getText());
+    String title = getView().getTitle().getText();
+    dto.setTitle(Strings.isNullOrEmpty(title) ? dto.getName() : title);
+    dto.setDescription(getView().getDescription().getText());
+    dto.setDatabase(getView().getDatabase().getText());
+    return dto;
   }
 
   private class ProjectValidationHandler extends ViewValidationHandler {
@@ -211,39 +256,5 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
     void setAvailableDatabases(JsArray<DatabaseDto> availableDatabases);
 
     void setBusy(boolean busy);
-  }
-
-  private class CreateProjectCallback implements ResponseCodeCallback {
-    @Override
-    public void onResponseCode(Request request, Response response) {
-      ResourceRequestBuilderFactory.<ProjectFactoryDto>newBuilder() //
-          .forResource("/projects")  //
-          .withResourceBody(ProjectFactoryDto.stringify(getProjectFactoryDto())) //
-          .withCallback(Response.SC_CREATED, new ResponseCodeCallback() {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              getView().hideDialog();
-              fireEvent(new ProjectCreatedEvent.Builder().build());
-            }
-          }) //
-          .withCallback(Response.SC_BAD_REQUEST, new ErrorResponseCallback(getView().asWidget()) {
-            @Override
-            public void onResponseCode(Request request, Response response) {
-              getView().setBusy(false);
-              super.onResponseCode(request, response);
-            }
-          }) //
-          .post().send();
-    }
-
-    private ProjectFactoryDto getProjectFactoryDto() {
-      ProjectFactoryDto dto = ProjectFactoryDto.create();
-      dto.setName(getView().getName().getText());
-      String title = getView().getTitle().getText();
-      dto.setTitle(Strings.isNullOrEmpty(title) ? dto.getName() : title);
-      dto.setDescription(getView().getDescription().getText());
-      dto.setDatabase(getView().getDatabase().getText());
-      return dto;
-    }
   }
 }
