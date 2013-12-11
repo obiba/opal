@@ -20,4 +20,8 @@ public interface ValidationMessages extends org.hibernate.validator.ValidationMe
   @Key("org.obiba.opal.core.validator.Unique.message")
   String org_obiba_opal_core_validator_Unique_message();
 
+  @DefaultStringValue("cannot be null if {fieldName} == {fieldValue}")
+  @Key("org.obiba.opal.core.validator.NotNullIfAnotherFieldHasValue.message")
+  String org_obiba_opal_core_validator_NotNullIfAnotherFieldHasValue_message();
+
 }

@@ -73,7 +73,7 @@ public class OpalKeyStore implements KeyProvider {
 
   public static final String PASSWORD_FOR = "Password for";
 
-  public enum UnitKeyType {
+  public enum KeyType {
     KEY_PAIR, CERTIFICATE
   }
 
@@ -101,11 +101,11 @@ public class OpalKeyStore implements KeyProvider {
       if(store.isKeyEntry(alias)) {
         CacheablePasswordCallback passwordCallback = createPasswordCallback("Password for '" + alias + "':  ");
         return store.getEntry(alias, new PasswordProtection(getKeyPassword(passwordCallback)));
-      } else if(store.isCertificateEntry(alias)) {
-        return store.getEntry(alias, null);
-      } else {
-        throw new UnsupportedOperationException("unsupported key type");
       }
+      if(store.isCertificateEntry(alias)) {
+        return store.getEntry(alias, null);
+      }
+      throw new UnsupportedOperationException("Unsupported key type for alias " + alias);
     } catch(KeyStoreException | IOException | UnsupportedCallbackException | UnrecoverableEntryException | NoSuchAlgorithmException e) {
       throw new RuntimeException(e);
     }
@@ -341,12 +341,12 @@ public class OpalKeyStore implements KeyProvider {
     }
   }
 
-  public UnitKeyType getKeyType(String alias) {
+  public KeyType getKeyType(String alias) {
     if(listKeyPairs().contains(alias)) {
-      return UnitKeyType.KEY_PAIR;
+      return KeyType.KEY_PAIR;
     }
     if(listCertificates().contains(alias)) {
-      return UnitKeyType.CERTIFICATE;
+      return KeyType.CERTIFICATE;
     }
     throw new IllegalArgumentException("unknown alias '" + alias + "'or key type");
   }
@@ -424,10 +424,7 @@ public class OpalKeyStore implements KeyProvider {
 
   private String chooseSignatureAlgorithm(String keyAlgorithm) {
     // TODO add more algorithms here.
-    if("DSA".equals(keyAlgorithm)) {
-      return "SHA1withDSA";
-    }
-    return "SHA1WithRSA";
+    return "DSA".equals(keyAlgorithm) ? "SHA1withDSA" : "SHA1WithRSA";
   }
 
   private KeyPair getKeyPairFromFile(FileObject privateKey) {
@@ -527,7 +524,6 @@ public class OpalKeyStore implements KeyProvider {
     PEMReader pemReader = null;
     try {
       pemReader = new PEMReader(new InputStreamReader(certificate), new PasswordFinder() {
-
         @Override
         public char[] getPassword() {
           return System.console().readPassword("%s:  ", "Password for imported certificate");
@@ -564,7 +560,7 @@ public class OpalKeyStore implements KeyProvider {
 
   @SuppressWarnings({ "StaticMethodOnlyUsedInOneClass", "ParameterHidesMemberVariable" })
   public static class Builder {
-    private String unit;
+    private String name;
 
     private CallbackHandler callbackHandler;
 
@@ -572,8 +568,8 @@ public class OpalKeyStore implements KeyProvider {
       return new Builder();
     }
 
-    public Builder unit(String unit) {
-      this.unit = unit;
+    public Builder name(String name) {
+      this.name = name;
       return this;
     }
 
@@ -589,18 +585,18 @@ public class OpalKeyStore implements KeyProvider {
     }
 
     public OpalKeyStore build() {
-      Assert.hasText(unit, "unit must not be null or empty");
+      Assert.hasText(name, "name must not be null or empty");
       Assert.notNull(callbackHandler, "callbackHandler must not be null");
 
       loadBouncyCastle();
 
-      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unit)
-          .prompt("Enter '" + unit + "' keystore password:  ")
-          .confirmation("Re-enter '" + unit + "' keystore password:  ").build();
+      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(name)
+          .prompt("Enter '" + name + "' keystore password:  ")
+          .confirmation("Re-enter '" + name + "' keystore password:  ").build();
 
       KeyStore keyStore = createEmptyKeyStore(passwordCallback);
 
-      return createUnitKeyStore(keyStore);
+      return createKeyStore(keyStore);
     }
 
     private KeyStore createEmptyKeyStore(CacheablePasswordCallback passwordCallback) {
@@ -609,12 +605,12 @@ public class OpalKeyStore implements KeyProvider {
         keyStore = KeyStore.getInstance("JCEKS");
         keyStore.load(null, getKeyPassword(passwordCallback));
       } catch(KeyStoreException e) {
-        clearPasswordCache(callbackHandler, unit);
+        clearPasswordCache(callbackHandler, name);
         throw new KeyProviderSecurityException("Wrong keystore password or keystore was tampered with");
       } catch(GeneralSecurityException | UnsupportedCallbackException e) {
         throw new RuntimeException(e);
       } catch(IOException ex) {
-        clearPasswordCache(callbackHandler, unit);
+        clearPasswordCache(callbackHandler, name);
         translateAndRethrowKeyStoreIOException(ex);
       }
       return keyStore;
@@ -633,8 +629,8 @@ public class OpalKeyStore implements KeyProvider {
       throw new RuntimeException(ex);
     }
 
-    private OpalKeyStore createUnitKeyStore(KeyStore keyStore) {
-      OpalKeyStore opalKeyStore = new OpalKeyStore(unit, keyStore);
+    private OpalKeyStore createKeyStore(KeyStore keyStore) {
+      OpalKeyStore opalKeyStore = new OpalKeyStore(name, keyStore);
       opalKeyStore.setCallbackHandler(callbackHandler);
       return opalKeyStore;
     }

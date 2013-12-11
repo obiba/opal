@@ -14,7 +14,6 @@ import java.util.List;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.junit.Assert;
 import org.junit.Test;
 import org.obiba.opal.core.vcs.OpalGitException;
 import org.obiba.opal.core.vcs.git.commands.OpalGitDiffCommand;
@@ -116,27 +115,19 @@ public class OpalGitDiffCommandTest {
 
   @Test
   public void testDiffWithValidCommit() {
-    try {
-      OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(vcs.getRepository(DATASOURCE_NAME), COMMIT_ID)
-          .addDatasourceName(DATASOURCE_NAME).build();
-      List<String> diffs = command.execute();
-      assertThat(diffs, matches(DIFF_VARIABLE));
-      assertThat(diffs, matches(DIFF_VIEW));
-    } catch(Exception e) {
-      Assert.fail();
-    }
+    OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(vcs.getRepository(DATASOURCE_NAME), COMMIT_ID)
+        .addDatasourceName(DATASOURCE_NAME).build();
+    List<String> diffs = command.execute();
+    assertThat(diffs, matches(DIFF_VARIABLE));
+    assertThat(diffs, matches(DIFF_VIEW));
   }
 
   @Test
   public void testDiffWithValidVariablePath() {
-    try {
-      OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(vcs.getRepository(DATASOURCE_NAME), COMMIT_ID)
-          .addPath("TestView/TOTO_VAR.js").addDatasourceName(DATASOURCE_NAME).build();
-      List<String> diffs = command.execute();
-      assertThat(diffs, matches(DIFF_VARIABLE));
-    } catch(Exception e) {
-      Assert.fail();
-    }
+    OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(vcs.getRepository(DATASOURCE_NAME), COMMIT_ID)
+        .addPath("TestView/TOTO_VAR.js").addDatasourceName(DATASOURCE_NAME).build();
+    List<String> diffs = command.execute();
+    assertThat(diffs, matches(DIFF_VARIABLE));
   }
 
   @Test(expected = OpalGitException.class)
@@ -147,61 +138,41 @@ public class OpalGitDiffCommandTest {
 
   @Test
   public void testDiffWithValidViewPath() {
-    try {
-      OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(vcs.getRepository(DATASOURCE_NAME), COMMIT_ID)
-          .addPath("TestView").addDatasourceName(DATASOURCE_NAME).build();
-      List<String> diffs = command.execute();
-      assertThat(diffs, matches(DIFF_VARIABLE));
-      assertThat(diffs, matches(DIFF_VIEW));
-    } catch(Exception e) {
-      Assert.fail();
-    }
+    OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(vcs.getRepository(DATASOURCE_NAME), COMMIT_ID)
+        .addPath("TestView").addDatasourceName(DATASOURCE_NAME).build();
+    List<String> diffs = command.execute();
+    assertThat(diffs, matches(DIFF_VARIABLE));
+    assertThat(diffs, matches(DIFF_VIEW));
   }
 
   @Test
   public void testDiffWithSelf() {
-    try {
-      new OpalGitDiffCommand.Builder(vcs.getRepository(DATASOURCE_NAME), COMMIT_ID).addDatasourceName(DATASOURCE_NAME)
-          .addNthCommit(0).build().execute();
-    } catch(Exception e) {
-      Assert.fail();
-    }
+    new OpalGitDiffCommand.Builder(vcs.getRepository(DATASOURCE_NAME), COMMIT_ID).addDatasourceName(DATASOURCE_NAME)
+        .addNthCommit(0).build().execute();
   }
 
   @Test
   public void testDiffWithTwoVersionsBack() {
-    try {
-      OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(vcs.getRepository(DATASOURCE_NAME), COMMIT_ID)
-          .addPath("TestView").addDatasourceName(DATASOURCE_NAME).addNthCommit(2).build();
-      List<String> diffs = command.execute();
-      assertThat(diffs, matches(DIFF_VIEW_TWO_VERSIONS_BACK));
-    } catch(Exception e) {
-      Assert.fail();
-    }
+    OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(vcs.getRepository(DATASOURCE_NAME), COMMIT_ID)
+        .addPath("TestView").addDatasourceName(DATASOURCE_NAME).addNthCommit(2).build();
+    List<String> diffs = command.execute();
+    assertThat(diffs, matches(DIFF_VIEW_TWO_VERSIONS_BACK));
   }
 
   @Test
   public void testDiffWithCurrent() {
-    try {
-      OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(vcs.getRepository(DATASOURCE_NAME), "HEAD")
-          .addPath("TestView/View.xml").addDatasourceName(DATASOURCE_NAME)
-          .addPreviousCommitId("be77432d15dec81b4c60ed858d5d678ceb247171").build();
-      List<String> diffs = command.execute();
-      assertThat(diffs, matches(DIFF_VIEW_WITH_HEAD));
-    } catch(Exception e) {
-      Assert.fail();
-    }
+    OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(vcs.getRepository(DATASOURCE_NAME), "HEAD")
+        .addPath("TestView/View.xml").addDatasourceName(DATASOURCE_NAME)
+        .addPreviousCommitId("be77432d15dec81b4c60ed858d5d678ceb247171").build();
+    List<String> diffs = command.execute();
+    assertThat(diffs, matches(DIFF_VIEW_WITH_HEAD));
   }
 
   @Test
   public void testDiffWithCurrentUsingGitVCS() {
-    try {
-      List<String> diffs = vcs
-          .getDiffEntries(DATASOURCE_NAME, "HEAD", "be77432d15dec81b4c60ed858d5d678ceb247171", "TestView/View.xml");
-      assertThat(diffs, matches(DIFF_VIEW_WITH_HEAD));
-    } catch(Exception e) {
-      Assert.fail();
-    }
+    List<String> diffs = vcs
+        .getDiffEntries(DATASOURCE_NAME, "HEAD", "be77432d15dec81b4c60ed858d5d678ceb247171", "TestView/View.xml");
+    assertThat(diffs, matches(DIFF_VIEW_WITH_HEAD));
   }
 
   /**
@@ -218,11 +189,7 @@ public class OpalGitDiffCommandTest {
 
       @Override
       public boolean matches(Object diffObject) {
-        if(diffObject instanceof List) {
-          return matchDiffs((List<String>) diffObject);
-        }
-
-        return diffObject.equals(theExpected);
+        return diffObject instanceof List ? matchDiffs((List<String>) diffObject) : diffObject.equals(theExpected);
       }
 
       @Override
@@ -234,7 +201,6 @@ public class OpalGitDiffCommandTest {
         for(String diff : diffs) {
           if(diff.equals(theExpected)) return true;
         }
-
         return false;
       }
 

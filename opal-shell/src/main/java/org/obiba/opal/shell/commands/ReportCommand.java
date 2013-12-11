@@ -60,11 +60,9 @@ public class ReportCommand extends AbstractOpalRuntimeDependentCommand<ReportCom
   @Autowired
   private VelocityEngine velocityEngine;
 
-  @Autowired
   @Value("${org.obiba.opal.public.url}")
   private String opalPublicUrl;
 
-  @Autowired
   @Value("${org.obiba.opal.smtp.from}")
   private String fromAddress;
 

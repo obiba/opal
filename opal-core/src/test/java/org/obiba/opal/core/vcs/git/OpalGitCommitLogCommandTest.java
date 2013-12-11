@@ -9,7 +9,6 @@
  */
 package org.obiba.opal.core.vcs.git;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.obiba.opal.core.vcs.CommitInfo;
 import org.obiba.opal.core.vcs.OpalGitException;
@@ -38,17 +37,13 @@ public class OpalGitCommitLogCommandTest {
 
   @Test
   public void testCommitInfoRetrievalWithValidCommitId() {
-    try {
-      OpalGitCommitLogCommand command = new OpalGitCommitLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME),
-          "TestView", COMMIT_ID).build();
-      CommitInfo commitInfo = command.execute();
-      assertThat(commitInfo, not(is(nullValue())));
-      assertThat(commitInfo.getCommitId(), is(COMMIT_ID));
-      assertThat(commitInfo.getAuthor(), is("administrator"));
-      assertThat(commitInfo.getComment(), is("Update TestView"));
-    } catch(Exception e) {
-      Assert.fail();
-    }
+    OpalGitCommitLogCommand command = new OpalGitCommitLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME),
+        "TestView", COMMIT_ID).build();
+    CommitInfo commitInfo = command.execute();
+    assertThat(commitInfo, not(is(nullValue())));
+    assertThat(commitInfo.getCommitId(), is(COMMIT_ID));
+    assertThat(commitInfo.getAuthor(), is("administrator"));
+    assertThat(commitInfo.getComment(), is("Update TestView"));
   }
 
   @Test(expected = OpalGitException.class)
@@ -60,17 +55,13 @@ public class OpalGitCommitLogCommandTest {
 
   @Test
   public void testCommitInfoRetrievalWithValidVariable() {
-    try {
-      OpalGitCommitLogCommand command = new OpalGitCommitLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME),
-          "TestView/TOTO_VAR.js", COMMIT_ID).build();
-      CommitInfo commitInfo = command.execute();
-      assertThat(commitInfo, not(is(nullValue())));
-      assertThat(commitInfo.getCommitId(), is(COMMIT_ID));
-      assertThat(commitInfo.getAuthor(), is("administrator"));
-      assertThat(commitInfo.getComment(), is("Update TestView"));
-    } catch(Exception e) {
-      Assert.fail();
-    }
+    OpalGitCommitLogCommand command = new OpalGitCommitLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME),
+        "TestView/TOTO_VAR.js", COMMIT_ID).build();
+    CommitInfo commitInfo = command.execute();
+    assertThat(commitInfo, not(is(nullValue())));
+    assertThat(commitInfo.getCommitId(), is(COMMIT_ID));
+    assertThat(commitInfo.getAuthor(), is("administrator"));
+    assertThat(commitInfo.getComment(), is("Update TestView"));
   }
 
   @Test(expected = OpalGitException.class)
@@ -80,12 +71,10 @@ public class OpalGitCommitLogCommandTest {
     command.execute();
   }
 
-  @Test(expected = OpalGitException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testCommitInfoRetrievalWithNoPath() {
-    new OpalGitCommitLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME),
-        null, COMMIT_ID).build().execute();
+    new OpalGitCommitLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME), null, COMMIT_ID).build().execute();
   }
-
 
 }
 

@@ -69,6 +69,12 @@ public class SubjectCredentialsResource {
       case APPLICATION:
         if(dto.hasCertificate()) {
           subjectCredentials.setCertificate(dto.getCertificate().toByteArray());
+        } else {
+          ConstraintViolation<SubjectCredentials> violation = ConstraintViolationImpl
+              .forBeanValidation("{javax.validation.constraints.NotNull.message}", "may not be null",
+                  SubjectCredentials.class, subjectCredentials, subjectCredentials, subjectCredentials,
+                  PathImpl.createPathFromString("certificate"), null, null);
+          throw new ConstraintViolationException(Sets.newHashSet(violation));
         }
         break;
     }

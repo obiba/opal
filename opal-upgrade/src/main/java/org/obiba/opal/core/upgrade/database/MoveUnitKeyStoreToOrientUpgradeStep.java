@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.obiba.opal.core.domain.unit.KeyStoreState;
+import org.obiba.opal.core.domain.security.KeyStoreState;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
 import org.obiba.runtime.Version;

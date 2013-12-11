@@ -1,13 +1,18 @@
 package org.obiba.opal.core.service.security;
 
+import java.io.IOException;
 import java.util.List;
+
+import javax.security.auth.callback.CallbackHandler;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.obiba.opal.core.domain.security.Group;
+import org.obiba.opal.core.domain.security.KeyStoreState;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.runtime.security.OpalUserRealm;
+import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.AbstractOrientDbTestConfig;
 import org.obiba.opal.core.service.Asserts;
 import org.obiba.opal.core.service.OrientDbService;
@@ -15,11 +20,14 @@ import org.obiba.opal.core.service.SubjectProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
+import org.springframework.util.ResourceUtils;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import com.google.common.io.Files;
 
 import static com.google.common.collect.Iterables.size;
 import static com.google.common.collect.Lists.newArrayList;
@@ -44,10 +52,14 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
   @Autowired
   private OrientDbService orientDbService;
 
+  @Autowired
+  private CredentialsKeyStoreService credentialsKeyStoreService;
+
   @Before
   public void clear() throws Exception {
     orientDbService.deleteAll(SubjectCredentials.class);
     orientDbService.deleteAll(Group.class);
+    orientDbService.deleteAll(KeyStoreState.class);
   }
 
   @Test
@@ -66,10 +78,9 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
   }
 
   @Test
-  public void test_create_new_application() {
+  public void test_create_new_application() throws IOException {
     SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
-        .type(SubjectCredentials.Type.APPLICATION).name("app1").certificate("certificate".getBytes()).enabled(true)
-        .build();
+        .type(SubjectCredentials.Type.APPLICATION).name("app1").certificate(getCertificate()).enabled(true).build();
     subjectCredentialsService.save(subjectCredentials);
 
     List<SubjectCredentials> list = newArrayList(
@@ -79,11 +90,14 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
 
     SubjectCredentials found = subjectCredentialsService.getSubjectCredentials(subjectCredentials.getName());
     assertSubjectEquals(subjectCredentials, found);
+
+    OpalKeyStore keyStore = credentialsKeyStoreService.getKeyStore();
+    assertThat(keyStore.aliasExists(subjectCredentials.getName()), is(true));
+    assertThat(keyStore.getKeyType(subjectCredentials.getName()), is(OpalKeyStore.KeyType.CERTIFICATE));
   }
 
   @Test
   public void test_update_user() {
-
     SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().type(SubjectCredentials.Type.USER)
         .name("user1").password("password").enabled(true).build();
     subjectCredentialsService.save(subjectCredentials);
@@ -101,25 +115,9 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
     Asserts.assertUpdatedTimestamps(subjectCredentials, found);
   }
 
-  @Test
-  public void test_update_application() {
-
-    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
-        .type(SubjectCredentials.Type.APPLICATION).name("app1").certificate("certificate".getBytes()).enabled(true)
-        .build();
-    subjectCredentialsService.save(subjectCredentials);
-
-    subjectCredentials.setCertificate("new certificate".getBytes());
-    subjectCredentialsService.save(subjectCredentials);
-
-    List<SubjectCredentials> list = newArrayList(
-        subjectCredentialsService.getSubjectCredentials(SubjectCredentials.Type.APPLICATION));
-    assertEquals(1, list.size());
-    assertSubjectEquals(subjectCredentials, list.get(0));
-
-    SubjectCredentials found = subjectCredentialsService.getSubjectCredentials(subjectCredentials.getName());
-    assertSubjectEquals(subjectCredentials, found);
-    Asserts.assertUpdatedTimestamps(subjectCredentials, found);
+  private byte[] getCertificate() throws IOException {
+    return Files.toByteArray(
+        ResourceUtils.getFile("classpath:org/obiba/opal/core/service/security/test-certificate-public.pem"));
   }
 
   @Test
@@ -146,13 +144,13 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
 
     Group group1 = subjectCredentialsService.getGroup("group1");
     assertNotNull(group1);
-    assertEquals(1, group1.getUsers().size());
-    assertTrue(group1.getUsers().contains(subjectCredentials.getName()));
+    assertEquals(1, group1.getSubjectCredentials().size());
+    assertTrue(group1.getSubjectCredentials().contains(subjectCredentials.getName()));
 
     Group group2 = subjectCredentialsService.getGroup("group2");
     assertNotNull(group2);
-    assertEquals(1, group2.getUsers().size());
-    assertTrue(group2.getUsers().contains(subjectCredentials.getName()));
+    assertEquals(1, group2.getSubjectCredentials().size());
+    assertTrue(group2.getSubjectCredentials().contains(subjectCredentials.getName()));
   }
 
   @Test
@@ -171,12 +169,12 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
 
     Group group1 = subjectCredentialsService.getGroup("group1");
     assertNotNull(group1);
-    assertEquals(0, group1.getUsers().size());
+    assertEquals(0, group1.getSubjectCredentials().size());
 
     Group group2 = subjectCredentialsService.getGroup("group2");
     assertNotNull(group2);
-    assertEquals(1, group2.getUsers().size());
-    assertTrue(group2.getUsers().contains(subjectCredentials.getName()));
+    assertEquals(1, group2.getSubjectCredentials().size());
+    assertTrue(group2.getSubjectCredentials().contains(subjectCredentials.getName()));
   }
 
   @Test
@@ -186,6 +184,19 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
     subjectCredentialsService.save(subjectCredentials);
     subjectCredentialsService.delete(subjectCredentials);
     assertEquals(0, size(subjectCredentialsService.getSubjectCredentials(SubjectCredentials.Type.USER)));
+  }
+
+  @Test
+  public void test_delete_application() throws IOException {
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
+        .type(SubjectCredentials.Type.APPLICATION).name("app1").certificate(getCertificate()).enabled(true).build();
+    subjectCredentialsService.save(subjectCredentials);
+
+    subjectCredentialsService.delete(subjectCredentials);
+    assertEquals(0, size(subjectCredentialsService.getSubjectCredentials(SubjectCredentials.Type.APPLICATION)));
+
+    OpalKeyStore keyStore = credentialsKeyStoreService.getKeyStore();
+    assertThat(keyStore.aliasExists(subjectCredentials.getName()), is(false));
   }
 
   @Test
@@ -199,10 +210,10 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
     assertEquals(0, size(subjectCredentialsService.getSubjectCredentials(SubjectCredentials.Type.USER)));
 
     Group group1 = subjectCredentialsService.getGroup("group1");
-    assertEquals(0, group1.getUsers().size());
+    assertEquals(0, group1.getSubjectCredentials().size());
 
     Group group2 = subjectCredentialsService.getGroup("group2");
-    assertEquals(0, group2.getUsers().size());
+    assertEquals(0, group2.getSubjectCredentials().size());
   }
 
   @Test
@@ -214,7 +225,7 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
   }
 
   @Test
-  public void test_delete_group_with_users() {
+  public void test_delete_group_with_subjects() {
     // TODO
   }
 
@@ -224,7 +235,6 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
     assertThat(found.getName(), is(expected.getName()));
     assertThat(found.getType(), is(expected.getType()));
     assertThat(found.getPassword(), is(expected.getPassword()));
-    assertThat(found.getCertificate(), is(expected.getCertificate()));
     assertThat(found.isEnabled(), is(expected.isEnabled()));
 
     assertTrue(Iterables.elementsEqual(expected.getGroups(), found.getGroups()));
@@ -235,16 +245,27 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
     assertThat(found, notNullValue());
     assertThat(found, is(expected));
     assertThat(found.getName(), is(expected.getName()));
-    assertTrue(Iterables.elementsEqual(expected.getUsers(), found.getUsers()));
+    assertTrue(Iterables.elementsEqual(expected.getSubjectCredentials(), found.getSubjectCredentials()));
     Asserts.assertCreatedTimestamps(expected, found);
   }
 
   @Configuration
+  @PropertySource("classpath:org/obiba/opal/core/service/security/SubjectCredentialsServiceImplTest.properties")
   public static class Config extends AbstractOrientDbTestConfig {
 
     @Bean
-    public SubjectCredentialsService userService() {
+    public SubjectCredentialsService subjectCredentialsService() {
       return new SubjectCredentialsServiceImpl();
+    }
+
+    @Bean
+    public CredentialsKeyStoreService credentialsKeyStoreService() {
+      return new CredentialsKeyStoreServiceImpl();
+    }
+
+    @Bean
+    public CallbackHandler callbackHandler() {
+      return ProjectsKeyStoreServiceImplTest.createPasswordCallbackHandler();
     }
 
     @Bean

@@ -34,7 +34,7 @@ import com.google.protobuf.Message.Builder;
 
 @Component
 @Provider
-@Consumes({ "application/x-protobuf" })
+@Consumes("application/x-protobuf")
 public class ProtobufNativeReaderProvider extends AbstractProtobufProvider implements MessageBodyReader<Object> {
 
   private final int messageSizeLimit;

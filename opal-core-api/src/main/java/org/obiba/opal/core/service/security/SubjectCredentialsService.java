@@ -13,6 +13,7 @@ import javax.validation.ConstraintViolationException;
 
 import org.obiba.opal.core.domain.security.Group;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
+import org.obiba.opal.core.service.DuplicateSubjectProfileException;
 import org.obiba.opal.core.service.SystemService;
 
 public interface SubjectCredentialsService extends SystemService {
@@ -41,7 +42,8 @@ public interface SubjectCredentialsService extends SystemService {
    *
    * @param subjectCredentials
    */
-  void save(SubjectCredentials subjectCredentials) throws ConstraintViolationException;
+  void save(SubjectCredentials subjectCredentials)
+      throws ConstraintViolationException, DuplicateSubjectProfileException;
 
   /**
    * Deletes a subjectCredentials from subjectCredentials table and from subject_acl

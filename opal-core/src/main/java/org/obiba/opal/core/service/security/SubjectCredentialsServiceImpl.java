@@ -9,6 +9,7 @@
  */
 package org.obiba.opal.core.service.security;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -24,10 +25,12 @@ import org.obiba.opal.core.domain.security.Group;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.domain.security.SubjectProfile;
 import org.obiba.opal.core.runtime.security.OpalUserRealm;
+import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.DuplicateSubjectProfileException;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
@@ -40,7 +43,11 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
   private static final String OPAL_DOMAIN = "opal";
 
-  private static final int HASH_ITERATIONS = 200000;
+  /**
+   * Number of times the user password is hashed for attack resiliency
+   */
+  @Value("${org.obiba.opal.security.password.nbHashIterations}")
+  private int nbHashIterations;
 
   @Autowired
   private SubjectAclService subjectAclService;
@@ -53,6 +60,9 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
   @Autowired
   private OpalConfigurationService opalConfigurationService;
+
+  @Autowired
+  private CredentialsKeyStoreService credentialsKeyStoreService;
 
   @Override
   @PostConstruct
@@ -89,22 +99,21 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
 
   @Override
   public String hashPassword(String password) {
-    return new Sha512Hash(password, opalConfigurationService.getOpalConfiguration().getSecretKey(), HASH_ITERATIONS)
+    return new Sha512Hash(password, opalConfigurationService.getOpalConfiguration().getSecretKey(), nbHashIterations)
         .toString();
   }
 
   @Override
-  public void save(SubjectCredentials subjectCredentials) throws ConstraintViolationException {
+  public void save(SubjectCredentials subjectCredentials)
+      throws ConstraintViolationException, DuplicateSubjectProfileException {
+
     SubjectCredentials existing = getSubjectCredentials(subjectCredentials.getName());
     boolean newSubject = existing == null;
     if(newSubject) {
-      SubjectProfile profile = subjectProfileService.getProfile(subjectCredentials.getName());
-      if(profile != null && !OpalUserRealm.OPAL_REALM.equals(profile.getRealm())) {
-        throw new DuplicateSubjectProfileException(profile);
-      }
+      validateProfile(subjectCredentials);
     }
 
-    Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
+    OpalKeyStore keyStore = null;
     switch(subjectCredentials.getType()) {
       case USER:
         // Copy current password if password is empty for existing user
@@ -113,21 +122,38 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
         }
         break;
       case APPLICATION:
-        // Copy current certificate if certificate is empty for existing application
-        if(subjectCredentials.getCertificate() == null && !newSubject) {
-          subjectCredentials.setCertificate(existing.getCertificate());
+        if(subjectCredentials.getCertificate() != null) {
+          keyStore = credentialsKeyStoreService.getKeyStore();
+          keyStore.importCertificate(subjectCredentials.getName(),
+              new ByteArrayInputStream(subjectCredentials.getCertificate()));
         }
         break;
     }
 
+    persist(subjectCredentials, keyStore);
+
+    if(newSubject) {
+      subjectProfileService.ensureProfile(subjectCredentials.getName(), OpalUserRealm.OPAL_REALM);
+    }
+  }
+
+  private void persist(SubjectCredentials subjectCredentials, @Nullable OpalKeyStore keyStore) {
+    Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
     toSave.put(subjectCredentials, subjectCredentials);
     for(Group group : findImpactedGroups(subjectCredentials)) {
       toSave.put(group, group);
     }
     orientDbService.save(toSave);
 
-    if(newSubject) {
-      subjectProfileService.ensureProfile(subjectCredentials.getName(), OpalUserRealm.OPAL_REALM);
+    if(keyStore != null) {
+      credentialsKeyStoreService.saveKeyStore(keyStore);
+    }
+  }
+
+  private void validateProfile(SubjectCredentials subjectCredentials) {
+    SubjectProfile profile = subjectProfileService.getProfile(subjectCredentials.getName());
+    if(profile != null && !OpalUserRealm.OPAL_REALM.equals(profile.getRealm())) {
+      throw new DuplicateSubjectProfileException(profile);
     }
   }
 
@@ -145,7 +171,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
             public Group apply(String groupName) {
               if(subjectCredentials.hasGroup(groupName)) return null;
               Group group = getGroup(groupName);
-              group.removeUser(subjectCredentials.getName());
+              group.removeSubjectCredential(subjectCredentials.getName());
               return group;
             }
           }));
@@ -159,11 +185,11 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
         Group group = getGroup(groupName);
         if(group == null) {
           group = new Group(groupName);
-          group.addUser(subjectCredentials.getName());
+          group.addSubjectCredential(subjectCredentials.getName());
           return group;
         }
-        if(!group.hasUser(subjectCredentials.getName())) {
-          group.addUser(subjectCredentials.getName());
+        if(!group.hasSubjectCredential(subjectCredentials.getName())) {
+          group.addSubjectCredential(subjectCredentials.getName());
           return group;
         }
         return null;
@@ -179,7 +205,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
     for(String groupName : subjectCredentials.getGroups()) {
       Group group = getGroup(groupName);
-      group.removeUser(subjectCredentials.getName());
+      group.removeSubjectCredential(subjectCredentials.getName());
       toSave.put(group, group);
     }
     // TODO we should execute these steps in a single transaction
@@ -188,6 +214,12 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     subjectAclService.deleteSubjectPermissions(OPAL_DOMAIN, null, SubjectAclService.SubjectType.USER
         .subjectFor(subjectCredentials.getName())); // Delete subjectCredentials's permissions
     subjectProfileService.deleteProfile(subjectCredentials.getName());
+
+    if(subjectCredentials.getType() == SubjectCredentials.Type.APPLICATION) {
+      OpalKeyStore keyStore = credentialsKeyStoreService.getKeyStore();
+      keyStore.deleteKey(subjectCredentials.getName());
+      credentialsKeyStoreService.saveKeyStore(keyStore);
+    }
   }
 
   @Override
@@ -208,7 +240,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
   @Override
   public void delete(Group group) {
     Map<HasUniqueProperties, HasUniqueProperties> toSave = Maps.newHashMap();
-    for(String userName : group.getUsers()) {
+    for(String userName : group.getSubjectCredentials()) {
       SubjectCredentials subjectCredentials = getSubjectCredentials(userName);
       subjectCredentials.removeGroup(group.getName());
       toSave.put(subjectCredentials, subjectCredentials);

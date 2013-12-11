@@ -27,7 +27,7 @@ public class Group extends AbstractTimestamped implements HasUniqueProperties, C
   @NotBlank
   private String name;
 
-  private Set<String> users = new HashSet<>();
+  private Set<String> subjectCredentials = new HashSet<>();
 
   public Group() {
   }
@@ -55,25 +55,25 @@ public class Group extends AbstractTimestamped implements HasUniqueProperties, C
     this.name = name;
   }
 
-  public Set<String> getUsers() {
-    return users;
+  public Set<String> getSubjectCredentials() {
+    return subjectCredentials;
   }
 
-  public void setUsers(Set<String> users) {
-    this.users = users;
+  public void setSubjectCredentials(Set<String> subjectCredentials) {
+    this.subjectCredentials = subjectCredentials;
   }
 
-  public void addUser(String user) {
-    if(users == null) users = new HashSet<>();
-    users.add(user);
+  public void addSubjectCredential(String subjectName) {
+    if(subjectCredentials == null) subjectCredentials = new HashSet<>();
+    subjectCredentials.add(subjectName);
   }
 
-  public void removeUser(String user) {
-    if(users != null) users.remove(user);
+  public void removeSubjectCredential(String subjectName) {
+    if(subjectCredentials != null) subjectCredentials.remove(subjectName);
   }
 
-  public boolean hasUser(String user) {
-    return users != null && users.contains(user);
+  public boolean hasSubjectCredential(String subjectName) {
+    return subjectCredentials != null && subjectCredentials.contains(subjectName);
   }
 
   @Override
@@ -118,8 +118,8 @@ public class Group extends AbstractTimestamped implements HasUniqueProperties, C
       return this;
     }
 
-    public Builder users(Set<String> users) {
-      group.users = users;
+    public Builder subjectCredentials(Set<String> subjectCredentials) {
+      group.subjectCredentials = subjectCredentials;
       return this;
     }
 

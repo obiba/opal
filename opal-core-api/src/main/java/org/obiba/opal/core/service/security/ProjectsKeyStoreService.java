@@ -73,6 +73,9 @@ public interface ProjectsKeyStoreService extends SystemService {
   void importKey(@NotNull Project project, @NotNull String alias, @NotNull InputStream privateKey,
       @NotNull String certificateInfo);
 
+  /**
+   * Import existing certificate
+   */
   void importCertificate(@NotNull Project project, @NotNull String alias, @NotNull InputStream byteArrayInputStream);
 
 }

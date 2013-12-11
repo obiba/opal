@@ -62,7 +62,7 @@ public abstract class OpalGitCommand<T> implements Command<T> {
 
   protected String getHeadCommitId() throws IOException {
     ObjectId id = getHeadCommit();
-    return id != null ? id.getName() : "";
+    return id == null ? "" : id.getName();
   }
 
   /**
@@ -70,8 +70,8 @@ public abstract class OpalGitCommand<T> implements Command<T> {
    *
    * @param <T> subclass type
    */
-  @SuppressWarnings("RawUseOfParameterizedType")
-  protected static class Builder<T extends Builder> {
+  protected static class Builder<T extends Builder<?>> {
+
     protected final Repository repository;
 
     protected String path;

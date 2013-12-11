@@ -227,7 +227,7 @@ public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<Sub
 
       @Override
       public String getValue(GroupDto object) {
-        return object.getUsersCount() > 0 ? object.getUsersArray().join(", ") : "";
+        return object.getSubjectCredentialsCount() > 0 ? object.getSubjectCredentialsArray().join(", ") : "";
       }
     };
 

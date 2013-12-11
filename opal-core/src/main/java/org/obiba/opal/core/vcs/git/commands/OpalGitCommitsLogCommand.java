@@ -49,7 +49,6 @@ public class OpalGitCommitsLogCommand extends OpalGitCommand<List<CommitInfo>> {
         logCommand.addPath(path);
       }
 
-      Iterable<RevCommit> commitLog = logCommand.call();
       List<CommitInfo> commits = new ArrayList<>();
       // for performance, get the id before looping thru all commits preventing resolving the id each time
       String headCommitId = getHeadCommitId();
@@ -58,7 +57,7 @@ public class OpalGitCommitsLogCommand extends OpalGitCommand<List<CommitInfo>> {
       // For now, the list is in order of 'current .. oldest'
       boolean isCurrent = true;
 
-      for(RevCommit commit : commitLog) {
+      for(RevCommit commit : logCommand.call()) {
         String commitId = commit.getName();
         boolean isHeadCommit = headCommitId.equals(commitId);
         PersonIdent personIdent = commit.getAuthorIdent();

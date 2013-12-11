@@ -13,9 +13,6 @@ import java.util.Map;
 
 import org.gwtopenmaps.openlayers.client.Projection;
 import org.gwtopenmaps.openlayers.client.Style;
-import org.gwtopenmaps.openlayers.client.control.SelectFeature;
-import org.gwtopenmaps.openlayers.client.event.VectorFeatureSelectedListener;
-import org.gwtopenmaps.openlayers.client.event.VectorFeatureUnselectedListener;
 import org.gwtopenmaps.openlayers.client.feature.VectorFeature;
 import org.gwtopenmaps.openlayers.client.geometry.Geometry;
 import org.gwtopenmaps.openlayers.client.geometry.LineString;
@@ -23,8 +20,6 @@ import org.gwtopenmaps.openlayers.client.geometry.LinearRing;
 import org.gwtopenmaps.openlayers.client.geometry.Point;
 import org.gwtopenmaps.openlayers.client.geometry.Polygon;
 import org.gwtopenmaps.openlayers.client.layer.Vector;
-import org.gwtopenmaps.openlayers.client.popup.FramedCloud;
-import org.gwtopenmaps.openlayers.client.popup.Popup;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
@@ -117,54 +112,6 @@ public abstract class ValueMap extends BaseMap {
     VectorFeature feature = new VectorFeature(g, style);
     feature.setFeatureId(id);
     vectorLayer.addFeature(feature);
-
-    //addFeaturePopup(vectorLayer, feature, value.getValue());
-  }
-
-  /**
-   * Add a popup to a feature.
-   *
-   * @param vectorLayer
-   * @param pointFeature
-   * @param content html content
-   */
-  private void addFeaturePopup(Vector vectorLayer, VectorFeature pointFeature, String content) {
-    if(featurePopupContent.size() == 0) {
-      // We want to display the popup when the user clicks the feature.
-      // So we add a VectorFeatureSelectedListener to the feature.
-
-      // First create a select control and make sure it is actived
-      SelectFeature selectFeature = new SelectFeature(vectorLayer);
-      selectFeature.setAutoActivate(true);
-      map.addControl(selectFeature);
-
-      // Secondly add a VectorFeatureSelectedListener to the feature
-      vectorLayer.addVectorFeatureSelectedListener(new VectorFeatureSelectedListener() {
-        public void onFeatureSelected(FeatureSelectedEvent eventObject) {
-          VectorFeature feature = eventObject.getVectorFeature();
-          String content = featurePopupContent.get(feature.getFeatureId());
-          //Attach a popup to the point, we use null as size cause we set autoSize to true
-          Popup popup = new FramedCloud("id1", feature.getCenterLonLat(), null, content, null, false);
-          popup.setPanMapIfOutOfView(true); //this set the popup in a strategic way, and pans the map if needed.
-          popup.setAutoSize(true);
-          feature.setPopup(popup);
-
-          //And attach the popup to the map
-          map.addPopup(eventObject.getVectorFeature().getPopup());
-        }
-      });
-
-      // And add a VectorFeatureUnselectedListener which removes the popup.
-      vectorLayer.addVectorFeatureUnselectedListener(new VectorFeatureUnselectedListener() {
-        public void onFeatureUnselected(FeatureUnselectedEvent eventObject) {
-          VectorFeature feature = eventObject.getVectorFeature();
-          map.removePopup(feature.getPopup());
-          feature.resetPopup();
-        }
-      });
-    }
-
-    featurePopupContent.put(pointFeature.getFeatureId(), content);
   }
 
   protected Style getDefaultStyle() {

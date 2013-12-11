@@ -26,7 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obiba.core.util.FileUtil;
 import org.obiba.opal.core.domain.Project;
-import org.obiba.opal.core.domain.unit.KeyStoreState;
+import org.obiba.opal.core.domain.security.KeyStoreState;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.OrientDbService;
 
@@ -105,7 +105,7 @@ public class ProjectsKeyStoreServiceImplTest {
   // Helper Methods
   //
 
-  private CallbackHandler createPasswordCallbackHandler() {
+  static CallbackHandler createPasswordCallbackHandler() {
     return new CallbackHandler() {
       @Override
       public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {

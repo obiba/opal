@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.domain.unit;
+package org.obiba.opal.core.domain.security;
 
 import java.util.Arrays;
 import java.util.List;

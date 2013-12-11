@@ -11,7 +11,6 @@ package org.obiba.opal.core.vcs.git;
 
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.obiba.opal.core.vcs.CommitInfo;
 import org.obiba.opal.core.vcs.OpalGitException;
@@ -38,16 +37,12 @@ public class OpalGitCommitsLogCommandTest {
 
   @Test
   public void testCommitsInfoRetrievalWitValidViewPath() {
-    try {
-      OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
-          .addDatasourceName(DATASOURCE_NAME).addPath("TestView").build();
-      List<CommitInfo> commitInfos = command.execute();
-      assertThat(commitInfos, not(is(nullValue())));
-      assertTrue(commitInfos.size() > 0);
-      assertThat(commitInfos.get(0).getCommitId(), not(is(nullValue())));
-    } catch(Exception e) {
-      Assert.fail();
-    }
+    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
+        .addDatasourceName(DATASOURCE_NAME).addPath("TestView").build();
+    List<CommitInfo> commitInfos = command.execute();
+    assertThat(commitInfos, not(is(nullValue())));
+    assertTrue(commitInfos.size() > 0);
+    assertThat(commitInfos.get(0).getCommitId(), not(is(nullValue())));
   }
 
   @Test(expected = OpalGitException.class)
@@ -59,17 +54,13 @@ public class OpalGitCommitsLogCommandTest {
 
   @Test
   public void testCommitsInfoRetrievalWitValidVariablePath() {
-    try {
-      OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
-          .addDatasourceName(DATASOURCE_NAME).addPath("TestView/TOTO_VAR.js").build();
+    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
+        .addDatasourceName(DATASOURCE_NAME).addPath("TestView/TOTO_VAR.js").build();
 
-      List<CommitInfo> commitInfos = command.execute();
-      assertThat(commitInfos, not(is(nullValue())));
-      assertThat(commitInfos.size(), not(is(0)));
-      assertThat(commitInfos.get(0).getCommitId(), not(is(nullValue())));
-    } catch(Exception e) {
-      Assert.fail();
-    }
+    List<CommitInfo> commitInfos = command.execute();
+    assertThat(commitInfos, not(is(nullValue())));
+    assertThat(commitInfos.size(), not(is(0)));
+    assertThat(commitInfos.get(0).getCommitId(), not(is(nullValue())));
   }
 
   @Test(expected = OpalGitException.class)
@@ -81,15 +72,11 @@ public class OpalGitCommitsLogCommandTest {
 
   @Test
   public void testCommitsInfoRetrievalForWholeRepository() {
-    try {
-      OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
-          .addDatasourceName(DATASOURCE_NAME).build();
-      List<CommitInfo> commitInfos = command.execute();
-      assertThat(commitInfos, not(is(nullValue())));
-      assertTrue(commitInfos.size() > 0);
-    } catch(Exception e) {
-      Assert.fail();
-    }
+    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
+        .addDatasourceName(DATASOURCE_NAME).build();
+    List<CommitInfo> commitInfos = command.execute();
+    assertThat(commitInfos, not(is(nullValue())));
+    assertTrue(commitInfos.size() > 0);
   }
 
   /**
@@ -97,15 +84,11 @@ public class OpalGitCommitsLogCommandTest {
    */
   @Test
   public void testCommitsInfoRetrievalWithEmptyPath() {
-    try {
-      OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
-          .addDatasourceName(DATASOURCE_NAME).addPath("").build();
-      List<CommitInfo> commitInfos = command.execute();
-      assertThat(commitInfos, not(is(nullValue())));
-      assertTrue(commitInfos.size() > 0);
-    } catch(Exception e) {
-      Assert.fail();
-    }
+    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
+        .addDatasourceName(DATASOURCE_NAME).addPath("").build();
+    List<CommitInfo> commitInfos = command.execute();
+    assertThat(commitInfos, not(is(nullValue())));
+    assertTrue(commitInfos.size() > 0);
   }
 
   @Test
@@ -143,7 +126,7 @@ public class OpalGitCommitsLogCommandTest {
 
     List<CommitInfo> commitInfos = command.execute();
     assertThat(commitInfos, not(is(nullValue())));
-    assertThat(commitInfos.size(),  greaterThan((5)));
+    assertThat(commitInfos.size(), greaterThan((5)));
     CommitInfo firstCommit = commitInfos.get(5);
     assertThat(firstCommit.getCommitId(), not(is(nullValue())));
     assertThat(firstCommit.getIsHead(), is(false));
@@ -151,4 +134,3 @@ public class OpalGitCommitsLogCommandTest {
   }
 
 }
-

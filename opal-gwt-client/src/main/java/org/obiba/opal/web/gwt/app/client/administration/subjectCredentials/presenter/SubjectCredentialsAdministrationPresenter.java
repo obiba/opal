@@ -193,7 +193,7 @@ public class SubjectCredentialsAdministrationPresenter extends
           String name = dto.getName();
           removeConfirmation = new RemoveRunnable(name, false);
           fireEvent(ConfirmationRequiredEvent.createWithMessages(removeConfirmation, translations.removeGroup(),
-              dto.getUsersCount() > 0
+              dto.getSubjectCredentialsCount() > 0
                   ? translationMessages.confirmRemoveGroupWithUsersOrApps(name)
                   : translationMessages.confirmRemoveGroup(name)));
         }

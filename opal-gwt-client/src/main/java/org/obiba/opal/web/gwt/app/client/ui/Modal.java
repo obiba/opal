@@ -2,7 +2,6 @@ package org.obiba.opal.web.gwt.app.client.ui;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Stack;
 
 import javax.annotation.Nullable;
@@ -20,7 +19,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.History;
@@ -414,13 +412,11 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
    * Closes the alerts along with the highlighted groups
    */
   public void closeAlerts() {
-
     Collection<Alert> alerts = new ArrayList<Alert>();
-
-    for (Iterator<Widget> iterator = alertPlace.iterator(); iterator.hasNext();) {
-      alerts.add((Alert)iterator.next());
+    for(Widget anAlertPlace : alertPlace) {
+      alerts.add((Alert) anAlertPlace);
     }
-    for (Alert alert : alerts) {
+    for(Alert alert : alerts) {
       // automatically removes the alert from the alertPlace children list, hence the two loops
       alert.close();
     }
@@ -458,13 +454,6 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     alert.setType(type);
     alert.setAnimation(true);
     alert.setClose(true);
-    final HandlerRegistration handler = alert.addCloseHandler(new CloseHandler() {
-      @Override
-      public void onClose(CloseEvent closeEvent) {
-        alert.removeFromParent();
-        if(groupCloseHandler != null) groupCloseHandler.onClose(closeEvent);
-      }
-    });
     addAlert(alert);
   }
 

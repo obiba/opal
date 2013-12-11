@@ -22,9 +22,8 @@ import org.obiba.opal.core.validator.NotNullIfAnotherFieldHasValue;
 
 import com.google.common.collect.Lists;
 
-@NotNullIfAnotherFieldHasValue.List({ //
-    @NotNullIfAnotherFieldHasValue(fieldName = "type", fieldValue = "USER", dependFieldName = "password"), //
-    @NotNullIfAnotherFieldHasValue(fieldName = "type", fieldValue = "APPLICATION", dependFieldName = "certificate") })
+@NotNullIfAnotherFieldHasValue.List(
+    @NotNullIfAnotherFieldHasValue(fieldName = "type", fieldValue = "USER", dependFieldName = "password"))
 public class SubjectCredentials extends AbstractTimestamped
     implements Comparable<SubjectCredentials>, HasUniqueProperties {
 
@@ -41,7 +40,7 @@ public class SubjectCredentials extends AbstractTimestamped
 
   private String password; // for user only
 
-  private byte[] certificate; // for application only
+  private transient byte[] certificate; // for application only
 
   private boolean enabled;
 

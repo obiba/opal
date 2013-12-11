@@ -110,13 +110,6 @@ public class CsvFormatStepPresenter extends PresenterWidget<CsvFormatStepPresent
         }).send();
   }
 
-  private boolean charsetExistsInAvailableCharsets(String charset) {
-    for(String availableCharset : availableCharsets) {
-      if(charset.equals(availableCharset)) return true;
-    }
-    return false;
-  }
-
   public void getDefaultCharset() {
     ResourceRequestBuilderFactory.<JsArrayString>newBuilder().forResource("/files/charsets/default").get()
         .withCallback(new ResourceCallback<JsArrayString>() {

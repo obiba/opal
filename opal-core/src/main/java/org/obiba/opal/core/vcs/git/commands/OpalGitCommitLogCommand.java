@@ -25,6 +25,8 @@ import org.obiba.opal.core.vcs.OpalGitException;
 
 import com.google.common.base.Strings;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * Opal GIT command used to extract the log of a repository path for a specific commit.
  */
@@ -51,7 +53,6 @@ public class OpalGitCommitLogCommand extends OpalGitCommand<CommitInfo> {
         PersonIdent personIdent = commit.getAuthorIdent();
         return new CommitInfo.Builder().setAuthor(personIdent.getName()).setDate(personIdent.getWhen())
             .setComment(commit.getFullMessage()).setCommitId(commit.getName()).setIsHead(isHead(commitId)).build();
-
       }
     } catch(IOException e) {
       throw new OpalGitException(e.getMessage(), e);
@@ -74,8 +75,8 @@ public class OpalGitCommitLogCommand extends OpalGitCommand<CommitInfo> {
     }
 
     public OpalGitCommitLogCommand build() {
-      if(Strings.isNullOrEmpty(path)) throw new OpalGitException("Commit path cannot empty nor null.");
-      if(Strings.isNullOrEmpty(commitId)) throw new OpalGitException("Commit id can not be empty nor null.");
+      checkArgument(!Strings.isNullOrEmpty(path), "Commit path cannot empty nor null.");
+      checkArgument(!Strings.isNullOrEmpty(commitId), "Commit id cannot empty nor null.");
       return new OpalGitCommitLogCommand(this);
     }
   }

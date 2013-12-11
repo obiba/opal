@@ -28,7 +28,7 @@ import org.apache.commons.vfs2.FileObject;
 import org.obiba.opal.core.crypt.CacheablePasswordCallback;
 import org.obiba.opal.core.crypt.CachingCallbackHandler;
 import org.obiba.opal.core.crypt.KeyProviderSecurityException;
-import org.obiba.opal.core.domain.unit.KeyStoreState;
+import org.obiba.opal.core.domain.security.KeyStoreState;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.NoSuchFunctionalUnitException;
 import org.obiba.opal.core.service.OrientDbService;
@@ -65,7 +65,7 @@ public abstract class AbstractKeyStoreService {
   OpalKeyStore getOrCreateKeyStore(@NotNull String name) {
     OpalKeyStore keyStore = getKeyStore(name);
     if(keyStore == null) {
-      keyStore = OpalKeyStore.Builder.newStore().unit(name).passwordPrompt(callbackHandler).build();
+      keyStore = OpalKeyStore.Builder.newStore().name(name).passwordPrompt(callbackHandler).build();
       saveKeyStore(keyStore);
     }
     return keyStore;
@@ -102,11 +102,11 @@ public abstract class AbstractKeyStoreService {
     notNull(keyStore, "keyStore must not be null");
 
     KeyStoreState state;
-    String unitName = keyStore.getName();
-    KeyStoreState existing = findByName(unitName);
+    String name = keyStore.getName();
+    KeyStoreState existing = findByName(name);
     if(existing == null) {
       state = new KeyStoreState();
-      state.setName(unitName);
+      state.setName(name);
     } else {
       state = existing;
     }
@@ -219,17 +219,17 @@ public abstract class AbstractKeyStoreService {
     return ks;
   }
 
-  private KeyStoreState findByName(String unitName) {
-    return orientDbService.findUnique(new KeyStoreState(unitName));
+  private KeyStoreState findByName(String name) {
+    return orientDbService.findUnique(new KeyStoreState(name));
   }
 
   private byte[] getKeyStoreByteArray(OpalKeyStore opalKeyStore) {
-    String unitName = opalKeyStore.getName();
+    String name = opalKeyStore.getName();
 
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     try {
-      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(unitName)
-          .prompt(getPasswordFor(unitName)).build();
+      CacheablePasswordCallback passwordCallback = CacheablePasswordCallback.Builder.newCallback().key(name)
+          .prompt(getPasswordFor(name)).build();
       opalKeyStore.getKeyStore().store(outputStream, getKeyPassword(passwordCallback));
     } catch(KeyStoreException e) {
       clearPasswordCache(callbackHandler, opalKeyStore.getName());
@@ -237,7 +237,7 @@ public abstract class AbstractKeyStoreService {
     } catch(GeneralSecurityException | UnsupportedCallbackException e) {
       throw new RuntimeException(e);
     } catch(IOException ex) {
-      clearPasswordCache(callbackHandler, unitName);
+      clearPasswordCache(callbackHandler, name);
       translateAndRethrowKeyStoreIOException(ex);
     }
     return outputStream.toByteArray();

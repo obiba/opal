@@ -241,7 +241,7 @@ message SubjectCredentialsDto {
 
 message GroupDto {
   required string name = 1;
-  repeated string users = 2;
+  repeated string subjectCredentials = 2;
 }
 
 // Extracts from RuntimeMXBean

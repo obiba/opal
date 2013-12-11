@@ -47,7 +47,7 @@ public class Dtos {
   public static Opal.GroupDto asDto(Group group) {
     return Opal.GroupDto.newBuilder() //
         .setName(group.getName()) //
-        .addAllUsers(group.getUsers()) //
+        .addAllSubjectCredentials(group.getSubjectCredentials()) //
         .build();
   }
 

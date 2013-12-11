@@ -60,7 +60,6 @@ public class SubjectCredentialResource {
         }
         break;
     }
-
     subjectCredentialsService.save(subjectCredentials);
     return Response.ok().build();
   }

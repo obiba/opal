@@ -9,7 +9,6 @@
  */
 package org.obiba.opal.core.vcs.git;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.obiba.opal.core.vcs.OpalGitException;
 import org.obiba.opal.core.vcs.git.commands.OpalGitFetchBlobCommand;
@@ -42,14 +41,10 @@ public class OpalGitFetchBlobCommandTest {
 
   @Test
   public void testBlobRetrievalWithValidVariablePath() {
-    try {
-      OpalGitFetchBlobCommand command = new OpalGitFetchBlobCommand.Builder(vcs.getRepository(DATASOURCE_NAME),
-          "TestView/PLACE_NAME.js", COMMIT_ID).addDatasourceName(DATASOURCE_NAME).build();
-      String blob = command.execute();
-      assertThat(blob, equalTo("$('PLACE_NAME')"));
-    } catch(Exception e) {
-      Assert.fail();
-    }
+    OpalGitFetchBlobCommand command = new OpalGitFetchBlobCommand.Builder(vcs.getRepository(DATASOURCE_NAME),
+        "TestView/PLACE_NAME.js", COMMIT_ID).addDatasourceName(DATASOURCE_NAME).build();
+    String blob = command.execute();
+    assertThat(blob, equalTo("$('PLACE_NAME')"));
   }
 
   @Test(expected = OpalGitException.class)
