@@ -261,6 +261,13 @@ public enum UriBuilders {
     }
   },
 
+  SYSTEM_KEYSTORE_HTTPS_CERTIFICATE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "keystore", "https", "certificate");
+    }
+  },
+
   SUBJECT_CREDENTIALS {
     @Override
     public UriBuilder create() {
