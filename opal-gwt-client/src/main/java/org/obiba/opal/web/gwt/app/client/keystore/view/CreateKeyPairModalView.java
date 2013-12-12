@@ -60,13 +60,25 @@ implements CreateKeyPairModalPresenter.Display {
   @UiField
   TextBox organizationalUnit;
 
+  @UiField
+  TextBox locality;
+
+  @UiField
+  TextBox organization;
+
+  @UiField
+  TextBox state;
+
+  @UiField
+  TextBox country;
+
   interface Binder extends UiBinder<Widget, CreateKeyPairModalView> {}
 
   @Inject
   public CreateKeyPairModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
     super(eventBus);
     initWidget(uiBinder.createAndBindUi(this));
-    modal.setTitle(translations.addResourcePermissionsModalTile());
+    modal.setTitle(translations.createKeyPairLabel());
   }
 
   @Override
@@ -111,8 +123,28 @@ implements CreateKeyPairModalPresenter.Display {
   }
 
   @Override
+  public HasText getOrganization() {
+    return organization;
+  }
+
+  @Override
   public HasText getOrganizationalUnit() {
     return organizationalUnit;
+  }
+
+  @Override
+  public HasText getLocality() {
+    return locality;
+  }
+
+  @Override
+  public HasText getState() {
+    return state;
+  }
+
+  @Override
+  public HasText getCountry() {
+    return country;
   }
 
   @Override

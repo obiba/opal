@@ -42,9 +42,11 @@ public class CreateKeyPairModalPresenter extends ModalPresenterWidget<CreateKeyP
     if(new ViewValidator().validate()) {
       if(saveHandler != null) {
         saveHandler.save(getView().getAlgorithm().getText(), getView().getSize().getText(),
-            getView().getFirstLastName().getText(), getView().getOrganizationalUnit().getText());
+            getView().getFirstLastName().getText(), getView().getOrganization().getText(),
+            getView().getOrganizationalUnit().getText(), getView().getLocality().getText(),
+            getView().getState().getText(), getView().getCountry().getText());
       }
-      getView().close();
+//      getView().close();
     }
   }
 
@@ -77,7 +79,8 @@ public class CreateKeyPairModalPresenter extends ModalPresenterWidget<CreateKeyP
   }
 
   public interface SaveHandler {
-    void save(String algorithm, String size, String firstLastName, String organizationalUnit);
+    void save(String algorithm, String size, String firstLastName, String organization, String organizationalUnit,
+        String locality, String state, String country);
   }
 
   public interface Display extends PopupView, HasUiHandlers<CreateKeyPairModalUiHandlers> {
@@ -95,7 +98,15 @@ public class CreateKeyPairModalPresenter extends ModalPresenterWidget<CreateKeyP
 
     HasText getFirstLastName();
 
+    HasText getOrganization();
+
     HasText getOrganizationalUnit();
+
+    HasText getLocality();
+
+    HasText getState();
+
+    HasText getCountry();
 
     void showError(@Nullable FormField formField, String message);
 

@@ -7,4 +7,6 @@ public interface ConfigurationUiHandlers extends UiHandlers {
   void onEditGeneralSettings();
 
   void onDownloadCertificate();
+
+  void onCreateKeyPair();
 }

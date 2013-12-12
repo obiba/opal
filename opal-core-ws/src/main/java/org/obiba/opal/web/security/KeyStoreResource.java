@@ -35,6 +35,8 @@ import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.security.KeyStoreService;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.model.Opal;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -50,6 +52,8 @@ public class KeyStoreResource {
 
   private OpalKeyStore keyStore;
 
+  @Qualifier("systemKeyStoreService")
+  @Autowired
   private KeyStoreService keyStoreService;
 
   @GET
@@ -201,7 +205,4 @@ public class KeyStoreResource {
     this.keyStore = keyStore;
   }
 
-  public void setKeyStoreService(KeyStoreService keyStoreService) {
-    this.keyStoreService = keyStoreService;
-  }
 }

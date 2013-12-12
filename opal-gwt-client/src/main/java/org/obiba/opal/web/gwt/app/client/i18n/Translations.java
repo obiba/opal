@@ -2564,4 +2564,8 @@ public interface Translations extends Constants {
   @Description("Unknown entities count label")
   @DefaultStringValue("? entities")
   String unknownEntitiesCount();
+
+  @Description("Create Key Pair label")
+  @DefaultStringValue("Create Key Pair")
+  String createKeyPairLabel();
 }
