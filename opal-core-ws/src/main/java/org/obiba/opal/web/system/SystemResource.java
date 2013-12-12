@@ -1,12 +1,10 @@
 package org.obiba.opal.web.system;
 
-import java.io.IOException;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
-import java.security.KeyStoreException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -194,7 +192,7 @@ public class SystemResource {
   }
 
   @Path("/keystore")
-  public KeyStoreResource getKeyStoreResource() throws IOException, KeyStoreException {
+  public KeyStoreResource getKeyStoreResource() {
     KeyStoreResource resource = applicationContext.getBean(KeyStoreResource.class);
     resource.setKeyStore(systemKeyStoreService.getKeyStore());
     return resource;

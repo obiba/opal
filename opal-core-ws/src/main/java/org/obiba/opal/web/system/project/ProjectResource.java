@@ -9,8 +9,6 @@
  */
 package org.obiba.opal.web.system.project;
 
-import java.io.IOException;
-import java.security.KeyStoreException;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -111,7 +109,7 @@ public class ProjectResource {
   }
 
   @Path("/keystore")
-  public KeyStoreResource getKeyStoreResource() throws IOException, KeyStoreException {
+  public KeyStoreResource getKeyStoreResource() {
     KeyStoreResource resource = applicationContext.getBean(KeyStoreResource.class);
     OpalKeyStore keyStore = projectsKeyStoreService.getKeyStore(getProject());
     resource.setKeyStore(keyStore);
