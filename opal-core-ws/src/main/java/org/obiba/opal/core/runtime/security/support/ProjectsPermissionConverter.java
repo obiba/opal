@@ -83,6 +83,7 @@ public class ProjectsPermissionConverter extends OpalPermissionConverter {
             toRest("/datasource/{0}/views", "POST:GET", args),//
             toRest("/project/{0}", "GET:GET", args),//
             toRest("/project/{0}/summary", "GET:GET", args),//
+            toRest("/project/{0}/transient-datasources", "POST", args),//
             toRest("/files/projects/{0}", "GET:GET/*", args), //
             toRest("/files/projects/{0}", "POST:GET/*", args), //
             toRest("/files/projects/{0}", "PUT:GET/*", args));

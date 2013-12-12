@@ -199,19 +199,16 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     resource.setProjectsKeyStoreService(projectKeyStoreServiceMock);
     resource.setDatasourceFactoryRegistry(newDatasourceFactoryRegistry());
 
-    expect(projectMock.getName()).andReturn("patate").atLeastOnce();
     expect(projectServiceMock.getProject("patate")).andReturn(projectMock).atLeastOnce();
     expect(projectKeyStoreServiceMock.getKeyStore(projectMock)).andReturn(null).atLeastOnce();
-
-    UriInfo uriInfoMock = createMock(UriInfo.class);
 
     Magma.DatasourceFactoryDto factoryDto = Magma.DatasourceFactoryDto.newBuilder()
         .setExtension(ExcelDatasourceFactoryDto.params,
             Magma.ExcelDatasourceFactoryDto.newBuilder().setFile(getDatasourcePath(DATASOURCE1)).setReadOnly(true)
                 .build()).build();
 
-    replay(uriInfoMock, projectMock, projectServiceMock, projectKeyStoreServiceMock);
-    Response response = resource.createDatasource(uriInfoMock, factoryDto);
+    replay(projectMock, projectServiceMock, projectKeyStoreServiceMock);
+    Response response = resource.createDatasource(factoryDto);
     assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
     Object entity = response.getEntity();
@@ -225,7 +222,7 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
       assertFalse(true);
     }
 
-    verify(uriInfoMock);
+    verify(projectMock, projectServiceMock, projectKeyStoreServiceMock);
   }
 
   @Test

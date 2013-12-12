@@ -50,6 +50,7 @@ import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.AclAction;
 import org.obiba.opal.web.model.Opal.LocaleDto;
 import org.obiba.opal.web.security.AuthorizationInterceptor;
+import org.obiba.opal.web.support.InvalidRequestException;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -140,23 +141,16 @@ public class DatasourceResource {
   }
 
   @DELETE
-  @ApiOperation(value = "Delete the datasource")
-  @ApiResponses(@ApiResponse(code = 404, message = "If datasource is not found"))
+  @ApiOperation(value = "Delete the datasource if this one is transient (not valid for project datasources)")
+  @ApiResponses({ @ApiResponse(code = 400, message = "If datasource is not transient"),
+      @ApiResponse(code = 404, message = "If datasource is not found") })
   public Response removeDatasource() {
     Datasource ds = null;
     if(MagmaEngine.get().hasTransientDatasource(name)) {
       ds = MagmaEngine.get().getTransientDatasourceInstance(name);
       MagmaEngine.get().removeTransientDatasource(name);
     } else if(MagmaEngine.get().hasDatasource(name)) {
-      MagmaEngine.get().removeDatasource(ds = MagmaEngine.get().getDatasource(name));
-      configService.modifyConfiguration(new ConfigModificationTask() {
-
-        @Override
-        public void doWithConfig(OpalConfiguration config) {
-          Disposables.dispose(config.getMagmaEngineFactory().removeFactory(name));
-        }
-      });
-      viewManager.removeAllViews(name);
+      throw new InvalidRequestException("DatasourceNotFound");
     } else {
       return Response.status(Status.NOT_FOUND)
           .entity(ClientErrorDtos.getErrorMessage(Status.NOT_FOUND, "DatasourceNotFound")).build();

@@ -56,6 +56,7 @@ public class ProjectsPermissionConverterTest
         "rest:/datasource/patate/views:POST:GET", //
         "rest:/project/patate:GET:GET", //
         "rest:/project/patate/summary:GET:GET", //
+        "rest:/project/patate/transient-datasources:POST", //
         "rest:/files/projects/patate:GET:GET/*", //
         "rest:/files/projects/patate:POST:GET/*",//
         "rest:/files/projects/patate:PUT:GET/*");

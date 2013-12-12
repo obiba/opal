@@ -81,8 +81,7 @@ public class ProjectTransientDatasourcesResource {
   }
 
   @POST
-  @NoAuthorization
-  public Response createDatasource(@Context UriInfo uriInfo, Magma.DatasourceFactoryDto factoryDto) {
+  public Response createDatasource(Magma.DatasourceFactoryDto factoryDto) {
     Project project = projectService.getProject(name);
     OpalKeyStore ks = projectsKeyStoreService.getKeyStore(project);
     DatasourceEncryptionStrategy encryptionStrategy = null;
