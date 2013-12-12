@@ -90,6 +90,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   @UiField
   FlowPanel permissionsPanel;
 
+  @UiField
+  FlowPanel encryptionKeysPanel;
+
   private ProjectDto project;
 
   private final Translations translations;
@@ -219,6 +222,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     } else if(slot == ProjectPresenter.TASKS_PANE) {
       tasksPanel.clear();
       tasksPanel.add(content);
+    } else if(slot == ProjectPresenter.PERMISSION_PANE) {
+      permissionsPanel.clear();
+      permissionsPanel.add(content);
     } else if(slot == ProjectPresenter.PERMISSION_PANE) {
       permissionsPanel.clear();
       permissionsPanel.add(content);

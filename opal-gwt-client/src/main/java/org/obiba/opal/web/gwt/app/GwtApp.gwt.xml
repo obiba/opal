@@ -65,6 +65,8 @@
       value="org.obiba.opal.web.gwt.app.client.inject.CreateViewWizardModule"/>
   <extend-configuration-property name="gin.ginjector.modules"
       value="org.obiba.opal.web.gwt.app.client.inject.PermissionsModule"/>
+  <extend-configuration-property name="gin.ginjector.modules"
+      value="org.obiba.opal.web.gwt.app.client.inject.KeystoreModule"/>
 
   <!-- Client-side REST framework -->
   <inherits name='org.obiba.opal.web.gwt.rest.Rest'/>
