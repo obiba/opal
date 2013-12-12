@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseC
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -23,6 +24,7 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.database.MongoDbSettingsDto;
 import org.obiba.opal.web.model.client.database.SqlSettingsDto;
+import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableEntityDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -170,12 +172,18 @@ public class IdentifiersDatabasePresenter extends PresenterWidget<IdentifiersDat
   }
 
   private void refreshDeletionCapability() {
-    ResourceRequestBuilderFactory.<JsArray<VariableEntityDto>>newBuilder() //
-        .forResource("/functional-units/entities/table/entities") //
-        .withCallback(new ResourceCallback<JsArray<VariableEntityDto>>() {
+    ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder() //
+        .forResource("/identifiers/tables?counts=true") //
+        .withCallback(new ResourceCallback<JsArray<TableDto>>() {
           @Override
-          public void onResource(Response response, @Nullable JsArray<VariableEntityDto> entities) {
-            getView().enableDeletion(entities == null || entities.length() == 0);
+          public void onResource(Response response, @Nullable JsArray<TableDto> tables) {
+            for (TableDto table : JsArrays.toIterable(tables)) {
+              if (table.getValueSetCount()>0) {
+                getView().enableDeletion(false);
+                return;
+              }
+            }
+            getView().enableDeletion(false);
           }
         }) //
         .withCallback(Response.SC_NOT_FOUND, new ResponseCodeCallback() {

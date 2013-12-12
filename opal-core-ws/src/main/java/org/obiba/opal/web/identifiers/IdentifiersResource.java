@@ -1,4 +1,4 @@
-package org.obiba.opal.web.system.identifiers;
+package org.obiba.opal.web.identifiers;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -56,8 +56,8 @@ import com.wordnik.swagger.annotations.ApiOperation;
 @Component
 @Transactional
 @Scope("request")
-@Path("/system/identifiers")
-@Api(value = "/system/identifiers", description = "Operations about identifiers")
+@Path("/identifiers")
+@Api(value = "/identifiers", description = "Operations about identifiers")
 public class IdentifiersResource extends AbstractIdentifiersResource {
 
   @Autowired

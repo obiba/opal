@@ -32,12 +32,8 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceUpdateListener;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
-import org.obiba.magma.support.Disposables;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
-import org.obiba.opal.core.cfg.OpalConfiguration;
-import org.obiba.opal.core.cfg.OpalConfigurationService;
-import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.runtime.security.support.OpalPermissions;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.search.IndexManagerConfigurationService;
@@ -78,8 +74,6 @@ public class DatasourceResource {
   @PathParam("name")
   private String name;
 
-  private OpalConfigurationService configService;
-
   private OpalGeneralConfigService serverService;
 
   private ViewManager viewManager;
@@ -94,11 +88,6 @@ public class DatasourceResource {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  @Autowired
-  public void setConfigService(OpalConfigurationService configService) {
-    this.configService = configService;
   }
 
   @Autowired

@@ -41,7 +41,6 @@ import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.cfg.OpalConfigurationService.ConfigModificationTask;
 import org.obiba.opal.core.domain.OpalGeneralConfig;
 import org.obiba.opal.core.domain.Project;
-import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
@@ -126,7 +125,6 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
 
     DatasourceResource resource = new DatasourceResource();
     resource.setApplicationContext(mockContext);
-    resource.setConfigService(opalConfigurationService);
     resource.setServerService(serverServiceMock);
     resource.setViewManager(viewManagerMock);
     resource.setIndexManagerConfigService(indexManagerConfigService);
@@ -159,7 +157,6 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
       }
     };
     resource.setApplicationContext(mockContext);
-    resource.setConfigService(mockOpalRuntime);
     resource.setServerService(serverServiceMock);
     resource.setViewManager(mockViewManager);
     resource.setIndexManagerConfigService(indexManagerConfigService);
@@ -177,7 +174,6 @@ public class DatasourceResourceTest extends AbstractMagmaResourceTest {
     IndexManagerConfigurationService indexManagerConfigService = new IndexManagerConfigurationService(opalRuntimeMock);
 
     DatasourceResource resource = new DatasourceResource();
-    resource.setConfigService(opalRuntimeMock);
     resource.setServerService(serverServiceMock);
     resource.setViewManager(viewManagerMock);
     resource.setIndexManagerConfigService(indexManagerConfigService);

@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.system.identifiers;
+package org.obiba.opal.web.identifiers;
 
 import java.io.File;
 

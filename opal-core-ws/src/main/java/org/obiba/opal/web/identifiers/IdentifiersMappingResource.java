@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.system.identifiers;
+package org.obiba.opal.web.identifiers;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -67,8 +67,8 @@ import au.com.bytecode.opencsv.CSVWriter;
 @Component
 @Transactional
 @Scope("request")
-@Path("/system/identifiers/mapping/{name}")
-@Api(value = "/system/identifiers/mapping/{name}",
+@Path("/identifiers/mapping/{name}")
+@Api(value = "/identifiers/mapping/{name}",
     description = "Operations about a specific identifiers mapping")
 public class IdentifiersMappingResource extends AbstractIdentifiersResource {
 
