@@ -14,7 +14,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.AddPrincipalHandler;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.Display;
@@ -80,8 +79,7 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     ValuesTablePresenter values = new ValuesTablePresenter(null, null, null, modalProviderValueSequence,
         modalEntityModalPresenter);
     presenter = new TablePresenter(displayMock, new CountingEventBus(), null, values,
-        resourcePermissionsPresenterProvider, mockIndexProvider, modalConfigureViewStepProvider,
-        variablesToViewProvider, variablePropertiesModalProvider, viewPropertiesModalProvider,
+        resourcePermissionsPresenterProvider, mockIndexProvider, variablesToViewProvider, variablePropertiesModalProvider, viewPropertiesModalProvider,
         tablePropertiesModalPresenterModalProvider, null, null, translations);
   }
 
