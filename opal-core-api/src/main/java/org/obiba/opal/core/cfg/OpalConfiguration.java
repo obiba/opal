@@ -37,6 +37,7 @@ public class OpalConfiguration {
 
   private MagmaEngineFactory magmaEngineFactory;
 
+  @SuppressWarnings({ "FieldCanBeLocal", "UnusedDeclaration" })
   private final Set<FunctionalUnit> functionalUnits;
 
   private final Set<ReportTemplate> reportTemplates;
