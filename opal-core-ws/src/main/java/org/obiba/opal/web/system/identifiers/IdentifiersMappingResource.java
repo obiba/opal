@@ -45,7 +45,7 @@ import org.obiba.opal.core.identifiers.IdentifiersMapping;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersImportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
-import org.obiba.opal.core.unit.FunctionalUnitIdentifiers;
+import org.obiba.opal.core.identifiers.IdentifiersMaps;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
@@ -134,7 +134,7 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
   public List<Magma.VariableEntityDto> getUnitEntities(
       @QueryParam("type") @DefaultValue("Participant") String entityType) {
     return Lists.newArrayList(Iterables
-        .transform(new FunctionalUnitIdentifiers(getValueTable(entityType), name).getUnitEntities(),
+        .transform(new IdentifiersMaps(getValueTable(entityType), name).getPrivateEntities(),
             Dtos.variableEntityAsDtoFunc));
   }
 
@@ -277,12 +277,12 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
     return MagmaEngine.get().getTransientDatasourceInstance(uid);
   }
 
-  private Iterable<FunctionalUnitIdentifiers.UnitIdentifier> getUnitIdentifiers(String entityType) {
-    return Iterables.filter(new FunctionalUnitIdentifiers(getValueTable(entityType), name),
-        new Predicate<FunctionalUnitIdentifiers.UnitIdentifier>() {
+  private Iterable<IdentifiersMaps.IdentifiersMap> getUnitIdentifiers(String entityType) {
+    return Iterables.filter(new IdentifiersMaps(getValueTable(entityType), name),
+        new Predicate<IdentifiersMaps.IdentifiersMap>() {
           @Override
-          public boolean apply(@Nullable FunctionalUnitIdentifiers.UnitIdentifier input) {
-            return input.hasUnitIdentifier();
+          public boolean apply(@Nullable IdentifiersMaps.IdentifiersMap input) {
+            return input.hasPrivateIdentifier();
           }
         });
   }
@@ -298,14 +298,14 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
   private void writeCSVValues(CSVWriter writer, ValueTable table, Variable variable) {
     // header
     writer.writeNext(new String[] { table.getEntityType(), variable.getName() });
-    for(FunctionalUnitIdentifiers.UnitIdentifier unitId : getUnitIdentifiers(table.getEntityType())) {
-      writer.writeNext(new String[] { unitId.getOpalIdentifier(), unitId.getUnitIdentifier() });
+    for(IdentifiersMaps.IdentifiersMap unitId : getUnitIdentifiers(table.getEntityType())) {
+      writer.writeNext(new String[] { unitId.getSystemIdentifier(), unitId.getPrivateIdentifier() });
     }
   }
 
   private void writePlainValues(Writer writer, ValueTable table) throws IOException {
-    for(FunctionalUnitIdentifiers.UnitIdentifier unitId : getUnitIdentifiers(table.getEntityType())) {
-      writer.write(unitId.getUnitIdentifier() + "\n");
+    for(IdentifiersMaps.IdentifiersMap unitId : getUnitIdentifiers(table.getEntityType())) {
+      writer.write(unitId.getPrivateIdentifier() + "\n");
     }
   }
 

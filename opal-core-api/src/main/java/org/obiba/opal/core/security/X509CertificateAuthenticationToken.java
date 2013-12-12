@@ -1,4 +1,4 @@
-package org.obiba.opal.core.unit.security;
+package org.obiba.opal.core.security;
 
 import java.security.cert.X509Certificate;
 

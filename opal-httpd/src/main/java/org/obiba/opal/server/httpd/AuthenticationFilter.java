@@ -34,7 +34,7 @@ import org.eclipse.jetty.http.HttpStatus;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.security.SubjectAclService;
-import org.obiba.opal.core.unit.security.X509CertificateAuthenticationToken;
+import org.obiba.opal.core.security.X509CertificateAuthenticationToken;
 import org.obiba.opal.web.security.HttpAuthorizationToken;
 import org.obiba.opal.web.security.HttpCookieAuthenticationToken;
 import org.obiba.opal.web.security.HttpHeaderAuthenticationToken;

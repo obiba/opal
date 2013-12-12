@@ -26,8 +26,7 @@ import org.obiba.magma.support.StaticValueTable;
 import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
 import org.obiba.opal.core.identifiers.IdentifiersMapping;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
-import org.obiba.opal.core.unit.FunctionalUnitIdentifiers;
-import org.obiba.opal.core.unit.FunctionalUnitIdentifiers.UnitIdentifier;
+import org.obiba.opal.core.identifiers.IdentifiersMaps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,10 +66,10 @@ public class IdentifiersImportServiceImpl implements IdentifiersImportService {
     PrivateVariableEntityMap entityMap = new OpalPrivateVariableEntityMap(identifiersTable, variable,
         localParticipantIdentifier);
 
-    for(UnitIdentifier unitId : new FunctionalUnitIdentifiers(identifiersTable, idMapping.getName())) {
+    for(IdentifiersMaps.IdentifiersMap unitId : new IdentifiersMaps(identifiersTable, idMapping.getName())) {
       // Create a private entity for each missing unitIdentifier
-      if(!unitId.hasUnitIdentifier()) {
-        entityMap.createPrivateEntity(unitId.getOpalEntity());
+      if(!unitId.hasPrivateIdentifier()) {
+        entityMap.createPrivateEntity(unitId.getSystemEntity());
         count++;
       }
     }
