@@ -68,16 +68,16 @@ public interface TranslationMessages extends Messages {
 
   @Description("Table count label")
   @DefaultMessage("{0} tables")
-  @AlternateMessage({ "none", "No tables", "one", "1 table" })
+  @AlternateMessage({ "=0", "No tables", "one", "1 table" })
   String tableCount(@PluralCount int count);
 
   @Description("Variable count label")
   @DefaultMessage("{0} variables")
-  @AlternateMessage({ "none", "No variables", "one", "1 variable" })
+  @AlternateMessage({ "=0", "No variables", "one", "1 variable" })
   String variableCount(@PluralCount int count);
 
   @Description("Entities count label")
   @DefaultMessage("{0} entities")
-  @AlternateMessage({ "none", "No entities", "one", "1 entity" })
+  @AlternateMessage({ "=0", "No entities", "one", "1 entity" })
   String entityCount(@PluralCount int count);
 }
