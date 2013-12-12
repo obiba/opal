@@ -34,14 +34,14 @@ public class OpalSslContextFactory implements SslContextFactory {
   private SystemKeyStoreService systemKeyStoreService;
 
   @Autowired
-  private UnitTrustManager unitTrustManager;
+  private CredentialsTrustManager credentialsTrustManager;
 
   @Override
   public SSLContext createSslContext() {
     OpalKeyStore opalKeystore = prepareServerKeystore();
     try {
       SSLContext ctx = SSLContext.getInstance("TLSv1");
-      ctx.init(new KeyManager[] { new UnitKeyManager(opalKeystore) }, new TrustManager[] { unitTrustManager }, null);
+      ctx.init(new KeyManager[] { new UnitKeyManager(opalKeystore) }, new TrustManager[] { credentialsTrustManager }, null);
       return ctx;
     } catch(Exception e) {
       throw new RuntimeException(e);

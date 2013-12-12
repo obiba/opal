@@ -67,7 +67,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     errorCode = executeImports(filesToImport);
 
     if(!options.isSource() & !options.isTables() & filesToImport.isEmpty()) {
-      // TODO: Should this be considered success or an error? Will treat as an error for now.
+      // Should this be considered success or an error? Will treat as an error for now.
       getShell().printf("No file, source or tables provided. Import canceled.\n");
       errorCode = CRITICAL_ERROR;
     } else if(errorCode != SUCCESS) {
@@ -97,10 +97,6 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
   //
   // Methods
   //
-
-  public void setDataImportService(DataImportService dataImportService) {
-    this.dataImportService = dataImportService;
-  }
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
@@ -175,23 +171,6 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       runtimeExceptionHandler(ex);
     }
     return errorCode;
-  }
-
-  @Nullable
-  private String getUnitName() {
-    String unitName = options.isUnit() ? options.getUnit() : null;
-    printUnitOptions();
-    return unitName;
-  }
-
-  private void printUnitOptions() {
-    if(options.isUnit()) {
-      getShell().printf("  Importing in unit: %s\n", options.getUnit());
-      getShell().printf("  Allow identifier generation: %s\n", options.isForce());
-      if(!options.isForce()) {
-        getShell().printf("  Ignore participants with unknown identifier: %s\n", options.isIgnore());
-      }
-    }
   }
 
   private String getTableNames() {
@@ -301,7 +280,7 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
     }
   }
 
-  private List<FileObject> getFilesInFolder(FileObject file) throws FileSystemException {
+  private Collection<FileObject> getFilesInFolder(FileObject file) throws FileSystemException {
     FileObject[] filesInDir = file.findFiles(new FileSelector() {
       @Override
       public boolean traverseDescendents(FileSelectInfo file) throws Exception {
@@ -315,10 +294,6 @@ public class ImportCommand extends AbstractOpalRuntimeDependentCommand<ImportCom
       }
     });
     return Arrays.asList(filesInDir);
-  }
-
-  private boolean isRelativeFilePath(String filePath) {
-    return !filePath.startsWith("/");
   }
 
 }

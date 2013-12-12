@@ -16,7 +16,6 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.obiba.opal.core.cfg.OpalConfiguration;
 import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

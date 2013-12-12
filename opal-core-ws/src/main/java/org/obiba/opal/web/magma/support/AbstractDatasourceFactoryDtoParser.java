@@ -25,15 +25,11 @@ import org.obiba.opal.core.magma.IdentifiersMappingDatasourceFactory;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
-import org.obiba.opal.core.unit.FunctionalUnitService;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractDatasourceFactoryDtoParser implements DatasourceFactoryDtoParser {
-
-  @Autowired
-  private FunctionalUnitService functionalUnitService;
 
   @Autowired
   private OpalRuntime opalRuntime;
@@ -90,10 +86,6 @@ public abstract class AbstractDatasourceFactoryDtoParser implements DatasourceFa
   @SuppressWarnings("UnusedDeclaration")
   protected OpalRuntime getOpalRuntime() {
     return opalRuntime;
-  }
-
-  protected FunctionalUnitService getFunctionalUnitService() {
-    return functionalUnitService;
   }
 
   protected FileObject resolveFileInFileSystem(String path) throws FileSystemException {

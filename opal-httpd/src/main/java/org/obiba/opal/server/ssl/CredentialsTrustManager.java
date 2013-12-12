@@ -13,35 +13,23 @@ import java.security.GeneralSecurityException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.List;
 
 import javax.net.ssl.X509TrustManager;
 
 import org.obiba.opal.core.security.OpalKeyStore;
-import org.obiba.opal.core.service.ProjectService;
-import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
-import org.obiba.opal.core.unit.FunctionalUnit;
-import org.obiba.opal.core.unit.FunctionalUnitService;
+import org.obiba.opal.core.service.security.CredentialsKeyStoreService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Lists;
-
 @Component
-public class UnitTrustManager implements X509TrustManager {
+public class CredentialsTrustManager implements X509TrustManager {
 
-  private static final Logger log = LoggerFactory.getLogger(UnitTrustManager.class);
-
-  @Autowired
-  private FunctionalUnitService functionalUnitService;
+  private static final Logger log = LoggerFactory.getLogger(CredentialsTrustManager.class);
 
   @Autowired
-  private ProjectsKeyStoreService projectsKeyStoreService;
-
-  @Autowired
-  private ProjectService projectService;
+  private CredentialsKeyStoreService credentialsKeyStoreService;
 
   @Override
   public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
@@ -51,16 +39,16 @@ public class UnitTrustManager implements X509TrustManager {
         log.debug("chain[{}]={}", i, chain[i]);
       }
     }
-    for(OpalKeyStore keyStore : getUnitKeyStores()) {
-      for(Certificate cert : keyStore.getCertificates().values()) {
-        for(X509Certificate x509Cert : chain) {
-          try {
-            x509Cert.verify(cert.getPublicKey());
-            // If verify succeeds, it doesn't throw an Exception
-            return;
-          } catch(GeneralSecurityException e) {
-            // Ignore
-          }
+
+    OpalKeyStore keyStore = credentialsKeyStoreService.getKeyStore();
+    for(Certificate cert : keyStore.getCertificates().values()) {
+      for(X509Certificate x509Cert : chain) {
+        try {
+          x509Cert.verify(cert.getPublicKey());
+          // If verify succeeds, it doesn't throw an Exception
+          return;
+        } catch(GeneralSecurityException e) {
+          // Ignore
         }
       }
     }
@@ -81,11 +69,4 @@ public class UnitTrustManager implements X509TrustManager {
     return new X509Certificate[0];
   }
 
-  private Iterable<OpalKeyStore> getUnitKeyStores() {
-    List<OpalKeyStore> trustedKeyStores = Lists.newArrayList();
-    for(FunctionalUnit unit : functionalUnitService.getFunctionalUnits()) {
-      trustedKeyStores.add(projectsKeyStoreService.getKeyStore(projectService.getProject(unit.getName())));
-    }
-    return trustedKeyStores;
-  }
 }
