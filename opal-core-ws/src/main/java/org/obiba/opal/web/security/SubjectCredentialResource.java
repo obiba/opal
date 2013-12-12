@@ -55,7 +55,7 @@ public class SubjectCredentialResource {
         }
         break;
       case APPLICATION:
-        if(dto.hasCertificate()) {
+        if(dto.hasCertificate() && !dto.getCertificate().isEmpty()) {
           subjectCredentials.setCertificate(dto.getCertificate().toByteArray());
         }
         break;
