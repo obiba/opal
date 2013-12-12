@@ -24,6 +24,7 @@ import javax.annotation.Nullable;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
@@ -31,6 +32,7 @@ import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openssl.PEMWriter;
 import org.obiba.opal.core.security.OpalKeyStore;
+import org.obiba.opal.core.service.security.KeyStoreService;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -47,6 +49,8 @@ import static javax.ws.rs.core.Response.Status;
 public class KeyStoreResource {
 
   private OpalKeyStore keyStore;
+
+  private KeyStoreService keyStoreService;
 
   @GET
   public List<Opal.KeyDto> getKeyEntries() throws KeyStoreException, IOException {
@@ -66,17 +70,33 @@ public class KeyStoreResource {
   }
 
   @POST
-  public Response createKeyEntry(Opal.KeyForm keyForm, URI keyEntryUri) {
+  public Response createKeyEntry(Opal.KeyForm keyForm) {
 
     if(keyStore.aliasExists(keyForm.getAlias())) {
       return Response.status(Status.BAD_REQUEST)
           .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "KeyEntryAlreadyExists").build()).build();
     }
 
-    ResponseBuilder responseBuilder = keyForm.getKeyType() == Opal.KeyType.KEY_PAIR ? doCreateOrImportKeyPair(keyStore,
-        keyForm) : doImportCertificate(keyStore, keyForm);
+    ResponseBuilder responseBuilder = keyForm.getKeyType() == Opal.KeyType.KEY_PAIR
+        ? doCreateOrImportKeyPair(keyForm)
+        : doImportCertificate(keyForm);
     if(responseBuilder == null) {
-      responseBuilder = Response.created(keyEntryUri);
+      keyStoreService.saveKeyStore(keyStore);
+      responseBuilder = Response.created(URI.create(""));
+    }
+
+    return responseBuilder.build();
+  }
+
+  @PUT
+  public Response updateKeyEntry(Opal.KeyForm keyForm) {
+
+    ResponseBuilder responseBuilder = keyForm.getKeyType() == Opal.KeyType.KEY_PAIR
+        ? doCreateOrImportKeyPair(keyForm)
+        : doImportCertificate(keyForm);
+    if(responseBuilder == null) {
+      keyStoreService.saveKeyStore(keyStore);
+      responseBuilder = Response.ok();
     }
 
     return responseBuilder.build();
@@ -114,36 +134,33 @@ public class KeyStoreResource {
   }
 
   @Nullable
-  private ResponseBuilder doImportCertificate(OpalKeyStore keystore, Opal.KeyForm keyForm) {
+  private ResponseBuilder doImportCertificate(Opal.KeyForm keyForm) {
 
-    keystore.importCertificate(keyForm.getAlias(), new ByteArrayInputStream(keyForm.getPublicImport().getBytes()));
+    keyStore.importCertificate(keyForm.getAlias(), new ByteArrayInputStream(keyForm.getPublicImport().getBytes()));
     return null;
   }
 
   @Nullable
-  private ResponseBuilder doCreateOrImportKeyPair(OpalKeyStore keystore, Opal.KeyForm keyForm) {
+  private ResponseBuilder doCreateOrImportKeyPair(Opal.KeyForm keyForm) {
     ResponseBuilder response = null;
     if(keyForm.hasPrivateForm() && keyForm.hasPublicForm()) {
-      keystore
-          .createOrUpdateKey(keyForm.getAlias(), keyForm.getPrivateForm().getAlgo(), keyForm.getPrivateForm().getSize(),
+      keyStore.createOrUpdateKey(keyForm.getAlias(), keyForm.getPrivateForm().getAlgo(), keyForm.getPrivateForm().getSize(),
               getCertificateInfo(keyForm.getPublicForm()));
     } else {
-      response = keyForm.hasPrivateImport()
-          ? doImportKeyPair(keystore, keyForm)
-          : Response.status(Status.BAD_REQUEST)
+      response = keyForm.hasPrivateImport() ? doImportKeyPair(keyForm) : Response.status(Status.BAD_REQUEST)
               .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "MissingPrivateKeyArgument").build());
     }
     return response;
   }
 
   @Nullable
-  private ResponseBuilder doImportKeyPair(OpalKeyStore keystore, Opal.KeyForm keyForm) {
+  private ResponseBuilder doImportKeyPair(Opal.KeyForm keyForm) {
     ResponseBuilder response = null;
     if(keyForm.hasPublicForm()) {
-      keystore.importKey(keyForm.getAlias(), new ByteArrayInputStream(keyForm.getPrivateImport().getBytes()),
+      keyStore.importKey(keyForm.getAlias(), new ByteArrayInputStream(keyForm.getPrivateImport().getBytes()),
           getCertificateInfo(keyForm.getPublicForm()));
     } else if(keyForm.hasPublicImport()) {
-      keystore.importKey(keyForm.getAlias(), new ByteArrayInputStream(keyForm.getPrivateImport().getBytes()),
+      keyStore.importKey(keyForm.getAlias(), new ByteArrayInputStream(keyForm.getPrivateImport().getBytes()),
           new ByteArrayInputStream(keyForm.getPublicImport().getBytes()));
     } else {
       response = Response.status(Status.BAD_REQUEST)
@@ -182,5 +199,9 @@ public class KeyStoreResource {
 
   public void setKeyStore(OpalKeyStore keyStore) {
     this.keyStore = keyStore;
+  }
+
+  public void setKeyStoreService(KeyStoreService keyStoreService) {
+    this.keyStoreService = keyStoreService;
   }
 }

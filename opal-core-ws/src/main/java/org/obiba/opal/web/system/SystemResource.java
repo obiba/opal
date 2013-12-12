@@ -195,6 +195,7 @@ public class SystemResource {
   public KeyStoreResource getKeyStoreResource() {
     KeyStoreResource resource = applicationContext.getBean(KeyStoreResource.class);
     resource.setKeyStore(systemKeyStoreService.getKeyStore());
+    resource.setKeyStoreService(systemKeyStoreService);
     return resource;
   }
 }

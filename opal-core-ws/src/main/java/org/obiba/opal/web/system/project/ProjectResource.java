@@ -113,6 +113,7 @@ public class ProjectResource {
     KeyStoreResource resource = applicationContext.getBean(KeyStoreResource.class);
     OpalKeyStore keyStore = projectsKeyStoreService.getKeyStore(getProject());
     resource.setKeyStore(keyStore);
+    resource.setKeyStoreService(projectsKeyStoreService);
     return resource;
   }
 

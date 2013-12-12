@@ -17,16 +17,13 @@ import javax.validation.constraints.NotNull;
 import org.apache.commons.vfs2.FileObject;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.security.OpalKeyStore;
-import org.obiba.opal.core.service.SystemService;
 
-public interface ProjectsKeyStoreService extends SystemService {
+public interface ProjectsKeyStoreService extends KeyStoreService {
 
   @NotNull
   OpalKeyStore getKeyStore(@NotNull Project project);
 
   boolean aliasExists(@NotNull Project project, @NotNull String alias);
-
-  void saveKeyStore(@NotNull OpalKeyStore keyStore);
 
   void createOrUpdateKey(@NotNull Project project, @NotNull String alias, @NotNull String algorithm, int size,
       @NotNull String certificateInfo);
