@@ -1,8 +1,9 @@
-package org.obiba.opal.core.security;
+package org.obiba.opal.core.service.security;
 
 import java.security.cert.X509Certificate;
 
 import javax.security.auth.x500.X500Principal;
+import javax.validation.constraints.NotNull;
 
 import org.apache.shiro.authc.AuthenticationToken;
 
@@ -12,7 +13,7 @@ public class X509CertificateAuthenticationToken implements AuthenticationToken {
 
   private final X509Certificate certificate;
 
-  public X509CertificateAuthenticationToken(X509Certificate certificate) {
+  public X509CertificateAuthenticationToken(@NotNull X509Certificate certificate) {
     if(certificate == null) throw new IllegalArgumentException("certificate cannot be null");
     this.certificate = certificate;
   }

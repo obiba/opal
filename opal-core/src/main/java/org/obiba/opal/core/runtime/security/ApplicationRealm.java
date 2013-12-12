@@ -25,7 +25,7 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.security.CredentialsKeyStoreService;
-import org.obiba.opal.core.security.X509CertificateAuthenticationToken;
+import org.obiba.opal.core.service.security.X509CertificateAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

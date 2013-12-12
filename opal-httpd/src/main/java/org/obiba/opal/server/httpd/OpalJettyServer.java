@@ -18,6 +18,9 @@ import java.util.Properties;
 
 import javax.annotation.Nullable;
 
+import org.apache.shiro.web.env.EnvironmentLoaderListener;
+import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
+import org.apache.shiro.web.servlet.ShiroFilter;
 import org.eclipse.jetty.ajp.Ajp13SocketConnector;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
@@ -162,8 +165,20 @@ public class OpalJettyServer {
     servletContextHandler.addEventListener(new ResteasyBootstrap());
     servletContextHandler.addEventListener(new SpringContextLoaderListener());
     servletContextHandler.addEventListener(new RequestContextListener());
+    servletContextHandler.addEventListener(new EnvironmentLoaderListener());
     servletContextHandler.addFilter(new FilterHolder(new OpalVersionFilter()), "/*", FilterMapping.DEFAULT);
+
+    // shiro
+//    servletContextHandler.addFilter(new FilterHolder(new AuthenticationFilter()), "/ws/*", FilterMapping.DEFAULT);
+    servletContextHandler.addFilter(new FilterHolder(new ShiroFilter()), "/ws/*", FilterMapping.DEFAULT);
+    servletContextHandler
+        .addFilter(new FilterHolder(new SslCertificateAuthenticationFilter()), "/ws/*", FilterMapping.DEFAULT);
+    .addFilter(new FilterHolder(new BasicHttpAuthenticationFilter()), "/ws/*", FilterMapping.DEFAULT);
+    .addFilter(new FilterHolder(new BasicHttpAuthenticationFilter()), "/ws/*", FilterMapping.DEFAULT);
     servletContextHandler.addFilter(new FilterHolder(new AuthenticationFilter()), "/ws/*", FilterMapping.DEFAULT);
+    servletContextHandler.addFilter(new FilterHolder(new AuthenticationFilter()), "/ws/*", FilterMapping.DEFAULT);
+    servletContextHandler.addFilter(new FilterHolder(new AuthenticationFilter()), "/ws/*", FilterMapping.DEFAULT);
+
     servletContextHandler
         .setInitParameter(ContextLoader.CONFIG_LOCATION_PARAM, "classpath:/META-INF/spring/opal-server/context.xml");
     servletContextHandler.setInitParameter("resteasy.servlet.mapping.prefix", "/ws");
