@@ -349,7 +349,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       dto.setFilesArray(selectedFiles);
     }
     if(importConfig.isIdentifierSharedWithUnit()) {
-      dto.setUnit(importConfig.getUnit());
+      dto.setUnit(importConfig.getIdentifiersMapping());
       dto.setForce(false);
       dto.setIgnore(true);
     }
@@ -379,9 +379,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     @Override
     public boolean validateFormat() {
       getView().clearError();
-      if(formatStepPresenter.validate()) {
-        return true;
-      }
+      if(formatStepPresenter.validate()) return true;
+
       for(Map.Entry<HasType<ControlGroupType>, String> entry : csvFormatStepPresenter.getErrors().entrySet()) {
         getView().showError(entry.getValue(), entry.getKey());
       }

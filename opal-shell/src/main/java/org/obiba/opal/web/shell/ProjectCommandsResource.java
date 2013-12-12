@@ -30,6 +30,7 @@ import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.obiba.opal.shell.commands.options.ImportCommandOptions;
 import org.obiba.opal.shell.commands.options.ReportCommandOptions;
 import org.obiba.opal.shell.web.CopyCommandOptionsDtoImpl;
+import org.obiba.opal.shell.web.ExportCommandOptionsDtoImpl;
 import org.obiba.opal.shell.web.ImportCommandOptionsDtoImpl;
 import org.obiba.opal.shell.web.ReportCommandOptionsDtoImpl;
 import org.obiba.opal.web.model.Commands;
@@ -44,6 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @Scope("request")
 @Path("/project/{name}/commands")
+@SuppressWarnings("OverlyCoupledClass")
 public class ProjectCommandsResource extends AbstractCommandsResource {
 
 //  private static final Logger log = LoggerFactory.getLogger(ProjectCommandsResource.class);
@@ -88,13 +90,41 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   @POST
   @Path("/_copy")
   public Response copyData(Commands.CopyCommandOptionsDto options) {
-    return launchCopyCommand("copy", options);
+    String commandName = "copy";
+
+    for(String table : options.getTablesList()) {
+      ensureTableValuesAccess(table);
+    }
+
+    ensureDatasourceWriteAccess(options.getDestination());
+
+    CopyCommandOptions copyOptions = new CopyCommandOptionsDtoImpl(options);
+    Command<CopyCommandOptions> copyCommand = commandRegistry.newCommand(commandName);
+    copyCommand.setOptions(copyOptions);
+
+    return launchCommand(commandName, copyCommand);
   }
 
   @POST
   @Path("/_export")
-  public Response exportData(Commands.CopyCommandOptionsDto options) {
-    return launchCopyCommand("export", options);
+  public Response exportData(Commands.ExportCommandOptionsDto options) {
+    String commandName = "export";
+
+    for(String table : options.getTablesList()) {
+      ensureTableValuesAccess(table);
+    }
+
+    if(options.hasDestination()) {
+      ensureDatasourceWriteAccess(options.getDestination());
+    } else if(options.hasOut()) {
+      ensureFileWriteAccess(options.getOut());
+    }
+
+    CopyCommandOptions copyOptions = new ExportCommandOptionsDtoImpl(opalRuntime, options);
+    Command<CopyCommandOptions> copyCommand = commandRegistry.newCommand(commandName);
+    copyCommand.setOptions(copyOptions);
+
+    return launchCommand(commandName, copyCommand);
   }
 
   @POST
@@ -110,28 +140,10 @@ public class ProjectCommandsResource extends AbstractCommandsResource {
   }
 
   @Override
-  protected CommandJob newCommandJob(String name, Command<?> command) {
-    CommandJob job = super.newCommandJob(name, command);
-    job.setProject(this.name);
+  protected CommandJob newCommandJob(String jobName, Command<?> command) {
+    CommandJob job = super.newCommandJob(jobName, command);
+    job.setProject(name);
     return job;
-  }
-
-  private Response launchCopyCommand(String commandName, Commands.CopyCommandOptionsDto options) {
-    for(String table : options.getTablesList()) {
-      ensureTableValuesAccess(table);
-    }
-
-    if(options.hasDestination()) {
-      ensureDatasourceWriteAccess(options.getDestination());
-    } else if(options.hasOut()) {
-      ensureFileWriteAccess(options.getOut());
-    }
-
-    CopyCommandOptions copyOptions = new CopyCommandOptionsDtoImpl(opalRuntime, options);
-    Command<CopyCommandOptions> copyCommand = commandRegistry.newCommand(commandName);
-    copyCommand.setOptions(copyOptions);
-
-    return launchCommand(commandName, copyCommand);
   }
 
   private void ensureTableValuesAccess(String table) {

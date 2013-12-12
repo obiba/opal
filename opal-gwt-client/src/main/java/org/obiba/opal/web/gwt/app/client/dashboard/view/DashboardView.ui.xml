@@ -23,9 +23,9 @@
         </g:Label>
       </b:Column>
 
-      <b:Column size="3" ui:field="units">
+      <b:Column size="3" ui:field="identifiers">
         <g:Image url="image/48/units.png" addStyleNames="inline-block"></g:Image>
-        <b:NavLink ui:field="unitsLink">
+        <b:NavLink ui:field="identifiersLink">
           <ui:msg description="Units link label">Manage Participant Identifiers</ui:msg>
         </b:NavLink>
         <g:Label addStyleNames="help-block">

@@ -9,9 +9,6 @@
  */
 package org.obiba.opal.web.gwt.app.client.magma.exportdata.presenter;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -19,19 +16,20 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.RequestCredentials;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingConfigDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.opal.CopyCommandOptionsDto;
-import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
+import org.obiba.opal.web.model.client.opal.ExportCommandOptionsDto;
+import org.obiba.opal.web.model.client.opal.IdentifiersMappingDto;
 
-import com.github.gwtbootstrap.client.ui.Alert;
+import com.google.common.collect.Sets;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -47,15 +45,13 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
 
   private final RequestCredentials credentials;
 
-  private Set<TableDto> exportTables = new HashSet<TableDto>();
+  private Set<TableDto> exportTables = Sets.newHashSet();
 
   private final Translations translations;
 
   private final FileSelectionPresenter fileSelectionPresenter;
 
   private String datasourceName;
-
-  protected String identifierEntityType;
 
   @Inject
   public DataExportPresenter(Display display, EventBus eventBus, Translations translations,
@@ -95,8 +91,7 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
 
   @Override
   public void onReveal() {
-    initUnits();
-    getView().setUsername(credentials.getUsername());
+    initIdentifiersMappings();
   }
 
   @Override
@@ -119,57 +114,66 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
 
   public void setDatasourceName(String name) {
     datasourceName = name;
+    getView().setFileBaseName(datasourceName);
   }
 
-  private void initUnits() {
+  private void initIdentifiersMappings() {
 
-    final ResponseCodeCallback errorCallback = new ResponseCodeCallback() {
+    ResponseCodeCallback errorCallback = new ResponseCodeCallback() {
       @Override
       public void onResponseCode(Request request, Response response) {
       }
     };
 
-    ResourceRequestBuilderFactory.<TableDto>newBuilder().forResource("/functional-units/entities/table").get()
-        .withCallback(new ResourceCallback<TableDto>() {
-          @Override
-          public void onResource(Response response, TableDto resource) {
-            identifierEntityType = resource.getEntityType();
+    ResourceRequestBuilderFactory.<JsArray<IdentifiersMappingDto>>newBuilder().forResource("/identifiers/mappings")
+        .get().withCallback(new ResourceCallback<JsArray<IdentifiersMappingDto>>() {
+      @Override
+      public void onResource(Response response, JsArray<IdentifiersMappingDto> resource) {
 
-            // if exporting at least one table of type 'identifiersEntityType', show units selection
-            boolean fetchUnits = false;
-            for(TableDto table : exportTables) {
-              if(table.hasEntityType() && table.getEntityType().equals(identifierEntityType)) {
-                fetchUnits = true;
-                break;
-              }
-            }
+        JsArray<IdentifiersMappingDto> mappings = JsArrays.toSafeArray(resource);
 
-            if(fetchUnits) {
-              ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>>newBuilder().forResource("/functional-units")
-                  .get().withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
-                @Override
-                public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
-                  getView().setUnits(units);
-                }
-              }).withCallback(Response.SC_FORBIDDEN, errorCallback).send();
-            }
+        // if exporting at least one table of type 'identifiersEntityType', show id mappings selection
+        for(TableDto table : exportTables) {
+          if(hasEntityTypeMapping(table, mappings)) {
+            getView().setIdentifiersMappings(mappings);
+            break;
           }
-        }).withCallback(Response.SC_FORBIDDEN, errorCallback).send();
+        }
+      }
+
+      private boolean hasEntityTypeMapping(TableDto table, JsArray<IdentifiersMappingDto> mappings) {
+        for(IdentifiersMappingDto mapping : JsArrays.toIterable(mappings)) {
+          if(hasEntityType(table, mapping)) return true;
+        }
+        return false;
+      }
+
+      private boolean hasEntityType(TableDto table, IdentifiersMappingDto mapping) {
+        for(String type : JsArrays.toIterable(mapping.getEntityTypesArray())) {
+          if(type.equals(table.getEntityType())) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+    }).withCallback(Response.SC_FORBIDDEN, errorCallback).send();
   }
 
   @Override
-  public void onSubmit(String fileFormat, String outFile, String unit) {
+  public void onSubmit(String fileFormat, String outFile, String idMapping) {
     getView().hideDialog();
 
     UriBuilder uriBuilder = UriBuilders.PROJECT_COMMANDS_EXPORT.create();
     ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build(datasourceName)).post() //
-        .withResourceBody(CopyCommandOptionsDto.stringify(createCopyCommandOptions(fileFormat, outFile, unit))) //
+        .withResourceBody(
+            ExportCommandOptionsDto.stringify(createExportCommandOptions(fileFormat, outFile, idMapping))) //
         .withCallback(Response.SC_BAD_REQUEST, new ClientFailureResponseCodeCallBack()) //
         .withCallback(Response.SC_CREATED, new SuccessResponseCodeCallBack(outFile)).send();
   }
 
-  private CopyCommandOptionsDto createCopyCommandOptions(String fileFormat, String outFile, String unit) {
-    CopyCommandOptionsDto dto = CopyCommandOptionsDto.create();
+  private ExportCommandOptionsDto createExportCommandOptions(String fileFormat, String outFile, String idMapping) {
+    ExportCommandOptionsDto dto = ExportCommandOptionsDto.create();
 
     JsArrayString selectedTables = JavaScriptObject.createArray().cast();
 
@@ -182,7 +186,11 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
     dto.setOut(outFile);
     dto.setNonIncremental(true);
     dto.setNoVariables(false);
-    if(unit != null) dto.setUnit(unit);
+    if(idMapping != null) {
+      IdentifiersMappingConfigDto idConfig = IdentifiersMappingConfigDto.create();
+      idConfig.setName(idMapping);
+      dto.setIdConfig(idConfig);
+    }
 
     return dto;
   }
@@ -217,14 +225,11 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
 
   public interface Display extends PopupView, HasUiHandlers<DataExportUiHandlers> {
 
-    /**
-     * Set a collection of Opal units retrieved from Opal.
-     */
-    void setUnits(JsArray<FunctionalUnitDto> units);
+    void setIdentifiersMappings(JsArray<IdentifiersMappingDto> mappings);
 
     void setFileWidgetDisplay(FileSelectionPresenter.Display display);
 
-    void setUsername(String username);
+    void setFileBaseName(String username);
 
     void showExportNAlert(String message);
 

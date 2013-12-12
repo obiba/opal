@@ -1,4 +1,5 @@
 import "Ws.proto";
+import "Identifiers.proto";
 
 package Opal;
 
@@ -44,19 +45,28 @@ message ImportCommandOptionsDto {
 }
 
 message CopyCommandOptionsDto {
-  optional string unit = 1;
-  optional string source = 2;
-  optional string destination = 3;
-  optional string out = 4;
-  optional bool nonIncremental = 5;
-  optional bool noValues = 6;
-  optional bool noVariables = 7;
-  optional string multiplex = 8;
-  optional string transform = 9;
-  repeated string tables = 10;
-  optional string format = 11;
-  optional bool copyNullValues = 12;
-  optional string destinationTableName = 13;
+  optional string source = 1;
+  required string destination = 2;
+  optional bool nonIncremental = 3;
+  optional bool noValues = 4;
+  optional bool noVariables = 5;
+  repeated string tables = 6;
+  optional bool copyNullValues = 7;
+  optional string destinationTableName = 8;
+}
+
+message ExportCommandOptionsDto {
+  optional string source = 1;
+  optional string destination = 2;
+  optional string out = 3;
+  optional bool nonIncremental = 4;
+  optional bool noValues = 5;
+  optional bool noVariables = 6;
+  repeated string tables = 7;
+  optional string format = 8;
+  optional bool copyNullValues = 9;
+  optional string destinationTableName = 10;
+  optional Identifiers.IdentifiersMappingConfigDto idConfig = 11;
 }
 
 message ReportCommandOptionsDto {

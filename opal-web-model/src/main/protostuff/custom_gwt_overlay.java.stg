@@ -24,6 +24,7 @@ import org.obiba.opal.web.model.client.database.*;
 import org.obiba.opal.web.model.client.magma.*;
 import org.obiba.opal.web.model.client.math.*;
 import org.obiba.opal.web.model.client.opal.*;
+import org.obiba.opal.web.model.client.identifiers.*;
 import org.obiba.opal.web.model.client.search.*;
 
 >>

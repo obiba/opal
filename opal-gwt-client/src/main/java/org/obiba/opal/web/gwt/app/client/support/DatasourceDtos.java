@@ -10,13 +10,13 @@
 package org.obiba.opal.web.gwt.app.client.support;
 
 import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
+import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingConfigDto;
 import org.obiba.opal.web.model.client.magma.CsvDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.CsvDatasourceTableBundleDto;
 import org.obiba.opal.web.model.client.magma.DatasourceBatchConfigDto;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.DatasourceIncrementalConfigDto;
-import org.obiba.opal.web.model.client.magma.DatasourceUnitConfigDto;
 import org.obiba.opal.web.model.client.magma.FsDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.GNPostalCodesDatasourceFactoryDto;
 import org.obiba.opal.web.model.client.magma.HCDatasourceFactoryDto;
@@ -162,12 +162,12 @@ public class DatasourceDtos {
   }
 
   private static void configureUnit(ImportConfig importConfig, DatasourceFactoryDto dto) {
-    if(!Strings.isNullOrEmpty(importConfig.getUnit())) {
-      DatasourceUnitConfigDto configDto = DatasourceUnitConfigDto.create();
-      configDto.setUnit(importConfig.getUnit());
+    if(!Strings.isNullOrEmpty(importConfig.getIdentifiersMapping())) {
+      IdentifiersMappingConfigDto configDto = IdentifiersMappingConfigDto.create();
+      configDto.setName(importConfig.getIdentifiersMapping());
       configDto.setAllowIdentifierGeneration(importConfig.isAllowIdentifierGeneration());
       configDto.setIgnoreUnknownIdentifier(importConfig.isIgnoreUnknownIdentifier());
-      dto.setUnitConfig(configDto);
+      dto.setIdConfig(configDto);
     }
   }
 

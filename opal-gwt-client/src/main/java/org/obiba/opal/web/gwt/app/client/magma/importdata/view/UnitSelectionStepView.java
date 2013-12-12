@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.magma.importdata.view;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.UnitSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
 import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
+import org.obiba.opal.web.model.client.opal.IdentifiersMappingDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -29,16 +30,12 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
 import com.github.gwtbootstrap.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
 
 public class UnitSelectionStepView extends ViewImpl implements UnitSelectionStepPresenter.Display {
 
-  @UiTemplate("UnitSelectionStepView.ui.xml")
-  interface ViewUiBinder extends UiBinder<Widget, UnitSelectionStepView> {}
-
-  private static final ViewUiBinder uiBinder = GWT.create(ViewUiBinder.class);
-
-  private final Widget widget;
+  interface Binder extends UiBinder<Widget, UnitSelectionStepView> {}
 
   @UiField
   InlineLabel noUnitLabel;
@@ -64,14 +61,10 @@ public class UnitSelectionStepView extends ViewImpl implements UnitSelectionStep
   @UiField
   FlowPanel unitSection;
 
-  public UnitSelectionStepView() {
-    widget = uiBinder.createAndBindUi(this);
+  @Inject
+  public UnitSelectionStepView(Binder uiBinder) {
+    initWidget(uiBinder.createAndBindUi(this));
     identifierAsIs.setValue(true);
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
   }
 
   @Override
@@ -80,21 +73,21 @@ public class UnitSelectionStepView extends ViewImpl implements UnitSelectionStep
   }
 
   @Override
-  public void setUnits(JsArray<FunctionalUnitDto> units) {
-    this.units.clear();
-    for(int i = 0; i < units.length(); i++) {
-      this.units.addItem(units.get(i).getName());
+  public void setIdentifiersMappings(JsArray<IdentifiersMappingDto> mappings) {
+    units.clear();
+    for(int i = 0; i < mappings.length(); i++) {
+      units.addItem(mappings.get(i).getName());
     }
-    this.units.setEnabled(isIdentifierSharedWithUnit());
-    noUnitLabel.setVisible(units.length() == 0);
-    unitPanel.setVisible(units.length() > 0);
-    this.units.setVisible(units.length() > 0);
-    identifierAsIs.setVisible(units.length() > 0);
-    identifierSharedWithUnit.setVisible(units.length() > 0);
+    units.setEnabled(isIdentifierSharedWithUnit());
+    noUnitLabel.setVisible(mappings.length() == 0);
+    unitPanel.setVisible(mappings.length() > 0);
+    units.setVisible(mappings.length() > 0);
+    identifierAsIs.setVisible(mappings.length() > 0);
+    identifierSharedWithUnit.setVisible(mappings.length() > 0);
   }
 
   @Override
-  public String getSelectedUnit() {
+  public String getSelectedIdentifiersMapping() {
     return units.getItemText(units.getSelectedIndex());
   }
 
@@ -109,7 +102,7 @@ public class UnitSelectionStepView extends ViewImpl implements UnitSelectionStep
   }
 
   @Override
-  public void setUnitEnabled(boolean enabled) {
+  public void setIdentifiersMappingEnabled(boolean enabled) {
     units.setEnabled(enabled);
   }
 

@@ -25,15 +25,11 @@ import org.obiba.opal.shell.commands.Command;
 import org.obiba.opal.shell.commands.CopyCommand;
 import org.obiba.opal.shell.commands.ImportCommand;
 import org.obiba.opal.shell.commands.ReportCommand;
-import org.obiba.opal.shell.commands.options.CopyCommandOptions;
-import org.obiba.opal.shell.commands.options.ImportCommandOptions;
 import org.obiba.opal.shell.commands.options.ReportCommandOptions;
 import org.obiba.opal.shell.service.CommandJobService;
 import org.obiba.opal.shell.service.NoSuchCommandJobException;
 import org.obiba.opal.web.model.Commands.CommandStateDto;
 import org.obiba.opal.web.model.Commands.CommandStateDto.Status;
-import org.obiba.opal.web.model.Commands.CopyCommandOptionsDto;
-import org.obiba.opal.web.model.Commands.ImportCommandOptionsDto;
 import org.obiba.opal.web.model.Commands.ReportCommandOptionsDto;
 
 import static org.easymock.EasyMock.createMock;
@@ -335,85 +331,6 @@ public class WebShellResourceTest {
   }
 
   @Test
-  public void testImportData() {
-    // Setup
-    Integer jobId = 1;
-    CommandRegistry mockCommandRegistry = createMockCommandRegistry();
-    ImportCommand importCommand = createImportCommand();
-    expect(mockCommandRegistry.<ImportCommandOptions>newCommand(importCommand.getName())).andReturn(importCommand)
-        .atLeastOnce();
-
-    CommandJobService mockCommandJobService = createMockCommandJobService();
-    expect(mockCommandJobService.launchCommand(eqCommandJob(createCommandJob(jobId, importCommand, null))))
-        .andReturn(jobId).atLeastOnce();
-
-    WebShellResource sut = new WebShellResource();
-    sut.setCommandJobService(mockCommandJobService);
-    sut.setCommandRegistry(mockCommandRegistry);
-
-    replay(mockCommandRegistry, mockCommandJobService);
-
-    // Exercise
-    ImportCommandOptionsDto optionsDto = createImportCommandOptionsDto("my-unit", "opal-data", null, "file1", "file2");
-    Response response = sut.importData(optionsDto);
-
-    // Verify mocks
-    verify(mockCommandRegistry, mockCommandJobService);
-
-    // Verify that the options in the dto were applied to the launched command
-    ImportCommandOptions importOptions = importCommand.getOptions();
-    assertEquals(optionsDto.getUnit(), importOptions.getUnit());
-    assertEquals(optionsDto.getDestination(), importOptions.getDestination());
-    assertEquals(optionsDto.getFilesCount(), importOptions.getFiles().size());
-    for(int i = 0; i < optionsDto.getFilesCount(); i++) {
-      assertEquals(optionsDto.getFiles(i), importOptions.getFiles().get(i));
-    }
-
-    // Verify that the HTTP response code was CREATED (201) and that the "Location"
-    // header was set to '/shell/command/{jobId}'.
-    assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-    assertEquals("/shell/command/" + jobId, response.getMetadata().getFirst("Location").toString());
-  }
-
-  @Test
-  public void testCopyData() {
-    // Setup
-    Integer jobId = 1;
-    CommandRegistry mockCommandRegistry = createMockCommandRegistry();
-    CopyCommand copyCommand = createCopyCommand();
-    expect(mockCommandRegistry.<CopyCommandOptions>newCommand(copyCommand.getName())).andReturn(copyCommand)
-        .atLeastOnce();
-
-    CommandJobService mockCommandJobService = createMockCommandJobService();
-    expect(mockCommandJobService.launchCommand(eqCommandJob(createCommandJob(jobId, copyCommand, null))))
-        .andReturn(jobId).atLeastOnce();
-
-    WebShellResource sut = new WebShellResource();
-    sut.setCommandJobService(mockCommandJobService);
-    sut.setCommandRegistry(mockCommandRegistry);
-
-    replay(mockCommandRegistry, mockCommandJobService);
-
-    // Exercise
-    CopyCommandOptionsDto optionsDto = createCopyCommandOptionsDto("opal-data", "jdbc", null, null, null);
-    Response response = sut.copyData(optionsDto);
-
-    // Verify mocks
-    verify(mockCommandRegistry, mockCommandJobService);
-
-    // Verify that the options in the dto were applied to the launched command
-    CopyCommandOptions copyOptions = copyCommand.getOptions();
-    assertEquals(optionsDto.getSource(), copyOptions.getSource());
-    assertEquals(optionsDto.getDestination(), copyOptions.getDestination());
-    assertEquals(optionsDto.getTablesCount(), copyOptions.getTables().size());
-
-    // Verify that the HTTP response code was CREATED (201) and that the "Location"
-    // header was set to '/shell/command/{jobId}'.
-    assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-    assertEquals("/shell/command/" + jobId, response.getMetadata().getFirst("Location").toString());
-  }
-
-  @Test
   public void testCreateReport() {
     // Setup
     Integer jobId = 1;
@@ -508,55 +425,10 @@ public class WebShellResourceTest {
     return new ArrayList<>();
   }
 
-  private ImportCommandOptionsDto createImportCommandOptionsDto(String unit, String destination, String archive,
-      String... files) {
-    ImportCommandOptionsDto.Builder dtoBuilder = ImportCommandOptionsDto.newBuilder();
-
-    dtoBuilder.setUnit(unit);
-    dtoBuilder.setDestination(destination);
-
-    if(archive != null) {
-      dtoBuilder.setArchive(archive);
-    }
-
-    for(String file : files) {
-      dtoBuilder.addFiles(file);
-    }
-
-    return dtoBuilder.build();
-  }
-
   private ReportCommandOptionsDto createReportCommandOptionsDto(String name) {
     ReportCommandOptionsDto.Builder dtoBuilder = ReportCommandOptionsDto.newBuilder();
 
     dtoBuilder.setName(name);
-
-    return dtoBuilder.build();
-  }
-
-  private CopyCommandOptionsDto createCopyCommandOptionsDto(String source, String destination, String out,
-      String multiplex, String transform, String... tables) {
-    CopyCommandOptionsDto.Builder dtoBuilder = CopyCommandOptionsDto.newBuilder();
-
-    if(source != null) {
-      dtoBuilder.setSource(source);
-    }
-    if(destination != null) {
-      dtoBuilder.setDestination(destination);
-    }
-    if(out != null) {
-      dtoBuilder.setOut(out);
-    }
-    if(multiplex != null) {
-      dtoBuilder.setMultiplex(multiplex);
-    }
-    if(transform != null) {
-      dtoBuilder.setTransform(transform);
-    }
-
-    for(String table : tables) {
-      dtoBuilder.addTables(table);
-    }
 
     return dtoBuilder.build();
   }

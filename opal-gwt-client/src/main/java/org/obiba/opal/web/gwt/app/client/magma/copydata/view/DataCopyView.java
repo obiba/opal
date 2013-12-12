@@ -72,17 +72,12 @@ public class DataCopyView extends ModalPopupViewWithUiHandlers<DataCopyUiHandler
 
   @UiHandler("submitButton")
   public void onSubmit(ClickEvent event) {
-    getUiHandlers().onSubmit();
+    getUiHandlers().onSubmit(getSelectedDatasource(), newName.getText());
   }
 
   @UiHandler("cancelButton")
   public void onCancel(ClickEvent event) {
     getUiHandlers().cancel();
-  }
-
-  @Override
-  public String getSelectedDatasource() {
-    return datasources.getValue(datasources.getSelectedIndex());
   }
 
   @Override
@@ -99,11 +94,6 @@ public class DataCopyView extends ModalPopupViewWithUiHandlers<DataCopyUiHandler
   public void showNewName(String name) {
     newTableNameGroup.setVisible(true);
     newName.setText(name);
-  }
-
-  @Override
-  public TextBox getNewName() {
-    return newName;
   }
 
   @Override
@@ -146,5 +136,9 @@ public class DataCopyView extends ModalPopupViewWithUiHandlers<DataCopyUiHandler
     } else {
       modal.addAlert(message, AlertType.ERROR, group);
     }
+  }
+
+  private String getSelectedDatasource() {
+    return datasources.getValue(datasources.getSelectedIndex());
   }
 }

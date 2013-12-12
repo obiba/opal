@@ -10,7 +10,6 @@
 package org.obiba.opal.web.gwt.app.client.magma.copydata.presenter;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -19,7 +18,6 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
@@ -29,13 +27,13 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.CopyCommandOptionsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
+import com.google.common.collect.Sets;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -45,7 +43,7 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
 
   private String datasourceName;
 
-  private Set<TableDto> copyTables = new HashSet<TableDto>();
+  private Set<TableDto> copyTables = Sets.newHashSet();
 
   private final Translations translations;
 
@@ -61,12 +59,6 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
     getView().setUiHandlers(this);
   }
 
-  @Override
-  protected void onBind() {
-    super.onBind();
-  }
-
-  @Override
   protected void onUnbind() {
     super.onUnbind();
     datasourceName = null;
@@ -84,39 +76,37 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
   }
 
   @Override
-  public void onSubmit() {
+  public void onSubmit(String destination, String newName) {
 
     // if only 1 table is selected and is copied to current datasource, validate new table name
-    String selectedDatasource = getView().getSelectedDatasource();
-    String newName = getView().getNewName().getText();
 
     if(copyTables.size() == 1) {
-      if(selectedDatasource.equals(datasourceName) && newName.isEmpty()) {
+      if(destination.equals(datasourceName) && newName.isEmpty()) {
         getView()
             .showError(Display.FormField.NEW_TABLE_NAME, translations.userMessageMap().get("DataCopyNewNameRequired"));
-      } else if(selectedDatasource.equals(datasourceName) && copyTables.iterator().next().getName().equals(newName)) {
+      } else if(destination.equals(datasourceName) && copyTables.iterator().next().getName().equals(newName)) {
         getView().showError(Display.FormField.NEW_TABLE_NAME,
             translations.userMessageMap().get("DataCopyNewNameAlreadyExists"));
       } else {
-        sendCommandsCopyRequest();
+        sendCommandsCopyRequest(destination, newName);
       }
     } else {
-      sendCommandsCopyRequest();
+      sendCommandsCopyRequest(destination, newName);
     }
   }
 
-  private void sendCommandsCopyRequest() {
+  private void sendCommandsCopyRequest(String destination, String newName) {
     getView().hideDialog();
 
     ResourceRequestBuilderFactory.newBuilder() //
         .forResource(UriBuilders.PROJECT_COMMANDS_COPY.create().build(datasourceName)) //
         .post() //
-        .withResourceBody(CopyCommandOptionsDto.stringify(createCopyCommandOptions())) //
+        .withResourceBody(CopyCommandOptionsDto.stringify(createCopyCommandOptions(destination, newName))) //
         .withCallback(Response.SC_BAD_REQUEST, new ClientFailureResponseCodeCallBack()) //
-        .withCallback(Response.SC_CREATED, new SuccessResponseCodeCallBack()).send();
+        .withCallback(Response.SC_CREATED, new SuccessResponseCodeCallBack(destination)).send();
   }
 
-  private CopyCommandOptionsDto createCopyCommandOptions() {
+  private CopyCommandOptionsDto createCopyCommandOptions(String destination, String newName) {
     CopyCommandOptionsDto dto = CopyCommandOptionsDto.create();
 
     JsArrayString selectedTables = JavaScriptObject.createArray().cast();
@@ -126,8 +116,8 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
     }
 
     dto.setTablesArray(selectedTables);
-    dto.setDestination(getView().getSelectedDatasource());
-    dto.setDestinationTableName(getView().getNewName().getText());
+    dto.setDestination(destination);
+    dto.setDestinationTableName(newName);
     dto.setNonIncremental(!getView().isIncremental());
     dto.setCopyNullValues(getView().isCopyNullValues());
     dto.setNoVariables(!getView().isWithVariables());
@@ -190,22 +180,6 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
   // Interfaces and classes
   //
 
-  private final class DestinationValidator implements ValidationHandler {
-    @Override
-    public boolean validate() {
-      List<String> errors = formValidationErrors();
-      if(errors.size() > 0) {
-        fireEvent(NotificationEvent.newBuilder().error(errors).build());
-        return false;
-      }
-      return true;
-    }
-
-    private List<String> formValidationErrors() {
-      return new ArrayList<String>();
-    }
-  }
-
   class ClientFailureResponseCodeCallBack implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
@@ -221,14 +195,19 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
   }
 
   class SuccessResponseCodeCallBack implements ResponseCodeCallback {
+
+    private final String destination;
+
+    SuccessResponseCodeCallBack(String destination) {
+      this.destination = destination;
+    }
+
     @Override
     public void onResponseCode(Request request, Response response) {
       String location = response.getHeader("Location");
       String jobId = location.substring(location.lastIndexOf('/') + 1);
 
-      fireEvent(
-          NotificationEvent.newBuilder().info("DataCopyProcessLaunched").args(jobId, getView().getSelectedDatasource())
-              .build());
+      fireEvent(NotificationEvent.newBuilder().info("DataCopyProcessLaunched").args(jobId, destination).build());
     }
   }
 
@@ -242,13 +221,6 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
      * Set a collection of datasources retrieved from Opal.
      */
     void setDatasources(List<DatasourceDto> datasources);
-
-    /**
-     * Get the datasource selected by the user.
-     */
-    String getSelectedDatasource();
-
-    HasText getNewName();
 
     void showNewName(String name);
 

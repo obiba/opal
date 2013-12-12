@@ -19,11 +19,9 @@ import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
-import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
+import org.obiba.opal.web.model.client.opal.IdentifiersMappingDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -31,8 +29,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -47,7 +43,7 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
 
   private final Translations translations;
 
-  private String username;
+  private String fileBaseName;
 
   interface Binder extends UiBinder<Widget, DataExportView> {}
 
@@ -58,10 +54,10 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
   Alert exportNTable;
 
   @UiField
-  Panel unitsPanel;
+  Panel identifiersPanel;
 
   @UiField
-  Chooser units;
+  Chooser identifiers;
 
   @UiField
   SimplePanel filePanel;
@@ -77,13 +73,12 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
     modal.setTitle(translations.exportData());
-    initWigits();
+    initWidgets();
   }
 
-  private void initWigits() {
+  private void initWidgets() {
     fileFormat.addItemToGroup(translations.csvLabel(), ImportConfig.ImportFormat.CSV.name());
     fileFormat.addItemToGroup(translations.opalXmlLabel(), ImportConfig.ImportFormat.XML.name());
-
   }
 
   @UiHandler("cancelButton")
@@ -93,22 +88,22 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
 
   @UiHandler("submitButton")
   public void onSubmit(ClickEvent event) {
-    getUiHandlers().onSubmit(getFileFormat(), getOutFile(), getSelectedUnit());
+    getUiHandlers().onSubmit(getFileFormat(), getOutFile(), getSelectedIdentifiersMapping());
   }
 
-  private String getSelectedUnit() {
-    return units.getSelectedIndex() == 0 ? null : units.getSelectedValue();
+  private String getSelectedIdentifiersMapping() {
+    return identifiers.getSelectedIndex() == 0 ? null : identifiers.getSelectedValue();
   }
 
   @Override
-  public void setUnits(JsArray<FunctionalUnitDto> unitDtos) {
-    units.clear();
-    units.addItem(translations.opalDefaultIdentifiersLabel());
-    for(int i = 0; i < unitDtos.length(); i++) {
-      units.addItem(unitDtos.get(i).getName());
+  public void setIdentifiersMappings(JsArray<IdentifiersMappingDto> mappings) {
+    identifiers.clear();
+    identifiers.addItem(translations.opalDefaultIdentifiersLabel());
+    for(int i = 0; i < mappings.length(); i++) {
+      identifiers.addItem(mappings.get(i).getName());
     }
-    units.setSelectedIndex(0);
-    unitsPanel.setVisible(unitDtos.length() > 0);
+    identifiers.setSelectedIndex(0);
+    identifiersPanel.setVisible(mappings.length() > 0);
   }
 
   private String getOutFile() {
@@ -119,7 +114,7 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
     if(!fileSelection.getFile().endsWith("/")) {
       suffix += "/";
     }
-    suffix += "export-" + username + "-" + dateFormat.format(date);
+    suffix += fileBaseName + "-" + dateFormat.format(date);
 
     if("xml".equalsIgnoreCase(getFileFormat())) {
       return fileSelection.getFile() + suffix + ".zip";
@@ -142,8 +137,8 @@ public class DataExportView extends ModalPopupViewWithUiHandlers<DataExportUiHan
   }
 
   @Override
-  public void setUsername(String username) {
-    this.username = username;
+  public void setFileBaseName(String fileBaseName) {
+    this.fileBaseName = fileBaseName;
   }
 
   @Override

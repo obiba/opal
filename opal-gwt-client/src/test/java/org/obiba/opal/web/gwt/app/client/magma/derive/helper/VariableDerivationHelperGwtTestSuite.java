@@ -12,6 +12,7 @@ package org.obiba.opal.web.gwt.app.client.magma.derive.helper;
 import com.google.gwt.junit.tools.GWTTestSuite;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 /**
@@ -29,4 +30,8 @@ public class VariableDerivationHelperGwtTestSuite extends GWTTestSuite {
     return suite;
   }
 
+  @Override
+  public void run(TestResult result) {
+    //To change body of implemented methods use File | Settings | File Templates.
+  }
 }

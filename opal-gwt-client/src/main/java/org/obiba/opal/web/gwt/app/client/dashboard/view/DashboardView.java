@@ -42,13 +42,13 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   NavLink reportsLink;
 
   @UiField
-  NavLink unitsLink;
+  NavLink identifiersLink;
 
   @UiField
   Panel datasources;
 
   @UiField
-  Panel units;
+  Panel identifiers;
 
   @UiField
   Panel files;
@@ -60,7 +60,7 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
   public DashboardView(Binder uiBinder, Translations translations) {
     initWidget(uiBinder.createAndBindUi(this));
     getDatasourcesLink().setHref("#" + Places.PROJECTS);
-    getUnitsLink().setHref("#" + Places.UNITS);
+    getIdentifiersLink().setHref("#" + Places.IDENTIFIERS);
     getReportsLink().setHref("#" + Places.REPORT_TEMPLATES);
     getFilesLink().setHref("#" + Places.FILES);
     pageTitle.setText(translations.pageDashboardTitle());
@@ -90,13 +90,13 @@ public class DashboardView extends Composite implements DashboardPresenter.Displ
     return reportsLink;
   }
 
-  public NavLink getUnitsLink() {
-    return unitsLink;
+  public NavLink getIdentifiersLink() {
+    return identifiersLink;
   }
 
   @Override
-  public HasAuthorization getUnitsAuthorizer() {
-    return new WidgetAuthorizer(units);
+  public HasAuthorization getIdentifiersAuthorizer() {
+    return new WidgetAuthorizer(identifiers);
   }
 
   @Override

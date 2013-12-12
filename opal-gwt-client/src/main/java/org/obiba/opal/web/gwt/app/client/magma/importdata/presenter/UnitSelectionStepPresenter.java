@@ -9,15 +9,18 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.importdata.presenter;
 
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
-import org.obiba.opal.web.model.client.opal.FunctionalUnitDto;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.model.client.opal.IdentifiersMappingDto;
 
 import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.http.client.Request;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Response;
@@ -36,32 +39,40 @@ public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionSte
   protected void onBind() {
     super.onBind();
     addEventHandlers();
-    initUnits();
+    initIdentifiersMappings();
   }
 
   private void addEventHandlers() {
     registerHandler(getView().addIdentifierAsIsClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        getView().setUnitEnabled(false);
+        getView().setIdentifiersMappingEnabled(false);
       }
     }));
     registerHandler(getView().addIdentifierSharedWithUnitClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        getView().setUnitEnabled(true);
+        getView().setIdentifiersMappingEnabled(true);
       }
     }));
   }
 
-  private void initUnits() {
-    ResourceRequestBuilderFactory.<JsArray<FunctionalUnitDto>>newBuilder().forResource("/functional-units").get()
-        .withCallback(new ResourceCallback<JsArray<FunctionalUnitDto>>() {
-          @Override
-          public void onResource(Response response, JsArray<FunctionalUnitDto> units) {
-            getView().setUnits(units);
-          }
-        }).send();
+  private void initIdentifiersMappings() {
+
+    ResponseCodeCallback errorCallback = new ResponseCodeCallback() {
+      @Override
+      public void onResponseCode(Request request, Response response) {
+      }
+    };
+
+    ResourceRequestBuilderFactory.<JsArray<IdentifiersMappingDto>>newBuilder().forResource("/identifiers/mappings")
+        .get().withCallback(new ResourceCallback<JsArray<IdentifiersMappingDto>>() {
+      @Override
+      public void onResource(Response response, JsArray<IdentifiersMappingDto> resource) {
+        getView().setIdentifiersMappings(JsArrays.toSafeArray(resource));
+      }
+
+    }).withCallback(Response.SC_FORBIDDEN, errorCallback).send();
   }
 
   public void setEntityType(String entityType) {
@@ -72,7 +83,7 @@ public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionSte
     boolean withUnit = getView().isIdentifierSharedWithUnit();
     importConfig.setIdentifierSharedWithUnit(withUnit);
     importConfig.setIdentifierAsIs(!withUnit);
-    importConfig.setUnit(withUnit ? getView().getSelectedUnit() : null);
+    importConfig.setIdentifiersMapping(withUnit ? getView().getSelectedIdentifiersMapping() : null);
     importConfig.setIncremental(getView().isIncremental());
     importConfig.setLimit(getView().getLimit());
   }
@@ -81,15 +92,15 @@ public class UnitSelectionStepPresenter extends PresenterWidget<UnitSelectionSte
 
     boolean isIdentifierSharedWithUnit();
 
-    void setUnits(JsArray<FunctionalUnitDto> units);
+    void setIdentifiersMappings(JsArray<IdentifiersMappingDto> mappings);
 
-    String getSelectedUnit();
+    String getSelectedIdentifiersMapping();
 
     HandlerRegistration addIdentifierAsIsClickHandler(ClickHandler handler);
 
     HandlerRegistration addIdentifierSharedWithUnitClickHandler(ClickHandler handler);
 
-    void setUnitEnabled(boolean enabled);
+    void setIdentifiersMappingEnabled(boolean enabled);
 
     boolean isIncremental();
 

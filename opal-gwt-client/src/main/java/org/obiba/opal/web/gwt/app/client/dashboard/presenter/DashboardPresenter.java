@@ -50,8 +50,8 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
   }
 
   private void authorize() {
-    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/functional-units").get()
-        .authorize(getView().getUnitsAuthorizer()).send();
+    ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/identifiers/tables").get()
+        .authorize(getView().getIdentifiersAuthorizer()).send();
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource("/report-templates").get()
         .authorize(getView().getReportsAuthorizer()).send();
   }
@@ -66,7 +66,7 @@ public class DashboardPresenter extends Presenter<DashboardPresenter.Display, Da
     // Authorization
     //
 
-    HasAuthorization getUnitsAuthorizer();
+    HasAuthorization getIdentifiersAuthorizer();
 
     HasAuthorization getReportsAuthorizer();
 

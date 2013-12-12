@@ -303,6 +303,10 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
       directory.createFolder();
     }
 
+    if (Strings.isNullOrEmpty(outputFile.getName().getExtension())) {
+      outputFile.createFolder();
+    }
+
     if("xls".equals(outputFile.getName().getExtension())) {
       getShell()
           .printf("WARNING: Writing to an Excel 97 spreadsheet. These are limited to 256 columns and 65536 rows " +

@@ -18,10 +18,10 @@
   <g:FlowPanel>
     <g:FlowPanel>
 
-      <g:Label styleName="section-title">
+      <g:Label>
         <ui:msg description="Incremental import">Specify how existing data is managed</ui:msg>
       </g:Label>
-      <g:FlowPanel styleName="input">
+      <g:FlowPanel>
         <b:CheckBox ui:field="incremental" addStyleNames="small-indent">
           <ui:msg description="Incremental import">Incremental import</ui:msg>
         </b:CheckBox>
@@ -30,7 +30,7 @@
         </g:Label>
       </g:FlowPanel>
 
-      <g:FlowPanel styleName="input" addStyleNames="small-indent">
+      <g:FlowPanel addStyleNames="small-indent">
         <b:CheckBox ui:field="limitCheck">
           <ui:msg description="Limit label">Limit</ui:msg>
         </b:CheckBox>
@@ -41,7 +41,7 @@
       </g:FlowPanel>
 
       <g:FlowPanel ui:field="unitSection">
-        <g:Label styleName="section-title">
+        <g:Label>
           <ui:msg description="Specify how the participant are identified">
             Specify how the participant are identified
           </ui:msg>
@@ -58,12 +58,12 @@
               should:
             </ui:msg>
           </g:InlineLabel>
-          <g:FlowPanel styleName="input">
+          <g:FlowPanel>
             <b:RadioButton name="identifierGroup" ui:field="identifierAsIs" addStyleNames="small-indent">
               <ui:msg description="Leave identifier as-is label">be used as-is</ui:msg>
             </b:RadioButton>
           </g:FlowPanel>
-          <g:FlowPanel styleName="input">
+          <g:FlowPanel>
             <b:RadioButton name="identifierGroup" ui:field="identifierSharedWithUnit" addStyleNames="small-indent">
               <ui:msg description="Share identifier with unit label">be considered as idenfiers shared with unit
               </ui:msg>

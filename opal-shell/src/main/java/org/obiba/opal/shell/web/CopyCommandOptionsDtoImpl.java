@@ -11,24 +11,13 @@ package org.obiba.opal.shell.web;
 
 import java.util.List;
 
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileType;
-import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.shell.commands.options.CopyCommandOptions;
 import org.obiba.opal.web.model.Commands.CopyCommandOptionsDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link CopyCommandOptions} based on an instance of {@link CopyCommandOptionsDto}.
  */
 public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
-  //
-  // Constants
-  //
-
-  private static final Logger log = LoggerFactory.getLogger(CopyCommandOptionsDtoImpl.class);
 
   //
   // Instance Variables
@@ -36,21 +25,12 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
 
   protected final CopyCommandOptionsDto dto;
 
-  private final OpalRuntime opalRuntime;
-
-  private String pathWithExtension;
-
   //
   // Constructors
   //
 
-  public CopyCommandOptionsDtoImpl(OpalRuntime opalRuntime, CopyCommandOptionsDto dto) {
-    this.opalRuntime = opalRuntime;
+  public CopyCommandOptionsDtoImpl(CopyCommandOptionsDto dto) {
     this.dto = dto;
-
-    if(dto.hasOut() && dto.hasFormat()) {
-      pathWithExtension = addFileExtensionIfMissing(dto.getOut(), dto.getFormat());
-    }
   }
 
   //
@@ -64,12 +44,12 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
 
   @Override
   public boolean isUnit() {
-    return dto.hasUnit();
+    return false;
   }
 
   @Override
   public String getUnit() {
-    return dto.getUnit();
+    return null;
   }
 
   @Override
@@ -94,12 +74,12 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
 
   @Override
   public boolean isOut() {
-    return dto.hasOut();
+    return false;
   }
 
   @Override
   public String getOut() {
-    return pathWithExtension != null ? pathWithExtension : dto.getOut();
+    return null;
   }
 
   @Override
@@ -134,22 +114,22 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
 
   @Override
   public boolean isMultiplex() {
-    return dto.hasMultiplex();
+    return false;
   }
 
   @Override
   public String getMultiplex() {
-    return dto.getMultiplex();
+    return null;
   }
 
   @Override
   public boolean isTransform() {
-    return dto.hasTransform();
+    return false;
   }
 
   @Override
   public String getTransform() {
-    return dto.getTransform();
+    return null;
   }
 
   @Override
@@ -157,54 +137,4 @@ public class CopyCommandOptionsDtoImpl implements CopyCommandOptions {
     return dto.getTablesList();
   }
 
-  //
-  // Methods
-  //
-
-  FileObject resolveFileInFileSystem(String path) throws FileSystemException {
-    return opalRuntime.getFileSystem().getRoot().resolveFile(path);
-  }
-
-  private String addFileExtensionIfMissing(String outputFilePath, String outputFileFormat) {
-    String modifiedPath = outputFilePath;
-
-    FileObject file = null;
-    try {
-      file = resolveFileInFileSystem(outputFilePath);
-
-      // Add the extension if the file object is an existing file (FileType.FILE)
-      // or a new file (FileType.IMAGINARY). We assume here that any "imaginary" file object
-      // is a non-existent folder.
-      if(file.getType() == FileType.FILE) {
-        modifiedPath = addExtension(outputFileFormat, outputFilePath);
-
-      } else if(file.getType() == FileType.IMAGINARY) {
-        if("xml".equals(outputFileFormat) && !outputFilePath.endsWith(".zip")) {
-          modifiedPath = addExtension(outputFileFormat, outputFilePath);
-        } else if("csv".equals(outputFileFormat)) {
-          // Create the directory
-          file.createFolder();
-        }
-      }
-
-    } catch(FileSystemException ex) {
-      log.error("Unexpected file system exception in addFileExtensionIfMissing", ex);
-    }
-
-    return modifiedPath;
-  }
-
-  private String addExtension(String outputFileFormat, String outputFilePath) {
-    if("csv".equals(outputFileFormat) && !outputFilePath.endsWith(".csv")) {
-      return outputFilePath + ".csv";
-    }
-    if("excel".equals(outputFileFormat) && !outputFilePath.endsWith(".xls") &&
-        !outputFilePath.endsWith(".xlsx")) {
-      return outputFilePath + ".xlsx"; // prefer .xlsx over .xls
-    }
-    if("xml".equals(outputFileFormat) && !outputFilePath.endsWith(".zip")) {
-      return outputFilePath + ".zip";
-    }
-    return outputFilePath;
-  }
 }

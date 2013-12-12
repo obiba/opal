@@ -258,7 +258,7 @@ public class IdentifiersImportPresenter extends WizardPresenterWidget<Identifier
     importConfig.setDestinationEntityType("Participant");
     importConfig.setCsvFile(csvOptionsFileSelectionPresenter.getSelectedFile());
     importConfig.setXmlFile(fileSelectionPresenter.getSelectedFile());
-    importConfig.setUnit(functionalUnit.getName());
+    importConfig.setIdentifiersMapping(functionalUnit.getName());
     importConfig.setCharacterSet(getView().getCsvOptions().getCharsetText().getText());
     importConfig.setRow(Integer.parseInt(getView().getCsvOptions().getRowText().getText()));
     importConfig.setQuote(getView().getCsvOptions().getQuote().getText());

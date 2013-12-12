@@ -33,6 +33,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import com.google.common.base.Strings;
+
 /**
  * Default implementation of {@link DataExportService}.
  */
@@ -65,7 +67,7 @@ public class DataExportServiceImpl implements DataExportService {
   public void exportTablesToDatasource(@Nullable String idMapping, @NotNull Set<ValueTable> sourceTables,
       @NotNull Datasource destinationDatasource, @NotNull DatasourceCopier.Builder datasourceCopier,
       boolean incremental) throws InterruptedException {
-    if(!identifiersTableService.hasIdentifiersMapping(idMapping))
+    if(!Strings.isNullOrEmpty(idMapping) && !identifiersTableService.hasIdentifiersMapping(idMapping))
       throw new NoSuchIdentifiersMappingException(idMapping);
 
     validateSourceDatasourceNotEqualDestinationDatasource(sourceTables, destinationDatasource);
@@ -167,7 +169,7 @@ public class DataExportServiceImpl implements DataExportService {
 
         // If the table contains an entity that requires key separation, create a "unit view" of the table (replace
         // public identifiers with private, unit-specific identifiers).
-        if(idMapping != null && identifiersTableService.hasIdentifiersMapping(tableToCopy.getEntityType(), idMapping)) {
+        if(!Strings.isNullOrEmpty(idMapping) && identifiersTableService.hasIdentifiersMapping(tableToCopy.getEntityType(), idMapping)) {
           // Make a view that converts opal identifiers to unit identifiers
           tableToCopy = new IdentifiersMappingView(idMapping, Policy.UNIT_IDENTIFIERS_ARE_PUBLIC, tableToCopy,
               identifiersTableService.getIdentifiersTable(tableToCopy.getEntityType()));

@@ -26,12 +26,8 @@ import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.CommandRegistry;
 import org.obiba.opal.shell.Dtos;
 import org.obiba.opal.shell.commands.Command;
-import org.obiba.opal.shell.commands.options.CopyCommandOptions;
-import org.obiba.opal.shell.commands.options.ImportCommandOptions;
 import org.obiba.opal.shell.commands.options.ReportCommandOptions;
 import org.obiba.opal.shell.service.NoSuchCommandJobException;
-import org.obiba.opal.shell.web.CopyCommandOptionsDtoImpl;
-import org.obiba.opal.shell.web.ImportCommandOptionsDtoImpl;
 import org.obiba.opal.shell.web.ReportCommandOptionsDtoImpl;
 import org.obiba.opal.web.model.Commands;
 import org.obiba.opal.web.model.Commands.CommandStateDto;
@@ -129,26 +125,6 @@ public class WebShellResource extends AbstractCommandsResource {
     } catch(IllegalStateException ex) {
       return Response.status(Status.BAD_REQUEST).entity("SetCommandStatus_BadRequest_NotCancellable").build();
     }
-  }
-
-  @POST
-  @Path("/import")
-  public Response importData(Commands.ImportCommandOptionsDto options) {
-    ImportCommandOptions importOptions = new ImportCommandOptionsDtoImpl(options);
-    Command<ImportCommandOptions> importCommand = commandRegistry.newCommand("import");
-    importCommand.setOptions(importOptions);
-
-    return launchCommand(importCommand);
-  }
-
-  @POST
-  @Path("/copy")
-  public Response copyData(Commands.CopyCommandOptionsDto options) {
-    CopyCommandOptions copyOptions = new CopyCommandOptionsDtoImpl(opalRuntime, options);
-    Command<CopyCommandOptions> copyCommand = commandRegistry.newCommand("copy");
-    copyCommand.setOptions(copyOptions);
-
-    return launchCommand(copyCommand);
   }
 
   @POST

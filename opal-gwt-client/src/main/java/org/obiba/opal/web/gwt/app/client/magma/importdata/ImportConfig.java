@@ -68,7 +68,7 @@ public class ImportConfig {
 
   private Map<String, Object> properties;
 
-  private String unit;
+  private String idMapping;
 
   private boolean allowIdentifierGeneration;
 
@@ -86,7 +86,7 @@ public class ImportConfig {
     characterSet = null;
     identifierAsIs = false;
     identifierSharedWithUnit = false;
-    unit = null;
+    idMapping = null;
     archiveLeave = false;
     archiveMove = false;
     archiveDirectory = null;
@@ -160,12 +160,12 @@ public class ImportConfig {
     this.identifierSharedWithUnit = identifierSharedWithUnit;
   }
 
-  public String getUnit() {
-    return unit;
+  public String getIdentifiersMapping() {
+    return idMapping;
   }
 
-  public void setUnit(String unit) {
-    this.unit = unit;
+  public void setIdentifiersMapping(String idMapping) {
+    this.idMapping = idMapping;
   }
 
   public boolean isArchiveLeave() {

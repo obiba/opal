@@ -25,6 +25,7 @@ import org.obiba.opal.core.magma.IdentifiersMappingDatasourceFactory;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersTableService;
 import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
+import org.obiba.opal.web.model.Identifiers;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.DatasourceFactoryDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,17 +54,17 @@ public abstract class AbstractDatasourceFactoryDtoParser implements DatasourceFa
   }
 
   private DatasourceFactory applyIdentifiersMapping(DatasourceFactoryDto dto, DatasourceFactory factory) {
-    if(!dto.hasUnitConfig()) return factory;
+    if(!dto.hasIdConfig()) return factory;
 
-    Magma.DatasourceUnitConfigDto unitConfig = dto.getUnitConfig();
-    String idMapping = unitConfig.getUnit();
+    Identifiers.IdentifiersMappingConfigDto idConfig = dto.getIdConfig();
+    String idMapping = idConfig.getName();
     if(!identifiersTableService.hasIdentifiersMapping(idMapping)) {
       throw new NoSuchIdentifiersMappingException(idMapping);
     }
 
     return new IdentifiersMappingDatasourceFactory(factory, idMapping, identifiersTableService,
-        unitConfig.getAllowIdentifierGeneration() ? participantIdentifier : null,
-        unitConfig.getIgnoreUnknownIdentifier());
+        idConfig.getAllowIdentifierGeneration() ? participantIdentifier : null,
+        idConfig.getIgnoreUnknownIdentifier());
   }
 
   private DatasourceFactory applyIncremental(DatasourceFactoryDto dto, DatasourceFactory factory) {

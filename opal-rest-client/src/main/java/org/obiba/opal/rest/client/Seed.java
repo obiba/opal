@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import org.obiba.opal.rest.client.magma.OpalJavaClient;
 import org.obiba.opal.rest.client.magma.UriBuilder;
 import org.obiba.opal.web.model.Commands.ImportCommandOptionsDto;
+import org.obiba.opal.web.model.Identifiers;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.CsvDatasourceFactoryDto;
 import org.obiba.opal.web.model.Magma.CsvDatasourceTableBundleDto;
@@ -302,7 +303,7 @@ public class Seed {
       DatasourceFactoryDto.Builder dsFactoryDtoBuilder = DatasourceFactoryDto.newBuilder();
       dsFactoryDtoBuilder.setName("xml");
       if(unit != null) {
-        dsFactoryDtoBuilder.setUnitConfig(Magma.DatasourceUnitConfigDto.newBuilder().setUnit(unit));
+        dsFactoryDtoBuilder.setIdConfig(Identifiers.IdentifiersMappingConfigDto.newBuilder().setName(unit));
       }
       dsFactoryDtoBuilder
           .setExtension(FsDatasourceFactoryDto.params, FsDatasourceFactoryDto.newBuilder().setFile(data).build());
