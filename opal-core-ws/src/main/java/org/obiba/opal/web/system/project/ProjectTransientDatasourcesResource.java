@@ -9,14 +9,13 @@
  ******************************************************************************/
 package org.obiba.opal.web.system.project;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
@@ -24,16 +23,15 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.datasource.crypt.EncryptedSecretKeyDatasourceEncryptionStrategy;
-import org.obiba.magma.support.DatasourceParsingException;
 import org.obiba.opal.core.domain.Project;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
-import org.obiba.opal.web.magma.*;
+import org.obiba.opal.web.magma.ClientErrorDtos;
+import org.obiba.opal.web.magma.DatasourceResource;
+import org.obiba.opal.web.magma.Dtos;
 import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
-import org.obiba.opal.web.magma.support.NoSuchDatasourceFactoryException;
 import org.obiba.opal.web.model.Magma;
-import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,14 +80,7 @@ public class ProjectTransientDatasourcesResource {
 
   @POST
   public Response createDatasource(Magma.DatasourceFactoryDto factoryDto) {
-    Project project = projectService.getProject(name);
-    OpalKeyStore ks = projectsKeyStoreService.getKeyStore(project);
-    DatasourceEncryptionStrategy encryptionStrategy = null;
-    if(ks != null && !ks.listKeyPairs().isEmpty()) {
-      encryptionStrategy = new EncryptedSecretKeyDatasourceEncryptionStrategy();
-      encryptionStrategy.setKeyProvider(ks);
-    }
-
+    DatasourceEncryptionStrategy encryptionStrategy = getDatasourceEncryptionStrategy();
     String uid = null;
     ResponseBuilder response = null;
     try {
@@ -97,14 +88,7 @@ public class ProjectTransientDatasourcesResource {
       uid = MagmaEngine.get().addTransientDatasource(factory);
       Datasource ds = MagmaEngine.get().getTransientDatasourceInstance(uid);
       response = Response.created(UriBuilder.fromPath("/").path(DatasourceResource.class).build(uid))
-          .entity(org.obiba.opal.web.magma.Dtos.asDto(ds).build());
-    } catch(NoSuchDatasourceFactoryException e) {
-      response = Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "UnidentifiedDatasourceFactory").build());
-    } catch(DatasourceParsingException pe) {
-      MagmaEngine.get().removeTransientDatasource(uid);
-      response = Response.status(BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(BAD_REQUEST, "DatasourceCreationFailed", pe));
+          .entity(Dtos.asDto(ds).build());
     } catch(MagmaRuntimeException e) {
       MagmaEngine.get().removeTransientDatasource(uid);
       response = Response.status(BAD_REQUEST)
@@ -112,6 +96,18 @@ public class ProjectTransientDatasourcesResource {
     }
 
     return response.build();
+  }
+
+  @Nullable
+  private DatasourceEncryptionStrategy getDatasourceEncryptionStrategy() {
+    Project project = projectService.getProject(name);
+    OpalKeyStore ks = projectsKeyStoreService.getKeyStore(project);
+    DatasourceEncryptionStrategy encryptionStrategy = null;
+    if(ks != null && !ks.listKeyPairs().isEmpty()) {
+      encryptionStrategy = new EncryptedSecretKeyDatasourceEncryptionStrategy();
+      encryptionStrategy.setKeyProvider(ks);
+    }
+    return encryptionStrategy;
   }
 
 }

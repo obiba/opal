@@ -65,10 +65,6 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
   @NotNull
   private final FileDatasourceFactory fileDatasourceFactory;
 
-  public void setDataExportService(DataExportService dataExportService) {
-    this.dataExportService = dataExportService;
-  }
-
   public CopyCommand() {
     fileDatasourceFactory = new MultipleFileCsvDatasourceFactory();
     fileDatasourceFactory.setNext(new SingleFileCsvDatasourceFactory()) //
@@ -314,10 +310,6 @@ public class CopyCommand extends AbstractOpalRuntimeDependentCommand<CopyCommand
               "which supports 16K columns.\n");
     }
     return outputFile;
-  }
-
-  private boolean isRelativeFilePath(String filePath) {
-    return !filePath.startsWith("/");
   }
 
   private void appendOption(StringBuffer sb, String option, boolean optionSpecified, String value) {

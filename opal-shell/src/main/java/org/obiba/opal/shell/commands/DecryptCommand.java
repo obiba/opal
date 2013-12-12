@@ -10,7 +10,6 @@
 package org.obiba.opal.shell.commands;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -69,10 +68,6 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
   // Methods
   //
 
-  public void setDecryptService(DecryptService decryptService) {
-    this.decryptService = decryptService;
-  }
-
   private boolean validOutputDir(FileObject outputDir) {
     if(outputDir == null) {
       getShell().printf("Invalid output directory");
@@ -89,7 +84,7 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
     return true;
   }
 
-  private void decryptFiles(List<String> encryptedFilePaths, FileObject outputDir) {
+  private void decryptFiles(Iterable<String> encryptedFilePaths, FileObject outputDir) {
     for(String path : encryptedFilePaths) {
       try {
         FileObject encryptedFile = getEncryptedFile(path);
@@ -136,7 +131,6 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
   private FileObject getOutputDir(String outputDirPath) {
     try {
       FileObject outputDir = getFile(outputDirPath);
-      outputDir = getFile(outputDirPath);
       outputDir.createFolder();
       return outputDir;
     } catch(FileSystemException e) {
@@ -159,9 +153,5 @@ public class DecryptCommand extends AbstractOpalRuntimeDependentCommand<DecryptC
 
   private FileObject getEncryptedFile(String path) throws FileSystemException {
     return getFile(path);
-  }
-
-  private boolean isRelativeFilePath(String filePath) {
-    return !filePath.startsWith("/");
   }
 }
