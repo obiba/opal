@@ -30,7 +30,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openssl.PEMWriter;
-import org.obiba.magma.crypt.MagmaCryptRuntimeException;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.model.Opal;
@@ -116,12 +115,8 @@ public class KeyStoreResource {
 
   @Nullable
   private ResponseBuilder doImportCertificate(OpalKeyStore keystore, Opal.KeyForm keyForm) {
-    try {
-      keystore.importCertificate(keyForm.getAlias(), new ByteArrayInputStream(keyForm.getPublicImport().getBytes()));
-    } catch(MagmaCryptRuntimeException e) {
-      return Response.status(Status.BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "InvalidCertificate").build());
-    }
+
+    keystore.importCertificate(keyForm.getAlias(), new ByteArrayInputStream(keyForm.getPublicImport().getBytes()));
     return null;
   }
 
