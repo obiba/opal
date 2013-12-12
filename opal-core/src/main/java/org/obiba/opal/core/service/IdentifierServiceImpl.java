@@ -32,6 +32,8 @@ import org.obiba.opal.core.magma.PrivateVariableEntityMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.common.base.Strings;
+
 /**
  *
  */
@@ -46,11 +48,11 @@ public class IdentifierServiceImpl implements IdentifierService {
 
   @Override
   public Variable createIdentifierVariable(@Nullable ValueTable privateView, @NotNull IdentifiersMapping idsMapping) {
-    Variable idVariable = Variable.Builder
-        .newVariable(idsMapping.getName(), TextType.get(), idsMapping.getEntityType()).build();
+    Variable idVariable = Variable.Builder.newVariable(idsMapping.getName(), TextType.get(), idsMapping.getEntityType())
+        .build();
 
-    ValueTableWriter identifiersTableWriter = identifiersTableService.createIdentifiersTableWriter(
-        idsMapping.getEntityType());
+    ValueTableWriter identifiersTableWriter = identifiersTableService
+        .createIdentifiersTableWriter(idsMapping.getEntityType());
     try {
       ValueTableWriter.VariableWriter variableWriter = identifiersTableWriter.writeVariables();
       try {
@@ -95,18 +97,20 @@ public class IdentifierServiceImpl implements IdentifierService {
         identifiersTableService.getIdentifiersTable(table.getEntityType()),
         allowIdentifierGeneration ? participantIdentifier : null, ignoreUnknownIdentifier);
     final String select = identifiersTableService.getSelectScript(table.getEntityType(), idMapping);
-    publicTable.setSelectClause(new JavascriptClause(select) {
+    if(!Strings.isNullOrEmpty(select)) {
+      publicTable.setSelectClause(new JavascriptClause(select) {
 
-      @Override
-      public boolean select(Variable variable) {
-        return !isIdentifierVariable(variable) && !isIdentifierVariableForUnit(variable);
-      }
+        @Override
+        public boolean select(Variable variable) {
+          return !isIdentifierVariable(variable) && !isIdentifierVariableForUnit(variable);
+        }
 
-      private boolean isIdentifierVariableForUnit(Variable variable) {
-        return select != null && super.select(variable);
-      }
+        private boolean isIdentifierVariableForUnit(Variable variable) {
+          return select != null && super.select(variable);
+        }
 
-    });
+      });
+    }
     publicTable.initialise();
     return publicTable;
   }
