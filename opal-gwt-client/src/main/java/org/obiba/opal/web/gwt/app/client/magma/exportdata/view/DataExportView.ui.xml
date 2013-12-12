@@ -49,7 +49,7 @@
       </b:HelpBlock>
     </b:ControlGroup>
 
-    <!--Units-->
+    <!--Identifiers-->
     <b:ControlGroup ui:field="identifiersPanel" visible="false">
       <b:ControlLabel>
         <ui:msg description="Identifiers Mapping field">Identifiers Mapping</ui:msg>

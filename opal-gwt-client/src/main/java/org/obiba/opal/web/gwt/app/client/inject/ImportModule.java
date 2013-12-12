@@ -13,23 +13,23 @@ import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.ArchiveStepP
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.CsvFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DataImportPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.DatasourceValuesStepPresenter;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.IdentifiersMappingSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.JdbcStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.LimesurveyStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.NoFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.RestStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.SpssFormatStepPresenter;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.UnitSelectionStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.XmlFormatStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.view.ArchiveStepView;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.view.CsvFormatStepView;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.view.DataImportView;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.view.DatasourceValuesStepView;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.view.IdentifiersMappingSelectionStepView;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.view.JdbcStepView;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.view.LimesurveyStepView;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.view.NoFormatStepView;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.view.RestStepView;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.view.SpssFormatStepView;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.view.UnitSelectionStepView;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.view.XmlFormatStepView;
 
 /**
@@ -42,8 +42,8 @@ public class ImportModule extends AbstractOpalModule {
   protected void configure() {
     bindWizardPresenterWidget(DataImportPresenter.class, DataImportPresenter.Display.class, DataImportView.class,
         DataImportPresenter.Wizard.class);
-    bindPresenterWidget(UnitSelectionStepPresenter.class, UnitSelectionStepPresenter.Display.class,
-        UnitSelectionStepView.class);
+    bindPresenterWidget(IdentifiersMappingSelectionStepPresenter.class, IdentifiersMappingSelectionStepPresenter.Display.class,
+        IdentifiersMappingSelectionStepView.class);
     bindPresenterWidget(DatasourceValuesStepPresenter.class, DatasourceValuesStepPresenter.Display.class,
         DatasourceValuesStepView.class);
     bindPresenterWidget(ArchiveStepPresenter.class, ArchiveStepPresenter.Display.class, ArchiveStepView.class);

@@ -1,0 +1,87 @@
+/*******************************************************************************
+ * Copyright 2008(c) The OBiBa Consortium. All rights reserved.
+ *
+ * This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+package org.obiba.opal.web.gwt.app.client.magma.importdata.view;
+
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.IdentifiersMappingSelectionStepPresenter;
+import org.obiba.opal.web.gwt.app.client.ui.Chooser;
+import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
+import org.obiba.opal.web.model.client.opal.IdentifiersMappingDto;
+
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.github.gwtbootstrap.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.gwtplatform.mvp.client.ViewImpl;
+
+public class IdentifiersMappingSelectionStepView extends ViewImpl implements IdentifiersMappingSelectionStepPresenter.Display {
+
+  interface Binder extends UiBinder<Widget, IdentifiersMappingSelectionStepView> {}
+
+  private final Translations translations;
+
+  @UiField
+  CheckBox incremental;
+
+  @UiField
+  NumericTextBox limit;
+
+  @UiField
+  Panel identifiersPanel;
+
+  @UiField
+  Chooser identifiers;
+
+  @Inject
+  public IdentifiersMappingSelectionStepView(Binder uiBinder, Translations translations) {
+    initWidget(uiBinder.createAndBindUi(this));
+    this.translations = translations;
+  }
+
+  @Override
+  public void setIdentifiersMappings(JsArray<IdentifiersMappingDto> mappings) {
+    identifiers.clear();
+    identifiers.addItem(translations.opalDefaultIdentifiersLabel());
+    for(int i = 0; i < mappings.length(); i++) {
+      identifiers.addItem(mappings.get(i).getName());
+    }
+    identifiers.setSelectedIndex(0);
+    identifiersPanel.setVisible(mappings.length() > 0);
+  }
+
+  @Override
+  public String getSelectedIdentifiersMapping() {
+    return identifiers.getSelectedIndex() == 0 ? null : identifiers.getSelectedValue();
+  }
+
+  @Override
+  public boolean isIncremental() {
+    return incremental.getValue();
+  }
+
+  @Override
+  public Integer getLimit() {
+    if(!limit.isEnabled()) return null;
+
+    Long value = limit.getNumberValue();
+    return value == null ? null : value.intValue();
+  }
+
+  @UiHandler("limitCheck")
+  public void onLimitCheck(ValueChangeEvent<Boolean> event) {
+    limit.setEnabled(event.getValue());
+  }
+
+}

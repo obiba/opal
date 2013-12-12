@@ -82,7 +82,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
   private final NoFormatStepPresenter noFormatStepPresenter;
 
-  private final UnitSelectionStepPresenter unitSelectionStepPresenter;
+  private final IdentifiersMappingSelectionStepPresenter identifiersMappingSelectionStepPresenter;
 
   private final ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter;
 
@@ -104,7 +104,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       SpssFormatStepPresenter spssFormatStepPresenter,//
       RestStepPresenter restStepPresenter,//
       NoFormatStepPresenter noFormatStepPresenter,//
-      UnitSelectionStepPresenter unitSelectionStepPresenter, //
+      IdentifiersMappingSelectionStepPresenter identifiersMappingSelectionStepPresenter, //
       ComparedDatasourcesReportStepPresenter comparedDatasourcesReportPresenter,
       ArchiveStepPresenter archiveStepPresenter, //
       DatasourceValuesStepPresenter datasourceValuesStepPresenter) {
@@ -116,7 +116,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     this.jdbcStepPresenter = jdbcStepPresenter;
     this.restStepPresenter = restStepPresenter;
     this.noFormatStepPresenter = noFormatStepPresenter;
-    this.unitSelectionStepPresenter = unitSelectionStepPresenter;
+    this.identifiersMappingSelectionStepPresenter = identifiersMappingSelectionStepPresenter;
     this.comparedDatasourcesReportPresenter = comparedDatasourcesReportPresenter;
     this.archiveStepPresenter = archiveStepPresenter;
     this.datasourceValuesStepPresenter = datasourceValuesStepPresenter;
@@ -139,7 +139,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   }
 
   private void setInSlotPresenters() {
-    setInSlot(Display.Slots.Unit, unitSelectionStepPresenter);
+    setInSlot(Display.Slots.Unit, identifiersMappingSelectionStepPresenter);
     setInSlot(Display.Slots.Values, datasourceValuesStepPresenter);
     setInSlot(Display.Slots.Archive, archiveStepPresenter);
     setInSlot(Display.Slots.Limesurvey, limesurveyStepPresenter);
@@ -416,7 +416,6 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
     public void onStepIn() {
       importConfig = formatStepPresenter.getImportConfig();
       importConfig.setDestinationDatasourceName(destination);
-      unitSelectionStepPresenter.setEntityType(importConfig.getEntityType());
     }
   }
 
@@ -438,7 +437,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       removeTransientDatasource();
       importConfig = formatStepPresenter.getImportConfig();
       importConfig.setDestinationDatasourceName(destination);
-      unitSelectionStepPresenter.updateImportConfig(importConfig);
+      identifiersMappingSelectionStepPresenter.updateImportConfig(importConfig);
       createTransientDatasource();
     }
 
