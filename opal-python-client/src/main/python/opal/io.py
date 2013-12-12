@@ -15,7 +15,7 @@ def add_import_arguments(parser):
     parser.add_argument('--tables', '-t', nargs='+', required=False, help='The list of tables to be imported (defaults to all)')
     parser.add_argument('--incremental', '-i', action='store_true', help='Incremental import (new and updated value sets)')
     parser.add_argument('--limit', '-li', required=False, type=int, help='Import limit (maximum number of value sets)')
-    parser.add_argument('--unit', '-un', required=False, help='Unit name for Participant ID mapping')
+    parser.add_argument('--identifiers', '-id', required=False, help='Name of the ID mapping')
     parser.add_argument('--json', '-j', action='store_true', help='Pretty JSON formatting of the response')
 
 class OpalImporter:
@@ -28,13 +28,13 @@ class OpalImporter:
             raise Exception("ExtensionFactoryInterface.add() method must be implemented by a concrete class.")
 
     @classmethod
-    def build(cls, client, destination, tables=None, incremental=None, limit=None, unit=None, verbose=None):
+    def build(cls, client, destination, tables=None, incremental=None, limit=None, identifiers=None, verbose=None):
         setattr(cls, 'client', client)
         setattr(cls, 'destination', destination)
         setattr(cls, 'tables', tables)
         setattr(cls, 'incremental', incremental)
         setattr(cls, 'limit', limit)
-        setattr(cls, 'unit', unit)
+        setattr(cls, 'identifiers', identifiers)
         setattr(cls, 'verbose', verbose)
         return cls()
 
@@ -96,10 +96,10 @@ class OpalImporter:
             factory.incrementalConfig.incrementalDestinationName = self.destination
         if self.limit:
             factory.batchConfig.limit = self.limit
-        if self.unit:
-            factory.unitConfig.unit = self.unit
-            factory.unitConfig.allowIdentifierGeneration = False
-            factory.unitConfig.ignoreUnknownIdentifier = False
+        if self.identifiers:
+            factory.idConfig.name = self.identifiers
+            factory.idConfig.allowIdentifierGeneration = False
+            factory.idConfig.ignoreUnknownIdentifier = False
 
         extension_factory.add(factory)
 
@@ -146,13 +146,13 @@ class OpalExporter:
     """
 
     @classmethod
-    def build(cls, client, datasource, tables, output, incremental=None, unit=None, verbose=None):
+    def build(cls, client, datasource, tables, output, incremental=None, identifiers=None, verbose=None):
         setattr(cls, 'client', client)
         setattr(cls, 'datasource', datasource)
         setattr(cls, 'tables', tables)
         setattr(cls, 'output', output)
         setattr(cls, 'incremental', incremental)
-        setattr(cls, 'unit', unit)
+        setattr(cls, 'identifiers', identifiers)
         setattr(cls, 'verbose', verbose)
         return cls()
 
@@ -162,7 +162,7 @@ class OpalExporter:
 
     def submit(self, format):
         # export options
-        options = opal.protobuf.Commands_pb2.CopyCommandOptionsDto()
+        options = opal.protobuf.Commands_pb2.ExportCommandOptionsDto()
         options.format = format
         options.out = self.output
         options.nonIncremental = not self.incremental
@@ -173,8 +173,10 @@ class OpalExporter:
             def table_fullname(t): return self.datasource + '.' + t
 
             options.tables.extend(map(table_fullname, tables2export))
-        if self.unit:
-            options.unit = self.unit
+        if self.identifiers:
+            options.idConfig.name = self.identifiers
+            options.idConfig.allowIdentifierGeneration = False
+            options.idConfig.ignoreUnknownIdentifier = False
 
         if self.verbose:
             print "** Export options:"
@@ -188,7 +190,7 @@ class OpalExporter:
         if self.verbose:
             request.verbose()
 
-        uri = opal.core.UriBuilder(['project', self.datasource, 'commands', '_copy']).build()
+        uri = opal.core.UriBuilder(['project', self.datasource, 'commands', '_export']).build()
         response = request.post().resource(uri).content(options.SerializeToString()).send()
 
         # get job status
