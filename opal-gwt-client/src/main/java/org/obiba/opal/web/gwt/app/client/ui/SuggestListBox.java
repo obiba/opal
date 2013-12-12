@@ -19,7 +19,6 @@ import com.github.gwtbootstrap.client.ui.base.TextBox;
 import com.github.gwtbootstrap.client.ui.base.UnorderedList;
 import com.github.gwtbootstrap.client.ui.constants.Constants;
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.FocusEvent;
@@ -47,15 +46,13 @@ public class SuggestListBox extends FocusPanel {
 
   private SuggestBox suggestBox;
 
-  private UnorderedList suggestionMenu = new UnorderedList();
+  private final UnorderedList suggestionMenu = new UnorderedList();
 
   private final Anchor clear;
 
   private final Anchor empty;
 
   private final SuggestOracle oracle;
-
-  private boolean strict = true;
 
   public SuggestListBox(SuggestOracle oracle) {
     this.oracle = oracle;
@@ -103,20 +100,11 @@ public class SuggestListBox extends FocusPanel {
     content.add(clear);
 
     empty = new Anchor();
-    empty.addStyleName("textbox-clearable-empty");
+//    empty.addStyleName("textbox-clearable-empty");
     empty.setVisible(true);
     content.add(empty);
 
     add(content);
-  }
-
-  /**
-   * Strict if only what is suggested can be added (default is true).
-   *
-   * @param strict
-   */
-  public void setStrict(boolean strict) {
-    this.strict = strict;
   }
 
   public SuggestBox getSuggestBox() {
@@ -178,6 +166,7 @@ public class SuggestListBox extends FocusPanel {
     return closeables.addItem(text, false);
   }
 
+  @SuppressWarnings("UnusedDeclaration")
   public SuggestOracle getSuggestOracle() {
     return suggestBox.getSuggestOracle();
   }
@@ -239,7 +228,8 @@ public class SuggestListBox extends FocusPanel {
     private int getActiveMenuItemIndex() {
       for(int i = 0; i < suggestionMenu.getWidgetCount(); i++) {
         NavWidget menuItem = (NavWidget) suggestionMenu.getWidget(i);
-        if(menuItem.getElement().hasAttribute("class") && menuItem.getElement().getClassName().equals(Constants.ACTIVE)) {
+        if(menuItem.getElement().hasAttribute("class") &&
+            menuItem.getElement().getClassName().equals(Constants.ACTIVE)) {
           return i;
         }
       }
@@ -258,7 +248,7 @@ public class SuggestListBox extends FocusPanel {
       this.suggestions = suggestions;
 
       // Hide the popup if there are no suggestions to display.
-      boolean anySuggestions = (suggestions != null && suggestions.size() > 0);
+      boolean anySuggestions = suggestions != null && suggestions.size() > 0;
       if(!anySuggestions) {
         hideSuggestions();
         return;

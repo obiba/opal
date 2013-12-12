@@ -90,12 +90,9 @@ public class SubjectCredentialsView extends ModalPopupViewWithUiHandlers<Subject
   @UiField
   TextArea certificate;
 
-  private final Translations translations;
-
   @Inject
   public SubjectCredentialsView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
-    this.translations = translations;
 
     groups = new SuggestListBox(new GroupSuggestOracle(eventBus));
 
