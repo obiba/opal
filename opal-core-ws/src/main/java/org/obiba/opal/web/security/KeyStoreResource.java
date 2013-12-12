@@ -76,16 +76,12 @@ public class KeyStoreResource {
     }
 
     ResponseBuilder response = null;
-    try {
-      response = keyForm.getKeyType() == Opal.KeyType.KEY_PAIR
-          ? doCreateOrImportKeyPair(keyStore, keyForm)
-          : doImportCertificate(keyStore, keyForm);
-      if(response == null) {
-        response = Response.created(keyEntryUri);
-      }
-    } catch(Exception e) {
-      response = Response.status(Status.INTERNAL_SERVER_ERROR)
-          .entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "KeyPairCreationFailed", e));
+
+    response = keyForm.getKeyType() == Opal.KeyType.KEY_PAIR
+        ? doCreateOrImportKeyPair(keyStore, keyForm)
+        : doImportCertificate(keyStore, keyForm);
+    if(response == null) {
+      response = Response.created(keyEntryUri);
     }
 
     return response.build();
@@ -97,13 +93,8 @@ public class KeyStoreResource {
     }
 
     ResponseBuilder response = null;
-    try {
-      keyStore.deleteKey(alias);
-      response = Response.ok();
-    } catch(RuntimeException e) {
-      response = Response.status(Status.INTERNAL_SERVER_ERROR)
-          .entity(ClientErrorDtos.getErrorMessage(Status.INTERNAL_SERVER_ERROR, "DeleteKeyPairFailed", e));
-    }
+    keyStore.deleteKey(alias);
+    response = Response.ok();
 
     return response.build();
   }
