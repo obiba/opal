@@ -101,10 +101,6 @@ public class OpalConfiguration {
     return Iterables.size(Iterables.filter(extensions, type)) == 1;
   }
 
-  public Set<FunctionalUnit> getFunctionalUnits() {
-    return functionalUnits;
-  }
-
   public Set<ReportTemplate> getReportTemplates() {
     return Collections.unmodifiableSet(reportTemplates);
   }

@@ -14,7 +14,6 @@ import java.util.Set;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.core.unit.FunctionalUnit;
 import org.obiba.opal.shell.commands.options.ShowCommandOptions;
 
 /**
