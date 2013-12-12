@@ -21,7 +21,11 @@ import java.util.Comparator;
 import java.util.List;
 
 import javax.annotation.Nullable;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -30,6 +34,8 @@ import org.obiba.magma.crypt.MagmaCryptRuntimeException;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.model.Opal;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
@@ -38,26 +44,48 @@ import static javax.ws.rs.core.Response.ResponseBuilder;
 import static javax.ws.rs.core.Response.Status;
 
 @Component
-@Path("/keystore")
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class KeyStoreResource {
 
-  public List<Opal.KeyDto> getKeyEntries(OpalKeyStore keyStore) throws KeyStoreException, IOException {
-    List<Opal.KeyDto> keyPairs = Lists.newArrayList();
+  private OpalKeyStore keyStore;
+
+  @GET
+  public List<Opal.KeyDto> getKeyEntries() throws KeyStoreException, IOException {
+    List<Opal.KeyDto> keyEntries = Lists.newArrayList();
     if(keyStore != null) {
       for(String alias : keyStore.listAliases()) {
         Opal.KeyType type = Opal.KeyType.valueOf(keyStore.getKeyType(alias).toString());
         Opal.KeyDto.Builder kpBuilder = Opal.KeyDto.newBuilder().setAlias(alias).setKeyType(type);
 
         kpBuilder.setCertificate(getPEMCertificate(keyStore, alias));
-        keyPairs.add(kpBuilder.build());
+        keyEntries.add(kpBuilder.build());
       }
 
-      sortByName(keyPairs);
+      sortByName(keyEntries);
     }
-    return keyPairs;
+    return keyEntries;
   }
 
-  public Response getKeyEntry(OpalKeyStore keyStore, String alias) throws IOException, KeyStoreException {
+  @POST
+  public Response createKeyEntry(Opal.KeyForm keyForm, URI keyEntryUri) {
+
+    if(keyStore.aliasExists(keyForm.getAlias())) {
+      return Response.status(Status.BAD_REQUEST)
+          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "KeyEntryAlreadyExists").build()).build();
+    }
+
+    ResponseBuilder responseBuilder = keyForm.getKeyType() == Opal.KeyType.KEY_PAIR ? doCreateOrImportKeyPair(keyStore,
+        keyForm) : doImportCertificate(keyStore, keyForm);
+    if(responseBuilder == null) {
+      responseBuilder = Response.created(keyEntryUri);
+    }
+
+    return responseBuilder.build();
+  }
+
+  @GET
+  @Path("/{alias}")
+  public Response getKeyEntry(@PathParam("alias") String alias) throws IOException, KeyStoreException {
     if(!keyStore.aliasExists(alias)) return Response.status(Status.NOT_FOUND).build();
 
     Opal.KeyType type = Opal.KeyType.valueOf(keyStore.getKeyType(alias).toString());
@@ -68,38 +96,20 @@ public class KeyStoreResource {
     return Response.ok().entity(keyBuilder.build()).build();
   }
 
-  public Response createKeyEntry(OpalKeyStore keyStore, Opal.KeyForm keyForm, URI keyEntryUri) {
-
-    if(keyStore.aliasExists(keyForm.getAlias())) {
-      return Response.status(Status.BAD_REQUEST)
-          .entity(ClientErrorDtos.getErrorMessage(Status.BAD_REQUEST, "KeyEntryAlreadyExists").build()).build();
-    }
-
-    ResponseBuilder response = null;
-
-    response = keyForm.getKeyType() == Opal.KeyType.KEY_PAIR
-        ? doCreateOrImportKeyPair(keyStore, keyForm)
-        : doImportCertificate(keyStore, keyForm);
-    if(response == null) {
-      response = Response.created(keyEntryUri);
-    }
-
-    return response.build();
-  }
-
-  public Response deleteKeyEntry(OpalKeyStore keyStore, String alias) {
+  @DELETE
+  @Path("/{alias}")
+  public Response deleteKeyEntry(@PathParam("alias") String alias) {
     if(!keyStore.aliasExists(alias)) {
       return Response.status(Status.NOT_FOUND).build();
     }
 
-    ResponseBuilder response = null;
     keyStore.deleteKey(alias);
-    response = Response.ok();
-
-    return response.build();
+    return Response.ok().build();
   }
 
-  public Response getCertificate(OpalKeyStore keyStore, String alias) throws IOException, KeyStoreException {
+  @GET
+  @Path("/{alias}/certificate")
+  public Response getCertificate(@PathParam("alias") String alias) throws IOException, KeyStoreException {
     return Response.ok(getPEMCertificate(keyStore, alias), MediaType.TEXT_PLAIN_TYPE).header("Content-disposition",
         "attachment; filename=\"" + keyStore.getName() + "-" + alias + "-certificate.pem\"").build();
   }
@@ -175,4 +185,7 @@ public class KeyStoreResource {
     });
   }
 
+  public void setKeyStore(OpalKeyStore keyStore) {
+    this.keyStore = keyStore;
+  }
 }

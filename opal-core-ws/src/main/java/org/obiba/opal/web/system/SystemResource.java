@@ -6,7 +6,6 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
-import java.net.URI;
 import java.security.KeyStoreException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,14 +13,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 
 import org.obiba.opal.core.cfg.TaxonomyService;
 import org.obiba.opal.core.domain.OpalGeneralConfig;
@@ -43,17 +38,13 @@ import org.springframework.stereotype.Component;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import static org.obiba.opal.web.model.Database.DatabasesStatusDto;
 
-@SuppressWarnings("SpringJavaAutowiringInspection")
 @Component
 @Path("/system")
 public class SystemResource {
 
-  @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
   private VersionProvider opalVersionProvider;
 
@@ -69,12 +60,8 @@ public class SystemResource {
   @Autowired
   private SystemKeyStoreService systemKeyStoreService;
 
-  ApplicationContext applicationContext;
-
   @Autowired
-  void setApplicationContext(ApplicationContext applicationContext) {
-    this.applicationContext = applicationContext;
-  }
+  private ApplicationContext applicationContext;
 
   @GET
   @Path("/version")
@@ -206,46 +193,10 @@ public class SystemResource {
     return Response.ok().build();
   }
 
-  @GET
   @Path("/keystore")
-  public Response getKeyEntries() throws IOException, KeyStoreException {
-    KeyStoreResource resource = applicationContext.getBean("keyStoreResource", KeyStoreResource.class);
-    Gson gson = new GsonBuilder().create();
-    List<Opal.KeyDto> keyEntries = resource.getKeyEntries(systemKeyStoreService.getKeyStore());
-
-    return Response.status(Response.Status.OK).entity(gson.toJson(keyEntries)).build();
+  public KeyStoreResource getKeyStoreResource() throws IOException, KeyStoreException {
+    KeyStoreResource resource = applicationContext.getBean(KeyStoreResource.class);
+    resource.setKeyStore(systemKeyStoreService.getKeyStore());
+    return resource;
   }
-
-  @POST
-  @Path("/keystore")
-  public Response createKeyEntries(Opal.KeyForm keyForm) {
-    KeyStoreResource resource = applicationContext.getBean("keyStoreResource", KeyStoreResource.class);
-    URI keyEntryUri = UriBuilder.fromPath("/").path(SystemResource.class).path("/keystore/" + keyForm.getAlias())
-        .build();
-
-    return resource.createKeyEntry(systemKeyStoreService.getKeyStore(), keyForm, keyEntryUri);
-  }
-
-  @GET
-  @Path("/keystore/{alias}")
-  public Response getKeyEntry(@PathParam("alias") String alias) throws IOException, KeyStoreException {
-    KeyStoreResource resource = applicationContext.getBean("keyStoreResource", KeyStoreResource.class);
-    return resource.getKeyEntry(systemKeyStoreService.getKeyStore(), alias);
-  }
-
-  @DELETE
-  @Path("/keystore/{alias}")
-  public Response deleteKeyEntry(@PathParam("alias") String alias) {
-    KeyStoreResource resource = applicationContext.getBean("keyStoreResource", KeyStoreResource.class);
-    return resource.deleteKeyEntry(systemKeyStoreService.getKeyStore(), alias);
-  }
-
-  @GET
-  @Path("/keystore/{alias}/certificate")
-  // TODO: Authenticated by cookies ?
-  public Response getCertificate(@PathParam("alias") String alias) throws IOException, KeyStoreException {
-    KeyStoreResource resource = applicationContext.getBean("keyStoreResource", KeyStoreResource.class);
-    return resource.getCertificate(systemKeyStoreService.getKeyStore(), alias);
-  }
-
 }
