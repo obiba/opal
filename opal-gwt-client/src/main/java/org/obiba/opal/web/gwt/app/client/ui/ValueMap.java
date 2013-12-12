@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.ui;
 
-import java.util.Map;
-
 import org.gwtopenmaps.openlayers.client.Projection;
 import org.gwtopenmaps.openlayers.client.Style;
 import org.gwtopenmaps.openlayers.client.feature.VectorFeature;
@@ -23,7 +21,6 @@ import org.gwtopenmaps.openlayers.client.layer.Vector;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.google.common.collect.Maps;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONParser;
@@ -36,8 +33,6 @@ public abstract class ValueMap extends BaseMap {
 
   // index of the value in the value sequence
   protected final Integer index;
-
-  private final Map<String, String> featurePopupContent = Maps.newHashMap();
 
   public ValueMap(VariableDto variable, ValueSetsDto.ValueDto value, Integer index) {
     this.variable = variable;

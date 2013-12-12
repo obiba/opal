@@ -62,28 +62,23 @@ public final class ResourcePermissionRequestPaths {
   }
 
   private static String normalizeNodePath(ResourcePermissionType type, String nodePath) {
-    String path = nodePath;
-
     switch(type) {
       case PROJECT:
-        path = "/project";
-        break;
+        return "/project";
       case DATASOURCE:
-        path = "/datasource";
-        break;
+        return "/datasource";
       case VARIABLE:
       case TABLE: {
         int i = nodePath.indexOf("/table");
-        if(i != -1) path = path.substring(i);
-        break;
+        return i == -1 ? nodePath : nodePath.substring(i);
       }
-      case REPORT_TEMPLATE:
+      case REPORT_TEMPLATE: {
         int i = nodePath.indexOf("/report-template");
-        if(i != -1) path = path.substring(i);
-        break;
+        return i == -1 ? nodePath : nodePath.substring(i);
+      }
+      default:
+        return nodePath;
     }
-
-    return path;
   }
 
 }

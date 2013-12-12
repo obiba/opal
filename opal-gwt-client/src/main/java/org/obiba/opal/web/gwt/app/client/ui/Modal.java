@@ -219,7 +219,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
         onMouseMoveEvent(event);
         break;
       case Event.ONMOUSEUP:
-        onMouseUpEvent(event);
+        onMouseUpEvent();
         break;
     }
   }
@@ -344,7 +344,7 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     DOM.setStyleAttribute(getElement(), "marginTop", "0px");
   }
 
-  private void onMouseUpEvent(Event event) {
+  private void onMouseUpEvent() {
     //reset states
     if(move) {
       move = false;

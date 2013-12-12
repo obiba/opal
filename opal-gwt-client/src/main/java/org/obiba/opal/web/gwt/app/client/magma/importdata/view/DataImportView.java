@@ -250,6 +250,7 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
   }
 
   @Override
+  @SuppressWarnings("PMD.NcssMethodCount")
   public void setInSlot(Object slot, IsWidget content) {
     if(!(slot instanceof Slots)) return;
     Widget wContent = content.asWidget();
@@ -386,6 +387,7 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
     updateHelpPanelsVisibility();
   }
 
+  @SuppressWarnings("PMD.NcssMethodCount")
   private void updateHelpPanelsVisibility() {
     switch(getImportFormat()) {
       case CSV:
@@ -412,7 +414,6 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
       case GEONAMES_POSTAL_CODES:
         helpGeonamesPostalCodes.setVisible(true);
         break;
-
     }
   }
 

@@ -39,11 +39,12 @@ public class DatasourceDtos {
   }
 
   public static boolean hasPersistedTables(DatasourceDto datasource) {
-    if (datasource.getTableArray() == null || datasource.getTableArray().length() == 0) return false;
-    if (datasource.getViewArray() == null || datasource.getViewArray().length() == 0) return true;
+    if(datasource.getTableArray() == null || datasource.getTableArray().length() == 0) return false;
+    if(datasource.getViewArray() == null || datasource.getViewArray().length() == 0) return true;
     return datasource.getTableArray().length() > datasource.getViewArray().length();
   }
 
+  @SuppressWarnings("PMD.NcssMethodCount")
   public static DatasourceFactoryDto createDatasourceFactoryDto(ImportConfig importConfig) {
     switch(importConfig.getImportFormat()) {
       case CSV:

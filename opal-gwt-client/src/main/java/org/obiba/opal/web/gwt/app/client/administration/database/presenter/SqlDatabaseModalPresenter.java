@@ -86,6 +86,7 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
   }
 
   @Override
+  @SuppressWarnings("PMD.NcssMethodCount")
   protected void displayDatabase(DatabaseDto dto) {
     getView().getName().setText(dto.getName());
     getView().getUsage().setValue(Usage.valueOf(dto.getUsage().getName()));
@@ -133,6 +134,7 @@ public class SqlDatabaseModalPresenter extends AbstractDatabaseModalPresenter<Sq
   }
 
   @Override
+  @SuppressWarnings("PMD.NcssMethodCount")
   protected DatabaseDto getDto() {
     DatabaseDto dto = DatabaseDto.create();
     SqlSettingsDto sqlDto = SqlSettingsDto.create();

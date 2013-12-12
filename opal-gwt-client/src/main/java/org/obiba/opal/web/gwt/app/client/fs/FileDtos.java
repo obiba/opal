@@ -98,6 +98,7 @@ public class FileDtos {
     return parentDto;
   }
 
+  @SuppressWarnings("PMD.NcssMethodCount")
   public static List<FileDto> getParents(FileDto dto) {
     String[] segments = getPathSegments(dto);
     List<FileDto> parents = Lists.newArrayList();

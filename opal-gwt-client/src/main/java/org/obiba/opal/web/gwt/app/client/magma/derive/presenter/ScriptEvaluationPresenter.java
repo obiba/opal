@@ -253,6 +253,7 @@ public class ScriptEvaluationPresenter extends PresenterWidget<ScriptEvaluationP
     }
 
     @Override
+    @SuppressWarnings("PMD.NcssMethodCount")
     public void onResponseCode(Request request, Response response) {
       switch(response.getStatusCode()) {
         case Response.SC_OK:
