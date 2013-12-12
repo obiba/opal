@@ -181,9 +181,7 @@ public class GroupSuggestOracle extends SuggestOracle {
    * @return the suggestion created
    */
   protected GroupSuggestion createSuggestion(String replacementString, String displayString, String group) {
-    GroupSuggestion v = new GroupSuggestion(replacementString, displayString, group);
-
-    return v;
+    return new GroupSuggestion(replacementString, displayString, group);
   }
 
 }

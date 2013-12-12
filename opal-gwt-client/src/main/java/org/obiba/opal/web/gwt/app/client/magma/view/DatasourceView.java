@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.DatasourcePresenter;
@@ -114,15 +115,19 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
 
   private final Translations translations;
 
+  private final TranslationMessages translationMessages;
+
   private final PlaceManager placeManager;
 
   private CheckboxColumn<TableDto> checkColumn;
 
   @Inject
-  public DatasourceView(Binder uiBinder, Translations translations, PlaceManager placeManager) {
-    initWidget(uiBinder.createAndBindUi(this));
+  public DatasourceView(Binder uiBinder, Translations translations, TranslationMessages translationMessages,
+      PlaceManager placeManager) {
+    this.translationMessages = translationMessages;
     this.translations = translations;
     this.placeManager = placeManager;
+    initWidget(uiBinder.createAndBindUi(this));
     addTableColumns();
   }
 
@@ -238,7 +243,7 @@ public class DatasourceView extends ViewWithUiHandlers<DatasourceUiHandlers> imp
     dataProvider.addDataDisplay(table);
     table.setSelectionModel(new SingleSelectionModel<TableDto>());
     table.setPageSize(Table.DEFAULT_PAGESIZE);
-    table.setEmptyTableWidget(new InlineLabel(translations.noTablesLabel()));
+    table.setEmptyTableWidget(new InlineLabel(translationMessages.tableCount(0)));
     pager.setDisplay(table);
   }
 

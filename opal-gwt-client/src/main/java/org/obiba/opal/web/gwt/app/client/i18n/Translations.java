@@ -2344,18 +2344,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Table References")
   String tableReferencesLabel();
 
-  @Description("No Tables label")
-  @DefaultStringValue("No tables")
-  String noTablesLabel();
-
-  @Description("No Variables label")
-  @DefaultStringValue("No variables")
-  String noVariablesLabel();
-
-  @Description("No Entities label")
-  @DefaultStringValue("No entities")
-  String noEntitiesLabel();
-
   @Description("Edit categories label")
   @DefaultStringValue("Edit categories")
   String editCategories();
@@ -2371,30 +2359,6 @@ public interface Translations extends Constants {
   @Description("Edit <Variable> properties label")
   @DefaultStringValue("Edit {0} properties")
   String editVariableProperties();
-
-  @Description("Table count label")
-  @DefaultStringValue("1 table")
-  String tableCountLabel();
-
-  @Description("Variable count label")
-  @DefaultStringValue("1 variable")
-  String variableCountLabel();
-
-  @Description("Entity count label")
-  @DefaultStringValue("1 entity")
-  String entityCountLabel();
-
-  @Description("Tables count label")
-  @DefaultStringValue("{0} tables")
-  String tablesCountLabel();
-
-  @Description("Variables count label")
-  @DefaultStringValue("{0} variables")
-  String variablesCountLabel();
-
-  @Description("Entities count label")
-  @DefaultStringValue("{0} entities")
-  String entitiesCountLabel();
 
   @Description("Last Update Ago label")
   @DefaultStringValue("Last update {0}")
@@ -2588,4 +2552,16 @@ public interface Translations extends Constants {
   @Description("Remove Application label")
   @DefaultStringValue("Remove Application")
   String removeApplication();
+
+  @Description("Unknown tables count label")
+  @DefaultStringValue("? tables")
+  String unknownTablesCount();
+
+  @Description("Unknown variables count label")
+  @DefaultStringValue("? variables")
+  String unknownVariablesCount();
+
+  @Description("Unknown entities count label")
+  @DefaultStringValue("? entities")
+  String unknownEntitiesCount();
 }

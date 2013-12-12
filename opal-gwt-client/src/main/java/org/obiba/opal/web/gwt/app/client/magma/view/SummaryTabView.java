@@ -121,22 +121,30 @@ public class SummaryTabView extends ViewImpl implements SummaryTabPresenter.Disp
     limitTextBox.setMin(1);
     limitTextBox.setValue(String.valueOf(limit));
     if(limit < entitiesCount) {
-      limitTextBox.setVisible(true);
-      previewSummaryTextSuffix.setVisible(true);
-      fullPanel.setVisible(false);
-      refreshPanel.setVisible(false);
-      previewSummaryText.setText(translations.summaryPreviewPendingLabel());
-      previewSummaryTextSuffix
-          .setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(entitiesCount)));
+      showLimitBox(entitiesCount);
     } else {
-      limitTextBox.setVisible(false);
-      previewSummaryTextSuffix.setVisible(false);
-      fullPanel.setVisible(false);
-      refreshPanel.setVisible(false);
-      previewSummaryText.setText(translations.summaryFullPendingLabel());
+      hideLimitBox();
     }
     previewSummary.setVisible(true);
     cancelPanel.setVisible(true);
+  }
+
+  private void showLimitBox(int entitiesCount) {
+    limitTextBox.setVisible(true);
+    previewSummaryTextSuffix.setVisible(true);
+    fullPanel.setVisible(false);
+    refreshPanel.setVisible(false);
+    previewSummaryText.setText(translations.summaryPreviewPendingLabel());
+    previewSummaryTextSuffix
+        .setText(translations.summaryTotalEntitiesLabel().replace("{0}", String.valueOf(entitiesCount)));
+  }
+
+  private void hideLimitBox() {
+    limitTextBox.setVisible(false);
+    previewSummaryTextSuffix.setVisible(false);
+    fullPanel.setVisible(false);
+    refreshPanel.setVisible(false);
+    previewSummaryText.setText(translations.summaryFullPendingLabel());
   }
 
   @Override

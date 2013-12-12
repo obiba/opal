@@ -29,7 +29,6 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.CopyCommandOptionsDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.github.gwtbootstrap.client.ui.Alert;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
@@ -37,7 +36,6 @@ import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -66,11 +64,6 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
   @Override
   protected void onBind() {
     super.onBind();
-    initDisplayComponents();
-  }
-
-  protected void initDisplayComponents() {
-    getView().setDestinationValidator(new DestinationValidator());
   }
 
   @Override
@@ -184,7 +177,8 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
       getView().showCopyNAlert(translations.export1Table());
       getView().showNewName(tables.iterator().next().getName());
     } else {
-      getView().showCopyNAlert(TranslationsUtils.replaceArguments(translations.exportNTables(), String.valueOf(copyTables.size())));
+      getView().showCopyNAlert(
+          TranslationsUtils.replaceArguments(translations.exportNTables(), String.valueOf(copyTables.size())));
     }
   }
 
@@ -243,8 +237,6 @@ public class DataCopyPresenter extends ModalPresenterWidget<DataCopyPresenter.Di
     enum FormField {
       NEW_TABLE_NAME
     }
-
-    void setDestinationValidator(ValidationHandler handler);
 
     /**
      * Set a collection of datasources retrieved from Opal.

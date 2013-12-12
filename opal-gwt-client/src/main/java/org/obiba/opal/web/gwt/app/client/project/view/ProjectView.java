@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.project.view;
 
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -28,7 +29,6 @@ import com.github.gwtbootstrap.client.ui.Label;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.github.gwtbootstrap.client.ui.TabPanel;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -44,8 +44,6 @@ import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implements ProjectPresenter.Display {
 
   interface Binder extends UiBinder<Widget, ProjectView> {}
-
-  private static final Translations translations = GWT.create(Translations.class);
 
   @UiField
   Breadcrumbs titlecrumbs;
@@ -94,10 +92,15 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
 
   private ProjectDto project;
 
-  @Inject
-  ProjectView(Binder uiBinder) {
-    initWidget(uiBinder.createAndBindUi(this));
+  private final Translations translations;
 
+  private final TranslationMessages translationMessages;
+
+  @Inject
+  ProjectView(Binder uiBinder, Translations translations, TranslationMessages translationMessages) {
+    this.translations = translations;
+    this.translationMessages = translationMessages;
+    initWidget(uiBinder.createAndBindUi(this));
     for(ProjectTab tab : ProjectTab.values()) {
       String title = translations.projectTabNameMap().get(tab.toString());
       TabPanelHelper.setTabTitle(tabPanel, tab.ordinal(), title);
@@ -118,7 +121,7 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     description.setText(project.getDescription());
 
     setTags();
-    if (project.hasTimestamps()) setTimestamps(project.getTimestamps());
+    if(project.hasTimestamps()) setTimestamps(project.getTimestamps());
   }
 
   private void setTags() {
@@ -139,32 +142,10 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
 
   @Override
   public void setProjectSummary(ProjectSummaryDto projectSummary) {
-    if(projectSummary == null) {
-      tableCount.setText(TranslationsUtils.replaceArguments(translations.tablesCountLabel(), "?"));
-      variableCount.setText(TranslationsUtils.replaceArguments(translations.variablesCountLabel(), "?"));
-      entityCount.setText(TranslationsUtils.replaceArguments(translations.entitiesCountLabel(), "?"));
-      return;
-    }
-
-    String count = "" + projectSummary.getTableCount();
-    if("0".equals(count)) count = translations.noTablesLabel();
-    else if("1".equals(count)) count = translations.tableCountLabel();
-    else count = TranslationsUtils.replaceArguments(translations.tablesCountLabel(), count);
-    tableCount.setText(count);
-
-    count = "" + projectSummary.getVariableCount();
-    if("0".equals(count)) count = translations.noVariablesLabel();
-    else if("1".equals(count)) count = translations.variableCountLabel();
-    else count = TranslationsUtils.replaceArguments(translations.variablesCountLabel(), count);
-    variableCount.setText(count);
-
-    count = "" + projectSummary.getEntityCount();
-    if("0".equals(count)) count = translations.noEntitiesLabel();
-    else if("1".equals(count)) count = translations.entityCountLabel();
-    else count = TranslationsUtils.replaceArguments(translations.entitiesCountLabel(), count);
-    entityCount.setText(count);
-
-    if (projectSummary.hasTimestamps()) setTimestamps(projectSummary.getTimestamps());
+    tableCount.setText(translationMessages.tableCount(projectSummary.getTableCount()));
+    variableCount.setText(translationMessages.variableCount(projectSummary.getVariableCount()));
+    entityCount.setText(translationMessages.entityCount(projectSummary.getEntityCount()));
+    if(projectSummary.hasTimestamps()) setTimestamps(projectSummary.getTimestamps());
   }
 
   @Override
@@ -224,6 +205,7 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   }
 
   @Override
+  @SuppressWarnings("PMD.NcssMethodCount")
   public void setInSlot(Object slot, IsWidget content) {
     if(slot == ProjectPresenter.TABLES_PANE) {
       tablesPanel.clear();

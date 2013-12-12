@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.view;
 
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -178,6 +179,8 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
   private final Translations translations;
 
+  private final TranslationMessages translationMessages;
+
   private final PlaceManager placeManager;
 
   private TableDto tableDto;
@@ -187,8 +190,10 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   private boolean hasLinkAuthorization = true;
 
   @Inject
-  public TableView(Binder uiBinder, Translations translations, PlaceManager placeManager) {
+  public TableView(Binder uiBinder, Translations translations, TranslationMessages translationMessages,
+      PlaceManager placeManager) {
     this.translations = translations;
+    this.translationMessages = translationMessages;
     this.placeManager = placeManager;
     initWidget(uiBinder.createAndBindUi(this));
     addTableColumns();
@@ -255,7 +260,7 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
 
     table.setSelectionModel(new SingleSelectionModel<VariableDto>());
     table.setPageSize(Table.DEFAULT_PAGESIZE);
-    table.setEmptyTableWidget(new InlineLabel(translations.noVariablesLabel()));
+    table.setEmptyTableWidget(new InlineLabel(translationMessages.variableCount(0)));
     pager.setDisplay(table);
     dataProvider.addDataDisplay(table);
 
@@ -307,14 +312,14 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     tableDto = dto;
     name.setText(dto.getName());
     entityType.setText(dto.getEntityType());
-    //edit.setVisible(dto.hasViewLink());
-
     timestamps.setText(TranslationsUtils.replaceArguments(translations.lastUpdateOnLabel(),
         Moment.create(dto.getTimestamps().getLastUpdate()).fromNow()));
-    variableCount.setText(TranslationsUtils.replaceArguments(translations.variablesCountLabel(),
-        dto.hasVariableCount() ? "" + dto.getVariableCount() : "?"));
-    entityCount.setText(TranslationsUtils.replaceArguments(translations.entitiesCountLabel(),
-        dto.hasValueSetCount() ? "" + dto.getValueSetCount() : "?"));
+    variableCount.setText(dto.hasVariableCount()
+        ? translationMessages.variableCount(dto.getVariableCount())
+        : translations.unknownVariablesCount());
+    entityCount.setText(dto.hasValueSetCount()
+        ? translationMessages.entityCount(dto.getValueSetCount())
+        : translations.unknownEntitiesCount());
   }
 
   @Override

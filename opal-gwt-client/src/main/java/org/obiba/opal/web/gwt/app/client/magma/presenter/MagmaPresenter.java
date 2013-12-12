@@ -132,7 +132,7 @@ public class MagmaPresenter extends PresenterWidget<MagmaPresenter.Display>
                     }
                   }
                 }
-                fireEvent(new VariableSelectionChangeEvent(MagmaPresenter.this, tableDto, selection, previous, next));
+                fireEvent(new VariableSelectionChangeEvent(tableDto, selection, previous, next));
               }
             })//
                 .withCallback(Response.SC_SERVICE_UNAVAILABLE, new ResponseCodeCallback() {

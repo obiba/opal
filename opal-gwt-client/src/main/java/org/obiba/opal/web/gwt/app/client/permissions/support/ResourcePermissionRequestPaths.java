@@ -72,10 +72,9 @@ public final class ResourcePermissionRequestPaths {
         int i = nodePath.indexOf("/table");
         return i == -1 ? nodePath : nodePath.substring(i);
       }
-      case REPORT_TEMPLATE: {
+      case REPORT_TEMPLATE:
         int i = nodePath.indexOf("/report-template");
         return i == -1 ? nodePath : nodePath.substring(i);
-      }
       default:
         return nodePath;
     }

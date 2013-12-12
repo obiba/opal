@@ -16,12 +16,9 @@ import org.obiba.opal.web.gwt.app.client.fs.FileDtos;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.event.MagmaPathSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ProjectResourcePermissionsPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
-import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
@@ -95,7 +92,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   public static final GwtEvent.Type<RevealContentHandler<?>> ADMIN_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
 
   @ContentSlot
-  public static final GwtEvent.Type<RevealContentHandler<?>> PERMISSION_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
+  public static final GwtEvent.Type<RevealContentHandler<?>> PERMISSION_PANE
+      = new GwtEvent.Type<RevealContentHandler<?>>();
 
   private final Provider<MagmaPresenter> magmaPresenterProvider;
 
@@ -130,9 +128,9 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   private ProjectAdministrationPresenter projectAdministrationPresenter;
 
   @Inject
-  public ProjectPresenter(EventBus eventBus, Display display, Proxy proxy, Translations translations,
-      PlaceManager placeManager, Provider<MagmaPresenter> magmaPresenterProvider,
-      Provider<FileExplorerPresenter> fileExplorerPresenterProvider,
+  @SuppressWarnings({ "PMD.ExcessiveParameterList", "ConstructorWithTooManyParameters" })
+  public ProjectPresenter(EventBus eventBus, Display display, Proxy proxy, PlaceManager placeManager,
+      Provider<MagmaPresenter> magmaPresenterProvider, Provider<FileExplorerPresenter> fileExplorerPresenterProvider,
       Provider<ReportsPresenter> reportsPresenterProvider, Provider<TasksPresenter> tasksPresenterProvider,
       Provider<ProjectAdministrationPresenter> projectAdministrationPresenterProvider,
       Provider<ProjectResourcePermissionsPresenter> projectResourcePermissionsProvider) {
@@ -156,20 +154,13 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   @Override
   public void prepareFromRequest(PlaceRequest request) {
     super.prepareFromRequest(request);
-
-    String requestedName = request.getParameter(ParameterTokens.TOKEN_NAME, null);
-
+    name = request.getParameter(ParameterTokens.TOKEN_NAME, null);
     tab = validateTab(request.getParameter(ParameterTokens.TOKEN_TAB, null));
-    String path = validatePath(requestedName, request.getParameter(ParameterTokens.TOKEN_PATH, null));
 
-    if(tab == Display.ProjectTab.TABLES) {
-      // TODO check that datasource name is the one of project
-      getView().setTabData(tab.ordinal(), path);
-    } else {
-      getView().setTabData(tab.ordinal(), null);
-    }
+    // TODO check that datasource name is the one of project
+    String path = validatePath(name, request.getParameter(ParameterTokens.TOKEN_PATH, null));
+    getView().setTabData(tab.ordinal(), tab == Display.ProjectTab.TABLES ? path : null);
 
-    name = requestedName;
     refresh();
   }
 
@@ -177,7 +168,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     // TODO handle wrong or missing project name
     if(name == null) return;
     // reset
-    ResourceRequestBuilderFactory.<ProjectDto>newBuilder().forResource(UriBuilders.PROJECT.create().build(name)).get()
+    ResourceRequestBuilderFactory.<ProjectDto>newBuilder().forResource(UriBuilders.PROJECT.create().build(name))
         .withCallback(new ResourceCallback<ProjectDto>() {
           @Override
           public void onResource(Response response, ProjectDto resource) {
@@ -187,39 +178,33 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
             onTabSelected(tab.ordinal());
             getView().selectTab(tab.ordinal());
           }
-        }).send();
+        }).get().send();
     refreshSummary();
   }
 
   private void refreshSummary() {
     // TODO handle wrong or missing project name
     if(name == null) return;
-    getView().setProjectSummary(null);
     ResourceRequestBuilderFactory.<ProjectSummaryDto>newBuilder()
-        .forResource(UriBuilders.PROJECT_SUMMARY.create().build(name)).get()
+        .forResource(UriBuilders.PROJECT_SUMMARY.create().build(name))
         .withCallback(new ResourceCallback<ProjectSummaryDto>() {
           @Override
           public void onResource(Response response, ProjectSummaryDto resource) {
             getView().setProjectSummary(resource);
           }
-        }).send();
+        }).get().send();
   }
 
   @Override
   public void onProjectsSelection() {
-    PlaceRequest request = new PlaceRequest.Builder().nameToken(Places.PROJECTS).build();
-    placeManager.revealPlace(request);
+    placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.PROJECTS).build());
   }
 
   @Override
+  @SuppressWarnings("PMD.NcssMethodCount")
   public void onTabSelected(int index) {
-    tab = Display.ProjectTab.values()[index];
-    PlaceRequest.Builder builder = PlaceRequestHelper
-        .createRequestBuilderWithParams(placeManager.getCurrentPlaceRequest(),
-            Arrays.asList(ParameterTokens.TOKEN_NAME));
-    builder.with(ParameterTokens.TOKEN_TAB, tab.toString());
     String queryPathParam = (String) getView().getTabData(index);
-
+    tab = Display.ProjectTab.values()[index];
     switch(tab) {
       case TABLES:
         onTablesTabSelected(queryPathParam);
@@ -228,10 +213,10 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
         onFilesTabSelected(queryPathParam);
         break;
       case REPORTS:
-        onReportsTabSelected(queryPathParam);
+        onReportsTabSelected();
         break;
       case TASKS:
-        onTasksTabSelected(queryPathParam);
+        onTasksTabSelected();
         break;
       case PERMISSIONS:
         onPermissionsTabSelected();
@@ -241,10 +226,13 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
         break;
     }
 
+    PlaceRequest.Builder builder = PlaceRequestHelper
+        .createRequestBuilderWithParams(placeManager.getCurrentPlaceRequest(),
+            Arrays.asList(ParameterTokens.TOKEN_NAME)) //
+        .with(ParameterTokens.TOKEN_TAB, tab.toString());
     if(!Strings.isNullOrEmpty(queryPathParam)) {
       builder.with(ParameterTokens.TOKEN_PATH, queryPathParam);
     }
-
     placeManager.updateHistory(builder.build(), true);
   }
 
@@ -253,11 +241,9 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       magmaPresenter = magmaPresenterProvider.get();
       setInSlot(TABLES_PANE, magmaPresenter);
     }
-    if(Strings.isNullOrEmpty(path)) {
-      fireEvent(new MagmaPathSelectionEvent(this, project.getDatasource().getName()));
-    } else {
-      fireEvent(new MagmaPathSelectionEvent(this, path));
-    }
+    fireEvent(Strings.isNullOrEmpty(path)
+        ? new MagmaPathSelectionEvent(this, project.getDatasource().getName())
+        : new MagmaPathSelectionEvent(this, path));
   }
 
   private void onFilesTabSelected(String path) {
@@ -266,14 +252,12 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       setInSlot(FILES_PANE, fileExplorerPresenter);
     }
     fileExplorerPresenter.showProject(name);
-    if(Strings.isNullOrEmpty(path)) {
-      fireEvent(new FolderRequestEvent(FileDtos.project(name)));
-    } else {
-      fireEvent(new FolderRequestEvent(FileDtos.create(path.split("/"))));
-    }
+    fireEvent(Strings.isNullOrEmpty(path)
+        ? new FolderRequestEvent(FileDtos.project(name))
+        : new FolderRequestEvent(FileDtos.create(path.split("/"))));
   }
 
-  private void onReportsTabSelected(String path) {
+  private void onReportsTabSelected() {
     if(reportsPresenter == null) {
       reportsPresenter = reportsPresenterProvider.get();
       setInSlot(REPORTS_PANE, reportsPresenter);
@@ -281,7 +265,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     reportsPresenter.showProject(name);
   }
 
-  private void onTasksTabSelected(String path) {
+  private void onTasksTabSelected() {
     if(tasksPresenter == null) {
       tasksPresenter = tasksPresenterProvider.get();
       setInSlot(TASKS_PANE, tasksPresenter);
@@ -292,10 +276,9 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   private void onPermissionsTabSelected() {
     if(projectResourcePermissionsPresenter == null) {
       projectResourcePermissionsPresenter = projectResourcePermissionsProvider.get();
-      setInSlot(PERMISSION_PANE, projectResourcePermissionsPresenter );
+      setInSlot(PERMISSION_PANE, projectResourcePermissionsPresenter);
     }
-    projectResourcePermissionsPresenter
-        .initialize(ResourcePermissionType.PROJECT, project);
+    projectResourcePermissionsPresenter.initialize(project);
   }
 
   private void onAdminTabSelected() {
@@ -332,19 +315,16 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       } catch(IllegalArgumentException ignored) {
       }
     }
-
     return Display.ProjectTab.HOME;
   }
 
   private String validatePath(String name, String path) {
     if(tab == Display.ProjectTab.TABLES && !Strings.isNullOrEmpty(path)) {
-      MagmaPath.Parser parser = new MagmaPath.Parser().parse(path);
-      String datasourceName = parser.getDatasource();
+      String datasourceName = MagmaPath.Parser.parse(path).getDatasource();
       if(!Strings.isNullOrEmpty(datasourceName) && name.equals(datasourceName)) {
         return path;
       }
     }
-
     updateHistory(null);
     return null;
   }

@@ -20,7 +20,6 @@ import java.util.Set;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.CsvOptionsDisplay;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
@@ -39,7 +38,6 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -54,11 +52,9 @@ import static org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig.Im
 public class CsvFormatStepPresenter extends PresenterWidget<CsvFormatStepPresenter.Display>
     implements DataImportPresenter.DataConfigFormatStepPresenter, CsvFormatStepUiHandlers {
 
-  private static final Translations translations = GWT.create(Translations.class);
-
   private final Collection<String> availableCharsets = new ArrayList<String>();
 
-  private FileSelectionPresenter csvFileSelectionPresenter;
+  private final FileSelectionPresenter csvFileSelectionPresenter;
 
   private ViewValidator viewValidator;
 

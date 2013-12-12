@@ -12,15 +12,16 @@ package org.obiba.opal.web.gwt.app.client.magma.derive.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
+import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.ScriptEvaluationPresenter.ScriptEvaluationCallback;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.ViewConfigurationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.support.ViewDtoBuilder;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
-import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.BranchingWizardStepController;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.DefaultWizardStepController;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardPresenterWidget;
@@ -28,7 +29,6 @@ import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardProxy;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepController.StepInHandler;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardType;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardView;
-import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.ScriptEvaluationPresenter.ScriptEvaluationCallback;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.event.WizardRequiredEvent;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -41,11 +41,11 @@ import org.obiba.opal.web.model.client.magma.ViewDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.web.bindery.event.shared.EventBus;
 
 import static org.obiba.opal.web.gwt.app.client.support.VariableDtos.allCategoriesMissing;
 import static org.obiba.opal.web.gwt.app.client.support.VariableDtos.hasCategories;
@@ -348,7 +348,7 @@ public class DeriveVariablePresenter extends WizardPresenterWidget<DeriveVariabl
     getView().hide();
     derivationPresenter.onClose();
     if(wizardType == FromWizardType) {
-      getEventBus().fireEvent(new VariableSelectionChangeEvent(this, table, variable));
+      getEventBus().fireEvent(new VariableSelectionChangeEvent(table, variable));
     } else if(deriveConclusionPresenter.getView().isOpenEditorSelected()) {
       getEventBus().fireEvent(new ViewConfigurationRequiredEvent(view, derived));
     }

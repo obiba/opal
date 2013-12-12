@@ -125,22 +125,9 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   @Override
   protected void onBind() {
     super.onBind();
-    csvFormatStepPresenter.bind();
-    xmlFormatStepPresenter.bind();
-    spssFormatStepPresenter.bind();
-    limesurveyStepPresenter.bind();
-    jdbcStepPresenter.bind();
-    restStepPresenter.bind();
-    comparedDatasourcesReportPresenter.bind();
-
+    bindPresenters();
     comparedDatasourcesReportPresenter.allowIgnoreAllModifications(false);
-
-    setInSlot(Display.Slots.Unit, unitSelectionStepPresenter);
-    setInSlot(Display.Slots.Values, datasourceValuesStepPresenter);
-    setInSlot(Display.Slots.Archive, archiveStepPresenter);
-    setInSlot(Display.Slots.Limesurvey, limesurveyStepPresenter);
-    setInSlot(Display.Slots.Jdbc, jdbcStepPresenter);
-    setInSlot(Display.Slots.Rest, restStepPresenter);
+    setInSlotPresenters();
 
     getView().setUnitSelectionStepInHandler(new UnitSelectionStepInHandler());
     getView().setComparedDatasourcesReportDisplay(comparedDatasourcesReportPresenter.getView());
@@ -149,7 +136,25 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
     addEventHandlers();
     updateFormatChooser();
+  }
 
+  private void setInSlotPresenters() {
+    setInSlot(Display.Slots.Unit, unitSelectionStepPresenter);
+    setInSlot(Display.Slots.Values, datasourceValuesStepPresenter);
+    setInSlot(Display.Slots.Archive, archiveStepPresenter);
+    setInSlot(Display.Slots.Limesurvey, limesurveyStepPresenter);
+    setInSlot(Display.Slots.Jdbc, jdbcStepPresenter);
+    setInSlot(Display.Slots.Rest, restStepPresenter);
+  }
+
+  private void bindPresenters() {
+    csvFormatStepPresenter.bind();
+    xmlFormatStepPresenter.bind();
+    spssFormatStepPresenter.bind();
+    limesurveyStepPresenter.bind();
+    jdbcStepPresenter.bind();
+    restStepPresenter.bind();
+    comparedDatasourcesReportPresenter.bind();
   }
 
   private void updateFormatChooser() {
@@ -376,12 +381,10 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       getView().clearError();
       if(formatStepPresenter.validate()) {
         return true;
-      } else {
-        for(Map.Entry<HasType<ControlGroupType>, String> entry : csvFormatStepPresenter.getErrors().entrySet()) {
-          getView().showError(entry.getValue(), entry.getKey());
-        }
       }
-
+      for(Map.Entry<HasType<ControlGroupType>, String> entry : csvFormatStepPresenter.getErrors().entrySet()) {
+        getView().showError(entry.getValue(), entry.getKey());
+      }
       return false;
     }
 

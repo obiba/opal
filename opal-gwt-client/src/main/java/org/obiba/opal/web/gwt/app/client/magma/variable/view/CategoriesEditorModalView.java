@@ -36,9 +36,9 @@ import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
+import com.google.common.base.Strings;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -70,13 +70,9 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   private static final int DEFAULT_PAGESIZE = 10;
 
-  private final Widget widget;
+  private final Translations translations;
 
-  private final Translations translations = GWT.create(Translations.class);
-
-  interface CategoriesEditorModalUiBinder extends UiBinder<Widget, CategoriesEditorModalView> {}
-
-  private static final CategoriesEditorModalUiBinder uiBinder = GWT.create(CategoriesEditorModalUiBinder.class);
+  interface Binder extends UiBinder<Widget, CategoriesEditorModalView> {}
 
   private final ListDataProvider<CategoryDto> dataProvider = new ListDataProvider<CategoryDto>();
 
@@ -128,9 +124,10 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
   IconAnchor moveDownLink;
 
   @Inject
-  public CategoriesEditorModalView(EventBus eventBus) {
+  public CategoriesEditorModalView(EventBus eventBus, Binder uiBinder, Translations translations) {
     super(eventBus);
-    widget = uiBinder.createAndBindUi(this);
+    this.translations = translations;
+    initWidget(uiBinder.createAndBindUi(this));
     dialog.setTitle(translations.editCategories());
     dialog.setResizable(true);
     dialog.setMinWidth(MIN_WIDTH);
@@ -143,11 +140,6 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
     pager.setDisplay(table);
     dataProvider.addDataDisplay(table);
-  }
-
-  @Override
-  public Widget asWidget() {
-    return widget;
   }
 
   @UiHandler("addButton")
@@ -268,30 +260,12 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
     // prepare cells for each translations
     for(final LocaleDto locale : locales) {
-      Column<CategoryDto, String> labelCol = new EditableTabableColumn<CategoryDto>() {
-        @Override
-        public String getValue(CategoryDto object) {
-          AttributeDto label = VariableDtos.getAttribute(object, LABEL, locale.getName());
-          return label == null ? "" : label.getValue();
-        }
-      };
-      labelCol.setFieldUpdater(new FieldUpdater<CategoryDto, String>() {
-        @Override
-        public void update(int index, CategoryDto object, String value) {
-          AttributeDto label = VariableDtos.getAttribute(object, LABEL, locale.getName());
-          if(label == null) {
-            // Create new attribute
-            VariableDtos.createAttribute(object, LABEL, locale.getName(), value);
-          } else {
-            label.setValue(value);
-          }
-        }
-      });
-      table
-          .addColumn(labelCol, translations.labelLabel() + " (" + translations.localeMap().get(locale.getName()) + ")");
-
+      renderLocalizedCategoryRows(locale);
     }
+    renderMissingColumn();
+  }
 
+  private void renderMissingColumn() {
     Column<CategoryDto, Boolean> missingCol = new Column<CategoryDto, Boolean>(new CheckboxCell(true, false)) {
       @Override
       public Boolean getValue(CategoryDto object) {
@@ -306,6 +280,29 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
       }
     });
     table.addColumn(missingCol, translations.missingLabel());
+  }
+
+  private void renderLocalizedCategoryRows(final LocaleDto locale) {
+    Column<CategoryDto, String> labelCol = new EditableTabableColumn<CategoryDto>() {
+      @Override
+      public String getValue(CategoryDto object) {
+        AttributeDto label = VariableDtos.getAttribute(object, LABEL, locale.getName());
+        return Strings.nullToEmpty(label.getValue());
+      }
+    };
+    labelCol.setFieldUpdater(new FieldUpdater<CategoryDto, String>() {
+      @Override
+      public void update(int index, CategoryDto object, String value) {
+        AttributeDto label = VariableDtos.getAttribute(object, LABEL, locale.getName());
+        if(label == null) {
+          // Create new attribute
+          VariableDtos.createAttribute(object, LABEL, locale.getName(), value);
+        } else {
+          label.setValue(value);
+        }
+      }
+    });
+    table.addColumn(labelCol, translations.labelLabel() + " (" + translations.localeMap().get(locale.getName()) + ")");
   }
 
   @Override
@@ -329,33 +326,35 @@ public class CategoriesEditorModalView extends ModalPopupViewWithUiHandlers<Cate
 
   private void addCategory() {
     dialog.clearAlert(nameGroup);
-    List<CategoryDto> current = new ArrayList<CategoryDto>(dataProvider.getList());
+    List<CategoryDto> existingCat = new ArrayList<CategoryDto>(dataProvider.getList());
 
     // Validate that the new name does not conflicts with an existing one
-    if(addCategoryName.getText().isEmpty()) {
-      showError(translations.categoryNameRequired(), nameGroup);
-      return;
-    }
-
-    for(CategoryDto c : current) {
-      if(c.getName().equalsIgnoreCase(addCategoryName.getText())) {
-        showError(translations.categoryNameAlreadyExists(), nameGroup);
-        return;
-      }
-    }
+    if(!validateName(existingCat)) return;
 
     CategoryDto newCategory = CategoryDto.create();
     newCategory.setName(addCategoryName.getText());
     newCategory.setIsMissing(false);
-    current.add(newCategory);
+    existingCat.add(newCategory);
 
-    dataProvider.setList(current);
+    dataProvider.setList(existingCat);
     dataProvider.refresh();
     pager.setVisible(dataProvider.getList().size() >= DEFAULT_PAGESIZE);
-    int pageIndex = dataProvider.getList().size() / table.getPageSize();
-    pager.setPage(pageIndex);
-
+    pager.setPage(dataProvider.getList().size() / table.getPageSize());
     addCategoryName.setText("");
+  }
+
+  private boolean validateName(List<CategoryDto> existingCat) {
+    if(addCategoryName.getText().isEmpty()) {
+      showError(translations.categoryNameRequired(), nameGroup);
+      return false;
+    }
+    for(CategoryDto c : existingCat) {
+      if(c.getName().equalsIgnoreCase(addCategoryName.getText())) {
+        showError(translations.categoryNameAlreadyExists(), nameGroup);
+        return false;
+      }
+    }
+    return true;
   }
 
   private class CategoryDtoDisplay implements CheckboxColumn.Display<CategoryDto> {

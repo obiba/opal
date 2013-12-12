@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
@@ -47,6 +48,8 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   interface Binder extends UiBinder<Widget, ProjectsView> {}
 
   private static final Translations translations = GWT.create(Translations.class);
+
+  private static final TranslationMessages translationMessages = GWT.create(TranslationMessages.class);
 
   @UiField
   Panel activePanel;
@@ -174,9 +177,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
     private void addTableNames(final ProjectsUiHandlers handlers, final ProjectDto project, FlowPanel panel) {
       JsArrayString tableNames = JsArrays.toSafeArray(project.getDatasource().getTableArray());
       if(tableNames.length() > 0) {
-        Anchor countLabel = new Anchor(tableNames.length() == 1
-            ? translations.tableCountLabel()
-            : TranslationsUtils.replaceArguments(translations.tablesCountLabel(), "" + tableNames.length()));
+        Anchor countLabel = new Anchor(translationMessages.tableCount(tableNames.length()));
         countLabel.addClickHandler(new ClickHandler() {
           @Override
           public void onClick(ClickEvent event) {

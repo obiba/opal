@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.fs.presenter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -29,7 +28,6 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.FileDto;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -51,8 +49,6 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
   private final FolderDetailsPresenter folderDetailsPresenter;
 
   private final ModalProvider<FileUploadModalPresenter> fileUploadModalProvider;
-
-  private FileUploadModalPresenter fileUploadModalPresenter;
 
   private Object fileSelectionSource;
 
@@ -112,7 +108,6 @@ public class FileSelectorPresenter extends ModalPresenterWidget<FileSelectorPres
         checkedFiles = event.getCheckedFiles();
       }
     });
-    fileUploadModalPresenter = fileUploadModalProvider.create();
     folderDetailsPresenter.setSingleSelectionModel(true);
   }
 

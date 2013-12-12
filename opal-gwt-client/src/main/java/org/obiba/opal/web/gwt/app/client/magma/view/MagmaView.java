@@ -8,7 +8,6 @@ import org.obiba.opal.web.gwt.app.client.ui.BreadcrumbsTabPanel;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -21,8 +20,6 @@ import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
 public class MagmaView extends ViewImpl implements MagmaPresenter.Display {
 
-  private static final Translations translations = GWT.create(Translations.class);
-
   interface Binder extends UiBinder<Widget, MagmaView> {}
 
   @UiField
@@ -33,29 +30,31 @@ public class MagmaView extends ViewImpl implements MagmaPresenter.Display {
 
   private final PlaceManager placeManager;
 
+  private final Translations translations;
+
   private Widget datasourceWidget;
 
   private Widget tableWidget;
 
   private Widget variableWidget;
 
-  private String datasource;
-
-  private String table;
-
   @Inject
-  public MagmaView(Binder uiBinder, PlaceManager placeManager) {
+  public MagmaView(Binder uiBinder, PlaceManager placeManager, Translations translations) {
     this.placeManager = placeManager;
+    this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
     tabPanel.addSelectionHandler(new SelectionHandler<Integer>() {
       @Override
       public void onSelection(SelectionEvent<Integer> event) {
-        if(event.getSelectedItem() == 0) {
-          //getUiHandlers().onDatasourceSelection(datasource);
-          setHeading("Datasource");
-        } else if(event.getSelectedItem() == 1) {
-          //getUiHandlers().onTableSelection(datasource, table);
-          setHeading("Table");
+        switch(event.getSelectedItem()) {
+          case 0:
+            //getUiHandlers().onDatasourceSelection(datasource);
+            setHeading();
+            break;
+          case 1:
+            //getUiHandlers().onTableSelection(datasource, table);
+            setHeading();
+            break;
         }
       }
     });
@@ -78,38 +77,33 @@ public class MagmaView extends ViewImpl implements MagmaPresenter.Display {
 
   @Override
   public void selectDatasource(String name) {
-    datasource = name;
     tabPanel.clear();
     tabPanel.addAndSelect(datasourceWidget, name);
     tabPanel.setMenuVisible(false);
-    setHeading("Datasource");
+    setHeading();
 
   }
 
   @Override
   public void selectTable(String datasource, String table, boolean isView) {
-    this.datasource = datasource;
-    this.table = table;
     tabPanel.clear();
     tabPanel.add(datasourceWidget, getDatasourceLink(datasource));
     tabPanel.addAndSelect(tableWidget, getTableLink(datasource, table));
     tabPanel.setMenuVisible(true);
-    setHeading(isView ? "View" : "Table");
+    setHeading();
   }
 
   @Override
   public void selectVariable(String datasource, String table, String variable) {
-    this.datasource = datasource;
-    this.table = table;
     tabPanel.clear();
     tabPanel.add(datasourceWidget, getDatasourceLink(datasource));
     tabPanel.add(tableWidget, getTableLink(datasource, table));
     tabPanel.addAndSelect(variableWidget, variable);
     tabPanel.setMenuVisible(true);
-    setHeading("Variable");
+    setHeading();
   }
 
-  private void setHeading(String subtext) {
+  private void setHeading() {
     heading.setText(translations.tablesLabel());
   }
 

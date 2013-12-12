@@ -93,15 +93,14 @@ public class NavigatorModule extends AbstractOpalModule {
 
   @Override
   protected void configure() {
-    bindPresenter(ProjectsPresenter.class, ProjectsPresenter.Display.class, ProjectsView.class,
-        ProjectsPresenter.Proxy.class);
-    bindPresenter(ProjectPresenter.class, ProjectPresenter.Display.class, ProjectView.class,
-        ProjectPresenter.Proxy.class);
-    bindPresenterWidget(ProjectAdministrationPresenter.class, ProjectAdministrationPresenter.Display.class,
-        ProjectAdministrationView.class);
-    bindPresenterWidget(ProjectPropertiesModalPresenter.class, ProjectPropertiesModalPresenter.Display.class,
-        ProjectPropertiesModalView.class);
+    configureProject();
+    configureMagma();
+    configureDereiveVariableWizard();
+    configureDatasource();
+    configureDeriveVariablePresenters();
+  }
 
+  private void configureMagma() {
     bindPresenterWidget(MagmaPresenter.class, MagmaPresenter.Display.class, MagmaView.class);
     bindPresenterWidget(DatasourcePresenter.class, DatasourcePresenter.Display.class, DatasourceView.class);
     bindPresenterWidget(TablePresenter.class, TablePresenter.Display.class, TableView.class);
@@ -126,13 +125,9 @@ public class NavigatorModule extends AbstractOpalModule {
 
     bindWizardPresenterWidget(CreateDatasourcePresenter.class, CreateDatasourcePresenter.Display.class,
         CreateDatasourceView.class, CreateDatasourcePresenter.Wizard.class);
+  }
 
-    bindWizardPresenterWidget(DeriveVariablePresenter.class, DeriveVariablePresenter.Display.class,
-        DeriveVariableView.class, DeriveVariablePresenter.CategorizeWizard.class);
-    // tricky case: one wizard presenter for 3 different types
-    bind(DeriveVariablePresenter.CustomWizard.class).asEagerSingleton();
-    bind(DeriveVariablePresenter.FromWizard.class).asEagerSingleton();
-
+  private void configureDatasource() {
     bindDatasourceFormPresenter(ExcelDatasourceFormPresenter.class, ExcelDatasourceFormPresenter.Display.class,
         ExcelDatasourceFormView.class, ExcelDatasourceFormPresenter.Subscriber.class);
     bindDatasourceFormPresenter(HibernateDatasourceFormPresenter.class, HibernateDatasourceFormPresenter.Display.class,
@@ -145,8 +140,25 @@ public class NavigatorModule extends AbstractOpalModule {
         CsvDatasourceFormView.class, CsvDatasourceFormPresenter.Subscriber.class);
     bindDatasourceFormPresenter(NullDatasourceFormPresenter.class, NullDatasourceFormPresenter.Display.class,
         NullDatasourceFormView.class, NullDatasourceFormPresenter.Subscriber.class);
+  }
 
-    configureDeriveVariablePresenters();
+  private void configureDereiveVariableWizard() {
+    bindWizardPresenterWidget(DeriveVariablePresenter.class, DeriveVariablePresenter.Display.class,
+        DeriveVariableView.class, DeriveVariablePresenter.CategorizeWizard.class);
+    // tricky case: one wizard presenter for 3 different types
+    bind(DeriveVariablePresenter.CustomWizard.class).asEagerSingleton();
+    bind(DeriveVariablePresenter.FromWizard.class).asEagerSingleton();
+  }
+
+  private void configureProject() {
+    bindPresenter(ProjectsPresenter.class, ProjectsPresenter.Display.class, ProjectsView.class,
+        ProjectsPresenter.Proxy.class);
+    bindPresenter(ProjectPresenter.class, ProjectPresenter.Display.class, ProjectView.class,
+        ProjectPresenter.Proxy.class);
+    bindPresenterWidget(ProjectAdministrationPresenter.class, ProjectAdministrationPresenter.Display.class,
+        ProjectAdministrationView.class);
+    bindPresenterWidget(ProjectPropertiesModalPresenter.class, ProjectPropertiesModalPresenter.Display.class,
+        ProjectPropertiesModalView.class);
   }
 
   private <V extends View> void bindDatasourceFormPresenter(Class<? extends PresenterWidget<V>> presenter,

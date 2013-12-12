@@ -43,8 +43,6 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
 
   private final ModalProvider<DeleteAllConfirmationModalPresenter> deleteAllConfirmationModalProvider;
 
-  private ResourcePermissionType resourceType;
-
   private ProjectDto project;
 
   @Inject
@@ -55,8 +53,7 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
     getView().setUiHandlers(this);
   }
 
-  public void initialize(@Nonnull ResourcePermissionType type, @Nonnull ProjectDto project) {
-    resourceType = type;
+  public void initialize(@Nonnull ProjectDto project) {
     this.project = project;
     retrievePermissions();
   }
@@ -79,9 +76,8 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
   @Override
   public void selectSubject(final Subject subject) {
     String requestPath = ResourcePermissionRequestPaths.projectSubject(project.getName(), subject.getPrincipal());
-    ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder()
-        .forResource(UriBuilder.create().fromPath(requestPath)
-            .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, subject.getType().getName()).build()).get()
+    ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder().forResource(UriBuilder.create().fromPath(requestPath)
+        .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, subject.getType().getName()).build()).get()
         .withCallback(new ResourceCallback<JsArray<Acl>>() {
           @Override
           public void onResource(Response response, JsArray<Acl> subjectAcls) {
@@ -99,9 +95,7 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
     String uri = UriBuilder.create().fromPath(requestPath)
         .query(ResourcePermissionRequestPaths.PRINCIPAL_QUERY_PARAM, principal)
         .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, subject.getType().getName()).build();
-    ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder()
-        .forResource(uri)
-        .delete()
+    ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder().forResource(uri).delete()
         .withCallback(Response.SC_OK, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
@@ -137,9 +131,7 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
     String requestPath = ResourcePermissionRequestPaths.projectSubject(project.getName(), subject.getPrincipal());
     String uri = UriBuilder.create().fromPath(requestPath)
         .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, subject.getType().getName()).build();
-    ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder()
-        .forResource(uri)
-        .delete()
+    ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder().forResource(uri).delete()
         .withCallback(Response.SC_OK, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {

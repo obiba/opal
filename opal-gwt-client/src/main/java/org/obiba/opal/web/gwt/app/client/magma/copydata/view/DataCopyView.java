@@ -18,7 +18,6 @@ import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyPresen
 import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
@@ -63,8 +62,6 @@ public class DataCopyView extends ModalPopupViewWithUiHandlers<DataCopyUiHandler
 
   @UiField
   CheckBox copyNullValues;
-
-  private ValidationHandler destinationValidator;
 
   @Inject
   public DataCopyView(EventBus eventBus, Binder uiBinder, Translations translations) {
@@ -122,11 +119,6 @@ public class DataCopyView extends ModalPopupViewWithUiHandlers<DataCopyUiHandler
   @Override
   public boolean isWithVariables() {
     return true;
-  }
-
-  @Override
-  public void setDestinationValidator(ValidationHandler handler) {
-    destinationValidator = handler;
   }
 
   @Override

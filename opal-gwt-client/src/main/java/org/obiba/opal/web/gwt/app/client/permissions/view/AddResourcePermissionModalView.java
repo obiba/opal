@@ -20,8 +20,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-public class AddResourcePermissionModalView extends AbstractResourcePermissionModalView<ResourcePermissionModalUiHandlers>
-    implements AddResourcePermissionModalPresenter.Display{
+public class AddResourcePermissionModalView
+    extends AbstractResourcePermissionModalView<ResourcePermissionModalUiHandlers>
+    implements AddResourcePermissionModalPresenter.Display {
 
   interface Binder extends UiBinder<Widget, AddResourcePermissionModalView> {}
 
@@ -43,13 +44,10 @@ public class AddResourcePermissionModalView extends AbstractResourcePermissionMo
   @UiField
   ControlGroup permissionsGroup;
 
-  private final Translations translations;
-
   @Inject
   public AddResourcePermissionModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
     super(eventBus);
     initWidget(uiBinder.createAndBindUi(this));
-    this.translations = translations;
     dialog.setTitle(translations.addResourcePermissionsModalTile());
   }
 

@@ -28,8 +28,6 @@ public class VariableSelectionChangeEvent extends GwtEvent<VariableSelectionChan
 
   private static final Type<Handler> TYPE = new Type<Handler>();
 
-  private final Object source;
-
   private final String datasourceName;
 
   private final String tableName;
@@ -47,54 +45,40 @@ public class VariableSelectionChangeEvent extends GwtEvent<VariableSelectionChan
   /**
    * @param selectedItem
    */
-  public VariableSelectionChangeEvent(Object source, TableDto table, VariableDto selectedItem) {
-    this(source, table.getDatasourceName(), table.getName(), selectedItem.getName(), table, selectedItem, null, null);
+  public VariableSelectionChangeEvent(TableDto table, VariableDto selectedItem) {
+    this(table.getDatasourceName(), table.getName(), selectedItem.getName(), table, selectedItem, null, null);
   }
 
-  public VariableSelectionChangeEvent(Object source,TableDto table, VariableDto selectedItem, VariableDto previous,
+  public VariableSelectionChangeEvent(TableDto table, VariableDto selectedItem, VariableDto previous,
       VariableDto next) {
-    this(source, table.getDatasourceName(), table.getName(), selectedItem.getName(), table, selectedItem, previous, next);
+    this(table.getDatasourceName(), table.getName(), selectedItem.getName(), table, selectedItem, previous, next);
   }
 
-  public VariableSelectionChangeEvent(Object source, String datasourceName, String tableName, String variableName) {
-    this(source, datasourceName, tableName, variableName, null, null, null, null);
+  public VariableSelectionChangeEvent(String datasourceName, String tableName, String variableName) {
+    this(datasourceName, tableName, variableName, null, null, null, null);
   }
 
-  public VariableSelectionChangeEvent(Object source, String datasourceName, String tableName, String variableName,
-      TableDto table, VariableDto selectedItem, VariableDto previous, VariableDto next) {
-    this.source = source;
+  public VariableSelectionChangeEvent(String datasourceName, String tableName, String variableName, TableDto table,
+      VariableDto selection, VariableDto previous, VariableDto next) {
     this.datasourceName = datasourceName;
     this.tableName = tableName;
     this.variableName = variableName;
     this.table = table;
-    selection = selectedItem;
+    this.selection = selection;
     this.previous = previous;
     this.next = next;
   }
 
-
   public String getDatasourceName() {
-    if (hasTable()) {
-      return getTable().getDatasourceName();
-    }
-
-    return datasourceName;
+    return hasTable() ? getTable().getDatasourceName() : datasourceName;
   }
 
   public String getTableName() {
-    if (hasTable()) {
-      return getTable().getName();
-    }
-
-    return tableName;
+    return hasTable() ? getTable().getName() : tableName;
   }
 
   public String getVariableName() {
-    if (hasSelection()) {
-      return getSelection().getName();
-    }
-
-    return variableName;
+    return hasSelection() ? getSelection().getName() : variableName;
   }
 
   public TableDto getTable() {
@@ -120,7 +104,6 @@ public class VariableSelectionChangeEvent extends GwtEvent<VariableSelectionChan
   public boolean hasSelection() {
     return selection != null;
   }
-
 
   public static Type<Handler> getType() {
     return TYPE;
