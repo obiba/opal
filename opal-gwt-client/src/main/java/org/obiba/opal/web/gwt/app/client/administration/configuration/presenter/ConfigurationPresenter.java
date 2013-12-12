@@ -1,6 +1,7 @@
 package org.obiba.opal.web.gwt.app.client.administration.configuration.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.configuration.event.GeneralConfigSavedEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
@@ -9,6 +10,7 @@ import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.app.client.support.BreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.GeneralConf;
 
 import com.google.gwt.core.client.GWT;
@@ -21,7 +23,6 @@ import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
 public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Display, ConfigurationPresenter.Proxy>
@@ -41,8 +42,7 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
 
   @Inject
   public ConfigurationPresenter(Display display, EventBus eventBus, Proxy proxy,
-      ModalProvider<GeneralConfModalPresenter> generalConfModalProvider,
-      BreadcrumbsBuilder breadcrumbsBuilder) {
+      ModalProvider<GeneralConfModalPresenter> generalConfModalProvider, BreadcrumbsBuilder breadcrumbsBuilder) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     this.generalConfModalProvider = generalConfModalProvider.setContainer(this);
     this.breadcrumbsBuilder = breadcrumbsBuilder;
@@ -76,20 +76,27 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
 
   private void refresh() {
     ResourceRequestBuilderFactory.<GeneralConf>newBuilder()//
-        .forResource("/system/conf/general").withCallback(new ResourceCallback<GeneralConf>() {
+        .forResource(UriBuilders.SYSTEM_CONF_GENERAL.create().build())
+        .withCallback(new ResourceCallback<GeneralConf>() {
 
-      @Override
-      public void onResource(Response response, GeneralConf resource) {
-        conf = resource;
-        getView().renderGeneralProperties(resource);
-      }
-    }).get().send();
+          @Override
+          public void onResource(Response response, GeneralConf resource) {
+            conf = resource;
+            getView().renderGeneralProperties(resource);
+          }
+        }).get().send();
   }
 
   @Override
   public void onEditGeneralSettings() {
     GeneralConfModalPresenter dialog = generalConfModalProvider.get();
     dialog.setGeneralConf(conf);
+  }
+
+  @Override
+  public void onDownloadCertificate() {
+    getEventBus()
+        .fireEvent(new FileDownloadRequestEvent(UriBuilders.SYSTEM_KEYSTORE_HTTPS_CERTIFICATE.create().build()));
   }
 
   public interface Display extends View, HasUiHandlers<ConfigurationUiHandlers>, HasBreadcrumbs {

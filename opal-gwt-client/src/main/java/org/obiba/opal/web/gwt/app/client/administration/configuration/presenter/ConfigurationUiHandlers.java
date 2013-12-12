@@ -5,4 +5,6 @@ import com.gwtplatform.mvp.client.UiHandlers;
 public interface ConfigurationUiHandlers extends UiHandlers {
 
   void onEditGeneralSettings();
+
+  void onDownloadCertificate();
 }
