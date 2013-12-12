@@ -29,11 +29,15 @@ import org.obiba.magma.Timestamped;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.support.UnionTimestamps;
 import org.obiba.opal.core.domain.Project;
+import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.NoSuchProjectException;
 import org.obiba.opal.core.service.ProjectService;
+import org.obiba.opal.core.service.security.ProjectsKeyStoreService;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Projects;
+import org.obiba.opal.web.security.KeyStoreResource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,8 +53,14 @@ public class ProjectResource {
   @Autowired
   private Set<DatasourceUpdateListener> datasourceUpdateListeners;
 
+  @Autowired
+  private ProjectsKeyStoreService projectsKeyStoreService;
+
   @PathParam("name")
   private String name;
+
+  @Autowired
+  private ApplicationContext applicationContext;
 
   @GET
   @Transactional(readOnly = true)
@@ -96,6 +106,14 @@ public class ProjectResource {
       // silently ignore project not found
     }
     return Response.ok().build();
+  }
+
+  @Path("/keystore")
+  public KeyStoreResource getKeyStoreResource() {
+    KeyStoreResource resource = applicationContext.getBean(KeyStoreResource.class);
+    OpalKeyStore keyStore = projectsKeyStoreService.getKeyStore(getProject());
+    resource.setKeyStore(keyStore);
+    return resource;
   }
 
   private Project getProject() {

@@ -22,12 +22,15 @@ import org.obiba.opal.core.domain.database.Database;
 import org.obiba.opal.core.domain.taxonomy.Taxonomy;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.core.service.database.DatabaseRegistry;
+import org.obiba.opal.core.service.security.SystemKeyStoreService;
 import org.obiba.opal.web.model.Opal;
+import org.obiba.opal.web.security.KeyStoreResource;
 import org.obiba.opal.web.taxonomy.Dtos;
 import org.obiba.opal.web.ws.security.NoAuthorization;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
 import org.obiba.runtime.upgrade.VersionProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
@@ -51,6 +54,12 @@ public class SystemResource {
 
   @Autowired
   private DatabaseRegistry databaseRegistry;
+
+  @Autowired
+  private SystemKeyStoreService systemKeyStoreService;
+
+  @Autowired
+  private ApplicationContext applicationContext;
 
   @GET
   @Path("/version")
@@ -180,5 +189,12 @@ public class SystemResource {
     serverService.save(conf);
 
     return Response.ok().build();
+  }
+
+  @Path("/keystore")
+  public KeyStoreResource getKeyStoreResource() {
+    KeyStoreResource resource = applicationContext.getBean(KeyStoreResource.class);
+    resource.setKeyStore(systemKeyStoreService.getKeyStore());
+    return resource;
   }
 }
