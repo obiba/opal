@@ -141,6 +141,20 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
 
     String originalName = selectedItems.get(0).get(0).getName();
     // Update values and namespace
+    updateValuesAndNamespace(attributes, newAttributes, originalName);
+
+    // Add other attributes
+    for(AttributeDto attribute : attributes) {
+      if(!attribute.getName().equals(getView().getName().getText())) {
+        newAttributes.push(attribute);
+      }
+    }
+
+    return newAttributes;
+  }
+
+  private void updateValuesAndNamespace(List<AttributeDto> attributes, JsArray<AttributeDto> newAttributes,
+      String originalName) {
     for(LocalizedEditableText localizedText : getView().getLocalizedValues().getValue()) {
       AttributeDto a = null;
       for(AttributeDto attribute : attributes) {
@@ -160,15 +174,6 @@ public class VariableAttributeModalPresenter extends ModalPresenterWidget<Variab
         newAttributes.push(a);
       }
     }
-
-    // Add other attributes
-    for(AttributeDto attribute : attributes) {
-      if(!attribute.getName().equals(getView().getName().getText())) {
-        newAttributes.push(attribute);
-      }
-    }
-
-    return newAttributes;
   }
 
   private AttributeDto getNewAttribute(LocalizedEditableText localizedText) {

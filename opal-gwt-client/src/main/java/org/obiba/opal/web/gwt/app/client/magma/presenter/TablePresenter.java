@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -25,7 +23,6 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
-import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexStatusRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
@@ -53,7 +50,6 @@ import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
-import org.obiba.opal.web.model.client.opal.AclAction;
 import org.obiba.opal.web.model.client.opal.TableIndexStatusDto;
 import org.obiba.opal.web.model.client.opal.TableIndexationStatus;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
@@ -103,8 +99,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
-  private final ModalProvider<ConfigureViewStepPresenter> configureViewStepProvider;
-
   private final ModalProvider<VariablesToViewPresenter> variablesToViewProvider;
 
   private final ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider;
@@ -116,9 +110,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   private final ModalProvider<DataExportPresenter> dataExportModalProvider;
 
   private final ModalProvider<DataCopyPresenter> dataCopyModalProvider;
-
-  @Inject
-  private CodingViewModalPresenter codingViewModalPresenter;
 
   private final ValuesTablePresenter valuesTablePresenter;
 
@@ -142,8 +133,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @Inject
   public TablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
       ValuesTablePresenter valuesTablePresenter, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
-      Provider<IndexPresenter> indexPresenter, ModalProvider<ConfigureViewStepPresenter> configureViewStepProvider,
-      ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
+      Provider<IndexPresenter> indexPresenter, ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
       ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider,
       ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider,
       ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider,
@@ -155,7 +145,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.indexPresenter = indexPresenter;
     this.translations = translations;
-    this.configureViewStepProvider = configureViewStepProvider.setContainer(this);
     this.variablesToViewProvider = variablesToViewProvider.setContainer(this);
     this.variablePropertiesModalProvider = variablePropertiesModalProvider.setContainer(this);
     this.tablePropertiesModalProvider = tablePropertiesModalProvider.setContainer(this);
