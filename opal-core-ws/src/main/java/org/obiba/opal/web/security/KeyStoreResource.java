@@ -30,7 +30,6 @@ import org.obiba.magma.crypt.MagmaCryptRuntimeException;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.model.Opal;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
@@ -39,7 +38,6 @@ import static javax.ws.rs.core.Response.ResponseBuilder;
 import static javax.ws.rs.core.Response.Status;
 
 @Component
-@Scope("request")
 @Path("/keystore")
 public class KeyStoreResource {
 
