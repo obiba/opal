@@ -130,6 +130,7 @@ public class BirtReportServiceImpl implements ReportService {
    * @return a ClassLoader that will load classes from BIRT dependencies before looking for classes in the Opal
    * classpath.
    */
+  @SuppressWarnings("unused")
   private ClassLoader createClassLoader(File libDir) {
     File[] jars = libDir.listFiles(new FilenameFilter() {
 

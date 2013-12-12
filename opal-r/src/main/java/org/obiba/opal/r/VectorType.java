@@ -197,18 +197,10 @@ public enum VectorType {
   protected REXP asFactors(Variable variable, int size, Iterable<Value> values, boolean withMissings) {
     List<String> levels = Lists.newArrayList();
     Map<String, Integer> codes = Maps.newHashMap();
-    // REXPFactor is one-based. That is, the ID the first level, is 1.
-    int i = 1;
-    for(Category c : variable.getCategories()) {
-      if(withMissings || !c.isMissing()) {
-        levels.add(c.getName());
-        codes.put(c.getName(), i++);
-      }
-    }
+    populateCodesAndLevels(variable, withMissings, codes, levels);
 
     int ints[] = new int[size];
-
-    i = 0;
+    int i = 0;
     for(Value value : values) {
       if(i >= size) {
         throw new IllegalStateException("unexpected value");
@@ -223,6 +215,17 @@ public enum VectorType {
       i++;
     }
     return new REXPFactor(ints, levels.toArray(new String[levels.size()]));
+  }
+
+  private void populateCodesAndLevels(Variable variable, boolean withMissings, Map<String, Integer> codes, List<String> levels) {
+    // REXPFactor is one-based. That is, the ID the first level, is 1.
+    int i = 1;
+    for(Category c : variable.getCategories()) {
+      if(withMissings || !c.isMissing()) {
+        levels.add(c.getName());
+        codes.put(c.getName(), i++);
+      }
+    }
   }
 
   /**
