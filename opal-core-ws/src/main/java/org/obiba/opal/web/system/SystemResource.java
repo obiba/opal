@@ -156,10 +156,9 @@ public class SystemResource {
 
   @GET
   @Path("/conf/general")
-  @NotAuthenticated
+  @NotAuthenticated // allow anonymous to be able to retrive Opal instance name
   public Opal.GeneralConf getOpalGeneralConfiguration() {
     OpalGeneralConfig conf = serverService.getConfig();
-
     return Opal.GeneralConf.newBuilder()//
         .setName(conf.getName())//
         .addAllLanguages(conf.getLocalesAsString())//
