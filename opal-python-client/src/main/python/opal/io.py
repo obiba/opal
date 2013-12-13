@@ -65,6 +65,12 @@ class OpalImporter:
             return transient.name + '.' + t
 
         options.tables.extend(map(table_fullname, tables2import))
+
+        if self.identifiers:
+            options.idConfig.name = self.identifiers
+            options.idConfig.allowIdentifierGeneration = False
+            options.idConfig.ignoreUnknownIdentifier = False
+
         if self.verbose:
             print "** Import options:"
             print options
@@ -109,7 +115,8 @@ class OpalImporter:
             print "**"
 
         # send request and parse response as a datasource
-        response = request.post().resource('/transient-datasources').content(factory.SerializeToString()).send()
+        uri = opal.core.UriBuilder(['project', self.destination, 'transient-datasources']).build()
+        response = request.post().resource(uri).content(factory.SerializeToString()).send()
         transient = opal.protobuf.Magma_pb2.DatasourceDto()
         transient.ParseFromString(response.content)
 

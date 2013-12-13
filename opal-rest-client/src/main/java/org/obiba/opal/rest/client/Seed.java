@@ -312,7 +312,9 @@ public class Seed {
       ImportCommandOptionsDto.Builder importCommand = ImportCommandOptionsDto.newBuilder().setDestination(destination)
           .setSource(csv.getName());
       if(unit != null) {
-        importCommand.setUnit(unit);
+        Identifiers.IdentifiersMappingConfigDto.Builder builder = Identifiers.IdentifiersMappingConfigDto.newBuilder();
+        builder.setName(unit);
+        importCommand.setIdConfig(builder.build());
       }
       ignore(opalClient.post(opalClient.newUri().segment("shell", "import").build(), importCommand.build()));
 
@@ -376,7 +378,9 @@ public class Seed {
       ImportCommandOptionsDto.Builder importCommand = ImportCommandOptionsDto.newBuilder().setDestination(destination)
           .setSource(csv.getName());
       if(unit != null) {
-        importCommand.setUnit(unit);
+        Identifiers.IdentifiersMappingConfigDto.Builder builder = Identifiers.IdentifiersMappingConfigDto.newBuilder();
+        builder.setName(unit);
+        importCommand.setIdConfig(builder.build());
       }
       ignore(opalClient.post(opalClient.newUri().segment("shell", "import").build(), importCommand.build()));
 

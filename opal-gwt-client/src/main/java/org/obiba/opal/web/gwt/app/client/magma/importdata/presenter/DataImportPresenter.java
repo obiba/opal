@@ -33,6 +33,7 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
 import org.obiba.opal.web.model.client.database.SqlSettingsDto;
+import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingConfigDto;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
 import org.obiba.opal.web.model.client.opal.ImportCommandOptionsDto;
@@ -349,9 +350,9 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       dto.setFilesArray(selectedFiles);
     }
     if(importConfig.isIdentifierSharedWithUnit()) {
-      dto.setUnit(importConfig.getIdentifiersMapping());
-      dto.setForce(false);
-      dto.setIgnore(true);
+      IdentifiersMappingConfigDto idConfig = IdentifiersMappingConfigDto.create();
+      idConfig.setName(importConfig.getIdentifiersMapping());
+      dto.setIdConfig(idConfig);
     }
     JsArrayString selectedTables = JavaScriptObject.createArray().cast();
     for(String tableName : comparedDatasourcesReportPresenter.getSelectedTables()) {
@@ -473,7 +474,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
       String factoryStr = DatasourceFactoryDto.stringify(factory);
       transientRequest = ResourceRequestBuilderFactory.<DatasourceFactoryDto>newBuilder()
-          .forResource(UriBuilders.PROJECT_TRANSIENT_DATASOURCE.create().build(destination)) //
+          .forResource(UriBuilders.PROJECT_TRANSIENT_DATASOURCE.create().build(importConfig.getDestinationDatasourceName())) //
           .post() //
           .withResourceBody(factoryStr) //
           .withCallback(new CreateTransientDatasourceCallback(factory), SC_CREATED, SC_BAD_REQUEST,

@@ -17,7 +17,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.DatasourceFactory;
 import org.obiba.magma.Initialisable;
 import org.obiba.magma.support.Initialisables;
-import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
+import org.obiba.opal.core.identifiers.IdentifierGenerator;
 import org.obiba.opal.core.service.IdentifiersTableService;
 
 public class IdentifiersMappingDatasourceFactory extends AbstractDatasourceFactory implements Initialisable {
@@ -31,12 +31,12 @@ public class IdentifiersMappingDatasourceFactory extends AbstractDatasourceFacto
   @NotNull
   private final IdentifiersTableService identifiersTableService;
 
-  private final IParticipantIdentifier identifierGenerator;
+  private final IdentifierGenerator identifierGenerator;
 
   private final boolean ignoreUnknownIdentifier;
 
   public IdentifiersMappingDatasourceFactory(@NotNull DatasourceFactory wrappedFactory, @NotNull String idMapping,
-      @NotNull IdentifiersTableService identifiersTableService, @Nullable IParticipantIdentifier identifierGenerator,
+      @NotNull IdentifiersTableService identifiersTableService, @Nullable IdentifierGenerator identifierGenerator,
       boolean ignoreUnknownIdentifier) {
     this.wrappedFactory = wrappedFactory;
     this.idMapping = idMapping;

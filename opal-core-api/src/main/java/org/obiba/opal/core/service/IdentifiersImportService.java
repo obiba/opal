@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
-import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
+import org.obiba.opal.core.identifiers.IdentifierGenerator;
 import org.obiba.opal.core.identifiers.IdentifiersMapping;
 
 /**
@@ -30,7 +30,7 @@ public interface IdentifiersImportService {
    * @param pIdentifier
    * @return
    */
-  int importIdentifiers(@NotNull IdentifiersMapping idMapping, @NotNull IParticipantIdentifier pIdentifier);
+  int importIdentifiers(@NotNull IdentifiersMapping idMapping, @NotNull IdentifierGenerator pIdentifier);
 
   /**
    * Import identifiers from identifiers tables of a given datasource.

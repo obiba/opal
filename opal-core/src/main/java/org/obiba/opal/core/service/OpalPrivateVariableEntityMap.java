@@ -29,7 +29,7 @@ import org.obiba.magma.VariableValueSource;
 import org.obiba.magma.VectorSource;
 import org.obiba.magma.support.VariableEntityBean;
 import org.obiba.magma.type.TextType;
-import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
+import org.obiba.opal.core.identifiers.IdentifierGenerator;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,13 +52,13 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
   private final Variable ownerVariable;
 
   @NotNull
-  private final IParticipantIdentifier participantIdentifier;
+  private final IdentifierGenerator participantIdentifier;
 
   @NotNull
   private final BiMap<VariableEntity, VariableEntity> publicToPrivate = HashBiMap.create();
 
   public OpalPrivateVariableEntityMap(@NotNull ValueTable keysValueTable, @NotNull Variable ownerVariable,
-      @NotNull IParticipantIdentifier participantIdentifier) {
+      @NotNull IdentifierGenerator participantIdentifier) {
     Assert.notNull(keysValueTable, "keysValueTable cannot be null");
     Assert.notNull(ownerVariable, "ownerVariable cannot be null");
     Assert.notNull(participantIdentifier, "participantIdentifier cannot be null");
@@ -102,7 +102,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
   public VariableEntity createPrivateEntity(@NotNull VariableEntity publicEntity) {
     Assert.notNull(publicEntity, "publicEntity cannot be null");
     for(int i = 0; i < 100; i++) {
-      VariableEntity privateEntity = entityFor(participantIdentifier.generateParticipantIdentifier());
+      VariableEntity privateEntity = entityFor(participantIdentifier.generateIdentifier());
       if(!publicToPrivate.inverse().containsKey(privateEntity)) {
         try {
           writeEntities(keysValueTable, publicEntity, privateEntity);
@@ -123,7 +123,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
   public VariableEntity createPublicEntity(@NotNull VariableEntity privateEntity) {
     Assert.notNull(privateEntity, "privateEntity cannot be null");
     for(int i = 0; i < 100; i++) {
-      VariableEntity publicEntity = entityFor(participantIdentifier.generateParticipantIdentifier());
+      VariableEntity publicEntity = entityFor(participantIdentifier.generateIdentifier());
       if(!publicToPrivate.containsKey(publicEntity)) {
         try {
           writeEntities(keysValueTable, publicEntity, privateEntity);

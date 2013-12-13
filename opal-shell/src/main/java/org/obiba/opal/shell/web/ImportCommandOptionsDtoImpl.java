@@ -43,12 +43,12 @@ public class ImportCommandOptionsDtoImpl implements ImportCommandOptions {
 
   @Override
   public String getUnit() {
-    return dto.getUnit();
+    return dto.getIdConfig().getName();
   }
 
   @Override
   public boolean isUnit() {
-    return dto.hasUnit();
+    return dto.hasIdConfig();
   }
 
   @Override
@@ -98,12 +98,14 @@ public class ImportCommandOptionsDtoImpl implements ImportCommandOptions {
 
   @Override
   public boolean isForce() {
-    return dto.getForce();
+    return dto.hasIdConfig() && dto.getIdConfig().hasAllowIdentifierGeneration() &&
+        dto.getIdConfig().getAllowIdentifierGeneration();
   }
 
   @Override
   public boolean isIgnore() {
-    return dto.getIgnore();
+    return dto.hasIdConfig() && dto.getIdConfig().hasIgnoreUnknownIdentifier() &&
+        dto.getIdConfig().getIgnoreUnknownIdentifier();
   }
 
   @Override

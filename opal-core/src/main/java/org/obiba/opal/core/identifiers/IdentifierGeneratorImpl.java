@@ -7,27 +7,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.domain.participant.identifier.impl;
+package org.obiba.opal.core.identifiers;
 
 import java.security.SecureRandom;
 import java.util.Random;
 
-import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * Provides a method to generate a random 10 digit {@link Participant} id. Clients are responsible to ensure that the id
+ * Provides a method to generate a random n digit, optionally prefixed . Clients are responsible to ensure that the id
  * is unique prior to use. Example ids: 7515827901, 4398790660, 0042480736.
  */
 @Component
-public final class DefaultParticipantIdentifierImpl implements IParticipantIdentifier {
+public final class IdentifierGeneratorImpl implements IdentifierGenerator {
 
   private final Random generator = new SecureRandom();
 
+  @Value("${org.obiba.opal.identifiers.length}")
   private int keySize = 10;
 
+  @Value("${org.obiba.opal.identifiers.zeros}")
   private boolean allowStartWithZero = false;
 
+  @Value("${org.obiba.opal.identifiers.prefix}")
   private String prefix;
 
   public void setKeySize(int keySize) {
@@ -51,7 +54,7 @@ public final class DefaultParticipantIdentifierImpl implements IParticipantIdent
   }
 
   @Override
-  public String generateParticipantIdentifier() {
+  public String generateIdentifier() {
     if(keySize < 1) {
       throw new IllegalStateException("keySize must be at least 1: " + keySize);
     }

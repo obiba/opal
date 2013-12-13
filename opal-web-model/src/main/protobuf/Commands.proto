@@ -33,15 +33,13 @@ message CommandStateDto {
 }
 
 message ImportCommandOptionsDto {
-  optional string unit = 1;
   optional string destination = 2;
   optional string archive = 3;
   repeated string files = 4;
   optional string source = 5;
-  optional bool force = 6 [default = false];
   repeated string tables = 7;
-  optional bool ignore = 8 [default = false];
   optional bool incremental = 9 [default = false];
+  optional Identifiers.IdentifiersMappingConfigDto idConfig = 10;
 }
 
 message CopyCommandOptionsDto {

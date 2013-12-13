@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.domain.participant.identifier.impl;
+package org.obiba.opal.core.identifiers;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,21 +21,21 @@ import org.junit.Test;
 
 public class DefaultParticipantIdentifierImplTest {
 
-  private DefaultParticipantIdentifierImpl participantIdentifier;
+  private IdentifierGeneratorImpl participantIdentifier;
 
   @Before
   public void setUp() throws Exception {
-    participantIdentifier = new DefaultParticipantIdentifierImpl();
+    participantIdentifier = new IdentifierGeneratorImpl();
   }
 
   @Test
   public void testGenerateParticipantIdentifierNotNull() {
-    Assert.assertNotNull(participantIdentifier.generateParticipantIdentifier());
+    Assert.assertNotNull(participantIdentifier.generateIdentifier());
   }
 
   @Test
   public void testGenerateParticipantIdentifierHasCorrectLength() {
-    Assert.assertEquals(10, participantIdentifier.generateParticipantIdentifier().length());
+    Assert.assertEquals(10, participantIdentifier.generateIdentifier().length());
   }
 
   @Test
@@ -44,7 +44,7 @@ public class DefaultParticipantIdentifierImplTest {
     Assume.assumeTrue(participantIdentifier.isAllowStartWithZero() == false);
     for(int i = 0; i < 10000; i++) { // Generate 10000 ids.
       Assert.assertTrue("Participant Identifier not expected to start with '0'",
-          participantIdentifier.generateParticipantIdentifier().charAt(0) != '0');
+          participantIdentifier.generateIdentifier().charAt(0) != '0');
     }
   }
 
@@ -55,7 +55,7 @@ public class DefaultParticipantIdentifierImplTest {
 
     Map<Character, Integer> distributionMap = new HashMap<>();
     for(int i = 0; i < 10000; i++) { // Generate 10000 ids.
-      String id = participantIdentifier.generateParticipantIdentifier();
+      String id = participantIdentifier.generateIdentifier();
       // Count occurrences of each of the 10 possible digits in each id.
       for(int j = 0; j < id.length(); j++) {
         char c = id.charAt(j);

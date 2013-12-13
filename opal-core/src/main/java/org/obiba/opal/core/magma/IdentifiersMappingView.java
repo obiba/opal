@@ -17,8 +17,7 @@ import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.transform.BijectiveFunction;
 import org.obiba.magma.views.View;
-import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
-import org.obiba.opal.core.domain.participant.identifier.impl.ParticipantIdentifiers;
+import org.obiba.opal.core.identifiers.IdentifierGenerator;
 import org.obiba.opal.core.service.OpalPrivateVariableEntityMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,7 +90,7 @@ public class IdentifiersMappingView extends View {
    * @param ignoreUnknownIdentifier error is thrown when an identifier that cannot be mapped is encountered
    */
   public IdentifiersMappingView(@NotNull String idMapping, @NotNull Policy policy, @NotNull ValueTable dataTable,
-      @NotNull ValueTable identifiersTable, @Nullable IParticipantIdentifier identifierGenerator,
+      @NotNull ValueTable identifiersTable, @Nullable IdentifierGenerator identifierGenerator,
       boolean ignoreUnknownIdentifier) {
 
     // Null check on dataTable is required. If dataTable is null, we'll get NPE instead of IllegalArgumentException
@@ -104,7 +103,12 @@ public class IdentifiersMappingView extends View {
     Variable idVariable = identifiersTable.getVariable(idMapping);
 
     entityMap = new OpalPrivateVariableEntityMap(identifiersTable, idVariable,
-        identifierGenerator == null ? ParticipantIdentifiers.UNSUPPORTED : identifierGenerator);
+        identifierGenerator == null ? new IdentifierGenerator() {
+          @Override
+          public String generateIdentifier() {
+            throw new UnsupportedOperationException("Identifiers generation not permitted");
+          }
+        } : identifierGenerator);
 
     switch(policy) {
       case UNIT_IDENTIFIERS_ARE_PUBLIC:
@@ -147,10 +151,14 @@ public class IdentifiersMappingView extends View {
     @Override
     public VariableEntity apply(VariableEntity from) {
       VariableEntity privateEntity = entityMap.privateEntity(from);
-      if(privateEntity == null && !ignoreUnknownIdentifier) {
-        throw new RuntimeException(
-            "No private ID found in identifiers mapping '" + idMapping + "' for entity '" + from.getIdentifier() +
-                "' of type '" + getEntityType() + "'");
+      if(privateEntity == null) {
+        if(allowIdentifierGeneration) {
+          privateEntity = entityMap.createPrivateEntity(from);
+        } else if(!ignoreUnknownIdentifier) {
+          throw new RuntimeException(
+              "No private ID found in identifiers mapping '" + idMapping + "' for entity '" + from.getIdentifier() +
+                  "' of type '" + getEntityType() + "'");
+        }
       }
       return privateEntity;
     }

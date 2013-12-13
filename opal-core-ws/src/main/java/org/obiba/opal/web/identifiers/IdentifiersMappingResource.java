@@ -40,7 +40,7 @@ import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
 import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.Disposables;
-import org.obiba.opal.core.domain.participant.identifier.impl.DefaultParticipantIdentifierImpl;
+import org.obiba.opal.core.identifiers.IdentifierGeneratorImpl;
 import org.obiba.opal.core.identifiers.IdentifiersMapping;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersImportService;
@@ -186,7 +186,7 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
   public Response importIdentifiers(@QueryParam("type") @DefaultValue("Participant") String entityType,
       @QueryParam("size") Integer size, @QueryParam("zeros") Boolean zeros, @QueryParam("prefix") String prefix) {
     try {
-      DefaultParticipantIdentifierImpl pId = new DefaultParticipantIdentifierImpl();
+      IdentifierGeneratorImpl pId = new IdentifierGeneratorImpl();
       if(size != null) pId.setKeySize(size);
       if(zeros != null) pId.setAllowStartWithZero(zeros);
       if(prefix != null) pId.setPrefix(prefix);

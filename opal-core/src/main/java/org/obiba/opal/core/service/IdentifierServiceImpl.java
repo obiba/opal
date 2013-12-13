@@ -25,7 +25,7 @@ import org.obiba.magma.type.BooleanType;
 import org.obiba.magma.type.TextType;
 import org.obiba.magma.views.SelectClause;
 import org.obiba.magma.views.View;
-import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
+import org.obiba.opal.core.identifiers.IdentifierGenerator;
 import org.obiba.opal.core.identifiers.IdentifiersMapping;
 import org.obiba.opal.core.magma.IdentifiersMappingView;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
@@ -44,7 +44,7 @@ public class IdentifierServiceImpl implements IdentifierService {
   private IdentifiersTableService identifiersTableService;
 
   @Autowired
-  private IParticipantIdentifier participantIdentifier;
+  private IdentifierGenerator participantIdentifier;
 
   @Override
   public Variable createIdentifierVariable(@Nullable ValueTable privateView, @NotNull IdentifiersMapping idsMapping) {

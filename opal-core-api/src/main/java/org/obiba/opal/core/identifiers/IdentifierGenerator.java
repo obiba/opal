@@ -7,18 +7,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.domain.participant.identifier;
+package org.obiba.opal.core.identifiers;
 
 /**
- * Provides a method to generate an identifier for a {@link Participant}. Implementations should produce a random id of
+ * Provides a method to generate an identifier. Implementations should produce a random id of
  * their choosing. Clients should always check to ensure that the id produced is unique!
  */
-public interface IParticipantIdentifier {
+public interface IdentifierGenerator {
 
   /**
-   * Returns a new {@link Participant} id. Check that it is unique before use!
+   * Returns a new identifier. Check that it is unique before use!
    *
-   * @return A {@link Participant} id.
+   * @return An identifier.
    */
-  String generateParticipantIdentifier();
+  String generateIdentifier();
 }

@@ -23,7 +23,7 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.StaticValueTable;
-import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
+import org.obiba.opal.core.identifiers.IdentifierGenerator;
 import org.obiba.opal.core.identifiers.IdentifiersMapping;
 import org.obiba.opal.core.magma.PrivateVariableEntityMap;
 import org.obiba.opal.core.identifiers.IdentifiersMaps;
@@ -46,7 +46,7 @@ public class IdentifiersImportServiceImpl implements IdentifiersImportService {
   private static final Logger log = LoggerFactory.getLogger(IdentifiersImportServiceImpl.class);
 
   @Autowired
-  private IParticipantIdentifier participantIdentifier;
+  private IdentifierGenerator participantIdentifier;
 
   @Autowired
   private IdentifiersTableService identifiersTableService;
@@ -56,8 +56,8 @@ public class IdentifiersImportServiceImpl implements IdentifiersImportService {
 
 
   @Override
-  public int importIdentifiers(@NotNull IdentifiersMapping idMapping, @NotNull IParticipantIdentifier pIdentifier) {
-    IParticipantIdentifier localParticipantIdentifier = pIdentifier == null ? participantIdentifier : pIdentifier;
+  public int importIdentifiers(@NotNull IdentifiersMapping idMapping, @NotNull IdentifierGenerator pIdentifier) {
+    IdentifierGenerator localParticipantIdentifier = pIdentifier == null ? participantIdentifier : pIdentifier;
 
     int count = 0;
 

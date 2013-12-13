@@ -20,7 +20,7 @@ import org.obiba.magma.datasource.crypt.DatasourceEncryptionStrategy;
 import org.obiba.magma.support.BatchDatasourceFactory;
 import org.obiba.magma.support.IncrementalDatasourceFactory;
 import org.obiba.magma.support.Initialisables;
-import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
+import org.obiba.opal.core.identifiers.IdentifierGenerator;
 import org.obiba.opal.core.magma.IdentifiersMappingDatasourceFactory;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersTableService;
@@ -39,7 +39,7 @@ public abstract class AbstractDatasourceFactoryDtoParser implements DatasourceFa
   private IdentifiersTableService identifiersTableService;
 
   @Autowired
-  private IParticipantIdentifier participantIdentifier;
+  private IdentifierGenerator participantIdentifier;
 
   @Override
   public DatasourceFactory parse(DatasourceFactoryDto dto, DatasourceEncryptionStrategy encryptionStrategy) {

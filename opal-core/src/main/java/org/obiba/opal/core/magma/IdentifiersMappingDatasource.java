@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.support.AbstractDatasourceWrapperWithCachedTables;
-import org.obiba.opal.core.domain.participant.identifier.IParticipantIdentifier;
+import org.obiba.opal.core.identifiers.IdentifierGenerator;
 import org.obiba.opal.core.service.IdentifiersTableService;
 
 /**
@@ -32,13 +32,13 @@ public class IdentifiersMappingDatasource extends AbstractDatasourceWrapperWithC
   @NotNull
   private final IdentifiersTableService identifiersTableService;
 
-  private final IParticipantIdentifier identifierGenerator;
+  private final IdentifierGenerator identifierGenerator;
 
   private final boolean ignoreUnknownIdentifier;
 
   public IdentifiersMappingDatasource(@NotNull Datasource wrapped, @NotNull String idMapping,
       @NotNull IdentifiersMappingView.Policy policy, @NotNull IdentifiersTableService identifiersTableService,
-      @Nullable IParticipantIdentifier identifierGenerator, boolean ignoreUnknownIdentifier) {
+      @Nullable IdentifierGenerator identifierGenerator, boolean ignoreUnknownIdentifier) {
     super(wrapped);
 
     this.idMapping = idMapping;
