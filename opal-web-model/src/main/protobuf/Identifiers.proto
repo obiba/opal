@@ -5,5 +5,5 @@ option java_package = "org.obiba.opal.web.model";
 message IdentifiersMappingConfigDto {
   optional string name = 1;
   optional bool allowIdentifierGeneration = 2 [default = false];
-  optional bool ignoreUnknownIdentifier = 3 [default = true];
+  optional bool ignoreUnknownIdentifier = 3 [default = false];
 }

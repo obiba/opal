@@ -189,6 +189,8 @@ public class DataExportPresenter extends ModalPresenterWidget<DataExportPresente
     if(idMapping != null) {
       IdentifiersMappingConfigDto idConfig = IdentifiersMappingConfigDto.create();
       idConfig.setName(idMapping);
+      idConfig.setAllowIdentifierGeneration(false);
+      idConfig.setIgnoreUnknownIdentifier(false);
       dto.setIdConfig(idConfig);
     }
 
