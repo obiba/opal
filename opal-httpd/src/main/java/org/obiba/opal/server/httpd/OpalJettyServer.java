@@ -19,17 +19,15 @@ import java.util.Properties;
 
 import javax.annotation.Nullable;
 
-import org.apache.shiro.web.env.EnvironmentLoaderListener;
-import org.apache.shiro.web.servlet.ShiroFilter;
 import org.eclipse.jetty.ajp.Ajp13SocketConnector;
 import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.DispatcherType;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
+import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.FilterMapping;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.resource.FileResource;
@@ -41,14 +39,17 @@ import org.obiba.opal.core.runtime.OpalRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
-import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.filter.DelegatingFilterProxy;
+
+import com.google.common.collect.ImmutableMap;
 
 import static org.eclipse.jetty.server.DispatcherType.ERROR;
 import static org.eclipse.jetty.server.DispatcherType.FORWARD;
 import static org.eclipse.jetty.server.DispatcherType.INCLUDE;
 import static org.eclipse.jetty.server.DispatcherType.REQUEST;
+import static org.springframework.web.context.ContextLoader.CONFIG_LOCATION_PARAM;
 
 /**
  *
@@ -166,30 +167,21 @@ public class OpalJettyServer {
   private Handler createServletHandler() {
     servletContextHandler = new ServletContextHandler(ServletContextHandler.NO_SECURITY);
     servletContextHandler.setContextPath("/");
-    configureListeners();
-    configureFilters();
-    servletContextHandler
-        .setInitParameter(ContextLoader.CONFIG_LOCATION_PARAM, "classpath:/META-INF/spring/opal-server/context.xml");
-    servletContextHandler.setInitParameter("resteasy.servlet.mapping.prefix", "/ws");
-    servletContextHandler.addServlet(HttpServletDispatcher.class, "/ws/*");
-    return servletContextHandler;
-  }
 
-  private void configureListeners() {
     servletContextHandler.addEventListener(new ResteasyBootstrap());
     servletContextHandler.addEventListener(new SpringContextLoaderListener());
     servletContextHandler.addEventListener(new RequestContextListener());
-    servletContextHandler.addEventListener(new EnvironmentLoaderListener());
-  }
 
-  private void configureFilters() {
     servletContextHandler.addFilter(OpalVersionFilter.class, "/*", FilterMapping.DEFAULT);
-    EnumSet<DispatcherType> dispatcherTypes = EnumSet.of(REQUEST, FORWARD, INCLUDE, ERROR);
-    servletContextHandler.addFilter(ShiroFilter.class, "/ws/*", dispatcherTypes);
-//    servletContextHandler.addFilter(SslCertificateAuthenticationFilter.class, "/ws/*", dispatcherTypes);
-//    servletContextHandler.addFilter(OpalHttpAuthenticationFilter.class, "/ws/*", dispatcherTypes);
-//    servletContextHandler.addFilter(BasicHttpAuthenticationFilter.class, "/ws/*", dispatcherTypes);
-//    servletContextHandler.addFilter(HttpCookieAuthenticationFilter.class, "/ws/*", dispatcherTypes);
+    FilterHolder authenticationFilterHolder = new FilterHolder(DelegatingFilterProxy.class);
+    authenticationFilterHolder.setName("authenticationFilter");
+    authenticationFilterHolder.setInitParameters(ImmutableMap.of("targetFilterLifecycle", "true"));
+    servletContextHandler.addFilter(authenticationFilterHolder, "/ws/*", EnumSet.of(REQUEST, FORWARD, INCLUDE, ERROR));
+
+    servletContextHandler.setInitParameter(CONFIG_LOCATION_PARAM, "classpath:/META-INF/spring/opal-server/context.xml");
+    servletContextHandler.setInitParameter("resteasy.servlet.mapping.prefix", "/ws");
+    servletContextHandler.addServlet(HttpServletDispatcher.class, "/ws/*");
+    return servletContextHandler;
   }
 
   private Handler createDistFileHandler(String directory) throws IOException, URISyntaxException {

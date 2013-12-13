@@ -42,6 +42,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
+import static javax.ws.rs.HttpMethod.GET;
+import static javax.ws.rs.HttpMethod.OPTIONS;
+
 @Component
 public class AuthorizationInterceptor extends AbstractSecurityComponent
     implements RequestCyclePreProcess, RequestCyclePostProcess {
@@ -61,12 +64,12 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
   private RequestAttributesProvider requestAttributeProvider;
 
   @Override
-  public Response preProcess(HttpRequest request, ResourceMethodInvoker resourceMethod) {
-    if(HttpMethod.OPTIONS.equals(request.getHttpMethod())) {
+  public Response preProcess(HttpRequest request, ResourceMethodInvoker method) {
+    if(OPTIONS.equals(request.getHttpMethod())) {
       // Allow header will be added on postProcess
       return Response.ok().build();
     }
-    if(!isWebServicePublic(resourceMethod) && !isWebServiceWithoutAuthorization(resourceMethod) &&
+    if(!isWebServicePublic(method) && !isWebServiceWithoutAuthorization(method) &&
         !getSubject().isPermitted("rest:" + getResourceMethodUri(request) + ":" + request.getHttpMethod())) {
       return Response.status(Status.FORBIDDEN).build();
     }
@@ -75,7 +78,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
 
   @Override
   public void postProcess(HttpRequest request, ResourceMethodInvoker resourceMethod, ServerResponse response) {
-    if(HttpMethod.GET.equals(request.getHttpMethod()) || HttpMethod.OPTIONS.equals(request.getHttpMethod())) {
+    if(GET.equals(request.getHttpMethod()) || OPTIONS.equals(request.getHttpMethod())) {
       Set<String> allowed = allowed(request, resourceMethod);
       if(allowed != null && allowed.size() > 0) {
         response.getMetadata().add(ALLOW_HTTP_HEADER, asHeader(allowed));
@@ -112,16 +115,16 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
       throw new IllegalStateException("Missing Location header in 201 response");
     }
     List<?> permissions = response.getMetadata().get(ALT_PERMISSIONS);
-    if(permissions != null) {
-      addPermission((Iterable<SubjectAclService.Permissions>) permissions);
-      response.getMetadata().remove(ALT_PERMISSIONS);
-    } else {
+    if(permissions == null) {
       List<?> altLocations = response.getMetadata().get(ALT_LOCATION);
       Iterable<URI> locations = ImmutableList.of(resourceUri);
       if(altLocations != null) {
         locations = Iterables.concat(locations, (Iterable<URI>) altLocations);
       }
       addPermissionUris(locations);
+    } else {
+      addPermission((Iterable<SubjectAclService.Permissions>) permissions);
+      response.getMetadata().remove(ALT_PERMISSIONS);
     }
   }
 
@@ -164,7 +167,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
         return permitted;
       }
 
-    }), ImmutableSet.of(HttpMethod.OPTIONS)));
+    }), ImmutableSet.of(OPTIONS)));
   }
 
   private Set<String> allowed(HttpRequest request, ResourceMethodInvoker method) {
@@ -175,9 +178,9 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
     Set<String> availableMethods = Sets.newHashSet();
     String path = getPath(method);
     for(Method otherMethod : method.getResourceClass().getMethods()) {
-      Set<String> patate = IsHttpMethod.getHttpMethods(otherMethod);
-      if(patate != null && isSamePath(otherMethod, path)) {
-        availableMethods.addAll(patate);
+      Set<String> httpMethods = IsHttpMethod.getHttpMethods(otherMethod);
+      if(httpMethods != null && isSamePath(otherMethod, path)) {
+        availableMethods.addAll(httpMethods);
       }
     }
     return availableMethods;
@@ -189,7 +192,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
 
   private String getPath(Method method) {
     Path path = method.getAnnotation(Path.class);
-    return path != null ? path.value() : "";
+    return path == null ? "" : path.value();
   }
 
   private boolean isSamePath(Method otherMethod, String path) {

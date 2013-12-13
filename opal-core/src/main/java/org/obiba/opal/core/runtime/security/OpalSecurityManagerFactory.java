@@ -20,12 +20,10 @@ import org.apache.shiro.authz.permission.PermissionResolverAware;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.authz.permission.RolePermissionResolverAware;
 import org.apache.shiro.cache.MemoryConstrainedCacheManager;
-import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
-import org.apache.shiro.realm.text.IniRealm;
 import org.apache.shiro.session.SessionListener;
 import org.apache.shiro.session.mgt.AbstractNativeSessionManager;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
@@ -91,7 +89,7 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
 
     @Override
     protected SecurityManager createDefaultInstance() {
-      DefaultSecurityManager dsm = new DefaultSecurityManager();
+      DefaultSecurityManager dsm = (DefaultSecurityManager) super.createDefaultInstance();
 
       if(dsm.getCacheManager() == null) {
         dsm.setCacheManager(new MemoryConstrainedCacheManager());
@@ -112,21 +110,6 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
     protected void applyRealmsToSecurityManager(Collection<Realm> shiroRealms, SecurityManager securityManager) {
       super.applyRealmsToSecurityManager(ImmutableList.<Realm>builder().addAll(realms).addAll(shiroRealms).build(),
           securityManager);
-    }
-
-    @Override
-    protected Realm createRealm(Ini ini) {
-      // Overridden to workaround issue https://issues.apache.org/jira/browse/SHIRO-322
-      IniRealm realm = new IniRealm(System.getProperty("OPAL_HOME") + "/conf/shiro.ini") {
-        @Override
-        protected void onInit() {
-          roles.clear();
-          users.clear();
-          super.onInit();
-        }
-      };
-      realm.setName(INI_REALM);
-      return realm;
     }
   }
 }

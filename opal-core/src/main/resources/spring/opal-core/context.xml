@@ -17,4 +17,6 @@
 
   <bean class="org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor"/>
 
+  <bean class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+
 </beans>

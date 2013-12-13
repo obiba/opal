@@ -27,6 +27,7 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.ws.security.NotAuthenticated;
@@ -52,6 +53,7 @@ public class AuthenticationResource extends AbstractSecurityComponent {
     try {
       Subject subject = SecurityUtils.getSubject();
       subject.login(new UsernamePasswordToken(username, password));
+      ThreadContext.bind(subject);
       subjectProfileService.ensureProfile(subject);
     } catch(AuthenticationException e) {
       log.info("Authentication failure of user '{}' at ip: '{}': {}", username, servletRequest.getRemoteAddr(),

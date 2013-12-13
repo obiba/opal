@@ -24,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 abstract class AbstractSecurityComponent {
 
-  @Autowired
   protected SessionsSecurityManager securityManager;
 
   @Autowired
