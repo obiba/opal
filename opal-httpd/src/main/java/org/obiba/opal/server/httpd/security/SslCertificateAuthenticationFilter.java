@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.server.httpd;
+package org.obiba.opal.server.httpd.security;
 
 import java.security.cert.X509Certificate;
 
@@ -24,8 +24,7 @@ public class SslCertificateAuthenticationFilter extends AuthenticatingFilter {
   @Override
   protected AuthenticationToken createToken(ServletRequest request, ServletResponse response) throws Exception {
     X509Certificate[] chain = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-    if(chain == null || chain.length == 0) return null;
-    return new X509CertificateAuthenticationToken(chain[0]);
+    return chain == null || chain.length == 0 ? null : new X509CertificateAuthenticationToken(chain[0]);
   }
 
   @Override
