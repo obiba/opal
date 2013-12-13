@@ -49,11 +49,40 @@
       </b:Controls>
       <b:HelpBlock>
         <ui:msg description="Import Identifiers Mapping help">When a mapping of identifiers is selected, each
-          identifier in the imported data will be mapped to a system identifier. The import will fail if one
-          identifier cannot be mapped.
+          identifier in the imported data will be mapped to a system identifier. Otherwise the imported identifier
+          will be added to the system identifiers.
         </ui:msg>
       </b:HelpBlock>
     </b:ControlGroup>
+
+    <o:CollapsiblePanel ui:field="idMappingOptions" visible="false">
+      <b:RadioButton ui:field="mappingRequired" checked="true" name="options">
+        <ui:msg description="Identifiers Mapping required for Import">Each identifiers must be mapped prior
+          importation
+        </ui:msg>
+      </b:RadioButton>
+      <b:HelpBlock>
+        <ui:msg description="Identifiers Mapping required for Import help">Importation will fail if one imported
+          identifier is not mapped to a system identifier.
+        </ui:msg>
+      </b:HelpBlock>
+      <b:RadioButton ui:field="ignoreUnmapped" name="options">
+        <ui:msg description="Ignore Unknown Identifiers at Import">Ignore unknown identifiers at import</ui:msg>
+      </b:RadioButton>
+      <b:HelpBlock>
+        <ui:msg description="Ignore Unknown Identifiers at Import help">Data which identifier cannot be mapped to a
+          system identifier will not be imported.
+        </ui:msg>
+      </b:HelpBlock>
+      <b:RadioButton ui:field="generateForUnmapped" name="options">
+        <ui:msg description="Generate Identifiers at Import">Generate a system identifier for each unknown imported
+          identifiers
+        </ui:msg>
+      </b:RadioButton>
+      <b:HelpBlock>
+        <ui:msg description=" help">A system identifier will be generated for each unknown imported identifier.</ui:msg>
+      </b:HelpBlock>
+    </o:CollapsiblePanel>
 
   </g:FlowPanel>
 

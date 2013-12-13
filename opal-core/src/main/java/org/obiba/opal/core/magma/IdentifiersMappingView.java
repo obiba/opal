@@ -18,6 +18,8 @@ import org.obiba.magma.VariableEntity;
 import org.obiba.magma.transform.BijectiveFunction;
 import org.obiba.magma.views.View;
 import org.obiba.opal.core.identifiers.IdentifierGenerator;
+import org.obiba.opal.core.service.NoSuchPrivateIdentifierMappingException;
+import org.obiba.opal.core.service.NoSuchSystemIdentifierMappingException;
 import org.obiba.opal.core.service.OpalPrivateVariableEntityMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,9 +157,7 @@ public class IdentifiersMappingView extends View {
         if(allowIdentifierGeneration) {
           privateEntity = entityMap.createPrivateEntity(from);
         } else if(!ignoreUnknownIdentifier) {
-          throw new RuntimeException(
-              "No private ID found in identifiers mapping '" + idMapping + "' for entity '" + from.getIdentifier() +
-                  "' of type '" + getEntityType() + "'");
+          throw new NoSuchSystemIdentifierMappingException(idMapping, from.getIdentifier(), getEntityType());
         }
       }
       return privateEntity;
@@ -187,8 +187,7 @@ public class IdentifiersMappingView extends View {
         if(allowIdentifierGeneration) {
           publicEntity = entityMap.createPublicEntity(from);
         } else if(!ignoreUnknownIdentifier) {
-          throw new RuntimeException("No system ID found in identifiers mapping '" + idMapping + "' for entity '" +
-              from.getIdentifier() + "' of type '" + getEntityType() + "'");
+          throw new NoSuchPrivateIdentifierMappingException(idMapping, from.getIdentifier(), getEntityType());
         }
       }
       return publicEntity;

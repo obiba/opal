@@ -16,6 +16,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.IdentifiersMappingDto;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.web.bindery.event.shared.EventBus;
@@ -24,7 +25,8 @@ import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
-public class IdentifiersMappingSelectionStepPresenter extends PresenterWidget<IdentifiersMappingSelectionStepPresenter.Display> {
+public class IdentifiersMappingSelectionStepPresenter
+    extends PresenterWidget<IdentifiersMappingSelectionStepPresenter.Display> {
 
   @Inject
   public IdentifiersMappingSelectionStepPresenter(Display display, EventBus eventBus) {
@@ -62,6 +64,9 @@ public class IdentifiersMappingSelectionStepPresenter extends PresenterWidget<Id
     importConfig.setIdentifiersMapping(getView().getSelectedIdentifiersMapping());
     importConfig.setIncremental(getView().isIncremental());
     importConfig.setLimit(getView().getLimit());
+    GWT.log("ignore=" + getView().ignoreUnknownIdentifier() + " ; allow=" + getView().allowIdentifierGeneration());
+    importConfig.setAllowIdentifierGeneration(getView().allowIdentifierGeneration());
+    importConfig.setIgnoreUnknownIdentifier(getView().ignoreUnknownIdentifier());
   }
 
   public interface Display extends View {
@@ -73,6 +78,10 @@ public class IdentifiersMappingSelectionStepPresenter extends PresenterWidget<Id
     boolean isIncremental();
 
     Integer getLimit();
+
+    boolean allowIdentifierGeneration();
+
+    boolean ignoreUnknownIdentifier();
 
   }
 

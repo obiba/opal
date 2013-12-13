@@ -15,12 +15,15 @@ import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
 import org.obiba.opal.web.model.client.opal.IdentifiersMappingDto;
 
+import com.github.gwtbootstrap.client.ui.CheckBox;
+import com.github.gwtbootstrap.client.ui.RadioButton;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -37,6 +40,18 @@ public class IdentifiersMappingSelectionStepView extends ViewImpl implements Ide
 
   @UiField
   NumericTextBox limit;
+
+  @UiField
+  Panel idMappingOptions;
+
+  @UiField
+  RadioButton mappingRequired;
+
+  @UiField
+  RadioButton ignoreUnmapped;
+
+  @UiField
+  RadioButton generateForUnmapped;
 
   @UiField
   Panel identifiersPanel;
@@ -79,9 +94,25 @@ public class IdentifiersMappingSelectionStepView extends ViewImpl implements Ide
     return value == null ? null : value.intValue();
   }
 
+  @Override
+  public boolean allowIdentifierGeneration() {
+    return identifiers.getSelectedIndex() > 0 && !mappingRequired.getValue() && generateForUnmapped.getValue();
+  }
+
+  @Override
+  public boolean ignoreUnknownIdentifier() {
+    return identifiers.getSelectedIndex() > 0 && !mappingRequired.getValue();
+  }
+
   @UiHandler("limitCheck")
   public void onLimitCheck(ValueChangeEvent<Boolean> event) {
     limit.setEnabled(event.getValue());
+  }
+
+  @UiHandler("identifiers")
+  public void onIdentifiersMappingChange(ChangeEvent event) {
+    idMappingOptions.setVisible(identifiers.getSelectedIndex()>0);
+    mappingRequired.setValue(true);
   }
 
 }

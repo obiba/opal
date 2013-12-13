@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Provider
-public class NoSuchFunctionalUnitExceptionMapper implements ExceptionMapper<NoSuchIdentifiersMappingException> {
+public class NoIdentifiersMappingExceptionMapper implements ExceptionMapper<NoSuchIdentifiersMappingException> {
 
   @Override
   public Response toResponse(NoSuchIdentifiersMappingException exception) {
