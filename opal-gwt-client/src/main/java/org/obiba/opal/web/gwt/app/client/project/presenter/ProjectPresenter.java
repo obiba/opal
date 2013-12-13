@@ -92,8 +92,10 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   public static final GwtEvent.Type<RevealContentHandler<?>> ADMIN_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
 
   @ContentSlot
-  public static final GwtEvent.Type<RevealContentHandler<?>> PERMISSION_PANE
-      = new GwtEvent.Type<RevealContentHandler<?>>();
+  public static final GwtEvent.Type<RevealContentHandler<?>> PERMISSION_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
+
+  @ContentSlot
+  public static final GwtEvent.Type<RevealContentHandler<?>> DATA_EXTCHANGE_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
 
   private final Provider<MagmaPresenter> magmaPresenterProvider;
 
@@ -280,6 +282,14 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     }
     projectResourcePermissionsPresenter.initialize(project);
   }
+//
+//  private void onPermissionsTabSelected() {
+//    if(projectResourcePermissionsPresenter == null) {
+//      projectResourcePermissionsPresenter = projectResourcePermissionsProvider.get();
+//      setInSlot(PERMISSION_PANE, projectResourcePermissionsPresenter);
+//    }
+//    projectResourcePermissionsPresenter.initialize(project);
+//  }
 
   private void onAdminTabSelected() {
     if(projectAdministrationPresenter == null) {

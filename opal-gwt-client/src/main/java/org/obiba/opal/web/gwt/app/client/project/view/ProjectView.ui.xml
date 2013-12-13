@@ -87,9 +87,7 @@
         </b:Paragraph>
 
         <b:Heading size="4">Encryption Keys</b:Heading>
-        <b:Paragraph>
-          Encryption keys are used do decrypt data files in "Opal Archive" format at importation time.
-        </b:Paragraph>
+        <g:FlowPanel ui:field="encryptionKeysPanel"></g:FlowPanel>
       </b:Tab>
       <b:Tab icon="BOOK">
         <b:Heading size="3">Administration</b:Heading>

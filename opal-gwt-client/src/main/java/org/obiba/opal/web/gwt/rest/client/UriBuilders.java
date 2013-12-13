@@ -268,6 +268,13 @@ public enum UriBuilders {
     }
   },
 
+  SYSTEM_KEYSTORE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("system", "keystore");
+    }
+  },
+
   SUBJECT_CREDENTIALS {
     @Override
     public UriBuilder create() {

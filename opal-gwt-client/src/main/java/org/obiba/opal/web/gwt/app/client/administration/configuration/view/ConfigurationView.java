@@ -59,6 +59,11 @@ public class ConfigurationView extends ViewWithUiHandlers<ConfigurationUiHandler
     getUiHandlers().onEditGeneralSettings();
   }
 
+  @UiHandler("createKeyPair")
+  public void onCreateKeyPair(ClickEvent event) {
+    getUiHandlers().onCreateKeyPair();
+  }
+
   @UiHandler("downloadCertificate")
   public void onDownload(ClickEvent event) {
     getUiHandlers().onDownloadCertificate();
