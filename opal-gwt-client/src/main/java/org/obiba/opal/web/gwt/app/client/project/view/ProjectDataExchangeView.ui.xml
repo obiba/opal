@@ -17,20 +17,16 @@
 
   <g:FlowPanel>
 
-  <g:FlowPanel>
-    <b:Thumbnail addStyleNames="no-bottom-margin">
-      <b:Heading size="4">Databases</b:Heading>
+    <g:FlowPanel addStyleNames="large-bottom-margin">
+      <b:Heading size="5">Databases</b:Heading>
       <b:Paragraph>
         The SQL databases from which data will be imported can be registered.
       </b:Paragraph>
-    </b:Thumbnail>
-  </g:FlowPanel>
+    </g:FlowPanel>
 
-    <g:FlowPanel>
-      <b:Thumbnail addStyleNames="large-top-margin no-bottom-margin">
-        <b:Heading size="4">Encryption Keys</b:Heading>
-        <g:FlowPanel ui:field="encryptionKeysPanel"></g:FlowPanel>
-      </b:Thumbnail>
+    <g:FlowPanel addStyleNames="large-top-margin">
+      <b:Heading size="5">Encryption Keys</b:Heading>
+      <g:FlowPanel ui:field="encryptionKeysPanel"></g:FlowPanel>
     </g:FlowPanel>
 
   </g:FlowPanel>

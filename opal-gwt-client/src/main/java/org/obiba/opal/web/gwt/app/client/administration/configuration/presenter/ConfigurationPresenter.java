@@ -1,9 +1,16 @@
 package org.obiba.opal.web.gwt.app.client.administration.configuration.presenter;
 
+import javax.annotation.Nonnull;
+
 import org.obiba.opal.web.gwt.app.client.administration.configuration.event.GeneralConfigSavedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.keystore.presenter.CreateKeyPairModalPresenter;
+import org.obiba.opal.web.gwt.app.client.keystore.presenter.ImportKeyPairModalPresenter;
+import org.obiba.opal.web.gwt.app.client.keystore.presenter.commands.CreateKeyPairCommand;
+import org.obiba.opal.web.gwt.app.client.keystore.presenter.commands.ImportKeyPairCommand;
+import org.obiba.opal.web.gwt.app.client.keystore.presenter.commands.KeystoreCommand;
+import org.obiba.opal.web.gwt.app.client.keystore.support.KeystoreType;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
@@ -15,10 +22,7 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.GeneralConf;
-import org.obiba.opal.web.model.client.opal.KeyForm;
 import org.obiba.opal.web.model.client.opal.KeyType;
-import org.obiba.opal.web.model.client.opal.PrivateKeyForm;
-import org.obiba.opal.web.model.client.opal.PublicKeyForm;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
@@ -33,16 +37,17 @@ import com.gwtplatform.mvp.client.annotations.ProxyStandard;
 import com.gwtplatform.mvp.client.annotations.TitleFunction;
 import com.gwtplatform.mvp.client.proxy.ProxyPlace;
 
-import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
-import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
-import static com.google.gwt.http.client.Response.SC_OK;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Display, ConfigurationPresenter.Proxy>
     implements ConfigurationUiHandlers {
 
+  private static final String SYSTEM_ALIAS = "https";
+
   private final ModalProvider<GeneralConfModalPresenter> generalConfModalProvider;
 
   private final ModalProvider<CreateKeyPairModalPresenter> createKeyPairModalProvider;
+  private final ModalProvider<ImportKeyPairModalPresenter> importKeyPairModalProvider;
 
   private GeneralConf conf = null;
 
@@ -57,9 +62,11 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
   @Inject
   public ConfigurationPresenter(Display display, EventBus eventBus, Proxy proxy,
       ModalProvider<GeneralConfModalPresenter> generalConfModalProvider,
-      ModalProvider<CreateKeyPairModalPresenter> createKeyPairModalProvider, BreadcrumbsBuilder breadcrumbsBuilder) {
+      ModalProvider<CreateKeyPairModalPresenter> createKeyPairModalProvider,
+      ModalProvider<ImportKeyPairModalPresenter> importKeyPairModalProvider, BreadcrumbsBuilder breadcrumbsBuilder) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     this.createKeyPairModalProvider = createKeyPairModalProvider.setContainer(this);
+    this.importKeyPairModalProvider = importKeyPairModalProvider.setContainer(this);
     this.generalConfModalProvider = generalConfModalProvider.setContainer(this);
     this.breadcrumbsBuilder = breadcrumbsBuilder;
     getView().setUiHandlers(this);
@@ -112,57 +119,67 @@ public class ConfigurationPresenter extends Presenter<ConfigurationPresenter.Dis
   @Override
   public void onCreateKeyPair() {
     CreateKeyPairModalPresenter dialog = createKeyPairModalProvider.get();
-    dialog.initialize(new CreateKeyPairModalPresenter.SaveHandler() {
+    dialog.initialize(KeystoreType.SYSTEM, new CreateKeyPairModalPresenter.SaveHandler() {
 
       @SuppressWarnings("MethodWithTooManyParameters")
       @Override
-      public void save(String algorithm, String size, String firstLastName, String organization,
+      public void save(String alias, String algorithm, String size, String firstLastName, String organization,
           String organizationalUnit, String locality, String state, String country) {
 
-        KeyForm keyForm = KeyForm.create();
-        keyForm.setAlias("https");
-        keyForm.setKeyType(KeyType.KEY_PAIR);
+        KeystoreCommand command = CreateKeyPairCommand.Builder.newBuilder()
+            .setUrl(UriBuilders.SYSTEM_KEYSTORE.create().build())//
+            .setAlias(SYSTEM_ALIAS)//
+            .setAlgorithm(algorithm)//
+            .setSize(size)//
+            .setFirstLastName(firstLastName)//
+            .setOrganization(organization)//
+            .setOrganizationalUnit(organizationalUnit)//
+            .setLocality(locality)//
+            .setState(state)//
+            .setCountry(country).build();
 
-        keyForm.setPrivateForm(getPrivateKeyForm(algorithm, size));
-        keyForm
-            .setPublicForm(getPublicKeyForm(firstLastName, organization, organizationalUnit, locality, state, country));
-
-        ResourceRequestBuilderFactory.newBuilder() //
-            .forResource(UriBuilders.SYSTEM_KEYSTORE.create().build()) //
-            .withResourceBody(KeyForm.stringify(keyForm)) //
-            .withCallback(SC_OK, new ResponseCodeCallback() {
-              @Override
-              public void onResponseCode(Request request, Response response) {
-                GWT.log("key pair CREATED ");
-              }
-            }) //
-            .withCallback(new ErrorResponseCallback(getView().asWidget()), SC_BAD_REQUEST, SC_BAD_REQUEST,
-                SC_INTERNAL_SERVER_ERROR) //
-            .put().send();
+        command.execute(new SuccessCallback(), new ErrorResponseCallback(getView().asWidget()));
       }
 
-      private PrivateKeyForm getPrivateKeyForm(String algorithm, String size) {
-        PrivateKeyForm privateForm = PrivateKeyForm.create();
-        privateForm.setAlgo(algorithm);
-        privateForm.setSize(Integer.parseInt(size));
-        return privateForm;
-      }
+      class SuccessCallback implements ResponseCodeCallback {
 
-      private PublicKeyForm getPublicKeyForm(String firstLastName, String organization, String organizationalUnit,
-          String locality, String state, String country) {
-        PublicKeyForm publicForm = PublicKeyForm.create();
-        publicForm.setName(firstLastName);
-        publicForm.setOrganization(organization);
-        publicForm.setOrganizationalUnit(organizationalUnit);
-        publicForm.setLocality(locality);
-        publicForm.setState(state);
-        publicForm.setCountry(country);
-        return publicForm;
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          GWT.log("key pair CREATED ");
+        }
       }
     });
   }
 
+
   @Override
+  public void onImportKeyPair() {
+    ImportKeyPairModalPresenter dialog = importKeyPairModalProvider.get();
+    dialog.initialize(KeystoreType.SYSTEM, ImportKeyPairModalPresenter.ImportType.KEY_PAIR,
+        new ImportKeyPairModalPresenter.SaveHandler() {
+          @Override
+          public void save(@Nonnull String publicKey, @Nullable String privateKey, @Nullable String alias) {
+            KeystoreCommand command = ImportKeyPairCommand.Builder.newBuilder()
+                .setUrl(UriBuilders.SYSTEM_KEYSTORE.create().build())//
+                .setAlias(SYSTEM_ALIAS)//
+                .setPublicKey(publicKey)//
+                .setPrivateKey(privateKey)//
+                .setKeyType(KeyType.KEY_PAIR)//
+                .build();
+
+            command.execute(new SuccessCallback(), new ErrorResponseCallback(getView().asWidget()));
+          }
+
+          class SuccessCallback implements ResponseCodeCallback {
+            @Override
+            public void onResponseCode(Request request, Response response) {
+              GWT.log("key pair CREATED ");
+            }
+          }
+        });
+  }
+
+    @Override
   public void onDownloadCertificate() {
     getEventBus()
         .fireEvent(new FileDownloadRequestEvent(UriBuilders.SYSTEM_KEYSTORE_HTTPS_CERTIFICATE.create().build()));

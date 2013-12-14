@@ -9,4 +9,6 @@ public interface ConfigurationUiHandlers extends UiHandlers {
   void onDownloadCertificate();
 
   void onCreateKeyPair();
+
+  void onImportKeyPair();
 }

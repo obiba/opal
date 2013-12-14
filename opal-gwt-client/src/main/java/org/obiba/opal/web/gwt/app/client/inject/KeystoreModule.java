@@ -12,8 +12,10 @@ package org.obiba.opal.web.gwt.app.client.inject;
 
 import org.obiba.opal.web.gwt.app.client.keystore.presenter.CreateKeyPairModalPresenter;
 import org.obiba.opal.web.gwt.app.client.keystore.presenter.EncryptionKeysPresenter;
+import org.obiba.opal.web.gwt.app.client.keystore.presenter.ImportKeyPairModalPresenter;
 import org.obiba.opal.web.gwt.app.client.keystore.view.CreateKeyPairModalView;
 import org.obiba.opal.web.gwt.app.client.keystore.view.EncryptionKeysView;
+import org.obiba.opal.web.gwt.app.client.keystore.view.ImportKeyPairModalView;
 
 import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
 
@@ -26,6 +28,8 @@ public class KeystoreModule extends AbstractPresenterModule {
         EncryptionKeysView.class);
     bindPresenterWidget(CreateKeyPairModalPresenter.class, CreateKeyPairModalPresenter.Display.class,
         CreateKeyPairModalView.class);
+    bindPresenterWidget(ImportKeyPairModalPresenter.class, ImportKeyPairModalPresenter.Display.class,
+        ImportKeyPairModalView.class);
   }
 
 }

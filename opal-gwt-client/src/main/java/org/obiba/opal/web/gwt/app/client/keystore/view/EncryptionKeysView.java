@@ -23,9 +23,13 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.model.client.opal.KeyDto;
 
 import com.github.gwtbootstrap.client.ui.CellTable;
+import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.SimplePager;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Widget;
@@ -64,6 +68,21 @@ public class EncryptionKeysView extends ViewWithUiHandlers<EncryptionKeysUiHandl
   @Override
   public void setData(@Nonnull List<KeyDto> keyPairs) {
     renderTable(keyPairs);
+  }
+
+  @UiHandler("createKeyPair")
+  public void onCreateKeyPairClicked(ClickEvent event) {
+    getUiHandlers().createKeyPair();
+  }
+
+  @UiHandler("importKeyPair")
+  public void onImportKeyPairClicked(ClickEvent event) {
+    getUiHandlers().importKeyPair();
+  }
+
+  @UiHandler("importCertificate")
+  public void onImportCertificateClicked(ClickEvent event) {
+    getUiHandlers().importCertificatePair();
   }
 
   private void renderTable(List<KeyDto> keyPairs) {

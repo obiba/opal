@@ -8,15 +8,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.keystore.presenter;
+package org.obiba.opal.web.gwt.app.client.keystore.support;
 
-import com.gwtplatform.mvp.client.UiHandlers;
-
-public interface EncryptionKeysUiHandlers extends UiHandlers {
-
-  void createKeyPair();
-
-  void importKeyPair();
-
-  void importCertificatePair();
+public enum KeystoreType {
+  PROJECT,
+  SYSTEM
 }

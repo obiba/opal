@@ -127,6 +127,7 @@ public class KeyStoreResource {
     }
 
     keyStore.deleteKey(alias);
+    keyStoreService.saveKeyStore(keyStore);
     return Response.ok().build();
   }
 
