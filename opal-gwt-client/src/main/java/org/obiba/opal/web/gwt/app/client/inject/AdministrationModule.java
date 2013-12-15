@@ -37,6 +37,10 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShie
 import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShieldPackageView;
 import org.obiba.opal.web.gwt.app.client.administration.fs.presenter.FilesAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.fs.view.FilesAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersTablePresenter;
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.IdentifiersAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.IdentifiersTableView;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexConfigurationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
@@ -82,6 +86,7 @@ public class AdministrationModule extends AbstractPresenterModule {
     configureUserGroups();
     configureSystemConfig();
     configureTaxonomies();
+    configureIdentifiers();
   }
 
   private void configureSystemConfig() {
@@ -148,5 +153,10 @@ public class AdministrationModule extends AbstractPresenterModule {
     bindPresenterWidget(MongoDatabaseModalPresenter.class, MongoDatabaseModalPresenter.Display.class,
         MongoDatabaseModalView.class);
   }
-
+  private void configureIdentifiers() {
+    bindPresenter(IdentifiersAdministrationPresenter.class, IdentifiersAdministrationPresenter.Display.class, IdentifiersAdministrationView.class,
+        IdentifiersAdministrationPresenter.Proxy.class);
+    bindPresenterWidget(IdentifiersTablePresenter.class, IdentifiersTablePresenter.Display.class,
+        IdentifiersTableView.class);
+  }
 }

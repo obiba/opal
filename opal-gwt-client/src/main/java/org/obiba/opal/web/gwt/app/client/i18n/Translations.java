@@ -2058,6 +2058,11 @@ public interface Translations extends Constants {
   @DefaultStringValue("R")
   String pageRConfigTitle();
 
+  @Description("Page Identifiers Admin title")
+  @DefaultStringValue("Identifiers Mappings")
+  String pageIdentifiersMappingTitle();
+
+
   @Description("Page Files title")
   @DefaultStringValue("Files")
   String pageFileExplorerTitle();

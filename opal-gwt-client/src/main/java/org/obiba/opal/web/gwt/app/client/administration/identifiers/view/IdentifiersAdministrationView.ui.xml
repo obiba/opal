@@ -1,0 +1,51 @@
+<!--
+  ~ Copyright (c) 2013 OBiBa. All rights reserved.
+  ~
+  ~ This program and the accompanying materials
+  ~ are made available under the terms of the GNU Public License v3.0.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+    ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+    ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+
+  <g:FlowPanel>
+    <g:FlowPanel addStyleNames="page-header">
+      <b:Breadcrumbs ui:field="breadcrumbs"/>
+    </g:FlowPanel>
+
+    <b:Paragraph>
+      Identifiers mappings are defined per entity type. Mapping identifiers consist of associating, for a given entity,
+      its identifier in the system to its identifiers in the data being imported or exported.
+    </b:Paragraph>
+
+    <b:ButtonGroup>
+      <b:Button type="INFO" icon="PLUS" ui:field="addEntityType">
+        <ui:msg description="Add Entity Type Mappings label">Add Entity Type Mappings</ui:msg>
+      </b:Button>
+    </b:ButtonGroup>
+
+    <b:FluidRow>
+      <b:Column size="2">
+        <b:NavList ui:field="selector">
+          <b:NavHeader>
+            <ui:msg description="Entity Types label">Entity Types</ui:msg>
+          </b:NavHeader>
+        </b:NavList>
+      </b:Column>
+      <b:Column size="10">
+        <g:FlowPanel ui:field="body"/>
+      </b:Column>
+    </b:FluidRow>
+
+
+
+
+  </g:FlowPanel>
+</ui:UiBinder>
