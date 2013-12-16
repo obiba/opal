@@ -33,7 +33,7 @@
 
     <b:FluidRow>
       <b:Column size="2">
-        <b:NavList ui:field="selector">
+        <b:NavList ui:field="selector" addStyleNames="top-margin">
           <b:NavHeader>
             <ui:msg description="Entity Types label">Entity Types</ui:msg>
           </b:NavHeader>
