@@ -679,6 +679,7 @@ public interface Translations extends Constants {
       "createView", "Create View",//
       "removeView", "Remove View",//
       "removeTable", "Remove Table",//
+      "removeIdentifiersTable", "Remove Identifiers Table",//
       "removeDerivedVariable", "Remove Derived Variable",//
       "removeVariable", "Remove Variable",//
       "deleteDataShieldAggregateMethod", "Delete Aggregating Method",//
@@ -729,6 +730,9 @@ public interface Translations extends Constants {
       "confirmRemoveView", "Please confirm that you want to remove the current view.",//
       "confirmRemoveTable",
       "Please confirm that you want to remove the current table. This cannot be undone and all data associated with this table will be lost.",
+      //
+      "confirmRemoveIdentifiersTable",
+      "Please confirm that you want to remove the current identifiers table. This cannot be undone and all identifiers of this table will be lost.",
       //
       "confirmRemoveDerivedVariable", "Please confirm that you want to remove the current derived variable.",//
       "confirmRemoveVariable",
@@ -1054,6 +1058,14 @@ public interface Translations extends Constants {
   @Description("Add Table title")
   @DefaultStringValue("Add Table")
   String addTableTitle();
+
+  @Description("Add Identifiers Table title")
+  @DefaultStringValue("Add Identifiers Table")
+  String addIdentifiersTableTitle();
+
+  @Description("Identifiers Tables title")
+  @DefaultStringValue("Identifiers Tables")
+  String identifiersTablesTitle();
 
   @Description("Add Table label")
   @DefaultStringValue("Add table...")

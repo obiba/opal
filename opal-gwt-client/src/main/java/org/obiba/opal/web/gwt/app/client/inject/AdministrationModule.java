@@ -38,8 +38,10 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShie
 import org.obiba.opal.web.gwt.app.client.administration.fs.presenter.FilesAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.fs.view.FilesAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersTableModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersTablePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.IdentifiersAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.IdentifiersTableModalView;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.IdentifiersTableView;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexConfigurationPresenter;
@@ -158,5 +160,7 @@ public class AdministrationModule extends AbstractPresenterModule {
         IdentifiersAdministrationPresenter.Proxy.class);
     bindPresenterWidget(IdentifiersTablePresenter.class, IdentifiersTablePresenter.Display.class,
         IdentifiersTableView.class);
+    bindPresenterWidget(IdentifiersTableModalPresenter.class, IdentifiersTableModalPresenter.Display.class,
+        IdentifiersTableModalView.class);
   }
 }

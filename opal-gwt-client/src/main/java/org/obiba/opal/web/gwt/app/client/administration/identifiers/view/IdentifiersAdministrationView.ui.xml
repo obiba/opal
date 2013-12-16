@@ -25,11 +25,27 @@
       its identifier in the system to its identifiers in the data being imported or exported.
     </b:Paragraph>
 
-    <b:ButtonGroup>
-      <b:Button type="INFO" icon="PLUS" ui:field="addEntityType">
-        <ui:msg description="Add Entity Type Mappings label">Add Entity Type Mappings</ui:msg>
-      </b:Button>
-    </b:ButtonGroup>
+    <g:FlowPanel>
+      <b:ButtonGroup>
+        <b:Button type="INFO" icon="PLUS" ui:field="addIdTable">
+          <ui:msg description="Add Identifiers Table label">Add Identifiers Table</ui:msg>
+        </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:DropdownButton text="Import Identifiers" icon="UPLOAD">
+          <b:NavLink ui:field="importSystemId">
+            <ui:msg description="Import System Identifiers label">Import system identifiers...</ui:msg>
+          </b:NavLink>
+          <b:NavLink ui:field="importIdMapping">
+            <ui:msg description="Import Identifiers Mapping label">Import identifiers mapping...</ui:msg>
+          </b:NavLink>
+        </b:DropdownButton>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:Button icon="TRASH" ui:field="deleteIdTable">
+        </b:Button>
+      </b:ButtonGroup>
+    </g:FlowPanel>
 
     <b:FluidRow>
       <b:Column size="2">
@@ -43,8 +59,6 @@
         <g:FlowPanel ui:field="body"/>
       </b:Column>
     </b:FluidRow>
-
-
 
 
   </g:FlowPanel>

@@ -10,16 +10,10 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter;
 
-import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
-import com.gwtplatform.mvp.client.UiHandlers;
+public interface IdentifiersTableModalUiHandlers extends ModalUiHandlers {
 
-public interface IdentifiersAdministrationUiHandlers extends UiHandlers {
-
-  void onSelection(TableDto identifiersTable);
-
-  void onAddIdentifiersTable();
-
-  void onDeleteIdentifiersTable();
+  void onSave(String entityType);
 
 }

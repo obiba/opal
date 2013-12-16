@@ -394,6 +394,20 @@ public enum UriBuilders {
 
     }
 
+  },
+
+  IDENTIFIERS_TABLES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("identifiers", "tables");
+    }
+  },
+
+  IDENTIFIERS_TABLE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("identifiers", "table","{}");
+    }
   };
 
   public abstract UriBuilder create();
