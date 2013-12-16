@@ -9,6 +9,8 @@
  ******************************************************************************/
 package org.obiba.opal.web.security;
 
+import javax.annotation.Nullable;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.session.Session;
@@ -33,6 +35,12 @@ abstract class AbstractSecurityComponent {
 
   static Subject getSubject() {
     return SecurityUtils.getSubject();
+  }
+
+  @Nullable
+  static String getPrincipal() {
+    Object principal = getSubject().getPrincipal();
+    return principal == null ? null : principal.toString();
   }
 
   boolean isUserAuthenticated() {
@@ -76,6 +84,7 @@ abstract class AbstractSecurityComponent {
     return getSession(sessionId) != null;
   }
 
+  @Nullable
   Session getSession(String sessionId) {
     if(sessionId != null) {
       SessionKey key = new DefaultSessionKey(sessionId);

@@ -125,7 +125,7 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
   }
 
   private void createSubjectNavLink(final Subject subject) {
-    Controls container = Subject.SubjectType.USER.isSubjectType(subject.getType()) ? users : groups;
+    Controls container = Subject.SubjectType.SUBJECT_CREDENTIALS.isSubjectType(subject.getType()) ? users : groups;
     NavLink link = new NavLink(subject.getPrincipal());
     link.addClickHandler(new ClickHandler() {
       @Override

@@ -11,8 +11,8 @@ package org.obiba.opal.web.gwt.app.client.authz.presenter;
 
 import org.obiba.opal.web.model.client.opal.Subject.SubjectType;
 
-import com.google.web.bindery.event.shared.EventBus;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
@@ -31,7 +31,7 @@ public class AuthorizationPresenter extends PresenterWidget<AuthorizationPresent
   }
 
   public void setAclRequest(String key, AclRequest... requests) {
-    userAuthzPresenter.setAclRequest(SubjectType.USER, requests);
+    userAuthzPresenter.setAclRequest(SubjectType.SUBJECT_CREDENTIALS, requests);
     groupAuthzPresenter.setAclRequest(SubjectType.GROUP, requests);
     getView().setExplanation(key);
   }

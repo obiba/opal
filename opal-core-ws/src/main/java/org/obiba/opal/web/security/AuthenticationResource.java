@@ -95,7 +95,7 @@ public class AuthenticationResource extends AbstractSecurityComponent {
     String principal = isValidSessionId(sessionId) ? SecurityUtils.getSubject().getPrincipal().toString() : null;
     return Opal.Subject.newBuilder() //
         .setPrincipal(principal) //
-        .setType(Opal.Subject.SubjectType.USER) //
+        .setType(Opal.Subject.SubjectType.SUBJECT_CREDENTIALS) //
         .build();
   }
 }

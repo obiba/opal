@@ -14,6 +14,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpHeaders;
@@ -63,6 +65,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
   @Autowired
   private RequestAttributesProvider requestAttributeProvider;
 
+  @Nullable
   @Override
   public Response preProcess(HttpRequest request, ResourceMethodInvoker method) {
     if(OPTIONS.equals(request.getHttpMethod())) {
@@ -132,7 +135,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
     for(SubjectAclService.Permissions resourcePermission : resourcePermissions) {
       for(String perm : resourcePermission.getPermissions()) {
         subjectAclService.addSubjectPermission(resourcePermission.getDomain(), resourcePermission.getNode(),
-            SubjectType.USER.subjectFor(getSubject().getPrincipal().toString()), perm);
+            SubjectType.SUBJECT_CREDENTIALS.subjectFor(getPrincipal()), perm);
       }
     }
   }
@@ -142,7 +145,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
       String resource = requestAttributeProvider.getResourcePath(resourceUri);
       if(!getSubject().isPermitted("rest:" + resource + ":*")) {
         subjectAclService
-            .addSubjectPermission("rest", resource, SubjectType.USER.subjectFor(getSubject().getPrincipal().toString()),
+            .addSubjectPermission("rest", resource, SubjectType.SUBJECT_CREDENTIALS.subjectFor(getPrincipal()),
                 "*:GET/*");
       }
     }
@@ -190,6 +193,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
     return getPath(method.getMethod());
   }
 
+  @NotNull
   private String getPath(Method method) {
     Path path = method.getAnnotation(Path.class);
     return path == null ? "" : path.value();

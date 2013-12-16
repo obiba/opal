@@ -24,11 +24,11 @@ import org.obiba.opal.core.domain.HasUniqueProperties;
 import org.obiba.opal.core.domain.security.Group;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.domain.security.SubjectProfile;
-import org.obiba.opal.core.runtime.security.OpalUserRealm;
 import org.obiba.opal.core.security.OpalKeyStore;
 import org.obiba.opal.core.service.DuplicateSubjectProfileException;
 import org.obiba.opal.core.service.OrientDbService;
 import org.obiba.opal.core.service.SubjectProfileService;
+import org.obiba.opal.core.service.security.realm.OpalUserRealm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -211,8 +211,9 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     // TODO we should execute these steps in a single transaction
     orientDbService.delete(subjectCredentials);
     if(!toSave.isEmpty()) orientDbService.save(toSave);
-    subjectAclService.deleteSubjectPermissions(OPAL_DOMAIN, null, SubjectAclService.SubjectType.USER
-        .subjectFor(subjectCredentials.getName())); // Delete subjectCredentials's permissions
+    // Delete subjectCredentials's permissions
+    subjectAclService.deleteSubjectPermissions(OPAL_DOMAIN, null,
+        SubjectAclService.SubjectType.SUBJECT_CREDENTIALS.subjectFor(subjectCredentials.getName()));
     subjectProfileService.deleteProfile(subjectCredentials.getName());
 
     if(subjectCredentials.getType() == SubjectCredentials.Type.APPLICATION) {
@@ -249,9 +250,9 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     // TODO we should execute these steps in a single transaction
     orientDbService.delete(group);
     if(!toSave.isEmpty()) orientDbService.save(toSave);
+    // Delete group's permissions
     subjectAclService.deleteSubjectPermissions(OPAL_DOMAIN, null,
-        SubjectAclService.SubjectType.valueOf(SubjectAclService.SubjectType.GROUP.name())
-            .subjectFor(group.getName())); // Delete group's permissions
+        SubjectAclService.SubjectType.valueOf(SubjectAclService.SubjectType.GROUP.name()).subjectFor(group.getName()));
   }
 
 }

@@ -213,13 +213,13 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     String folderNode = "/files" + path;
     boolean found = false;
     for(SubjectAclService.Permissions acl : subjectAclService
-        .getNodePermissions("opal", folderNode, SubjectAclService.SubjectType.USER)) {
+        .getNodePermissions("opal", folderNode, SubjectAclService.SubjectType.SUBJECT_CREDENTIALS)) {
       found = findPermission(acl, HOME_PERM);
       if(found) break;
     }
     if(!found) {
-      subjectAclService
-          .addSubjectPermission("opal", folderNode, SubjectAclService.SubjectType.USER.subjectFor(username), HOME_PERM);
+      subjectAclService.addSubjectPermission("opal", folderNode,
+          SubjectAclService.SubjectType.SUBJECT_CREDENTIALS.subjectFor(username), HOME_PERM);
     }
   }
 

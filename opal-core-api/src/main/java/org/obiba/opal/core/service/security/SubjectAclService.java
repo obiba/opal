@@ -198,12 +198,12 @@ public interface SubjectAclService extends SystemService {
   }
 
   enum SubjectType {
-    USER, GROUP;
+
+    SUBJECT_CREDENTIALS, GROUP;
 
     public Subject subjectFor(String principal) {
       return new Subject(principal, this);
     }
-
   }
 
   interface Permissions {

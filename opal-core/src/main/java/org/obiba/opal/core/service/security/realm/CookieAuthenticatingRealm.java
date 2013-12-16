@@ -7,36 +7,46 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.runtime.security;
+package org.obiba.opal.core.service.security.realm;
 
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAccount;
-import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
+import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.obiba.opal.web.security.HttpHeaderAuthenticationToken;
+import org.obiba.opal.web.security.HttpCookieAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 @Component
-public class HttpHeaderAuthenticatingRealm extends AbstractHttpAuthenticatingRealm {
+public class CookieAuthenticatingRealm extends AbstractHttpAuthenticatingRealm {
 
-  public HttpHeaderAuthenticatingRealm() {
-    setCredentialsMatcher(new AllowAllCredentialsMatcher());
+  public CookieAuthenticatingRealm() {
   }
 
   @Override
   public boolean supports(AuthenticationToken token) {
-    return token instanceof HttpHeaderAuthenticationToken;
+    return token instanceof HttpCookieAuthenticationToken;
   }
 
   @Override
   protected String getSessionId(AuthenticationToken token) {
-    return ((HttpHeaderAuthenticationToken) token).getSessionId();
+    return ((HttpCookieAuthenticationToken) token).getSessionId();
   }
 
   @Override
   protected AuthenticationInfo createAuthenticationInfo(AuthenticationToken token, PrincipalCollection principals) {
-    return new SimpleAccount(principals, null);
+    HttpCookieAuthenticationToken cookieToken = (HttpCookieAuthenticationToken) token;
+    String urlHash = getUrlHash(cookieToken.getSessionId(), cookieToken.getUrl());
+    return new SimpleAccount(principals, urlHash);
+  }
+
+  /**
+   * @param sessionId
+   * @param url
+   * @return
+   */
+  private String getUrlHash(String sessionId, String url) {
+    return new Md5Hash(url, sessionId).toHex();
   }
 
 }

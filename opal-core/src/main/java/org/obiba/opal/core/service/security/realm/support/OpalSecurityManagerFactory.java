@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.runtime.security;
+package org.obiba.opal.core.service.security.realm.support;
 
 import java.util.Collection;
 import java.util.Set;
@@ -28,6 +28,7 @@ import org.apache.shiro.session.SessionListener;
 import org.apache.shiro.session.mgt.AbstractNativeSessionManager;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.util.LifecycleUtils;
+import org.obiba.opal.core.service.security.realm.OpalPermissionResolver;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

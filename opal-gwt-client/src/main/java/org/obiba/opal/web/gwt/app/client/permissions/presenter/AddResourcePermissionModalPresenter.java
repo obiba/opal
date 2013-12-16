@@ -45,7 +45,7 @@ public class AddResourcePermissionModalPresenter
   public AddResourcePermissionModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
     getView().setUiHandlers(this);
-    getView().getSubjectType().setValue(Subject.SubjectType.USER.getName());
+    getView().getSubjectType().setValue(Subject.SubjectType.SUBJECT_CREDENTIALS.getName());
     getView().getSubjectType().setValue(Subject.SubjectType.GROUP.getName());
   }
 
@@ -60,7 +60,7 @@ public class AddResourcePermissionModalPresenter
   public void save() {
     getView().clearErrors();
     if(new ViewValidatorHandler().validate()) {
-      if (updateHandler != null) {
+      if(updateHandler != null) {
         updateHandler.update(Arrays.asList(getView().getPrincipal().getText()), getView().getSubjectType().getValue(),
             getView().getPermission());
       }
@@ -92,23 +92,27 @@ public class AddResourcePermissionModalPresenter
   private final class DuplicateSubjectValidator extends AbstractFieldValidator {
 
     private final String principal;
+
     private final Subject.SubjectType type;
 
     public DuplicateSubjectValidator(String principal, String typeName, String id) {
       super("", id);
       this.principal = principal;
-      type = Subject.SubjectType.USER.getName().equals(typeName) ? Subject.SubjectType.USER : Subject.SubjectType.GROUP;
-      setErrorMessageKey(
-          Subject.SubjectType.USER.isSubjectType(type) ? "DuplicateAclSubjectUser" : "DuplicateAclSubjectGroup");
+      type = Subject.SubjectType.SUBJECT_CREDENTIALS.getName().equals(typeName)
+          ? Subject.SubjectType.SUBJECT_CREDENTIALS
+          : Subject.SubjectType.GROUP;
+      setErrorMessageKey(Subject.SubjectType.SUBJECT_CREDENTIALS.isSubjectType(type)
+          ? "DuplicateAclSubjectUser"
+          : "DuplicateAclSubjectGroup");
       setArgs(Arrays.asList(principal));
     }
 
     @Override
     protected boolean hasError() {
 
-      for (Acl acl : currentAclList) {
+      for(Acl acl : currentAclList) {
         Subject subject = acl.getSubject();
-        if (subject.getPrincipal().equals(principal) && subject.getType().isSubjectType(type)) {
+        if(subject.getPrincipal().equals(principal) && subject.getType().isSubjectType(type)) {
           return true;
         }
       }

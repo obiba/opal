@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.runtime.security;
+package org.obiba.opal.core.service.security.realm;
 
 import java.util.Collection;
 
@@ -24,11 +24,11 @@ import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.obiba.opal.core.runtime.security.support.SubjectPermissionsConverterRegistry;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.core.service.security.SubjectAclService.Subject;
 import org.obiba.opal.core.service.security.SubjectAclService.SubjectAclChangeCallback;
 import org.obiba.opal.core.service.security.SubjectAclService.SubjectType;
+import org.obiba.opal.core.service.security.realm.support.SubjectPermissionsConverterRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -154,7 +154,7 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
   }
 
   private SubjectAclService.Subject getSubject(PrincipalCollection principals) {
-    return SubjectType.USER.subjectFor(principals.getPrimaryPrincipal().toString());
+    return SubjectType.SUBJECT_CREDENTIALS.subjectFor(principals.getPrimaryPrincipal().toString());
   }
 
   private final class GroupPermissionResolver implements RolePermissionResolver {

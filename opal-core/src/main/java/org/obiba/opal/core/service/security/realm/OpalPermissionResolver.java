@@ -7,9 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.runtime.security;
-
-import org.obiba.opal.core.runtime.security.SpatialRealm.RestSpace;
+package org.obiba.opal.core.service.security.realm;
 
 import eu.flatwhite.shiro.spatial.SingleSpaceRelationProvider;
 import eu.flatwhite.shiro.spatial.SingleSpaceResolver;
@@ -20,7 +18,7 @@ import eu.flatwhite.shiro.spatial.finite.NodeResolver;
 public class OpalPermissionResolver extends SpatialPermissionResolver {
 
   public OpalPermissionResolver() {
-    super(new SingleSpaceResolver(new RestSpace()), new NodeResolver(),
+    super(new SingleSpaceResolver(new SpatialRealm.RestSpace()), new NodeResolver(),
         new SingleSpaceRelationProvider(new NodeRelationProvider()));
   }
 
