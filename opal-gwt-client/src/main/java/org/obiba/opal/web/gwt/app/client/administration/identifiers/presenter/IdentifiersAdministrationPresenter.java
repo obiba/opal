@@ -1,5 +1,7 @@
 package org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter;
 
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.event.IdentifiersTableCreated;
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.event.IdentifiersTableCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
@@ -95,6 +97,12 @@ public class IdentifiersAdministrationPresenter extends
     super.onBind();
     setInSlot("Table", identifiersTablePresenter);
     addRegisteredHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler());
+    addRegisteredHandler(IdentifiersTableCreatedEvent.getType(), new IdentifiersTableCreatedEvent.IdentifiersTableCreatedHandler() {
+      @Override
+      public void onIdentifiersTableCreated(IdentifiersTableCreatedEvent event) {
+        refreshAndSelect(event.getDto().getEntityType());
+      }
+    });
   }
 
   @Override
@@ -111,7 +119,7 @@ public class IdentifiersAdministrationPresenter extends
 
   @Override
   public void onAddIdentifiersTable() {
-    identifiersTableModalProvider.show();
+    identifiersTableModalProvider.get();
   }
 
   @Override
@@ -129,6 +137,10 @@ public class IdentifiersAdministrationPresenter extends
   //
 
   private void refresh() {
+    refreshAndSelect(null);
+  }
+
+  private void refreshAndSelect(final String entityType) {
     String uri = UriBuilders.IDENTIFIERS_TABLES.create().query("counts", "true").build();
     ResourceRequestBuilderFactory.<JsArray<TableDto>>newBuilder() //
         .forResource(uri) //
@@ -136,7 +148,7 @@ public class IdentifiersAdministrationPresenter extends
           @Override
           public void onResource(Response response, JsArray<TableDto> resource) {
             JsArray<TableDto> tables = JsArrays.toSafeArray(resource);
-            getView().showIdentifiersTables(tables);
+            getView().showIdentifiersTables(tables, entityType);
           }
         }) //
         .get().send();
@@ -183,7 +195,7 @@ public class IdentifiersAdministrationPresenter extends
 
   public interface Display extends View, HasBreadcrumbs, HasUiHandlers<IdentifiersAdministrationUiHandlers> {
 
-    void showIdentifiersTables(JsArray<TableDto> identifiersTables);
+    void showIdentifiersTables(JsArray<TableDto> identifiersTables, String selectEntityType);
 
   }
 

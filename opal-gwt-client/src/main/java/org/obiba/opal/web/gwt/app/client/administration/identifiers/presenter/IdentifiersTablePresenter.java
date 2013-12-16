@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -37,7 +38,7 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
 
   public void showIdentifiersTable(TableDto identifiers) {
     getView().showIdentifiersTable(identifiers);
-    String uri = UriBuilder.create().segment("identifiers", "table", identifiers.getName(), "variables").build();
+    String uri = UriBuilders.IDENTIFIERS_TABLE_VARIABLES.create().build(identifiers.getName());
     ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder() //
         .forResource(uri) //
         .withCallback(new ResourceCallback<JsArray<VariableDto>>() {
@@ -51,14 +52,13 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
 
   @Override
   public void onIdentifiersRequest(TableDto identifiersTable, String select, final int offset, int limit) {
-    String uri = UriBuilder.create().segment("identifiers", "table", identifiersTable.getName(), "valueSets")
-        .query("select", select).query("offset", "" + offset).query("limit", "" + limit).build();
+    String uri = UriBuilders.IDENTIFIERS_TABLE_VALUESETS.create()
+        .query("select", select).query("offset", "" + offset).query("limit", "" + limit).build(identifiersTable.getName());
     ResourceRequestBuilderFactory.<ValueSetsDto>newBuilder() //
         .forResource(uri) //
         .withCallback(new ResourceCallback<ValueSetsDto>() {
           @Override
           public void onResource(Response response, ValueSetsDto resource) {
-
             getView().setValueSets(offset, resource);
           }
         }) //

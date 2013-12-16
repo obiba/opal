@@ -14,6 +14,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.event.IdentifiersTableCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalUiHandlers;
@@ -121,8 +122,10 @@ public class IdentifiersTableModalPresenter extends ModalPresenterWidget<Identif
 
   private class TableCreateCallback implements ResponseCodeCallback {
 
-    private TableCreateCallback(TableDto tableDto) {
+    private TableDto table;
 
+    private TableCreateCallback(TableDto table) {
+      this.table = table;
     }
 
     @Override
@@ -136,7 +139,7 @@ public class IdentifiersTableModalPresenter extends ModalPresenterWidget<Identif
     }
 
     private void onSuccess() {
-      placeManager.revealPlace(new PlaceRequest.Builder().nameToken(Places.IDENTIFIERS).build());
+      fireEvent(new IdentifiersTableCreatedEvent.Builder().dto(table).build());
     }
   }
 

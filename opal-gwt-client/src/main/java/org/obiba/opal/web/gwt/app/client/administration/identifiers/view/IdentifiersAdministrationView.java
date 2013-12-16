@@ -8,6 +8,7 @@ import org.obiba.opal.web.model.client.magma.TableDto;
 import com.github.gwtbootstrap.client.ui.NavHeader;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.base.UnorderedList;
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -51,21 +52,29 @@ public class IdentifiersAdministrationView extends ViewWithUiHandlers<Identifier
   }
 
   @Override
-  public void showIdentifiersTables(JsArray<TableDto> identifiersTables) {
+  public void showIdentifiersTables(JsArray<TableDto> identifiersTables, String entityType) {
     this.identifiersTables = identifiersTables;
     selector.clear();
     selector.add(new NavHeader(translations.identifiersTablesTitle()));
+    TableSelectionHandler linkToSelect = null;
     for(int i = 0; i < identifiersTables.length(); i++) {
       TableDto table = identifiersTables.get(i);
       NavLink link = new NavLink(table.getEntityType());
-      link.addClickHandler(new TableSelectionHandler(i));
+      TableSelectionHandler handler = new TableSelectionHandler(i);
+      link.addClickHandler(handler);
       if(i == 0) {
-        link.setActive(true);
-        getUiHandlers().onSelection(table);
+        linkToSelect = handler;
+      }
+      if (!Strings.isNullOrEmpty(entityType) && entityType.toLowerCase().equals(table.getEntityType().toLowerCase())) {
+        linkToSelect = handler;
       }
       selector.add(link);
     }
+    if (linkToSelect != null) {
+      linkToSelect.select();
+    }
   }
+
 
   @Override
   public HasWidgets getBreadcrumbs() {
@@ -97,6 +106,10 @@ public class IdentifiersAdministrationView extends ViewWithUiHandlers<Identifier
         ((NavLink)selector.getWidget(j)).setActive(false);
       }
       ((NavLink)selector.getWidget(i+1)).setActive(true);
+    }
+
+    public void select() {
+      onClick(null);
     }
   }
 }

@@ -408,6 +408,20 @@ public enum UriBuilders {
     public UriBuilder create() {
       return UriBuilder.create().segment("identifiers", "table","{}");
     }
+  },
+
+  IDENTIFIERS_TABLE_VARIABLES {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("identifiers", "table","{}", "variables");
+    }
+  },
+
+  IDENTIFIERS_TABLE_VALUESETS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("identifiers", "table","{}", "valueSets");
+    }
   };
 
   public abstract UriBuilder create();
