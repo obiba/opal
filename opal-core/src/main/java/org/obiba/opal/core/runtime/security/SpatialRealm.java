@@ -129,12 +129,10 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
   @Override
   protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
     Iterable<String> perms = loadSubjectPermissions(principals);
-    if(perms != null) {
-      SimpleAuthorizationInfo sai = new SimpleAuthorizationInfo();
-      sai.setStringPermissions(ImmutableSet.copyOf(perms));
-      return sai;
-    }
-    return null;
+    if(perms == null) return null;
+    SimpleAuthorizationInfo sai = new SimpleAuthorizationInfo();
+    sai.setStringPermissions(ImmutableSet.copyOf(perms));
+    return sai;
   }
 
   @Override
@@ -166,15 +164,13 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
       Subject group = SubjectType.GROUP.subjectFor(roleString);
       if(isAuthorizationCachingEnabled() && getRolePermissionCache() != null) {
         Collection<Permission> cached = getRolePermissionCache().get(group);
-        if(cached != null) {
-          return cached;
+        if(cached == null) {
+          cached = doGetGroupPermissions(group);
+          getRolePermissionCache().put(group, cached);
         }
-        cached = doGetGroupPermissions(group);
-        getRolePermissionCache().put(group, cached);
         return cached;
-      } else {
-        return doGetGroupPermissions(group);
       }
+      return doGetGroupPermissions(group);
     }
 
     private Collection<Permission> doGetGroupPermissions(Subject group) {
@@ -203,14 +199,11 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
   static class RestSpace extends NodeSpace {
     @Override
     protected double calculateDistance(Spatial s1, Spatial s2) {
-
       Double d = super.calculateDistance(s1, s2);
       if(Double.isNaN(d)) {
         // Check for plural form relation
         Node n1 = (Node) s1;
-
         Node n2 = (Node) s2;
-
         int nodes = Math.min(n1.getPath().size(), n2.getPath().size());
         for(int i = 0; i < nodes; i++) {
           Node lhs = n1.getPath().get(i);
@@ -220,10 +213,8 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
             return isPluralForm(lhs, rhs) ? 1 : d;
           }
         }
-
       }
       return d;
-
     }
 
     /**
