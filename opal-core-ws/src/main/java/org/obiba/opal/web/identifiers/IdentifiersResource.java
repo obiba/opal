@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -25,9 +28,12 @@ import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.VariableEntity;
 import org.obiba.magma.support.Disposables;
+import org.obiba.magma.support.StaticDatasource;
+import org.obiba.magma.support.StaticValueTable;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersImportService;
 import org.obiba.opal.core.service.IdentifiersTableService;
+import org.obiba.opal.core.service.NoSuchIdentifiersMappingException;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.DatasourceTablesResource;
@@ -37,6 +43,7 @@ import org.obiba.opal.web.magma.support.DatasourceFactoryRegistry;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.IdentifiersMappingDto;
+import org.obiba.opal.web.support.InvalidRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
@@ -45,6 +52,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -125,18 +133,53 @@ public class IdentifiersResource extends AbstractIdentifiersResource {
     return dtos;
   }
 
+  /**
+   * Add the system identifiers provided in the body of the request (one per line) to the corresponding identfiers table (if this one exists).
+   *
+   * @param entityType
+   * @param identifiers
+   * @return
+   */
   @POST
-  @Path("/mappings/entities")
-  public Response importIdentifiers(Magma.DatasourceFactoryDto datasourceFactoryDto) {
+  @Consumes("text/plain")
+  @Path("/mappings/entities/_import")
+  public Response importIdentifiers(@QueryParam("type") String entityType, String identifiers) {
+    if(entityType == null || !identifiersTableService.hasIdentifiersTable(entityType))
+      throw new InvalidRequestException("No such identifiers table for entity type: " + entityType);
+    if(Strings.isNullOrEmpty(identifiers)) throw new InvalidRequestException("A list of identifiers is expected");
+
+    try {
+      ImmutableList.Builder<String> builder = ImmutableList.builder();
+      for(String id : identifiers.split(System.getProperty("line.separator"))) {
+        if(!Strings.isNullOrEmpty(id)) {
+          builder.add(id);
+        }
+      }
+      ValueTable table = new StaticValueTable(new StaticDatasource("import-identifiers"), entityType, builder.build(),
+          entityType);
+      importIdentifiersFromTable(table);
+      return Response.ok().build();
+    } catch(IOException ex) {
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
+          ClientErrorDtos.getErrorMessage(Response.Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex))
+          .build();
+    }
+  }
+
+  /**
+   * Make a transient datasource and copy the identifiers into the corresponding identifiers tables.
+   *
+   * @param datasourceFactoryDto
+   * @return
+   */
+  @POST
+  @Path("/mappings/entities/_import")
+  public Response importIdentifiers(@NotNull Magma.DatasourceFactoryDto datasourceFactoryDto) {
+    if(datasourceFactoryDto == null) throw new NoSuchDatasourceException("");
+
     try {
       importIdentifiersFromTransientDatasource(datasourceFactoryDto);
       return Response.ok().build();
-    } catch(NoSuchDatasourceException ex) {
-      return Response.status(Response.Status.NOT_FOUND)
-          .entity(ClientErrorDtos.getErrorMessage(Response.Status.NOT_FOUND, "DatasourceNotFound", ex)).build();
-    } catch(NoSuchValueTableException ex) {
-      return Response.status(Response.Status.NOT_FOUND)
-          .entity(ClientErrorDtos.getErrorMessage(Response.Status.NOT_FOUND, "ValueTableNotFound", ex)).build();
     } catch(IOException ex) {
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
           ClientErrorDtos.getErrorMessage(Response.Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex))
@@ -146,14 +189,15 @@ public class IdentifiersResource extends AbstractIdentifiersResource {
 
   /**
    * If a datasource name is provided, it will be used to import all identifiers from this datasource or just the
-   * identifiers from the provided table name in the datasource. Else all datasources identifiers will be imported.
+   * identifiers from the provided table name in the datasource. Else identifiers of all data datasources will be imported.
+   * Applies only to entity types that are handled by the identifiers datasource.
    *
    * @param datasource
    * @param table
    * @return
    */
   @POST
-  @Path("/mappings/entities/sync")
+  @Path("/mappings/entities/_sync")
   public Response importIdentifiers(@QueryParam("datasource") String datasource,
       @SuppressWarnings("TypeMayBeWeakened") @QueryParam("table") List<String> tableList) {
     try {
@@ -170,12 +214,6 @@ public class IdentifiersResource extends AbstractIdentifiersResource {
         importIdentifiersFromAllDatasources();
       }
       return Response.ok().build();
-    } catch(NoSuchDatasourceException ex) {
-      return Response.status(Response.Status.NOT_FOUND)
-          .entity(ClientErrorDtos.getErrorMessage(Response.Status.NOT_FOUND, "DatasourceNotFound", ex)).build();
-    } catch(NoSuchValueTableException ex) {
-      return Response.status(Response.Status.NOT_FOUND)
-          .entity(ClientErrorDtos.getErrorMessage(Response.Status.NOT_FOUND, "ValueTableNotFound", ex)).build();
     } catch(IOException ex) {
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
           ClientErrorDtos.getErrorMessage(Response.Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex))
@@ -183,15 +221,25 @@ public class IdentifiersResource extends AbstractIdentifiersResource {
     }
   }
 
+  /**
+   * Report the number of entities that can be synchronized: entities of any type that are in the data datasource
+   * but not in the identifiers datasource.
+   *
+   * @param datasource
+   * @param tableList
+   * @return
+   */
   @GET
-  @Path("/mappings/entities/sync")
-  public List<Magma.TableIdentifiersSync> getIdentifiersToBeImported(@QueryParam("datasource") String datasource,
+  @Path("/mappings/entities/_sync")
+  public List<Magma.TableIdentifiersSync> getIdentifiersToBeImported(
+      @NotNull @QueryParam("datasource") String datasource,
       @SuppressWarnings("TypeMayBeWeakened") @QueryParam("table") List<String> tableList) {
+    if(datasource == null) throw new NoSuchDatasourceException("");
     final Datasource ds = MagmaEngine.get().getDatasource(datasource);
 
     ImmutableList.Builder<Magma.TableIdentifiersSync> builder = ImmutableList.builder();
 
-    Iterable<ValueTable> tables = Iterables.filter(tableList == null || tableList.isEmpty()
+    Iterable<ValueTable> tables = tableList == null || tableList.isEmpty()
         ? ds.getValueTables()
         : Iterables.transform(tableList, new Function<String, ValueTable>() {
 
@@ -199,16 +247,13 @@ public class IdentifiersResource extends AbstractIdentifiersResource {
           public ValueTable apply(String input) {
             return ds.getValueTable(input);
           }
-        }), new Predicate<ValueTable>() {
-
-      @Override
-      public boolean apply(ValueTable input) {
-        return identifiersTableService.hasIdentifiersTable(input.getEntityType());
-      }
-    });
+        });
 
     for(ValueTable vt : tables) {
-      Set<VariableEntity> entities = identifiersTableService.getIdentifiersTable(vt.getEntityType()).getVariableEntities();
+      Set<VariableEntity> entities = Sets.newHashSet();
+      if(identifiersTableService.hasIdentifiersTable(vt.getEntityType())) {
+        entities = identifiersTableService.getIdentifiersTable(vt.getEntityType()).getVariableEntities();
+      }
       builder.add(getTableIdentifiersSync(entities, ds, vt));
     }
 
@@ -224,7 +269,8 @@ public class IdentifiersResource extends AbstractIdentifiersResource {
     int count = 0;
     Set<VariableEntity> tableEntities = vt.getVariableEntities();
     Magma.TableIdentifiersSync.Builder builder = Magma.TableIdentifiersSync.newBuilder()//
-        .setDatasource(ds.getName()).setTable(vt.getName()).setTotal(tableEntities.size());
+        .setDatasource(ds.getName()).setTable(vt.getName()).setEntityType(vt.getEntityType())
+        .setTotal(tableEntities.size());
 
     for(VariableEntity entity : tableEntities) {
       if(!entities.contains(entity)) {

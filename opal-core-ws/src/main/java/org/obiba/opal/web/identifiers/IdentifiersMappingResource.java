@@ -192,12 +192,6 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
       if(prefix != null) pId.setPrefix(prefix);
       int count = identifiersImportService.importIdentifiers(new IdentifiersMapping(name, entityType), pId);
       return Response.ok().entity(Integer.toString(count)).build();
-    } catch(NoSuchDatasourceException ex) {
-      return Response.status(Response.Status.NOT_FOUND)
-          .entity(ClientErrorDtos.getErrorMessage(Response.Status.NOT_FOUND, "DatasourceNotFound", ex)).build();
-    } catch(NoSuchValueTableException ex) {
-      return Response.status(Response.Status.NOT_FOUND)
-          .entity(ClientErrorDtos.getErrorMessage(Response.Status.NOT_FOUND, "ValueTableNotFound", ex)).build();
     } catch(MagmaRuntimeException ex) {
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
           .entity(ClientErrorDtos.getErrorMessage(Response.Status.INTERNAL_SERVER_ERROR, "ImportIdentifiersError", ex))
