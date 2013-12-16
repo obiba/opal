@@ -37,7 +37,8 @@ public class OpalConfiguration {
 
   private MagmaEngineFactory magmaEngineFactory;
 
-  @SuppressWarnings({ "FieldCanBeLocal", "UnusedDeclaration" })
+  //TODO delete this once unit upgrade is done
+  @SuppressWarnings({ "FieldCanBeLocal", "UnusedDeclaration", "PMD.UnusedPrivateField" })
   private final Set<FunctionalUnit> functionalUnits;
 
   private final Set<ReportTemplate> reportTemplates;
