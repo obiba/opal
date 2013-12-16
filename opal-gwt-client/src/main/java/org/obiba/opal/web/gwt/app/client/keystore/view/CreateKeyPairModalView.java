@@ -92,29 +92,37 @@ implements CreateKeyPairModalPresenter.Display {
   public void showError(@Nullable CreateKeyPairModalPresenter.Display.FormField formField, String message) {
     ControlGroup group = null;
     if(formField != null) {
-      switch(formField) {
-        case NAME:
-          group = nameGroup;
-          break;
-        case ALGORITHM:
-          group = algorithmGroup;
-          break;
-        case SIZE:
-          group = sizeGroup;
-          break;
-        case FIRST_LAST_NAME:
-          group = firstLastNameGroup;
-          break;
-        case ORGANIZATIONAL_UNIT:
-          group = organizationalUnitGroup;
-          break;
-      }
+      group = getGroupWidgets(formField);
     }
+
     if(group == null) {
       modal.addAlert(message, AlertType.ERROR);
     } else {
       modal.addAlert(message, AlertType.ERROR, group);
     }
+  }
+
+  private ControlGroup getGroupWidgets(FormField formField) {
+    ControlGroup group = null;
+
+    switch(formField) {
+      case NAME:
+        group = nameGroup;
+        break;
+      case ALGORITHM:
+        group = algorithmGroup;
+        break;
+      case SIZE:
+        group = sizeGroup;
+        break;
+      case FIRST_LAST_NAME:
+        group = firstLastNameGroup;
+        break;
+      case ORGANIZATIONAL_UNIT:
+        group = organizationalUnitGroup;
+        break;
+    }
+    return group;
   }
 
   @Override
