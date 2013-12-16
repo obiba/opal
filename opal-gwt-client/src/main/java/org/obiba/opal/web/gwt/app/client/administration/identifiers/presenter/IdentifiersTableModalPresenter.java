@@ -17,10 +17,7 @@ import javax.annotation.Nullable;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.event.IdentifiersTableCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalUiHandlers;
-import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
@@ -28,9 +25,7 @@ import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
-import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -41,8 +36,6 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 /**
  *
@@ -52,16 +45,12 @@ public class IdentifiersTableModalPresenter extends ModalPresenterWidget<Identif
 
   private final Translations translations;
 
-  private final PlaceManager placeManager;
-
   private final ValidationHandler validationHandler;
 
   @Inject
-  public IdentifiersTableModalPresenter(EventBus eventBus, Display display, Translations translations,
-      PlaceManager placeManager) {
+  public IdentifiersTableModalPresenter(EventBus eventBus, Display display, Translations translations) {
     super(eventBus, display);
     this.translations = translations;
-    this.placeManager = placeManager;
     validationHandler = new PropertiesValidationHandler();
     getView().setUiHandlers(this);
   }
@@ -79,7 +68,6 @@ public class IdentifiersTableModalPresenter extends ModalPresenterWidget<Identif
         .withCallback(new ResourceCallback<JsArray<TableDto>>() {
           @Override
           public void onResource(Response response, JsArray<TableDto> resource) {
-            JsArray<TableDto> tables = JsArrays.toSafeArray(resource);
             for(TableDto table : JsArrays.toList(resource)) {
               if(table.getEntityType().toLowerCase().equals(newTable.getEntityType().toLowerCase())) {
                 // identifiers table for this entity type already exists
