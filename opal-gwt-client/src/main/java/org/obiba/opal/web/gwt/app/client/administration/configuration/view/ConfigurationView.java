@@ -59,6 +59,11 @@ public class ConfigurationView extends ViewWithUiHandlers<ConfigurationUiHandler
     getUiHandlers().onEditGeneralSettings();
   }
 
+  @UiHandler("importKeyPair")
+  public void onImportKeyPair(ClickEvent event) {
+    getUiHandlers().onImportKeyPair();
+  }
+
   @UiHandler("createKeyPair")
   public void onCreateKeyPair(ClickEvent event) {
     getUiHandlers().onCreateKeyPair();

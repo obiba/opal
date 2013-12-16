@@ -275,6 +275,27 @@ public enum UriBuilders {
     }
   },
 
+  PROJECT_KEYSTORE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "keystore");
+    }
+  },
+
+  PROJECT_KEYSTORE_ALIAS {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "keystore", "{}");
+    }
+  },
+
+  PROJECT_KEYSTORE_ALIAS_CERTIFICATE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "keystore", "{}", "certificate");
+    }
+  },
+
   SUBJECT_CREDENTIALS {
     @Override
     public UriBuilder create() {

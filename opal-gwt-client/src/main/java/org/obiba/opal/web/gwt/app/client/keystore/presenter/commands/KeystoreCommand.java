@@ -8,15 +8,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.keystore.presenter;
+package org.obiba.opal.web.gwt.app.client.keystore.presenter.commands;
 
-import com.gwtplatform.mvp.client.UiHandlers;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 
-public interface EncryptionKeysUiHandlers extends UiHandlers {
+import edu.umd.cs.findbugs.annotations.Nullable;
 
-  void createKeyPair();
-
-  void importKeyPair();
-
-  void importCertificatePair();
+public interface KeystoreCommand {
+  void execute(@Nullable ResponseCodeCallback success, @Nullable ResponseCodeCallback failure);
 }

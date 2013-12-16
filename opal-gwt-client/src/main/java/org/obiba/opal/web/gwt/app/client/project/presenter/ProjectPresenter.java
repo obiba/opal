@@ -107,6 +107,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private final Provider<ProjectResourcePermissionsPresenter> projectResourcePermissionsProvider;
 
+  private final Provider<ProjectDataExchangePresenter> projectDataExchangeProvider;
+
   private final Provider<ProjectAdministrationPresenter> projectAdministrationPresenterProvider;
 
   private final PlaceManager placeManager;
@@ -127,6 +129,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private ProjectResourcePermissionsPresenter projectResourcePermissionsPresenter;
 
+  private ProjectDataExchangePresenter projectDataExchangePresenter;
+
   private ProjectAdministrationPresenter projectAdministrationPresenter;
 
   @Inject
@@ -135,7 +139,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       Provider<MagmaPresenter> magmaPresenterProvider, Provider<FileExplorerPresenter> fileExplorerPresenterProvider,
       Provider<ReportsPresenter> reportsPresenterProvider, Provider<TasksPresenter> tasksPresenterProvider,
       Provider<ProjectAdministrationPresenter> projectAdministrationPresenterProvider,
-      Provider<ProjectResourcePermissionsPresenter> projectResourcePermissionsProvider) {
+      Provider<ProjectResourcePermissionsPresenter> projectResourcePermissionsProvider,
+      Provider<ProjectDataExchangePresenter> projectDataExchangeProvider) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
     this.placeManager = placeManager;
@@ -145,6 +150,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     this.tasksPresenterProvider = tasksPresenterProvider;
     this.projectAdministrationPresenterProvider = projectAdministrationPresenterProvider;
     this.projectResourcePermissionsProvider = projectResourcePermissionsProvider;
+    this.projectDataExchangeProvider = projectDataExchangeProvider;
   }
 
   @Override
@@ -223,6 +229,9 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       case PERMISSIONS:
         onPermissionsTabSelected();
         break;
+      case DATA_EXCHANGE:
+        onDataExchangeTabSelected();
+        break;
       case ADMINISTRATION:
         onAdminTabSelected();
         break;
@@ -282,14 +291,14 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     }
     projectResourcePermissionsPresenter.initialize(project);
   }
-//
-//  private void onPermissionsTabSelected() {
-//    if(projectResourcePermissionsPresenter == null) {
-//      projectResourcePermissionsPresenter = projectResourcePermissionsProvider.get();
-//      setInSlot(PERMISSION_PANE, projectResourcePermissionsPresenter);
-//    }
-//    projectResourcePermissionsPresenter.initialize(project);
-//  }
+
+  private void onDataExchangeTabSelected() {
+    if(projectDataExchangePresenter == null) {
+      projectDataExchangePresenter = projectDataExchangeProvider.get();
+      setInSlot(DATA_EXTCHANGE_PANE, projectDataExchangePresenter);
+    }
+    projectDataExchangePresenter.initialize(project);
+  }
 
   private void onAdminTabSelected() {
     if(projectAdministrationPresenter == null) {

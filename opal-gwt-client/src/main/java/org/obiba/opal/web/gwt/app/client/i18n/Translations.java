@@ -130,6 +130,7 @@ public interface Translations extends Constants {
       "Edit", "Edit", //
       "Copy", "Copy", //
       "Test", "Test", //
+      "Certificate", "Certificate", //
       "Download", "Download", //
       "DownloadCertificate", "Download Certificate", //
       "Index now", "Index now", //
@@ -431,7 +432,7 @@ public interface Translations extends Constants {
       "FunctionalUnitAlreadyExistWithTheSpecifiedName", "A unit with the same name already exists.",//
       "FunctionalUnitNameIsRequired", "Unit name is required.",//
       "DuplicateFunctionalUnitNames", "Duplicate Unit names.",//
-      "KeyPairAliasIsRequired", "Alias is required",//
+      "KeyPairAliasIsRequired", "Name is required",//
       "KeyPairAlgorithmIsRequired", "Algorithm is required.",//
       "KeyPairKeySizeIsRequired", "Size is required.",//
       "KeyPairPrivateKeyPEMIsRequired", "Private Key in PEM format is required.", //
@@ -1284,6 +1285,14 @@ public interface Translations extends Constants {
   @DefaultStringValue("Import Data (no storage)")
   String importDataNoStorageLabel();
 
+  @Description("Import Key Pair title")
+  @DefaultStringValue("Import Key Pair")
+  String importKeyPairTitle();
+
+  @Description("Import Certificate title")
+  @DefaultStringValue("Import Certificate Pair")
+  String importCertificateTitle();
+
   @Description("Data import title")
   @DefaultStringValue("Import Data")
   String importData();
@@ -1636,6 +1645,8 @@ public interface Translations extends Constants {
       "REPORTS", "Reports", //
       "TASKS", "Tasks", //
       "PERMISSIONS", "Permissions", //
+      "PERMISSIONS", "Permissions", //
+      "DATA_EXCHANGE", "Data Exchange", //
       "ADMINISTRATION", "Administration" //
   })
   Map<String, String> projectTabNameMap();
