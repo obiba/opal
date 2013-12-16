@@ -26,6 +26,7 @@ import com.google.gwt.dom.client.Style;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.AsyncDataProvider;
@@ -41,6 +42,12 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
 
   @UiField
   Heading title;
+
+  @UiField
+  Label systemIdsCount;
+
+  @UiField
+  Label idMappingsCount;
 
   @UiField
   Panel tablePanel;
@@ -65,6 +72,8 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
   public void showIdentifiersTable(TableDto table) {
     this.table = table;
     title.setText(table.getEntityType());
+    systemIdsCount.setText("" + table.getValueSetCount());
+    idMappingsCount.setText("" + table.getVariableCount());
   }
 
   @Override
