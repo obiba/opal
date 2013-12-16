@@ -36,8 +36,7 @@ public class AttributeMapping {
       field = attribute.getNamespace() + "-" + field;
     }
     if(attribute.isLocalised()) {
-      //noinspection ConstantConditions
-      field += "-" + attribute.getLocale().toString();
+      field += "-" + attribute.getLocale();
     }
     return field;
   }

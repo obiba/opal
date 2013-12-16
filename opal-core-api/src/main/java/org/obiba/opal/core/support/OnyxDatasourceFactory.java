@@ -28,7 +28,7 @@ public class OnyxDatasourceFactory extends AbstractDatasourceFactory {
   }
 
   @Override
-  public void setName(String name) {
+  public void setName(@NotNull String name) {
     wrappedFactory.setName(name);
   }
 

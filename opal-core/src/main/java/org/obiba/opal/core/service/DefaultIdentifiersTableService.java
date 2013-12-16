@@ -86,8 +86,8 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
 
   @Override
   public boolean hasEntities() {
-    for (ValueTable table : getDatasource().getValueTables()) {
-      if (!Iterables.isEmpty(table.getVariableEntities())) return true;
+    for(ValueTable table : getDatasource().getValueTables()) {
+      if(!Iterables.isEmpty(table.getVariableEntities())) return true;
     }
     return false;
   }
@@ -131,7 +131,7 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
   }
 
   @Override
-  public boolean hasIdentifiersTable(String entityType) {
+  public boolean hasIdentifiersTable(@NotNull String entityType) {
     for(ValueTable table : getDatasource().getValueTables()) {
       if(table.getEntityType().toLowerCase().equals(entityType.toLowerCase())) {
         return true;
@@ -140,8 +140,9 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
     return false;
   }
 
+  @NotNull
   @Override
-  public ValueTable getIdentifiersTable(String entityType) {
+  public ValueTable getIdentifiersTable(@NotNull String entityType) {
     for(ValueTable table : getDatasource().getValueTables()) {
       if(table.getEntityType().toLowerCase().equals(entityType.toLowerCase())) {
         return table;
@@ -150,8 +151,9 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
     throw new NoSuchValueTableException("");
   }
 
+  @NotNull
   @Override
-  public ValueTable ensureIdentifiersTable(String entityType) {
+  public ValueTable ensureIdentifiersTable(@NotNull String entityType) {
     if(!hasIdentifiersTable(entityType)) {
       ValueTableWriter vtw = null;
       try {
@@ -163,8 +165,9 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
     return getIdentifiersTable(entityType);
   }
 
+  @NotNull
   @Override
-  public Variable ensureIdentifiersMapping(IdentifiersMapping idMapping) {
+  public Variable ensureIdentifiersMapping(@NotNull IdentifiersMapping idMapping) {
     ValueTable table = ensureIdentifiersTable(idMapping.getEntityType());
     if(!table.hasVariable(idMapping.getName())) {
       ValueTableWriter vtw = null;
@@ -190,28 +193,29 @@ public class DefaultIdentifiersTableService implements IdentifiersTableService {
 
   @Nullable
   @Override
-  public String getSelectScript(String entityType, String idMapping) {
-    if (!hasIdentifiersTable(entityType)) return null;
+  public String getSelectScript(@NotNull String entityType, @NotNull String idMapping) {
+    if(!hasIdentifiersTable(entityType)) return null;
     ValueTable table = getIdentifiersTable(entityType);
-    if (!table.hasVariable(idMapping)) return null;
+    if(!table.hasVariable(idMapping)) return null;
     Variable variable = table.getVariable(idMapping);
-    if (!variable.hasAttribute("select")) return null;
+    if(!variable.hasAttribute("select")) return null;
 
     return variable.getAttributeStringValue("select");
   }
 
   @Override
-  public boolean hasIdentifiersMapping(String idMapping) {
-    for (ValueTable table : getDatasource().getValueTables()) {
-      if (table.hasVariable(idMapping)) return true;
+  public boolean hasIdentifiersMapping(@NotNull String idMapping) {
+    for(ValueTable table : getDatasource().getValueTables()) {
+      if(table.hasVariable(idMapping)) return true;
     }
     return false;
   }
 
   @Override
-  public boolean hasIdentifiersMapping(String entityType, String idMapping) {
-    for (ValueTable table : getDatasource().getValueTables()) {
-      if (table.getEntityType().toLowerCase().equals(entityType.toLowerCase()) && table.hasVariable(idMapping)) return true;
+  public boolean hasIdentifiersMapping(@NotNull String entityType, @NotNull String idMapping) {
+    for(ValueTable table : getDatasource().getValueTables()) {
+      if(table.getEntityType().toLowerCase().equals(entityType.toLowerCase()) && table.hasVariable(idMapping))
+        return true;
     }
     return false;
   }

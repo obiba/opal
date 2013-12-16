@@ -44,7 +44,7 @@ public class DatashieldConfiguration implements OpalConfigurationExtension, Seri
   private List<DataShieldEnvironment> environments;
 
   public Level getLevel() {
-    return level != null ? level : Level.RESTRICTED;
+    return level == null ? Level.RESTRICTED : level;
   }
 
   public void setLevel(Level level) {

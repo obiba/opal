@@ -135,7 +135,7 @@ public class FileDtos {
     int lastSeparatorIndex = childPath.lastIndexOf('/');
 
     if(lastSeparatorIndex != -1) {
-      parentPath = lastSeparatorIndex != 0 ? childPath.substring(0, lastSeparatorIndex) : "/";
+      parentPath = lastSeparatorIndex == 0 ? "/" : childPath.substring(0, lastSeparatorIndex);
     }
 
     return parentPath;

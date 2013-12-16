@@ -175,7 +175,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
       // datasource. Also, more obviously, it is not necessarily the case that all value sets have a value
       // for all key variables.
       if(!value.isNull()) {
-        log.debug("{} <--> ({}) cached", valueSet.getVariableEntity().getIdentifier(), value.toString());
+        log.debug("{} <--> ({}) cached", valueSet.getVariableEntity().getIdentifier(), value);
         publicToPrivate.put(entityFor(valueSet.getVariableEntity().getIdentifier()), entityFor(value.toString()));
       }
     }
@@ -187,7 +187,7 @@ public class OpalPrivateVariableEntityMap implements PrivateVariableEntityMap {
     for(VariableEntity opalEntity : entities) {
       Value value = values.next();
       if(!value.isNull()) {
-        log.debug("{} <--> ({}) cached", opalEntity.getIdentifier(), value.toString());
+        log.debug("{} <--> ({}) cached", opalEntity.getIdentifier(), value);
         publicToPrivate.put(entityFor(opalEntity.getIdentifier()), entityFor(value.toString()));
       }
     }

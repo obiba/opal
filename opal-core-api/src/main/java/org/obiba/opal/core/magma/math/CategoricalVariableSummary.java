@@ -177,7 +177,6 @@ public class CategoricalVariableSummary extends AbstractVariableSummary implemen
         if(value.isNull()) {
           summary.frequencyDist.addValue(NULL_NAME);
         } else {
-          //noinspection ConstantConditions
           for(Value v : value.asSequence().getValue()) {
             add(v);
           }

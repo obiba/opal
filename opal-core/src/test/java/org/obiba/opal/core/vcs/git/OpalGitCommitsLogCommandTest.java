@@ -30,11 +30,6 @@ public class OpalGitCommitsLogCommandTest {
 
   private static final TestOpalGitVersionControlSystem vcs = new TestOpalGitVersionControlSystem();
 
-  @Test(expected = OpalGitException.class)
-  public void testCreateCommandWithNullRepository() {
-    new OpalGitCommitsLogCommand.Builder(null).build();
-  }
-
   @Test
   public void testCommitsInfoRetrievalWitValidViewPath() {
     OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))

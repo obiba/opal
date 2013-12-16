@@ -22,6 +22,7 @@ import org.elasticsearch.common.xcontent.XContentFactory;
 import org.obiba.magma.Attribute;
 import org.obiba.magma.AttributeAware;
 import org.obiba.magma.Category;
+import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.opal.search.IndexSynchronization;
@@ -149,7 +150,8 @@ public class EsVariablesIndexManager extends EsIndexManager implements Variables
             if(!attributeFields.containsKey(field)) {
               attributeFields.put(field, new ArrayList<>());
             }
-            attributeFields.get(field).add(attribute.getValue().getValue());
+            Value value = attribute.getValue();
+            attributeFields.get(field).add(value.isNull() ? null : value.getValue());
           }
         }
       }

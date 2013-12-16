@@ -116,7 +116,7 @@ public enum VectorType {
       REXPRaw raws[] = new REXPRaw[size];
       int i = 0;
       for(Value value : values) {
-        raws[i++] = new REXPRaw((byte[]) value.getValue());
+        raws[i++] = new REXPRaw(value.isNull() ? null : (byte[]) value.getValue());
       }
       return new REXPList(new RList(raws));
     }
@@ -217,7 +217,8 @@ public enum VectorType {
     return new REXPFactor(ints, levels.toArray(new String[levels.size()]));
   }
 
-  private void populateCodesAndLevels(Variable variable, boolean withMissings, Map<String, Integer> codes, List<String> levels) {
+  private void populateCodesAndLevels(Variable variable, boolean withMissings, Map<String, Integer> codes,
+      List<String> levels) {
     // REXPFactor is one-based. That is, the ID the first level, is 1.
     int i = 1;
     for(Category c : variable.getCategories()) {

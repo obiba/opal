@@ -8,9 +8,11 @@ import java.util.Map;
 import javax.validation.constraints.NotNull;
 
 import net.sf.ehcache.Cache;
+import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 
 import org.obiba.magma.Timestamped;
+import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.Variable;
 import org.obiba.magma.type.BinaryType;
@@ -110,7 +112,7 @@ public abstract class AbstractVariableSummaryCachedService< //
     return (TVariableSummary) element.getObjectValue();
   }
 
-  private TVariableSummary cacheSummary(TVariableSummaryFactory summaryFactory, Cache cache, String key) {
+  private TVariableSummary cacheSummary(TVariableSummaryFactory summaryFactory, Ehcache cache, String key) {
     TVariableSummary summary = summaryFactory.getSummary();
     cache.put(new Element(key, summary));
     return summary;
@@ -118,7 +120,7 @@ public abstract class AbstractVariableSummaryCachedService< //
 
   private boolean isCacheObsolete(Element element, Timestamped table) {
     Date creationTime = new Date(element.getCreationTime());
-    Date tableLastUpdate = (Date) table.getTimestamps().getLastUpdate().getValue();
-    return tableLastUpdate != null && tableLastUpdate.after(creationTime);
+    Value lastUpdate = table.getTimestamps().getLastUpdate();
+    return !lastUpdate.isNull() && ((Date) lastUpdate.getValue()).after(creationTime);
   }
 }

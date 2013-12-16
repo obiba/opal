@@ -46,7 +46,7 @@ public class IdentifiersMappingDatasourceFactory extends AbstractDatasourceFacto
   }
 
   @Override
-  public void setName(String name) {
+  public void setName(@NotNull String name) {
     wrappedFactory.setName(name);
   }
 

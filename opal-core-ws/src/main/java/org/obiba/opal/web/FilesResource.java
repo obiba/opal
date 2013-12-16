@@ -512,7 +512,7 @@ public class FilesResource {
   }
 
   private String getPathOfFileToWrite(String path) {
-    return path.startsWith("/tmp/") ? "/tmp/" + UUID.randomUUID().toString() + ".tmp" : path;
+    return path.startsWith("/tmp/") ? "/tmp/" + UUID.randomUUID() + ".tmp" : path;
   }
 
   private Response getPathNotExistResponse(String path) {

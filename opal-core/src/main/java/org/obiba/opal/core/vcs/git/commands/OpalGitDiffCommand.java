@@ -157,10 +157,9 @@ public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
       currentCommitParser = new CanonicalTreeParser();
       currentCommitParser.reset(reader, currentCommit.getTree());
 
-      previousCommitParser = null;
-      RevCommit previousCommit = !Strings.isNullOrEmpty(previousCommitId)
-          ? getCommitById(previousCommitId)
-          : getCommitById(OpalGitUtils.getNthCommitId(commitId, nthCommit));
+      RevCommit previousCommit = Strings.isNullOrEmpty(previousCommitId) //
+          ? getCommitById(OpalGitUtils.getNthCommitId(commitId, nthCommit)) //
+          : getCommitById(previousCommitId);
 
       if(previousCommit == null) {
         // currentCommit is the first commit in the tree

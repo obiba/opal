@@ -52,7 +52,7 @@ public class QueryTermJsonBuilderTest {
     QueryTermJsonBuilder queryBuilder = new QueryTermJsonBuilder().setTermFieldName("_id").setTermFieldValue("6436175")
         .setTermFilters(filtersBuilder.build());
 
-    log.info(">>>>> {}", queryBuilder.build().toString());
+    log.info(">>>>> {}", queryBuilder.build());
 
   }
 

@@ -12,7 +12,6 @@ package org.obiba.opal.web.magma;
 import java.util.Locale;
 
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.obiba.magma.Attribute;
@@ -29,6 +28,8 @@ import org.obiba.opal.web.model.Magma.JdbcDatasourceSettingsDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 
 import com.googlecode.protobuf.format.JsonFormat;
+
+import static org.junit.Assert.assertEquals;
 
 public class DtosTest {
 
@@ -62,26 +63,26 @@ public class DtosTest {
   }
 
   private void checkConversion(VariableDto variableDto, Variable variable) {
-    Assert.assertEquals(variable.getName(), variableDto.getName());
-    Assert.assertEquals(variable.getEntityType(), variableDto.getEntityType());
-    Assert.assertEquals(variable.getValueType().getName(), variableDto.getValueType());
-    Assert.assertEquals(variable.getMimeType(), variableDto.getMimeType());
-    Assert.assertEquals(variable.isRepeatable(), variableDto.getIsRepeatable());
-    Assert.assertEquals(variable.getOccurrenceGroup(), variableDto.getOccurrenceGroup());
-    Assert.assertEquals(variable.getUnit(), variableDto.getUnit());
+    assertEquals(variable.getName(), variableDto.getName());
+    assertEquals(variable.getEntityType(), variableDto.getEntityType());
+    assertEquals(variable.getValueType().getName(), variableDto.getValueType());
+    assertEquals(variable.getMimeType(), variableDto.getMimeType());
+    assertEquals(variable.isRepeatable(), variableDto.getIsRepeatable());
+    assertEquals(variable.getOccurrenceGroup(), variableDto.getOccurrenceGroup());
+    assertEquals(variable.getUnit(), variableDto.getUnit());
     checkConversion(variableDto.getCategoriesList().get(0), (Category) variable.getCategories().toArray()[0]);
     checkConversion(variableDto.getAttributesList().get(0), variable.getAttributes().get(0));
   }
 
   private void checkConversion(AttributeDto attributesDto, Attribute attribute) {
-    Assert.assertEquals(attribute.getName(), attributesDto.getName());
-    Assert.assertEquals(attribute.getLocale().toString(), attributesDto.getLocale());
-    Assert.assertEquals(attribute.getValue().getValue(), attributesDto.getValue());
+    assertEquals(attribute.getName(), attributesDto.getName());
+    assertEquals(attribute.getLocale().toString(), attributesDto.getLocale());
+    assertEquals(attribute.getValue().getValue(), attributesDto.getValue());
   }
 
   private void checkConversion(CategoryDto categoryDto, Category category) {
-    Assert.assertEquals(category.getName(), categoryDto.getName());
-    Assert.assertEquals(category.isMissing(), categoryDto.getIsMissing());
+    assertEquals(category.getName(), categoryDto.getName());
+    assertEquals(category.isMissing(), categoryDto.getIsMissing());
     checkConversion(categoryDto.getAttributesList().get(0), category.getAttributes().get(0));
   }
 
@@ -119,7 +120,7 @@ public class DtosTest {
   public void testDatasourceFactoryDtoJsonFormat() {
     String json = JsonFormat.printToString(buildDatasourceFactoryDto());
     // non regression check for protobuf json format patch about nested extensions
-    Assert.assertEquals(
+    assertEquals(
         "{\"Magma.ExcelDatasourceFactoryDto.params\": {\"file\": \"/toto/tata.xlsx\"},\"Magma.JdbcDatasourceFactoryDto.params\": {\"database\": \"MyDatabase\",\"settings\": {\"defaultEntityType\": \"Participant\",\"useMetadataTables\": true}},\"Magma.HibernateDatasourceFactoryDto.params\": {}}",
         json);
   }

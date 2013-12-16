@@ -65,10 +65,8 @@ public class IdentifierAssociations implements Iterable<IdentifierAssociations.I
 
     @Nullable
     public String getUnitIdentifier(String unitName) {
-      if(!unitIdentifiers.containsKey(unitName)) {
-        return null;
-      }
-      return (String) unitIdentifiers.get(unitName).getValue();
+      Value value = unitIdentifiers.get(unitName);
+      return value == null || value.isNull() ? null : (String) value.getValue();
     }
 
     public VariableEntity getUnitEntity(String unitName) {
@@ -148,6 +146,7 @@ public class IdentifierAssociations implements Iterable<IdentifierAssociations.I
       }
     }
 
+    @SuppressWarnings("ConstantConditions")
     public void put(@NotNull String unitIdentifier, @NotNull String opalIdentifier) {
       if(unitIdentifier == null) throw new IllegalArgumentException("unitIdentifier cannot be null");
       if(opalIdentifier == null) throw new IllegalArgumentException("opalIdentifier cannot be null");

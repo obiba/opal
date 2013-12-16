@@ -178,7 +178,7 @@ public class ValueSetResourceImpl extends AbstractValueTableResource implements 
     Variable variable = vvs.getVariable();
 
     // download as a file
-    ResponseBuilder builder = TimestampedResponses.ok(getValueTable(), value.getValue())
+    ResponseBuilder builder = TimestampedResponses.ok(getValueTable(), value.isNull() ? null : value.getValue())
         .type(getVariableMimeType(variable));
     builder.header("Content-Disposition", "attachment; filename=\"" + getFileName(variable, identifier, pos) + "\"");
     return builder;

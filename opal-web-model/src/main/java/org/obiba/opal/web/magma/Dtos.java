@@ -133,7 +133,6 @@ public final class Dtos {
   public static AttributeDto.Builder asDto(Attribute from) {
     AttributeDto.Builder a = AttributeDto.newBuilder().setName(from.getName()).setValue(from.getValue().toString());
     if(from.isLocalised()) {
-      //noinspection ConstantConditions
       a.setLocale(from.getLocale().toString());
     }
     if(from.hasNamespace()) {

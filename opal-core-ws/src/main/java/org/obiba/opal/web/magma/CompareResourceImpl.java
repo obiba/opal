@@ -11,8 +11,11 @@ package org.obiba.opal.web.magma;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -282,7 +285,7 @@ public class CompareResourceImpl implements CompareResource {
   }
 
   @SuppressWarnings("SimplifiableIfStatement")
-  private boolean isModified(String compared, String with) {
+  private boolean isModified(@Nullable String compared, @Nullable String with) {
     if(compared == null && with == null) return false;
     if((compared == null || compared.isEmpty()) && (with == null || with.isEmpty())) return false;
     return !(compared != null && compared.equals(with));
@@ -337,22 +340,16 @@ public class CompareResourceImpl implements CompareResource {
 
   private boolean isModified(Value compared, Value with) {
     if(compared == null && with == null) return false;
-    String comparedStr = compared == null ? null : compared.toString();
-    String withStr = with == null ? null : with.toString();
-
+    String comparedStr = compared == null || compared.isNull() ? null : compared.toString();
+    String withStr = with == null || with.isNull() ? null : with.toString();
     return isModified(comparedStr, withStr);
   }
 
   private boolean isSameAttribute(Attribute compared, Attribute with) {
     if(!compared.getName().equals(with.getName())) return false;
-    if((compared.getLocale() == null || compared.getLocale().toString().isEmpty()) &&
-        (with.getLocale() == null || with.getLocale().toString().isEmpty())) {
-      return true;
-    }
-    if(compared.getLocale() != null) {
-      return compared.getLocale().equals(with.getLocale());
-    }
-    return with.getLocale() != null && with.getLocale().equals(compared.getLocale());
+    Locale comparedLocale = compared.isLocalised() ? compared.getLocale() : null;
+    Locale withLocale = with.isLocalised() ? with.getLocale() : null;
+    return Objects.equals(comparedLocale, withLocale);
   }
 
   private ConflictDto createConflictDto(VariableDto variableDto, String code, String... args) {

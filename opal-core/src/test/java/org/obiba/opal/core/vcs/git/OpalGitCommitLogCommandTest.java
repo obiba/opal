@@ -30,11 +30,6 @@ public class OpalGitCommitLogCommandTest {
 
   private static final TestOpalGitVersionControlSystem vcs = new TestOpalGitVersionControlSystem();
 
-  @Test(expected = OpalGitException.class)
-  public void testCreateCommandWithNullRepository() {
-    new OpalGitCommitLogCommand.Builder(null, "", COMMIT_ID).build();
-  }
-
   @Test
   public void testCommitInfoRetrievalWithValidCommitId() {
     OpalGitCommitLogCommand command = new OpalGitCommitLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME),
@@ -69,11 +64,6 @@ public class OpalGitCommitLogCommandTest {
     OpalGitCommitLogCommand command = new OpalGitCommitLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME),
         "TestView/BAD_VAR.js", COMMIT_ID).build();
     command.execute();
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testCommitInfoRetrievalWithNoPath() {
-    new OpalGitCommitLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME), null, COMMIT_ID).build().execute();
   }
 
 }
