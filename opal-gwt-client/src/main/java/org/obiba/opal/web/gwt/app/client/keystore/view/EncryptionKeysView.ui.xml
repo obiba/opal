@@ -17,22 +17,25 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <b:ControlGroup>
-      <b:Controls>
-        <b:FluidRow addStyleNames="no-bottom-margin">
-          <b:Column size="3">
-            <b:Heading size="4" ui:field="principal"></b:Heading>
-          </b:Column>
-          <b:Column size="9">
-            <b:Button type="DANGER" ui:field="deleteAll" addStyleNames="pull-right">
-              <ui:msg description="Delete All label">Delete All</ui:msg>
-            </b:Button>
-            <b:SimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
-          </b:Column>
-        </b:FluidRow>
-      </b:Controls>
-    </b:ControlGroup>
-    <o:Table ui:field="permissionsTable"/>
+    <b:FluidRow addStyleNames="no-bottom-margin">
+      <b:Column size="3">
+        <b:DropdownButton text="Add Table" type="INFO" icon="PLUS">
+          <b:NavLink icon="QUESTION_SIGN" ui:field="createKeyPair">
+            <ui:msg description="Create Key Pair label">Create Key Pair...</ui:msg>
+          </b:NavLink>
+          <b:NavLink icon="QUESTION_SIGN" ui:field="importKeyPair">
+            <ui:msg description="Import Key Pair label">Import Key Pair...</ui:msg>
+          </b:NavLink>
+          <b:NavLink icon="QUESTION_SIGN" ui:field="importCertificate">
+            <ui:msg description="Import Certificate label">Import Certificate...</ui:msg>
+          </b:NavLink>
+        </b:DropdownButton>
+      </b:Column>
+      <b:Column size="9">
+        <b:SimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
+      </b:Column>
+    </b:FluidRow>
+    <o:Table ui:field="encryptionKeysTable" addStyleNames="small-top-margin"/>
 
   </g:FlowPanel>
 

@@ -19,8 +19,9 @@ import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.obiba.opal.core.vcs.OpalGitException;
 import org.obiba.opal.core.vcs.support.OpalGitUtils;
+
+import com.google.common.base.Preconditions;
 
 /**
  * Base class for all Opal GIT commands. All subclasses are immutables and must be created by their respective builders
@@ -79,7 +80,7 @@ public abstract class OpalGitCommand<T> implements Command<T> {
     protected String datasourceName; // used mainly for debug and meaningful error messages
 
     protected Builder(@NotNull Repository repository) {
-      if(repository == null) throw new OpalGitException("Repository cannot be null.");
+      Preconditions.checkArgument(repository != null, "Repository cannot be null.");
       this.repository = repository;
     }
 

@@ -23,7 +23,7 @@ public abstract class OpalPermissionConverterTest<T> {
     Assert.assertNotNull(expected);
     Iterable<String> convertedIter = converter.convert("opal", node, perm.toString());
     Assert.assertNotNull(convertedIter);
-    System.out.println("opal:" + node + ":" + perm.toString());
+    System.out.println("opal:" + node + ":" + perm);
     for(String converted : convertedIter) {
       System.out.println("  " + converted);
     }

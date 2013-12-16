@@ -10,13 +10,10 @@
 
 package org.obiba.opal.web.gwt.app.client.keystore.presenter;
 
-import com.gwtplatform.mvp.client.UiHandlers;
+import javax.annotation.Nullable;
 
-public interface EncryptionKeysUiHandlers extends UiHandlers {
-
-  void createKeyPair();
-
-  void importKeyPair();
-
-  void importCertificatePair();
+public interface KeyPairDisplay<T> {
+  void close();
+  void clearErrors();
+  void showError(@Nullable T formField, String message);
 }

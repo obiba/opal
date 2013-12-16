@@ -71,10 +71,12 @@ import org.obiba.opal.web.gwt.app.client.magma.view.VariableVcsCommitHistoryView
 import org.obiba.opal.web.gwt.app.client.magma.view.VariableView;
 import org.obiba.opal.web.gwt.app.client.magma.view.VcsCommitHistoryModalView;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectDataExchangePresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsPresenter;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectAdministrationView;
+import org.obiba.opal.web.gwt.app.client.project.view.ProjectDataExchangeView;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectPropertiesModalView;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectView;
 import org.obiba.opal.web.gwt.app.client.project.view.ProjectsView;
@@ -159,6 +161,8 @@ public class NavigatorModule extends AbstractOpalModule {
         ProjectAdministrationView.class);
     bindPresenterWidget(ProjectPropertiesModalPresenter.class, ProjectPropertiesModalPresenter.Display.class,
         ProjectPropertiesModalView.class);
+    bindPresenterWidget(ProjectDataExchangePresenter.class, ProjectDataExchangePresenter.Display.class,
+        ProjectDataExchangeView.class);
   }
 
   private <V extends View> void bindDatasourceFormPresenter(Class<? extends PresenterWidget<V>> presenter,

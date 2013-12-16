@@ -10,13 +10,8 @@
 
 package org.obiba.opal.web.gwt.app.client.keystore.presenter;
 
-import com.gwtplatform.mvp.client.UiHandlers;
+import org.obiba.opal.web.gwt.app.client.ui.ModalUiHandlers;
 
-public interface EncryptionKeysUiHandlers extends UiHandlers {
-
-  void createKeyPair();
-
-  void importKeyPair();
-
-  void importCertificatePair();
+public interface KeyPairModalUiHandlers extends ModalUiHandlers {
+  void save();
 }

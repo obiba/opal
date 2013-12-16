@@ -563,7 +563,7 @@ public class WebShellResourceTest {
       buffer.append(" with command \"");
       buffer.append(expected.getCommand().getName());
       buffer.append(" and toString \"");
-      buffer.append(expected.getCommand().toString());
+      buffer.append(expected.getCommand());
       buffer.append("\")");
     }
   }

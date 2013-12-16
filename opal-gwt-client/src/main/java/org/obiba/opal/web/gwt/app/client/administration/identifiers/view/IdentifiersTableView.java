@@ -74,24 +74,7 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
     pager = new SimplePager();
     pager.addStyleName("pull-right bottom-margin");
     tablePanel.add(pager);
-
-    idTable = new Table<ValueSetsDto.ValueSetDto>();
-    idTable.setPageSize(20);
-    idTable.addColumn(new TextColumn<ValueSetsDto.ValueSetDto>() {
-
-      @Override
-      public String getValue(ValueSetsDto.ValueSetDto value) {
-        return value.getIdentifier();
-      }
-    }, "ID");
-    idTable.setColumnWidth(0, 1, Style.Unit.PX);
-    for(VariableDto variable : JsArrays.toIterable(variables)) {
-      idTable.addColumn(new IdentifierColumn(variable), variable.getName());
-    }
-    idTable.addStyleName("pull-left");
-    pager.setDisplay(idTable);
-    idTable.setRowCount(table.getValueSetCount());
-    idTable.setPageStart(0);
+    createAndInitializeIdTable(variables);
     tablePanel.add(idTable);
 
     for(HasData<ValueSetsDto.ValueSetDto> display : provider.getDataDisplays()) {
@@ -114,6 +97,26 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
       Range range = display.getVisibleRange();
       getUiHandlers().onIdentifiersRequest(table, "true", range.getStart(), range.getLength());
     }
+  }
+
+  private void createAndInitializeIdTable(JsArray<VariableDto> variables) {
+    idTable = new Table<ValueSetsDto.ValueSetDto>();
+    idTable.setPageSize(20);
+    idTable.addColumn(new TextColumn<ValueSetsDto.ValueSetDto>() {
+
+      @Override
+      public String getValue(ValueSetsDto.ValueSetDto value) {
+        return value.getIdentifier();
+      }
+    }, "ID");
+    idTable.setColumnWidth(0, 1, Style.Unit.PX);
+    for(VariableDto variable : JsArrays.toIterable(variables)) {
+      idTable.addColumn(new IdentifierColumn(variable), variable.getName());
+    }
+    idTable.addStyleName("pull-left");
+    pager.setDisplay(idTable);
+    idTable.setRowCount(table.getValueSetCount());
+    idTable.setPageStart(0);
   }
 
   private class IdentifierColumn extends TextColumn<ValueSetsDto.ValueSetDto> {

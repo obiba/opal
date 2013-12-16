@@ -27,7 +27,6 @@ import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFac
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
-import org.obiba.opal.web.gwt.rest.client.authorization.CascadingAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.FileDto;
@@ -215,9 +214,9 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
       authorized = false;
 
     // cannot paste in a children
-    if (authorized) {
-      for (FileDto file : filesClipboard) {
-        if (FileDtos.isFolder(file) && getCurrentFolder().getPath().startsWith(file.getPath())) {
+    if(authorized) {
+      for(FileDto file : filesClipboard) {
+        if(FileDtos.isFolder(file) && getCurrentFolder().getPath().startsWith(file.getPath())) {
           authorized = false;
           break;
         }
@@ -283,10 +282,10 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
 
           @Override
           public void onResponseCode(Request request, Response response) {
-            if(response.getStatusCode() != Response.SC_OK) {
-              getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-            } else {
+            if(response.getStatusCode() == Response.SC_OK) {
               getEventBus().fireEvent(new FileDeletedEvent(file));
+            } else {
+              getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
             }
           }
         };
@@ -333,10 +332,10 @@ public class FileExplorerPresenter extends PresenterWidget<FileExplorerPresenter
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() != Response.SC_OK) {
-          fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-        } else {
+        if(response.getStatusCode() == Response.SC_OK) {
           fireEvent(new FolderRequestEvent(getCurrentFolder()));
+        } else {
+          fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         }
         filesClipboard = null;
         currentAction = null;

@@ -12,7 +12,6 @@ package org.obiba.opal.datashield.expr;
 import java.io.StringReader;
 import java.util.Map;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
@@ -192,7 +191,7 @@ public class DataShieldExprTest {
     String test = "A %*% (B(C ~ A + (G+D)^2 : H, C * D()) * 1/F)";
     DataShieldGrammar g = new DataShieldGrammar(new StringReader(test));
     StringBuilder b = (StringBuilder) g.root().jjtAccept(visitor, new StringBuilder());
-    System.out.println(test + " --> " + b.toString());
+    System.out.println(test + " --> " + b);
 
   }
 }

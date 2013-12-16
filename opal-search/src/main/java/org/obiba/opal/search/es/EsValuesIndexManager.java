@@ -153,7 +153,6 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
         String fieldName = index.getFieldName(variable.getName());
         if(value.isSequence() && !value.isNull()) {
           List<Object> values = Lists.newArrayList();
-          //noinspection ConstantConditions
           for(Value v : value.asSequence().getValue()) {
             values.add(esValue(variable, v));
           }
@@ -199,8 +198,9 @@ public class EsValuesIndexManager extends EsIndexManager implements ValuesIndexM
               return null;
             }
         }
+        if(value.isNull()) return null;
         Object obj = value.getValue();
-        if(obj != null && value.getValueType() == DateType.get()) {
+        if(value.getValueType() == DateType.get()) {
           return obj.toString(); // ie MagmaDate.toString()
         }
         return obj;

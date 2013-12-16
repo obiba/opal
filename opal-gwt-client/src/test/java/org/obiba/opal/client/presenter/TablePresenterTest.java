@@ -65,7 +65,7 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     usersAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     Provider<ResourcePermissionsPresenter> resourcePermissionsPresenterProvider = createMock(Provider.class);
-    Provider<IndexPresenter> mockIndexProvider = createMock(Provider.class);
+    ModalProvider<IndexPresenter> mockIndexProvider = createMock(ModalProvider.class);
     ModalProvider<EntityModalPresenter> modalEntityModalPresenter = createMock(ModalProvider.class);
     ModalProvider<ValueSequencePopupPresenter> modalProviderValueSequence = createMock(ModalProvider.class);
     ModalProvider<ConfigureViewStepPresenter> modalConfigureViewStepProvider = createMock(ModalProvider.class);

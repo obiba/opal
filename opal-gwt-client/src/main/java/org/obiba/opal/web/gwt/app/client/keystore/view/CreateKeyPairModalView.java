@@ -14,7 +14,8 @@ import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.keystore.presenter.CreateKeyPairModalPresenter;
-import org.obiba.opal.web.gwt.app.client.keystore.presenter.CreateKeyPairModalUiHandlers;
+import org.obiba.opal.web.gwt.app.client.keystore.presenter.KeyPairModalUiHandlers;
+import org.obiba.opal.web.gwt.app.client.keystore.support.KeystoreType;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 
@@ -30,7 +31,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-public class CreateKeyPairModalView extends ModalPopupViewWithUiHandlers<CreateKeyPairModalUiHandlers>
+public class CreateKeyPairModalView extends ModalPopupViewWithUiHandlers<KeyPairModalUiHandlers>
 implements CreateKeyPairModalPresenter.Display {
 
   @UiField
@@ -72,6 +73,12 @@ implements CreateKeyPairModalPresenter.Display {
   @UiField
   TextBox country;
 
+  @UiField
+  TextBox name;
+
+  @UiField
+  ControlGroup nameGroup;
+
   interface Binder extends UiBinder<Widget, CreateKeyPairModalView> {}
 
   @Inject
@@ -85,26 +92,42 @@ implements CreateKeyPairModalPresenter.Display {
   public void showError(@Nullable CreateKeyPairModalPresenter.Display.FormField formField, String message) {
     ControlGroup group = null;
     if(formField != null) {
-      switch(formField) {
-        case ALGORITHM:
-          group = algorithmGroup;
-          break;
-        case SIZE:
-          group = sizeGroup;
-          break;
-        case FIRST_LAST_NAME:
-          group = firstLastNameGroup;
-          break;
-        case ORGANIZATIONAL_UNIT:
-          group = organizationalUnitGroup;
-          break;
-      }
+      group = getGroupWidgets(formField);
     }
+
     if(group == null) {
       modal.addAlert(message, AlertType.ERROR);
     } else {
       modal.addAlert(message, AlertType.ERROR, group);
     }
+  }
+
+  private ControlGroup getGroupWidgets(FormField formField) {
+    ControlGroup group = null;
+
+    switch(formField) {
+      case NAME:
+        group = nameGroup;
+        break;
+      case ALGORITHM:
+        group = algorithmGroup;
+        break;
+      case SIZE:
+        group = sizeGroup;
+        break;
+      case FIRST_LAST_NAME:
+        group = firstLastNameGroup;
+        break;
+      case ORGANIZATIONAL_UNIT:
+        group = organizationalUnitGroup;
+        break;
+    }
+    return group;
+  }
+
+  @Override
+  public HasText getName() {
+    return name;
   }
 
   @Override
@@ -148,8 +171,18 @@ implements CreateKeyPairModalPresenter.Display {
   }
 
   @Override
+  public void setType(KeystoreType type) {
+    nameGroup.setVisible(type == KeystoreType.PROJECT);
+  }
+
+  @Override
   public void close() {
     modal.hide();
+  }
+
+  @Override
+  public void clearErrors() {
+    modal.closeAlerts();
   }
 
   @UiHandler("cancelButton")

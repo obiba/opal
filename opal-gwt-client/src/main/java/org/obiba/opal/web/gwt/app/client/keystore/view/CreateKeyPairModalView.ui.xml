@@ -20,6 +20,16 @@
     <g:FlowPanel>
 
       <g:FlowPanel>
+        <b:ControlGroup ui:field="nameGroup">
+          <b:ControlLabel>
+            <ui:msg description="Name label">Name</ui:msg>
+            <o:RequiredIcon/>
+          </b:ControlLabel>
+          <b:Controls>
+            <b:TextBox ui:field="name"/>
+          </b:Controls>
+        </b:ControlGroup>
+
         <b:Paragraph>
           <ui:msg description="Create Key Pair Modal Private key">Private Key</ui:msg>
         </b:Paragraph>

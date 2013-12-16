@@ -173,7 +173,7 @@ public interface SubjectAclService extends SystemService {
 
     @Override
     public String toString() {
-      return getType().toString() + ":" + getPrincipal();
+      return getType() + ":" + getPrincipal();
     }
 
     @Override

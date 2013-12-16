@@ -13,6 +13,8 @@ package org.obiba.opal.web.gwt.app.client.keystore.presenter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
 import org.obiba.opal.web.gwt.app.client.keystore.support.KeystoreType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -25,15 +27,24 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
-public class CreateKeyPairModalPresenter extends ModalPresenterWidget<CreateKeyPairModalPresenter.Display>
+import edu.umd.cs.findbugs.annotations.Nullable;
+
+public class ImportKeyPairModalPresenter extends ModalPresenterWidget<ImportKeyPairModalPresenter.Display>
     implements KeyPairModalUiHandlers {
 
-  private SaveHandler saveHandler;
+  public enum ImportType {
+    KEY_PAIR,
+    CERTIFICATE
+  }
 
   private KeystoreType keystoreType;
 
+  private ImportType importType;
+
+  private SaveHandler saveHandler;
+
   @Inject
-  public CreateKeyPairModalPresenter(Display display, EventBus eventBus) {
+  public ImportKeyPairModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
     getView().setUiHandlers(this);
   }
@@ -41,22 +52,25 @@ public class CreateKeyPairModalPresenter extends ModalPresenterWidget<CreateKeyP
   @Override
   public void save() {
     getView().clearErrors();
+
     if(new ViewValidator().validate()) {
       if(saveHandler != null) {
-        saveHandler
-            .save(getView().getName().getText(), getView().getAlgorithm().getText(), getView().getSize().getText(),
-                getView().getFirstLastName().getText(), getView().getOrganizationalUnit().getText(),
-                getView().getOrganizationalUnit().getText(), getView().getLocality().getText(),
-                getView().getState().getText(), getView().getCountry().getText());
+        saveHandler.save(getView().getPublicKey().getText(), getView().getPrivateKey().getText(),
+            getView().getName().getText());
       }
       getView().close();
     }
   }
 
-  public void initialize(KeystoreType type, SaveHandler handler) {
+  public void initialize(KeystoreType kType, ImportType type, SaveHandler handler) {
     saveHandler = handler;
-    keystoreType = type;
-    getView().setType(type);
+    keystoreType = kType;
+    importType = type;
+    getView().setType(kType, type);
+  }
+
+  public interface SaveHandler {
+    void save(@Nonnull String publicKey, @Nullable String privateKey, @Nullable String alias);
   }
 
   private final class ViewValidator extends ViewValidationHandler {
@@ -72,14 +86,13 @@ public class CreateKeyPairModalPresenter extends ModalPresenterWidget<CreateKeyP
             Display.FormField.NAME.name()));
       }
 
-      validators.add(new RequiredTextValidator(getView().getAlgorithm(), "KeyPairAlgorithmIsRequired",
-          Display.FormField.ALGORITHM.name()));
-      validators.add(
-          new RequiredTextValidator(getView().getSize(), "KeyPairKeySizeIsRequired", Display.FormField.SIZE.name()));
-      validators.add(new RequiredTextValidator(getView().getFirstLastName(), "KeyPairFirstAndLastNameIsRequired",
-          Display.FormField.FIRST_LAST_NAME.name()));
-      validators.add(new RequiredTextValidator(getView().getOrganizationalUnit(), "KeyPairOrganizationalUnitIsRequired",
-          Display.FormField.ORGANIZATIONAL_UNIT.name()));
+      if(importType == ImportType.KEY_PAIR) {
+        validators.add(new RequiredTextValidator(getView().getPrivateKey(), "KeyPairPrivateKeyPEMIsRequired",
+            Display.FormField.PRIVATE_KEY.name()));
+      }
+
+      validators.add(new RequiredTextValidator(getView().getPublicKey(), "KeyPairPublicKeyPEMIsRequired",
+          Display.FormField.PUBLIC_KEY.name()));
       return validators;
     }
 
@@ -89,40 +102,21 @@ public class CreateKeyPairModalPresenter extends ModalPresenterWidget<CreateKeyP
     }
   }
 
-  public interface SaveHandler {
-    void save(String alias, String algorithm, String size, String firstLastName, String organization, String organizationalUnit,
-        String locality, String state, String country);
-  }
-
   public interface Display extends KeyPairDisplay<Display.FormField>, PopupView, HasUiHandlers<KeyPairModalUiHandlers> {
 
     enum FormField {
       NAME,
-      ALGORITHM,
-      SIZE,
-      FIRST_LAST_NAME,
-      ORGANIZATIONAL_UNIT
+      PUBLIC_KEY,
+      PRIVATE_KEY
     }
 
     HasText getName();
 
-    HasText getAlgorithm();
+    HasText getPublicKey();
 
-    HasText getSize();
+    HasText getPrivateKey();
 
-    HasText getFirstLastName();
-
-    HasText getOrganization();
-
-    HasText getOrganizationalUnit();
-
-    HasText getLocality();
-
-    HasText getState();
-
-    HasText getCountry();
-
-    void setType(KeystoreType type);
+    void setType(KeystoreType kType, ImportType type);
   }
-
 }
+

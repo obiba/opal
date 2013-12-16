@@ -37,6 +37,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
@@ -91,7 +92,7 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
   FlowPanel permissionsPanel;
 
   @UiField
-  FlowPanel encryptionKeysPanel;
+  SimplePanel dataExchange;
 
   private ProjectDto project;
 
@@ -225,9 +226,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     } else if(slot == ProjectPresenter.PERMISSION_PANE) {
       permissionsPanel.clear();
       permissionsPanel.add(content);
-    } else if(slot == ProjectPresenter.PERMISSION_PANE) {
-      permissionsPanel.clear();
-      permissionsPanel.add(content);
+    } else if(slot == ProjectPresenter.DATA_EXTCHANGE_PANE) {
+      dataExchange.clear();
+      dataExchange.add(content);
     } else if(slot == ProjectPresenter.ADMIN_PANE) {
       adminPanel.clear();
       adminPanel.add(content);

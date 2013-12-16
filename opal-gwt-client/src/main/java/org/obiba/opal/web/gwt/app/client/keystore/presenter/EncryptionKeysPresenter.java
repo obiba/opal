@@ -10,31 +10,196 @@
 
 package org.obiba.opal.web.gwt.app.client.keystore.presenter;
 
-import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import java.util.List;
 
+import javax.annotation.Nonnull;
+
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.keystore.presenter.commands.CreateKeyPairCommand;
+import org.obiba.opal.web.gwt.app.client.keystore.presenter.commands.ImportKeyPairCommand;
+import org.obiba.opal.web.gwt.app.client.keystore.presenter.commands.KeystoreCommand;
+import org.obiba.opal.web.gwt.app.client.keystore.support.KeystoreType;
+import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
+import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
+import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.opal.KeyDto;
+import org.obiba.opal.web.model.client.opal.KeyType;
+import org.obiba.opal.web.model.client.opal.ProjectDto;
+
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 public class EncryptionKeysPresenter extends PresenterWidget<EncryptionKeysPresenter.Display>
     implements EncryptionKeysUiHandlers {
 
   private final ModalProvider<CreateKeyPairModalPresenter> createKeyPairModalProvider;
 
+  private final ModalProvider<ImportKeyPairModalPresenter> importKeyPairModalProvider;
+
+  private ProjectDto project;
+
   @Inject
   public EncryptionKeysPresenter(Display display, EventBus eventBus,
-      ModalProvider<CreateKeyPairModalPresenter> createKeyPairModalProvider) {
+      ModalProvider<CreateKeyPairModalPresenter> createKeyPairModalProvider,
+      ModalProvider<ImportKeyPairModalPresenter> importKeyPairModalProvider) {
     super(eventBus, display);
     this.createKeyPairModalProvider = createKeyPairModalProvider.setContainer(this);
+    this.importKeyPairModalProvider = importKeyPairModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
-  public void initialize() {
+  @Override
+  protected void onBind() {
+    super.onBind();
+    getView().getActions().setActionHandler(new ActionHandler<KeyDto>() {
+
+      @Override
+      public void doAction(KeyDto keyPair, String actionName) {
+        if (Display.DOWNLOAD_CERTIFICATE_ACTION.equals(actionName)) {
+          downloadCertificate(keyPair);
+        }
+        else if (ActionsColumn.DELETE_ACTION.equals(actionName)) {
+          deleteKey(keyPair);
+        }
+      }
+    });
+  }
+
+  private void deleteKey(KeyDto keyPair) {
+    ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+      @Override
+      public void onResponseCode(Request request, Response response) {
+        retrieveKeyPairs();
+      }
+    };
+
+    UriBuilder ub = UriBuilder.create()
+        .fromPath(UriBuilders.PROJECT_KEYSTORE_ALIAS.create().build(project.getName(), keyPair.getAlias()));
+    ResourceRequestBuilderFactory.<JsArray<KeyDto>>newBuilder().forResource(ub.build()).delete()
+        .withCallback(Response.SC_OK, callbackHandler) //
+        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, callbackHandler) //
+        .withCallback(Response.SC_NOT_FOUND, callbackHandler).send();
 
   }
 
+
+  private void downloadCertificate(KeyDto keyPair) {
+    UriBuilder ub = UriBuilder.create()
+        .fromPath(UriBuilders.PROJECT_KEYSTORE_ALIAS_CERTIFICATE.create().build(project.getName(), keyPair.getAlias()));
+    getEventBus().fireEvent(new FileDownloadRequestEvent(ub.build()));
+  }
+
+  public void initialize(ProjectDto projectDto) {
+    project = projectDto;
+    retrieveKeyPairs();
+  }
+
+  private void retrieveKeyPairs() {
+    UriBuilder ub = UriBuilder.create().fromPath(UriBuilders.PROJECT_KEYSTORE.create().build(project.getName()));
+    ResourceRequestBuilderFactory.<JsArray<KeyDto>>newBuilder().forResource(ub.build()).get()
+        .withCallback(new ResourceCallback<JsArray<KeyDto>>() {
+          @Override
+          public void onResource(Response response, JsArray<KeyDto> resource) {
+            getView().setData(JsArrays.toList(resource));
+          }
+        }).send();
+
+  }
+
+  @Override
+  public void createKeyPair() {
+    createKeyPairModalProvider.get().initialize(KeystoreType.PROJECT, new CreateKeyPairModalPresenter.SaveHandler() {
+      @Override
+      public void save(String alias, String algorithm, String size, String firstLastName, String organization,
+          String organizationalUnit, String locality, String state, String country) {
+
+        KeystoreCommand command = CreateKeyPairCommand.Builder.newBuilder()
+            .setUrl(UriBuilders.PROJECT_KEYSTORE.create().build(project.getName()))//
+            .setAlias(alias)//
+            .setAlgorithm(algorithm)//
+            .setSize(size)//
+            .setFirstLastName(firstLastName)//
+            .setOrganization(organization)//
+            .setOrganizationalUnit(organizationalUnit)//
+            .setLocality(locality)//
+            .setState(state)//
+            .setCountry(country)
+            .build();
+
+        command.execute(new SuccessCallback(), new ErrorResponseCallback(getView().asWidget()));
+      }
+    });
+  }
+
+  @Override
+  public void importKeyPair() {
+    importKeyPairModalProvider.get().initialize(KeystoreType.PROJECT, ImportKeyPairModalPresenter.ImportType.KEY_PAIR,
+        new ImportKeyPairModalPresenter.SaveHandler() {
+          @Override
+          public void save(@Nonnull String publicKey, @Nullable String privateKey, @Nullable String alias) {
+            KeystoreCommand command = ImportKeyPairCommand.Builder.newBuilder()
+                .setUrl(UriBuilders.PROJECT_KEYSTORE.create().build(project.getName()))//
+                .setAlias(alias)//
+                .setPublicKey(publicKey)//
+                .setPrivateKey(privateKey)//
+                .setKeyType(KeyType.KEY_PAIR)//
+                .build();
+
+            command.execute(new SuccessCallback(), new ErrorResponseCallback(getView().asWidget()));
+          }
+        });
+  }
+
+  @Override
+  public void importCertificatePair() {
+    importKeyPairModalProvider.get().initialize(KeystoreType.PROJECT,
+        ImportKeyPairModalPresenter.ImportType.CERTIFICATE, new ImportKeyPairModalPresenter.SaveHandler() {
+      @Override
+      public void save(@Nonnull String publicKey, @Nullable String privateKey, @Nullable String alias) {
+        KeystoreCommand command = ImportKeyPairCommand.Builder.newBuilder()
+            .setUrl(UriBuilders.PROJECT_KEYSTORE.create().build(project.getName()))//
+            .setAlias(alias)//
+            .setPublicKey(publicKey)//
+            .setKeyType(KeyType.CERTIFICATE)//
+            .build();
+
+        command.execute(new SuccessCallback(), new ErrorResponseCallback(getView().asWidget()));
+      }
+    });
+  }
+
+  private final class SuccessCallback implements ResponseCodeCallback {
+
+    private SuccessCallback() {}
+
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      retrieveKeyPairs();
+    }
+  }
+
   public interface Display extends View, HasUiHandlers<EncryptionKeysUiHandlers> {
+
+    String DOWNLOAD_CERTIFICATE_ACTION = "Certificate";
+
+    HasActionHandler<KeyDto> getActions();
+
+    void setData(@Nonnull List<KeyDto> keyPairs);
   }
 }

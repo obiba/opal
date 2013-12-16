@@ -36,6 +36,7 @@ public class ValueMapPopupView extends ModalPopupViewWithUiHandlers<ModalUiHandl
     implements ValueMapPopupPresenter.Display {
 
   private static final int MINIMUM_WIDTH = 400;
+
   private static final int MINIMUM_HEIGHT = 400;
 
   interface ValueMapPopupViewUiBinder extends UiBinder<Widget, ValueMapPopupView> {}
@@ -73,17 +74,16 @@ public class ValueMapPopupView extends ModalPopupViewWithUiHandlers<ModalUiHandl
     dialog.setTitle(event.getVariable().getName() + " - " + event.getEntityIdentifier());
     panel.clear();
     ValueMap map = null;
-    
-    if (event.getVariable().getValueType().equals("point"))
+    if("point".equals(event.getVariable().getValueType())) {
       map = new PointValueMap(event.getVariable(), event.getValue(), event.getIndex());
-    else if (event.getVariable().getValueType().equals("linestring"))
+    } else if("linestring".equals(event.getVariable().getValueType())) {
       map = new LineStringValueMap(event.getVariable(), event.getValue(), event.getIndex());
-    else if (event.getVariable().getValueType().equals("polygon"))
+    } else if("polygon".equals(event.getVariable().getValueType())) {
       map = new PolygonValueMap(event.getVariable(), event.getValue(), event.getIndex());
-
-    if (map != null) {
+    }
+    if(map != null) {
       // TODO needs more refining and also a resize handler on the dialog
-      map.setHeight(String.valueOf(MINIMUM_WIDTH)+"px");
+      map.setHeight(String.valueOf(MINIMUM_WIDTH) + "px");
       map.setWidth("100%");
       panel.add(map);
     }

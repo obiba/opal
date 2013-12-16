@@ -194,8 +194,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
   }
 
   private void serializeAllViewFiles(Iterable<View> views, File localRepo, List<String> varFilesToRemove,
-      StringBuilder message)
-      throws IOException {
+      StringBuilder message) throws IOException {
     for(View view : views) {
       doWriteGitView(localRepo, view, varFilesToRemove);
       if(message.length() > 0) {
@@ -234,7 +233,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     return localRepo.listFiles(new FileFilter() {
       @Override
       public boolean accept(File pathname) {
-        return pathname.isDirectory() && !pathname.getName().equals(".git") &&
+        return pathname.isDirectory() && !".git".equals(pathname.getName()) &&
             new File(pathname, VIEW_FILE_NAME).exists();
       }
     });

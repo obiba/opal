@@ -113,7 +113,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
 
   private final ValuesTablePresenter valuesTablePresenter;
 
-  private final Provider<IndexPresenter> indexPresenter;
+  private final ModalProvider<IndexPresenter> indexPresenter;
 
   private final Translations translations;
 
@@ -133,7 +133,7 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
   @Inject
   public TablePresenter(Display display, EventBus eventBus, PlaceManager placeManager,
       ValuesTablePresenter valuesTablePresenter, Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
-      Provider<IndexPresenter> indexPresenter, ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
+      ModalProvider<IndexPresenter> indexPresenter, ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
       ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider,
       ModalProvider<ViewPropertiesModalPresenter> viewPropertiesModalProvider,
       ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalProvider,
@@ -143,8 +143,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
     this.resourcePermissionsProvider = resourcePermissionsProvider;
-    this.indexPresenter = indexPresenter;
     this.translations = translations;
+    this.indexPresenter = indexPresenter.setContainer(this);
     this.variablesToViewProvider = variablesToViewProvider.setContainer(this);
     this.variablePropertiesModalProvider = variablePropertiesModalProvider.setContainer(this);
     this.tablePropertiesModalProvider = tablePropertiesModalProvider.setContainer(this);
@@ -548,7 +548,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     dialog.setUpdateMethodCallbackRefreshIndices(false);
     dialog.setUpdateMethodCallbackRefreshTable(true);
     dialog.updateSchedules(objects);
-    addToPopupSlot(dialog);
   }
 
   private final class ValuesCommand implements Command {

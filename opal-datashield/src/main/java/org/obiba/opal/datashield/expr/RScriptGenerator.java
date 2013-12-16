@@ -59,7 +59,7 @@ public class RScriptGenerator implements DataShieldGrammarVisitor {
   @Override
   public Object visit(ASTsubsetCall node, Object data) {
     StringBuilder sb = (StringBuilder) data;
-    sb.append(node.value.toString()).append("[ ");
+    sb.append(node.value).append("[ ");
     for(int i = 0; i < node.jjtGetNumChildren(); i++) {
       Node child = node.jjtGetChild(i);
       if(i > 0) sb.append(',');

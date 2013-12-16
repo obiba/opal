@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.app.client.report.presenter;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -34,12 +33,10 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.Authorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.opal.AclAction;
 import org.obiba.opal.web.model.client.opal.ReportDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.http.client.Request;
@@ -132,10 +129,11 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
   private void authorize() {
     // display reports
     String uri;
-    if (reportTemplate.hasProject()) {
-      uri= UriBuilder.create().segment("files", "meta", "reports", reportTemplate.getProject(), reportTemplate.getName()).build();
+    if(reportTemplate.hasProject()) {
+      uri = UriBuilder.create()
+          .segment("files", "meta", "reports", reportTemplate.getProject(), reportTemplate.getName()).build();
     } else {
-      uri= UriBuilder.create().segment("files", "meta", "reports", reportTemplate.getName()).build();
+      uri = UriBuilder.create().segment("files", "meta", "reports", reportTemplate.getName()).build();
     }
 
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(uri).get()
@@ -188,10 +186,10 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
       @Override
       public void onResponseCode(Request request, Response response) {
-        if(response.getStatusCode() != Response.SC_OK) {
-          getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
-        } else {
+        if(response.getStatusCode() == Response.SC_OK) {
           refreshProducedReports(reportTemplate);
+        } else {
+          getEventBus().fireEvent(NotificationEvent.newBuilder().error(response.getText()).build());
         }
       }
     };
@@ -204,18 +202,19 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
   private void refreshProducedReports(ReportTemplateDto reportTemplate) {
     String uri = UriBuilder.create().segment("report-template", reportTemplate.getName(), "reports").build();
-    if (reportTemplate.hasProject()) {
-      uri = UriBuilders.PROJECT_REPORT_TEMPLATE_REPORTS.create().build(reportTemplate.getProject(), reportTemplate.getName());
+    if(reportTemplate.hasProject()) {
+      uri = UriBuilders.PROJECT_REPORT_TEMPLATE_REPORTS.create()
+          .build(reportTemplate.getProject(), reportTemplate.getName());
     }
     ResourceRequestBuilderFactory.<JsArray<ReportDto>>newBuilder().forResource(uri).get()
-        .withCallback(new ProducedReportsResourceCallback()).withCallback(Response.SC_NOT_FOUND, new NoProducedReportsResourceCallback())
-        .send();
+        .withCallback(new ProducedReportsResourceCallback())
+        .withCallback(Response.SC_NOT_FOUND, new NoProducedReportsResourceCallback()).send();
   }
 
   private void refreshReportTemplateDetails(ReportTemplateDto reportTemplate) {
     String reportTemplateName = reportTemplate.getName();
     String uri = UriBuilder.create().segment("report-template", reportTemplateName).build();
-    if (reportTemplate.hasProject()) {
+    if(reportTemplate.hasProject()) {
       uri = UriBuilders.PROJECT_REPORT_TEMPLATE.create().build(reportTemplate.getProject(), reportTemplateName);
     }
 
@@ -314,7 +313,7 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
 
     @Override
     public void authorized() {
-      if (reportTemplate.hasProject()) {
+      if(reportTemplate.hasProject()) {
         getView().setVisiblePermissionsPanel(true);
         ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
         resourcePermissionsPresenter.initialize(ResourcePermissionType.REPORT_TEMPLATE, ResourcePermissionRequestPaths

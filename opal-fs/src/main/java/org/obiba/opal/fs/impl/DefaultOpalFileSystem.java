@@ -50,7 +50,7 @@ public class DefaultOpalFileSystem implements OpalFileSystem {
         log.info("Opal File System does not exist. Trying to create it.");
         vfsRoot.createFolder();
       }
-      nativeRootURL = vfsRoot.getURL().toString() + "/";
+      nativeRootURL = vfsRoot.getURL() + "/";
 
       if(!vfsRoot.isReadable()) {
         log.error("Opal File System is not readable.  Please check your Opal File System configuration.");

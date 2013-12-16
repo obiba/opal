@@ -80,13 +80,13 @@ public class DatasourceSelectorView extends ViewImpl implements DatasourceSelect
   @Override
   public String getSelection() {
     int selectedIndex = datasourceListBox.getSelectedIndex();
-    return selectedIndex != -1 ? datasourceListBox.getValue(selectedIndex) : null;
+    return selectedIndex == -1 ? null : datasourceListBox.getValue(selectedIndex);
   }
 
   @Override
   public DatasourceDto getSelectionDto() {
     int selectedIndex = datasourceListBox.getSelectedIndex();
-    return selectedIndex != -1 ? datasources.get(selectedIndex) : null;
+    return selectedIndex == -1 ? null : datasources.get(selectedIndex);
   }
 
   @Override
