@@ -17,7 +17,7 @@ import com.gwtplatform.dispatch.annotation.GenEvent;
 import com.gwtplatform.dispatch.annotation.Optional;
 
 @GenEvent
-public class IdentifiersTableCreated {
+public class IdentifiersTableSelection {
 
   @Optional
   TableDto dto;

@@ -91,6 +91,11 @@ public class IdentifiersAdministrationView extends ViewWithUiHandlers<Identifier
     getUiHandlers().onDeleteIdentifiersTable();
   }
 
+  @UiHandler("importSystemId")
+  void onImportSystemIdentifiers(ClickEvent event) {
+    getUiHandlers().onImportSystemIdentifiers();
+  }
+
   private class TableSelectionHandler implements ClickHandler {
 
     private final int i;

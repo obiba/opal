@@ -483,6 +483,7 @@ public interface Translations extends Constants {
       "CannotFindDatabase", "Cannot find database named {0}",//
       "NameIsRequired", "A name is required.",//
       "EntityTypeIsRequired", "An entity type is required.",//
+      "IdentifiersAreRequired", "Some identifiers are required.",//
       "DriverIsRequired", "A driver is required.",//
       "DefaultEntityTypeIsRequired", "Default Entity Type is required for Custom SQL schema.",//
       "DatabaseUsageIsRequired", "Database usage is required.",//
@@ -1063,6 +1064,10 @@ public interface Translations extends Constants {
   @Description("Add Identifiers Table title")
   @DefaultStringValue("Add Identifiers Table")
   String addIdentifiersTableTitle();
+
+  @Description("Import System Identifiers title")
+  @DefaultStringValue("Import System Identifiers")
+  String importSystemIdentifiersTitle();
 
   @Description("Identifiers Tables title")
   @DefaultStringValue("Identifiers Tables")

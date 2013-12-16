@@ -1,18 +1,15 @@
 package org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter;
 
-import org.obiba.opal.web.gwt.app.client.administration.identifiers.event.IdentifiersTableCreated;
-import org.obiba.opal.web.gwt.app.client.administration.identifiers.event.IdentifiersTableCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.event.IdentifiersTableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.table.presenter.TablePropertiesModalPresenter;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
 import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -21,14 +18,12 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.View;
@@ -52,6 +47,8 @@ public class IdentifiersAdministrationPresenter extends
 
   private final ModalProvider<IdentifiersTableModalPresenter> identifiersTableModalProvider;
 
+  private final ModalProvider<ImportSystemIdentifiersModalPresenter> importSystemIdentifiersModalProvider;
+
   private TableDto selectedTable;
 
   private Runnable removeConfirmation;
@@ -60,12 +57,15 @@ public class IdentifiersAdministrationPresenter extends
   public IdentifiersAdministrationPresenter(EventBus eventBus, Display display, Proxy proxy,
       IdentifiersTablePresenter identifiersTablePresenter,
       ModalProvider<IdentifiersTableModalPresenter> identifiersTableModalProvider,
+      ModalProvider<ImportSystemIdentifiersModalPresenter> importSystemIdentifiersModalProvider,
       DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
     this.identifiersTablePresenter = identifiersTablePresenter;
     this.breadcrumbsHelper = breadcrumbsHelper;
     this.identifiersTableModalProvider = identifiersTableModalProvider;
+    this.importSystemIdentifiersModalProvider = importSystemIdentifiersModalProvider;
     this.identifiersTableModalProvider.setContainer(this);
+    this.importSystemIdentifiersModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -77,7 +77,7 @@ public class IdentifiersAdministrationPresenter extends
   @Override
   public void authorize(HasAuthorization authorizer) {
     // test access to the identifiers tables
-    String uri = UriBuilder.create().segment("identifiers", "tables").build();
+    String uri = UriBuilders.IDENTIFIERS_TABLES.create().build();
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(uri).get().authorize(authorizer).send();
   }
 
@@ -97,12 +97,13 @@ public class IdentifiersAdministrationPresenter extends
     super.onBind();
     setInSlot("Table", identifiersTablePresenter);
     addRegisteredHandler(ConfirmationEvent.getType(), new RemoveConfirmationEventHandler());
-    addRegisteredHandler(IdentifiersTableCreatedEvent.getType(), new IdentifiersTableCreatedEvent.IdentifiersTableCreatedHandler() {
-      @Override
-      public void onIdentifiersTableCreated(IdentifiersTableCreatedEvent event) {
-        refreshAndSelect(event.getDto().getEntityType());
-      }
-    });
+    addRegisteredHandler(IdentifiersTableSelectionEvent.getType(),
+        new IdentifiersTableSelectionEvent.IdentifiersTableSelectionHandler() {
+          @Override
+          public void onIdentifiersTableSelection(IdentifiersTableSelectionEvent event) {
+            refreshAndSelect(event.getDto().getEntityType());
+          }
+        });
   }
 
   @Override
@@ -130,6 +131,14 @@ public class IdentifiersAdministrationPresenter extends
         .createWithKeys(removeConfirmation, "removeIdentifiersTable", "confirmRemoveIdentifiersTable");
 
     fireEvent(event);
+  }
+
+  @Override
+  public void onImportSystemIdentifiers() {
+    if(selectedTable != null) {
+      ImportSystemIdentifiersModalPresenter p = importSystemIdentifiersModalProvider.get();
+      p.initialize(selectedTable);
+    }
   }
 
   //

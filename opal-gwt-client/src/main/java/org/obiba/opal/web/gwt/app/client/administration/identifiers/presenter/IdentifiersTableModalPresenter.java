@@ -14,7 +14,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.administration.identifiers.event.IdentifiersTableCreatedEvent;
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.event.IdentifiersTableSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
@@ -71,7 +71,7 @@ public class IdentifiersTableModalPresenter extends ModalPresenterWidget<Identif
             for(TableDto table : JsArrays.toList(resource)) {
               if(table.getEntityType().toLowerCase().equals(newTable.getEntityType().toLowerCase())) {
                 // identifiers table for this entity type already exists
-                getView().showError(translations.tableNameAlreadyExists(), Display.FormField.NAME);
+                getView().showError(translations.tableNameAlreadyExists(), Display.FormField.ENTITY_TYPE);
                 return;
               }
             }
@@ -100,7 +100,7 @@ public class IdentifiersTableModalPresenter extends ModalPresenterWidget<Identif
   public interface Display extends PopupView, HasUiHandlers<IdentifiersTableModalUiHandlers> {
 
     enum FormField {
-      NAME, ENTITY_TYPE
+      ENTITY_TYPE
     }
 
     void showError(String message, @Nullable FormField id);
@@ -127,7 +127,7 @@ public class IdentifiersTableModalPresenter extends ModalPresenterWidget<Identif
     }
 
     private void onSuccess() {
-      fireEvent(new IdentifiersTableCreatedEvent.Builder().dto(table).build());
+      fireEvent(new IdentifiersTableSelectionEvent.Builder().dto(table).build());
     }
   }
 
