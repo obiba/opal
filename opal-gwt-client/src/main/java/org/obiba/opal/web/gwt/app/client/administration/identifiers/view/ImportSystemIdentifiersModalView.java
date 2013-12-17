@@ -94,6 +94,21 @@ public class ImportSystemIdentifiersModalView extends ModalPopupViewWithUiHandle
   }
 
   @Override
+  public void setBusy(boolean busy) {
+    if(busy) {
+      dialog.setBusy(busy);
+      dialog.setCloseVisible(false);
+      saveButton.setEnabled(false);
+      closeButton.setEnabled(false);
+    } else {
+      dialog.setBusy(busy);
+      dialog.setCloseVisible(true);
+      saveButton.setEnabled(true);
+      closeButton.setEnabled(true);
+    }
+  }
+
+  @Override
   public HasText getIdentifiers() {
     return identifiers;
   }

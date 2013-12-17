@@ -59,6 +59,7 @@ public class ImportSystemIdentifiersModalPresenter
   public void onSubmit(String identifiers) {
     if(!validationHandler.validate()) return;
 
+    getView().setBusy(true);
     String uri = UriBuilder.create().segment("identifiers", "mappings", "entities", "_import")
         .query("type", table.getEntityType()).build();
     ResourceRequestBuilderFactory.newBuilder().forResource(uri) //
@@ -67,6 +68,7 @@ public class ImportSystemIdentifiersModalPresenter
         .withCallback(new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
+            getView().setBusy(false);
             if(response.getStatusCode() == Response.SC_OK) {
               getView().hide();
               fireEvent(new IdentifiersTableSelectionEvent.Builder().dto(table).build());
@@ -82,6 +84,8 @@ public class ImportSystemIdentifiersModalPresenter
     enum FormField {
       IDENTIFIERS
     }
+
+    void setBusy(boolean busy);
 
     void showError(String message, @Nullable FormField id);
 

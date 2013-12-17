@@ -87,7 +87,7 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
   public void setVariables(JsArray<VariableDto> variables) {
     tablePanel.clear();
 
-    pager = new SimplePager();
+    pager = new SimplePager(SimplePager.TextLocation.RIGHT);
     pager.addStyleName("pull-right bottom-margin");
     tablePanel.add(pager);
     createAndInitializeIdTable(variables);
