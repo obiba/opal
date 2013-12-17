@@ -19,14 +19,14 @@
   <g:FlowPanel>
     <b:FluidRow addStyleNames="no-bottom-margin">
       <b:Column size="3">
-        <b:DropdownButton text="Add Table" type="INFO" icon="PLUS">
-          <b:NavLink icon="QUESTION_SIGN" ui:field="createKeyPair">
+        <b:DropdownButton ui:field="addDropdown" text="Add" type="INFO" icon="PLUS">
+          <b:NavLink ui:field="createKeyPair">
             <ui:msg description="Create Key Pair label">Create Key Pair...</ui:msg>
           </b:NavLink>
-          <b:NavLink icon="QUESTION_SIGN" ui:field="importKeyPair">
+          <b:NavLink ui:field="importKeyPair">
             <ui:msg description="Import Key Pair label">Import Key Pair...</ui:msg>
           </b:NavLink>
-          <b:NavLink icon="QUESTION_SIGN" ui:field="importCertificate">
+          <b:NavLink ui:field="importCertificate">
             <ui:msg description="Import Certificate label">Import Certificate...</ui:msg>
           </b:NavLink>
         </b:DropdownButton>

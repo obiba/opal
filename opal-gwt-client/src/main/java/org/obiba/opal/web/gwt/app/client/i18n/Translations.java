@@ -435,6 +435,7 @@ public interface Translations extends Constants {
       "KeyPairAliasIsRequired", "Name is required",//
       "KeyPairAlgorithmIsRequired", "Algorithm is required.",//
       "KeyPairKeySizeIsRequired", "Size is required.",//
+      "KeyPairKeySizeNumeric", "Size must be a valid integer.",//
       "KeyPairPrivateKeyPEMIsRequired", "Private Key in PEM format is required.", //
       "KeyPairFirstAndLastNameIsRequired", "First and Last Name is required.",//
       "KeyPairOrganizationalUnitIsRequired", "Organizational Unit is required.",//
@@ -560,7 +561,8 @@ public interface Translations extends Constants {
       "DuplicateAclSubjectUser", "User '{0}' already exists, please choose a unique name.",//
       "DuplicateAclSubjectGroup", "Group '{0}' already exists, please choose a unique name.",//
       "InvalidCertificate", "Invalid certificate. Please Make sure to provide valid certificate keys.",//
-      "InvalidKeypair", "Failed to create key pair. Please make sure the algorithm name and its size are valid."//
+      "InvalidKeypair", "Failed to create key pair. Please make sure to provide a valid algorithm name and size.",
+      "KeyEntryAlreadyExists", "A key with the same name exists, please choose a unique name."//
   })
   Map<String, String> userMessageMap();
 
@@ -1078,6 +1080,10 @@ public interface Translations extends Constants {
   @Description("Add Table label")
   @DefaultStringValue("Add table...")
   String addTableLabel();
+
+  @Description("Add Key Pair label")
+  @DefaultStringValue("Add")
+  String addKeyPairLabel();
 
   @Description("Add Table no storage label")
   @DefaultStringValue("Add table (no storage)")

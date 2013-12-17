@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.model.client.opal.KeyDto;
 
 import com.github.gwtbootstrap.client.ui.CellTable;
+import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -44,6 +45,9 @@ public class EncryptionKeysView extends ViewWithUiHandlers<EncryptionKeysUiHandl
   @UiField
   CellTable<KeyDto> encryptionKeysTable;
 
+  @UiField
+  DropdownButton addDropdown;
+
   interface Binder extends UiBinder<Widget, EncryptionKeysView> {}
 
   private final Translations translations;
@@ -55,6 +59,7 @@ public class EncryptionKeysView extends ViewWithUiHandlers<EncryptionKeysUiHandl
   public EncryptionKeysView(Binder uiBinder, Translations translations) {
     initWidget(uiBinder.createAndBindUi(this));
     this.translations = translations;
+    addDropdown.setText(translations.addKeyPairLabel());
     initializeTable();
   }
 

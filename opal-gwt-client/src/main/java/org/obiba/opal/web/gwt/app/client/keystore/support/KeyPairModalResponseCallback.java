@@ -30,7 +30,6 @@ import static com.google.gwt.http.client.Response.SC_OK;
  * Created by rhaeri on 16/12/13.
 */
 public class KeyPairModalResponseCallback<T> implements ResponseCodeCallback {
-  private final String defaultMessage;
 
   private final KeyPairModalSavedHandler savedHandler;
 
@@ -38,9 +37,7 @@ public class KeyPairModalResponseCallback<T> implements ResponseCodeCallback {
 
   private static final Translations translations = GWT.create(Translations.class);
 
-  public KeyPairModalResponseCallback(@Nonnull KeyPairDisplay<T> display, @Nonnull KeyPairModalSavedHandler handler,
-      @Nonnull String message) {
-    defaultMessage = message;
+  public KeyPairModalResponseCallback(@Nonnull KeyPairDisplay<T> display, @Nonnull KeyPairModalSavedHandler handler) {
     keypairDisplay = display;
     savedHandler = handler;
   }
@@ -52,8 +49,8 @@ public class KeyPairModalResponseCallback<T> implements ResponseCodeCallback {
       if(savedHandler != null) savedHandler.saved();
       keypairDisplay.close();
     } else {
-      String msg = ClientErrorDtos.getStatus(response.getText());
-      keypairDisplay.showError(null, TranslationsUtils.replaceArguments(translations.userMessageMap().get(msg)));
+      keypairDisplay.showError(null, TranslationsUtils
+          .replaceArguments(translations.userMessageMap().get(ClientErrorDtos.getStatus(response.getText()))));
     }
   }
 }

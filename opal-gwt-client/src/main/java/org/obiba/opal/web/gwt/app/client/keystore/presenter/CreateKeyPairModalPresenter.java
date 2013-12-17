@@ -15,13 +15,13 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.keystore.presenter.commands.CreateKeyPairCommand;
 import org.obiba.opal.web.gwt.app.client.keystore.presenter.commands.KeystoreCommand;
 import org.obiba.opal.web.gwt.app.client.keystore.support.KeyPairModalResponseCallback;
 import org.obiba.opal.web.gwt.app.client.keystore.support.KeystoreType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RegExValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
@@ -36,7 +36,7 @@ import com.gwtplatform.mvp.client.PopupView;
 public class CreateKeyPairModalPresenter extends ModalPresenterWidget<CreateKeyPairModalPresenter.Display>
     implements KeyPairModalUiHandlers {
 
-  private final Translations translations;
+  private static final String DEFAULT_ALIAS = "https";
 
   private KeystoreType keystoreType;
 
@@ -47,9 +47,8 @@ public class CreateKeyPairModalPresenter extends ModalPresenterWidget<CreateKeyP
   private String requestUrl;
 
   @Inject
-  public CreateKeyPairModalPresenter(Display display, EventBus eventBus, Translations translations) {
+  public CreateKeyPairModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
-    this.translations = translations;
     getView().setUiHandlers(this);
   }
 
@@ -57,8 +56,9 @@ public class CreateKeyPairModalPresenter extends ModalPresenterWidget<CreateKeyP
   public void save() {
     getView().clearErrors();
     if(new ViewValidator().validate()) {
+      String alias = keystoreType == KeystoreType.PROJECT ? getView().getName().getText() : DEFAULT_ALIAS;
       KeystoreCommand command = CreateKeyPairCommand.Builder.newBuilder().setUrl(requestUrl)//
-          .setAlias(getView().getName().getText())//
+          .setAlias(alias)//
           .setAlgorithm(getView().getAlgorithm().getText())//
           .setSize(getView().getSize().getText())//
           .setFirstLastName(getView().getFirstLastName().getText())//
@@ -69,8 +69,7 @@ public class CreateKeyPairModalPresenter extends ModalPresenterWidget<CreateKeyP
           .setCountry(getView().getCountry().getText())//
           .setUpdate(updateKeyPair).build();
 
-      KeyPairModalResponseCallback callback = new KeyPairModalResponseCallback(getView(), savedHandler,
-          "InvalidCertificate");
+      KeyPairModalResponseCallback callback = new KeyPairModalResponseCallback(getView(), savedHandler);
       command.execute(callback, callback);
     }
   }
@@ -107,6 +106,8 @@ public class CreateKeyPairModalPresenter extends ModalPresenterWidget<CreateKeyP
           Display.FormField.ALGORITHM.name()));
       validators.add(
           new RequiredTextValidator(getView().getSize(), "KeyPairKeySizeIsRequired", Display.FormField.SIZE.name()));
+      validators.add(
+          new RegExValidator(getView().getSize(), "^\\d+$", "KeyPairKeySizeNumeric", Display.FormField.SIZE.name()));
       return validators;
     }
 

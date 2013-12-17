@@ -309,7 +309,9 @@ public class OpalKeyStore implements KeyProvider {
       X509Certificate cert = makeCertificate(algorithm, certificateInfo, keyPair);
       CacheablePasswordCallback passwordCallback = createPasswordCallback(getPasswordFor(name));
       store.setKeyEntry(alias, keyPair.getPrivate(), getKeyPassword(passwordCallback), new X509Certificate[] { cert });
-    } catch(GeneralSecurityException | IOException | UnsupportedCallbackException e) {
+    } catch(GeneralSecurityException e) {
+      throw new GeneralSecurityRuntimeException(e);
+    } catch(IOException | UnsupportedCallbackException e) {
       throw new RuntimeException(e);
     }
   }

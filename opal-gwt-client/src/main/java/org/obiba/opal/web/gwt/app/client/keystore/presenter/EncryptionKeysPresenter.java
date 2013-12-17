@@ -39,6 +39,7 @@ import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.URL;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -106,7 +107,7 @@ public class EncryptionKeysPresenter extends PresenterWidget<EncryptionKeysPrese
   private void downloadCertificate(KeyDto keyPair) {
     UriBuilder ub = UriBuilder.create()
         .fromPath(UriBuilders.PROJECT_KEYSTORE_ALIAS_CERTIFICATE.create().build(project.getName(), keyPair.getAlias()));
-    getEventBus().fireEvent(new FileDownloadRequestEvent(ub.build()));
+    getEventBus().fireEvent(new FileDownloadRequestEvent(URL.decodeQueryString(ub.build())));
   }
 
   public void initialize(ProjectDto projectDto) {

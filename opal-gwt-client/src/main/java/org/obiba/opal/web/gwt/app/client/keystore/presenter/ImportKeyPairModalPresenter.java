@@ -13,7 +13,6 @@ package org.obiba.opal.web.gwt.app.client.keystore.presenter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.keystore.presenter.commands.ImportKeyPairCommand;
 import org.obiba.opal.web.gwt.app.client.keystore.presenter.commands.KeystoreCommand;
 import org.obiba.opal.web.gwt.app.client.keystore.support.KeyPairModalResponseCallback;
@@ -37,8 +36,6 @@ public class ImportKeyPairModalPresenter extends ModalPresenterWidget<ImportKeyP
 
   private static final String DEFAULT_ALIAS = "https";
 
-  private final Translations translations;
-
   private boolean updateKeyPair = false;
 
   public enum ImportType {
@@ -55,9 +52,8 @@ public class ImportKeyPairModalPresenter extends ModalPresenterWidget<ImportKeyP
   private String requestUrl;
 
   @Inject
-  public ImportKeyPairModalPresenter(Display display, EventBus eventBus, Translations translations) {
+  public ImportKeyPairModalPresenter(Display display, EventBus eventBus) {
     super(eventBus, display);
-    this.translations = translations;
     getView().setUiHandlers(this);
   }
 
@@ -67,8 +63,7 @@ public class ImportKeyPairModalPresenter extends ModalPresenterWidget<ImportKeyP
 
     if(new ViewValidator().validate()) {
       KeystoreCommand command = createCommand();
-      KeyPairModalResponseCallback callback = new KeyPairModalResponseCallback(getView(), savedHandler,
-          "InvalidCertificate");
+      KeyPairModalResponseCallback callback = new KeyPairModalResponseCallback(getView(), savedHandler);
       command.execute(callback, callback);
     }
   }
