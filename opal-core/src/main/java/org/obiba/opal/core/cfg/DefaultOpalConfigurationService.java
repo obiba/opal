@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.core.cfg;
 
-import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.locks.Condition;
@@ -20,12 +18,14 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.js.GlobalMethodProvider;
 import org.obiba.magma.js.MagmaContextFactory;
 import org.obiba.magma.js.MagmaJsExtension;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.core.magma.js.OpalGlobalMethodProvider;
+import org.obiba.opal.core.service.security.CryptoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +33,8 @@ import com.google.common.base.Strings;
 
 @Component
 public class DefaultOpalConfigurationService implements OpalConfigurationService {
+
+  private static final int DATABASE_PASSWORD_LENGTH = 15;
 
   private OpalConfigurationIo opalConfigIo;
 
@@ -42,9 +44,16 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
 
   private OpalConfiguration opalConfiguration;
 
+  private CryptoService cryptoService;
+
   @Autowired
   public void setOpalConfigIo(OpalConfigurationIo opalConfigIo) {
     this.opalConfigIo = opalConfigIo;
+  }
+
+  @Autowired
+  public void setCryptoService(CryptoService cryptoService) {
+    this.cryptoService = cryptoService;
   }
 
   @Override
@@ -52,6 +61,7 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
   public void start() {
     configureMagma();
     readOpalConfiguration();
+    configureSecretKey();
     configureDatabasePassword();
   }
 
@@ -69,13 +79,24 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
     new MagmaEngine().extend(new MagmaXStreamExtension()).extend(jsExtension);
   }
 
+  private void configureSecretKey() {
+    if(Strings.isNullOrEmpty(opalConfiguration.getSecretKey())) {
+      modifyConfiguration(new ConfigModificationTask() {
+        @Override
+        public void doWithConfig(OpalConfiguration config) {
+          config.setSecretKey(cryptoService.generateSecretKey());
+        }
+      });
+    }
+  }
+
   private void configureDatabasePassword() {
     if(Strings.isNullOrEmpty(opalConfiguration.getDatabasePassword())) {
       modifyConfiguration(new ConfigModificationTask() {
         @Override
-        @SuppressWarnings("MagicNumber")
         public void doWithConfig(OpalConfiguration config) {
-          config.setDatabasePassword(new BigInteger(130, new SecureRandom()).toString(32));
+          String password = new SecureRandomNumberGenerator().nextBytes(DATABASE_PASSWORD_LENGTH).toString();
+          config.setDatabasePassword(cryptoService.encrypt(password));
         }
       });
     }

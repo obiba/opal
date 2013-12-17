@@ -1,13 +1,12 @@
 <org.obiba.opal.core.cfg.OpalConfiguration>
 
-  <secretKey>this will be generated during install</secretKey>
+  <secretKey/>
 
   <databasePassword/>
 
   <fileSystemRoot>file://${OPAL_HOME}/fs</fileSystemRoot>
 
-  <functionalUnits>
-  </functionalUnits>
+  <functionalUnits/>
 
   <magmaEngineFactory>
 

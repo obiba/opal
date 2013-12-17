@@ -3,6 +3,7 @@ package org.obiba.opal.core.cfg;
 import javax.sql.DataSource;
 
 import org.obiba.opal.core.runtime.jdbc.DataSourceFactoryBean;
+import org.obiba.opal.core.service.security.CryptoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +17,9 @@ public class QuartzDataSourceFactoryBean extends DataSourceFactoryBean {
   @Autowired
   private OpalConfigurationService opalConfigurationService;
 
+  @Autowired
+  private CryptoService cryptoService;
+
   public QuartzDataSourceFactoryBean() {
     setDriverClass("org.hsqldb.jdbcDriver");
     setUrl("jdbc:hsqldb:file:" + DB_PATH + ";shutdown=true;hsqldb.tx=mvcc");
@@ -25,7 +29,7 @@ public class QuartzDataSourceFactoryBean extends DataSourceFactoryBean {
   @Override
   public DataSource getObject() {
     if(password == null) {
-      setPassword(opalConfigurationService.getOpalConfiguration().getDatabasePassword());
+      setPassword(cryptoService.decrypt(opalConfigurationService.getOpalConfiguration().getDatabasePassword()));
     }
     return super.getObject();
   }

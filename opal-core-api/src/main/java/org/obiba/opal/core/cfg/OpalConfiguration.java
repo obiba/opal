@@ -31,6 +31,9 @@ public class OpalConfiguration {
 
   private String secretKey;
 
+  /**
+   * Encrypted password
+   */
   private String databasePassword;
 
   private String fileSystemRoot;
@@ -151,10 +154,16 @@ public class OpalConfiguration {
     this.migratedToOpal2 = migratedToOpal2;
   }
 
+  /**
+   * @return encrypted password
+   */
   public String getDatabasePassword() {
     return databasePassword;
   }
 
+  /**
+   * @param databasePassword encrypted password
+   */
   public void setDatabasePassword(String databasePassword) {
     this.databasePassword = databasePassword;
   }

@@ -58,8 +58,6 @@
             </bean>
           </property>
         </bean>
-        <bean class="org.obiba.opal.core.install.CreateOpalSecretKeyInstallStep"/>
-        <!--<bean class="org.obiba.opal.core.install.CreateDatabasePasswordStep"/>-->
         <bean class="org.obiba.opal.core.install.CreateOpalGeneralConfigInstallStep"/>
       </list>
     </property>
