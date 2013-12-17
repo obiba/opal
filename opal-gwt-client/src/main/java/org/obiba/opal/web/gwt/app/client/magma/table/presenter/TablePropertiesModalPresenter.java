@@ -15,7 +15,6 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
@@ -28,9 +27,7 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.DatasourceDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
-import org.obiba.opal.web.model.client.magma.VariableDto;
 
-import com.google.common.base.Strings;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -91,7 +88,7 @@ public class TablePropertiesModalPresenter extends ModalPresenterWidget<TablePro
   public void onSave(String name, String entityType) {
     if(!validationHandler.validate()) return;
 
-    final TableDto newTable = getTableDto(name, entityType);
+    TableDto newTable = getTableDto(name, entityType);
 
     if(table == null) {
       onCreate(newTable);
@@ -100,7 +97,7 @@ public class TablePropertiesModalPresenter extends ModalPresenterWidget<TablePro
     }
   }
 
-  private void onUpdate(final TableDto updatedTable) {
+  private void onUpdate(TableDto updatedTable) {
     UriBuilder uriBuilder = UriBuilders.DATASOURCE_TABLE.create();
 
     ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build(datasource, table.getName())) //
@@ -169,13 +166,13 @@ public class TablePropertiesModalPresenter extends ModalPresenterWidget<TablePro
 
     @Override
     protected void onSuccess() {
-      placeManager.revealPlace(ProjectPlacesHelper.getDatasourcePlace(datasource));
+      placeManager.revealPlace(ProjectPlacesHelper.getTablePlace(datasource, updatedTable.getName()));
     }
   }
 
   private class TableUpdateCallback implements ResponseCodeCallback {
 
-    private final TableDto updatedTable;
+    protected final TableDto updatedTable;
 
     private TableUpdateCallback(TableDto tableDto) {
       updatedTable = tableDto;

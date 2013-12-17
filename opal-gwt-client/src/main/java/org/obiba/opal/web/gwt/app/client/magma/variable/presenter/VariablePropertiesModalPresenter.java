@@ -214,7 +214,7 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
 
   private class VariableUpdateCallback implements ResponseCodeCallback {
 
-    private final VariableDto updatedVariable;
+    protected final VariableDto updatedVariable;
 
     private VariableUpdateCallback(VariableDto updatedVariable) {
       this.updatedVariable = updatedVariable;
@@ -245,7 +245,7 @@ public class VariablePropertiesModalPresenter extends ModalPresenterWidget<Varia
     @Override
     protected void onSuccess() {
       placeManager.revealPlace(ProjectPlacesHelper
-          .getTablePlace(tableDto.getDatasourceName(), tableDto.getName()));
+          .getVariablePlace(tableDto.getDatasourceName(), tableDto.getName(), updatedVariable.getName()));
     }
   }
 
