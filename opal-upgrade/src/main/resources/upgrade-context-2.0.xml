@@ -51,9 +51,6 @@
     <property name="upgradeSteps">
       <list>
 
-        <!-- 2.0.0 / generate database password -->
-        <!--<bean class="org.obiba.opal.core.install.CreateDatabasePasswordStep"/>-->
-
         <!-- 2.0.0 / import database config from XML to OrientDB -->
         <bean class="org.obiba.opal.core.upgrade.database.MoveDatasourcesToOrientUpgradeStep">
           <property name="description" value="Move database config from properties file to OrientDB"/>

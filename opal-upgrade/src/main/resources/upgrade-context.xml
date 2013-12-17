@@ -30,6 +30,8 @@
 
   <bean id="opalConfigurationIo" class="org.obiba.opal.core.cfg.OpalConfigurationIo"/>
 
+  <bean id="upgradeCryptoService" class="org.obiba.opal.core.service.security.CryptoServiceImpl"/>
+
   <bean id="upgradeOpalConfigurationService" class="org.obiba.opal.core.cfg.DefaultOpalConfigurationService"/>
 
   <bean id="opalVersionModifier" class="org.obiba.opal.core.upgrade.support.OpalVersionModifier"/>
