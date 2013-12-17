@@ -22,9 +22,11 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
-import org.obiba.opal.core.vcs.OpalGitException;
-import org.obiba.opal.core.vcs.support.OpalGitUtils;
+import org.obiba.opal.core.vcs.git.OpalGitException;
+import org.obiba.opal.core.vcs.git.support.GitUtils;
 
+import com.google.common.base.Charsets;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 /**
@@ -32,11 +34,11 @@ import com.google.common.base.Strings;
  */
 public class OpalGitFetchBlobCommand extends OpalGitCommand<String> {
 
-  private String path;
+  private final String path;
 
-  private String commitId;
+  private final String commitId;
 
-  private String encoding;
+  private final String encoding;
 
   private OpalGitFetchBlobCommand(Builder builder) {
     super(builder.repository, builder.datasourceName);
@@ -50,16 +52,13 @@ public class OpalGitFetchBlobCommand extends OpalGitCommand<String> {
     try {
       ObjectReader reader = repository.newObjectReader();
       TreeWalk treewalk = getPathTreeWalk(reader);
-
       if(treewalk != null) {
         return new String(reader.open(treewalk.getObjectId(0)).getBytes(),
-            Charset.forName(Strings.isNullOrEmpty(encoding) ? "UTF-8" : encoding));
+            Strings.isNullOrEmpty(encoding) ? Charsets.UTF_8 : Charset.forName(encoding));
       }
-
-    } catch(Exception e) {
-      throw new OpalGitException(e.getMessage(), e);
+    } catch(IOException e) {
+      throw new OpalGitException(e);
     }
-
     throw new OpalGitException(String.format("Path '%s' was not found in commit '%s'", path, commitId));
   }
 
@@ -82,6 +81,8 @@ public class OpalGitFetchBlobCommand extends OpalGitCommand<String> {
 
     public Builder(@NotNull Repository repository, @NotNull String path, @NotNull String commitId) {
       super(repository);
+      Preconditions.checkArgument(path != null, "path cannot be null.");
+      Preconditions.checkArgument(commitId != null, "commitId cannot be null.");
       addPath(path);
       this.commitId = commitId;
     }
@@ -92,11 +93,10 @@ public class OpalGitFetchBlobCommand extends OpalGitCommand<String> {
     }
 
     public OpalGitFetchBlobCommand build() {
-      if(Strings.isNullOrEmpty(commitId)) throw new OpalGitException("Commit id cannot be empty nor null");
-      if(Strings.isNullOrEmpty(path)) throw new OpalGitException("Commit path cannot be empty nor null");
-      if(!OpalGitUtils.isFilePath(path))
-        throw new OpalGitException("Commit path must point to a file and not a folder");
-      return new OpalGitFetchBlobCommand(this);
+      if(GitUtils.isFilePath(path)) {
+        return new OpalGitFetchBlobCommand(this);
+      }
+      throw new OpalGitException("Commit path must point to a file and not a folder");
     }
 
   }

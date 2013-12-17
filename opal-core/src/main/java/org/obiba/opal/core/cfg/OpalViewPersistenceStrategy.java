@@ -43,7 +43,7 @@ import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewPersistenceStrategy;
 import org.obiba.magma.xstream.MagmaXStreamExtension;
 import org.obiba.opal.audit.OpalUserProvider;
-import org.obiba.opal.core.vcs.support.OpalGitUtils;
+import org.obiba.opal.core.vcs.git.support.GitUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -251,7 +251,7 @@ public class OpalViewPersistenceStrategy implements ViewPersistenceStrategy {
     String remoteUrl = "file://" + targetDir.getAbsolutePath();
     File tmp = getTmpDirectory();
     File localRepo = new File(tmp, "opal-" + Long.toString(System.nanoTime()));
-    OpalGitUtils.cloneRepository(localRepo.getParentFile(), localRepo.getName(), remoteUrl);
+    GitUtils.cloneRepository(localRepo.getParentFile(), localRepo.getName(), remoteUrl);
     return localRepo;
   }
 

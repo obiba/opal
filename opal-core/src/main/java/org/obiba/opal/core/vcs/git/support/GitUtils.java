@@ -1,6 +1,7 @@
-package org.obiba.opal.core.vcs.support;
+package org.obiba.opal.core.vcs.git.support;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.List;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.FetchCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryCache;
@@ -16,45 +18,30 @@ import org.eclipse.jgit.transport.FetchResult;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.util.FS;
 
-public final class OpalGitUtils {
+public final class GitUtils {
 
   public static final String HEAD_COMMIT_ID = "HEAD";
 
-  public static final Object VIEW_FILE_NAME = "View.xml";
+  private static final Object VIEW_FILE_NAME = "View.xml";
 
-  public static final Object VARIABLE_FILE_EXTENSION = ".js";
+  private static final Object VARIABLE_FILE_EXTENSION = ".js";
 
-  public final static String OPAL_HOME_SYSTEM_PROPERTY_NAME = "OPAL_HOME";
-
-  public static final String VIEWS_DIRECTORY_NAME = "views";
-
-  public static final String GIT_DIRECTORY_NAME = "data" + File.separator + "git";
-
-  public static final String GIT_EXTENSION = ".git";
-
-  public static File buildOpalGitRootPath() {
-    StringBuilder pathBuilder = new StringBuilder();
-    pathBuilder.append(System.getProperty(OPAL_HOME_SYSTEM_PROPERTY_NAME)).append(File.separatorChar)
-        .append(GIT_DIRECTORY_NAME).append(File.separatorChar).append(VIEWS_DIRECTORY_NAME);
-
-    return new File(pathBuilder.toString());
-  }
+  private GitUtils() {}
 
   public static File getGitDirectoryName(File root, String datasource) {
-    return new File(root, datasource + GIT_EXTENSION);
+    return new File(root, datasource + ".git");
   }
 
   public static String getViewFilePath(String view) {
-    return new StringBuilder().append(view).append(File.separatorChar).append(VIEW_FILE_NAME).toString();
+    return view + File.separatorChar + VIEW_FILE_NAME;
   }
 
   public static String getVariableFilePath(String view, String variable) {
-    return new StringBuilder().append(view).append(File.separatorChar).append(variable).append(VARIABLE_FILE_EXTENSION)
-        .toString();
+    return view + File.separatorChar + variable + VARIABLE_FILE_EXTENSION;
   }
 
   public static String getNthCommitId(String commitId, int nth) {
-    return commitId + "~" + String.valueOf(nth);
+    return commitId + "~" + nth;
   }
 
   public static boolean isFilePath(String path) {
@@ -72,7 +59,8 @@ public final class OpalGitUtils {
    * @param fromUrl
    * @throws Exception
    */
-  public static void cloneRepository(File repositoriesFolder, String name, String fromUrl) throws Exception {
+  public static void cloneRepository(File repositoriesFolder, String name, String fromUrl)
+      throws IOException, GitAPIException {
     String repoName = name;
     // normal repository, strip .git suffix
     if(name.toLowerCase().endsWith(Constants.DOT_GIT_EXT)) {
@@ -101,7 +89,7 @@ public final class OpalGitUtils {
   }
 
   /**
-   * Fetch updates from the remote repository. If refSpecs is unspecifed,
+   * Fetch updates from the remote repository. If refSpecs is unspecified,
    * remote heads, tags, and notes are retrieved.
    *
    * @param credentialsProvider
@@ -110,7 +98,7 @@ public final class OpalGitUtils {
    * @return FetchResult
    * @throws Exception
    */
-  public static FetchResult fetchRepository(Repository repository, RefSpec... refSpecs) throws Exception {
+  public static FetchResult fetchRepository(Repository repository, RefSpec... refSpecs) throws GitAPIException {
     Git git = new Git(repository);
     FetchCommand fetch = git.fetch();
     List<RefSpec> specs = new ArrayList<>();

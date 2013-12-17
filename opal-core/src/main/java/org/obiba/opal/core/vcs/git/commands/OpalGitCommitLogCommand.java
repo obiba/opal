@@ -21,7 +21,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.obiba.opal.core.vcs.CommitInfo;
-import org.obiba.opal.core.vcs.OpalGitException;
+import org.obiba.opal.core.vcs.git.OpalGitException;
 
 import com.google.common.base.Strings;
 
@@ -32,9 +32,9 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public class OpalGitCommitLogCommand extends OpalGitCommand<CommitInfo> {
 
-  private String path;
+  private final String path;
 
-  private String commitId;
+  private final String commitId;
 
   private OpalGitCommitLogCommand(Builder builder) {
     super(builder.repository, builder.datasourceName);
@@ -45,7 +45,6 @@ public class OpalGitCommitLogCommand extends OpalGitCommand<CommitInfo> {
   @Override
   public CommitInfo execute() {
     RevWalk walk = new RevWalk(repository);
-
     try {
       RevCommit commit = walk.parseCommit(ObjectId.fromString(commitId));
       if(TreeWalk.forPath(repository, path, commit.getTree()) != null) {
@@ -55,9 +54,8 @@ public class OpalGitCommitLogCommand extends OpalGitCommand<CommitInfo> {
             .setComment(commit.getFullMessage()).setCommitId(commit.getName()).setIsHead(isHead(commitId)).build();
       }
     } catch(IOException e) {
-      throw new OpalGitException(e.getMessage(), e);
+      throw new OpalGitException(e);
     }
-
     throw new OpalGitException(String.format("Path '%s' was not found in commit '%s'", path, commitId));
   }
 
@@ -70,13 +68,13 @@ public class OpalGitCommitLogCommand extends OpalGitCommand<CommitInfo> {
 
     public Builder(@NotNull Repository repository, @NotNull String path, @NotNull String commitId) {
       super(repository);
+      checkArgument(!Strings.isNullOrEmpty(path), "path cannot be empty nor null.");
+      checkArgument(!Strings.isNullOrEmpty(commitId), "commitId cannot be empty nor null.");
       addPath(path);
       this.commitId = commitId;
     }
 
     public OpalGitCommitLogCommand build() {
-      checkArgument(!Strings.isNullOrEmpty(path), "Commit path cannot empty nor null.");
-      checkArgument(!Strings.isNullOrEmpty(commitId), "Commit id cannot empty nor null.");
       return new OpalGitCommitLogCommand(this);
     }
   }

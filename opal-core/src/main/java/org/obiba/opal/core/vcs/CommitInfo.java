@@ -16,7 +16,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import javax.annotation.Nullable;
+
 public class CommitInfo {
+
+  private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+
+  static {
+    DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+  }
+
   private String author;
 
   private Date date;
@@ -38,14 +47,11 @@ public class CommitInfo {
   }
 
   public Date getDate() {
-    return (Date)date.clone();
+    return (Date) date.clone();
   }
 
   public String getDateAsIso8601() {
-    TimeZone tz = TimeZone.getTimeZone("UTC");
-    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
-    df.setTimeZone(tz);
-    return df.format(date);
+    return DATE_FORMAT.format(date);
   }
 
   public String getComment() {
@@ -56,8 +62,9 @@ public class CommitInfo {
     return commitId;
   }
 
+  @Nullable
   public List<String> getDiffEntries() {
-    return diffEntries != null ? diffEntries.subList(0, diffEntries.size()) : null;
+    return diffEntries == null ? null : diffEntries.subList(0, diffEntries.size());
   }
 
   public String getBlob() {
@@ -148,7 +155,6 @@ public class CommitInfo {
       commitInfo.blob = blob;
       commitInfo.isHead = isHead;
       commitInfo.isCurrent = isCurrent;
-
       return commitInfo;
     }
   }

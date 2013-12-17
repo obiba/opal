@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.core.vcs.git;
+package org.obiba.opal.core.vcs.git.commands;
 
 import java.util.List;
 
@@ -15,19 +15,11 @@ import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Test;
-import org.obiba.opal.core.vcs.OpalGitException;
-import org.obiba.opal.core.vcs.git.commands.OpalGitDiffCommand;
-import org.obiba.opal.core.vcs.git.support.TestOpalGitVersionControlSystem;
+import org.obiba.opal.core.vcs.git.OpalGitException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class OpalGitDiffCommandTest {
-
-  private static final String COMMIT_ID = "448b81ed146cc76751c3b10b89e80cc99da63427";
-
-  private static final String BAD_COMMIT_ID = "DeadBeefDeadBeefDeadBeefDeadBeefDeadBeef";
-
-  private static final String DATASOURCE_NAME = "opal-data2";
+public class OpalGitDiffCommandTest extends AbstractOpalGitCommandTest {
 
   private static final String DIFF_VARIABLE = "diff --git a/TestView/TOTO_VAR.js b/TestView/TOTO_VAR.js\n" +
       "new file mode 100644\n" +
@@ -111,12 +103,10 @@ public class OpalGitDiffCommandTest {
       " </org.obiba.magma.views.View>\n" +
       "\\ No newline at end of file\n";
 
-  private static final TestOpalGitVersionControlSystem vcs = new TestOpalGitVersionControlSystem();
-
   @Test
   public void testDiffWithValidCommit() {
-    OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(vcs.getRepository(DATASOURCE_NAME), COMMIT_ID)
-        .addDatasourceName(DATASOURCE_NAME).build();
+    OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(versionControlSystem.getRepository(DATASOURCE_NAME),
+        COMMIT_ID).addDatasourceName(DATASOURCE_NAME).build();
     List<String> diffs = command.execute();
     assertThat(diffs, matches(DIFF_VARIABLE));
     assertThat(diffs, matches(DIFF_VIEW));
@@ -124,22 +114,22 @@ public class OpalGitDiffCommandTest {
 
   @Test
   public void testDiffWithValidVariablePath() {
-    OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(vcs.getRepository(DATASOURCE_NAME), COMMIT_ID)
-        .addPath("TestView/TOTO_VAR.js").addDatasourceName(DATASOURCE_NAME).build();
+    OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(versionControlSystem.getRepository(DATASOURCE_NAME),
+        COMMIT_ID).addPath("TestView/TOTO_VAR.js").addDatasourceName(DATASOURCE_NAME).build();
     List<String> diffs = command.execute();
     assertThat(diffs, matches(DIFF_VARIABLE));
   }
 
   @Test(expected = OpalGitException.class)
   public void testDiffWithInvalidCommit() {
-    new OpalGitDiffCommand.Builder(vcs.getRepository(DATASOURCE_NAME), BAD_COMMIT_ID).addPath("TestView")
-        .addDatasourceName(DATASOURCE_NAME).build().execute();
+    new OpalGitDiffCommand.Builder(versionControlSystem.getRepository(DATASOURCE_NAME), BAD_COMMIT_ID)
+        .addPath("TestView").addDatasourceName(DATASOURCE_NAME).build().execute();
   }
 
   @Test
   public void testDiffWithValidViewPath() {
-    OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(vcs.getRepository(DATASOURCE_NAME), COMMIT_ID)
-        .addPath("TestView").addDatasourceName(DATASOURCE_NAME).build();
+    OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(versionControlSystem.getRepository(DATASOURCE_NAME),
+        COMMIT_ID).addPath("TestView").addDatasourceName(DATASOURCE_NAME).build();
     List<String> diffs = command.execute();
     assertThat(diffs, matches(DIFF_VARIABLE));
     assertThat(diffs, matches(DIFF_VIEW));
@@ -147,22 +137,22 @@ public class OpalGitDiffCommandTest {
 
   @Test
   public void testDiffWithSelf() {
-    new OpalGitDiffCommand.Builder(vcs.getRepository(DATASOURCE_NAME), COMMIT_ID).addDatasourceName(DATASOURCE_NAME)
-        .addNthCommit(0).build().execute();
+    new OpalGitDiffCommand.Builder(versionControlSystem.getRepository(DATASOURCE_NAME), COMMIT_ID)
+        .addDatasourceName(DATASOURCE_NAME).addNthCommit(0).build().execute();
   }
 
   @Test
   public void testDiffWithTwoVersionsBack() {
-    OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(vcs.getRepository(DATASOURCE_NAME), COMMIT_ID)
-        .addPath("TestView").addDatasourceName(DATASOURCE_NAME).addNthCommit(2).build();
+    OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(versionControlSystem.getRepository(DATASOURCE_NAME),
+        COMMIT_ID).addPath("TestView").addDatasourceName(DATASOURCE_NAME).addNthCommit(2).build();
     List<String> diffs = command.execute();
     assertThat(diffs, matches(DIFF_VIEW_TWO_VERSIONS_BACK));
   }
 
   @Test
   public void testDiffWithCurrent() {
-    OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(vcs.getRepository(DATASOURCE_NAME), "HEAD")
-        .addPath("TestView/View.xml").addDatasourceName(DATASOURCE_NAME)
+    OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(versionControlSystem.getRepository(DATASOURCE_NAME),
+        "HEAD").addPath("TestView/View.xml").addDatasourceName(DATASOURCE_NAME)
         .addPreviousCommitId("be77432d15dec81b4c60ed858d5d678ceb247171").build();
     List<String> diffs = command.execute();
     assertThat(diffs, matches(DIFF_VIEW_WITH_HEAD));
@@ -170,7 +160,7 @@ public class OpalGitDiffCommandTest {
 
   @Test
   public void testDiffWithCurrentUsingGitVCS() {
-    List<String> diffs = vcs
+    List<String> diffs = versionControlSystem
         .getDiffEntries(DATASOURCE_NAME, "HEAD", "be77432d15dec81b4c60ed858d5d678ceb247171", "TestView/View.xml");
     assertThat(diffs, matches(DIFF_VIEW_WITH_HEAD));
   }
@@ -183,23 +173,22 @@ public class OpalGitDiffCommandTest {
    */
   private static Matcher<List<String>> matches(final String expected) {
 
-    return new BaseMatcher() {
-
-      private String theExpected = expected;
+    return new BaseMatcher<List<String>>() {
 
       @Override
+      @SuppressWarnings("unchecked")
       public boolean matches(Object diffObject) {
-        return diffObject instanceof List ? matchDiffs((List<String>) diffObject) : diffObject.equals(theExpected);
+        return diffObject instanceof List ? matchDiffs((Iterable<String>) diffObject) : diffObject.equals(expected);
       }
 
       @Override
       public void describeTo(Description description) {
-        description.appendText(theExpected);
+        description.appendText(expected);
       }
 
-      private boolean matchDiffs(List<String> diffs) {
+      private boolean matchDiffs(Iterable<String> diffs) {
         for(String diff : diffs) {
-          if(diff.equals(theExpected)) return true;
+          if(diff.equals(expected)) return true;
         }
         return false;
       }

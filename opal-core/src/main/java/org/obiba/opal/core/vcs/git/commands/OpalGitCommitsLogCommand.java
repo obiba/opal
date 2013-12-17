@@ -23,7 +23,7 @@ import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.obiba.opal.core.vcs.CommitInfo;
-import org.obiba.opal.core.vcs.OpalGitException;
+import org.obiba.opal.core.vcs.git.OpalGitException;
 
 import com.google.common.base.Strings;
 
@@ -32,7 +32,7 @@ import com.google.common.base.Strings;
  */
 public class OpalGitCommitsLogCommand extends OpalGitCommand<List<CommitInfo>> {
 
-  private String path;
+  private final String path;
 
   private OpalGitCommitsLogCommand(Builder builder) {
     super(builder.repository, builder.datasourceName);
@@ -50,14 +50,12 @@ public class OpalGitCommitsLogCommand extends OpalGitCommand<List<CommitInfo>> {
       }
 
       List<CommitInfo> commits = getCommitInfos(logCommand);
-
       if(commits.isEmpty()) {
         throw new OpalGitException(getNoCommitsErrorMessage());
       }
-
       return commits;
     } catch(GitAPIException | IOException e) {
-      throw new OpalGitException(e.getMessage(), e);
+      throw new OpalGitException(e);
     }
   }
 

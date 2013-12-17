@@ -27,8 +27,8 @@ import org.eclipse.jgit.treewalk.AbstractTreeIterator;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.EmptyTreeIterator;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
-import org.obiba.opal.core.vcs.OpalGitException;
-import org.obiba.opal.core.vcs.support.OpalGitUtils;
+import org.obiba.opal.core.vcs.git.OpalGitException;
+import org.obiba.opal.core.vcs.git.support.GitUtils;
 
 import com.google.common.base.Strings;
 
@@ -42,7 +42,7 @@ public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
 
   private final String commitId;
 
-  private String previousCommitId;
+  private final String previousCommitId;
 
   private int nthCommit = 1;
 
@@ -65,7 +65,7 @@ public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
       return CompareDiffTrees(currentCommitParser, previousCommitParser);
 
     } catch(IOException e) {
-      throw new OpalGitException(e.getMessage(), e);
+      throw new OpalGitException(e);
     } finally {
       reader.release();
     }
@@ -131,7 +131,7 @@ public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
   }
 
   private class DiffCurrentPreviousTreeParsersFactory {
-    private ObjectReader reader;
+    private final ObjectReader reader;
 
     private CanonicalTreeParser currentCommitParser;
 
@@ -158,7 +158,7 @@ public class OpalGitDiffCommand extends OpalGitCommand<List<String>> {
       currentCommitParser.reset(reader, currentCommit.getTree());
 
       RevCommit previousCommit = Strings.isNullOrEmpty(previousCommitId) //
-          ? getCommitById(OpalGitUtils.getNthCommitId(commitId, nthCommit)) //
+          ? getCommitById(GitUtils.getNthCommitId(commitId, nthCommit)) //
           : getCommitById(previousCommitId);
 
       if(previousCommit == null) {

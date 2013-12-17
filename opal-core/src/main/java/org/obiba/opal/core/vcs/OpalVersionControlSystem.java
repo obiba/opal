@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 public interface OpalVersionControlSystem {
+
   List<CommitInfo> getCommitsInfo(@NotNull String datasource, @NotNull String path);
 
   CommitInfo getCommitInfo(@NotNull String datasource, @NotNull String path, @NotNull String commitId);

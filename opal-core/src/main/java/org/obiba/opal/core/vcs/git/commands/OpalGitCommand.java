@@ -19,7 +19,7 @@ import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.obiba.opal.core.vcs.support.OpalGitUtils;
+import org.obiba.opal.core.vcs.git.support.GitUtils;
 
 import com.google.common.base.Preconditions;
 
@@ -30,20 +30,21 @@ import com.google.common.base.Preconditions;
  */
 public abstract class OpalGitCommand<T> implements Command<T> {
 
-  protected final Repository repository;
+  final Repository repository;
 
-  protected final String datasourceName;
+  final String datasourceName;
 
-  protected OpalGitCommand(Repository repository) {
+  OpalGitCommand(Repository repository) {
     this(repository, "");
   }
 
-  protected OpalGitCommand(@NotNull Repository repository, @Nullable String datasourceName) {
+  OpalGitCommand(@NotNull Repository repository, @Nullable String datasourceName) {
     this.repository = repository;
     this.datasourceName = datasourceName;
   }
 
-  protected RevCommit getCommitById(String commitId) throws IOException {
+  @Nullable
+  RevCommit getCommitById(String commitId) throws IOException {
     ObjectId id = repository.resolve(commitId);
 
     if(id != null) {
@@ -53,15 +54,15 @@ public abstract class OpalGitCommand<T> implements Command<T> {
     return null;
   }
 
-  public boolean isHead(String commitId) throws IOException {
-    return OpalGitUtils.HEAD_COMMIT_ID.equals(commitId) ? true : getHeadCommitId().equals(commitId);
+  boolean isHead(String commitId) throws IOException {
+    return GitUtils.HEAD_COMMIT_ID.equals(commitId) || getHeadCommitId().equals(commitId);
   }
 
-  protected ObjectId getHeadCommit() throws IOException {
-    return repository.resolve(OpalGitUtils.HEAD_COMMIT_ID);
+  ObjectId getHeadCommit() throws IOException {
+    return repository.resolve(GitUtils.HEAD_COMMIT_ID);
   }
 
-  protected String getHeadCommitId() throws IOException {
+  String getHeadCommitId() throws IOException {
     ObjectId id = getHeadCommit();
     return id == null ? "" : id.getName();
   }
@@ -73,24 +74,27 @@ public abstract class OpalGitCommand<T> implements Command<T> {
    */
   protected static class Builder<T extends Builder<?>> {
 
-    protected final Repository repository;
+    final Repository repository;
 
-    protected String path;
+    String path;
 
-    protected String datasourceName; // used mainly for debug and meaningful error messages
+    String datasourceName; // used mainly for debug and meaningful error messages
 
-    protected Builder(@NotNull Repository repository) {
+    @SuppressWarnings("ConstantConditions")
+    Builder(@NotNull Repository repository) {
       Preconditions.checkArgument(repository != null, "Repository cannot be null.");
       this.repository = repository;
     }
 
-    public T addPath(@NotNull String value) {
-      path = value;
+    @SuppressWarnings("unchecked")
+    public T addPath(@Nullable String path) {
+      this.path = path;
       return (T) this;
     }
 
-    public T addDatasourceName(@NotNull String value) {
-      datasourceName = value;
+    @SuppressWarnings("unchecked")
+    public T addDatasourceName(@NotNull String datasourceName) {
+      this.datasourceName = datasourceName;
       return (T) this;
     }
   }

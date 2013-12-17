@@ -19,9 +19,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.obiba.opal.core.vcs.CommitInfo;
-import org.obiba.opal.core.vcs.OpalGitException;
 import org.obiba.opal.core.vcs.OpalVersionControlSystem;
-import org.obiba.opal.core.vcs.support.OpalGitUtils;
+import org.obiba.opal.core.vcs.git.OpalGitException;
+import org.obiba.opal.core.vcs.git.support.GitUtils;
 import org.obiba.opal.web.Dtos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -49,7 +49,7 @@ public class ViewVcsLogResource {
   @Path("/commits")
   public Response getCommitsInfo() {
     try {
-      List<CommitInfo> commitInfos = vcs.getCommitsInfo(datasource, OpalGitUtils.getViewFilePath(view));
+      List<CommitInfo> commitInfos = vcs.getCommitsInfo(datasource, GitUtils.getViewFilePath(view));
       return Response.ok().entity(Dtos.asDto(commitInfos)).build();
     } catch(OpalGitException e) {
       return Response.status(Response.Status.BAD_REQUEST).entity("FailedToRetrieveViewCommitInfos").build();
@@ -60,8 +60,7 @@ public class ViewVcsLogResource {
   @Path("/variable/{variableName}/commits")
   public Response getVariableCommitsInfo(@NotNull @PathParam("variableName") String variableName) {
     try {
-      List<CommitInfo> commitInfos = vcs
-          .getCommitsInfo(datasource, OpalGitUtils.getVariableFilePath(view, variableName));
+      List<CommitInfo> commitInfos = vcs.getCommitsInfo(datasource, GitUtils.getVariableFilePath(view, variableName));
       return Response.ok().entity(Dtos.asDto(commitInfos)).build();
     } catch(OpalGitException e) {
       return Response.status(Response.Status.BAD_REQUEST).entity("FailedToRetrieveVariableCommitInfos").build();
@@ -74,7 +73,7 @@ public class ViewVcsLogResource {
       @NotNull @PathParam("commitId") String commitId) {
 
     try {
-      String path = OpalGitUtils.getVariableFilePath(view, variableName);
+      String path = GitUtils.getVariableFilePath(view, variableName);
       return Response.ok().entity(
           Dtos.asDto(getVariableDiffInternal(vcs.getCommitInfo(datasource, path, commitId), path, commitId, null)))
           .build();
@@ -89,9 +88,9 @@ public class ViewVcsLogResource {
       @NotNull @PathParam("commitId") String commitId) {
 
     try {
-      String path = OpalGitUtils.getVariableFilePath(view, variableName);
+      String path = GitUtils.getVariableFilePath(view, variableName);
       return Response.ok().entity(Dtos.asDto(
-          getVariableDiffInternal(vcs.getCommitInfo(datasource, path, commitId), path, OpalGitUtils.HEAD_COMMIT_ID,
+          getVariableDiffInternal(vcs.getCommitInfo(datasource, path, commitId), path, GitUtils.HEAD_COMMIT_ID,
               commitId))).build();
     } catch(OpalGitException e) {
       return Response.status(Response.Status.BAD_REQUEST).entity("FailedToRetrieveVariableCommitInfo").build();
@@ -103,8 +102,8 @@ public class ViewVcsLogResource {
   public Response getVariableContent(@NotNull @PathParam("variableName") String variableName,
       @NotNull @PathParam("commitId") String commitId) {
     try {
-      String blob = vcs.getBlob(datasource, OpalGitUtils.getVariableFilePath(view, variableName), commitId);
-      String path = OpalGitUtils.getVariableFilePath(view, variableName);
+      String blob = vcs.getBlob(datasource, GitUtils.getVariableFilePath(view, variableName), commitId);
+      String path = GitUtils.getVariableFilePath(view, variableName);
       CommitInfo commitInfo = CommitInfo.Builder.createFromObject(vcs.getCommitInfo(datasource, path, commitId))
           .setBlob(blob).build();
       return Response.ok().entity(Dtos.asDto(commitInfo)).build();

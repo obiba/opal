@@ -7,15 +7,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.core.vcs.git;
+package org.obiba.opal.core.vcs.git.commands;
 
 import java.util.List;
 
 import org.junit.Test;
 import org.obiba.opal.core.vcs.CommitInfo;
-import org.obiba.opal.core.vcs.OpalGitException;
-import org.obiba.opal.core.vcs.git.commands.OpalGitCommitsLogCommand;
-import org.obiba.opal.core.vcs.git.support.TestOpalGitVersionControlSystem;
+import org.obiba.opal.core.vcs.git.OpalGitException;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
@@ -24,16 +22,13 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-public class OpalGitCommitsLogCommandTest {
-
-  private static final String DATASOURCE_NAME = "opal-data2";
-
-  private static final TestOpalGitVersionControlSystem vcs = new TestOpalGitVersionControlSystem();
+public class OpalGitCommitsLogCommandTest extends AbstractOpalGitCommandTest {
 
   @Test
   public void testCommitsInfoRetrievalWitValidViewPath() {
-    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
-        .addDatasourceName(DATASOURCE_NAME).addPath("TestView").build();
+    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(
+        versionControlSystem.getRepository(DATASOURCE_NAME)).addDatasourceName(DATASOURCE_NAME).addPath("TestView")
+        .build();
     List<CommitInfo> commitInfos = command.execute();
     assertThat(commitInfos, not(is(nullValue())));
     assertTrue(commitInfos.size() > 0);
@@ -42,15 +37,17 @@ public class OpalGitCommitsLogCommandTest {
 
   @Test(expected = OpalGitException.class)
   public void testCommitsInfoRetrievalWitInvalidViewPath() {
-    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
-        .addDatasourceName(DATASOURCE_NAME).addPath("DEADBEAF").build();
+    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(
+        versionControlSystem.getRepository(DATASOURCE_NAME)).addDatasourceName(DATASOURCE_NAME).addPath("DEADBEAF")
+        .build();
     command.execute();
   }
 
   @Test
   public void testCommitsInfoRetrievalWitValidVariablePath() {
-    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
-        .addDatasourceName(DATASOURCE_NAME).addPath("TestView/TOTO_VAR.js").build();
+    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(
+        versionControlSystem.getRepository(DATASOURCE_NAME)).addDatasourceName(DATASOURCE_NAME)
+        .addPath("TestView/TOTO_VAR.js").build();
 
     List<CommitInfo> commitInfos = command.execute();
     assertThat(commitInfos, not(is(nullValue())));
@@ -60,15 +57,16 @@ public class OpalGitCommitsLogCommandTest {
 
   @Test(expected = OpalGitException.class)
   public void testCommitsInfoRetrievalWitInvalidVariablePath() {
-    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
-        .addDatasourceName(DATASOURCE_NAME).addPath("TestView/BAD_VAR.js").build();
+    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(
+        versionControlSystem.getRepository(DATASOURCE_NAME)).addDatasourceName(DATASOURCE_NAME)
+        .addPath("TestView/BAD_VAR.js").build();
     command.execute();
   }
 
   @Test
   public void testCommitsInfoRetrievalForWholeRepository() {
-    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
-        .addDatasourceName(DATASOURCE_NAME).build();
+    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(
+        versionControlSystem.getRepository(DATASOURCE_NAME)).addDatasourceName(DATASOURCE_NAME).build();
     List<CommitInfo> commitInfos = command.execute();
     assertThat(commitInfos, not(is(nullValue())));
     assertTrue(commitInfos.size() > 0);
@@ -79,8 +77,8 @@ public class OpalGitCommitsLogCommandTest {
    */
   @Test
   public void testCommitsInfoRetrievalWithEmptyPath() {
-    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
-        .addDatasourceName(DATASOURCE_NAME).addPath("").build();
+    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(
+        versionControlSystem.getRepository(DATASOURCE_NAME)).addDatasourceName(DATASOURCE_NAME).addPath("").build();
     List<CommitInfo> commitInfos = command.execute();
     assertThat(commitInfos, not(is(nullValue())));
     assertTrue(commitInfos.size() > 0);
@@ -88,8 +86,9 @@ public class OpalGitCommitsLogCommandTest {
 
   @Test
   public void testHeadAndCurrentCommitFlags() {
-    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
-        .addDatasourceName(DATASOURCE_NAME).addPath("TestView/TOTO_VAR.js").build();
+    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(
+        versionControlSystem.getRepository(DATASOURCE_NAME)).addDatasourceName(DATASOURCE_NAME)
+        .addPath("TestView/TOTO_VAR.js").build();
 
     List<CommitInfo> commitInfos = command.execute();
     assertThat(commitInfos, not(is(nullValue())));
@@ -102,8 +101,9 @@ public class OpalGitCommitsLogCommandTest {
 
   @Test
   public void testNotHeadAndCurrentCommitFlagsForVariable() {
-    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
-        .addDatasourceName(DATASOURCE_NAME).addPath("TestView/PLACE_NAME.js").build();
+    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(
+        versionControlSystem.getRepository(DATASOURCE_NAME)).addDatasourceName(DATASOURCE_NAME)
+        .addPath("TestView/PLACE_NAME.js").build();
 
     List<CommitInfo> commitInfos = command.execute();
     assertThat(commitInfos, not(is(nullValue())));
@@ -116,12 +116,13 @@ public class OpalGitCommitsLogCommandTest {
 
   @Test
   public void testNotHeadNotCurrentCommitFlagsForView() {
-    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(vcs.getRepository(DATASOURCE_NAME))
-        .addDatasourceName(DATASOURCE_NAME).addPath("TestView").build();
+    OpalGitCommitsLogCommand command = new OpalGitCommitsLogCommand.Builder(
+        versionControlSystem.getRepository(DATASOURCE_NAME)).addDatasourceName(DATASOURCE_NAME).addPath("TestView")
+        .build();
 
     List<CommitInfo> commitInfos = command.execute();
     assertThat(commitInfos, not(is(nullValue())));
-    assertThat(commitInfos.size(), greaterThan((5)));
+    assertThat(commitInfos.size(), greaterThan(5));
     CommitInfo firstCommit = commitInfos.get(5);
     assertThat(firstCommit.getCommitId(), not(is(nullValue())));
     assertThat(firstCommit.getIsHead(), is(false));

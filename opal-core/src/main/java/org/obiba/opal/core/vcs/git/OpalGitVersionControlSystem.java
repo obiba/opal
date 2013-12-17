@@ -14,24 +14,34 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.obiba.opal.core.vcs.CommitInfo;
-import org.obiba.opal.core.vcs.OpalGitException;
 import org.obiba.opal.core.vcs.OpalVersionControlSystem;
 import org.obiba.opal.core.vcs.git.commands.OpalGitCommitLogCommand;
 import org.obiba.opal.core.vcs.git.commands.OpalGitCommitsLogCommand;
 import org.obiba.opal.core.vcs.git.commands.OpalGitDiffCommand;
 import org.obiba.opal.core.vcs.git.commands.OpalGitFetchBlobCommand;
-import org.obiba.opal.core.vcs.support.OpalGitUtils;
+import org.obiba.opal.core.vcs.git.support.GitUtils;
 import org.springframework.stereotype.Component;
-
-import edu.umd.cs.findbugs.annotations.Nullable;
 
 @Component
 public class OpalGitVersionControlSystem implements OpalVersionControlSystem {
+
+  private static final String GIT_ROOT_PATH = "/data/git/views";
+
+  private final File repoPath;
+
+  public OpalGitVersionControlSystem() {
+    this(new File(System.getProperty("OPAL_HOME") + GIT_ROOT_PATH));
+  }
+
+  public OpalGitVersionControlSystem(File repoPath) {
+    this.repoPath = repoPath;
+  }
 
   @Override
   public List<CommitInfo> getCommitsInfo(@NotNull String datasource, @NotNull String path) {
@@ -59,18 +69,16 @@ public class OpalGitVersionControlSystem implements OpalVersionControlSystem {
       @Nullable String prevCommitId, @Nullable String path) {
     OpalGitDiffCommand command = new OpalGitDiffCommand.Builder(getRepository(datasource), commitId).addPath(path)
         .addDatasourceName(datasource).addPreviousCommitId(prevCommitId).build();
-
     return command.execute();
   }
 
-  protected Repository getRepository(String name) {
-    File repo = OpalGitUtils.getGitDirectoryName(OpalGitUtils.buildOpalGitRootPath(), name);
+  public Repository getRepository(String name) {
+    File repo = GitUtils.getGitDirectoryName(repoPath, name);
     FileRepositoryBuilder builder = new FileRepositoryBuilder();
-
     try {
       return builder.setGitDir(repo).readEnvironment().findGitDir().build();
     } catch(IOException e) {
-      throw new OpalGitException(e.getMessage(), e);
+      throw new OpalGitException(e);
     }
   }
 

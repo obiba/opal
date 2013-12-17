@@ -8,16 +8,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.core.vcs;
+package org.obiba.opal.core.vcs.git;
 
 public class OpalGitException extends RuntimeException {
+
+  private static final long serialVersionUID = -3862617434361717332L;
 
   public OpalGitException(String msg) {
     super(msg);
   }
 
-  public OpalGitException(String msg, Throwable cause) {
-    super(msg, cause);
+  public OpalGitException(Throwable cause) {
+    super(cause);
   }
 
 }
