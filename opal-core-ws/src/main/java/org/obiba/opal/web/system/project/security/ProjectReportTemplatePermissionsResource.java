@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Iterables;
 
+import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 import static org.obiba.opal.web.system.project.security.ProjectPermissionsResource.DOMAIN;
 import static org.obiba.opal.web.system.project.security.ProjectPermissionsResource.MagmaPermissionsPredicate;
 
@@ -68,7 +69,7 @@ public class ProjectReportTemplatePermissionsResource extends AbstractProjectPer
    * @return
    */
   @GET
-  public Iterable<Opal.Acl> getTablePermissions(@QueryParam("type") SubjectAclService.SubjectType type) {
+  public Iterable<Opal.Acl> getTablePermissions(@QueryParam("type") SubjectType type) {
 
     // make sure project exists
     validateTemplate();
@@ -88,7 +89,7 @@ public class ProjectReportTemplatePermissionsResource extends AbstractProjectPer
    * @return
    */
   @POST
-  public Response setTablePermission(@QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
+  public Response setTablePermission(@QueryParam("type") @DefaultValue("SUBJECT_CREDENTIALS") SubjectType type,
       @QueryParam("principal") List<String> principals, @QueryParam("permission") ReportTemplatePermission permission) {
     // make sure template exists
     validateTemplate();
@@ -104,7 +105,7 @@ public class ProjectReportTemplatePermissionsResource extends AbstractProjectPer
    * @return
    */
   @DELETE
-  public Response deleteTablePermissions(@QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
+  public Response deleteTablePermissions(@QueryParam("type") @DefaultValue("SUBJECT_CREDENTIALS") SubjectType type,
       @QueryParam("principal") List<String> principals) {
 
     // make sure template exists

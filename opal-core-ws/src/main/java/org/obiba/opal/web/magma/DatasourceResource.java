@@ -34,7 +34,7 @@ import org.obiba.magma.MagmaEngine;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.views.View;
 import org.obiba.magma.views.ViewManager;
-import org.obiba.opal.core.runtime.security.support.OpalPermissions;
+import org.obiba.opal.core.security.OpalPermissions;
 import org.obiba.opal.core.service.OpalGeneralConfigService;
 import org.obiba.opal.search.IndexManagerConfigurationService;
 import org.obiba.opal.search.Schedule;

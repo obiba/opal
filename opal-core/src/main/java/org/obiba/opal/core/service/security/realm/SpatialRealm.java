@@ -24,10 +24,9 @@ import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.security.SubjectAclService;
-import org.obiba.opal.core.service.security.SubjectAclService.Subject;
 import org.obiba.opal.core.service.security.SubjectAclService.SubjectAclChangeCallback;
-import org.obiba.opal.core.service.security.SubjectAclService.SubjectType;
 import org.obiba.opal.core.service.security.realm.support.SubjectPermissionsConverterRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -45,6 +44,9 @@ import eu.flatwhite.shiro.spatial.finite.Node;
 import eu.flatwhite.shiro.spatial.finite.NodeRelationProvider;
 import eu.flatwhite.shiro.spatial.finite.NodeResolver;
 import eu.flatwhite.shiro.spatial.finite.NodeSpace;
+
+import static org.obiba.opal.core.domain.security.SubjectAcl.Subject;
+import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 
 @Component
 public class SpatialRealm extends AuthorizingRealm implements RolePermissionResolver {
@@ -145,7 +147,7 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
     return null;
   }
 
-  private Iterable<String> loadSubjectPermissions(SubjectAclService.Subject subject) {
+  private Iterable<String> loadSubjectPermissions(SubjectAcl.Subject subject) {
     return subjectPermissionsConverterRegistry.convert(subjectAclService.getSubjectPermissions(subject));
   }
 
@@ -153,7 +155,7 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
     return loadSubjectPermissions(getSubject(principals));
   }
 
-  private SubjectAclService.Subject getSubject(PrincipalCollection principals) {
+  private SubjectAcl.Subject getSubject(PrincipalCollection principals) {
     return SubjectType.SUBJECT_CREDENTIALS.subjectFor(principals.getPrimaryPrincipal().toString());
   }
 

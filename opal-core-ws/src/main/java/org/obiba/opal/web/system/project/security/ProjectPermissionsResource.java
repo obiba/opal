@@ -24,6 +24,7 @@ import javax.ws.rs.core.Response;
 
 import org.obiba.magma.support.MagmaEngineTableResolver;
 import org.obiba.magma.support.MagmaEngineVariableResolver;
+import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
@@ -36,6 +37,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+
+import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 
 @Component
 @Scope("request")
@@ -69,7 +72,7 @@ public class ProjectPermissionsResource extends AbstractProjectPermissionsResour
   @GET
   @Path("/_all")
   public Iterable<Opal.Acl> getPermissions(@QueryParam("domain") @DefaultValue("opal") String domain,
-      @QueryParam("type") SubjectAclService.SubjectType type) {
+      @QueryParam("type") SubjectType type) {
 
     // make sure project exists
     projectService.getProject(name);
@@ -84,7 +87,7 @@ public class ProjectPermissionsResource extends AbstractProjectPermissionsResour
 
   @GET
   @Path("/subjects")
-  public Iterable<Opal.Subject> getSubjects(@QueryParam("type") SubjectAclService.SubjectType type) {
+  public Iterable<Opal.Subject> getSubjects(@QueryParam("type") SubjectType type) {
 
     // make sure project exists
     projectService.getProject(name);
@@ -94,16 +97,16 @@ public class ProjectPermissionsResource extends AbstractProjectPermissionsResour
             .filter(subjectAclService.getNodeHierarchyPermissions(DOMAIN, "/datasource/" + name, type),
                 new MagmaPermissionsPredicate()));
 
-    List<SubjectAclService.Subject> subjects = Lists.newArrayList();
+    List<SubjectAcl.Subject> subjects = Lists.newArrayList();
     for(SubjectAclService.Permissions perms : permissions) {
-      SubjectAclService.Subject subject = perms.getSubject();
+      SubjectAcl.Subject subject = perms.getSubject();
       if(!subjects.contains(subject)) subjects.add(subject);
     }
 
-    return Iterables.transform(subjects, new Function<SubjectAclService.Subject, Opal.Subject>() {
+    return Iterables.transform(subjects, new Function<SubjectAcl.Subject, Opal.Subject>() {
       @Nullable
       @Override
-      public Opal.Subject apply(@Nullable SubjectAclService.Subject input) {
+      public Opal.Subject apply(@Nullable SubjectAcl.Subject input) {
         assert input != null;
         return Opal.Subject.newBuilder().setPrincipal(input.getPrincipal())
             .setType(Opal.Subject.SubjectType.valueOf(input.getType().name())).build();
@@ -120,7 +123,7 @@ public class ProjectPermissionsResource extends AbstractProjectPermissionsResour
    */
   @GET
   @Path("/project")
-  public Iterable<Opal.Acl> getProjectPermissions(@QueryParam("type") SubjectAclService.SubjectType type) {
+  public Iterable<Opal.Acl> getProjectPermissions(@QueryParam("type") SubjectType type) {
 
     // make sure project exists
     projectService.getProject(name);
@@ -140,7 +143,7 @@ public class ProjectPermissionsResource extends AbstractProjectPermissionsResour
   @SuppressWarnings("TypeMayBeWeakened")
   @POST
   @Path("/project")
-  public Response addProjectPermission(@QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
+  public Response addProjectPermission(@QueryParam("type") @DefaultValue("SUBJECT_CREDENTIALS") SubjectType type,
       @QueryParam("principal") List<String> principals,
       @QueryParam("permission") @DefaultValue("PROJECT_ALL") ProjectPermission permission) {
     // make sure project exists
@@ -159,7 +162,7 @@ public class ProjectPermissionsResource extends AbstractProjectPermissionsResour
   @SuppressWarnings("TypeMayBeWeakened")
   @DELETE
   @Path("/project")
-  public Response deleteProjectPermissions(@QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
+  public Response deleteProjectPermissions(@QueryParam("type") @DefaultValue("SUBJECT_CREDENTIALS") SubjectType type,
       @QueryParam("principal") List<String> principals) {
     // make sure project exists
     projectService.getProject(name);

@@ -18,6 +18,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
+import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Iterables;
+
+import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 
 @Component
 @Scope("request")
@@ -39,10 +42,9 @@ public class SubjectCredentialsGroupAuthorizationResource {
 
   @GET
   public Iterable<Opal.Acl> get(@QueryParam("domain") @DefaultValue("opal") String domain,
-      @QueryParam("type") SubjectAclService.SubjectType type) {
+      @QueryParam("type") SubjectType type) {
 
-    SubjectAclService.Subject aclSubject = type.subjectFor(subject);
-
+    SubjectAcl.Subject aclSubject = type.subjectFor(subject);
     Collection<SubjectAclService.Permissions> permissions = new HashSet<>();
     for(SubjectAclService.Permissions p : subjectAclService.getSubjectPermissions(aclSubject)) {
       if(p.getDomain().equals(domain)) {

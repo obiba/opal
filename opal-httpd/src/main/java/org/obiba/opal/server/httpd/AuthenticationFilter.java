@@ -30,6 +30,7 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.eclipse.jetty.http.HttpHeaders;
 import org.eclipse.jetty.http.HttpStatus;
+import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.SubjectProfileService;
 import org.obiba.opal.core.service.security.SubjectAclService;
@@ -213,13 +214,14 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     String folderNode = "/files" + path;
     boolean found = false;
     for(SubjectAclService.Permissions acl : subjectAclService
-        .getNodePermissions("opal", folderNode, SubjectAclService.SubjectType.SUBJECT_CREDENTIALS)) {
+        .getNodePermissions("opal", folderNode, SubjectAcl.SubjectType.SUBJECT_CREDENTIALS)) {
       found = findPermission(acl, HOME_PERM);
       if(found) break;
     }
     if(!found) {
-      subjectAclService.addSubjectPermission("opal", folderNode,
-          SubjectAclService.SubjectType.SUBJECT_CREDENTIALS.subjectFor(username), HOME_PERM);
+      subjectAclService
+          .addSubjectPermission("opal", folderNode, SubjectAcl.SubjectType.SUBJECT_CREDENTIALS.subjectFor(username),
+              HOME_PERM);
     }
   }
 
@@ -241,7 +243,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         if(s != null) {
           Session session = s.getSession(false);
           log.trace("Unbinding subject {} session {} from executing thread {}", s.getPrincipal(),
-              session != null ? session.getId() : "null", Thread.currentThread().getId());
+              session == null ? "null" : session.getId(), Thread.currentThread().getId());
         }
       }
     } finally {

@@ -12,26 +12,29 @@ package org.obiba.opal.web.system.project.security;
 
 import java.util.Collection;
 
+import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.support.InvalidRequestException;
 
+import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
+
 public abstract class AbstractProjectPermissionsResource {
 
-  protected void setPermission(Collection<String> principals, SubjectAclService.SubjectType type, String permission) {
+  protected void setPermission(Collection<String> principals, SubjectType type, String permission) {
     validatePrincipals(principals);
 
     for(String principal : principals) {
-      SubjectAclService.Subject subject = type.subjectFor(principal);
+      SubjectAcl.Subject subject = type.subjectFor(principal);
       getSubjectAclService().deleteSubjectPermissions(ProjectPermissionsResource.DOMAIN, getNode(), subject);
       getSubjectAclService().addSubjectPermission(ProjectPermissionsResource.DOMAIN, getNode(), subject, permission);
     }
   }
 
-  protected void deletePermissions(Collection<String> principals, SubjectAclService.SubjectType type) {
+  protected void deletePermissions(Collection<String> principals, SubjectType type) {
     validatePrincipals(principals);
 
     for(String principal : principals) {
-      SubjectAclService.Subject subject = type.subjectFor(principal);
+      SubjectAcl.Subject subject = type.subjectFor(principal);
       getSubjectAclService().deleteSubjectPermissions(ProjectPermissionsResource.DOMAIN, getNode(), subject);
     }
   }

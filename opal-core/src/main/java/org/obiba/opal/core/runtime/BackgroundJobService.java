@@ -20,7 +20,7 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
-import org.obiba.opal.core.runtime.security.BackgroundJobServiceAuthToken;
+import org.obiba.opal.core.security.BackgroundJobServiceAuthToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

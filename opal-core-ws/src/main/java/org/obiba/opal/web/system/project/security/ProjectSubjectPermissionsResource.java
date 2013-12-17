@@ -18,6 +18,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Iterables;
 
+import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 import static org.obiba.opal.web.system.project.security.ProjectPermissionsResource.DOMAIN;
 import static org.obiba.opal.web.system.project.security.ProjectPermissionsResource.MagmaPermissionsPredicate;
 
@@ -61,7 +63,7 @@ public class ProjectSubjectPermissionsResource {
    */
   @GET
   public Iterable<Opal.Acl> getSubjectPermissions(
-      @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type) {
+      @QueryParam("type") @DefaultValue("SUBJECT_CREDENTIALS") SubjectType type) {
 
     // make sure project exists
     projectService.getProject(name);
@@ -83,13 +85,12 @@ public class ProjectSubjectPermissionsResource {
    * @return
    */
   @DELETE
-  public Response deleteSubjectPermissions(
-      @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type) {
+  public Response deleteSubjectPermissions(@QueryParam("type") @DefaultValue("SUBJECT_CREDENTIALS") SubjectType type) {
 
     // make sure project exists
     projectService.getProject(name);
 
-    SubjectAclService.Subject subject = type.subjectFor(principal);
+    SubjectAcl.Subject subject = type.subjectFor(principal);
     for(SubjectAclService.Permissions permissions : Iterables
         .concat(subjectAclService.getSubjectNodeHierarchyPermissions(DOMAIN, getProjectNode(), subject),
             subjectAclService.getSubjectNodeHierarchyPermissions(DOMAIN, getDatasourceNode(), subject))) {

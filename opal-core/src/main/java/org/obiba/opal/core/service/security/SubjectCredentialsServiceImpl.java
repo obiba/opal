@@ -38,6 +38,9 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
+import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
+import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType.SUBJECT_CREDENTIALS;
+
 @Component
 public class SubjectCredentialsServiceImpl implements SubjectCredentialsService {
 
@@ -212,8 +215,8 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     orientDbService.delete(subjectCredentials);
     if(!toSave.isEmpty()) orientDbService.save(toSave);
     // Delete subjectCredentials's permissions
-    subjectAclService.deleteSubjectPermissions(OPAL_DOMAIN, null,
-        SubjectAclService.SubjectType.SUBJECT_CREDENTIALS.subjectFor(subjectCredentials.getName()));
+    subjectAclService
+        .deleteSubjectPermissions(OPAL_DOMAIN, null, SUBJECT_CREDENTIALS.subjectFor(subjectCredentials.getName()));
     subjectProfileService.deleteProfile(subjectCredentials.getName());
 
     if(subjectCredentials.getType() == SubjectCredentials.Type.APPLICATION) {
@@ -252,7 +255,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     if(!toSave.isEmpty()) orientDbService.save(toSave);
     // Delete group's permissions
     subjectAclService.deleteSubjectPermissions(OPAL_DOMAIN, null,
-        SubjectAclService.SubjectType.valueOf(SubjectAclService.SubjectType.GROUP.name()).subjectFor(group.getName()));
+        SubjectType.valueOf(SubjectType.GROUP.name()).subjectFor(group.getName()));
   }
 
 }

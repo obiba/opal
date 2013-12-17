@@ -25,7 +25,7 @@ import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.type.DateTimeType;
-import org.obiba.opal.core.runtime.security.BackgroundJobServiceAuthToken;
+import org.obiba.opal.core.security.BackgroundJobServiceAuthToken;
 import org.obiba.opal.search.service.OpalSearchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

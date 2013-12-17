@@ -62,7 +62,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.obiba.core.util.StreamUtil;
 import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.core.runtime.security.support.OpalPermissions;
+import org.obiba.opal.core.security.OpalPermissions;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.AclAction;

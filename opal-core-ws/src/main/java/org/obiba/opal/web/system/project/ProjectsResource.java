@@ -24,7 +24,7 @@ import org.obiba.magma.MagmaRuntimeException;
 import org.obiba.magma.NoSuchDatasourceException;
 import org.obiba.magma.support.DatasourceParsingException;
 import org.obiba.opal.core.domain.Project;
-import org.obiba.opal.core.runtime.security.support.OpalPermissions;
+import org.obiba.opal.core.security.OpalPermissions;
 import org.obiba.opal.core.service.ProjectService;
 import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.magma.support.NoSuchDatasourceFactoryException;

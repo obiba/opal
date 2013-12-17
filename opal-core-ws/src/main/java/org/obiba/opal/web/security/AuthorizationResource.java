@@ -26,6 +26,8 @@ import org.springframework.stereotype.Component;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 
+import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
+
 @Component
 @Scope("request")
 @Path("/authz/{resource:.*}")
@@ -39,14 +41,14 @@ public class AuthorizationResource {
 
   @GET
   public Iterable<Opal.Acl> get(@QueryParam("domain") @DefaultValue("opal") String domain,
-      @QueryParam("type") SubjectAclService.SubjectType type) {
+      @QueryParam("type") SubjectType type) {
     return Iterables
         .transform(subjectAclService.getNodePermissions(domain, getNode(), type), PermissionsToAclFunction.INSTANCE);
   }
 
   @POST
   public Opal.Acl add(@QueryParam("domain") @DefaultValue("opal") String domain, @QueryParam("subject") String subject,
-      @QueryParam("type") SubjectAclService.SubjectType type, @QueryParam("perm") String permission) {
+      @QueryParam("type") SubjectType type, @QueryParam("perm") String permission) {
     subjectAclService.addSubjectPermission(domain, getNode(), type.subjectFor(subject), permission);
     return PermissionsToAclFunction.INSTANCE
         .apply(subjectAclService.getSubjectNodePermissions(domain, getNode(), type.subjectFor(subject)));
@@ -54,8 +56,7 @@ public class AuthorizationResource {
 
   @DELETE
   public Opal.Acl delete(@QueryParam("domain") @DefaultValue("opal") String domain,
-      @QueryParam("subject") String subject, @QueryParam("type") SubjectAclService.SubjectType type,
-      @QueryParam("perm") String permission) {
+      @QueryParam("subject") String subject, @QueryParam("type") SubjectType type, @QueryParam("perm") String permission) {
     if(Strings.isNullOrEmpty(permission)) {
       subjectAclService.deleteSubjectPermissions(domain, getNode(), type.subjectFor(subject));
     } else {

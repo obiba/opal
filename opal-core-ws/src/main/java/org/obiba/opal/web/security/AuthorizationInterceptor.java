@@ -29,7 +29,6 @@ import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.resteasy.util.IsHttpMethod;
 import org.obiba.opal.core.service.security.SubjectAclService;
-import org.obiba.opal.core.service.security.SubjectAclService.SubjectType;
 import org.obiba.opal.web.ws.inject.RequestAttributesProvider;
 import org.obiba.opal.web.ws.intercept.RequestCyclePostProcess;
 import org.obiba.opal.web.ws.intercept.RequestCyclePreProcess;
@@ -46,6 +45,7 @@ import com.google.common.collect.Sets;
 
 import static javax.ws.rs.HttpMethod.GET;
 import static javax.ws.rs.HttpMethod.OPTIONS;
+import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 
 @Component
 public class AuthorizationInterceptor extends AbstractSecurityComponent

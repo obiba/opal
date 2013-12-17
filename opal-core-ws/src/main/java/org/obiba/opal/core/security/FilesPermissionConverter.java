@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.runtime.security.support;
+package org.obiba.opal.core.security;
 
 import org.obiba.opal.web.model.Opal.AclAction;
 import org.springframework.stereotype.Component;
@@ -57,8 +57,7 @@ public class FilesPermissionConverter extends OpalPermissionConverter {
         String[] args = args(node, "/files/(.+)");
         return args.length == 0
             ? Lists.newArrayList(toRest("/files", "GET:GET/*"), toRest("/files", "POST:GET/*"))
-            : Lists.newArrayList(toRest("/files/{0}", "GET:GET/*", args),
-                toRest("/files/{0}", "POST:GET/*", args));
+            : Lists.newArrayList(toRest("/files/{0}", "GET:GET/*", args), toRest("/files/{0}", "POST:GET/*", args));
       }
     },
     /**

@@ -9,7 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.security;
 
-import org.obiba.opal.core.service.security.SubjectAclService;
+import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.security.SubjectAclService.Permissions;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.Acl;
@@ -30,7 +30,7 @@ public class PermissionsToAclFunction implements Function<Permissions, Opal.Acl>
     return builder.build();
   }
 
-  static final Opal.Subject valueOf(SubjectAclService.Subject from) {
+  static final Opal.Subject valueOf(SubjectAcl.Subject from) {
     return Opal.Subject.newBuilder().setPrincipal(from.getPrincipal())
         .setType(Opal.Subject.SubjectType.valueOf(from.getType().name())).build();
   }

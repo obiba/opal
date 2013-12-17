@@ -37,6 +37,8 @@ import com.google.common.collect.Sets;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 
 import static com.orientechnologies.orient.core.metadata.schema.OClass.INDEX_TYPE;
+import static org.obiba.opal.core.domain.security.SubjectAcl.Subject;
+import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 
 @Component
 public class DefaultSubjectAclService implements SubjectAclService {
@@ -73,7 +75,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
     Iterable<SubjectAcl> subjectAcls = orientDbService
         .list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() + " where node = ? or node like ?",
             node, node + "/%");
-    Set<SubjectAclService.Subject> subjects = Sets.newTreeSet();
+    Set<Subject> subjects = Sets.newTreeSet();
     for(SubjectAcl acl : subjectAcls) {
       subjects.add(acl.getSubject());
       delete(acl);
@@ -87,7 +89,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
   @Override
   public void deleteNodePermissions(String domain, String node) {
-    Set<SubjectAclService.Subject> subjects = Sets.newTreeSet();
+    Set<Subject> subjects = Sets.newTreeSet();
     for(SubjectAcl acl : find(domain, node)) {
       subjects.add(acl.getSubject());
       delete(acl);
@@ -98,7 +100,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
   @Override
   public void deleteNodeHierarchyPermissions(String domain, String node) {
     deleteNodePermissions(domain, node);
-    Set<SubjectAclService.Subject> subjects = Sets.newTreeSet();
+    Set<Subject> subjects = Sets.newTreeSet();
     for(SubjectAcl acl : Iterables.concat(find(domain, node), findLike(domain, node + "/"))) {
       subjects.add(acl.getSubject());
       delete(acl);
@@ -107,7 +109,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public void deleteSubjectPermissions(String domain, String node, SubjectAclService.Subject subject) {
+  public void deleteSubjectPermissions(String domain, String node, Subject subject) {
     for(SubjectAcl acl : find(domain, node, subject)) {
       delete(acl);
     }
@@ -115,8 +117,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public void deleteSubjectPermissions(String domain, String node, SubjectAclService.Subject subject,
-      String permission) {
+  public void deleteSubjectPermissions(String domain, String node, Subject subject, String permission) {
     SubjectAcl acl = find(domain, node, subject, permission);
     if(acl != null) {
       delete(acl);
@@ -125,16 +126,14 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public void addSubjectPermissions(String domain, String node, SubjectAclService.Subject subject,
-      Iterable<String> permissions) {
+  public void addSubjectPermissions(String domain, String node, Subject subject, Iterable<String> permissions) {
     for(String permission : permissions) {
       addSubjectPermission(domain, node, subject, permission);
     }
   }
 
   @Override
-  public void addSubjectPermission(String domain, String node, @NotNull SubjectAclService.Subject subject,
-      @NotNull String permission) {
+  public void addSubjectPermission(String domain, String node, @NotNull Subject subject, @NotNull String permission) {
     Assert.notNull(subject, "subject cannot be null");
     Assert.notNull(permission, "permission cannot be null");
     HasUniqueProperties acl = new SubjectAcl(domain, node, subject, permission);
@@ -144,7 +143,7 @@ public class DefaultSubjectAclService implements SubjectAclService {
 
   @Override
   public Permissions getSubjectNodePermissions(@NotNull final String domain, @NotNull final String node,
-      @NotNull final SubjectAclService.Subject subject) {
+      @NotNull final Subject subject) {
     Assert.notNull(node, "node cannot be null");
     Assert.notNull(subject, "subject cannot be null");
 
@@ -195,40 +194,40 @@ public class DefaultSubjectAclService implements SubjectAclService {
     return entries.values();
   }
 
-  private Iterable<SubjectAcl> find(SubjectAclService.Subject subject) {
+  private Iterable<SubjectAcl> find(Subject subject) {
     return orientDbService
         .list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() + " where principal = ? and type = ?",
-            subject.getPrincipal(), subject.getType().toString());
+            subject.getPrincipal(), subject.getType());
   }
 
   private Iterable<SubjectAcl> find(String domain, String node, SubjectType type) {
     return orientDbService.list(SubjectAcl.class,
         "select from " + SubjectAcl.class.getSimpleName() + " where domain = ? and node = ? and type = ?", domain, node,
-        type.toString());
+        type);
   }
 
   private Iterable<SubjectAcl> findLike(String domain, String node, SubjectType type) {
     return orientDbService.list(SubjectAcl.class,
         "select from " + SubjectAcl.class.getSimpleName() + " where domain = ? and node like ? and type = ?", domain,
-        node + "%", type.toString());
+        node + "%", type);
   }
 
   private Iterable<SubjectAcl> find(String domain, SubjectType type) {
     return orientDbService
         .list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() + " where domain = ? and type = ?",
-            domain, type.toString());
+            domain, type);
   }
 
-  private Iterable<SubjectAcl> find(String domain, String node, SubjectAclService.Subject subject) {
+  private Iterable<SubjectAcl> find(String domain, String node, Subject subject) {
     return orientDbService.list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() +
         " where domain = ? and node = ? and principal = ? and type = ?", domain, node, subject.getPrincipal(),
-        subject.getType().toString());
+        subject.getType());
   }
 
-  private Iterable<SubjectAcl> findLike(String domain, String node, SubjectAclService.Subject subject) {
+  private Iterable<SubjectAcl> findLike(String domain, String node, Subject subject) {
     return orientDbService.list(SubjectAcl.class, "select from " + SubjectAcl.class.getSimpleName() +
         " where domain = ? and node like ? and principal = ? and type = ?", domain, node + "%", subject.getPrincipal(),
-        subject.getType().toString());
+        subject.getType());
   }
 
   private Iterable<SubjectAcl> find(String domain, String node) {
@@ -241,12 +240,12 @@ public class DefaultSubjectAclService implements SubjectAclService {
         " where domain = ? and node like ?", domain, node + "%");
   }
 
-  private SubjectAcl find(String domain, String node, SubjectAclService.Subject subject, String permission) {
+  private SubjectAcl find(String domain, String node, Subject subject, String permission) {
     return orientDbService.findUnique(new SubjectAcl(domain, node, subject, permission));
   }
 
   @Override
-  public Iterable<Permissions> getSubjectPermissions(final SubjectAclService.Subject subject) {
+  public Iterable<Permissions> getSubjectPermissions(final Subject subject) {
     return Iterables.transform(find(subject), new Function<SubjectAcl, Permissions>() {
 
       @Override
@@ -322,19 +321,19 @@ public class DefaultSubjectAclService implements SubjectAclService {
   }
 
   @Override
-  public Iterable<SubjectAclService.Subject> getSubjects(String domain, SubjectType type) {
-    return FluentIterable.from(find(domain, type)).transform(new Function<SubjectAcl, SubjectAclService.Subject>() {
+  public Iterable<Subject> getSubjects(String domain, SubjectType type) {
+    return FluentIterable.from(find(domain, type)).transform(new Function<SubjectAcl, Subject>() {
 
       @Override
-      public SubjectAclService.Subject apply(SubjectAcl from) {
+      public Subject apply(SubjectAcl from) {
         return from.getSubject();
       }
 
-    }).filter(new Predicate<SubjectAclService.Subject>() {
+    }).filter(new Predicate<Subject>() {
       final Collection<Subject> set = new TreeSet<>();
 
       @Override
-      public boolean apply(SubjectAclService.Subject input) {
+      public boolean apply(Subject input) {
         // add returns false if the set already contains the element
         return set.add(input);
       }
@@ -345,14 +344,14 @@ public class DefaultSubjectAclService implements SubjectAclService {
    * @param subjects
    */
   private void notifyListeners(Iterable<Subject> subjects) {
-    for(SubjectAclService.Subject s : subjects)
+    for(Subject s : subjects)
       notifyListeners(s);
   }
 
   /**
    * @param subject
    */
-  private void notifyListeners(SubjectAclService.Subject subject) {
+  private void notifyListeners(Subject subject) {
     for(SubjectAclChangeCallback c : callbacks) {
       try {
         c.onSubjectAclChanged(subject);

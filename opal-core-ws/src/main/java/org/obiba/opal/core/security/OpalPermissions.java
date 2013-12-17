@@ -7,12 +7,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.runtime.security.support;
+package org.obiba.opal.core.security;
 
 import java.net.URI;
 
+import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.security.SubjectAclService;
-import org.obiba.opal.core.service.security.SubjectAclService.Subject;
 import org.obiba.opal.web.model.Opal.AclAction;
 import org.obiba.opal.web.ws.cfg.OpalWsConfig;
 
@@ -53,7 +53,7 @@ public class OpalPermissions implements SubjectAclService.Permissions {
   }
 
   @Override
-  public Subject getSubject() {
+  public SubjectAcl.Subject getSubject() {
     return null;
   }
 

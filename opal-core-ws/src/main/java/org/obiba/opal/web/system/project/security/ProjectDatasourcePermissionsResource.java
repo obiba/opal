@@ -31,6 +31,8 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Iterables;
 
+import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
+
 @Component
 @Scope("request")
 @Path("/project/{name}/permissions/datasource")
@@ -59,7 +61,7 @@ public class ProjectDatasourcePermissionsResource extends AbstractProjectPermiss
    * @return
    */
   @GET
-  public Iterable<Opal.Acl> getDatasourcePermissions(@QueryParam("type") SubjectAclService.SubjectType type) {
+  public Iterable<Opal.Acl> getDatasourcePermissions(@QueryParam("type") SubjectType type) {
     // make sure datasource exists
     MagmaEngine.get().getDatasource(name);
 
@@ -78,7 +80,7 @@ public class ProjectDatasourcePermissionsResource extends AbstractProjectPermiss
    * @return
    */
   @POST
-  public Response setDatasourcePermission(@QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
+  public Response setDatasourcePermission(@QueryParam("type") @DefaultValue("SUBJECT_CREDENTIALS") SubjectType type,
       @QueryParam("principal") List<String> principals, @QueryParam("permission") DatasourcePermission permission) {
     // make sure datasource exists
     MagmaEngine.get().getDatasource(name);
@@ -94,8 +96,7 @@ public class ProjectDatasourcePermissionsResource extends AbstractProjectPermiss
    * @return
    */
   @DELETE
-  public Response deleteDatasourcePermissions(
-      @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
+  public Response deleteDatasourcePermissions(@QueryParam("type") @DefaultValue("SUBJECT_CREDENTIALS") SubjectType type,
       @QueryParam("principal") List<String> principals) {
     // make sure datasource exists
     MagmaEngine.get().getDatasource(name);

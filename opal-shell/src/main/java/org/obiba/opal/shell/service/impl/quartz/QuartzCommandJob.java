@@ -14,7 +14,7 @@ import java.util.Arrays;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
-import org.obiba.opal.core.runtime.security.BackgroundJobServiceAuthToken;
+import org.obiba.opal.core.security.BackgroundJobServiceAuthToken;
 import org.obiba.opal.shell.CommandJob;
 import org.obiba.opal.shell.CommandLines;
 import org.obiba.opal.shell.CommandRegistry;

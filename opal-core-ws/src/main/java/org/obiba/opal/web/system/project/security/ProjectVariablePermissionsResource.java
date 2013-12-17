@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Iterables;
 
+import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 import static org.obiba.opal.web.system.project.security.ProjectPermissionsResource.DOMAIN;
 
 @Component
@@ -67,7 +68,7 @@ public class ProjectVariablePermissionsResource extends AbstractProjectPermissio
    * @return
    */
   @GET
-  public Iterable<Opal.Acl> getTableVariablesPermissions(@QueryParam("type") SubjectAclService.SubjectType type) {
+  public Iterable<Opal.Acl> getTableVariablesPermissions(@QueryParam("type") SubjectType type) {
 
     // make sure datasource, table and variable exists
     MagmaEngine.get().getDatasource(name).getValueTable(table).getVariable(variable);
@@ -88,8 +89,7 @@ public class ProjectVariablePermissionsResource extends AbstractProjectPermissio
    * @return
    */
   @POST
-  public Response setTableVariablePermission(
-      @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
+  public Response setTableVariablePermission(@QueryParam("type") @DefaultValue("SUBJECT_CREDENTIALS") SubjectType type,
       @QueryParam("principal") List<String> principals, @QueryParam("permission") VariablePermission permission) {
 
     // make sure datasource, table and variable exists
@@ -106,8 +106,7 @@ public class ProjectVariablePermissionsResource extends AbstractProjectPermissio
    * @return
    */
   @DELETE
-  public Response setTableVariablePermission(
-      @QueryParam("type") @DefaultValue("USER") SubjectAclService.SubjectType type,
+  public Response setTableVariablePermission(@QueryParam("type") @DefaultValue("SUBJECT_CREDENTIALS") SubjectType type,
       @QueryParam("principal") List<String> principals) {
     // make sure datasource, table and variable exists
     getValueTable().getVariable(variable);

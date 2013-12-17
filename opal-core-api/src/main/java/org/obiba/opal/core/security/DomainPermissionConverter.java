@@ -7,12 +7,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.runtime.security.support;
+package org.obiba.opal.core.security;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.obiba.opal.core.runtime.security.SubjectPermissionConverter;
 
 /**
  * Convert a opal domain permission as a set of magma domain permissions.

@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.core.runtime.security.support;
 
+import org.obiba.opal.core.security.DomainPermissionConverter;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
@@ -42,7 +43,7 @@ public class ReportTemplatePermissionConverter extends DomainPermissionConverter
     REPORT_TEMPLATE_ALL {
       @Override
       public Iterable<String> convert(String node) {
-        if (node.startsWith("/project/")) {
+        if(node.startsWith("/project/")) {
           String[] args = args(node, "/project/(.+)/report-template/(.+)");
           return Lists.newArrayList(toRest("/project/{0}/report-template/{1}", "*:GET/*", args),//
               toRest("/files/meta/reports/{0}/{1}", "GET:GET/GET", args),//
@@ -59,16 +60,16 @@ public class ReportTemplatePermissionConverter extends DomainPermissionConverter
     REPORT_TEMPLATE_READ {
       @Override
       public Iterable<String> convert(String node) {
-        if (node.startsWith("/project/")) {
+        if(node.startsWith("/project/")) {
           String[] args = args(node, "/project/(.+)/report-template/(.+)");
           return Lists.newArrayList(toRest("/project/{0}/report-template/{1}", "GET:GET/GET", args),//
               toRest("/files/meta/reports/{0}/{1}", "GET:GET/GET", args),//
               toRest("/files/reports/{0}/{1}", "GET:GET/GET", args));
         } else {
-        String[] args = args(node, "/report-template/(.+)");
-        return Lists.newArrayList(toRest("/report-template/{0}", "GET:GET/GET", args),//
-            toRest("/files/meta/reports/{0}", "GET:GET/GET", args),//
-            toRest("/files/reports/{0}", "GET:GET/GET", args));
+          String[] args = args(node, "/report-template/(.+)");
+          return Lists.newArrayList(toRest("/report-template/{0}", "GET:GET/GET", args),//
+              toRest("/files/meta/reports/{0}", "GET:GET/GET", args),//
+              toRest("/files/reports/{0}", "GET:GET/GET", args));
         }
       }
 

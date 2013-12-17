@@ -19,6 +19,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
+import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.web.model.Opal;
 import org.obiba.opal.web.model.Opal.Acl;
@@ -28,8 +29,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+
+import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
 
 @Component
 @Scope("request")
@@ -40,24 +44,23 @@ public class AuthorizationQueryResource {
   private SubjectAclService subjectAclService;
 
   @GET
-  public Iterable<Acls> get(@QueryParam("domain") String domain, @QueryParam("type") SubjectAclService.SubjectType type,
+  public Iterable<Acls> get(@QueryParam("domain") String domain, @QueryParam("type") SubjectType type,
       @QueryParam("node") List<String> nodes) {
     if(nodes == null || nodes.isEmpty()) return getSubjects(domain, type);
 
     return getAclsGroupedBySubject(domain, type, nodes);
   }
 
-  Iterable<Acls> getSubjects(String domain, SubjectAclService.SubjectType type) {
+  Iterable<Acls> getSubjects(String domain, SubjectType type) {
     List<Acls> acls = Lists.newArrayList();
-    for(SubjectAclService.Subject subject : subjectAclService.getSubjects(domain, type)) {
+    for(SubjectAcl.Subject subject : subjectAclService.getSubjects(domain, type)) {
       acls.add(newAcls(subject).build());
     }
     Collections.sort(acls, AclsComparator.INSTANCE);
     return acls;
   }
 
-  private Iterable<Acls> getAclsGroupedBySubject(String domain, SubjectAclService.SubjectType type,
-      Iterable<String> nodes) {
+  private Iterable<Acls> getAclsGroupedBySubject(String domain, SubjectType type, Iterable<String> nodes) {
     Map<Opal.Subject, Acls.Builder> aclMap = new HashMap<>();
 
     for(String node : nodes) {
@@ -83,7 +86,7 @@ public class AuthorizationQueryResource {
     return Acls.newBuilder().setSubject(subject);
   }
 
-  private Acls.Builder newAcls(SubjectAclService.Subject subject) {
+  private Acls.Builder newAcls(SubjectAcl.Subject subject) {
     return Acls.newBuilder().setSubject(PermissionsToAclFunction.valueOf(subject));
   }
 
@@ -93,10 +96,10 @@ public class AuthorizationQueryResource {
 
     @Override
     public int compare(Acls o1, Acls o2) {
-      if(o1.getSubject().getType() == o2.getSubject().getType()) {
-        return o1.getSubject().getPrincipal().compareTo(o2.getSubject().getPrincipal());
-      }
-      return o1.getSubject().getType().compareTo(o2.getSubject().getType());
+      return ComparisonChain.start() //
+          .compare(o1.getSubject().getType(), o2.getSubject().getType()) //
+          .compare(o1.getSubject().getPrincipal(), o2.getSubject().getPrincipal()) //
+          .result();
     }
   }
 

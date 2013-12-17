@@ -42,7 +42,7 @@ import org.obiba.magma.datasource.excel.ExcelDatasource;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Disposables;
 import org.obiba.magma.views.ViewManager;
-import org.obiba.opal.core.runtime.security.support.OpalPermissions;
+import org.obiba.opal.core.security.OpalPermissions;
 import org.obiba.opal.web.TimestampedResponses;
 import org.obiba.opal.web.model.Magma;
 import org.obiba.opal.web.model.Magma.TableDto;

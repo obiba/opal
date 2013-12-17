@@ -16,12 +16,21 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotBlank;
 import org.obiba.opal.core.domain.AbstractTimestamped;
 import org.obiba.opal.core.domain.HasUniqueProperties;
-import org.obiba.opal.core.service.security.SubjectAclService;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Lists;
 
 public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperties {
+
+  public enum SubjectType {
+
+    SUBJECT_CREDENTIALS, GROUP;
+
+    public Subject subjectFor(String principal) {
+      return new Subject(principal, this);
+    }
+  }
 
   @NotNull
   @NotBlank
@@ -36,8 +45,7 @@ public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperti
   private String principal;
 
   @NotNull
-  @NotBlank
-  private String type;
+  private SubjectType type;
 
   @NotNull
   @NotBlank
@@ -47,12 +55,11 @@ public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperti
 
   }
 
-  public SubjectAcl(@NotNull String domain, @NotNull String node, @NotNull SubjectAclService.Subject subject,
-      @NotNull String permission) {
-    this(domain, node, subject.getPrincipal(), subject.getType().toString(), permission);
+  public SubjectAcl(@NotNull String domain, @NotNull String node, @NotNull Subject subject, @NotNull String permission) {
+    this(domain, node, subject.getPrincipal(), subject.getType(), permission);
   }
 
-  private SubjectAcl(@NotNull String domain, @NotNull String node, @NotNull String principal, @NotNull String type,
+  private SubjectAcl(@NotNull String domain, @NotNull String node, @NotNull String principal, @NotNull SubjectType type,
       @NotNull String permission) {
     this.domain = domain;
     this.node = node;
@@ -108,16 +115,16 @@ public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperti
   }
 
   @NotNull
-  public String getType() {
+  public SubjectType getType() {
     return type;
   }
 
-  public void setType(@NotNull String type) {
+  public void setType(@NotNull SubjectType type) {
     this.type = type;
   }
 
-  public SubjectAclService.Subject getSubject() {
-    return SubjectAclService.SubjectType.valueOf(getType()).subjectFor(getPrincipal());
+  public Subject getSubject() {
+    return type.subjectFor(getPrincipal());
   }
 
   @Override
@@ -137,5 +144,55 @@ public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperti
     return Objects.equal(domain, other.domain) && Objects.equal(node, other.node) &&
         Objects.equal(principal, other.principal) && Objects.equal(type, other.type) &&
         Objects.equal(permission, other.permission);
+  }
+
+  public static class Subject implements Comparable<Subject> {
+
+    private final String principal;
+
+    private final SubjectType type;
+
+    public Subject(String principal, SubjectType type) {
+      this.principal = principal;
+      this.type = type;
+    }
+
+    public String getPrincipal() {
+      return principal;
+    }
+
+    public SubjectType getType() {
+      return type;
+    }
+
+    @Override
+    public int compareTo(@NotNull Subject other) {
+      return ComparisonChain.start() //
+          .compare(type, other.type) //
+          .compare(principal, other.principal) //
+          .result();
+    }
+
+    @Override
+    public String toString() {
+      return getType() + ":" + getPrincipal();
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hashCode(principal, type);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if(this == obj) {
+        return true;
+      }
+      if(obj == null || getClass() != obj.getClass()) {
+        return false;
+      }
+      final Subject other = (Subject) obj;
+      return Objects.equal(this.principal, other.principal) && Objects.equal(this.type, other.type);
+    }
   }
 }

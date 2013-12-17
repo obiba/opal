@@ -18,7 +18,7 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.obiba.opal.core.runtime.security.BackgroundJobServiceAuthToken;
+import org.obiba.opal.core.security.BackgroundJobServiceAuthToken;
 import org.springframework.stereotype.Component;
 
 @Component
