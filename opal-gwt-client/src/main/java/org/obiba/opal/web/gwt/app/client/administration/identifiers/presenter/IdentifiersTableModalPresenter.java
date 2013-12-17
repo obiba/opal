@@ -120,15 +120,12 @@ public class IdentifiersTableModalPresenter extends ModalPresenterWidget<Identif
     public void onResponseCode(Request request, Response response) {
       if(response.getStatusCode() == Response.SC_OK || response.getStatusCode() == Response.SC_CREATED) {
         getView().hide();
-        onSuccess();
+        fireEvent(new IdentifiersTableSelectionEvent.Builder().dto(table).build());
       } else {
         getView().showError(response.getText(), null);
       }
     }
 
-    private void onSuccess() {
-      fireEvent(new IdentifiersTableSelectionEvent.Builder().dto(table).build());
-    }
   }
 
   private class PropertiesValidationHandler extends ViewValidationHandler {

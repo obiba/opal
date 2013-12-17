@@ -38,10 +38,12 @@ import org.obiba.opal.web.gwt.app.client.administration.datashield.view.DataShie
 import org.obiba.opal.web.gwt.app.client.administration.fs.presenter.FilesAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.fs.view.FilesAdministrationView;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersAdministrationPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersMappingModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersTableModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersTablePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.ImportSystemIdentifiersModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.IdentifiersAdministrationView;
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.IdentifiersMappingModalView;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.IdentifiersTableModalView;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.IdentifiersTableView;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.view.ImportSystemIdentifiersModalView;
@@ -166,5 +168,7 @@ public class AdministrationModule extends AbstractPresenterModule {
         IdentifiersTableModalView.class);
     bindPresenterWidget(ImportSystemIdentifiersModalPresenter.class, ImportSystemIdentifiersModalPresenter.Display.class,
         ImportSystemIdentifiersModalView.class);
+    bindPresenterWidget(IdentifiersMappingModalPresenter.class, IdentifiersMappingModalPresenter.Display.class,
+        IdentifiersMappingModalView.class);
   }
 }

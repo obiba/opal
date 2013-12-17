@@ -2,6 +2,11 @@ package Identifiers;
 
 option java_package = "org.obiba.opal.web.model";
 
+message IdentifiersMappingDto {
+  required string name = 1;
+  repeated string entityTypes = 2;
+}
+
 message IdentifiersMappingConfigDto {
   optional string name = 1;
   optional bool allowIdentifierGeneration = 2 [default = false];

@@ -11,6 +11,7 @@
 package org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter;
 
 import org.obiba.opal.web.model.client.magma.TableDto;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 
 import com.gwtplatform.mvp.client.UiHandlers;
 
@@ -22,4 +23,9 @@ public interface IdentifiersTableUiHandlers extends UiHandlers {
 
   void onImportSystemIdentifiers();
 
+  void onAddIdentifiersMapping();
+
+  void onEditIdentifiersMapping(VariableDto variable);
+
+  void onDeleteIdentifiersMapping(VariableDto variable);
 }

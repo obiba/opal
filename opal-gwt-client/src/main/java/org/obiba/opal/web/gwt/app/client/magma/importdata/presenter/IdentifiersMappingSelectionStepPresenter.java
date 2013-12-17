@@ -14,7 +14,7 @@ import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.model.client.opal.IdentifiersMappingDto;
+import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingDto;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;

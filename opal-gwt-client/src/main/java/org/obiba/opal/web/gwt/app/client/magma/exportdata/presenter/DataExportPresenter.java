@@ -27,7 +27,7 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingConfigDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.opal.ExportCommandOptionsDto;
-import org.obiba.opal.web.model.client.opal.IdentifiersMappingDto;
+import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingDto;
 
 import com.google.common.collect.Sets;
 import com.google.gwt.core.client.JavaScriptObject;

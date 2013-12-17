@@ -19,7 +19,7 @@ import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
-import org.obiba.opal.web.model.client.opal.IdentifiersMappingDto;
+import org.obiba.opal.web.model.client.identifiers.IdentifiersMappingDto;
 
 import com.github.gwtbootstrap.client.ui.Alert;
 import com.google.gwt.core.client.JsArray;

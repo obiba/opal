@@ -43,16 +43,21 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
 
   private final ModalProvider<ImportSystemIdentifiersModalPresenter> importSystemIdentifiersModalProvider;
 
+  private final ModalProvider<IdentifiersMappingModalPresenter> identifiersMappingModalProvider;
+
   private TableDto table;
 
   private Runnable removeConfirmation;
 
   @Inject
   public IdentifiersTablePresenter(EventBus eventBus, Display view,
-      ModalProvider<ImportSystemIdentifiersModalPresenter> importSystemIdentifiersModalProvider) {
+      ModalProvider<ImportSystemIdentifiersModalPresenter> importSystemIdentifiersModalProvider,
+      ModalProvider<IdentifiersMappingModalPresenter> identifiersMappingModalProvider) {
     super(eventBus, view);
     this.importSystemIdentifiersModalProvider = importSystemIdentifiersModalProvider;
     this.importSystemIdentifiersModalProvider.setContainer(this);
+    this.identifiersMappingModalProvider = identifiersMappingModalProvider;
+    this.identifiersMappingModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -94,7 +99,7 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
 
   @Override
   public void onDeleteIdentifiersTable() {
-    removeConfirmation = new RemoveRunnable();
+    removeConfirmation = new RemoveIdentifiersTableRunnable();
 
     ConfirmationRequiredEvent event = ConfirmationRequiredEvent
         .createWithKeys(removeConfirmation, "removeIdentifiersTable", "confirmRemoveIdentifiersTable");
@@ -108,6 +113,32 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
       ImportSystemIdentifiersModalPresenter p = importSystemIdentifiersModalProvider.get();
       p.initialize(table);
     }
+  }
+
+  @Override
+  public void onAddIdentifiersMapping() {
+    if(table != null) {
+      IdentifiersMappingModalPresenter p = identifiersMappingModalProvider.get();
+      p.initialize(table);
+    }
+  }
+
+  @Override
+  public void onEditIdentifiersMapping(VariableDto variable) {
+    IdentifiersMappingModalPresenter p = identifiersMappingModalProvider.get();
+    p.initialize(variable, table);
+  }
+
+  @Override
+  public void onDeleteIdentifiersMapping(VariableDto variable) {
+    removeConfirmation = new RemoveIdentifiersMappingRunnable(variable);
+
+    ConfirmationRequiredEvent event = ConfirmationRequiredEvent
+        .createWithKeys(removeConfirmation, "removeIdentifiersMapping", "confirmRemoveIdentifiersMapping");
+
+    fireEvent(event);
+
+
   }
 
   //
@@ -125,7 +156,7 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
     }
   }
 
-  private class RemoveRunnable implements Runnable {
+  private class RemoveIdentifiersTableRunnable implements Runnable {
     @Override
     public void run() {
       ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
@@ -142,6 +173,37 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
       };
 
       String uri = UriBuilders.IDENTIFIERS_TABLE.create().build(table.getName());
+      ResourceRequestBuilderFactory.newBuilder().forResource(uri).delete().withCallback(SC_OK, callbackHandler)
+          .withCallback(SC_FORBIDDEN, callbackHandler).withCallback(SC_INTERNAL_SERVER_ERROR, callbackHandler)
+          .withCallback(SC_NOT_FOUND, callbackHandler).send();
+    }
+
+  }
+
+  private class RemoveIdentifiersMappingRunnable implements Runnable {
+
+    private final VariableDto variable;
+
+    private RemoveIdentifiersMappingRunnable(VariableDto variable) {
+      this.variable = variable;
+    }
+
+    @Override
+    public void run() {
+      ResponseCodeCallback callbackHandler = new ResponseCodeCallback() {
+
+        @Override
+        public void onResponseCode(Request request, Response response) {
+          if(response.getStatusCode() == SC_OK) {
+            fireEvent(new IdentifiersTableSelectionEvent.Builder().dto(table).build());
+          } else {
+            String errorMessage = response.getText().isEmpty() ? "UnknownError" : response.getText();
+            fireEvent(NotificationEvent.newBuilder().error(errorMessage).build());
+          }
+        }
+      };
+
+      String uri = UriBuilders.IDENTIFIERS_TABLE_VARIABLE.create().build(table.getName(), variable.getName());
       ResourceRequestBuilderFactory.newBuilder().forResource(uri).delete().withCallback(SC_OK, callbackHandler)
           .withCallback(SC_FORBIDDEN, callbackHandler).withCallback(SC_INTERNAL_SERVER_ERROR, callbackHandler)
           .withCallback(SC_NOT_FOUND, callbackHandler).send();

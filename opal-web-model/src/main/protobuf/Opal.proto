@@ -2,11 +2,6 @@ package Opal;
 
 option java_package = "org.obiba.opal.web.model";
 
-message IdentifiersMappingDto {
-  required string name = 1;
-  repeated string entityTypes = 2;
-}
-
 message FunctionalUnitDto {
   required string name = 1;
   required string keyVariableName = 2;

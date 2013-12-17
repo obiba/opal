@@ -438,6 +438,13 @@ public enum UriBuilders {
     }
   },
 
+  IDENTIFIERS_TABLE_VARIABLE {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("identifiers", "table","{}", "variable", "{}");
+    }
+  },
+
   IDENTIFIERS_TABLE_VALUESETS {
     @Override
     public UriBuilder create() {

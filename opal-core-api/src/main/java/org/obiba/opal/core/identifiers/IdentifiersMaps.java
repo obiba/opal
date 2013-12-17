@@ -83,6 +83,7 @@ public class IdentifiersMaps implements Iterable<IdentifiersMaps.IdentifiersMap>
   /**
    * For each entities in the identifiers table, extract the private identifiers corresponding to the named
    * identifiers mapping.
+   *
    * @param identifiersTable
    * @param idMapping variable name which values are the private identifiers
    */
@@ -93,6 +94,7 @@ public class IdentifiersMaps implements Iterable<IdentifiersMaps.IdentifiersMap>
 
   /**
    * Get all private entities: entities with non-null private identifiers.
+   *
    * @return
    */
   public Iterable<VariableEntity> getPrivateEntities() {
@@ -130,7 +132,9 @@ public class IdentifiersMaps implements Iterable<IdentifiersMaps.IdentifiersMap>
 
       @Override
       public IdentifiersMap next() {
-        return new IdentifiersMap(systemEntities.next().getIdentifier(), (String) privateIdentifiers.next().getValue());
+        Value value = privateIdentifiers.next();
+        return new IdentifiersMap(systemEntities.next().getIdentifier(),
+            value.isNull() ? null : (String) value.getValue());
       }
 
       @Override

@@ -308,6 +308,11 @@ public interface Translations extends Constants {
   @DefaultStringValue("A variable already exists with this name.")
   String variableNameAlreadyExists();
 
+  @Description("Identifiers mapping name already exists label")
+  @DefaultStringValue("An identifiers mapping already exists with this name.")
+  String identifiersMappingNameAlreadyExists();
+
+
   @Description("Attribute name already exists label")
   @DefaultStringValue("The specified attribute name already exists.")
   String attributeNameAlreadyExists();
@@ -686,6 +691,7 @@ public interface Translations extends Constants {
       "removeView", "Remove View",//
       "removeTable", "Remove Table",//
       "removeIdentifiersTable", "Remove Identifiers Table",//
+      "removeIdentifiersMapping", "Remove Identifiers Mapping",//
       "removeDerivedVariable", "Remove Derived Variable",//
       "removeVariable", "Remove Variable",//
       "deleteDataShieldAggregateMethod", "Delete Aggregating Method",//
@@ -739,6 +745,9 @@ public interface Translations extends Constants {
       //
       "confirmRemoveIdentifiersTable",
       "Please confirm that you want to remove the current identifiers table. This cannot be undone and all identifiers of this table will be lost.",
+      //
+      "confirmRemoveIdentifiersMapping",
+      "Please confirm that you want to remove this identifiers mapping. This cannot be undone and all identifiers of this mapping will be lost.",
       //
       "confirmRemoveDerivedVariable", "Please confirm that you want to remove the current derived variable.",//
       "confirmRemoveVariable",
@@ -2030,6 +2039,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Add Variable")
   String addVariable();
 
+  @Description("Add Identifiers Mapping label")
+  @DefaultStringValue("Add Identifiers Mapping")
+  String addIdentifiersMapping();
+
   @Description("Add variables to view... label")
   @DefaultStringValue("Add Variables to View...")
   String addVariablesToView();
@@ -2396,6 +2409,10 @@ public interface Translations extends Constants {
   @Description("Edit properties label")
   @DefaultStringValue("Edit properties")
   String editProperties();
+
+  @Description("Edit Identifiers Mapping label")
+  @DefaultStringValue("Edit Identifiers Mapping")
+  String editIdentifiersMapping();
 
   @Description("Edit <Variable> properties label")
   @DefaultStringValue("Edit {0} properties")

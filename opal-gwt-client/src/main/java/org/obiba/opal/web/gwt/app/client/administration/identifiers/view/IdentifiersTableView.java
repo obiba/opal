@@ -10,11 +10,19 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.identifiers.view;
 
+import java.util.ArrayList;
+
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersTablePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersTableUiHandlers;
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.VariableAttributeColumn;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
+import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -34,9 +42,14 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
+import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.Range;
+import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
+import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 
 public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiHandlers>
     implements IdentifiersTablePresenter.Display {
@@ -56,22 +69,35 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
   Label idMappingsCount;
 
   @UiField
-  Panel tablePanel;
+  Panel mappingsPanel;
 
-  private SimplePager pager;
+  @UiField
+  Panel identifiersPanel;
 
-  private ValueSetsDataProvider provider;
+  private final Translations translations;
+
+  private final ListDataProvider<VariableDto> variablesProvider;
+
+  private SimplePager variablesPager;
+
+  private SimplePager valueSetsPager;
+
+  private final ValueSetsDataProvider valueSetsProvider;
 
   private TableDto table;
 
-  private Table<ValueSetsDto.ValueSetDto> idTable;
+  private Table<VariableDto> variablesTable;
+
+  private Table<ValueSetsDto.ValueSetDto> valueSetsTable;
 
   private JsArrayString variableNames;
 
   @Inject
-  public IdentifiersTableView(Binder uiBinder) {
+  public IdentifiersTableView(Binder uiBinder, Translations translations) {
     initWidget(uiBinder.createAndBindUi(this));
-    provider = new ValueSetsDataProvider();
+    valueSetsProvider = new ValueSetsDataProvider();
+    variablesProvider = new ListDataProvider<VariableDto>();
+    this.translations = translations;
   }
 
   @Override
@@ -85,25 +111,15 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
 
   @Override
   public void setVariables(JsArray<VariableDto> variables) {
-    tablePanel.clear();
-
-    pager = new SimplePager(SimplePager.TextLocation.RIGHT);
-    pager.addStyleName("pull-right bottom-margin");
-    tablePanel.add(pager);
-    createAndInitializeIdTable(variables);
-    tablePanel.add(idTable);
-
-    for(HasData<ValueSetsDto.ValueSetDto> display : provider.getDataDisplays()) {
-      provider.removeDataDisplay(display);
-    }
-    provider.addDataDisplay(idTable);
+    populateMappingsPanel(variables);
+    populateIdentifiersPanel(variables);
   }
 
   @Override
   public void setValueSets(int offset, ValueSetsDto valueSets) {
     variableNames = valueSets.getVariablesArray();
-    provider.updateRowData(offset, JsArrays.toList(valueSets.getValueSetsArray()));
-    idTable.setVisibleRange(offset, idTable.getPageSize());
+    valueSetsProvider.updateRowData(offset, JsArrays.toList(valueSets.getValueSetsArray()));
+    valueSetsTable.setVisibleRange(offset, valueSetsTable.getPageSize());
   }
 
   @UiHandler("deleteIdTable")
@@ -114,6 +130,11 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
   @UiHandler("importSystemId")
   void onImportSystemIdentifiers(ClickEvent event) {
     getUiHandlers().onImportSystemIdentifiers();
+  }
+
+  @UiHandler("addIdMapping")
+  void onAddIdentifiersMapping(ClickEvent event) {
+    getUiHandlers().onAddIdentifiersMapping();
   }
 
   //
@@ -129,24 +150,98 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
     }
   }
 
-  private void createAndInitializeIdTable(JsArray<VariableDto> variables) {
-    idTable = new Table<ValueSetsDto.ValueSetDto>();
-    idTable.setPageSize(20);
-    idTable.addColumn(new TextColumn<ValueSetsDto.ValueSetDto>() {
+  private void populateMappingsPanel(JsArray<VariableDto> variables) {
+    if(variablesTable != null) {
+      variablesProvider.removeDataDisplay(variablesTable);
+    }
+    mappingsPanel.clear();
+    variablesPager = new SimplePager(SimplePager.TextLocation.RIGHT);
+    variablesPager.addStyleName("pull-right bottom-margin");
+    mappingsPanel.add(variablesPager);
+    createAndInitializeVariablesTable();
+    mappingsPanel.add(variablesTable);
+
+    variablesProvider.addDataDisplay(variablesTable);
+    variablesProvider.setList(JsArrays.toList(variables));
+    variablesProvider.refresh();
+  }
+
+  private void populateIdentifiersPanel(JsArray<VariableDto> variables) {
+    if(valueSetsTable != null) {
+      valueSetsProvider.removeDataDisplay(valueSetsTable);
+    }
+    identifiersPanel.clear();
+
+    valueSetsPager = new SimplePager(SimplePager.TextLocation.RIGHT);
+    valueSetsPager.addStyleName("pull-right bottom-margin");
+    identifiersPanel.add(valueSetsPager);
+    createAndInitializeValueSetsTable(variables);
+    identifiersPanel.add(valueSetsTable);
+    valueSetsProvider.addDataDisplay(valueSetsTable);
+  }
+
+  private void createAndInitializeValueSetsTable(JsArray<VariableDto> variables) {
+    valueSetsTable = new Table<ValueSetsDto.ValueSetDto>();
+    valueSetsTable.setPageSize(20);
+    valueSetsTable.addColumn(new TextColumn<ValueSetsDto.ValueSetDto>() {
 
       @Override
       public String getValue(ValueSetsDto.ValueSetDto value) {
         return value.getIdentifier();
       }
     }, "ID");
-    idTable.setColumnWidth(0, 1, Style.Unit.PX);
+    valueSetsTable.setColumnWidth(0, 1, Style.Unit.PX);
     for(VariableDto variable : JsArrays.toIterable(variables)) {
-      idTable.addColumn(new IdentifierColumn(variable), variable.getName());
+      valueSetsTable.addColumn(new IdentifierColumn(variable), variable.getName());
     }
-    idTable.addStyleName("pull-left");
-    pager.setDisplay(idTable);
-    idTable.setRowCount(table.getValueSetCount());
-    idTable.setPageStart(0);
+    valueSetsTable.addStyleName("pull-left");
+    valueSetsPager.setDisplay(valueSetsTable);
+    valueSetsTable.setRowCount(table.getValueSetCount());
+    valueSetsTable.setPageStart(0);
+  }
+
+  private void createAndInitializeVariablesTable() {
+    variablesTable = new Table<VariableDto>();
+    variablesTable.setPageSize(20);
+    variablesTable.addColumn(new TextColumn<VariableDto>() {
+      @Override
+      public String getValue(VariableDto object) {
+        return object.getName();
+      }
+    }, translations.nameLabel());
+    variablesTable.addColumn(new VariableAttributeColumn("label"), translations.labelLabel());
+    variablesTable.addColumn(new VariableActionsColumn(), translations.actionsLabel());
+    variablesTable.addStyleName("pull-left");
+    variablesPager.setDisplay(variablesTable);
+    variablesTable.setPageStart(0);
+  }
+
+  private class VariableActionsColumn extends ActionsColumn<VariableDto> {
+    private VariableActionsColumn() {
+      super(new ActionsProvider<VariableDto>() {
+
+        @Override
+        public String[] allActions() {
+          return new String[] { EDIT_ACTION, DELETE_ACTION };
+        }
+
+        @Override
+        public String[] getActions(VariableDto value) {
+          return allActions();
+        }
+      });
+      setActionHandler(new ActionHandler<VariableDto>() {
+        @Override
+        public void doAction(VariableDto object, String actionName) {
+
+          if(actionName.equalsIgnoreCase(DELETE_ACTION)) {
+            getUiHandlers().onDeleteIdentifiersMapping(object);
+          } else if(actionName.equalsIgnoreCase(EDIT_ACTION)) {
+            getUiHandlers().onEditIdentifiersMapping(object);
+          }
+        }
+      });
+    }
   }
 
   private class IdentifierColumn extends TextColumn<ValueSetsDto.ValueSetDto> {
