@@ -89,7 +89,6 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
 
   private class CustomIniSecurityManagerFactory extends IniSecurityManagerFactory {
 
-
     private CustomIniSecurityManagerFactory(String resourcePath) {
       super(resourcePath);
     }

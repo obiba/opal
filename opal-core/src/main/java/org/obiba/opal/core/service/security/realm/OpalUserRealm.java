@@ -13,6 +13,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.shiro.authc.AccountException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -24,14 +26,16 @@ import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.cache.MemoryConstrainedCacheManager;
-import org.apache.shiro.crypto.hash.Sha256Hash;
+import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.util.SimpleByteSource;
+import org.obiba.opal.core.cfg.OpalConfigurationService;
 import org.obiba.opal.core.domain.security.SubjectCredentials;
 import org.obiba.opal.core.service.security.SubjectCredentialsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -42,12 +46,30 @@ public class OpalUserRealm extends AuthorizingRealm {
 
   public static final String OPAL_REALM = "opal-user-realm";
 
+  /**
+   * Number of times the user password is hashed for attack resiliency
+   */
+  @Value("${org.obiba.opal.security.password.nbHashIterations}")
+  private int nbHashIterations;
+
   @Autowired
   private SubjectCredentialsService subjectCredentialsService;
 
-  public OpalUserRealm() {
+  @Autowired
+  private OpalConfigurationService opalConfigurationService;
+
+  private String salt;
+
+  @PostConstruct
+  public void postConstruct() {
+
     setCacheManager(new MemoryConstrainedCacheManager());
-    setCredentialsMatcher(new HashedCredentialsMatcher(Sha256Hash.ALGORITHM_NAME));
+
+    HashedCredentialsMatcher credentialsMatcher = new HashedCredentialsMatcher(Sha512Hash.ALGORITHM_NAME);
+    credentialsMatcher.setHashIterations(nbHashIterations);
+    setCredentialsMatcher(credentialsMatcher);
+
+    salt = opalConfigurationService.getOpalConfiguration().getSecretKey();
   }
 
   @Override
@@ -71,7 +93,7 @@ public class OpalUserRealm extends AuthorizingRealm {
     }
     SimpleAuthenticationInfo authInfo = new SimpleAuthenticationInfo(username, subjectCredentials.getPassword(),
         getName());
-    authInfo.setCredentialsSalt(new SimpleByteSource(username));
+    authInfo.setCredentialsSalt(new SimpleByteSource(salt));
     return authInfo;
   }
 
