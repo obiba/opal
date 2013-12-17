@@ -16,14 +16,17 @@ import javax.annotation.PreDestroy;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.ModularRealmAuthorizer;
+import org.apache.shiro.authz.permission.PermissionResolver;
 import org.apache.shiro.authz.permission.PermissionResolverAware;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.authz.permission.RolePermissionResolverAware;
 import org.apache.shiro.cache.MemoryConstrainedCacheManager;
+import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.realm.text.IniRealm;
 import org.apache.shiro.session.SessionListener;
 import org.apache.shiro.session.mgt.AbstractNativeSessionManager;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
@@ -38,7 +41,7 @@ import com.google.common.collect.ImmutableList;
 @Component
 public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> {
 
-  public static final String INI_REALM = "ini-realm";
+  public static final String INI_REALM = "opal-ini-realm";
 
   @Autowired
   private Set<Realm> realms;
@@ -48,6 +51,8 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
 
   @Autowired
   private RolePermissionResolver rolePermissionResolver;
+
+  private PermissionResolver permissionResolver = new OpalPermissionResolver();
 
   private SecurityManager securityManager;
 
@@ -84,6 +89,7 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
 
   private class CustomIniSecurityManagerFactory extends IniSecurityManagerFactory {
 
+
     private CustomIniSecurityManagerFactory(String resourcePath) {
       super(resourcePath);
     }
@@ -102,7 +108,7 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
 
       if(dsm.getAuthorizer() instanceof ModularRealmAuthorizer) {
         ((RolePermissionResolverAware) dsm.getAuthorizer()).setRolePermissionResolver(rolePermissionResolver);
-        ((PermissionResolverAware) dsm.getAuthorizer()).setPermissionResolver(new OpalPermissionResolver());
+        ((PermissionResolverAware) dsm.getAuthorizer()).setPermissionResolver(permissionResolver);
       }
       return dsm;
     }
@@ -111,6 +117,18 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
     protected void applyRealmsToSecurityManager(Collection<Realm> shiroRealms, SecurityManager securityManager) {
       super.applyRealmsToSecurityManager(ImmutableList.<Realm>builder().addAll(realms).addAll(shiroRealms).build(),
           securityManager);
+    }
+
+    @Override
+    protected Realm createRealm(Ini ini) {
+      // Set the resolvers first, because IniRealm is initialized before the resolvers are
+      // applied by the ModularRealmAuthorizer
+      IniRealm realm = new IniRealm();
+      realm.setName(INI_REALM);
+      realm.setRolePermissionResolver(rolePermissionResolver);
+      realm.setPermissionResolver(permissionResolver);
+      realm.setResourcePath(System.getProperty("OPAL_HOME") + "/conf/shiro.ini");
+      return realm;
     }
   }
 }
