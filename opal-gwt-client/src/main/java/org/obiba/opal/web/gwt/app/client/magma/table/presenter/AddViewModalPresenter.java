@@ -55,6 +55,14 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
+import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
+import static com.google.gwt.http.client.Response.SC_CREATED;
+import static com.google.gwt.http.client.Response.SC_FORBIDDEN;
+import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
+import static com.google.gwt.http.client.Response.SC_METHOD_NOT_ALLOWED;
+import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
+import static com.google.gwt.http.client.Response.SC_OK;
+
 public class AddViewModalPresenter extends ModalPresenterWidget<AddViewModalPresenter.Display>
     implements AddViewModalUiHandlers {
 
@@ -127,12 +135,12 @@ public class AddViewModalPresenter extends ModalPresenterWidget<AddViewModalPres
   public void createView() {
     getView().clearErrors();
 
-    if (!viewValidator.validate()) return;
-
-    ResponseCodeCallback completed = new CompletedCallback();
-    ResponseCodeCallback failed = new FailedCallback();
+    if(!viewValidator.validate()) return;
 
     String viewName = getView().getViewName().getText();
+
+    ResponseCodeCallback completed = new CompletedCallback(viewName);
+    ResponseCodeCallback failed = new FailedCallback();
 
     // Build the ViewDto for the request.
     ViewDtoBuilder viewDtoBuilder = ViewDtoBuilder.newBuilder().setName(viewName)
@@ -144,13 +152,9 @@ public class AddViewModalPresenter extends ModalPresenterWidget<AddViewModalPres
         .post()//
         .forResource(ub.build())//
         .withResourceBody(ViewDto.stringify(createViewDto(viewDtoBuilder)))//
-        .withCallback(Response.SC_CREATED, completed)//
-        .withCallback(Response.SC_OK, completed)//
-        .withCallback(Response.SC_BAD_REQUEST, failed)//
-        .withCallback(Response.SC_NOT_FOUND, failed)//
-        .withCallback(Response.SC_FORBIDDEN, failed)//
-        .withCallback(Response.SC_METHOD_NOT_ALLOWED, failed)//
-        .withCallback(Response.SC_INTERNAL_SERVER_ERROR, failed);
+        .withCallback(completed, SC_CREATED, SC_OK)//
+        .withCallback(failed, SC_BAD_REQUEST, SC_NOT_FOUND, SC_FORBIDDEN, SC_METHOD_NOT_ALLOWED,
+            SC_INTERNAL_SERVER_ERROR);//
 
     resourceRequestBuilder.send();
   }
@@ -159,8 +163,7 @@ public class AddViewModalPresenter extends ModalPresenterWidget<AddViewModalPres
     String fileName = fileSelectionPresenter.getSelectedFile();
     if(Strings.isNullOrEmpty(fileName)) {
       viewDtoBuilder.defaultVariableListView();
-    }
-    else {
+    } else {
       FileViewDto fileView = FileViewDto.create();
       fileView.setFilename(fileName);
       fileView.setType(getFileType(fileName));
@@ -209,9 +212,16 @@ public class AddViewModalPresenter extends ModalPresenterWidget<AddViewModalPres
   }
 
   private class CompletedCallback implements ResponseCodeCallback {
+
+    private final String viewName;
+
+    private CompletedCallback(String viewName) {
+      this.viewName = viewName;
+    }
+
     @Override
     public void onResponseCode(Request request, Response response) {
-      placeManager.revealPlace(ProjectPlacesHelper.getDatasourcePlace(datasourceDto.getName()));
+      placeManager.revealPlace(ProjectPlacesHelper.getTablePlace(datasourceDto.getName(), viewName));
       getView().closeDialog();
     }
   }
@@ -251,9 +261,11 @@ public class AddViewModalPresenter extends ModalPresenterWidget<AddViewModalPres
     }
 
     private void addViewNameValidators(Collection<FieldValidator> validators) {
-      validators.add(new RequiredTextValidator(getView().getViewName(), "ViewNameRequired", Display.FormField.VIEW_NAME.name()));
-      validators.add(new DisallowedCharactersValidator(getView().getViewName(), new char[] { '.', ':' },
-          "ViewNameDisallowedChars", Display.FormField.VIEW_NAME.name()));
+      validators.add(
+          new RequiredTextValidator(getView().getViewName(), "ViewNameRequired", Display.FormField.VIEW_NAME.name()));
+      validators.add(
+          new DisallowedCharactersValidator(getView().getViewName(), new char[] { '.', ':' }, "ViewNameDisallowedChars",
+              Display.FormField.VIEW_NAME.name()));
     }
 
     private void addTablesValidators(Collection<FieldValidator> validators) {
