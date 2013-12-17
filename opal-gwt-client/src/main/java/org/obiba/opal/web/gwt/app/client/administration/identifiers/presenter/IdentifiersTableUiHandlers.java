@@ -18,4 +18,8 @@ public interface IdentifiersTableUiHandlers extends UiHandlers {
 
   void onIdentifiersRequest(TableDto identifiersTable, String select, int offset, int limit);
 
+  void onDeleteIdentifiersTable();
+
+  void onImportSystemIdentifiers();
+
 }

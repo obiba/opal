@@ -133,28 +133,28 @@
 
             <g:Grid>
               <g:row>
-                <g:customCell styleName="top-aligned">
+                <g:customCell>
                   <g:Label ui:field="indexStatusText" addStyleNames="inline"/>
                 </g:customCell>
-                <g:customCell styleName="top-aligned">
+                <g:customCell>
 
                   <b:ProgressBar ui:field="progress" addStyleNames="xsmall-indent progress no-bottom-margin"/>
                 </g:customCell>
-                <g:customCell styleName="top-aligned">
+                <g:customCell>
 
-                  <g:Anchor ui:field="clearIndexLink" addStyleNames="inline xsmall-indent action">Clear</g:Anchor>
+                  <g:Anchor ui:field="clearIndexLink" addStyleNames="inline xsmall-indent">Clear</g:Anchor>
                 </g:customCell>
-                <g:customCell styleName="top-aligned">
+                <g:customCell>
 
-                  <g:Anchor ui:field="indexNowLink" addStyleNames="inline xsmall-indent action">Index now</g:Anchor>
+                  <g:Anchor ui:field="indexNowLink" addStyleNames="inline xsmall-indent">Index now</g:Anchor>
                 </g:customCell>
-                <g:customCell styleName="top-aligned">
+                <g:customCell>
 
-                  <g:Anchor ui:field="scheduleLink" addStyleNames="inline xsmall-indent action">Schedule indexing
+                  <g:Anchor ui:field="scheduleLink" addStyleNames="inline xsmall-indent">Schedule indexing
                   </g:Anchor>
                 </g:customCell>
-                <g:customCell styleName="top-aligned">
-                  <g:Anchor ui:field="cancelLink" addStyleNames="inline xsmall-indent action">Cancel</g:Anchor>
+                <g:customCell>
+                  <g:Anchor ui:field="cancelLink" addStyleNames="inline xsmall-indent">Cancel</g:Anchor>
                 </g:customCell>
               </g:row>
             </g:Grid>
@@ -163,19 +163,31 @@
 
         <b:FluidRow addStyleNames="text-align-center">
           <b:Column size="4">
-            <b:WellNavList>
-              <b:NavLink icon="TIME" ui:field="timestamps">?</b:NavLink>
-            </b:WellNavList>
+            <b:Well>
+              <b:Icon type="TIME"></b:Icon>
+              <g:Label addStyleNames="xsmall-indent inline-block">
+                <ui:msg description="Last update label">Last update</ui:msg>
+              </g:Label>
+              <g:Label ui:field="timestamps"/>
+            </b:Well>
           </b:Column>
           <b:Column size="4">
-            <b:WellNavList>
-              <b:NavLink icon="COLUMNS" ui:field="variableCount">? variables</b:NavLink>
-            </b:WellNavList>
+            <b:Well>
+              <b:Icon type="COLUMNS"></b:Icon>
+              <g:Label addStyleNames="xsmall-indent inline-block">
+                <ui:msg description="Number of variables label">Number of variables</ui:msg>
+              </g:Label>
+              <g:Label ui:field="variableCount"/>
+            </b:Well>
           </b:Column>
           <b:Column size="4">
-            <b:WellNavList>
-              <b:NavLink icon="USER" ui:field="entityCount">? entities</b:NavLink>
-            </b:WellNavList>
+            <b:Well>
+              <b:Icon type="ALIGN_JUSTIFY"></b:Icon>
+              <g:Label addStyleNames="xsmall-indent inline-block">
+                <ui:msg description="Number of entities label">Number of entities</ui:msg>
+              </g:Label>
+              <g:Label ui:field="entityCount"/>
+            </b:Well>
           </b:Column>
         </b:FluidRow>
 

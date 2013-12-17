@@ -11,7 +11,6 @@ package org.obiba.opal.web.gwt.app.client.magma.view;
 
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationMessages;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TableUiHandlers;
@@ -92,13 +91,13 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
   PropertiesTable propertiesTable;
 
   @UiField
-  NavLink timestamps;
+  Label timestamps;
 
   @UiField
-  NavLink variableCount;
+  Label variableCount;
 
   @UiField
-  NavLink entityCount;
+  Label entityCount;
 
   @UiField
   FlowPanel indexStatus;
@@ -312,14 +311,9 @@ public class TableView extends ViewWithUiHandlers<TableUiHandlers> implements Ta
     tableDto = dto;
     name.setText(dto.getName());
     entityType.setText(dto.getEntityType());
-    timestamps.setText(TranslationsUtils.replaceArguments(translations.lastUpdateOnLabel(),
-        Moment.create(dto.getTimestamps().getLastUpdate()).fromNow()));
-    variableCount.setText(dto.hasVariableCount()
-        ? translationMessages.variableCount(dto.getVariableCount())
-        : translations.unknownVariablesCount());
-    entityCount.setText(dto.hasValueSetCount()
-        ? translationMessages.entityCount(dto.getValueSetCount())
-        : translations.unknownEntitiesCount());
+    timestamps.setText(Moment.create(dto.getTimestamps().getLastUpdate()).fromNow());
+    variableCount.setText(dto.hasVariableCount() ? dto.getVariableCount() + "" : "-");
+    entityCount.setText(dto.hasValueSetCount() ? dto.getValueSetCount() + "" : "-");
   }
 
   @Override

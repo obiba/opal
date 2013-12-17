@@ -17,36 +17,66 @@
     ui:generateLocales="default">
 
   <g:FlowPanel>
-    <b:Heading size="3" ui:field="title"/>
+    <g:FlowPanel addStyleNames="clearfix">
+      <b:Heading size="3" ui:field="title" addStyleNames="pull-left no-top-margin"/>
+      <g:FlowPanel addStyleNames="pull-right">
+        <b:ButtonGroup>
+          <b:DropdownButton text="Import Identifiers" icon="UPLOAD">
+            <b:NavLink ui:field="importSystemId">
+              <ui:msg description="Import System Identifiers label">Import system identifiers...</ui:msg>
+            </b:NavLink>
+            <b:NavLink ui:field="importIdMapping">
+              <ui:msg description="Import Identifiers Mapping label">Import identifiers mapping...</ui:msg>
+            </b:NavLink>
+          </b:DropdownButton>
+        </b:ButtonGroup>
+        <b:ButtonGroup>
+          <b:Button icon="TRASH" ui:field="deleteIdTable">
+          </b:Button>
+        </b:ButtonGroup>
+      </g:FlowPanel>
+    </g:FlowPanel>
 
-    <b:Heading size="4">
-      <ui:msg description="Summary label">Summary</ui:msg>
-    </b:Heading>
-    <b:FluidRow>
-      <b:Column size="6">
-        <o:PropertiesTable keyStyleNames="span3">
+    <b:TabPanel tabPosition="above" ui:field="tabPanel">
+      <b:Tab heading="Mappings" active="true">
 
-          <o:PropertyPanel>
-            <g:Label>
-              <ui:msg description="Number of system identifiers label">Number of system identifiers</ui:msg>
-            </g:Label>
-            <g:Label ui:field="systemIdsCount"/>
-          </o:PropertyPanel>
+      </b:Tab>
+      <b:Tab heading="Summary">
+        <b:FluidRow addStyleNames="text-align-center">
+          <b:Column size="4">
+            <b:Well>
+              <b:Icon type="TIME"></b:Icon>
+              <g:Label addStyleNames="xsmall-indent inline-block">
+                <ui:msg description="Last update label">Last update</ui:msg>
+              </g:Label>
+              <g:Label ui:field="timestamps"/>
+            </b:Well>
+          </b:Column>
+          <b:Column size="4">
+            <b:Well>
+              <b:Icon type="COLUMNS"></b:Icon>
+              <g:Label addStyleNames="xsmall-indent inline-block">
+                <ui:msg description="Number of identifier mappings label">Number of identifier mappings</ui:msg>
+              </g:Label>
+              <g:Label ui:field="idMappingsCount"/>
+            </b:Well>
+          </b:Column>
+          <b:Column size="4">
+            <b:Well>
+              <b:Icon type="ALIGN_JUSTIFY"></b:Icon>
+              <g:Label addStyleNames="xsmall-indent inline-block">
+                <ui:msg description="Number of system identifiers label">Number of system identifiers</ui:msg>
+              </g:Label>
+              <g:Label ui:field="systemIdsCount"/>
+            </b:Well>
+          </b:Column>
+        </b:FluidRow>
+      </b:Tab>
+      <b:Tab heading="Identifiers">
+        <g:FlowPanel ui:field="tablePanel"/>
+      </b:Tab>
+    </b:TabPanel>
 
-          <o:PropertyPanel>
-            <g:Label>
-              <ui:msg description="Number of identifier mappings label">Number of identifier mappings</ui:msg>
-            </g:Label>
-            <g:Label ui:field="idMappingsCount"/>
-          </o:PropertyPanel>
 
-        </o:PropertiesTable>
-      </b:Column>
-    </b:FluidRow>
-
-    <b:Heading size="4" addStyleNames="pull-left">
-      <ui:msg description="Identifiers label">Identifiers</ui:msg>
-    </b:Heading>
-    <g:FlowPanel ui:field="tablePanel"/>
   </g:FlowPanel>
 </ui:UiBinder>

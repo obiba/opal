@@ -14,6 +14,7 @@ import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.Id
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersTableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
+import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -23,8 +24,10 @@ import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Style;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
@@ -42,6 +45,9 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
 
   @UiField
   Heading title;
+
+  @UiField
+  Label timestamps;
 
   @UiField
   Label systemIdsCount;
@@ -72,6 +78,7 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
   public void showIdentifiersTable(TableDto table) {
     this.table = table;
     title.setText(table.getEntityType());
+    timestamps.setText(Moment.create(table.getTimestamps().getLastUpdate()).fromNow());
     systemIdsCount.setText("" + table.getValueSetCount());
     idMappingsCount.setText("" + table.getVariableCount());
   }
@@ -98,6 +105,20 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
     provider.updateRowData(offset, JsArrays.toList(valueSets.getValueSetsArray()));
     idTable.setVisibleRange(offset, idTable.getPageSize());
   }
+
+  @UiHandler("deleteIdTable")
+  void onDeleteTable(ClickEvent event) {
+    getUiHandlers().onDeleteIdentifiersTable();
+  }
+
+  @UiHandler("importSystemId")
+  void onImportSystemIdentifiers(ClickEvent event) {
+    getUiHandlers().onImportSystemIdentifiers();
+  }
+
+  //
+  // Private methods
+  //
 
   private class ValueSetsDataProvider extends AsyncDataProvider<ValueSetsDto.ValueSetDto> {
     @Override

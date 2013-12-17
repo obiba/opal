@@ -20,8 +20,4 @@ public interface IdentifiersAdministrationUiHandlers extends UiHandlers {
 
   void onAddIdentifiersTable();
 
-  void onDeleteIdentifiersTable();
-
-  void onImportSystemIdentifiers();
-
 }
