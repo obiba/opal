@@ -20,11 +20,11 @@
     <g:InlineLabel ui:field="noValues">
       <ui:msg description="No Values label">No Values</ui:msg>
     </g:InlineLabel>
-    <g:PopupPanel ui:field="navigationPopup" autoHideEnabled="true" styleName="gwt-MenuBarPopup"></g:PopupPanel>
+    <g:PopupPanel ui:field="navigationPopup" autoHideEnabled="true" styleName="gwt-MenuBarPopup"/>
 
     <g:FlowPanel ui:field="searchPanel">
-      <b:ControlGroup>
-        <b:InputAddOn prependIcon="SEARCH">
+      <b:ControlGroup ui:field="searchIdentifierGroup" visible="false">
+      <b:InputAddOn prependIcon="SEARCH">
           <b:TextBox ui:field="searchBox" placeholder="search for an identifier..."/>
         </b:InputAddOn>
       </b:ControlGroup>
@@ -44,7 +44,7 @@
         </b:HelpBlock>
       </b:ControlGroup>
 
-      <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"></b:SimplePager>
+      <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right"/>
     </g:FlowPanel>
 
     <o:CollapsiblePanel ui:field="addPanel">
@@ -59,7 +59,7 @@
               <g:HorizontalPanel>
                 <b:Controls>
                   <b:InputAddOn prependIcon="FILTER">
-                    <o:TextBoxClearable ui:field="filter"></o:TextBoxClearable>
+                    <o:TextBoxClearable ui:field="filter"/>
                   </b:InputAddOn>
                 </b:Controls>
               </g:HorizontalPanel>
@@ -70,7 +70,7 @@
               <g:Label>
                 <ui:msg description="Number of Visible Variables label">Number of visible variables</ui:msg>
               </g:Label>
-              <o:NumericTextBox ui:field="visibleColumns" addStyleNames="span1"></o:NumericTextBox>
+              <o:NumericTextBox ui:field="visibleColumns" addStyleNames="span1"/>
             </g:FlowPanel>
           </g:customCell>
           <g:customCell styleName="small-indent">
@@ -78,14 +78,14 @@
               <g:Label>
                 <ui:msg description="Number of Rows label">Number of rows</ui:msg>
               </g:Label>
-              <o:NumericTextBox ui:field="pageSize" addStyleNames="span1"></o:NumericTextBox>
+              <o:NumericTextBox ui:field="pageSize" addStyleNames="span1"/>
             </g:FlowPanel>
           </g:customCell>
         </g:row>
       </g:Grid>
     </o:CollapsiblePanel>
 
-    <o:Table ui:field="valuesTable"></o:Table>
+    <o:Table ui:field="valuesTable"/>
   </g:FlowPanel>
 
 </ui:UiBinder>

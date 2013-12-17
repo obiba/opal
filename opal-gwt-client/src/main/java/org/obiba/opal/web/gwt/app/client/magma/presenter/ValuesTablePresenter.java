@@ -25,6 +25,7 @@ import org.obiba.opal.web.gwt.app.client.ui.CategoricalCriterionDropdown;
 import org.obiba.opal.web.gwt.app.client.ui.CriterionPanel;
 import org.obiba.opal.web.gwt.app.client.ui.DateTimeCriterionDropdown;
 import org.obiba.opal.web.gwt.app.client.ui.DefaultCriterionDropdown;
+import org.obiba.opal.web.gwt.app.client.ui.IdentifiersCriterionDropdown;
 import org.obiba.opal.web.gwt.app.client.ui.NumericalCriterionDropdown;
 import org.obiba.opal.web.gwt.app.client.ui.TextBoxClearable;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
@@ -238,36 +239,9 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     // Show Values Filter when ES is enabled
     ResourceRequestBuilderFactory.<JsArray<TableIndexStatusDto>>newBuilder().forResource(
         UriBuilders.DATASOURCE_TABLE_INDEX.create().build(originalTable.getDatasourceName(), originalTable.getName()))
-        .get().withCallback(new ResponseCodeCallback() {
-      @Override
-      public void onResponseCode(Request request, Response response) {
-        // Unavailable
-        getView().getValuesFilterGroup().setVisible(false);
-      }
-    }, SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND, SC_SERVICE_UNAVAILABLE)
-        .withCallback(new ResourceCallback<JsArray<TableIndexStatusDto>>() {
-          @Override
-          public void onResource(Response response, JsArray<TableIndexStatusDto> resource) {
-            TableIndexStatusDto statusDto = TableIndexStatusDto.get(JsArrays.toSafeArray(resource));
-            boolean isIndexed = statusDto.getStatus().getName().equals(TableIndexationStatus.UPTODATE.getName());
-            getView().getValuesFilterGroup().setVisible(isIndexed);
-
-            if(isIndexed) {
-              // Fetch variable-field mapping for ES queries
-              ResourceRequestBuilderFactory.<OpalMap>newBuilder().forResource(
-                  UriBuilders.DATASOURCE_TABLE_INDEX_SCHEMA.create()
-                      .build(originalTable.getDatasourceName(), originalTable.getName()))
-                  .withCallback(new ResourceCallback<OpalMap>() {
-                    @Override
-                    public void onResource(Response response, OpalMap resource) {
-                      if(response.getStatusCode() == Response.SC_OK) {
-                        opalMap = resource;
-                      }
-                    }
-                  }).get().send();
-            }
-          }
-        }).send();
+        .withCallback(new ESUnavailableCallback(), SC_INTERNAL_SERVER_ERROR, SC_FORBIDDEN, SC_NOT_FOUND,
+            SC_SERVICE_UNAVAILABLE)//
+        .withCallback(new ESAvailableCallback()).get().send();
   }
 
   private class VariablesResourceCallback implements ResourceCallback<QueryResultDto> {
@@ -436,10 +410,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
 
     @Override
     public void requestBinaryValue(VariableDto variable, String entityIdentifier) {
-      StringBuilder link = new StringBuilder(originalTable.getLink());
-      link.append("/valueSet/").append(entityIdentifier).append("/variable/").append(variable.getName())
-          .append("/value");
-      getEventBus().fireEvent(new FileDownloadRequestEvent(link.toString()));
+      getEventBus().fireEvent(new FileDownloadRequestEvent(
+          originalTable.getLink() + "/valueSet/" + entityIdentifier + "/variable/" + variable.getName() + "/value"));
     }
 
     @Override
@@ -554,6 +526,8 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     int getPageSize();
 
     void setRowCount(int totalHits);
+
+    ControlGroup getSearchIdentifierGroup();
   }
 
   public enum ViewMode {
@@ -592,8 +566,6 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
     public void onChange(ChangeEvent event) {
 
       applyAllValueSetsFilter();
-      // Maybe call fetcher.updateVariables and let it call applyFilterVariables
-//      fetcher.updateVariables(getView().getFilterText());
     }
   }
 
@@ -632,7 +604,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       }
     }
 
-    private void addDefaultFilter(final VariableDto resource, final String indexedFieldName) {
+    private void addDefaultFilter(VariableDto resource, String indexedFieldName) {
       DefaultCriterionDropdown criterion = new DefaultCriterionDropdown(resource, indexedFieldName) {
         @Override
         public void doFilterValueSets() {
@@ -643,7 +615,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       getView().addVariableFilter(new CriterionPanel(criterion));
     }
 
-    private void addDateFilter(final VariableDto resource, final String indexedFieldName) {
+    private void addDateFilter(VariableDto resource, String indexedFieldName) {
       // DataTime filter
       DateTimeCriterionDropdown criterion = new DateTimeCriterionDropdown(resource, indexedFieldName) {
         @Override
@@ -676,7 +648,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       }
     }
 
-    private void addCategoricalFilter(final QueryResultDto resource) {
+    private void addCategoricalFilter(QueryResultDto resource) {
       // Categorical variable
       CategoricalCriterionDropdown criterion = new CategoricalCriterionDropdown(variableDto, fieldName, resource) {
         @Override
@@ -688,7 +660,7 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       getView().addVariableFilter(new CriterionPanel(criterion));
     }
 
-    private void addNumericalFilter(final QueryResultDto resource) {
+    private void addNumericalFilter(QueryResultDto resource) {
       // Numerical variable
       NumericalCriterionDropdown criterion = new NumericalCriterionDropdown(variableDto, fieldName, resource) {
         @Override
@@ -701,5 +673,54 @@ public class ValuesTablePresenter extends PresenterWidget<ValuesTablePresenter.D
       getView().addVariableFilter(new CriterionPanel(criterion));
     }
 
+  }
+
+  private class ESUnavailableCallback implements ResponseCodeCallback {
+    @Override
+    public void onResponseCode(Request request, Response response) {
+      // Unavailable
+      getView().getValuesFilterGroup().setVisible(false);
+      // show identifiers filter
+      getView().getSearchIdentifierGroup().setVisible(true);
+    }
+  }
+
+  private class ESAvailableCallback implements ResourceCallback<JsArray<TableIndexStatusDto>> {
+    @Override
+    public void onResource(Response response, JsArray<TableIndexStatusDto> resource) {
+      TableIndexStatusDto statusDto = TableIndexStatusDto.get(JsArrays.toSafeArray(resource));
+      boolean isIndexed = statusDto.getStatus().getName().equals(TableIndexationStatus.UPTODATE.getName());
+      getView().getValuesFilterGroup().setVisible(isIndexed);
+
+      if(isIndexed) {
+
+        // Show identifier default filter if not already added
+        if(getView().getFiltersPanel().getWidgetCount() == 0) {
+          IdentifiersCriterionDropdown criterion = new IdentifiersCriterionDropdown() {
+            @Override
+            public void doFilterValueSets() {
+              applyAllValueSetsFilter();
+            }
+          };
+          criterion.addChangeHandler(new EmptyNotEmptyFilterRequest());
+          getView().addVariableFilter(new CriterionPanel(criterion, false, false));
+        }
+
+        // Fetch variable-field mapping for ES queries
+        ResourceRequestBuilderFactory.<OpalMap>newBuilder().forResource(
+            UriBuilders.DATASOURCE_TABLE_INDEX_SCHEMA.create()
+                .build(originalTable.getDatasourceName(), originalTable.getName()))
+            .withCallback(new ResourceCallback<OpalMap>() {
+              @Override
+              public void onResource(Response response, OpalMap resource) {
+                if(response.getStatusCode() == Response.SC_OK) {
+                  opalMap = resource;
+                }
+              }
+            }).get().send();
+      }
+
+      getView().getSearchIdentifierGroup().setVisible(!isIndexed);
+    }
   }
 }
