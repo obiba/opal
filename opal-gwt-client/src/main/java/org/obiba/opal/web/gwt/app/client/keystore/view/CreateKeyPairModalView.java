@@ -115,12 +115,6 @@ implements CreateKeyPairModalPresenter.Display {
       case SIZE:
         group = sizeGroup;
         break;
-      case FIRST_LAST_NAME:
-        group = firstLastNameGroup;
-        break;
-      case ORGANIZATIONAL_UNIT:
-        group = organizationalUnitGroup;
-        break;
     }
     return group;
   }

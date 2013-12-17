@@ -895,7 +895,6 @@ public class VariablesListTabPresenter extends PresenterWidget<VariablesListTabP
         for(JavaScriptErrorDto error : JsArrays.toIterable(errors)) {
           String msg = error.getMessage() + " (line #" + error.getLineNumber() + ")";
           messages.add(msg);
-          GWT.log(msg);
         }
         if(messages.isEmpty()) {
           getEventBus()

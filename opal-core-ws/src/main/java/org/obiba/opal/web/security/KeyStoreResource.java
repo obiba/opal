@@ -13,7 +13,9 @@ package org.obiba.opal.web.security;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 import java.util.Collections;
@@ -37,6 +39,7 @@ import org.obiba.opal.web.magma.ClientErrorDtos;
 import org.obiba.opal.web.model.Opal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -55,6 +58,9 @@ public class KeyStoreResource {
   @Qualifier("systemKeyStoreService")
   @Autowired
   private KeyStoreService keyStoreService;
+
+  @Value("${org.obiba.opal.public.url}")
+  private String publicUrl;
 
   @GET
   public List<Opal.KeyDto> getKeyEntries() throws KeyStoreException, IOException {
@@ -175,8 +181,22 @@ public class KeyStoreResource {
   }
 
   private String getCertificateInfo(Opal.PublicKeyForm pkForm) {
-    return "CN=" + pkForm.getName() + ", OU=" + pkForm.getOrganizationalUnit() + ", O=" + pkForm.getOrganization() +
-        ", L=" + pkForm.getLocality() + ", ST=" + pkForm.getState() + ", C=" + pkForm.getCountry();
+    return validateNameAndOrganizationInfo(pkForm) + ", L=" + pkForm.getLocality() + ", ST=" + pkForm.getState() +
+        ", C=" + pkForm.getCountry();
+  }
+
+  private String validateNameAndOrganizationInfo(Opal.PublicKeyForm pkForm) {
+    try {
+      String hostname = new URL(publicUrl).getHost();
+      String cn = pkForm.getName();
+      String ou = pkForm.getOrganizationalUnit();
+      String o = pkForm.getOrganization();
+
+      return String.format("CN=%s, OU=%s, O=%s", cn.isEmpty() ? hostname : cn, ou.isEmpty() ? "opal" : ou,
+          o.isEmpty() ? hostname : o);
+    } catch(MalformedURLException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private String getPEMCertificate(OpalKeyStore keystore, String alias) throws KeyStoreException, IOException {

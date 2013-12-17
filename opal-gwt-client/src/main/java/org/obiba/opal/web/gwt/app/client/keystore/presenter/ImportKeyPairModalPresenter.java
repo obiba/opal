@@ -13,13 +13,17 @@ package org.obiba.opal.web.gwt.app.client.keystore.presenter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
-
+import org.obiba.opal.web.gwt.app.client.keystore.presenter.commands.ImportKeyPairCommand;
+import org.obiba.opal.web.gwt.app.client.keystore.presenter.commands.KeystoreCommand;
+import org.obiba.opal.web.gwt.app.client.keystore.support.KeyPairModalResponseCallback;
 import org.obiba.opal.web.gwt.app.client.keystore.support.KeystoreType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.opal.KeyType;
+import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
@@ -27,10 +31,12 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
-
 public class ImportKeyPairModalPresenter extends ModalPresenterWidget<ImportKeyPairModalPresenter.Display>
     implements KeyPairModalUiHandlers {
+
+  private static final String DEFAULT_ALIAS = "https";
+
+  private boolean updateKeyPair = false;
 
   public enum ImportType {
     KEY_PAIR,
@@ -41,7 +47,9 @@ public class ImportKeyPairModalPresenter extends ModalPresenterWidget<ImportKeyP
 
   private ImportType importType;
 
-  private SaveHandler saveHandler;
+  private KeyPairModalSavedHandler savedHandler;
+
+  private String requestUrl;
 
   @Inject
   public ImportKeyPairModalPresenter(Display display, EventBus eventBus) {
@@ -54,23 +62,50 @@ public class ImportKeyPairModalPresenter extends ModalPresenterWidget<ImportKeyP
     getView().clearErrors();
 
     if(new ViewValidator().validate()) {
-      if(saveHandler != null) {
-        saveHandler.save(getView().getPublicKey().getText(), getView().getPrivateKey().getText(),
-            getView().getName().getText());
-      }
-      getView().close();
+      KeystoreCommand command = createCommand();
+      KeyPairModalResponseCallback callback = new KeyPairModalResponseCallback(getView(), savedHandler);
+      command.execute(callback, callback);
     }
   }
 
-  public void initialize(KeystoreType kType, ImportType type, SaveHandler handler) {
-    saveHandler = handler;
-    keystoreType = kType;
+  public void initialize(ImportType type, ProjectDto projectDto, KeyPairModalSavedHandler handler) {
+    savedHandler = handler;
+    keystoreType = KeystoreType.PROJECT;
     importType = type;
-    getView().setType(kType, type);
+    requestUrl = UriBuilders.PROJECT_KEYSTORE.create().build(projectDto.getName());
+    getView().setType(keystoreType, type);
   }
 
-  public interface SaveHandler {
-    void save(@Nonnull String publicKey, @Nullable String privateKey, @Nullable String alias);
+  public void initialize(ImportType type, KeyPairModalSavedHandler handler) {
+    savedHandler = handler;
+    keystoreType = KeystoreType.SYSTEM;
+    importType = type;
+    requestUrl = UriBuilders.SYSTEM_KEYSTORE.create().build();
+    updateKeyPair = true;
+    getView().setType(keystoreType, type);
+  }
+
+  private KeystoreCommand createCommand() {
+    String alias = keystoreType == KeystoreType.PROJECT ? getView().getName().getText() : DEFAULT_ALIAS;
+
+    if(importType == ImportType.KEY_PAIR) {
+      return ImportKeyPairCommand.Builder.newBuilder()//
+          .setUrl(requestUrl)//
+          .setAlias(alias)//
+          .setPublicKey(getView().getPublicKey().getText())//
+          .setPrivateKey(getView().getPrivateKey().getText())//
+          .setKeyType(KeyType.KEY_PAIR)//
+          .setUpdate(updateKeyPair)//
+          .build();
+    }
+
+    return ImportKeyPairCommand.Builder.newBuilder()//
+        .setUrl(requestUrl)//
+        .setAlias(alias)//
+        .setPublicKey(getView().getPublicKey().getText())//
+        .setKeyType(KeyType.CERTIFICATE)//
+        .setUpdate(updateKeyPair)//
+        .build();
   }
 
   private final class ViewValidator extends ViewValidationHandler {
@@ -81,9 +116,9 @@ public class ImportKeyPairModalPresenter extends ModalPresenterWidget<ImportKeyP
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
-      if (keystoreType == KeystoreType.PROJECT) {
-        validators.add(new RequiredTextValidator(getView().getName(), "KeyPairAliasIsRequired",
-            Display.FormField.NAME.name()));
+      if(keystoreType == KeystoreType.PROJECT) {
+        validators.add(
+            new RequiredTextValidator(getView().getName(), "KeyPairAliasIsRequired", Display.FormField.NAME.name()));
       }
 
       if(importType == ImportType.KEY_PAIR) {

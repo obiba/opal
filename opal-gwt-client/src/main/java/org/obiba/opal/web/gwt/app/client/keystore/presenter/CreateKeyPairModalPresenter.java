@@ -13,11 +13,19 @@ package org.obiba.opal.web.gwt.app.client.keystore.presenter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
+import org.obiba.opal.web.gwt.app.client.keystore.presenter.commands.CreateKeyPairCommand;
+import org.obiba.opal.web.gwt.app.client.keystore.presenter.commands.KeystoreCommand;
+import org.obiba.opal.web.gwt.app.client.keystore.support.KeyPairModalResponseCallback;
 import org.obiba.opal.web.gwt.app.client.keystore.support.KeystoreType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RegExValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
+import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.model.client.opal.ProjectDto;
 
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
@@ -28,9 +36,15 @@ import com.gwtplatform.mvp.client.PopupView;
 public class CreateKeyPairModalPresenter extends ModalPresenterWidget<CreateKeyPairModalPresenter.Display>
     implements KeyPairModalUiHandlers {
 
-  private SaveHandler saveHandler;
+  private static final String DEFAULT_ALIAS = "https";
 
   private KeystoreType keystoreType;
+
+  private boolean updateKeyPair = false;
+
+  private KeyPairModalSavedHandler savedHandler;
+
+  private String requestUrl;
 
   @Inject
   public CreateKeyPairModalPresenter(Display display, EventBus eventBus) {
@@ -42,21 +56,37 @@ public class CreateKeyPairModalPresenter extends ModalPresenterWidget<CreateKeyP
   public void save() {
     getView().clearErrors();
     if(new ViewValidator().validate()) {
-      if(saveHandler != null) {
-        saveHandler
-            .save(getView().getName().getText(), getView().getAlgorithm().getText(), getView().getSize().getText(),
-                getView().getFirstLastName().getText(), getView().getOrganizationalUnit().getText(),
-                getView().getOrganizationalUnit().getText(), getView().getLocality().getText(),
-                getView().getState().getText(), getView().getCountry().getText());
-      }
-      getView().close();
+      String alias = keystoreType == KeystoreType.PROJECT ? getView().getName().getText() : DEFAULT_ALIAS;
+      KeystoreCommand command = CreateKeyPairCommand.Builder.newBuilder().setUrl(requestUrl)//
+          .setAlias(alias)//
+          .setAlgorithm(getView().getAlgorithm().getText())//
+          .setSize(getView().getSize().getText())//
+          .setFirstLastName(getView().getFirstLastName().getText())//
+          .setOrganization(getView().getOrganization().getText())//
+          .setOrganizationalUnit(getView().getOrganizationalUnit().getText())//
+          .setLocality(getView().getLocality().getText())//
+          .setState(getView().getState().getText())//
+          .setCountry(getView().getCountry().getText())//
+          .setUpdate(updateKeyPair).build();
+
+      KeyPairModalResponseCallback callback = new KeyPairModalResponseCallback(getView(), savedHandler);
+      command.execute(callback, callback);
     }
   }
 
-  public void initialize(KeystoreType type, SaveHandler handler) {
-    saveHandler = handler;
-    keystoreType = type;
-    getView().setType(type);
+  public void initialize(@Nonnull ProjectDto projectDto, @Nonnull KeyPairModalSavedHandler handler) {
+    savedHandler = handler;
+    keystoreType = KeystoreType.PROJECT;
+    requestUrl = UriBuilders.PROJECT_KEYSTORE.create().build(projectDto.getName());
+    getView().setType(keystoreType);
+  }
+
+  public void initialize(KeyPairModalSavedHandler handler) {
+    savedHandler = handler;
+    keystoreType = KeystoreType.SYSTEM;
+    updateKeyPair = true;
+    requestUrl = UriBuilders.SYSTEM_KEYSTORE.create().build();
+    getView().setType(keystoreType);
   }
 
   private final class ViewValidator extends ViewValidationHandler {
@@ -67,19 +97,17 @@ public class CreateKeyPairModalPresenter extends ModalPresenterWidget<CreateKeyP
     protected Set<FieldValidator> getValidators() {
       Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
 
-      if (keystoreType == KeystoreType.PROJECT) {
-        validators.add(new RequiredTextValidator(getView().getName(), "KeyPairAliasIsRequired",
-            Display.FormField.NAME.name()));
+      if(keystoreType == KeystoreType.PROJECT) {
+        validators.add(
+            new RequiredTextValidator(getView().getName(), "KeyPairAliasIsRequired", Display.FormField.NAME.name()));
       }
 
       validators.add(new RequiredTextValidator(getView().getAlgorithm(), "KeyPairAlgorithmIsRequired",
           Display.FormField.ALGORITHM.name()));
       validators.add(
           new RequiredTextValidator(getView().getSize(), "KeyPairKeySizeIsRequired", Display.FormField.SIZE.name()));
-      validators.add(new RequiredTextValidator(getView().getFirstLastName(), "KeyPairFirstAndLastNameIsRequired",
-          Display.FormField.FIRST_LAST_NAME.name()));
-      validators.add(new RequiredTextValidator(getView().getOrganizationalUnit(), "KeyPairOrganizationalUnitIsRequired",
-          Display.FormField.ORGANIZATIONAL_UNIT.name()));
+      validators.add(
+          new RegExValidator(getView().getSize(), "^\\d+$", "KeyPairKeySizeNumeric", Display.FormField.SIZE.name()));
       return validators;
     }
 
@@ -89,19 +117,12 @@ public class CreateKeyPairModalPresenter extends ModalPresenterWidget<CreateKeyP
     }
   }
 
-  public interface SaveHandler {
-    void save(String alias, String algorithm, String size, String firstLastName, String organization, String organizationalUnit,
-        String locality, String state, String country);
-  }
-
   public interface Display extends KeyPairDisplay<Display.FormField>, PopupView, HasUiHandlers<KeyPairModalUiHandlers> {
 
     enum FormField {
       NAME,
       ALGORITHM,
       SIZE,
-      FIRST_LAST_NAME,
-      ORGANIZATIONAL_UNIT
     }
 
     HasText getName();

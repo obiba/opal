@@ -10,7 +10,6 @@
 
 package org.obiba.opal.web.gwt.app.client.keystore.presenter.commands;
 
-import org.obiba.opal.web.gwt.app.client.keystore.support.KeystoreType;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.model.client.opal.KeyForm;
@@ -21,6 +20,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
 import static com.google.gwt.http.client.Response.SC_OK;
+import static com.google.gwt.http.client.Response.SC_CREATED;
 
 public class CreateKeyPairCommand extends AbstractKeystoreCommand {
   private String algorithm;
@@ -44,12 +44,23 @@ public class CreateKeyPairCommand extends AbstractKeystoreCommand {
     keyForm
         .setPublicForm(getPublicKeyForm(firstLastName, organization, organizationalUnit, locality, state, country));
 
-    ResourceRequestBuilderFactory.newBuilder() //
-        .forResource(url) //
-        .withResourceBody(KeyForm.stringify(keyForm)) //
-        .withCallback(SC_OK, success)
-        .withCallback(failure, SC_BAD_REQUEST, SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR)
-        .put().send();
+    if (update) {
+      ResourceRequestBuilderFactory.newBuilder() //
+          .forResource(url) //
+          .withResourceBody(KeyForm.stringify(keyForm)) //
+          .withCallback(SC_OK, success)
+          .withCallback(failure, SC_BAD_REQUEST, SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR)
+          .put().send();
+
+    } else {
+      ResourceRequestBuilderFactory.newBuilder() //
+          .forResource(url) //
+          .withResourceBody(KeyForm.stringify(keyForm)) //
+          .withCallback(SC_CREATED, success)
+          .withCallback(failure, SC_BAD_REQUEST, SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR)
+          .post().send();
+    }
+
   }
 
   public static class Builder extends AbstractKeystoreCommand.Builder<Builder, CreateKeyPairCommand> {

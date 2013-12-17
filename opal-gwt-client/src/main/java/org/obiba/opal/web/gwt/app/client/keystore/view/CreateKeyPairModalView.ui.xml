@@ -18,7 +18,6 @@
 
   <o:Modal ui:field="modal" resizable="false" closeVisible="true" keyboard="true" animation="false">
     <g:FlowPanel>
-
       <g:FlowPanel>
         <b:ControlGroup ui:field="nameGroup">
           <b:ControlLabel>
@@ -30,38 +29,9 @@
           </b:Controls>
         </b:ControlGroup>
 
-        <b:Paragraph>
-          <ui:msg description="Create Key Pair Modal Private key">Private Key</ui:msg>
-        </b:Paragraph>
-        <b:ControlGroup ui:field="algorithmGroup">
-          <b:ControlLabel>
-            <ui:msg description="Create Key Pair Modal Algorithm label">Algorithm</ui:msg>
-            <o:RequiredIcon/>
-          </b:ControlLabel>
-          <b:Controls>
-            <b:TextBox ui:field="algorithm"/>
-          </b:Controls>
-        </b:ControlGroup>
-
-        <b:ControlGroup ui:field="sizeGroup">
-          <b:ControlLabel>
-            <ui:msg description="Size label">Size</ui:msg>
-            <o:RequiredIcon/>
-          </b:ControlLabel>
-          <b:Controls>
-            <b:TextBox ui:field="size"/>
-          </b:Controls>
-        </b:ControlGroup>
-      </g:FlowPanel>
-
-      <g:FlowPanel>
-        <b:Paragraph>
-          <ui:msg description="Public Key (Certificate) label">Public Key (Certificate)</ui:msg>
-        </b:Paragraph>
         <b:ControlGroup ui:field="firstLastNameGroup">
           <b:ControlLabel>
             <ui:msg description="First Last Name label">First and Last Name</ui:msg>
-            <o:RequiredIcon/>
           </b:ControlLabel>
           <b:Controls>
             <b:TextBox ui:field="firstLastName"/>
@@ -71,7 +41,6 @@
         <b:ControlGroup ui:field="organizationGroup">
           <b:ControlLabel>
             <ui:msg description="Organization label">Organization</ui:msg>
-            <o:RequiredIcon/>
           </b:ControlLabel>
           <b:Controls>
             <b:TextBox ui:field="organization"/>
@@ -81,7 +50,6 @@
         <b:ControlGroup ui:field="organizationalUnitGroup">
           <b:ControlLabel>
             <ui:msg description="Organization Unit label">Organizational Unit</ui:msg>
-            <o:RequiredIcon/>
           </b:ControlLabel>
           <b:Controls>
             <b:TextBox ui:field="organizationalUnit"/>
@@ -91,7 +59,6 @@
         <b:ControlGroup ui:field="localityGroup">
           <b:ControlLabel>
             <ui:msg description="Locality label">Locality</ui:msg>
-            <o:RequiredIcon/>
           </b:ControlLabel>
           <b:Controls>
             <b:TextBox ui:field="locality"/>
@@ -101,7 +68,6 @@
         <b:ControlGroup ui:field="stateGroup">
           <b:ControlLabel>
             <ui:msg description="State/Province Name label">State/Province Name (full name)</ui:msg>
-            <o:RequiredIcon/>
           </b:ControlLabel>
           <b:Controls>
             <b:TextBox ui:field="state"/>
@@ -111,7 +77,6 @@
         <b:ControlGroup ui:field="countryGroup">
           <b:ControlLabel>
             <ui:msg description="Country label">Country (2 letter code)</ui:msg>
-            <o:RequiredIcon/>
           </b:ControlLabel>
           <b:Controls>
             <b:TextBox ui:field="country"/>
@@ -119,6 +84,32 @@
         </b:ControlGroup>
 
       </g:FlowPanel>
+
+
+      <o:CollapsiblePanel>
+        <g:FlowPanel>
+
+          <b:ControlGroup ui:field="algorithmGroup">
+            <b:ControlLabel>
+              <ui:msg description="Create Key Pair Modal Algorithm label">Algorithm</ui:msg>
+              <o:RequiredIcon/>
+            </b:ControlLabel>
+            <b:Controls>
+              <b:TextBox ui:field="algorithm" text="RSA"/>
+            </b:Controls>
+          </b:ControlGroup>
+
+          <b:ControlGroup ui:field="sizeGroup">
+            <b:ControlLabel>
+              <ui:msg description="Size label">Size</ui:msg>
+              <o:RequiredIcon/>
+            </b:ControlLabel>
+            <b:Controls>
+              <b:TextBox ui:field="size" text="2048"/>
+            </b:Controls>
+          </b:ControlGroup>
+        </g:FlowPanel>
+      </o:CollapsiblePanel>
     </g:FlowPanel>
 
     <b:ModalFooter>

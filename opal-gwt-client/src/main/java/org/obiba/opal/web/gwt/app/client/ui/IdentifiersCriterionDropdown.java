@@ -32,18 +32,7 @@ public abstract class IdentifiersCriterionDropdown extends CriterionDropdown {
 
   @Override
   public Widget getSpecificControls() {
-    // Remove empty/not empty radio
-    radioControls.remove(1);
-    radioControls.remove(1);
-
-    // Update radio controls
-    RadioButton like = getRadioButton(translations.criterionFiltersMap().get("like"), null);
-    like.addClickHandler(new OperatorClickHandler());
-    radioControls.add(like);
-
-    RadioButton not_like = getRadioButton(translations.criterionFiltersMap().get("not_like"), null);
-    not_like.addClickHandler(new OperatorClickHandler());
-    radioControls.add(not_like);
+    setupRadioControls();
 
     ListItem specificControls = new ListItem();
     matches = new TextBox();
@@ -63,6 +52,20 @@ public abstract class IdentifiersCriterionDropdown extends CriterionDropdown {
     specificControls.add(matches);
     specificControls.add(matchesHelp);
     return specificControls;
+  }
+
+  private void setupRadioControls() {// Remove empty/not empty radio
+    radioControls.remove(1);
+    radioControls.remove(1);
+
+    // Update radio controls
+    RadioButton like = getRadioButton(translations.criterionFiltersMap().get("like"), null);
+    like.addClickHandler(new OperatorClickHandler());
+    radioControls.add(like);
+
+    RadioButton not_like = getRadioButton(translations.criterionFiltersMap().get("not_like"), null);
+    not_like.addClickHandler(new OperatorClickHandler());
+    radioControls.add(not_like);
   }
 
   @Override

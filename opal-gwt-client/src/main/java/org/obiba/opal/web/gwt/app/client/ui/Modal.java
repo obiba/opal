@@ -454,6 +454,13 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
     alert.setType(type);
     alert.setAnimation(true);
     alert.setClose(true);
+    alert.addCloseHandler(new CloseHandler() {
+      @Override
+      public void onClose(CloseEvent closeEvent) {
+        alert.removeFromParent();
+        if(groupCloseHandler != null) groupCloseHandler.onClose(closeEvent);
+      }
+    });
     addAlert(alert);
   }
 
