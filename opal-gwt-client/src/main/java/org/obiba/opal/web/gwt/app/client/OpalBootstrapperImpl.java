@@ -107,7 +107,7 @@ public class OpalBootstrapperImpl implements Bootstrapper {
       @Override
       public void onCredentialsExpired(RequestCredentialsExpiredEvent e) {
         requestCredentials.invalidate();
-        placeManager.revealUnauthorizedPlace(Places.LOGIN);
+        Window.Location.reload();
       }
     });
     eventBus.addHandler(SessionCreatedEvent.getType(), new SessionCreatedEvent.Handler() {
