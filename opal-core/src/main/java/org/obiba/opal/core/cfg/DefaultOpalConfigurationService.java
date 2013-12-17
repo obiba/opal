@@ -36,25 +36,17 @@ public class DefaultOpalConfigurationService implements OpalConfigurationService
 
   private static final int DATABASE_PASSWORD_LENGTH = 15;
 
+  @Autowired
   private OpalConfigurationIo opalConfigIo;
+
+  @Autowired
+  private CryptoService cryptoService;
 
   private final Lock opalConfigurationLock = new ReentrantLock();
 
   private final Condition opalConfigAvailable = opalConfigurationLock.newCondition();
 
   private OpalConfiguration opalConfiguration;
-
-  private CryptoService cryptoService;
-
-  @Autowired
-  public void setOpalConfigIo(OpalConfigurationIo opalConfigIo) {
-    this.opalConfigIo = opalConfigIo;
-  }
-
-  @Autowired
-  public void setCryptoService(CryptoService cryptoService) {
-    this.cryptoService = cryptoService;
-  }
 
   @Override
   @PostConstruct
