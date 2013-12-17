@@ -26,26 +26,40 @@ public class CriterionPanel extends FlowPanel {
 
   private final CriterionDropdown criterion;
 
-  public CriterionPanel(final CriterionDropdown criterion) {
+  public CriterionPanel(CriterionDropdown criterion) {
     this.criterion = criterion;
-    criterion.addStyleName("open");
+    initPanel(true, true);
+  }
 
-    IconAnchor remove = new IconAnchor();
-    remove.setIcon(IconType.REMOVE);
-    remove.setTitle(translations.removeLabel());
-    remove.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        removeFromParent();
-        criterion.doFilterValueSets();
-      }
-    });
+  public CriterionPanel(CriterionDropdown criterion, boolean removeable, boolean opened) {
+    this.criterion = criterion;
+    initPanel(removeable, opened);
+  }
+
+  private void initPanel(boolean removeable, boolean opened) {
+    if(opened) {
+      criterion.addStyleName("open");
+    }
 
     InputAddOn w = new InputAddOn();
     w.addStyleName("small-addon");
-    w.addAppendWidget(remove);
-    w.add(criterion);
+    w.addStyleName("input-append");
 
+    if(removeable) {
+      IconAnchor remove = new IconAnchor();
+      remove.setIcon(IconType.REMOVE);
+      remove.setTitle(translations.removeLabel());
+      remove.addClickHandler(new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          removeFromParent();
+          criterion.doFilterValueSets();
+        }
+      });
+      w.addAppendWidget(remove);
+    }
+
+    w.add(criterion);
     add(w);
 
     addStyleName("xsmall-indent");

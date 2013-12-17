@@ -143,6 +143,9 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   @UiField(provided = true)
   Typeahead variableTypeahead;
 
+  @UiField
+  ControlGroup searchIdentifierGroup;
+
   private ValueSetsDataProvider dataProvider;
 
   private List<VariableDto> listVariable;
@@ -539,6 +542,11 @@ public class ValuesTableView extends ViewWithUiHandlers<ValuesTableUiHandlers> i
   @Override
   public void setRowCount(int totalHits) {
     valuesTable.setRowCount(totalHits);
+  }
+
+  @Override
+  public ControlGroup getSearchIdentifierGroup() {
+    return searchIdentifierGroup;
   }
 
   //

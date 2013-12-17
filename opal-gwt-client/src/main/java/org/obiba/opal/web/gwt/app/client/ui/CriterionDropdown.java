@@ -62,7 +62,6 @@ public abstract class CriterionDropdown extends DropdownButton {
     int nb = 0;
     if(queryResult != null) {
 
-      // TODO: FacetArray for 1 variable always return only 1 facetArray ?
       if(queryResult.getFacetsArray().length() > 0) {
         if(queryResult.getFacetsArray().get(0).hasStatistics()) {
           // Statistics facet
@@ -123,12 +122,6 @@ public abstract class CriterionDropdown extends DropdownButton {
     return radio;
   }
 
-  void resetRadioControls() {
-    for(int i = 0; i < radioControls.getWidgetCount(); i++) {
-      ((RadioButton) radioControls.getWidget(i)).setValue(null);
-    }
-  }
-
   protected void updateCriterionFilter(String filter) {
     setText(filter.isEmpty() ? variable.getName() : variable.getName() + ": " + filter);
   }
@@ -166,13 +159,12 @@ public abstract class CriterionDropdown extends DropdownButton {
 
   // TODO: Find the selector that allows to skip the selection of the first input after the li of chosen options...
   private static native void bind(Element e) /*-{
-    console.log($wnd.jQuery(e).next().find('label, li'));
-    $wnd.jQuery(e).next().find('label, li').click(function(w) {
-        w.stopPropagation();
-    });
+      $wnd.jQuery(e).next().find('label, li').click(function (w) {
+          w.stopPropagation();
+      });
 
-    $wnd.jQuery(e).next().find('input').not('input[autocomplete]').click(function(w) {
-        w.stopPropagation();
-    });
+      $wnd.jQuery(e).next().find('input').not('input[autocomplete]').click(function (w) {
+          w.stopPropagation();
+      });
   }-*/;
 }
