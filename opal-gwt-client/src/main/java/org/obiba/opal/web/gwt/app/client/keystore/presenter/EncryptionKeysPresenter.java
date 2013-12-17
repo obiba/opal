@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.keystore.presenter.commands.ImportKeyPa
 import org.obiba.opal.web.gwt.app.client.keystore.presenter.commands.KeystoreCommand;
 import org.obiba.opal.web.gwt.app.client.keystore.support.KeystoreType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.support.ClientErrorDtos;
 import org.obiba.opal.web.gwt.app.client.support.ErrorResponseCallback;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
@@ -34,6 +35,7 @@ import org.obiba.opal.web.model.client.opal.KeyDto;
 import org.obiba.opal.web.model.client.opal.KeyType;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -45,8 +47,10 @@ import com.gwtplatform.mvp.client.View;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 
+import static com.google.gwt.http.client.Response.SC_OK;
+
 public class EncryptionKeysPresenter extends PresenterWidget<EncryptionKeysPresenter.Display>
-    implements EncryptionKeysUiHandlers {
+    implements EncryptionKeysUiHandlers, KeyPairModalSavedHandler  {
 
   private final ModalProvider<CreateKeyPairModalPresenter> createKeyPairModalProvider;
 
@@ -124,74 +128,22 @@ public class EncryptionKeysPresenter extends PresenterWidget<EncryptionKeysPrese
 
   @Override
   public void createKeyPair() {
-    createKeyPairModalProvider.get().initialize(KeystoreType.PROJECT, new CreateKeyPairModalPresenter.SaveHandler() {
-      @Override
-      public void save(String alias, String algorithm, String size, String firstLastName, String organization,
-          String organizationalUnit, String locality, String state, String country) {
-
-        KeystoreCommand command = CreateKeyPairCommand.Builder.newBuilder()
-            .setUrl(UriBuilders.PROJECT_KEYSTORE.create().build(project.getName()))//
-            .setAlias(alias)//
-            .setAlgorithm(algorithm)//
-            .setSize(size)//
-            .setFirstLastName(firstLastName)//
-            .setOrganization(organization)//
-            .setOrganizationalUnit(organizationalUnit)//
-            .setLocality(locality)//
-            .setState(state)//
-            .setCountry(country)
-            .build();
-
-        command.execute(new SuccessCallback(), new ErrorResponseCallback(getView().asWidget()));
-      }
-    });
+    createKeyPairModalProvider.get().initialize(project, this);
   }
 
   @Override
   public void importKeyPair() {
-    importKeyPairModalProvider.get().initialize(KeystoreType.PROJECT, ImportKeyPairModalPresenter.ImportType.KEY_PAIR,
-        new ImportKeyPairModalPresenter.SaveHandler() {
-          @Override
-          public void save(@Nonnull String publicKey, @Nullable String privateKey, @Nullable String alias) {
-            KeystoreCommand command = ImportKeyPairCommand.Builder.newBuilder()
-                .setUrl(UriBuilders.PROJECT_KEYSTORE.create().build(project.getName()))//
-                .setAlias(alias)//
-                .setPublicKey(publicKey)//
-                .setPrivateKey(privateKey)//
-                .setKeyType(KeyType.KEY_PAIR)//
-                .build();
-
-            command.execute(new SuccessCallback(), new ErrorResponseCallback(getView().asWidget()));
-          }
-        });
+    importKeyPairModalProvider.get().initialize(ImportKeyPairModalPresenter.ImportType.KEY_PAIR, project, this);
   }
 
   @Override
   public void importCertificatePair() {
-    importKeyPairModalProvider.get().initialize(KeystoreType.PROJECT,
-        ImportKeyPairModalPresenter.ImportType.CERTIFICATE, new ImportKeyPairModalPresenter.SaveHandler() {
-      @Override
-      public void save(@Nonnull String publicKey, @Nullable String privateKey, @Nullable String alias) {
-        KeystoreCommand command = ImportKeyPairCommand.Builder.newBuilder()
-            .setUrl(UriBuilders.PROJECT_KEYSTORE.create().build(project.getName()))//
-            .setAlias(alias)//
-            .setPublicKey(publicKey)//
-            .setKeyType(KeyType.CERTIFICATE)//
-            .build();
-
-        command.execute(new SuccessCallback(), new ErrorResponseCallback(getView().asWidget()));
-      }
-    });
+    importKeyPairModalProvider.get().initialize(ImportKeyPairModalPresenter.ImportType.CERTIFICATE, project, this);
   }
 
-  private final class SuccessCallback implements ResponseCodeCallback {
-
-    private SuccessCallback() {}
-
-    @Override
-    public void onResponseCode(Request request, Response response) {
-      retrieveKeyPairs();
-    }
+  @Override
+  public void saved() {
+    retrieveKeyPairs();
   }
 
   public interface Display extends View, HasUiHandlers<EncryptionKeysUiHandlers> {

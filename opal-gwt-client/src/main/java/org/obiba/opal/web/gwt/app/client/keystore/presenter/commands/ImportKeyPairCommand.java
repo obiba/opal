@@ -18,15 +18,17 @@ import org.obiba.opal.web.model.client.opal.KeyType;
 import edu.umd.cs.findbugs.annotations.Nullable;
 
 import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
+import static com.google.gwt.http.client.Response.SC_CREATED;
 import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
 import static com.google.gwt.http.client.Response.SC_OK;
 
 public class ImportKeyPairCommand extends AbstractKeystoreCommand {
 
   private String publicKey;
-  private String privateKey;
-  private KeyType keyType;
 
+  private String privateKey;
+
+  private KeyType keyType;
 
   @Override
   public void execute(@Nullable ResponseCodeCallback success, @Nullable ResponseCodeCallback failure) {
@@ -37,15 +39,24 @@ public class ImportKeyPairCommand extends AbstractKeystoreCommand {
     keyForm.setPrivateImport(privateKey);
     keyForm.setPublicImport(publicKey);
 
-    ResourceRequestBuilderFactory.newBuilder() //
-        .forResource(url) //
-        .withResourceBody(KeyForm.stringify(keyForm)) //
-        .withCallback(SC_OK, success)
-        .withCallback(failure, SC_BAD_REQUEST, SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR)
-        .put().send();
+    if(update) {
+      ResourceRequestBuilderFactory.newBuilder() //
+          .forResource(url) //
+          .withResourceBody(KeyForm.stringify(keyForm)) //
+          .withCallback(SC_OK, success).withCallback(failure, SC_BAD_REQUEST, SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR)
+          .put().send();
+
+    } else {
+      ResourceRequestBuilderFactory.newBuilder() //
+          .forResource(url) //
+          .withResourceBody(KeyForm.stringify(keyForm)) //
+          .withCallback(SC_CREATED, success).withCallback(failure, SC_BAD_REQUEST, SC_BAD_REQUEST, SC_INTERNAL_SERVER_ERROR)
+          .post().send();
+
+    }
   }
 
-  public static class Builder extends AbstractKeystoreCommand.Builder<Builder, ImportKeyPairCommand>{
+  public static class Builder extends AbstractKeystoreCommand.Builder<Builder, ImportKeyPairCommand> {
 
     private Builder() {
       command = new ImportKeyPairCommand();

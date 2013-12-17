@@ -558,7 +558,9 @@ public interface Translations extends Constants {
       "AttributeAlreadyExists", "An attribute with this namespace and name already exists.",//
       "PermissionRequired", "You must select a at most one permission type.",//
       "DuplicateAclSubjectUser", "User '{0}' already exists, please choose a unique name.",//
-      "DuplicateAclSubjectGroup", "Group '{0}' already exists, please choose a unique name."//
+      "DuplicateAclSubjectGroup", "Group '{0}' already exists, please choose a unique name.",//
+      "InvalidCertificate", "Invalid certificate. Please Make sure to provide valid certificate keys.",//
+      "InvalidKeypair", "Failed to create key pair. Please make sure the algorithm name and its size are valid."//
   })
   Map<String, String> userMessageMap();
 

@@ -20,6 +20,7 @@ public abstract class AbstractKeystoreCommand implements KeystoreCommand {
 
   protected String url;
   protected String alias;
+  protected boolean update = false;
 
   public abstract void execute(@Nullable ResponseCodeCallback success, @Nullable ResponseCodeCallback failure);
 
@@ -55,6 +56,12 @@ public abstract class AbstractKeystoreCommand implements KeystoreCommand {
       command.alias = value;
       return (T)this;
     }
+
+    public T setUpdate(boolean value) {
+      command.update = value;
+      return (T)this;
+    }
+
 
     public C build() {
       return command;
