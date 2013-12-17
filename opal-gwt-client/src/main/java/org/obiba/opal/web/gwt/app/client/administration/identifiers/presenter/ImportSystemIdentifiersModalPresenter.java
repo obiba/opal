@@ -15,7 +15,6 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.event.IdentifiersTableSelectionEvent;
-import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
@@ -41,16 +40,13 @@ public class ImportSystemIdentifiersModalPresenter
     extends ModalPresenterWidget<ImportSystemIdentifiersModalPresenter.Display>
     implements ImportSystemIdentifiersModalUiHandlers {
 
-  private final Translations translations;
-
   private final ValidationHandler validationHandler;
 
   private TableDto table;
 
   @Inject
-  public ImportSystemIdentifiersModalPresenter(EventBus eventBus, Display display, Translations translations) {
+  public ImportSystemIdentifiersModalPresenter(EventBus eventBus, Display display) {
     super(eventBus, display);
-    this.translations = translations;
     validationHandler = new PropertiesValidationHandler();
     getView().setUiHandlers(this);
   }
@@ -61,6 +57,8 @@ public class ImportSystemIdentifiersModalPresenter
 
   @Override
   public void onSubmit(String identifiers) {
+    if(!validationHandler.validate()) return;
+
     String uri = UriBuilder.create().segment("identifiers", "mappings", "entities", "_import")
         .query("type", table.getEntityType()).build();
     ResourceRequestBuilderFactory.newBuilder().forResource(uri) //
