@@ -49,8 +49,6 @@ public class IdentifiersMappingModalPresenter extends ModalPresenterWidget<Ident
 
   private final Translations translations;
 
-  private final PlaceManager placeManager;
-
   private VariableDto variable;
 
   private TableDto tableDto;
@@ -58,11 +56,9 @@ public class IdentifiersMappingModalPresenter extends ModalPresenterWidget<Ident
   private final ValidationHandler validationHandler;
 
   @Inject
-  public IdentifiersMappingModalPresenter(EventBus eventBus, Display display, Translations translations,
-      PlaceManager placeManager) {
+  public IdentifiersMappingModalPresenter(EventBus eventBus, Display display, Translations translations) {
     super(eventBus, display);
     this.translations = translations;
-    this.placeManager = placeManager;
     validationHandler = new PropertiesValidationHandler();
     getView().setUiHandlers(this);
   }

@@ -17,6 +17,7 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
 import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
@@ -26,7 +27,6 @@ import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.model.client.opal.Acl;
 import org.obiba.opal.web.model.client.opal.Subject;
 
-import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -42,11 +42,10 @@ public class AddResourcePermissionModalPresenter
   private List<Acl> currentAclList;
 
   @Inject
-  public AddResourcePermissionModalPresenter(Display display, EventBus eventBus) {
+  public AddResourcePermissionModalPresenter(Display display, EventBus eventBus, Translations translations) {
     super(eventBus, display);
     getView().setUiHandlers(this);
-    getView().getSubjectType().setValue(Subject.SubjectType.SUBJECT_CREDENTIALS.getName());
-    getView().getSubjectType().setValue(Subject.SubjectType.GROUP.getName());
+    initializeViewSubjectTypes(translations);
   }
 
   public void initialize(@Nonnull ResourcePermissionType type, @Nonnull UpdateResourcePermissionHandler handler,
@@ -66,6 +65,15 @@ public class AddResourcePermissionModalPresenter
       }
       getView().close();
     }
+  }
+
+  private void initializeViewSubjectTypes(Translations translations) {
+    String userType = Subject.SubjectType.SUBJECT_CREDENTIALS.getName();
+    String groupType = Subject.SubjectType.GROUP.getName();
+
+    ResourceSubjectType subjectType = getView().getSubjectType();
+    subjectType.addItem(translations.shortSubjectTypeMap().get(userType), userType);
+    subjectType.addItem(translations.shortSubjectTypeMap().get(groupType), groupType);
   }
 
   private final class ViewValidatorHandler extends ViewValidationHandler {
@@ -121,6 +129,11 @@ public class AddResourcePermissionModalPresenter
     }
   }
 
+  public static interface ResourceSubjectType {
+    void addItem(String item, String value);
+    String getValue();
+  }
+
   public interface Display extends PopupView, HasUiHandlers<ResourcePermissionModalUiHandlers> {
     enum FormField {
       PRINCIPAL,
@@ -132,7 +145,7 @@ public class AddResourcePermissionModalPresenter
 
     String getPermission();
 
-    TakesValue<String> getSubjectType();
+    ResourceSubjectType getSubjectType();
 
     HasText getPrincipal();
 
@@ -142,5 +155,6 @@ public class AddResourcePermissionModalPresenter
 
     void clearErrors();
   }
+
 
 }

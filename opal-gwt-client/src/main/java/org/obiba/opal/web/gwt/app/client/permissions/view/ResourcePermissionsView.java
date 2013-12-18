@@ -108,7 +108,7 @@ public class ResourcePermissionsView extends ViewWithUiHandlers<ResourcePermissi
 
       @Override
       public String getValue(Acl acl) {
-        return acl.getSubject().getType().getName();
+        return translations.shortSubjectTypeMap().get(acl.getSubject().getType().getName());
       }
     };
 

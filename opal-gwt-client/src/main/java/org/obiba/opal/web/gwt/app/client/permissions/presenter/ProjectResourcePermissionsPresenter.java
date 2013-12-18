@@ -10,14 +10,18 @@
 
 package org.obiba.opal.web.gwt.app.client.permissions.presenter;
 
+import java.util.Comparator;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -37,6 +41,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 public class ProjectResourcePermissionsPresenter extends PresenterWidget<ProjectResourcePermissionsPresenter.Display>
     implements ProjectResourcePermissionsUiHandlers, DeleteAllSubjectPermissionsHandler {
@@ -47,10 +52,13 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
 
   @Inject
   public ProjectResourcePermissionsPresenter(Display display, EventBus eventBus,
-      ModalProvider<DeleteAllConfirmationModalPresenter> deleteAllConfirmationModalProvider) {
+      ModalProvider<DeleteAllConfirmationModalPresenter> deleteAllConfirmationModalProvider,
+      Translations translations) {
     super(eventBus, display);
     this.deleteAllConfirmationModalProvider = deleteAllConfirmationModalProvider.setContainer(this);
     getView().setUiHandlers(this);
+    getView().initializeTable(new NodeToPlaceConverterImpl(), new NodeNameFormatterImpl(translations),
+        new NodeToTypeMapperImpl(translations), new ResourceTypeComparator());
   }
 
   public void initialize(@Nonnull ProjectDto project) {
@@ -146,7 +154,132 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
 
     void setSubjectData(Subject subject, List<Acl> subjectAcls);
 
+    void initializeTable(NodeToPlaceMapper nodeToPlaceMapper, NodeNameFormatter formatter,
+        NodeToTypeMapper nodeToTypeMapper, Comparator<Acl> resourceTypeComparator);
+
     HasActionHandler<Acl> getActions();
+  }
+
+  public interface NodeToPlaceMapper {
+    PlaceRequest map(Acl acl);
+  }
+
+  private static final class NodeToPlaceConverterImpl implements NodeToPlaceMapper {
+
+    @Override
+    public PlaceRequest map(Acl acl) {
+      return getPlaceRequest(ResourcePermissionType.getTypeByPermission(acl.getActions(0)),
+          acl.getResource().split("/"));
+    }
+
+    private PlaceRequest getPlaceRequest(ResourcePermissionType type, String[] parts) {
+      PlaceRequest placeRequest = null;
+      switch (type) {
+        case PROJECT:
+          placeRequest = ProjectPlacesHelper.getProjectPlace(parts[2]);
+          break;
+
+        case DATASOURCE:
+          placeRequest = ProjectPlacesHelper.getDatasourcePlace(parts[2]);
+          break;
+
+        case TABLE:
+          placeRequest = ProjectPlacesHelper.getTablePlace(parts[2], parts[4]);
+          break;
+
+        case VARIABLE:
+          placeRequest = ProjectPlacesHelper.getVariablePlace(parts[2], parts[4], parts[6]);
+          break;
+
+        case REPORT_TEMPLATE:
+          placeRequest = ProjectPlacesHelper.getReportsPlace(parts[2]);
+          break;
+      }
+
+      assert placeRequest != null;
+      return placeRequest;
+    }
+  }
+
+  public interface NodeNameFormatter {
+    String format(Acl acl);
+  }
+
+  private static final class NodeNameFormatterImpl implements NodeNameFormatter {
+
+    private final Translations translations;
+
+    private NodeNameFormatterImpl(Translations translations) {
+      this.translations = translations;
+    }
+
+    @Override
+    public String format(Acl acl) {
+      return getName(ResourcePermissionType.getTypeByPermission(acl.getActions(0)), acl.getResource().split("/"));
+    }
+
+    private String getName(ResourcePermissionType type, String[] parts) {
+      String name = null;
+      switch (type) {
+        case PROJECT:
+          name = parts[2];
+          break;
+
+        case DATASOURCE:
+          name = translations.resourceNodeDatasourceName();
+          break;
+
+        case TABLE:
+          name = parts[2];
+          break;
+
+        case VARIABLE:
+              name = parts[4] + ":" + parts[6];
+          break;
+
+        case REPORT_TEMPLATE:
+          name = parts[2];
+          break;
+      }
+
+      assert name != null;
+      return name;
+    }
+  }
+
+  public interface NodeToTypeMapper {
+    String map(Acl acl);
+  }
+
+  private static final class NodeToTypeMapperImpl implements NodeToTypeMapper {
+
+    private final Translations translations;
+
+    private NodeToTypeMapperImpl(Translations translations) {
+      this.translations = translations;
+    }
+
+    @Override
+    public String map(Acl acl) {
+      ResourcePermissionType type = ResourcePermissionType.getTypeByPermission(acl.getActions(0));
+      return TranslationsUtils.replaceArguments(translations.permissionResourceNodeTypeMap().get(type.name()));
+    }
+  }
+
+  private static final class ResourceTypeComparator implements Comparator<Acl>
+  {
+    public int compare(Acl o1, Acl o2) {
+      ResourcePermissionType t1 = ResourcePermissionType.getTypeByPermission(o1.getActions(0));
+      ResourcePermissionType t2 = ResourcePermissionType.getTypeByPermission(o2.getActions(0));
+
+      if(t1.ordinal() < t2.ordinal()) {
+        return 1;
+      } else if(t1.ordinal() > t2.ordinal()) {
+        return -1;
+      }
+
+      return 0;
+    }
   }
 
 }

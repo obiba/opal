@@ -21,7 +21,7 @@ public enum ResourcePermissionType {
   TABLE(AclAction.TABLE_READ, AclAction.TABLE_VALUES, AclAction.TABLE_EDIT, AclAction.TABLE_VALUES_EDIT,
       AclAction.TABLE_ALL),
   VARIABLE(AclAction.VARIABLE_READ),
-  REPORT_TEMPLATE(AclAction.REPORT_TEMPLATE_ALL, AclAction.REPORT_TEMPLATE_READ);
+  REPORT_TEMPLATE(AclAction.REPORT_TEMPLATE_READ, AclAction.REPORT_TEMPLATE_ALL);
 
   public ArrayList<AclAction> getPermissions() {
     return (ArrayList<AclAction>) permissions.clone();

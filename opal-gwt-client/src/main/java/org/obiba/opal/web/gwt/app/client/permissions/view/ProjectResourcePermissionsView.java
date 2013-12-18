@@ -10,6 +10,7 @@
 
 package org.obiba.opal.web.gwt.app.client.permissions.view;
 
+import java.util.Comparator;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -21,6 +22,7 @@ import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.model.client.opal.Acl;
 import org.obiba.opal.web.model.client.opal.Subject;
 
@@ -36,11 +38,14 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectResourcePermissionsUiHandlers>
     implements ProjectResourcePermissionsPresenter.Display {
@@ -62,6 +67,7 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
   @UiField
   Table permissionsTable;
 
+
   @UiField
   Button deleteAll;
 
@@ -71,15 +77,40 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
 
   private Subject subject;
 
+  private ColumnSortEvent.ListHandler<Acl> typeSortHandler;
+
+  private TypeColumn typeColumn;
+
+  private final PlaceManager placeManager;
+
+
   @Inject
-  public ProjectResourcePermissionsView(Binder uiBinder) {
+  public ProjectResourcePermissionsView(Binder uiBinder, PlaceManager placeManager) {
     initWidget(uiBinder.createAndBindUi(this));
-    initPermissionTable();
+    this.placeManager = placeManager;
   }
 
   @Override
   public void setData(@Nonnull List<Subject> subjects) {
     renderUsersAndGroups(subjects);
+  }
+
+  @Override
+  public void initializeTable(ProjectResourcePermissionsPresenter.NodeToPlaceMapper nodeToPlaceMapper,
+      ProjectResourcePermissionsPresenter.NodeNameFormatter formatter,
+      ProjectResourcePermissionsPresenter.NodeToTypeMapper nodeToTypeMappert,
+      Comparator<Acl> resourceTypeComparator) {
+
+    tablePager.setDisplay(permissionsTable);
+    typeColumn = new TypeColumn(nodeToTypeMappert);
+    permissionsTable.addColumn(typeColumn, translations.typeLabel());
+    permissionsTable.addColumn(new ResourceColumn(nodeToPlaceMapper, formatter), translations.resourceLabel());
+    permissionsTable.addColumn(ProjectPermissionColumns.PERMISSION, translations.permissionLabel());
+    permissionsTable.addColumn(ProjectPermissionColumns.ACTIONS, translations.actionsLabel());
+    permissionsDataProvider.addDataDisplay(permissionsTable);
+    typeSortHandler = new ColumnSortEvent.ListHandler<Acl>(permissionsDataProvider.getList());
+    typeSortHandler.setComparator(typeColumn, resourceTypeComparator);
+    permissionsTable.addColumnSortHandler(typeSortHandler);
   }
 
   @Override
@@ -99,20 +130,14 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
     getUiHandlers().deleteAllPermissions(subject);
   }
 
-  private void initPermissionTable() {
-    tablePager.setDisplay(permissionsTable);
-    permissionsTable.addColumn(ProjectPermissionColumns.RESOURCE, translations.resourceLabel());
-    permissionsTable.addColumn(ProjectPermissionColumns.PERMISSION, translations.permissionLabel());
-    permissionsTable.addColumn(ProjectPermissionColumns.ACTIONS, translations.actionsLabel());
-    permissionsDataProvider.addDataDisplay(permissionsTable);
-  }
-
   private void renderSubjectsPermissionTable(List<Acl> subjectAcls) {
     permissionsDataProvider.setList(subjectAcls);
     tablePager.firstPage();
     permissionsDataProvider.refresh();
-//    tablePager.setPageSize(0);
     tablePager.setVisible(permissionsDataProvider.getList().size() > tablePager.getPageSize());
+    typeSortHandler.setList(permissionsDataProvider.getList());
+    permissionsTable.getColumnSortList().push(typeColumn);
+    ColumnSortEvent.fire(permissionsTable, permissionsTable.getColumnSortList());
   }
 
   private void renderUsersAndGroups(@Nonnull List<Subject> subjects) {
@@ -137,15 +162,45 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
     container.add(link);
   }
 
+  private class ResourceColumn extends Column<Acl, Acl> {
+
+    public ResourceColumn(final ProjectResourcePermissionsPresenter.NodeToPlaceMapper converter,
+        final ProjectResourcePermissionsPresenter.NodeNameFormatter formatter) {
+      super(new PlaceRequestCell<Acl>(placeManager) {
+        @Override
+        public PlaceRequest getPlaceRequest(Acl value) {
+          return converter.map(value);
+        }
+
+        @Override
+        public String getText(Acl value) {
+          return formatter.format(value);
+        }
+      });
+    }
+
+    @Override
+    public Acl getValue(Acl object) {
+      return object;
+    }
+  }
+
+  private class TypeColumn extends TextColumn<Acl> {
+
+    private ProjectResourcePermissionsPresenter.NodeToTypeMapper mapper;
+
+    private TypeColumn(ProjectResourcePermissionsPresenter.NodeToTypeMapper mapper) {
+      this.mapper = mapper;
+      setSortable(true);
+    }
+
+    @Override
+    public String getValue(Acl acl) {
+      return mapper.map(acl);
+    }
+  }
+
   private static final class ProjectPermissionColumns {
-
-    static final Column<Acl, String> RESOURCE = new TextColumn<Acl>() {
-
-      @Override
-      public String getValue(Acl acl) {
-        return acl.getResource();
-      }
-    };
 
     static final Column<Acl, String> PERMISSION = new TextColumn<Acl>() {
 
