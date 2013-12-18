@@ -564,6 +564,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
       useMetadataTables.setValue(false);
     }
     jdbcOptions.setVisible(show);
+    jdbcOptions.setOpen(true);
   }
 
 }

@@ -35,8 +35,6 @@ public class SubjectProfileAuthenticationListener implements AuthenticationListe
 
   private static final String HOME_PERM = "FILES_SHARE";
 
-  private static final String PROFILE_CHECKED = "profileChecked";
-
   @Autowired
   private SubjectAclService subjectAclService;
 

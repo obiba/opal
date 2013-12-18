@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.importdata.presenter;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -383,7 +384,17 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       getView().clearError();
       if(formatStepPresenter.validate()) return true;
 
-      Set<Map.Entry<HasType<ControlGroupType>, String>> entries = null;
+      for(Map.Entry<HasType<ControlGroupType>, String> entry : getErrorEntries()) {
+        getView().showError(entry.getValue(), entry.getKey());
+      }
+
+      return false;
+    }
+
+    private Iterable<Map.Entry<HasType<ControlGroupType>, String>> getErrorEntries() {
+      Set<Map.Entry<HasType<ControlGroupType>, String>> entries
+          = new HashSet<Map.Entry<HasType<ControlGroupType>, String>>();
+
       switch(getView().getImportFormat()) {
         case CSV:
           entries = csvFormatStepPresenter.getErrors().entrySet();
@@ -398,14 +409,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
           entries = spssFormatStepPresenter.getErrors().entrySet();
           break;
       }
-
-      if(entries != null) {
-        for(Map.Entry<HasType<ControlGroupType>, String> entry : entries) {
-          getView().showError(entry.getValue(), entry.getKey());
-        }
-      }
-
-      return false;
+      return entries;
     }
 
     @Override
@@ -493,8 +497,8 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       DatasourceFactoryDto factory = DatasourceDtos.createDatasourceFactoryDto(importConfig);
 
       String factoryStr = DatasourceFactoryDto.stringify(factory);
-      transientRequest = ResourceRequestBuilderFactory.<DatasourceFactoryDto>newBuilder()
-          .forResource(UriBuilders.PROJECT_TRANSIENT_DATASOURCE.create().build(importConfig.getDestinationDatasourceName())) //
+      transientRequest = ResourceRequestBuilderFactory.<DatasourceFactoryDto>newBuilder().forResource(
+          UriBuilders.PROJECT_TRANSIENT_DATASOURCE.create().build(importConfig.getDestinationDatasourceName())) //
           .withResourceBody(factoryStr) //
           .withCallback(new CreateTransientDatasourceCallback(factory), SC_CREATED, SC_BAD_REQUEST,
               SC_INTERNAL_SERVER_ERROR) //

@@ -47,6 +47,10 @@
         <o:RequiredIcon/>
       </b:ControlLabel>
       <o:Chooser ui:field="sqlSchema" name="magmaDatasourceType"/>
+      <b:HelpBlock>
+        <ui:msg description="SQL Schema help label">Specifies the expected structure of the database.
+        </ui:msg>
+      </b:HelpBlock>
     </b:ControlGroup>
 
     <b:ControlGroup ui:field="driverGroup">
@@ -55,6 +59,10 @@
         <o:RequiredIcon/>
       </b:ControlLabel>
       <o:Chooser ui:field="driver" name="driver"/>
+      <b:HelpBlock>
+        <ui:msg description="Driver help label">Specifies which driver should be used to connect to this database.
+        </ui:msg>
+      </b:HelpBlock>
     </b:ControlGroup>
 
     <b:ControlGroup ui:field="urlGroup">
@@ -93,31 +101,55 @@
         <o:RequiredIcon/>
       </b:ControlLabel>
       <b:TextBox ui:field="tablePrefix" b:id="tablePrefix"/>
+      <b:HelpBlock>
+        <ui:msg description="Table prefix help label">Specifies the prefix used to identify LimeSurvey tables.</ui:msg>
+      </b:HelpBlock>
     </o:CollapsiblePanel>
 
     <o:CollapsiblePanel ui:field="jdbcOptions">
       <b:ControlGroup ui:field="defaultEntityTypeGroup">
         <b:ControlLabel for="defaultEntityType">
-          <ui:msg description="Default Entity Type label">Default Entity Type</ui:msg>
+          <ui:msg description="Entity Type label">Entity Type</ui:msg>
+          <o:RequiredIcon/>
         </b:ControlLabel>
         <b:TextBox ui:field="defaultEntityType" b:id="defaultEntityType"/>
+        <b:HelpBlock>
+          <ui:msg description="Entity type help label">For example:</ui:msg>
+          <i>
+            Participant
+          </i>
+        </b:HelpBlock>
       </b:ControlGroup>
+
       <b:ControlGroup>
         <b:ControlLabel for="defaultCreatedTimestampColumn">
           <ui:msg description="Creation timestamp column label">Creation timestamp column</ui:msg>
         </b:ControlLabel>
         <b:TextBox ui:field="defaultCreatedTimestampColumn" b:id="defaultCreatedTimestampColumn"/>
+        <b:HelpBlock>
+          <ui:msg description="Creation timestamp help label">The default column name for creation timestamps.</ui:msg>
+        </b:HelpBlock>
       </b:ControlGroup>
+
       <b:ControlGroup>
         <b:ControlLabel for="defaultUpdatedTimestampColumn">
           <ui:msg description="Update timestamp column label">Update timestamp column</ui:msg>
         </b:ControlLabel>
         <b:TextBox ui:field="defaultUpdatedTimestampColumn" b:id="defaultUpdatedTimestampColumn"/>
+        <b:HelpBlock>
+          <ui:msg description="Update timestamp help label">The default a column name for update timestamps.</ui:msg>
+        </b:HelpBlock>
       </b:ControlGroup>
+
       <b:ControlGroup>
         <b:CheckBox ui:field="useMetadataTables" b:id="useMetadataTables" inline="true">
           <ui:msg description="With variables description tables label">With variables description tables</ui:msg>
         </b:CheckBox>
+        <b:HelpBlock>
+          <ui:msg description="With variables help label">If checked, the variables description will be fetched from
+            database.
+          </ui:msg>
+        </b:HelpBlock>
       </b:ControlGroup>
     </o:CollapsiblePanel>
 
