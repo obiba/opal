@@ -121,9 +121,6 @@
         </b:HelpBlock>
       </b:ControlGroup>
 
-      <!--The default a column name for creation timestamps-->
-      <!--The default a column name for update timestamps-->
-
       <b:ControlGroup>
         <b:ControlLabel for="defaultCreatedTimestampColumn">
           <ui:msg description="Creation timestamp column label">Creation timestamp column</ui:msg>
