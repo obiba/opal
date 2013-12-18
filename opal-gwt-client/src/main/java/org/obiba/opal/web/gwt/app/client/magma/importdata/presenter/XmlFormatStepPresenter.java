@@ -9,14 +9,25 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.importdata.presenter;
 
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
+import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
+import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 
-import com.google.web.bindery.event.shared.EventBus;
+import com.github.gwtbootstrap.client.ui.base.HasType;
+import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
@@ -25,7 +36,9 @@ import static org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig.Im
 public class XmlFormatStepPresenter extends PresenterWidget<XmlFormatStepPresenter.Display>
     implements DataImportPresenter.DataConfigFormatStepPresenter {
 
-  private FileSelectionPresenter xmlFileSelectionPresenter;
+  private final FileSelectionPresenter xmlFileSelectionPresenter;
+
+  private ViewValidator viewValidator;
 
   @Inject
   public XmlFormatStepPresenter(EventBus eventBus, Display display, FileSelectionPresenter xmlFileSelectionPresenter) {
@@ -38,6 +51,7 @@ public class XmlFormatStepPresenter extends PresenterWidget<XmlFormatStepPresent
     xmlFileSelectionPresenter.setFileSelectionType(FileSelectionType.FILE_OR_FOLDER);
     xmlFileSelectionPresenter.bind();
     getView().setXmlFileSelectorWidgetDisplay(xmlFileSelectionPresenter.getView());
+    viewValidator = new ViewValidator();
   }
 
   @Override
@@ -51,11 +65,11 @@ public class XmlFormatStepPresenter extends PresenterWidget<XmlFormatStepPresent
 
   @Override
   public boolean validate() {
-    if(getView().getSelectedFile().isEmpty() || !getView().getSelectedFile().toLowerCase().endsWith(".zip")) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error("ZipFileRequired").build());
-      return false;
-    }
-    return true;
+    return viewValidator.validate();
+  }
+
+  public Map<HasType<ControlGroupType>, String> getErrors() {
+    return viewValidator.getErrors();
   }
 
   //
@@ -64,10 +78,50 @@ public class XmlFormatStepPresenter extends PresenterWidget<XmlFormatStepPresent
 
   public interface Display extends View, WizardStepDisplay {
 
+    enum FormField {
+      FILE
+    }
+
     void setXmlFileSelectorWidgetDisplay(FileSelectionPresenter.Display display);
 
     String getSelectedFile();
 
+    HasType<ControlGroupType> getGroupType(String id);
   }
 
+  private final class ViewValidator extends ViewValidationHandler {
+
+    private Map<HasType<ControlGroupType>, String> errors;
+
+    @Override
+    protected Set<FieldValidator> getValidators() {
+      errors = new HashMap<HasType<ControlGroupType>, String>();
+
+      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+
+      validators.add(
+          new ConditionValidator(fileExtensionCondition(xmlFileSelectionPresenter.getSelectedFile()), "ZipFileRequired",
+              Display.FormField.FILE.name()));
+
+      return validators;
+    }
+
+    private HasValue<Boolean> fileExtensionCondition(final String selectedFile) {
+      return new HasBooleanValue() {
+        @Override
+        public Boolean getValue() {
+          return selectedFile.toLowerCase().endsWith(".zip");
+        }
+      };
+    }
+
+    @Override
+    protected void showMessage(String id, String message) {
+      errors.put(getView().getGroupType(id), message);
+    }
+
+    public Map<HasType<ControlGroupType>, String> getErrors() {
+      return errors;
+    }
+  }
 }

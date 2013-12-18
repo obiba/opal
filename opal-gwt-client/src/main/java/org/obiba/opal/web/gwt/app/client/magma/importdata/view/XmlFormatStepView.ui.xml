@@ -1,18 +1,22 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-    <g:FlowPanel styleName="input">
-      <g:Label addStyleNames="key">
+  <g:FlowPanel>
+    <b:ControlGroup ui:field="selectFileGroup">
+      <b:ControlLabel>
         <ui:msg description="Data File label">Data File</ui:msg>
-      </g:Label>
+      </b:ControlLabel>
       <g:SimplePanel ui:field="selectXmlFilePanel"/>
       <g:Label styleName="help-block">
         <ui:msg description="Opal XML File Description label">Data in Opal Archive format are packaged in a '.zip' file
         </ui:msg>
       </g:Label>
-    </g:FlowPanel>
+    </b:ControlGroup>
+
+  </g:FlowPanel>
 
 </ui:UiBinder>

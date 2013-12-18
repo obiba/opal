@@ -9,12 +9,22 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.importdata.presenter;
 
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
-import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
-import com.google.web.bindery.event.shared.EventBus;
+import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
+import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
+import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
+
+import com.github.gwtbootstrap.client.ui.base.HasType;
+import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
@@ -22,6 +32,8 @@ import static org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig.Im
 
 public class RestStepPresenter extends PresenterWidget<RestStepPresenter.Display>
     implements DataImportPresenter.DataConfigFormatStepPresenter {
+
+  private ViewValidator viewValidator;
 
   @Inject
   public RestStepPresenter(EventBus eventBus, Display view) {
@@ -31,48 +43,77 @@ public class RestStepPresenter extends PresenterWidget<RestStepPresenter.Display
   @Override
   protected void onBind() {
     super.onBind();
+    viewValidator = new ViewValidator();
   }
 
   @Override
   public ImportConfig getImportConfig() {
     ImportConfig importConfig = new ImportConfig();
     importConfig.setImportFormat(ImportFormat.REST);
-    importConfig.put("url", getView().getUrl()) //
-        .put("username", getView().getUsername())//
-        .put("password", getView().getPassword())//
-        .put("remoteDatasource", getView().getRemoteDatasource());
+    importConfig.put("url", getView().getUrl().getText()) //
+        .put("username", getView().getUsername().getText())//
+        .put("password", getView().getPassword().getText())//
+        .put("remoteDatasource", getView().getRemoteDatasource().getText());
     return importConfig;
   }
 
   @Override
   public boolean validate() {
-    if(getView().getUrl().isEmpty()) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error("OpalURLIsRequired").build());
-      return false;
-    }
-    if(getView().getUsername().isEmpty()) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error("UsernameIsRequired").build());
-      return false;
-    }
-    if(getView().getPassword().isEmpty()) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error("PasswordRequired").build());
-      return false;
-    }
-    if(getView().getRemoteDatasource().isEmpty()) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error("RemoteDatasourceIsRequired").build());
-      return false;
-    }
-    return true;
+    return viewValidator.validate();
+  }
+
+  public Map<HasType<ControlGroupType>, String> getErrors() {
+    return viewValidator.getErrors();
   }
 
   public interface Display extends View, WizardStepDisplay {
 
-    String getRemoteDatasource();
+    enum FormField {
+      URL,
+      USERNAME,
+      PASSWORD,
+      REMOTE_DATESOURCE
+    }
 
-    String getPassword();
+    HasText getRemoteDatasource();
 
-    String getUsername();
+    HasText getPassword();
 
-    String getUrl();
+    HasText getUsername();
+
+    HasText getUrl();
+
+    HasType<ControlGroupType> getGroupType(String id);
+  }
+
+  private final class ViewValidator extends ViewValidationHandler {
+
+    private Map<HasType<ControlGroupType>, String> errors;
+
+    @Override
+    protected Set<FieldValidator> getValidators() {
+      errors = new HashMap<HasType<ControlGroupType>, String>();
+
+      Set<FieldValidator> validators = new LinkedHashSet<FieldValidator>();
+
+      validators.add(new RequiredTextValidator(getView().getUrl(), "OpalURLIsRequired", Display.FormField.URL.name()));
+      validators.add(
+          new RequiredTextValidator(getView().getUsername(), "UsernameIsRequired", Display.FormField.USERNAME.name()));
+      validators.add(
+          new RequiredTextValidator(getView().getPassword(), "PasswordRequired", Display.FormField.PASSWORD.name()));
+      validators.add(new RequiredTextValidator(getView().getRemoteDatasource(), "RemoteDatasourceIsRequired",
+          Display.FormField.REMOTE_DATESOURCE.name()));
+
+      return validators;
+    }
+
+    @Override
+    protected void showMessage(String id, String message) {
+      errors.put(getView().getGroupType(id), message);
+    }
+
+    public Map<HasType<ControlGroupType>, String> getErrors() {
+      return errors;
+    }
   }
 }

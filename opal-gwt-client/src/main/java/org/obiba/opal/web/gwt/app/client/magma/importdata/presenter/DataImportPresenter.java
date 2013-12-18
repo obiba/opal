@@ -10,6 +10,7 @@
 package org.obiba.opal.web.gwt.app.client.magma.importdata.presenter;
 
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -45,14 +46,13 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.watopi.chosen.client.event.ChosenChangeEvent;
 
 import static com.google.gwt.http.client.Response.SC_BAD_REQUEST;
 import static com.google.gwt.http.client.Response.SC_CREATED;
@@ -61,6 +61,8 @@ import static com.google.gwt.http.client.Response.SC_INTERNAL_SERVER_ERROR;
 import static com.google.gwt.http.client.Response.SC_NOT_FOUND;
 import static com.google.gwt.http.client.Response.SC_OK;
 import static org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig.ImportFormat;
+
+;
 
 @SuppressWarnings("OverlyCoupledClass")
 public class DataImportPresenter extends WizardPresenterWidget<DataImportPresenter.Display> {
@@ -189,10 +191,9 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
   }
 
   private void addEventHandlers() {
-    registerHandler(getView().addFormatChangeHandler(new ChangeHandler() {
-
+    registerHandler(getView().addFormatChangeHandler(new ChosenChangeEvent.ChosenChangeHandler() {
       @Override
-      public void onChange(ChangeEvent evt) {
+      public void onChange(ChosenChangeEvent event) {
         updateFormatStepDisplay();
       }
     }));
@@ -382,9 +383,28 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       getView().clearError();
       if(formatStepPresenter.validate()) return true;
 
-      for(Map.Entry<HasType<ControlGroupType>, String> entry : csvFormatStepPresenter.getErrors().entrySet()) {
-        getView().showError(entry.getValue(), entry.getKey());
+      Set<Map.Entry<HasType<ControlGroupType>, String>> entries = null;
+      switch(getView().getImportFormat()) {
+        case CSV:
+          entries = csvFormatStepPresenter.getErrors().entrySet();
+          break;
+        case XML:
+          entries = xmlFormatStepPresenter.getErrors().entrySet();
+          break;
+        case REST:
+          entries = restStepPresenter.getErrors().entrySet();
+          break;
+        case SPSS:
+          entries = spssFormatStepPresenter.getErrors().entrySet();
+          break;
       }
+
+      if(entries != null) {
+        for(Map.Entry<HasType<ControlGroupType>, String> entry : entries) {
+          getView().showError(entry.getValue(), entry.getKey());
+        }
+      }
+
       return false;
     }
 
@@ -475,11 +495,10 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
       String factoryStr = DatasourceFactoryDto.stringify(factory);
       transientRequest = ResourceRequestBuilderFactory.<DatasourceFactoryDto>newBuilder()
           .forResource(UriBuilders.PROJECT_TRANSIENT_DATASOURCE.create().build(importConfig.getDestinationDatasourceName())) //
-          .post() //
           .withResourceBody(factoryStr) //
           .withCallback(new CreateTransientDatasourceCallback(factory), SC_CREATED, SC_BAD_REQUEST,
               SC_INTERNAL_SERVER_ERROR) //
-          .send();
+          .post().send();
     }
 
     private class CreateTransientDatasourceCallback implements ResponseCodeCallback {
@@ -560,7 +579,7 @@ public class DataImportPresenter extends WizardPresenterWidget<DataImportPresent
 
     void setDatasourceValuesStepInHandler(StepInHandler handler);
 
-    HandlerRegistration addFormatChangeHandler(ChangeHandler handler);
+    HandlerRegistration addFormatChangeHandler(ChosenChangeEvent.ChosenChangeHandler handler);
 
     void setFormatStepDisplay(WizardStepDisplay display);
 

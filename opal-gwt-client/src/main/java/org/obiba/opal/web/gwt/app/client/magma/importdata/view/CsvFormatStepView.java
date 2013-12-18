@@ -40,7 +40,6 @@ public class CsvFormatStepView extends AbstractCsvOptionsViewWithUiHandlers<CsvF
   // Instance Variables
   //
 
-
   @UiField
   SimplePanel selectFilePanel;
 
@@ -84,7 +83,7 @@ public class CsvFormatStepView extends AbstractCsvOptionsViewWithUiHandlers<CsvF
   public HasType<ControlGroupType> getGroupType(String id) {
     try {
       FormField field = FormField.valueOf(id);
-      switch (field) {
+      switch(field) {
         case FILE:
           return selectFileGroup;
         case TABLE:
@@ -92,7 +91,7 @@ public class CsvFormatStepView extends AbstractCsvOptionsViewWithUiHandlers<CsvF
         case ENTITY_TYPE:
           return entityTypeGroup;
       }
-    } catch(Exception e) {
+    } catch(Exception ignored) {
     }
 
     return getCsvOptions().getGroupType(id);

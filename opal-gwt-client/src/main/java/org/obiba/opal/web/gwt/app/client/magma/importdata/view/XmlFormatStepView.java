@@ -13,11 +13,11 @@ import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.presenter.XmlFormatStepPresenter;
 
-import com.google.gwt.core.client.GWT;
+import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.github.gwtbootstrap.client.ui.base.HasType;
+import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -31,6 +31,9 @@ public class XmlFormatStepView extends ViewImpl implements XmlFormatStepPresente
 
   @UiField
   SimplePanel selectXmlFilePanel;
+
+  @UiField
+  ControlGroup selectFileGroup;
 
   @Inject
   public XmlFormatStepView(Binder uiBinder) {
@@ -47,6 +50,11 @@ public class XmlFormatStepView extends ViewImpl implements XmlFormatStepPresente
   @Override
   public String getSelectedFile() {
     return fileSelection.getFile();
+  }
+
+  @Override
+  public HasType<ControlGroupType> getGroupType(String id) {
+    return selectFileGroup;
   }
 
 }
