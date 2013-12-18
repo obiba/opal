@@ -104,6 +104,12 @@
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.apache.shiro.tools</groupId>
+      <artifactId>shiro-tools-hasher</artifactId>
+    </dependency>
+
   </dependencies>
 
   <build>

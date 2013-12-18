@@ -672,6 +672,12 @@
         <artifactId>shiro-extras</artifactId>
         <version>${shiro-extras.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.shiro.tools</groupId>
+        <artifactId>shiro-tools-hasher</artifactId>
+        <version>${shiro.version}</version>
+        <scope>runtime</scope>
+      </dependency>
 
       <dependency>
         <groupId>org.bouncycastle</groupId>
