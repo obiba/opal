@@ -61,8 +61,8 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
         new NodeToTypeMapperImpl(translations), new ResourceTypeComparator());
   }
 
-  public void initialize(@Nonnull ProjectDto project) {
-    this.project = project;
+  public void initialize(@Nonnull ProjectDto projectDto) {
+    project = projectDto;
     retrievePermissions();
   }
 
@@ -88,8 +88,14 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
         .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, subject.getType().getName()).build()).get()
         .withCallback(new ResourceCallback<JsArray<Acl>>() {
           @Override
-          public void onResource(Response response, JsArray<Acl> subjectAcls) {
-            getView().setSubjectData(subject, JsArrays.toList(subjectAcls));
+          public void onResource(Response response, JsArray<Acl> acls) {
+            List<Acl> subjectAcls = JsArrays.toList(acls);
+            if(subjectAcls.size() > 0) {
+              getView().setSubjectData(subject, subjectAcls);
+            } else {
+              // refresh and select another subject if any
+              retrievePermissions();
+            }
           }
         }).send();
   }
@@ -113,7 +119,7 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
   }
 
   @Override
-  public void deleteAllPermissions(final Subject subject) {
+  public void deleteAllPermissions(Subject subject) {
     deleteAllConfirmationModalProvider.get().initialize(subject, this);
   }
 
@@ -124,7 +130,7 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
         .withCallback(new ResourceCallback<JsArray<Subject>>() {
           @Override
           public void onResource(Response response, JsArray<Subject> subjects) {
-            final List<Subject> subjectList = JsArrays.toList(subjects);
+            List<Subject> subjectList = JsArrays.toList(subjects);
             getView().setData(subjectList);
 
             if(subjectList.size() > 0) {
@@ -146,7 +152,6 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
             selectSubject(subject);
           }
         }).send();
-
   }
 
   public interface Display extends View, HasUiHandlers<ProjectResourcePermissionsUiHandlers> {
@@ -172,7 +177,7 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
           acl.getResource().split("/"));
     }
 
-    private PlaceRequest getPlaceRequest(ResourcePermissionType type, String[] parts) {
+    private PlaceRequest getPlaceRequest(ResourcePermissionType type, String... parts) {
       PlaceRequest placeRequest = null;
       switch (type) {
         case PROJECT:
@@ -218,7 +223,7 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
       return getName(ResourcePermissionType.getTypeByPermission(acl.getActions(0)), acl.getResource().split("/"));
     }
 
-    private String getName(ResourcePermissionType type, String[] parts) {
+    private String getName(ResourcePermissionType type, String... parts) {
       String name = null;
       switch (type) {
         case PROJECT:
@@ -268,13 +273,16 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
 
   private static final class ResourceTypeComparator implements Comparator<Acl>
   {
+    @Override
     public int compare(Acl o1, Acl o2) {
       ResourcePermissionType t1 = ResourcePermissionType.getTypeByPermission(o1.getActions(0));
       ResourcePermissionType t2 = ResourcePermissionType.getTypeByPermission(o2.getActions(0));
 
       if(t1.ordinal() < t2.ordinal()) {
         return 1;
-      } else if(t1.ordinal() > t2.ordinal()) {
+      }
+      
+      if(t1.ordinal() > t2.ordinal()) {
         return -1;
       }
 

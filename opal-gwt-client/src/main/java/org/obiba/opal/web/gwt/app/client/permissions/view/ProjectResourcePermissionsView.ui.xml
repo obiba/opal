@@ -18,22 +18,24 @@
 
   <g:FlowPanel>
 
-    <b:FluidRow>
+    <b:HelpBlock ui:field="emptyHelp">
+      <ui:msg description="Project Resource Permission Alert text">There are currently no permissions granted to any
+        user or group in this project.
+      </ui:msg>
+    </b:HelpBlock>
+
+    <b:FluidRow ui:field="permissionsRow">
       <b:Column size="3">
-        <b:ControlGroup>
-          <b:ControlLabel>
+        <b:NavList ui:field="users">
+          <b:NavHeader>
             <ui:msg description="Project Resource Permission Users label">Users</ui:msg>
-          </b:ControlLabel>
-          <b:Controls ui:field="users">
-          </b:Controls>
-        </b:ControlGroup>
-        <b:ControlGroup addStyleNames="large-top-margin">
-          <b:ControlLabel>
+          </b:NavHeader>
+        </b:NavList>
+        <b:NavList ui:field="groups">
+          <b:NavHeader>
             <ui:msg description="Project Resource Permission Users label">Groups</ui:msg>
-          </b:ControlLabel>
-          <b:Controls ui:field="groups">
-          </b:Controls>
-        </b:ControlGroup>
+          </b:NavHeader>
+        </b:NavList>
       </b:Column>
       <b:Column size="9">
         <b:ControlGroup>

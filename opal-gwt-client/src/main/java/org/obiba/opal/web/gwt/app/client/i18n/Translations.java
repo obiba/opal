@@ -1511,6 +1511,14 @@ public interface Translations extends Constants {
       "GROUP", "Group" })
   Map<String, String> shortSubjectTypeMap();
 
+  @Description("Subject Type Users label")
+  @DefaultStringValue("Users")
+  String subjectTypeUsers();
+
+  @Description("Subject Type Groups label")
+  @DefaultStringValue("Groups")
+  String subjectTypeGroups();
+
   @Description("Derive label")
   @DefaultStringValue("Derive")
   String deriveLabel();

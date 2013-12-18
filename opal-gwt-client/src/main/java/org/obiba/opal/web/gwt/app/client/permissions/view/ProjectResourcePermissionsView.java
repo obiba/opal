@@ -26,10 +26,12 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.model.client.opal.Acl;
 import org.obiba.opal.web.model.client.opal.Subject;
 
-import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.Controls;
+import com.github.gwtbootstrap.client.ui.FluidRow;
 import com.github.gwtbootstrap.client.ui.Heading;
+import com.github.gwtbootstrap.client.ui.HelpBlock;
+import com.github.gwtbootstrap.client.ui.NavHeader;
 import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.NavList;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -53,10 +55,10 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
   interface Binder extends UiBinder<Widget, ProjectResourcePermissionsView> {}
 
   @UiField
-  Controls users;
+  NavList users;
 
   @UiField
-  Controls groups;
+  NavList groups;
 
   @UiField
   Heading principal;
@@ -65,17 +67,19 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
   SimplePager tablePager;
 
   @UiField
-  Table permissionsTable;
-
+  Table<Acl> permissionsTable;
 
   @UiField
-  Button deleteAll;
+  FluidRow permissionsRow;
+
+  @UiField
+  HelpBlock emptyHelp;
 
   private final static Translations translations = GWT.create(Translations.class);
 
   private final ListDataProvider<Acl> permissionsDataProvider = new ListDataProvider<Acl>();
 
-  private Subject subject;
+  private Subject currentSubject;
 
   private ColumnSortEvent.ListHandler<Acl> typeSortHandler;
 
@@ -93,6 +97,8 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
   @Override
   public void setData(@Nonnull List<Subject> subjects) {
     renderUsersAndGroups(subjects);
+    permissionsRow.setVisible(subjects.size() > 0);
+    emptyHelp.setVisible(!permissionsRow.isVisible());
   }
 
   @Override
@@ -115,7 +121,7 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
 
   @Override
   public void setSubjectData(Subject subject, List<Acl> subjectAcls) {
-    this.subject = subject;
+    this.currentSubject = subject;
     principal.setText(subject.getPrincipal());
     renderSubjectsPermissionTable(subjectAcls);
   }
@@ -125,9 +131,10 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
     return ProjectPermissionColumns.ACTIONS;
   }
 
+  @SuppressWarnings("UnusedParameters")
   @UiHandler("deleteAll")
   public void onDeleteAllClicked(ClickEvent event) {
-    getUiHandlers().deleteAllPermissions(subject);
+    getUiHandlers().deleteAllPermissions(currentSubject);
   }
 
   private void renderSubjectsPermissionTable(List<Acl> subjectAcls) {
@@ -140,17 +147,23 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
     ColumnSortEvent.fire(permissionsTable, permissionsTable.getColumnSortList());
   }
 
-  private void renderUsersAndGroups(@Nonnull List<Subject> subjects) {
+  private void renderUsersAndGroups(@Nonnull Iterable<Subject> subjects) {
     users.clear();
     groups.clear();
 
     for (Subject aSubject : subjects) {
       createSubjectNavLink(aSubject);
     }
+
+    users.setVisible(users.getWidgetCount() > 0);
+    groups.setVisible(groups.getWidgetCount() > 0);
+
+    users.insert(new NavHeader(translations.subjectTypeUsers()), 0);
+    groups.insert(new NavHeader(translations.subjectTypeGroups()), 0);
   }
 
   private void createSubjectNavLink(final Subject subject) {
-    Controls container = Subject.SubjectType.SUBJECT_CREDENTIALS.isSubjectType(subject.getType()) ? users : groups;
+    NavList container = Subject.SubjectType.SUBJECT_CREDENTIALS.isSubjectType(subject.getType()) ? users : groups;
     NavLink link = new NavLink(subject.getPrincipal());
     link.addClickHandler(new ClickHandler() {
       @Override
@@ -164,7 +177,7 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
 
   private class ResourceColumn extends Column<Acl, Acl> {
 
-    public ResourceColumn(final ProjectResourcePermissionsPresenter.NodeToPlaceMapper converter,
+    private ResourceColumn(final ProjectResourcePermissionsPresenter.NodeToPlaceMapper converter,
         final ProjectResourcePermissionsPresenter.NodeNameFormatter formatter) {
       super(new PlaceRequestCell<Acl>(placeManager) {
         @Override
