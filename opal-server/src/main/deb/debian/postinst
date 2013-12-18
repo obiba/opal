@@ -30,14 +30,15 @@ case "$1" in
             echo Updating administrator password.
             # We should really hash the password instead of storing in clear-text
             #adminpw=`echo -n $RET | sha256sum | cut -d ' ' -f 1`
-            adminpw=$RET
+            #adminpw=$RET
+            adminpw=`echo -n $RET | ./var/lib/opal/tools/shiro-tools-hasher-*-cli.jar -pnc | cut -d ' ' -f 1`
             tfile=`mktemp`
-	        if [ ! -f "$tfile" ]; then
-               return 1
+            if [ ! -f "$tfile" ]; then
+              return 1
             fi
-			cat /etc/opal/shiro.ini | sed \
-			  -e "s/^administrator\s*=.*,/administrator=$adminpw,/" \
-			  > $tfile && mv $tfile /etc/opal/shiro.ini
+            cat /etc/opal/shiro.ini | sed \
+              -e "s/^administrator\s*=.*,/administrator=$adminpw,/" \
+              > $tfile && mv $tfile /etc/opal/shiro.ini
         fi
 
     	# Create opal user if it doesn't exist.

@@ -17,6 +17,7 @@ import javax.annotation.PreDestroy;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AbstractAuthenticator;
 import org.apache.shiro.authc.AuthenticationListener;
+import org.apache.shiro.authc.credential.PasswordMatcher;
 import org.apache.shiro.authz.ModularRealmAuthorizer;
 import org.apache.shiro.authz.permission.PermissionResolver;
 import org.apache.shiro.authz.permission.PermissionResolverAware;
@@ -135,6 +136,7 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
       realm.setRolePermissionResolver(rolePermissionResolver);
       realm.setPermissionResolver(permissionResolver);
       realm.setResourcePath(System.getProperty("OPAL_HOME") + "/conf/shiro.ini");
+      realm.setCredentialsMatcher(new PasswordMatcher());
       return realm;
     }
   }

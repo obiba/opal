@@ -115,7 +115,6 @@
 
   <build>
     <plugins>
-
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
@@ -134,7 +133,6 @@
         </executions>
       </plugin>
     </plugins>
-
   </build>
 
   <profiles>
@@ -180,6 +178,10 @@
 
                     <exec executable="debuild" dir="${deb.dir}" failonerror="true" osfamily="unix">
                       <arg value="-b"/>
+                      <!-- Uncomment following options to package locally  -->
+                      <!--<arg value="-i"/>-->
+                      <!--<arg value="-us"/>-->
+                      <!--<arg value="-uc"/>-->
                     </exec>
                   </target>
                 </configuration>
