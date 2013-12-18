@@ -1952,7 +1952,7 @@ public interface Translations extends Constants {
   String indexNotScheduled();
 
   @Description("Indexation in progress")
-  @DefaultStringValue("Indexation on progress")
+  @DefaultStringValue("Indexation in progress")
   String indexInProgress();
 
   @Description("Table index is out-of-date")
