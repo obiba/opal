@@ -15,15 +15,15 @@ public class Dtos {
         .name(dto.getName()) //
         .enabled(dto.getEnabled()) //
         .groups(Sets.newHashSet(dto.getGroupsList()));
-    switch(dto.getType()) {
-      case USER:
-        builder.type(SubjectCredentials.Type.USER);
+    switch(dto.getAuthenticationType()) {
+      case PASSWORD:
+        builder.authenticationType(SubjectCredentials.AuthenticationType.PASSWORD);
         break;
-      case APPLICATION:
-        builder.type(SubjectCredentials.Type.APPLICATION);
+      case CERTIFICATE:
+        builder.authenticationType(SubjectCredentials.AuthenticationType.CERTIFICATE);
         break;
     }
-    // dont't copy password or certificate
+    // don't copy password or certificate
     return builder.build();
   }
 
@@ -32,15 +32,15 @@ public class Dtos {
         .setName(subjectCredentials.getName()) //
         .setEnabled(subjectCredentials.isEnabled()) //
         .addAllGroups(subjectCredentials.getGroups());
-    switch(subjectCredentials.getType()) {
-      case USER:
-        builder.setType(Opal.SubjectCredentialsType.USER);
+    switch(subjectCredentials.getAuthenticationType()) {
+      case PASSWORD:
+        builder.setAuthenticationType(Opal.SubjectCredentialsDto.AuthenticationType.PASSWORD);
         break;
-      case APPLICATION:
-        builder.setType(Opal.SubjectCredentialsType.APPLICATION);
+      case CERTIFICATE:
+        builder.setAuthenticationType(Opal.SubjectCredentialsDto.AuthenticationType.CERTIFICATE);
         break;
     }
-    // dont't copy password or certificate
+    // don't copy password or certificate
     return builder.build();
   }
 

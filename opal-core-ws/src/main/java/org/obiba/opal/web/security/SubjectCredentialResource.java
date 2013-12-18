@@ -48,13 +48,13 @@ public class SubjectCredentialResource {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
     SubjectCredentials subjectCredentials = Dtos.fromDto(dto);
-    switch(subjectCredentials.getType()) {
-      case USER:
+    switch(subjectCredentials.getAuthenticationType()) {
+      case PASSWORD:
         if(dto.hasPassword() && !dto.getPassword().isEmpty()) {
           subjectCredentials.setPassword(subjectCredentialsService.hashPassword(dto.getPassword()));
         }
         break;
-      case APPLICATION:
+      case CERTIFICATE:
         if(dto.hasCertificate() && !dto.getCertificate().isEmpty()) {
           subjectCredentials.setCertificate(dto.getCertificate().toByteArray());
         }

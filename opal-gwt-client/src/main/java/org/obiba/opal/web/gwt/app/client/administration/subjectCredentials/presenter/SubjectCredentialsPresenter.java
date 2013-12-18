@@ -32,7 +32,6 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.opal.SubjectCredentialsDto;
-import org.obiba.opal.web.model.client.opal.SubjectCredentialsType;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
@@ -59,7 +58,7 @@ public class SubjectCredentialsPresenter extends ModalPresenterWidget<SubjectCre
 
   private Mode dialogMode;
 
-  private SubjectCredentialsType subjectCredentialsType;
+  private SubjectCredentialsDto.AuthenticationType authenticationType;
 
   public enum Mode {
     UPDATE, CREATE
@@ -122,7 +121,7 @@ public class SubjectCredentialsPresenter extends ModalPresenterWidget<SubjectCre
 
   private SubjectCredentialsDto getDto() {
     SubjectCredentialsDto dto = SubjectCredentialsDto.create();
-    dto.setType(subjectCredentialsType);
+    dto.setAuthenticationType(authenticationType);
     dto.setName(getView().getName().getText());
     dto.setPassword(getView().getPassword().getText());
     dto.setCertificate(getView().getCertificate().getText());
@@ -132,26 +131,21 @@ public class SubjectCredentialsPresenter extends ModalPresenterWidget<SubjectCre
   }
 
   public void setSubjectCredentials(SubjectCredentialsDto dto) {
-    setSubjectCredentialsType(dto.getType());
+    setAuthenticationType(dto.getAuthenticationType());
     getView().getName().setText(dto.getName());
     getView().getGroups().setValue(JsArrays.toList(dto.getGroupsArray()));
     getView().setNamedEnabled(false);
-
-    if(SubjectCredentialsDtos.isUser(dto)) {
-      setTitle(translationMessages.editUserLabel(dto.getName()));
-    } else if(SubjectCredentialsDtos.isApplication(dto)) {
-      setTitle(translationMessages.editApplicationLabel(dto.getName()));
-    }
+    setTitle(translationMessages.editUserLabel(dto.getName()));
   }
 
   public void setDialogMode(Mode mode) {
     dialogMode = mode;
   }
 
-  public void setSubjectCredentialsType(SubjectCredentialsType subjectCredentialsType) {
-    this.subjectCredentialsType = subjectCredentialsType;
-    getView().getPasswordGroupVisibility().setVisible(SubjectCredentialsDtos.isUser(subjectCredentialsType));
-    getView().getCertificateGroupVisibility().setVisible(SubjectCredentialsDtos.isApplication(subjectCredentialsType));
+  public void setAuthenticationType(SubjectCredentialsDto.AuthenticationType authenticationType) {
+    this.authenticationType = authenticationType;
+    getView().getPasswordGroupVisibility().setVisible(SubjectCredentialsDtos.isPassword(authenticationType));
+    getView().getCertificateGroupVisibility().setVisible(SubjectCredentialsDtos.isCertificate(authenticationType));
   }
 
   public void setTitle(String title) {
@@ -170,9 +164,9 @@ public class SubjectCredentialsPresenter extends ModalPresenterWidget<SubjectCre
         if(dialogMode == Mode.CREATE) {
           validators.add(new RequiredTextValidator(getView().getName(), "SubjectCredentialNameIsRequired",
               Display.FormField.NAME.name()));
-          if(SubjectCredentialsDtos.isUser(subjectCredentialsType)) {
+          if(SubjectCredentialsDtos.isPassword(authenticationType)) {
             addPasswordValidators();
-          } else if(SubjectCredentialsDtos.isApplication(subjectCredentialsType)) {
+          } else if(SubjectCredentialsDtos.isCertificate(authenticationType)) {
             validators.add(new RequiredTextValidator(getView().getCertificate(), "CertificateIsRequired",
                 Display.FormField.CERTIFICATE.name()));
           }

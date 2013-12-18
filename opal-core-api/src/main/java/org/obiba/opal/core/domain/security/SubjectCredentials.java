@@ -23,12 +23,13 @@ import org.obiba.opal.core.validator.NotNullIfAnotherFieldHasValue;
 import com.google.common.collect.Lists;
 
 @NotNullIfAnotherFieldHasValue.List(
-    @NotNullIfAnotherFieldHasValue(fieldName = "type", fieldValue = "USER", dependFieldName = "password"))
+    @NotNullIfAnotherFieldHasValue(fieldName = "authenticationType", fieldValue = "PASSWORD",
+        dependFieldName = "password"))
 public class SubjectCredentials extends AbstractTimestamped
     implements Comparable<SubjectCredentials>, HasUniqueProperties {
 
-  public enum Type {
-    USER, APPLICATION
+  public enum AuthenticationType {
+    PASSWORD, CERTIFICATE
   }
 
   @NotNull
@@ -36,10 +37,11 @@ public class SubjectCredentials extends AbstractTimestamped
   private String name;
 
   @NotNull
-  private Type type;
+  private AuthenticationType authenticationType;
 
   private String password; // for user only
 
+  @SuppressWarnings("TransientFieldInNonSerializableClass")
   private transient byte[] certificate; // for application only
 
   private boolean enabled;
@@ -73,12 +75,12 @@ public class SubjectCredentials extends AbstractTimestamped
   }
 
   @NotNull
-  public Type getType() {
-    return type;
+  public AuthenticationType getAuthenticationType() {
+    return authenticationType;
   }
 
-  public void setType(@NotNull Type type) {
-    this.type = type;
+  public void setAuthenticationType(@NotNull AuthenticationType authenticationType) {
+    this.authenticationType = authenticationType;
   }
 
   public String getPassword() {
@@ -168,8 +170,8 @@ public class SubjectCredentials extends AbstractTimestamped
       return this;
     }
 
-    public Builder type(Type type) {
-      subjectCredentials.type = type;
+    public Builder authenticationType(AuthenticationType authenticationType) {
+      subjectCredentials.authenticationType = authenticationType;
       return this;
     }
 

@@ -44,10 +44,6 @@ public interface TranslationMessages extends Messages {
   @DefaultMessage("Edit user {0}")
   String editUserLabel(String name);
 
-  @Description("Edit Application label")
-  @DefaultMessage("Edit application {0}")
-  String editApplicationLabel(String name);
-
   @Description("Confirm remove group label")
   @DefaultMessage("Please confirm that you want to remove the group {0}.")
   String confirmRemoveGroup(String name);
@@ -55,16 +51,12 @@ public interface TranslationMessages extends Messages {
   @Description("Confirm remove group with users label")
   @DefaultMessage(
       "Please confirm that you want to remove the group {0}.<br />" +
-          "The group {0} will be removed for users and applications belonging to this group.")
-  String confirmRemoveGroupWithUsersOrApps(String name);
+          "The group {0} will be removed for users belonging to this group.")
+  String confirmRemoveGroupWithUsers(String name);
 
   @Description("Confirm remove user label")
   @DefaultMessage("Please confirm that you want to remove the user {0}.")
   String confirmRemoveUser(String name);
-
-  @Description("Confirm remove application label")
-  @DefaultMessage("Please confirm that you want to remove the application {0}.")
-  String confirmRemoveApplication(String name);
 
   @Description("Table count label")
   @DefaultMessage("{0} tables")

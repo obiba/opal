@@ -27,9 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 @Component
 @Path("/system/subject-credentials")
@@ -57,16 +57,16 @@ public class SubjectCredentialsResource {
           .forBeanValidation("{org.obiba.opal.core.validator.Unique.message}", "must be unique",
               SubjectCredentials.class, subjectCredentials, subjectCredentials, subjectCredentials,
               PathImpl.createPathFromString("name"), null, null);
-      throw new ConstraintViolationException(Sets.newHashSet(violation));
+      throw new ConstraintViolationException(ImmutableSet.of(violation));
     }
 
-    switch(subjectCredentials.getType()) {
-      case USER:
+    switch(subjectCredentials.getAuthenticationType()) {
+      case PASSWORD:
         if(dto.hasPassword()) {
           subjectCredentials.setPassword(subjectCredentialsService.hashPassword(dto.getPassword()));
         }
         break;
-      case APPLICATION:
+      case CERTIFICATE:
         if(dto.hasCertificate()) {
           subjectCredentials.setCertificate(dto.getCertificate().toByteArray());
         } else {
@@ -74,7 +74,7 @@ public class SubjectCredentialsResource {
               .forBeanValidation("{javax.validation.constraints.NotNull.message}", "may not be null",
                   SubjectCredentials.class, subjectCredentials, subjectCredentials, subjectCredentials,
                   PathImpl.createPathFromString("certificate"), null, null);
-          throw new ConstraintViolationException(Sets.newHashSet(violation));
+          throw new ConstraintViolationException(ImmutableSet.of(violation));
         }
         break;
     }

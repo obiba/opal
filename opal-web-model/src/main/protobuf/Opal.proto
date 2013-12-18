@@ -220,14 +220,13 @@ message ScheduleDto {
   optional int32 minutes = 4;
 }
 
-enum SubjectCredentialsType {
-  USER = 1;
-  APPLICATION = 2;
-}
-
 message SubjectCredentialsDto {
+  enum AuthenticationType {
+    PASSWORD = 1;
+    CERTIFICATE = 2;
+  }
   required string name = 1;
-  required SubjectCredentialsType type = 2;
+  required AuthenticationType authenticationType = 2;
   optional string password = 3; // only set when the password is to be updated on POST or PUT
   optional bytes certificate = 4;
   repeated string groups = 5;

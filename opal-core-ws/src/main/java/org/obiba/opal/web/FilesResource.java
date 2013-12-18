@@ -316,7 +316,7 @@ public class FilesResource {
           .header(AuthorizationInterceptor.ALT_PERMISSIONS, new OpalPermissions(folderUri, AclAction.FILES_ALL))//
           .entity(dto).build();
     } catch(FileSystemException couldNotCreateTheFolder) {
-      return Response.status(Status.INTERNAL_SERVER_ERROR).entity("cannotCreatefolderUnexpectedError").build();
+      return Response.status(Status.INTERNAL_SERVER_ERROR).entity("cannotCreateFolderUnexpectedError").build();
     }
   }
 

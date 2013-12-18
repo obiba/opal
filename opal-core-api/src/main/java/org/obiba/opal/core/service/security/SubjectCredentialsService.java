@@ -25,7 +25,7 @@ public interface SubjectCredentialsService extends SystemService {
    *
    * @return a list of subjectCredentials instances
    */
-  Iterable<SubjectCredentials> getSubjectCredentials(SubjectCredentials.Type type);
+  Iterable<SubjectCredentials> getSubjectCredentials(SubjectCredentials.AuthenticationType authenticationType);
 
   /**
    * Returns the subjectCredentials with the specified login

@@ -84,10 +84,10 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
   }
 
   @Override
-  public Iterable<SubjectCredentials> getSubjectCredentials(SubjectCredentials.Type type) {
-    return orientDbService
-        .list(SubjectCredentials.class, "select from " + SubjectCredentials.class.getSimpleName() + " where type = ?",
-            type);
+  public Iterable<SubjectCredentials> getSubjectCredentials(SubjectCredentials.AuthenticationType authenticationType) {
+    return orientDbService.list(SubjectCredentials.class,
+        "select from " + SubjectCredentials.class.getSimpleName() + " where authenticationType = ?",
+        authenticationType);
   }
 
   @Override
@@ -117,14 +117,14 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     }
 
     OpalKeyStore keyStore = null;
-    switch(subjectCredentials.getType()) {
-      case USER:
+    switch(subjectCredentials.getAuthenticationType()) {
+      case PASSWORD:
         // Copy current password if password is empty for existing user
         if(subjectCredentials.getPassword() == null && !newSubject) {
           subjectCredentials.setPassword(existing.getPassword());
         }
         break;
-      case APPLICATION:
+      case CERTIFICATE:
         if(subjectCredentials.getCertificate() != null) {
           keyStore = credentialsKeyStoreService.getKeyStore();
           keyStore.importCertificate(subjectCredentials.getName(),
@@ -219,7 +219,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
         .deleteSubjectPermissions(OPAL_DOMAIN, null, SUBJECT_CREDENTIALS.subjectFor(subjectCredentials.getName()));
     subjectProfileService.deleteProfile(subjectCredentials.getName());
 
-    if(subjectCredentials.getType() == SubjectCredentials.Type.APPLICATION) {
+    if(subjectCredentials.getAuthenticationType() == SubjectCredentials.AuthenticationType.CERTIFICATE) {
       OpalKeyStore keyStore = credentialsKeyStoreService.getKeyStore();
       keyStore.deleteKey(subjectCredentials.getName());
       credentialsKeyStoreService.saveKeyStore(keyStore);

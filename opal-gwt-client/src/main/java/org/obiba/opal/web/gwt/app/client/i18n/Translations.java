@@ -385,7 +385,7 @@ public interface Translations extends Constants {
       "Could not create the folder, a folder or a file exist with that name at the specified path.", //
       "cannotCreateFolderParentIsReadOnly", "Could create the following folder because its parent folder is read-only.",
       //
-      "cannotCreatefolderUnexpectedError", "There was an unexpected error while creating the folder.", //
+      "cannotCreateFolderUnexpectedError", "There was an unexpected error while creating the folder.", //
       "cannotDeleteNotEmptyFolder", "This folder contains one or many file(s) and as a result cannot be deleted.", //
       "cannotDeleteReadOnlyFile", "Could delete the  file or folder because it is read-only.", //
       "couldNotDeleteFileError", "There was an error while deleting the file or folder.", //
@@ -422,7 +422,7 @@ public interface Translations extends Constants {
       "CronExpressionIsRequired", "A schedule expression must be specified.",//
       "NotificationEmailsAreInvalid", "One or more of the notifications emails specified are invalid.",//
       "ReportTemplateNameIsRequired", "A name is required for the report template.",//
-      "OccurrenceGroupIsRequired", "An Occurence Group must be specified for Repeatable variables.",//
+      "OccurrenceGroupIsRequired", "An Occurrence Group must be specified for Repeatable variables.",//
       "NewVariableNameIsRequired", "A name is required for the new variable to be created.",//
       "ScriptIsRequired", "A script is required.",//
       "JavascriptError", "Error in script '{0}': {1} ({2}:{3})",//
@@ -577,7 +577,7 @@ public interface Translations extends Constants {
       "CreateViewFailed", "Failed to create view. Make sure the view file is valid.",//
       "SPSSOrExcelFileRequired", "An Excel or a SPSS file is required.",//
       "ESQueryBadRequest", "Not a valid search query.", "DuplicateUserName", "A user with same name already exists.",
-      "DuplicateSubjectProfile", "A user or application profile is already registered with the same name.",//
+      "DuplicateSubjectProfile", "A user profile is already registered with the same name.",//
       "AttributeNameIsRequired", "An attribute name is required",//
       "AttributeAlreadyExists", "An attribute with this namespace and name already exists.",//
       "PermissionRequired", "You must select a at most one permission type.",//
@@ -1268,7 +1268,7 @@ public interface Translations extends Constants {
 
   @Description("Select Key Type Step label")
   @DefaultStringValue(
-      "Provide a name and a type for the cyrptographic key to add to this Unit.")
+      "Provide a name and a type for the cryptographic key to add to this Unit.")
   String keyTypeStep();
 
   @Description("Import Certificate label")
@@ -1558,7 +1558,7 @@ public interface Translations extends Constants {
       "Name the derived variable and select the view in which it will appear.")
   String saveDerivedVariable();
 
-  @Description("Recode Categorie Step title")
+  @Description("Recode Categories Step title")
   @DefaultStringValue(
       "Recode categories and observed distinct values to new values.")
   String recodeCategoriesStepTitle();
@@ -2149,9 +2149,9 @@ public interface Translations extends Constants {
   @DefaultStringValue("Tasks")
   String pageJobsTitle();
 
-  @Description("Page Users, Groups and Applications title")
-  @DefaultStringValue("Users, Groups and Applications")
-  String pageUsersGroupsAndApplicationsTitle();
+  @Description("Page Users and Groups title")
+  @DefaultStringValue("Users and Groups")
+  String pageUsersGroupsTitle();
 
   @Description("Page Projects title")
   @DefaultStringValue("Projects")
@@ -2197,6 +2197,10 @@ public interface Translations extends Constants {
   @DefaultStringValue("Enabled")
   String userStatusLabel();
 
+  @Description("User Authentication label")
+  @DefaultStringValue("Authentication")
+  String userAuthenticationLabel();
+
   @Description("Group Name label")
   @DefaultStringValue("Name")
   String groupNameLabel();
@@ -2213,13 +2217,13 @@ public interface Translations extends Constants {
   @DefaultStringValue("disabled")
   String disabledLabel();
 
-  @Description("Add User label")
-  @DefaultStringValue("Add User")
-  String addUserLabel();
+  @Description("Add user with password label")
+  @DefaultStringValue("Add user with password")
+  String addUserWithPasswordLabel();
 
-  @Description("Add Application label")
-  @DefaultStringValue("Add Application")
-  String addApplicationLabel();
+  @Description("Add user with certificate label")
+  @DefaultStringValue("Add user with certificate")
+  String addUserWithCertificateLabel();
 
   @Description("Add Project label")
   @DefaultStringValue("Add Project")
@@ -2628,10 +2632,6 @@ public interface Translations extends Constants {
   @DefaultStringValue("Remove User")
   String removeUser();
 
-  @Description("Remove Application label")
-  @DefaultStringValue("Remove Application")
-  String removeApplication();
-
   @Description("Unknown tables count label")
   @DefaultStringValue("? tables")
   String unknownTablesCount();
@@ -2647,4 +2647,8 @@ public interface Translations extends Constants {
   @Description("Create Key Pair label")
   @DefaultStringValue("Create Key Pair")
   String createKeyPairLabel();
+
+  @Description("AuthenticationType Labels")
+  @DefaultStringMapValue({ "PASSWORD", "Password", "CERTIFICATE", "Certificate" })
+  Map<String, String> authenticationTypeMap();
 }

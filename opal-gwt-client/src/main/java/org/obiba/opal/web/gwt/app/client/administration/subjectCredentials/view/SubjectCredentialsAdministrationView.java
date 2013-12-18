@@ -24,6 +24,7 @@ import org.obiba.opal.web.model.client.opal.SubjectCredentialsDto;
 import com.github.gwtbootstrap.client.ui.CellTable;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -44,8 +45,6 @@ import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_
 public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<SubjectCredentialsAdministrationUiHandlers>
     implements Display {
 
-  private final Translations translations;
-
   interface Binder extends UiBinder<Widget, SubjectCredentialsAdministrationView> {}
 
   @UiField
@@ -53,12 +52,6 @@ public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<Sub
 
   @UiField
   CellTable<SubjectCredentialsDto> usersTable;
-
-  @UiField
-  SimplePager applicationsTablePager;
-
-  @UiField
-  CellTable<SubjectCredentialsDto> applicationsTable;
 
   @UiField
   SimplePager groupsTablePager;
@@ -69,35 +62,31 @@ public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<Sub
   @UiField
   HasWidgets breadcrumbs;
 
-  private final ListDataProvider<SubjectCredentialsDto> userDataProvider
-      = new ListDataProvider<SubjectCredentialsDto>();
+  private final static Translations translations = GWT.create(Translations.class);
 
-  private final ListDataProvider<SubjectCredentialsDto> applicationDataProvider
+  private final ListDataProvider<SubjectCredentialsDto> userDataProvider
       = new ListDataProvider<SubjectCredentialsDto>();
 
   private final ListDataProvider<GroupDto> groupDataProvider = new ListDataProvider<GroupDto>();
 
   @Inject
-  public SubjectCredentialsAdministrationView(Binder uiBinder, Translations translations) {
-    this.translations = translations;
+  public SubjectCredentialsAdministrationView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
     usersTable.setVisibleRange(0, 10);
-    applicationsTable.setVisibleRange(0, 10);
     groupsTable.setVisibleRange(0, 10);
-    configSubjectCredentialsTable(userDataProvider, usersTable, usersTablePager);
-    configSubjectCredentialsTable(applicationDataProvider, applicationsTable, applicationsTablePager);
+    configUserTable();
     configGroupTable();
   }
 
-  private void configSubjectCredentialsTable(ListDataProvider<SubjectCredentialsDto> dataProvider,
-      CellTable<SubjectCredentialsDto> table, SimplePager pager) {
-    table.addColumn(SubjectCredentialColumns.NAME, translations.userNameLabel());
-    table.addColumn(SubjectCredentialColumns.GROUPS, translations.userGroupsLabel());
-    table.addColumn(SubjectCredentialColumns.STATUS, translations.userStatusLabel());
-    table.addColumn(SubjectCredentialColumns.ACTIONS, translations.actionsLabel());
-    table.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
-    pager.setDisplay(table);
-    dataProvider.addDataDisplay(table);
+  private void configUserTable() {
+    usersTable.addColumn(UserColumns.NAME, translations.userNameLabel());
+    usersTable.addColumn(UserColumns.GROUPS, translations.userGroupsLabel());
+    usersTable.addColumn(UserColumns.STATUS, translations.userStatusLabel());
+    usersTable.addColumn(UserColumns.AUTHENTICATION, translations.userAuthenticationLabel());
+    usersTable.addColumn(UserColumns.ACTIONS, translations.actionsLabel());
+    usersTable.setEmptyTableWidget(new Label(translations.noDataAvailableLabel()));
+    usersTablePager.setDisplay(usersTable);
+    userDataProvider.addDataDisplay(usersTable);
   }
 
   private void configGroupTable() {
@@ -111,29 +100,23 @@ public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<Sub
 
   @UiHandler("addUser")
   public void onAddUser(ClickEvent event) {
-    getUiHandlers().onAddUser();
+    getUiHandlers().onAddUserWithPassword();
   }
 
   @UiHandler("addApplication")
   public void onAddApplication(ClickEvent event) {
-    getUiHandlers().onAddApplication();
+    getUiHandlers().onAddUserWithCertificate();
   }
 
   @Override
   public void clear() {
     renderUserRows(Collections.<SubjectCredentialsDto>emptyList());
-    renderApplicationRows(Collections.<SubjectCredentialsDto>emptyList());
     renderGroupRows(Collections.<GroupDto>emptyList());
   }
 
   @Override
   public void renderUserRows(List<SubjectCredentialsDto> rows) {
     renderRows(rows, userDataProvider, usersTablePager);
-  }
-
-  @Override
-  public void renderApplicationRows(List<SubjectCredentialsDto> rows) {
-    renderRows(rows, applicationDataProvider, applicationsTablePager);
   }
 
   @Override
@@ -155,7 +138,7 @@ public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<Sub
 
   @Override
   public HasActionHandler<SubjectCredentialsDto> getSubjectCredentialActions() {
-    return SubjectCredentialColumns.ACTIONS;
+    return UserColumns.ACTIONS;
   }
 
   @Override
@@ -163,21 +146,21 @@ public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<Sub
     return GroupColumns.ACTIONS;
   }
 
-  private static final class SubjectCredentialColumns {
+  private static final class UserColumns {
 
     static final Column<SubjectCredentialsDto, String> NAME = new TextColumn<SubjectCredentialsDto>() {
 
       @Override
-      public String getValue(SubjectCredentialsDto object) {
-        return object.getName();
+      public String getValue(SubjectCredentialsDto subjectCredentialsDto) {
+        return subjectCredentialsDto.getName();
       }
     };
 
     static final Column<SubjectCredentialsDto, String> GROUPS = new TextColumn<SubjectCredentialsDto>() {
 
       @Override
-      public String getValue(SubjectCredentialsDto object) {
-        return object.getGroupsCount() > 0 ? object.getGroupsArray().join(", ") : "";
+      public String getValue(SubjectCredentialsDto subjectCredentialsDto) {
+        return subjectCredentialsDto.getGroupsCount() > 0 ? subjectCredentialsDto.getGroupsArray().join(", ") : "";
       }
     };
 
@@ -189,8 +172,15 @@ public class SubjectCredentialsAdministrationView extends ViewWithUiHandlers<Sub
           }
         }) {
       @Override
-      public Boolean getValue(SubjectCredentialsDto object) {
-        return object.getEnabled();
+      public Boolean getValue(SubjectCredentialsDto subjectCredentialsDto) {
+        return subjectCredentialsDto.getEnabled();
+      }
+    };
+
+    static final Column<SubjectCredentialsDto, String> AUTHENTICATION = new TextColumn<SubjectCredentialsDto>() {
+      @Override
+      public String getValue(SubjectCredentialsDto subjectCredentialsDto) {
+        return translations.authenticationTypeMap().get(subjectCredentialsDto.getAuthenticationType().getName());
       }
     };
 

@@ -17,14 +17,14 @@
               </b:NavHeader>
               <b:Divider/>
               <o:OpalNavLink ui:field="usersGroupsPlace" icon="COG">
-                <ui:msg description="Main Administration Users, Groups and Applications title">
-                  Users, Groups and Applications
+                <ui:msg description="Main Administration Users and Groups title">
+                  Users and Groups
                 </ui:msg>
               </o:OpalNavLink>
               <g:FlowPanel>
                 <g:Label styleName="help-block">
-                  <ui:msg description="Main Administration Users, Groups and Applications help">
-                    Add, update, remove users, groups and applications
+                  <ui:msg description="Main Administration Users and Groups help">
+                    Add, update, remove users and groups
                   </ui:msg>
                 </g:Label>
               </g:FlowPanel>

@@ -9,12 +9,10 @@
  */
 package org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.presenter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
-import org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.SubjectCredentialsDtos;
 import org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.event.GroupsRefreshedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.subjectCredentials.event.SubjectCredentialsRefreshedEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
@@ -36,7 +34,6 @@ import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.GroupDto;
 import org.obiba.opal.web.model.client.opal.SubjectCredentialsDto;
-import org.obiba.opal.web.model.client.opal.SubjectCredentialsType;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
@@ -105,23 +102,23 @@ public class SubjectCredentialsAdministrationPresenter extends
   @Override
   @TitleFunction
   public String getTitle() {
-    return translations.pageUsersGroupsAndApplicationsTitle();
+    return translations.pageUsersGroupsTitle();
   }
 
   @Override
-  public void onAddUser() {
+  public void onAddUserWithPassword() {
     SubjectCredentialsPresenter presenter = modalProvider.get();
     presenter.setDialogMode(SubjectCredentialsPresenter.Mode.CREATE);
-    presenter.setSubjectCredentialsType(SubjectCredentialsType.USER);
-    presenter.setTitle(translations.addUserLabel());
+    presenter.setAuthenticationType(SubjectCredentialsDto.AuthenticationType.PASSWORD);
+    presenter.setTitle(translations.addUserWithPasswordLabel());
   }
 
   @Override
-  public void onAddApplication() {
+  public void onAddUserWithCertificate() {
     SubjectCredentialsPresenter presenter = modalProvider.get();
     presenter.setDialogMode(SubjectCredentialsPresenter.Mode.CREATE);
-    presenter.setSubjectCredentialsType(SubjectCredentialsType.APPLICATION);
-    presenter.setTitle(translations.addApplicationLabel());
+    presenter.setAuthenticationType(SubjectCredentialsDto.AuthenticationType.CERTIFICATE);
+    presenter.setTitle(translations.addUserWithCertificateLabel());
   }
 
   @Override
@@ -160,11 +157,8 @@ public class SubjectCredentialsAdministrationPresenter extends
         } else if(ActionsColumn.DELETE_ACTION.equals(actionName)) {
 
           removeConfirmation = new RemoveRunnable(dto.getName(), true);
-          boolean isUser = SubjectCredentialsDtos.isUser(dto);
-          String title = isUser ? translations.removeUser() : translations.removeApplication();
-          String message = isUser
-              ? translationMessages.confirmRemoveUser(dto.getName())
-              : translationMessages.confirmRemoveApplication(dto.getName());
+          String title = translations.removeUser();
+          String message = translationMessages.confirmRemoveUser(dto.getName());
           fireEvent(ConfirmationRequiredEvent.createWithMessages(removeConfirmation, title, message));
 
         } else if(Display.DISABLE_ACTION.equals(actionName) || Display.ENABLE_ACTION.equals(actionName)) {
@@ -194,7 +188,7 @@ public class SubjectCredentialsAdministrationPresenter extends
           removeConfirmation = new RemoveRunnable(name, false);
           fireEvent(ConfirmationRequiredEvent.createWithMessages(removeConfirmation, translations.removeGroup(),
               dto.getSubjectCredentialsCount() > 0
-                  ? translationMessages.confirmRemoveGroupWithUsersOrApps(name)
+                  ? translationMessages.confirmRemoveGroupWithUsers(name)
                   : translationMessages.confirmRemoveGroup(name)));
         }
       }
@@ -212,21 +206,7 @@ public class SubjectCredentialsAdministrationPresenter extends
         .withCallback(new ResourceCallback<JsArray<SubjectCredentialsDto>>() {
           @Override
           public void onResource(Response response, JsArray<SubjectCredentialsDto> resource) {
-            List<SubjectCredentialsDto> users = new ArrayList<SubjectCredentialsDto>();
-            List<SubjectCredentialsDto> applications = new ArrayList<SubjectCredentialsDto>();
-            if(resource != null) {
-              int length = resource.length();
-              for(int i = 0; i < length; i++) {
-                SubjectCredentialsDto dto = resource.get(i);
-                if(SubjectCredentialsDtos.isUser(dto)) {
-                  users.add(dto);
-                } else if(SubjectCredentialsDtos.isApplication(dto)) {
-                  applications.add(dto);
-                }
-              }
-            }
-            getView().renderUserRows(users);
-            getView().renderApplicationRows(applications);
+            getView().renderUserRows(JsArrays.toList(JsArrays.toSafeArray(resource)));
           }
         }) //
         .get().send();
@@ -307,8 +287,6 @@ public class SubjectCredentialsAdministrationPresenter extends
     String DISABLE_ACTION = "Disable";
 
     void renderUserRows(List<SubjectCredentialsDto> rows);
-
-    void renderApplicationRows(List<SubjectCredentialsDto> rows);
 
     void renderGroupRows(List<GroupDto> rows);
 

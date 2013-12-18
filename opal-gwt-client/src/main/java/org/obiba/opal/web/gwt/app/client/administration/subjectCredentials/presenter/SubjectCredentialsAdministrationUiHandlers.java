@@ -14,8 +14,8 @@ import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface SubjectCredentialsAdministrationUiHandlers extends UiHandlers {
 
-  void onAddUser();
+  void onAddUserWithPassword();
 
-  void onAddApplication();
+  void onAddUserWithCertificate();
 
 }

@@ -11,24 +11,17 @@
 package org.obiba.opal.web.gwt.app.client.administration.subjectCredentials;
 
 import org.obiba.opal.web.model.client.opal.SubjectCredentialsDto;
-import org.obiba.opal.web.model.client.opal.SubjectCredentialsType;
 
 public class SubjectCredentialsDtos {
 
-  public static boolean isUser(SubjectCredentialsType type) {
-    return type.getName().equals(SubjectCredentialsType.USER.getName());
+  private SubjectCredentialsDtos() {}
+
+  public static boolean isPassword(SubjectCredentialsDto.AuthenticationType type) {
+    return type.getName().equals(SubjectCredentialsDto.AuthenticationType.PASSWORD.getName());
   }
 
-  public static boolean isApplication(SubjectCredentialsType type) {
-    return type.getName().equals(SubjectCredentialsType.APPLICATION.getName());
-  }
-
-  public static boolean isUser(SubjectCredentialsDto dto) {
-    return isUser(dto.getType());
-  }
-
-  public static boolean isApplication(SubjectCredentialsDto dto) {
-    return isApplication(dto.getType());
+  public static boolean isCertificate(SubjectCredentialsDto.AuthenticationType type) {
+    return type.getName().equals(SubjectCredentialsDto.AuthenticationType.CERTIFICATE.getName());
   }
 
 }

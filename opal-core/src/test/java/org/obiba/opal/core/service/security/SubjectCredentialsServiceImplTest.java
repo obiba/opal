@@ -64,12 +64,13 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
 
   @Test
   public void test_create_new_user() {
-    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().type(SubjectCredentials.Type.USER)
-        .name("user1").password("password").enabled(true).build();
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
+        .authenticationType(SubjectCredentials.AuthenticationType.PASSWORD).name("user1").password("password")
+        .enabled(true).build();
     subjectCredentialsService.save(subjectCredentials);
 
     List<SubjectCredentials> list = newArrayList(
-        subjectCredentialsService.getSubjectCredentials(SubjectCredentials.Type.USER));
+        subjectCredentialsService.getSubjectCredentials(SubjectCredentials.AuthenticationType.PASSWORD));
     assertEquals(1, list.size());
     assertSubjectEquals(subjectCredentials, list.get(0));
 
@@ -80,11 +81,12 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
   @Test
   public void test_create_new_application() throws IOException {
     SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
-        .type(SubjectCredentials.Type.APPLICATION).name("app1").certificate(getCertificate()).enabled(true).build();
+        .authenticationType(SubjectCredentials.AuthenticationType.CERTIFICATE).name("app1")
+        .certificate(getCertificate()).enabled(true).build();
     subjectCredentialsService.save(subjectCredentials);
 
     List<SubjectCredentials> list = newArrayList(
-        subjectCredentialsService.getSubjectCredentials(SubjectCredentials.Type.APPLICATION));
+        subjectCredentialsService.getSubjectCredentials(SubjectCredentials.AuthenticationType.CERTIFICATE));
     assertEquals(1, list.size());
     assertSubjectEquals(subjectCredentials, list.get(0));
 
@@ -98,15 +100,16 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
 
   @Test
   public void test_update_user() {
-    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().type(SubjectCredentials.Type.USER)
-        .name("user1").password("password").enabled(true).build();
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
+        .authenticationType(SubjectCredentials.AuthenticationType.PASSWORD).name("user1").password("password")
+        .enabled(true).build();
     subjectCredentialsService.save(subjectCredentials);
 
     subjectCredentials.setPassword("new password");
     subjectCredentialsService.save(subjectCredentials);
 
     List<SubjectCredentials> list = newArrayList(
-        subjectCredentialsService.getSubjectCredentials(SubjectCredentials.Type.USER));
+        subjectCredentialsService.getSubjectCredentials(SubjectCredentials.AuthenticationType.PASSWORD));
     assertEquals(1, list.size());
     assertSubjectEquals(subjectCredentials, list.get(0));
 
@@ -136,8 +139,9 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
   @Test
   public void test_create_groups_from_user() {
 
-    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().type(SubjectCredentials.Type.USER)
-        .name("user1").password("password").groups(Sets.newHashSet("group1", "group2")).build();
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
+        .authenticationType(SubjectCredentials.AuthenticationType.PASSWORD).name("user1").password("password")
+        .groups(Sets.newHashSet("group1", "group2")).build();
     subjectCredentialsService.save(subjectCredentials);
 
     assertEquals(2, size(subjectCredentialsService.getGroups()));
@@ -155,8 +159,9 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
 
   @Test
   public void test_remove_groups_from_user() {
-    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().type(SubjectCredentials.Type.USER)
-        .name("user1").password("password").groups(Sets.newHashSet("group1", "group2")).build();
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
+        .authenticationType(SubjectCredentials.AuthenticationType.PASSWORD).name("user1").password("password")
+        .groups(Sets.newHashSet("group1", "group2")).build();
     subjectCredentialsService.save(subjectCredentials);
 
     subjectCredentials.removeGroup("group1");
@@ -179,21 +184,24 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
 
   @Test
   public void test_delete_user() {
-    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().type(SubjectCredentials.Type.USER)
-        .name("user1").password("password").build();
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
+        .authenticationType(SubjectCredentials.AuthenticationType.PASSWORD).name("user1").password("password").build();
     subjectCredentialsService.save(subjectCredentials);
     subjectCredentialsService.delete(subjectCredentials);
-    assertEquals(0, size(subjectCredentialsService.getSubjectCredentials(SubjectCredentials.Type.USER)));
+    assertEquals(0,
+        size(subjectCredentialsService.getSubjectCredentials(SubjectCredentials.AuthenticationType.PASSWORD)));
   }
 
   @Test
   public void test_delete_application() throws IOException {
     SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
-        .type(SubjectCredentials.Type.APPLICATION).name("app1").certificate(getCertificate()).enabled(true).build();
+        .authenticationType(SubjectCredentials.AuthenticationType.CERTIFICATE).name("app1")
+        .certificate(getCertificate()).enabled(true).build();
     subjectCredentialsService.save(subjectCredentials);
 
     subjectCredentialsService.delete(subjectCredentials);
-    assertEquals(0, size(subjectCredentialsService.getSubjectCredentials(SubjectCredentials.Type.APPLICATION)));
+    assertEquals(0,
+        size(subjectCredentialsService.getSubjectCredentials(SubjectCredentials.AuthenticationType.CERTIFICATE)));
 
     OpalKeyStore keyStore = credentialsKeyStoreService.getKeyStore();
     assertThat(keyStore.aliasExists(subjectCredentials.getName()), is(false));
@@ -201,13 +209,15 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
 
   @Test
   public void test_delete_user_with_groups() {
-    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create().type(SubjectCredentials.Type.USER)
-        .name("user1").password("password").groups(Sets.newHashSet("group1", "group2")).build();
+    SubjectCredentials subjectCredentials = SubjectCredentials.Builder.create()
+        .authenticationType(SubjectCredentials.AuthenticationType.PASSWORD).name("user1").password("password")
+        .groups(Sets.newHashSet("group1", "group2")).build();
     subjectCredentialsService.save(subjectCredentials);
 
     subjectCredentialsService.delete(subjectCredentials);
 
-    assertEquals(0, size(subjectCredentialsService.getSubjectCredentials(SubjectCredentials.Type.USER)));
+    assertEquals(0,
+        size(subjectCredentialsService.getSubjectCredentials(SubjectCredentials.AuthenticationType.PASSWORD)));
 
     Group group1 = subjectCredentialsService.getGroup("group1");
     assertEquals(0, group1.getSubjectCredentials().size());
@@ -233,7 +243,7 @@ public class SubjectCredentialsServiceImplTest extends AbstractJUnit4SpringConte
     assertThat(found, notNullValue());
     assertThat(found, is(expected));
     assertThat(found.getName(), is(expected.getName()));
-    assertThat(found.getType(), is(expected.getType()));
+    assertThat(found.getAuthenticationType(), is(expected.getAuthenticationType()));
     assertThat(found.getPassword(), is(expected.getPassword()));
     assertThat(found.isEnabled(), is(expected.isEnabled()));
 
