@@ -103,9 +103,7 @@ public class IdentifiersMappingModalPresenter extends ModalPresenterWidget<Ident
   }
 
   public void onUpdate(VariableDto updatedVariable) {
-    UriBuilder uriBuilder;
-    uriBuilder = UriBuilders.IDENTIFIERS_TABLE_VARIABLE.create();
-
+    UriBuilder uriBuilder = UriBuilders.IDENTIFIERS_TABLE_VARIABLE.create();
     ResourceRequestBuilderFactory.newBuilder().forResource(uriBuilder.build(tableDto.getName(), variable.getName())) //
         .put() //
         .withResourceBody(VariableDto.stringify(updatedVariable)) //

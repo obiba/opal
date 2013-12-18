@@ -43,6 +43,8 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
 
   private final ModalProvider<ImportSystemIdentifiersModalPresenter> importSystemIdentifiersModalProvider;
 
+  private final ModalProvider<ImportIdentifiersMappingModalPresenter> importIdentifiersMappingModalProvider;
+
   private final ModalProvider<IdentifiersMappingModalPresenter> identifiersMappingModalProvider;
 
   private final ModalProvider<GenerateIdentifiersModalPresenter> generateIdentifiersModalProvider;
@@ -54,10 +56,12 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
   @Inject
   public IdentifiersTablePresenter(EventBus eventBus, Display view,
       ModalProvider<ImportSystemIdentifiersModalPresenter> importSystemIdentifiersModalProvider,
+      ModalProvider<ImportIdentifiersMappingModalPresenter> importIdentifiersMappingModalProvider,
       ModalProvider<IdentifiersMappingModalPresenter> identifiersMappingModalProvider,
       ModalProvider<GenerateIdentifiersModalPresenter> generateIdentifiersModalProvider) {
     super(eventBus, view);
     this.importSystemIdentifiersModalProvider = importSystemIdentifiersModalProvider.setContainer(this);
+    this.importIdentifiersMappingModalProvider = importIdentifiersMappingModalProvider.setContainer(this);
     this.identifiersMappingModalProvider = identifiersMappingModalProvider.setContainer(this);
     this.generateIdentifiersModalProvider = generateIdentifiersModalProvider.setContainer(this);
     getView().setUiHandlers(this);
@@ -113,6 +117,14 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
   public void onImportSystemIdentifiers() {
     if(table != null) {
       ImportSystemIdentifiersModalPresenter p = importSystemIdentifiersModalProvider.get();
+      p.initialize(table);
+    }
+  }
+
+  @Override
+  public void onImportIdentifiersMapping() {
+    if(table != null) {
+      ImportIdentifiersMappingModalPresenter p = importIdentifiersMappingModalProvider.get();
       p.initialize(table);
     }
   }

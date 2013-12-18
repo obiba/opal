@@ -21,6 +21,7 @@ import org.obiba.magma.Datasource;
 import org.obiba.magma.ValueTable;
 import org.obiba.opal.core.runtime.OpalRuntime;
 import org.obiba.opal.core.service.IdentifiersTableService;
+import org.obiba.opal.web.support.InvalidRequestException;
 
 public abstract class AbstractIdentifiersResource {
 
@@ -55,6 +56,11 @@ public abstract class AbstractIdentifiersResource {
       }
     }
     return null;
+  }
+
+  protected void ensureEntityType(String entityType) {
+    if(entityType == null || !getIdentifiersTableService().hasIdentifiersTable(entityType))
+      throw new InvalidRequestException("No such identifiers table for entity type: " + entityType);
   }
 
   protected Datasource getDatasource() {

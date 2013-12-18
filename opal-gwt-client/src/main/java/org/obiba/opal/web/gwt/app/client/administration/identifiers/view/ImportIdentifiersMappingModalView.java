@@ -11,32 +11,39 @@ package org.obiba.opal.web.gwt.app.client.administration.identifiers.view;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.ImportSystemIdentifiersModalPresenter;
-import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.ImportSystemIdentifiersModalUiHandlers;
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.ImportIdentifiersMappingModalPresenter;
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.ImportIdentifiersMappingModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
+import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextArea;
+import com.github.gwtbootstrap.client.ui.TextBox;
+import com.github.gwtbootstrap.client.ui.Typeahead;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-public class ImportSystemIdentifiersModalView extends ModalPopupViewWithUiHandlers<ImportSystemIdentifiersModalUiHandlers>
-    implements ImportSystemIdentifiersModalPresenter.Display {
+public class ImportIdentifiersMappingModalView
+    extends ModalPopupViewWithUiHandlers<ImportIdentifiersMappingModalUiHandlers>
+    implements ImportIdentifiersMappingModalPresenter.Display {
 
-  interface Binder extends UiBinder<Widget, ImportSystemIdentifiersModalView> {}
+  interface Binder extends UiBinder<Widget, ImportIdentifiersMappingModalView> {}
 
   private final Translations translations;
 
@@ -50,17 +57,32 @@ public class ImportSystemIdentifiersModalView extends ModalPopupViewWithUiHandle
   Button saveButton;
 
   @UiField
+  ControlGroup variableGroup;
+
+  @UiField
+  Typeahead variableTypeahead;
+
+  @UiField
+  TextBox variableName;
+
+  @UiField
+  ControlGroup systemIdsGroup;
+
+  @UiField
   ControlGroup idsGroup;
+
+  @UiField
+  TextArea systemIdentifiers;
 
   @UiField
   TextArea identifiers;
 
   @Inject
-  public ImportSystemIdentifiersModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
+  public ImportIdentifiersMappingModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
     super(eventBus);
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
-    dialog.setTitle(translations.importSystemIdentifiersTitle());
+    dialog.setTitle(translations.importIdentifiersMappingTitle());
   }
 
   @UiHandler("closeButton")
@@ -70,7 +92,7 @@ public class ImportSystemIdentifiersModalView extends ModalPopupViewWithUiHandle
 
   @UiHandler("saveButton")
   void onSave(ClickEvent event) {
-    getUiHandlers().onSubmit(getIdentifiers().getText());
+    getUiHandlers().onSubmit(variableName.getText(), getSystemIdentifiers().getText(), getIdentifiers().getText());
   }
 
   @Override
@@ -83,11 +105,25 @@ public class ImportSystemIdentifiersModalView extends ModalPopupViewWithUiHandle
       msg = errorDto.getStatus();
       if(translations.userMessageMap().containsKey(msg)) msg = translations.userMessageMap().get(errorDto.getStatus());
     } catch(Exception ignored) {
+      if(translations.userMessageMap().containsKey(message)) msg = translations.userMessageMap().get(message);
     }
 
     if(group == null) {
       dialog.addAlert(msg, AlertType.ERROR);
-    } else dialog.addAlert(msg, AlertType.ERROR, idsGroup);
+    } else if(group == FormField.NAME) {
+      dialog.addAlert(msg, AlertType.ERROR, variableGroup);
+    } else if(group == FormField.IDENTIFIERS) {
+      dialog.addAlert(msg, AlertType.ERROR, idsGroup);
+    } else dialog.addAlert(msg, AlertType.ERROR, systemIdsGroup);
+  }
+
+  @Override
+  public void setVariables(JsArray<VariableDto> variables) {
+    MultiWordSuggestOracle oracle = (MultiWordSuggestOracle) variableTypeahead.getSuggestOracle();
+    oracle.clear();
+    for (VariableDto var : JsArrays.toIterable(variables)) {
+      oracle.add(var.getName());
+    }
   }
 
   @Override
@@ -106,8 +142,17 @@ public class ImportSystemIdentifiersModalView extends ModalPopupViewWithUiHandle
   }
 
   @Override
+  public HasText getSystemIdentifiers() {
+    return systemIdentifiers;
+  }
+
+  @Override
   public HasText getIdentifiers() {
     return identifiers;
   }
 
+  @Override
+  public HasText getVariableName() {
+    return variableName;
+  }
 }

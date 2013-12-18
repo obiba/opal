@@ -18,19 +18,21 @@
 
   <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false">
     <g:FlowPanel>
-        <!--Entity type-->
-        <b:ControlGroup ui:field="entityGroup">
-          <b:ControlLabel>
-            <ui:msg description="Identifiers label">Identifiers</ui:msg>
-            <o:RequiredIcon/>
-          </b:ControlLabel>
-          <b:Controls>
-            <b:TextArea ui:field="identifiers" alternateSize="XLARGE" visibleLines="3" b:id="identifiers"/>
-          </b:Controls>
-          <b:HelpBlock>
-            <ui:msg description="Import System Identifiers help">List one system identifier per line. New identifiers will be added, existing ones will be ignored.</ui:msg>
-          </b:HelpBlock>
-        </b:ControlGroup>
+      <!--Identifiers-->
+      <b:ControlGroup ui:field="idsGroup">
+        <b:ControlLabel>
+          <ui:msg description="Identifiers label">Identifiers</ui:msg>
+          <o:RequiredIcon/>
+        </b:ControlLabel>
+        <b:Controls>
+          <b:TextArea ui:field="identifiers" alternateSize="XLARGE" visibleLines="10"/>
+        </b:Controls>
+        <b:HelpBlock>
+          <ui:msg description="Import System Identifiers help">List one system identifier per line. New identifiers will
+            be added, existing ones will be ignored.
+          </ui:msg>
+        </b:HelpBlock>
+      </b:ControlGroup>
     </g:FlowPanel>
 
     <b:ModalFooter>

@@ -33,21 +33,28 @@ public interface IdentifiersImportService {
   int importIdentifiers(@NotNull IdentifiersMapping idMapping, @NotNull IdentifierGenerator pIdentifier);
 
   /**
-   * Import identifiers from identifiers tables of a given datasource.
+   * Import identifiers from identifiers tables of a given data datasource.
    * @param idMapping
    * @param sourceDatasource
    * @param select
    * @throws IOException
    */
-  void importIdentifiers(@NotNull IdentifiersMapping idMapping, Datasource sourceDatasource, @Nullable String select)
+  void importIdentifiers(@NotNull IdentifiersMapping idMapping, Datasource dataDatasource, @Nullable String select)
       throws IOException;
 
   /**
-   * Import the identifiers of the given table's entities (table values are ignored).
+   * Import the identifiers of the given data table's entities (table values are ignored).
    *
    * @param sourceValueTable
    * @throws java.io.IOException
    */
-  void importIdentifiers(ValueTable sourceValueTable) throws IOException;
+  void importIdentifiers(ValueTable dataValueTable) throws IOException;
+
+  /**
+   * Copy the identifiers entries from the given table of identifiers.
+   * @param identifiersValueTable
+   * @throws IOException
+   */
+  void copyIdentifiers(ValueTable identifiersValueTable) throws IOException;
 
 }

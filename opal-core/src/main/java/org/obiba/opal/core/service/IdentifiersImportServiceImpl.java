@@ -16,6 +16,7 @@ import javax.validation.constraints.NotNull;
 
 import org.obiba.magma.Datasource;
 import org.obiba.magma.MagmaEngine;
+import org.obiba.magma.RenameValueTable;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
@@ -142,4 +143,17 @@ public class IdentifiersImportServiceImpl implements IdentifiersImportService {
         .copy(sourceIdentifiersTable, identifiersTableService.getDatasource());
   }
 
+  @Override
+  public void copyIdentifiers(ValueTable identifiersValueTable) throws IOException {
+    ValueTable destinationIdentifiersTable = identifiersTableService.ensureIdentifiersTable(identifiersValueTable.getEntityType());
+    ValueTable sourceIdentifiersTable = identifiersValueTable;
+
+    if (!destinationIdentifiersTable.getName().equals(identifiersValueTable)) {
+        sourceIdentifiersTable = new RenameValueTable(destinationIdentifiersTable.getName(), identifiersValueTable);
+    }
+
+    // Don't copy null values otherwise, we'll delete existing mappings
+    DatasourceCopier.Builder.newCopier().dontCopyNullValues().withLoggingListener().build()
+        .copy(sourceIdentifiersTable, identifiersTableService.getDatasource());
+  }
 }

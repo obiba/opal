@@ -10,8 +10,6 @@
 
 package org.obiba.opal.web.gwt.app.client.administration.identifiers.view;
 
-import java.util.ArrayList;
-
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersTablePresenter;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersTableUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
@@ -22,7 +20,6 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.VariableAttributeColumn;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
-import org.obiba.opal.web.model.client.magma.AttributeDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
@@ -44,12 +41,8 @@ import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.Range;
-import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
-
-import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.DELETE_ACTION;
-import static org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn.EDIT_ACTION;
 
 public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiHandlers>
     implements IdentifiersTablePresenter.Display {
@@ -130,6 +123,11 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
   @UiHandler("importSystemId")
   void onImportSystemIdentifiers(ClickEvent event) {
     getUiHandlers().onImportSystemIdentifiers();
+  }
+
+  @UiHandler("importIdMapping")
+  void onImportIdentifiersMapping(ClickEvent event) {
+    getUiHandlers().onImportIdentifiersMapping();
   }
 
   @UiHandler("addIdMapping")

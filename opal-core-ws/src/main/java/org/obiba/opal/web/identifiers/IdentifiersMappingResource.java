@@ -19,6 +19,7 @@ import java.util.NoSuchElementException;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -38,6 +39,7 @@ import org.obiba.magma.NoSuchValueTableException;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueTableWriter;
 import org.obiba.magma.Variable;
+import org.obiba.magma.datasource.csv.support.CsvDatasourceFactory;
 import org.obiba.magma.lang.Closeables;
 import org.obiba.magma.support.Disposables;
 import org.obiba.opal.core.identifiers.IdentifierGeneratorImpl;
@@ -63,6 +65,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 import au.com.bytecode.opencsv.CSVWriter;
+import de.schlichtherle.io.File;
 
 @Component
 @Transactional
@@ -99,7 +102,8 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
 
   @GET
   @ApiOperation(value = "Get a specific identifiers mapping for an entity type")
-  public Magma.VariableDto get(@QueryParam("type") @DefaultValue("Participant") String entityType) {
+  public Magma.VariableDto get(@QueryParam("type") String entityType) {
+    ensureEntityType(entityType);
     ValueTable table = getValueTable(entityType);
     Variable variable = table.getVariable(name);
 
@@ -108,7 +112,8 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
 
   @DELETE
   @ApiOperation(value = "Delete a specific identifiers mapping for an entity type")
-  public Response delete(@QueryParam("type") @DefaultValue("Participant") String entityType) {
+  public Response delete(@QueryParam("type") String entityType) {
+    ensureEntityType(entityType);
     ValueTableWriter vtw = null;
     ValueTableWriter.VariableWriter vw = null;
     try {
@@ -131,8 +136,8 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
   @GET
   @Path("/entities")
   @ApiOperation(value = "Get identifiers as entities")
-  public List<Magma.VariableEntityDto> getUnitEntities(
-      @QueryParam("type") @DefaultValue("Participant") String entityType) {
+  public List<Magma.VariableEntityDto> getUnitEntities(@QueryParam("type") String entityType) {
+    ensureEntityType(entityType);
     return Lists.newArrayList(Iterables
         .transform(new IdentifiersMaps(getValueTable(entityType), name).getPrivateEntities(),
             Dtos.variableEntityAsDtoFunc));
@@ -140,41 +145,61 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
 
   @GET
   @Path("/_count")
-  public String getEntitiesCount(@QueryParam("type") @DefaultValue("Participant") String entityType) {
+  public String getEntitiesCount(@QueryParam("type") String entityType) {
+    ensureEntityType(entityType);
     return String.valueOf(Iterables.size(getUnitIdentifiers(entityType)));
   }
 
+  /**
+   * Copy the provided identifiers mapping into the corresponding identifiers table. New system identifiers will be
+   * added, existing mapped identifiers will be overridden.
+   * @param entityType
+   * @param separator
+   * @param identifiersMap
+   * @return
+   */
   @POST
+  @Consumes("text/plain")
   @Path("/_import")
-  public Response importIdentifiers(Magma.DatasourceFactoryDto datasourceFactoryDto,
-      @QueryParam("type") @DefaultValue("Participant") String entityType, @QueryParam("select") String select) {
+  public Response importIdentifiers(@QueryParam("type") String entityType,
+      @QueryParam("separator") @DefaultValue(",") String separator, String identifiersMap) {
+    ensureEntityType(entityType);
     Response response = null;
-
-    Datasource sourceDatasource = createTransientDatasource(datasourceFactoryDto);
-
+    java.io.File csvData = null;
     try {
-      identifiersImportService
-          .importIdentifiers(new IdentifiersMapping(name, entityType), sourceDatasource, select);
-      response = Response.ok().build();
-    } catch(NoSuchDatasourceException ex) {
-      response = Response.status(Response.Status.NOT_FOUND)
-          .entity(ClientErrorDtos.getErrorMessage(Response.Status.NOT_FOUND, "DatasourceNotFound", ex)).build();
-    } catch(NoSuchValueTableException ex) {
-      response = Response.status(Response.Status.NOT_FOUND)
-          .entity(ClientErrorDtos.getErrorMessage(Response.Status.NOT_FOUND, "ValueTableNotFound", ex)).build();
-    } catch(IOException ex) {
+      CsvDatasourceFactory factory = new CsvDatasourceFactory();
+      csvData = java.io.File.createTempFile("opal", ".csv");
+      PrintWriter writer = new PrintWriter(csvData);
+      writer.println("ID" + separator + name);
+      writer.print(identifiersMap);
+      writer.flush();
+      writer.close();
+      factory.setSeparator(separator);
+      factory.addTable(entityType, csvData, entityType);
+      response = copyIdentifiers(createTransientDatasource(factory));
+
+    } catch(IOException e) {
       response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
-          ClientErrorDtos.getErrorMessage(Response.Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex))
+          ClientErrorDtos.getErrorMessage(Response.Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", e))
           .build();
     } finally {
-      Disposables.silentlyDispose(sourceDatasource);
+      if (csvData!= null) csvData.delete();
     }
 
     return response;
   }
 
+  @POST
+  @Path("/_import")
+  public Response importIdentifiers(Magma.DatasourceFactoryDto datasourceFactoryDto,
+      @QueryParam("type") String entityType, @QueryParam("select") String select) {
+    ensureEntityType(entityType);
+    return importIdentifiers(createTransientDatasource(datasourceFactoryDto), entityType, select);
+  }
+
   /**
    * Generate identifiers.
+   *
    * @param entityType
    * @param size
    * @param zeros
@@ -183,8 +208,9 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
    */
   @POST
   @Path("/_generate")
-  public Response importIdentifiers(@QueryParam("type") @DefaultValue("Participant") String entityType,
-      @QueryParam("size") Integer size, @QueryParam("zeros") Boolean zeros, @QueryParam("prefix") String prefix) {
+  public Response importIdentifiers(@QueryParam("type") String entityType, @QueryParam("size") Integer size,
+      @QueryParam("zeros") Boolean zeros, @QueryParam("prefix") String prefix) {
+    ensureEntityType(entityType);
     try {
       IdentifierGeneratorImpl pId = new IdentifierGeneratorImpl();
       if(size != null) pId.setKeySize(size);
@@ -199,7 +225,6 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
     }
   }
 
-
   /**
    * Get the non-null values of a variable's vector in CSV format.
    *
@@ -212,8 +237,8 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
   @Produces("text/csv")
   @AuthenticatedByCookie
   @ApiOperation(value = "Get identifiers mapping in CSV", produces = "text/csv")
-  public Response getVectorCSVValues(@QueryParam("type") @DefaultValue("Participant") String entityType)
-      throws MagmaRuntimeException, IOException {
+  public Response getVectorCSVValues(@QueryParam("type") String entityType) throws MagmaRuntimeException, IOException {
+    ensureEntityType(entityType);
     ValueTable table = getValueTable(entityType);
     Variable variable = table.getVariable(name);
 
@@ -242,8 +267,8 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
   @Produces("text/plain")
   @AuthenticatedByCookie
   @ApiOperation(value = "Get identifiers in plain text", produces = "text/plain")
-  public Response getVectorValues(@QueryParam("type") @DefaultValue("Participant") String entityType)
-      throws MagmaRuntimeException, IOException {
+  public Response getVectorValues(@QueryParam("type") String entityType) throws MagmaRuntimeException, IOException {
+    ensureEntityType(entityType);
     ValueTable table = getValueTable(entityType);
     Variable variable = table.getVariable(name);
 
@@ -264,16 +289,65 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
   // Private methods
   //
 
+  private Response importIdentifiers(Datasource sourceDatasource, String entityType, String select) {
+    Response response = null;
+    try {
+      identifiersImportService.importIdentifiers(new IdentifiersMapping(name, entityType), sourceDatasource, select);
+      response = Response.ok().build();
+    } catch(NoSuchDatasourceException ex) {
+      response = Response.status(Response.Status.NOT_FOUND)
+          .entity(ClientErrorDtos.getErrorMessage(Response.Status.NOT_FOUND, "DatasourceNotFound", ex)).build();
+    } catch(NoSuchValueTableException ex) {
+      response = Response.status(Response.Status.NOT_FOUND)
+          .entity(ClientErrorDtos.getErrorMessage(Response.Status.NOT_FOUND, "ValueTableNotFound", ex)).build();
+    } catch(IOException ex) {
+      response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
+          ClientErrorDtos.getErrorMessage(Response.Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex))
+          .build();
+    } finally {
+      Disposables.silentlyDispose(sourceDatasource);
+    }
+
+    return response;
+  }
+
+  private Response copyIdentifiers(Datasource identifiersDatasource) {
+    Response response = null;
+    try {
+      for(ValueTable identifiersTable : identifiersDatasource.getValueTables()) {
+        identifiersImportService.copyIdentifiers(identifiersTable);
+      }
+      response = Response.ok().build();
+    } catch(NoSuchDatasourceException ex) {
+      response = Response.status(Response.Status.NOT_FOUND)
+          .entity(ClientErrorDtos.getErrorMessage(Response.Status.NOT_FOUND, "DatasourceNotFound", ex)).build();
+    } catch(NoSuchValueTableException ex) {
+      response = Response.status(Response.Status.NOT_FOUND)
+          .entity(ClientErrorDtos.getErrorMessage(Response.Status.NOT_FOUND, "ValueTableNotFound", ex)).build();
+    } catch(IOException ex) {
+      response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
+          ClientErrorDtos.getErrorMessage(Response.Status.INTERNAL_SERVER_ERROR, "DatasourceCopierIOException", ex))
+          .build();
+    } finally {
+      Disposables.silentlyDispose(identifiersDatasource);
+    }
+
+    return response;
+  }
+
   private Datasource createTransientDatasource(Magma.DatasourceFactoryDto datasourceFactoryDto) {
-    DatasourceFactory factory = datasourceFactoryRegistry.parse(datasourceFactoryDto);
+    return createTransientDatasource(datasourceFactoryRegistry.parse(datasourceFactoryDto));
+  }
+
+  private Datasource createTransientDatasource(DatasourceFactory factory) {
     String uid = MagmaEngine.get().addTransientDatasource(factory);
 
     return MagmaEngine.get().getTransientDatasourceInstance(uid);
   }
 
   private Iterable<IdentifiersMaps.IdentifiersMap> getUnitIdentifiers(String entityType) {
-    return Iterables.filter(new IdentifiersMaps(getValueTable(entityType), name),
-        new Predicate<IdentifiersMaps.IdentifiersMap>() {
+    return Iterables
+        .filter(new IdentifiersMaps(getValueTable(entityType), name), new Predicate<IdentifiersMaps.IdentifiersMap>() {
           @Override
           public boolean apply(@Nullable IdentifiersMaps.IdentifiersMap input) {
             return input.hasPrivateIdentifier();

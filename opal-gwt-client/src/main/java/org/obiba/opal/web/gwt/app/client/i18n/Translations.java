@@ -490,6 +490,9 @@ public interface Translations extends Constants {
       "NameIsRequired", "A name is required.",//
       "EntityTypeIsRequired", "An entity type is required.",//
       "IdentifiersAreRequired", "Some identifiers are required.",//
+      "SystemIdentifiersAreRequired", "Some system identifiers are required.",//
+      "IdentifiersAreMissing", "Some identifiers are missing.",//
+      "SystemIdentifiersAreMissing", "Some system identifiers are missing.",//
       "DriverIsRequired", "A driver is required.",//
       "DefaultEntityTypeIsRequired", "Default Entity Type is required for Custom SQL schema.",//
       "DatabaseUsageIsRequired", "Database usage is required.",//
@@ -1081,6 +1084,10 @@ public interface Translations extends Constants {
   @Description("Import System Identifiers title")
   @DefaultStringValue("Import System Identifiers")
   String importSystemIdentifiersTitle();
+
+  @Description("Import Identifiers Mapping title")
+  @DefaultStringValue("Import Identifiers Mapping")
+  String importIdentifiersMappingTitle();
 
   @Description("Identifiers Tables title")
   @DefaultStringValue("Identifiers Tables")
