@@ -64,7 +64,7 @@
       </g:HorizontalPanel>
       <b:HelpBlock>
         <ui:msg description="Import Identifiers Mapping help">List one identifier per line. New identifiers will
-          be added, existing ones will be ignored.
+          be added, existing ones will be overridden. Identifiers of other mappings will remain untouched.
         </ui:msg>
       </b:HelpBlock>
 
