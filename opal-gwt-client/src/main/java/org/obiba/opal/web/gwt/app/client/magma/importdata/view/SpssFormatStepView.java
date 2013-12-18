@@ -15,9 +15,11 @@ import org.obiba.opal.web.gwt.app.client.support.LanguageLocale;
 import org.obiba.opal.web.gwt.app.client.ui.CharacterSetView;
 import org.obiba.opal.web.gwt.app.client.ui.DropdownSuggestBox;
 
+import com.github.gwtbootstrap.client.ui.ControlGroup;
+import com.github.gwtbootstrap.client.ui.base.HasType;
+import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -42,6 +44,12 @@ public class SpssFormatStepView extends ViewImpl implements SpssFormatStepPresen
 
   @UiField
   DropdownSuggestBox localeNameBox;
+
+  @UiField
+  ControlGroup selectFileGroup;
+
+  @UiField
+  ControlGroup localeGroup;
 
   @Inject
   public SpssFormatStepView(Binder uiBinder) {
@@ -89,6 +97,19 @@ public class SpssFormatStepView extends ViewImpl implements SpssFormatStepPresen
   @Override
   public String getLocale() {
     return localeNameBox.getText();
+  }
+
+  @Override
+  public HasType<ControlGroupType> getGroupType(String id) {
+    SpssFormatStepPresenter.Display.FormField field = SpssFormatStepPresenter.Display.FormField.valueOf(id);
+    switch(field) {
+      case FILE:
+        return selectFileGroup;
+      case LOCALE:
+        return localeGroup;
+    }
+
+    return null;
   }
 }
 

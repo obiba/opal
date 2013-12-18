@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.importdata.presenter;
 
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
@@ -81,10 +80,7 @@ public class JdbcStepPresenter extends PresenterWidget<JdbcStepPresenter.Display
 
   @Override
   public boolean validate() {
-    if(getView().getSelectedDatabase().isEmpty()) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error("JdbcDatabaseIsRequired").build());
-      return false;
-    }
+    // JDBC format is removed is no JDBC database exists
     return true;
   }
 

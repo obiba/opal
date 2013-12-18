@@ -29,7 +29,6 @@ import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 import com.github.gwtbootstrap.client.ui.base.HasType;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
 import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -42,6 +41,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.watopi.chosen.client.event.ChosenChangeEvent;
 
 import static org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig.ImportFormat;
 
@@ -149,6 +149,11 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
           @Override
           public boolean validate() {
             return importDataInputsHandler.validateFormat();
+          }
+        }).onPrevious(new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            clearError();
           }
         }).title(translations.dataImportFileStep())//
 
@@ -297,8 +302,8 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
   }
 
   @Override
-  public HandlerRegistration addFormatChangeHandler(ChangeHandler handler) {
-    return formatChooser.addChangeHandler(handler);
+  public HandlerRegistration addFormatChangeHandler(ChosenChangeEvent.ChosenChangeHandler handler) {
+    return formatChooser.addChosenChangeHandler(handler);
   }
 
   @Override
@@ -387,7 +392,7 @@ public class DataImportView extends ModalViewImpl implements DataImportPresenter
     updateHelpPanelsVisibility();
   }
 
-  @SuppressWarnings("PMD.NcssMethodCount")
+  @SuppressWarnings({ "PMD.NcssMethodCount", "OverlyLongMethod" })
   private void updateHelpPanelsVisibility() {
     switch(getImportFormat()) {
       case CSV:
