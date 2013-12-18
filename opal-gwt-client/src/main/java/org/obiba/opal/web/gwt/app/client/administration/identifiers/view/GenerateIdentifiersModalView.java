@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.web.gwt.app.client.unit.view;
+package org.obiba.opal.web.gwt.app.client.administration.identifiers.view;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,8 +18,8 @@ import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.NumericTextBox;
-import org.obiba.opal.web.gwt.app.client.unit.presenter.GenerateIdentifiersModalPresenter.Display;
-import org.obiba.opal.web.gwt.app.client.unit.presenter.GenerateIdentifiersModalUiHandlers;
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.GenerateIdentifiersModalPresenter.Display;
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.GenerateIdentifiersModalUiHandlers;
 
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.CheckBox;
@@ -90,6 +90,9 @@ public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<G
   @UiField
   Button generateButton;
 
+  @UiField
+  Button cancelButton;
+
   //
   // Constructors
   //
@@ -122,9 +125,16 @@ public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<G
     updateDescriptionText();
   }
 
+  @Override
+  public void setBusy(boolean busy) {
+    generateButton.setEnabled(!busy);
+    cancelButton.setEnabled(!busy);
+    dialog.setBusy(busy);
+  }
+
   @UiHandler("generateButton")
   public void onGenerateButtonClicked(ClickEvent event) {
-    getUiHandlers().generateIdentifiers();
+    getUiHandlers().generateIdentifiers(getSize(), getAllowZeros(), getPrefix());
   }
 
   @UiHandler("cancelButton")
@@ -132,18 +142,15 @@ public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<G
     hideDialog();
   }
 
-  @Override
-  public Number getSize() {
+  private Number getSize() {
     return size.getNumberValue();
   }
 
-  @Override
-  public String getPrefix() {
+  private String getPrefix() {
     return prefix.getText();
   }
 
-  @Override
-  public boolean getAllowZeros() {
+  private boolean getAllowZeros() {
     return allowZeros.getValue();
   }
 

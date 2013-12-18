@@ -45,6 +45,8 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
 
   private final ModalProvider<IdentifiersMappingModalPresenter> identifiersMappingModalProvider;
 
+  private final ModalProvider<GenerateIdentifiersModalPresenter> generateIdentifiersModalProvider;
+
   private TableDto table;
 
   private Runnable removeConfirmation;
@@ -52,12 +54,12 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
   @Inject
   public IdentifiersTablePresenter(EventBus eventBus, Display view,
       ModalProvider<ImportSystemIdentifiersModalPresenter> importSystemIdentifiersModalProvider,
-      ModalProvider<IdentifiersMappingModalPresenter> identifiersMappingModalProvider) {
+      ModalProvider<IdentifiersMappingModalPresenter> identifiersMappingModalProvider,
+      ModalProvider<GenerateIdentifiersModalPresenter> generateIdentifiersModalProvider) {
     super(eventBus, view);
-    this.importSystemIdentifiersModalProvider = importSystemIdentifiersModalProvider;
-    this.importSystemIdentifiersModalProvider.setContainer(this);
-    this.identifiersMappingModalProvider = identifiersMappingModalProvider;
-    this.identifiersMappingModalProvider.setContainer(this);
+    this.importSystemIdentifiersModalProvider = importSystemIdentifiersModalProvider.setContainer(this);
+    this.identifiersMappingModalProvider = identifiersMappingModalProvider.setContainer(this);
+    this.generateIdentifiersModalProvider = generateIdentifiersModalProvider.setContainer(this);
     getView().setUiHandlers(this);
   }
 
@@ -137,8 +139,12 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
         .createWithKeys(removeConfirmation, "removeIdentifiersMapping", "confirmRemoveIdentifiersMapping");
 
     fireEvent(event);
+  }
 
-
+  @Override
+  public void onGenerateIdentifiersMapping(VariableDto variable) {
+    GenerateIdentifiersModalPresenter p = generateIdentifiersModalProvider.get();
+    p.initialize(variable, table);
   }
 
   //

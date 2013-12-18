@@ -142,7 +142,8 @@ public interface Translations extends Constants {
       "CommitDiff", "Diff", //
       "DiffWithCurrent", "Diff with current",//
       "Enable", "Enable",//
-      "Disable", "Disable"//
+      "Disable", "Disable",//
+      "Generate identifiers", "Generate identifiers"//
   })
   Map<String, String> actionMap();
 
@@ -311,7 +312,6 @@ public interface Translations extends Constants {
   @Description("Identifiers mapping name already exists label")
   @DefaultStringValue("An identifiers mapping already exists with this name.")
   String identifiersMappingNameAlreadyExists();
-
 
   @Description("Attribute name already exists label")
   @DefaultStringValue("The specified attribute name already exists.")
@@ -2110,7 +2110,6 @@ public interface Translations extends Constants {
   @Description("Page Identifiers Admin title")
   @DefaultStringValue("Identifiers Mappings")
   String pageIdentifiersMappingTitle();
-
 
   @Description("Page Files title")
   @DefaultStringValue("Files")

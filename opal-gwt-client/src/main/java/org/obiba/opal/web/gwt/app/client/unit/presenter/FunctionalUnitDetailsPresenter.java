@@ -11,6 +11,7 @@ package org.obiba.opal.web.gwt.app.client.unit.presenter;
 
 import javax.annotation.Nullable;
 
+import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.GenerateIdentifiersModalPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -452,8 +453,6 @@ public class FunctionalUnitDetailsPresenter
               .build());
       return;
     }
-
-    generateIdentifiersModalProvider.get().setAffectedEntitiesCount(affectedCount);
   }
 
   //

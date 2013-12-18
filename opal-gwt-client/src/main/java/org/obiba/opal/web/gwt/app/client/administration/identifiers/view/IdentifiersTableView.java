@@ -217,12 +217,15 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
   }
 
   private class VariableActionsColumn extends ActionsColumn<VariableDto> {
+
+    public static final String GENERATE_IDS_ACTION = "Generate identifiers";
+
     private VariableActionsColumn() {
       super(new ActionsProvider<VariableDto>() {
 
         @Override
         public String[] allActions() {
-          return new String[] { EDIT_ACTION, DELETE_ACTION };
+          return new String[] { EDIT_ACTION, DELETE_ACTION, GENERATE_IDS_ACTION };
         }
 
         @Override
@@ -238,6 +241,8 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
             getUiHandlers().onDeleteIdentifiersMapping(object);
           } else if(actionName.equalsIgnoreCase(EDIT_ACTION)) {
             getUiHandlers().onEditIdentifiersMapping(object);
+          } else if(actionName.equalsIgnoreCase(GENERATE_IDS_ACTION)) {
+            getUiHandlers().onGenerateIdentifiersMapping(object);
           }
         }
       });
