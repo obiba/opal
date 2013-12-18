@@ -176,6 +176,24 @@ public interface Translations extends Constants {
       "REPORT_TEMPLATE_READ", "View Reports" })
   Map<String, String> permissionMap();
 
+  @Description("Permission Node Name format map")
+  @Constants.DefaultStringMapValue({ //
+      "PROJECT", "Project",//
+      "DATASOURCE", "Tables",//
+      "TABLE", "Table",//
+      "VARIABLE", "Variable",//
+      "REPORT_TEMPLATE", "Report"//
+  })
+  Map<String, String> permissionResourceNodeTypeMap();
+
+  @Description("resource Node Datasource Name")
+  @DefaultStringValue("All")
+  String resourceNodeDatasourceName();
+
+  @Description("Update Resource Permission User label")
+  @DefaultStringValue("Permission of user: ")
+  String userResourcePermissionLabel();
+
   @Description("Permission explanation map")
   @DefaultStringMapValue({ //
       "PROJECT_ALL", "Can edit and delete project.", //
@@ -204,10 +222,6 @@ public interface Translations extends Constants {
       "REPORT_TEMPLATE_ALL", "Administrate", //
       "REPORT_TEMPLATE_READ", "View reports" })
   Map<String, String> permissionExplanationMap();
-
-  @Description("Update Resource Permission User label")
-  @DefaultStringValue("Permission of user: ")
-  String userResourcePermissionLabel();
 
   @Description("Authorization explanation map")
   @DefaultStringMapValue({ //
@@ -1480,12 +1494,12 @@ public interface Translations extends Constants {
   Map<String, String> valueTypeMap();
 
   @Description("Subject Type map")
-  @DefaultStringMapValue({ "USER", "User Name", //
+  @DefaultStringMapValue({ "SUBJECT_CREDENTIALS", "User Name", //
       "GROUP", "Group Name" })
   Map<String, String> subjectTypeMap();
 
   @Description("Subject Type map")
-  @DefaultStringMapValue({ "USER", "User", //
+  @DefaultStringMapValue({ "SUBJECT_CREDENTIALS", "User", //
       "GROUP", "Group" })
   Map<String, String> shortSubjectTypeMap();
 

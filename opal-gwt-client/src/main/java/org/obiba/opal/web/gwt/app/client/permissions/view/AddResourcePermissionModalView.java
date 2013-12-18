@@ -6,6 +6,7 @@ import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissio
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
+import org.obiba.opal.web.model.client.opal.Subject;
 
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
@@ -14,7 +15,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -62,12 +62,12 @@ public class AddResourcePermissionModalView
   }
 
   @Override
-  public TakesValue<String> getSubjectType() {
-    return new TakesValue<String>() {
+  public AddResourcePermissionModalPresenter.ResourceSubjectType getSubjectType() {
+    return new AddResourcePermissionModalPresenter.ResourceSubjectType() {
 
       @Override
-      public void setValue(String type) {
-        subjectType.addItem(type);
+      public void addItem(String item, String value) {
+        subjectType.addItem(item, value);
       }
 
       @Override
