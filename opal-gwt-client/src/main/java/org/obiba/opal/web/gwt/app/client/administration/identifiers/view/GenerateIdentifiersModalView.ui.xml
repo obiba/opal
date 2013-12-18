@@ -40,7 +40,7 @@
             <ui:msg description="Identifiers size">Identifier size</ui:msg>
           </b:ControlLabel>
           <o:NumericTextBox ui:field="size" width="6em" minConstrained="true"
-              maxConstrained="false"></o:NumericTextBox>
+              maxConstrained="false"/>
           <b:HelpBlock ui:field="sizeHelp">
             <ui:msg description="configure help label">Size Help</ui:msg>
           </b:HelpBlock>
@@ -50,7 +50,7 @@
           <b:ControlLabel for="prefix">
             <ui:msg description="Identifiers prefix">Identifier Prefix</ui:msg>
           </b:ControlLabel>
-          <b:TextBox ui:field="prefix"></b:TextBox>
+          <b:TextBox ui:field="prefix"/>
         </b:ControlGroup>
 
         <b:ControlGroup>

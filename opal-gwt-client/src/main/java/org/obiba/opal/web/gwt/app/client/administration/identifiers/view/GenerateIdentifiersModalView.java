@@ -46,7 +46,7 @@ import com.google.web.bindery.event.shared.EventBus;
 public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<GenerateIdentifiersModalUiHandlers>
     implements Display {
 
-  interface GenerateIdentifiersModalUiBinder extends UiBinder<Widget, GenerateIdentifiersModalView> {}
+  interface Binder extends UiBinder<Widget, GenerateIdentifiersModalView> {}
 
   //
   // Constants
@@ -55,8 +55,6 @@ public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<G
   private static final int MIN_IDENTIFIER_SIZE = 5;
 
   private static final int MAX_IDENTIFIER_SIZE = 20;
-
-  private static final GenerateIdentifiersModalUiBinder uiBinder = GWT.create(GenerateIdentifiersModalUiBinder.class);
 
   private final Translations translations;
 
@@ -97,7 +95,7 @@ public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<G
   // Constructors
   //
   @Inject
-  public GenerateIdentifiersModalView(EventBus eventBus, Translations translations) {
+  public GenerateIdentifiersModalView(Binder uiBinder, EventBus eventBus, Translations translations) {
     super(eventBus);
     this.translations = translations;
     initWidget(uiBinder.createAndBindUi(this));
@@ -130,6 +128,13 @@ public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<G
     generateButton.setEnabled(!busy);
     cancelButton.setEnabled(!busy);
     dialog.setBusy(busy);
+  }
+
+  @Override
+  public void setDefault(int sizeNb, String prefixStr) {
+    size.setValue(sizeNb + "");
+    prefix.setText(prefixStr);
+    sampleIdentifier.setText(generateSampleIdentifier());
   }
 
   @UiHandler("generateButton")

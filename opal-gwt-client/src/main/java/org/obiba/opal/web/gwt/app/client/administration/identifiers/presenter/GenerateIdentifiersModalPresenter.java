@@ -54,6 +54,10 @@ public class GenerateIdentifiersModalPresenter extends ModalPresenterWidget<Gene
     this.variable = variable;
     this.table = table;
 
+    String prefix = variable.getName().toUpperCase() + "-";
+    int size = (table.getValueSetCount() +"").length();
+    getView().setDefault(size, prefix);
+
     UriBuilder ub = UriBuilder.create().segment("identifiers", "mapping", "{}", "_count")
         .query("type", table.getEntityType());
     ResourceRequestBuilderFactory.newBuilder().forResource(ub.build(variable.getName())).get()//
@@ -119,5 +123,7 @@ public class GenerateIdentifiersModalPresenter extends ModalPresenterWidget<Gene
     void setAffectedEntities(int count);
 
     void setBusy(boolean busy);
+
+    void setDefault(int size, String prefix);
   }
 }
