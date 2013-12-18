@@ -21,6 +21,7 @@ import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
+import org.obiba.opal.web.gwt.app.client.ui.celltable.PlaceRequestCell;
 import org.obiba.opal.web.model.client.opal.Acl;
 import org.obiba.opal.web.model.client.opal.Subject;
 
@@ -41,6 +42,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectResourcePermissionsUiHandlers>
     implements ProjectResourcePermissionsPresenter.Display {
@@ -62,6 +65,7 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
   @UiField
   Table permissionsTable;
 
+
   @UiField
   Button deleteAll;
 
@@ -71,9 +75,17 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
 
   private Subject subject;
 
+  private ProjectResourcePermissionsPresenter.NodeNameFormatter nodeNameFormatter;
+
+  private ProjectResourcePermissionsPresenter.NodeToPlaceConverter nodeToPlaceConverter;
+
+  private final PlaceManager placeManager;
+
+
   @Inject
-  public ProjectResourcePermissionsView(Binder uiBinder) {
+  public ProjectResourcePermissionsView(Binder uiBinder, PlaceManager placeManager) {
     initWidget(uiBinder.createAndBindUi(this));
+    this.placeManager = placeManager;
     initPermissionTable();
   }
 
@@ -90,6 +102,16 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
   }
 
   @Override
+  public void setNodeToPlaceConverter(ProjectResourcePermissionsPresenter.NodeToPlaceConverter converter) {
+    nodeToPlaceConverter = converter;
+  }
+
+  @Override
+  public void setNodeNameFormatter(ProjectResourcePermissionsPresenter.NodeNameFormatter formatter) {
+    nodeNameFormatter = formatter;
+  }
+
+  @Override
   public HasActionHandler<Acl> getActions() {
     return ProjectPermissionColumns.ACTIONS;
   }
@@ -101,7 +123,7 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
 
   private void initPermissionTable() {
     tablePager.setDisplay(permissionsTable);
-    permissionsTable.addColumn(ProjectPermissionColumns.RESOURCE, translations.resourceLabel());
+    permissionsTable.addColumn(new TableColumn(), translations.resourceLabel());
     permissionsTable.addColumn(ProjectPermissionColumns.PERMISSION, translations.permissionLabel());
     permissionsTable.addColumn(ProjectPermissionColumns.ACTIONS, translations.actionsLabel());
     permissionsDataProvider.addDataDisplay(permissionsTable);
@@ -137,15 +159,30 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
     container.add(link);
   }
 
+  private class TableColumn extends Column<Acl, Acl> {
+
+    public TableColumn() {
+      super(new PlaceRequestCell<Acl>(placeManager) {
+        @Override
+        public PlaceRequest getPlaceRequest(Acl value) {
+          return nodeToPlaceConverter.convert(value);
+        }
+
+        @Override
+        public String getText(Acl value) {
+          return nodeNameFormatter.format(value);
+        }
+      });
+    }
+
+    @Override
+    public Acl getValue(Acl object) {
+      return object;
+    }
+  }
+
+
   private static final class ProjectPermissionColumns {
-
-    static final Column<Acl, String> RESOURCE = new TextColumn<Acl>() {
-
-      @Override
-      public String getValue(Acl acl) {
-        return acl.getResource();
-      }
-    };
 
     static final Column<Acl, String> PERMISSION = new TextColumn<Acl>() {
 

@@ -18,6 +18,7 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -37,6 +38,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 public class ProjectResourcePermissionsPresenter extends PresenterWidget<ProjectResourcePermissionsPresenter.Display>
     implements ProjectResourcePermissionsUiHandlers, DeleteAllSubjectPermissionsHandler {
@@ -51,6 +53,8 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
     super(eventBus, display);
     this.deleteAllConfirmationModalProvider = deleteAllConfirmationModalProvider.setContainer(this);
     getView().setUiHandlers(this);
+    getView().setNodeToPlaceConverter(new NodeToPlaceConverterImpl());
+    getView().setNodeNameFormatter(new NodeNameFormatterImpl());
   }
 
   public void initialize(@Nonnull ProjectDto project) {
@@ -146,7 +150,90 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
 
     void setSubjectData(Subject subject, List<Acl> subjectAcls);
 
+    void setNodeToPlaceConverter(NodeToPlaceConverter converter);
+
+    void setNodeNameFormatter(NodeNameFormatter formatter);
+
     HasActionHandler<Acl> getActions();
+  }
+
+  public interface NodeToPlaceConverter {
+    PlaceRequest convert(Acl acl);
+  }
+
+  private static final class NodeToPlaceConverterImpl implements NodeToPlaceConverter {
+
+    @Override
+    public PlaceRequest convert(Acl acl) {
+      ResourcePermissionType type = ResourcePermissionType.getTypeByPermission(acl.getActions(0));
+      String[] parts = acl.getResource().split("/");
+      PlaceRequest placeRequest = null;
+
+      switch (type) {
+        case PROJECT:
+          placeRequest = ProjectPlacesHelper.getProjectPlace(parts[2]);
+          break;
+
+        case DATASOURCE:
+          placeRequest = ProjectPlacesHelper.getDatasourcePlace(parts[2]);
+          break;
+
+        case TABLE:
+          placeRequest = ProjectPlacesHelper.getTablePlace(parts[2], parts[4]);
+          break;
+
+        case VARIABLE:
+          placeRequest = ProjectPlacesHelper.getVariablePlace(parts[2], parts[4], parts[6]);
+          break;
+
+        case REPORT_TEMPLATE:
+          placeRequest = ProjectPlacesHelper.getReportsPlace(parts[2]);
+          break;
+      }
+
+      assert placeRequest != null;
+      return placeRequest;
+    }
+  }
+
+
+  public interface NodeNameFormatter {
+    String format(Acl acl);
+  }
+
+  private static final class NodeNameFormatterImpl implements NodeNameFormatter {
+
+    @Override
+    public String format(Acl acl) {
+      ResourcePermissionType type = ResourcePermissionType.getTypeByPermission(acl.getActions(0));
+      String[] parts = acl.getResource().split("/");
+      String name = null;
+
+      switch (type) {
+        case PROJECT:
+          name = parts[2] + " [project]";
+          break;
+
+        case DATASOURCE:
+          name = "All Tables";
+          break;
+
+        case TABLE:
+          name = parts[2] + " [table]";
+          break;
+
+        case VARIABLE:
+              name = parts[4] + ":" + parts[6];
+          break;
+
+        case REPORT_TEMPLATE:
+          name = parts[2] + " [report]";
+          break;
+      }
+
+      assert name != null;
+      return name;
+    }
   }
 
 }
