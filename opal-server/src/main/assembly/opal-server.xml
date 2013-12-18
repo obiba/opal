@@ -7,6 +7,8 @@
     <format>zip</format>
   </formats>
   <fileSets>
+
+    <!-- Copy Windows batch scripts -->
     <fileSet>
       <directory>src/main/bin</directory>
       <outputDirectory>bin</outputDirectory>
@@ -14,8 +16,16 @@
         <include>*.bat</include>
       </includes>
     </fileSet>
+    <fileSet>
+      <directory>src/main/tools</directory>
+      <outputDirectory>tools</outputDirectory>
+      <includes>
+        <include>*.bat</include>
+      </includes>
+      <filtered>true</filtered>
+    </fileSet>
 
-    <!-- Copy unix shell scripts. -->
+    <!-- Copy unix shell scripts -->
     <fileSet>
       <directory>src/main/bin</directory>
       <outputDirectory>bin</outputDirectory>
@@ -26,6 +36,18 @@
       <includes>
         <include>*</include>
       </includes>
+    </fileSet>
+    <fileSet>
+      <directory>src/main/tools</directory>
+      <outputDirectory>tools</outputDirectory>
+      <fileMode>0755</fileMode>
+      <excludes>
+        <exclude>*.bat</exclude>
+      </excludes>
+      <includes>
+        <include>*</include>
+      </includes>
+      <filtered>true</filtered>
     </fileSet>
 
     <fileSet>
@@ -45,6 +67,7 @@
       <excludes>
         <exclude>org.obiba.opal:opal-gwt-client:*</exclude>
         <exclude>org.obiba.opal:opal-reporting:zip:dist</exclude>
+        <exclude>org.apache.shiro.tools:shiro-tools-hasher:*</exclude>
       </excludes>
     </dependencySet>
 
@@ -63,6 +86,14 @@
         <include>org.obiba.opal:opal-reporting:zip:dist</include>
       </includes>
       <unpack>true</unpack>
+    </dependencySet>
+
+    <!-- Tools -->
+    <dependencySet>
+      <outputDirectory>tools</outputDirectory>
+      <includes>
+        <include>org.apache.shiro.tools:shiro-tools-hasher:*</include>
+      </includes>
     </dependencySet>
 
   </dependencySets>

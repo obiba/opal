@@ -677,6 +677,7 @@
         <artifactId>shiro-tools-hasher</artifactId>
         <version>${shiro.version}</version>
         <scope>runtime</scope>
+        <classifier>cli</classifier>
       </dependency>
 
       <dependency>
