@@ -19,8 +19,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -30,10 +28,6 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.eclipse.jetty.http.HttpHeaders;
 import org.eclipse.jetty.http.HttpStatus;
-import org.obiba.opal.core.domain.security.SubjectAcl;
-import org.obiba.opal.core.runtime.OpalRuntime;
-import org.obiba.opal.core.service.SubjectProfileService;
-import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.core.service.security.X509CertificateAuthenticationToken;
 import org.obiba.opal.web.security.HttpAuthorizationToken;
 import org.obiba.opal.web.security.HttpCookieAuthenticationToken;
@@ -57,17 +51,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
   @Autowired
   private SessionsSecurityManager securityManager;
-
-  @Autowired
-  private OpalRuntime opalRuntime;
-
-  @Autowired
-  private SubjectAclService subjectAclService;
-
-  @Autowired
-  private SubjectProfileService subjectProfileService;
-
-  private static final String HOME_PERM = "FILES_SHARE";
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -114,14 +97,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
           Thread.currentThread().getId());
       ThreadContext.bind(subject);
       session.touch();
-
-      // TODO do this on Shiro session opened
-      String username = subject.getPrincipal().toString();
-      subjectProfileService.ensureProfile(subject);
-      ensureUserHomeExists(username);
-      ensureFolderPermissions(username, "/home/" + username);
-      ensureFolderPermissions(username, "/tmp");
-
       log.info("Successfully authenticated subject {}", SecurityUtils.getSubject().getPrincipal());
     }
   }
@@ -198,44 +173,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     return sessionId;
   }
 
-  private void ensureUserHomeExists(String username) {
-    try {
-      FileObject home = opalRuntime.getFileSystem().getRoot().resolveFile("/home/" + username);
-      if(!home.exists()) {
-        log.info("Creating user home: /home/{}", username);
-        home.createFolder();
-      }
-    } catch(FileSystemException e) {
-      log.error("Failed creating user home.", e);
-    }
-  }
-
-  private void ensureFolderPermissions(String username, String path) {
-    String folderNode = "/files" + path;
-    boolean found = false;
-    for(SubjectAclService.Permissions acl : subjectAclService
-        .getNodePermissions("opal", folderNode, SubjectAcl.SubjectType.SUBJECT_CREDENTIALS)) {
-      found = findPermission(acl, HOME_PERM);
-      if(found) break;
-    }
-    if(!found) {
-      subjectAclService
-          .addSubjectPermission("opal", folderNode, SubjectAcl.SubjectType.SUBJECT_CREDENTIALS.subjectFor(username),
-              HOME_PERM);
-    }
-  }
-
-  private boolean findPermission(SubjectAclService.Permissions acl, String permission) {
-    boolean found = false;
-    for(String perm : acl.getPermissions()) {
-      if(perm.equals(permission)) {
-        found = true;
-        break;
-      }
-    }
-    return found;
-  }
-
   private void unbind() {
     try {
       if(log.isTraceEnabled()) {
@@ -243,7 +180,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         if(s != null) {
           Session session = s.getSession(false);
           log.trace("Unbinding subject {} session {} from executing thread {}", s.getPrincipal(),
-              session == null ? "null" : session.getId(), Thread.currentThread().getId());
+              session == null ? null : session.getId(), Thread.currentThread().getId());
         }
       }
     } finally {

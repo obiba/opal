@@ -48,10 +48,13 @@ public class BackgroundJobRealm extends AuthorizingRealm {
     return info;
   }
 
-  private static class SystemPrincipal {
+  public static class SystemPrincipal {
+
+    public static final String PRINCIPAL = "opal/system";
+
     @Override
     public String toString() {
-      return "opal/system";
+      return PRINCIPAL;
     }
   }
 }

@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.obiba.opal.core.runtime;
+package org.obiba.opal.core.service;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +20,9 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.obiba.opal.core.cfg.OpalConfigurationExtension;
+import org.obiba.opal.core.runtime.BackgroundJob;
+import org.obiba.opal.core.runtime.NoSuchServiceConfigurationException;
+import org.obiba.opal.core.runtime.Service;
 import org.obiba.opal.core.security.BackgroundJobServiceAuthToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

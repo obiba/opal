@@ -1,4 +1,4 @@
-package org.obiba.opal.core.service;
+package org.obiba.opal.core.service.security.authc;
 
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListener;
@@ -14,7 +14,6 @@ public class OpalSessionListener implements SessionListener {
 
   @Override
   public void onStart(Session session) {
-
   }
 
   @Override
@@ -26,4 +25,5 @@ public class OpalSessionListener implements SessionListener {
   public void onExpiration(Session session) {
     subjectAclService.deleteNodePermissions("/auth/session/" + session.getId());
   }
+
 }

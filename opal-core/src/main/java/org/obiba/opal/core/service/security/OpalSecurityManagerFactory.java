@@ -7,7 +7,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.core.service.security.realm.support;
+package org.obiba.opal.core.service.security;
 
 import java.util.Collection;
 import java.util.Set;
@@ -15,6 +15,8 @@ import java.util.Set;
 import javax.annotation.PreDestroy;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AbstractAuthenticator;
+import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authz.ModularRealmAuthorizer;
 import org.apache.shiro.authz.permission.PermissionResolver;
 import org.apache.shiro.authz.permission.PermissionResolverAware;
@@ -48,6 +50,9 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
 
   @Autowired
   private Set<SessionListener> sessionListeners;
+
+  @Autowired
+  private Set<AuthenticationListener> authenticationListeners;
 
   @Autowired
   private RolePermissionResolver rolePermissionResolver;
@@ -109,6 +114,9 @@ public class OpalSecurityManagerFactory implements FactoryBean<SecurityManager> 
         ((RolePermissionResolverAware) dsm.getAuthorizer()).setRolePermissionResolver(rolePermissionResolver);
         ((PermissionResolverAware) dsm.getAuthorizer()).setPermissionResolver(permissionResolver);
       }
+
+      ((AbstractAuthenticator) dsm.getAuthenticator()).setAuthenticationListeners(authenticationListeners);
+
       return dsm;
     }
 

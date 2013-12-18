@@ -55,7 +55,8 @@ public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperti
 
   }
 
-  public SubjectAcl(@NotNull String domain, @NotNull String node, @NotNull Subject subject, @NotNull String permission) {
+  public SubjectAcl(@NotNull String domain, @NotNull String node, @NotNull Subject subject,
+      @NotNull String permission) {
     this(domain, node, subject.getPrincipal(), subject.getType(), permission);
   }
 
@@ -75,7 +76,7 @@ public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperti
 
   @Override
   public List<Object> getUniqueValues() {
-    return Lists.<Object>newArrayList(domain, node, principal, type, permission);
+    return Lists.<Object>newArrayList(domain, node, principal, type.toString(), permission);
   }
 
   @NotNull

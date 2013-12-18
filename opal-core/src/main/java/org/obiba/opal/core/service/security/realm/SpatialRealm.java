@@ -27,7 +27,6 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.obiba.opal.core.domain.security.SubjectAcl;
 import org.obiba.opal.core.service.security.SubjectAclService;
 import org.obiba.opal.core.service.security.SubjectAclService.SubjectAclChangeCallback;
-import org.obiba.opal.core.service.security.realm.support.SubjectPermissionsConverterRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
