@@ -9,7 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.magma.importdata.presenter;
 
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
@@ -56,9 +55,8 @@ public class LimesurveyStepPresenter extends PresenterWidget<LimesurveyStepPrese
               if(sqlDatabaseDto.getSqlSchema().getName().equals(SqlSettingsDto.SqlSchema.LIMESURVEY.getName())) {
                 databases.push(resource.get(i));
               }
-
-              getView().setDatabases(databases);
             }
+            getView().setDatabases(databases);
           }
         })//
         .withCallback(Response.SC_FORBIDDEN, new ResponseCodeCallback() {
@@ -80,10 +78,7 @@ public class LimesurveyStepPresenter extends PresenterWidget<LimesurveyStepPrese
 
   @Override
   public boolean validate() {
-    if(getView().getSelectedDatabase().isEmpty()) {
-      getEventBus().fireEvent(NotificationEvent.newBuilder().error("LimeSurveyDatabaseIsRequired").build());
-      return false;
-    }
+    // LimeSurvey format is removed is no LimeSurvey database exists
     return true;
   }
 

@@ -24,9 +24,10 @@ import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.CsvOptionsDisplay;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
 import org.obiba.opal.web.gwt.app.client.ui.wizard.WizardStepDisplay;
-import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.CharacterSetEncodingValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
 import org.obiba.opal.web.gwt.app.client.validator.RegExValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
@@ -41,6 +42,7 @@ import com.github.gwtbootstrap.client.ui.constants.ControlGroupType;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
@@ -80,7 +82,9 @@ public class CsvFormatStepPresenter extends PresenterWidget<CsvFormatStepPresent
     addHandler(FileSelectionEvent.getType(), new FileSelectionEvent.Handler() {
       @Override
       public void onFileSelection(FileSelectionEvent event) {
-        getView().setTable(createTableName(event.getSelectedFile().getSelectionPath()));
+        String selectionPath = event.getSelectedFile().getSelectionPath();
+        String tableName = selectionPath.substring(selectionPath.lastIndexOf('/') + 1, selectionPath.lastIndexOf('.'));
+        getView().setTable(tableName);
       }
     });
     getView().setEntityType("Participant");
@@ -164,7 +168,7 @@ public class CsvFormatStepPresenter extends PresenterWidget<CsvFormatStepPresent
   }
 
   public Map<HasType<ControlGroupType>, String> getErrors() {
-    return viewValidator.errors;
+    return viewValidator.getErrors();
   }
 
   public void setDestination(String destination) {
@@ -187,10 +191,6 @@ public class CsvFormatStepPresenter extends PresenterWidget<CsvFormatStepPresent
           }
         }).send();
 
-  }
-
-  private String createTableName(String selectedFile) {
-    return selectedFile.substring(selectedFile.lastIndexOf('/') + 1, selectedFile.lastIndexOf('.'));
   }
 
   //
@@ -219,7 +219,7 @@ public class CsvFormatStepPresenter extends PresenterWidget<CsvFormatStepPresent
 
   private final class ViewValidator extends ViewValidationHandler {
 
-    Map<HasType<ControlGroupType>, String> errors;
+    private Map<HasType<ControlGroupType>, String> errors;
 
     @Override
     protected Set<FieldValidator> getValidators() {
@@ -237,23 +237,34 @@ public class CsvFormatStepPresenter extends PresenterWidget<CsvFormatStepPresent
       return validators;
     }
 
-    private void addRowValidators(Set<FieldValidator> validators) {
+    private void addRowValidators(Collection<FieldValidator> validators) {
       validators.add(new RegExValidator(getView().getRowText(), "^[1-9]\\d*$", "RowMustBePositiveInteger",
           CsvOptionsDisplay.CsvFormField.ROW.name()));
     }
 
-    private void addOptionsValidators(Set<FieldValidator> validators) {
+    private void addOptionsValidators(Collection<FieldValidator> validators) {
       validators.add(new RequiredTextValidator(getView().getFieldSeparator(), "FieldSeparatorRequired",
           CsvOptionsDisplay.CsvFormField.FIELD.name()));
       validators.add(new RequiredTextValidator(getView().getQuote(), "QuoteSeparatorRequired",
           CsvOptionsDisplay.CsvFormField.QUOTE.name()));
     }
 
-    private void addFileValidators(Set<FieldValidator> validators) {
-      validators.add(new FileTypeValidator(csvFileSelectionPresenter.getSelectedFile(), Display.FormField.FILE.name()));
+    private void addFileValidators(Collection<FieldValidator> validators) {
+      validators.add(
+          new ConditionValidator(fileExtensionCondition(csvFileSelectionPresenter.getSelectedFile()), "CSVFileRequired",
+              Display.FormField.FILE.name()));
     }
 
-    private void addCharsetValidator(Set<FieldValidator> validators) {
+    private HasValue<Boolean> fileExtensionCondition(final String selectedFile) {
+      return new HasBooleanValue() {
+        @Override
+        public Boolean getValue() {
+          return selectedFile.toLowerCase().endsWith(".csv");
+        }
+      };
+    }
+
+    private void addCharsetValidator(Collection<FieldValidator> validators) {
       String charset = getView().getCharsetText().getText();
       CharacterSetEncodingValidator charsetValidator = new CharacterSetEncodingValidator(charset,
           "InvalidCharacterSetName", CsvOptionsDisplay.CsvFormField.CHARSET.name());
@@ -261,12 +272,12 @@ public class CsvFormatStepPresenter extends PresenterWidget<CsvFormatStepPresent
       validators.add(charsetValidator);
     }
 
-    private void addTableValidators(Set<FieldValidator> validators) {
+    private void addTableValidators(Collection<FieldValidator> validators) {
       validators.add(new RequiredTextValidator(getView().getSelectedTable(), "DestinationTableRequired",
           Display.FormField.TABLE.name()));
     }
 
-    private void addEntityTypeValidator(Set<FieldValidator> validators) {
+    private void addEntityTypeValidator(Collection<FieldValidator> validators) {
       validators.add(new RequiredTextValidator(getView().getSelectedEntityType(), "DestinationTableEntityTypeRequired",
           Display.FormField.ENTITY_TYPE.name()));
     }
@@ -275,19 +286,9 @@ public class CsvFormatStepPresenter extends PresenterWidget<CsvFormatStepPresent
     protected void showMessage(String id, String message) {
       errors.put(getView().getGroupType(id), message);
     }
-  }
 
-  private final static class FileTypeValidator extends AbstractFieldValidator {
-    private final String fileName;
-
-    FileTypeValidator(String fileName, String id) {
-      super("CSVFileRequired", id);
-      this.fileName = fileName;
-    }
-
-    @Override
-    protected boolean hasError() {
-      return !fileName.toLowerCase().endsWith(".csv");
+    public Map<HasType<ControlGroupType>, String> getErrors() {
+      return errors;
     }
   }
 

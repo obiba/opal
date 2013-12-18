@@ -24,13 +24,18 @@ import com.gwtplatform.mvp.client.ViewImpl;
 
 public class LimesurveyStepView extends ViewImpl implements LimesurveyStepPresenter.Display {
 
+  interface Binder extends UiBinder<Widget, LimesurveyStepView> {}
+
   @UiField
   ListBox database;
 
   @UiField
   TextBox tablePrefix;
 
-  interface Binder extends UiBinder<Widget, LimesurveyStepView> {}
+  @Inject
+  public LimesurveyStepView(Binder uiBinder) {
+    initWidget(uiBinder.createAndBindUi(this));
+  }
 
   @Override
   public void setDatabases(JsArray<DatabaseDto> resource) {
@@ -48,11 +53,6 @@ public class LimesurveyStepView extends ViewImpl implements LimesurveyStepPresen
   @Override
   public String getTablePrefix() {
     return tablePrefix.getValue();
-  }
-
-  @Inject
-  public LimesurveyStepView(Binder uiBinder) {
-    initWidget(uiBinder.createAndBindUi(this));
   }
 
 }
