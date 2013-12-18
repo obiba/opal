@@ -263,7 +263,7 @@ public class IdentifiersMappingResource extends AbstractIdentifiersResource {
    * @throws IOException
    */
   @GET
-  @Path("/_export")
+  @Path("/entities/_export")
   @Produces("text/plain")
   @AuthenticatedByCookie
   @ApiOperation(value = "Get identifiers in plain text", produces = "text/plain")

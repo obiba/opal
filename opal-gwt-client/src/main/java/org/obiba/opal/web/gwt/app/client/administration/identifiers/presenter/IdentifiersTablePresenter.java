@@ -14,11 +14,13 @@ import org.obiba.opal.web.gwt.app.client.administration.identifiers.event.Identi
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
+import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.ValueSetsDto;
@@ -157,6 +159,13 @@ public class IdentifiersTablePresenter extends PresenterWidget<IdentifiersTableP
   public void onGenerateIdentifiersMapping(VariableDto variable) {
     GenerateIdentifiersModalPresenter p = generateIdentifiersModalProvider.get();
     p.initialize(variable, table);
+  }
+
+  @Override
+  public void onDownloadIdentifiers(VariableDto variable) {
+    fireEvent(new FileDownloadRequestEvent(
+        UriBuilder.create().segment("identifiers", "mapping", "{}", "_export").query("type", variable.getEntityType())
+            .build(variable.getName())));
   }
 
   //

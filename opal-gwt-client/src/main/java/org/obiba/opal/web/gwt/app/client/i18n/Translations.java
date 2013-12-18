@@ -143,7 +143,8 @@ public interface Translations extends Constants {
       "DiffWithCurrent", "Diff with current",//
       "Enable", "Enable",//
       "Disable", "Disable",//
-      "Generate identifiers", "Generate identifiers"//
+      "Generate identifiers", "Generate identifiers",//
+      "Download identifiers", "Download identifiers"//
   })
   Map<String, String> actionMap();
 
