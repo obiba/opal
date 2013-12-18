@@ -300,7 +300,9 @@ public class OrientDbServiceImpl implements OrientDbService {
         OProperty property = indexClass.getProperty(propertyPath);
         if(property == null) {
           PropertyDescriptor propertyDescriptor = BeanUtils.getPropertyDescriptor(clazz, propertyPath);
-          indexClass.createProperty(propertyPath, OType.getTypeByClass(propertyDescriptor.getPropertyType()));
+          Class<?> propertyType = propertyDescriptor.getPropertyType();
+          indexClass
+              .createProperty(propertyPath, OType.getTypeByClass(propertyType.isEnum() ? String.class : propertyType));
           schema.save();
         }
       }
