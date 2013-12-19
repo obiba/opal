@@ -62,13 +62,22 @@ public class MoveSubjectAclToOrientUpgradeStep extends AbstractUpgradeStep {
     }
 
     private String upgradePermission(String permission) {
-      if("CREATE_VIEW".equals(permission)) return "CREATE_TABLE";
-      if("VIEW_ALL".equals(permission)) return "TABLE_ALL";
-      if("VIEW_READ".equals(permission)) return "TABLE_READ";
-      if("VIEW_VALUES".equals(permission)) return "TABLE_VALUES";
-      if("VIEW_EDIT".equals(permission)) return "TABLE_EDIT";
-      if("VIEW_VALUES_EDIT".equals(permission)) return "TABLE_VALUES_EDIT";
-      return permission;
+      switch(permission) {
+        case "CREATE_VIEW":
+          return "CREATE_TABLE";
+        case "VIEW_ALL":
+          return "TABLE_ALL";
+        case "VIEW_READ":
+          return "TABLE_READ";
+        case "VIEW_VALUES":
+          return "TABLE_VALUES";
+        case "VIEW_EDIT":
+          return "TABLE_EDIT";
+        case "VIEW_VALUES_EDIT":
+          return "TABLE_VALUES_EDIT";
+        default:
+          return permission;
+      }
     }
 
     private String upgradeDomain(String domain) {

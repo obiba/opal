@@ -41,13 +41,17 @@ public final class Hasher {
       return;
     }
     try {
-      Hash hash = new SimpleHash(DEFAULT_PASSWORD_ALGORITHM_NAME, args[0], getSalt(), DEFAULT_PASSWORD_NUM_ITERATIONS);
-      HashFormat format = HASH_FORMAT_FACTORY.getInstance(Shiro1CryptFormat.class.getName());
-      System.out.println(format.format(hash));
+      System.out.println(hash(args[0]));
     } catch(Exception e) {
       printException(e);
       System.exit(-1);
     }
+  }
+
+  public static String hash(String value) {
+    Hash hash = new SimpleHash(DEFAULT_PASSWORD_ALGORITHM_NAME, value, getSalt(), DEFAULT_PASSWORD_NUM_ITERATIONS);
+    HashFormat format = HASH_FORMAT_FACTORY.getInstance(Shiro1CryptFormat.class.getName());
+    return format.format(hash);
   }
 
   private static ByteSource getSalt() {

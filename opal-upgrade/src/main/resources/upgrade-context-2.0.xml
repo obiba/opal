@@ -101,6 +101,9 @@
         <!-- 2.0.0 / move version from table to opal-config.xml -->
         <bean class="org.obiba.opal.core.upgrade.database.CopyVersionToOpalConfigurationUpgradeStep"/>
 
+        <!-- 2.0.0 / hash passwords in shiro.ini -->
+        <bean class="org.obiba.opal.core.upgrade.security.HashShiroIniPasswordUpgradeStep"/>
+
         <!-- 2.0.0 / update Opal Configuration -->
         <bean class="org.obiba.opal.core.upgrade.database.UpdateOpalConfigurationFlagUpgradeStep"/>
 
