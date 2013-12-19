@@ -18,11 +18,11 @@
 
   <g:FlowPanel>
 
-    <b:HelpBlock ui:field="emptyHelp">
+    <b:Paragraph ui:field="emptyHelp">
       <ui:msg description="Project Resource Permission Alert text">There are currently no permissions granted to any
         user or group in this project.
       </ui:msg>
-    </b:HelpBlock>
+    </b:Paragraph>
 
     <b:FluidRow ui:field="permissionsRow">
       <b:Column size="3">
@@ -42,11 +42,11 @@
           <b:Controls>
             <b:FluidRow addStyleNames="no-bottom-margin">
               <b:Column size="3">
-                <b:Heading size="4" ui:field="principal"></b:Heading>
+                <b:Heading size="3" ui:field="principal" addStyleNames="no-top-margin"/>
               </b:Column>
               <b:Column size="9">
-                <b:Button type="DANGER" ui:field="deleteAll" addStyleNames="pull-right">
-                  <ui:msg description="Delete All label">Delete All</ui:msg>
+                <b:Button icon="TRASH" ui:field="deleteAll" addStyleNames="pull-right small-top-margin">
+                  <ui:msg description="Delete all permissions label">Delete all permissions</ui:msg>
                 </b:Button>
                 <b:SimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
               </b:Column>

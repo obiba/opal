@@ -100,7 +100,7 @@ public class SubjectAuthorizationView extends ViewImpl implements SubjectAuthori
 
   @Override
   public void renderSubjectType(String type) {
-    typeLabel.setText(translations.subjectTypeMap().get(type));
+    typeLabel.setText(translations.subjectTypeMap().get(type + ".name"));
   }
 
   private static final class SubjectSuggestionDisplay extends SuggestBox.DefaultSuggestionDisplay {

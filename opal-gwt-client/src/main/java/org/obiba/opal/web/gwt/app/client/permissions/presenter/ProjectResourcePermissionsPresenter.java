@@ -134,9 +134,23 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
             getView().setData(subjectList);
 
             if(subjectList.size() > 0) {
-              selectSubject(subjectList.get(0));
+              selectFirstUser(subjectList);
             }
           }
+
+          private void selectFirstUser(List<Subject> subjectList) {
+            Subject selection = subjectList.get(0);
+            if(!Subject.SubjectType.SUBJECT_CREDENTIALS.isSubjectType(selection.getType())) {
+              for(Subject subject : subjectList) {
+                if(Subject.SubjectType.SUBJECT_CREDENTIALS.isSubjectType(subject.getType())) {
+                  selection = subject;
+                  break;
+                }
+              }
+            }
+            selectSubject(selection);
+          }
+
         }).send();
   }
 
@@ -179,7 +193,7 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
 
     private PlaceRequest getPlaceRequest(ResourcePermissionType type, String... parts) {
       PlaceRequest placeRequest = null;
-      switch (type) {
+      switch(type) {
         case PROJECT:
           placeRequest = ProjectPlacesHelper.getProjectPlace(parts[2]);
           break;
@@ -225,21 +239,21 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
 
     private String getName(ResourcePermissionType type, String... parts) {
       String name = null;
-      switch (type) {
+      switch(type) {
         case PROJECT:
           name = parts[2];
           break;
 
         case DATASOURCE:
-          name = translations.resourceNodeDatasourceName();
+          name = translations.allTablesLabel();
           break;
 
         case TABLE:
-          name = parts[2];
+          name = parts[4];
           break;
 
         case VARIABLE:
-              name = parts[4] + ":" + parts[6];
+          name = parts[4] + ":" + parts[6];
           break;
 
         case REPORT_TEMPLATE:
@@ -271,8 +285,7 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
     }
   }
 
-  private static final class ResourceTypeComparator implements Comparator<Acl>
-  {
+  private static final class ResourceTypeComparator implements Comparator<Acl> {
     @Override
     public int compare(Acl o1, Acl o2) {
       ResourcePermissionType t1 = ResourcePermissionType.getTypeByPermission(o1.getActions(0));
@@ -281,7 +294,7 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
       if(t1.ordinal() < t2.ordinal()) {
         return 1;
       }
-      
+
       if(t1.ordinal() > t2.ordinal()) {
         return -1;
       }

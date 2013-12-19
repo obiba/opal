@@ -154,7 +154,6 @@ public interface Translations extends Constants {
 
       "DATASOURCE_ALL", "Administrate", //
       "CREATE_TABLE", "Add Table", //
-      "CREATE_VIEW", "Add View", //
 
       "TABLE_ALL", "Administrate", //
       "TABLE_READ", "View Dictionary + Summary", //
@@ -162,13 +161,8 @@ public interface Translations extends Constants {
       "TABLE_EDIT", "Edit Dictionary + View Summary", //
       "TABLE_VALUES_EDIT", "Edit Dictionary + view Values", //
 
-      "VIEW_ALL", "Administrate", //
-      "VIEW_READ", "View Dictionary + Summary", //
-      "VIEW_VALUES", "View Dictionary + Values", //
-      "VIEW_EDIT", "Edit Dictionary + View Summary", //
-      "VIEW_VALUES_EDIT", "Edit Dictionary + View Values", //
-
       "VARIABLE_READ", "View Dictionary + Summary", //
+
       "DATABASES_ALL", "Administrate", //
       "R_SESSION_ALL", "Use", //
       "DATASHIELD_ALL", "Administrate", //
@@ -197,31 +191,25 @@ public interface Translations extends Constants {
 
   @Description("Permission explanation map")
   @DefaultStringMapValue({ //
-      "PROJECT_ALL", "Can edit and delete project.", //
+      "PROJECT_ALL.help", "Full access to project settings and data.", //
 
-      "DATASOURCE_ALL", "Can edit and delete tables.", //
-      "CREATE_TABLE", "Can add tables.", //
-      "CREATE_VIEW", "Can add views", //
+      "DATASOURCE_ALL.help", "Full access to project tables, including individual values.", //
+      "CREATE_TABLE.help", "Add tables or views.", //
 
-      "TABLE_ALL", "Can edit/delete tables", //
-      "TABLE_READ", "Can view dictionary and summary without access to individual data", //
-      "TABLE_VALUES", "Can view dictionary with access to individual data", //
-      "TABLE_EDIT", "Can edit dictionary and view summaries", //
-      "TABLE_VALUES_EDIT", "Edit dictionary and view values", //
+      "TABLE_ALL.help", "Full access to the table, including edition of the dictionary and individual values.", //
+      "TABLE_READ.help", "View dictionary and summaries (no access to individual values).", //
+      "TABLE_VALUES.help", "View dictionary with access to individual values.", //
+      "TABLE_EDIT.help", "Edit dictionary and view values summary (no access to individual values).", //
+      "TABLE_VALUES_EDIT.help", "Edit dictionary and view individual values.", //
 
-      "VIEW_ALL", "Administrate", //
-      "VIEW_READ", "View dictionary and summaries", //
-      "VIEW_VALUES", "View dictionary and values", //
-      "VIEW_EDIT", "Edit dictionary and view summaries", //
-      "VIEW_VALUES_EDIT", "Edit dictionary and view values", //
+      "VARIABLE_READ.help", "View variable description and values summary (no access to individual values).", //
 
-      "VARIABLE_READ", "View with summary", //
-      "DATABASES_ALL", "Administrate", //
-      "R_SESSION_ALL", "Can use R services", //
-      "DATASHIELD_ALL", "Administrate", //
-      "DATASHIELD_SESSION_ALL", "Can use datashield services", //
-      "REPORT_TEMPLATE_ALL", "Administrate", //
-      "REPORT_TEMPLATE_READ", "View reports" })
+      "DATABASES_ALL.help", "Administrate databases.", //
+      "R_SESSION_ALL.help", "Use R services.", //
+      "DATASHIELD_ALL.help", "Administrate DataSHIELD settings.", //
+      "DATASHIELD_SESSION_ALL.help", "Use DataSHIELD services.", //
+      "REPORT_TEMPLATE_ALL.help", "Full access to the report template (settings and reports).", //
+      "REPORT_TEMPLATE_READ.help", "View reports only." })
   Map<String, String> permissionExplanationMap();
 
   @Description("Authorization explanation map")
@@ -1501,9 +1489,9 @@ public interface Translations extends Constants {
   })
   Map<String, String> valueTypeMap();
 
-  @Description("Subject Type map")
-  @DefaultStringMapValue({ "SUBJECT_CREDENTIALS", "User Name", //
-      "GROUP", "Group Name" })
+  @Description("Subject Type Name map")
+  @DefaultStringMapValue({ "SUBJECT_CREDENTIALS.name", "User Name", //
+      "GROUP.name", "Group Name" })
   Map<String, String> subjectTypeMap();
 
   @Description("Subject Type map")

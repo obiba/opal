@@ -67,7 +67,7 @@ public class ResourcePermissionsPanel extends Composite {
 
     radio.addStyleName("no-bottom-margin");
     radio.setValue(select);
-    HelpBlock help = new HelpBlock(translations.permissionMap().get(permissionKey));
+    HelpBlock help = new HelpBlock(translations.permissionExplanationMap().get(permissionKey + ".help"));
 
     panel.add(radio);
     panel.add(help);

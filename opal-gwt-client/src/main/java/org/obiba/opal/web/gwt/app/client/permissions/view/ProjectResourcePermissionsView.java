@@ -32,6 +32,7 @@ import com.github.gwtbootstrap.client.ui.HelpBlock;
 import com.github.gwtbootstrap.client.ui.NavHeader;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.NavList;
+import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.github.gwtbootstrap.client.ui.SimplePager;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -73,7 +74,7 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
   FluidRow permissionsRow;
 
   @UiField
-  HelpBlock emptyHelp;
+  Paragraph emptyHelp;
 
   private final static Translations translations = GWT.create(Translations.class);
 
@@ -86,7 +87,6 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
   private TypeColumn typeColumn;
 
   private final PlaceManager placeManager;
-
 
   @Inject
   public ProjectResourcePermissionsView(Binder uiBinder, PlaceManager placeManager) {
@@ -104,13 +104,12 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
   @Override
   public void initializeTable(ProjectResourcePermissionsPresenter.NodeToPlaceMapper nodeToPlaceMapper,
       ProjectResourcePermissionsPresenter.NodeNameFormatter formatter,
-      ProjectResourcePermissionsPresenter.NodeToTypeMapper nodeToTypeMappert,
-      Comparator<Acl> resourceTypeComparator) {
+      ProjectResourcePermissionsPresenter.NodeToTypeMapper nodeToTypeMappert, Comparator<Acl> resourceTypeComparator) {
 
     tablePager.setDisplay(permissionsTable);
     typeColumn = new TypeColumn(nodeToTypeMappert);
-    permissionsTable.addColumn(typeColumn, translations.typeLabel());
     permissionsTable.addColumn(new ResourceColumn(nodeToPlaceMapper, formatter), translations.resourceLabel());
+    permissionsTable.addColumn(typeColumn, translations.typeLabel());
     permissionsTable.addColumn(ProjectPermissionColumns.PERMISSION, translations.permissionLabel());
     permissionsTable.addColumn(ProjectPermissionColumns.ACTIONS, translations.actionsLabel());
     permissionsDataProvider.addDataDisplay(permissionsTable);
@@ -121,9 +120,10 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
 
   @Override
   public void setSubjectData(Subject subject, List<Acl> subjectAcls) {
-    this.currentSubject = subject;
+    currentSubject = subject;
     principal.setText(subject.getPrincipal());
     renderSubjectsPermissionTable(subjectAcls);
+    activateSubjectNavLink(subject);
   }
 
   @Override
@@ -137,6 +137,10 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
     getUiHandlers().deleteAllPermissions(currentSubject);
   }
 
+  //
+  // Private methods
+  //
+
   private void renderSubjectsPermissionTable(List<Acl> subjectAcls) {
     permissionsDataProvider.setList(subjectAcls);
     tablePager.firstPage();
@@ -147,11 +151,25 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
     ColumnSortEvent.fire(permissionsTable, permissionsTable.getColumnSortList());
   }
 
+  private void activateSubjectNavLink(Subject subject) {
+    NavList container = Subject.SubjectType.SUBJECT_CREDENTIALS.isSubjectType(subject.getType()) ? users : groups;
+    for(int i = 0; i < container.getWidgetCount(); i++) {
+      if(container.getWidget(i) instanceof NavLink) {
+        NavLink link = (NavLink) container.getWidget(i);
+        // must trim because NavLink adds some spaces
+        if (link.getText().trim().equals(subject.getPrincipal())) {
+          link.setActive(true);
+          return;
+        }
+      }
+    }
+  }
+
   private void renderUsersAndGroups(@Nonnull Iterable<Subject> subjects) {
     users.clear();
     groups.clear();
 
-    for (Subject aSubject : subjects) {
+    for(Subject aSubject : subjects) {
       createSubjectNavLink(aSubject);
     }
 
@@ -165,12 +183,7 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
   private void createSubjectNavLink(final Subject subject) {
     NavList container = Subject.SubjectType.SUBJECT_CREDENTIALS.isSubjectType(subject.getType()) ? users : groups;
     NavLink link = new NavLink(subject.getPrincipal());
-    link.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        getUiHandlers().selectSubject(subject);
-      }
-    });
+    link.addClickHandler(new SubjectNavLinkClickHandler(subject, link));
 
     container.add(link);
   }
@@ -219,7 +232,7 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
 
       @Override
       public String getValue(Acl acl) {
-      return translations.permissionMap().get(acl.getActions(0));
+        return translations.permissionMap().get(acl.getActions(0));
       }
     };
 
@@ -235,5 +248,32 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
         return allActions();
       }
     });
+  }
+
+  private class SubjectNavLinkClickHandler implements ClickHandler {
+    private final Subject subject;
+
+    private final NavLink link;
+
+    SubjectNavLinkClickHandler(Subject subject, NavLink link) {
+      this.subject = subject;
+      this.link = link;
+    }
+
+    @Override
+    public void onClick(ClickEvent event) {
+      getUiHandlers().selectSubject(subject);
+      unActivateAll(users);
+      unActivateAll(groups);
+      link.setActive(true);
+    }
+
+    private void unActivateAll(NavList container) {
+      for(int i = 0; i < container.getWidgetCount(); i++) {
+        if(container.getWidget(i) instanceof NavLink) {
+          ((NavLink) container.getWidget(i)).setActive(false);
+        }
+      }
+    }
   }
 }
