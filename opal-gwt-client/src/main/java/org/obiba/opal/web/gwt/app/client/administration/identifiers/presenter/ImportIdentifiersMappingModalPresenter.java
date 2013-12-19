@@ -78,7 +78,7 @@ public class ImportIdentifiersMappingModalPresenter
 
   @Override
   public void onSubmit(String name, String systemIdentifiers, String identifiers) {
-    if(!validate(name, systemIdentifiers, identifiers)) return;
+    if(!validate(systemIdentifiers, identifiers)) return;
 
     getView().setBusy(true);
     // create variable if missing
@@ -95,7 +95,7 @@ public class ImportIdentifiersMappingModalPresenter
     }
   }
 
-  private boolean validate(String name, String systemIdentifiers, String identifiers) {
+  private boolean validate(String systemIdentifiers, String identifiers) {
     if(!validationHandler.validate()) return false;
 
     String[] systemIds = systemIdentifiers.split("\\n");
