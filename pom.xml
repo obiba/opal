@@ -43,6 +43,7 @@
     <module>opal-datashield</module>
     <module>opal-search</module>
     <module>opal-upgrade</module>
+    <module>opal-tools</module>
   </modules>
 
   <dependencyManagement>
