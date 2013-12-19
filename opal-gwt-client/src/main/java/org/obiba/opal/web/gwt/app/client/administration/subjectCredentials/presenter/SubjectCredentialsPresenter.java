@@ -158,18 +158,19 @@ public class SubjectCredentialsPresenter extends ModalPresenterWidget<SubjectCre
 
     @Override
     protected Set<FieldValidator> getValidators() {
-      if(validators == null) {
-        validators = new LinkedHashSet<FieldValidator>();
+      if(validators != null) {
+        return validators;
+      }
 
-        if(dialogMode == Mode.CREATE) {
-          validators.add(new RequiredTextValidator(getView().getName(), "SubjectCredentialNameIsRequired",
-              Display.FormField.NAME.name()));
-          if(SubjectCredentialsDtos.isPassword(authenticationType)) {
-            addPasswordValidators();
-          } else if(SubjectCredentialsDtos.isCertificate(authenticationType)) {
-            validators.add(new RequiredTextValidator(getView().getCertificate(), "CertificateIsRequired",
-                Display.FormField.CERTIFICATE.name()));
-          }
+      validators = new LinkedHashSet<FieldValidator>();
+      if(dialogMode == Mode.CREATE) {
+        validators.add(new RequiredTextValidator(getView().getName(), "SubjectCredentialNameIsRequired",
+            Display.FormField.NAME.name()));
+        if(SubjectCredentialsDtos.isPassword(authenticationType)) {
+          addPasswordValidators();
+        } else if(SubjectCredentialsDtos.isCertificate(authenticationType)) {
+          validators.add(new RequiredTextValidator(getView().getCertificate(), "CertificateIsRequired",
+              Display.FormField.CERTIFICATE.name()));
         }
       }
       return validators;
@@ -202,7 +203,6 @@ public class SubjectCredentialsPresenter extends ModalPresenterWidget<SubjectCre
         public Boolean getValue() {
           return password.getText().isEmpty() && confirmPassword.getText().isEmpty() ||
               password.getText().equals(confirmPassword.getText());
-
         }
       };
     }

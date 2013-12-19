@@ -161,13 +161,15 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
   private String extractSessionId(HttpServletRequest request, @Nullable Cookie sessionCookie) {
     String sessionId = request.getHeader(HttpHeaders.AUTHORIZATION);
-    if(sessionId == null) sessionId = request.getHeader(OpalAuth.CREDENTIALS_HEADER);
     if(sessionId == null) {
-      if(sessionCookie == null) {
-        sessionCookie = WebUtils.getCookie(request, OPAL_SESSION_ID_COOKIE_NAME);
-        if(sessionCookie != null) {
-          sessionId = sessionCookie.getValue();
-        }
+      sessionId = request.getHeader(OpalAuth.CREDENTIALS_HEADER);
+    }
+    if(sessionId == null) {
+      Cookie safeSessionCookie = sessionCookie == null
+          ? WebUtils.getCookie(request, OPAL_SESSION_ID_COOKIE_NAME)
+          : sessionCookie;
+      if(safeSessionCookie != null) {
+        sessionId = safeSessionCookie.getValue();
       }
     }
     return sessionId;
