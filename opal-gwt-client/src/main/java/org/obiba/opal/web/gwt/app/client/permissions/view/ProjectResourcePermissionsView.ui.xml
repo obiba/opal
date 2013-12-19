@@ -24,7 +24,7 @@
       </ui:msg>
     </b:Paragraph>
 
-    <b:FluidRow ui:field="permissionsRow">
+    <b:FluidRow ui:field="permissionsRow" visible="false">
       <b:Column size="3">
         <b:NavList ui:field="users">
           <b:NavHeader>

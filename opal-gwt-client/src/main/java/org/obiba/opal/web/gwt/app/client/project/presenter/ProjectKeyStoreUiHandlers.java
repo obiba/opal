@@ -12,6 +12,6 @@ package org.obiba.opal.web.gwt.app.client.project.presenter;
 
 import com.gwtplatform.mvp.client.UiHandlers;
 
-public interface ProjectDataExchangeUiHandlers extends UiHandlers {
+public interface ProjectKeyStoreUiHandlers extends UiHandlers {
 
 }

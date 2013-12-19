@@ -19,7 +19,7 @@
   <g:FlowPanel>
     <b:FluidRow addStyleNames="no-bottom-margin">
       <b:Column size="3">
-        <b:DropdownButton ui:field="addDropdown" text="Add" type="INFO" icon="PLUS">
+        <b:DropdownButton ui:field="addDropdown" text="Add Key" type="INFO" icon="PLUS">
           <b:NavLink ui:field="createKeyPair">
             <ui:msg description="Create Key Pair label">Create Key Pair...</ui:msg>
           </b:NavLink>
@@ -35,9 +35,7 @@
         <b:SimplePager ui:field="tablePager" location="RIGHT" addStyleNames="pull-right"/>
       </b:Column>
     </b:FluidRow>
-    <g:FlowPanel addStyleNames="min-height-450">
-      <o:Table ui:field="encryptionKeysTable" addStyleNames="small-top-margin"/>
-    </g:FlowPanel>
+    <o:Table ui:field="encryptionKeysTable" addStyleNames="small-top-margin"/>
 
   </g:FlowPanel>
 

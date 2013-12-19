@@ -78,10 +78,6 @@
         <b:Heading size="3">Permissions</b:Heading>
         <g:FlowPanel ui:field="permissionsPanel"></g:FlowPanel>
       </b:Tab>
-      <b:Tab icon="EXCHANGE">
-        <b:Heading size="3">Data Exchange</b:Heading>
-        <g:SimplePanel ui:field="dataExchange"></g:SimplePanel>
-      </b:Tab>
       <b:Tab icon="BOOK">
         <b:Heading size="3">Administration</b:Heading>
         <g:SimplePanel ui:field="adminPanel"/>

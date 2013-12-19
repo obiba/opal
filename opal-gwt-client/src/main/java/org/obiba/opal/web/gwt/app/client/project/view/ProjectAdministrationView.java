@@ -71,6 +71,12 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   Panel permissions;
 
   @UiField
+  Panel keyStorePanel;
+
+  @UiField
+  Panel keyStore;
+
+  @UiField
   Panel deletePanel;
 
   private ProjectDto project;
@@ -99,12 +105,14 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
     }
   }
 
-
   @Override
   public void setInSlot(Object slot, IsWidget content) {
-    permissions.clear();
-    if(content != null) {
-      permissions.add(content);
+    if(slot == Places.KEYSTORE) {
+      keyStore.clear();
+      if(content != null) keyStore.add(content);
+    } else {
+      permissions.clear();
+      if(content != null) permissions.add(content);
     }
   }
 
@@ -121,6 +129,11 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   @Override
   public HasAuthorization getPermissionsAuthorizer() {
     return new WidgetAuthorizer(permissionsPanel);
+  }
+
+  @Override
+  public HasAuthorization getKeyStoreAuthorizer() {
+    return new WidgetAuthorizer(keyStorePanel);
   }
 
   @Override

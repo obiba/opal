@@ -1698,7 +1698,7 @@ public interface Translations extends Constants {
       "TASKS", "Tasks", //
       "PERMISSIONS", "Permissions", //
       "PERMISSIONS", "Permissions", //
-      "DATA_EXCHANGE", "Data Exchange", //
+      "KEYSTORE", "Data Exchange", //
       "ADMINISTRATION", "Administration" //
   })
   Map<String, String> projectTabNameMap();

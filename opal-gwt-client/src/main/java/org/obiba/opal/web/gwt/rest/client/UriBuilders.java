@@ -75,6 +75,13 @@ public enum UriBuilders {
     }
   },
 
+  PROJECT_PERMISSIONS_ALL {
+    @Override
+    public UriBuilder create() {
+      return UriBuilder.create().segment("project", "{}", "permissions", "_all");
+    }
+  },
+
   PROJECT_TRANSIENT_DATASOURCE {
     @Override
     public UriBuilder create() {

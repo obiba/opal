@@ -10,8 +10,8 @@
 
 package org.obiba.opal.web.gwt.app.client.project.view;
 
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectDataExchangePresenter;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectDataExchangeUiHandlers;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectKeyStorePresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectKeyStoreUiHandlers;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -21,16 +21,16 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
-public class ProjectDataExchangeView extends ViewWithUiHandlers<ProjectDataExchangeUiHandlers>
-    implements ProjectDataExchangePresenter.Display {
+public class ProjectKeyStoreView extends ViewWithUiHandlers<ProjectKeyStoreUiHandlers>
+    implements ProjectKeyStorePresenter.Display {
 
   @UiField
   FlowPanel encryptionKeysPanel;
 
-  interface Binder extends UiBinder<Widget, ProjectDataExchangeView> {}
+  interface Binder extends UiBinder<Widget, ProjectKeyStoreView> {}
 
   @Inject
-  public ProjectDataExchangeView(Binder uiBinder) {
+  public ProjectKeyStoreView(Binder uiBinder) {
     initWidget(uiBinder.createAndBindUi(this));
   }
 

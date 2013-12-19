@@ -72,9 +72,16 @@
       </g:FlowPanel>
     </g:FlowPanel>
 
+    <g:FlowPanel ui:field="keyStorePanel">
+      <b:Heading size="4">
+        <ui:msg description="Keystore label">Keystore</ui:msg>
+      </b:Heading>
+      <g:FlowPanel ui:field="keyStore"/>
+    </g:FlowPanel>
+
     <g:FlowPanel ui:field="permissionsPanel">
       <b:Heading size="4">
-        <ui:msg description="Danger Zone label">Permissions</ui:msg>
+        <ui:msg description="Permissions label">Permissions</ui:msg>
       </b:Heading>
       <g:FlowPanel ui:field="permissions"/>
     </g:FlowPanel>

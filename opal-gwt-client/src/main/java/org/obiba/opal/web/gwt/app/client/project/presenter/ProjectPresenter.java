@@ -27,9 +27,11 @@ import org.obiba.opal.web.gwt.app.client.support.MagmaPath;
 import org.obiba.opal.web.gwt.app.client.support.PlaceRequestHelper;
 import org.obiba.opal.web.gwt.app.client.task.presenter.TasksPresenter;
 import org.obiba.opal.web.gwt.app.client.ui.HasTabPanel;
+import org.obiba.opal.web.gwt.rest.client.ResourceAuthorizationRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
+import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.ProjectSummaryDto;
 
@@ -62,13 +64,14 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       REPORTS,
       TASKS,
       PERMISSIONS,
-      DATA_EXCHANGE,
       ADMINISTRATION
     }
 
     void setProject(ProjectDto project);
 
     void setProjectSummary(ProjectSummaryDto projectSummary);
+
+    HasAuthorization getPermissionsAuthorizer();
   }
 
   @ProxyStandard
@@ -92,10 +95,8 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   public static final GwtEvent.Type<RevealContentHandler<?>> ADMIN_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
 
   @ContentSlot
-  public static final GwtEvent.Type<RevealContentHandler<?>> PERMISSION_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
-
-  @ContentSlot
-  public static final GwtEvent.Type<RevealContentHandler<?>> DATA_EXTCHANGE_PANE = new GwtEvent.Type<RevealContentHandler<?>>();
+  public static final GwtEvent.Type<RevealContentHandler<?>> PERMISSION_PANE
+      = new GwtEvent.Type<RevealContentHandler<?>>();
 
   private final Provider<MagmaPresenter> magmaPresenterProvider;
 
@@ -107,7 +108,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private final Provider<ProjectResourcePermissionsPresenter> projectResourcePermissionsProvider;
 
-  private final Provider<ProjectDataExchangePresenter> projectDataExchangeProvider;
+
 
   private final Provider<ProjectAdministrationPresenter> projectAdministrationPresenterProvider;
 
@@ -129,7 +130,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private ProjectResourcePermissionsPresenter projectResourcePermissionsPresenter;
 
-  private ProjectDataExchangePresenter projectDataExchangePresenter;
+  private ProjectKeyStorePresenter projectKeyStorePresenter;
 
   private ProjectAdministrationPresenter projectAdministrationPresenter;
 
@@ -139,8 +140,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       Provider<MagmaPresenter> magmaPresenterProvider, Provider<FileExplorerPresenter> fileExplorerPresenterProvider,
       Provider<ReportsPresenter> reportsPresenterProvider, Provider<TasksPresenter> tasksPresenterProvider,
       Provider<ProjectAdministrationPresenter> projectAdministrationPresenterProvider,
-      Provider<ProjectResourcePermissionsPresenter> projectResourcePermissionsProvider,
-      Provider<ProjectDataExchangePresenter> projectDataExchangeProvider) {
+      Provider<ProjectResourcePermissionsPresenter> projectResourcePermissionsProvider) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
     this.placeManager = placeManager;
@@ -150,7 +150,6 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     this.tasksPresenterProvider = tasksPresenterProvider;
     this.projectAdministrationPresenterProvider = projectAdministrationPresenterProvider;
     this.projectResourcePermissionsProvider = projectResourcePermissionsProvider;
-    this.projectDataExchangeProvider = projectDataExchangeProvider;
   }
 
   @Override
@@ -172,6 +171,16 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
     refresh();
   }
 
+  private void authorize() {
+    if(name == null) return;
+
+    // permissions tab
+    ResourceAuthorizationRequestBuilderFactory.newBuilder()
+        .forResource(UriBuilders.PROJECT_PERMISSIONS_ALL.create().build(name)).get()//
+        .authorize(getView().getPermissionsAuthorizer())//
+        .send();
+  }
+
   public void refresh() {
     // TODO handle wrong or missing project name
     if(name == null) return;
@@ -188,6 +197,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
           }
         }).get().send();
     refreshSummary();
+    authorize();
   }
 
   private void refreshSummary() {
@@ -228,9 +238,6 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
         break;
       case PERMISSIONS:
         onPermissionsTabSelected();
-        break;
-      case DATA_EXCHANGE:
-        onDataExchangeTabSelected();
         break;
       case ADMINISTRATION:
         onAdminTabSelected();
@@ -290,14 +297,6 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       setInSlot(PERMISSION_PANE, projectResourcePermissionsPresenter);
     }
     projectResourcePermissionsPresenter.initialize(project);
-  }
-
-  private void onDataExchangeTabSelected() {
-    if(projectDataExchangePresenter == null) {
-      projectDataExchangePresenter = projectDataExchangeProvider.get();
-      setInSlot(DATA_EXTCHANGE_PANE, projectDataExchangePresenter);
-    }
-    projectDataExchangePresenter.initialize(project);
   }
 
   private void onAdminTabSelected() {

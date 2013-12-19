@@ -20,15 +20,15 @@ import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 
-public class ProjectDataExchangePresenter extends PresenterWidget<ProjectDataExchangePresenter.Display>
-    implements ProjectDataExchangeUiHandlers {
+public class ProjectKeyStorePresenter extends PresenterWidget<ProjectKeyStorePresenter.Display>
+    implements ProjectKeyStoreUiHandlers {
 
   // TODO use a provider once encryption key authorization is implemented
   private final EncryptionKeysPresenter encryptionKeysPresenter;
 
 
   @Inject
-  public ProjectDataExchangePresenter(Display display, EventBus eventBus,
+  public ProjectKeyStorePresenter(Display display, EventBus eventBus,
       Provider<EncryptionKeysPresenter> encryptionKeysProvider) {
     super(eventBus, display);
     this.encryptionKeysPresenter = encryptionKeysProvider.get();
@@ -45,6 +45,6 @@ public class ProjectDataExchangePresenter extends PresenterWidget<ProjectDataExc
     encryptionKeysPresenter.initialize(projectDto);
   }
 
-  public interface Display extends View, HasUiHandlers<ProjectDataExchangeUiHandlers> {
+  public interface Display extends View, HasUiHandlers<ProjectKeyStoreUiHandlers> {
   }
 }

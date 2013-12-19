@@ -27,7 +27,6 @@ import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
@@ -53,6 +52,8 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
 
   private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
+  private final Provider<ProjectKeyStorePresenter> projectDataExchangeProvider;
+
   private ProjectDto project;
 
   private Runnable removeConfirmation;
@@ -60,12 +61,14 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
   @Inject
   public ProjectAdministrationPresenter(EventBus eventBus, Display view, PlaceManager placeManager,
       ModalProvider<ProjectPropertiesModalPresenter> projectPropertiesModalProvider,
-      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider) {
+      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
+      Provider<ProjectKeyStorePresenter> projectDataExchangeProvider) {
     super(eventBus, view);
     getView().setUiHandlers(this);
     this.placeManager = placeManager;
     this.projectPropertiesModalProvider = projectPropertiesModalProvider.setContainer(this);
     this.resourcePermissionsProvider = resourcePermissionsProvider;
+    this.projectDataExchangeProvider = projectDataExchangeProvider;
   }
 
   @Override
@@ -92,13 +95,19 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     // set permissions
     ResourceAuthorizationRequestBuilderFactory.newBuilder() //
         .forResource(UriBuilders.PROJECT_PERMISSIONS_PROJECT.create().build(project.getName())) //
-        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsUpdate())) //
+        .authorize(new CompositeAuthorizer(getView().getPermissionsAuthorizer(), new PermissionsSlotAuthorizer())) //
         .post().send();
 
+    // set keystore
+    ResourceAuthorizationRequestBuilderFactory.newBuilder() //
+        .forResource(UriBuilders.PROJECT_KEYSTORE.create().build(project.getName())) //
+        .authorize(new CompositeAuthorizer(getView().getKeyStoreAuthorizer(), new KeyStoreSlotAuthorizer())) //
+        .post().send();
+
+    // delete project
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(project.getLink()).delete()
         .authorize(getView().getDeleteAuthorizer()).send();
   }
-
 
   @Override
   public void onEdit() {
@@ -158,7 +167,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
   /**
    * Update permissions on authorization.
    */
-  private final class PermissionsUpdate implements HasAuthorization {
+  private final class PermissionsSlotAuthorizer implements HasAuthorization {
     @Override
     public void unauthorized() {
 
@@ -166,20 +175,47 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
 
     @Override
     public void beforeAuthorization() {
-      clearSlot(null);
+      clearSlot(Display.Places.PERMISSIONS);
     }
 
     @Override
     public void authorized() {
       ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
 
-      resourcePermissionsPresenter.initialize(ResourcePermissionType.PROJECT, ResourcePermissionRequestPaths
-              .projectPermissions(project.getName()));
-      setInSlot(null, resourcePermissionsPresenter);
+      resourcePermissionsPresenter.initialize(ResourcePermissionType.PROJECT,
+          ResourcePermissionRequestPaths.projectPermissions(project.getName()));
+      setInSlot(Display.Places.PERMISSIONS, resourcePermissionsPresenter);
+    }
+  }
+
+  /**
+   * Update keystore on authorization.
+   */
+  private final class KeyStoreSlotAuthorizer implements HasAuthorization {
+    @Override
+    public void unauthorized() {
+
+    }
+
+    @Override
+    public void beforeAuthorization() {
+      clearSlot(Display.Places.KEYSTORE);
+    }
+
+    @Override
+    public void authorized() {
+      ProjectKeyStorePresenter p = projectDataExchangeProvider.get();
+
+      p.initialize(project);
+      setInSlot(Display.Places.KEYSTORE, p);
     }
   }
 
   public interface Display extends View, HasUiHandlers<ProjectAdministrationUiHandlers> {
+
+    enum Places {
+      PERMISSIONS, KEYSTORE
+    }
 
     void setProject(ProjectDto project);
 
@@ -188,6 +224,8 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
     HasAuthorization getEditAuthorizer();
 
     HasAuthorization getPermissionsAuthorizer();
+
+    HasAuthorization getKeyStoreAuthorizer();
 
     HasAuthorization getDeleteAuthorizer();
   }
