@@ -10,8 +10,6 @@
 
 package org.obiba.opal.web.gwt.app.client.permissions.support;
 
-import javax.annotation.Nonnull;
-
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 
 @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
@@ -25,59 +23,58 @@ public final class ResourcePermissionRequestPaths {
 
   public static final String PERMISSION_QUERY_PARAM = "permission";
 
-  public static String projectPermissions(@Nonnull String project) {
-    return baseUri(project).segment("project").build();
-  }
+  public enum UriBuilders {
 
-  public static String projectSubjects(@Nonnull String project) {
-    return baseUri(project).segment("subjects").build();
-  }
-
-  public static String projectSubject(@Nonnull String project, @Nonnull String subject) {
-    return baseUri(project).segment("subject", subject).build();
-  }
-
-  public static String projectNode(ResourcePermissionType type, @Nonnull String project, @Nonnull String nodePath) {
-    return baseUri(project).fromPath(normalizeNodePath(type, nodePath)).build();
-  }
-
-  public static String datasourcePermissions(@Nonnull String project) {
-    return baseUri(project).segment("datasource").build();
-  }
-
-  public static String tablePermissions(@Nonnull String project, @Nonnull String table) {
-    return baseUri(project).segment("table", table).build();
-  }
-
-  public static String variablePermissions(@Nonnull String project, @Nonnull String table, @Nonnull String variable) {
-    return UriBuilder.create().fromPath(tablePermissions(project, table)).segment("variable", variable).build();
-  }
-
-  public static String reportTemplatePermissions(@Nonnull String project, @Nonnull String report) {
-    return baseUri(project).segment("report-template", report).build();
-  }
-
-  private static UriBuilder baseUri(String project) {
-    return UriBuilder.create().segment("project", project, "permissions");
-  }
-
-  private static String normalizeNodePath(ResourcePermissionType type, String nodePath) {
-    switch(type) {
-      case PROJECT:
-        return "/project";
-      case DATASOURCE:
-        return "/datasource";
-      case VARIABLE:
-      case TABLE: {
-        int i = nodePath.indexOf("/table");
-        return i == -1 ? nodePath : nodePath.substring(i);
+    PROJECT_PERMISSIONS_DATASOURCE {
+      @Override
+      public UriBuilder create() {
+        return UriBuilder.create().segment("project", "{}", "permissions", "datasource");
       }
-      case REPORT_TEMPLATE:
-        int i = nodePath.indexOf("/report-template");
-        return i == -1 ? nodePath : nodePath.substring(i);
-      default:
-        return nodePath;
-    }
+    },
+
+    PROJECT_PERMISSIONS_PROJECT {
+      @Override
+      public UriBuilder create() {
+        return UriBuilder.create().segment("project", "{}", "permissions", "project");
+      }
+    },
+
+    PROJECT_PERMISSIONS_REPORTTEMPLATE {
+      @Override
+      public UriBuilder create() {
+        return UriBuilder.create().segment("project", "{}", "permissions", "report-template", "{}");
+      }
+    },
+
+    PROJECT_PERMISSIONS_SUBJECTS {
+      @Override
+      public UriBuilder create() {
+        return UriBuilder.create().segment("project", "{}", "permissions", "subjects");
+      }
+    },
+
+    PROJECT_PERMISSIONS_SUBJECT {
+      @Override
+      public UriBuilder create() {
+        return UriBuilder.create().segment("project", "{}", "permissions", "subject", "{}");
+      }
+    },
+
+    PROJECT_PERMISSIONS_TABLE {
+      @Override
+      public UriBuilder create() {
+        return UriBuilder.create().segment("project", "{}", "permissions", "table", "{}");
+      }
+    },
+
+    PROJECT_PERMISSIONS_TABLE_VARIABLE {
+      @Override
+      public UriBuilder create() {
+        return UriBuilder.create().segment("project", "{}", "permissions", "table", "{}", "variable", "{}");
+      }
+    };
+
+    public abstract UriBuilder create();
   }
 
 }

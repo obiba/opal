@@ -179,6 +179,11 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     }
   }
 
+  @Override
+  public void unbind() {
+    super.unbind();
+  }
+
   private void updateTableIndexStatus() {
     // Table indexation status
     ResourceAuthorizationRequestBuilderFactory.newBuilder().forResource(table.getLink() + "/index").get()
@@ -907,7 +912,8 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     public void authorized() {
       ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
       resourcePermissionsPresenter.initialize(ResourcePermissionType.TABLE,
-          ResourcePermissionRequestPaths.tablePermissions(table.getDatasourceName(), table.getName()));
+          ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_TABLE, table.getDatasourceName(),
+          table.getName());
 
       setInSlot(Display.Slots.Permissions, resourcePermissionsPresenter);
     }

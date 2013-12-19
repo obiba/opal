@@ -14,8 +14,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
@@ -55,7 +53,6 @@ import org.obiba.opal.web.model.client.magma.CategoryDto;
 import org.obiba.opal.web.model.client.magma.TableDto;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.magma.ViewDto;
-import org.obiba.opal.web.model.client.opal.AclAction;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -121,7 +118,8 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
       VariableVcsCommitHistoryPresenter variableVcsCommitHistoryPresenter,
       ModalProvider<VariablesToViewPresenter> variablesToViewProvider,
       ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider,
-      ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider, ModalProvider<VariableAttributeModalPresenter> attributeModalProvider) {
+      ModalProvider<VariablePropertiesModalPresenter> propertiesEditorModalProvider,
+      ModalProvider<VariableAttributeModalPresenter> attributeModalProvider) {
     super(eventBus, display);
     this.placeManager = placeManager;
     this.valuesTablePresenter = valuesTablePresenter;
@@ -713,8 +711,9 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     @Override
     public void authorized() {
       ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
-      resourcePermissionsPresenter.initialize(ResourcePermissionType.VARIABLE, ResourcePermissionRequestPaths
-          .variablePermissions(table.getDatasourceName(), table.getName(), variable.getName()));
+      resourcePermissionsPresenter.initialize(ResourcePermissionType.VARIABLE,
+          ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_TABLE_VARIABLE, table.getDatasourceName(),
+          table.getName(), variable.getName());
       setInSlot(Display.Slots.Permissions, resourcePermissionsPresenter);
     }
   }
