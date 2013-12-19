@@ -21,12 +21,6 @@
     </fileSet>
 
     <fileSet>
-      <directory>src/main/resources</directory>
-      <outputDirectory>opal-python</outputDirectory>
-      <filtered>true</filtered>
-    </fileSet>
-
-    <fileSet>
       <directory>../opal-web-model/target/generated-sources/protobuf-python/</directory>
       <outputDirectory>opal-python/bin/opal/protobuf</outputDirectory>
       <includes>
