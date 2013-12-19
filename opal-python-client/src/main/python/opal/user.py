@@ -11,10 +11,8 @@ def add_arguments(parser):
     """
     Add data command specific options
     """
-    parser.add_argument('--name', '-n', required=False,
-                        help='User name.')
-    parser.add_argument('--upassword', '-upa', required=False,
-                        help='User password.')
+    parser.add_argument('--name', '-n', required=False, help='User name.')
+    parser.add_argument('--upassword', '-upa', required=False, help='User password.')
     parser.add_argument('--disabled', '-di', action='store_true', required=False,
                         help='Disable user account (if ommited the user is enabled by default).')
     parser.add_argument('--groups', '-g', nargs='+', required=False, help='User groups')

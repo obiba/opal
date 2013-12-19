@@ -53,6 +53,7 @@ import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
@@ -158,7 +159,6 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public void create(@NotNull Database database)
       throws ConstraintViolationException, MultipleIdentifiersDatabaseException {
     if(orientDbService.findUnique(database) == null) {
@@ -167,7 +167,7 @@ public class DefaultDatabaseRegistry implements DatabaseRegistry, DatasourceUpda
       ConstraintViolation<Database> violation = ConstraintViolationImpl
           .forBeanValidation("{org.obiba.opal.core.validator.Unique.message}", "must be unique", Database.class,
               database, database, database, PathImpl.createPathFromString("name"), null, null);
-      throw new ConstraintViolationException(Sets.newHashSet(violation));
+      throw new ConstraintViolationException(ImmutableSet.of(violation));
     }
   }
 

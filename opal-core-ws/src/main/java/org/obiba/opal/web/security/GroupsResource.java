@@ -27,9 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 @Component
 @Path("/system/groups")
@@ -56,7 +56,7 @@ public class GroupsResource {
       ConstraintViolation<Group> violation = ConstraintViolationImpl
           .forBeanValidation("{org.obiba.opal.core.validator.Unique.message}", "must be unique", Group.class, group,
               group, group, PathImpl.createPathFromString("name"), null, null);
-      throw new ConstraintViolationException(Sets.newHashSet(violation));
+      throw new ConstraintViolationException(ImmutableSet.of(violation));
     }
     subjectCredentialsService.createGroup(dto.getName());
     return Response.ok().build();
