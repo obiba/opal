@@ -24,7 +24,7 @@ import static org.obiba.core.util.FileUtil.getFileFromResource;
  */
 public abstract class AbstractMagmaResourceTest {
 
-  protected static final String DATASOURCES_FOLDER = "datasources-novalues";
+  protected static final String DATASOURCES_FOLDER = "org/obiba/opal/web/magma/datasources-novalues";
 
   public static final String DATASOURCE1 = "datasource1-novalues.xlsx";
 
