@@ -110,6 +110,11 @@
       <artifactId>shiro-tools-hasher</artifactId>
       <classifier>cli</classifier>
     </dependency>
+    <dependency>
+      <groupId>org.obiba.opal.tools</groupId>
+      <artifactId>password-hasher</artifactId>
+      <classifier>cli</classifier>
+    </dependency>
 
   </dependencies>
 

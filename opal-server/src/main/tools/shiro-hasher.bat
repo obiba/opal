@@ -1,1 +1,1 @@
-java -jar shiro-tools-hasher-${shiro.version}-cli.jar %*
+java -jar lib\shiro-tools-hasher-${shiro.version}-cli.jar %*
