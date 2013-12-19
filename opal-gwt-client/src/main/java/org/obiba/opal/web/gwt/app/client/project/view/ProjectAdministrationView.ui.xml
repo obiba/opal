@@ -72,11 +72,11 @@
       </g:FlowPanel>
     </g:FlowPanel>
 
-    <g:FlowPanel>
+    <g:FlowPanel ui:field="permissionsPanel">
       <b:Heading size="4">
         <ui:msg description="Danger Zone label">Permissions</ui:msg>
       </b:Heading>
-      <g:FlowPanel ui:field="permissionsPanel"></g:FlowPanel>
+      <g:FlowPanel ui:field="permissions"/>
     </g:FlowPanel>
 
     <g:FlowPanel ui:field="deletePanel">

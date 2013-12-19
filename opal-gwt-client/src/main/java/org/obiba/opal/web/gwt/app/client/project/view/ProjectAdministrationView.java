@@ -68,6 +68,9 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   Panel permissionsPanel;
 
   @UiField
+  Panel permissions;
+
+  @UiField
   Panel deletePanel;
 
   private ProjectDto project;
@@ -99,9 +102,9 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {
-    permissionsPanel.clear();
+    permissions.clear();
     if(content != null) {
-      permissionsPanel.add(content);
+      permissions.add(content);
     }
   }
 
