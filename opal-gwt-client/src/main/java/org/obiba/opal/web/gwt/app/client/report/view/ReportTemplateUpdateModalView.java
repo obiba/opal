@@ -58,7 +58,7 @@ public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<
   ControlGroup labelName;
 
   @UiField
-  ControlGroup labelTempleFile;
+  ControlGroup labelTemplateFile;
 
   @UiField
   ControlGroup labelSchedule;
@@ -86,6 +86,9 @@ public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<
 
   @UiField
   RadioButton scheduleRadio;
+
+  @UiField
+  ControlGroup emailsGroup;
 
   private FileSelectionPresenter.Display fileSelection;
 
@@ -133,6 +136,7 @@ public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<
 
   @Override
   public void showErrors(List<String> messages) {
+    dialog.closeAlerts();
     for(String msg : messages) {
       dialog.addAlert(translations.userMessageMap().get(msg), AlertType.ERROR);
     }
@@ -179,7 +183,7 @@ public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<
   }
 
   @Override
-  public HasText getShedule() {
+  public HasText getSchedule() {
     return schedule;
   }
 
@@ -258,15 +262,15 @@ public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<
         case NAME:
           labelName.setType(ControlGroupType.ERROR);
           break;
-
-        case TEMPLE_FILE:
-          labelTempleFile.setType(ControlGroupType.ERROR);
+        case TEMPLATE_FILE:
+          labelTemplateFile.setType(ControlGroupType.ERROR);
           break;
-
         case CRON_EXPRESSION:
           labelSchedule.setType(ControlGroupType.ERROR);
           break;
-
+        case EMAILS:
+          emailsGroup.setType(ControlGroupType.ERROR);
+          break;
         default:
           break;
       }
@@ -276,7 +280,7 @@ public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<
   @Override
   public void clearErrors() {
     labelName.setType(ControlGroupType.NONE);
-    labelTempleFile.setType(ControlGroupType.NONE);
+    labelTemplateFile.setType(ControlGroupType.NONE);
     labelSchedule.setType(ControlGroupType.NONE);
   }
 
@@ -284,6 +288,8 @@ public class ReportTemplateUpdateModalView extends ModalPopupViewWithUiHandlers<
     @Override
     public void onHidden(HiddenEvent hiddenEvent) {
       getUiHandlers().onDialogHidden();
+      clearErrors();
+      dialog.clearAlert();
     }
   }
 

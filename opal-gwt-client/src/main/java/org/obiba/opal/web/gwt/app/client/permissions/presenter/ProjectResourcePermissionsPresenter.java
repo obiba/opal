@@ -18,6 +18,7 @@ import javax.annotation.Nonnull;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.permissions.support.AclResourceTokenizer;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
@@ -28,7 +29,6 @@ import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
-import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 import org.obiba.opal.web.model.client.opal.Acl;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.Subject;
@@ -75,7 +75,7 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
       @Override
       public void doAction(Acl acl, String actionName) {
         if(ActionsColumn.DELETE_ACTION.equals(actionName)) {
-          deletePersmission(acl);
+          deletePermission(acl);
         }
       }
     });
@@ -83,33 +83,29 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
 
   @Override
   public void selectSubject(final Subject subject) {
-    String requestPath = ResourcePermissionRequestPaths.projectSubject(project.getName(), subject.getPrincipal());
-    ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder().forResource(UriBuilder.create().fromPath(requestPath)
-        .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, subject.getType().getName()).build()).get()
-        .withCallback(new ResourceCallback<JsArray<Acl>>() {
-          @Override
-          public void onResource(Response response, JsArray<Acl> acls) {
-            List<Acl> subjectAcls = JsArrays.toList(acls);
-            if(subjectAcls.size() > 0) {
-              getView().setSubjectData(subject, subjectAcls);
-            } else {
-              // refresh and select another subject if any
-              retrievePermissions();
-            }
-          }
-        }).send();
+    ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder().forResource(
+        ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_SUBJECT.create()
+            .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, subject.getType().getName())
+            .build(project.getName(), subject.getPrincipal())).get().withCallback(new ResourceCallback<JsArray<Acl>>() {
+      @Override
+      public void onResource(Response response, JsArray<Acl> acls) {
+        List<Acl> subjectAcls = JsArrays.toList(acls);
+        if(subjectAcls.size() > 0) {
+          getView().setSubjectData(subject, subjectAcls);
+        } else {
+          // refresh and select another subject if any
+          retrievePermissions();
+        }
+      }
+    }).send();
   }
 
-  public void deletePersmission(Acl acl) {
+  public void deletePermission(Acl acl) {
     final Subject subject = acl.getSubject();
-    String principal = subject.getPrincipal();
-    String requestPath = ResourcePermissionRequestPaths
-        .projectNode(ResourcePermissionType.getTypeByPermission(acl.getActions(0)), project.getName(),
-            acl.getResource());
-    String uri = UriBuilder.create().fromPath(requestPath)
-        .query(ResourcePermissionRequestPaths.PRINCIPAL_QUERY_PARAM, principal)
-        .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, subject.getType().getName()).build();
-    ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder().forResource(uri).delete()
+    String nodeUri = getNodeUri(ResourcePermissionType.getTypeByPermission(acl.getActions(0)), acl.getResource(),
+        subject.getPrincipal(), subject.getType().getName());
+
+    ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder().forResource(nodeUri).delete()
         .withCallback(Response.SC_OK, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
@@ -118,15 +114,52 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
         }).send();
   }
 
+  private String getNodeUri(ResourcePermissionType type, String aclResource, String principal, String typeName) {
+    AclResourceTokenizer aclTokenizer = new AclResourceTokenizer(aclResource);
+
+    switch(type) {
+      case PROJECT:
+        return ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_PROJECT.create()
+            .query(ResourcePermissionRequestPaths.PRINCIPAL_QUERY_PARAM, principal)
+            .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, typeName)
+            .build(aclTokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT));
+      case DATASOURCE:
+        return ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_DATASOURCE.create()
+            .query(ResourcePermissionRequestPaths.PRINCIPAL_QUERY_PARAM, principal)
+            .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, typeName)
+            .build(aclTokenizer.getToken(AclResourceTokenizer.ResourceTokens.DATASOURCE));
+      case VARIABLE:
+        return ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_TABLE_VARIABLE.create()
+            .query(ResourcePermissionRequestPaths.PRINCIPAL_QUERY_PARAM, principal)
+            .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, typeName)
+            .build(aclTokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT),
+                aclTokenizer.getToken(AclResourceTokenizer.ResourceTokens.TABLE),
+                aclTokenizer.getToken(AclResourceTokenizer.ResourceTokens.VARIABLE));
+      case TABLE:
+        return ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_TABLE.create()
+            .query(ResourcePermissionRequestPaths.PRINCIPAL_QUERY_PARAM, principal)
+            .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, typeName)
+            .build(aclTokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT),
+                aclTokenizer.getToken(AclResourceTokenizer.ResourceTokens.TABLE));
+      case REPORT_TEMPLATE:
+        return ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_REPORTTEMPLATE.create()
+            .query(ResourcePermissionRequestPaths.PRINCIPAL_QUERY_PARAM, principal)
+            .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, typeName)
+            .build(aclTokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT),
+                aclTokenizer.getToken(AclResourceTokenizer.ResourceTokens.REPORTTEMPLATE));
+      default:
+        return null;
+    }
+  }
+
   @Override
   public void deleteAllPermissions(Subject subject) {
     deleteAllConfirmationModalProvider.get().initialize(subject, this);
   }
 
   private void retrievePermissions() {
-    String resourcePath = ResourcePermissionRequestPaths.projectSubjects(project.getName());
-    ResourceRequestBuilderFactory.<JsArray<Subject>>newBuilder()
-        .forResource(UriBuilder.create().fromPath(resourcePath).build()).get()
+    ResourceRequestBuilderFactory.<JsArray<Subject>>newBuilder().forResource(
+        ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_SUBJECTS.create().build(project.getName())).get()
         .withCallback(new ResourceCallback<JsArray<Subject>>() {
           @Override
           public void onResource(Response response, JsArray<Subject> subjects) {
@@ -156,9 +189,9 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
 
   @Override
   public void deleteAllSubjectPermissions(final Subject subject) {
-    String requestPath = ResourcePermissionRequestPaths.projectSubject(project.getName(), subject.getPrincipal());
-    String uri = UriBuilder.create().fromPath(requestPath)
-        .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, subject.getType().getName()).build();
+    String uri = ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_SUBJECT.create()
+        .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, subject.getType().getName())
+        .build(project.getName(), subject.getPrincipal());
     ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder().forResource(uri).delete()
         .withCallback(Response.SC_OK, new ResponseCodeCallback() {
           @Override
@@ -188,30 +221,34 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
     @Override
     public PlaceRequest map(Acl acl) {
       return getPlaceRequest(ResourcePermissionType.getTypeByPermission(acl.getActions(0)),
-          acl.getResource().split("/"));
+          new AclResourceTokenizer(acl.getResource()));
     }
 
-    private PlaceRequest getPlaceRequest(ResourcePermissionType type, String... parts) {
+    private PlaceRequest getPlaceRequest(ResourcePermissionType type, AclResourceTokenizer tokenizer) {
       PlaceRequest placeRequest = null;
       switch(type) {
         case PROJECT:
-          placeRequest = ProjectPlacesHelper.getProjectPlace(parts[2]);
+          placeRequest = ProjectPlacesHelper
+              .getProjectPlace(tokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT));
           break;
-
         case DATASOURCE:
-          placeRequest = ProjectPlacesHelper.getDatasourcePlace(parts[2]);
+          placeRequest = ProjectPlacesHelper
+              .getDatasourcePlace(tokenizer.getToken(AclResourceTokenizer.ResourceTokens.DATASOURCE));
           break;
-
         case TABLE:
-          placeRequest = ProjectPlacesHelper.getTablePlace(parts[2], parts[4]);
+          placeRequest = ProjectPlacesHelper
+              .getTablePlace(tokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT),
+                  tokenizer.getToken(AclResourceTokenizer.ResourceTokens.TABLE));
           break;
-
         case VARIABLE:
-          placeRequest = ProjectPlacesHelper.getVariablePlace(parts[2], parts[4], parts[6]);
+          placeRequest = ProjectPlacesHelper
+              .getVariablePlace(tokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT),
+                  tokenizer.getToken(AclResourceTokenizer.ResourceTokens.TABLE),
+                  tokenizer.getToken(AclResourceTokenizer.ResourceTokens.VARIABLE));
           break;
-
         case REPORT_TEMPLATE:
-          placeRequest = ProjectPlacesHelper.getReportsPlace(parts[2]);
+          placeRequest = ProjectPlacesHelper
+              .getReportsPlace(tokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT));
           break;
       }
 

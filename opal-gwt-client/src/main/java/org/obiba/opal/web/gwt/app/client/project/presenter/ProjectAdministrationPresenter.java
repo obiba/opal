@@ -183,7 +183,7 @@ public class ProjectAdministrationPresenter extends PresenterWidget<ProjectAdmin
       ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
 
       resourcePermissionsPresenter.initialize(ResourcePermissionType.PROJECT,
-          ResourcePermissionRequestPaths.projectPermissions(project.getName()));
+          ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_PROJECT, project.getName());
       setInSlot(Display.Places.PERMISSIONS, resourcePermissionsPresenter);
     }
   }

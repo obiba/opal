@@ -16,6 +16,8 @@ import com.gwtplatform.mvp.client.UiHandlers;
 
 public interface ResourcePermissionsUiHandlers extends UiHandlers {
   void addPersmission();
+
   void editPersmission(Acl acl);
-  void deletePersmission(Acl acl);
+
+  void deletePermission(Acl acl);
 }

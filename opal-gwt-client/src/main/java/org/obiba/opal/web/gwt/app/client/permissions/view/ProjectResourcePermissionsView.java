@@ -218,6 +218,7 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
     private TypeColumn(ProjectResourcePermissionsPresenter.NodeToTypeMapper mapper) {
       this.mapper = mapper;
       setSortable(true);
+      setDefaultSortAscending(true);
     }
 
     @Override

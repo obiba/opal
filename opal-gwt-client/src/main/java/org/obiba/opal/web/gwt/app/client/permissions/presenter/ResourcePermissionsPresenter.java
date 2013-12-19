@@ -42,7 +42,10 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
   private final ModalProvider<AddResourcePermissionModalPresenter> addModalProvider;
   private final ModalProvider<UpdateResourcePermissionModalPresenter> updateModalProvider;
   private ResourcePermissionType resourceType;
-  private String resourcePath;
+
+  private ResourcePermissionRequestPaths.UriBuilders uriBuilder;
+
+  private String[] resources;
 
   @Inject
   public ResourcePermissionsPresenter(Display display, EventBus eventBus,
@@ -54,9 +57,11 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
     getView().setUiHandlers(this);
   }
 
-  public void initialize(@Nonnull ResourcePermissionType type, @Nonnull String resource) {
+  public void initialize(@Nonnull ResourcePermissionType type,
+      @Nonnull ResourcePermissionRequestPaths.UriBuilders uriBuilder, @Nonnull String... resources) {
     resourceType = type;
-    resourcePath = resource;
+    this.uriBuilder = uriBuilder;
+    this.resources = resources;
     retrievePermissions();
   }
 
@@ -72,16 +77,14 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
           editPersmission(acl);
         }
         else if (ActionsColumn.DELETE_ACTION.equals(actionName)) {
-          deletePersmission(acl);
+          deletePermission(acl);
         }
       }
     });
   }
 
   private void retrievePermissions() {
-    ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder()
-        .forResource(UriBuilder.create().fromPath(resourcePath).build()).get()
-        .withCallback(new ResourceCallback<JsArray<Acl>>() {
+    ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder().forResource(uriBuilder.create().build(resources)).get().withCallback(new ResourceCallback<JsArray<Acl>>() {
           @Override
           public void onResource(Response response, JsArray<Acl> acls) {
             getView().setData(JsArrays.toList(acls));
@@ -100,10 +103,10 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
   }
 
   @Override
-  public void deletePersmission(Acl acl) {
-    String uri = UriBuilder.create().fromPath(resourcePath)
+  public void deletePermission(Acl acl) {
+    String uri = uriBuilder.create()
         .query(ResourcePermissionRequestPaths.PRINCIPAL_QUERY_PARAM, acl.getSubject().getPrincipal())
-        .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, acl.getSubject().getType().getName()).build();
+        .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, acl.getSubject().getType().getName()).build(resources);
     ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder()
         .forResource(uri)
         .delete()
@@ -117,18 +120,15 @@ public class ResourcePermissionsPresenter extends PresenterWidget<ResourcePermis
 
   @Override
   public void update(List<String> subjectPrincipals, String subjectType, String permission) {
-    UriBuilder uriBuilder = UriBuilder.create().fromPath(resourcePath)
-        .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, subjectType)//
+    UriBuilder uri = uriBuilder.create().query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, subjectType)//
         .query(ResourcePermissionRequestPaths.PERMISSION_QUERY_PARAM, permission);
 
     for (String principal : subjectPrincipals) {
-      uriBuilder.query(ResourcePermissionRequestPaths.PRINCIPAL_QUERY_PARAM, principal);
+      uri.query(ResourcePermissionRequestPaths.PRINCIPAL_QUERY_PARAM, principal);
     }
 
 
-    ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder()
-        .forResource(uriBuilder.build())
-        .post()
+    ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder().forResource(uri.build(resources)).post()
         .withCallback(Response.SC_OK, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {

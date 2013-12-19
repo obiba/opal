@@ -14,23 +14,20 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ItemSelectorPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.presenter.NotificationPresenter;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateCreatedEvent;
 import org.obiba.opal.web.gwt.app.client.report.event.ReportTemplateUpdatedEvent;
-import org.obiba.opal.web.gwt.app.client.validator.ConditionalValidator;
+import org.obiba.opal.web.gwt.app.client.validator.ConditionValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
+import org.obiba.opal.web.gwt.app.client.validator.HasBooleanValue;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.view.KeyValueItemInputView;
 import org.obiba.opal.web.gwt.app.client.view.TextBoxItemInputView;
-import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
@@ -39,8 +36,6 @@ import org.obiba.opal.web.model.client.opal.ParameterDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-import com.github.gwtbootstrap.client.ui.event.ClosedEvent;
-import com.github.gwtbootstrap.client.ui.event.ClosedHandler;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.gwt.core.client.JsonUtils;
@@ -81,7 +76,7 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
 
     enum FormField {
       NAME,
-      TEMPLE_FILE,
+      TEMPLATE_FILE,
       EMAILS,
       CRON_EXPRESSION
     }
@@ -100,7 +95,7 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
 
     String getFormat();
 
-    HasText getShedule();
+    HasText getSchedule();
 
     HasValue<Boolean> isScheduled();
 
@@ -137,50 +132,50 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
   }
 
   private void addValidators() {
-    validators.add(new RequiredTextValidator(getView().getName(), "ReportTemplateNameIsRequired")
-        .setId(Display.FormField.TEMPLE_FILE.name()));
+    validators.add(
+        new RequiredTextValidator(getView().getName(), "ReportTemplateNameIsRequired", Display.FormField.NAME.name()));
 
-    validators.add(new FieldValidator() {
+    validators.add(new ConditionValidator(fileExtensionCondition(), "BirtReportDesignFileIsRequired",
+        Display.FormField.TEMPLATE_FILE.name()));
 
-      @Nullable
+    validators.add(new ConditionValidator(cronCondition(getView().isScheduled(), getView().getSchedule()),
+        "CronExpressionIsRequired", Display.FormField.CRON_EXPRESSION.name()));
+
+    validators
+        .add(new ConditionValidator(emailCondition(), "NotificationEmailsAreInvalid", Display.FormField.EMAILS.name()));
+  }
+
+  private HasValue<Boolean> fileExtensionCondition() {
+    return new HasBooleanValue() {
       @Override
-      public String validate() {
-        if("".equals(getView().getDesignFile())) {
-          return "BirtReportDesignFileIsRequired";
-        }
-        return null;
+      public Boolean getValue() {
+        return getView().getDesignFile().toLowerCase().endsWith(".rptdesign");
       }
+    };
+  }
 
+  private HasValue<Boolean> emailCondition() {
+    return new HasBooleanValue() {
       @Override
-      public String getId() {
-        return Display.FormField.NAME.name();
-      }
-    });
-
-    validators.add(new ConditionalValidator(getView().isScheduled(),
-        new RequiredTextValidator(getView().getShedule(), "CronExpressionIsRequired"))
-        .setId(Display.FormField.CRON_EXPRESSION.name()));
-
-    validators.add(new FieldValidator() {
-
-      @Nullable
-      @Override
-      public String validate() {
+      public Boolean getValue() {
         for(String email : emailSelectorPresenter.getView().getItems()) {
           if(!email
               .matches("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*((\\.[A-Za-z]{2,}){1}$)")) {
-            return "NotificationEmailsAreInvalid";
+            return false;
           }
         }
-        return null;
+        return true;
       }
+    };
+  }
 
+  private HasValue<Boolean> cronCondition(final HasValue<Boolean> isScheduled, final HasText cron) {
+    return new HasBooleanValue() {
       @Override
-      public String getId() {
-        return Display.FormField.EMAILS.name();
+      public Boolean getValue() {
+        return !(isScheduled.getValue() && cron.getText().isEmpty());
       }
-
-    });
+    };
   }
 
   @Override
@@ -231,7 +226,7 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
 
   @Override
   public void disableSchedule() {
-    getView().getShedule().setText("");
+    getView().getSchedule().setText("");
   }
 
   private void createReportTemplate() {
@@ -284,9 +279,9 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
   private ReportTemplateDto getReportTemplateDto() {
     ReportTemplateDto reportTemplate = ReportTemplateDto.create();
     reportTemplate.setName(getView().getName().getText());
-    String schedule = getView().getShedule().getText();
+    String schedule = getView().getSchedule().getText();
     if(schedule != null && schedule.trim().length() > 0) {
-      reportTemplate.setCron(getView().getShedule().getText());
+      reportTemplate.setCron(getView().getSchedule().getText());
     }
     reportTemplate.setFormat(getView().getFormat());
     reportTemplate.setDesign(getView().getDesignFile());
@@ -371,13 +366,5 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
           }));
     }
 
-  }
-
-  private class ErrorNotificationErrorCloseHandler implements ClosedHandler {
-
-    @Override
-    public void onClosed(ClosedEvent closedEvent) {
-      getView().clearErrors();
-    }
   }
 }

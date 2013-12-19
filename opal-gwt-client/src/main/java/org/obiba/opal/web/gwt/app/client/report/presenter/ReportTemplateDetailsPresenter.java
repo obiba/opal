@@ -316,8 +316,9 @@ public class ReportTemplateDetailsPresenter extends PresenterWidget<ReportTempla
       if(reportTemplate.hasProject()) {
         getView().setVisiblePermissionsPanel(true);
         ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
-        resourcePermissionsPresenter.initialize(ResourcePermissionType.REPORT_TEMPLATE, ResourcePermissionRequestPaths
-            .reportTemplatePermissions(reportTemplate.getProject(), reportTemplate.getName()));
+        resourcePermissionsPresenter.initialize(ResourcePermissionType.REPORT_TEMPLATE,
+            ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_REPORTTEMPLATE, reportTemplate.getProject(),
+            reportTemplate.getName());
         setInSlot(null, resourcePermissionsPresenter);
       } else {
         getView().setVisiblePermissionsPanel(false);

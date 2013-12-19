@@ -384,8 +384,8 @@ public class DatasourcePresenter extends PresenterWidget<DatasourcePresenter.Dis
     @Override
     public void authorized() {
       ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
-      resourcePermissionsPresenter.initialize(ResourcePermissionType.DATASOURCE, ResourcePermissionRequestPaths
-              .datasourcePermissions(datasourceName));
+      resourcePermissionsPresenter.initialize(ResourcePermissionType.DATASOURCE,
+          ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_DATASOURCE, datasourceName);
       setInSlot(null, resourcePermissionsPresenter);
     }
   }
