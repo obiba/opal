@@ -135,7 +135,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
     for(SubjectAclService.Permissions resourcePermission : resourcePermissions) {
       for(String perm : resourcePermission.getPermissions()) {
         subjectAclService.addSubjectPermission(resourcePermission.getDomain(), resourcePermission.getNode(),
-            SubjectType.SUBJECT_CREDENTIALS.subjectFor(getPrincipal()), perm);
+            SubjectType.USER.subjectFor(getPrincipal()), perm);
       }
     }
   }
@@ -145,7 +145,7 @@ public class AuthorizationInterceptor extends AbstractSecurityComponent
       String resource = requestAttributeProvider.getResourcePath(resourceUri);
       if(!getSubject().isPermitted("rest:" + resource + ":*")) {
         subjectAclService
-            .addSubjectPermission("rest", resource, SubjectType.SUBJECT_CREDENTIALS.subjectFor(getPrincipal()),
+            .addSubjectPermission("rest", resource, SubjectType.USER.subjectFor(getPrincipal()),
                 "*:GET/*");
       }
     }

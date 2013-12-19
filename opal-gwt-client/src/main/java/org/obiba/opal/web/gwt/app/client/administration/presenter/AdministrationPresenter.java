@@ -84,7 +84,7 @@ public class AdministrationPresenter extends Presenter<AdministrationPresenter.D
   //
 
   private void setHistoryTokens() {
-    getView().setUsersGroupsHistoryToken(getHistoryToken(Places.SUBJECT_CREDENTIALS));
+    getView().setUsersGroupsHistoryToken(getHistoryToken(Places.USER));
     getView().setDatabasesHistoryToken(getHistoryToken(Places.DATABASES));
     getView().setIndexHistoryToken(getHistoryToken(Places.INDEX));
     getView().setRHistoryToken(getHistoryToken(Places.R));

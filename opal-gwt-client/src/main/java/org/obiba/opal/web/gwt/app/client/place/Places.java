@@ -41,7 +41,7 @@ public final class Places {
 
   public static final String ADMINISTRATION = "!admin";
 
-  public static final String SUBJECT_CREDENTIALS = ADMINISTRATION + ".subject-credentials";
+  public static final String USER = ADMINISTRATION + ".users";
 
   public static final String DATABASES = "!databases";
 

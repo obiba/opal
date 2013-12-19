@@ -152,7 +152,7 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
   }
 
   private void activateSubjectNavLink(Subject subject) {
-    NavList container = Subject.SubjectType.SUBJECT_CREDENTIALS.isSubjectType(subject.getType()) ? users : groups;
+    NavList container = Subject.SubjectType.USER.isSubjectType(subject.getType()) ? users : groups;
     for(int i = 0; i < container.getWidgetCount(); i++) {
       if(container.getWidget(i) instanceof NavLink) {
         NavLink link = (NavLink) container.getWidget(i);
@@ -181,7 +181,7 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
   }
 
   private void createSubjectNavLink(final Subject subject) {
-    NavList container = Subject.SubjectType.SUBJECT_CREDENTIALS.isSubjectType(subject.getType()) ? users : groups;
+    NavList container = Subject.SubjectType.USER.isSubjectType(subject.getType()) ? users : groups;
     NavLink link = new NavLink(subject.getPrincipal());
     link.addClickHandler(new SubjectNavLinkClickHandler(subject, link));
 

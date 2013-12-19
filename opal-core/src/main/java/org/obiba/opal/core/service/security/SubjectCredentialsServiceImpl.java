@@ -39,7 +39,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
 import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType;
-import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType.SUBJECT_CREDENTIALS;
+import static org.obiba.opal.core.domain.security.SubjectAcl.SubjectType.USER;
 
 @Component
 public class SubjectCredentialsServiceImpl implements SubjectCredentialsService {
@@ -216,7 +216,7 @@ public class SubjectCredentialsServiceImpl implements SubjectCredentialsService 
     if(!toSave.isEmpty()) orientDbService.save(toSave);
     // Delete subjectCredentials's permissions
     subjectAclService
-        .deleteSubjectPermissions(OPAL_DOMAIN, null, SUBJECT_CREDENTIALS.subjectFor(subjectCredentials.getName()));
+        .deleteSubjectPermissions(OPAL_DOMAIN, null, USER.subjectFor(subjectCredentials.getName()));
     subjectProfileService.deleteProfile(subjectCredentials.getName());
 
     if(subjectCredentials.getAuthenticationType() == SubjectCredentials.AuthenticationType.CERTIFICATE) {

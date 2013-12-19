@@ -140,9 +140,9 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
 
           private void selectFirstUser(List<Subject> subjectList) {
             Subject selection = subjectList.get(0);
-            if(!Subject.SubjectType.SUBJECT_CREDENTIALS.isSubjectType(selection.getType())) {
+            if(!Subject.SubjectType.USER.isSubjectType(selection.getType())) {
               for(Subject subject : subjectList) {
-                if(Subject.SubjectType.SUBJECT_CREDENTIALS.isSubjectType(subject.getType())) {
+                if(Subject.SubjectType.USER.isSubjectType(subject.getType())) {
                   selection = subject;
                   break;
                 }

@@ -90,7 +90,7 @@ public class ProjectTablePermissionsResource extends AbstractProjectPermissionsR
    * @return
    */
   @POST
-  public Response setTablePermission(@QueryParam("type") @DefaultValue("SUBJECT_CREDENTIALS") SubjectType type,
+  public Response setTablePermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals, @QueryParam("permission") TablePermission permission) {
 
     // make sure datasource and table exists
@@ -107,7 +107,7 @@ public class ProjectTablePermissionsResource extends AbstractProjectPermissionsR
    * @return
    */
   @DELETE
-  public Response deleteTablePermissions(@QueryParam("type") @DefaultValue("SUBJECT_CREDENTIALS") SubjectType type,
+  public Response deleteTablePermissions(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals) {
 
     // make sure datasource and table exists

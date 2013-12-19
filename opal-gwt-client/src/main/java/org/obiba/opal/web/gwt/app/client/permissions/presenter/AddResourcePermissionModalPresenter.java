@@ -68,7 +68,7 @@ public class AddResourcePermissionModalPresenter
   }
 
   private void initializeViewSubjectTypes(Translations translations) {
-    String userType = Subject.SubjectType.SUBJECT_CREDENTIALS.getName();
+    String userType = Subject.SubjectType.USER.getName();
     String groupType = Subject.SubjectType.GROUP.getName();
 
     ResourceSubjectType subjectType = getView().getSubjectType();
@@ -106,10 +106,10 @@ public class AddResourcePermissionModalPresenter
     public DuplicateSubjectValidator(String principal, String typeName, String id) {
       super("", id);
       this.principal = principal;
-      type = Subject.SubjectType.SUBJECT_CREDENTIALS.getName().equals(typeName)
-          ? Subject.SubjectType.SUBJECT_CREDENTIALS
+      type = Subject.SubjectType.USER.getName().equals(typeName)
+          ? Subject.SubjectType.USER
           : Subject.SubjectType.GROUP;
-      setErrorMessageKey(Subject.SubjectType.SUBJECT_CREDENTIALS.isSubjectType(type)
+      setErrorMessageKey(Subject.SubjectType.USER.isSubjectType(type)
           ? "DuplicateAclSubjectUser"
           : "DuplicateAclSubjectGroup");
       setArgs(Arrays.asList(principal));

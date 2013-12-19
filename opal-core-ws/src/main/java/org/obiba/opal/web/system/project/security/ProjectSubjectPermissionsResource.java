@@ -63,7 +63,7 @@ public class ProjectSubjectPermissionsResource {
    */
   @GET
   public Iterable<Opal.Acl> getSubjectPermissions(
-      @QueryParam("type") @DefaultValue("SUBJECT_CREDENTIALS") SubjectType type) {
+      @QueryParam("type") @DefaultValue("USER") SubjectType type) {
 
     // make sure project exists
     projectService.getProject(name);
@@ -85,7 +85,7 @@ public class ProjectSubjectPermissionsResource {
    * @return
    */
   @DELETE
-  public Response deleteSubjectPermissions(@QueryParam("type") @DefaultValue("SUBJECT_CREDENTIALS") SubjectType type) {
+  public Response deleteSubjectPermissions(@QueryParam("type") @DefaultValue("USER") SubjectType type) {
 
     // make sure project exists
     projectService.getProject(name);

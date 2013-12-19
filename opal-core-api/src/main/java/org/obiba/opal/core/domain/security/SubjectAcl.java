@@ -25,7 +25,7 @@ public class SubjectAcl extends AbstractTimestamped implements HasUniqueProperti
 
   public enum SubjectType {
 
-    SUBJECT_CREDENTIALS, GROUP;
+    USER, GROUP;
 
     public Subject subjectFor(String principal) {
       return new Subject(principal, this);

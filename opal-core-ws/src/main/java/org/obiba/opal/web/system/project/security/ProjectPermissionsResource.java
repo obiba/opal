@@ -143,7 +143,7 @@ public class ProjectPermissionsResource extends AbstractProjectPermissionsResour
   @SuppressWarnings("TypeMayBeWeakened")
   @POST
   @Path("/project")
-  public Response addProjectPermission(@QueryParam("type") @DefaultValue("SUBJECT_CREDENTIALS") SubjectType type,
+  public Response addProjectPermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals,
       @QueryParam("permission") @DefaultValue("PROJECT_ALL") ProjectPermission permission) {
     // make sure project exists
@@ -162,7 +162,7 @@ public class ProjectPermissionsResource extends AbstractProjectPermissionsResour
   @SuppressWarnings("TypeMayBeWeakened")
   @DELETE
   @Path("/project")
-  public Response deleteProjectPermissions(@QueryParam("type") @DefaultValue("SUBJECT_CREDENTIALS") SubjectType type,
+  public Response deleteProjectPermissions(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals) {
     // make sure project exists
     projectService.getProject(name);

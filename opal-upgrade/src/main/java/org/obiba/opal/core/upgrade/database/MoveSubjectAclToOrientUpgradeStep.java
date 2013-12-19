@@ -52,7 +52,7 @@ public class MoveSubjectAclToOrientUpgradeStep extends AbstractUpgradeStep {
       acl.setPrincipal(rs.getString("principal"));
       switch(rs.getString("type")) {
         case "USER":
-          acl.setType(SubjectAcl.SubjectType.SUBJECT_CREDENTIALS);
+          acl.setType(SubjectAcl.SubjectType.USER);
           break;
         case "GROUP":
           acl.setType(SubjectAcl.SubjectType.GROUP);

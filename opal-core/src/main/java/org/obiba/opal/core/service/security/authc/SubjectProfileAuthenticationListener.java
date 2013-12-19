@@ -88,13 +88,13 @@ public class SubjectProfileAuthenticationListener implements AuthenticationListe
     String folderNode = "/files" + path;
     boolean found = false;
     for(SubjectAclService.Permissions acl : subjectAclService
-        .getNodePermissions("opal", folderNode, SubjectAcl.SubjectType.SUBJECT_CREDENTIALS)) {
+        .getNodePermissions("opal", folderNode, SubjectAcl.SubjectType.USER)) {
       found = findPermission(acl, HOME_PERM);
       if(found) break;
     }
     if(!found) {
       subjectAclService
-          .addSubjectPermission("opal", folderNode, SubjectAcl.SubjectType.SUBJECT_CREDENTIALS.subjectFor(username),
+          .addSubjectPermission("opal", folderNode, SubjectAcl.SubjectType.USER.subjectFor(username),
               HOME_PERM);
     }
   }

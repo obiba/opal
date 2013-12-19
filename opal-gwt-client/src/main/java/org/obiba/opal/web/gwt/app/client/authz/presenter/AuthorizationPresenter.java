@@ -31,7 +31,7 @@ public class AuthorizationPresenter extends PresenterWidget<AuthorizationPresent
   }
 
   public void setAclRequest(String key, AclRequest... requests) {
-    userAuthzPresenter.setAclRequest(SubjectType.SUBJECT_CREDENTIALS, requests);
+    userAuthzPresenter.setAclRequest(SubjectType.USER, requests);
     groupAuthzPresenter.setAclRequest(SubjectType.GROUP, requests);
     getView().setExplanation(key);
   }

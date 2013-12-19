@@ -80,7 +80,7 @@ public class ProjectDatasourcePermissionsResource extends AbstractProjectPermiss
    * @return
    */
   @POST
-  public Response setDatasourcePermission(@QueryParam("type") @DefaultValue("SUBJECT_CREDENTIALS") SubjectType type,
+  public Response setDatasourcePermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals, @QueryParam("permission") DatasourcePermission permission) {
     // make sure datasource exists
     MagmaEngine.get().getDatasource(name);
@@ -96,7 +96,7 @@ public class ProjectDatasourcePermissionsResource extends AbstractProjectPermiss
    * @return
    */
   @DELETE
-  public Response deleteDatasourcePermissions(@QueryParam("type") @DefaultValue("SUBJECT_CREDENTIALS") SubjectType type,
+  public Response deleteDatasourcePermissions(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals) {
     // make sure datasource exists
     MagmaEngine.get().getDatasource(name);

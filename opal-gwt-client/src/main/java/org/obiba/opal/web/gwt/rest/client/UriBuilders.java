@@ -296,7 +296,7 @@ public enum UriBuilders {
     }
   },
 
-  SUBJECT_CREDENTIALS {
+  USER {
     @Override
     public UriBuilder create() {
       return UriBuilder.create().segment("system", "subject-credentials");

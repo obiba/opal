@@ -89,7 +89,7 @@ public class ProjectReportTemplatePermissionsResource extends AbstractProjectPer
    * @return
    */
   @POST
-  public Response setTablePermission(@QueryParam("type") @DefaultValue("SUBJECT_CREDENTIALS") SubjectType type,
+  public Response setTablePermission(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals, @QueryParam("permission") ReportTemplatePermission permission) {
     // make sure template exists
     validateTemplate();
@@ -105,7 +105,7 @@ public class ProjectReportTemplatePermissionsResource extends AbstractProjectPer
    * @return
    */
   @DELETE
-  public Response deleteTablePermissions(@QueryParam("type") @DefaultValue("SUBJECT_CREDENTIALS") SubjectType type,
+  public Response deleteTablePermissions(@QueryParam("type") @DefaultValue("USER") SubjectType type,
       @QueryParam("principal") List<String> principals) {
 
     // make sure template exists

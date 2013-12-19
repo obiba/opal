@@ -155,7 +155,7 @@ public class SpatialRealm extends AuthorizingRealm implements RolePermissionReso
   }
 
   private SubjectAcl.Subject getSubject(PrincipalCollection principals) {
-    return SubjectType.SUBJECT_CREDENTIALS.subjectFor(principals.getPrimaryPrincipal().toString());
+    return SubjectType.USER.subjectFor(principals.getPrimaryPrincipal().toString());
   }
 
   private final class GroupPermissionResolver implements RolePermissionResolver {

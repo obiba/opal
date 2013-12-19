@@ -93,7 +93,7 @@ message ParameterDto {
 
 message Subject {
   enum SubjectType {
-    SUBJECT_CREDENTIALS = 0;
+    USER = 0;
     GROUP = 1;
   }
   required string principal = 1;
