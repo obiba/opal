@@ -18,7 +18,6 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FolderUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileExplorerPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.MagmaPathSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.MagmaPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.presenter.ProjectResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.place.ParameterTokens;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.ApplicationPresenter;
@@ -106,7 +105,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private final Provider<TasksPresenter> tasksPresenterProvider;
 
-  private final Provider<ProjectResourcePermissionsPresenter> projectResourcePermissionsProvider;
+  private final Provider<ProjectPermissionsPresenter> projectResourcePermissionsProvider;
 
 
 
@@ -128,7 +127,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
 
   private TasksPresenter tasksPresenter;
 
-  private ProjectResourcePermissionsPresenter projectResourcePermissionsPresenter;
+  private ProjectPermissionsPresenter projectPermissionsPresenter;
 
   private ProjectKeyStorePresenter projectKeyStorePresenter;
 
@@ -140,7 +139,7 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
       Provider<MagmaPresenter> magmaPresenterProvider, Provider<FileExplorerPresenter> fileExplorerPresenterProvider,
       Provider<ReportsPresenter> reportsPresenterProvider, Provider<TasksPresenter> tasksPresenterProvider,
       Provider<ProjectAdministrationPresenter> projectAdministrationPresenterProvider,
-      Provider<ProjectResourcePermissionsPresenter> projectResourcePermissionsProvider) {
+      Provider<ProjectPermissionsPresenter> projectResourcePermissionsProvider) {
     super(eventBus, display, proxy, ApplicationPresenter.WORKBENCH);
     getView().setUiHandlers(this);
     this.placeManager = placeManager;
@@ -292,11 +291,11 @@ public class ProjectPresenter extends Presenter<ProjectPresenter.Display, Projec
   }
 
   private void onPermissionsTabSelected() {
-    if(projectResourcePermissionsPresenter == null) {
-      projectResourcePermissionsPresenter = projectResourcePermissionsProvider.get();
-      setInSlot(PERMISSION_PANE, projectResourcePermissionsPresenter);
+    if(projectPermissionsPresenter == null) {
+      projectPermissionsPresenter = projectResourcePermissionsProvider.get();
+      setInSlot(PERMISSION_PANE, projectPermissionsPresenter);
     }
-    projectResourcePermissionsPresenter.initialize(project);
+    projectPermissionsPresenter.initialize(project);
   }
 
   private void onAdminTabSelected() {

@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.permissions.view;
+package org.obiba.opal.web.gwt.app.client.project.view;
 
 import java.util.Comparator;
 import java.util.List;
@@ -16,8 +16,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.permissions.presenter.ProjectResourcePermissionsPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.presenter.ProjectResourcePermissionsUiHandlers;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPermissionsUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.Table;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsProvider;
@@ -28,7 +28,6 @@ import org.obiba.opal.web.model.client.opal.Subject;
 
 import com.github.gwtbootstrap.client.ui.FluidRow;
 import com.github.gwtbootstrap.client.ui.Heading;
-import com.github.gwtbootstrap.client.ui.HelpBlock;
 import com.github.gwtbootstrap.client.ui.NavHeader;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.NavList;
@@ -50,10 +49,10 @@ import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
-public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectResourcePermissionsUiHandlers>
-    implements ProjectResourcePermissionsPresenter.Display {
+public class ProjectPermissionsView extends ViewWithUiHandlers<ProjectPermissionsUiHandlers>
+    implements ProjectPermissionsPresenter.Display {
 
-  interface Binder extends UiBinder<Widget, ProjectResourcePermissionsView> {}
+  interface Binder extends UiBinder<Widget, ProjectPermissionsView> {}
 
   @UiField
   NavList users;
@@ -89,7 +88,7 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
   private final PlaceManager placeManager;
 
   @Inject
-  public ProjectResourcePermissionsView(Binder uiBinder, PlaceManager placeManager) {
+  public ProjectPermissionsView(Binder uiBinder, PlaceManager placeManager) {
     initWidget(uiBinder.createAndBindUi(this));
     this.placeManager = placeManager;
   }
@@ -102,9 +101,9 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
   }
 
   @Override
-  public void initializeTable(ProjectResourcePermissionsPresenter.NodeToPlaceMapper nodeToPlaceMapper,
-      ProjectResourcePermissionsPresenter.NodeNameFormatter formatter,
-      ProjectResourcePermissionsPresenter.NodeToTypeMapper nodeToTypeMappert, Comparator<Acl> resourceTypeComparator) {
+  public void initializeTable(ProjectPermissionsPresenter.NodeToPlaceMapper nodeToPlaceMapper,
+      ProjectPermissionsPresenter.NodeNameFormatter formatter,
+      ProjectPermissionsPresenter.NodeToTypeMapper nodeToTypeMappert, Comparator<Acl> resourceTypeComparator) {
 
     tablePager.setDisplay(permissionsTable);
     typeColumn = new TypeColumn(nodeToTypeMappert);
@@ -190,8 +189,8 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
 
   private class ResourceColumn extends Column<Acl, Acl> {
 
-    private ResourceColumn(final ProjectResourcePermissionsPresenter.NodeToPlaceMapper converter,
-        final ProjectResourcePermissionsPresenter.NodeNameFormatter formatter) {
+    private ResourceColumn(final ProjectPermissionsPresenter.NodeToPlaceMapper converter,
+        final ProjectPermissionsPresenter.NodeNameFormatter formatter) {
       super(new PlaceRequestCell<Acl>(placeManager) {
         @Override
         public PlaceRequest getPlaceRequest(Acl value) {
@@ -213,9 +212,9 @@ public class ProjectResourcePermissionsView extends ViewWithUiHandlers<ProjectRe
 
   private class TypeColumn extends TextColumn<Acl> {
 
-    private ProjectResourcePermissionsPresenter.NodeToTypeMapper mapper;
+    private ProjectPermissionsPresenter.NodeToTypeMapper mapper;
 
-    private TypeColumn(ProjectResourcePermissionsPresenter.NodeToTypeMapper mapper) {
+    private TypeColumn(ProjectPermissionsPresenter.NodeToTypeMapper mapper) {
       this.mapper = mapper;
       setSortable(true);
       setDefaultSortAscending(true);

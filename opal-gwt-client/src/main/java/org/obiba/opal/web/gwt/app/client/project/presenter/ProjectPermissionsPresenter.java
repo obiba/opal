@@ -8,7 +8,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.obiba.opal.web.gwt.app.client.permissions.presenter;
+package org.obiba.opal.web.gwt.app.client.project.presenter;
 
 import java.util.Comparator;
 import java.util.List;
@@ -18,11 +18,12 @@ import javax.annotation.Nonnull;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
+import org.obiba.opal.web.gwt.app.client.permissions.presenter.DeleteAllConfirmationModalPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.presenter.DeleteAllSubjectPermissionsHandler;
 import org.obiba.opal.web.gwt.app.client.permissions.support.AclResourceTokenizer;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
 import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionHandler;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -43,17 +44,16 @@ import com.gwtplatform.mvp.client.PresenterWidget;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
-public class ProjectResourcePermissionsPresenter extends PresenterWidget<ProjectResourcePermissionsPresenter.Display>
-    implements ProjectResourcePermissionsUiHandlers, DeleteAllSubjectPermissionsHandler {
+public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissionsPresenter.Display>
+    implements ProjectPermissionsUiHandlers, DeleteAllSubjectPermissionsHandler {
 
   private final ModalProvider<DeleteAllConfirmationModalPresenter> deleteAllConfirmationModalProvider;
 
   private ProjectDto project;
 
   @Inject
-  public ProjectResourcePermissionsPresenter(Display display, EventBus eventBus,
-      ModalProvider<DeleteAllConfirmationModalPresenter> deleteAllConfirmationModalProvider,
-      Translations translations) {
+  public ProjectPermissionsPresenter(Display display, EventBus eventBus,
+      ModalProvider<DeleteAllConfirmationModalPresenter> deleteAllConfirmationModalProvider, Translations translations) {
     super(eventBus, display);
     this.deleteAllConfirmationModalProvider = deleteAllConfirmationModalProvider.setContainer(this);
     getView().setUiHandlers(this);
@@ -201,7 +201,7 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
         }).send();
   }
 
-  public interface Display extends View, HasUiHandlers<ProjectResourcePermissionsUiHandlers> {
+  public interface Display extends View, HasUiHandlers<ProjectPermissionsUiHandlers> {
     void setData(@Nonnull List<Subject> subjects);
 
     void setSubjectData(Subject subject, List<Acl> subjectAcls);

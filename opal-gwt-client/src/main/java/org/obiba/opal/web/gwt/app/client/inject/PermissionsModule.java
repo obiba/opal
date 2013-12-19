@@ -11,12 +11,12 @@ package org.obiba.opal.web.gwt.app.client.inject;
 
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.AddResourcePermissionModalPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.DeleteAllConfirmationModalPresenter;
-import org.obiba.opal.web.gwt.app.client.permissions.presenter.ProjectResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.presenter.UpdateResourcePermissionModalPresenter;
 import org.obiba.opal.web.gwt.app.client.permissions.view.AddResourcePermissionModalView;
 import org.obiba.opal.web.gwt.app.client.permissions.view.DeleteAllConfirmationModalView;
-import org.obiba.opal.web.gwt.app.client.permissions.view.ProjectResourcePermissionsView;
+import org.obiba.opal.web.gwt.app.client.project.view.ProjectPermissionsView;
 import org.obiba.opal.web.gwt.app.client.permissions.view.ResourcePermissionsView;
 import org.obiba.opal.web.gwt.app.client.permissions.view.UpdateResourcePermissionModalView;
 
@@ -31,8 +31,8 @@ public class PermissionsModule extends AbstractPresenterModule {
   protected void configure() {
     bindPresenterWidget(ResourcePermissionsPresenter.class, ResourcePermissionsPresenter.Display.class,
         ResourcePermissionsView.class);
-    bindPresenterWidget(ProjectResourcePermissionsPresenter.class, ProjectResourcePermissionsPresenter.Display.class,
-        ProjectResourcePermissionsView.class);
+    bindPresenterWidget(ProjectPermissionsPresenter.class, ProjectPermissionsPresenter.Display.class,
+        ProjectPermissionsView.class);
     bindPresenterWidget(UpdateResourcePermissionModalPresenter.class, UpdateResourcePermissionModalPresenter.Display.class,
         UpdateResourcePermissionModalView.class);
     bindPresenterWidget(AddResourcePermissionModalPresenter.class, AddResourcePermissionModalPresenter.Display.class,
