@@ -159,6 +159,12 @@
         <artifactId>password-hasher</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.obiba.opal.tools</groupId>
+        <artifactId>password-hasher</artifactId>
+        <version>${project.version}</version>
+        <classifier>cli</classifier>
+      </dependency>
 
       <!-- Obiba dependencies -->
       <dependency>
