@@ -40,15 +40,11 @@
   <extend-configuration-property name="gin.ginjector.modules"
       value="org.obiba.opal.web.gwt.app.client.inject.AuthorizationModule"/>
   <extend-configuration-property name="gin.ginjector.modules"
-      value="org.obiba.opal.web.gwt.app.client.inject.ConfigureViewWizardModule"/>
-  <extend-configuration-property name="gin.ginjector.modules"
       value="org.obiba.opal.web.gwt.app.client.inject.DashboardModule"/>
   <extend-configuration-property name="gin.ginjector.modules"
       value="org.obiba.opal.web.gwt.app.client.inject.ExportModule"/>
   <extend-configuration-property name="gin.ginjector.modules"
       value="org.obiba.opal.web.gwt.app.client.inject.FileSystemModule"/>
-  <extend-configuration-property name="gin.ginjector.modules"
-      value="org.obiba.opal.web.gwt.app.client.inject.ImportIdentifiersWizardModule"/>
   <extend-configuration-property name="gin.ginjector.modules"
       value="org.obiba.opal.web.gwt.app.client.inject.ImportModule"/>
   <extend-configuration-property name="gin.ginjector.modules"
@@ -59,8 +55,6 @@
       value="org.obiba.opal.web.gwt.app.client.inject.NavigatorModule"/>
   <extend-configuration-property name="gin.ginjector.modules"
       value="org.obiba.opal.web.gwt.app.client.inject.ReportsModule"/>
-  <extend-configuration-property name="gin.ginjector.modules"
-      value="org.obiba.opal.web.gwt.app.client.inject.UnitsModule"/>
   <extend-configuration-property name="gin.ginjector.modules"
       value="org.obiba.opal.web.gwt.app.client.inject.CreateViewWizardModule"/>
   <extend-configuration-property name="gin.ginjector.modules"

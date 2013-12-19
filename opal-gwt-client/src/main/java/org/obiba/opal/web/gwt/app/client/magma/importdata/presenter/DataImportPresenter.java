@@ -16,7 +16,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
-import org.obiba.opal.web.gwt.app.client.magma.createdatasource.presenter.DatasourceCreatedCallback;
+import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.magma.importdata.ImportConfig;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.presenter.ComparedDatasourcesReportStepPresenter;
 import org.obiba.opal.web.gwt.app.client.support.DatasourceDtos;

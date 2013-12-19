@@ -7,20 +7,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.obiba.opal.web.gwt.app.client.magma.configureview.event;
+package org.obiba.opal.web.gwt.app.client.magma.event;
 
-public enum UpdateType {
+import org.obiba.opal.web.model.client.magma.DatasourceDto;
+import org.obiba.opal.web.model.client.magma.DatasourceFactoryDto;
+import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
-  /**
-   * Item in list intended to be added to existing items.
-   */
-  ADD,
+public interface DatasourceCreatedCallback {
 
-  /**
-   * Item in list intended to replace existing items.
-   */
-  EDIT,
+  void onSuccess(DatasourceFactoryDto factory, DatasourceDto datasource);
 
-  DELETE
+  void onFailure(DatasourceFactoryDto factory, ClientErrorDto error);
 
 }

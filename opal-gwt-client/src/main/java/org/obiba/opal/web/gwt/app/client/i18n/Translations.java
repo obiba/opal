@@ -437,9 +437,6 @@ public interface Translations extends Constants {
       "NotIgnoredConflicts", "Some conflicts were detected. Ignore modifications before applying changes.",//
       "NoVariablesToBeImported", "No variables are to be imported.",//
       "DataImportFailed", "The data importation has failed: {0}",//
-      "FunctionalUnitAlreadyExistWithTheSpecifiedName", "A unit with the same name already exists.",//
-      "FunctionalUnitNameIsRequired", "Unit name is required.",//
-      "DuplicateFunctionalUnitNames", "Duplicate Unit names.",//
       "KeyPairAliasIsRequired", "Name is required",//
       "KeyPairAlgorithmIsRequired", "Algorithm is required.",//
       "KeyPairKeySizeIsRequired", "Size is required.",//
@@ -526,7 +523,6 @@ public interface Translations extends Constants {
       "NoVariableValuesFound", "Failed to retrieve the list of variable values",//
       "EntityIdentifierNotFound", "{0} identifier {1} could not be found in table {2}",//
       "ParticipantIdentifiersAlreadyGenerated", "Participant identifiers have already been generated for the Unit {0}",
-      "FunctionalUnitCreationFailed", "Failed to create functional unit: {0}",//
       "RPackageInstalledButNotFound",
       "Package was probably successfully installed in R but cannot be found. Restarting R server might solve this issue.",
       "InvalidLocaleName", "Invalid locale name '{0}'. Please choose a valid locale name from the list.",//
@@ -689,8 +685,6 @@ public interface Translations extends Constants {
       "removeProject", "Remove Project",//
       "removeDatasource", "Remove Datasource",//
       "removeReportTemplate", "Remove Report Template",//
-      "removeFunctionalUnit", "Remove Unit",//
-      "generateFunctionalUnitIdentifiers", "Generate Unit Identifiers",//
       "overwriteVariable", "Overwrite Variable",//
       "overwriteView", "Overwrite View",//
       "createView", "Create View",//
@@ -736,9 +730,6 @@ public interface Translations extends Constants {
       "Please confirm that you want to remove the current datasource from Opal configuration.",//
       "confirmDeleteReportTemplate",
       "Please confirm that you want to remove the current Report Template from Opal configuration (report design and generated reports will not be affected).",
-//
-      "confirmDeleteFunctionalUnit",
-      "Please confirm that you want to remove the current Unit from Opal configuration. All encrypted material will not be accessible anymore",
 //
       "confirmOverwriteVariable",
       "A variable with the same name already exists. Please confirm that you want to overwrite this variable.",//
@@ -1240,7 +1231,7 @@ public interface Translations extends Constants {
 
   @Description("Generate Identifiers label")
   @DefaultStringValue("Generate Identifiers")
-  String generateUnitIdentifiers();
+  String generateIdentifiers();
 
   @Description("Import Unit Identifiers From Data label")
   @DefaultStringValue("Import Identifiers from Data File")
@@ -1999,15 +1990,15 @@ public interface Translations extends Constants {
   @DefaultStringValue("Elastic search configuration")
   String esConfigurationLabel();
 
-  @Description("Specify Generate Functional Unit Identifier")
+  @Description("Specify Generate Identifier")
   @Constants.DefaultStringValue(
-      "{0} new identifier will be generated for this unit. To customize the identifier format modify the settings below.")
-  String specifyGenerateFunctionalUnitIdentifier();
+      "{0} new identifier will be generated for this mapping. To customize the identifier format modify the settings below.")
+  String specifyGenerateIdentifier();
 
-  @Description("Specify Generate Functional Unit Identifiers")
+  @Description("Specify Generate Identifiers")
   @Constants.DefaultStringValue(
-      "{0} new identifiers will be generated for this unit. To customize the identifier format modify the settings below.")
-  String specifyGenerateFunctionalUnitIdentifiers();
+      "{0} new identifiers will be generated for this mapping. To customize the identifier format modify the settings below.")
+  String specifyGenerateIdentifiers();
 
   @Description("Generate Identifiers button label")
   @DefaultStringValue("Generate")
@@ -2132,10 +2123,6 @@ public interface Translations extends Constants {
   @Description("Page Files title")
   @DefaultStringValue("Files")
   String pageFileExplorerTitle();
-
-  @Description("Page Functional Unit title")
-  @DefaultStringValue("Units")
-  String pageFunctionalUnitTitle();
 
   @Description("Page Report Template title")
   @DefaultStringValue("Reports")

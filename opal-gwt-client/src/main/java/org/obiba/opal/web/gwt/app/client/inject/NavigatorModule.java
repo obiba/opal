@@ -9,8 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.inject;
 
-import org.obiba.opal.web.gwt.app.client.magma.createdatasource.presenter.CreateDatasourcePresenter;
-import org.obiba.opal.web.gwt.app.client.magma.createdatasource.view.CreateDatasourceView;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.CsvDatasourceFormPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.DatasourceFormPresenterSubscriber;
 import org.obiba.opal.web.gwt.app.client.magma.datasource.presenter.ExcelDatasourceFormPresenter;
@@ -124,9 +122,6 @@ public class NavigatorModule extends AbstractOpalModule {
         VariablePropertiesModalView.class);
     bindPresenterWidget(VariableAttributeModalPresenter.class, VariableAttributeModalPresenter.Display.class,
         VariableAttributeModalView.class);
-
-    bindWizardPresenterWidget(CreateDatasourcePresenter.class, CreateDatasourcePresenter.Display.class,
-        CreateDatasourceView.class, CreateDatasourcePresenter.Wizard.class);
   }
 
   private void configureDatasource() {

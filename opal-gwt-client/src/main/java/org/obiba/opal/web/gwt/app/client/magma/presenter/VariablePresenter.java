@@ -18,7 +18,6 @@ import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.derive.helper.VariableDuplicationHelper;
 import org.obiba.opal.web.gwt.app.client.magma.derive.presenter.DeriveVariablePresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.SummaryRequiredEvent;
@@ -156,7 +155,6 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
     setInSlot(Display.Slots.History, variableVcsCommitHistoryPresenter);
 
     addRegisteredHandler(VariableSelectionChangeEvent.getType(), this);
-    addRegisteredHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler());
     addRegisteredHandler(VariableRefreshEvent.getType(), new VariableRefreshEvent.Handler() {
       @Override
       public void onVariableRefresh(VariableRefreshEvent event) {
@@ -581,41 +579,6 @@ public class VariablePresenter extends PresenterWidget<VariablePresenter.Display
         removeConfirmation.run();
         removeConfirmation = null;
       }
-    }
-  }
-
-  class ViewSavedEventHandler implements ViewSavedEvent.Handler {
-
-    @Override
-    public void onViewSaved(ViewSavedEvent event) {
-      if(isVisible() && isCurrentTable(event.getView())) {
-        ResourceRequestBuilderFactory.<JsArray<VariableDto>>newBuilder().forResource(table.getLink() + "/variables")
-            .get().withCallback(new ResourceCallback<JsArray<VariableDto>>() {
-
-          @Override
-          public void onResource(Response response, JsArray<VariableDto> resource) {
-            JsArray<VariableDto> variables = JsArrays.toSafeArray(resource);
-            for(int i = 0; i < variables.length(); i++) {
-              if(isCurrentVariable(variables.get(i))) {
-                variable = null;
-                updateDisplay(table, variables.get(i), i > 0 ? variables.get(i - 1) : null,
-                    i < variables.length() + 1 ? variables.get(i + 1) : null);
-                break;
-              }
-            }
-          }
-
-          private boolean isCurrentVariable(VariableDto variableDto) {
-            return variableDto.getName().equals(variable.getName()) &&
-                variableDto.getParentLink().getLink().equals(variable.getParentLink().getLink());
-          }
-        }).send();
-      }
-    }
-
-    private boolean isCurrentTable(ViewDto viewDto) {
-      return table != null && table.getDatasourceName().equals(viewDto.getDatasourceName()) &&
-          table.getName().equals(viewDto.getName());
     }
   }
 

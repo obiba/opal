@@ -17,15 +17,13 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import org.obiba.opal.web.gwt.app.client.event.ModalClosedEvent;
-import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionEvent;
 import org.obiba.opal.web.gwt.app.client.fs.event.FileSelectionUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectionPresenter;
 import org.obiba.opal.web.gwt.app.client.fs.presenter.FileSelectorPresenter.FileSelectionType;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.createdatasource.presenter.DatasourceCreatedCallback;
+import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceCreatedCallback;
 import org.obiba.opal.web.gwt.app.client.magma.importvariables.support.DatasourceFileType;
 import org.obiba.opal.web.gwt.app.client.presenter.CharacterSetDisplay;
 import org.obiba.opal.web.gwt.app.client.support.DatasourceParsingErrorDtos;
@@ -39,7 +37,6 @@ import org.obiba.opal.web.gwt.app.client.validator.AbstractFieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.CharacterSetEncodingValidator;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.LocaleValidator;
-import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
 import org.obiba.opal.web.gwt.app.client.validator.ViewValidationHandler;
 import org.obiba.opal.web.gwt.rest.client.ResourceCallback;
 import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
@@ -57,11 +54,9 @@ import org.obiba.opal.web.model.client.magma.ViewDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.common.base.Strings;
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;

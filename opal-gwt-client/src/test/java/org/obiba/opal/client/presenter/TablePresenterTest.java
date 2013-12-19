@@ -19,8 +19,6 @@ import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPre
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
-import org.obiba.opal.web.gwt.app.client.magma.configureview.presenter.ConfigureViewStepPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.EntityModalPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.TablePresenter;
@@ -68,7 +66,6 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     ModalProvider<IndexPresenter> mockIndexProvider = createMock(ModalProvider.class);
     ModalProvider<EntityModalPresenter> modalEntityModalPresenter = createMock(ModalProvider.class);
     ModalProvider<ValueSequencePopupPresenter> modalProviderValueSequence = createMock(ModalProvider.class);
-    ModalProvider<ConfigureViewStepPresenter> modalConfigureViewStepProvider = createMock(ModalProvider.class);
     ModalProvider<VariablesToViewPresenter> variablesToViewProvider = createMock(ModalProvider.class);
     ModalProvider<VariablePropertiesModalPresenter> variablePropertiesModalProvider = createMock(ModalProvider.class);
     ModalProvider<TablePropertiesModalPresenter> tablePropertiesModalPresenterModalProvider = createMock(
@@ -93,9 +90,6 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
         (TableSelectionChangeEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
     expect(eventBusMock.addHandler((Type<ConfirmationEvent.Handler>) EasyMock.anyObject(),
         (ConfirmationEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
-    expect(eventBusMock
-        .addHandler((Type<ViewSavedEvent.Handler>) EasyMock.anyObject(), (ViewSavedEvent.Handler) EasyMock.anyObject()))
-        .andReturn(handlerRegistrationMock).once();
     expect(displayMock.addVariableSortHandler((ColumnSortEvent.Handler) EasyMock.anyObject()))
         .andReturn(handlerRegistrationMock).once();
 

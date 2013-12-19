@@ -16,7 +16,6 @@ import org.junit.Test;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.AddPrincipalHandler;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
-import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
@@ -79,9 +78,6 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
         (ConfirmationEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
     expect(eventBusMock.addHandler((Type<DatasourceUpdatedEvent.Handler>) EasyMock.anyObject(),
         (DatasourceUpdatedEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
-    expect(eventBusMock
-        .addHandler((Type<ViewSavedEvent.Handler>) EasyMock.anyObject(), (ViewSavedEvent.Handler) EasyMock.anyObject()))
-        .andReturn(handlerRegistrationMock).once();
 
     usersAuthzDisplayMock.addPrincipalHandler((AddPrincipalHandler) EasyMock.anyObject());
 

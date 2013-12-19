@@ -30,7 +30,6 @@ import org.obiba.opal.web.model.Magma.TableDto;
 import org.obiba.opal.web.model.Magma.VariableDto;
 import org.obiba.opal.web.model.Magma.ViewDto;
 import org.obiba.opal.web.model.Opal.FileDto;
-import org.obiba.opal.web.model.Opal.FunctionalUnitDto;
 import org.obiba.opal.web.model.Opal.ReportTemplateDto;
 
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
@@ -40,9 +39,8 @@ import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 @SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class Seed {
 
-  private final Seeder[] seeders = new Seeder[] { new FileSystemSeeder(), new FunctionalUnitsSeeder(),
-      new ReportsSeeder(), new DatasourcesSeeder(), new OpalXmlImportSeeder(), new CsvImportSeeder(),
-      new ViewsSeeder() };
+  private final Seeder[] seeders = new Seeder[] { new FileSystemSeeder(), new ReportsSeeder(), new DatasourcesSeeder(),
+      new OpalXmlImportSeeder(), new CsvImportSeeder(), new ViewsSeeder() };
 
   private final OpalJavaClient opalClient;
 
@@ -137,31 +135,6 @@ public class Seed {
     @Override
     protected String getKey() {
       return "datasources";
-    }
-
-  }
-
-  private class FunctionalUnitsSeeder extends ArraySeeder {
-
-    @Override
-    protected void onSeed(JSONArray seed) throws JSONException, IOException {
-      for(int i = 0; i < seed.length(); i++) {
-        JSONObject jsonDs = seed.getJSONObject(i);
-
-        String name = jsonDs.getString("name");
-        HttpResponse r = opalClient.get(opalClient.newUri().segment("functional-unit", name).build());
-        r.getEntity().consumeContent();
-        if(r.getStatusLine().getStatusCode() == SC_NOT_FOUND) {
-          System.out.println("Creating unit " + name);
-          ignore(opalClient.post(opalClient.newUri().segment("functional-units").build(),
-              FunctionalUnitDto.newBuilder().setName(name).setKeyVariableName(name).build()));
-        }
-      }
-    }
-
-    @Override
-    protected String getKey() {
-      return "units";
     }
 
   }

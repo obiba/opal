@@ -22,7 +22,6 @@ import org.obiba.opal.web.gwt.app.client.fs.event.FileDownloadRequestEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
-import org.obiba.opal.web.gwt.app.client.magma.configureview.event.ViewSavedEvent;
 import org.obiba.opal.web.gwt.app.client.magma.copydata.presenter.DataCopyPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableIndexStatusRefreshEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
@@ -215,9 +214,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     registerHandler(getView().addFilterVariableHandler(new FilterVariableHandler()));
     // Filter: Clear filter event
     registerHandler(getView().getFilter().getClear().addClickHandler(new FilterClearHandler()));
-
-    // OPAL-975
-    addRegisteredHandler(ViewSavedEvent.getType(), new ViewSavedEventHandler());
 
     addRegisteredHandler(TableIndexStatusRefreshEvent.getType(), new TableIndexStatusRefreshHandler());
 
@@ -706,17 +702,6 @@ public class TablePresenter extends PresenterWidget<TablePresenter.Display>
     public void onResource(Response response, JsArray<ViewDto> resource) {
       ViewDto viewDto = ViewDto.get(JsArrays.toSafeArray(resource));
       getView().setFromTables(viewDto.getFromArray());
-    }
-  }
-
-  // OPAL-975
-  private class ViewSavedEventHandler implements ViewSavedEvent.Handler {
-
-    @Override
-    public void onViewSaved(ViewSavedEvent event) {
-      if(table != null) {
-        updateDisplay(table);
-      }
     }
   }
 

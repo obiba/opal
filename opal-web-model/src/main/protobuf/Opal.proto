@@ -2,13 +2,6 @@ package Opal;
 
 option java_package = "org.obiba.opal.web.model";
 
-message FunctionalUnitDto {
-  required string name = 1;
-  required string keyVariableName = 2;
-  optional string select = 3;
-  optional string description = 4;
-}
-
 enum KeyType {
   KEY_PAIR = 0;
   CERTIFICATE = 1;

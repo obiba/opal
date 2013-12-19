@@ -32,7 +32,12 @@ public interface DecryptService {
       throws NoSuchIdentifiersMappingException, IllegalArgumentException, IOException;
 
   /**
-   * Equivalent to <code>decryptData(FunctionalUnit.OPAL_INSTANCE, datasourceName, file)</code>.
+   * Decrypt data using the system keystore.
+   * @param datasourceName
+   * @param file
+   * @throws NoSuchIdentifiersMappingException
+   * @throws IllegalArgumentException
+   * @throws IOException
    */
   void decryptData(String datasourceName, FileObject file)
       throws NoSuchIdentifiersMappingException, IllegalArgumentException, IOException;

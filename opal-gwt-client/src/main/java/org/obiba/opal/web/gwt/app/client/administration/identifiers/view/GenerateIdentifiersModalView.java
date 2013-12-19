@@ -27,7 +27,6 @@ import com.github.gwtbootstrap.client.ui.HelpBlock;
 import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.base.InlineLabel;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
@@ -200,7 +199,7 @@ public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<G
   }
 
   private void initializeTexts() {
-    dialog.setTitle(translations.generateUnitIdentifiers());
+    dialog.setTitle(translations.generateIdentifiers());
     updateDescriptionText();
     List<String> args = new ArrayList<String>();
     args.clear();
@@ -215,8 +214,8 @@ public class GenerateIdentifiersModalView extends ModalPopupViewWithUiHandlers<G
     List<String> args = new ArrayList<String>();
     args.add(String.valueOf(affectedEntities));
     String rawMessage = affectedEntities > 1
-        ? translations.specifyGenerateFunctionalUnitIdentifiers()
-        : translations.specifyGenerateFunctionalUnitIdentifier();
+        ? translations.specifyGenerateIdentifiers()
+        : translations.specifyGenerateIdentifier();
     confirmationMessage.setText(TranslationsUtils.replaceArguments(rawMessage, args));
   }
 
