@@ -12,7 +12,6 @@ package org.obiba.opal.web.gwt.app.client.permissions.support;
 
 import org.obiba.opal.web.gwt.rest.client.UriBuilder;
 
-@SuppressWarnings("StaticMethodOnlyUsedInOneClass")
 public final class ResourcePermissionRequestPaths {
 
   private ResourcePermissionRequestPaths() {}

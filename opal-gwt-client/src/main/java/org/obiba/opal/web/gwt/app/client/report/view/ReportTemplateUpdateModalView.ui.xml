@@ -26,8 +26,8 @@
         </b:ControlLabel>
         <b:TextBox name="reportTemplateName" ui:field="reportTemplateName"/>
       </b:ControlGroup>
-      <b:ControlGroup ui:field="labelTempleFile">
-        <b:ControlLabel>
+      <b:ControlGroup ui:field="labelTemplateFile">
+      <b:ControlLabel>
           <ui:msg description="BIRT Design File label">BIRT Design File</ui:msg>
         </b:ControlLabel>
         <g:SimplePanel ui:field="designFilePanel"/>
@@ -65,8 +65,8 @@
           </b2:IconAnchor>
         </b:ControlGroup>
       </b:ControlGroup>
-      <b:ControlGroup>
-        <b:ControlLabel>
+      <b:ControlGroup ui:field="emailsGroup">
+      <b:ControlLabel>
           <ui:msg description="Notification Emails label">Notification Emails</ui:msg>
         </b:ControlLabel>
         <g:SimplePanel ui:field="notificationEmailsPanel"/>

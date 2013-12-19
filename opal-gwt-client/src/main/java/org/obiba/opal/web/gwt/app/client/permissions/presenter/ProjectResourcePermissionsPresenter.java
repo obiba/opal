@@ -105,7 +105,8 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
     String nodeUri = getNodeUri(ResourcePermissionType.getTypeByPermission(acl.getActions(0)), acl.getResource(),
         subject.getPrincipal(), subject.getType().getName());
 
-    ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder().forResource(nodeUri).delete().withCallback(Response.SC_OK, new ResponseCodeCallback() {
+    ResourceRequestBuilderFactory.<JsArray<Acl>>newBuilder().forResource(nodeUri).delete()
+        .withCallback(Response.SC_OK, new ResponseCodeCallback() {
           @Override
           public void onResponseCode(Request request, Response response) {
             selectSubject(subject);
@@ -144,7 +145,8 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
         return ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_REPORTTEMPLATE.create()
             .query(ResourcePermissionRequestPaths.PRINCIPAL_QUERY_PARAM, principal)
             .query(ResourcePermissionRequestPaths.TYPE_QUERY_PARAM, typeName)
-            .build(aclTokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT));
+            .build(aclTokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT),
+                aclTokenizer.getToken(AclResourceTokenizer.ResourceTokens.REPORTTEMPLATE));
       default:
         return null;
     }
@@ -157,7 +159,8 @@ public class ProjectResourcePermissionsPresenter extends PresenterWidget<Project
 
   private void retrievePermissions() {
     ResourceRequestBuilderFactory.<JsArray<Subject>>newBuilder().forResource(
-        ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_SUBJECTS.create().build(project.getName())).get().withCallback(new ResourceCallback<JsArray<Subject>>() {
+        ResourcePermissionRequestPaths.UriBuilders.PROJECT_PERMISSIONS_SUBJECTS.create().build(project.getName())).get()
+        .withCallback(new ResourceCallback<JsArray<Subject>>() {
           @Override
           public void onResource(Response response, JsArray<Subject> subjects) {
             List<Subject> subjectList = JsArrays.toList(subjects);
