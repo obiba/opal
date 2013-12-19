@@ -99,14 +99,7 @@ public class ImportIdentifiersMappingModalView
   public void showError(String message, @Nullable FormField group) {
     if(Strings.isNullOrEmpty(message)) return;
 
-    String msg = message;
-    try {
-      ClientErrorDto errorDto = JsonUtils.unsafeEval(message);
-      msg = errorDto.getStatus();
-      if(translations.userMessageMap().containsKey(msg)) msg = translations.userMessageMap().get(errorDto.getStatus());
-    } catch(Exception ignored) {
-      if(translations.userMessageMap().containsKey(message)) msg = translations.userMessageMap().get(message);
-    }
+    String msg = translateErrorMessage(message);
 
     if(group == null) {
       dialog.addAlert(msg, AlertType.ERROR);
@@ -121,7 +114,7 @@ public class ImportIdentifiersMappingModalView
   public void setVariables(JsArray<VariableDto> variables) {
     MultiWordSuggestOracle oracle = (MultiWordSuggestOracle) variableTypeahead.getSuggestOracle();
     oracle.clear();
-    for (VariableDto var : JsArrays.toIterable(variables)) {
+    for(VariableDto var : JsArrays.toIterable(variables)) {
       oracle.add(var.getName());
     }
   }
@@ -154,5 +147,22 @@ public class ImportIdentifiersMappingModalView
   @Override
   public HasText getVariableName() {
     return variableName;
+  }
+
+  //
+  // Private methods
+  //
+
+  private String translateErrorMessage(String message) {
+    String msg = message;
+    try {
+      ClientErrorDto errorDto = JsonUtils.unsafeEval(message);
+      msg = errorDto.getStatus();
+      if(translations.userMessageMap().containsKey(msg)) msg = translations.userMessageMap().get(errorDto.getStatus());
+    } catch(Exception ignored) {
+      if(translations.userMessageMap().containsKey(message)) msg = translations.userMessageMap().get(message);
+    }
+
+    return msg;
   }
 }
