@@ -14,8 +14,14 @@ import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.gwtplatform.mvp.client.UiHandlers;
 
-public interface ReportTemplateListUiHandlers extends UiHandlers {
+public interface ReportTemplateDetailsUiHandlers extends UiHandlers {
 
-  void onSelection(ReportTemplateDto template);
+  void onDownload();
+
+  void onExecute();
+
+  void onEdit();
+
+  void onDelete();
 
 }

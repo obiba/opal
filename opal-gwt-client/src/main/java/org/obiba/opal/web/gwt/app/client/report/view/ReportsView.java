@@ -9,18 +9,29 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.report.view;
 
-import org.obiba.opal.web.gwt.app.client.presenter.SplitPaneWorkbenchPresenter;
+import java.util.Collection;
+
+import org.obiba.opal.web.gwt.app.client.i18n.Translations;
+import org.obiba.opal.web.gwt.app.client.i18n.TranslationsUtils;
+import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportsPresenter;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportsUiHandlers;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.gwt.rest.client.authorization.WidgetAuthorizer;
+import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.NavHeader;
+import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.NavList;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -29,51 +40,44 @@ import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 public class ReportsView extends ViewWithUiHandlers<ReportsUiHandlers> implements ReportsPresenter.Display {
 
+  private final Translations translations;
+
   @UiField
   Button add;
-
-  @UiField
-  Button edit;
-
-  @UiField
-  Button remove;
-
-  @UiField
-  Button download;
-
-  @UiField
-  Button execute;
 
   @UiField
   ScrollPanel reportTemplateDetailsPanel;
 
   @UiField
-  ScrollPanel reportTemplateListPanel;
+  NavList reportList;
 
   interface Binder extends UiBinder<Widget, ReportsView> {}
 
   @Inject
-  public ReportsView(Binder uiBinder) {
+  public ReportsView(Binder uiBinder, Translations translations) {
     initWidget(uiBinder.createAndBindUi(this));
+    this.translations = translations;
   }
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {
-    HasWidgets panel = null;
-    SplitPaneWorkbenchPresenter.Slot splitSlot = (SplitPaneWorkbenchPresenter.Slot) slot;
-    switch(splitSlot) {
-      case LEFT:
-        panel = reportTemplateListPanel;
-        break;
-      case CENTER:
-        panel = reportTemplateDetailsPanel;
-        break;
+    reportTemplateDetailsPanel.clear();
+    reportTemplateDetailsPanel.add(content);
+  }
+
+  @Override
+  public void setReportTemplates(JsArray<ReportTemplateDto> templates) {
+    reportList.clear();
+
+    // group templates by project
+    Multimap<String, ReportTemplateDto> templateMap = ArrayListMultimap.create();
+    for(final ReportTemplateDto template : JsArrays.toIterable(JsArrays.toSafeArray(templates))) {
+      templateMap.get(template.getProject()).add(template);
     }
-    if(panel != null) {
-      panel.clear();
-      if(content != null) {
-        panel.add(content.asWidget());
-      }
+
+    for(String project : templateMap.keySet()) {
+      reportList.add(new NavHeader(TranslationsUtils.replaceArguments(translations.reportTemplatesHeader(), project)));
+      addReportTemplateLinks(templateMap.get(project));
     }
   }
 
@@ -82,56 +86,57 @@ public class ReportsView extends ViewWithUiHandlers<ReportsUiHandlers> implement
     getUiHandlers().onAdd();
   }
 
-  @UiHandler("edit")
-  public void onEdit(ClickEvent event) {
-    getUiHandlers().onEdit();
-  }
-
-  @UiHandler("remove")
-  public void onDelete(ClickEvent event) {
-    getUiHandlers().onDelete();
-  }
-
-  @UiHandler("download")
-  public void onDownload(ClickEvent event) {
-    getUiHandlers().onDownload();
-  }
-
-  @UiHandler("execute")
-  public void onExecute(ClickEvent event) {
-    getUiHandlers().onExecute();
-  }
-
   @Override
   public HasAuthorization getAddReportTemplateAuthorizer() {
     return new WidgetAuthorizer(add);
   }
 
   @Override
-  public HasAuthorization getExecuteReportAuthorizer() {
-    return new WidgetAuthorizer(execute);
-  }
-
-  @Override
-  public HasAuthorization getDownloadReportDesignAuthorizer() {
-    return new WidgetAuthorizer(download);
-  }
-
-  @Override
-  public HasAuthorization getRemoveReportTemplateAuthorizer() {
-    return new WidgetAuthorizer(remove);
-  }
-
-  @Override
-  public HasAuthorization getUpdateReportTemplateAuthorizer() {
-    return new WidgetAuthorizer(edit);
-  }
-
-  @Override
   public void setCurrentReportTemplateVisible(boolean visible) {
-    execute.setVisible(visible);
-    download.setVisible(visible);
-    remove.setVisible(visible);
-    edit.setVisible(visible);
+  }
+
+  //
+  // Private methods
+  //
+
+  private void addReportTemplateLinks(Collection<ReportTemplateDto> templates) {
+    boolean activated = false;
+    for(ReportTemplateDto template : templates) {
+      NavLink link = new NavLink(template.getName());
+      // first one is selected
+      if(!activated) {
+        link.setActive(true);
+        activated = true;
+      }
+      link.addClickHandler(new ReportTemplateClickHandler(template, link));
+      reportList.add(link);
+    }
+  }
+
+  private class ReportTemplateClickHandler implements ClickHandler {
+
+    private final ReportTemplateDto template;
+
+    private final NavLink link;
+
+    ReportTemplateClickHandler(ReportTemplateDto template, NavLink link) {
+      this.template = template;
+      this.link = link;
+    }
+
+    @Override
+    public void onClick(ClickEvent event) {
+      unActivateLinks();
+      link.setActive(true);
+      getUiHandlers().onSelection(template);
+    }
+
+    private void unActivateLinks() {
+      for(int i = 0; i < reportList.getWidgetCount(); i++) {
+        if(reportList.getWidget(i) instanceof NavLink) {
+          ((NavLink) reportList.getWidget(i)).setActive(false);
+        }
+      }
+    }
   }
 }

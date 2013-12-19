@@ -45,7 +45,10 @@ public class ReportTemplatePermissionConverter extends DomainPermissionConverter
       public Iterable<String> convert(String node) {
         if(node.startsWith("/project/")) {
           String[] args = args(node, "/project/(.+)/report-template/(.+)");
-          return Lists.newArrayList(toRest("/project/{0}/report-template/{1}", "*:GET/*", args),//
+          return Lists.newArrayList(
+              toRest("/project/{0}", "GET:GET", args),//
+              toRest("/project/{0}/summary", "GET:GET", args),//
+              toRest("/project/{0}/report-template/{1}", "*:GET/*", args),//
               toRest("/files/meta/reports/{0}/{1}", "GET:GET/GET", args),//
               toRest("/files/reports/{0}/{1}", "*:GET/*", args));
         } else {
@@ -62,7 +65,10 @@ public class ReportTemplatePermissionConverter extends DomainPermissionConverter
       public Iterable<String> convert(String node) {
         if(node.startsWith("/project/")) {
           String[] args = args(node, "/project/(.+)/report-template/(.+)");
-          return Lists.newArrayList(toRest("/project/{0}/report-template/{1}", "GET:GET/GET", args),//
+          return Lists.newArrayList(
+              toRest("/project/{0}", "GET:GET", args),//
+              toRest("/project/{0}/summary", "GET:GET", args),//
+              toRest("/project/{0}/report-template/{1}", "GET:GET/GET", args),//
               toRest("/files/meta/reports/{0}/{1}", "GET:GET/GET", args),//
               toRest("/files/reports/{0}/{1}", "GET:GET/GET", args));
         } else {

@@ -354,6 +354,7 @@ public class ReportTemplateUpdateModalPresenter extends ModalPresenterWidget<Rep
       setDialogMode(Mode.CREATE);
     } else {
       setDialogMode(Mode.UPDATE);
+      if (reportTemplate.hasProject()) project = reportTemplate.getProject();
       getView().setReportTemplate(reportTemplate);
       emailSelectorPresenter.getView().setItems(JsArrays.toIterable(reportTemplate.getEmailNotificationArray()));
       parametersSelectorPresenter.getView().setItems(Iterables

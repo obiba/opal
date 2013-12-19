@@ -15,6 +15,7 @@ import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrayDataProvider;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter;
+import org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsUiHandlers;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.ActionsColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.DateTimeColumn;
 import org.obiba.opal.web.gwt.app.client.ui.celltable.HasActionHandler;
@@ -24,14 +25,18 @@ import org.obiba.opal.web.model.client.opal.ParameterDto;
 import org.obiba.opal.web.model.client.opal.ReportDto;
 import org.obiba.opal.web.model.client.opal.ReportTemplateDto;
 
+import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.SimplePager;
+import com.github.gwtbootstrap.client.ui.base.IconAnchor;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Anchor;
@@ -42,16 +47,29 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.HandlerRegistration;
-import com.gwtplatform.mvp.client.ViewImpl;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 
 import static org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter.DELETE_ACTION;
 import static org.obiba.opal.web.gwt.app.client.report.presenter.ReportTemplateDetailsPresenter.DOWNLOAD_ACTION;
 
-public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplateDetailsPresenter.Display {
+public class ReportTemplateDetailsView extends ViewWithUiHandlers<ReportTemplateDetailsUiHandlers>
+    implements ReportTemplateDetailsPresenter.Display {
 
   interface Binder extends UiBinder<Widget, ReportTemplateDetailsView> {}
 
-  private static final Translations translations = GWT.create(Translations.class);
+  private final Translations translations;
+
+  @UiField
+  IconAnchor edit;
+
+  @UiField
+  Button remove;
+
+  @UiField
+  Button download;
+
+  @UiField
+  Button execute;
 
   @UiField
   Panel detailsPanel;
@@ -102,8 +120,9 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
   private ReportTemplateDto reportTemplate;
 
   @Inject
-  public ReportTemplateDetailsView(Binder uiBinder) {
+  public ReportTemplateDetailsView(Binder uiBinder, Translations translations) {
     initWidget(uiBinder.createAndBindUi(this));
+    this.translations = translations;
     initProducedReportsTable();
   }
 
@@ -217,6 +236,46 @@ public class ReportTemplateDetailsView extends ViewImpl implements ReportTemplat
   @Override
   public void setVisiblePermissionsPanel(boolean value) {
     permissionsPanel.setVisible(value);
+  }
+
+  @Override
+  public HasAuthorization getExecuteReportAuthorizer() {
+    return new WidgetAuthorizer(execute);
+  }
+
+  @Override
+  public HasAuthorization getDownloadReportDesignAuthorizer() {
+    return new WidgetAuthorizer(download);
+  }
+
+  @Override
+  public HasAuthorization getRemoveReportTemplateAuthorizer() {
+    return new WidgetAuthorizer(remove);
+  }
+
+  @Override
+  public HasAuthorization getUpdateReportTemplateAuthorizer() {
+    return new WidgetAuthorizer(edit);
+  }
+
+  @UiHandler("edit")
+  public void onEdit(ClickEvent event) {
+    getUiHandlers().onEdit();
+  }
+
+  @UiHandler("remove")
+  public void onDelete(ClickEvent event) {
+    getUiHandlers().onDelete();
+  }
+
+  @UiHandler("download")
+  public void onDownload(ClickEvent event) {
+    getUiHandlers().onDownload();
+  }
+
+  @UiHandler("execute")
+  public void onExecute(ClickEvent event) {
+    getUiHandlers().onExecute();
   }
 
 }

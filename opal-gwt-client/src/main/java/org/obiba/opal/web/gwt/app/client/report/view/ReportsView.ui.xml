@@ -7,34 +7,32 @@
 
 
   <g:FlowPanel>
-    <g:FlowPanel>
-      <b:ButtonGroup>
-        <b:Button icon="PLUS" type="INFO" ui:field="add">
-          <ui:msg description="Add Report Template label">Add report template</ui:msg>
-        </b:Button>
-      </b:ButtonGroup>
-      <b:ButtonGroup>
-        <b:Button icon="DOWNLOAD" ui:field="download">
-          <ui:msg description="Download report design label">Download report design</ui:msg>
-        </b:Button>
-      </b:ButtonGroup>
-      <b:ButtonGroup>
-        <b:Button icon="COG" ui:field="execute">
-          <ui:msg description="Execute label">Execute</ui:msg>
-        </b:Button>
-      </b:ButtonGroup>
-      <b:ButtonGroup>
-        <b:Button icon="EDIT" ui:field="edit">
-        </b:Button>
-      </b:ButtonGroup>
-      <b:ButtonGroup>
-        <b:Button icon="TRASH" ui:field="remove">
-        </b:Button>
-      </b:ButtonGroup>
-    </g:FlowPanel>
+    <b:Paragraph>
+      <ui:msg description="Report Templates text">Reports can be generated using the
+        <a href="http://www.eclipse.org/birt" target="_blank">Business Intelligence and
+          Reporting Tools
+        </a>
+        (BIRT). See the
+        <a href="http://wiki.obiba.org/display/OPALDOC/Opal+BIRT+User+Guide" target="_blank">
+          Opal BIRT User Guide
+        </a>
+        for more details.
+      </ui:msg>
+    </b:Paragraph>
     <b:FluidRow>
       <b:Column size="2">
-        <g:ScrollPanel ui:field="reportTemplateListPanel" addStyleNames="top-margin"/>
+        <g:ScrollPanel>
+          <b:NavList ui:field="reportList">
+            <b:NavHeader>
+              <ui:msg description="Reports label">Reports</ui:msg>
+            </b:NavHeader>
+          </b:NavList>
+        </g:ScrollPanel>
+        <b:ButtonGroup addStyleNames="top-margin">
+          <b:Button icon="PLUS" type="INFO" ui:field="add">
+            <ui:msg description="Add Report Template label">Add report template</ui:msg>
+          </b:Button>
+        </b:ButtonGroup>
       </b:Column>
       <b:Column size="10">
         <g:ScrollPanel ui:field="reportTemplateDetailsPanel"/>
