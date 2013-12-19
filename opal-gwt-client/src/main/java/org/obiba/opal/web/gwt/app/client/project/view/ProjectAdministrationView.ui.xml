@@ -92,8 +92,8 @@
       </b:Heading>
       <b:Form>
         <b:Paragraph>
-          Deleting a project destroys all associated data and files. It can be a long running task and there is no
-          going back.
+          <ui:msg description="Delete Project text">Deleting a project destroys all associated data and files. It can be a long running task and there is no
+            going back.</ui:msg>
         </b:Paragraph>
         <b:Button type="DANGER" ui:field="deleteProject">Delete Project</b:Button>
       </b:Form>

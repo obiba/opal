@@ -1101,7 +1101,7 @@ public interface Translations extends Constants {
   String addTableLabel();
 
   @Description("Add Key Pair label")
-  @DefaultStringValue("Add")
+  @DefaultStringValue("Add Key")
   String addKeyPairLabel();
 
   @Description("Add Table no storage label")
