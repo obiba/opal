@@ -48,12 +48,13 @@ public class EncryptionKeysView extends ViewWithUiHandlers<EncryptionKeysUiHandl
   @UiField
   DropdownButton addDropdown;
 
+  private ActionsColumn<KeyDto> actionsColumn;
+
   interface Binder extends UiBinder<Widget, EncryptionKeysView> {}
 
   private final Translations translations;
 
   private final ListDataProvider<KeyDto> keyPairsDataProvider = new ListDataProvider<KeyDto>();
-
 
   @Inject
   public EncryptionKeysView(Binder uiBinder, Translations translations) {
@@ -65,7 +66,7 @@ public class EncryptionKeysView extends ViewWithUiHandlers<EncryptionKeysUiHandl
 
   @Override
   public HasActionHandler<KeyDto> getActions() {
-    return EncryptionKeysColumns.ACTIONS;
+    return actionsColumn;
   }
 
   @Override
@@ -97,15 +98,17 @@ public class EncryptionKeysView extends ViewWithUiHandlers<EncryptionKeysUiHandl
 
   private void initializeTable() {
     tablePager.setDisplay(encryptionKeysTable);
-    encryptionKeysTable.addColumn(EncryptionKeysColumns.NAME, translations.nameLabel());
-    encryptionKeysTable.addColumn(EncryptionKeysColumns.TYPE, translations.typeLabel());
-    encryptionKeysTable.addColumn(EncryptionKeysColumns.ACTIONS, translations.actionsLabel());
+    EncryptionKeysColumns columns = new EncryptionKeysColumns();
+    actionsColumn = columns.actionsColumn;
+    encryptionKeysTable.addColumn(columns.nameColumn, translations.nameLabel());
+    encryptionKeysTable.addColumn(columns.typeColumn, translations.typeLabel());
+    encryptionKeysTable.addColumn(columns.actionsColumn, translations.actionsLabel());
     keyPairsDataProvider.addDataDisplay(encryptionKeysTable);
   }
 
-  private static final class EncryptionKeysColumns {
+  private final class EncryptionKeysColumns {
 
-    static final Column<KeyDto, String> NAME = new TextColumn<KeyDto>() {
+    final Column<KeyDto, String> nameColumn = new TextColumn<KeyDto>() {
 
       @Override
       public String getValue(KeyDto keyPair) {
@@ -113,15 +116,15 @@ public class EncryptionKeysView extends ViewWithUiHandlers<EncryptionKeysUiHandl
       }
     };
 
-    static final Column<KeyDto, String> TYPE = new TextColumn<KeyDto>() {
+    final Column<KeyDto, String> typeColumn = new TextColumn<KeyDto>() {
 
       @Override
       public String getValue(KeyDto keyPair) {
-        return keyPair.getKeyType().getName();
+        return translations.keyTypeMap().get(keyPair.getKeyType().getName());
       }
     };
 
-    static final ActionsColumn<KeyDto> ACTIONS = new ActionsColumn<KeyDto>(new ActionsProvider<KeyDto>() {
+    final ActionsColumn<KeyDto> actionsColumn = new ActionsColumn<KeyDto>(new ActionsProvider<KeyDto>() {
 
       @Override
       public String[] allActions() {
