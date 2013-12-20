@@ -150,10 +150,13 @@ public interface Translations extends Constants {
 
   @Description("Permission map")
   @DefaultStringMapValue({ //
+      "SYSTEM_ALL", "Administrate", //
+      "PROJECT_ADD", "Add project", //
+
       "PROJECT_ALL", "Administrate", //
 
       "DATASOURCE_ALL", "Administrate", //
-      "CREATE_TABLE", "Add table", //
+      "TABLE_ADD", "Add table", //
 
       "TABLE_ALL", "Administrate", //
       "TABLE_READ", "View dictionary and summary", //
@@ -164,9 +167,9 @@ public interface Translations extends Constants {
       "VARIABLE_READ", "View dictionary and summary", //
 
       "DATABASES_ALL", "Administrate", //
-      "R_SESSION_ALL", "Use", //
+      "R_USE", "Use", //
       "DATASHIELD_ALL", "Administrate", //
-      "DATASHIELD_SESSION_ALL", "Use", //
+      "DATASHIELD_USE", "Use", //
       "REPORT_TEMPLATE_ALL", "Administrate", //
       "REPORT_TEMPLATE_READ", "View reports" })
   Map<String, String> permissionMap();
@@ -191,10 +194,13 @@ public interface Translations extends Constants {
 
   @Description("Permission explanation map")
   @DefaultStringMapValue({ //
+      "SYSTEM_ALL.help", "Full access to the system.", //
+
+      "PROJECT_ADD.help", "Add new projects and therefore can import/export data in the context of the project.", //
       "PROJECT_ALL.help", "Full access to project settings and data.", //
 
       "DATASOURCE_ALL.help", "Full access to project tables, including individual values.", //
-      "CREATE_TABLE.help", "Add tables or views.", //
+      "TABLE_ADD.help", "Add tables or views.", //
 
       "TABLE_ALL.help", "Full access to the table, including edition of the dictionary and individual values.", //
       "TABLE_READ.help", "View dictionary and summaries (no access to individual values).", //
@@ -205,9 +211,9 @@ public interface Translations extends Constants {
       "VARIABLE_READ.help", "View variable description and values summary (no access to individual values).", //
 
       "DATABASES_ALL.help", "Administrate databases.", //
-      "R_SESSION_ALL.help", "Use R services.", //
+      "R_USE.help", "Use R services: can push accessible data to R and can execute ANY R commands on them.", //
       "DATASHIELD_ALL.help", "Administrate DataSHIELD settings.", //
-      "DATASHIELD_SESSION_ALL.help", "Use DataSHIELD services.", //
+      "DATASHIELD_USE.help", "Use DataSHIELD services: can push accessible data to R and can execute limited R commands on them.", //
       "REPORT_TEMPLATE_ALL.help", "Full access to the report template (settings and reports).", //
       "REPORT_TEMPLATE_READ.help", "View reports only." })
   Map<String, String> permissionExplanationMap();

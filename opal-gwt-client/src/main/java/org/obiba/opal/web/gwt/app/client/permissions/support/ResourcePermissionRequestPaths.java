@@ -24,6 +24,20 @@ public final class ResourcePermissionRequestPaths {
 
   public enum UriBuilders {
 
+    SYSTEM_PERMISSIONS_R {
+      @Override
+      public UriBuilder create() {
+        return UriBuilder.create().segment("system", "permissions", "r");
+      }
+    },
+
+    SYSTEM_PERMISSIONS_DATASHIELD {
+      @Override
+      public UriBuilder create() {
+        return UriBuilder.create().segment("system", "permissions", "datashield");
+      }
+    },
+
     PROJECT_PERMISSIONS_DATASOURCE {
       @Override
       public UriBuilder create() {

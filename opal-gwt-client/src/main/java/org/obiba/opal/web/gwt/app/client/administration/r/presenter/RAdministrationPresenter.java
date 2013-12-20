@@ -3,8 +3,10 @@ package org.obiba.opal.web.gwt.app.client.administration.r.presenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
+import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
@@ -14,13 +16,13 @@ import org.obiba.opal.web.gwt.rest.client.ResourceRequestBuilderFactory;
 import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
-import org.obiba.opal.web.model.client.opal.AclAction;
 import org.obiba.opal.web.model.client.opal.ServiceDto;
 import org.obiba.opal.web.model.client.opal.ServiceStatus;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.View;
@@ -34,17 +36,16 @@ public class RAdministrationPresenter
     extends ItemAdministrationPresenter<RAdministrationPresenter.Display, RAdministrationPresenter.Proxy>
     implements RAdministrationUiHandlers {
 
-  public static final Object PermissionSlot = new Object();
-
-  private final AuthorizationPresenter authorizationPresenter;
+  private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
 
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
   @Inject
   public RAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
-      AuthorizationPresenter authorizationPresenter, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
+      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
+      DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
-    this.authorizationPresenter = authorizationPresenter;
+    this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.breadcrumbsHelper = breadcrumbsHelper;
     getView().setUiHandlers(this);
   }
@@ -64,12 +65,6 @@ public class RAdministrationPresenter
   @TitleFunction
   public String getTitle() {
     return translations.pageRConfigTitle();
-  }
-
-  @Override
-  protected void onBind() {
-    super.onBind();
-    authorizationPresenter.setAclRequest("r", new AclRequest(AclAction.R_USE, "/r"));
   }
 
   @Override
@@ -135,23 +130,6 @@ public class RAdministrationPresenter
         .send();
   }
 
-  private final class PermissionsUpdate implements HasAuthorization {
-    @Override
-    public void unauthorized() {
-      clearSlot(PermissionSlot);
-    }
-
-    @Override
-    public void beforeAuthorization() {
-
-    }
-
-    @Override
-    public void authorized() {
-      setInSlot(PermissionSlot, authorizationPresenter);
-    }
-  }
-
   private final class RSessionCreatedCallback implements ResponseCodeCallback {
     @Override
     public void onResponseCode(Request request, Response response) {
@@ -176,11 +154,38 @@ public class RAdministrationPresenter
     }
   }
 
+  /**
+   * Update permissions on authorization.
+   */
+  private final class PermissionsUpdate implements HasAuthorization {
+    @Override
+    public void unauthorized() {
+      clearSlot(Display.Slots.Permissions);
+    }
+
+    @Override
+    public void beforeAuthorization() {
+
+    }
+
+    @Override
+    public void authorized() {
+      ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
+      resourcePermissionsPresenter.initialize(ResourcePermissionType.R, ResourcePermissionRequestPaths.UriBuilders.SYSTEM_PERMISSIONS_R);
+
+      setInSlot(Display.Slots.Permissions, resourcePermissionsPresenter);
+    }
+  }
+
   @ProxyStandard
   @NameToken(Places.R)
   public interface Proxy extends ProxyPlace<RAdministrationPresenter> {}
 
   public interface Display extends View, HasBreadcrumbs, HasUiHandlers<RAdministrationUiHandlers> {
+
+    enum Slots {
+      Permissions
+    }
 
     enum Status {
       Startable, Stoppable, Pending

@@ -101,7 +101,7 @@ public class RAdministrationView extends ViewWithUiHandlers<RAdministrationUiHan
 
   @Override
   public void setInSlot(Object slot, IsWidget content) {
-    if(slot == RAdministrationPresenter.PermissionSlot) {
+    if(slot == Slots.Permissions) {
       permissions.clear();
       permissions.add(content);
     }

@@ -17,7 +17,7 @@ import org.obiba.opal.web.model.client.opal.AclAction;
 
 public enum ResourcePermissionType {
   ADMINISTRATION(AclAction.SYSTEM_ALL, AclAction.PROJECT_ADD),
-  DATASHIELD(AclAction.DATASHIELD_ALL, AclAction.DATASHIELD_USE),
+  DATASHIELD(AclAction.DATASHIELD_USE, AclAction.DATASHIELD_ALL),
   R(AclAction.R_USE),
   PROJECT(AclAction.PROJECT_ALL),
   DATASOURCE(AclAction.TABLE_ADD, AclAction.DATASOURCE_ALL),

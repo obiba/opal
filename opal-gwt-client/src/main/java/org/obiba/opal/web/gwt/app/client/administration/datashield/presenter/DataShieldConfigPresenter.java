@@ -13,6 +13,9 @@ import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministra
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
 import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.presenter.ResourcePermissionsPresenter;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionRequestPaths;
+import org.obiba.opal.web.gwt.app.client.permissions.support.ResourcePermissionType;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
 import org.obiba.opal.web.gwt.app.client.support.DefaultBreadcrumbsBuilder;
@@ -52,6 +55,8 @@ public class DataShieldConfigPresenter
 
   }
 
+  private final Provider<ResourcePermissionsPresenter> resourcePermissionsProvider;
+
   public static final Object PackageSlot = new Object();
 
   public static final Object AggregateEnvironmentSlot = new Object();
@@ -66,24 +71,22 @@ public class DataShieldConfigPresenter
 
   private final DataShieldAdministrationPresenter assignPresenter;
 
-  private final AuthorizationPresenter authorizationPresenter;
-
   private final DefaultBreadcrumbsBuilder breadcrumbsHelper;
 
   private static final String DATASHIELD_NAME = "DataSHIELD";
 
   @Inject
   public DataShieldConfigPresenter(Display display, EventBus eventBus, Proxy proxy,
+      Provider<ResourcePermissionsPresenter> resourcePermissionsProvider,
       Provider<DataShieldAdministrationPresenter> adminPresenterProvider,
-      DataShieldPackageAdministrationPresenter packagePresenter, AuthorizationPresenter authorizationPresenter,
-      DefaultBreadcrumbsBuilder breadcrumbsHelper) {
+      DataShieldPackageAdministrationPresenter packagePresenter, DefaultBreadcrumbsBuilder breadcrumbsHelper) {
     super(eventBus, display, proxy);
+    this.resourcePermissionsProvider = resourcePermissionsProvider;
     this.packagePresenter = packagePresenter;
     aggregatePresenter = adminPresenterProvider.get();
     assignPresenter = adminPresenterProvider.get();
     aggregatePresenter.setEnvironment(DataShieldEnvironment.AGGREGATE);
     assignPresenter.setEnvironment(DataShieldEnvironment.ASSIGN);
-    this.authorizationPresenter = authorizationPresenter;
     this.breadcrumbsHelper = breadcrumbsHelper;
   }
 
@@ -122,11 +125,6 @@ public class DataShieldConfigPresenter
 
   @Override
   protected void onBind() {
-    super.onBind();
-    authorizationPresenter
-        .setAclRequest("datashield", new AclRequest(AclAction.DATASHIELD_USE, "/datashield"),
-            new AclRequest(AclAction.DATASHIELD_ALL, "/datashield"));
-
     addToSlot(PackageSlot, packagePresenter);
     addToSlot(AggregateEnvironmentSlot, aggregatePresenter);
     addToSlot(AssignEnvironmentSlot, assignPresenter);
@@ -145,7 +143,10 @@ public class DataShieldConfigPresenter
 
     @Override
     public void authorized() {
-      setInSlot(PermissionSlot, authorizationPresenter);
+      ResourcePermissionsPresenter resourcePermissionsPresenter = resourcePermissionsProvider.get();
+      resourcePermissionsPresenter.initialize(ResourcePermissionType.DATASHIELD, ResourcePermissionRequestPaths.UriBuilders.SYSTEM_PERMISSIONS_DATASHIELD);
+
+      setInSlot(PermissionSlot, resourcePermissionsPresenter);
     }
   }
 
