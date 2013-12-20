@@ -11,44 +11,41 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
     xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
-    xmlns:o="urn:import:org.obiba.opal.web.gwt.app.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
   <g:FlowPanel>
 
-    <b:FluidRow addStyleNames="page-header">
-      <b:Column size="9">
-        <b:Heading size="3">
-          <ui:msg description="Projects label">Projects</ui:msg>
-        </b:Heading>
-      </b:Column>
-      <b:Column size="3">
-        <b:ButtonGroup addStyleNames="pull-right">
-          <b:Button type="INFO" icon="PLUS" ui:field="add">
-            <ui:msg description="Add Project label">Add Project</ui:msg>
-          </b:Button>
-        </b:ButtonGroup>
-        <b:ButtonGroup addStyleNames="pull-right">
-          <b:DropdownButton text="Sort by">
-            <b:NavLink ui:field="lastUpdateNav" icon="OK">
-              <ui:msg description="Last Update label">Last Update</ui:msg>
-            </b:NavLink>
-            <b:NavLink ui:field="nameNav" addStyleNames="no-icon">
-              <ui:msg description="Name label">Name</ui:msg>
-            </b:NavLink>
-          </b:DropdownButton>
-        </b:ButtonGroup>
-      </b:Column>
-    </b:FluidRow>
+    <b:PageHeader>
+      <ui:msg description="Projects label">Projects</ui:msg>
+    </b:PageHeader>
+    <b:Paragraph>
+      <ui:msg description="Projects text">A project is a repository of data and their dictionary. In a project, data can
+        be imported, exported, analysed and transformed. Projects also offer access controls to the dictionary,
+        the summaries and the individual data.
+      </ui:msg>
+    </b:Paragraph>
+    <b:Form>
+      <b:ButtonGroup>
+        <b:Button type="INFO" icon="PLUS" ui:field="add">
+          <ui:msg description="Add Project label">Add Project</ui:msg>
+        </b:Button>
+      </b:ButtonGroup>
+      <b:ButtonGroup>
+        <b:DropdownButton text="Sort by" ui:field="sort" visible="false">
+          <b:NavLink ui:field="lastUpdateNav" icon="OK">
+            <ui:msg description="Last Update label">Last Update</ui:msg>
+          </b:NavLink>
+          <b:NavLink ui:field="nameNav" addStyleNames="no-icon">
+            <ui:msg description="Name label">Name</ui:msg>
+          </b:NavLink>
+        </b:DropdownButton>
+      </b:ButtonGroup>
+    </b:Form>
 
-    <o:NavPillsPanel>
-      <b:NavLink active="true">Active</b:NavLink>
-      <g:FlowPanel ui:field="activePanel" addStyleNames="items"/>
-      <b:NavLink>Archived</b:NavLink>
-      <g:FlowPanel ui:field="archivedPanel" addStyleNames="items"/>
-    </o:NavPillsPanel>
+    <g:FlowPanel ui:field="activePanel" addStyleNames="items"/>
+
 
   </g:FlowPanel>
 

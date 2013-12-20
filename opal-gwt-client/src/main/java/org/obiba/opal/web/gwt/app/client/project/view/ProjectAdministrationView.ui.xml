@@ -50,8 +50,7 @@
 
       <b:Alert type="WARNING" close="false" animation="true" ui:field="noDatabasePanel">
         <ui:msg description="No Project Database label">No database is defined for this project. No data can be
-          imported. Only
-          views can be added.
+          imported. Only views can be added.
         </ui:msg>
       </b:Alert>
       <g:FlowPanel ui:field="databasePanel">
@@ -96,13 +95,19 @@
       <b:Heading size="4">
         <ui:msg description="Danger Zone label">Danger zone</ui:msg>
       </b:Heading>
+      <!-- b:Paragraph>
+        <ui:msg description="Archive Project text">Archiving a project makes it inaccessible. This can be reverted.
+        </ui:msg>
+      </b:Paragraph>
       <b:Form>
-        <b:Paragraph>
-          <ui:msg description="Delete Project text">Deleting a project destroys all associated data and files. It can be a long running task and there is no
-            going back.</ui:msg>
-        </b:Paragraph>
-        <b:Button type="DANGER" ui:field="deleteProject">Delete Project</b:Button>
-      </b:Form>
+        <b:Button type="WARNING" ui:field="archiveProject">Archive Project</b:Button>
+      </b:Form-->
+      <b:Paragraph>
+        <ui:msg description="Delete Project text">Deleting a project destroys all associated data and files. It can be a
+          long running task and there is no going back.
+        </ui:msg>
+      </b:Paragraph>
+      <b:Button type="DANGER" ui:field="deleteProject">Delete Project</b:Button>
     </g:FlowPanel>
 
   </g:FlowPanel>

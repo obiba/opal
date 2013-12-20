@@ -23,6 +23,7 @@ import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectsUiHandlers;
 import org.obiba.opal.web.gwt.datetime.client.Moment;
 import org.obiba.opal.web.model.client.opal.ProjectDto;
 
+import com.github.gwtbootstrap.client.ui.DropdownButton;
 import com.github.gwtbootstrap.client.ui.Heading;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
@@ -55,7 +56,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
   Panel activePanel;
 
   @UiField
-  Panel archivedPanel;
+  DropdownButton sort;
 
   @UiField
   NavLink nameNav;
@@ -110,7 +111,6 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
 
   private void redraw() {
     activePanel.clear();
-    archivedPanel.clear();
     JsArray<ProjectDto> activeProjects = JsArrays.create();
     JsArray<ProjectDto> archivedProjects = JsArrays.create();
     for(ProjectDto project : JsArrays.toIterable(projects)) {
@@ -121,7 +121,7 @@ public class ProjectsView extends ViewWithUiHandlers<ProjectsUiHandlers> impleme
       }
     }
     sortBy.sort(getUiHandlers(), activePanel, activeProjects);
-    sortBy.sort(getUiHandlers(), archivedPanel, archivedProjects);
+    sort.setVisible(activeProjects.length()>0);
   }
 
   @SuppressWarnings("ParameterHidesMemberVariable")
