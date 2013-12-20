@@ -136,7 +136,7 @@ public class MongoDatabaseModalView extends ModalPopupViewWithUiHandlers<Databas
 
   @Override
   public void clearErrors() {
-    modal.clearAlert();
+    modal.closeAlerts();
   }
 
   @Override

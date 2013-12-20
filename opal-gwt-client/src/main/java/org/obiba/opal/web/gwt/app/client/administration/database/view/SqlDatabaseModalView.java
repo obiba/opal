@@ -210,7 +210,7 @@ public class SqlDatabaseModalView extends ModalPopupViewWithUiHandlers<DatabaseU
 
   @Override
   public void clearErrors() {
-    modal.clearAlert();
+    modal.closeAlerts();
   }
 
   @Override
