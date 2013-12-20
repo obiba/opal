@@ -133,7 +133,9 @@ public class ProjectView extends ViewWithUiHandlers<ProjectUiHandlers> implement
     JsArrayString tagsArray = JsArrays.toSafeArray(project.getTagsArray());
     if(tagsArray.length() > 0) {
       for(String tag : JsArrays.toIterable(tagsArray)) {
-        tagsPanel.add(new Label(tag));
+        Label tagLabel = new Label(tag);
+        tagLabel.addStyleName("small-indent");
+        tagsPanel.add(tagLabel);
       }
     }
   }

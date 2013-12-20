@@ -57,6 +57,16 @@
       </b:HelpBlock>
     </b:ControlGroup>
 
+    <b:ControlGroup>
+      <b:ControlLabel for="tags">
+        <ui:msg description="Tags label">Tags</ui:msg>
+      </b:ControlLabel>
+      <b:TextBox ui:field="tags" b:id="tags"/>
+      <b:HelpBlock>
+        <ui:msg description="Project Tags help">Optional space separated keywords.</ui:msg>
+      </b:HelpBlock>
+    </b:ControlGroup>
+
     <b:ModalFooter>
       <b:Button type="PRIMARY" ui:field="saveButton">
         <ui:msg description="Save button label">Save</ui:msg>

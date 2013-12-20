@@ -47,6 +47,9 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
   Label description;
 
   @UiField
+  Label tags;
+
+  @UiField
   IconAnchor editProperties;
 
   @UiField
@@ -93,6 +96,7 @@ public class ProjectAdministrationView extends ViewWithUiHandlers<ProjectAdminis
     name.setText(project.getName());
     title.setText(project.getTitle());
     description.setText(project.getDescription());
+    if(project.getTagsArray() != null) tags.setText(project.getTagsArray().join(" "));
     noDatabasePanel.setVisible(!project.hasDatabase());
     databasePanel.setVisible(project.hasDatabase());
     if(project.hasDatabase()) {

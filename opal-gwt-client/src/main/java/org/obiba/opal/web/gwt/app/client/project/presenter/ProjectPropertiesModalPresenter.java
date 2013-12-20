@@ -26,7 +26,10 @@ import org.obiba.opal.web.model.client.opal.ProjectDto;
 import org.obiba.opal.web.model.client.opal.ProjectFactoryDto;
 
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.HasText;
@@ -145,6 +148,14 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
     String title = getView().getTitle().getText();
     dto.setTitle(Strings.isNullOrEmpty(title) ? dto.getName() : title);
     dto.setDescription(getView().getDescription().getText());
+    String tags = getView().getTags().getText();
+    if (!Strings.isNullOrEmpty(tags)) {
+      JsArrayString arr = JavaScriptObject.createArray().cast();
+      dto.setTagsArray(arr);
+      for (String t : tags.split(" ")) {
+        arr.push(t);
+      }
+    }
     dto.setDatabase(getView().getDatabase().getText());
     dto.setArchived(project.getArchived());
     return dto;
@@ -187,6 +198,15 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
     dto.setTitle(Strings.isNullOrEmpty(title) ? dto.getName() : title);
     dto.setDescription(getView().getDescription().getText());
     dto.setDatabase(getView().getDatabase().getText());
+    String tags = getView().getTags().getText();
+    if (!Strings.isNullOrEmpty(tags)) {
+      JsArrayString arr = JavaScriptObject.createArray().cast();
+      dto.setTagsArray(arr);
+      for (String t : tags.split(" ")) {
+        arr.push(t);
+      }
+    }
+
     return dto;
   }
 
@@ -244,6 +264,8 @@ public class ProjectPropertiesModalPresenter extends ModalPresenterWidget<Projec
     HasText getTitle();
 
     HasText getDescription();
+
+    HasText getTags();
 
     HasText getDatabase();
 

@@ -38,6 +38,12 @@
               </g:Label>
               <g:Label ui:field="description"/>
             </o:PropertyPanel>
+            <o:PropertyPanel>
+              <g:Label>
+                <ui:msg description="Tags label">Tags</ui:msg>
+              </g:Label>
+              <g:Label ui:field="tags"/>
+            </o:PropertyPanel>
           </o:PropertiesTable>
         </b:Column>
       </b:Row>

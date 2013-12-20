@@ -59,6 +59,9 @@ public class ProjectPropertiesModalView extends ModalPopupViewWithUiHandlers<Pro
   HasText description;
 
   @UiField
+  HasText tags;
+
+  @UiField
   Button saveButton;
 
   @UiField
@@ -86,6 +89,7 @@ public class ProjectPropertiesModalView extends ModalPopupViewWithUiHandlers<Pro
     name.setEnabled(false);
     title.setText(project.getTitle());
     description.setText(project.getDescription());
+    if(project.getTagsArray() != null) tags.setText(project.getTagsArray().join(" "));
     // database will be set when databases list will be available
     database.setEnabled(!DatasourceDtos.hasPersistedTables(project.getDatasource()));
   }
@@ -108,6 +112,11 @@ public class ProjectPropertiesModalView extends ModalPopupViewWithUiHandlers<Pro
   @Override
   public HasText getDescription() {
     return description;
+  }
+
+  @Override
+  public HasText getTags() {
+    return tags;
   }
 
   @Override
