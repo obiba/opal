@@ -14,9 +14,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.obiba.opal.web.gwt.app.client.administration.index.presenter.IndexPresenter;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.AddPrincipalHandler;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.magma.event.TableSelectionChangeEvent;
@@ -52,16 +49,10 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
 
   private TablePresenter presenter;
 
-  private Display usersAuthzDisplayMock;
-
-  private Display groupsAuthzDisplayMock;
-
   @Before
   public void setUp() {
     displayMock = createMock(TablePresenter.Display.class);
     eventBusMock = createMock(EventBus.class);
-    usersAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
-    groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     Provider<ResourcePermissionsPresenter> resourcePermissionsPresenterProvider = createMock(Provider.class);
     ModalProvider<IndexPresenter> mockIndexProvider = createMock(ModalProvider.class);
     ModalProvider<EntityModalPresenter> modalEntityModalPresenter = createMock(ModalProvider.class);
@@ -93,13 +84,9 @@ public class TablePresenterTest extends AbstractGwtTestSetup {
     expect(displayMock.addVariableSortHandler((ColumnSortEvent.Handler) EasyMock.anyObject()))
         .andReturn(handlerRegistrationMock).once();
 
-    usersAuthzDisplayMock.addPrincipalHandler((AddPrincipalHandler) EasyMock.anyObject());
-
-    groupsAuthzDisplayMock.addPrincipalHandler((AddPrincipalHandler) EasyMock.anyObject());
-
-    replay(displayMock, eventBusMock, usersAuthzDisplayMock, groupsAuthzDisplayMock);
+    replay(displayMock, eventBusMock);
     presenter.bind();
 
-    verify(displayMock, eventBusMock, usersAuthzDisplayMock, groupsAuthzDisplayMock);
+    verify(displayMock, eventBusMock);
   }
 }

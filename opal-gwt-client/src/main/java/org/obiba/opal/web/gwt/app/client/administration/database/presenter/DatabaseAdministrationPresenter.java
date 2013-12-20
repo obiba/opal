@@ -11,8 +11,6 @@ package org.obiba.opal.web.gwt.app.client.administration.database.presenter;
 
 import org.obiba.opal.web.gwt.app.client.administration.presenter.ItemAdministrationPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.NotificationEvent;
 import org.obiba.opal.web.gwt.app.client.place.Places;
 import org.obiba.opal.web.gwt.app.client.presenter.HasBreadcrumbs;
@@ -23,7 +21,6 @@ import org.obiba.opal.web.gwt.rest.client.ResponseCodeCallback;
 import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
-import org.obiba.opal.web.model.client.opal.AclAction;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.google.gwt.core.client.JsArray;
@@ -31,7 +28,6 @@ import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.Response;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
@@ -55,18 +51,15 @@ public class DatabaseAdministrationPresenter extends
 
   private final DataDatabasesPresenter dataDatabasesPresenter;
 
-  private final AuthorizationPresenter authorizationPresenter;
-
   private final BreadcrumbsBuilder breadcrumbsBuilder;
 
   @Inject
   public DatabaseAdministrationPresenter(Display display, EventBus eventBus, Proxy proxy,
       IdentifiersDatabasePresenter identifiersDatabasePresenter, DataDatabasesPresenter dataDatabasesPresenter,
-      Provider<AuthorizationPresenter> authorizationPresenter, BreadcrumbsBuilder breadcrumbsBuilder) {
+      BreadcrumbsBuilder breadcrumbsBuilder) {
     super(eventBus, display, proxy);
     this.identifiersDatabasePresenter = identifiersDatabasePresenter;
     this.dataDatabasesPresenter = dataDatabasesPresenter;
-    this.authorizationPresenter = authorizationPresenter.get();
     this.breadcrumbsBuilder = breadcrumbsBuilder;
   }
 
@@ -112,8 +105,6 @@ public class DatabaseAdministrationPresenter extends
     breadcrumbsBuilder.setBreadcrumbView(getView().getBreadcrumbs());
     setInSlot(Slot.IDENTIFIERS, identifiersDatabasePresenter);
     setInSlot(Slot.DATA, dataDatabasesPresenter);
-    authorizationPresenter
-        .setAclRequest("databases", new AclRequest(AclAction.DATABASES_ALL, UriBuilders.DATABASES.create().build()));
   }
 
   static void testConnection(EventBus eventBus, String database) {

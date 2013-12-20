@@ -13,10 +13,6 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.AddPrincipalHandler;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.Display;
 import org.obiba.opal.web.gwt.app.client.magma.event.VariableSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.SummaryTabPresenter;
 import org.obiba.opal.web.gwt.app.client.magma.presenter.VariablePresenter;
@@ -50,10 +46,6 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
 
   private VariablePresenter variablePresenter;
 
-  private Display usersAuthzDisplayMock;
-
-  private Display groupsAuthzDisplayMock;
-
   private VariableVcsCommitHistoryPresenter variableVcsCommitHistoryPresenterMock;
 
   @Before
@@ -61,9 +53,7 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
     displayMock = createMock(VariablePresenter.Display.class);
     summaryTabMock = createMock(SummaryTabPresenter.Display.class);
     eventBusMock = createMock(EventBus.class);
-    usersAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     variableVcsCommitHistoryPresenterMock = createMock(VariableVcsCommitHistoryPresenter.class);
-    groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     Provider<ResourcePermissionsPresenter> mockResourcePermissionProvider = createMock(Provider.class);
     ModalProvider<VariablesToViewPresenter> variablesToViewProvider = createMock(ModalProvider.class);
     ModalProvider<CategoriesEditorModalPresenter> categoriesEditorModalProvider = createMock(ModalProvider.class);
@@ -86,14 +76,10 @@ public class VariablePresenterTest extends AbstractGwtTestSetup {
 
     displayMock.setSummaryTabWidget(summaryTabMock);
 
-    usersAuthzDisplayMock.addPrincipalHandler((AddPrincipalHandler) EasyMock.anyObject());
-
-    groupsAuthzDisplayMock.addPrincipalHandler((AddPrincipalHandler) EasyMock.anyObject());
-
-    replay(displayMock, eventBusMock, usersAuthzDisplayMock, groupsAuthzDisplayMock);
+    replay(displayMock, eventBusMock);
     variablePresenter.bind();
 
-    verify(displayMock, eventBusMock, usersAuthzDisplayMock, groupsAuthzDisplayMock);
+    verify(displayMock, eventBusMock);
   }
 
 }

@@ -13,8 +13,6 @@ import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseC
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseDeletedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.database.event.DatabaseUpdatedEvent;
 import org.obiba.opal.web.gwt.app.client.administration.presenter.RequestAdministrationPermissionEvent;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AclRequest;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationRequiredEvent;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalProvider;
@@ -28,7 +26,6 @@ import org.obiba.opal.web.gwt.rest.client.UriBuilders;
 import org.obiba.opal.web.gwt.rest.client.authorization.CompositeAuthorizer;
 import org.obiba.opal.web.gwt.rest.client.authorization.HasAuthorization;
 import org.obiba.opal.web.model.client.database.DatabaseDto;
-import org.obiba.opal.web.model.client.opal.AclAction;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.http.client.Request;
@@ -37,7 +34,6 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PresenterWidget;
@@ -53,8 +49,6 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
 
   private final ModalProvider<MongoDatabaseModalPresenter> mongoDatabaseModalProvider;
 
-  private final AuthorizationPresenter authorizationPresenter;
-
   private final ResourceDataProvider<DatabaseDto> resourceDatabasesProvider = new ResourceDataProvider<DatabaseDto>(
       UriBuilders.DATABASES_WITH_SETTINGS.create().build());
 
@@ -63,12 +57,10 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
   @Inject
   public DataDatabasesPresenter(Display display, EventBus eventBus,
       ModalProvider<SqlDatabaseModalPresenter> sqlDatabaseModalProvider,
-      ModalProvider<MongoDatabaseModalPresenter> mongoDatabaseModalProvider,
-      Provider<AuthorizationPresenter> authorizationPresenter) {
+      ModalProvider<MongoDatabaseModalPresenter> mongoDatabaseModalProvider) {
     super(eventBus, display);
     this.sqlDatabaseModalProvider = sqlDatabaseModalProvider.setContainer(this);
     this.mongoDatabaseModalProvider = mongoDatabaseModalProvider.setContainer(this);
-    this.authorizationPresenter = authorizationPresenter.get();
     getView().setUiHandlers(this);
   }
 
@@ -149,9 +141,6 @@ public class DataDatabasesPresenter extends PresenterWidget<DataDatabasesPresent
       }
 
     });
-
-    authorizationPresenter
-        .setAclRequest("databases", new AclRequest(AclAction.DATABASES_ALL, UriBuilders.DATABASES.create().build()));
   }
 
   private void refresh() {

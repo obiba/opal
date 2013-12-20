@@ -13,8 +13,6 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter.AddPrincipalHandler;
 import org.obiba.opal.web.gwt.app.client.event.ConfirmationEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceSelectionChangeEvent;
 import org.obiba.opal.web.gwt.app.client.magma.event.DatasourceUpdatedEvent;
@@ -45,18 +43,12 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
 
   private DatasourcePresenter datasourcePresenter;
 
-  private SubjectAuthorizationPresenter.Display usersAuthzDisplayMock;
-
-  private SubjectAuthorizationPresenter.Display groupsAuthzDisplayMock;
-
   @SuppressWarnings("unchecked")
   @Before
   public void setUp() {
     displayMock = createMock(DatasourcePresenter.Display.class);
     eventBusMock = createMock(EventBus.class);
     Provider<ResourcePermissionsPresenter> mockPermissionsProvider = createMock(Provider.class);
-    usersAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
-    groupsAuthzDisplayMock = createMock(SubjectAuthorizationPresenter.Display.class);
     ModalProvider<TablePropertiesModalPresenter> propertiesEditorModalProvider = createMock(ModalProvider.class);
     ModalProvider<AddViewModalPresenter> createViewModalProvider = createMock(ModalProvider.class);
 
@@ -79,13 +71,9 @@ public class DatasourcePresenterTest extends AbstractGwtTestSetup {
     expect(eventBusMock.addHandler((Type<DatasourceUpdatedEvent.Handler>) EasyMock.anyObject(),
         (DatasourceUpdatedEvent.Handler) EasyMock.anyObject())).andReturn(handlerRegistrationMock).once();
 
-    usersAuthzDisplayMock.addPrincipalHandler((AddPrincipalHandler) EasyMock.anyObject());
-
-    groupsAuthzDisplayMock.addPrincipalHandler((AddPrincipalHandler) EasyMock.anyObject());
-
-    replay(displayMock, eventBusMock, usersAuthzDisplayMock, groupsAuthzDisplayMock);
+    replay(displayMock, eventBusMock);
     datasourcePresenter.bind();
 
-    verify(displayMock, eventBusMock, usersAuthzDisplayMock, groupsAuthzDisplayMock);
+    verify(displayMock, eventBusMock);
   }
 }

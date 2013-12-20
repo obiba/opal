@@ -9,10 +9,6 @@
  ******************************************************************************/
 package org.obiba.opal.web.gwt.app.client.inject;
 
-import org.obiba.opal.web.gwt.app.client.authz.presenter.AuthorizationPresenter;
-import org.obiba.opal.web.gwt.app.client.authz.presenter.SubjectAuthorizationPresenter;
-import org.obiba.opal.web.gwt.app.client.authz.view.AuthorizationView;
-import org.obiba.opal.web.gwt.app.client.authz.view.SubjectAuthorizationView;
 import org.obiba.opal.web.gwt.app.client.presenter.PostInstallPresenter;
 import org.obiba.opal.web.gwt.app.client.presenter.LoginPresenter;
 import org.obiba.opal.web.gwt.app.client.view.PostInstallView;
@@ -34,10 +30,8 @@ public class AuthorizationModule extends AbstractPresenterModule {
     bind(ResourceAuthorizationCache.class).in(Singleton.class);
 
     bindPresenter(LoginPresenter.class, LoginPresenter.Display.class, LoginView.class, LoginPresenter.Proxy.class);
-    bindPresenter(PostInstallPresenter.class, PostInstallPresenter.Display.class, PostInstallView.class, PostInstallPresenter.Proxy.class);
-    bindPresenterWidget(AuthorizationPresenter.class, AuthorizationPresenter.Display.class, AuthorizationView.class);
-    bindPresenterWidget(SubjectAuthorizationPresenter.class, SubjectAuthorizationPresenter.Display.class,
-        SubjectAuthorizationView.class);
+    bindPresenter(PostInstallPresenter.class, PostInstallPresenter.Display.class, PostInstallView.class,
+        PostInstallPresenter.Proxy.class);
   }
 
 }
