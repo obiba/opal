@@ -6,7 +6,7 @@
     ui:generateKeys="com.google.gwt.i18n.server.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
 
-  <o:Modal ui:field="dialog" resizable="true" closeVisible="true" keyboard="true" animation="false">
+  <o:Modal ui:field="dialog" resizable="false" closeVisible="true" keyboard="true" animation="false">
     <g:FlowPanel ui:field="panel">
     </g:FlowPanel>
     <b:ModalFooter>

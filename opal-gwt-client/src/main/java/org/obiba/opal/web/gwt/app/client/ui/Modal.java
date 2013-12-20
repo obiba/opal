@@ -26,6 +26,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.dom.client.Element;
 
 /**
  * A Bootstrap Modal, resizable and draggable.
@@ -146,6 +147,14 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
   public void setMinHeight(int height) {
     if(height < 0) return;
     minHeight = height;
+  }
+
+  public void setPadding(int padding) {
+    setBoddyPadding(getBodyWidget().getElement(), padding);
+  }
+
+  public int getBodyHeight() {
+    return getBodyWidget().getOffsetHeight();
   }
 
   @Override
@@ -522,5 +531,10 @@ public class Modal extends com.github.gwtbootstrap.client.ui.Modal {
       }
     }
   }
+
+  private native void setBoddyPadding(Element e, int padding) /*-{
+      $wnd.jQuery(e).css("padding", padding + "px");
+  }-*/;
+
 
 }

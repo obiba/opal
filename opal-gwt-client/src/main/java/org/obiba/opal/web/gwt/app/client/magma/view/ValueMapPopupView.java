@@ -35,9 +35,9 @@ import com.google.web.bindery.event.shared.EventBus;
 public class ValueMapPopupView extends ModalPopupViewWithUiHandlers<ModalUiHandlers>
     implements ValueMapPopupPresenter.Display {
 
-  private static final int MINIMUM_WIDTH = 400;
+  private static final int MINIMUM_WIDTH = 500;
 
-  private static final int MINIMUM_HEIGHT = 400;
+  private static final int MINIMUM_HEIGHT = 500;
 
   interface ValueMapPopupViewUiBinder extends UiBinder<Widget, ValueMapPopupView> {}
 
@@ -57,6 +57,7 @@ public class ValueMapPopupView extends ModalPopupViewWithUiHandlers<ModalUiHandl
     widget = uiBinder.createAndBindUi(this);
     dialog.setMinWidth(MINIMUM_WIDTH);
     dialog.setMinHeight(MINIMUM_HEIGHT);
+    dialog.setPadding(0);
   }
 
   @Override
@@ -83,7 +84,7 @@ public class ValueMapPopupView extends ModalPopupViewWithUiHandlers<ModalUiHandl
     }
     if(map != null) {
       // TODO needs more refining and also a resize handler on the dialog
-      map.setHeight(String.valueOf(MINIMUM_WIDTH) + "px");
+      map.setHeight(String.valueOf(dialog.getBodyHeight()) + "px");
       map.setWidth("100%");
       panel.add(map);
     }
