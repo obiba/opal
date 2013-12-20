@@ -29,22 +29,24 @@
 
     <b:TabPanel tabPosition="above" ui:field="tabPanel">
       <b:Tab heading="Dictionary" active="true">
-        <b:Heading size="4" addStyleNames="inline-block">
+        <b:Heading size="4">
           <ui:msg description="Properties label">Tables</ui:msg>
         </b:Heading>
-        <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right small-top-margin small-indent"/>
-        <b:DropdownButton text="Add Table" type="INFO" icon="PLUS" ui:field="addBtn"
-            addStyleNames="pull-right small-top-margin">
-          <b:NavLink icon="TABLE" ui:field="addTable">
-            <ui:msg description="Add Table label">Add table...</ui:msg>
-          </b:NavLink>
-          <b:NavLink icon="TABLE" ui:field="addUpdateTables">
-            <ui:msg description="Add Update Tables label">Add/update tables from dictionary...</ui:msg>
-          </b:NavLink>
-          <b:NavLink icon="COG" ui:field="addView">
-            <ui:msg description="Add view label">Add view...</ui:msg>
-          </b:NavLink>
-        </b:DropdownButton>
+        <g:FlowPanel addStyleNames="bottom-margin">
+          <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right small-top-margin small-indent"/>
+          <b:DropdownButton text="Add Table" type="INFO" icon="PLUS" ui:field="addBtn"
+              addStyleNames="small-top-margin">
+            <b:NavLink icon="TABLE" ui:field="addTable">
+              <ui:msg description="Add Table label">Add table...</ui:msg>
+            </b:NavLink>
+            <b:NavLink icon="TABLE" ui:field="addUpdateTables">
+              <ui:msg description="Add Update Tables label">Add/update tables from dictionary...</ui:msg>
+            </b:NavLink>
+            <b:NavLink icon="COG" ui:field="addView">
+              <ui:msg description="Add view label">Add view...</ui:msg>
+            </b:NavLink>
+          </b:DropdownButton>
+        </g:FlowPanel>
 
         <b:Alert ui:field="selectAllItemsAlert" close="false" visible="false"
             addStyleNames="select">

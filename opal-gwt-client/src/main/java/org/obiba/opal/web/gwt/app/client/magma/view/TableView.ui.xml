@@ -72,17 +72,18 @@
           </b:Column>
         </b:Row>
 
-        <g:FlowPanel>
-          <b:Heading size="4" addStyleNames="inline-block">
-            <ui:msg description="Variables label">Variables</ui:msg>
-          </b:Heading>
-          <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right small-top-margin"/>
-          <b:Controls addStyleNames="pull-right small-top-margin small-right-indent">
+        <b:Heading size="4">
+          <ui:msg description="Variables label">Variables</ui:msg>
+        </b:Heading>
+
+        <g:FlowPanel addStyleNames="bottom-margin">
+          <b:SimplePager ui:field="pager" location="RIGHT" addStyleNames="pull-right small-top-margin small-indent"/>
+          <b:Controls addStyleNames="pull-right small-top-margin">
             <b:InputAddOn prependIcon="FILTER">
               <o:TextBoxClearable ui:field="filter" addStyleNames="inline-block"/>
             </b:InputAddOn>
           </b:Controls>
-          <b:ButtonGroup addStyleNames="pull-right">
+          <b:ButtonGroup>
             <b:Button type="INFO" icon="PLUS" ui:field="addVariable"
                 addStyleNames="small-right-indent small-top-margin">
               <ui:msg description="Add Variable label">Add Variable</ui:msg>

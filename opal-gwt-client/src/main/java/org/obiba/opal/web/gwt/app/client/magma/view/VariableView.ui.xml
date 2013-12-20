@@ -134,10 +134,10 @@
         <o:Table ui:field="categoryTable"/>
 
         <g:FlowPanel>
-          <b:Heading size="4" addStyleNames="inline-block">
+          <b:Heading size="4">
             <ui:msg description="Attributes label">Attributes</ui:msg>
           </b:Heading>
-          <b:Button type="INFO" icon="PLUS" ui:field="addAttribute" addStyleNames="pull-right small-top-margin">
+          <b:Button type="INFO" icon="PLUS" ui:field="addAttribute">
             <ui:msg description="Add Attribute label">Add Attribute</ui:msg>
           </b:Button>
         </g:FlowPanel>
