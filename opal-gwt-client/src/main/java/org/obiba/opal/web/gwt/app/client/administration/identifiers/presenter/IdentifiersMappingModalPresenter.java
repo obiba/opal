@@ -162,11 +162,11 @@ public class IdentifiersMappingModalPresenter extends ModalPresenterWidget<Ident
     return variableDto;
   }
 
-  private void updateInfoFromView(VariableDto v) {
-    v.setName(getView().getName());
+  private void updateInfoFromView(VariableDto variableDto) {
+    variableDto.setName(getView().getName());
     if(variable.getAttributesArray() == null) {
       JsArray<AttributeDto> attributes = JsArrays.create().cast();
-      v.setAttributesArray(attributes);
+      variableDto.setAttributesArray(attributes);
     }
     AttributeDto labelAttr = null;
     for(AttributeDto attr : JsArrays.toIterable(variable.getAttributesArray())) {
@@ -178,7 +178,7 @@ public class IdentifiersMappingModalPresenter extends ModalPresenterWidget<Ident
     if(labelAttr == null) {
       labelAttr = AttributeDto.create();
       labelAttr.setName("description");
-      v.getAttributesArray().push(labelAttr);
+      variableDto.getAttributesArray().push(labelAttr);
     }
     labelAttr.setValue(getView().getDescription());
   }
