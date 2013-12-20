@@ -207,7 +207,7 @@ public class IdentifiersTableView extends ViewWithUiHandlers<IdentifiersTableUiH
         return object.getName();
       }
     }, translations.nameLabel());
-    variablesTable.addColumn(new VariableAttributeColumn("label"), translations.labelLabel());
+    variablesTable.addColumn(new VariableAttributeColumn("description"), translations.descriptionLabel());
     variablesTable.addColumn(new VariableActionsColumn(), translations.actionsLabel());
     variablesTable.addStyleName("pull-left");
     variablesPager.setDisplay(variablesTable);

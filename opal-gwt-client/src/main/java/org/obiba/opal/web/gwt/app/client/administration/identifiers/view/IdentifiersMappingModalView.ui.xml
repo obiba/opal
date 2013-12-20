@@ -22,13 +22,13 @@
         </b:HelpBlock>
       </b:ControlGroup>
 
-      <!--Label-->
+      <!--Description-->
       <b:ControlGroup>
         <b:ControlLabel>
-          <ui:msg description="Label label">Label</ui:msg>
+          <ui:msg description="Description label">Description</ui:msg>
         </b:ControlLabel>
         <b:Controls>
-          <b:TextBox ui:field="label"/>
+          <b:TextBox ui:field="description"/>
         </b:Controls>
         <b:HelpBlock>
           <ui:msg description="Identifiers Mapping Label help">Short description of the mapping.</ui:msg>

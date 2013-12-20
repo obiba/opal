@@ -14,16 +14,13 @@ import javax.annotation.Nullable;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersMappingModalPresenter;
 import org.obiba.opal.web.gwt.app.client.administration.identifiers.presenter.IdentifiersMappingModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
-import org.obiba.opal.web.gwt.app.client.magma.variable.presenter.VariablePropertiesModalUiHandlers;
 import org.obiba.opal.web.gwt.app.client.support.AttributeHelper;
-import org.obiba.opal.web.gwt.app.client.ui.Chooser;
 import org.obiba.opal.web.gwt.app.client.ui.Modal;
 import org.obiba.opal.web.gwt.app.client.ui.ModalPopupViewWithUiHandlers;
 import org.obiba.opal.web.model.client.magma.VariableDto;
 import org.obiba.opal.web.model.client.ws.ClientErrorDto;
 
 import com.github.gwtbootstrap.client.ui.Button;
-import com.github.gwtbootstrap.client.ui.CheckBox;
 import com.github.gwtbootstrap.client.ui.ControlGroup;
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.github.gwtbootstrap.client.ui.constants.AlertType;
@@ -55,7 +52,7 @@ public class IdentifiersMappingModalView extends ModalPopupViewWithUiHandlers<Id
   TextBox variableName;
 
   @UiField
-  TextBox label;
+  TextBox description;
 
   @UiField
   Button closeButton;
@@ -86,7 +83,7 @@ public class IdentifiersMappingModalView extends ModalPopupViewWithUiHandlers<Id
   public void renderProperties(VariableDto variable, boolean modifyName) {
     if(variable != null) {
       variableName.setText(variable.getName());
-      label.setText(AttributeHelper.getAttributeValue(variable.getAttributesArray(), "label"));
+      description.setText(AttributeHelper.getAttributeValue(variable.getAttributesArray(), "description"));
     } else {
       dialog.setTitle(translations.addIdentifiersMapping());
     }
@@ -122,7 +119,7 @@ public class IdentifiersMappingModalView extends ModalPopupViewWithUiHandlers<Id
   }
 
   @Override
-  public String getLabel() {
-    return variableName.getText();
+  public String getDescription() {
+    return description.getText();
   }
 }

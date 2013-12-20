@@ -18,7 +18,6 @@ import org.obiba.opal.web.gwt.app.client.administration.identifiers.event.Identi
 import org.obiba.opal.web.gwt.app.client.i18n.Translations;
 import org.obiba.opal.web.gwt.app.client.js.JsArrays;
 import org.obiba.opal.web.gwt.app.client.presenter.ModalPresenterWidget;
-import org.obiba.opal.web.gwt.app.client.project.presenter.ProjectPlacesHelper;
 import org.obiba.opal.web.gwt.app.client.validator.FieldValidator;
 import org.obiba.opal.web.gwt.app.client.validator.RequiredTextValidator;
 import org.obiba.opal.web.gwt.app.client.validator.ValidationHandler;
@@ -39,7 +38,6 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.PopupView;
-import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
 /**
  *
@@ -137,58 +135,59 @@ public class IdentifiersMappingModalPresenter extends ModalPresenterWidget<Ident
   }
 
   private VariableDto getVariableDto() {
-    VariableDto v = VariableDto.create();
-    v.setIsNewVariable(variable == null);
-    v.setEntityType(tableDto.getEntityType());
-    v.setIsRepeatable(false);
-    v.setValueType("text");
+    VariableDto variableDto = VariableDto.create();
+    variableDto.setIsNewVariable(variable == null);
+    variableDto.setEntityType(tableDto.getEntityType());
+    variableDto.setIsRepeatable(false);
+    variableDto.setValueType("text");
     if(variable != null) {
-      v.setLink(variable.getLink());
-      v.setIndex(variable.getIndex());
+      variableDto.setLink(variable.getLink());
+      variableDto.setIndex(variable.getIndex());
 
-      v.setParentLink(variable.getParentLink());
-      v.setName(variable.getName());
-      v.setValueType(variable.getValueType());
+      variableDto.setParentLink(variable.getParentLink());
+      variableDto.setName(variable.getName());
+      variableDto.setValueType(variable.getValueType());
 
       if(variable.getAttributesArray() != null && variable.getAttributesArray().length() > 0) {
-        v.setAttributesArray(variable.getAttributesArray());
+        variableDto.setAttributesArray(variable.getAttributesArray());
       }
 
       if(variable.getCategoriesArray() != null && variable.getCategoriesArray().length() > 0) {
-        v.setCategoriesArray(variable.getCategoriesArray());
+        variableDto.setCategoriesArray(variable.getCategoriesArray());
       }
     }
 
     // Update info from view
-    updateInfoFromView(v);
-    return v;
+    updateInfoFromView(variableDto);
+    return variableDto;
   }
 
-  private void updateInfoFromView(VariableDto v) {
-    v.setName(getView().getName());
-//    if(variable.getAttributesArray() == null) {
-//      variable.setAttributesArray((JsArray<AttributeDto>) JsArrays.create());
-//    }
-//    AttributeDto labelAttr = null;
-//    for (AttributeDto attr : JsArrays.toIterable(variable.getAttributesArray())) {
-//      if (attr.getName().equals("label")) {
-//        labelAttr = attr;
-//        break;
-//      }
-//    }
-//    if (labelAttr == null) {
-//      labelAttr = AttributeDto.create();
-//      labelAttr.setName("label");
-//      variable.getAttributesArray().push(labelAttr);
-//    }
-//    labelAttr.setValue(getView().getLabel());
+  private void updateInfoFromView(VariableDto variableDto) {
+    variableDto.setName(getView().getName());
+    if(variable.getAttributesArray() == null) {
+      JsArray<AttributeDto> attributes = JsArrays.create().cast();
+      variableDto.setAttributesArray(attributes);
+    }
+    AttributeDto labelAttr = null;
+    for(AttributeDto attr : JsArrays.toIterable(variable.getAttributesArray())) {
+      if(attr.getName().equals("description")) {
+        labelAttr = attr;
+        break;
+      }
+    }
+    if(labelAttr == null) {
+      labelAttr = AttributeDto.create();
+      labelAttr.setName("description");
+      variableDto.getAttributesArray().push(labelAttr);
+    }
+    labelAttr.setValue(getView().getDescription());
   }
 
   public interface Display extends PopupView, HasUiHandlers<IdentifiersMappingModalUiHandlers> {
 
     String getName();
 
-    String getLabel();
+    String getDescription();
 
     enum FormField {
       NAME
