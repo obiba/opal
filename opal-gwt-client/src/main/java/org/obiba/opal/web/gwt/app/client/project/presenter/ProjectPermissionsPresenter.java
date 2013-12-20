@@ -271,14 +271,15 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
 
     @Override
     public String format(Acl acl) {
-      return getName(ResourcePermissionType.getTypeByPermission(acl.getActions(0)), acl.getResource().split("/"));
+      return getName(ResourcePermissionType.getTypeByPermission(acl.getActions(0)),
+          new AclResourceTokenizer(acl.getResource()));
     }
 
-    private String getName(ResourcePermissionType type, String... parts) {
+    private String getName(ResourcePermissionType type, AclResourceTokenizer tokenizer) {
       String name = null;
       switch(type) {
         case PROJECT:
-          name = parts[2];
+          name = tokenizer.getToken(AclResourceTokenizer.ResourceTokens.PROJECT);
           break;
 
         case DATASOURCE:
@@ -286,15 +287,16 @@ public class ProjectPermissionsPresenter extends PresenterWidget<ProjectPermissi
           break;
 
         case TABLE:
-          name = parts[4];
+          name = tokenizer.getToken(AclResourceTokenizer.ResourceTokens.TABLE);
           break;
 
         case VARIABLE:
-          name = parts[4] + ":" + parts[6];
+          name = tokenizer.getToken(AclResourceTokenizer.ResourceTokens.TABLE) + ":" + tokenizer
+            .getToken(AclResourceTokenizer.ResourceTokens.VARIABLE);
           break;
 
         case REPORT_TEMPLATE:
-          name = parts[2];
+          name = tokenizer.getToken(AclResourceTokenizer.ResourceTokens.REPORTTEMPLATE);
           break;
       }
 
